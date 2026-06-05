@@ -118,8 +118,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void onTabSelected(TabLayout.Tab tab) {
                 int pos = tab.getPosition();
 
+                logger.log("tabselected : "+pos);
+
                 //Refresh View
-                mMainAdapter.getBaseView(pos).refreshView();
+                mMainAdapter.refreshPagerView(pos);
             }
 
             @Override
@@ -129,8 +131,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void onTabReselected(TabLayout.Tab tab) {
                 int pos = tab.getPosition();
 
+                logger.log("tab-reselected : "+pos);
+
                 //Refresh View
-                mMainAdapter.getBaseView(pos).refreshView();
+                mMainAdapter.refreshPagerView(pos);
             }
         });
 
@@ -405,13 +409,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void MinimaNewBlock() {
         //New BLOCK - update HOME page..
-        mMainAdapter.getHomeView().refreshView();
+        mMainAdapter.refreshHomeView();
     }
 
     @Override
-    public void MinimaLoadKeys(int zKeys, boolean zFinished) {
-
-    }
+    public void MinimaLoadKeys(int zKeys, boolean zFinished) {}
 
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {

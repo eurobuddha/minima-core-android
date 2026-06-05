@@ -12,6 +12,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.main.MainAdapter;
 import org.minimarex.minimacore.utils.MinimaCMD;
 import org.minimarex.minimacore.utils.MinimaCMDListener;
 import org.minimarex.minimacore.main.BaseView;
@@ -24,7 +25,6 @@ public class ReceiveView extends BaseView {
 
     Button mChangeButton;
 
-    boolean mChangeInit = false;
     public ReceiveView(Activity zActivity){
         super(zActivity, R.layout.view_wallet_receive);
 
@@ -40,6 +40,7 @@ public class ReceiveView extends BaseView {
             }
         });
 
+        refreshView();
     }
 
     public void changeAddress(){
@@ -71,7 +72,8 @@ public class ReceiveView extends BaseView {
                     Bitmap bitmap = barcodeEncoder.encodeBitmap(zAddress, BarcodeFormat.QR_CODE, 400, 400);
                     mQRCodeAddress.setImageBitmap(bitmap);
 
-                    mChangeInit = true;
+                    //Store this..
+                    MainAdapter.RECEIVE_ADDRESS = zAddress;
 
                 } catch(Exception e) {
 
@@ -96,8 +98,10 @@ public class ReceiveView extends BaseView {
             return;
         }
 
-        if(!mChangeInit){
+        if(MainAdapter.RECEIVE_ADDRESS == null){
             changeAddress();
+        }else{
+            updateAddress(MainAdapter.RECEIVE_ADDRESS);
         }
     }
 }

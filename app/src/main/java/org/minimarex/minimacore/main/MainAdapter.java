@@ -9,64 +9,62 @@ import org.minimarex.minimacore.main.views.balance.BalanceView;
 import org.minimarex.minimacore.main.views.home.HomeView;
 import org.minimarex.minimacore.main.views.receive.ReceiveView;
 import org.minimarex.minimacore.main.views.send.SendView;
-import org.minimarex.minimacore.main.views.terminal.TerminalView;
+import org.minimarex.minimacore.utils.logger;
 
 public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
 
     MainActivity mActivity;
 
-    HomeView mHomeView;
-    BalanceView mBalanceView;
-
-    SendView mSendView;
-
-    ReceiveView mReceiveView;
-    TerminalView mTerminalView;
-
     BaseView[] mAllViews;
+
+    public static String RECEIVE_ADDRESS = null;
 
     public MainAdapter(MainActivity zContext){
         mActivity = zContext;
 
-        mHomeView       = new HomeView(zContext);
-        mBalanceView    = new BalanceView(zContext);
-        mSendView       = new SendView(zContext);
-        mReceiveView    = new ReceiveView(zContext);
-        mTerminalView   = new TerminalView(zContext);
+        //Clear receive address
+        RECEIVE_ADDRESS = null;
 
+        //Store of all current valid views..
         mAllViews = new BaseView[4];
-        mAllViews[0] = mHomeView;
-        mAllViews[1] = mBalanceView;
-        mAllViews[2] = mSendView;
-        mAllViews[3] = mReceiveView;
-//        mAllViews[4] = mTerminalView;
     }
 
-    public BaseView getBaseView(int zPos){
-        return mAllViews[zPos];
+    public void refreshPagerView(int zPosition){
+        if(mAllViews[zPosition] != null){
+            mAllViews[zPosition].refreshView();
+        }
     }
 
-    public HomeView getHomeView(){
-        return mHomeView;
-    }
-
-    public BalanceView getBalanceView(){
-        return mBalanceView;
+    public void refreshHomeView(){
+        if(mAllViews[0] != null){
+            mAllViews[0].refreshView();
+        }
     }
 
     @Override
     public int getCount() {
-        return mAllViews.length;
+        return 4;
     }
 
     @Override
     public Object instantiateItem(final ViewGroup container, int position) {
 
-        //Get the View
-        BaseView baseview = mAllViews[position];
+        BaseView baseview = null;
 
-        //Add and remove
-        container.removeView(baseview.getMainView());
+        if(position == 0){
+            baseview    = new HomeView(mActivity);
+        }else if(position == 1){
+            baseview = new BalanceView(mActivity);
+        }else if(position == 2){
+            baseview = new SendView(mActivity);
+        }else if(position == 3){
+            baseview = new ReceiveView(mActivity);
+        }
+
+        //Store this..
+        mAllViews[position] = baseview;
+
+        //Add to our view..
         container.addView(baseview.getMainView());
 
         return baseview.getMainView();
@@ -79,12 +77,18 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
+        //No store..
+        mAllViews[position] = null;
+
+        //Remove from container
         container.removeView((View)object);
     }
 
     public void refreshAllViews(){
         for(int i=0;i<mAllViews.length;i++){
-            mAllViews[i].refreshView();
+            if(mAllViews[i] != null){
+                mAllViews[i].refreshView();
+            }
         }
     }
 }

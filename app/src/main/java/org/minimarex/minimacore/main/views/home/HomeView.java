@@ -43,6 +43,8 @@ public class HomeView extends BaseView {
         mConnections  = getMainView().findViewById(R.id.home_connections);
         mPeers      = getMainView().findViewById(R.id.home_peers);
         mVersion    = getMainView().findViewById(R.id.home_app_version);
+
+        refreshView();
     }
 
     @Override

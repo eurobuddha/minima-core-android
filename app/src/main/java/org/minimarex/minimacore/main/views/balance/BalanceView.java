@@ -24,6 +24,8 @@ public class BalanceView extends BaseView {
 
         mBalanceList = getMainView().findViewById(R.id.wallet_balance_list);
         mBalanceList.setAdapter(mBalanceAdapter);
+
+        refreshView();
     }
 
     @Override
@@ -31,7 +33,6 @@ public class BalanceView extends BaseView {
 
         //Have we started
         if(!MinimaCMD.checkMinimaStarted()){
-            logger.log("HOME VIEW Minima NOT Started..");
             return;
         }
 

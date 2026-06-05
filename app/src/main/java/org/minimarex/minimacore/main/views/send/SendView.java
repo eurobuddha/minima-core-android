@@ -70,6 +70,8 @@ public class SendView extends BaseView {
                 showConfirmDialog(amount, address, tokenname, tokenid);
             }
         });
+
+        refreshView();
     }
 
     private void showConfirmDialog(String zAmount, String zAddress, String zTokenName, String zTokenid ){
@@ -144,7 +146,6 @@ public class SendView extends BaseView {
             public void run() {
                 mTokenAdapter.updateTokens(zBalance);
                 mTokens.invalidate();
-
             }
         });
     }

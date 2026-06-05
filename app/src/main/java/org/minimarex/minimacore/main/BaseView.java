@@ -27,7 +27,5 @@ public class BaseView {
         return mMainView;
     }
 
-    public void refreshView(){
-        logger.log("BASE VIEW REFRESH..!");
-    }
+    public void refreshView(){}
 }

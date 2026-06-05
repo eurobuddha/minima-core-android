@@ -13,25 +13,14 @@
         android:layout_width="wrap_content"
         android:layout_height="20dp"/>
 
-    <ImageView
-          android:id="@+id/wallet_receive_qrcode"
-          android:layout_width="280dp"
-          android:layout_height="300dp"/>
-
-      <TextView
+    <TextView
           android:id="@+id/wallet_receive_address"
-          android:layout_width="250dp"
+          android:layout_width="280dp"
           android:layout_height="wrap_content"
           android:textIsSelectable="true"
           android:gravity="center"
           android:paddingTop="20dp"
           android:paddingBottom="20dp"
-          android:text=""/>
-
-      <Button
-          android:id="@+id/wallet_receive_changeaddress"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="Change Address"/>
+          android:text="Connecting to Minima..\n\nPlease wait.."/>
 
 </LinearLayout>
