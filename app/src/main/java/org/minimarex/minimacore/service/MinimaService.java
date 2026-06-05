@@ -38,8 +38,10 @@ import org.minimarex.minimacore.main.MainActivity;
 import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.utils.logger;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 /** Foreground Service for the Minima Node
@@ -49,6 +51,8 @@ import java.util.StringTokenizer;
  * 23 April 2020
  * */
 public class MinimaService extends Service {
+
+    public static SimpleDateFormat DATEFORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
 
     public static boolean mHaveStartedShutdown = false;
 
@@ -369,7 +373,7 @@ public class MinimaService extends Service {
 
             String block    = header.getString("block");
             long timemilli  = Long.valueOf(header.getString("timemilli"));
-            String date     = MinimaLogger.DATEFORMAT.format(new Date(timemilli));
+            String date     = DATEFORMAT.format(new Date(timemilli));
 
             //String date     = (String) header.get("date");
 

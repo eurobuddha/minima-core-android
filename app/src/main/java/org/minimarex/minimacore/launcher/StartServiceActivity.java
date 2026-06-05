@@ -84,7 +84,11 @@ public class StartServiceActivity extends AppCompatActivity implements ServiceCo
 
                 //Now add some default peers.. from spartacusrex.com
                 //MinimaCMD.runMinima("peers action:addpeers peerslist:"+ Peers.getDefaultPeers(StartServiceActivity.this));
+
                 MinimaCMD.runMinima("peers action:addpeers peerslist:"+ Peers.DEFAULT_MINIMAPEERS);
+
+                //Internal
+                //MinimaCMD.runMinima("peers action:addpeers peerslist:10.0.2.2:12001");
 
                 //Now hide the Progress Dialog
                 if(mProgress.isShowing()){

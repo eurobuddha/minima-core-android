@@ -14,8 +14,10 @@ import org.minimarex.minimacore.utils.MinimaCMDListener;
 import org.minimarex.minimacore.utils.logger;
 import org.minimarex.minimacore.main.BaseView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 import java.util.StringTokenizer;
 
@@ -28,6 +30,8 @@ public class HomeView extends BaseView {
     TextView mBlockTime;
     TextView mConnections;
     TextView mPeers;
+
+    private SimpleDateFormat DATEFORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
 
     public HomeView(Activity zActivity){
         super(zActivity, R.layout.view_home);
@@ -122,8 +126,10 @@ public class HomeView extends BaseView {
 
         long timemilli  = txp.getTimeMilli().getAsLong();
         Date dd         = new Date(timemilli);
-        String datestr  = MinimaLogger.DATEFORMAT.format(new Date(timemilli));
+        String datestr  = DATEFORMAT.format(new Date(timemilli));
         mBlockTime.setText(datestr);
+
+        //logger.log("HOME TIME : "+datestr);
 
         try {
             String vcode  = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
