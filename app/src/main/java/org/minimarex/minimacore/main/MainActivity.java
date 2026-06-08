@@ -116,12 +116,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                int pos = tab.getPosition();
-
-                logger.log("tabselected : "+pos);
-
                 //Refresh View
-                mMainAdapter.refreshPagerView(pos);
+                mMainAdapter.refreshPagerView(tab.getPosition());
             }
 
             @Override
@@ -129,12 +125,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                int pos = tab.getPosition();
-
-                logger.log("tab-reselected : "+pos);
-
                 //Refresh View
-                mMainAdapter.refreshPagerView(pos);
+                mMainAdapter.refreshPagerView(tab.getPosition());
             }
         });
 

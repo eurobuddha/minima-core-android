@@ -32,12 +32,14 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
     public void refreshPagerView(int zPosition){
         if(mAllViews[zPosition] != null){
             mAllViews[zPosition].refreshView();
+            mAllViews[zPosition].getMainView().invalidate();
         }
     }
 
     public void refreshHomeView(){
         if(mAllViews[0] != null){
             mAllViews[0].refreshView();
+            mAllViews[0].getMainView().invalidate();
         }
     }
 
