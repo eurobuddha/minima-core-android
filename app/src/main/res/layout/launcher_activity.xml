@@ -37,7 +37,7 @@
         android:paddingTop="50dp"
         android:paddingBottom="50dp"
         android:textSize="20dp"
-        android:text="Welcom to Minima\n\nPlease choose login method.."/>
+        android:text="Welcome to Minima\n\nPlease choose login method.."/>
 
     <Button
         android:id="@+id/launcher_button_newwallet"

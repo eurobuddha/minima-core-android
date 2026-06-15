@@ -1,6 +1,9 @@
 package org.minimarex.minimacore.main.views.home;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.minima.database.MinimaDB;
@@ -43,6 +46,19 @@ public class HomeView extends BaseView {
         mConnections  = getMainView().findViewById(R.id.home_connections);
         mPeers      = getMainView().findViewById(R.id.home_peers);
         mVersion    = getMainView().findViewById(R.id.home_app_version);
+
+        Button tester = getMainView().findViewById(R.id.button_tester);
+        tester.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logger.log("Test Button pressed!");
+
+                Intent intent = new Intent("com.example.snippets.ACTION_UPDATE_DATA");
+                intent.putExtra("com.example.snippets.DATA", "SOME DATA!");
+                intent.setPackage("org.minimarex.minimacore");
+                zActivity.sendBroadcast(intent);
+            }
+        });
 
         refreshView();
     }

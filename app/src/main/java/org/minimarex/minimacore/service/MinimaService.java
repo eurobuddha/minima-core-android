@@ -31,11 +31,15 @@ import org.minima.system.network.webhooks.NotifyManager;
 import org.minima.system.params.ParamConfigurer;
 import org.minima.utils.MinimaLogger;
 import org.minima.utils.MinimaUncaughtException;
+import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
 import org.minima.utils.messages.Message;
 import org.minima.utils.messages.MessageListener;
 import org.minimarex.minimacore.main.MainActivity;
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.receiver.MinimaMessages;
+import org.minimarex.minimacore.receiver.MinimaReceiver;
+import org.minimarex.minimacore.receiver.ReceiverDB;
 import org.minimarex.minimacore.utils.logger;
 
 import java.text.SimpleDateFormat;
@@ -93,6 +97,9 @@ public class MinimaService extends Service {
 
     //So we start with a seed
     String mSeed = null;
+
+    //Receiver listening for Broadcast Messages
+    private MinimaReceiver mMinimaReceiver;
 
     @Override
     public void onCreate() {
@@ -201,16 +208,16 @@ public class MinimaService extends Service {
                         }
 
                     }else if(event.equals("LOAD_ALL_KEYS_START")){
-                        MinimaLogger.log("SERVICE received "+event, false);
+                        //MinimaLogger.log("SERVICE received "+event, false);
 
                     }else if(event.equals("LOAD_ALL_KEYS_FINISH")){
-                        MinimaLogger.log("SERVICE received "+event, false);
+                        //MinimaLogger.log("SERVICE received "+event, false);
 
                         if(mServiceListener != null) {
                             mServiceListener.MinimaLoadKeys((int) data.get("keys"), true);
                         }
                     }else if(event.equals("LOAD_ALL_KEYS_VALUE")){
-                        MinimaLogger.log("SERVICE received "+event+" "+data.toString(), false);
+                        //MinimaLogger.log("SERVICE received "+event+" "+data.toString(), false);
 
                         if(mServiceListener != null) {
                             mServiceListener.MinimaLoadKeys((int)data.get("keys"), false);
@@ -242,7 +249,8 @@ public class MinimaService extends Service {
         vars.add("-allowallip");
 
         //TESTER HACK
-        //vars.add("-test");
+        //vars.add("-clean");
+        vars.add("-solo");
 
         vars.add("-nosyncibd");
 
@@ -291,10 +299,23 @@ public class MinimaService extends Service {
 
         //Listen to Battery Events
         addBatteryListener();
+
+        //And the broadcast receiver
+        mMinimaReceiver = new MinimaReceiver(minima, this);
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(MinimaMessages.MINIMA_API_REGISTER);
+        filter.addAction(MinimaMessages.MINIMA_API_CMD);
+
+        registerReceiver(mMinimaReceiver, filter, Context.RECEIVER_EXPORTED);
     }
 
     public Minima getMinima(){
         return minima;
+    }
+
+    public ReceiverDB getReceiverDatabase(){
+        return mMinimaReceiver.getDatabase();
     }
 
     public void setTopBlock(){
@@ -415,6 +436,14 @@ public class MinimaService extends Service {
         }catch(Exception exc){
             MinimaLogger.log(exc);
         }
+
+        //Unregister receiver
+        try{
+            unregisterReceiver(mMinimaReceiver);
+        }catch(Exception exc){}
+
+        //Close the database
+        mMinimaReceiver.onDestroy();
 
         //Not listening anymore..
         Main.setMinimaListener(null);

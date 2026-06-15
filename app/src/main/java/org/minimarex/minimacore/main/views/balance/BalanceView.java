@@ -20,7 +20,7 @@ public class BalanceView extends BaseView {
     public BalanceView(Activity zActivity){
         super(zActivity, R.layout.view_wallet_balance);
 
-        mBalanceAdapter = new BalanceAdapter(zActivity,"1");
+        mBalanceAdapter = new BalanceAdapter(zActivity);
 
         mBalanceList = getMainView().findViewById(R.id.wallet_balance_list);
         mBalanceList.setAdapter(mBalanceAdapter);

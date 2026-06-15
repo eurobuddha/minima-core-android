@@ -15,14 +15,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import org.minima.utils.json.JSONArray;
+import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.launcher.newwallet.NewWalletActivity;
 import org.minimarex.minimacore.launcher.restore.RestoreWalletSyncActivity;
+import org.minimarex.minimacore.receiver.ReceiverDB;
 import org.minimarex.minimacore.utils.logger;
 
 public class LauncherActivity extends AppCompatActivity {
 
     public static LauncherActivity LAUNCHER_ACTIVITY;
+
+    ReceiverDB mDatabase;
 
     public boolean isNightMode() {
         int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
@@ -75,8 +80,35 @@ public class LauncherActivity extends AppCompatActivity {
             }
         });
 
+
+        /*//Create the database
+        mDatabase = new ReceiverDB(this);
+        mDatabase.wipeDB();
+
+        mDatabase.insertApp("pname","pid", "minid");
+        mDatabase.insertApp("pname2","pid2", "minid2");
+
+        JSONArray res = mDatabase.selectAllApps();
+        logger.log("Database : "+res.toString());
+
+        JSONObject app = mDatabase.selectApp("pname","pid", "minid");
+        logger.log("APP : "+app.toString());
+
+        //Check..
+        //boolean added = mDatabase.alreadyAdded("pname2", "pid2", "minid2s");
+        //logger.log("Already pname : "+added);
+
+        mDatabase.close();
+        */
+
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+//        mDatabase.close();
+    }
 
 
 }

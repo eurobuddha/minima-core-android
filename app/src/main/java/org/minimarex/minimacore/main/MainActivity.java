@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     public static MainActivity MAIN_ACTIVITY;
 
-    MinimaService mMinima = null;
+    MinimaService mMinimaService = null;
 
     ViewPager mMainPager;
 
@@ -98,20 +98,20 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         tabs.setupWithViewPager(mMainPager);
 
         //Set up Tabs
-        tabs.getTabAt(0).setText("Home");
-        tabs.getTabAt(0).setIcon(R.drawable.ic_minima);
+        //tabs.getTabAt(0).setText("Home");
+        //tabs.getTabAt(0).setIcon(R.drawable.ic_minima);
 
-        tabs.getTabAt(1).setText("Balance");
-        tabs.getTabAt(1).setIcon(R.drawable.ic_network);
+        tabs.getTabAt(0).setText("Balance");
+        tabs.getTabAt(0).setIcon(R.drawable.ic_network);
 
-        tabs.getTabAt(2).setText("Send");
-        tabs.getTabAt(2).setIcon(R.drawable.ic_transfer);
+        tabs.getTabAt(1).setText("Send");
+        tabs.getTabAt(1).setIcon(R.drawable.ic_transfer);
 
-        tabs.getTabAt(3).setText("Receive");
-        tabs.getTabAt(3).setIcon(R.drawable.ic_freedom);
+        tabs.getTabAt(2).setText("Receive");
+        tabs.getTabAt(2).setIcon(R.drawable.ic_freedom);
 
-        //tabs.getTabAt(4).setText("Terminal");
-        //tabs.getTabAt(4).setIcon(R.drawable.ic_dapps);
+        tabs.getTabAt(3).setText("Apps");
+        tabs.getTabAt(3).setIcon(R.drawable.ic_dapps);
 
         tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -195,8 +195,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         super.onDestroy();
 
         //Unbind from the service..
-        if(mMinima != null) {
-            mMinima = null;
+        if(mMinimaService != null) {
+            mMinimaService = null;
             unbindService(this);
         }
     }
@@ -318,8 +318,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         }
 
         //Cancel the alarm
-        if(mMinima != null){
-            mMinima.cancelAlarm();
+        if(mMinimaService != null){
+            mMinimaService.cancelAlarm();
         }
 
         //Show a shutdown spinning dialog
@@ -339,8 +339,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         });
 
         //Unbind from service
-        if(mMinima!=null) {
-            mMinima = null;
+        if(mMinimaService !=null) {
+            mMinimaService = null;
             try{
                 unbindService(this);
             }catch(Exception exc){
@@ -409,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void MinimaNewBlock() {
         //New BLOCK - update HOME page..
-        mMainAdapter.refreshHomeView();
+        //mMainAdapter.refreshHomeView();
     }
 
     @Override
@@ -418,10 +418,13 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
         MinimaService.MyBinder binder = (MinimaService.MyBinder)iBinder;
-        mMinima = binder.getService();
+        mMinimaService = binder.getService();
 
         //Tell the service Who we are..
-        mMinima.mServiceListener = this;
+        mMinimaService.mServiceListener = this;
+
+        //Get the Database
+        mMainAdapter.getAppsView().setDatabase(mMinimaService.getReceiverDatabase());
 
         //Now refresh the views..
         mMainAdapter.refreshAllViews();
@@ -429,6 +432,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     @Override
     public void onServiceDisconnected(ComponentName componentName) {
-        mMinima = null;
+        mMinimaService = null;
     }
 }

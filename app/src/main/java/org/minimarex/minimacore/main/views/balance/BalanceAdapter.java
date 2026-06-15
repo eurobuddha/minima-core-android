@@ -15,15 +15,11 @@ import org.minimarex.minimacore.utils.logger;
 
 public class BalanceAdapter extends BaseAdapter {
 
-    Context mContext;
-
-    String[] mText;
-
     private static LayoutInflater inflater = null;
 
     JSONArray mCurrentBalance = new JSONArray();
 
-    public BalanceAdapter(Context zContext, String id){
+    public BalanceAdapter(Context zContext){
         super();
 
         inflater = (LayoutInflater) zContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
