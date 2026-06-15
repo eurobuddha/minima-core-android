@@ -70,13 +70,17 @@ public class MinimaReceiver extends BroadcastReceiver {
                 return;
             }
 
-            String cmd = zIntent.getStringExtra(MinimaMessages.MINIMA_API_CMD_ACTION);
-            //logger.log("Run Command : " + cmd);
+            //Is it enabled..!
+            if((int)app.get("penabled")!=1){
+                logger.log("Package NOT enabled : " + frompackage);
+                sendResponse(zContext, frompackage, responseid, minimauid, getErrorMessage("Package NOT enabled in Minima-Core!"));
+                return;
+            }
 
-            String result = mMinima.runMinimaCMD(cmd, false);
+            String cmd      = zIntent.getStringExtra(MinimaMessages.MINIMA_API_CMD_ACTION);
+            String result   = mMinima.runMinimaCMD(cmd, false);
 
             //Send it back..
-            //logger.log("Run Result : " + result);
             sendResponse(zContext, frompackage, responseid, minimauid, result);
         }
     }
@@ -105,6 +109,13 @@ public class MinimaReceiver extends BroadcastReceiver {
     private String getRegisterMessage(String zMessage){
         JSONObject ret = new JSONObject();
         ret.put("status",true);
+        ret.put("response",zMessage);
+        return ret.toString();
+    }
+
+    private String getErrorMessage(String zMessage){
+        JSONObject ret = new JSONObject();
+        ret.put("status",false);
         ret.put("response",zMessage);
         return ret.toString();
     }

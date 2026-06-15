@@ -44,7 +44,6 @@ public class AppsAdapter extends BaseAdapter {
 
     public void updateValues(){
         mCurrentValues = mDatabase.selectAllApps();
-
         notifyDataSetChanged();
     }
 

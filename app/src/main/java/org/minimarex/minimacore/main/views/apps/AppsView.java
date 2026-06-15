@@ -55,7 +55,8 @@ public class AppsView extends BaseView {
         LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService(mActivity.LAYOUT_INFLATER_SERVICE);
         View dialogview = inflater.inflate(R.layout.dialog_apps_info, null);
 
-        final String packageclass = (String)zApp.get("package");
+        final String packageclass   = (String)zApp.get("package");
+        final String packageid      = (String)zApp.get("packageid");
         TextView packagec   = dialogview.findViewById(R.id.app_info_package);
         packagec.setText(packageclass);
 
@@ -70,7 +71,7 @@ public class AppsView extends BaseView {
         cb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAppsAdapter.getDatabase().setEnabled((String)zApp.get("package"), cb.isChecked());
+                mAppsAdapter.getDatabase().setEnabled(packageclass, packageid, cb.isChecked());
             }
         });
 
@@ -98,7 +99,14 @@ public class AppsView extends BaseView {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int whichButton) {
                         AppsView.this.refreshView();
-                    }}).show();
+                    }})
+                .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mAppsAdapter.getDatabase().delete(packageclass, packageid);
+                        AppsView.this.refreshView();
+                    }
+                }).show();
 
     }
 
@@ -108,6 +116,12 @@ public class AppsView extends BaseView {
 
     @Override
     public void refreshView() {
-        mAppsAdapter.updateValues();
+        mAppsList.post(new Runnable() {
+            @Override
+            public void run() {
+                mAppsAdapter.updateValues();
+                mAppsList.invalidate();
+            }
+        });
     }
 }

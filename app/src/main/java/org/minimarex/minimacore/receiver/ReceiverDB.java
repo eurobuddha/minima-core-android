@@ -66,17 +66,18 @@ public class ReceiverDB extends SQLiteOpenHelper {
 
         JSONArray results = new JSONArray();
 
-        String[] cols = new String[] {"package", "packageid", "minimaid", "penabled"};
+        String[] cols = new String[] {"_id","package", "packageid", "minimaid", "penabled"};
         Cursor mCursor = db.query(false, "applications", cols,null, null, null, null, null, null);
         if (mCursor != null) {
 
             try {
                 while (mCursor.moveToNext()) {
                     JSONObject app = new JSONObject();
-                    app.put("package", mCursor.getString(0));
-                    app.put("packageid", mCursor.getString(1));
-                    app.put("minimaid", mCursor.getString(2));
-                    app.put("penabled", mCursor.getInt(3));
+                    app.put("_id", mCursor.getString(0));
+                    app.put("package", mCursor.getString(1));
+                    app.put("packageid", mCursor.getString(2));
+                    app.put("minimaid", mCursor.getString(3));
+                    app.put("penabled", mCursor.getInt(4));
 
                     results.add(app);
                 }
@@ -91,7 +92,7 @@ public class ReceiverDB extends SQLiteOpenHelper {
     public JSONObject selectApp(String zPackageName, String zpackageID, String zMinimaID){
         SQLiteDatabase db = getWritableDatabase();
 
-        String[] cols = new String[] {"package", "packageid", "minimaid", "penabled"};
+        String[] cols = new String[] {"_id","package", "packageid", "minimaid", "penabled"};
         String[] args = new String[] {zPackageName, zpackageID, zMinimaID};
         Cursor mCursor = db.query(true, "applications", cols,"package=? AND packageid=? AND minimaid=?",
                 args, null, null, null, null);
@@ -99,10 +100,11 @@ public class ReceiverDB extends SQLiteOpenHelper {
             try {
                 while (mCursor.moveToNext()) {
                     JSONObject app = new JSONObject();
-                    app.put("package", mCursor.getString(0));
-                    app.put("packageid", mCursor.getString(1));
-                    app.put("minimaid", mCursor.getString(2));
-                    app.put("penabled", mCursor.getInt(3));
+                    app.put("_id", mCursor.getString(0));
+                    app.put("package", mCursor.getString(1));
+                    app.put("packageid", mCursor.getString(2));
+                    app.put("minimaid", mCursor.getString(3));
+                    app.put("penabled", mCursor.getInt(4));
 
                     return app;
                 }
@@ -118,7 +120,11 @@ public class ReceiverDB extends SQLiteOpenHelper {
         return selectApp(zPackageName,zPackageID,zMinimaID) != null;
     }
 
-    public void setEnabled(String zPackageName, boolean zEnabled){
+    public void deletePackage(){
+
+    }
+
+    public void setEnabled(String zPackageName, String zPackageID, boolean zEnabled){
         ContentValues cv = new ContentValues();
         if(zEnabled){
             cv.put("penabled",1);
@@ -127,6 +133,11 @@ public class ReceiverDB extends SQLiteOpenHelper {
         }
 
         SQLiteDatabase db = getWritableDatabase();
-        db.update("applications", cv, "package=?", new String[]{zPackageName});
+        db.update("applications", cv, "package=? AND packageid=?", new String[]{zPackageName, zPackageID});
+    }
+
+    public void delete(String zPackageName, String zPackageID){
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete("applications", "package=? AND packageid=?", new String[]{zPackageName, zPackageID});
     }
 }
