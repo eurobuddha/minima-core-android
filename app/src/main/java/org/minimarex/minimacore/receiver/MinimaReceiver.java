@@ -106,6 +106,24 @@ public class MinimaReceiver extends BroadcastReceiver {
         zContext.sendBroadcast(intent);
     }
 
+    public void sendNotify(Context zContext, String zPackage, String zMinimaID, String zNotifyMessage){
+
+        //Create the Response intent
+        Intent intent = new Intent(MinimaMessages.MINIMA_API_NOTIFY);
+
+        //The MinimaID they expect
+        intent.putExtra(MinimaMessages.MINIMA_API_REGISTER_MINIMAID, zMinimaID);
+
+        //The Notify Data
+        intent.putExtra(MinimaMessages.MINIMA_API_NOTIFY_DATA, zNotifyMessage);
+
+        //Set to send ONLY back to original sender
+        intent.setPackage(zPackage);
+
+        //And broadcast
+        zContext.sendBroadcast(intent);
+    }
+
     private String getRegisterMessage(String zMessage){
         JSONObject ret = new JSONObject();
         ret.put("status",true);

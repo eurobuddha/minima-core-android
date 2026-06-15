@@ -171,7 +171,13 @@ public class MinimaService extends Service {
                     JSONObject data = (JSONObject) notify.get("data");
 
                     if(!event.equals("MINIMALOG")){
-                        //MinimaLogger.log("SERVICE received "+event, false);
+                        MinimaLogger.log("SERVICE received event:"+event+" data:"+data.toString(), false);
+
+                        JSONObject broadmessage = new JSONObject();
+                        broadmessage.put("event",event);
+                        broadmessage.put("data",data);
+
+                        sendBroadcastNotify(broadmessage.toString());
                     }
 
                     if(event.equals("NEWBLOCK")) {
@@ -316,6 +322,25 @@ public class MinimaService extends Service {
 
     public ReceiverDB getReceiverDatabase(){
         return mMinimaReceiver.getDatabase();
+    }
+
+    public void sendBroadcastNotify(String zMessage){
+        JSONArray apps = mMinimaReceiver.getDatabase().selectAllApps();
+
+        int tot=apps.size();
+        for(int i=0;i<tot;i++){
+
+            //Get the App
+            JSONObject app = (JSONObject) apps.get(i);
+
+            if((int)app.get("penabled") == 1){
+                //Get the package
+                String packageclass = app.getString("package");
+                String minimaid     = app.getString("minimaid");
+
+                mMinimaReceiver.sendNotify(this, packageclass, minimaid, zMessage);
+            }
+        }
     }
 
     public void setTopBlock(){

@@ -27,5 +27,6 @@ public class MinimaMessages {
     public static final String MINIMA_API_RESPONSE_RESULT       = MINIMA_BASE_CLASS +".RESPONSE_RESULT";
 
     //Send a global Broadcast Message
-    //public static final String MINIMA_API_RESPONSE              = MINIMA_BASE_CLASS +".RESPONSE";
+    public static final String MINIMA_API_NOTIFY                = MINIMA_BASE_CLASS +".NOTIFY";
+    public static final String MINIMA_API_NOTIFY_DATA           = MINIMA_BASE_CLASS +".NOTIFY_DATA";
 }
