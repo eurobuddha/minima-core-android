@@ -15,8 +15,11 @@ import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.receiver.ReceiverDB;
+import org.minimarex.minimacore.service.MinimaService;
 import org.minimarex.minimacore.utils.TokenUtils;
 import org.minimarex.minimacore.utils.logger;
+
+import java.util.Date;
 
 public class AppsAdapter extends BaseAdapter {
 
@@ -73,6 +76,7 @@ public class AppsAdapter extends BaseAdapter {
         TextView appname      = row.findViewById(R.id.apps_name);
         TextView apppackage  = row.findViewById(R.id.apps_package);
         TextView appenabled   = row.findViewById(R.id.apps_enabled);
+        TextView applastused   = row.findViewById(R.id.apps_lastused);
 
         //Get the app..
         JSONObject app = (JSONObject) mCurrentValues.get(position);
@@ -106,6 +110,11 @@ public class AppsAdapter extends BaseAdapter {
         }else{
             appenabled.setText("Enabled"+admin);
         }
+
+        //The date
+        long timemilli  = (long)app.get("lastused");
+        String date     = MinimaService.DATEFORMAT.format(new Date(timemilli));
+        applastused.setText(date);
 
         return row;
     }
