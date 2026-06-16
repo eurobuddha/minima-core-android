@@ -45,10 +45,11 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
         return (AppsView) mAllViews[3];
     }
 
-    /*public void refreshHomeView(){
+    //Refresh the Balance..
+    public void refreshHomeView(){
         mAllViews[0].refreshView();
         mAllViews[0].getMainView().invalidate();
-    }*/
+    }
 
     @Override
     public int getCount() {

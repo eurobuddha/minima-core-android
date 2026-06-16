@@ -33,6 +33,17 @@ public class BalanceView extends BaseView {
 
         //Have we started
         if(!MinimaCMD.checkMinimaStarted()){
+
+            JSONArray tempbal = new JSONArray();
+            JSONObject bal = new JSONObject();
+            bal.put("tokenid","0x00");
+            bal.put("token","Awaiting Connection..");
+            bal.put("confirmed","0");
+            bal.put("unconfirmed","0");
+            tempbal.add(bal);
+
+            refreshBalance(tempbal);
+
             return;
         }
 

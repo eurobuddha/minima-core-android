@@ -409,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void MinimaNewBlock() {
         //New BLOCK - update HOME page..
-        //mMainAdapter.refreshHomeView();
+        mMainAdapter.refreshHomeView();
     }
 
     @Override
