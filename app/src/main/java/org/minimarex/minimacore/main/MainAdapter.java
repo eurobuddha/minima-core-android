@@ -37,8 +37,6 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
     }
 
     public void refreshPagerView(int zPosition){
-        logger.log("refreshPagerView "+zPosition);
-
         mAllViews[zPosition].refreshView();
         mAllViews[zPosition].getMainView().invalidate();
     }

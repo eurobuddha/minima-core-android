@@ -8,35 +8,44 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
-import org.minimarex.minimacore.utils.logger;
 
 public class ReceiverDB extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "receive.db";
 
+    //The Handle to the DB
+    SQLiteDatabase mDB;
+
+    //All the Columns
+    String[] ALL_COLUMNS = new String[] {"_id","package", "packageid", "minimaid", "penabled", "admin", "lastused"};
+
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table if not exists applications ( " +
+    private static final String DATABASE_CREATE_APPLICATIONS = "create table if not exists applications ( " +
             "_id integer primary key," +
             "package text not null," +
             "packageid text not null," +
             "minimaid text not null," +
-            "penabled integer not null" +
+            "penabled integer not null," +
+            "admin integer not null," +
+            "lastused integer not null" +
             ");";
 
     public ReceiverDB(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+        //Get handle..
+        mDB = getWritableDatabase();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(DATABASE_CREATE);
+        db.execSQL(DATABASE_CREATE_APPLICATIONS);
     }
 
     public void wipeDB(){
-        SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DROP TABLE IF EXISTS applications");
-        onCreate(db);
+        mDB.execSQL("DROP TABLE IF EXISTS applications");
+        onCreate(mDB);
     }
 
     @Override
@@ -50,39 +59,44 @@ public class ReceiverDB extends SQLiteOpenHelper {
 
     public void insertApp(String zPackageName, String zPackageID, String zMinimaID){
 
-        SQLiteDatabase db = getWritableDatabase();
-
         ContentValues values = new ContentValues();
         values.put("package", zPackageName);
         values.put("packageid", zPackageID);
         values.put("minimaid", zMinimaID);
         values.put("penabled", 0);
+        values.put("admin", 0);
+        values.put("lastused", System.currentTimeMillis());
 
-        db.insert("applications", null, values);
+        mDB.insert("applications", null, values);
+    }
+
+    private JSONObject convertCursor(Cursor zCursor){
+        JSONObject app = new JSONObject();
+
+        app.put("_id", zCursor.getString(0));
+        app.put("package", zCursor.getString(1));
+        app.put("packageid", zCursor.getString(2));
+        app.put("minimaid", zCursor.getString(3));
+        app.put("penabled", zCursor.getInt(4));
+        app.put("admin", zCursor.getInt(5));
+        app.put("lastused", zCursor.getLong(6));
+
+        return app;
     }
 
     public JSONArray selectAllApps() {
-        SQLiteDatabase db = getWritableDatabase();
 
         JSONArray results = new JSONArray();
 
-        String[] cols = new String[] {"_id","package", "packageid", "minimaid", "penabled"};
-        Cursor mCursor = db.query(false, "applications", cols,null, null, null, null, null, null);
-        if (mCursor != null) {
+        Cursor cursor = mDB.query(false, "applications", ALL_COLUMNS,null, null, null, null, null, null);
+        if (cursor != null) {
 
             try {
-                while (mCursor.moveToNext()) {
-                    JSONObject app = new JSONObject();
-                    app.put("_id", mCursor.getString(0));
-                    app.put("package", mCursor.getString(1));
-                    app.put("packageid", mCursor.getString(2));
-                    app.put("minimaid", mCursor.getString(3));
-                    app.put("penabled", mCursor.getInt(4));
-
-                    results.add(app);
+                while (cursor.moveToNext()) {
+                    results.add(convertCursor(cursor));
                 }
             } finally {
-                mCursor.close();
+                cursor.close();
             }
         }
 
@@ -90,26 +104,17 @@ public class ReceiverDB extends SQLiteOpenHelper {
     }
 
     public JSONObject selectApp(String zPackageName, String zpackageID, String zMinimaID){
-        SQLiteDatabase db = getWritableDatabase();
 
-        String[] cols = new String[] {"_id","package", "packageid", "minimaid", "penabled"};
         String[] args = new String[] {zPackageName, zpackageID, zMinimaID};
-        Cursor mCursor = db.query(true, "applications", cols,"package=? AND packageid=? AND minimaid=?",
+        Cursor cursor = mDB.query(true, "applications", ALL_COLUMNS,"package=? AND packageid=? AND minimaid=?",
                 args, null, null, null, null);
-        if (mCursor != null) {
+        if (cursor != null) {
             try {
-                while (mCursor.moveToNext()) {
-                    JSONObject app = new JSONObject();
-                    app.put("_id", mCursor.getString(0));
-                    app.put("package", mCursor.getString(1));
-                    app.put("packageid", mCursor.getString(2));
-                    app.put("minimaid", mCursor.getString(3));
-                    app.put("penabled", mCursor.getInt(4));
-
-                    return app;
+                while (cursor.moveToNext()) {
+                    return convertCursor(cursor);
                 }
             } finally {
-                mCursor.close();
+                cursor.close();
             }
         }
 
@@ -120,10 +125,6 @@ public class ReceiverDB extends SQLiteOpenHelper {
         return selectApp(zPackageName,zPackageID,zMinimaID) != null;
     }
 
-    public void deletePackage(){
-
-    }
-
     public void setEnabled(String zPackageName, String zPackageID, boolean zEnabled){
         ContentValues cv = new ContentValues();
         if(zEnabled){
@@ -132,12 +133,28 @@ public class ReceiverDB extends SQLiteOpenHelper {
             cv.put("penabled",0);
         }
 
-        SQLiteDatabase db = getWritableDatabase();
-        db.update("applications", cv, "package=? AND packageid=?", new String[]{zPackageName, zPackageID});
+        mDB.update("applications", cv, "package=? AND packageid=?", new String[]{zPackageName, zPackageID});
+    }
+
+    public void setAdmin(String zPackageName, String zPackageID, boolean zAdmin){
+        ContentValues cv = new ContentValues();
+        if(zAdmin){
+            cv.put("admin",1);
+        }else{
+            cv.put("admin",0);
+        }
+
+        mDB.update("applications", cv, "package=? AND packageid=?", new String[]{zPackageName, zPackageID});
+    }
+
+    public void updateLastUsed(String zPackageName, String zPackageID){
+        ContentValues cv = new ContentValues();
+        cv.put("lastused",System.currentTimeMillis());
+
+        mDB.update("applications", cv, "package=? AND packageid=?", new String[]{zPackageName, zPackageID});
     }
 
     public void delete(String zPackageName, String zPackageID){
-        SQLiteDatabase db = getWritableDatabase();
-        db.delete("applications", "package=? AND packageid=?", new String[]{zPackageName, zPackageID});
+        mDB.delete("applications", "package=? AND packageid=?", new String[]{zPackageName, zPackageID});
     }
 }
