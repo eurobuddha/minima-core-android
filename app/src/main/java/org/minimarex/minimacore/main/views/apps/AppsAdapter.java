@@ -96,10 +96,15 @@ public class AppsAdapter extends BaseAdapter {
             logger.log("Package not found.. "+packageclass+" "+e);
         }
 
+        String admin = "";
+        if((int)app.get("admin")==1){
+            admin = " [ADMIN]";
+        }
+
         if((int)app.get("penabled")==0){
-            appenabled.setText("Disabled");
+            appenabled.setText("Disabled"+admin);
         }else{
-            appenabled.setText("Enabled");
+            appenabled.setText("Enabled"+admin);
         }
 
         return row;

@@ -77,8 +77,14 @@ public class MinimaReceiver extends BroadcastReceiver {
                 return;
             }
 
+            //Is it an ADMIN user
+            String Userid = "0xFF";
+            if((int)app.get("admin")==1){
+                Userid = "0x00";
+            }
+
             String cmd      = zIntent.getStringExtra(MinimaMessages.MINIMA_API_CMD_ACTION);
-            String result   = mMinima.runMinimaCMD(cmd, false);
+            String result   = mMinima.runMinimaCMD(cmd, false,Userid);
 
             //Send it back..
             sendResponse(zContext, frompackage, responseid, minimauid, result);

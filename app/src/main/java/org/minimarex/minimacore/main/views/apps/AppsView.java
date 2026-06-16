@@ -60,8 +60,8 @@ public class AppsView extends BaseView {
         TextView packagec   = dialogview.findViewById(R.id.app_info_package);
         packagec.setText(packageclass);
 
-        TextView name       = dialogview.findViewById(R.id.app_info_name);
-        name.setText("not found..");
+        //TextView name       = dialogview.findViewById(R.id.app_info_name);
+        //name.setText("not found..");
 
         final CheckBox cb = dialogview.findViewById(R.id.app_info_enabled);
         if((int)zApp.get("penabled") == 1){
@@ -75,27 +75,37 @@ public class AppsView extends BaseView {
             }
         });
 
-        //Get the ICON
+        final CheckBox admincb = dialogview.findViewById(R.id.app_info_admin);
+        if((int)zApp.get("admin") == 1){
+            admincb.setChecked(true);
+        }
 
+        admincb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAppsAdapter.getDatabase().setAdmin(packageclass, packageid, admincb.isChecked());
+            }
+        });
+
+        //Get the ICON
+        Drawable icon = null;
+        String   pname = "";
         try{
             PackageManager pkgmanager = mActivity.getPackageManager();
 
             ApplicationInfo appinfo = pkgmanager.getApplicationInfo(packageclass, 0);
 
-            String pname     = pkgmanager.getApplicationLabel(appinfo).toString();
-            name.setText(pname);
-
-            //Drawable icon   = pkgmanager.getApplicationIcon(appinfo);
-            //img.setImageDrawable(icon);
+            pname     = pkgmanager.getApplicationLabel(appinfo).toString();
+            icon = pkgmanager.getApplicationIcon(appinfo);
 
         }catch (PackageManager.NameNotFoundException e){
             logger.log("Package not found.. "+packageclass+" "+e);
         }
 
         new AlertDialog.Builder(getActivity())
-                .setTitle("Application Info")
+                .setTitle(pname)
                 .setView(dialogview)
-                .setIcon(R.drawable.ic_minima)
+                .setIcon(icon)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int whichButton) {
                         AppsView.this.refreshView();
