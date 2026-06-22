@@ -20,6 +20,7 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -36,6 +37,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
+import org.minima.database.MinimaDB;
+import org.minima.objects.TxPoW;
 import org.minima.system.params.GeneralParams;
 import org.minima.utils.MiniFile;
 import org.minima.utils.json.JSONObject;
@@ -48,6 +51,7 @@ import org.minimarex.minimacore.utils.MinimaCMDListener;
 import org.minimarex.minimacore.utils.logger;
 
 import java.io.File;
+import java.util.Date;
 
 
 public class MainActivity extends AppCompatActivity implements ServiceConnection, MinimaServiceListener {
@@ -63,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     ProgressDialog mShutdownDialog = null;
 
     boolean WIPE_ON_SHUTDOWN = false;
+
+    TextView mFooter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         tb.getOverflowIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
 
         setSupportActionBar(tb);
+
+        mFooter = findViewById(R.id.main_footer);
 
         mMainAdapter = new MainAdapter(this);
 
@@ -410,6 +418,44 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     public void MinimaNewBlock() {
         //New BLOCK - update HOME page..
         mMainAdapter.refreshHomeView();
+
+        //Set the Footer
+        setFooterText();
+    }
+
+    public void setFooterText(){
+
+        //Have we started
+        if(!MinimaCMD.checkMinimaStarted()){
+            return;
+        }
+
+        //Run some Minima Commands..
+        MinimaCMD.runMinima("keys", new MinimaCMDListener() {
+            @Override
+            public void cmdResult(JSONObject zResult) {
+                mFooter.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            JSONObject resp = (JSONObject) zResult.get("response");
+                            int maxuses     = (int) resp.get("maxuses");
+
+                            //Get tip
+                            TxPoW txp = MinimaDB.getDB().getTxPoWTree().getTip().getTxPoW();
+
+                            int block = txp.getBlockNumber().getAsInt();
+
+                            long timemilli  = txp.getTimeMilli().getAsLong();
+                            Date dd         = new Date(timemilli);
+                            String datestr  = MinimaService.DATEFORMAT.format(new Date(timemilli));
+
+                            mFooter.setText("Key Uses:"+maxuses+" Block:"+block+" @ "+datestr);
+                        }catch(Exception exc){}
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -428,6 +474,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         //Now refresh the views..
         mMainAdapter.refreshAllViews();
+
+        //Set the footer Text
+        setFooterText();
     }
 
     @Override
