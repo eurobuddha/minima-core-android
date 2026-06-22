@@ -38,6 +38,16 @@ The main API is accessed via
 
 The application shows up in Minima-Core and must be enabled by the User
 
+You MUST call onDestroy from the MinimaAPI to shutdown cleanly
+```
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mMinimaAPI.onDestroy();
+    }
+```
+
 You can receive push notifications of Minima events by creating a BroadcastReceiver in your app and listening for
 ```
 org.minimarex.minimacore.NOTIFY

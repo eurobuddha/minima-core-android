@@ -6,6 +6,8 @@ import android.content.Intent;
 
 import org.minima.Minima;
 import org.minima.utils.json.JSONObject;
+import org.minimarex.minimaapi.MinimaAPI;
+import org.minimarex.minimaapi.MinimaAPILogger;
 import org.minimarex.minimaapi.MinimaAPIMessages;
 import org.minimarex.minimacore.utils.logger;
 
@@ -25,6 +27,8 @@ public class MinimaReceiver extends BroadcastReceiver {
 
         mDatabase = new ReceiverDB(zContext);
         //mDatabase.wipeDB();
+
+        MinimaAPILogger.log("MAIN - Started logging:"+MinimaAPI.LOGGING_ENABLED);
     }
 
     public ReceiverDB getDatabase(){
@@ -39,13 +43,16 @@ public class MinimaReceiver extends BroadcastReceiver {
     public void onReceive(Context zContext, Intent zIntent) {
 
         String action = zIntent.getAction();
-        //logger.log("RECEIVED action : " + action);
 
         //Get the Extra data - that is ALWAYS Sent
         String frompackage      = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_PACKAGE_CLASS);
         String frompackageuid   = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_APP_UID);
         String minimauid        = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID);
         String responseid       = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID);
+
+        if(MinimaAPI.LOGGING_ENABLED){
+            MinimaAPILogger.log("MAIN - RECEIVED BROADCAST respID:"+responseid+" frompackage:"+frompackage+" action:"+action);
+        }
 
         //Get the App
         JSONObject app = mDatabase.selectApp(frompackage, frompackageuid, minimauid);
@@ -108,6 +115,10 @@ public class MinimaReceiver extends BroadcastReceiver {
     }
 
     public void sendResponse(Context zContext, String zPackage, String zResponseID, String zMinimaID, String zResponse){
+
+        if(MinimaAPI.LOGGING_ENABLED){
+            MinimaAPILogger.log("MAIN - SEND BROADCAST respID:"+zResponseID+" resp:"+zResponse);
+        }
 
         //Create the Response intent
         Intent intent = new Intent(MinimaAPIMessages.MINIMA_API_RESPONSE);

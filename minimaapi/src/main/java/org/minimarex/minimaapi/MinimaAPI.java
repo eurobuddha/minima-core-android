@@ -13,6 +13,8 @@ import java.util.Random;
 
 public class MinimaAPI {
 
+    public static boolean LOGGING_ENABLED = false;
+
     /**
      * Minima Receiver will need to check The MinimaID
      *
@@ -120,6 +122,10 @@ public class MinimaAPI {
         //Find the Listener..
         MinimaAPIListener listener = mResponseHandlers.get(responseid);
 
+        if(MinimaAPI.LOGGING_ENABLED){
+            MinimaAPILogger.log("MinimaAPI - RECEIVED respID:"+responseid+" resp:"+result);
+        }
+
         //Did we find it..
         if(listener == null){
             MinimaAPILogger.log("Received Invalid ResponseID.. not found : "+responseid);
@@ -139,6 +145,10 @@ public class MinimaAPI {
 
         //Add this to the message
         zIntent.putExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID, randomid);
+
+        if(MinimaAPI.LOGGING_ENABLED){
+            MinimaAPILogger.log("MinimaAPI - ADD respID:"+randomid);
+        }
 
         //Add to the table..
         mResponseHandlers.put(randomid, zListener);
