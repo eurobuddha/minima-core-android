@@ -3,8 +3,40 @@ An Android application running minima-core
 
 This is a simple clean Minima client that runs in full on Android
 
-Fully non-custodial with wallet and terminal functionality
+Fully non-custodial with wallet functionality
 
-Also - you can now use the minimaapi.aar ( in the minima-core-android-integrate repo ) to write Android apps that communicate securely with Minima Core
+You also have the miniaapi.aar - an Android lib that allows your own applications to talk to Minima Core.
 
+Simply load the minimaapi.aar module/lib into your project.
+
+The main API is accessed via
+```
+        //Start and register the Minima API
+        mMinimaAPI = new MinimaAPI(this);
+
+        //Run a command
+        mMinimaAPI.Command("block", new MinimaAPIListener() {
+            @Override
+            public void response(JSONObject zResponse) {
+                
+                //You can now use the JSON zResponse object..
+                //..
+                        
+                //If you want to update a UI component you need to run it on the UI Thread..
+                //MainActivity.this.runOnUiThread(new Runnable() {
+                //    @Override
+                //    public void run() {}
+                //});
+            }
+        });
+```
+
+The application shows up in Minima-Core and must be enabled by the User
+
+You can receive push notifications of Minima events by creating a BroadcastReceiver in your app and listening for
+```
+org.minimarex.minimacore.NOTIFY
+```
+
+Look at the Terminal APK for an example of how this works..
 
