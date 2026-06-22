@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("org.minimarex.minimaapi", appContext.getPackageName());
+        assertEquals("org.minimarex.minimaapi.test", appContext.getPackageName());
     }
 }
