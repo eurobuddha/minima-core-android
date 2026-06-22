@@ -10,8 +10,8 @@ android {
         applicationId "org.minimarex.minimacore"
         minSdk 28
         targetSdk 35
-        versionCode 14
-        versionName "1.1.1"
+        versionCode 15
+        versionName "1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -48,6 +48,7 @@ dependencies {
     implementation libs.activity
     implementation libs.constraintlayout
     implementation files('libs/minima.jar')
+    implementation project(':minimaapi')
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import org.minima.Minima;
 import org.minima.utils.json.JSONObject;
+import org.minimarex.minimaapi.MinimaAPIMessages;
 import org.minimarex.minimacore.utils.logger;
 
 import java.util.Objects;
@@ -38,18 +39,18 @@ public class MinimaReceiver extends BroadcastReceiver {
     public void onReceive(Context zContext, Intent zIntent) {
 
         String action = zIntent.getAction();
-        logger.log("RECEIVED action : " + action);
+        //logger.log("RECEIVED action : " + action);
 
         //Get the Extra data - that is ALWAYS Sent
-        String frompackage      = zIntent.getStringExtra(MinimaMessages.MINIMA_API_PACKAGE_CLASS);
-        String frompackageuid   = zIntent.getStringExtra(MinimaMessages.MINIMA_API_APP_UID);
-        String minimauid        = zIntent.getStringExtra(MinimaMessages.MINIMA_API_REGISTER_MINIMAID);
-        String responseid       = zIntent.getStringExtra(MinimaMessages.MINIMA_API_RESPONSE_ID);
+        String frompackage      = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_PACKAGE_CLASS);
+        String frompackageuid   = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_APP_UID);
+        String minimauid        = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID);
+        String responseid       = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID);
 
         //Get the App
         JSONObject app = mDatabase.selectApp(frompackage, frompackageuid, minimauid);
 
-        if (Objects.equals(zIntent.getAction(), MinimaMessages.MINIMA_API_REGISTER)) {
+        if (Objects.equals(zIntent.getAction(), MinimaAPIMessages.MINIMA_API_REGISTER)) {
 
             //CHECK AND ADD to DB
             if(app == null){
@@ -71,7 +72,7 @@ public class MinimaReceiver extends BroadcastReceiver {
                 sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
             }
 
-        } else if (Objects.equals(zIntent.getAction(), MinimaMessages.MINIMA_API_CMD)) {
+        } else if (Objects.equals(zIntent.getAction(), MinimaAPIMessages.MINIMA_API_CMD)) {
 
             //Does the App exist
             if(app == null){
@@ -98,7 +99,7 @@ public class MinimaReceiver extends BroadcastReceiver {
             //Update last used
             mDatabase.updateLastUsed(frompackage, frompackageuid);
 
-            String cmd      = zIntent.getStringExtra(MinimaMessages.MINIMA_API_CMD_ACTION);
+            String cmd      = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_CMD_ACTION);
             String result   = mMinima.runMinimaCMD(cmd, false, Userid);
 
             //Send it back..
@@ -109,16 +110,16 @@ public class MinimaReceiver extends BroadcastReceiver {
     public void sendResponse(Context zContext, String zPackage, String zResponseID, String zMinimaID, String zResponse){
 
         //Create the Response intent
-        Intent intent = new Intent(MinimaMessages.MINIMA_API_RESPONSE);
+        Intent intent = new Intent(MinimaAPIMessages.MINIMA_API_RESPONSE);
 
         //The MinimaID they expect
-        intent.putExtra(MinimaMessages.MINIMA_API_REGISTER_MINIMAID, zMinimaID);
+        intent.putExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID, zMinimaID);
 
         //The ResponseID they expect
-        intent.putExtra(MinimaMessages.MINIMA_API_RESPONSE_ID, zResponseID);
+        intent.putExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID, zResponseID);
 
         //The REsponse Data
-        intent.putExtra(MinimaMessages.MINIMA_API_RESPONSE_RESULT, zResponse);
+        intent.putExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_RESULT, zResponse);
 
         //Set to send ONLY back to original sender
         intent.setPackage(zPackage);
@@ -130,13 +131,13 @@ public class MinimaReceiver extends BroadcastReceiver {
     public void sendNotify(Context zContext, String zPackage, String zMinimaID, String zNotifyMessage){
 
         //Create the Response intent
-        Intent intent = new Intent(MinimaMessages.MINIMA_API_NOTIFY);
+        Intent intent = new Intent(MinimaAPIMessages.MINIMA_API_NOTIFY);
 
         //The MinimaID they expect
-        intent.putExtra(MinimaMessages.MINIMA_API_REGISTER_MINIMAID, zMinimaID);
+        intent.putExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID, zMinimaID);
 
         //The Notify Data
-        intent.putExtra(MinimaMessages.MINIMA_API_NOTIFY_DATA, zNotifyMessage);
+        intent.putExtra(MinimaAPIMessages.MINIMA_API_NOTIFY_DATA, zNotifyMessage);
 
         //Set to send ONLY back to original sender
         intent.setPackage(zPackage);

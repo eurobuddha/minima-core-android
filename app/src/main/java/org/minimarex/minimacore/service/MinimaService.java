@@ -14,7 +14,6 @@ import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -35,9 +34,9 @@ import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
 import org.minima.utils.messages.Message;
 import org.minima.utils.messages.MessageListener;
+import org.minimarex.minimaapi.MinimaAPIMessages;
 import org.minimarex.minimacore.main.MainActivity;
 import org.minimarex.minimacore.R;
-import org.minimarex.minimacore.receiver.MinimaMessages;
 import org.minimarex.minimacore.receiver.MinimaReceiver;
 import org.minimarex.minimacore.receiver.ReceiverDB;
 import org.minimarex.minimacore.utils.logger;
@@ -310,8 +309,8 @@ public class MinimaService extends Service {
         mMinimaReceiver = new MinimaReceiver(minima, this);
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction(MinimaMessages.MINIMA_API_REGISTER);
-        filter.addAction(MinimaMessages.MINIMA_API_CMD);
+        filter.addAction(MinimaAPIMessages.MINIMA_API_REGISTER);
+        filter.addAction(MinimaAPIMessages.MINIMA_API_CMD);
 
         registerReceiver(mMinimaReceiver, filter, Context.RECEIVER_EXPORTED);
     }
