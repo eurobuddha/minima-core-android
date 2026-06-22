@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Minima Core"
 include ':app'
+include ':minimaapi'
