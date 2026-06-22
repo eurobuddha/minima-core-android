@@ -11,7 +11,7 @@ Simply load the minimaapi.aar module/lib into your project.
 
 The main API is accessed via
 ```
-        //You must first register your app to allow messages to be sent and push notifications
+        //You must first register to allow messages to be sent and push notifications
         mMinimaAPI = new MinimaAPI(this, new MinimaAPIListener() {
             @Override
             public void response(JSONObject zResponse) {
@@ -27,7 +27,7 @@ The main API is accessed via
                 //You can now use the JSON zResponse object..
                 //..
                         
-                //If you want to update a UI component you need to run it on the UI Thread..
+                //If you want to update a UI component run it on the UI Thread..
                 //MainActivity.this.runOnUiThread(new Runnable() {
                 //    @Override
                 //    public void run() {}
