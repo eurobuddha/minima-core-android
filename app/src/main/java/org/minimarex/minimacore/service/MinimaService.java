@@ -169,7 +169,7 @@ public class MinimaService extends Service {
                     String event    = (String) notify.get("event");
                     JSONObject data = (JSONObject) notify.get("data");
 
-                    if(!event.equals("MINIMALOG")){
+                    //if(!event.equals("MINIMALOG")){
                         //MinimaLogger.log("SERVICE received event:"+event+" data:"+data.toString(), false);
 
                         JSONObject broadmessage = new JSONObject();
@@ -177,7 +177,7 @@ public class MinimaService extends Service {
                         broadmessage.put("data",data);
 
                         sendBroadcastNotify(broadmessage.toString());
-                    }
+                    //}
 
                     if(event.equals("NEWBLOCK")) {
 

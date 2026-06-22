@@ -73,7 +73,7 @@ public class ReceiverDB extends SQLiteOpenHelper {
     private JSONObject convertCursor(Cursor zCursor){
         JSONObject app = new JSONObject();
 
-        app.put("_id", zCursor.getString(0));
+        app.put("_id", zCursor.getInt(0));
         app.put("package", zCursor.getString(1));
         app.put("packageid", zCursor.getString(2));
         app.put("minimaid", zCursor.getString(3));
