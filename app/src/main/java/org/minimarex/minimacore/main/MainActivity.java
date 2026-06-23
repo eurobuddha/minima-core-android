@@ -68,7 +68,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     boolean WIPE_ON_SHUTDOWN = false;
 
-    TextView mFooter;
+    TextView mFooterLeft;
+    TextView mFooterRight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +96,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         setSupportActionBar(tb);
 
-        mFooter = findViewById(R.id.main_footer);
+        mFooterLeft  = findViewById(R.id.main_footer_left);
+        mFooterRight = findViewById(R.id.main_footer_right);
 
         mMainAdapter = new MainAdapter(this);
 
@@ -430,27 +432,35 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             return;
         }
 
+        mFooterRight.post(new Runnable() {
+            @Override
+            public void run() {
+                //Get tip
+                TxPoW txp = MinimaDB.getDB().getTxPoWTree().getTip().getTxPoW();
+
+                int block = txp.getBlockNumber().getAsInt();
+
+                long timemilli  = txp.getTimeMilli().getAsLong();
+                Date dd         = new Date(timemilli);
+                String datestr  = MinimaService.DATEFORMAT_TIME.format(new Date(timemilli));
+
+                mFooterRight.setText(block+" @ "+datestr);
+            }
+        });
+
         //Run some Minima Commands..
         MinimaCMD.runMinima("keys", new MinimaCMDListener() {
             @Override
             public void cmdResult(JSONObject zResult) {
-                mFooter.post(new Runnable() {
+                mFooterLeft.post(new Runnable() {
                     @Override
                     public void run() {
                         try{
                             JSONObject resp = (JSONObject) zResult.get("response");
                             int maxuses     = (int) resp.get("maxuses");
 
-                            //Get tip
-                            TxPoW txp = MinimaDB.getDB().getTxPoWTree().getTip().getTxPoW();
+                            mFooterLeft.setText("Key Uses:"+maxuses);
 
-                            int block = txp.getBlockNumber().getAsInt();
-
-                            long timemilli  = txp.getTimeMilli().getAsLong();
-                            Date dd         = new Date(timemilli);
-                            String datestr  = MinimaService.DATEFORMAT.format(new Date(timemilli));
-
-                            mFooter.setText("Key Uses:"+maxuses+" Block:"+block+" @ "+datestr);
                         }catch(Exception exc){}
                     }
                 });

@@ -55,7 +55,8 @@ import java.util.StringTokenizer;
  * */
 public class MinimaService extends Service {
 
-    public static SimpleDateFormat DATEFORMAT = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.ENGLISH);
+    public static SimpleDateFormat DATEFORMAT       = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.ENGLISH);
+    public static SimpleDateFormat DATEFORMAT_TIME  = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
 
     public static boolean mHaveStartedShutdown = false;
 
