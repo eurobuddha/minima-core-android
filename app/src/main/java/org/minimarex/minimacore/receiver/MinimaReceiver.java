@@ -15,6 +15,8 @@ import java.util.Objects;
 
 public class MinimaReceiver extends BroadcastReceiver {
 
+    public static final int MAX_MESSAGE_LEN = 256000;
+
     private Minima mMinima;
 
     ReceiverDB mDatabase;
@@ -42,75 +44,99 @@ public class MinimaReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context zContext, Intent zIntent) {
 
-        String action = zIntent.getAction();
+        //Put the WHOLE thing in a try catch..
+        try{
+            String action = zIntent.getAction();
 
-        //Get the Extra data - that is ALWAYS Sent
-        String frompackage      = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_PACKAGE_CLASS);
-        String frompackageuid   = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_APP_UID);
-        String minimauid        = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID);
-        String responseid       = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID);
+            //Get the Extra data - that is ALWAYS Sent
+            String frompackage      = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_PACKAGE_CLASS);
+            String frompackageuid   = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_APP_UID);
+            String minimauid        = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID);
+            String responseid       = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID);
 
-        if(MinimaAPI.LOGGING_ENABLED){
-            MinimaAPILogger.log("MAIN - RECEIVED BROADCAST respID:"+responseid+" frompackage:"+frompackage+" action:"+action);
-        }
+            if(MinimaAPI.LOGGING_ENABLED){
+                MinimaAPILogger.log("MAIN - RECEIVED BROADCAST respID:"+responseid+" frompackage:"+frompackage+" action:"+action);
+            }
 
-        //Get the App
-        JSONObject app = mDatabase.selectApp(frompackage, frompackageuid, minimauid);
+            //Get the App
+            JSONObject app = mDatabase.selectApp(frompackage, frompackageuid, minimauid);
 
-        if (Objects.equals(zIntent.getAction(), MinimaAPIMessages.MINIMA_API_REGISTER)) {
+            //Check the message type
+            if (Objects.equals(zIntent.getAction(), MinimaAPIMessages.MINIMA_API_REGISTER)) {
 
-            //CHECK AND ADD to DB
-            if(app == null){
+                //CHECK AND ADD to DB
+                if(app == null){
 
-                //Add to the database..
-                mDatabase.insertApp(frompackage, frompackageuid, minimauid);
+                    //Add to the database..
+                    mDatabase.insertApp(frompackage, frompackageuid, minimauid);
 
-                //Send response..
-                String basicmessage = getBasicMessage(true, false, false,"Registered OK!");
-                sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
+                    //Send response..
+                    String basicmessage = getBasicMessage(true, false, false,"Registered OK!");
+                    sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
 
-            }else{
+                }else{
+
+                    boolean enabled = (int)app.get("penabled")==1;
+                    boolean admin   = (int)app.get("admin")==1;
+
+                    //Send response..
+                    String basicmessage = getBasicMessage(true, enabled, admin, "Already registered..");
+                    sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
+                }
+
+            } else if (Objects.equals(zIntent.getAction(), MinimaAPIMessages.MINIMA_API_CMD)) {
+
+                //Does the App exist
+                if(app == null){
+                    logger.log("UNKNOWN Package for request : " + frompackage);
+                    return;
+                }
 
                 boolean enabled = (int)app.get("penabled")==1;
                 boolean admin   = (int)app.get("admin")==1;
 
-                //Send response..
-                String basicmessage = getBasicMessage(true, enabled, admin, "Already registered..");
-                sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
+                //Is it enabled..!
+                if(!enabled){
+                    String basicmessage = getBasicMessage(false, enabled, admin, "Package NOT enabled in Minima-Core!");
+                    sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
+                    return;
+                }
+
+                //Is it an ADMIN user
+                String Userid = "0xFF";
+                if(admin){
+                    Userid = "0x00";
+                }
+
+                //Update last used
+                mDatabase.updateLastUsed(frompackage, frompackageuid);
+
+                String cmd      = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_CMD_ACTION);
+
+                //Check size.. is JSON format so will be longer than normal HEX
+                //Need to be able to sign transactions etc..
+                if(cmd.length() > MAX_MESSAGE_LEN){
+                    String basicmessage = getBasicMessage(false, enabled, admin, "Command too long! MAX("+MAX_MESSAGE_LEN+")");
+                    sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
+                    return;
+                }
+
+                //Run the command
+                String result   = mMinima.runMinimaCMD(cmd, false, Userid);
+
+                //Check the result is within acceptable parameters
+                if(result.length() > MAX_MESSAGE_LEN){
+                    String basicmessage = getBasicMessage(false, enabled, admin, "Result too long! MAX("+MAX_MESSAGE_LEN+")");
+                    sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
+                    return;
+                }
+
+                //Send it back..
+                sendResponse(zContext, frompackage, responseid, minimauid, result);
             }
 
-        } else if (Objects.equals(zIntent.getAction(), MinimaAPIMessages.MINIMA_API_CMD)) {
-
-            //Does the App exist
-            if(app == null){
-                logger.log("UNKNOWN Package for request : " + frompackage);
-                return;
-            }
-
-            boolean enabled = (int)app.get("penabled")==1;
-            boolean admin   = (int)app.get("admin")==1;
-
-            //Is it enabled..!
-            if(!enabled){
-                String basicmessage = getBasicMessage(false, enabled, admin, "Package NOT enabled in Minima-Core!");
-                sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
-                return;
-            }
-
-            //Is it an ADMIN user
-            String Userid = "0xFF";
-            if(admin){
-                Userid = "0x00";
-            }
-
-            //Update last used
-            mDatabase.updateLastUsed(frompackage, frompackageuid);
-
-            String cmd      = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_CMD_ACTION);
-            String result   = mMinima.runMinimaCMD(cmd, false, Userid);
-
-            //Send it back..
-            sendResponse(zContext, frompackage, responseid, minimauid, result);
+        }catch(Exception exc){
+            MinimaAPILogger.log("ERROR MinimaReceive :"+exc.toString());
         }
     }
 
