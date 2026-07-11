@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".main.MainActivity">
+    android:background="@color/core_bg">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
+        android:text="MiniDapps"
+        android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
 
-      <ListView
-          android:id="@+id/wallet_apps_list"
-          android:layout_height="match_parent"
-          android:layout_width="match_parent"/>
-
+    <ListView
+        android:id="@+id/wallet_apps_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/core_bg"
+        android:divider="@color/core_outline"
+        android:dividerHeight="1dp"
+        android:scrollbars="none" />
 </LinearLayout>
