@@ -8,8 +8,7 @@ import androidx.annotation.NonNull;
 import org.minimarex.minimacore.main.views.apps.AppsView;
 import org.minimarex.minimacore.main.views.balance.BalanceView;
 import org.minimarex.minimacore.main.views.home.HomeView;
-import org.minimarex.minimacore.main.views.receive.ReceiveView;
-import org.minimarex.minimacore.main.views.send.SendView;
+import org.minimarex.minimacore.main.views.terminal.TerminalView;
 import org.minimarex.minimacore.utils.logger;
 
 public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
@@ -27,12 +26,15 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
         RECEIVE_ADDRESS = null;
 
         //Store of all current valid views..
+        //Tabs: Home / Wallet / Terminal / Apps  (Send + Receive are reached
+        //via buttons on the Wallet tab, launching SendActivity/ReceiveActivity).
+        //NB: Apps MUST stay at index 3 (getAppsView) and the dashboard at
+        //index 0 (refreshHomeView) so the service/DB wiring stays intact.
         mAllViews = new BaseView[4];
 
-        //mAllViews[0] = new HomeView(mActivity);
-        mAllViews[0] = new BalanceView(mActivity);
-        mAllViews[1] = new SendView(mActivity);
-        mAllViews[2] = new ReceiveView(mActivity);
+        mAllViews[0] = new HomeView(mActivity);
+        mAllViews[1] = new BalanceView(mActivity);
+        mAllViews[2] = new TerminalView(mActivity);
         mAllViews[3] = new AppsView(mActivity);
     }
 

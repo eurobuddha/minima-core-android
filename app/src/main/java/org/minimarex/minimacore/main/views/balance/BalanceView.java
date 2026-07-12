@@ -1,12 +1,17 @@
 package org.minimarex.minimacore.main.views.balance;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.main.BaseView;
+import org.minimarex.minimacore.main.views.receive.ReceiveActivity;
+import org.minimarex.minimacore.main.views.send.SendActivity;
 import org.minimarex.minimacore.utils.MinimaCMD;
 import org.minimarex.minimacore.utils.MinimaCMDListener;
 import org.minimarex.minimacore.utils.logger;
@@ -14,6 +19,8 @@ import org.minimarex.minimacore.utils.logger;
 public class BalanceView extends BaseView {
 
     ListView mBalanceList;
+
+    TextView mTotalBalance;
 
     BalanceAdapter mBalanceAdapter;
 
@@ -24,6 +31,22 @@ public class BalanceView extends BaseView {
 
         mBalanceList = getMainView().findViewById(R.id.wallet_balance_list);
         mBalanceList.setAdapter(mBalanceAdapter);
+
+        mTotalBalance = getMainView().findViewById(R.id.wallet_total_balance);
+
+        getMainView().findViewById(R.id.wallet_btn_send).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().startActivity(new Intent(getActivity(), SendActivity.class));
+            }
+        });
+
+        getMainView().findViewById(R.id.wallet_btn_receive).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().startActivity(new Intent(getActivity(), ReceiveActivity.class));
+            }
+        });
 
         refreshView();
     }
@@ -71,7 +94,33 @@ public class BalanceView extends BaseView {
             public void run() {
                 mBalanceAdapter.updateValues(zBalance);
                 mBalanceList.invalidate();
+
+                //Header total = the Minima (0x00) sendable balance
+                updateTotal(zBalance);
             }
         });
+    }
+
+    private void updateTotal(JSONArray zBalance){
+        if(mTotalBalance == null){
+            return;
+        }
+
+        String total = "0";
+        try{
+            for(int i=0;i<zBalance.size();i++){
+                JSONObject token = (JSONObject) zBalance.get(i);
+                String tokenid   = String.valueOf(token.get("tokenid"));
+                if("0x00".equals(tokenid)){
+                    //Prefer sendable; fall back to confirmed
+                    Object send = token.get("sendable");
+                    Object conf = token.get("confirmed");
+                    total = String.valueOf(send != null ? send : conf);
+                    break;
+                }
+            }
+        }catch(Exception exc){}
+
+        mTotalBalance.setText(total);
     }
 }

@@ -19,6 +19,7 @@ import android.provider.Settings;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,8 +43,8 @@ import org.minima.objects.TxPoW;
 import org.minima.system.params.GeneralParams;
 import org.minima.utils.MiniFile;
 import org.minima.utils.json.JSONObject;
+import org.minimarex.minimacore.MinimaApplication;
 import org.minimarex.minimacore.R;
-import org.minimarex.minimacore.main.views.terminal.TerminalActivity;
 import org.minimarex.minimacore.service.MinimaService;
 import org.minimarex.minimacore.service.MinimaServiceListener;
 import org.minimarex.minimacore.utils.MinimaCMD;
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         });
 
         Toolbar tb = findViewById(R.id.toolbar);
-        tb.setTitle("Minima-Core");
+        tb.setTitle("Minima Core");
         tb.getOverflowIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
 
         setSupportActionBar(tb);
@@ -107,18 +108,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(mMainPager);
 
-        //Set up Tabs
-        //tabs.getTabAt(0).setText("Home");
-        //tabs.getTabAt(0).setIcon(R.drawable.ic_minima);
+        //Set up Tabs — Home / Wallet / Terminal / Apps
+        tabs.getTabAt(0).setText("Home");
+        tabs.getTabAt(0).setIcon(R.drawable.ic_drawer_home);
 
-        tabs.getTabAt(0).setText("Balance");
-        tabs.getTabAt(0).setIcon(R.drawable.ic_network);
+        tabs.getTabAt(1).setText("Wallet");
+        tabs.getTabAt(1).setIcon(R.drawable.ic_minima);
 
-        tabs.getTabAt(1).setText("Send");
-        tabs.getTabAt(1).setIcon(R.drawable.ic_transfer);
-
-        tabs.getTabAt(2).setText("Receive");
-        tabs.getTabAt(2).setIcon(R.drawable.ic_freedom);
+        tabs.getTabAt(2).setText("Terminal");
+        tabs.getTabAt(2).setIcon(R.drawable.ic_edit_note);
 
         tabs.getTabAt(3).setText("Apps");
         tabs.getTabAt(3).setIcon(R.drawable.ic_dapps);
@@ -128,6 +126,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void onTabSelected(TabLayout.Tab tab) {
                 //Refresh View
                 mMainAdapter.refreshPagerView(tab.getPosition());
+
+                //Reflect the current tab in the toolbar title
+                setToolbarTitle(tab.getPosition());
             }
 
             @Override
@@ -149,6 +150,19 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         checkPermission(perms,99);
 
         checkBattery();
+    }
+
+    public void setToolbarTitle(int zPosition){
+        String title;
+        switch (zPosition){
+            case 1:  title = "Wallet";      break;
+            case 2:  title = "Terminal";    break;
+            case 3:  title = "Apps";        break;
+            default: title = "Minima Core"; break;
+        }
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setTitle(title);
+        }
     }
 
     public void checkBattery() {
@@ -226,6 +240,37 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        //Reflect the persisted screenshot preference in the checkbox
+        MenuItem ss = menu.findItem(R.id.mainmenu_screenshots);
+        if(ss != null){
+            ss.setChecked(MinimaApplication.screenshotsAllowed(this));
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    public void toggleScreenshots(MenuItem zItem){
+        boolean allow = !MinimaApplication.screenshotsAllowed(this);
+
+        //Persist
+        SharedPreferences prefs = getSharedPreferences(MinimaApplication.PREFS_NAME, MODE_PRIVATE);
+        prefs.edit().putBoolean(MinimaApplication.PREF_ALLOW_SS, allow).apply();
+
+        zItem.setChecked(allow);
+
+        //Apply to THIS window immediately; other activities pick it up on creation
+        if(allow){
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        }else{
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
+                    WindowManager.LayoutParams.FLAG_SECURE);
+        }
+
+        Toast.makeText(this, allow ? "Screenshots allowed" : "Screenshots blocked",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId())
@@ -236,10 +281,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 //
 //                return true;
 
-            case R.id.mainmenu_terminal :
+            case R.id.mainmenu_screenshots :
 
-                //addPeerDialog();
-                MainActivity.this.startActivity(new Intent(MainActivity.this, TerminalActivity.class));
+                toggleScreenshots(item);
 
                 return true;
 

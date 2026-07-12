@@ -57,7 +57,8 @@ public class LauncherActivity extends AppCompatActivity {
         }
 
         Toolbar tb = findViewById(R.id.toolbar);
-        tb.setTitle("Minima-Core");
+        //Clean launcher — no title, the M logo speaks for itself (matches design)
+        tb.setTitle("");
         setSupportActionBar(tb);
 
         Button newwallet = findViewById(R.id.launcher_button_newwallet);

@@ -9,12 +9,6 @@
 <!--        app:showAsAction="never" />-->
 
     <item
-        android:id="@+id/mainmenu_terminal"
-        android:orderInCategory="100"
-        android:title="Terminal"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/mainmenu_resync"
         android:orderInCategory="100"
         android:title="Resync Node"
@@ -36,6 +30,13 @@
         android:id="@+id/mainmenu_wipeminima"
         android:orderInCategory="100"
         android:title="Reset Minima"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/mainmenu_screenshots"
+        android:orderInCategory="100"
+        android:title="Allow Screenshots"
+        android:checkable="true"
         app:showAsAction="never" />
 
 </menu>

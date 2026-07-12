@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:background="@color/core_surface"
     android:paddingHorizontal="16dp"
-    android:paddingVertical="15dp">
+    android:paddingVertical="13dp">
+
+    <!-- token icon (identicon fallback, real icon loaded over) + web-validation badge -->
+    <FrameLayout
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/bg_token_tile">
+
+        <ImageView
+            android:id="@+id/balance_tokenicon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="Token icon" />
+
+        <ImageView
+            android:id="@+id/balance_tokenbadge"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_gravity="bottom|end"
+            android:visibility="gone"
+            android:contentDescription="Web validated" />
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="0dp"
