@@ -1,4 +1,7 @@
 # minima-core-android
+
+> ⚠️ **Personal fork — in development, use at your own risk.** This is an experimental, actively-developed personal fork of Minima Core, provided **AS IS**, without warranty of any kind (licensed under [Apache 2.0](LICENSE), same as upstream Minima). It is a non-custodial node that manages real keys and funds; back up your seed and only use it with funds you can afford to lose. Not an official Minima Global release, and not financial advice.
+
 An Android application running minima-core 
 
 This is a simple clean Minima client that runs in full on Android
