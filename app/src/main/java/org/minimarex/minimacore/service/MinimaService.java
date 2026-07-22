@@ -234,6 +234,8 @@ public class MinimaService extends Service {
         });
 
         //Start her up..
+        SharedPreferences pref  = getSharedPreferences("main_prefs",MODE_PRIVATE);
+
         ArrayList<String> vars = new ArrayList<>();
 
         vars.add("-daemon");
@@ -247,12 +249,26 @@ public class MinimaService extends Service {
         vars.add("-port");
         vars.add("11001");
 
-        //Normal
-        vars.add("-isclient");
+        //Server or client - user-set toggle (ParamsActivity). Exactly ONE of the pair is
+        //passed: -server and -isclient both write IS_ACCEPTING_IN_LINKS and the winner
+        //would otherwise depend on param-map iteration order.
+        if(pref.getBoolean("PARAM_SERVER", false)){
+            vars.add("-server");
+        }else{
+            vars.add("-isclient");
+        }
         vars.add("-mobile");
         vars.add("-limitbandwidth");
 
         vars.add("-allowallip");
+
+        //User-set toggles (ParamsActivity)
+        if(pref.getBoolean("PARAM_MEGAMMR", false)){
+            vars.add("-megammr");
+        }
+        if(pref.getBoolean("PARAM_RPC", false)){
+            vars.add("-rpcenable");
+        }
 
         //TESTER HACK
         //vars.add("-clean");
@@ -261,9 +277,6 @@ public class MinimaService extends Service {
         vars.add("-nosyncibd");
 
         vars.add("-noshutdownhook");
-
-        //Are there any EXTRA params..
-        SharedPreferences pref  = getSharedPreferences("main_prefs",MODE_PRIVATE);
 
         //Add the seed
         vars.add("-anyseed");
@@ -274,18 +287,23 @@ public class MinimaService extends Service {
         //EXTRA params
         String prefstring       = pref.getString("minima_extra_params","");
 
-        //Remove -clean..
-        String newprefs = prefstring.replaceAll("-clean","");
+        //Remove the wipe flags.. and USE the stripped string this boot too (previously the
+        //original string was tokenized, so a -clean slipped through on the boot it was set)
+        String newprefs = prefstring
+                .replaceAll("-clean","")
+                .replaceAll("-genesis","")
+                .replaceAll("-solo","")
+                .trim().replaceAll("\\s+"," ");
         SharedPreferences.Editor edit = pref.edit();
         edit.putString("minima_extra_params",newprefs);
         edit.apply();
 
         //Check if Valid!
-        boolean validparams = ParamConfigurer.checkParams(prefstring);
+        boolean validparams = ParamConfigurer.checkParams(newprefs);
 
         if(validparams) {
-            if (!prefstring.equals("")) {
-                StringTokenizer strtok = new StringTokenizer(prefstring, " ");
+            if (!newprefs.equals("")) {
+                StringTokenizer strtok = new StringTokenizer(newprefs, " ");
                 while (strtok.hasMoreTokens()) {
                     String param = strtok.nextToken();
                     vars.add(param);

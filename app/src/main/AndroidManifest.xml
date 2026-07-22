@@ -58,6 +58,7 @@
         <activity android:name=".launcher.restore.SeedSyncServiceActivity"></activity>
         <activity android:name=".main.SeedSyncActivity"></activity>
         <activity android:name=".main.views.terminal.TerminalActivity"></activity>
+        <activity android:name=".main.ParamsActivity"></activity>
         <activity android:name=".main.views.send.SendActivity"></activity>
         <activity android:name=".main.views.receive.ReceiveActivity"></activity>
 

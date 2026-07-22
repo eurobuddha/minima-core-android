@@ -69,6 +69,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     boolean WIPE_ON_SHUTDOWN = false;
 
+    //Set by ParamsActivity's Save & Restart - the service is started again after
+    //the graceful shutdown completes instead of finishing the activity
+    boolean RESTART_ON_SHUTDOWN = false;
+
     TextView mFooterLeft;
     TextView mFooterRight;
 
@@ -293,6 +297,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
                 return true;
 
+            case R.id.mainmenu_params :
+
+                MainActivity.this.startActivity(new Intent(MainActivity.this, ParamsActivity.class));
+
+                return true;
+
             case R.id.mainmenu_shhowseed :
                 //Show the seed
                 MinimaCMD.runMinima("vault", new MinimaCMDListener() {
@@ -357,10 +367,25 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         builder.show();
     }
 
+    /** Save & Restart from ParamsActivity - clean shutdown then start again. */
+    public void restartMinima(){
+        RESTART_ON_SHUTDOWN = true;
+        shutdownMinima();
+    }
+
     public void shutdownMinima(){
 
         //Has the service shutdown
         if(MinimaService.haveStartedShutdown()){
+
+            //Restarting? Just start it again..
+            if(RESTART_ON_SHUTDOWN){
+                RESTART_ON_SHUTDOWN = false;
+                startMinimaService();
+                Toast.makeText(this, "Minima restarting..", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Toast.makeText(this, "Minima Service Stopped", Toast.LENGTH_SHORT).show();
 
             //Are we WIPING..
@@ -438,6 +463,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         editor.putBoolean("SEED_SET", false);
         editor.putString("SEED", "");
         editor.putInt("KEYUSES", 0);
+        editor.putBoolean(ParamsActivity.PREF_PARAM_SERVER, false);
+        editor.putBoolean(ParamsActivity.PREF_PARAM_MEGAMMR, false);
+        editor.putBoolean(ParamsActivity.PREF_PARAM_RPC, false);
+        editor.putString(ParamsActivity.PREF_EXTRA_PARAMS, "");
         editor.commit();
     }
 
@@ -454,6 +483,27 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             if(mShutdownDialog.isShowing()){
                 mShutdownDialog.dismiss();
             }
+        }
+
+        //Restarting with new params? Start the service again instead of closing
+        if(RESTART_ON_SHUTDOWN){
+            RESTART_ON_SHUTDOWN = false;
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //Small delay so the old service instance fully releases (DB locks etc)
+                    mMainPager.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            startMinimaService();
+                            Toast.makeText(MainActivity.this,
+                                    "Minima restarting with new params..", Toast.LENGTH_LONG).show();
+                        }
+                    }, 2000);
+                }
+            });
+            return;
         }
 
         //And shutdown..

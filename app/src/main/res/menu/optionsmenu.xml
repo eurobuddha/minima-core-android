@@ -15,6 +15,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/mainmenu_params"
+        android:orderInCategory="100"
+        android:title="Startup Params"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/mainmenu_shhowseed"
         android:orderInCategory="100"
         android:title="Show Seed"
