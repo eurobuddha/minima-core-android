@@ -13,8 +13,8 @@ android {
         // vc25: unifies the parallel 1.3.2/1.3.3 (vc23/24, Filez session) and 1.4.0/1.4.1
         // (vc23/24, params session) release lines - same code, clashing codes. 1.4.2/vc25
         // supersedes every installed variant so all devices get offered the update.
-        versionCode 27
-        versionName "1.5.1-ui-h2"
+        versionCode 28
+        versionName "1.6.0-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
