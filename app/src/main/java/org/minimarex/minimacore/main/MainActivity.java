@@ -125,6 +125,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         tabs.getTabAt(3).setText("Apps");
         tabs.getTabAt(3).setIcon(R.drawable.ic_dapps);
 
+        tabs.getTabAt(4).setText("Logs");
+        tabs.getTabAt(4).setIcon(R.drawable.ic_edit_note);
+
         tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -162,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             case 1:  title = "Wallet";      break;
             case 2:  title = "Terminal";    break;
             case 3:  title = "Apps";        break;
+            case 4:  title = "Logs";        break;
             default: title = "Minima Core"; break;
         }
         if(getSupportActionBar() != null){

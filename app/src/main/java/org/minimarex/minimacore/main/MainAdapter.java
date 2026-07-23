@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import org.minimarex.minimacore.main.views.apps.AppsView;
 import org.minimarex.minimacore.main.views.balance.BalanceView;
 import org.minimarex.minimacore.main.views.home.HomeView;
+import org.minimarex.minimacore.main.views.logs.LogsView;
 import org.minimarex.minimacore.main.views.terminal.TerminalView;
 import org.minimarex.minimacore.utils.logger;
 
@@ -26,16 +27,18 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
         RECEIVE_ADDRESS = null;
 
         //Store of all current valid views..
-        //Tabs: Home / Wallet / Terminal / Apps  (Send + Receive are reached
+        //Tabs: Home / Wallet / Terminal / Apps / Logs  (Send + Receive are reached
         //via buttons on the Wallet tab, launching SendActivity/ReceiveActivity).
         //NB: Apps MUST stay at index 3 (getAppsView) and the dashboard at
         //index 0 (refreshHomeView) so the service/DB wiring stays intact.
-        mAllViews = new BaseView[4];
+        //New views are APPENDED (Logs=4) - never inserted before index 3.
+        mAllViews = new BaseView[5];
 
         mAllViews[0] = new HomeView(mActivity);
         mAllViews[1] = new BalanceView(mActivity);
         mAllViews[2] = new TerminalView(mActivity);
         mAllViews[3] = new AppsView(mActivity);
+        mAllViews[4] = new LogsView(mActivity);
     }
 
     public void refreshPagerView(int zPosition){
@@ -55,7 +58,7 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
 
     @Override
     public int getCount() {
-        return 4;
+        return 5;
     }
 
     @Override

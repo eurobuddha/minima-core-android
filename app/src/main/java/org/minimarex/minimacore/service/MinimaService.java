@@ -39,6 +39,7 @@ import org.minimarex.minimacore.main.MainActivity;
 import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.receiver.MinimaReceiver;
 import org.minimarex.minimacore.receiver.ReceiverDB;
+import org.minimarex.minimacore.utils.LogBuffer;
 import org.minimarex.minimacore.utils.logger;
 
 import java.text.SimpleDateFormat;
@@ -180,7 +181,12 @@ public class MinimaService extends Service {
                         sendBroadcastNotify(broadmessage.toString());
                     //}
 
-                    if(event.equals("NEWBLOCK")) {
+                    if(event.equals("MINIMALOG")){
+
+                        //Feed the in-app Logs tab (bounded ring buffer)
+                        LogBuffer.append((String) data.get("message"));
+
+                    }else if(event.equals("NEWBLOCK")) {
 
                         //Get the TxPoW
                         mTxPowJSON = (JSONObject) data.get("txpow");
