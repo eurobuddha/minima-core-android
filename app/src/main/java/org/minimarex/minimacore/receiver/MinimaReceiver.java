@@ -306,7 +306,50 @@ public class MinimaReceiver extends BroadcastReceiver {
 
                 JSONObject resp = fileOK("list");
                 resp.put("path", relPath(base, dir));
+                //The node's OWN canonical base path - clients must build terminal paths from
+                //this, never reconstruct it from other commands
+                resp.put("base", base.getCanonicalPath());
                 resp.put("list", arr);
+                return resp.toString();
+            }
+
+            //Resolve a RAW terminal-style path exactly like MiniFile.createBaseFile does and
+            //report what the node actually sees - the ground truth for "file doesn't exist"
+            case "stat" : {
+                String raw = zPath == null ? "" : zPath;
+                File f;
+                if(raw.contains(File.separator) || raw.contains("\\") || raw.contains("/")){
+                    f = new File(raw);
+                }else{
+                    f = new File(base, raw);
+                }
+                JSONObject resp = fileOK("stat");
+                resp.put("query", raw);
+                resp.put("exists", f.exists());
+                resp.put("isdir", f.isDirectory());
+                resp.put("size", f.isFile() ? f.length() : 0L);
+                resp.put("abspath", f.getAbsolutePath());
+                try{ resp.put("canonical", f.getCanonicalPath()); }catch(Exception ignore){}
+                resp.put("base", base.getCanonicalPath());
+
+                //When the file is missing, show what IS there - catches invisible
+                //name mismatches that are impossible to spot by eye
+                if(!f.exists()){
+                    File parent = f.getParentFile();
+                    resp.put("parentexists", parent != null && parent.isDirectory());
+                    if(parent != null && parent.isDirectory()){
+                        JSONArray kids = new JSONArray();
+                        File[] children = parent.listFiles();
+                        if(children != null){
+                            int n = 0;
+                            for(File k : children){
+                                kids.add(k.getName());
+                                if(++n >= 50) break;
+                            }
+                        }
+                        resp.put("parentlist", kids);
+                    }
+                }
                 return resp.toString();
             }
 
@@ -324,6 +367,7 @@ public class MinimaReceiver extends BroadcastReceiver {
 
                 JSONObject resp = fileOK("get");
                 resp.put("path", relPath(base, file));
+                resp.put("abspath", file.getCanonicalPath());
                 resp.put("name", file.getName());
                 resp.put("size", file.length());
                 resp.put("modified", file.lastModified());
