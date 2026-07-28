@@ -122,13 +122,46 @@ ignore them cleanly.
 - PR #1 (executor) is open; we can raise the other two as separate PRs on request, or you
   can cherry-pick from the fork branch — whichever you prefer.
 
-### Related, separate work (mention only)
+---
 
-The same fork also carries fixes outside the IPC layer you may want independently: a fix for
-the extra-params boot path (a stored `-clean` was stripped from the saved string but the
-original was tokenized into the boot args — i.e. the wipe ran on the very boot it was set),
-and a set of MegaMMR `action:import` robustness changes in the core jar (streamed IBD import,
-OOM watermarks so a too-large file reports cleanly instead of killing the process, strict
-truncated-file detection). Details on request — happy to write those up too.
+## Beyond the IPC layer — the rest of the fork, at a glance
+
+The fork is published to our own app store as **"Minima Core — New UI (Preview)"** (currently
+1.6.x). Besides the IPC work above (~2,900 insertions across 59 files vs upstream `main` in
+the UI/resources alone), it carries:
+
+**Look & feel** — a brand-native, dark-first restyle of every screen (commit `b37fe5b`,
+resources-only, no behaviour change), then a structural redesign (`cfe8856`): a **Home
+dashboard** tab (block height, node + APK versions, connection state), tab bar
+Home / Wallet / Terminal / Apps (+ Logs), consistent typography/colour system, and a
+**screenshot privacy toggle** (FLAG_SECURE, persisted, default-blocked).
+
+**Wallet** — the Wallet tab was rebuilt around dedicated **Send** and **Receive** activities
+(validated recipient via `checkaddress`, amount clamping, QR on receive) and a token-aware
+balance view with **token icons**: remote icon URLs are treated as hostile (size caps, SSRF
+blocking, bounded loader pool), validated through the node's own `webvalidate` /
+`tokenvalidate`, rendered over a deterministic identicon fallback; SVG token art supported.
+
+**Node-facing UX** — a **Startup Params** screen (server mode / MegaMMR / RPC toggles + a
+validated free-text args field wired to the existing `minima_extra_params` pref, with
+Save & Restart doing a clean quit-and-relaunch), and a **Logs tab**: a live on-device tail
+of `MinimaLogger` output (the `MINIMALOG` notify event the node already fires), with
+pause/clear/share, substring filter and per-subsystem verbosity chips driving the `logs`
+command. While wiring the params screen we also fixed a latent hazard in the upstream boot
+path: a stored `-clean` in the extra params was stripped from the *saved* string but the
+*original* string was tokenized into the boot args — the wipe ran on the very boot it was
+set.
+
+**Stability** — the H2 2.4.240 VerifyError fix (**PR #2**, open), and a set of MegaMMR
+`action:import` robustness changes in the core jar: streamed batched IBD import, in-flight
+OOM watermarks in both load phases (a too-large file now reports
+"cannot hold this MegaMMR in memory" instead of killing the process), strict truncated-file
+detection, and megaprune applied at read time. Measured against a real mainnet
+`megammr.mmr`: the MMR tree is ~1.5 M entries / ~1 GB in RAM — details and numbers on
+request.
+
+Any of this is available in the same fork; the UI work is opinionated and we don't expect
+upstream wants it wholesale, but individual pieces (token-icon validation, the Logs tab,
+the params screen, the `-clean` fix) lift out cleanly.
 
 Thanks for Minima — and for taking the 1.2.4 hardening on board.
