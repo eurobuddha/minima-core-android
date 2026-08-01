@@ -13,6 +13,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.main.MainAdapter;
+import org.minimarex.minimacore.utils.Clip;
 import org.minimarex.minimacore.utils.MinimaCMD;
 import org.minimarex.minimacore.utils.MinimaCMDListener;
 import org.minimarex.minimacore.main.BaseView;
@@ -31,6 +32,16 @@ public class ReceiveView extends BaseView {
         mQRCodeAddress = getMainView().findViewById(R.id.wallet_receive_qrcode);
 
         mAddressText = getMainView().findViewById(R.id.wallet_receive_address);
+
+        getMainView().findViewById(R.id.wallet_receive_copy).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String addr = mAddressText.getText().toString().trim();
+                if(!addr.isEmpty()){
+                    Clip.copy(getActivity(), "address", addr, "Address copied");
+                }
+            }
+        });
 
         mChangeButton = getMainView().findViewById(R.id.wallet_receive_changeaddress);
         mChangeButton.setOnClickListener(new View.OnClickListener() {

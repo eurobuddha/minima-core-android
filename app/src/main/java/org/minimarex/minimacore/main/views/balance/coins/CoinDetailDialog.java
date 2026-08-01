@@ -68,7 +68,7 @@ public class CoinDetailDialog {
         json.setText(raw);
 
         mDialog = new MaterialAlertDialogBuilder(mActivity)
-                .setTitle("Coin "+Format.shortHash(String.valueOf(zCoin.get("coinid"))))
+                .setTitle(zSendable ? "Coin — sendable" : "Coin — locked")
                 .setView(body)
                 .setPositiveButton("Close", null)
                 //null listener on purpose - see below

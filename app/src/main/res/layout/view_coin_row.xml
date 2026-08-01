@@ -1,58 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  A coin in the coins modal. The whole row is the tap target (opens the detail modal) -
-  deliberately no textIsSelectable anywhere in here: a selectable TextView inside a
-  ListView row swallows the touch so OnItemClickListener stops firing, and the selection
-  anchor survives view recycling. The full, copyable id lives in the detail modal.
+  A coin in the coins modal. The coin id is shown IN FULL, wrapped - never shortened.
+  Tap opens the full detail, long-press copies the id outright.
+
+  No textIsSelectable in here: a selectable TextView inside a ListView row swallows the
+  touch so OnItemClickListener stops firing, and the selection anchor survives view
+  recycling. Long-press copy gives the same result without either problem.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
+    android:orientation="vertical"
     android:background="@color/core_surface"
     android:foreground="?attr/selectableItemBackground"
     android:paddingHorizontal="16dp"
     android:paddingVertical="12dp">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
 
         <TextView
             android:id="@+id/coin_amount"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:ellipsize="end"
+            android:layout_weight="1"
             android:fontFeatureSettings="tnum"
             android:textAppearance="@style/TextAppearance.MinimaCore.BodyStrong" />
 
         <TextView
-            android:id="@+id/coin_id"
-            android:layout_width="match_parent"
+            android:id="@+id/coin_locked"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:maxLines="1"
-            android:fontFamily="monospace"
-            android:textSize="11sp"
-            android:textColor="@color/core_text_faint" />
+            android:layout_marginStart="12dp"
+            android:visibility="gone"
+            android:background="@drawable/bg_pill"
+            android:paddingHorizontal="9dp"
+            android:paddingVertical="3dp"
+            android:text="LOCKED"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.06"
+            android:textColor="@color/status_warn" />
     </LinearLayout>
 
     <TextView
-        android:id="@+id/coin_locked"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:visibility="gone"
-        android:background="@drawable/bg_pill"
-        android:paddingHorizontal="9dp"
-        android:paddingVertical="3dp"
-        android:text="LOCKED"
-        android:textSize="10sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.06"
-        android:textColor="@color/status_warn" />
+        android:id="@+id/coin_id"
+        style="@style/MonoBlock"
+        android:layout_marginTop="4dp"
+        android:textSize="11sp"
+        android:textColor="@color/core_text_faint" />
 </LinearLayout>

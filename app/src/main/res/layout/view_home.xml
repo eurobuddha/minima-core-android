@@ -66,8 +66,12 @@
                     <View style="@style/HomeDivider" />
                     <LinearLayout style="@style/HomeRow">
                         <TextView style="@style/HomeRow.Label" android:text="Random peer" />
+                        <!-- shown in full and selectable - never ellipsized -->
                         <TextView android:id="@+id/home_peers" style="@style/HomeRow.Value"
-                            android:maxLines="1" android:ellipsize="middle" />
+                            android:layout_width="0dp" android:layout_weight="1"
+                            android:textIsSelectable="true"
+                            android:breakStrategy="simple"
+                            android:hyphenationFrequency="none" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

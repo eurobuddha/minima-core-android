@@ -17,6 +17,8 @@ import org.minimarex.minimacore.main.views.balance.tokens.Identicon;
 import org.minimarex.minimacore.main.views.balance.tokens.ImageLoader;
 import org.minimarex.minimacore.main.views.balance.tokens.TokenMeta;
 import org.minimarex.minimacore.main.views.balance.tokens.WebValidate;
+import org.minimarex.minimacore.utils.Clip;
+import org.minimarex.minimacore.utils.Format;
 
 public class BalanceAdapter extends BaseAdapter {
 
@@ -64,13 +66,14 @@ public class BalanceAdapter extends BaseAdapter {
         TextView tokenname   = row.findViewById(R.id.balance_tokenname);
         TextView tokenamount = row.findViewById(R.id.balance_tokenamount);
         TextView tokenid     = row.findViewById(R.id.balance_tokenid);
+        TextView breakdown   = row.findViewById(R.id.balance_breakdown);
         ImageView icon       = row.findViewById(R.id.balance_tokenicon);
         ImageView badge      = row.findViewById(R.id.balance_tokenbadge);
 
         //Get the balance..
         JSONObject bal = (JSONObject) mCurrentBalance.get(position);
 
-        //Token ID
+        //Token ID - in full, never shortened
         String id = String.valueOf(bal.get("tokenid"));
         tokenid.setText(id);
 
@@ -113,21 +116,55 @@ public class BalanceAdapter extends BaseAdapter {
             }
         }
 
-        //Amount
-        String confirmed    = String.valueOf(bal.get("confirmed"));
-        String unconfirmed  = String.valueOf(bal.get("unconfirmed"));
-        if(confirmed.length() > 12){
-            confirmed = confirmed.substring(0,12)+"..";
+        //SENDABLE is the headline figure - confirmed includes coins locked in contracts
+        //and overstates what the user can actually spend. Shown in full, never clipped.
+        String confirmed   = val(bal, "confirmed");
+        String unconfirmed = val(bal, "unconfirmed");
+        String sendable    = bal.get("sendable") == null ? confirmed : val(bal, "sendable");
+        String coincount   = val(bal, "coins");
+
+        tokenamount.setText(Format.tidyAmount(sendable));
+
+        //Everything the headline number leaves out, for THIS token - not just Minima
+        StringBuilder sub = new StringBuilder();
+        String locked = Format.subtract(confirmed, sendable);
+        if(isPositive(locked)){
+            sub.append("locked ").append(locked);
         }
-        if(unconfirmed.length() > 12){
-            unconfirmed = unconfirmed.substring(0,12)+"..";
+        if(isPositive(unconfirmed)){
+            if(sub.length() > 0){ sub.append("  ·  "); }
+            sub.append("unconfirmed ").append(Format.tidyAmount(unconfirmed));
         }
-        if(unconfirmed.equals("0")){
-            tokenamount.setText(confirmed);
+        if(!"0".equals(coincount) && !"—".equals(coincount)){
+            if(sub.length() > 0){ sub.append("  ·  "); }
+            sub.append(coincount).append(" coins");
+        }
+
+        if(sub.length() > 0){
+            breakdown.setText(sub.toString());
+            breakdown.setVisibility(View.VISIBLE);
         }else{
-            tokenamount.setText(confirmed+"("+unconfirmed+")");
+            breakdown.setVisibility(View.GONE);
         }
 
         return row;
+    }
+
+    private static String val(JSONObject zBal, String zKey){
+        Object v = zBal.get(zKey);
+        if(v == null){
+            return "0";
+        }
+        String s = String.valueOf(v);
+        return (s.isEmpty() || "null".equals(s)) ? "0" : s;
+    }
+
+    /** True when the string parses as a number greater than zero. */
+    private static boolean isPositive(String zValue){
+        try{
+            return new java.math.BigDecimal(zValue).signum() > 0;
+        }catch(Exception exc){
+            return false;
+        }
     }
 }

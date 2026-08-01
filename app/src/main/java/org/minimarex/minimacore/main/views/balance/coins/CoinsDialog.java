@@ -16,6 +16,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.Clip;
 import org.minimarex.minimacore.utils.Format;
 import org.minimarex.minimacore.utils.MinimaCMD;
 import org.minimarex.minimacore.utils.MinimaCMDListener;
@@ -83,13 +84,26 @@ public class CoinsDialog {
         mFooter         = body.findViewById(R.id.coins_footer);
         mList           = body.findViewById(R.id.coins_list);
 
-        header.setText("sendable "+Format.tidyAmount(safe(zSendable))
-                      +"  ·  confirmed "+Format.tidyAmount(safe(zConfirmed)));
+        //Sendable leads - it is the spendable figure. confirmed includes locked coins.
+        StringBuilder hdr = new StringBuilder("sendable ").append(Format.tidyAmount(safe(zSendable)));
+        String lockedAmt = Format.subtract(zConfirmed, zSendable);
+        if(!"—".equals(lockedAmt) && !"0".equals(lockedAmt)){
+            hdr.append("  ·  locked ").append(lockedAmt);
+        }
+        hdr.append("  ·  confirmed ").append(Format.tidyAmount(safe(zConfirmed)));
+        header.setText(hdr.toString());
 
         mList.setAdapter(mAdapter);
         mList.setOnItemClickListener((parent, view, position, id) -> {
             JSONObject coin = (JSONObject) mAdapter.getItem(position);
             mOpenDetail = CoinDetailDialog.show(mActivity, coin, mAdapter.isSendable(coin));
+        });
+
+        //Long-press copies the full coin id straight out of the list
+        mList.setOnItemLongClickListener((parent, view, position, id) -> {
+            JSONObject coin = (JSONObject) mAdapter.getItem(position);
+            Clip.copy(mActivity, "coinid", String.valueOf(coin.get("coinid")), "Coin ID copied");
+            return true;
         });
 
         setStatus("Reading coins…", R.color.core_text_faint);
@@ -236,8 +250,22 @@ public class CoinsDialog {
     private void sizeList(int zCount){
         DisplayMetrics dm = mActivity.getResources().getDisplayMetrics();
 
-        int rowPx   = (int)(66 * dm.density);
-        int divider = (int)(1  * dm.density);
+        //Measure a REAL row - rows wrap the full coin id, so their height depends on the
+        //id length and the screen width and can't be hardcoded
+        int rowPx = 0;
+        try{
+            View sample = mAdapter.getView(0, null, mList);
+            int wSpec = View.MeasureSpec.makeMeasureSpec(
+                    mList.getWidth() > 0 ? mList.getWidth() : dm.widthPixels, View.MeasureSpec.AT_MOST);
+            sample.measure(wSpec, View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            rowPx = sample.getMeasuredHeight();
+        }catch(Throwable exc){}
+
+        if(rowPx <= 0){
+            rowPx = (int)(92 * dm.density);
+        }
+
+        int divider = (int)(1 * dm.density);
         int wanted  = (rowPx * zCount) + (divider * Math.max(0, zCount-1));
         int max     = (int)(dm.heightPixels * 0.55f);
 

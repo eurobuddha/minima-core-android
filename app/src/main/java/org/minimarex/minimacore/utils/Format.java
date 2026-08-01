@@ -31,18 +31,9 @@ public class Format {
         return s.isEmpty() ? "0" : s;
     }
 
-    /**
-     * First 8 + ellipsis + last 6, for a hash shown in a scannable list row.
-     *
-     * NEVER use this in a detail field or anywhere the value is meant to be copied -
-     * the whole point of the coin detail modal is that ids arrive byte-exact.
-     */
-    public static String shortHash(String zHash){
-        if(zHash == null || zHash.length() < 12){
-            return zHash;
-        }
-        return zHash.substring(0,8) + "…" + zHash.substring(zHash.length()-6);
-    }
+    // NOTE: there is deliberately no shortHash/abbreviate helper here. Hashes, addresses
+    // and token ids are shown IN FULL everywhere in this app - wrapped if they need it -
+    // and are copyable. If you are tempted to add one back, wrap the text instead.
 
     /**
      * Coarse "how stale is this" bucket. Coarse on purpose - the wallet re-renders this

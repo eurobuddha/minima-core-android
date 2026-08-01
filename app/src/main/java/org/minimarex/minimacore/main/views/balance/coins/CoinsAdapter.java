@@ -70,8 +70,8 @@ public class CoinsAdapter extends BaseAdapter {
 
         amount.setText(Format.tidyAmount(Format.coinAmount(coin)));
 
-        //Short form only - the full id is one tap away in the detail modal
-        coinid.setText(Format.shortHash(String.valueOf(coin.get("coinid"))));
+        //IN FULL - wrapped, never shortened
+        coinid.setText(String.valueOf(coin.get("coinid")));
 
         locked.setVisibility(isSendable(coin) ? View.GONE : View.VISIBLE);
 

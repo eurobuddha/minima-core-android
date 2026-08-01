@@ -14,6 +14,7 @@ import org.minimarex.minimacore.main.views.balance.coins.CoinsDialog;
 import org.minimarex.minimacore.main.views.balance.tokens.TokenMeta;
 import org.minimarex.minimacore.main.views.receive.ReceiveActivity;
 import org.minimarex.minimacore.main.views.send.SendActivity;
+import org.minimarex.minimacore.utils.Clip;
 import org.minimarex.minimacore.utils.Format;
 import org.minimarex.minimacore.utils.MinimaCMD;
 import org.minimarex.minimacore.utils.MinimaCMDListener;
@@ -78,6 +79,18 @@ public class BalanceView extends BaseView {
             }catch(Throwable exc){
                 logger.log("Could not open coins : "+exc);
             }
+        });
+
+        //Long-press copies the full token id. Wired on the ListView, not the row view -
+        //a long-click listener set on the row itself can swallow the item click.
+        mBalanceList.setOnItemLongClickListener((parent, view, position, id) -> {
+            try{
+                JSONObject bal = (JSONObject) mBalanceAdapter.getItem(position);
+                Clip.copy(getActivity(), "tokenid", String.valueOf(bal.get("tokenid")), "Token ID copied");
+            }catch(Throwable exc){
+                logger.log("Could not copy token id : "+exc);
+            }
+            return true;
         });
 
         getMainView().findViewById(R.id.wallet_btn_send).setOnClickListener(new View.OnClickListener() {
