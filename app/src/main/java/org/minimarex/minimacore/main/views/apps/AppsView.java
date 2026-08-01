@@ -1,7 +1,7 @@
 package org.minimarex.minimacore.main.views.apps;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -102,7 +102,7 @@ public class AppsView extends BaseView {
             logger.log("Package not found.. "+packageclass+" "+e);
         }
 
-        new AlertDialog.Builder(getActivity())
+        new MaterialAlertDialogBuilder(getActivity())
                 .setTitle(pname)
                 .setView(dialogview)
                 .setIcon(icon)

@@ -44,6 +44,18 @@
             android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
     </LinearLayout>
 
+    <!-- what makes up that number: confirmed / locked / unconfirmed / coin count / staleness -->
+    <TextView
+        android:id="@+id/wallet_balance_breakdown"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="6dp"
+        android:textAppearance="@style/TextAppearance.MinimaCore.Caption"
+        android:textColor="@color/core_text_faint"
+        android:textSize="12sp"
+        android:lineSpacingMultiplier="1.25" />
+
     <!-- ===== Send / Receive ===== -->
     <LinearLayout
         android:layout_width="match_parent"

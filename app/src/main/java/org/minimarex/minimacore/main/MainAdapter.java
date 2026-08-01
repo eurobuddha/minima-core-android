@@ -91,4 +91,13 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
             }
         }
     }
+
+    /** Called from MainActivity.onDestroy - a dialog still showing then leaks its window. */
+    public void destroyAllViews(){
+        for(int i=0;i<mAllViews.length;i++){
+            if(mAllViews[i] != null){
+                mAllViews[i].onActivityDestroy();
+            }
+        }
+    }
 }

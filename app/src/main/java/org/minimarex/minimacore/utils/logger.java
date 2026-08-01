@@ -1,9 +1,10 @@
 package org.minimarex.minimacore.utils;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.minimarex.minimacore.R;
 
@@ -20,7 +21,7 @@ public class logger {
     }
 
     public static void showDialog(Context zContext, String zTitle, String zMessage, Runnable zOnOK){
-        new AlertDialog.Builder(zContext)
+        new MaterialAlertDialogBuilder(zContext)
                 .setTitle(zTitle)
                 .setMessage(zMessage)
                 .setIcon(R.drawable.ic_minima)

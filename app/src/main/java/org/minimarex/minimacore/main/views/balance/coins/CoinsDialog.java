@@ -1,0 +1,325 @@
+package org.minimarex.minimacore.main.views.balance.coins;
+
+import android.app.Activity;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import org.minima.utils.json.JSONArray;
+import org.minima.utils.json.JSONObject;
+import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.Format;
+import org.minimarex.minimacore.utils.MinimaCMD;
+import org.minimarex.minimacore.utils.MinimaCMDListener;
+import org.minimarex.minimacore.utils.logger;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Every coin behind a token balance.
+ *
+ * Lists ALL relevant coins - including ones locked in a contract - because seeing what
+ * inflates confirmed-over-sendable is the whole point. Locked coins get a chip.
+ * Tapping a coin opens the full, copyable detail.
+ */
+public class CoinsDialog {
+
+    private final Activity     mActivity;
+    private final CoinsAdapter mAdapter;
+
+    private AlertDialog mDialog;
+    private TextView    mStatus;
+    private TextView    mFooter;
+    private ListView    mList;
+
+    /** Set the moment the user closes the modal - a late node reply is then dropped. */
+    private boolean mDismissed = false;
+
+    private CoinDetailDialog mOpenDetail = null;
+
+    private final String mTokenId;
+    private final String mConfirmed;
+
+    /** Everything the background thread produces, handed over in one go. */
+    private static class Result {
+        JSONArray   coins;
+        Set<String> sendableIds;
+        String      sum;
+        String      error;
+    }
+
+    public static CoinsDialog show(Activity zActivity, String zTokenId, String zTokenName,
+                                   String zSendable, String zConfirmed){
+        CoinsDialog cd = new CoinsDialog(zActivity, zTokenId, zConfirmed);
+        cd.open(zTokenName, zSendable, zConfirmed);
+        return cd;
+    }
+
+    private CoinsDialog(Activity zActivity, String zTokenId, String zConfirmed){
+        mActivity  = zActivity;
+        mTokenId   = zTokenId;
+        mConfirmed = zConfirmed;
+        mAdapter   = new CoinsAdapter(zActivity);
+    }
+
+    /** Runs on the UI thread. The window is up before the node is asked anything. */
+    private void open(String zTokenName, String zSendable, String zConfirmed){
+
+        LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+        View body = inflater.inflate(R.layout.dialog_wallet_coins, null);
+
+        TextView header = body.findViewById(R.id.coins_header);
+        mStatus         = body.findViewById(R.id.coins_status);
+        mFooter         = body.findViewById(R.id.coins_footer);
+        mList           = body.findViewById(R.id.coins_list);
+
+        header.setText("sendable "+Format.tidyAmount(safe(zSendable))
+                      +"  ·  confirmed "+Format.tidyAmount(safe(zConfirmed)));
+
+        mList.setAdapter(mAdapter);
+        mList.setOnItemClickListener((parent, view, position, id) -> {
+            JSONObject coin = (JSONObject) mAdapter.getItem(position);
+            mOpenDetail = CoinDetailDialog.show(mActivity, coin, mAdapter.isSendable(coin));
+        });
+
+        setStatus("Reading coins…", R.color.core_text_faint);
+
+        mDialog = new MaterialAlertDialogBuilder(mActivity)
+                .setTitle(zTokenName == null ? "Coins" : zTokenName+" coins")
+                .setView(body)
+                .setPositiveButton("Close", null)
+                .create();
+
+        mDialog.setOnDismissListener(d -> {
+            mDismissed = true;
+            dismissDetail();
+        });
+
+        mDialog.show();
+
+        //Guard first: with no tip the node answers status:true with an EMPTY array,
+        //which would otherwise read as "you have no coins"
+        if(!MinimaCMD.checkMinimaStarted()){
+            setStatus("Node not started — no coin data yet.", R.color.status_warn);
+            return;
+        }
+
+        fetchCoins();
+    }
+
+    /**
+     * Two queries: every relevant coin, then the sendable-only subset. The node's coin JSON
+     * has no per-coin sendable flag, so the LOCKED chips come from diffing the two by coinid.
+     * If the second one fails we simply show no chips - never fail the whole modal for it.
+     */
+    private void fetchCoins(){
+
+        final String all      = "coins relevant:true tokenid:"+mTokenId+" simplestate:false";
+        final String sendable = "coins relevant:true sendable:true tokenid:"+mTokenId+" simplestate:false";
+
+        //MinimaCMD runs this on a bare Thread with no handler - an escaping throwable kills the app
+        MinimaCMD.runMinima(all, new MinimaCMDListener() {
+            @Override
+            public void cmdResult(JSONObject zResult) {
+                try{
+                    final Result res = new Result();
+
+                    res.error = errorOf(zResult);
+                    if(res.error != null){
+                        deliver(res);
+                        return;
+                    }
+
+                    res.coins = (JSONArray) zResult.get("response");
+                    if(res.coins == null){
+                        res.coins = new JSONArray();
+                    }
+
+                    //Sum here, on the background thread - a wallet can hold thousands of coins
+                    res.sum = sumOf(res.coins);
+
+                    MinimaCMD.runMinima(sendable, new MinimaCMDListener() {
+                        @Override
+                        public void cmdResult(JSONObject zSendResult) {
+                            try{
+                                res.sendableIds = idsOf(zSendResult);
+                            }catch(Throwable exc){
+                                logger.log("Coins sendable query failed : "+exc);
+                                res.sendableIds = null;
+                            }
+                            deliver(res);
+                        }
+                    });
+
+                }catch(Throwable exc){
+                    logger.log("Coins query failed : "+exc);
+                    Result res = new Result();
+                    res.error  = String.valueOf(exc);
+                    deliver(res);
+                }
+            }
+        });
+    }
+
+    private void deliver(Result zResult){
+        mActivity.runOnUiThread(() -> {
+            //Modal closed, tab left, or the Activity went away mid-flight
+            if(mDismissed || mActivity.isFinishing() || mActivity.isDestroyed()){
+                return;
+            }
+            populate(zResult);
+        });
+    }
+
+    private void populate(Result zResult){
+
+        if(zResult.error != null){
+            //Deliberately distinct from the empty state - a failed query is not an empty wallet
+            setStatus("⚠ Coins query failed — "+zResult.error, R.color.status_bad);
+            return;
+        }
+
+        if(zResult.coins == null || zResult.coins.size() == 0){
+            setStatus("No coins for this token.", R.color.core_text_faint);
+            return;
+        }
+
+        mAdapter.updateValues(zResult.coins, zResult.sendableIds);
+
+        mStatus.setVisibility(View.GONE);
+        mList.setVisibility(View.VISIBLE);
+        sizeList(zResult.coins.size());
+
+        int locked = 0;
+        if(zResult.sendableIds != null){
+            for(int i=0;i<zResult.coins.size();i++){
+                if(!mAdapter.isSendable((JSONObject) zResult.coins.get(i))){
+                    locked++;
+                }
+            }
+        }
+
+        StringBuilder foot = new StringBuilder();
+        foot.append(zResult.coins.size()).append(" coins");
+        if(zResult.sendableIds != null){
+            foot.append("  ·  ").append(locked).append(" locked");
+        }
+        foot.append("  ·  sum ").append(Format.tidyAmount(zResult.sum));
+
+        //Cross-check against the balance the wallet screen is showing
+        if(differs(zResult.sum, mConfirmed)){
+            foot.append("\n⚠ sum ≠ confirmed (").append(Format.tidyAmount(safe(mConfirmed))).append(")");
+            mFooter.setTextColor(ContextCompat.getColor(mActivity, R.color.status_warn));
+        }else{
+            mFooter.setTextColor(ContextCompat.getColor(mActivity, R.color.core_text_faint));
+        }
+
+        mFooter.setText(foot.toString());
+        mFooter.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * AlertDialog measures its custom view with an unbounded height spec, so a
+     * wrap_content ListView collapses to a single row. Size it explicitly: snug for a
+     * handful of coins, capped and scrollable for thousands.
+     */
+    private void sizeList(int zCount){
+        DisplayMetrics dm = mActivity.getResources().getDisplayMetrics();
+
+        int rowPx   = (int)(66 * dm.density);
+        int divider = (int)(1  * dm.density);
+        int wanted  = (rowPx * zCount) + (divider * Math.max(0, zCount-1));
+        int max     = (int)(dm.heightPixels * 0.55f);
+
+        ViewGroup.LayoutParams lp = mList.getLayoutParams();
+        lp.height = Math.min(wanted, max);
+        mList.setLayoutParams(lp);
+    }
+
+    private void setStatus(String zText, int zColorRes){
+        mStatus.setText(zText);
+        mStatus.setTextColor(ContextCompat.getColor(mActivity, zColorRes));
+        mStatus.setVisibility(View.VISIBLE);
+        mList.setVisibility(View.GONE);
+        mFooter.setVisibility(View.GONE);
+    }
+
+    /** Called by BalanceView when the Activity goes away, so the window can't leak. */
+    public void dismiss(){
+        dismissDetail();
+        if(mDialog != null && mDialog.isShowing()){
+            mDialog.dismiss();
+        }
+    }
+
+    private void dismissDetail(){
+        if(mOpenDetail != null){
+            mOpenDetail.dismiss();
+            mOpenDetail = null;
+        }
+    }
+
+    // ---- helpers ----
+
+    /** The command's error string, or null when it succeeded. */
+    private static String errorOf(JSONObject zResult){
+        if(zResult == null){
+            return "no reply from the node";
+        }
+        if(!Boolean.TRUE.equals(zResult.get("status"))){
+            Object err = zResult.get("error");
+            return err == null ? "unknown error" : String.valueOf(err);
+        }
+        return null;
+    }
+
+    private static Set<String> idsOf(JSONObject zResult){
+        if(errorOf(zResult) != null){
+            return null;
+        }
+
+        JSONArray arr = (JSONArray) zResult.get("response");
+        if(arr == null){
+            return null;
+        }
+
+        Set<String> ids = new HashSet<>();
+        for(int i=0;i<arr.size();i++){
+            ids.add(String.valueOf(((JSONObject)arr.get(i)).get("coinid")));
+        }
+        return ids;
+    }
+
+    private static String sumOf(JSONArray zCoins){
+        BigDecimal sum = BigDecimal.ZERO;
+        for(int i=0;i<zCoins.size();i++){
+            try{
+                sum = sum.add(new BigDecimal(Format.coinAmount((JSONObject) zCoins.get(i))));
+            }catch(Exception exc){}
+        }
+        return sum.toPlainString();
+    }
+
+    /** compareTo, not equals - BigDecimal("10") does not equal BigDecimal("10.0"). */
+    private static boolean differs(String zA, String zB){
+        try{
+            return new BigDecimal(zA).compareTo(new BigDecimal(zB)) != 0;
+        }catch(Exception exc){
+            return false;
+        }
+    }
+
+    private static String safe(String zValue){
+        return (zValue == null || "null".equals(zValue)) ? "—" : zValue;
+    }
+}

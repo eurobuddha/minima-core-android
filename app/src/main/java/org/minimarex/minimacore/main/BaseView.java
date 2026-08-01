@@ -28,4 +28,7 @@ public class BaseView {
     }
 
     public void refreshView(){}
+
+    /** The Activity is going away - drop timers and dismiss any dialog this view owns. */
+    public void onActivityDestroy(){}
 }

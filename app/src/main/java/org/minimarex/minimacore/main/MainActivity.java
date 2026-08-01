@@ -226,6 +226,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     protected void onDestroy() {
         super.onDestroy();
 
+        //Drop any dialog a tab still has open, or its window leaks on rotation
+        if(mMainAdapter != null){
+            mMainAdapter.destroyAllViews();
+        }
+
         //Unbind from the service..
         if(mMinimaService != null) {
             mMinimaService = null;
