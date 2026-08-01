@@ -36,6 +36,41 @@ public class Format {
     // and are copyable. If you are tempted to add one back, wrap the text instead.
 
     /**
+     * Pull a bare Minima address out of whatever a QR actually contained.
+     *
+     * Wallets encode addresses plain, but also as URIs (minima:Mx… , minima://Mx…?amount=1).
+     * A raw Mx… / 0x… is passed straight through - neither contains a colon, so a colon is a
+     * reliable marker of a scheme rather than part of the address.
+     */
+    public static String cleanAddress(String zRaw){
+        if(zRaw == null){
+            return "";
+        }
+
+        String s = zRaw.trim();
+
+        //Strip a URI scheme, but never touch a bare address
+        if(!s.startsWith("0x") && !s.startsWith("Mx")){
+            int colon = s.indexOf(':');
+            if(colon > -1){
+                s = s.substring(colon+1);
+                while(s.startsWith("/")){
+                    s = s.substring(1);
+                }
+            }
+        }
+
+        //Drop any query string / fragment the URI carried
+        int cut = s.indexOf('?');
+        if(cut > -1){ s = s.substring(0, cut); }
+        cut = s.indexOf('#');
+        if(cut > -1){ s = s.substring(0, cut); }
+
+        //A QR can carry trailing whitespace or a newline
+        return s.trim();
+    }
+
+    /**
      * Coarse "how stale is this" bucket. Coarse on purpose - the wallet re-renders this
      * every 10s and fine-grained seconds would visibly jitter.
      */

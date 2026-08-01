@@ -29,6 +29,17 @@
             android:paddingVertical="6dp"
             android:minHeight="48dp" />
 
+        <!-- what the selected token can actually spend, in full -->
+        <TextView
+            android:id="@+id/wallet_send_sendable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:lineSpacingMultiplier="1.2"
+            android:textAppearance="@style/TextAppearance.MinimaCore.Caption"
+            android:textColor="@color/core_text_faint"
+            android:textSize="12sp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,15 +48,36 @@
             android:text="Amount"
             android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
 
-        <EditText
-            android:id="@+id/wallet_send_amount"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:hint="0.0"
-            android:textColor="@color/core_text"
-            android:textColorHint="@color/core_text_faint"
-            android:textAppearance="@style/TextAppearance.MinimaCore.Body" />
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:baselineAligned="false">
+
+            <EditText
+                android:id="@+id/wallet_send_amount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="numberDecimal"
+                android:hint="0.0"
+                android:textColor="@color/core_text"
+                android:textColorHint="@color/core_text_faint"
+                android:textAppearance="@style/TextAppearance.MinimaCore.Body" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/wallet_send_max"
+                style="@style/Widget.MinimaCore.Button.Outlined"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_marginStart="8dp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="16dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="Max" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -55,14 +87,41 @@
             android:text="To address"
             android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
 
-        <EditText
-            android:id="@+id/wallet_send_address"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Mx… or 0x…"
-            android:textColor="@color/core_text"
-            android:textColorHint="@color/core_text_faint"
-            android:textAppearance="@style/TextAppearance.MinimaCore.Body" />
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:baselineAligned="false">
+
+            <!-- full address, wraps rather than scrolls - a pasted or scanned Mx… must be
+                 visible end to end so it can be checked before sending -->
+            <EditText
+                android:id="@+id/wallet_send_address"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="textNoSuggestions|textMultiLine"
+                android:breakStrategy="simple"
+                android:hyphenationFrequency="none"
+                android:hint="Mx… or 0x…"
+                android:textColor="@color/core_text"
+                android:textColorHint="@color/core_text_faint"
+                android:textAppearance="@style/TextAppearance.MinimaCore.Body" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/wallet_send_scan"
+                style="@style/Widget.MinimaCore.Button.Outlined"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_marginStart="8dp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="16dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="Scan"
+                android:contentDescription="Scan a recipient address QR code" />
+        </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/wallet_send_sendbutton"

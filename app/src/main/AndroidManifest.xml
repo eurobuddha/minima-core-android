@@ -13,6 +13,13 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- Network API -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Scan a recipient address QR on the Send screen. Declared explicitly rather than
+         inherited from the zxing library manifest. The camera is optional - the app is
+         fully usable without one, so this must not gate installs. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <!-- Wake Lock-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- BOOT Message -->
