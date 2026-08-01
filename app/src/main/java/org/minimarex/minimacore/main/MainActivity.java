@@ -528,6 +528,30 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         setFooterText();
     }
 
+    /**
+     * NEWBALANCE - funds have actually moved on chain.
+     *
+     * This is the honest confirmation point: a `send` reply only means the transaction was
+     * built and posted, not that it was mined. Refresh the wallet so its figures and the
+     * "updated ..." stamp are current, and say so once.
+     */
+    @Override
+    public void MinimaNewBalance() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    //Wallet is index 1 - refresh it wherever the user happens to be
+                    mMainAdapter.refreshPagerView(1);
+                    Toast.makeText(MainActivity.this, "Balance updated on chain", Toast.LENGTH_SHORT).show();
+
+                }catch(Throwable exc){
+                    logger.log("NEWBALANCE refresh failed : "+exc);
+                }
+            }
+        });
+    }
+
     public void setFooterText(){
 
         //Have we started

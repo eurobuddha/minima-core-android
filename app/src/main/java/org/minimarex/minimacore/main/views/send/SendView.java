@@ -15,6 +15,7 @@ import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.main.BaseView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.minimarex.minimacore.utils.Feedback;
 import org.minimarex.minimacore.utils.Format;
 import org.minimarex.minimacore.utils.MinimaCMD;
 import org.minimarex.minimacore.utils.MinimaCMDListener;
@@ -133,12 +134,7 @@ public class SendView extends BaseView {
 
     protected void sendFunds(String zAMount, String zAddress, String zTokenid){
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getActivity(), "Sending funds..", Toast.LENGTH_SHORT).show();
-            }
-        });
+        Feedback.toast(getActivity(), "Building transaction…");
 
         String cmd = "send amount:"+zAMount+" address:"+zAddress+" tokenid:"+zTokenid;
 
@@ -147,28 +143,44 @@ public class SendView extends BaseView {
             public void cmdResult(JSONObject zResult) {
                 //Raw Thread - an escaping throwable would kill the app
                 try{
-                    final boolean ok = Boolean.TRUE.equals(zResult.get("status"));
-                    final String  err = String.valueOf(zResult.get("error"));
+                    final String err = Feedback.errorOf(zResult);
+
+                    if(err != null){
+                        //Show the node's OWN words - "Insufficient funds.. you only have X
+                        //require:Y" is exactly what the user needs, and is under "message"
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                logger.showDialog(getActivity(), "Send failed",
+                                        err + "\n\nNothing was sent. Your inputs have been kept.");
+                            }
+                        });
+                        return;
+                    }
+
+                    final String txpowid = Feedback.txpowIdOf(zResult);
 
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(ok){
-                                //Only clear the form once the node has actually accepted it -
-                                //on failure the user keeps what they typed
-                                mAmount.setText("");
-                                mAddress.setText("");
-                                Toast.makeText(getActivity(), "Funds Sent!", Toast.LENGTH_SHORT).show();
-                            }else{
-                                logger.showDialog(getActivity(), "Send failed",
-                                        ("null".equals(err) ? "The node rejected the transaction." : err)
-                                        + "\n\nNothing was sent. Your inputs have been kept.");
+                            //Accepted - clear the form. Only now, never before the node answered.
+                            mAmount.setText("");
+                            mAddress.setText("");
+
+                            //NOT "sent". The node has built and posted the transaction; it still
+                            //has to be mined into a block. The wallet toasts again when the
+                            //balance actually moves (NEWBALANCE).
+                            Feedback.longToast(getActivity(), "Transaction posted — mining…");
+
+                            if(txpowid != null){
+                                logger.log("Send posted txpowid:"+txpowid);
                             }
                         }
                     });
 
                 }catch(Throwable exc){
                     logger.log("Send failed : "+exc);
+                    Feedback.toast(getActivity(), "Send failed — see the Logs tab");
                 }
             }
         });

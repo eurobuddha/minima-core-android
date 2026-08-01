@@ -209,6 +209,13 @@ public class MinimaService extends Service {
                         //Notify the User
                         createNotification("Your balance has changed");
 
+                        //..and tell the UI, so the wallet can refresh and confirm in-app.
+                        //This is the real "it landed" signal - a send command reply only
+                        //means the transaction was built and posted, not mined.
+                        if(mServiceListener != null){
+                            mServiceListener.MinimaNewBalance();
+                        }
+
                     }else if(event.equals("SHUTDOWN")){
 
                         MinimaLogger.log("SERVICE Received SHUTDOWN!");

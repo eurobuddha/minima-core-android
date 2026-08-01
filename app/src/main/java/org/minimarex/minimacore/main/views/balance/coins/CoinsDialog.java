@@ -17,6 +17,7 @@ import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.utils.Clip;
+import org.minimarex.minimacore.utils.Feedback;
 import org.minimarex.minimacore.utils.Format;
 import org.minimarex.minimacore.utils.MinimaCMD;
 import org.minimarex.minimacore.utils.MinimaCMDListener;
@@ -299,16 +300,9 @@ public class CoinsDialog {
 
     // ---- helpers ----
 
-    /** The command's error string, or null when it succeeded. */
+    /** Shared with every other call site - commands report failure under differing keys. */
     private static String errorOf(JSONObject zResult){
-        if(zResult == null){
-            return "no reply from the node";
-        }
-        if(!Boolean.TRUE.equals(zResult.get("status"))){
-            Object err = zResult.get("error");
-            return err == null ? "unknown error" : String.valueOf(err);
-        }
-        return null;
+        return Feedback.errorOf(zResult);
     }
 
     private static Set<String> idsOf(JSONObject zResult){
