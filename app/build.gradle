@@ -16,8 +16,12 @@ android {
         // vc34: truthful chain feedback - node errors come from the right key ("message",
         // not just "error"), a posted txn says "mining" rather than "sent", and NEWBALANCE
         // reaches the UI. Bump BEFORE building - a published versionCode is never reused.
-        versionCode 34
-        versionName "1.6.6-ui-h2"
+        // vc35: SECURITY - the bundled minima.jar carries the Wallet.signData fix. That method
+        // was the only unsynchronized mutator on Wallet and its read-modify-write of the key
+        // `uses` counter let two concurrent signers spend the SAME Winternitz leaf on different
+        // data, which leaks that leaf's private key. Confirmed in the wild (7 of 64 keys).
+        versionCode 35
+        versionName "1.6.7-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
