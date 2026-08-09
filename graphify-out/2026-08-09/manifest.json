@@ -1,7 +1,7 @@
 {
   "app/build.gradle": {
-    "mtime": 1786299080.3918185,
-    "ast_hash": "0e051489cc3b34d9335b9f701b42a823",
+    "mtime": 1786235716.7069883,
+    "ast_hash": "1c3201e3216720d9173bca838e74bd61",
     "semantic_hash": ""
   },
   "app/release/baselineProfiles/0/app-release.dm": {
@@ -185,9 +185,9 @@
     "semantic_hash": "62a4e717a14161a06fca7c7dea76ab70"
   },
   "app/src/main/java/org/minimarex/minimacore/receiver/MinimaReceiver.java": {
-    "mtime": 1786299068.549893,
-    "ast_hash": "77ed8280e8c6cd985a45be387d2da6c8",
-    "semantic_hash": ""
+    "mtime": 1785227280.9934459,
+    "ast_hash": "79d6c8e118e7e9309a67018c69a723b3",
+    "semantic_hash": "79d6c8e118e7e9309a67018c69a723b3"
   },
   "app/src/main/java/org/minimarex/minimacore/receiver/ReceiverDB.java": {
     "mtime": 1782212448.999741,

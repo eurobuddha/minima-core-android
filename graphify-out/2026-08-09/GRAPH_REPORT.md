@@ -1,29 +1,29 @@
-# Graph Report - base  (2026-08-09)
+# Graph Report - base  (2026-08-01)
 
 ## Corpus Check
-- 72 files · ~26,994 words
+- 72 files · ~26,749 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 661 nodes · 1257 edges · 56 communities (25 shown, 31 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 22 edges (avg confidence: 0.8)
+- 660 nodes · 1264 edges · 51 communities (26 shown, 25 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 25 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b326c7ae`
+- Built from commit: `f226bb7a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- Context
+- MinimaReceiver
 - CoinsAdapter
 - MainActivity
 - MinimaService
 - ReceiverDB
 - BalanceAdapter
 - MinimaAPI
-- LogsView
-- BroadcastReceiver
+- logger.java
+- Identicon
 - CoinsDialog
 - ImageLoader
 - StartServiceActivity.java
@@ -41,9 +41,9 @@
 - AppCompatActivity
 - MinimaApplication
 - BroadcastReceiver
-- BaseView
+- MainAdapter
 - TokenMeta
-- TokenSpinnerAdapter
+- LogBuffer
 - Context
 - Bundle
 - ComponentName
@@ -62,22 +62,17 @@
 - MinimaServiceListener
 - TextView
 - JSONObject
-- WebValidate
-- Intent
-- JSONObject
-- Minima
-- Override
 
 ## God Nodes (most connected - your core abstractions)
 1. `MinimaService` - 40 edges
 2. `MainActivity` - 36 edges
-3. `CoinsDialog` - 25 edges
-4. `ReceiverDB` - 23 edges
+3. `ReceiverDB` - 26 edges
+4. `CoinsDialog` - 25 edges
 5. `MinimaReceiver` - 20 edges
 6. `BaseView` - 19 edges
-7. `SendView` - 17 edges
-8. `BalanceAdapter` - 17 edges
-9. `MinimaAPI` - 17 edges
+7. `MinimaAPI` - 18 edges
+8. `SendView` - 17 edges
+9. `BalanceAdapter` - 17 edges
 10. `SeedSyncServiceActivity` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -95,55 +90,59 @@
 ## Import Cycles
 - None detected.
 
-## Communities (56 total, 31 thin omitted)
+## Communities (51 total, 25 thin omitted)
+
+### Community 0 - "MinimaReceiver"
+Cohesion: 0.15
+Nodes (8): Context, Intent, JSONObject, Minima, Override, MinimaReceiver, MinimaAPILogger, MinimaAPIMessages
 
 ### Community 1 - "CoinsAdapter"
-Cohesion: 0.20
+Cohesion: 0.22
 Nodes (8): CoinsAdapter, Activity, JSONArray, JSONObject, LayoutInflater, Override, View, ViewGroup
 
 ### Community 2 - "MainActivity"
-Cohesion: 0.10
-Nodes (10): IBinder, Override, TextView, MainActivity, ComponentName, MainAdapter, Menu, MenuItem (+2 more)
+Cohesion: 0.11
+Nodes (12): IBinder, Override, TextView, MainActivity, Bundle, ComponentName, Intent, MainAdapter (+4 more)
 
 ### Community 3 - "MinimaService"
 Cohesion: 0.07
-Nodes (25): Alarm, MinimaReceiver, IBinder, JSONObject, Override, MinimaService, MyBinder, Binder (+17 more)
+Nodes (27): Alarm, Alarm, Context, Intent, Override, BootReceiver, Context, Intent (+19 more)
 
 ### Community 4 - "ReceiverDB"
 Cohesion: 0.09
 Nodes (16): AppsAdapter, Context, JSONArray, LayoutInflater, Override, View, ViewGroup, Context (+8 more)
 
 ### Community 5 - "BalanceAdapter"
-Cohesion: 0.06
-Nodes (23): BalanceAdapter, Activity, JSONArray, JSONObject, LayoutInflater, Override, View, ViewGroup (+15 more)
+Cohesion: 0.07
+Nodes (20): BalanceAdapter, Activity, JSONArray, JSONObject, LayoutInflater, Override, View, ViewGroup (+12 more)
 
 ### Community 6 - "MinimaAPI"
-Cohesion: 0.14
-Nodes (11): Context, Intent, MinimaAPI, JSONObject, MinimaAPIListener, MinimaAPILogger, Context, Intent (+3 more)
+Cohesion: 0.15
+Nodes (10): Context, Intent, MinimaAPI, JSONObject, MinimaAPIListener, Context, Intent, Override (+2 more)
 
-### Community 7 - "LogsView"
-Cohesion: 0.07
-Nodes (21): Override, Activity, Button, EditText, JSONObject, Override, ScrollView, TextView (+13 more)
+### Community 7 - "logger.java"
+Cohesion: 0.06
+Nodes (34): BaseView, Activity, View, HomeView, Activity, Override, SimpleDateFormat, TextView (+26 more)
 
-### Community 8 - "BroadcastReceiver"
-Cohesion: 0.23
-Nodes (9): Alarm, Context, Intent, Override, BootReceiver, Context, Intent, Override (+1 more)
+### Community 8 - "Identicon"
+Cohesion: 0.42
+Nodes (4): Identicon, Bitmap, Canvas, Paint
 
 ### Community 9 - "CoinsDialog"
-Cohesion: 0.15
-Nodes (10): AlertDialog, CoinsDialog, Activity, JSONArray, JSONObject, TextView, Result, CoinDetailDialog (+2 more)
+Cohesion: 0.10
+Nodes (13): AlertDialog, CoinsDialog, Activity, JSONArray, JSONObject, TextView, Result, Feedback (+5 more)
 
 ### Community 10 - "ImageLoader"
 Cohesion: 0.16
-Nodes (9): Identicon, Bitmap, ImageLoader, Activity, Bitmap, ImageView, Canvas, LruCache (+1 more)
+Nodes (7): ImageLoader, Activity, Bitmap, ImageView, Activity, WebValidate, LruCache
 
 ### Community 11 - "StartServiceActivity.java"
-Cohesion: 0.11
-Nodes (14): Bundle, ComponentName, IBinder, Override, ProgressDialog, SeedSyncServiceActivity, Bundle, ComponentName (+6 more)
+Cohesion: 0.08
+Nodes (21): Bundle, ComponentName, IBinder, Override, ProgressDialog, SeedSyncServiceActivity, Bundle, ComponentName (+13 more)
 
 ### Community 13 - "SendView"
 Cohesion: 0.08
-Nodes (18): ActivityResultLauncher, Override, SendActivity, Activity, JSONArray, Override, TextView, SendView (+10 more)
+Nodes (20): ActivityResultLauncher, Activity, Override, TextView, ReceiveView, Override, SendActivity, Activity (+12 more)
 
 ### Community 14 - "minimacore/ExampleInstrumentedTest.java"
 Cohesion: 0.60
@@ -162,44 +161,44 @@ Cohesion: 0.30
 Nodes (6): CoinDetailDialog, Activity, AlertDialog, JSONObject, LayoutInflater, LinearLayout
 
 ### Community 27 - "AppCompatActivity"
-Cohesion: 0.05
-Nodes (35): Bundle, Override, LauncherActivity, Bundle, Override, NewWalletActivity, Bundle, EditText (+27 more)
+Cohesion: 0.07
+Nodes (26): Bundle, Override, LauncherActivity, Bundle, Override, NewWalletActivity, Bundle, EditText (+18 more)
 
 ### Community 28 - "MinimaApplication"
 Cohesion: 0.36
 Nodes (4): Context, Override, MinimaApplication, Application
 
-### Community 30 - "BaseView"
-Cohesion: 0.06
-Nodes (25): BaseView, Activity, View, Override, View, ViewGroup, MainAdapter, AppsView (+17 more)
+### Community 30 - "MainAdapter"
+Cohesion: 0.10
+Nodes (12): Override, View, ViewGroup, MainAdapter, AppsView, Activity, JSONObject, ListView (+4 more)
 
 ### Community 31 - "TokenMeta"
 Cohesion: 0.23
 Nodes (4): IconResolver, JSONObject, TokenMeta, Pattern
 
-### Community 32 - "TokenSpinnerAdapter"
-Cohesion: 0.31
-Nodes (5): Context, JSONArray, JSONObject, TokenSpinnerAdapter, ArrayAdapter
+### Community 32 - "LogBuffer"
+Cohesion: 0.16
+Nodes (7): Context, JSONArray, JSONObject, TokenSpinnerAdapter, LogBuffer, Sink, ArrayAdapter
 
 ## Knowledge Gaps
 - **1 isolated node(s):** `MinimaAPIMessages`
   These have ≤1 connection - possible missing edges or undocumented components.
-- **31 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **25 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `MinimaService` connect `MinimaService` to `BroadcastReceiver`, `MainActivity`, `StartServiceActivity.java`?**
-  _High betweenness centrality (0.114) - this node is a cross-community bridge._
-- **Why does `MainActivity` connect `MainActivity` to `MinimaService`, `LogsView`, `StartServiceActivity.java`, `AppCompatActivity`, `BaseView`?**
-  _High betweenness centrality (0.073) - this node is a cross-community bridge._
-- **Why does `ReceiverDB` connect `ReceiverDB` to `AppCompatActivity`?**
-  _High betweenness centrality (0.067) - this node is a cross-community bridge._
+- **Why does `MinimaService` connect `MinimaService` to `MainActivity`, `StartServiceActivity.java`, `BalanceAdapter`, `MainAdapter`?**
+  _High betweenness centrality (0.118) - this node is a cross-community bridge._
+- **Why does `ReceiverDB` connect `ReceiverDB` to `MinimaReceiver`, `AppCompatActivity`?**
+  _High betweenness centrality (0.082) - this node is a cross-community bridge._
+- **Why does `MainActivity` connect `MainActivity` to `MinimaService`, `logger.java`, `StartServiceActivity.java`, `AppCompatActivity`, `MainAdapter`?**
+  _High betweenness centrality (0.074) - this node is a cross-community bridge._
 - **What connects `MinimaAPIMessages` to the rest of the system?**
   _1 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `MinimaReceiver` be split into smaller, more focused modules?**
+  _Cohesion score 0.1477832512315271 - nodes in this community are weakly interconnected._
 - **Should `MainActivity` be split into smaller, more focused modules?**
-  _Cohesion score 0.10099573257467995 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11261261261261261 - nodes in this community are weakly interconnected._
 - **Should `MinimaService` be split into smaller, more focused modules?**
-  _Cohesion score 0.06830601092896176 - nodes in this community are weakly interconnected._
-- **Should `ReceiverDB` be split into smaller, more focused modules?**
-  _Cohesion score 0.09102564102564102 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06676342525399129 - nodes in this community are weakly interconnected._
