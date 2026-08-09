@@ -29,6 +29,17 @@ public class MinimaReceiver extends BroadcastReceiver {
 
     public static final int MAX_MESSAGE_LEN = 256000;
 
+    /* Replies use a LOWER threshold than inbound commands. length() counts
+     * UTF-16 chars but Parcel.writeString serialises ~2 bytes per char, so a
+     * reply "under the 256,000 cap" can still build a ~512KB parcel — and the
+     * broadcast queue KILLS the receiving app around a ~256KB parcel
+     * (TransactionTooLargeException, observed live: parcel size 262240 for a
+     * ~131K-char reply → companion app process death, no callback, no stub).
+     * 100,000 chars ≈ 200KB parcel keeps inline replies safely clear of the
+     * kill line; anything bigger rides the content:// file hand-off (new
+     * clients) or gets the honest stub (legacy clients). */
+    public static final int MAX_RESPONSE_LEN = 100000;
+
     //Large responses are written here and handed over as a content:// URI
     public static final String FILE_RESPONSE_AUTHORITY  = "org.minimarex.minimacore.ipcresponses";
     public static final String FILE_RESPONSE_DIR        = "ipcresponses";
@@ -168,14 +179,14 @@ public class MinimaReceiver extends BroadcastReceiver {
                             String result = mMinima.runMinimaCMD(cmd, false, userid);
 
                             //Check the result is within acceptable parameters
-                            if(result.length() > MAX_MESSAGE_LEN){
+                            if(result.length() > MAX_RESPONSE_LEN){
 
                                 //New clients get the payload as a content:// file - old clients get the stub
                                 if(ffileresp && sendFileResponse(appcontext, fpackage, fresponse, fminimauid, result)){
                                     return;
                                 }
 
-                                String basicmessage = getBasicMessage(false, fenabled, fadmin, "Result too long! MAX("+MAX_MESSAGE_LEN+")");
+                                String basicmessage = getBasicMessage(false, fenabled, fadmin, "Result too long! MAX("+MAX_RESPONSE_LEN+")");
                                 sendResponse(appcontext, fpackage, fresponse, fminimauid, basicmessage);
                                 return;
                             }
@@ -245,11 +256,11 @@ public class MinimaReceiver extends BroadcastReceiver {
                         }
 
                         try{
-                            if(result.length() > MAX_MESSAGE_LEN){
+                            if(result.length() > MAX_RESPONSE_LEN){
                                 if(ffileresp && sendFileResponse(appcontext, fpackage, fresponse, fminimauid, result)){
                                     return;
                                 }
-                                result = fileError("Result too long! MAX("+MAX_MESSAGE_LEN+")");
+                                result = fileError("Result too long! MAX("+MAX_RESPONSE_LEN+")");
                             }
                             sendResponse(appcontext, fpackage, fresponse, fminimauid, result);
                         }catch(Exception ignore){}

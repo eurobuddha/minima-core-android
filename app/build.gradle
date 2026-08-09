@@ -25,8 +25,8 @@ android {
         // with NO rules attributes at all), so Android Auto Backup was uploading a spendable wallet and its
         // private keys to the user's cloud - and a restore could reconstitute a signing node on any phone.
         // Cloud backup and device transfer are both excluded now.
-        versionCode 36
-        versionName "1.6.8-ui-h2"
+        versionCode 37
+        versionName "1.6.9-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
