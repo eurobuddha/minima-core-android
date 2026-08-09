@@ -35,8 +35,17 @@
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
+    <!-- allowBackup=false is a FUND-SAFETY setting here, not a preference. With the scaffold default
+         (true + empty rules) Android Auto Backup uploaded this app's whole data directory to the user's
+         cloud and RESTORED it on reinstall — which both exfiltrates the data below and re-plants state a
+         reinstall is supposed to clear. A reinstall must be a true reset.
+         At stake: the BIP39 seed phrase this app stores in cleartext (main_prefs "SEED"), and getFilesDir() —
+         which IS the Minima node's data directory: wallet.db and the node's private keys. Auto Backup was
+         uploading a spendable wallet to the user's cloud and could reconstitute a signing node on any phone -->
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/ic_minima"
         android:label="@string/app_name"
         android:largeHeap="true"

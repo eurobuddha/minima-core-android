@@ -20,8 +20,13 @@ android {
         // was the only unsynchronized mutator on Wallet and its read-modify-write of the key
         // `uses` counter let two concurrent signers spend the SAME Winternitz leaf on different
         // data, which leaks that leaf's private key. Confirmed in the wild (7 of 64 keys).
-        versionCode 35
-        versionName "1.6.7-ui-h2"
+        // vc36: SECURITY - allowBackup is off. getFilesDir() IS the node's data directory and main_prefs
+        // holds the BIP39 seed in cleartext, yet the manifest carried the scaffold default (allowBackup=true
+        // with NO rules attributes at all), so Android Auto Backup was uploading a spendable wallet and its
+        // private keys to the user's cloud - and a restore could reconstitute a signing node on any phone.
+        // Cloud backup and device transfer are both excluded now.
+        versionCode 36
+        versionName "1.6.8-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
