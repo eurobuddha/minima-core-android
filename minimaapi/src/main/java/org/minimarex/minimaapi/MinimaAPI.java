@@ -13,7 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Hashtable;
-import java.util.Random;
+import java.security.SecureRandom;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -91,12 +91,13 @@ public class MinimaAPI {
     }
 
     private String getRandomString() {
+        //These IDs are the only thing authenticating broadcast replies to our EXPORTED
+        //receiver, so they must be unguessable - never java.util.Random here.
         String SALTCHARS = "ABCDEF1234567890";
         StringBuilder salt = new StringBuilder();
-        Random rnd = new Random();
+        SecureRandom rnd = new SecureRandom();
         while (salt.length() < 32) { // length of the random string.
-            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-            salt.append(SALTCHARS.charAt(index));
+            salt.append(SALTCHARS.charAt(rnd.nextInt(SALTCHARS.length())));
         }
         return "0x"+salt.toString();
     }
