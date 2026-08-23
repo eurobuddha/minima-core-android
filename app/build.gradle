@@ -25,8 +25,13 @@ android {
         // with NO rules attributes at all), so Android Auto Backup was uploading a spendable wallet and its
         // private keys to the user's cloud - and a restore could reconstitute a signing node on any phone.
         // Cloud backup and device transfer are both excluded now.
-        versionCode 38
-        versionName "1.6.10-ui-h2"
+        // vc39: FIX - the bundled minima.jar carries the Wallet.removeScript cache fix. Demoting a
+        // shared script with `newscript trackall:false` deleted only the DB row; the in-memory
+        // mAllTrackedAddress cache kept the address until restart, so a polluted node kept adopting
+        // EVERY stranger's coin at a shared covenant (e.g. the casino) into its relevant set every
+        // block. removeScript now clears the caches, so the demote takes effect immediately.
+        versionCode 39
+        versionName "1.6.11-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
