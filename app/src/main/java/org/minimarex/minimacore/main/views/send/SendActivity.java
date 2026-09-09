@@ -3,18 +3,15 @@ package org.minimarex.minimacore.main.views.send;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.KeyboardInsets;
 
 /**
  * Thin host that presents the send-funds form.
@@ -45,17 +42,13 @@ public class SendActivity extends AppCompatActivity {
             }
         });
 
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_send);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.send_main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
 
         Toolbar tb = findViewById(R.id.send_toolbar);
         tb.setTitle("Send");
         tb.setNavigationOnClickListener(v -> finish());
+        KeyboardInsets.install(this, findViewById(R.id.send_main), tb);
 
         //Host the existing, self-contained send view
         mSend = new SendView(this);

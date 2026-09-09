@@ -75,6 +75,7 @@
         android:background="@color/core_outline" />
 
     <LinearLayout
+        android:id="@+id/main_footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/core_surface"

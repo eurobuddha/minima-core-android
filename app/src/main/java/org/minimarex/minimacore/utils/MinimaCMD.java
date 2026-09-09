@@ -19,7 +19,16 @@ public class MinimaCMD {
         Runnable rr = new Runnable() {
             @Override
             public void run() {
-                JSONObject res = Main.getInstance().runSingleMinimaCMD(zCommand);
+                JSONObject res;
+                try {
+                    Main node = Main.getInstance();
+                    if (node == null) throw new IllegalStateException("Node is not running");
+                    res = node.runSingleMinimaCMD(zCommand);
+                } catch (Exception exc) {
+                    res = new JSONObject();
+                    res.put("status", false);
+                    res.put("error", exc.getMessage() == null ? exc.toString() : exc.getMessage());
+                }
                 //logger.log("Run Minima CMD: "+res.toString());
                 zListener.cmdResult(res);
             }
@@ -30,6 +39,7 @@ public class MinimaCMD {
     }
 
     public static boolean checkMinimaStarted(){
+        if (Main.getInstance() == null) return false;
         //Update the Values..
         MinimaDB mdb = MinimaDB.getDB();
         if(mdb == null){

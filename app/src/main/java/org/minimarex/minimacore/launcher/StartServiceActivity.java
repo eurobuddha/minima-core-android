@@ -33,6 +33,8 @@ public class StartServiceActivity extends AppCompatActivity implements ServiceCo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (org.minimarex.minimacore.main.SeedSyncActivity.redirectIfPending(this)) return;
+
         logger.log("Start Minima service..");
 
         mProgress = new ProgressDialog(this);

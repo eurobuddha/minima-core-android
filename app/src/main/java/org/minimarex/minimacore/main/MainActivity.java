@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -24,16 +23,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
@@ -45,6 +40,7 @@ import org.minima.utils.MiniFile;
 import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.MinimaApplication;
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.KeyboardInsets;
 import org.minimarex.minimacore.service.MinimaService;
 import org.minimarex.minimacore.service.MinimaServiceListener;
 import org.minimarex.minimacore.utils.MinimaCMD;
@@ -80,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (SeedSyncActivity.redirectIfPending(this)) return;
+
         MAIN_ACTIVITY = this;
 
         //Start the Service..
@@ -87,19 +85,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
 
         Toolbar tb = findViewById(R.id.toolbar);
         tb.setTitle("Minima Core");
-        tb.getOverflowIcon().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
 
         setSupportActionBar(tb);
+        KeyboardInsets.install(this, findViewById(R.id.main), tb,
+                findViewById(R.id.tabs), findViewById(R.id.main_footer));
 
         mFooterLeft  = findViewById(R.id.main_footer_left);
         mFooterRight = findViewById(R.id.main_footer_right);
@@ -225,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (MAIN_ACTIVITY == this) MAIN_ACTIVITY = null;
 
         //Drop any dialog a tab still has open, or its window leaks on rotation
         if(mMainAdapter != null){
@@ -233,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         //Unbind from the service..
         if(mMinimaService != null) {
+            if (mMinimaService.mServiceListener == this) mMinimaService.mServiceListener = null;
             mMinimaService = null;
             unbindService(this);
         }

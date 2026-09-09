@@ -2,6 +2,7 @@ package org.minimarex.minimacore.utils;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Static ring buffer for the node's log lines (MINIMALOG notify events).
@@ -19,9 +20,32 @@ public final class LogBuffer {
 
     private static final int MAX_LINES = 600;
 
-    private static final ArrayDeque<String> mLines = new ArrayDeque<>();
+    private static final Tail mLines = new Tail();
 
     private static Sink mSink = null;
+
+    // Non-UI observers (e.g. resync) coexist with the Logs tab, never replace it.
+    private static final CopyOnWriteArraySet<Sink> mObservers = new CopyOnWriteArraySet<>();
+
+    public static void addObserver(Sink sink) { mObservers.add(sink); }
+    public static void removeObserver(Sink sink) { mObservers.remove(sink); }
+
+    /** The same bounded tail for an operation that must outlive its Activity. */
+    public static final class Tail {
+        private final ArrayDeque<String> lines = new ArrayDeque<>();
+        private long revision;
+
+        public synchronized void append(String line) {
+            if (line == null) return;
+            lines.addLast(line);
+            while (lines.size() > MAX_LINES) lines.removeFirst();
+            revision++;
+        }
+
+        public synchronized ArrayList<String> snapshot() { return new ArrayList<>(lines); }
+        public synchronized long revision() { return revision; }
+        public synchronized void clear() { lines.clear(); revision++; }
+    }
 
     private LogBuffer() {}
 
@@ -32,10 +56,7 @@ public final class LogBuffer {
 
         Sink sink;
         synchronized (mLines){
-            mLines.addLast(zLine);
-            while(mLines.size() > MAX_LINES){
-                mLines.removeFirst();
-            }
+            mLines.append(zLine);
             sink = mSink;
         }
 
@@ -45,12 +66,15 @@ public final class LogBuffer {
                 sink.onLine(zLine);
             }catch(Exception ignore){}
         }
+        for (Sink observer : mObservers) {
+            try { observer.onLine(zLine); } catch (Exception ignore) { }
+        }
     }
 
     /** All buffered lines, oldest first. */
     public static ArrayList<String> snapshot(){
         synchronized (mLines){
-            return new ArrayList<>(mLines);
+            return mLines.snapshot();
         }
     }
 

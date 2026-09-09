@@ -11,17 +11,14 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import org.minima.system.params.GlobalParams;
 import org.minima.utils.MiniFormat;
 import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.KeyboardInsets;
 import org.minimarex.minimacore.launcher.StartServiceActivity;
 import org.minimarex.minimacore.main.MainActivity;
 import org.minimarex.minimacore.utils.MinimaCMD;
@@ -41,17 +38,13 @@ public class TerminalActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_terminal);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.sync_main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
 
         Toolbar tb = findViewById(R.id.toolbar);
         tb.setTitle("Terminal");
         setSupportActionBar(tb);
+        KeyboardInsets.install(this, findViewById(R.id.sync_main), tb);
 
         mScroller   = findViewById(R.id.terminal_scroller);
         mMainText   = findViewById(R.id.terminal_maintext);

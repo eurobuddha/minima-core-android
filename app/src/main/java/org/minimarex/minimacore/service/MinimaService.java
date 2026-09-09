@@ -59,7 +59,10 @@ public class MinimaService extends Service {
     public static SimpleDateFormat DATEFORMAT       = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.ENGLISH);
     public static SimpleDateFormat DATEFORMAT_TIME  = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
 
-    public static boolean mHaveStartedShutdown = false;
+    public static volatile boolean mHaveStartedShutdown = false;
+    // Restart is safe only AFTER onDestroy releases the old node, receiver and locks.
+    private static volatile boolean mShutdownComplete = true;
+    public static boolean isShutdownComplete() { return mShutdownComplete; }
 
     //Currently Binding doesn't work as we run in a separate process..
     public class MyBinder extends Binder {
@@ -105,6 +108,7 @@ public class MinimaService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        mShutdownComplete = false;
 
         logger.log("Minima Service Starting..");
 
@@ -171,6 +175,10 @@ public class MinimaService extends Service {
                     String event    = (String) notify.get("event");
                     JSONObject data = (JSONObject) notify.get("data");
 
+                    // Capture locally before companion delivery: a broken recipient must
+                    // not hide progress from the resync page or Logs tab.
+                    if ("MINIMALOG".equals(event)) LogBuffer.append((String) data.get("message"));
+
                     //if(!event.equals("MINIMALOG")){
                         //MinimaLogger.log("SERVICE received event:"+event+" data:"+data.toString(), false);
 
@@ -184,7 +192,7 @@ public class MinimaService extends Service {
                     if(event.equals("MINIMALOG")){
 
                         //Feed the in-app Logs tab (bounded ring buffer)
-                        LogBuffer.append((String) data.get("message"));
+                        // Already captured above.
 
                     }else if(event.equals("NEWBLOCK")) {
 
@@ -357,6 +365,7 @@ public class MinimaService extends Service {
     }
 
     public void sendBroadcastNotify(String zMessage){
+        if (mMinimaReceiver == null) return; // node can emit logs during startup
         JSONArray apps = mMinimaReceiver.getDatabase().selectAllApps();
 
         int tot=apps.size();
@@ -370,7 +379,11 @@ public class MinimaService extends Service {
                 String packageclass = app.getString("package");
                 String minimaid     = app.getString("minimaid");
 
-                mMinimaReceiver.sendNotify(this, packageclass, minimaid, zMessage);
+                try {
+                    mMinimaReceiver.sendNotify(this, packageclass, minimaid, zMessage);
+                } catch (Exception exc) {
+                    logger.log("Companion notification failed for " + packageclass + " : " + exc);
+                }
             }
         }
     }
@@ -527,6 +540,7 @@ public class MinimaService extends Service {
 
         //NULL the main Instance..
         Main.ClearMainInstance();
+        mShutdownComplete = true;
     }
 
     @Override
@@ -591,4 +605,3 @@ public class MinimaService extends Service {
         }
     }
 }
-

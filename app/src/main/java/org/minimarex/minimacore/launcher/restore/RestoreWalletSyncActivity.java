@@ -9,15 +9,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import org.minima.utils.BIP39;
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.KeyboardInsets;
 import org.minimarex.minimacore.launcher.LauncherActivity;
 import org.minimarex.minimacore.utils.logger;
 
@@ -31,17 +28,13 @@ public class RestoreWalletSyncActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        EdgeToEdge.enable(this);
         setContentView(R.layout.restorewallet_activity);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.restorewallet_main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
 
         Toolbar tb = findViewById(R.id.toolbar);
         tb.setTitle("Restore Wallet");
         setSupportActionBar(tb);
+        KeyboardInsets.install(this, findViewById(R.id.restorewallet_main), tb);
 
         mSeedInput      = findViewById(R.id.restorewallet_seed);
         mKeyUsesInput   = findViewById(R.id.restorewallet_keyuses);

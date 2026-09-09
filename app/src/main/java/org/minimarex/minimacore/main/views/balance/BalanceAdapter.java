@@ -17,7 +17,6 @@ import org.minimarex.minimacore.main.views.balance.tokens.Identicon;
 import org.minimarex.minimacore.main.views.balance.tokens.ImageLoader;
 import org.minimarex.minimacore.main.views.balance.tokens.TokenMeta;
 import org.minimarex.minimacore.main.views.balance.tokens.WebValidate;
-import org.minimarex.minimacore.utils.Clip;
 import org.minimarex.minimacore.utils.Format;
 
 public class BalanceAdapter extends BaseAdapter {
@@ -60,7 +59,7 @@ public class BalanceAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         if(row == null){
-            row = inflater.inflate(R.layout.view_balance_row, null);
+            row = inflater.inflate(R.layout.view_balance_row, parent, false);
         }
 
         TextView tokenname   = row.findViewById(R.id.balance_tokenname);
@@ -117,23 +116,25 @@ public class BalanceAdapter extends BaseAdapter {
         }
 
         //SENDABLE is the headline figure - confirmed includes coins locked in contracts
-        //and overstates what the user can actually spend. Shown in full, never clipped.
+        //and overstates what the user can actually spend. Tap the row for exact amounts.
         String confirmed   = val(bal, "confirmed");
         String unconfirmed = val(bal, "unconfirmed");
         String sendable    = bal.get("sendable") == null ? confirmed : val(bal, "sendable");
         String coincount   = val(bal, "coins");
 
-        tokenamount.setText(Format.tidyAmount(sendable));
+        String summary = Format.summaryAmount(sendable);
+        tokenamount.setText(summary);
+        tokenamount.setContentDescription("Sendable " + summary + ". Tap token for exact amount and coins.");
 
         //Everything the headline number leaves out, for THIS token - not just Minima
         StringBuilder sub = new StringBuilder();
         String locked = Format.subtract(confirmed, sendable);
         if(isPositive(locked)){
-            sub.append("locked ").append(locked);
+            sub.append("locked ").append(Format.summaryAmount(locked));
         }
         if(isPositive(unconfirmed)){
             if(sub.length() > 0){ sub.append("  ·  "); }
-            sub.append("unconfirmed ").append(Format.tidyAmount(unconfirmed));
+            sub.append("unconfirmed ").append(Format.summaryAmount(unconfirmed));
         }
         if(!"0".equals(coincount) && !"—".equals(coincount)){
             if(sub.length() > 0){ sub.append("  ·  "); }

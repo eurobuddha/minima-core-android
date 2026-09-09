@@ -208,7 +208,7 @@ public class BalanceView extends BaseView {
             }
         }catch(Exception exc){}
 
-        mTotalBalance.setText(total);
+        mTotalBalance.setText(Format.summaryAmount(total));
 
         updateBreakdown();
     }
@@ -225,9 +225,9 @@ public class BalanceView extends BaseView {
         }
 
         mBreakdown.setText(
-                  "confirmed "  + Format.tidyAmount(mConfirmed)
-                + "  ·  locked ≈ "   + Format.subtract(mConfirmed, mSendable)
-                + "  ·  unconfirmed " + Format.tidyAmount(mUnconfirmed)
+                  "confirmed "  + Format.summaryAmount(mConfirmed)
+                + "  ·  locked ≈ "   + Format.summaryAmount(Format.subtract(mConfirmed, mSendable))
+                + "  ·  unconfirmed " + Format.summaryAmount(mUnconfirmed)
                 + "  ·  " + mCoinCount + " coins"
                 + "  ·  updated " + Format.ago(mLastBalanceUpdate)
                 + "  ·  tap a token for coins");

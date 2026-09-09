@@ -67,23 +67,23 @@
         </activity>
 
         <!-- Launcher -->
-        <activity android:name=".launcher.LauncherActivity"></activity>
-        <activity android:name=".launcher.newwallet.NewWalletActivity"></activity>
-        <activity android:name=".launcher.newwallet.NewWalletRestoreActivity"></activity>
-        <activity android:name=".launcher.restore.RestoreWalletSyncActivity"></activity>
+        <activity android:name=".launcher.LauncherActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".launcher.newwallet.NewWalletActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".launcher.newwallet.NewWalletRestoreActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".launcher.restore.RestoreWalletSyncActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".launcher.restore.SeedSyncServiceActivity"></activity>
-        <activity android:name=".main.SeedSyncActivity"></activity>
-        <activity android:name=".main.views.terminal.TerminalActivity"></activity>
-        <activity android:name=".main.ParamsActivity"></activity>
-        <activity android:name=".main.views.send.SendActivity"></activity>
-        <activity android:name=".main.views.receive.ReceiveActivity"></activity>
+        <activity android:name=".main.SeedSyncActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".main.views.terminal.TerminalActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".main.ParamsActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".main.views.send.SendActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".main.views.receive.ReceiveActivity" android:windowSoftInputMode="adjustResize"></activity>
 
         <!-- Start the service -->
         <activity android:name=".launcher.StartServiceActivity"></activity>
 
 
         <!-- Main Activity-->
-        <activity android:name=".main.MainActivity"></activity>
+        <activity android:name=".main.MainActivity" android:windowSoftInputMode="adjustResize"></activity>
 
         <!-- SERVICES -->
         <service

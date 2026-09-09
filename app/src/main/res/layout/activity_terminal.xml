@@ -36,7 +36,8 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:background="@color/core_surface"
-            android:padding="10dp">
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="6dp">
 
             <EditText
                 android:id="@+id/terminal_input"
@@ -52,7 +53,7 @@
                 android:textColor="@color/core_text"
                 android:textColorHint="@color/core_text_faint"
                 android:textSize="14sp"
-                android:imeOptions="actionSend" />
+                android:imeOptions="actionSend|flagNoExtractUi" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/terminal_send"

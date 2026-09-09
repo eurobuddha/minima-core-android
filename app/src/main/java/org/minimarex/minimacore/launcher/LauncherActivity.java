@@ -8,16 +8,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.KeyboardInsets;
 import org.minimarex.minimacore.launcher.newwallet.NewWalletActivity;
 import org.minimarex.minimacore.launcher.restore.RestoreWalletSyncActivity;
 import org.minimarex.minimacore.receiver.ReceiverDB;
@@ -42,13 +39,8 @@ public class LauncherActivity extends AppCompatActivity {
 
         LAUNCHER_ACTIVITY = this;
 
-        EdgeToEdge.enable(this);
         setContentView(R.layout.launcher_activity);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.launcher_main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
 
         //Are we night mode..
         if(isNightMode()){
@@ -60,6 +52,7 @@ public class LauncherActivity extends AppCompatActivity {
         //Clean launcher — no title, the M logo speaks for itself (matches design)
         tb.setTitle("");
         setSupportActionBar(tb);
+        KeyboardInsets.install(this, findViewById(R.id.launcher_main), tb);
 
         Button newwallet = findViewById(R.id.launcher_button_newwallet);
         newwallet.setOnClickListener(new View.OnClickListener() {

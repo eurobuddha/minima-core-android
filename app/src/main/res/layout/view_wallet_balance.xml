@@ -29,14 +29,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:maxLines="1"
+            android:breakStrategy="simple"
+            android:hyphenationFrequency="none"
+            android:textIsSelectable="true"
             android:fontFeatureSettings="tnum"
             android:text="0"
             android:textAppearance="@style/TextAppearance.MinimaCore.Numeral"
-            app:autoSizeTextType="uniform"
-            app:autoSizeMinTextSize="14sp"
-            app:autoSizeMaxTextSize="34sp"
-            app:autoSizeStepGranularity="1sp" />
+            android:textSize="26sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -50,6 +49,9 @@
     <!-- what makes up that number: confirmed / locked / unconfirmed / coin count / staleness -->
     <TextView
         android:id="@+id/wallet_balance_breakdown"
+        android:breakStrategy="simple"
+        android:hyphenationFrequency="none"
+        android:textIsSelectable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="16dp"

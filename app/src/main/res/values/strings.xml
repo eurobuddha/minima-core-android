@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MinimaCore</string>
+    <string name="hide_keyboard">Hide keyboard</string>
 </resources>

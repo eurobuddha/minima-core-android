@@ -58,7 +58,7 @@
             android:textColor="@color/core_text"
             android:textColorHint="@color/core_text_faint"
             android:textSize="13sp"
-            android:imeOptions="actionDone" />
+            android:imeOptions="actionDone|flagNoExtractUi" />
     </LinearLayout>
 
     <!-- Verbosity chips: each runs the node's `logs <key>:true|false` command -->

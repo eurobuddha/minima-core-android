@@ -6,15 +6,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import org.minima.utils.BIP39;
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.KeyboardInsets;
 
 public class NewWalletActivity extends AppCompatActivity {
 
@@ -22,17 +19,13 @@ public class NewWalletActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        EdgeToEdge.enable(this);
         setContentView(R.layout.newwallet_activity);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.newwallet_main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
 
         Toolbar tb = findViewById(R.id.toolbar);
         tb.setTitle("New Wallet");
         setSupportActionBar(tb);
+        KeyboardInsets.install(this, findViewById(R.id.newwallet_main), tb);
 
         //get a new seed
         String seed = BIP39.convertWordListToString(BIP39.getNewWordList());

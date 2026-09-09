@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  A token in the wallet list. Stacked rather than one line so the FULL token id and the
-  FULL amount both fit without being clipped - nothing here is ever ellipsized.
-  Tap opens that token's coins; long-press copies the token id.
+  A token in the wallet list, with a six-decimal amount summary and full token id.
+  Tap opens exact amounts and that token's coins; long-press copies the token id.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -51,20 +50,24 @@
             android:layout_weight="1"
             android:textAppearance="@style/TextAppearance.MinimaCore.BodyStrong" />
 
-        <!-- SENDABLE, not confirmed - this is what the user can actually spend -->
-        <TextView
-            android:id="@+id/balance_tokenamount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:gravity="end"
-            android:fontFeatureSettings="tnum"
-            android:textAppearance="@style/TextAppearance.MinimaCore.BodyStrong" />
     </LinearLayout>
+
+    <!-- Full-width summary: large balances cannot displace the token name. -->
+    <TextView
+        android:id="@+id/balance_tokenamount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:breakStrategy="simple"
+        android:hyphenationFrequency="none"
+        android:fontFeatureSettings="tnum"
+        android:textAppearance="@style/TextAppearance.MinimaCore.BodyStrong" />
 
     <!-- locked / unconfirmed / coin count for THIS token -->
     <TextView
         android:id="@+id/balance_breakdown"
+        android:breakStrategy="simple"
+        android:hyphenationFrequency="none"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"

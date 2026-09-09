@@ -30,8 +30,12 @@ android {
         // mAllTrackedAddress cache kept the address until restart, so a polluted node kept adopting
         // EVERY stranger's coin at a shared covenant (e.g. the casino) into its relevant set every
         // block. removeScript now clears the caches, so the demote takes effect immediately.
-        versionCode 39
-        versionName "1.6.11-ui-h2"
+        // vc40: full-precision balance wrapping and retained resync progress/restart feedback.
+        // vc41: keyboard-aware screen resizing and an explicit keyboard dismissal action.
+        // vc42: let the main overflow menu icon follow the light/dark theme.
+        // vc43: six-decimal wallet summaries; exact amounts remain in token/coin details.
+        versionCode 43
+        versionName "1.6.15-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -3,6 +3,7 @@ package org.minimarex.minimacore.utils;
 import org.minima.utils.json.JSONObject;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * Display formatting for wallet amounts, hashes and timestamps.
@@ -12,23 +13,44 @@ import java.math.BigDecimal;
  */
 public class Format {
 
+    private static final BigDecimal SUMMARY_UNIT = new BigDecimal("0.000001");
+
     private Format(){}
+
+    /** Display only: at most six decimals; use tidyAmount for exact token/coin details. */
+    public static String summaryAmount(String zAmount){
+        if(zAmount == null || zAmount.isEmpty()) return "0";
+        try {
+            BigDecimal value = new BigDecimal(zAmount.trim());
+            if(value.signum() == 0) return "0";
+            // Do not hide a real balance as zero, even with very small exponents.
+            if(value.abs().compareTo(SUMMARY_UNIT) < 0){
+                return value.signum() > 0 ? "<0.000001" : ">-0.000001";
+            }
+            if(value.scale() < -1000) return zAmount;
+            // AtomiX Util.fmt5, adapted to six places: never round spendable funds up.
+            return tidyAmount(value.setScale(6, RoundingMode.DOWN).toPlainString());
+        } catch (NumberFormatException | ArithmeticException exc) {
+            return zAmount;
+        }
+    }
 
     /** Trim trailing zeros from a decimal amount string for tidy display. */
     public static String tidyAmount(String zAmount){
         if(zAmount == null || zAmount.isEmpty()){
             return "0";
         }
-        if(!zAmount.contains(".")){
-            return zAmount;
+        try {
+            // PandaDEX PriceMath.fmt: normalise without rounding or exponent form.
+            // Regex zero-stripping corrupts exponents: 1.0E-10 becomes 1.0E-1.
+            BigDecimal value = new BigDecimal(zAmount.trim()).stripTrailingZeros();
+            // Malformed external data must not expand an enormous exponent in the UI.
+            // Keep the exact original notation for values outside any node amount range.
+            if (value.scale() > 1000 || value.scale() < -1000) return zAmount;
+            return value.toPlainString();
+        } catch (NumberFormatException | ArithmeticException exc) {
+            return zAmount; // preserve placeholders and unexpected node responses
         }
-
-        String s = zAmount.replaceAll("0+$", "");
-        if(s.endsWith(".")){
-            s = s.substring(0, s.length()-1);
-        }
-
-        return s.isEmpty() ? "0" : s;
     }
 
     // NOTE: there is deliberately no shortHash/abbreviate helper here. Hashes, addresses

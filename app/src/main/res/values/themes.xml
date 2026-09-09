@@ -135,6 +135,8 @@
 
     <!-- ===================== edit text ===================== -->
     <style name="Widget.MinimaCore.EditText" parent="Widget.AppCompat.EditText">
+        <!-- Keep the app and its dismissal control visible with landscape keyboards. -->
+        <item name="android:imeOptions">flagNoExtractUi</item>
         <item name="android:textColor">@color/core_text</item>
         <item name="android:textColorHint">@color/core_text_faint</item>
         <item name="android:fontFamily">@font/manrope</item>

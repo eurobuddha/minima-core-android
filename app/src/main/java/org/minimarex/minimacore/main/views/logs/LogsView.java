@@ -235,4 +235,9 @@ public class LogsView extends BaseView implements LogBuffer.Sink {
             }
         });
     }
+
+    @Override
+    public void onActivityDestroy() {
+        LogBuffer.clearSink(this);
+    }
 }

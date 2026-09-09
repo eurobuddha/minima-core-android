@@ -9,17 +9,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import org.minima.system.params.ParamConfigurer;
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.KeyboardInsets;
 
 import java.util.StringTokenizer;
 
@@ -58,17 +55,13 @@ public class ParamsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        EdgeToEdge.enable(this);
         setContentView(R.layout.params_activity);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.params_main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
 
         Toolbar tb = findViewById(R.id.toolbar);
         tb.setTitle("Startup Params");
         setSupportActionBar(tb);
+        KeyboardInsets.install(this, findViewById(R.id.params_main), tb);
 
         mServerSwitch = findViewById(R.id.params_switch_server);
         mMegaSwitch   = findViewById(R.id.params_switch_megammr);
