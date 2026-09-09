@@ -19,6 +19,8 @@ public class MinimaAPIReceive extends BroadcastReceiver {
     @Override
     public void onReceive(Context zContext, Intent zIntent) {
 
+        if (zIntent == null) return;
+
         //What Action
         String action = zIntent.getAction();
 

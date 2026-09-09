@@ -7,9 +7,14 @@ import android.util.Base64;
 import android.util.LruCache;
 import android.widget.ImageView;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
+import java.lang.ref.WeakReference;
+import java.util.function.Consumer;
+import org.minimarex.minimacore.utils.BackgroundWork;
+import org.minimarex.minimacore.utils.ExpiringCache;
+import org.minimarex.minimacore.utils.SharedRequests;
 
 /**
  * Ported from the utxoWallet/Minima wallet: async loader for token icons — handles data: URIs,
@@ -29,60 +34,69 @@ public final class ImageLoader {
     private static final int FULL_PX  = 1600;     // NFT full-resolution view (bounded so it can't OOM)
     private static final int MAX_BYTES = 8 * 1024 * 1024;   // hard cap so a hostile icon url can't OOM us
 
-    // Small shared pool — token metadata can name dozens of icon urls; don't spawn a raw thread per icon.
-    private static final java.util.concurrent.ExecutorService EXEC =
-            java.util.concurrent.Executors.newFixedThreadPool(4);
+    private static final Handler MAIN = new Handler(Looper.getMainLooper());
+    private static final SharedRequests<String, Bitmap> REQUESTS =
+            new SharedRequests<>(BackgroundWork.pool(4, 64), task -> MAIN.post(task));
+    private static final ExpiringCache<String, Boolean> FAILED =
+            new ExpiringCache<>(256, SystemClock::elapsedRealtime);
 
     private ImageLoader() {}
 
-    /** Thumbnail load (downsampled) for a row/detail icon. */
-    public static void load(final Activity act, final String url, final ImageView iv, int fallbackRes) {
+    public static void load(Activity act, String url, ImageView iv, int fallbackRes) {
         load(act, url, iv, fallbackRes, THUMB_PX);
     }
 
-    /** Full-resolution load (bounded to FULL_PX) for an NFT image view. */
-    public static void loadFull(final Activity act, final String url, final ImageView iv, int fallbackRes) {
+    public static void loadFull(Activity act, String url, ImageView iv, int fallbackRes) {
         load(act, url, iv, fallbackRes, FULL_PX);
     }
 
-    /** Load ON TOP of whatever the ImageView already shows (an identicon): keeps it on failure, replaces on
-     *  success. onLoaded fires once on a fresh successful decode (so the caller can re-render). */
-    public static void loadOver(final Activity act, final String url, final ImageView iv, final Runnable onLoaded) {
-        iv.setTag(url);
-        if (url == null || url.isEmpty()) return;      // keep the identicon
-        String key = THUMB_PX + "|" + url;
-        Bitmap cached = CACHE.get(key);
-        if (cached != null) { iv.setImageBitmap(cached); return; }
-        EXEC.execute(() -> {
-            final Bitmap b = decode(url, THUMB_PX);
-            if (b == null) return;                      // keep the identicon on failure
-            CACHE.put(key, b);
-            act.runOnUiThread(() -> {
-                if (act.isDestroyed()) return;          // activity gone — don't touch its views
-                if (url.equals(iv.getTag())) iv.setImageBitmap(b);
-                if (onLoaded != null) onLoaded.run();
-            });
-        });
+    public static void loadOver(Activity act, String url, ImageView iv, Runnable onLoaded) {
+        request(act, url, iv, THUMB_PX, onLoaded);
     }
 
-    private static void load(final Activity act, final String url, final ImageView iv, int fallbackRes, final int reqPx) {
-        iv.setTag(url);
-        if (url == null || url.isEmpty()) { iv.setImageResource(fallbackRes); return; }
+    private static void load(Activity act, String url, ImageView iv, int fallbackRes, int reqPx) {
+        iv.setImageResource(fallbackRes);
+        request(act, url, iv, reqPx, null);
+    }
 
+    /** The view owns its subscription; background tasks hold only a weak reference to it. */
+    private static final class Target implements Consumer<Bitmap> {
+        final WeakReference<Activity> activity;
+        final WeakReference<ImageView> view;
+        final Runnable onLoaded;
+        final String key;
+        Target(Activity act, ImageView iv, String key, Runnable callback) {
+            activity = new WeakReference<>(act); view = new WeakReference<>(iv);
+            onLoaded = callback; this.key = key;
+        }
+        @Override public void accept(Bitmap bitmap) {
+            Activity act = activity.get(); ImageView iv = view.get();
+            if (bitmap == null || act == null || act.isDestroyed() || act.isFinishing()
+                    || iv == null || iv.getTag() != this) return;
+            iv.setImageBitmap(bitmap);
+            Runnable callback = onLoaded;
+            if (callback != null) callback.run();
+        }
+    }
+
+    private static void request(Activity act, String url, ImageView iv, int reqPx, Runnable onLoaded) {
+        if (url == null || url.isEmpty()) { iv.setTag(null); return; }
         String key = reqPx + "|" + url;
+        Object previous = iv.getTag();
+        Target target = previous instanceof Target && key.equals(((Target) previous).key)
+                ? (Target) previous : new Target(act, iv, key, onLoaded);
+        iv.setTag(target);
         Bitmap cached = CACHE.get(key);
         if (cached != null) { iv.setImageBitmap(cached); return; }
-
-        iv.setImageResource(fallbackRes);
-        EXEC.execute(() -> {
-            final Bitmap b = decode(url, reqPx);
-            if (b == null) return;
-            CACHE.put(key, b);
-            act.runOnUiThread(() -> {
-                if (act.isDestroyed()) return;
-                if (url.equals(iv.getTag())) iv.setImageBitmap(b);
-            });
-        });
+        if (FAILED.get(key) != null) return;
+        REQUESTS.request(key, () -> {
+            // Another completed request may have filled the cache before this job ran.
+            Bitmap bitmap = CACHE.get(key);
+            if (bitmap == null) bitmap = decode(url, reqPx);
+            if (bitmap != null) CACHE.put(key, bitmap);
+            else FAILED.put(key, Boolean.TRUE, 30_000);
+            return bitmap;
+        }, target);
     }
 
     /** Fetch the raw bytes then decode DOWNSAMPLED to ~reqPx, so a multi-MB icon never OOMs a thumbnail.
@@ -140,39 +154,16 @@ public final class ImageLoader {
 
     private static byte[] fetch(String url) throws Exception {
         String f = url.startsWith("ipfs://") ? "https://ipfs.io/ipfs/" + url.substring("ipfs://".length()) : url;
-        URL u = new URL(f);
-        if (isBlockedHost(u.getHost())) return null;   // token metadata must not point us at loopback/LAN (the node RPC)
-        HttpURLConnection con = (HttpURLConnection) u.openConnection();
-        con.setConnectTimeout(8000);
-        con.setReadTimeout(15000);
-        con.setInstanceFollowRedirects(true);
-        try (InputStream in = con.getInputStream(); java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream()) {
-            byte[] buf = new byte[8192]; int n; int total = 0;
-            while ((n = in.read(buf)) > 0) {
-                total += n;
-                if (total > MAX_BYTES) return null;    // oversized response — bail, keep the identicon
-                bos.write(buf, 0, n);
-            }
-            return bos.toByteArray();
-        } finally { con.disconnect(); }
-    }
-
-    /** True for loopback / any-local / link-local / site-local (private) hosts, or anything unresolvable. */
-    static boolean isBlockedHost(String host) {
-        if (host == null || host.isEmpty()) return true;
-        try {
-            for (java.net.InetAddress a : java.net.InetAddress.getAllByName(host)) {
-                if (a.isLoopbackAddress() || a.isAnyLocalAddress() || a.isLinkLocalAddress() || a.isSiteLocalAddress())
-                    return true;
-            }
-        } catch (Exception e) { return true; }
-        return false;
+        return NetFetch.get(f, MAX_BYTES, 8000, 15000, false);
     }
 
     private static byte[] dataUriBytes(String dataUri) {
         int comma = dataUri.indexOf(',');
         if (comma < 0) return null;
         if (!dataUri.substring(0, comma).contains("base64")) return null;
-        return Base64.decode(dataUri.substring(comma + 1), Base64.DEFAULT);
+        // Enforce the same byte budget for inline metadata before allocating the decoded array.
+        if (dataUri.length() - comma - 1 > ((MAX_BYTES + 2L) / 3) * 4) return null;
+        byte[] bytes = Base64.decode(dataUri.substring(comma + 1), Base64.DEFAULT);
+        return bytes.length <= MAX_BYTES ? bytes : null;
     }
 }

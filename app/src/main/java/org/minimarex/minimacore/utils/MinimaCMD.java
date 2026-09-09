@@ -6,6 +6,27 @@ import org.minima.system.Main;
 import org.minima.utils.json.JSONObject;
 
 public class MinimaCMD {
+    private static final java.util.concurrent.Executor READS = BackgroundWork.pool(3, 64);
+
+    public static java.util.concurrent.Executor readExecutor() { return READS; }
+
+    /** Synchronous command body, called only from a background worker. */
+    public static JSONObject execute(String command) {
+        try {
+            Main node = Main.getInstance();
+            if (node == null) throw new IllegalStateException("Node is not running");
+            return node.runSingleMinimaCMD(command);
+        } catch (Exception exc) {
+            return error(exc.getMessage() == null ? exc.toString() : exc.getMessage());
+        }
+    }
+
+    private static JSONObject error(String message) {
+        JSONObject result = new JSONObject();
+        result.put("status", false);
+        result.put("error", message);
+        return result;
+    }
 
     public static void runMinima(String zCommand){
         runMinima(zCommand, new MinimaCMDListener() {
@@ -19,23 +40,23 @@ public class MinimaCMD {
         Runnable rr = new Runnable() {
             @Override
             public void run() {
-                JSONObject res;
-                try {
-                    Main node = Main.getInstance();
-                    if (node == null) throw new IllegalStateException("Node is not running");
-                    res = node.runSingleMinimaCMD(zCommand);
-                } catch (Exception exc) {
-                    res = new JSONObject();
-                    res.put("status", false);
-                    res.put("error", exc.getMessage() == null ? exc.toString() : exc.getMessage());
-                }
+                JSONObject res = execute(zCommand);
                 //logger.log("Run Minima CMD: "+res.toString());
                 zListener.cmdResult(res);
             }
         };
 
-        Thread tt = new Thread(rr);
-        tt.start();
+        String command = zCommand == null ? "" : zCommand.trim();
+        // Strict read allowlist: long-running writes/resync never occupy the read pool.
+        if (command.equals("balance") || command.equals("keys") || command.equals("peers")
+                || command.equals("network") || command.equals("coins") || command.startsWith("coins ")) {
+            try { READS.execute(rr); }
+            catch (java.util.concurrent.RejectedExecutionException e) {
+                zListener.cmdResult(error("Node reads are busy. Please retry."));
+            }
+        } else {
+            new Thread(rr, "Minima-command").start();
+        }
     }
 
     public static boolean checkMinimaStarted(){
@@ -47,11 +68,12 @@ public class MinimaCMD {
         }
 
         //Current TxPoW
-        if(mdb.getTxPoWTree().getTip() == null){
+        var tip = mdb.getTxPoWTree().getTip();
+        if(tip == null){
             return false;
         }
 
-        TxPoW txp = mdb.getTxPoWTree().getTip().getTxPoW();
+        TxPoW txp = tip.getTxPoW();
         if(txp == null){
             return false;
         }

@@ -34,8 +34,9 @@ android {
         // vc41: keyboard-aware screen resizing and an explicit keyboard dismissal action.
         // vc42: let the main overflow menu icon follow the light/dark theme.
         // vc43: six-decimal wallet summaries; exact amounts remain in token/coin details.
-        versionCode 43
-        versionName "1.6.15-ui-h2"
+        // vc44: safe metadata downloads, lifecycle-safe startup/API, bounded coalesced reads and caching.
+        versionCode 44
+        versionName "1.6.16-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

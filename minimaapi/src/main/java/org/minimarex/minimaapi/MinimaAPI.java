@@ -29,6 +29,8 @@ public class MinimaAPI {
     private static String RECEIVER_MINIMA_ID = "";
     public static boolean checkMinimaID(Context zContext, Intent zIntent){
 
+        if (zIntent == null) return false;
+
         //Is Minima ID set..
         if(RECEIVER_MINIMA_ID.equals("")){
             SharedPreferences prefs = zContext.getSharedPreferences("minima_api_prefs", zContext.MODE_PRIVATE);
@@ -36,10 +38,12 @@ public class MinimaAPI {
         }
 
         //Now get the sent ID
-        String minimaid = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID);
-
-        //Return if equal
-        return minimaid.equals(RECEIVER_MINIMA_ID);
+        try {
+            String minimaid = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID);
+            return minimaid != null && !minimaid.isEmpty() && minimaid.equals(RECEIVER_MINIMA_ID);
+        } catch (RuntimeException malformedExtras) {
+            return false;
+        }
     }
 
     //Details used by the CMD receiver
@@ -47,6 +51,7 @@ public class MinimaAPI {
     private String MY_APP_ID;
     private static String MINIMA_ID;
 
+    private volatile boolean destroyed;
     Context mContext;
 
     Hashtable<String, MinimaAPIListener> mResponseHandlers = new Hashtable<>();
@@ -103,6 +108,8 @@ public class MinimaAPI {
     }
 
     public void onDestroy(){
+        destroyed = true;
+        mResponseHandlers.clear();
         try{
             mContext.unregisterReceiver(mMinimaAPIReceiver);
         }catch(Exception exc){}
@@ -112,45 +119,50 @@ public class MinimaAPI {
     }
 
     public void ResponseReceived(Intent zIntent){
-
-        //Check the Minima ID values..
-        String minimaid = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID);
-        if(!minimaid.equals(MINIMA_ID)){
-            MinimaAPILogger.log("Received Invalid MinimaID from broadcast! : "+minimaid);
+        if (destroyed || zIntent == null) return;
+        final String responseid, uristr, result;
+        try {
+            String minimaid = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID);
+            if (minimaid == null || minimaid.isEmpty() || !minimaid.equals(MINIMA_ID)) return;
+            responseid = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID);
+            if (responseid == null || responseid.isEmpty() || !mResponseHandlers.containsKey(responseid)) return;
+            uristr = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_URI);
+            result = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_RESULT);
+            if (uristr == null && (result == null || result.isEmpty())) return;
+            if (uristr != null && (!"content".equals(Uri.parse(uristr).getScheme())
+                    || Uri.parse(uristr).getAuthority() == null)) return;
+        } catch (RuntimeException malformedExtras) {
             return;
         }
-
-        final String responseid = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID);
-
-        //Is the payload a content:// file.. (result was too big for an Intent extra)
-        final String uristr = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_URI);
-        if(uristr != null){
-
-            //Read the file OFF the main thread then deliver as normal
-            mFileExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    String result;
-                    try{
-                        result = readResponseUri(uristr);
-                    }catch(Exception exc){
-                        MinimaAPILogger.log("ERROR reading response URI : "+exc);
-
-                        //NEVER go silent - callers would wait forever
-                        result = "{\"status\":false,\"error\":\"Failed to read large response : "+exc+"\"}";
+        if (uristr != null) {
+            try {
+                mFileExecutor.execute(() -> {
+                    if (destroyed) return;
+                    String payload;
+                    try { payload = readResponseUri(uristr); }
+                    catch (Exception exc) {
+                        payload = failure("Failed to read large response: " + exc).toString();
                     }
-                    deliverResult(responseid, result);
-                }
-            });
-            return;
+                    deliverResult(responseid, payload);
+                });
+            } catch (java.util.concurrent.RejectedExecutionException ignored) {
+                // Owner was destroyed between validation and scheduling.
+            }
+        } else {
+            deliverResult(responseid, result);
         }
+    }
 
-        String result = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_RESULT);
-        deliverResult(responseid, result);
+    private static JSONObject failure(String message) {
+        JSONObject result = new JSONObject();
+        try { result.put("status", false); result.put("error", message); }
+        catch (JSONException impossible) { throw new IllegalStateException(impossible); }
+        return result;
     }
 
     private String readResponseUri(String zUriStr) throws Exception {
         InputStream is = mContext.getContentResolver().openInputStream(Uri.parse(zUriStr));
+        if (is == null) throw new java.io.IOException("Response file unavailable");
         try{
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buf = new byte[65536];
@@ -166,18 +178,17 @@ public class MinimaAPI {
 
     private void deliverResult(String zResponseID, String zResult){
 
+        if (destroyed || zResponseID == null || zResult == null) return;
         //Convert the Result to a JSON
-        JSONObject json = null;
+        JSONObject json;
         try {
             json = new JSONObject(zResult);
         } catch (JSONException e) {
-            MinimaAPILogger.log("Received Invalid JSONObject from broadcast! : "+zResult);
-
-            json = new JSONObject();
+            json = failure("Node returned an invalid JSON response");
         }
 
         //Find the Listener..
-        MinimaAPIListener listener = mResponseHandlers.get(zResponseID);
+        MinimaAPIListener listener = mResponseHandlers.remove(zResponseID);
 
         if(MinimaAPI.LOGGING_ENABLED){
             MinimaAPILogger.log("MinimaAPI - RECEIVED respID:"+zResponseID+" resp:"+zResult);
@@ -187,11 +198,8 @@ public class MinimaAPI {
         if(listener == null){
             MinimaAPILogger.log("Received Invalid ResponseID.. not found : "+zResponseID);
         }else{
-            //Remove this response handler..
-            mResponseHandlers.remove(zResponseID);
-
-            //Handle reply..
-            listener.response(json);
+            // Atomic removal above guarantees one delivery even for duplicate replies.
+            if (!destroyed) listener.response(json);
         }
     }
 
@@ -243,6 +251,7 @@ public class MinimaAPI {
     }
 
     public void Command(String zCommand, MinimaAPIListener zListener){
+        if (destroyed) return;
 
         //Create the register Intent
         Intent intent = getBaseIntent(MinimaAPIMessages.MINIMA_API_CMD);
@@ -269,6 +278,7 @@ public class MinimaAPI {
      * @param zUri     put only - a content:// uri this app has granted the node read on, otherwise null
      */
     public void FileCommand(String zAction, String zPath, String zNewPath, Uri zUri, MinimaAPIListener zListener){
+        if (destroyed) return;
 
         Intent intent = getBaseIntent(MinimaAPIMessages.MINIMA_API_FILE);
 

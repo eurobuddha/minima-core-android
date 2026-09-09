@@ -517,11 +517,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     @Override
     public void MinimaNewBlock() {
-        //New BLOCK - update HOME page..
-        mMainAdapter.refreshHomeView();
-
-        //Set the Footer
-        setFooterText();
+        runOnUiThread(() -> {
+            if (isFinishing() || isDestroyed() || mMainAdapter == null) return;
+            mMainAdapter.refreshHomeView();
+            setFooterText();
+        });
     }
 
     /**

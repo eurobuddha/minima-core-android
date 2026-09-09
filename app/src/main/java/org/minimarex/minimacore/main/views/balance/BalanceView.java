@@ -17,10 +17,16 @@ import org.minimarex.minimacore.main.views.send.SendActivity;
 import org.minimarex.minimacore.utils.Clip;
 import org.minimarex.minimacore.utils.Format;
 import org.minimarex.minimacore.utils.MinimaCMD;
-import org.minimarex.minimacore.utils.MinimaCMDListener;
 import org.minimarex.minimacore.utils.logger;
 
 public class BalanceView extends BaseView {
+
+    private final android.os.Handler main = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final org.minimarex.minimacore.utils.CoalescingRefresh<JSONObject> refresh =
+            new org.minimarex.minimacore.utils.CoalescingRefresh<>(MinimaCMD.readExecutor(),
+                    main::post, () -> MinimaCMD.execute("balance"), this::applyBalance,
+                    error -> logger.log("Balance refresh failed: " + error));
+    private boolean destroyed;
 
     ListView mBalanceList;
 
@@ -48,7 +54,11 @@ public class BalanceView extends BaseView {
     private final Runnable mTick = new Runnable() {
         @Override
         public void run() {
+            if (destroyed) return;
             updateBreakdown();
+            if (mMainView.getGlobalVisibleRect(new android.graphics.Rect())) {
+                mBalanceAdapter.refreshExpiredMetadata(mBalanceList.getFirstVisiblePosition(), mBalanceList.getLastVisiblePosition());
+            }
             if(mBreakdown != null && mBreakdown.getWindowToken() != null){
                 mBreakdown.postDelayed(this, 10000);
             }
@@ -112,6 +122,10 @@ public class BalanceView extends BaseView {
 
     @Override
     public void refreshView() {
+        if (android.os.Looper.myLooper() != android.os.Looper.getMainLooper()) {
+            main.post(this::refreshView); return;
+        }
+        if (destroyed) return;
 
         //Never stack timers when the tab is re-selected
         if(mBreakdown != null){
@@ -121,6 +135,7 @@ public class BalanceView extends BaseView {
 
         //Have we started
         if(!MinimaCMD.checkMinimaStarted()){
+            refresh.invalidate();
 
             JSONArray tempbal = new JSONArray();
             JSONObject bal = new JSONObject();
@@ -137,43 +152,25 @@ public class BalanceView extends BaseView {
             return;
         }
 
-        //Run Cmd
-        MinimaCMD.runMinima("balance", new MinimaCMDListener() {
-            @Override
-            public void cmdResult(JSONObject zResult) {
-                //A throwable escaping here would take the app down - MinimaCMD uses a bare Thread
-                try{
-                    //Get the balance response
-                    JSONArray balance = (JSONArray)zResult.get("response");
-
-                    if(balance == null){
-                        logger.log("NULL BALANCE : "+zResult.toString());
-                        return;
-                    }
-
-                    //Stamp when the node actually answered, not when we asked
-                    mLastBalanceUpdate = System.currentTimeMillis();
-
-                    refreshBalance(balance);
-
-                }catch(Throwable exc){
-                    logger.log("Balance refresh failed : "+exc);
-                }
-            }
-        });
+        refresh.request();
     }
 
-    private void refreshBalance(JSONArray zBalance){
-        mBalanceList.post(new Runnable() {
-            @Override
-            public void run() {
-                mBalanceAdapter.updateValues(zBalance);
-                mBalanceList.invalidate();
+    private void applyBalance(JSONObject result) {
+        if (destroyed || getActivity().isFinishing() || getActivity().isDestroyed()) return;
+        if (!MinimaCMD.checkMinimaStarted()) { refreshView(); return; }
+        Object balance = result == null ? null : result.get("response");
+        if (result == null || Boolean.FALSE.equals(result.get("status")) || !(balance instanceof JSONArray)) {
+            logger.log("Balance refresh failed");
+            return;
+        }
+        mLastBalanceUpdate = System.currentTimeMillis();
+        refreshBalance((JSONArray) balance);
+    }
 
-                //Header total = the Minima (0x00) sendable balance
-                updateTotal(zBalance);
-            }
-        });
+    private void refreshBalance(JSONArray balance) {
+        if (destroyed) return;
+        mBalanceAdapter.updateValues(balance);
+        updateTotal(balance);
     }
 
     private void updateTotal(JSONArray zBalance){
@@ -235,6 +232,10 @@ public class BalanceView extends BaseView {
 
     @Override
     public void onActivityDestroy(){
+        destroyed = true;
+        refresh.close();
+        main.removeCallbacksAndMessages(null);
+        mBalanceAdapter.destroy();
         if(mBreakdown != null){
             mBreakdown.removeCallbacks(mTick);
         }
