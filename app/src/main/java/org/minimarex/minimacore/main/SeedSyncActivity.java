@@ -1,5 +1,6 @@
 package org.minimarex.minimacore.main;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,12 +17,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.widget.NestedScrollView;
 
-import org.minima.system.Main;
 import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.utils.KeyboardInsets;
 import org.minimarex.minimacore.launcher.StartServiceActivity;
 import org.minimarex.minimacore.service.MinimaService;
-import org.minimarex.minimacore.service.Alarm;
 import org.minimarex.minimacore.utils.Clip;
 import org.minimarex.minimacore.utils.Peers;
 
@@ -76,7 +75,7 @@ public class SeedSyncActivity extends AppCompatActivity {
         terminal = findViewById(R.id.seed_sync_log);
         progress = findViewById(R.id.seed_sync_progress);
         logScroll = findViewById(R.id.seed_sync_log_scroll);
-        proceed.setOnClickListener(v -> startResync());
+        proceed.setOnClickListener(v -> confirmResync());
         restart.setOnClickListener(v -> {
             session.requestRestart();
             // A failed resync can leave a partially stopped node. Finish its normal
@@ -90,31 +89,43 @@ public class SeedSyncActivity extends AppCompatActivity {
         render();
     }
 
-    @android.annotation.SuppressLint("ApplySharedPref") // Persist before the destructive command starts.
+    /**
+     * A resync is not a tidy-up: the node deletes txpow.mv.db and archive.mv.db, refetches
+     * the chain and then shuts down. Say so before it happens, and say what is NOT at risk -
+     * the wallet and seed are untouched without a seed phrase, and people need to know that
+     * before they will press the button on a node holding real funds.
+     */
+    private void confirmResync() {
+        String requestedHost = host.getText().toString().trim();
+        if (!ResyncSession.validHost(requestedHost)) {
+            host.setError("Enter a hostname or IPv4 address and a port from 1 to 65535");
+            return;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Resync this node?")
+                .setMessage("Minima will rebuild its chain data from " + requestedHost + ".\n\n"
+                        + "\u2022 Your wallet and seed phrase are not touched.\n"
+                        + "\u2022 The node stops when it finishes and you restart it here.\n"
+                        + "\u2022 Any transaction still waiting to be mined is dropped.\n\n"
+                        + "This can take a while on a slow connection.")
+                .setPositiveButton("Resync", (d, w) -> startResync())
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
     private void startResync() {
         String requestedHost = host.getText().toString().trim();
         if (!ResyncSession.validHost(requestedHost)) {
             host.setError("Enter a hostname or IPv4 address and a port from 1 to 65535");
             return;
         }
-        // A missing chain tip is precisely why a damaged node may need resync.
-        if (Main.getInstance() == null || MinimaService.haveStartedShutdown()) {
-            setTextIfChanged(status, "The node is not running. Restart the node before resyncing.");
-            return;
-        }
         host.setError(null);
-        // A process death must never look like success or silently repeat a resync.
-        if (!prefs.edit().putBoolean(PREF_PENDING, true).commit()) {
-            setTextIfChanged(status, "Could not save resync state. Check available storage and try again.");
-            return;
+        // Shared with the health check's automatic path - see ResyncLauncher for why the
+        // pending flag, the alarms and the service binding all have to be handled here.
+        ResyncLauncher.Result result = ResyncLauncher.begin(this, requestedHost);
+        if (!result.started) {
+            setTextIfChanged(status, result.error);
         }
-        // Leave restart under the user's control, including after process death.
-        new Alarm().cancelAlarm(this);
-        MinimaService.cancelAlarm();
-        session.start(requestedHost, System.nanoTime());
-        // MainActivity binds the service. Release that binding now, otherwise
-        // the node's stopSelf at resync completion cannot reach onDestroy.
-        if (MainActivity.MAIN_ACTIVITY != null) MainActivity.MAIN_ACTIVITY.finish();
         render();
     }
 

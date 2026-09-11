@@ -416,6 +416,10 @@ public class MinimaService extends Service {
         //Set status Bar notification
         setMinimaNotification();
 
+        //Check whether the node's database has grown to the point where it needs a
+        //resync. Cheap, off-thread, and a no-op until the node is actually up.
+        NodeHealthMonitor.checkAsync(this);
+
         return START_STICKY;
     }
 

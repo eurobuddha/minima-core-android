@@ -50,8 +50,26 @@ android {
         // with 60k rows - 25,535 page reads as a tableScan vs 3,755 via the index.
         // CREATE INDEX IF NOT EXISTS runs in createSQL(), so existing DBs index on next start -
         // expect one slow first boot while it builds. No migration, no schema version.
-        versionCode 45
-        versionName "1.6.17-ui-h2"
+        // vc46: the node now watches its own database and says when it needs a resync.
+        // The 2026-09-11 incident ran for weeks with no signal at all - nothing in the app
+        // monitored anything, and the hourly Alarm only ever restarted a DEAD service, so a
+        // node that was alive and starving looked fine right up until companion apps began
+        // timing out. NodeHealth reads `status complete:true` at service start and on that
+        // same hourly tick. The store is the LEADING signal (txpow rows and bytes, total
+        // disk) because that is what actually grows; heap is only a backstop, and is a
+        // FRACTION of Runtime.maxMemory() (0.60 warn / 0.80 act) because heapgrowthlimit is
+        // 256m on some devices and 512m on others, so absolute MB do not travel. A verdict
+        // must hold for 10 minutes before it is reported, in both directions, so neither a
+        // spike nor one quiet sample can flip it. Healthy reference, measured on the zfold
+        // after its resync: disk 29.0 MB, txpowdb 10.1 MB / 2050 rows.
+        // WATCH/DEGRADED raise a notification that opens the resync screen. New opt-in
+        // switch "Resync automatically when unhealthy" (default OFF) will do it unattended -
+        // at most once a day, never while a transaction is waiting to be mined, and it falls
+        // over to another MegaMMR host only on a pre-flight failure, never after megammrsync
+        // has already deleted the databases. The resync screen now confirms before it runs,
+        // which it never did before. Wallet and seed are untouched throughout.
+        versionCode 46
+        versionName "1.6.18-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

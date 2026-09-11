@@ -25,6 +25,14 @@ public class Alarm extends BroadcastReceiver
             MinimaLogger.log("Cannot start foreground service : "+exc);
         }
 
+        //This hourly tick is the app's only background scheduler, so the node health
+        //check rides it. It is a no-op when the node is not up.
+        try{
+            NodeHealthMonitor.checkAsync(context);
+        }catch(Exception exc){
+            MinimaLogger.log("Node health check failed to start : "+exc);
+        }
+
         //Send a start service JOB
         //ServiceStarterJobService.enqueueWork(context, new Intent());
     }

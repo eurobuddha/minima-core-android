@@ -35,6 +35,8 @@ public class ParamsActivity extends AppCompatActivity {
     public static final String PREF_PARAM_MEGAMMR = "PARAM_MEGAMMR";
     public static final String PREF_PARAM_RPC     = "PARAM_RPC";
     public static final String PREF_EXTRA_PARAMS  = "minima_extra_params";
+    //Not a node flag: read by NodeHealthMonitor, not by MinimaService at boot.
+    public static final String PREF_AUTORESYNC    = "PARAM_AUTORESYNC";
 
     //Flags that must never come in via the free-text field: wipe/seed danger
     //(-clean/-genesis/-solo wipe data, -seed/-anyseed/-dbpassword touch the wallet)
@@ -49,6 +51,7 @@ public class ParamsActivity extends AppCompatActivity {
     SwitchMaterial mServerSwitch;
     SwitchMaterial mMegaSwitch;
     SwitchMaterial mRpcSwitch;
+    SwitchMaterial mAutoResyncSwitch;
     EditText       mExtraInput;
 
     @Override
@@ -66,6 +69,7 @@ public class ParamsActivity extends AppCompatActivity {
         mServerSwitch = findViewById(R.id.params_switch_server);
         mMegaSwitch   = findViewById(R.id.params_switch_megammr);
         mRpcSwitch    = findViewById(R.id.params_switch_rpc);
+        mAutoResyncSwitch = findViewById(R.id.params_switch_autoresync);
         mExtraInput   = findViewById(R.id.params_extra);
 
         //Load the current values
@@ -73,6 +77,7 @@ public class ParamsActivity extends AppCompatActivity {
         mServerSwitch.setChecked(prefs.getBoolean(PREF_PARAM_SERVER, false));
         mMegaSwitch.setChecked(prefs.getBoolean(PREF_PARAM_MEGAMMR, false));
         mRpcSwitch.setChecked(prefs.getBoolean(PREF_PARAM_RPC, false));
+        mAutoResyncSwitch.setChecked(prefs.getBoolean(PREF_AUTORESYNC, false));
         mExtraInput.setText(prefs.getString(PREF_EXTRA_PARAMS, ""));
 
         Button save = findViewById(R.id.params_button_save);
@@ -144,6 +149,7 @@ public class ParamsActivity extends AppCompatActivity {
         editor.putBoolean(PREF_PARAM_SERVER,  mServerSwitch.isChecked());
         editor.putBoolean(PREF_PARAM_MEGAMMR, mMegaSwitch.isChecked());
         editor.putBoolean(PREF_PARAM_RPC,     mRpcSwitch.isChecked());
+        editor.putBoolean(PREF_AUTORESYNC,    mAutoResyncSwitch.isChecked());
         editor.putString(PREF_EXTRA_PARAMS, extra);
         editor.commit();
 

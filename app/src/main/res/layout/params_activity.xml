@@ -96,6 +96,23 @@
                 android:textSize="12sp"
                 android:textColor="@color/core_text_mid" />
 
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/params_switch_autoresync"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Resync automatically when unhealthy"
+                android:textAppearance="@style/TextAppearance.MinimaCore.Body"
+                android:textColor="@color/core_text" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Minima checks its own database hourly. Off, it tells you when a resync is needed. On, it rebuilds the chain itself, at most once a day and never while a transaction is waiting to be mined. Your wallet and seed phrase are never touched either way."
+                android:textAppearance="@style/TextAppearance.MinimaCore.Body"
+                android:textSize="12sp"
+                android:textColor="@color/core_text_mid" />
+
             <TextView style="@style/FormLabel" android:text="Extra arguments (advanced)" />
 
             <EditText
