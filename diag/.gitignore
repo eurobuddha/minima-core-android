@@ -1,0 +1,5 @@
+# Raw device captures stay LOCAL - never commit them.
+# dumpsys diskstats carries the device's full installed-app list, and the events
+# buffer carries other apps' activity. This repo is public. Commit diag/README.md
+# (the analysis) and keep the dumps on the machine that took them.
+*/

@@ -35,8 +35,23 @@ android {
         // vc42: let the main overflow menu icon follow the light/dark theme.
         // vc43: six-decimal wallet summaries; exact amounts remain in token/coin details.
         // vc44: safe metadata downloads, lifecycle-safe startup/API, bounded coalesced reads and caching.
-        versionCode 44
-        versionName "1.6.16-ui-h2"
+        // vc45: PERF - the bundled minima.jar indexes txpow.timemilli and (isrelevant, timemilli),
+        // and gives getLatestTxPoW's query a WHERE clause so H2 will actually use that index.
+        // Those columns were unindexed while five hot statements sorted or filtered on them, so
+        // `SELECT * FROM txpow ORDER BY timemilli DESC` was a full table scan that dragged every
+        // row's txpowdata BLOB through the sort. Every TxPoWSqlDB method is synchronized, so one
+        // `history` call from any companion stalled all node DB reads - including the SINGLE-
+        // threaded IPC command executor. Measured on R58M307HEEN (2026-09-11, 500MB+ txpow store):
+        // all 1626 Long-monitor-contention mentions named TxPoWSqlDB, 506 holds by getLatestTxPoW
+        // blocking exists (299) and getTxPoW (210), longest hold 47.171s against a 30s
+        // NodeApi.READ_TIMEOUT_MS. See diag/README.md.
+        // The index alone was NOT enough: H2 refuses to use an index for a bare ORDER BY .. LIMIT
+        // with no WHERE, so the query carries a deliberate `timemilli > 0`. Verified on H2 2.1.214
+        // with 60k rows - 25,535 page reads as a tableScan vs 3,755 via the index.
+        // CREATE INDEX IF NOT EXISTS runs in createSQL(), so existing DBs index on next start -
+        // expect one slow first boot while it builds. No migration, no schema version.
+        versionCode 45
+        versionName "1.6.17-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
