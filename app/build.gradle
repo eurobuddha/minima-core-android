@@ -76,8 +76,16 @@ android {
         // be fooled by the wall clock moving BACKWARDS (NTP correction, or the user changing
         // the time): a naive now-minus-last goes negative, reads as "too soon", and would
         // have silently suppressed every check until the clock caught up.
-        versionCode 47
-        versionName "1.6.19-ui-h2"
+        // vc48: the health check is driven by the node's own block heartbeat, not AlarmManager.
+        // Found on the Z Fold 7: six minutes after start its hourly Alarm had not fired ONCE -
+        // setInexactRepeating is subject to Doze and OEM battery management - so that device
+        // would have gone hours with no health check at all, and vc46/47 looked fine only
+        // because the alarm happened to fire promptly on the older Galaxy. A block arrives
+        // every ~50s while the node runs, so NEWBLOCK now asks for a check and the interval
+        // (15 min) does the scheduling by turning almost all of them away. The service-start
+        // and Alarm calls stay as belt and braces; they are debounced like everything else.
+        versionCode 48
+        versionName "1.6.20-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -48,14 +48,29 @@ public final class NodeHealthMonitor {
     static final int FAILOVER_WINDOW_MILLIS = 3 * 60 * 1000;
 
     /**
-     * Ignore a second check this soon after the last one.
+     * How often a check actually runs. This IS the schedule, not just a debounce.
      *
-     * The hourly Alarm both starts the service AND asks for a check, and starting a running
-     * service delivers onStartCommand again - which also asks for a check. That produced two
-     * identical samples milliseconds apart, seen in the field on the very first release.
-     * Debouncing here fixes it for every caller rather than for that one pair.
+     * Callers ask far more often than this - every new block, at service start, and on the
+     * hourly Alarm - and all but one are turned away. Driving it from the node's own block
+     * heartbeat rather than from AlarmManager is deliberate: setInexactRepeating is subject
+     * to Doze and OEM battery management, and on a Z Fold 7 it had not fired once six minutes
+     * after start, which would have left that device with no health check for hours. A block
+     * arrives roughly every 50 seconds while the node is running.
+     *
+     * It also collapses the original duplicate: the Alarm both starts the service AND asks
+     * for a check, and starting a running service delivers onStartCommand, which asks again.
      */
-    static final long MIN_CHECK_INTERVAL_MILLIS = 60_000L;
+    static final long MIN_CHECK_INTERVAL_MILLIS = 15L * 60 * 1000;
+
+    /**
+     * A check whose status read FAILED retries this soon, not after the full interval.
+     *
+     * `status complete:true` throws during early startup - the wallet's seed row is not
+     * loaded yet, so it NPEs on SeedRow.getSeed() - and the first check after a restart lands
+     * squarely in that window. Spending the whole interval on it left a freshly started node
+     * unmonitored for fifteen minutes; observed on a Z Fold 7 as no health line at all.
+     */
+    static final long RETRY_AFTER_FAILURE_MILLIS = 60_000L;
 
     private static final NodeHealth HEALTH = new NodeHealth();
     private static final java.util.concurrent.atomic.AtomicLong LAST_CHECK =
@@ -87,7 +102,16 @@ public final class NodeHealthMonitor {
 
         JSONObject reply = MinimaCMD.execute("status complete:true");
         NodeHealth.Metrics metrics = NodeHealth.read(reply);
-        if (metrics == null) return;
+        if (metrics == null) {
+            // Say so. A health check that fails silently is worse than no health check: it
+            // looks exactly like a healthy node.
+            String error = org.minimarex.minimacore.utils.Feedback.errorOf(reply);
+            MinimaLogger.log("Node health: could not read node status - "
+                    + (error != null ? error : "reply was not in the expected shape")
+                    + " (retrying shortly)");
+            retrySooner(nowMillis);
+            return;
+        }
 
         NodeHealth.Assessment raw = NodeHealth.classify(metrics);
         NodeHealth.State state = HEALTH.update(metrics, nowMillis);
@@ -137,6 +161,11 @@ public final class NodeHealthMonitor {
             if (tooSoon) return false;
             if (LAST_CHECK.compareAndSet(last, nowMillis)) return true;
         }
+    }
+
+    /** Give back most of the interval, so a failed read is retried on a following block. */
+    private static void retrySooner(long nowMillis) {
+        LAST_CHECK.set(nowMillis - (MIN_CHECK_INTERVAL_MILLIS - RETRY_AFTER_FAILURE_MILLIS));
     }
 
     /** The numbers behind the verdict, so a trend is readable straight from the Logs tab. */

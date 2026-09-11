@@ -199,6 +199,15 @@ public class MinimaService extends Service {
                         //Get the TxPoW
                         mTxPowJSON = (JSONObject) data.get("txpow");
 
+                        //The node's own heartbeat is the health check's schedule. AlarmManager
+                        //is not: setInexactRepeating is subject to Doze and OEM battery
+                        //management, and on a Z Fold 7 it had not fired ONCE six minutes after
+                        //start, so a device could go hours with no check at all. A block
+                        //arrives roughly every 50s while the node is running, and
+                        //NodeHealthMonitor debounces to its own interval, so almost every call
+                        //here returns immediately.
+                        NodeHealthMonitor.checkAsync(MinimaService.this);
+
                         //Show a notification
                         mHandler.post(new Runnable() {
                             @Override
