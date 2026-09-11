@@ -16,6 +16,31 @@ node and destroys the state. Two devices, both Samsung, both attached over adb.
 
 The zfold7 `RFCY71KW3LX` from `HEAP_EXHAUSTION_2026-09-11.md` was not attached.
 
+## Outcome (added after the fact)
+
+Both devices were fixed by **`megammrsync action:resync`**, not by a code change. The zfold7's
+store went from ~1.18 GB to **29.0 MB**, and `R58M307HEEN` recovered on **unpatched 1.6.15**
+without an install or even a process restart — same pid 28022, heap 501,501 KB pinned at the
+ceiling down to 132,314 KB, blocking GCs 12,247 → 0. The vc45 index patch (`HARDENING_1.6.17.md`)
+is preventive; it has not been demonstrated to fix anything in the field, because the condition
+it targets no longer exists on either device.
+
+**⚠ The `App Data Sizes` figures below came from `dumpsys diskstats`, and it is stale.** It
+reported 1,182.9 MB for the zfold both before the install and after the store had fallen to
+29 MB — byte-identical across an APK install and a 97.5% reduction. It is a cached snapshot on
+the system's own schedule, not a live measurement. Treat every diskstats size in this document
+as a point-in-time reading of unknown age.
+
+The trustworthy source is the node's own `status complete:true` — `memory.disk`,
+`memory.files.*`, and `txpow.txpowdb` for the row count. Reaching it needs a companion app
+(Terminal IDE works) or RPC enabled from Startup Params; note that enabling RPC restarts the
+node and resets the state you were trying to measure. Post-resync, the zfold reported:
+
+```
+disk 29.0 MB   txpowdb 10.1 MB (2050 rows)   archivedb 2.3 MB   chaintree 7.0 MB   ram 87.3 MB
+block 2309303 at the tip, branches 0, ~53 s/block, 4 peers, locked false, megammr false
+```
+
 ## Headline numbers
 
 | | subject (ours, vc43) | control (stock, vc20) |

@@ -99,12 +99,85 @@ The gap widens with the table, because the scan is O(rows) and the index path is
 - AAR SHA-256: `fb7f4c176cc56c461bc4647d1b21d3a9ba80798339ff984285423d9415707f4e`
   (unchanged from 1.6.16 — `minimaapi` did not change.)
 
+## Field outcome — read this before crediting the patch
+
+Deployed to the zfold7 (`RFCY71KW3LX`) on 2026-09-11, followed by a
+`megammrsync action:resync`. The node is healthy. **But the evidence credits the resync, not
+this release,** and the honest record matters more than the release note.
+
+### The clean experiment ran on the other device
+
+`R58M307HEEN` recovered **completely without this build**. Same process throughout — pid 28022,
+6.5 hours uptime, still on 1.6.15-ui-h2 — no install and no restart, only a resync:
+
+| | before | after resync (unpatched 1.6.15) |
+|---|---|---|
+| Dalvik heap alloc | 501,501 KB, pinned at the 524,288 KB ceiling | **132,314 KB** |
+| heap size | 524,288 KB | **156,890 KB** — ART gave memory back, so the live set genuinely collapsed |
+| blocking GCs | 12,247 in 2 h | **0** in a 5-minute window |
+| `getLatestTxPoW` contention | 506 of 575 events | **0** |
+
+The zfold cannot separate the variables: it received a new APK, a process restart and a resync
+within the same twenty minutes, and a restart alone was already known to recover the heap.
+
+### What the zfold actually looks like now
+
+From the node's own `status complete:true` — the only trustworthy source (see the caveat below):
+
+```
+disk 29.0 MB      txpowdb 10.1 MB   archivedb 2.3 MB   chaintree 7.0 MB   cascade 2.2 MB
+ram  87.3 MB      txpow.txpowdb 2050 rows            mempool 1   ramdb 976
+block 2309303 at the tip, branches 0, speed 0.01883 (~53 s/block), 4 peers
+locked false, megammr false
+```
+
+**29.0 MB total, from ~1.18 GB.** The txpow table is 10.1 MB and 2,050 rows. The pollution is
+gone — removed, not merely indexed around.
+
+### So what is this release worth?
+
+Preventive, and currently latent. The indexes now operate on a 10 MB table where a full scan
+costs nothing, and the condition they were built for no longer exists on either device. They
+remain correct and well-motivated — the contention attribution was unambiguous (506 of 575
+events on the G975F, 78 of 91 on the zfold, both on `getLatestTxPoW`) and the `EXPLAIN ANALYZE`
+numbers are real — but **this release has not been demonstrated to fix anything in the field**,
+and should not be described as having done so. What it buys is that a txpow table allowed to
+grow large again cannot lock the node the same way.
+
+### Caveat that invalidates earlier numbers: `dumpsys diskstats` is stale
+
+Every data-directory figure taken from `adb shell dumpsys diskstats` in this investigation is
+unreliable. It reported **1,182.9 MB** for the zfold both before the install and after the
+resync — byte-identical across an APK install *and* a 97.5% reduction in the real store. It is a
+cached snapshot the system refreshes on its own schedule, not a live measurement.
+
+Use `status complete:true` (`memory.disk` and `memory.files.*`). Reaching it needs a companion
+app — Terminal IDE works — or RPC enabled from Startup Params, remembering that enabling RPC
+restarts the node and resets the state you were trying to measure.
+
 ## What this does not fix
 
 This removes a stall, not the cause of the stall. The `txpow` table is large because
 `SQL_DELETE_TXPOW` is `WHERE timemilli < ? AND isrelevant=0`, so **rows marked relevant are
 never deleted** — and the coin-set pollution bug fixed in vc39 spent weeks marking strangers'
 covenant coins relevant on affected nodes. Indexing makes a bloated table survivable; it does
-not un-bloat it. The cleanup (`megammrsync action:resync`) is still needed on affected devices,
-and is tracked separately along with the heap watchdog, the unbounded `CoinsDialog` query, the
-uncapped IPC reply, and the `H2-lob-cleaner` process kills.
+not un-bloat it. The cleanup is `megammrsync action:resync`, and as the field outcome above
+records, **that is what actually fixed both devices.**
+
+Still open, tracked separately:
+
+- **Archive regrowth.** `MAX_KEEP_BLOCKS = 2000 × NUMBER_DAYS_ARCHIVE` = 100,000 blocks (~50
+  days), hard-coded at `ArchiveManager.java:28` with no CLI override, written unconditionally on
+  mobile. The zfold's archive is 2.3 MB today and will climb toward that cap. This is the slow
+  disk creep to watch.
+- **Nothing tells the user any of this is happening.** There is no heap monitoring in the app at
+  all, and the hourly `Alarm` only restarts a *dead* service — it does nothing for a node that is
+  alive and starving.
+- **Unbounded amplifiers.** `CoinsDialog.java:142` issues `coins relevant:true` with no `limit:`
+  and no paging; `MinimaReceiver.java:181` caps the inbound command and the inline reply but not
+  the command result itself.
+- **`H2-lob-cleaner` process kills** — two FATAL kills in 12 hours on the G975F. Upstream rather
+  than ours: `core/Minima` has the same 30-minute `closeAndReopen()` cycle and the same H2
+  2.1.214, and neither H2 version installs an uncaught-exception handler on that executor.
+- **`Wallet.updateUses` contention** — 7.78 s holds observed on the zfold *after* this release, on
+  the signing path. Unrelated to txpow, and the next thing to look at.
