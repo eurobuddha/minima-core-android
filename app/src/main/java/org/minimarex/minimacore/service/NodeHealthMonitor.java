@@ -47,7 +47,19 @@ public final class NodeHealthMonitor {
     static final int FAILOVER_POLL_MILLIS = 10_000;
     static final int FAILOVER_WINDOW_MILLIS = 3 * 60 * 1000;
 
+    /**
+     * Ignore a second check this soon after the last one.
+     *
+     * The hourly Alarm both starts the service AND asks for a check, and starting a running
+     * service delivers onStartCommand again - which also asks for a check. That produced two
+     * identical samples milliseconds apart, seen in the field on the very first release.
+     * Debouncing here fixes it for every caller rather than for that one pair.
+     */
+    static final long MIN_CHECK_INTERVAL_MILLIS = 60_000L;
+
     private static final NodeHealth HEALTH = new NodeHealth();
+    private static final java.util.concurrent.atomic.AtomicLong LAST_CHECK =
+            new java.util.concurrent.atomic.AtomicLong(0);
 
     private NodeHealthMonitor() {}
 
@@ -68,6 +80,10 @@ public final class NodeHealthMonitor {
         if (Main.getInstance() == null || MinimaService.haveStartedShutdown()) return;
         // Never diagnose a node that is mid-resync - it is supposed to look wrong.
         if (ResyncSession.get().state() == ResyncSession.State.RUNNING) return;
+        // Claim the slot only once a real sample is about to happen. Claiming earlier meant
+        // the check fired at service start - before the node had finished coming up - burned
+        // the minute doing nothing, and suppressed the next trigger that could have sampled.
+        if (!claimCheck(nowMillis)) return;
 
         JSONObject reply = MinimaCMD.execute("status complete:true");
         NodeHealth.Metrics metrics = NodeHealth.read(reply);
@@ -102,6 +118,25 @@ public final class NodeHealthMonitor {
             return;
         }
         notify(context, state, reason);
+    }
+
+    /**
+     * True if this caller won the right to run a check now.
+     *
+     * The wall clock can move BACKWARDS - an NTP correction, or the user changing the time -
+     * and a naive `now - last` would then be negative, read as "too soon", and silently
+     * suppress every check until the clock caught up again. A jump backwards re-baselines
+     * and runs instead.
+     */
+    private static boolean claimCheck(long nowMillis) {
+        while (true) {
+            long last = LAST_CHECK.get();
+            boolean tooSoon = last != 0
+                    && nowMillis >= last
+                    && nowMillis - last < MIN_CHECK_INTERVAL_MILLIS;
+            if (tooSoon) return false;
+            if (LAST_CHECK.compareAndSet(last, nowMillis)) return true;
+        }
     }
 
     /** The numbers behind the verdict, so a trend is readable straight from the Logs tab. */

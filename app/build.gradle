@@ -68,8 +68,16 @@ android {
         // over to another MegaMMR host only on a pre-flight failure, never after megammrsync
         // has already deleted the databases. The resync screen now confirms before it runs,
         // which it never did before. Wallet and seed are untouched throughout.
-        versionCode 46
-        versionName "1.6.18-ui-h2"
+        // vc47: FIX in vc46's own health check, caught by reading its first field log. The
+        // hourly Alarm both starts the service AND asks for a check, and starting a running
+        // service delivers onStartCommand, which asks again - so every tick sampled TWICE,
+        // 7ms apart, and wrote two identical lines to the Logs tab. Checks are now debounced
+        // to one a minute for every caller, not just that pair. The debounce also refuses to
+        // be fooled by the wall clock moving BACKWARDS (NTP correction, or the user changing
+        // the time): a naive now-minus-last goes negative, reads as "too soon", and would
+        // have silently suppressed every check until the clock caught up.
+        versionCode 47
+        versionName "1.6.19-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
