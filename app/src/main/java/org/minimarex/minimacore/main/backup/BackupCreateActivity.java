@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -63,6 +64,10 @@ public class BackupCreateActivity extends AppCompatActivity {
                 new ActivityResultContracts.CreateDocument("application/octet-stream"),
                 this::onExportDestinationChosen);
 
+        // The backup password is the only thing protecting an exported .bak, and it can now be
+        // revealed on screen - so this screen opts out of the "Allow Screenshots" setting exactly
+        // as VaultActivity does, rather than leaving the password in a recents thumbnail.
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.backup_create);
         Toolbar tb = findViewById(R.id.toolbar);
         tb.setTitle("Create backup");

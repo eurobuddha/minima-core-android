@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -64,6 +65,10 @@ public class RestoreFileActivity extends AppCompatActivity {
         importLauncher = registerForActivityResult(
                 new ActivityResultContracts.OpenDocument(), this::onFileChosen);
 
+        // The backup password is the only thing protecting an exported .bak, and it can now be
+        // revealed on screen - so this screen opts out of the "Allow Screenshots" setting exactly
+        // as VaultActivity does, rather than leaving the password in a recents thumbnail.
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.backup_restore);
         Toolbar tb = findViewById(R.id.toolbar);
         tb.setTitle("Restore from file");
@@ -116,7 +121,11 @@ public class RestoreFileActivity extends AppCompatActivity {
             TextView subtitle = row.findViewById(R.id.backup_row_subtitle);
             // Full filename, never elided - it is what goes into the command.
             title.setText(file.getName());
-            subtitle.setText(NodeFiles.formatBytes(file.length()) + " · " + when.format(new Date(file.lastModified())));
+            // The folder also holds archive exports and txn files. They are listed because a
+            // restore CAN name them, but they must not look like backups.
+            String kind = NodeFiles.isBackup(file) ? "" : " · not a .bak";
+            subtitle.setText(NodeFiles.formatBytes(file.length()) + " · "
+                    + when.format(new Date(file.lastModified())) + kind);
             row.setOnClickListener(v -> {
                 selected = file.getName();
                 renderFiles();
@@ -124,7 +133,7 @@ public class RestoreFileActivity extends AppCompatActivity {
             Button action = row.findViewById(R.id.backup_row_action);
             action.setVisibility(View.VISIBLE);
             action.setText("Delete");
-            action.setOnClickListener(v -> confirmDelete(file, files.size()));
+            action.setOnClickListener(v -> confirmDelete(file, NodeFiles.backupCount(this)));
             row.setAlpha(file.getName().equals(selected) ? 1f : 0.55f);
             fileRows.addView(row);
         }
@@ -141,7 +150,9 @@ public class RestoreFileActivity extends AppCompatActivity {
      * someone is one tap from having no way back at all.
      */
     private void confirmDelete(File file, int totalBackups) {
-        String warning = totalBackups <= 1
+        // Counts .bak files only. Counting every listed file meant one backup sitting beside a
+        // txn file looked like "two backups", and this warning silently did not fire.
+        String warning = NodeFiles.isBackup(file) && totalBackups <= 1
                 ? "\n\nThis is the only backup file on this node. Once it is gone there is nothing here to restore from."
                 : "";
         new MaterialAlertDialogBuilder(this)

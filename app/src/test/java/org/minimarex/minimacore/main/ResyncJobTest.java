@@ -88,9 +88,46 @@ public class ResyncJobTest {
         assertEquals("megammrsync action:resync host:example.org:9001"
                 + " phrase:\"" + twelveWords() + "\" keyuses:2000", job.command());
         assertEquals("Seed restore", job.label());
-        // Stateful signatures: the node caps keyuses at 262144 for normal keys.
-        assertNull(ResyncJob.seedResync("example.org:9001", twelveWords(), 262145));
+        assertNull(ResyncJob.seedResync("example.org:9001", twelveWords(), ResyncJob.MAX_KEY_USES + 1));
         assertNull(ResyncJob.seedResync("example.org:9001", twelveWords(), -1));
+    }
+
+    @Test public void keyusesBelowTheNodesOwnDefaultIsRefused() {
+        // keyuses:0 says "no keys have been used", so after a seed resync the node signs from
+        // index 0 again - and a reused Winternitz index exposes the private key. A low value is
+        // not a lesser version of this operation, it is the unsafe version of it.
+        assertNull(ResyncJob.seedResync("example.org:9001", twelveWords(), 0));
+        assertNull(ResyncJob.seedResync("example.org:9001", twelveWords(), 1));
+        assertNull(ResyncJob.seedResync("example.org:9001", twelveWords(), ResyncJob.MIN_KEY_USES - 1));
+        assertNotNull(ResyncJob.seedResync("example.org:9001", twelveWords(), ResyncJob.MIN_KEY_USES));
+    }
+
+    @Test public void onlyBip39PhraseLengthsAreAccepted() {
+        StringBuilder words = new StringBuilder("abandon");
+        for (int count = 2; count <= 25; count++) {
+            words.append(" abandon");
+            boolean bip39 = count == 12 || count == 15 || count == 18 || count == 21 || count == 24;
+            assertEquals(count + " words", bip39, ResyncJob.validPhrase(words.toString()));
+        }
+    }
+
+    @Test public void aTruncatedSeedPasteIsNotASeed() {
+        // Whole bytes only - an odd digit count means characters were lost on the way in.
+        assertTrue(ResyncJob.validSeedHex("0xAB"));
+        assertTrue(ResyncJob.validSeedHex("0xABCD"));
+        assertFalse(ResyncJob.validSeedHex("0xABC"));
+        assertFalse(ResyncJob.validSeedHex("0x"));
+    }
+
+    @Test public void theCommandIsDroppedOnceItHasBeenDispatched() {
+        // It carries the backup password and ResyncSession is a process-lifetime singleton.
+        ResyncJob job = ResyncJob.fileRestore("backup.bak", "pass123");
+        assertTrue(job.command().contains("pass123"));
+        job.forgetCommand();
+        assertEquals("", job.command());
+        // Everything the UI still needs survives.
+        assertEquals("Restore", job.label());
+        assertFalse(job.selfShutsDown());
     }
 
     private static String twelveWords() {

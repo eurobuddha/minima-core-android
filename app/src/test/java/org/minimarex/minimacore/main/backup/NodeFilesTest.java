@@ -145,6 +145,36 @@ public class NodeFilesTest {
         }
     }
 
+    @Test public void aTruncatedNameCannotBecomeAnUnusableImport() {
+        // Clamping after stripping leading dots could expose a new "." or "-" and produce a name
+        // validFilename rejects - imported, listed nowhere, unusable in a restore command.
+        StringBuilder raw = new StringBuilder();
+        for (int i = 0; i < 200; i++) raw.append('a');
+        String longDotted = "..." + raw + ".bak";
+        String safe = NodeFiles.safeName(longDotted);
+        assertTrue("safe name must be nameable in a command: " + safe,
+                org.minimarex.minimacore.main.ResyncJob.validFilename(safe));
+        assertTrue(safe.length() <= 128);
+    }
+
+    @Test public void onlyBakFilesCountAsBackups() {
+        // The folder also holds archive exports and txn files; counting them made "this is the
+        // only backup" silently fail to fire.
+        assertTrue(NodeFiles.isBackup(write("wallet.bak")));
+        assertTrue(NodeFiles.isBackup(write("WALLET.BAK")));
+        assertFalse(NodeFiles.isBackup(write("archiveexport.gz")));
+        assertFalse(NodeFiles.isBackup(write("unsignedtransaction-1.txn")));
+        assertFalse(NodeFiles.isBackup(new File(base, "missing.bak")));
+    }
+
+    private File write(String name) throws RuntimeException {
+        try {
+            File file = new File(base, name);
+            try (FileOutputStream out = new FileOutputStream(file)) { out.write(new byte[]{1}); }
+            return file;
+        } catch (IOException exc) { throw new RuntimeException(exc); }
+    }
+
     @Test public void byteCountsAreReportedInUnitsPeopleRead() {
         assertEquals("512 B", NodeFiles.formatBytes(512));
         assertEquals("1.0 KB", NodeFiles.formatBytes(1024));

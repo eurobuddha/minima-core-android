@@ -67,6 +67,7 @@
                 <EditText
                     android:id="@+id/backup_create_password"
                     style="@style/FormField"
+                    android:saveEnabled="false"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:inputType="textPassword"
@@ -94,6 +95,7 @@
                 <EditText
                     android:id="@+id/backup_create_confirm"
                     style="@style/FormField"
+                    android:saveEnabled="false"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:inputType="textPassword"

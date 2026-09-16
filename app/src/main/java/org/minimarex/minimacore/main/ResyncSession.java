@@ -50,8 +50,10 @@ public final class ResyncSession implements LogBuffer.Sink {
         log.append("Checking connection, downloading and importing chain data. Keep Minima Core running.");
         LogBuffer.addObserver(this);
         try {
-            // newJob.command() can carry a backup password - it is passed to the node and never logged.
+            // newJob.command() can carry a backup password - it is passed to the node and never
+            // logged, then dropped so this singleton does not hold it for the life of the process.
             runner.run(newJob.command(), reply -> finished(currentAttempt, reply));
+            newJob.forgetCommand();
         } catch (Exception exc) {
             JSONObject reply = new JSONObject();
             reply.put("status", false);

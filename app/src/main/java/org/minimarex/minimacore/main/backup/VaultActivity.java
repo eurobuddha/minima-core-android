@@ -84,7 +84,7 @@ public class VaultActivity extends AppCompatActivity {
 
         reveal.setOnClickListener(v -> toggleReveal());
         copyPhrase.setOnClickListener(v ->
-                Clip.copy(this, "Minima seed phrase", currentPhrase, "Seed phrase copied"));
+                Clip.copySensitive(this, "Minima seed phrase", currentPhrase, "Seed phrase copied"));
     }
 
     @Override protected void onResume() {
@@ -94,8 +94,11 @@ public class VaultActivity extends AppCompatActivity {
     }
 
     @Override protected void onPause() {
-        // Do not leave the phrase on screen for whoever opens the app next.
+        // Do not leave the phrase on screen, or in memory, for whoever opens the app next.
+        // onResume re-reads it from the node, so nothing is lost by dropping it here.
         hidePhrase();
+        currentPhrase = "";
+        currentSeed = "";
         super.onPause();
     }
 
@@ -158,6 +161,9 @@ public class VaultActivity extends AppCompatActivity {
     }
 
     private void hidePhrase() {
+        // Clear, not just hide: a GONE view still holds the words in the hierarchy.
+        phrase.setText("");
+        seed.setText("");
         phrase.setVisibility(View.GONE);
         seed.setVisibility(View.GONE);
         seedLabel.setVisibility(View.GONE);
@@ -346,7 +352,8 @@ public class VaultActivity extends AppCompatActivity {
                 "your 24 words, separated by spaces");
         EditText host = field(InputType.TYPE_CLASS_TEXT, "host:port");
         host.setText(Peers.getDefaultPeers(this));
-        EditText uses = field(InputType.TYPE_CLASS_NUMBER, "key uses, e.g. 2000");
+        EditText uses = field(InputType.TYPE_CLASS_NUMBER,
+                "key uses, at least " + ResyncJob.MIN_KEY_USES);
         uses.setText("2000");
         box.addView(words);
         box.addView(host);
@@ -372,7 +379,8 @@ public class VaultActivity extends AppCompatActivity {
                     }
                     ResyncJob job = ResyncJob.seedResync(hostText, phraseText, keyUses);
                     if (job == null) {
-                        setStatus("Check the phrase, the host and the key uses (0 to 262144).");
+                        setStatus("Check the phrase, the host, and the key uses ("
+                                + ResyncJob.MIN_KEY_USES + " to " + ResyncJob.MAX_KEY_USES + ").");
                         return;
                     }
                     ResyncLauncher.Result result = ResyncLauncher.begin(this, job);

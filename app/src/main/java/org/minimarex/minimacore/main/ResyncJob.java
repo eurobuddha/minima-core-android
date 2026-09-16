@@ -36,11 +36,25 @@ public final class ResyncJob {
      * Spaces are the one whitespace that CAN be carried safely, because the value is quoted and
      * both tokenisers keep a quoted run intact. A ':' or '"' cannot - see the class comment.
      */
-    private static final String PHRASE_RULE = "[A-Za-z]+( [A-Za-z]+){11,23}";
+    private static final String PHRASE_RULE = "[A-Za-z]+( [A-Za-z]+)+";
+
+    /** BIP39 only ever produces these lengths, so anything else is a typo, not a phrase. */
+    private static final int[] PHRASE_WORD_COUNTS = {12, 15, 18, 21, 24};
+
+    /**
+     * The node's own default, and our floor.
+     *
+     * keyuses:0 is the single most dangerous value this app can send. It tells the node no keys
+     * have been used, so after a seed resync it signs from index 0 again - and a reused
+     * Winternitz index exposes the private key. Refusing it outright is the only safe default;
+     * the node itself defaults to 1000 for the same reason.
+     */
+    public static final int MIN_KEY_USES = 1000;
+    public static final int MAX_KEY_USES = 262144;
 
     private final Kind kind;
     private final boolean selfShutsDown;
-    private final String command;
+    private String command;
     private final String host;
     private final String label;
     private final String startLine;
@@ -80,14 +94,22 @@ public final class ResyncJob {
         return filename != null && filename.matches(FILENAME_RULE) && !filename.contains("..");
     }
 
-    /** The wallet seed as the node stores it: SeedRow keeps seed.to0xString(). */
+    /**
+     * The wallet seed as the node stores it: SeedRow keeps seed.to0xString().
+     * Whole bytes only - an odd digit count is a truncated paste, not a seed.
+     */
     public static boolean validSeedHex(String seed) {
-        return seed != null && seed.matches("0[xX][0-9A-Fa-f]{2,256}");
+        return seed != null && seed.matches("0[xX](?:[0-9A-Fa-f]{2}){1,128}");
     }
 
-    /** 12 to 24 words, letters and single spaces. Rejects anything the tokeniser would rewrite. */
+    /** A BIP39-length phrase of letters and single spaces. Rejects what the tokeniser rewrites. */
     public static boolean validPhrase(String phrase) {
-        return phrase != null && phrase.matches(PHRASE_RULE);
+        if (phrase == null || !phrase.matches(PHRASE_RULE)) return false;
+        int words = phrase.split(" ").length;
+        for (int allowed : PHRASE_WORD_COUNTS) {
+            if (words == allowed) return true;
+        }
+        return false;
     }
 
     /** Collapse the whitespace a user pastes, so a tidy phrase is not rejected for formatting. */
@@ -136,11 +158,13 @@ public final class ResyncJob {
      *
      * keyuses matters and is not cosmetic: Minima signatures are stateful, so every seed resync
      * must declare a higher used-key count than the last one or previously used keys can be
-     * reused - which is how a wallet loses funds. The node defaults it to 1000, max 262144.
+     * reused - which is how a wallet loses funds. Floored at MIN_KEY_USES: a low value is not a
+     * lesser version of this operation, it is the unsafe version of it.
      */
     public static ResyncJob seedResync(String host, String phrase, int keyUses) {
         String tidy = tidyPhrase(phrase);
-        if (!validHost(host) || !validPhrase(tidy) || keyUses < 0 || keyUses > 262144) return null;
+        if (!validHost(host) || !validPhrase(tidy)
+                || keyUses < MIN_KEY_USES || keyUses > MAX_KEY_USES) return null;
         return new ResyncJob(Kind.SEED_RESYNC, true,
                 "megammrsync action:resync host:" + host
                         + " phrase:\"" + tidy + "\" keyuses:" + keyUses,
@@ -155,6 +179,17 @@ public final class ResyncJob {
 
     /** The exact string handed to the node. Never logged - it carries the backup password. */
     public String command() { return command; }
+
+    /**
+     * Drop our reference to the command once it has been dispatched.
+     *
+     * The command string carries the backup password, and ResyncSession is a process-lifetime
+     * singleton, so holding it kept the password reachable long after the node had finished with
+     * it. This does not scrub it from memory - Java strings cannot be zeroed - but it stops the
+     * lifetime being "until the app dies". Everything the UI reads afterwards (label, host, kind,
+     * selfShutsDown) is still here.
+     */
+    void forgetCommand() { command = ""; }
 
     /** "" when this job has no host, so callers can always ask without a null check. */
     public String host() { return host; }

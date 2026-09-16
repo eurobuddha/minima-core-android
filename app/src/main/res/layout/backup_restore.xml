@@ -98,6 +98,7 @@
                 <EditText
                     android:id="@+id/backup_restore_password"
                     style="@style/FormField"
+                    android:saveEnabled="false"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:inputType="textPassword"

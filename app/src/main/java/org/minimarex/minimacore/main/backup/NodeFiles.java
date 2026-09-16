@@ -84,8 +84,12 @@ public final class NodeFiles {
         int slash = Math.max(name.lastIndexOf('/'), name.lastIndexOf('\\'));
         if (slash >= 0) name = name.substring(slash + 1);
         name = name.replaceAll("[^A-Za-z0-9._-]", "_");
-        while (name.startsWith(".")) name = name.substring(1);
+        // Clamp first: truncating afterwards could expose a new leading "." or "-" and produce a
+        // name ResyncJob.validFilename rejects, leaving the file imported but unusable.
         if (name.length() > 128) name = name.substring(name.length() - 128);
+        while (name.startsWith(".") || name.startsWith("-") || name.startsWith("_")) {
+            name = name.substring(1);
+        }
         return name;
     }
 
@@ -106,18 +110,34 @@ public final class NodeFiles {
 
     /** Copies and closes both sides. Returns the byte count so the caller can verify it. */
     public static long copy(InputStream in, OutputStream out) throws IOException {
-        if (in == null || out == null) throw new IOException("Could not open the file");
-        long total = 0;
+        // try-with-resources on both, so a null or throwing second stream cannot leak the first.
         try (InputStream source = in; OutputStream sink = out) {
+            if (source == null || sink == null) throw new IOException("Could not open the file");
+            long total = 0;
             byte[] buffer = new byte[64 * 1024];
             int read;
-            while ((read = source.read(buffer)) > 0) {
+            // != -1, not > 0: a legal zero-length read would otherwise end the copy early and
+            // silently truncate the file.
+            while ((read = source.read(buffer)) != -1) {
                 sink.write(buffer, 0, read);
                 total += read;
             }
             sink.flush();
+            return total;
         }
-        return total;
+    }
+
+    /** The byte count the provider claims for a picked document, or -1 when it will not say. */
+    public static long sizeOf(ContentResolver resolver, Uri uri) {
+        try (Cursor cursor = resolver.query(uri, null, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int column = cursor.getColumnIndex(OpenableColumns.SIZE);
+                if (column >= 0 && !cursor.isNull(column)) return cursor.getLong(column);
+            }
+        } catch (Exception ignored) {
+            // Not knowing the size is not a reason to refuse the import.
+        }
+        return -1;
     }
 
     /**
@@ -146,7 +166,19 @@ public final class NodeFiles {
         File destination = resolveInBase(base, name);
         checkWriteAllowed(base, destination);
         if (destination.isDirectory()) throw new IOException("A folder of that name already exists");
-        copy(context.getContentResolver().openInputStream(source), new FileOutputStream(destination));
+
+        long expected = sizeOf(context.getContentResolver(), source);
+        long copied = copy(context.getContentResolver().openInputStream(source),
+                new FileOutputStream(destination));
+        // Export has always verified its byte count; import must too. A short copy leaves a .bak
+        // that looks restorable and fails much later, inside `restore`, as "Incorrect Password!" -
+        // sending someone hunting for a password problem when the file is simply truncated.
+        if (expected >= 0 && copied != expected) {
+            // Never leave a half file sitting in the list looking like a backup.
+            boolean removed = destination.delete();
+            throw new IOException("Only " + copied + " of " + expected + " bytes copied"
+                    + (removed ? "" : " and the partial file could not be removed"));
+        }
         return destination;
     }
 
@@ -217,6 +249,20 @@ public final class NodeFiles {
         }
         java.util.Collections.sort(out, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
         return out;
+    }
+
+    /** A .bak specifically, as opposed to an archive export or a txn file sharing the folder. */
+    public static boolean isBackup(File file) {
+        return file != null && file.isFile() && file.getName().toLowerCase(java.util.Locale.UK).endsWith(".bak");
+    }
+
+    /** How many actual backups are in the folder - what "this is the only backup" must count. */
+    public static int backupCount(Context context) {
+        int count = 0;
+        for (File file : restorable(context)) {
+            if (isBackup(file)) count++;
+        }
+        return count;
     }
 
     public static String formatBytes(long bytes) {
