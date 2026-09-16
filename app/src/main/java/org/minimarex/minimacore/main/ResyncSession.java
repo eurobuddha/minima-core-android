@@ -66,11 +66,32 @@ public final class ResyncSession implements LogBuffer.Sink {
         String error = Feedback.errorOf(reply);
         state = error == null ? State.SUCCEEDED : State.FAILED;
         finishedAt = System.nanoTime();
-        result = error == null ? label() + " complete. Waiting for the node to finish shutting down." : error;
-        // The reply is node output, not our command string, so it cannot echo the password back.
-        if (reply != null) log.append(reply.toString());
+        boolean waits = job == null || job.selfShutsDown();
+        result = error == null
+                ? label() + (waits
+                        ? " complete. Waiting for the node to finish shutting down."
+                        : " complete. Restart the node for it to take effect.")
+                : error;
+        if (reply != null) log.append(redacted(reply));
         log.append(error == null ? result : label() + " failed: " + error);
         LogBuffer.removeObserver(this);
+    }
+
+    /**
+     * The reply with its echoed parameters removed.
+     *
+     * Command.getJSONReply() puts the command's own params back into the reply, so a restore
+     * reply carries {"file":...,"password":...} - the user's backup password. This log is shown
+     * on screen and has a "Copy log" button, so logging the reply verbatim put the password on
+     * the clipboard. Only "params" is dropped; everything the node actually reported is kept.
+     */
+    private static String redacted(JSONObject reply) {
+        if (reply.get("params") == null) return reply.toString();
+        JSONObject copy = new JSONObject();
+        for (Object key : reply.keySet()) {
+            if (!"params".equals(String.valueOf(key))) copy.put(key, reply.get(key));
+        }
+        return copy.toString();
     }
 
     @Override public synchronized void onLine(String line) {

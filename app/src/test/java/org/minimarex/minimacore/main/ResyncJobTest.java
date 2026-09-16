@@ -97,6 +97,16 @@ public class ResyncJobTest {
         return "abandon ability able about above absent absorb abstract absurd abuse access accident";
     }
 
+    @Test public void onlyTheMegammrsyncFamilyTakesTheNodeDownItself() {
+        // megammrsync ends with Main.NotifyMainListenerOfShutDown(), which the service answers
+        // with stopSelf(). Plain `restore` returns "Restart Minima for restore to take effect!"
+        // and never notifies anyone, so a screen that waits for a shutdown there waits forever.
+        assertTrue(ResyncJob.hostResync("example.org:9001").selfShutsDown());
+        assertTrue(ResyncJob.fileResync("example.org:9001", "backup.bak", "pass123").selfShutsDown());
+        assertTrue(ResyncJob.seedResync("example.org:9001", twelveWords(), 2000).selfShutsDown());
+        assertFalse(ResyncJob.fileRestore("backup.bak", "pass123").selfShutsDown());
+    }
+
     @Test public void anInvalidJobIsNullSoItCanNeverBeStarted() {
         assertNull(ResyncJob.hostResync("node:9001;quit"));
         assertNull(ResyncJob.fileRestore("backup.bak", ""));

@@ -152,6 +152,11 @@ public class SeedSyncActivity extends AppCompatActivity {
         boolean succeeded = state == ResyncSession.State.SUCCEEDED;
         boolean failed = state == ResyncSession.State.FAILED;
         boolean waitingToRestart = session.restartRequested();
+        // A plain `restore` never notifies the service, so isShutdownComplete() stays false
+        // forever. Only wait on a shutdown the command actually performs - see
+        // ResyncJob.selfShutsDown().
+        boolean selfShutsDown = session.job() == null || session.job().selfShutsDown();
+        boolean nodeDown = !selfShutsDown || MinimaService.isShutdownComplete();
         host.setEnabled(!running && !succeeded && !waitingToRestart);
         proceed.setEnabled(!running && !succeeded && !waitingToRestart);
         setTextIfChanged(proceed, running ? "Resyncing…" : failed ? "Retry resync" : "Resync Node");
@@ -159,17 +164,17 @@ public class SeedSyncActivity extends AppCompatActivity {
         // A restore has no host to type - hide the input rather than offer a field it ignores.
         host.setVisibility(hostJob ? View.VISIBLE : View.GONE);
         proceed.setVisibility(hostJob ? View.VISIBLE : View.GONE);
-        progress.setVisibility(running || waitingToRestart || (succeeded && !MinimaService.isShutdownComplete())
+        progress.setVisibility(running || waitingToRestart || (succeeded && !nodeDown)
                 ? View.VISIBLE : View.GONE);
         restart.setVisibility(succeeded || failed ? View.VISIBLE : View.GONE);
-        restart.setEnabled(!waitingToRestart && (!succeeded || MinimaService.isShutdownComplete()));
+        restart.setEnabled(!waitingToRestart && (!succeeded || nodeDown));
         if (running) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             setTextIfChanged(status, session.label() + " in progress. Keep Minima Core running; wait for completion before restarting.");
         } else if (!waitingToRestart) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             if (succeeded) {
-                setTextIfChanged(status, MinimaService.isShutdownComplete()
+                setTextIfChanged(status, nodeDown
                         ? session.label() + " complete. You can restart the node now — no phone reboot is needed."
                         : session.result());
                 if (prefs.getBoolean(PREF_PENDING, false)) {

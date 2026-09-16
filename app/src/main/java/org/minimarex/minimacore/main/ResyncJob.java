@@ -39,13 +39,16 @@ public final class ResyncJob {
     private static final String PHRASE_RULE = "[A-Za-z]+( [A-Za-z]+){11,23}";
 
     private final Kind kind;
+    private final boolean selfShutsDown;
     private final String command;
     private final String host;
     private final String label;
     private final String startLine;
 
-    private ResyncJob(Kind kind, String command, String host, String label, String startLine) {
+    private ResyncJob(Kind kind, boolean selfShutsDown, String command, String host,
+                      String label, String startLine) {
         this.kind = kind;
+        this.selfShutsDown = selfShutsDown;
         this.command = command;
         this.host = host;
         this.label = label;
@@ -95,7 +98,7 @@ public final class ResyncJob {
      */
     public static ResyncJob hostResync(String host) {
         if (!validHost(host)) return null;
-        return new ResyncJob(Kind.HOST_RESYNC,
+        return new ResyncJob(Kind.HOST_RESYNC, true,
                 "megammrsync action:resync host:" + host,
                 host,
                 "Resync",
@@ -105,7 +108,7 @@ public final class ResyncJob {
     /** Pure local restore from a backup file already in the node's base folder. No network. */
     public static ResyncJob fileRestore(String filename, String password) {
         if (!validFilename(filename) || !validPassword(password)) return null;
-        return new ResyncJob(Kind.FILE_RESTORE,
+        return new ResyncJob(Kind.FILE_RESTORE, false,
                 "restore file:\"" + filename + "\" password:\"" + password + "\"",
                 "",
                 "Restore",
@@ -115,7 +118,7 @@ public final class ResyncJob {
     /** Restore a backup file AND resync to the chain tip from a MegaMMR host. */
     public static ResyncJob fileResync(String host, String filename, String password) {
         if (!validHost(host) || !validFilename(filename) || !validPassword(password)) return null;
-        return new ResyncJob(Kind.FILE_RESYNC,
+        return new ResyncJob(Kind.FILE_RESYNC, true,
                 "megammrsync action:resync host:" + host
                         + " file:\"" + filename + "\" password:\"" + password + "\"",
                 host,
@@ -133,7 +136,7 @@ public final class ResyncJob {
     public static ResyncJob seedResync(String host, String phrase, int keyUses) {
         String tidy = tidyPhrase(phrase);
         if (!validHost(host) || !validPhrase(tidy) || keyUses < 0 || keyUses > 262144) return null;
-        return new ResyncJob(Kind.SEED_RESYNC,
+        return new ResyncJob(Kind.SEED_RESYNC, true,
                 "megammrsync action:resync host:" + host
                         + " phrase:\"" + tidy + "\" keyuses:" + keyUses,
                 host,
@@ -159,4 +162,18 @@ public final class ResyncJob {
 
     /** True when finishing this job should be remembered as the node's default peer. */
     public boolean setsDefaultPeer() { return !host.isEmpty(); }
+
+    /**
+     * Whether the NODE takes itself down when this command finishes.
+     *
+     * This is not a detail - it decides whether a screen may wait for a shutdown.
+     * megammrsync ends with Main.NotifyMainListenerOfShutDown(), which MinimaService receives
+     * and answers with stopSelf(), so onDestroy runs and isShutdownComplete() becomes true.
+     * Plain `restore` does NOT: it calls Main.restoreReady(true) part-way through, tears the
+     * node's processors down in place, and returns "Restart Minima for restore to take effect!"
+     * without ever notifying the service. Waiting for a shutdown there waits forever - which
+     * left the restore screen spinning with its Restart button disabled and force-quit as the
+     * only way out (reported on device, 2026-09-16).
+     */
+    public boolean selfShutsDown() { return selfShutsDown; }
 }

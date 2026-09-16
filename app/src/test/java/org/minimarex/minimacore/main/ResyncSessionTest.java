@@ -81,6 +81,53 @@ public class ResyncSessionTest {
         assertTrue(session.result().contains("Completion is unknown"));
     }
 
+    @Test public void theBackupPasswordNeverReachesTheVisibleLog() {
+        // Command.getJSONReply() echoes the command's own params back in the reply, so a restore
+        // reply carries {"file":...,"password":...}. This log is on screen and has a Copy button.
+        FakeRunner runner = new FakeRunner();
+        ResyncSession session = new ResyncSession(runner);
+        try {
+            session.start(ResyncJob.fileRestore("backup.bak", "SecretPass99"), System.nanoTime());
+            JSONObject echoed = new JSONObject();
+            echoed.put("command", "restore");
+            JSONObject params = new JSONObject();
+            params.put("file", "backup.bak");
+            params.put("password", "SecretPass99");
+            echoed.put("params", params);
+            echoed.put("status", true);
+            echoed.put("message", "Restart Minima for restore to take effect!");
+            runner.callback.cmdResult(echoed);
+
+            String log = String.join("\n", session.log.snapshot());
+            assertFalse("the password must never be logged", log.contains("SecretPass99"));
+            assertFalse(log.contains("\"params\""));
+            // Everything the node actually said is still kept.
+            assertTrue(log.contains("Restart Minima for restore to take effect!"));
+        } finally { LogBuffer.removeObserver(session); }
+    }
+
+    @Test public void aRestoreIsNotDescribedAsWaitingForAShutdownItNeverDoes() {
+        FakeRunner runner = new FakeRunner();
+        ResyncSession session = new ResyncSession(runner);
+        try {
+            session.start(ResyncJob.fileRestore("backup.bak", "pass123"), System.nanoTime());
+            runner.reply(true, null);
+            assertEquals(ResyncSession.State.SUCCEEDED, session.state());
+            assertFalse(session.result().contains("shutting down"));
+            assertTrue(session.result().contains("Restart the node"));
+        } finally { LogBuffer.removeObserver(session); }
+    }
+
+    @Test public void aHostResyncStillSaysItIsWaitingForTheShutdownItDoesPerform() {
+        FakeRunner runner = new FakeRunner();
+        ResyncSession session = new ResyncSession(runner);
+        try {
+            session.start(ResyncJob.hostResync("example.org:9001"), System.nanoTime());
+            runner.reply(true, null);
+            assertTrue(session.result().contains("shutting down"));
+        } finally { LogBuffer.removeObserver(session); }
+    }
+
     @Test public void validatesHostBeforeItCanBecomeCommandParameters() {
         assertTrue(ResyncSession.validHost("node.example.org:9001"));
         assertTrue(ResyncSession.validHost("192.168.1.10:9001"));
