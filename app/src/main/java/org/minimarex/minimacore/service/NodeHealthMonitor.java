@@ -217,7 +217,8 @@ public final class NodeHealthMonitor {
         String host = remaining.remove(0);
         MinimaLogger.log("Node health: starting an automatic resync from " + host + " (" + reason + ")");
 
-        ResyncLauncher.Result result = ResyncLauncher.begin(context, host);
+        ResyncLauncher.Result result = ResyncLauncher.begin(context,
+                org.minimarex.minimacore.main.ResyncJob.hostResync(host));
         if (!result.started) {
             MinimaLogger.log("Node health: automatic resync did not start - " + result.error);
             notify(context, NodeHealth.State.DEGRADED, reason);

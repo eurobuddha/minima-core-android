@@ -28,8 +28,8 @@ public class ResyncSessionTest {
         FakeRunner runner = new FakeRunner();
         ResyncSession session = new ResyncSession(runner);
         try {
-            assertTrue(session.start("example.org:9001", System.nanoTime()));
-            assertFalse(session.start("other.org:9001", System.nanoTime()));
+            assertTrue(session.start(ResyncJob.hostResync("example.org:9001"), System.nanoTime()));
+            assertFalse(session.start(ResyncJob.hostResync("other.org:9001"), System.nanoTime()));
             LogBuffer.append("MegaMMR sync finished.. please restart");
             assertEquals(ResyncSession.State.RUNNING, session.state());
             assertEquals(1, runner.calls);
@@ -38,7 +38,7 @@ public class ResyncSessionTest {
             assertEquals(ResyncSession.State.RUNNING, session.state());
             runner.reply(true, null);
             assertEquals(ResyncSession.State.SUCCEEDED, session.state());
-            assertFalse(session.start("example.org:9001", System.nanoTime()));
+            assertFalse(session.start(ResyncJob.hostResync("example.org:9001"), System.nanoTime()));
             long revision = session.log.revision();
             LogBuffer.append("unrelated future node log");
             assertEquals(revision, session.log.revision());
@@ -49,12 +49,12 @@ public class ResyncSessionTest {
         FakeRunner runner = new FakeRunner();
         ResyncSession session = new ResyncSession(runner);
         try {
-            session.start("example.org:9001", System.nanoTime());
+            session.start(ResyncJob.hostResync("example.org:9001"), System.nanoTime());
             MinimaCMDListener oldCallback = runner.callback;
             runner.reply(false, "Could not connect to Archive host!");
             assertEquals(ResyncSession.State.FAILED, session.state());
             assertEquals("Could not connect to Archive host!", session.result());
-            assertTrue(session.start("second.org:9002", System.nanoTime()));
+            assertTrue(session.start(ResyncJob.hostResync("second.org:9002"), System.nanoTime()));
             assertEquals("second.org:9002", session.host());
             assertEquals("", session.result());
             JSONObject stale = new JSONObject();
@@ -64,7 +64,7 @@ public class ResyncSessionTest {
             runner.reply(false, "retry failed");
             session.requestRestart();
             assertTrue(session.restartRequested());
-            assertFalse(session.start("second.org:9002", System.nanoTime()));
+            assertFalse(session.start(ResyncJob.hostResync("second.org:9002"), System.nanoTime()));
             session.reset();
             assertEquals(ResyncSession.State.IDLE, session.state());
         } finally { LogBuffer.removeObserver(session); }
@@ -72,7 +72,7 @@ public class ResyncSessionTest {
 
     @Test public void exceptionAndInterruptedProcessNeverReportSuccess() {
         ResyncSession session = new ResyncSession((cmd, cb) -> { throw new IllegalStateException("Node is not running"); });
-        session.start("example.org:9001", System.nanoTime());
+        session.start(ResyncJob.hostResync("example.org:9001"), System.nanoTime());
         assertEquals(ResyncSession.State.FAILED, session.state());
         assertEquals("Node is not running", session.result());
         session.reset();

@@ -27,6 +27,8 @@ import org.minimarex.minimacore.utils.Peers;
 /** Retained command state with a bounded, selectable live tail of real node output. */
 public class SeedSyncActivity extends AppCompatActivity {
     public static final String PREF_PENDING = "node_resync_pending";
+    /** Which operation the pending flag belongs to, so an interrupted restore is not called a resync. */
+    public static final String PREF_PENDING_LABEL = "node_resync_pending_label";
 
     /** Reopening the app must return to progress, not start a node over an active resync. */
     public static boolean redirectIfPending(android.app.Activity activity) {
@@ -59,11 +61,14 @@ public class SeedSyncActivity extends AppCompatActivity {
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         prefs = getSharedPreferences("main_prefs", MODE_PRIVATE);
-        if (prefs.getBoolean(PREF_PENDING, false)) session.interrupted();
+        if (prefs.getBoolean(PREF_PENDING, false)) session.interrupted(prefs.getString(PREF_PENDING_LABEL, "Resync"));
         setContentView(R.layout.seed_sync);
 
         Toolbar tb = findViewById(R.id.toolbar);
-        tb.setTitle("Resync node");
+        // This screen shows progress for whatever destructive job is live, not only a host resync
+        // - redirectIfPending routes a restore back here too.
+        tb.setTitle(session.job() == null || session.job().kind() == ResyncJob.Kind.HOST_RESYNC
+                ? "Resync node" : session.label() + " node");
         setSupportActionBar(tb);
         KeyboardInsets.install(this, findViewById(R.id.sync_main), tb);
         host = findViewById(R.id.seed_sync_host);
@@ -122,7 +127,7 @@ public class SeedSyncActivity extends AppCompatActivity {
         host.setError(null);
         // Shared with the health check's automatic path - see ResyncLauncher for why the
         // pending flag, the alarms and the service binding all have to be handled here.
-        ResyncLauncher.Result result = ResyncLauncher.begin(this, requestedHost);
+        ResyncLauncher.Result result = ResyncLauncher.begin(this, ResyncJob.hostResync(requestedHost));
         if (!result.started) {
             setTextIfChanged(status, result.error);
         }
@@ -150,25 +155,30 @@ public class SeedSyncActivity extends AppCompatActivity {
         host.setEnabled(!running && !succeeded && !waitingToRestart);
         proceed.setEnabled(!running && !succeeded && !waitingToRestart);
         setTextIfChanged(proceed, running ? "Resyncing…" : failed ? "Retry resync" : "Resync Node");
+        boolean hostJob = session.job() == null || session.job().kind() == ResyncJob.Kind.HOST_RESYNC;
+        // A restore has no host to type - hide the input rather than offer a field it ignores.
+        host.setVisibility(hostJob ? View.VISIBLE : View.GONE);
+        proceed.setVisibility(hostJob ? View.VISIBLE : View.GONE);
         progress.setVisibility(running || waitingToRestart || (succeeded && !MinimaService.isShutdownComplete())
                 ? View.VISIBLE : View.GONE);
         restart.setVisibility(succeeded || failed ? View.VISIBLE : View.GONE);
         restart.setEnabled(!waitingToRestart && (!succeeded || MinimaService.isShutdownComplete()));
         if (running) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            setTextIfChanged(status, "Resync in progress. Keep Minima Core running; wait for completion before restarting.");
+            setTextIfChanged(status, session.label() + " in progress. Keep Minima Core running; wait for completion before restarting.");
         } else if (!waitingToRestart) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             if (succeeded) {
                 setTextIfChanged(status, MinimaService.isShutdownComplete()
-                        ? "Resync complete. You can restart the node now — no phone reboot is needed."
+                        ? session.label() + " complete. You can restart the node now — no phone reboot is needed."
                         : session.result());
                 if (prefs.getBoolean(PREF_PENDING, false)) {
-                    Peers.setDefaultPeers(this, session.host());
+                    // Only a job that actually used a host should overwrite the default peer.
+                    if (session.job() != null && session.job().setsDefaultPeer()) Peers.setDefaultPeers(this, session.host());
                     prefs.edit().putBoolean(PREF_PENDING, false).apply();
                 }
             } else if (failed) {
-                setTextIfChanged(status, "Resync not completed. " + session.result() + "\nYou can retry, or restart the node and check its status.");
+                setTextIfChanged(status, session.label() + " not completed. " + session.result() + "\nYou can retry, or restart the node and check its status.");
                 if (prefs.getBoolean(PREF_PENDING, false)) prefs.edit().putBoolean(PREF_PENDING, false).apply();
             }
         }
