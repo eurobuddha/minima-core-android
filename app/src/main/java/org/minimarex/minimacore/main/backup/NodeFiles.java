@@ -108,23 +108,41 @@ public final class NodeFiles {
         return safe.isEmpty() ? "import_" + System.currentTimeMillis() : safe;
     }
 
-    /** Copies and closes both sides. Returns the byte count so the caller can verify it. */
-    public static long copy(InputStream in, OutputStream out) throws IOException {
-        // try-with-resources on both, so a null or throwing second stream cannot leak the first.
-        try (InputStream source = in; OutputStream sink = out) {
-            if (source == null || sink == null) throw new IOException("Could not open the file");
-            long total = 0;
-            byte[] buffer = new byte[64 * 1024];
-            int read;
-            // != -1, not > 0: a legal zero-length read would otherwise end the copy early and
-            // silently truncate the file.
-            while ((read = source.read(buffer)) != -1) {
-                sink.write(buffer, 0, read);
-                total += read;
-            }
-            sink.flush();
-            return total;
+    /**
+     * Move bytes between two streams the CALLER owns and closes.
+     *
+     * It deliberately does not close them. Passing freshly constructed streams as arguments to a
+     * closing helper looked safe but was not: Java evaluates arguments left to right, so when the
+     * second constructor threw, the first stream had already been created and nothing ever
+     * adopted it. Both streams are now opened inside one try-with-resources at the call site,
+     * which closes the first even when the second initialiser throws.
+     */
+    private static long transfer(InputStream source, OutputStream sink) throws IOException {
+        if (source == null || sink == null) throw new IOException("Could not open the file");
+        long total = 0;
+        byte[] buffer = new byte[64 * 1024];
+        int read;
+        // != -1, not > 0: a legal zero-length read would otherwise end the copy early and
+        // silently truncate the file.
+        while ((read = source.read(buffer)) != -1) {
+            sink.write(buffer, 0, read);
+            total += read;
         }
+        sink.flush();
+        return total;
+    }
+
+    /** openOutputStream is documented to return null as well as to throw. Treat both as failure. */
+    private static OutputStream openOut(Context context, Uri destination) throws IOException {
+        OutputStream out = context.getContentResolver().openOutputStream(destination);
+        if (out == null) throw new IOException("Could not open the destination you chose");
+        return out;
+    }
+
+    private static InputStream openIn(Context context, Uri source) throws IOException {
+        InputStream in = context.getContentResolver().openInputStream(source);
+        if (in == null) throw new IOException("Could not open the file you chose");
+        return in;
     }
 
     /** The byte count the provider claims for a picked document, or -1 when it will not say. */
@@ -146,10 +164,16 @@ public final class NodeFiles {
      */
     public static long exportTo(Context context, File source, Uri destination) throws IOException {
         if (!source.isFile()) throw new IOException("The backup file is no longer there");
-        long copied = copy(new FileInputStream(source),
-                context.getContentResolver().openOutputStream(destination));
-        if (copied != source.length()) {
-            throw new IOException("Expected " + source.length() + " bytes but wrote " + copied);
+        // Read the length BEFORE copying: comparing against a length re-read afterwards would
+        // compare the result with whatever the file became, not with what we set out to copy.
+        long expected = source.length();
+        long copied;
+        try (InputStream in = new FileInputStream(source);
+             OutputStream out = openOut(context, destination)) {
+            copied = transfer(in, out);
+        }
+        if (copied != expected) {
+            throw new IOException("Expected " + expected + " bytes but wrote " + copied);
         }
         return copied;
     }
@@ -168,8 +192,11 @@ public final class NodeFiles {
         if (destination.isDirectory()) throw new IOException("A folder of that name already exists");
 
         long expected = sizeOf(context.getContentResolver(), source);
-        long copied = copy(context.getContentResolver().openInputStream(source),
-                new FileOutputStream(destination));
+        long copied;
+        try (InputStream in = openIn(context, source);
+             OutputStream out = new FileOutputStream(destination)) {
+            copied = transfer(in, out);
+        }
         // Export has always verified its byte count; import must too. A short copy leaves a .bak
         // that looks restorable and fails much later, inside `restore`, as "Incorrect Password!" -
         // sending someone hunting for a password problem when the file is simply truncated.

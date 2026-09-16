@@ -56,6 +56,8 @@ public class VaultActivity extends AppCompatActivity {
     private String currentSeed = "";
     private boolean locked;
     private boolean busy;
+    /** False until the first `vault` reply lands, so "empty" is not mistaken for "no phrase". */
+    private boolean loaded;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +101,7 @@ public class VaultActivity extends AppCompatActivity {
         hidePhrase();
         currentPhrase = "";
         currentSeed = "";
+        loaded = false;
         super.onPause();
     }
 
@@ -115,6 +118,7 @@ public class VaultActivity extends AppCompatActivity {
                         buildActions();
                         return;
                     }
+                    loaded = true;
                     Object response = result.get("response");
                     if (response instanceof JSONObject) {
                         JSONObject json = (JSONObject) response;
@@ -141,6 +145,12 @@ public class VaultActivity extends AppCompatActivity {
     private void toggleReveal() {
         if (phrase.getVisibility() == View.VISIBLE) {
             hidePhrase();
+            return;
+        }
+        if (!loaded) {
+            // The cache is dropped on pause and refilled asynchronously on resume. Without this,
+            // tapping Show in that gap reported "no seed phrase" for what is only a slow read.
+            setStatus("Reading from the node…");
             return;
         }
         if (currentPhrase.isEmpty()) {
