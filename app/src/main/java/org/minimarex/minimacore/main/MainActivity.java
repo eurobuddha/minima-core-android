@@ -296,32 +296,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
                 return true;
 
-            case R.id.mainmenu_resync :
+            case R.id.mainmenu_backup :
 
-                MainActivity.this.startActivity(new Intent(MainActivity.this, SeedSyncActivity.class));
+                MainActivity.this.startActivity(new Intent(MainActivity.this,
+                        org.minimarex.minimacore.main.backup.BackupActivity.class));
 
                 return true;
 
             case R.id.mainmenu_params :
 
                 MainActivity.this.startActivity(new Intent(MainActivity.this, ParamsActivity.class));
-
-                return true;
-
-            case R.id.mainmenu_shhowseed :
-                //Show the seed
-                MinimaCMD.runMinima("vault", new MinimaCMDListener() {
-                    @Override
-                    public void cmdResult(JSONObject zResult) {
-                        MainActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                JSONObject resp = (JSONObject) zResult.get("response");
-                                logger.showDialog(MainActivity.this, "Minima Seed",resp.get("phrase").toString());
-                            }
-                        });
-                    }
-                });
 
                 return true;
 

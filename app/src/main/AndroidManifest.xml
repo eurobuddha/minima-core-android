@@ -75,6 +75,9 @@
         <activity android:name=".main.SeedSyncActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.views.terminal.TerminalActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.ParamsActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".main.backup.BackupActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".main.backup.BackupCreateActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".main.backup.RestoreFileActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.views.send.SendActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.views.receive.ReceiveActivity" android:windowSoftInputMode="adjustResize"></activity>
 
