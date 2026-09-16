@@ -21,6 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.SystemBars;
 import org.minimarex.minimacore.main.ResyncJob;
 import org.minimarex.minimacore.main.ResyncLauncher;
 import org.minimarex.minimacore.main.SeedSyncActivity;
@@ -67,6 +68,8 @@ public class VaultActivity extends AppCompatActivity {
         setSupportActionBar(tb);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         tb.setNavigationOnClickListener(v -> finish());
+        // targetSdk 35 is edge to edge: without this the toolbar sits under the clock.
+        SystemBars.pad(findViewById(R.id.vault_main));
 
         state = findViewById(R.id.vault_state);
         status = findViewById(R.id.vault_status);
@@ -177,10 +180,11 @@ public class VaultActivity extends AppCompatActivity {
         } else {
             addAction("Lock private keys",
                     "Encrypt the keys behind a password. The node keeps running and verifying, but cannot spend until unlocked.",
-                    v -> askPassword("Lock private keys",
-                            "Choose a password. Without it the keys cannot be unlocked, and only your seed phrase will bring them back.",
+                    v -> askNewPassword("Lock private keys",
+                            "Choose a password and type it twice. Without it the keys cannot be unlocked, and only your seed phrase will bring them back.",
                             "Lock",
-                            password -> run(VaultCommands.passwordLock(password), "Private keys locked.")));
+                            (password, confirm) -> run(VaultCommands.passwordLock(password, confirm),
+                                    "Private keys locked.")));
 
             addAction("Wipe private keys",
                     "Remove the keys from this device, keeping the public keys. Only your seed phrase can restore them.",
@@ -210,6 +214,7 @@ public class VaultActivity extends AppCompatActivity {
     // ---- input dialogs ----
 
     private interface PasswordAction { void run(String password); }
+    private interface NewPasswordAction { void run(String password, String confirm); }
     private interface PhraseAction { void run(String phrase); }
 
     private EditText field(int inputType, String hint) {
@@ -222,22 +227,63 @@ public class VaultActivity extends AppCompatActivity {
         return input;
     }
 
+    private LinearLayout column() {
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        int pad = Math.round(8 * getResources().getDisplayMetrics().density);
+        box.setPadding(pad, pad, pad, pad);
+        return box;
+    }
+
+    /** One password, for a value the node itself verifies - a wrong one just fails harmlessly. */
     private void askPassword(String title, String message, String confirmText, PasswordAction action) {
-        EditText input = field(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD,
-                "letters and numbers only");
+        LinearLayout box = column();
+        PasswordField entry = PasswordField.inflate(this, box, "letters and numbers only");
+        box.addView(entry.view());
         new MaterialAlertDialogBuilder(this)
                 .setTitle(title)
                 .setMessage(message)
-                .setView(input)
+                .setView(box)
                 .setPositiveButton(confirmText, (d, w) -> {
-                    String password = input.getText().toString();
-                    if (!ResyncJob.validPassword(password)) {
+                    if (!ResyncJob.validPassword(entry.text())) {
                         // Same rule as everywhere else: the node's tokeniser rewrites anything
                         // else, so a password it would mangle must never be sent.
                         setStatus("Letters and numbers only — the node cannot carry other characters.");
                         return;
                     }
-                    action.run(password);
+                    action.run(entry.text());
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    /**
+     * Two entries, for a password that is being SET.
+     *
+     * Nothing verifies it afterwards: whatever is typed here becomes the only way back to the
+     * keys short of the seed phrase, so a single mistyped character is unrecoverable. Both boxes
+     * reveal, so the value can be read before committing.
+     */
+    private void askNewPassword(String title, String message, String confirmText, NewPasswordAction action) {
+        LinearLayout box = column();
+        PasswordField first = PasswordField.inflate(this, box, "letters and numbers only");
+        PasswordField second = PasswordField.inflate(this, box, "type it again");
+        box.addView(first.view());
+        box.addView(second.view());
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setView(box)
+                .setPositiveButton(confirmText, (d, w) -> {
+                    if (!ResyncJob.validPassword(first.text())) {
+                        setStatus("Letters and numbers only — the node cannot carry other characters.");
+                        return;
+                    }
+                    if (!first.text().equals(second.text())) {
+                        setStatus("The two passwords do not match. Nothing was changed.");
+                        return;
+                    }
+                    action.run(first.text(), second.text());
                 })
                 .setNegativeButton("Cancel", null)
                 .show();

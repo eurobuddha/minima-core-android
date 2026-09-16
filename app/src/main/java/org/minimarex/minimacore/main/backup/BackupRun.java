@@ -35,10 +35,13 @@ public final class BackupRun {
 
     BackupRun(Runner runner) { this.runner = runner; }
 
-    public synchronized boolean start(String filename, String password) {
+    public synchronized boolean start(String filename, String password, String confirm) {
         if (state == State.RUNNING) return false;
         // Same rules as every other node command we build - see ResyncJob for why they exist.
         if (!ResyncJob.validFilename(filename) || !ResyncJob.validPassword(password)) return false;
+        // The node's confirm: is only worth sending if it is the user's SECOND entry. Handing it
+        // a copy of the first made it compare the password with itself and always pass.
+        if (!ResyncJob.validPassword(confirm) || !password.equals(confirm)) return false;
         final long current = ++attempt;
         state = State.RUNNING;
         error = "";

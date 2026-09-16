@@ -82,6 +82,9 @@ public class BackupCreateActivity extends AppCompatActivity {
         path = findViewById(R.id.backup_create_path);
         progress = findViewById(R.id.backup_create_progress);
 
+        PasswordField.attach(password, findViewById(R.id.backup_create_password_eye));
+        PasswordField.attach(confirm, findViewById(R.id.backup_create_confirm_eye));
+
         if (TextUtils.isEmpty(name.getText())) name.setText(suggestedName());
         go.setOnClickListener(v -> attemptBackup());
         copy.setOnClickListener(v ->
@@ -134,7 +137,7 @@ public class BackupCreateActivity extends AppCompatActivity {
             return;
         }
 
-        if (!run.start(file, pass)) {
+        if (!run.start(file, pass, again)) {
             setTextIfChanged(status, "A backup is already running.");
             return;
         }

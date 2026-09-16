@@ -17,14 +17,14 @@ public class VaultCommandsTest {
 
     @Test public void lockAndUnlockQuoteThePasswordAndAskTheNodeToCheckTheMatch() {
         assertEquals("vault action:passwordlock password:\"pass123\" confirm:\"pass123\"",
-                VaultCommands.passwordLock("pass123"));
+                VaultCommands.passwordLock("pass123", "pass123"));
         assertEquals("vault action:passwordunlock password:\"pass123\"",
                 VaultCommands.passwordUnlock("pass123"));
     }
 
     @Test public void aPasswordTheTokeniserWouldRewriteNeverBecomesACommand() {
         for (String bad : new String[]{"a:b", "two words", "has\"quote", "semi;colon", "", null}) {
-            assertNull(String.valueOf(bad), VaultCommands.passwordLock(bad));
+            assertNull(String.valueOf(bad), VaultCommands.passwordLock(bad, bad));
             assertNull(String.valueOf(bad), VaultCommands.passwordUnlock(bad));
         }
     }
@@ -54,6 +54,14 @@ public class VaultCommandsTest {
                 "abandon\" phrase:STOLEN able about above absent absorb abstract absurd abuse access accident"));
         assertNull(VaultCommands.restoreKeys("too few words"));
         assertNull(VaultCommands.restoreKeys(null));
+    }
+
+    @Test public void lockRefusesTwoEntriesThatDoNotMatch() {
+        // Passing the first value as confirm made the node compare it with itself and always
+        // pass - the check existed and did nothing. A real mismatch must be refused.
+        assertNull(VaultCommands.passwordLock("pass123", "pass124"));
+        assertNull(VaultCommands.passwordLock("pass123", ""));
+        assertNotNull(VaultCommands.passwordLock("pass123", "pass123"));
     }
 
     @Test public void readIsJustTheBareCommand() {

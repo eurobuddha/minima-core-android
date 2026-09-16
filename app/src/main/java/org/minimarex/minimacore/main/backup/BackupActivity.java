@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.SystemBars;
 import org.minimarex.minimacore.main.SeedSyncActivity;
 
 /**
@@ -34,6 +35,8 @@ public class BackupActivity extends AppCompatActivity {
         setSupportActionBar(tb);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         tb.setNavigationOnClickListener(v -> finish());
+        // targetSdk 35 is edge to edge: without this the toolbar sits under the clock.
+        SystemBars.pad(findViewById(R.id.backup_hub_main));
 
         gate = findViewById(R.id.backup_hub_gate);
         rows = findViewById(R.id.backup_hub_rows);

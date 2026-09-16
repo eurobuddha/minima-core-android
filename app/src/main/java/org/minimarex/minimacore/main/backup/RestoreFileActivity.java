@@ -84,6 +84,7 @@ public class RestoreFileActivity extends AppCompatActivity {
         go = findViewById(R.id.backup_restore_go);
         importButton = findViewById(R.id.backup_restore_import);
 
+        PasswordField.attach(password, findViewById(R.id.backup_restore_password_eye));
         host.setText(Peers.getDefaultPeers(this));
         modeResync.setOnCheckedChangeListener((b, checked) ->
                 hostRow.setVisibility(checked ? View.VISIBLE : View.GONE));

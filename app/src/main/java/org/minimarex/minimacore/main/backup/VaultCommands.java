@@ -27,11 +27,15 @@ public final class VaultCommands {
     /**
      * Encrypt the private keys behind a password. They are wiped from the wallet and kept
      * encrypted in the UserDB, so the node can still verify but cannot spend until unlocked.
-     * confirm: makes the NODE enforce the match rather than trusting this screen to.
+     *
+     * Takes the SECOND entry, not a copy of the first. Passing the same string as confirm: made
+     * the node compare the password with itself, which always matched - the check looked like it
+     * was there and did nothing. The caller must collect two separate entries.
      */
-    public static String passwordLock(String password) {
-        if (!ResyncJob.validPassword(password)) return null;
-        return "vault action:passwordlock password:\"" + password + "\" confirm:\"" + password + "\"";
+    public static String passwordLock(String password, String confirm) {
+        if (!ResyncJob.validPassword(password) || !ResyncJob.validPassword(confirm)) return null;
+        if (!password.equals(confirm)) return null;
+        return "vault action:passwordlock password:\"" + password + "\" confirm:\"" + confirm + "\"";
     }
 
     /** Decrypt the private keys again. */

@@ -45,7 +45,7 @@ public class BackupRunTest {
     @Test public void detailsAreReadFromTheTopLevelWhereTheNodePutsThem() {
         FakeRunner runner = new FakeRunner();
         BackupRun run = new BackupRun(runner);
-        assertTrue(run.start("minima-backup-20260916-101500.bak", "pass123"));
+        assertTrue(run.start("minima-backup-20260916-101500.bak", "pass123", "pass123"));
         runner.callback.cmdResult(realReply());
 
         assertEquals(BackupRun.State.SUCCEEDED, run.state());
@@ -60,7 +60,7 @@ public class BackupRunTest {
     @Test public void theNestedIpcShapeIsAlsoAccepted() {
         FakeRunner runner = new FakeRunner();
         BackupRun run = new BackupRun(runner);
-        run.start("backup.bak", "pass123");
+        run.start("backup.bak", "pass123", "pass123");
 
         JSONObject nested = new JSONObject();
         nested.put("status", true);
@@ -79,7 +79,7 @@ public class BackupRunTest {
         // user can disprove by looking in the folder - which is exactly what happened.
         FakeRunner runner = new FakeRunner();
         BackupRun run = new BackupRun(runner);
-        run.start("backup.bak", "pass123");
+        run.start("backup.bak", "pass123", "pass123");
 
         JSONObject bare = new JSONObject();
         bare.put("status", true);
@@ -95,7 +95,7 @@ public class BackupRunTest {
     @Test public void aRealFailureStillFails() {
         FakeRunner runner = new FakeRunner();
         BackupRun run = new BackupRun(runner);
-        run.start("backup.bak", "pass123");
+        run.start("backup.bak", "pass123", "pass123");
 
         JSONObject failure = new JSONObject();
         failure.put("status", false);
@@ -107,10 +107,10 @@ public class BackupRunTest {
         run.reset();
     }
 
-    @Test public void theCommandAsksTheNodeToEnforceThePasswordMatch() {
+    @Test public void theCommandCarriesTheSecondEntryAsConfirm() {
         FakeRunner runner = new FakeRunner();
         BackupRun run = new BackupRun(runner);
-        run.start("backup.bak", "pass123");
+        run.start("backup.bak", "pass123", "pass123");
         assertEquals("backup file:\"backup.bak\" password:\"pass123\" confirm:\"pass123\"",
                 runner.command);
         run.reset();
@@ -119,8 +119,11 @@ public class BackupRunTest {
     @Test public void anInvalidNameOrPasswordNeverReachesTheNode() {
         FakeRunner runner = new FakeRunner();
         BackupRun run = new BackupRun(runner);
-        assertFalse(run.start("../escape.bak", "pass123"));
-        assertFalse(run.start("backup.bak", "has\" quote"));
+        assertFalse(run.start("../escape.bak", "pass123", "pass123"));
+        assertFalse(run.start("backup.bak", "has\" quote", "has\" quote"));
+        // A confirmation that does not match must not reach the node either - the node's own
+        // confirm: check is useless if we hand it a copy of the first entry.
+        assertFalse(run.start("backup.bak", "pass123", "pass124"));
         assertNull(runner.command);
     }
 }

@@ -28,7 +28,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingHorizontal="24dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="40dp">
 
             <TextView
                 android:layout_width="match_parent"
@@ -56,21 +58,57 @@
 
             <TextView style="@style/FormLabel" android:text="Password" />
 
-            <EditText
-                android:id="@+id/backup_create_password"
-                style="@style/FormField"
-                android:inputType="textPassword"
-                android:importantForAutofill="no"
-                android:hint="letters and numbers only" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/backup_create_password"
+                    style="@style/FormField"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:inputType="textPassword"
+                    android:importantForAutofill="no"
+                    android:hint="letters and numbers only" />
+
+                <ImageButton
+                    android:id="@+id/backup_create_password_eye"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_visibility"
+                    android:contentDescription="Show password" />
+            </LinearLayout>
 
             <TextView style="@style/FormLabel" android:text="Confirm password" />
 
-            <EditText
-                android:id="@+id/backup_create_confirm"
-                style="@style/FormField"
-                android:inputType="textPassword"
-                android:importantForAutofill="no"
-                android:hint="type it again" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/backup_create_confirm"
+                    style="@style/FormField"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:inputType="textPassword"
+                    android:importantForAutofill="no"
+                    android:hint="type it again" />
+
+                <ImageButton
+                    android:id="@+id/backup_create_confirm_eye"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_visibility"
+                    android:contentDescription="Show password" />
+            </LinearLayout>
 
             <!-- The node defaults an unset backup password to the literal word "minima"
                  (backup.java). Saying so is the only thing standing between a user and an
