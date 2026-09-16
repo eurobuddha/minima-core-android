@@ -80,6 +80,11 @@ public final class ResyncJob {
         return filename != null && filename.matches(FILENAME_RULE) && !filename.contains("..");
     }
 
+    /** The wallet seed as the node stores it: SeedRow keeps seed.to0xString(). */
+    public static boolean validSeedHex(String seed) {
+        return seed != null && seed.matches("0[xX][0-9A-Fa-f]{2,256}");
+    }
+
     /** 12 to 24 words, letters and single spaces. Rejects anything the tokeniser would rewrite. */
     public static boolean validPhrase(String phrase) {
         return phrase != null && phrase.matches(PHRASE_RULE);
