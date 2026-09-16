@@ -35,4 +35,15 @@
             android:lineSpacingMultiplier="1.25" />
     </LinearLayout>
 
+    <!-- Row action, e.g. Delete. GONE unless the host screen turns it on, so the hub's
+         navigation rows stay plain. -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/backup_row_action"
+        style="@style/Widget.MinimaCore.Button.Outlined"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:minWidth="0dp"
+        android:visibility="gone" />
+
 </LinearLayout>

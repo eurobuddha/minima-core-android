@@ -85,6 +85,66 @@ public class NodeFilesTest {
         assertEquals("backup-3.bak", NodeFiles.uniqueName(base, "backup.bak"));
     }
 
+    @Test public void deleteRemovesTheFileAndNothingElse() throws IOException {
+        File keep = new File(base, "keep.bak");
+        File go = new File(base, "go.bak");
+        try (FileOutputStream out = new FileOutputStream(keep)) { out.write(new byte[]{1}); }
+        try (FileOutputStream out = new FileOutputStream(go)) { out.write(new byte[]{1}); }
+
+        NodeFiles.delete(base, "go.bak");
+        assertFalse(go.exists());
+        assertTrue("an unrelated backup must survive", keep.exists());
+    }
+
+    @Test public void deleteRefusesAFolderSoNodeStateCannotBeRemoved() throws IOException {
+        // Every root entry the node creates is a directory: databases, mds, ssl, backup,
+        // restore, archiverestore. None is ever a backup someone means to delete.
+        assertTrue(new File(base, "mds").mkdirs());
+        try {
+            NodeFiles.delete(base, "mds");
+            fail("Expected a folder to be refused");
+        } catch (IOException expected) {
+            assertTrue(expected.getMessage(), expected.getMessage().contains("folder"));
+        }
+        assertTrue(new File(base, "mds").isDirectory());
+    }
+
+    @Test public void deleteRefusesTheLiveDatabasesFolderAndAnythingInIt() throws IOException {
+        File databases = new File(base, "databases");
+        assertTrue(databases.mkdirs());
+        File live = new File(databases, "txpow.mv.db");
+        try (FileOutputStream out = new FileOutputStream(live)) { out.write(new byte[]{1}); }
+        try {
+            NodeFiles.delete(base, "databases/txpow.mv.db");
+            fail("Expected the live chain DB to be refused");
+        } catch (IOException expected) {
+            assertTrue(expected.getMessage(), expected.getMessage().contains("protected"));
+        }
+        assertTrue("the live chain DB must still be there", live.isFile());
+    }
+
+    @Test public void deleteCannotReachOutsideTheBaseFolder() throws IOException {
+        File outside = File.createTempFile("outside", ".bak");
+        try {
+            NodeFiles.delete(base, "../" + outside.getName());
+            // If it resolved without throwing it must not have touched the outside file.
+            assertTrue("a file outside base must not be deleted", outside.exists());
+        } catch (IOException expected) {
+            assertTrue(outside.exists());
+        } finally {
+            assertTrue(outside.delete() || !outside.exists());
+        }
+    }
+
+    @Test public void deletingSomethingAlreadyGoneSaysSoRatherThanClaimingSuccess() {
+        try {
+            NodeFiles.delete(base, "never-existed.bak");
+            fail("Expected a missing file to be reported");
+        } catch (IOException expected) {
+            assertTrue(expected.getMessage(), expected.getMessage().contains("no longer there"));
+        }
+    }
+
     @Test public void byteCountsAreReportedInUnitsPeopleRead() {
         assertEquals("512 B", NodeFiles.formatBytes(512));
         assertEquals("1.0 KB", NodeFiles.formatBytes(1024));

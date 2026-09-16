@@ -120,12 +120,51 @@ public class RestoreFileActivity extends AppCompatActivity {
                 selected = file.getName();
                 renderFiles();
             });
+            Button action = row.findViewById(R.id.backup_row_action);
+            action.setVisibility(View.VISIBLE);
+            action.setText("Delete");
+            action.setOnClickListener(v -> confirmDelete(file, files.size()));
             row.setAlpha(file.getName().equals(selected) ? 1f : 0.55f);
             fileRows.addView(row);
         }
         if (!selected.isEmpty()) {
             setTextIfChanged(status, "Selected " + selected);
         }
+    }
+
+    /**
+     * Deleting a backup is irreversible and the file may be the only copy of a wallet.
+     *
+     * So the dialog names the file in full and its size, and says plainly what cannot be
+     * undone. When it is the last backup left, it says that too - that is the case where
+     * someone is one tap from having no way back at all.
+     */
+    private void confirmDelete(File file, int totalBackups) {
+        String warning = totalBackups <= 1
+                ? "\n\nThis is the only backup file on this node. Once it is gone there is nothing here to restore from."
+                : "";
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Delete this backup?")
+                .setMessage(file.getName() + "\n" + NodeFiles.formatBytes(file.length()) + "\n\n"
+                        + "This permanently removes the file from the node folder. If you have not saved a "
+                        + "copy somewhere else, the wallet inside it cannot be recovered." + warning)
+                .setPositiveButton("Delete", (d, w) -> deleteNow(file.getName()))
+                .setNegativeButton("Keep", null)
+                .show();
+    }
+
+    private void deleteNow(String name) {
+        String message;
+        try {
+            NodeFiles.delete(this, name);
+            message = "Deleted " + name;
+            if (name.equals(selected)) selected = "";
+        } catch (Exception exc) {
+            message = "Could not delete " + name + ". "
+                    + (exc.getMessage() == null ? exc.toString() : exc.getMessage());
+        }
+        renderFiles();
+        setTextIfChanged(status, message);
     }
 
     private void onFileChosen(Uri source) {

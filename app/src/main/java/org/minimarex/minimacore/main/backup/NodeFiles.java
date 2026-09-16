@@ -150,6 +150,36 @@ public final class NodeFiles {
         return destination;
     }
 
+    /**
+     * Delete one file from the base folder root.
+     *
+     * Deliberately narrow. It refuses a directory, because every root-level entry the node
+     * creates is one (databases, mds, ssl, backup, restore, archiverestore) and none of them is
+     * ever something a user means to remove from a backup list. checkWriteAllowed still runs, so
+     * the live databases folder is refused twice over rather than relying on the isFile() check.
+     *
+     * Irreversible: a .bak is a whole wallet, and this may be its only copy. The CALLER is
+     * responsible for having confirmed that with the user first.
+     */
+    public static void delete(Context context, String name) throws IOException {
+        delete(base(context), name);
+    }
+
+    /** Base-folder-explicit form, so the guardrails can be tested without an Android Context. */
+    public static void delete(File base, String name) throws IOException {
+        File target = resolveInBase(base, name);
+        checkWriteAllowed(base, target);
+        if (target.isDirectory()) {
+            throw new IOException("That is a folder, not a backup file");
+        }
+        if (!target.isFile()) {
+            throw new IOException("That file is no longer there");
+        }
+        if (!target.delete()) {
+            throw new IOException("The file could not be deleted");
+        }
+    }
+
     /** A name that does not collide with an existing file, so an import never silently overwrites. */
     public static String uniqueName(File base, String name) {
         File candidate = new File(base, name);
