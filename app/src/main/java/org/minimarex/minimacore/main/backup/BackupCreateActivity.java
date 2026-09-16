@@ -157,13 +157,20 @@ public class BackupCreateActivity extends AppCompatActivity {
         if (running) {
             setTextIfChanged(status, "Writing the backup. The node is locked while it copies, so this can take a while.");
         } else if (done) {
-            setTextIfChanged(status, "Backup created.");
-            detail.setVisibility(View.VISIBLE);
-            setTextIfChanged(detail, "Size " + run.size() + " · block " + run.block() + " · saved in the node folder as");
-            path.setVisibility(View.VISIBLE);
-            setTextIfChanged(path, run.path());
-            copy.setVisibility(View.VISIBLE);
-            export.setVisibility(View.VISIBLE);
+            boolean located = !run.path().isEmpty();
+            // Exporting needs a path. Without one the backup still exists - say so and point at
+            // the list that will show it, rather than claiming a failure the folder disproves.
+            setTextIfChanged(status, located
+                    ? "Backup created."
+                    : "Backup created, but the node did not report the file name. Find it under Restore from file.");
+            detail.setVisibility(located ? View.VISIBLE : View.GONE);
+            path.setVisibility(located ? View.VISIBLE : View.GONE);
+            copy.setVisibility(located ? View.VISIBLE : View.GONE);
+            export.setVisibility(located ? View.VISIBLE : View.GONE);
+            if (located) {
+                setTextIfChanged(detail, "Size " + run.size() + " · block " + run.block() + " · saved in the node folder as");
+                setTextIfChanged(path, run.path());
+            }
         } else if (state == BackupRun.State.FAILED) {
             setTextIfChanged(status, "Backup failed. " + run.error());
             detail.setVisibility(View.GONE);

@@ -65,23 +65,40 @@ public final class BackupRun {
             error = failure;
             return;
         }
-        Object response = reply == null ? null : reply.get("response");
-        JSONObject backup = response instanceof JSONObject
-                ? (JSONObject) ((JSONObject) response).get("backup") : null;
-        if (backup == null) {
-            state = State.FAILED;
-            error = "The node reported success but returned no backup details.";
+        JSONObject details = detailsOf(reply);
+        if (details == null) {
+            // status was true, so the node DID write the file - saying "failed" here would be a
+            // lie the user can disprove by looking in the folder. Report the success we know
+            // about and let the restore list be where they find it.
+            state = State.SUCCEEDED;
+            error = "";
             return;
         }
-        path = text(backup.get("file"));
-        size = text(backup.get("size"));
-        block = text(backup.get("block"));
-        if (path.isEmpty()) {
-            state = State.FAILED;
-            error = "The node did not report where the backup was written.";
-            return;
-        }
+        path = text(details.get("file"));
+        size = text(details.get("size"));
+        block = text(details.get("block"));
         state = State.SUCCEEDED;
+    }
+
+    /**
+     * Where `backup` actually puts its details.
+     *
+     * In-process the reply IS the command's own object, and backup.java does
+     * ret.put("backup", resp) - so the details sit at the TOP level, as a sibling of "status",
+     * not inside "response". (Over the broadcast IPC a companion app sees them nested one
+     * deeper, which is why apks/filez reads response.backup; that shape does not apply here.)
+     * Both are accepted so this cannot silently break again if the wrapping ever changes.
+     */
+    private static JSONObject detailsOf(JSONObject reply) {
+        if (reply == null) return null;
+        Object top = reply.get("backup");
+        if (top instanceof JSONObject) return (JSONObject) top;
+        Object response = reply.get("response");
+        if (response instanceof JSONObject) {
+            Object nested = ((JSONObject) response).get("backup");
+            if (nested instanceof JSONObject) return (JSONObject) nested;
+        }
+        return null;
     }
 
     private static String text(Object value) {
