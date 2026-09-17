@@ -151,4 +151,19 @@ public class Format {
             return "—";
         }
     }
+
+    /**
+     * A Minima address the node will accept as `address:`. Checked BEFORE it goes into a command:
+     * the node has no escape character, so a pasted "MxREAL burn:100" would otherwise inject a
+     * burn. Mx addresses are upper-case base32; 0x is script hex.
+     */
+    public static boolean isValidAddress(String zAddress){
+        return zAddress != null && zAddress.matches("(Mx[A-Z0-9]{20,}|0x[0-9A-Fa-f]{20,})");
+    }
+
+    /** A plain positive decimal. No sign, exponent or spaces - nothing the tokeniser can split. */
+    public static boolean isValidAmount(String zAmount){
+        return zAmount != null && zAmount.matches("[0-9]+(\\.[0-9]+)?")
+                && new BigDecimal(zAmount).signum() > 0;
+    }
 }

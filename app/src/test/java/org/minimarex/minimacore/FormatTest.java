@@ -61,4 +61,28 @@ public class FormatTest {
         assertEquals("—", Format.tidyAmount("—"));
         assertEquals("1E-2000000000", Format.tidyAmount("1E-2000000000"));
     }
+
+    @Test public void sendRefusesAnythingTheTokeniserCouldTurnIntoAParameter() {
+        assertTrue(Format.isValidAddress("MxG18HGG6FJ038614Y8CW46US6G20810K0070CD00Z83282G60G1N6GADSYR77EHV3BAHBTFEJKHWG32CCGFZ"));
+        assertTrue(Format.isValidAddress("0x7D39745FBD29049BE29850B55A18BF550E4D442F930F86266E34193D89042A90"));
+        // The injection: a pasted "address" carrying a second parameter.
+        assertFalse(Format.isValidAddress("MxG18HGG6FJ038614Y8CW46US6G20810K0070CD00Z832 burn:100"));
+        assertFalse(Format.isValidAddress("MxG18HGG6FJ038614Y8CW46US6G20810K0070CD00Z832 split:20"));
+        assertFalse(Format.isValidAddress("Mx"));
+        assertFalse(Format.isValidAddress(""));
+        assertFalse(Format.isValidAddress(null));
+    }
+
+    @Test public void amountsAreBareDecimalsGreaterThanZero() {
+        assertTrue(Format.isValidAmount("1"));
+        assertTrue(Format.isValidAmount("0.5"));
+        assertTrue(Format.isValidAmount("1000000.000001"));
+        assertFalse(Format.isValidAmount("0"));
+        assertFalse(Format.isValidAmount("0.0"));
+        assertFalse(Format.isValidAmount("-1"));
+        assertFalse(Format.isValidAmount("1e3"));
+        assertFalse(Format.isValidAmount("1 mine:false"));
+        assertFalse(Format.isValidAmount(""));
+        assertFalse(Format.isValidAmount(null));
+    }
 }

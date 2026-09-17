@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 import org.minima.utils.MinimaLogger;
 
@@ -43,15 +42,23 @@ public class Alarm extends BroadcastReceiver
         AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, Alarm.class);
 
-        PendingIntent pi;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            pi = PendingIntent.getBroadcast(context, 0, intent, FLAG_IMMUTABLE);
-        }else {
-            pi = PendingIntent.getBroadcast(context, 0, intent, FLAG_IMMUTABLE);
-        }
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, FLAG_IMMUTABLE);
 
         am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), AlarmManager.INTERVAL_HOUR , pi); // Millisec * Second * Minute
 //        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60 * 1 , pi); // Millisec * Second * Minute
+    }
+
+    /**
+     * One shot, soon. Used after an automatic resync: the in-process restart is a Handler post
+     * and dies with the process, which Android may kill the moment the service is gone. This
+     * survives that. Inexact on purpose - exact alarms need a runtime permission on 31+ and a
+     * few seconds either way does not matter here.
+     */
+    public void setOnce(Context context, long delayMillis){
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, Alarm.class);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 1, intent, FLAG_IMMUTABLE);
+        am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMillis, pi);
     }
 
     public void cancelAlarm(Context context){
@@ -59,12 +66,7 @@ public class Alarm extends BroadcastReceiver
 
         Intent intent = new Intent(context, Alarm.class);
 
-        PendingIntent pi;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            pi = PendingIntent.getBroadcast(context, 0, intent, FLAG_IMMUTABLE);
-        }else {
-            pi = PendingIntent.getBroadcast(context, 0, intent, FLAG_IMMUTABLE);
-        }
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, FLAG_IMMUTABLE);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pi);

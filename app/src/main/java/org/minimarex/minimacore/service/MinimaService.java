@@ -36,6 +36,8 @@ import org.minima.utils.messages.Message;
 import org.minima.utils.messages.MessageListener;
 import org.minimarex.minimaapi.MinimaAPIMessages;
 import org.minimarex.minimacore.main.MainActivity;
+import org.minimarex.minimacore.main.ParamsActivity;
+import org.minimarex.minimacore.main.ResyncLauncher;
 import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.receiver.MinimaReceiver;
 import org.minimarex.minimacore.receiver.ReceiverDB;
@@ -125,6 +127,10 @@ public class MinimaService extends Service {
         mHaveStartedShutdown    = false;
         mCancelAlarmOnShutdown  = false;
 
+        //A (re)started node is a fresh sample: do not let a verdict from before a resync linger
+        //through its dwell and re-trigger. NodeHealth.reset() had no caller before this.
+        NodeHealthMonitor.health().reset();
+
         //Power
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"Minima::MiniPower");
@@ -179,22 +185,19 @@ public class MinimaService extends Service {
                     // not hide progress from the resync page or Logs tab.
                     if ("MINIMALOG".equals(event)) LogBuffer.append((String) data.get("message"));
 
-                    //if(!event.equals("MINIMALOG")){
-                        //MinimaLogger.log("SERVICE received event:"+event+" data:"+data.toString(), false);
+                    JSONObject broadmessage = new JSONObject();
+                    broadmessage.put("event",event);
+                    broadmessage.put("data",data);
 
-                        JSONObject broadmessage = new JSONObject();
-                        broadmessage.put("event",event);
-                        broadmessage.put("data",data);
+                    //MINIMALOG is one broadcast per log line per app - thousands during a resync.
+                    //Only the terminal apps consume it and they are ADMIN anyway (they run write
+                    //commands), so it goes to ADMIN apps only; every wallet app stops being woken
+                    //for a stream it discards.
+                    //ponytail: gated on admin rather than a per-app "logs" flag; add the flag if an
+                    //admin app that does not want logs ever becomes a problem.
+                    sendBroadcastNotify(broadmessage.toString(), event.equals("MINIMALOG"));
 
-                        sendBroadcastNotify(broadmessage.toString());
-                    //}
-
-                    if(event.equals("MINIMALOG")){
-
-                        //Feed the in-app Logs tab (bounded ring buffer)
-                        // Already captured above.
-
-                    }else if(event.equals("NEWBLOCK")) {
+                    if(event.equals("NEWBLOCK")) {
 
                         //Get the TxPoW
                         mTxPowJSON = (JSONObject) data.get("txpow");
@@ -247,7 +250,16 @@ public class MinimaService extends Service {
                         //MinimaLogger.log("SERVICE received "+event, false);
 
                     }else if(event.equals("LOAD_ALL_KEYS_FINISH")){
-                        //MinimaLogger.log("SERVICE received "+event, false);
+
+                        //The wallet provably has its keys now, so the cleartext copy of the seed
+                        //phrase in prefs has done its one job. The node only reads -seed when it
+                        //is CREATING a wallet (Wallet.java returns early when a seed row exists),
+                        //so keeping it here was a permanent second copy with weaker protection.
+                        SharedPreferences sp = getSharedPreferences("main_prefs", MODE_PRIVATE);
+                        if(!sp.getString("SEED","").isEmpty()){
+                            sp.edit().putString("SEED","").apply();
+                            MinimaLogger.log("Seed phrase cleared from preferences - wallet holds it now");
+                        }
 
                         if(mServiceListener != null) {
                             mServiceListener.MinimaLoadKeys((int) data.get("keys"), true);
@@ -298,6 +310,11 @@ public class MinimaService extends Service {
         }
         if(pref.getBoolean("PARAM_RPC", false)){
             vars.add("-rpcenable");
+            //Never RPC without auth: HTTPServer binds every interface and CMDHandler only checks
+            //credentials when a password is set, so a bare -rpcenable is unauthenticated command
+            //execution for anything that can reach the port.
+            vars.add("-rpcpassword");
+            vars.add(ParamsActivity.ensureRpcPassword(pref));
         }
 
         //TESTER HACK
@@ -373,7 +390,7 @@ public class MinimaService extends Service {
         return mMinimaReceiver.getDatabase();
     }
 
-    public void sendBroadcastNotify(String zMessage){
+    public void sendBroadcastNotify(String zMessage, boolean zAdminOnly){
         if (mMinimaReceiver == null) return; // node can emit logs during startup
         JSONArray apps = mMinimaReceiver.getDatabase().selectAllApps();
 
@@ -383,7 +400,7 @@ public class MinimaService extends Service {
             //Get the App
             JSONObject app = (JSONObject) apps.get(i);
 
-            if((int)app.get("penabled") == 1){
+            if((int)app.get("penabled") == 1 && (!zAdminOnly || (int)app.get("admin") == 1)){
                 //Get the package
                 String packageclass = app.getString("package");
                 String minimaid     = app.getString("minimaid");
@@ -525,8 +542,11 @@ public class MinimaService extends Service {
             unregisterReceiver(mMinimaReceiver);
         }catch(Exception exc){}
 
-        //Close the database
-        mMinimaReceiver.onDestroy();
+        //Close the database - null if onCreate failed before it was built; crashing here would
+        //only mask the error that actually stopped the service
+        if(mMinimaReceiver != null){
+            mMinimaReceiver.onDestroy();
+        }
 
         //Not listening anymore..
         Main.setMinimaListener(null);
@@ -538,8 +558,8 @@ public class MinimaService extends Service {
         Toast.makeText(this, "Minima Service Stopped", Toast.LENGTH_SHORT).show();
 
         //Release the wakelocks..
-        mWakeLock.release();
-        mWifiLock.release();
+        if(mWakeLock != null && mWakeLock.isHeld()) mWakeLock.release();
+        if(mWifiLock != null && mWifiLock.isHeld()) mWifiLock.release();
 
         //Remove the receiver
         if(mBatteryReceiver != null){
@@ -554,6 +574,9 @@ public class MinimaService extends Service {
         //NULL the main Instance..
         Main.ClearMainInstance();
         mShutdownComplete = true;
+
+        //An automatic resync has nobody to tap Restart - bring the node back ourselves.
+        ResyncLauncher.afterShutdown(getApplicationContext());
     }
 
     @Override

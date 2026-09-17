@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import org.minima.utils.BIP39;
 import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.utils.KeyboardInsets;
+import org.minimarex.minimacore.main.ResyncJob;
 import org.minimarex.minimacore.launcher.LauncherActivity;
 import org.minimarex.minimacore.utils.logger;
 
@@ -76,11 +77,20 @@ public class RestoreWalletSyncActivity extends AppCompatActivity {
                 }
 
                 String keyusesstr = mKeyUsesInput.getText().toString().trim();
-                if(keyusesstr.equals("")){
-                    showDialog("Seed Error","Cannot have an empty seed");
+                int keyuses;
+                try{
+                    keyuses = Integer.parseInt(keyusesstr);
+                }catch(NumberFormatException exc){
+                    showDialog("Key uses","Key uses must be a whole number.");
                     return;
                 }
-                int keyuses = Integer.parseInt(keyusesstr);
+                //Same floor as the in-app seed rebuild: keyuses:0 says no key was ever used, and
+                //a reused Winternitz index exposes the private key.
+                if(keyuses < ResyncJob.MIN_KEY_USES || keyuses > ResyncJob.MAX_KEY_USES){
+                    showDialog("Key uses","Key uses must be between "+ResyncJob.MIN_KEY_USES
+                            +" and "+ResyncJob.MAX_KEY_USES+". Higher than any previous restore of this seed.");
+                    return;
+                }
 
                 String megammr = mMegaNode.getText().toString().trim();
 

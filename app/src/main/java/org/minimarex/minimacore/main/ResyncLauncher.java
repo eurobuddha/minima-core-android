@@ -1,6 +1,7 @@
 package org.minimarex.minimacore.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
@@ -8,6 +9,7 @@ import android.os.Looper;
 import org.minima.system.Main;
 import org.minimarex.minimacore.service.Alarm;
 import org.minimarex.minimacore.service.MinimaService;
+import org.minimarex.minimacore.utils.Peers;
 
 /**
  * The one way a destructive node job is started, from any screen or from the health check.
@@ -59,9 +61,13 @@ public final class ResyncLauncher {
             return fail("Could not save progress state. Check available storage and try again.");
         }
 
-        // Leave restart under the user's control, including after process death.
-        new Alarm().cancelAlarm(context);
-        MinimaService.cancelAlarm();
+        // Leave restart under the user's control, including after process death - unless the
+        // health monitor started this with nobody watching, in which case the alarm stays armed
+        // as the fallback and afterShutdown() brings the node back itself.
+        if (!job.automatic()) {
+            new Alarm().cancelAlarm(context);
+            MinimaService.cancelAlarm();
+        }
 
         if (!ResyncSession.get().start(job, System.nanoTime())) {
             // Refused (already running, or already finished and awaiting restart). Do not
@@ -78,5 +84,42 @@ public final class ResyncLauncher {
             });
         }
         return new Result(true, null);
+    }
+
+    /**
+     * Called by MinimaService at the very end of onDestroy.
+     *
+     * A resync the health monitor started has nobody on the resync screen, so the "Restart node"
+     * tap that completes a manual one never comes. Without this the feature that exists to keep
+     * the node healthy left it OFF until the user next opened the app. Manual jobs are untouched.
+     * If the foreground-service start is refused, the hourly Alarm - deliberately left armed for
+     * automatic jobs - is the fallback.
+     */
+    public static void afterShutdown(Context context) {
+        ResyncSession session = ResyncSession.get();
+        ResyncJob job = session.job();
+        if (job == null || !job.automatic() || session.state() != ResyncSession.State.SUCCEEDED) return;
+
+        final Context app = context.getApplicationContext();
+        if (job.setsDefaultPeer()) Peers.setDefaultPeers(app, job.host());
+        app.getSharedPreferences("main_prefs", Context.MODE_PRIVATE).edit()
+                .putBoolean(SeedSyncActivity.PREF_PENDING, false)
+                .remove(SeedSyncActivity.PREF_PENDING_LABEL)
+                .apply();
+        session.reset();
+
+        // Belt and braces. The Handler post is the fast path but dies with the process, which
+        // Android may kill the moment its last component is gone; the one-shot alarm survives
+        // that and bounds the worst case to ~30s rather than the hourly alarm's full interval.
+        new Alarm().setOnce(app, 30_000);
+        // Same 2s the manual restart path uses, so the old instance releases its DB locks first.
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            try {
+                app.startForegroundService(new Intent(app, MinimaService.class));
+            } catch (Exception exc) {
+                org.minima.utils.MinimaLogger.log("Automatic resync: could not restart the node now - "
+                        + exc + ". The hourly alarm will.");
+            }
+        }, 2000);
     }
 }

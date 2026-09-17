@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import org.minima.system.params.ParamConfigurer;
 import org.minimarex.minimacore.R;
+import org.minimarex.minimacore.utils.Clip;
 import org.minimarex.minimacore.utils.KeyboardInsets;
 
 import java.util.StringTokenizer;
@@ -34,6 +36,8 @@ public class ParamsActivity extends AppCompatActivity {
     public static final String PREF_PARAM_SERVER  = "PARAM_SERVER";
     public static final String PREF_PARAM_MEGAMMR = "PARAM_MEGAMMR";
     public static final String PREF_PARAM_RPC     = "PARAM_RPC";
+    //Generated once, never blank: RPC is never started without it (MinimaService).
+    public static final String PREF_PARAM_RPC_PASSWORD = "PARAM_RPC_PASSWORD";
     public static final String PREF_EXTRA_PARAMS  = "minima_extra_params";
     //Not a node flag: read by NodeHealthMonitor, not by MinimaService at boot.
     public static final String PREF_AUTORESYNC    = "PARAM_AUTORESYNC";
@@ -52,6 +56,8 @@ public class ParamsActivity extends AppCompatActivity {
     SwitchMaterial mMegaSwitch;
     SwitchMaterial mRpcSwitch;
     SwitchMaterial mAutoResyncSwitch;
+    TextView       mRpcPassword;
+    View           mRpcPasswordRow;
     EditText       mExtraInput;
 
     @Override
@@ -79,6 +85,15 @@ public class ParamsActivity extends AppCompatActivity {
         mRpcSwitch.setChecked(prefs.getBoolean(PREF_PARAM_RPC, false));
         mAutoResyncSwitch.setChecked(prefs.getBoolean(PREF_AUTORESYNC, false));
         mExtraInput.setText(prefs.getString(PREF_EXTRA_PARAMS, ""));
+
+        //The RPC password, shown in full with Copy whenever RPC is on - it is the only thing
+        //between the LAN and this node's commands, and the user has to type it somewhere.
+        mRpcPassword    = findViewById(R.id.params_rpc_password);
+        mRpcPasswordRow = findViewById(R.id.params_rpc_password_row);
+        findViewById(R.id.params_rpc_password_copy).setOnClickListener(v ->
+                Clip.copySensitive(this, "Minima RPC password", mRpcPassword.getText().toString(), "RPC password copied"));
+        mRpcSwitch.setOnCheckedChangeListener((b, on) -> renderRpcPassword(on));
+        renderRpcPassword(mRpcSwitch.isChecked());
 
         Button save = findViewById(R.id.params_button_save);
         save.setOnClickListener(new View.OnClickListener() {
@@ -116,6 +131,29 @@ public class ParamsActivity extends AppCompatActivity {
                         .show();
             }
         });
+    }
+
+    private void renderRpcPassword(boolean on){
+        mRpcPasswordRow.setVisibility(on ? View.VISIBLE : View.GONE);
+        if(on) mRpcPassword.setText(ensureRpcPassword(getSharedPreferences("main_prefs", MODE_PRIVATE)));
+    }
+
+    /**
+     * The RPC password, generating and storing one on first use.
+     *
+     * Hex from SecureRandom: unguessable, and safe both as a boot argument and in a Basic-auth
+     * header. The node's RPC user is "minima". Shared with MinimaService so the password shown
+     * here is exactly the one the node is started with.
+     */
+    public static String ensureRpcPassword(SharedPreferences prefs){
+        String existing = prefs.getString(PREF_PARAM_RPC_PASSWORD, "");
+        if(!existing.isEmpty()) return existing;
+        byte[] raw = new byte[16];
+        new java.security.SecureRandom().nextBytes(raw);
+        StringBuilder hex = new StringBuilder();
+        for(byte b : raw) hex.append(String.format("%02x", b));
+        prefs.edit().putString(PREF_PARAM_RPC_PASSWORD, hex.toString()).commit();
+        return hex.toString();
     }
 
     /** Validate + persist. Returns false (with a dialog shown) on any problem. */

@@ -109,6 +109,18 @@ public class SendView extends BaseView {
                     return;
                 }
 
+                //Checked BEFORE anything is put into a command. The node has no escape character,
+                //so a pasted "MxREAL burn:100" would otherwise inject a burn - and the confirm
+                //dialog was the only thing standing between that paste and lost funds.
+                if(!Format.isValidAddress(address)){
+                    logger.showDialog(getActivity(),"Error","That is not a Minima address. Nothing was sent.");
+                    return;
+                }
+                if(!Format.isValidAmount(amount)){
+                    logger.showDialog(getActivity(),"Error","Amount must be a plain number greater than zero. Nothing was sent.");
+                    return;
+                }
+
                 JSONObject token    = mTokenAdapter.getToken(mChosenToken);
                 String tokenid      = token.get("tokenid").toString();
                 String tokenname    = TokenUtils.getTokenName(token);

@@ -16,6 +16,8 @@ import org.minima.database.wallet.Wallet;
 import org.minima.system.Main;
 import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.launcher.StartServiceActivity;
+import org.minimarex.minimacore.main.ResyncJob;
+import org.minimarex.minimacore.utils.Feedback;
 import org.minimarex.minimacore.service.MinimaService;
 import org.minimarex.minimacore.service.MinimaServiceListener;
 import org.minimarex.minimacore.utils.MinimaCMD;
@@ -27,6 +29,8 @@ import org.minimarex.minimacore.utils.logger;
 public class SeedSyncServiceActivity extends AppCompatActivity implements ServiceConnection, MinimaServiceListener {
 
     MinimaService mMinima = null;
+    /** Set in onDestroy so the startup-wait thread stops instead of spinning past the screen. */
+    volatile boolean mDestroyed = false;
 
     ProgressDialog mProgress;
 
@@ -57,12 +61,23 @@ public class SeedSyncServiceActivity extends AppCompatActivity implements Servic
             public void run() {
                 logger.log("Wait for Minima Service to start..");
 
-                while(mMinima == null){
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+                //Bounded and cancellable: this used to spin forever if the bind never came, and
+                //NPE'd on a raw thread - taking the whole app down - if the node was not up yet.
+                long deadline = System.currentTimeMillis() + 120_000;
+                while(mMinima == null && !mDestroyed && System.currentTimeMillis() < deadline){
+                    try { Thread.sleep(500); } catch (InterruptedException e) { return; }
+                }
+                if(mDestroyed) return;
+                if(mMinima == null){
+                    //Giving up silently would leave the spinner up with nothing to read.
+                    runOnUiThread(() -> {
+                        if(isFinishing() || isDestroyed()) return;
+                        mProgress.dismiss();
+                        logger.showDialog(SeedSyncServiceActivity.this, "Could not start Minima",
+                                "The node service did not come up in time. Open Minima and try the restore again.",
+                                SeedSyncServiceActivity.this::finish);
+                    });
+                    return;
                 }
 
                 //Set this to listen for shutdown after sync..
@@ -70,17 +85,14 @@ public class SeedSyncServiceActivity extends AppCompatActivity implements Servic
 
                 logger.log("Now wait for Minima to say..");
 
-                while(!Main.getInstance().isStartUpComplete()){
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+                while(!mDestroyed && (Main.getInstance() == null || !Main.getInstance().isStartUpComplete())){
+                    try { Thread.sleep(500); } catch (InterruptedException e) { return; }
                 }
+                if(mDestroyed) return;
 
-                //Get Key uses..
+                //Get Key uses.. never below the node's own default (stateful signatures)
                 SharedPreferences pref  = getSharedPreferences("main_prefs",MODE_PRIVATE);
-                int keyuses = pref.getInt("KEYUSES",-1);
+                int keyuses = Math.max(ResyncJob.MIN_KEY_USES, pref.getInt("KEYUSES", ResyncJob.MIN_KEY_USES));
 
                 //Now run command to create ALL key uses..
                 MinimaCMD.runMinima("keys action:createallkeys keyuses:"+keyuses, new MinimaCMDListener() {
@@ -97,6 +109,7 @@ public class SeedSyncServiceActivity extends AppCompatActivity implements Servic
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mDestroyed = true;
 
         //Unbind from the service..
         if(mMinima != null) {
@@ -177,14 +190,13 @@ public class SeedSyncServiceActivity extends AppCompatActivity implements Servic
             @Override
             public void cmdResult(JSONObject zResult) {
 
-                //Get status..
-                boolean status = (boolean)zResult.get("status");
+                //The node reports failures under "message" or "error"; Feedback handles both
+                //and never returns an empty string, so there is always something to show.
+                final String error = Feedback.errorOf(zResult);
 
-                if(!status){
+                if(error != null){
                     //Service has finished resync..
                     mProgress.dismiss();
-
-                    String error = zResult.getString("error");
 
                     SeedSyncServiceActivity.this.runOnUiThread(new Runnable() {
                         @Override

@@ -144,6 +144,15 @@ public class ResyncJobTest {
         assertFalse(ResyncJob.fileRestore("backup.bak", "pass123").selfShutsDown());
     }
 
+    @Test public void onlyTheMonitorsResyncIsMarkedAutomatic() {
+        // An automatic job has nobody watching the screen, so ResyncLauncher must not cancel
+        // the restart alarm for it and must bring the node back itself afterwards.
+        assertTrue(ResyncJob.hostResync("example.org:9001", true).automatic());
+        assertFalse(ResyncJob.hostResync("example.org:9001").automatic());
+        assertFalse(ResyncJob.fileRestore("backup.bak", "pass123").automatic());
+        assertFalse(ResyncJob.seedResync("example.org:9001", twelveWords(), 2000).automatic());
+    }
+
     @Test public void anInvalidJobIsNullSoItCanNeverBeStarted() {
         assertNull(ResyncJob.hostResync("node:9001;quit"));
         assertNull(ResyncJob.fileRestore("backup.bak", ""));

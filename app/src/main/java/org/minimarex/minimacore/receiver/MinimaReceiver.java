@@ -95,6 +95,18 @@ public class MinimaReceiver extends BroadcastReceiver {
                 MinimaAPILogger.log("MAIN - RECEIVED BROADCAST respID:"+responseid+" frompackage:"+frompackage+" action:"+action);
             }
 
+            //Every identifying extra above is self-declared by the sender; the pairing token is
+            //the only real check. Where the platform can say who ACTUALLY sent the broadcast
+            //(API 34+), a package that claims to be someone else is a spoof and is dropped -
+            //a leaked token then also needs the victim's signing key, not just its name.
+            if(android.os.Build.VERSION.SDK_INT >= 34){
+                String real = getSentFromPackage();
+                if(real != null && frompackage != null && !real.equals(frompackage)){
+                    logger.log("IPC sender "+real+" claimed to be "+frompackage+" - dropped");
+                    return;
+                }
+            }
+
             //Get the App
             JSONObject app = mDatabase.selectApp(frompackage, frompackageuid, minimauid);
 
@@ -348,7 +360,19 @@ public class MinimaReceiver extends BroadcastReceiver {
                 if(!f.exists()){
                     File parent = f.getParentFile();
                     resp.put("parentexists", parent != null && parent.isDirectory());
-                    if(parent != null && parent.isDirectory()){
+                    //Only enumerate INSIDE the base folder. Every other action is confined to it,
+                    //and listing an arbitrary parent was a filesystem oracle nothing here needs.
+                    //Same containment test as resolveInBase: a bare prefix match would let a
+                    //sibling folder that merely starts with the same letters through.
+                    boolean parentInBase = false;
+                    try{
+                        if(parent != null){
+                            String pp = parent.getCanonicalPath();
+                            String bp = base.getCanonicalPath();
+                            parentInBase = pp.equals(bp) || pp.startsWith(bp + File.separator);
+                        }
+                    }catch(Exception ignore){}
+                    if(parentInBase && parent.isDirectory()){
                         JSONArray kids = new JSONArray();
                         File[] children = parent.listFiles();
                         if(children != null){

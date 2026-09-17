@@ -91,10 +91,35 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="HTTP RPC interface on port 11005. Only enable if you know you need it - anything that can reach the port can command the node."
+                android:text="HTTP RPC interface on port 11005. Anything that can reach the port can command this node, so it is never started without Basic auth: user minima, password below."
                 android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                 android:textSize="12sp"
                 android:textColor="@color/core_text_mid" />
+
+            <LinearLayout
+                android:id="@+id/params_rpc_password_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView style="@style/FormLabel" android:text="RPC password" />
+
+                <TextView
+                    android:id="@+id/params_rpc_password"
+                    style="@style/MonoBlock"
+                    android:padding="12dp"
+                    android:background="@drawable/bg_token_tile"
+                    android:textIsSelectable="true" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/params_rpc_password_copy"
+                    style="@style/Widget.MinimaCore.Button.Outlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Copy RPC password" />
+            </LinearLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/params_switch_autoresync"

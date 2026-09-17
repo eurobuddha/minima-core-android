@@ -54,15 +54,17 @@ public final class ResyncJob {
 
     private final Kind kind;
     private final boolean selfShutsDown;
+    private final boolean automatic;
     private String command;
     private final String host;
     private final String label;
     private final String startLine;
 
-    private ResyncJob(Kind kind, boolean selfShutsDown, String command, String host,
-                      String label, String startLine) {
+    private ResyncJob(Kind kind, boolean selfShutsDown, boolean automatic, String command,
+                      String host, String label, String startLine) {
         this.kind = kind;
         this.selfShutsDown = selfShutsDown;
+        this.automatic = automatic;
         this.command = command;
         this.host = host;
         this.label = label;
@@ -124,8 +126,17 @@ public final class ResyncJob {
      * Command string is byte-identical to the one ResyncSession used before this type existed.
      */
     public static ResyncJob hostResync(String host) {
+        return hostResync(host, false);
+    }
+
+    /**
+     * @param automatic true when the health monitor started it with nobody watching. Such a job
+     *                  must bring the node back itself (ResyncLauncher.afterShutdown) - a manual
+     *                  one leaves restart with the user.
+     */
+    public static ResyncJob hostResync(String host, boolean automatic) {
         if (!validHost(host)) return null;
-        return new ResyncJob(Kind.HOST_RESYNC, true,
+        return new ResyncJob(Kind.HOST_RESYNC, true, automatic,
                 "megammrsync action:resync host:" + host,
                 host,
                 "Resync",
@@ -135,7 +146,7 @@ public final class ResyncJob {
     /** Pure local restore from a backup file already in the node's base folder. No network. */
     public static ResyncJob fileRestore(String filename, String password) {
         if (!validFilename(filename) || !validPassword(password)) return null;
-        return new ResyncJob(Kind.FILE_RESTORE, false,
+        return new ResyncJob(Kind.FILE_RESTORE, false, false,
                 "restore file:\"" + filename + "\" password:\"" + password + "\"",
                 "",
                 "Restore",
@@ -145,7 +156,7 @@ public final class ResyncJob {
     /** Restore a backup file AND resync to the chain tip from a MegaMMR host. */
     public static ResyncJob fileResync(String host, String filename, String password) {
         if (!validHost(host) || !validFilename(filename) || !validPassword(password)) return null;
-        return new ResyncJob(Kind.FILE_RESYNC, true,
+        return new ResyncJob(Kind.FILE_RESYNC, true, false,
                 "megammrsync action:resync host:" + host
                         + " file:\"" + filename + "\" password:\"" + password + "\"",
                 host,
@@ -165,7 +176,7 @@ public final class ResyncJob {
         String tidy = tidyPhrase(phrase);
         if (!validHost(host) || !validPhrase(tidy)
                 || keyUses < MIN_KEY_USES || keyUses > MAX_KEY_USES) return null;
-        return new ResyncJob(Kind.SEED_RESYNC, true,
+        return new ResyncJob(Kind.SEED_RESYNC, true, false,
                 "megammrsync action:resync host:" + host
                         + " phrase:\"" + tidy + "\" keyuses:" + keyUses,
                 host,
@@ -199,6 +210,9 @@ public final class ResyncJob {
 
     /** First line of the live log. Safe to show: it never contains the password. */
     public String startLine() { return startLine; }
+
+    /** Started by the health monitor, not a person - so the node must restart itself afterwards. */
+    public boolean automatic() { return automatic; }
 
     /** True when finishing this job should be remembered as the node's default peer. */
     public boolean setsDefaultPeer() { return !host.isEmpty(); }

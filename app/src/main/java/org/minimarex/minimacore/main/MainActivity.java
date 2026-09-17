@@ -41,6 +41,7 @@ import org.minima.utils.json.JSONObject;
 import org.minimarex.minimacore.MinimaApplication;
 import org.minimarex.minimacore.R;
 import org.minimarex.minimacore.utils.KeyboardInsets;
+import org.minimarex.minimacore.receiver.ReceiverDB;
 import org.minimarex.minimacore.service.MinimaService;
 import org.minimarex.minimacore.service.MinimaServiceListener;
 import org.minimarex.minimacore.utils.MinimaCMD;
@@ -171,20 +172,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         String packageName = getPackageName();
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        if (pm.isIgnoringBatteryOptimizations(packageName)) {
-
-            //Wait for startup sequence..
-            waitForMinimaToStartUp();
-
-        } else {
+        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
 
             //Run intent and get the result
             ActivityResultLauncher<Intent> startActivityForResult = registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        //Wait for startup sequence..
-                        waitForMinimaToStartUp();
-                    }
+                    result -> {}
             );
 
             Intent intent = new Intent();
@@ -193,10 +186,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
             startActivityForResult.launch(intent);
         }
-    }
-
-    public void waitForMinimaToStartUp(){
-        return;
     }
 
     public void checkPermission(String[] permissions, int requestCode){
@@ -446,6 +435,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         MiniFile.deleteFileOrFolder(GeneralParams.BASE_FILE_FOLDER, new File(GeneralParams.BASE_FILE_FOLDER));
 
+        //Companion pairings live in receive.db, not the node folder. A reset is a new wallet and
+        //must not hand every previously-enabled app - ADMIN included - straight to it.
+        try{
+            ReceiverDB pairings = new ReceiverDB(this);
+            pairings.wipeDB();
+            pairings.close();
+        }catch(Exception exc){
+            logger.log("Could not wipe companion pairings : "+exc);
+        }
+
         //reset prefs..
         SharedPreferences prefs = getSharedPreferences("main_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
@@ -542,7 +541,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         mFooterRight.post(new Runnable() {
             @Override
             public void run() {
-                //Get tip
+                //Re-check inside the Runnable: the tip can be gone by the time this runs
+                //(mid-resync), and an NPE here is on the main thread.
+                if(!MinimaCMD.checkMinimaStarted()) return;
                 TxPoW txp = MinimaDB.getDB().getTxPoWTree().getTip().getTxPoW();
 
                 int block = txp.getBlockNumber().getAsInt();
