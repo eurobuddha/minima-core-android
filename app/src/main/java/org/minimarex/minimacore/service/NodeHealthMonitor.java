@@ -97,6 +97,22 @@ public final class NodeHealthMonitor {
     /** Synchronous body. Visible for testing the plumbing; the decisions live in NodeHealth. */
     static void checkNow(Context context, long nowMillis) {
         if (Main.getInstance() == null || MinimaService.haveStartedShutdown()) return;
+        // A node that exists is not a node that is READY. Until startup completes the wallet is
+        // not loaded and `status complete:true` throws inside the node (SeedRow.getSeed() on a
+        // null), which the reader reports as "could not read node status" - an alarming line on
+        // every single restart for a node that is merely still booting. Reproduced on both test
+        // phones, every time, during the 1.6.35 upgrade. claimCheck() below already worried
+        // about this ("the check fired at service start - before the node had finished coming
+        // up"); asking the node directly is the guard that actually holds.
+        if (!Main.getInstance().isStartUpComplete()) return;
+        // A node that exists is not a node that is READY. Until startup completes the wallet is
+        // not loaded and `status complete:true` throws inside the node
+        // (SeedRow.getSeed() on null), which the reader reports as "could not read node status"
+        // - an alarming line on every single restart, for a node that is merely still booting.
+        // Reproduced on both test phones, every time, on the 1.6.35 upgrade. claimCheck() below
+        // already worried about this ("the check fired at service start - before the node had
+        // finished coming up"); asking the node directly is the guard that actually holds.
+        if (!Main.getInstance().isStartUpComplete()) return;
         // Never diagnose a node that is mid-resync - it is supposed to look wrong.
         if (ResyncSession.get().state() == ResyncSession.State.RUNNING) return;
         // Claim the slot only once a real sample is about to happen. Claiming earlier meant

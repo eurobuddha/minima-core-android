@@ -87,9 +87,16 @@ public final class NodeHealth {
      * between samples, and it measures the harm directly - a blocking GC is precisely the pause
      * that makes a companion app's 30 s read time out. Thresholds are deliberately loose, per the
      * rule for the store thresholds above: they exist to catch a runaway, not to police a busy
-     * node. A healthy node here does single digits per hour.
+     * node.
+     *
+     * CALIBRATED, not guessed. Two healthy nodes on 1.6.35, 2026-09-22, both following the chain:
+     * 27/hr on the S10+ (freshly resynced, 2112 rows) and 24/hr on the zfold7 (194 MB store,
+     * 22202 rows). So ~25/hr is what "fine" looks like here, across very different store sizes.
+     * WATCH at 200 is 8x that. The first draft used 60, which is barely 2x and would have nagged
+     * a merely busy node - exactly what the rule above forbids. The observed fault ran to
+     * hundreds and thousands per hour, so the separation is ample either way.
      */
-    static final long BLOCKING_GC_WATCH_PER_HOUR    = 60L;
+    static final long BLOCKING_GC_WATCH_PER_HOUR    = 200L;
     static final long BLOCKING_GC_DEGRADED_PER_HOUR = 600L;
 
     /** A state must hold this long before it is reported, so a spike cannot flip it. */

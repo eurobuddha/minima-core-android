@@ -44,12 +44,19 @@ public class NodeHealthTest {
     }
 
     @Test public void aModestlyPausingNodeOnlyWarns() {
-        assertEquals(NodeHealth.State.WATCH, NodeHealth.classify(gcMetrics(70 * MB, 100)).state);
+        assertEquals(NodeHealth.State.WATCH, NodeHealth.classify(gcMetrics(70 * MB, 250)).state);
     }
 
-    /** A busy node is not a sick one - single digits an hour must stay silent. */
-    @Test public void anOrdinaryCollectionRateIsNotAFault() {
-        assertEquals(NodeHealth.State.OK, NodeHealth.classify(gcMetrics(70 * MB, 5)).state);
+    /**
+     * A busy node is not a sick one. Both measured healthy nodes sat at 24-27/hr on 1.6.35
+     * (S10+ freshly resynced at 2112 rows, zfold7 at 194 MB / 22202 rows), so the rate a real
+     * working node produces must stay silent with room to spare.
+     */
+    @Test public void aMeasuredHealthyCollectionRateIsNotAFault() {
+        assertEquals(NodeHealth.State.OK, NodeHealth.classify(gcMetrics(70 * MB, 27)).state);
+        assertEquals(NodeHealth.State.OK, NodeHealth.classify(gcMetrics(70 * MB, 24)).state);
+        // and a node several times busier than that is still not a fault
+        assertEquals(NodeHealth.State.OK, NodeHealth.classify(gcMetrics(70 * MB, 150)).state);
     }
 
     /**

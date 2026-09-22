@@ -84,8 +84,8 @@ android {
         // every ~50s while the node runs, so NEWBLOCK now asks for a check and the interval
         // (15 min) does the scheduling by turning almost all of them away. The service-start
         // and Alarm calls stay as belt and braces; they are debounced like everything else.
-        versionCode 63
-        versionName "1.6.35-ui-h2"
+        versionCode 64
+        versionName "1.6.36-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
