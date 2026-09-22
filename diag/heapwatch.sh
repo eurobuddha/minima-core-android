@@ -4,8 +4,18 @@
 # WHY: the 2026-09-11 incident was driven by on-disk store size, and a megammrsync resync fixed
 # it. On 2026-09-21 the zfold7 pinned its heap AGAIN after 3d21h of uptime — 489,748 KB of the
 # 524,288 KB ceiling, blocking GC in a loop, its own block clock frozen 11 blocks behind the
-# chain — and this time the store had already been resynced. That points at an uptime-
-# proportional retention rather than a data-size one, and only a growth curve tells those apart.
+# chain.
+#
+# CORRECTION (2026-09-22). This header used to say the store driver "had already been removed",
+# so the cause had to be an uptime-proportional retention. That was wrong, and it was wrong for
+# the reason diag/README.md warns about: it rested on `dumpsys diskstats` reporting 143.8 MB,
+# which is a stale cached snapshot. The node's own health monitor reported the S10+ txpow table
+# at 583 MB. It is the same mechanism as September.
+#
+# What the curve DID establish, and what nothing before it had: the post-GC floor stays flat
+# (55-76 MB across 21 hours) while peaks climb 92 -> 411 MB and blocking GCs go 50 -> 1104. So
+# nothing is being retained. The node is allocating faster than it can collect, against a
+# ceiling it cannot raise. Fixed in minimacore 1.6.35-ui-h2 / minima-core b8a3af42.
 #
 # Both phones now run DIFFERENT node builds, which makes this a free A/B:
 #   RFCY71KW3LX zfold7  1.6.34-ui-h2 (vc62)

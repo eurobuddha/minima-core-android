@@ -72,6 +72,26 @@ public final class NodeHealth {
      */
     static final long HEAP_WATERMARK_FLOOR = 32L * 1024 * 1024;
 
+    /**
+     * Blocking garbage collections per hour.
+     *
+     * The heap thresholds above are right about WHAT matters and wrong about HOW it is read: they
+     * sample Runtime at one instant, hourly, and a struggling node's heap is not a level, it is a
+     * sawtooth. Measured 2026-09-22 over 21 hours on a Galaxy S10+ serving seven companion apps,
+     * sampled every 10 minutes: the post-GC floor sat at 55-76 MB the whole time while peaks
+     * climbed 92 MB -> 411 MB. An hourly instant reading mostly catches the floor, so the node
+     * reported WATCH on store size while it was in fact thrashing - 1104 blocking GC waits - and
+     * never reached the DEGRADED that would have triggered the auto-resync.
+     *
+     * art.gc.blocking-gc-count is the honest signal: a cumulative counter, so it cannot be missed
+     * between samples, and it measures the harm directly - a blocking GC is precisely the pause
+     * that makes a companion app's 30 s read time out. Thresholds are deliberately loose, per the
+     * rule for the store thresholds above: they exist to catch a runaway, not to police a busy
+     * node. A healthy node here does single digits per hour.
+     */
+    static final long BLOCKING_GC_WATCH_PER_HOUR    = 60L;
+    static final long BLOCKING_GC_DEGRADED_PER_HOUR = 600L;
+
     /** A state must hold this long before it is reported, so a spike cannot flip it. */
     static final long DWELL_MILLIS = 10L * 60 * 1000;
 
@@ -84,9 +104,16 @@ public final class NodeHealth {
         public final long mempool;
         public final long heapMax;
         public final long heapUsed;
+        /** Blocking GCs per hour since the previous sample; -1 when not yet known. */
+        public final long blockingGcPerHour;
 
         public Metrics(long txpowRows, long txpowBytes, long diskBytes, long archiveBytes,
                        long mempool, long heapMax, long heapUsed) {
+            this(txpowRows, txpowBytes, diskBytes, archiveBytes, mempool, heapMax, heapUsed, -1);
+        }
+
+        public Metrics(long txpowRows, long txpowBytes, long diskBytes, long archiveBytes,
+                       long mempool, long heapMax, long heapUsed, long blockingGcPerHour) {
             this.txpowRows = txpowRows;
             this.txpowBytes = txpowBytes;
             this.diskBytes = diskBytes;
@@ -94,6 +121,7 @@ public final class NodeHealth {
             this.mempool = mempool;
             this.heapMax = heapMax;
             this.heapUsed = heapUsed;
+            this.blockingGcPerHour = blockingGcPerHour;
         }
 
         public long heapHeadroom() { return Math.max(0, heapMax - heapUsed); }
@@ -130,6 +158,12 @@ public final class NodeHealth {
             return new Assessment(State.DEGRADED,
                     "heap " + mb(m.heapUsed) + " of " + mb(m.heapMax) + " used");
         }
+        // Ahead of the store thresholds: this is the harm, they are only a leading indicator.
+        if (m.blockingGcPerHour >= BLOCKING_GC_DEGRADED_PER_HOUR) {
+            return new Assessment(State.DEGRADED,
+                    "the node is stalling on memory - " + m.blockingGcPerHour
+                    + " blocking collections an hour");
+        }
         if (m.txpowRows >= TXPOW_ROWS_DEGRADED) {
             return new Assessment(State.DEGRADED,
                     "the transaction table holds " + m.txpowRows + " rows");
@@ -144,6 +178,11 @@ public final class NodeHealth {
         }
         if (m.txpowBytes >= TXPOW_BYTES_WATCH) {
             return new Assessment(State.WATCH, "the transaction table is " + mb(m.txpowBytes));
+        }
+        if (m.blockingGcPerHour >= BLOCKING_GC_WATCH_PER_HOUR) {
+            return new Assessment(State.WATCH,
+                    "the node is pausing for memory - " + m.blockingGcPerHour
+                    + " blocking collections an hour");
         }
         if (m.heapFraction() >= HEAP_WATCH_FRACTION) {
             return new Assessment(State.WATCH,
@@ -198,6 +237,11 @@ public final class NodeHealth {
      * not an unhealthy node, and must never trigger a resync.
      */
     public static Metrics read(JSONObject statusReply) {
+        return read(statusReply, -1);
+    }
+
+    /** As {@link #read(JSONObject)}, carrying a measured blocking-GC rate (-1 when unknown). */
+    public static Metrics read(JSONObject statusReply, long blockingGcPerHour) {
         if (statusReply == null || !Boolean.TRUE.equals(statusReply.get("status"))) return null;
 
         Object responseObj = statusReply.get("response");
@@ -217,7 +261,8 @@ public final class NodeHealth {
                 bytes(str(files, "archivedb")),
                 num(txpow, "mempool"),
                 rt.maxMemory(),
-                rt.totalMemory() - rt.freeMemory());
+                rt.totalMemory() - rt.freeMemory(),
+                blockingGcPerHour);
     }
 
     /**

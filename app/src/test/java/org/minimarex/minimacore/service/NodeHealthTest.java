@@ -24,6 +24,51 @@ public class NodeHealthTest {
         return new NodeHealth.Metrics(rows, txpowBytes, diskBytes, 2 * MB, 0, heapMax, heapUsed);
     }
 
+    private static NodeHealth.Metrics gcMetrics(long heapUsed, long blockingGcPerHour) {
+        return new NodeHealth.Metrics(2050, (long) (10.1 * MB), 29 * MB, 2 * MB, 0,
+                512 * MB, heapUsed, blockingGcPerHour);
+    }
+
+    /**
+     * The case that made this signal necessary. Measured on a Galaxy S10+ over 21 hours,
+     * sampled every 10 minutes: the post-GC floor never left 55-76 MB while peaks reached
+     * 411 MB and blocking GCs ran past 1000. An hourly instantaneous heap reading mostly
+     * catches the floor, so heap fraction alone called this node healthy while every
+     * companion app was timing out.
+     */
+    @Test public void aThrashingNodeIsDegradedEvenWhenTheHeapSampleLooksFine() {
+        NodeHealth.Metrics m = gcMetrics(70 * MB, 1100);
+        NodeHealth.Assessment a = NodeHealth.classify(m);
+        assertEquals(NodeHealth.State.DEGRADED, a.state);
+        assertTrue(a.reason, a.reason.contains("1100"));
+    }
+
+    @Test public void aModestlyPausingNodeOnlyWarns() {
+        assertEquals(NodeHealth.State.WATCH, NodeHealth.classify(gcMetrics(70 * MB, 100)).state);
+    }
+
+    /** A busy node is not a sick one - single digits an hour must stay silent. */
+    @Test public void anOrdinaryCollectionRateIsNotAFault() {
+        assertEquals(NodeHealth.State.OK, NodeHealth.classify(gcMetrics(70 * MB, 5)).state);
+    }
+
+    /**
+     * -1 is "not measured yet" - the first check after a restart has no previous count to
+     * difference against. Unknown must never read as good news, nor as a fault.
+     */
+    @Test public void anUnmeasuredCollectionRateIsNoSignalEitherWay() {
+        assertEquals(NodeHealth.State.OK, NodeHealth.classify(gcMetrics(70 * MB, -1)).state);
+        // and it must not mask a real fault found by another signal
+        NodeHealth.Metrics big = new NodeHealth.Metrics(2050, 950 * MB, 1000 * MB, 2 * MB, 0,
+                512 * MB, 70 * MB, -1);
+        assertEquals(NodeHealth.State.DEGRADED, NodeHealth.classify(big).state);
+    }
+
+    /** The old constructor must keep working, and must mean "unknown". */
+    @Test public void theRateDefaultsToUnknownOnTheOlderConstructor() {
+        assertEquals(-1, metrics(2050, 10 * MB, 29 * MB, 512 * MB, 87 * MB).blockingGcPerHour);
+    }
+
     /** A real healthy node must be silent, or the feature is worse than useless. */
     @Test public void measuredHealthyNodeIsOk() {
         NodeHealth.Metrics m = metrics(2050, (long) (10.1 * MB), 29 * MB, 512 * MB, 87 * MB);

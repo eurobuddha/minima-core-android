@@ -73,6 +73,10 @@ public final class NodeHealthMonitor {
     static final long RETRY_AFTER_FAILURE_MILLIS = 60_000L;
 
     private static final NodeHealth HEALTH = new NodeHealth();
+
+    /** Previous cumulative blocking-GC count + when it was read, for the per-hour rate. */
+    private static long sLastGcCount = -1;
+    private static long sLastGcAt    = 0;
     private static final java.util.concurrent.atomic.AtomicLong LAST_CHECK =
             new java.util.concurrent.atomic.AtomicLong(0);
 
@@ -101,7 +105,7 @@ public final class NodeHealthMonitor {
         if (!claimCheck(nowMillis)) return;
 
         JSONObject reply = MinimaCMD.execute("status complete:true");
-        NodeHealth.Metrics metrics = NodeHealth.read(reply);
+        NodeHealth.Metrics metrics = NodeHealth.read(reply, blockingGcPerHour(nowMillis));
         if (metrics == null) {
             // Say so. A health check that fails silently is worse than no health check: it
             // looks exactly like a healthy node.
@@ -174,7 +178,46 @@ public final class NodeHealthMonitor {
                 + ", txpow " + NodeHealth.mb(m.txpowBytes) + " / " + m.txpowRows + " rows"
                 + ", archive " + NodeHealth.mb(m.archiveBytes)
                 + ", heap " + NodeHealth.mb(m.heapUsed) + " of " + NodeHealth.mb(m.heapMax)
+                + (m.blockingGcPerHour < 0 ? "" : ", blocking GC " + m.blockingGcPerHour + "/hr")
                 + ", mempool " + m.mempool;
+    }
+
+    /**
+     * Blocking GCs per hour since the previous check.
+     *
+     * art.gc.blocking-gc-count is cumulative and process-wide, so unlike an instantaneous heap
+     * reading it cannot miss what happened between two samples - which is the whole reason this
+     * exists. A struggling node's heap is a sawtooth (measured: floor 55-76 MB, peaks to 411 MB,
+     * over 21 hours), so hourly snapshots of Runtime mostly catch the floor and report a healthy
+     * number while companion apps are timing out.
+     *
+     * Returns -1 on the first call (no previous sample to difference against) and on anything
+     * unexpected. -1 means "unknown", and NodeHealth.classify treats unknown as no signal rather
+     * than as good news.
+     */
+    private static synchronized long blockingGcPerHour(long nowMillis) {
+        try {
+            String raw = android.os.Debug.getRuntimeStat("art.gc.blocking-gc-count");
+            if (raw == null) return -1;
+
+            long count   = Long.parseLong(raw.trim());
+            long prev    = sLastGcCount;
+            long prevAt  = sLastGcAt;
+            sLastGcCount = count;
+            sLastGcAt    = nowMillis;
+
+            //First sample, or a counter that went backwards (process restarted under us)
+            if (prev < 0 || count < prev) return -1;
+
+            long elapsed = nowMillis - prevAt;
+            //A clock that jumped, or two checks in the same instant - no usable rate
+            if (elapsed < 60_000L) return -1;
+
+            return ((count - prev) * 3_600_000L) / elapsed;
+
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     // --- automatic path -------------------------------------------------------------

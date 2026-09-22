@@ -10,6 +10,22 @@ No code change was made. This is a report for whoever picks up the fix.
 > before acting on the H2 cache lead, which turns out to be a fifth of the problem rather than
 > the cause.
 
+> **Update 2026-09-22 — fixed, and one correction.** This document's diagnosis holds: store
+> growth is the driver and a resync is what clears it. What it could not say is *why* the store
+> grows without bound. `TxPoWSqlDB`'s only DELETE carried `AND isrelevant=0`, so a row once
+> marked relevant could never be removed by anything — not the routine 3-day clean, not
+> `cleanDB(true)`, not a restart. Fixed in minimacore **1.6.35-ui-h2** (node source
+> `b8a3af42`): relevant rows now age out on their own longer window
+> (`NUMBER_DAYS_RELEVANT_SQLTXPOWDB`, default 30 days), and `coins` gained a `max:` bound plus a
+> heap watermark so no single read can spike the heap.
+>
+> A 21-hour sampling run (`diag/heapwatch.sh`) added the mechanism this document was missing:
+> the post-GC floor stays **flat** at 55-76 MB while peaks climb 92 -> 411 MB and blocking GCs
+> go 50 -> 1104. Nothing is retained — the node allocates faster than it can collect. That also
+> corrects a claim made on 2026-09-21 that the store driver had been removed; that rested on
+> `dumpsys diskstats`, which this repo already knew to be stale, while the node's own health
+> monitor said 583 MB.
+
 ## What the user sees
 
 Every companion APK stops working at once — a casino bet that will not resolve, an NFT
