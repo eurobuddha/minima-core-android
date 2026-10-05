@@ -84,10 +84,43 @@ android {
         // every ~50s while the node runs, so NEWBLOCK now asks for a check and the interval
         // (15 min) does the scheduling by turning almost all of them away. The service-start
         // and Alarm calls stay as belt and braces; they are debounced like everything else.
-        versionCode 64
-        versionName "1.6.36-ui-h2"
+        // vc65: upstream 1.1.2.31 merge ("block as key uses"). The bundled minima.jar is a FULL
+        // Gradle rebuild of our fork rebased onto upstream c2a54a2e4 (1.1.2.31-rex1): all eight
+        // of our core patches survive (MegaMMR OOM/streaming/watermarks, signData+sendsign
+        // Winternitz fixes, removeScript cache clear, txpow indexes, relevant-row ageing), plus
+        // a new capacity guard - signing past a key's size^depth now throws instead of wrapping
+        // to leaf 0 (one-time-key reuse). New "block" product flavor = NEW app
+        // (org.minimarex.minimablock, fresh installs only) that forces -blockaskeyuses -lowram
+        // like upstream 1.7; the classic flavor keeps the legacy key system and stays the app
+        // existing wallets run. Same seed produces DIFFERENT addresses across the two systems -
+        // that is why the block app is a separate SKU and never an update.
+        versionCode 65
+        versionName "1.7.0-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    flavorDimensions = ["keymode"]
+    productFlavors {
+        classic {
+            dimension "keymode"
+            // Existing app, existing users, legacy 64x3 keys. applicationId stays the
+            // defaultConfig org.minimarex.minimacore.
+            buildConfigField "boolean", "BLOCK_KEYUSES", "false"
+        }
+        block {
+            dimension "keymode"
+            // NEW SKU - fresh installs only. Forces the upstream block-as-keyuses system
+            // (128x4 trees, keyuses = chain tip block). A classic seed restored here gets
+            // DIFFERENT addresses, so this is never shipped as an update to classic.
+            applicationId "org.minimarex.minimablock"
+            versionNameSuffix "-block"
+            buildConfigField "boolean", "BLOCK_KEYUSES", "true"
+        }
     }
     signingConfigs {
         // Minima family release key. Credentials come from ~/.gradle/gradle.properties

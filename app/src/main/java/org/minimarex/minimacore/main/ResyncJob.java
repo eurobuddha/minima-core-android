@@ -1,5 +1,7 @@
 package org.minimarex.minimacore.main;
 
+import org.minimarex.minimacore.BuildConfig;
+
 import org.minima.system.commands.network.connect;
 import org.minima.utils.messages.Message;
 
@@ -50,7 +52,9 @@ public final class ResyncJob {
      * the node itself defaults to 1000 for the same reason.
      */
     public static final int MIN_KEY_USES = 1000;
-    public static final int MAX_KEY_USES = 262144;
+    //Legacy keys are 64x3 trees (262,144 leaves); the block flavor's keys are 128x4
+    //(268,435,456) and its key uses track the chain tip block number.
+    public static final int MAX_KEY_USES = BuildConfig.BLOCK_KEYUSES ? 268435456 : 262144;
 
     private final Kind kind;
     private final boolean selfShutsDown;

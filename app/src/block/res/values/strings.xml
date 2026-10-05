@@ -1,0 +1,7 @@
+<resources>
+    <!-- Block flavor (org.minimarex.minimablock): forced -blockaskeyuses node. -->
+    <string name="app_name">MinimaBlock</string>
+    <!-- Block mode: keys.maxuses is roughly the last block a key signed at, not a count toward exhaustion. -->
+    <string name="home_keyuses_label">Last key block</string>
+    <string name="restore_intro">Enter your seed phrase, key uses and the address of a Minima MegaMMR node.\n\nWARNING: this app uses the NEW block-as-key-uses key system. A seed from the classic MinimaCore app produces DIFFERENT addresses here — coins held on classic addresses will NOT appear. Sweep funds out of the classic app instead of restoring its seed here.</string>
+</resources>

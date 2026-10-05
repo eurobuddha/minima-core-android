@@ -1,5 +1,7 @@
 package org.minimarex.minimacore.service;
 
+import org.minimarex.minimacore.BuildConfig;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -303,6 +305,16 @@ public class MinimaService extends Service {
         vars.add("-limitbandwidth");
 
         vars.add("-allowallip");
+
+        //Block flavor only: mirror upstream 1.7 - keyuses come from the chain tip block
+        //(-blockaskeyuses, 128x4 trees) and the coin/txblock DBs live in SQL (-lowram).
+        //NEVER add these to the classic flavor: the flag derives DIFFERENT addresses from
+        //the same seed, and a legacy 64x3 key signing under it past block 262,144 would
+        //reuse Winternitz leaves (the jar now refuses, but the flag stays flavor-locked).
+        if(BuildConfig.BLOCK_KEYUSES) {
+            vars.add("-blockaskeyuses");
+            vars.add("-lowram");
+        }
 
         //User-set toggles (ParamsActivity)
         if(pref.getBoolean("PARAM_MEGAMMR", false)){

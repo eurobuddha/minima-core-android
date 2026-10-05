@@ -43,11 +43,13 @@ public class ParamsActivity extends AppCompatActivity {
     public static final String PREF_AUTORESYNC    = "PARAM_AUTORESYNC";
 
     //Flags that must never come in via the free-text field: wipe/seed danger
-    //(-clean/-genesis/-solo wipe data, -seed/-anyseed/-dbpassword touch the wallet)
+    //(-clean/-genesis/-solo wipe data, -seed/-anyseed/-dbpassword touch the wallet,
+    //-blockaskeyuses flips the ENTIRE key system: same seed, different addresses, and
+    //legacy keys driven past 262,144 uses - the key mode is the flavor's decision only)
     //and flags the app manages itself (-data/-basefolder/-conf/-daemon/-noshutdownhook,
     //-server/-isclient collide with the Server toggle non-deterministically).
     private static final String[] BLOCKED_FLAGS = {
-            "-clean", "-genesis", "-solo", "-seed", "-anyseed", "-dbpassword",
+            "-clean", "-genesis", "-solo", "-seed", "-anyseed", "-dbpassword", "-blockaskeyuses",
             "-data", "-basefolder", "-conf", "-daemon", "-noshutdownhook",
             "-server", "-isclient"
     };

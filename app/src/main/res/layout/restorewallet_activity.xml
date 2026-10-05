@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Enter your seed phrase, key uses and the address of a Minima MegaMMR node."
+                android:text="@string/restore_intro"
                 android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                 android:textColor="@color/core_text_mid"
                 android:lineSpacingMultiplier="1.3" />

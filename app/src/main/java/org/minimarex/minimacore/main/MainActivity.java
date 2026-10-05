@@ -1,5 +1,7 @@
 package org.minimarex.minimacore.main;
 
+import org.minimarex.minimacore.BuildConfig;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -567,7 +569,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                             JSONObject resp = (JSONObject) zResult.get("response");
                             int maxuses     = (int) resp.get("maxuses");
 
-                            mFooterLeft.setText("Key Uses:"+maxuses);
+                            mFooterLeft.setText((BuildConfig.BLOCK_KEYUSES ? "Last Key Block:" : "Key Uses:")+maxuses);
 
                         }catch(Exception exc){}
                     }
