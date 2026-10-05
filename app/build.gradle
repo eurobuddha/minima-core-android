@@ -94,8 +94,13 @@ android {
         // like upstream 1.7; the classic flavor keeps the legacy key system and stays the app
         // existing wallets run. Same seed produces DIFFERENT addresses across the two systems -
         // that is why the block app is a separate SKU and never an update.
-        versionCode 65
-        versionName "1.7.0-ui-h2"
+        // vc66: FIX caught on-device - the IPC file-hand-off FileProvider declared the FIXED
+        // authority org.minimarex.minimacore.ipcresponses, so installing the block flavor next
+        // to classic failed with INSTALL_FAILED_CONFLICTING_PROVIDER. The authority now derives
+        // from the applicationId; companion apps are unaffected (they open the granted
+        // content:// URI from the intent, never the constant).
+        versionCode 66
+        versionName "1.7.1-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

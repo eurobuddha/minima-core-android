@@ -40,8 +40,12 @@ public class MinimaReceiver extends BroadcastReceiver {
      * clients) or gets the honest stub (legacy clients). */
     public static final int MAX_RESPONSE_LEN = 100000;
 
-    //Large responses are written here and handed over as a content:// URI
-    public static final String FILE_RESPONSE_AUTHORITY  = "org.minimarex.minimacore.ipcresponses";
+    //Large responses are written here and handed over as a content:// URI.
+    //Derived from the applicationId: a FIXED authority made the classic and block flavors
+    //UNINSTALLABLE side by side (INSTALL_FAILED_CONFLICTING_PROVIDER - two apps cannot declare
+    //the same provider authority). Companions are unaffected: they open the granted content://
+    //URI they receive, they never build one from this constant.
+    public static final String FILE_RESPONSE_AUTHORITY  = org.minimarex.minimacore.BuildConfig.APPLICATION_ID + ".ipcresponses";
     public static final String FILE_RESPONSE_DIR        = "ipcresponses";
     public static final long   FILE_RESPONSE_MAX_AGE_MS = 5 * 60 * 1000;
 

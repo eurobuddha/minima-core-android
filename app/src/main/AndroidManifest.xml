@@ -104,7 +104,7 @@
              explicitly and only to the requesting package -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="org.minimarex.minimacore.ipcresponses"
+            android:authorities="${applicationId}.ipcresponses"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
