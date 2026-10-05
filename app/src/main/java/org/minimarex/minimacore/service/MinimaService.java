@@ -374,6 +374,30 @@ public class MinimaService extends Service {
             Toast.makeText(this, "[!] Minima EXTRA Params Error.. pls fix", Toast.LENGTH_LONG).show();
         }
 
+        //Another Minima node already on our port? Say so - the classic and block apps both
+        //bind 11001, and without this the losing node just dies with a bind error the user
+        //never sees. Informational only: the start proceeds (the other node may be shutting
+        //down). Checked off the main thread - even a localhost connect is network I/O.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try (java.net.Socket s = new java.net.Socket()) {
+                    s.connect(new java.net.InetSocketAddress("127.0.0.1", 11001), 400);
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MinimaService.this,
+                                "[!] Another Minima node is already running on this device "
+                                + "(the other Minima app?). Stop it first - two nodes cannot "
+                                + "share port 11001.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                } catch (java.io.IOException free) {
+                    //Port free - the normal case
+                }
+            }
+        }).start();
+
         //Start her up!
         minima.mainStarter(vars.toArray(new String[0]));
 

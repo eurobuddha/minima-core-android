@@ -99,8 +99,20 @@ android {
         // to classic failed with INSTALL_FAILED_CONFLICTING_PROVIDER. The authority now derives
         // from the applicationId; companion apps are unaffected (they open the granted
         // content:// URI from the intent, never the constant).
-        versionCode 66
-        versionName "1.7.1-ui-h2"
+        // vc67: code-review fixes. The bundled jar is 1.1.2.31-rex2: (1) -lowram nodes silently
+        // IGNORED the state: filter in coin searches (upstream regression, proven live - a
+        // non-matching state value returned every coin); the SQL-CoinDB path now fetches the
+        // full row for the check, so state searches and max:+state behave again. (2) An
+        // over-capacity key is refused BEFORE the block-keyuses counter is advanced and saved,
+        // so a retry loop no longer burns a UserDB write per refusal. App side: both flavors
+        // warn when another Minima node already holds port 11001 (classic + block cannot run
+        // together); the block flavor's restore pre-fills the key-uses floor and relabels the
+        // field (the node derives real uses from the chain tip). NOTE for the CLASSIC flavor:
+        // its first release from this branch ships the full 1.1.2.3->1.1.2.31 core jump and
+        // needs its own device soak before publishing - treat it as a major core upgrade, not
+        // a routine bump.
+        versionCode 67
+        versionName "1.7.2-ui-h2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
