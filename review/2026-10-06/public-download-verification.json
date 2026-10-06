@@ -1,0 +1,59 @@
+{
+  "cid": "bafybeieb7xx3v4dfvtpszl7dxyjde5c52kzvzj7gv32ijoadcjlzydsfl4",
+  "native": [
+    {
+      "name": "AtomiX",
+      "version": "0.1.71",
+      "bytes": 22530842,
+      "sha256": "b598f680ef4313e4123b5cb4e7db925ba3f753797357dcbf449c0a3b556aa468",
+      "url": "https://ipfs.eurobuddha.com/ipfs/bafybeieb7xx3v4dfvtpszl7dxyjde5c52kzvzj7gv32ijoadcjlzydsfl4/apks/AtomiX-0.1.71.apk"
+    },
+    {
+      "name": "minimaCore PandaBear",
+      "version": "1.7.4-PandaBear",
+      "bytes": 20689019,
+      "sha256": "6d2708a0f87adc25484818feccb6e8eba1b50c3ffcbf387b3b9baee6ac211bae",
+      "url": "https://ipfs.eurobuddha.com/ipfs/bafybeieb7xx3v4dfvtpszl7dxyjde5c52kzvzj7gv32ijoadcjlzydsfl4/apks/minima-core-ui-1.7.4.apk"
+    },
+    {
+      "name": "minimaCore BlackBear",
+      "version": "1.7.4-BlackBear",
+      "bytes": 20689591,
+      "sha256": "55b6b1d4a7685e3ee5cde586794107a3264d8eee15cee1d71df6cf3051bc1d27",
+      "url": "https://ipfs.eurobuddha.com/ipfs/bafybeieb7xx3v4dfvtpszl7dxyjde5c52kzvzj7gv32ijoadcjlzydsfl4/apks/minima-block-1.7.4.apk"
+    },
+    {
+      "name": "PandaPools",
+      "version": "0.9.64",
+      "bytes": 17238811,
+      "sha256": "62e2033de017df79759d369492580373527ef9bf5c2e725e8f1a1834b025523c",
+      "url": "https://ipfs.eurobuddha.com/ipfs/bafybeieb7xx3v4dfvtpszl7dxyjde5c52kzvzj7gv32ijoadcjlzydsfl4/apks/pandapools-0.9.64.apk"
+    }
+  ],
+  "mds": [
+    {
+      "name": "PandaPools",
+      "version": "0.6.32",
+      "bytes": 242673,
+      "sha256": "60e47f2c6dbc4aa81e00af6dd9b3b60c859d4b9f24d50dd8be7f6b64f61dcf61",
+      "url": "https://ipfs.eurobuddha.com/ipfs/bafybeieb7xx3v4dfvtpszl7dxyjde5c52kzvzj7gv32ijoadcjlzydsfl4/panda_dapps/external/pandapools/PandaPools_0.6.32.mds.zip"
+    }
+  ],
+  "live_mds_catalogs": [
+    {
+      "url": "https://eurobuddha.com/pandadapps.json",
+      "version": "0.6.32",
+      "sha256": "60e47f2c6dbc4aa81e00af6dd9b3b60c859d4b9f24d50dd8be7f6b64f61dcf61"
+    },
+    {
+      "url": "https://store.eurobuddha.com/pandadapps.json",
+      "version": "0.6.32",
+      "sha256": "60e47f2c6dbc4aa81e00af6dd9b3b60c859d4b9f24d50dd8be7f6b64f61dcf61"
+    },
+    {
+      "url": "https://ipfs.eurobuddha.com/pandadapps.json",
+      "version": "0.6.32",
+      "sha256": "60e47f2c6dbc4aa81e00af6dd9b3b60c859d4b9f24d50dd8be7f6b64f61dcf61"
+    }
+  ]
+}
