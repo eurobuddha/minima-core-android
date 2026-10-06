@@ -1,7 +1,5 @@
 package org.minimarex.minimacore.launcher.restore;
 
-import org.minimarex.minimacore.BuildConfig;
-import org.minimarex.minimacore.main.ResyncJob;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -43,13 +41,6 @@ public class RestoreWalletSyncActivity extends AppCompatActivity {
         mSeedInput      = findViewById(R.id.restorewallet_seed);
         mKeyUsesInput   = findViewById(R.id.restorewallet_keyuses);
         mMegaNode       = findViewById(R.id.restorewallet_megammr);
-
-        //Block mode derives every key use from the chain tip, so the entered value is only a
-        //safety floor the block-derived number immediately dominates. Pre-fill it so nobody
-        //agonises over a field that no longer decides anything.
-        if(BuildConfig.BLOCK_KEYUSES && mKeyUsesInput.getText().toString().trim().isEmpty()) {
-            mKeyUsesInput.setText(String.valueOf(ResyncJob.MIN_KEY_USES));
-        }
 
         Button checkbutton = findViewById(R.id.restorewallet_button_check);
         checkbutton.setOnClickListener(new View.OnClickListener() {

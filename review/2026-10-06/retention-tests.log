@@ -1,0 +1,12 @@
+  OK   seeded 5 rows
+  OK   irrelevant inside the window survives
+  OK   irrelevant past the window is deleted
+  OK   relevant inside the window survives
+  OK   relevant well inside the window survives
+  OK   relevant past the window IS deleted - the whole point of the fix
+  OK   hard clean drops fresh irrelevant rows
+  OK   hard clean does NOT wipe the user's recent history
+  OK   hard clean leaves in-window relevant rows alone
+  OK   a relevant window below the plain one is clamped, not honoured
+
+ALL PASS - 10 checks

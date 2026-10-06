@@ -1,0 +1,30 @@
+Archive contents (dapp.conf must be first):
+-------------------------------------------
+Archive:  PandaPools_0.6.32.mds.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+      388  10-06-2026 09:40   dapp.conf
+   115096  10-06-2026 09:40   index.html
+    15083  09-03-2026 22:33   style.css
+    19150  07-11-2026 12:14   mds.js
+   131722  07-11-2026 12:14   decimal.js
+     5489  09-22-2026 13:24   covenant.js
+     9661  07-11-2026 12:41   curve.js
+    17698  09-03-2026 22:40   calc.js
+     5964  07-11-2026 12:29   router.js
+     8324  09-09-2026 21:05   book.js
+    76202  10-06-2026 09:40   poolmgr.js
+    30520  10-06-2026 09:40   store.js
+     8708  09-09-2026 09:57   history.js
+    15178  08-01-2026 20:29   statement.js
+    21296  07-16-2026 20:31   sha3.js
+     4378  09-09-2026 09:42   receipt-recovery.js
+    19119  09-09-2026 09:57   activity-chain.js
+    30631  10-06-2026 09:40   reserve-recovery.js
+    26138  07-11-2026 16:04   favicon.png
+      737  07-11-2026 19:10   minima.svg
+   231546  10-06-2026 10:04   service.js
+---------                     -------
+   793028                     21 files
+-------------------------------------------
+Built PandaPools_0.6.32.mds.zip

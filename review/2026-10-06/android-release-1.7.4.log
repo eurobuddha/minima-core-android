@@ -1,0 +1,209 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/Users/eurobuddha/.gradle/wrapper/dists/gradle-8.11.1-bin/bpt9gzteqjrbo1mjrsomdt32c/gradle-8.11.1/lib/native-platform-0.22-milestone-26.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preClassicReleaseBuild UP-TO-DATE
+> Task :app:mergeClassicReleaseJniLibFolders UP-TO-DATE
+> Task :minimaapi:preBuild UP-TO-DATE
+> Task :minimaapi:preReleaseBuild UP-TO-DATE
+> Task :minimaapi:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :minimaapi:mergeReleaseNativeLibs NO-SOURCE
+> Task :minimaapi:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :app:mergeClassicReleaseNativeLibs NO-SOURCE
+> Task :app:stripClassicReleaseDebugSymbols NO-SOURCE
+> Task :app:extractClassicReleaseNativeSymbolTables NO-SOURCE
+> Task :app:mergeClassicReleaseNativeDebugMetadata NO-SOURCE
+> Task :minimaapi:prepareReleaseArtProfile UP-TO-DATE
+> Task :app:mergeClassicReleaseArtProfile UP-TO-DATE
+> Task :minimaapi:generateReleaseResValues UP-TO-DATE
+> Task :minimaapi:generateReleaseResources UP-TO-DATE
+> Task :minimaapi:packageReleaseResources UP-TO-DATE
+> Task :minimaapi:parseReleaseLocalResources UP-TO-DATE
+> Task :minimaapi:generateReleaseRFile UP-TO-DATE
+> Task :minimaapi:javaPreCompileRelease UP-TO-DATE
+> Task :minimaapi:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :minimaapi:bundleLibRuntimeToJarRelease UP-TO-DATE
+> Task :app:desugarClassicReleaseFileDependencies UP-TO-DATE
+> Task :app:generateClassicReleaseBuildConfig
+> Task :app:javaPreCompileClassicRelease UP-TO-DATE
+> Task :minimaapi:writeReleaseAarMetadata UP-TO-DATE
+> Task :app:checkClassicReleaseAarMetadata UP-TO-DATE
+> Task :app:generateClassicReleaseResValues UP-TO-DATE
+> Task :app:mapClassicReleaseSourceSetPaths
+> Task :app:generateClassicReleaseResources
+> Task :app:packageClassicReleaseResources
+> Task :app:createClassicReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksClassicRelease UP-TO-DATE
+> Task :minimaapi:extractDeepLinksRelease UP-TO-DATE
+> Task :minimaapi:processReleaseManifest UP-TO-DATE
+> Task :app:parseClassicReleaseLocalResources
+> Task :app:processClassicReleaseMainManifest
+> Task :app:processClassicReleaseManifest
+> Task :minimaapi:compileReleaseLibraryResources UP-TO-DATE
+> Task :minimaapi:bundleLibCompileToJarRelease UP-TO-DATE
+> Task :minimaapi:bundleLibRuntimeToDirRelease UP-TO-DATE
+> Task :app:checkClassicReleaseDuplicateClasses UP-TO-DATE
+> Task :app:mergeClassicReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexClassicRelease UP-TO-DATE
+> Task :app:mergeClassicReleaseShaders UP-TO-DATE
+> Task :app:compileClassicReleaseShaders NO-SOURCE
+> Task :app:generateClassicReleaseAssets UP-TO-DATE
+> Task :minimaapi:mergeReleaseShaders UP-TO-DATE
+> Task :minimaapi:compileReleaseShaders NO-SOURCE
+> Task :minimaapi:generateReleaseAssets UP-TO-DATE
+> Task :minimaapi:mergeReleaseAssets UP-TO-DATE
+> Task :app:mergeClassicReleaseAssets UP-TO-DATE
+> Task :app:compressClassicReleaseAssets UP-TO-DATE
+> Task :app:extractClassicReleaseVersionControlInfo UP-TO-DATE
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :minimaapi:processReleaseJavaRes NO-SOURCE
+> Task :minimaapi:createFullJarRelease UP-TO-DATE
+> Task :minimaapi:extractProguardFiles UP-TO-DATE
+> Task :minimaapi:generateReleaseLintModel UP-TO-DATE
+> Task :minimaapi:prepareLintJarForPublish UP-TO-DATE
+> Task :minimaapi:stripReleaseDebugSymbols NO-SOURCE
+> Task :minimaapi:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :minimaapi:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :minimaapi:extractReleaseAnnotations UP-TO-DATE
+> Task :minimaapi:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :minimaapi:mergeReleaseConsumerProguardFiles UP-TO-DATE
+> Task :minimaapi:mergeReleaseJavaResource UP-TO-DATE
+> Task :minimaapi:syncReleaseLibJars UP-TO-DATE
+> Task :minimaapi:bundleReleaseLocalLintAar UP-TO-DATE
+> Task :minimaapi:lintVitalAnalyzeRelease UP-TO-DATE
+> Task :minimaapi:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :minimaapi:generateReleaseLintVitalModel UP-TO-DATE
+> Task :app:processClassicReleaseJavaRes NO-SOURCE
+> Task :app:mergeClassicReleaseJavaResource UP-TO-DATE
+> Task :app:collectClassicReleaseDependencies UP-TO-DATE
+> Task :app:mergeClassicReleaseResources
+> Task :app:sdkClassicReleaseDependencyData UP-TO-DATE
+> Task :app:validateSigningClassicRelease UP-TO-DATE
+> Task :app:writeClassicReleaseAppMetadata UP-TO-DATE
+> Task :app:writeClassicReleaseSigningConfigVersions UP-TO-DATE
+> Task :app:preBlockReleaseBuild UP-TO-DATE
+> Task :app:mergeBlockReleaseJniLibFolders UP-TO-DATE
+> Task :app:mergeBlockReleaseNativeLibs NO-SOURCE
+> Task :app:stripBlockReleaseDebugSymbols NO-SOURCE
+> Task :app:extractBlockReleaseNativeSymbolTables NO-SOURCE
+> Task :app:mergeBlockReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:mergeBlockReleaseArtProfile UP-TO-DATE
+> Task :app:desugarBlockReleaseFileDependencies UP-TO-DATE
+> Task :app:generateBlockReleaseBuildConfig
+> Task :app:javaPreCompileBlockRelease UP-TO-DATE
+> Task :app:checkBlockReleaseAarMetadata UP-TO-DATE
+> Task :app:generateBlockReleaseResValues UP-TO-DATE
+> Task :app:mapBlockReleaseSourceSetPaths
+> Task :app:generateBlockReleaseResources
+> Task :app:packageBlockReleaseResources
+> Task :app:createBlockReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksBlockRelease UP-TO-DATE
+> Task :app:parseBlockReleaseLocalResources
+> Task :app:processBlockReleaseMainManifest
+> Task :app:processBlockReleaseManifest
+> Task :app:checkBlockReleaseDuplicateClasses UP-TO-DATE
+> Task :app:mergeBlockReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexBlockRelease UP-TO-DATE
+> Task :app:mergeBlockReleaseShaders UP-TO-DATE
+> Task :app:compileBlockReleaseShaders NO-SOURCE
+> Task :app:generateBlockReleaseAssets UP-TO-DATE
+> Task :app:mergeBlockReleaseAssets UP-TO-DATE
+> Task :app:compressBlockReleaseAssets UP-TO-DATE
+> Task :app:extractBlockReleaseVersionControlInfo UP-TO-DATE
+> Task :app:processBlockReleaseJavaRes NO-SOURCE
+> Task :app:mergeBlockReleaseJavaResource UP-TO-DATE
+> Task :app:collectBlockReleaseDependencies UP-TO-DATE
+> Task :app:sdkBlockReleaseDependencyData UP-TO-DATE
+> Task :app:validateSigningBlockRelease UP-TO-DATE
+> Task :app:writeBlockReleaseAppMetadata UP-TO-DATE
+> Task :app:writeBlockReleaseSigningConfigVersions UP-TO-DATE
+> Task :app:preClassicReleaseUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileClassicReleaseUnitTest UP-TO-DATE
+> Task :app:processClassicReleaseUnitTestJavaRes NO-SOURCE
+> Task :app:preBlockReleaseUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileBlockReleaseUnitTest UP-TO-DATE
+> Task :app:processBlockReleaseUnitTestJavaRes NO-SOURCE
+> Task :minimaapi:lintAnalyzeRelease UP-TO-DATE
+> Task :minimaapi:preReleaseUnitTestBuild UP-TO-DATE
+> Task :minimaapi:generateReleaseUnitTestLintModel UP-TO-DATE
+> Task :minimaapi:lintAnalyzeReleaseUnitTest UP-TO-DATE
+> Task :minimaapi:generateReleaseUnitTestStubRFile UP-TO-DATE
+> Task :minimaapi:javaPreCompileReleaseUnitTest UP-TO-DATE
+> Task :minimaapi:compileReleaseUnitTestJavaWithJavac UP-TO-DATE
+> Task :minimaapi:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :minimaapi:testReleaseUnitTest UP-TO-DATE
+> Task :app:processBlockReleaseManifestForPackage
+> Task :app:processClassicReleaseManifestForPackage
+> Task :app:mergeBlockReleaseResources
+> Task :app:processClassicReleaseResources
+> Task :app:processBlockReleaseResources
+
+> Task :app:compileClassicReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :app:dexBuilderClassicRelease
+> Task :app:mergeClassicReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:generateClassicReleaseLintVitalReportModel
+
+> Task :app:compileBlockReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :app:dexBuilderBlockRelease
+> Task :app:mergeBlockReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:generateBlockReleaseLintVitalReportModel
+> Task :app:generateClassicReleaseLintReportModel
+> Task :app:generateBlockReleaseLintReportModel
+> Task :app:optimizeClassicReleaseResources
+> Task :app:bundleClassicReleaseClassesToCompileJar
+> Task :app:bundleClassicReleaseClassesToRuntimeJar
+> Task :app:bundleBlockReleaseClassesToCompileJar
+> Task :app:bundleBlockReleaseClassesToRuntimeJar
+> Task :app:lintVitalAnalyzeClassicRelease
+> Task :app:compileClassicReleaseUnitTestJavaWithJavac UP-TO-DATE
+> Task :app:lintVitalReportClassicRelease SKIPPED
+> Task :app:lintVitalClassicRelease SKIPPED
+> Task :app:lintVitalAnalyzeBlockRelease
+> Task :app:testClassicReleaseUnitTest
+> Task :app:lintVitalReportBlockRelease SKIPPED
+> Task :app:lintVitalBlockRelease SKIPPED
+> Task :app:compileBlockReleaseUnitTestJavaWithJavac UP-TO-DATE
+> Task :app:mergeDexClassicRelease
+> Task :app:mergeDexBlockRelease
+> Task :app:testBlockReleaseUnitTest
+> Task :app:generateClassicReleaseUnitTestLintModel
+> Task :app:generateBlockReleaseUnitTestLintModel
+> Task :app:optimizeBlockReleaseResources
+> Task :app:compileBlockReleaseArtProfile
+> Task :app:compileClassicReleaseArtProfile
+> Task :app:packageBlockRelease
+> Task :app:createBlockReleaseApkListingFileRedirect
+> Task :app:assembleBlockRelease
+> Task :app:packageClassicRelease
+> Task :app:createClassicReleaseApkListingFileRedirect
+> Task :app:assembleClassicRelease
+> Task :app:lintAnalyzeClassicReleaseUnitTest
+> Task :app:lintAnalyzeClassicRelease
+> Task :app:lintAnalyzeBlockReleaseUnitTest
+
+> Task :app:lintReportClassicRelease
+Wrote HTML report to file:///Users/eurobuddha/Projects/minima/apks/base/app/build/reports/lint-results-classicRelease.html
+
+> Task :app:lintClassicRelease
+> Task :app:lintAnalyzeBlockRelease
+
+> Task :app:lintReportBlockRelease
+Wrote HTML report to file:///Users/eurobuddha/Projects/minima/apks/base/app/build/reports/lint-results-blockRelease.html
+
+> Task :app:lintBlockRelease
+[Incubating] Problems report is available at: file:///Users/eurobuddha/Projects/minima/apks/base/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 11s
+146 actionable tasks: 58 executed, 88 up-to-date

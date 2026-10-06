@@ -52,6 +52,15 @@ public class MinimaAPI {
     private static String MINIMA_ID;
 
     private volatile boolean destroyed;
+    // Discover only by REGISTER; commands (including writes) always target ONE pinned node.
+    private final android.os.Handler main = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final java.util.Map<String, JSONObject> registrations = new java.util.LinkedHashMap<>();
+    private final java.util.List<Runnable> awaitingNode = new java.util.ArrayList<>();
+    private String nodePackage;
+    private boolean discovering;
+    private boolean ambiguous;
+    private int discoveryGeneration;
+    public static final String BLOCK_PACKAGE = "org.minimarex.minimablock";
     Context mContext;
 
     Hashtable<String, MinimaAPIListener> mResponseHandlers = new Hashtable<>();
@@ -109,6 +118,8 @@ public class MinimaAPI {
 
     public void onDestroy(){
         destroyed = true;
+        main.removeCallbacksAndMessages(null);
+        awaitingNode.clear();
         mResponseHandlers.clear();
         try{
             mContext.unregisterReceiver(mMinimaAPIReceiver);
@@ -233,24 +244,62 @@ public class MinimaAPI {
         intent.putExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID, MINIMA_ID);
 
         //Set to send ONLY to the Minima Core APK
-        intent.setPackage(MinimaAPIMessages.MINIMA_BASE_CLASS);
+        intent.setPackage(nodePackage == null ? MinimaAPIMessages.MINIMA_BASE_CLASS : nodePackage);
 
         return intent;
     }
 
     private void Register(MinimaAPIListener zListener){
+        discovering = true;
+        registrations.clear();
+        final int generation = ++discoveryGeneration;
+        final java.util.List<String> requestIds = new java.util.ArrayList<>();
+        for (String target : new String[]{MinimaAPIMessages.MINIMA_BASE_CLASS, BLOCK_PACKAGE}) {
+            Intent intent = getBaseIntent(MinimaAPIMessages.MINIMA_API_REGISTER);
+            intent.setPackage(target);
+            addResponseHandler(intent, reply -> main.post(() -> {
+                if (destroyed || !discovering || generation != discoveryGeneration
+                        || !reply.optBoolean("status", false)) return;
+                registrations.put(target, reply);
+            }));
+            requestIds.add(intent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID));
+            mContext.sendBroadcast(intent);
+        }
+        main.postDelayed(() -> {
+            if (destroyed || generation != discoveryGeneration) return;
+            for (String id : requestIds) mResponseHandlers.remove(id);
+            discovering = false;
+            ambiguous = registrations.size() > 1;
+            nodePackage = registrations.size() == 1 ? registrations.keySet().iterator().next() : null;
+            JSONObject result = nodePackage == null ? routingFailure() : registrations.get(nodePackage);
+            java.util.List<Runnable> waiting = new java.util.ArrayList<>(awaitingNode);
+            awaitingNode.clear();
+            if (zListener != null) zListener.response(result);
+            for (Runnable request : waiting) request.run();
+        }, 1500);
+    }
 
-        //Create the register Intent
-        Intent intent = getBaseIntent(MinimaAPIMessages.MINIMA_API_REGISTER);
+    private JSONObject routingFailure() {
+        return failure(ambiguous
+                ? "Both Minima apps are running. Stop one and reopen this companion. No command was sent."
+                : "No Minima node replied. Start MinimaCore or MinimaBlock and try again. No command was sent.");
+    }
 
-        //Create the Reponse UID
-        addResponseHandler(intent, zListener);
-
-        //And broadcast
-        mContext.sendBroadcast(intent);
+    private void withNode(Runnable request, MinimaAPIListener listener) {
+        if (destroyed) return;
+        if (nodePackage != null) { request.run(); return; }
+        awaitingNode.add(() -> {
+            if (nodePackage != null) request.run();
+            else if (listener != null) listener.response(routingFailure());
+        });
+        if (!discovering) Register(null);
     }
 
     public void Command(String zCommand, MinimaAPIListener zListener){
+        main.post(() -> withNode(() -> sendCommand(zCommand, zListener), zListener));
+    }
+
+    private void sendCommand(String zCommand, MinimaAPIListener zListener){
         if (destroyed) return;
 
         //Create the register Intent
@@ -278,6 +327,10 @@ public class MinimaAPI {
      * @param zUri     put only - a content:// uri this app has granted the node read on, otherwise null
      */
     public void FileCommand(String zAction, String zPath, String zNewPath, Uri zUri, MinimaAPIListener zListener){
+        main.post(() -> withNode(() -> sendFileCommand(zAction, zPath, zNewPath, zUri, zListener), zListener));
+    }
+
+    private void sendFileCommand(String zAction, String zPath, String zNewPath, Uri zUri, MinimaAPIListener zListener){
         if (destroyed) return;
 
         Intent intent = getBaseIntent(MinimaAPIMessages.MINIMA_API_FILE);

@@ -111,8 +111,9 @@ android {
         // its first release from this branch ships the full 1.1.2.3->1.1.2.31 core jump and
         // needs its own device soak before publishing - treat it as a major core upgrade, not
         // a routine bump.
-        versionCode 67
-        versionName "1.7.2-ui-h2"
+        // vc68: independent merge review: safe companion routing and core regression fixes.
+        versionCode 69
+        versionName "1.7.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -125,6 +126,7 @@ android {
     productFlavors {
         classic {
             dimension "keymode"
+            versionNameSuffix "-PandaBear"
             // Existing app, existing users, legacy 64x3 keys. applicationId stays the
             // defaultConfig org.minimarex.minimacore.
             buildConfigField "boolean", "BLOCK_KEYUSES", "false"
@@ -135,7 +137,7 @@ android {
             // (128x4 trees, keyuses = chain tip block). A classic seed restored here gets
             // DIFFERENT addresses, so this is never shipped as an update to classic.
             applicationId "org.minimarex.minimablock"
-            versionNameSuffix "-block"
+            versionNameSuffix "-BlackBear"
             buildConfigField "boolean", "BLOCK_KEYUSES", "true"
         }
     }

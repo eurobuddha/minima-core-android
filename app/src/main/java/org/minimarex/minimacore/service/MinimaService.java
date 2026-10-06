@@ -76,6 +76,7 @@ public class MinimaService extends Service {
     }
     private IBinder mBinder = new MyBinder();
     MinimaService mService;
+    private boolean serviceDestroyed;
 
     public MinimaServiceListener mServiceListener = null;
 
@@ -395,11 +396,14 @@ public class MinimaService extends Service {
                 } catch (java.io.IOException free) {
                     //Port free - the normal case
                 }
+                //Sequence startup after the probe; otherwise it can detect our own node.
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (!serviceDestroyed && !mHaveStartedShutdown) {
+                        minima.mainStarter(vars.toArray(new String[0]));
+                    }
+                });
             }
-        }).start();
-
-        //Start her up!
-        minima.mainStarter(vars.toArray(new String[0]));
+        }, "minima-port-check").start();
 
         //Notify User service is now running!
         Toast.makeText(this, "Minima Service Started", Toast.LENGTH_SHORT).show();
@@ -553,6 +557,7 @@ public class MinimaService extends Service {
 
     @Override
     public void onDestroy() {
+        serviceDestroyed = true;
         super.onDestroy();
 
         //Have started shutdown

@@ -1,0 +1,59 @@
+PASS actual Android receipt fixture recovers identical posted ID
+PASS altered header, wrong hash and malformed parents cannot recover
+PASS MiniNumber signed bytes and fractional scale agree with Java codec
+PASS elapsed blocks, old confirmed status and elapsed time never confirm
+PASS failed receipts beyond 120 are preserved
+PASS old receipt matches only reconstructed identity and requires independent proof
+PASS new receipts retain immutable transaction identity across mining
+PASS withdrawal derives from spent reserves and identical header time on both devices
+PASS all confirmations rotate beyond the former 150-record limit
+PASS transport errors and malformed confirmation replies preserve last verified evidence
+PASS not-found evidence replaces a previous green confirmation
+PASS public address lookup stores third-party transactions outside wallet accounting
+PASS timeline retains old failures and joins exact IDs without using amount/time guesses
+PASS reloaded SQL store preserves original IDs and proof metadata
+PASS a skipped history reply is incomplete and cannot mark backfill or repair finished
+PASS failed public lookup stays visible and never deletes cached transactions
+PASS MDS Activity renders real counts, transaction times and original receipt IDs
+PASS storage read failures retain the last visible snapshot and report the error
+18 tests passed
+✔ tests/activity-chain.test.cjs (1169.178583ms)
+✔ current live reserves beat expired proofs; restore quarantines even a higher current counter (68.934375ms)
+✔ stale snapshot falls back to current archive IDs, validated by receiver before import (34.874042ms)
+✔ wrong-address proof, failed imports and archive outage preserve unresolved recipe and report zero (55.468167ms)
+✔ invalid recipe and covenant address mismatch never track, import or save (21.917875ms)
+✔ failed durable recipe write prevents tracking/import and retains signing hold in memory (8.990334ms)
+✔ crowded address uses saved exact IDs and ordinary reads preserve owner metadata (23.616ms)
+✔ dust and raw token amount never count as fully recovered reserves (21.227416ms)
+✔ actual input script key is checked after delayed key read and newly installed hold (19.679083ms)
+✔ failed signing confirmation keeps latch even if rollback SQL fails; successful retry clears it durably (32.156458ms)
+✔ backup discards proofs if reserves move mid-export and retains current counter floor (28.085125ms)
+✔ archive endpoint and command whitelist reject credential and command injection (9.728417ms)
+✔ headless shipped service blocks signatures for quarantined actual auto signer (17.926917ms)
+✔ old-schema upgrade quarantines existing recipes while an explicitly new pool is trusted (18.953917ms)
+✔ read-only MDS signing never creates pending commands; restore cancels only owned pool transaction IDs (25.078125ms)
+✔ corrupt existing Desktop database cannot be silently replaced (1.218584ms)
+✔ MDS archive stream rejects oversized content and aborts the request (8.706666ms)
+✔ headless refresh validates KMIN and preserves oldest leg age without browser timers (10.984166ms)
+✔ discovery preserves a confirmed signing state; unknown new discovery remains held (25.426042ms)
+✔ foreign cleanup never untracks a recipe restored while a coin reply was delayed (15.667667ms)
+✔ foreign and unchanged owned reserve scans never flush the whole database (20.030959ms)
+✔ Book discovery populates both young reserve ages for the foreground refresh gate (8.73925ms)
+✔ the signing gate names WHICH problem it is (7.868708ms)
+✔ a backup is proven usable before it is handed over (9.158667ms)
+✔ stranding warns early enough to act, and never on an unknown age (7.88275ms)
+✔ a forward that moved only one leg does NOT finish the job (9.851625ms)
+✔ the collect queue is durable and only an empty read clears it (8.161166ms)
+✔ one card per pool, carrying BOTH identifiers and the retire action (14.293958ms)
+✔ no cards at all until ownership is known (14.390167ms)
+✔ retiring a pool hides it without losing anything needed to reclaim it (24.234917ms)
+✔ block-mode keys reach the real signing boundary and recovery confirmation (18.198166ms)
+✔ block-mode support preserves legacy exhaustion and restored-key quarantine (12.880792ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1175.897375

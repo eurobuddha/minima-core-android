@@ -1,0 +1,9 @@
+Minima @ 06/10/2026 09:26:32 [23.5 MB] : Generating Base Private Seed Key
+Minima @ 06/10/2026 09:26:32 [24.5 MB] : Adding base MULTISIG address 0x56FCB91ECCF1E0B31B5ADF7D3374411F4BA1C569685CC945634FB2A23D4554E9
+FAIL custom keyuses 4294967296 refused
+FAIL custom keyuses 0.5 refused
+FAIL custom keyuses -4294967296 refused
+Minima @ 06/10/2026 09:26:34 [185.8 MB] : SqlDB requires re-open : wallet
+FAIL capacity refusal relocks wallet
+FAIL max:1 sendable:true finds later simple coin
+Failures: 5

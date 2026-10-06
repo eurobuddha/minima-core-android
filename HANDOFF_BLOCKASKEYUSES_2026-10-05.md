@@ -1,3 +1,5 @@
+> Follow-up review: [BlackBear findings, fixes and verified local builds](REVIEW_BLACKBEAR_2026-10-06.md). The report supersedes this handoff’s compatibility and review conclusions.
+
 # MinimaBlock Merge Handoff — for independent model review
 
 Session of 2026-10-05 · Minima build family (`~/Projects/minima`) · author: Claude Fable 5, directed by eurobuddha.
