@@ -37,7 +37,7 @@ cd "$(dirname "$0")"
 mkdir -p heapwatch-out
 while :; do
   for s in $(adb devices | awk 'NR>1 && $2=="device"{print $1}'); do
-    mem=$(adb -s "$s" shell dumpsys meminfo org.minimarex.minimacore 2>/dev/null) || continue
+    mem=$(adb -s "$s" shell dumpsys meminfo com.eurobuddha.minimacore 2>/dev/null) || continue
     alloc=$(echo "$mem" | awk '/Dalvik Heap/{print $3}')
     size=$(echo "$mem"  | awk '/Dalvik Heap/{print $8}')
     pss=$(echo "$mem"   | awk '/TOTAL PSS:/{print $3}')

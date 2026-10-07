@@ -1,0 +1,23 @@
+{
+  "ci": "https://github.com/eurobuddha/minimaDesk/actions/runs/37643351525",
+  "commit": "2788490115935013e7f55ff1060b80f569c6344a",
+  "all_platforms_passed": true,
+  "artifacts": [
+    {
+      "path": "/Users/eurobuddha/Projects/minima/desktop/minimaDesk/dist/ci-0.7.74/minimadesk-linux/minimaDesk-0.7.74.AppImage",
+      "size": 245030235,
+      "sha256": "6f2a41945a5ab82abc9db6e35edd276130810a25f0bb2cdaa38ff8b8f91fcffa"
+    },
+    {
+      "path": "/Users/eurobuddha/Projects/minima/desktop/minimaDesk/dist/ci-0.7.74/minimadesk-mac/minimaDesk-0.7.74-arm64.dmg",
+      "size": 231671047,
+      "sha256": "11bc42cdd2017c00f81d3d23d369fbc991e1e50076d74cd25cce695f81f5840d"
+    },
+    {
+      "path": "/Users/eurobuddha/Projects/minima/desktop/minimaDesk/dist/ci-0.7.74/minimadesk-win/minimaDesk Setup 0.7.74.exe",
+      "size": 210135700,
+      "sha256": "155d7289f4addde88dcf0523842420ccb6e470cc5efcac4eb4ae8f8526eb8f52"
+    }
+  ],
+  "mac_release_candidate": "Use the separately verified, signed and notarized local DMG in minimadesk-0.7.74-artifact.json."
+}
