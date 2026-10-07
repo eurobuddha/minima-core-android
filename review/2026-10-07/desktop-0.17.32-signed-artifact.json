@@ -1,0 +1,16 @@
+{
+  "path": "/Users/eurobuddha/Projects/minima/desktop/minimacore-desktop/dist/minimaCore-0.17.32-arm64.dmg",
+  "size": 164669848,
+  "sha256": "6694b77f6013c8c0d1e02888a257f048fb4cf1a3dd8cdbfdbf5699df7bb70ae6",
+  "version": "0.17.32",
+  "checks": [
+    "Developer ID",
+    "hardened runtime",
+    "strict deep signature",
+    "app notarization staple",
+    "DMG notarization staple",
+    "Gatekeeper app and DMG"
+  ],
+  "log": "review/2026-10-07/desktop-0.17.32-signed-build.log",
+  "published": false
+}

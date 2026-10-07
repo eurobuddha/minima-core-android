@@ -1,0 +1,17 @@
+[
+  {
+    "path": "/Users/eurobuddha/Projects/minima/desktop/pandaget-desktop/dist/ci-0.1.3/pandaget-desktop-linux/PandaGet-0.1.3.AppImage",
+    "sha256": "a09009d18f0b4aff7c026807487244dcd2b02b6284694758cc85329aa5f611ce",
+    "size": 109060724
+  },
+  {
+    "path": "/Users/eurobuddha/Projects/minima/desktop/pandaget-desktop/dist/ci-0.1.3/pandaget-desktop-win/PandaGet Setup 0.1.3.exe",
+    "sha256": "d4b63864a7e36dbb1ff4aae24ba3cb9d80dc639959b5fbae460b4bec59d62432",
+    "size": 81955053
+  },
+  {
+    "path": "/Users/eurobuddha/Projects/minima/desktop/pandaget-desktop/dist/ci-0.1.3/pandaget-desktop-mac/PandaGet-0.1.3-arm64.dmg",
+    "sha256": "94c04ea5b0f05aae2e239a1895660360400fd4317d31001f303d419bc5900be5",
+    "size": 107955374
+  }
+]

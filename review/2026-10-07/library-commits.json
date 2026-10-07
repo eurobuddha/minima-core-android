@@ -1,0 +1,207 @@
+[
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/futurecash",
+    "commit": "44cfc2d82d5441f42160c7dc3314f9296df84b6a",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/keyreuses",
+    "commit": "2e560dedb3476dc3b5a87910234f89194cfc7818",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/vestr",
+    "commit": "89724c02586b76460be9bf668616c4171e5b52ae",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/desktop/minimacore-desktop",
+    "commit": "3f4b1896bb5b849c2198492b012ee6c19aa00846",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/mail",
+    "commit": "7532629d70a725b63ce65af494edf0d9359f001e",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/pandapools",
+    "commit": "1b1079ea1161096969c0e23f8b1d05848282ba28",
+    "pushed_to": "origin/review/0.8.9"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/maxima/build/account-import",
+    "commit": "63a72dad034bf5f255a7fe47ea10bd4360887acc",
+    "pushed_to": "origin/feature/chat-actions-2026-10-04"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/futurecash-next",
+    "commit": "f8d09620156320242f54b8c7d2e212dac0ee8419",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/entropy",
+    "commit": "a8a3cd7e308d010dbe05ce3bb0bbe2423e0b7ae9",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/blockexplorer",
+    "commit": "27a3e677fe3d7a981a83f07d85e928d3987c473f",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/terminalide",
+    "commit": "740fcd3885e4e1a51d5d712489d378e9bcfd9268",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/nftstudio",
+    "commit": "87f8b225565987dfdb156de73bf909dafab08a66",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/history",
+    "commit": "d548a073a5bd832c295c8bada6c2b6db4654d5f7",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/ethwallet",
+    "commit": "a970a56776df39a09d31e0ab063e9b9bd990414b",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/atomix",
+    "commit": "3e787c143ae21c43db98becfc4d946438bfa58b1",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/NFTwallet",
+    "commit": "6bed343693efb82f24767bfd73042399a97b7c11",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/filez",
+    "commit": "b1dc65db98c45bc9acdde52786aa119a0501c04a",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/minimaswap",
+    "commit": "26709e6cf46f1e1f06877e0db917ebb342c7c34a",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/merchinbox",
+    "commit": "1e9a202a54ff1a6b81a351c860b6a3394493ef5e",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/salon",
+    "commit": "f216ab135b4cd5e8bdea56a2681b023d142e5824",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/limit",
+    "commit": "b3b99dd67addd793f0e7ceb8afaf46f0e6aa41cc",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/casino",
+    "commit": "5a6a5d6915b40482c344c2eb7afe14e8f3a30752",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/terminal",
+    "commit": "bd856fc65573cc81f719823ab18740611a293dbc",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/usdtswap",
+    "commit": "e9225e13bfc3484a16bd46b95b433acafa3374f6",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/utxo",
+    "commit": "c3e69c4ff11a1af7b410e7a873bc675c79a5ae90",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/faucet",
+    "commit": "9a8a05616b5df1b633595a2eb522f7810717934a",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/expert",
+    "commit": "601eba6e1cf1ecbd75f34135b08a3d6764ed061d",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/merchshop",
+    "commit": "4155530edf2b2acfb55d86946072cea6942daaf7",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/pandadex",
+    "commit": "76001ab870d770dab7705757c2a19be4bd5c0d28",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/pandaapps",
+    "commit": "b149b930fa0ca49a183e2f6291aacbd1fa11c8b9",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/openly",
+    "commit": "9ea5508b5470d0ca7c2ad05f7d9f3fd432757e1a",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/merchstudio",
+    "commit": "69aa5d8b0a80fb123f267b1957c490e6257a2a47",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/mininotes/minimaDocs",
+    "commit": "b1b71c5b95902528ecff709b306d13691cd5cd71",
+    "pushed_to": "origin/minimadocs"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/mds/statenft-suite",
+    "commit": "2a9a6aefa672187b29ce3bf64a9de23dc98b3fe4",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/mininotes/mininotes",
+    "commit": "b000a9509aa044858909ca859c715ade0120a876",
+    "push_pending": "Configured origin belongs to mininotesorg; need user-owned destination"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/pocketweb",
+    "commit": "1f30e6f7a46f72348d91d8aa7d5b13adcafa7231",
+    "push_pending": "No configured remote"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/desktop/minima-core-apks",
+    "commit": "8e7f9b46794454f7aa7c1eac61b7ff96278640fa",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/desktop/pandaget-desktop",
+    "commit": "65878c17f4d3a347777b3f60a0741221d9bf0399",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/base",
+    "commit": "f7bcb5bdbed3b5be898d2d279ad10499f89ddb4b",
+    "pushed_to": "fork/ui/full-redesign"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/core/minima-core/merge-1.1.2.31",
+    "commit": "c81f326f76f588f4a6b02fa0903a24dc2fb05f8b",
+    "pushed_to": "fork/merge/upstream-1.1.2.31"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/desktop/minimacore-appstore",
+    "commit": "c91bbb0d2ddaa7c784e3b6d04771577adb324d93",
+    "pushed_to": "origin/main"
+  }
+]

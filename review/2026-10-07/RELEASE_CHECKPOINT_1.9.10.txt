@@ -1,0 +1,30 @@
+Release checkpoint — 2026-10-07
+
+Completed and pushed in this continuation:
+- Core 1.1.2.31-euro4: c81f326f7, fork/merge/upstream-1.1.2.31.
+- Android Core 1.9.10 (81): f7bcb5b, fork/ui/full-redesign.
+  PandaBear, BlackBear and Pandamonium APKs built and verified. Ownership filtering before max: fixed.
+  244 Core Java tests; 113/113/115 Android tests; five ownership checks; existing signing/search/database checks pass.
+- PandaGet Desktop 0.1.3: 65878c1, origin/main. Four regression tests pass; all three platform builds pass.
+  Required checksums, rejected overlapping same-destination downloads, disk backpressure respected.
+  macOS bundle and DMG signed, notarized, stapled and accepted by Gatekeeper.
+- Minima Core Desktop 0.17.32: previously pushed 3f4b1896; signed/notarized/stapled macOS installer completed here.
+  Windows/Linux/macOS CI artifacts downloaded; signed local DMG is the macOS release candidate.
+- MiniDapp store 0.3.2: c91bbb0, origin/main. Quoted validated install path reused from minimaDesk.
+  Three regression tests pass; versioned archive inspected; not published.
+- Current Wallet unit suite: 39 passing. Current NFT Wallet suite: 59 passing (up-to-date).
+- minimaDesk Parlons/retired-host suites: nine passing.
+
+Owner decisions received:
+- Review and finish Core 1.9.10 in this task.
+- Keep the already-live Minima Wallet 0.2.12 catalogue listing.
+
+Remaining decisions and work:
+- Store selection question submitted for Core 1.9.10 (all three), Core Desktop 0.17.32, PandaGet Desktop 0.1.3.
+- PocketWeb has no remote; original Mininotes points to mininotesorg. Destination question pending.
+- Original Mininotes artifact remains unsigned; do not publish it as a signed family update.
+- Full-library audit remains open; current source/tests and historical compatibility checks do not prove every financial workflow.
+- MiniDapp store 0.3.2 and remaining companion candidates await separate publication selection.
+
+Fold remains on owner-confirmed working Pandamonium 1.9.9. No further device operations here.
+No historical release binaries, backups, node data or Git history purged.
