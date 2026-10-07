@@ -22,3 +22,17 @@ dependencyResolutionManagement {
 rootProject.name = "Minima Core"
 include ':app'
 include ':minimaapi'
+
+// Reviewed source snapshots of the existing native companion apps.
+['ethwallet','atomix','pandapools','futurecash-next','pandadex','casino','blockexplorer','filez','history','vestr','entropy','terminalide','mail'].each { feature ->
+    include ":integrated-${feature}"
+    project(":integrated-${feature}").projectDir = file("integrated/${feature}")
+}
+
+// Standalone Mail with the updated SDK, only for cross-APK compatibility verification.
+if (providers.gradleProperty('companionReview').isPresent()) {
+    include ':review-companion-mail'
+    project(':review-companion-mail').projectDir = file('review/companion-mail')
+    include ':review-companion-pandadex'
+    project(':review-companion-pandadex').projectDir = file('review/companion-pandadex')
+}

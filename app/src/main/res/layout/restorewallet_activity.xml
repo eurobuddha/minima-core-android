@@ -40,6 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:id="@+id/restorewallet_intro"
                 android:text="@string/restore_intro"
                 android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                 android:textColor="@color/core_text_mid"

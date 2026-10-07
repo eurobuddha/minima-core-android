@@ -1,0 +1,9 @@
+<resources>
+    <!-- Block mode by default; Classic mode is selectable in Startup Params. -->
+    <string name="app_name">Minima Core</string>
+    <!-- Block mode: keys.maxuses is roughly the last block a key signed at, not a count toward exhaustion. -->
+    <string name="home_keyuses_label">Last key block</string>
+    <!-- Block mode: the node derives key uses from the chain tip; this value is only a safety floor. -->
+    <string name="restore_keyuses_label">Key uses (above every previously used index)</string>
+    <string name="restore_intro">Enter your seed phrase, key uses and the address of a Minima MegaMMR node. Match the original wallet mode in Startup Params before restoring: the same seed produces different addresses in classic and block modes.\n\nEnter a key-use floor above every index previously used by that wallet. The current chain height alone does not prove an index is unused. Stop the original wallet before restoring.</string>
+</resources>

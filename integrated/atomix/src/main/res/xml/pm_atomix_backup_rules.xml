@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Legacy (API < 31) Auto Backup rules. allowBackup="false" already disables backup, but these excludes are
+   kept explicit so the intent survives anyone flipping that flag back:
+
+   NOTHING in this app may leave the device. The prefs hold the swap identity (swap_addr/swap_pk) and the
+   databases hold `secrets` — the HTLC claim preimages. A cloud restore of either is harmful: it re-plants an
+   identity the node may no longer own (which is exactly how a user's 0.1.19 halt survived a full
+   uninstall + node reset + reinstall), and it copies spend-authorising material off-device.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="database" path="." />
+    <exclude domain="file" path="." />
+    <exclude domain="external" path="." />
+    <exclude domain="root" path="." />
+</full-backup-content>

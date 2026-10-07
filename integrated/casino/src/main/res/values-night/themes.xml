@@ -1,0 +1,11 @@
+<resources>
+    <style name="pm_casino_Theme.Casino" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/pm_casino_gold</item>
+        <item name="colorOnPrimary">@color/pm_casino_bg</item>
+        <item name="colorSecondary">@color/pm_casino_cyan</item>
+        <item name="android:colorBackground">@color/pm_casino_bg</item>
+        <item name="android:statusBarColor">@color/pm_casino_bg</item>
+        <item name="android:navigationBarColor">@color/pm_casino_bg</item>
+        <item name="android:windowBackground">@color/pm_casino_bg</item>
+    </style>
+</resources>

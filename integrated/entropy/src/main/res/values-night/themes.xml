@@ -1,0 +1,9 @@
+<resources>
+    <style name="pm_entropy_Theme.Entropy" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/pm_entropy_gold</item>
+        <item name="colorSecondary">@color/pm_entropy_cyan</item>
+        <item name="android:windowBackground">@color/pm_entropy_bg</item>
+        <item name="android:statusBarColor">@color/pm_entropy_bg</item>
+        <item name="android:navigationBarColor">@color/pm_entropy_bg</item>
+    </style>
+</resources>

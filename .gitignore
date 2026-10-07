@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+/integrated/**/build/
+/review/pandamonium-emulator/

@@ -1,0 +1,32 @@
+[
+  {
+    "build": "PandaBear",
+    "package": "com.eurobuddha.minimacore",
+    "version": "1.9.10-PandaBear",
+    "versionCode": 81,
+    "path": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-PandaBear-1.9.10.apk",
+    "sha256": "472bd4ceeb494d94c752b8e9be060f9a369be5a147355a6edbf14eba296c16b3",
+    "signer": "eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f",
+    "namespace_scan": "passed"
+  },
+  {
+    "build": "BlackBear",
+    "package": "com.eurobuddha.minimablock",
+    "version": "1.9.10-BlackBear",
+    "versionCode": 81,
+    "path": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-BlackBear-1.9.10.apk",
+    "sha256": "f960490195423eff9d8ea11b2cbde1055e4f95fb680781be4745740b2f4bb9b9",
+    "signer": "eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f",
+    "namespace_scan": "passed"
+  },
+  {
+    "build": "Pandamonium",
+    "package": "com.eurobuddha.pandamonium",
+    "version": "1.9.10-Pandamonium",
+    "versionCode": 81,
+    "path": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-1.9.10.apk",
+    "sha256": "38301193a655d7c971abf959bbcec7a5764b76edf31ad2e78b5c2e5c0ff6430f",
+    "signer": "eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f",
+    "namespace_scan": "passed"
+  }
+]

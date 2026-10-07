@@ -91,7 +91,7 @@
 
         <!-- SERVICES -->
         <service
-            android:name="org.minimarex.minimacore.service.MinimaService"
+            android:name="com.eurobuddha.minimacore.service.MinimaService"
             android:foregroundServiceType="specialUse"
             android:enabled="true"
             android:exported="false">

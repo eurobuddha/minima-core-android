@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <queries>
+        <package android:name="com.eurobuddha.minimacore" />
+    </queries>
+    <application>
+        <activity android:name="com.eurobuddha.vestr.MainActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo">
+            </activity>
+        <activity android:name="com.eurobuddha.vestr.CreateContractActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo" />
+        <activity android:name="com.eurobuddha.vestr.ContractDetailActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo" />
+        <activity android:name="com.eurobuddha.vestr.CalculatorActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo" />
+    </application>
+</manifest>

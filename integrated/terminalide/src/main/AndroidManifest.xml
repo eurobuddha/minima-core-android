@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity android:name="com.eurobuddha.terminalide.MainActivity" android:windowSoftInputMode="adjustResize" android:exported="false" android:theme="@style/pm_terminalide_Theme.Terminal">
+            </activity>
+        <activity android:name="com.eurobuddha.terminalide.ide.ScriptEditorActivity" android:windowSoftInputMode="adjustResize" android:exported="false" android:parentActivityName="com.eurobuddha.terminalide.MainActivity" android:theme="@style/pm_terminalide_Theme.Terminal" />
+        <provider android:name="com.eurobuddha.terminalide.IntegratedFileProvider" android:authorities="${applicationId}.terminalide.fileprovider" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/pm_terminalide_file_paths" />
+        </provider>
+    </application>
+</manifest>

@@ -1,0 +1,31 @@
+package com.eurobuddha.vestr;
+
+import org.json.JSONObject;
+
+/** One row of the node's "balance" command: an aggregate per token, with full metadata. */
+public class TokenBalance {
+
+    public String tokenid;
+    public TokenMeta meta;
+    public String name;          // convenience = meta.name
+    public String confirmed;
+    public String unconfirmed;
+    public String sendable;
+    public String total;
+    public int coins;
+
+    public static TokenBalance from(JSONObject b) {
+        TokenBalance t = new TokenBalance();
+        t.tokenid     = b.optString("tokenid", Util.MINIMA_TOKENID);
+        t.meta        = TokenMeta.parse(b.opt("token"), t.tokenid);
+        t.name        = t.meta.name;
+        t.confirmed   = b.optString("confirmed", "0");
+        t.unconfirmed = b.optString("unconfirmed", "0");
+        t.sendable    = b.optString("sendable", t.confirmed);
+        t.total       = b.optString("total", t.confirmed);
+        t.coins       = b.optInt("coins", 0);
+        // balance entries sometimes carry decimals at the top level
+        if (t.meta.decimals.isEmpty()) t.meta.decimals = b.optString("decimals", "");
+        return t;
+    }
+}

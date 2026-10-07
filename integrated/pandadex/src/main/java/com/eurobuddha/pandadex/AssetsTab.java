@@ -1,0 +1,160 @@
+package com.eurobuddha.pandadex;
+
+import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.view.Gravity;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Map;
+
+/** ASSETS tab: node wallet balances using sendable / confirmed / locked / unconfirmed,
+ *  receive address, and the MxUSD bridge pointer. */
+@SuppressLint("ViewConstructor")
+public final class AssetsTab extends LinearLayout {
+
+    private final MainActivity act;
+    private final LinearLayout body;
+
+    public AssetsTab(MainActivity act) {
+        super(act);
+        this.act = act;
+        setOrientation(VERTICAL);
+        int pad = Design.dp(act, 12);
+        setPadding(pad, pad, pad, pad);
+        body = new LinearLayout(act);
+        body.setOrientation(VERTICAL);
+        addView(body);
+    }
+
+    private TextView t(String s, int color, float size, android.graphics.Typeface tf) {
+        TextView v = new TextView(getContext());
+        v.setText(s);
+        v.setTextColor(color);
+        v.setTextSize(size);
+        v.setTypeface(tf);
+        return v;
+    }
+
+    private LinearLayout card() {
+        LinearLayout c = new LinearLayout(getContext());
+        c.setOrientation(VERTICAL);
+        c.setBackground(Design.card(getContext(), 12));
+        int p = Design.dp(getContext(), 12);
+        c.setPadding(p, p, p, p);
+        LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        lp.bottomMargin = Design.dp(getContext(), 10);
+        body.addView(c, lp);
+        return c;
+    }
+
+    public void render() {
+        body.removeAllViews();
+
+        if (act.interruptedWrite()) {
+            LinearLayout pause = card();
+            pause.addView(t("SIGNING PAUSED", Design.ACCENT(), 12f, Design.sansBold()));
+            pause.addView(t("A node write lost its reply. It may have completed.", Design.TEXT(), 12f, Design.sans()));
+            TextView resolve = t("Resolve interrupted write", Design.ACCENT(), 14f, Design.sansBold());
+            resolve.setPadding(0, Design.dp(getContext(), 16), 0, Design.dp(getContext(), 16));
+            resolve.setOnClickListener(v -> act.resolveInterruptedWrite()); pause.addView(resolve);
+        }
+
+        if (act.hasUnresolvedTrade()) {
+            LinearLayout receipt = card();
+            receipt.addView(t("TRADE STILL BEING CHECKED", Design.ACCENT(), 12f, Design.sansBold()));
+            TextView review = t("View submitted receipt and check again", Design.TEXT(), 13f, Design.sans());
+            review.setPadding(0, Design.dp(getContext(), 16), 0, Design.dp(getContext(), 16));
+            review.setOnClickListener(v -> act.reviewUnresolvedTrade()); receipt.addView(review);
+        }
+
+        // locked in my resting orders
+        BigDecimal lockedMinima = BigDecimal.ZERO, lockedUsdt = BigDecimal.ZERO;
+        for (Order5 o : act.book().values()) {
+            if (!o.isMine(act.keys(), act.addrs())) continue;
+            if (o.sell) lockedMinima = lockedMinima.add(o.locked);
+            else lockedUsdt = lockedUsdt.add(o.locked);
+        }
+
+        BigDecimal freeM = act.minimaSendable(), freeU = act.usdtSendable();
+        BigDecimal mid = act.bookMid();
+
+        LinearLayout head = card();
+        head.addView(t("AVAILABLE TO TRADE", Design.DIM(), 10f, Design.sansBold()));
+        boolean balancesLoaded=act.minimaBalanceAtMs()>0&&act.usdtBalanceAtMs()>0;
+        if (balancesLoaded && act.makerBookReady() && mid != null && mid.signum() > 0) {
+            BigDecimal value = freeU.add(freeM.multiply(mid, PriceMath.MC));
+            head.addView(t("≈ " + PriceMath.fmt(value.setScale(4, RoundingMode.HALF_UP)) + " MxUSD",
+                    Design.TEXT(), 22f, Design.monoBold()));
+            head.addView(t("sendable funds only, valued at book mid " + PriceMath.fmtPrice(mid),
+                    Design.DIM2(), 9.5f, Design.sans()));
+        } else {
+            head.addView(t("—", Design.TEXT(), 22f, Design.monoBold()));
+            head.addView(t(balancesLoaded ? "Waiting for a current book price." : "Waiting for wallet balances from MinimaCore.", Design.DIM2(), 9.5f, Design.sans()));
+        }
+
+        assetCard("MINIMA · available to trade", freeM, act.minimaConfirmed(),
+                act.minimaLockedNode(), act.minimaUnconfirmed(), act.minimaCoins(),
+                act.minimaBalanceAtMs(), lockedMinima, true);
+        assetCard("MxUSD · available to trade", freeU, act.usdtConfirmed(),
+                act.usdtLockedNode(), act.usdtUnconfirmed(), act.usdtCoins(),
+                act.usdtBalanceAtMs(), lockedUsdt, false);
+
+        LinearLayout recv = card();
+        recv.addView(t("RECEIVE", Design.DIM(), 10f, Design.sansBold()));
+        String addr = act.receiveAddress();
+        TextView a = t(addr.isEmpty() ? "Address not loaded" : addr, Design.TEXT(), 10f, Design.mono());
+        recv.addView(a);
+        TextView copy = t(addr.isEmpty() ? act.receiveLoadingMessage() : "Tap to copy", Design.ACCENT(), 9.5f, Design.sans());
+        recv.addView(copy);
+        if (!addr.isEmpty()) recv.setOnClickListener(v -> {
+            ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+            if (cm == null) return;
+            cm.setPrimaryClip(ClipData.newPlainText("address", addr));
+            act.toast("Address copied");
+        });
+        if (!addr.isEmpty()) Design.pressable(recv);
+
+        LinearLayout bridge = card();
+        bridge.addView(t("NEED MxUSD?", Design.DIM(), 10f, Design.sansBold()));
+        bridge.addView(t("MxUSD is the wrapped-USDT token on Minima. Bridge in at mxusd.global, "
+                + "or swap ERC20 USDT ↔ MxUSD with AtomiX.", Design.DIM2(), 10f, Design.sans()));
+    }
+
+    private void assetCard(String title, BigDecimal sendable, BigDecimal confirmed,
+                           BigDecimal locked, BigDecimal unconfirmed, int coins,
+                           long updatedAtMs, BigDecimal inDexOrders, boolean minima) {
+        LinearLayout c = card();
+        c.addView(t(title, Design.DIM(), 10f, Design.sansBold()));
+        if(updatedAtMs<=0) {
+            c.addView(t("—", Design.TEXT(), 18f, Design.monoBold()));
+            c.addView(t(act.balanceMessage(minima), Design.DIM2(), 10f, Design.sans()));
+            c.setOnClickListener(v -> act.retryBalances());
+        } else {
+        c.addView(t(PriceMath.fmt(sendable), Design.IN(), 18f, Design.monoBold()));
+        c.addView(t("confirmed " + PriceMath.fmt(confirmed)
+                + "  ·  locked ≈ " + PriceMath.fmt(locked)
+                + "  ·  unconfirmed " + PriceMath.fmt(unconfirmed)
+                + "  ·  " + coins + " coins"
+                + "  ·  updated " + age(updatedAtMs),
+                Design.DIM2(), 9.5f, Design.mono()));
+        }
+        if (inDexOrders.signum() > 0) {
+            c.addView(t((act.makerBookReady() ? "in PandaDEX orders " : "in saved PandaDEX orders ") + PriceMath.fmt(inDexOrders),
+                    Design.ACCENT(), 9.5f, Design.mono()));
+        }
+    }
+
+    private static String age(long updatedAtMs) {
+        if (updatedAtMs <= 0) return "never";
+        long sec = Math.max(0, (System.currentTimeMillis() - updatedAtMs) / 1000);
+        if (sec < 60) return sec + "s ago";
+        long min = sec / 60;
+        if (min < 60) return min + "m ago";
+        return (min / 60) + "h ago";
+    }
+}

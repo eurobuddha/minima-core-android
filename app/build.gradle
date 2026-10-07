@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'org.minimarex.minimacore'
+    namespace 'com.eurobuddha.minimacore'
     compileSdk 36
 
     defaultConfig {
-        applicationId "org.minimarex.minimacore"
+        applicationId "com.eurobuddha.minimacore"
         minSdk 28
         targetSdk 35
         // vc25: unifies the parallel 1.3.2/1.3.3 (vc23/24, Filez session) and 1.4.0/1.4.1
@@ -90,12 +90,12 @@ android {
         // Winternitz fixes, removeScript cache clear, txpow indexes, relevant-row ageing), plus
         // a new capacity guard - signing past a key's size^depth now throws instead of wrapping
         // to leaf 0 (one-time-key reuse). New "block" product flavor = NEW app
-        // (org.minimarex.minimablock, fresh installs only) that forces -blockaskeyuses -lowram
+        // (com.eurobuddha.minimablock, fresh installs only) that forces -blockaskeyuses -lowram
         // like upstream 1.7; the classic flavor keeps the legacy key system and stays the app
         // existing wallets run. Same seed produces DIFFERENT addresses across the two systems -
         // that is why the block app is a separate SKU and never an update.
         // vc66: FIX caught on-device - the IPC file-hand-off FileProvider declared the FIXED
-        // authority org.minimarex.minimacore.ipcresponses, so installing the block flavor next
+        // authority com.eurobuddha.minimacore.ipcresponses, so installing the block flavor next
         // to classic failed with INSTALL_FAILED_CONFLICTING_PROVIDER. The authority now derives
         // from the applicationId; companion apps are unaffected (they open the granted
         // content:// URI from the intent, never the constant).
@@ -112,9 +112,16 @@ android {
         // needs its own device soak before publishing - treat it as a major core upgrade, not
         // a routine bump.
         // vc68: independent merge review: safe companion routing and core regression fixes.
-        versionCode 69
-        versionName "1.7.4"
+        // vc81: the bundled minima.jar separates OWN-WALLET from TRACKED. `balance` (no address:)
+        // now totals only coins at this wallet's own simple addresses - newscript watch scripts
+        // (e.g. minimaWallet's 64 classic addresses) no longer inflate the node wallet's rows,
+        // amounts or coin counts. New `coins own:true` filter for companion apps (NFT wallet)
+        // that mean "the node's coins"; plain `coins relevant:true` still returns tracked coins
+        // for watch-style apps (minimaWallet).
+        versionCode 81
+        versionName "1.9.10"
 
+        buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -128,7 +135,7 @@ android {
             dimension "keymode"
             versionNameSuffix "-PandaBear"
             // Existing app, existing users, legacy 64x3 keys. applicationId stays the
-            // defaultConfig org.minimarex.minimacore.
+            // defaultConfig com.eurobuddha.minimacore.
             buildConfigField "boolean", "BLOCK_KEYUSES", "false"
         }
         block {
@@ -136,9 +143,16 @@ android {
             // NEW SKU - fresh installs only. Forces the upstream block-as-keyuses system
             // (128x4 trees, keyuses = chain tip block). A classic seed restored here gets
             // DIFFERENT addresses, so this is never shipped as an update to classic.
-            applicationId "org.minimarex.minimablock"
+            applicationId "com.eurobuddha.minimablock"
             versionNameSuffix "-BlackBear"
             buildConfigField "boolean", "BLOCK_KEYUSES", "true"
+        }
+        pandamonium {
+            dimension "keymode"
+            applicationId "com.eurobuddha.pandamonium"
+            versionNameSuffix "-Pandamonium"
+            buildConfigField "boolean", "BLOCK_KEYUSES", "true"
+            buildConfigField "boolean", "PANDAMONIUM", "true"
         }
     }
     signingConfigs {
@@ -196,4 +210,22 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+}
+
+// Feature code is linked only into Pandamonium; classic and block keep their existing contents.
+dependencies {
+    pandamoniumImplementation 'androidx.drawerlayout:drawerlayout:1.2.0'
+    pandamoniumImplementation project(':integrated-ethwallet')
+    pandamoniumImplementation project(':integrated-atomix')
+    pandamoniumImplementation project(':integrated-pandapools')
+    pandamoniumImplementation project(':integrated-futurecash-next')
+    pandamoniumImplementation project(':integrated-pandadex')
+    pandamoniumImplementation project(':integrated-casino')
+    pandamoniumImplementation project(':integrated-blockexplorer')
+    pandamoniumImplementation project(':integrated-filez')
+    pandamoniumImplementation project(':integrated-history')
+    pandamoniumImplementation project(':integrated-vestr')
+    pandamoniumImplementation project(':integrated-entropy')
+    pandamoniumImplementation project(':integrated-terminalide')
+    pandamoniumImplementation project(':integrated-mail')
 }

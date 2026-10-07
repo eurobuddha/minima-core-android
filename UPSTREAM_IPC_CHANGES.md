@@ -50,7 +50,7 @@ transport itself has to change for big payloads.
 - New client → new node: the client puts a boolean extra `…CMD_FILERESP=true` on the CMD
   intent. If the result exceeds `MAX_MESSAGE_LEN`, the node writes it to
   `cacheDir/ipcresponses/<responseid>.json`, exposes it via a **non-exported FileProvider**
-  (authority `org.minimarex.minimacore.ipcresponses`), grants **read to exactly the calling
+  (authority `com.eurobuddha.minimacore.ipcresponses`), grants **read to exactly the calling
   package** (`grantUriPermission`, plus ClipData grant for newer Android), and broadcasts
   the normal RESPONSE intent carrying `…RESPONSE_URI` + `…RESPONSE_LEN` instead of
   `…RESPONSE_RESULT`. A file descriptor crosses Binder, not the data — size is effectively
@@ -79,7 +79,7 @@ private `getFilesDir()` — unreachable by any other app, and users have no way 
 files off the device (or to place a restore/import file where the node can see it) without
 adb. Our Filez app needed a supported path.
 
-**Design.** A third broadcast action, `org.minimarex.minimacore.FILE`, alongside REGISTER
+**Design.** A third broadcast action, `com.eurobuddha.minimacore.FILE`, alongside REGISTER
 and CMD, with extras `FILE_ACTION`, `FILE_PATH`, `FILE_NEWPATH`, `FILE_URI`. Actions:
 
 | Action | Behaviour |

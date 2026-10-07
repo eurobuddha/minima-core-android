@@ -1,0 +1,7 @@
+Terminal IDE
+Copyright (c) 2026 eurobuddha — MIT License
+
+This application bundles the prebuilt MinimaAPI IPC library (app/libs/minimaapi.aar)
+from the Minima Core Android project (github.com/spartacusrex-minima/minima-core-android),
+which is licensed under the Apache License, Version 2.0.
+http://www.apache.org/licenses/LICENSE-2.0

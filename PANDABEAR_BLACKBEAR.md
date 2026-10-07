@@ -1,14 +1,14 @@
 # PandaBear and BlackBear: which Minima node should I use?
 
-**PandaBear is the update for existing PandaBear wallets. BlackBear is the separate app for the newer block-as-key-uses wallet mode.** Both run on the same Minima network and include our companion-app, signing-safety and reliability fixes.
+**PandaBear uses classic wallet keys. BlackBear forces block-as-key-uses and low-RAM storage.** Both run on the same Minima network and include our companion-app, signing-safety and reliability fixes.
 
 | | PandaBear | BlackBear |
 | --- | --- | --- |
-| Android package | `org.minimarex.minimacore` | `org.minimarex.minimablock` |
+| Android package | `com.eurobuddha.minimacore` | `com.eurobuddha.minimablock` |
 | Wallet key mode | Classic, per-key signing counter | Block-as-key-uses, based on chain height and persisted counters |
 | Key tree | 64 × 64 × 64: 262,144 leaves per key | 128 × 128 × 128 × 128: 268,435,456 leaves per key |
 | Best fit | Keep using your existing classic wallet and addresses | Start a new wallet in the newer mode |
-| Installation | Updates our existing family-signed PandaBear app | Separate installation and separate app data |
+| Installation | The 1.9.10 build is a separate Android identity from earlier PandaBear releases | The 1.9.10 build is a separate Android identity from earlier BlackBear releases |
 | Storage mode | Existing classic configuration | Low-RAM SQL coin/block storage enabled by default |
 
 ## The important difference: wallet addresses
@@ -30,14 +30,38 @@ In PandaBear, a key's use count advances when that key signs. In BlackBear, the 
 
 Neither mode permits reuse of a one-time signing leaf. Restore with the matching wallet mode, stop the old wallet first, and set a recovery floor above every previously used index. Chain height alone cannot prove that a signing index is unused. Neither mode makes two simultaneously signing copies of the same wallet safe.
 
+## Pandamonium
+
+The application is **Minima Core**; **Pandamonium** is its integrated-app build. It uses
+`com.eurobuddha.pandamonium`. Block-as-key-uses and low-RAM storage are enabled by default.
+Its Classic mode setting removes both startup flags. Changing that setting does not recreate
+existing keys or reset their signing counters. Standalone companion APKs remain supported.
+
 ## Companion apps
 
-AtomiX 0.1.71 and PandaPools Android 0.9.64 include the updated SDK. It discovers which node responds, then sends commands only to that node. If both respond, it refuses commands and asks you to stop one. Older companion APKs may target PandaBear's package explicitly and need an SDK update to connect to BlackBear.
+The updated family SDK discovers PandaBear, BlackBear and Pandamonium by registration, then
+sends commands to one responding node. Multiple responders cause a refusal; commands are
+never broadcast to several nodes. PandaDEX retains its bounded SDK and uses the same
+three-build discovery rule. External apps still require the core's normal enable/admin permissions.
 
-PandaPools MiniDapp 0.6.32 also fixes block-mode key-capacity checks while retaining restored-key quarantine and counter-regression checks.
+## Namespace migration candidate
 
-## This release
+The verified Pandamonium Fold release is **1.9.9**, Android version code **80**, using the existing
+family key. Their application IDs and shared IPC namespace now use `com.eurobuddha`.
 
-PandaBear **1.7.4-PandaBear** and BlackBear **1.7.4-BlackBear** use Android version code **69** and core **1.1.2.31-rex3**. Both are signed with the existing Minima-family key. Their source and regression findings are documented in [the review report](REVIEW_BLACKBEAR_2026-10-06.md).
+**These core candidates cannot update earlier installations in place.** Android treats the new
+application IDs as separate apps, even with the same signing key. Keep the old installation
+until its wallet and app data have been migrated and verified. A seed alone is not a complete
+backup of signing counters, active swaps, pool recovery records or embedded app data.
+Android Keystore-backed data also cannot simply be copied across application identities.
+A complete cross-identity migration has not yet been verified; these builds are not published.
 
-Automated tests, release builds and lint pass. These releases have not had a new multi-day device soak or a mainnet-scale import test. Keep your recovery information before upgrading. The earlier 1.7.3 local builds were review artifacts; these distinctly named 1.7.4 builds are the store release.
+Companions whose application IDs already used `com.eurobuddha` keep those IDs and can receive
+normal signed updates. The standalone Terminal ID also changes, so its installation is separate.
+The companion updates and new cores must be released together; the new SDK targets the new
+family identities and protocol. No compatibility with unrevised APKs or the upstream official
+Core is implied by this namespace migration.
+
+Pandamonium 1.9.9 was installed in place over the already-renamed 1.9.7 build on the Fold and confirmed working by the owner. The separate-identity warning above concerns the earlier namespace migration, not updates between these `com.eurobuddha` versions. Store publication remains pending.
+
+All three 1.9.10 (81) release artifacts have passed local builds, unit tests, release lint and family-signature verification. The reviewed jar is 1.1.2.31-euro4. Its default balance excludes watch-only addresses while companion tracking remains available. The Fold remains on owner-verified 1.9.9; 1.9.10 store publication awaits selection.

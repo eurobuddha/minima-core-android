@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <package android:name="com.eurobuddha.minimacore" />
+    </queries>
+    <application>
+        <activity android:name="com.eurobuddha.entropy.MainActivity" android:exported="false" android:screenOrientation="portrait" android:theme="@style/pm_entropy_Theme.Entropy">
+            </activity>
+    </application>
+</manifest>

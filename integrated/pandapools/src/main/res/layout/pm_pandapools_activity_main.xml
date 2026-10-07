@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:ns2="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:id="@+id/pm_pandapools_main" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@color/pm_pandapools_ux_bg" tools:context=".MainActivity">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingTop="14dp" android:paddingBottom="10dp" android:tag="pandamonium.app.toolbar">
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+            <TextView android:id="@+id/pm_pandapools_brandTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="PandaPools" android:textColor="@color/pm_pandapools_ux_accent" android:textStyle="bold" android:textSize="17sp" />
+            <TextView android:id="@+id/pm_pandapools_brandSub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="LIQUIDITY POOLS" android:textColor="@color/pm_pandapools_ux_subtext" android:textSize="9sp" android:letterSpacing="0.15" />
+        </LinearLayout>
+        <TextView android:id="@+id/pm_pandapools_designToggle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="◐ STYLE" android:textColor="@color/pm_pandapools_ux_accent" android:textSize="11sp" android:letterSpacing="0.08" android:padding="6dp" android:layout_marginEnd="6dp" />
+        <TextView android:id="@+id/pm_pandapools_blockNo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="#—" android:textColor="@color/pm_pandapools_ux_subtext" android:textSize="13sp" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/pm_pandapools_pairingBanner" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@color/pm_pandapools_ux_banner" android:padding="16dp" android:visibility="gone">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="PandaPools is not enabled yet" android:textColor="@color/pm_pandapools_ux_accent" android:textStyle="bold" android:textSize="15sp" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry." android:textColor="@color/pm_pandapools_ux_subtext" android:textSize="13sp" />
+        <Button android:id="@+id/pm_pandapools_openNodeBtn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Open Minima Core" />
+    </LinearLayout>
+    <com.google.android.material.tabs.TabLayout android:id="@+id/pm_pandapools_tabs" android:layout_width="match_parent" android:layout_height="wrap_content" ns2:tabMode="scrollable" ns2:tabGravity="fill" ns2:tabIndicatorColor="@color/pm_pandapools_ux_accent" ns2:tabSelectedTextColor="@color/pm_pandapools_ux_accent" ns2:tabTextColor="@color/pm_pandapools_ux_subtext" />
+    <androidx.viewpager.widget.ViewPager android:id="@+id/pm_pandapools_pager" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+</LinearLayout>

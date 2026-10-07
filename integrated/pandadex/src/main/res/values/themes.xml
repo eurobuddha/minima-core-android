@@ -1,0 +1,42 @@
+<resources>
+    <style name="pm_pandadex_Base.Theme.PandaDex" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
+
+    <style name="pm_pandadex_Theme.PandaDex" parent="pm_pandadex_Base.Theme.PandaDex" />
+
+    
+    <style name="pm_pandadex_DexDialogDark" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:colorBackground">#12151C</item>
+        <item name="android:textColorPrimary">#EEF0F4</item>
+        <item name="android:textColorSecondary">#8B909C</item>
+        <item name="android:colorAccent">#F7931A</item>
+        <item name="android:windowBackground">@drawable/pm_pandadex_dialog_bg_dark</item>
+        
+        <item name="android:buttonBarButtonStyle">@style/pm_pandadex_DexDialogBtnDark</item>
+        <item name="buttonBarButtonStyle">@style/pm_pandadex_DexDialogBtnDarkCompat</item>
+    </style>
+
+    <style name="pm_pandadex_DexDialogBtnDark" parent="android:Widget.Material.Button.Borderless">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+    <style name="pm_pandadex_DexDialogBtnDarkCompat" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="pm_pandadex_DexDialogLight" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorBackground">#FFFFFF</item>
+        <item name="android:textColorPrimary">#181B22</item>
+        <item name="android:textColorSecondary">#8B909C</item>
+        <item name="android:colorAccent">#F7931A</item>
+        <item name="android:windowBackground">@drawable/pm_pandadex_dialog_bg_light</item>
+        <item name="android:buttonBarButtonStyle">@style/pm_pandadex_DexDialogBtnLight</item>
+        <item name="buttonBarButtonStyle">@style/pm_pandadex_DexDialogBtnLightCompat</item>
+    </style>
+
+    <style name="pm_pandadex_DexDialogBtnLight" parent="android:Widget.Material.Light.Button.Borderless">
+        <item name="android:textColor">#181B22</item>
+    </style>
+    <style name="pm_pandadex_DexDialogBtnLightCompat" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">#181B22</item>
+    </style>
+</resources>

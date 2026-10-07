@@ -1,0 +1,6 @@
+<resources>
+    <style name="pm_pandapools_Base.Theme.PandaPools" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
+
+    <style name="pm_pandapools_Theme.PandaPools" parent="pm_pandapools_Base.Theme.PandaPools" />
+</resources>

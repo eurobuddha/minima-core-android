@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <package android:name="com.eurobuddha.minimacore" />
+        <package android:name="com.eurobuddha.pandaapps" />
+    </queries>
+    <application>
+        <activity android:name="com.eurobuddha.filez.MainActivity" android:exported="false" android:theme="@style/pm_filez_Theme.Utxo">
+            </activity>
+    </application>
+</manifest>

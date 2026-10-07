@@ -1,0 +1,10 @@
+<resources>
+    <color name="pm_terminalide_black">#FF000000</color>
+    <color name="pm_terminalide_white">#FFFFFFFF</color>
+    <color name="pm_terminalide_ide_bg">#011627</color>
+    <color name="pm_terminalide_ide_bg_light">#0B2942</color>
+    <color name="pm_terminalide_ide_text">#D6DEEB</color>
+    <color name="pm_terminalide_ide_dim">#697098</color>
+    <color name="pm_terminalide_ide_accent">#82AAFF</color>
+    <color name="pm_terminalide_ide_warn">#F78C6C</color>
+</resources>

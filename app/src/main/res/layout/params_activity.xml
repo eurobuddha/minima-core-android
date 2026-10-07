@@ -45,6 +45,31 @@
                 android:textColor="@color/core_text_mid"
                 android:lineSpacingMultiplier="1.3" />
 
+            <LinearLayout
+                android:id="@+id/params_classic_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/params_switch_classic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/classic_mode_title"
+                    android:textAppearance="@style/TextAppearance.MinimaCore.Body"
+                    android:textColor="@color/core_text" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/classic_mode_description"
+                    android:textAppearance="@style/TextAppearance.MinimaCore.Body"
+                    android:textSize="12sp"
+                    android:textColor="@color/core_text_mid" />
+            </LinearLayout>
+
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/params_switch_server"
                 android:layout_width="match_parent"

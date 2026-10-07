@@ -1,0 +1,40 @@
+<resources>
+    
+    <style name="pm_futurecash_next_Base.Theme.FutureCash" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">#F7931A</item>
+        <item name="colorAccent">#F7931A</item>
+        <item name="android:colorBackground">#0B0D12</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="pm_futurecash_next_Theme.FutureCash" parent="pm_futurecash_next_Base.Theme.FutureCash" />
+
+    
+    <style name="pm_futurecash_next_FcDialogDark" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:colorBackground">#12151C</item>
+        <item name="android:textColorPrimary">#EEF0F4</item>
+        <item name="android:textColorSecondary">#8B909C</item>
+        <item name="android:colorAccent">#F7931A</item>
+        <item name="android:windowBackground">@drawable/pm_futurecash_next_dialog_bg_dark</item>
+        <item name="android:buttonBarButtonStyle">@style/pm_futurecash_next_FcDialogBtnDark</item>
+    </style>
+
+    
+    <style name="pm_futurecash_next_FcDialogBtnDark" parent="android:Widget.Material.Button.Borderless">
+        <item name="android:textColor">#F7931A</item>
+    </style>
+
+    <style name="pm_futurecash_next_FcDialogLight" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorBackground">#FFFFFF</item>
+        <item name="android:textColorPrimary">#181B22</item>
+        <item name="android:textColorSecondary">#8B909C</item>
+        <item name="android:colorAccent">#F7931A</item>
+        <item name="android:windowBackground">@drawable/pm_futurecash_next_dialog_bg_light</item>
+        <item name="android:buttonBarButtonStyle">@style/pm_futurecash_next_FcDialogBtnLight</item>
+    </style>
+
+    <style name="pm_futurecash_next_FcDialogBtnLight" parent="android:Widget.Material.Button.Borderless">
+        <item name="android:textColor">#B25E00</item>
+    </style>
+</resources>

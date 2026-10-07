@@ -1,0 +1,10 @@
+<resources>
+    
+    <style name="pm_vestr_Base.Theme.Utxo" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">#F7931A</item>
+        <item name="colorAccent">#F7931A</item>
+        <item name="android:colorBackground">#0A0A0F</item>
+    </style>
+
+    <style name="pm_vestr_Theme.Utxo" parent="pm_vestr_Base.Theme.Utxo" />
+</resources>

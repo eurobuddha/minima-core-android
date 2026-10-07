@@ -1,0 +1,42 @@
+<resources>
+    <style name="pm_atomix_Base.Theme.Utxo" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
+
+    <style name="pm_atomix_Theme.Utxo" parent="pm_atomix_Base.Theme.Utxo" />
+
+    
+    <style name="pm_atomix_SwapDialogDark" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:colorBackground">#12151C</item>
+        <item name="android:textColorPrimary">#EEF0F4</item>
+        <item name="android:textColorSecondary">#8B909C</item>
+        <item name="android:colorAccent">#F7931A</item>
+        <item name="android:windowBackground">@drawable/pm_atomix_dialog_bg_dark</item>
+        
+        <item name="android:buttonBarButtonStyle">@style/pm_atomix_SwapDialogBtnDark</item>
+        <item name="buttonBarButtonStyle">@style/pm_atomix_SwapDialogBtnDarkCompat</item>
+    </style>
+
+    <style name="pm_atomix_SwapDialogBtnDark" parent="android:Widget.Material.Button.Borderless">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+    <style name="pm_atomix_SwapDialogBtnDarkCompat" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="pm_atomix_SwapDialogLight" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorBackground">#FFFFFF</item>
+        <item name="android:textColorPrimary">#181B22</item>
+        <item name="android:textColorSecondary">#8B909C</item>
+        <item name="android:colorAccent">#F7931A</item>
+        <item name="android:windowBackground">@drawable/pm_atomix_dialog_bg_light</item>
+        <item name="android:buttonBarButtonStyle">@style/pm_atomix_SwapDialogBtnLight</item>
+        <item name="buttonBarButtonStyle">@style/pm_atomix_SwapDialogBtnLightCompat</item>
+    </style>
+
+    <style name="pm_atomix_SwapDialogBtnLight" parent="android:Widget.Material.Light.Button.Borderless">
+        <item name="android:textColor">#181B22</item>
+    </style>
+    <style name="pm_atomix_SwapDialogBtnLightCompat" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">#181B22</item>
+    </style>
+</resources>

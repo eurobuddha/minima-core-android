@@ -1,0 +1,28 @@
+// Imported native feature; see ../sources.lock.json and scripts/import-pandamonium.py.
+plugins { alias(libs.plugins.android.library) }
+android {
+    namespace 'com.eurobuddha.futurecashnext'
+    compileSdk 36
+    defaultConfig {
+        minSdk 28
+        buildConfigField 'String', 'VERSION_NAME', '"0.1.8"'
+        buildConfigField 'int', 'VERSION_CODE', '108'
+    }
+    buildFeatures { buildConfig true }
+    testOptions { unitTests.returnDefaultValues = true }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+dependencies {
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    testImplementation libs.junit
+    implementation 'androidx.work:work-runtime:2.9.1'
+    implementation project(':minimaapi')
+    testImplementation 'org.json:json:20240303'
+}

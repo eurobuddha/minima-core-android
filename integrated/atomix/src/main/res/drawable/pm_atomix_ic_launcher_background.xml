@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AtomiX atom — light ground (#F4F5F8) matching the foreground's ground so the adaptive parallax
+     edges blend seamlessly. The atom motif (Minima mark nucleus + Tether-green electrons) is in the
+     foreground layer, sized to the adaptive safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#F4F5F8"
+        android:pathData="M0,0h108v108h-108z" />
+</vector>

@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:ns1="http://schemas.android.com/apk/res-auto" android:id="@+id/pm_entropy_root" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/pm_entropy_bg">
+    <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="14dp" android:tag="pandamonium.app.toolbar">
+        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:id="@+id/pm_entropy_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:text="ENTROPY" android:textColor="@color/pm_entropy_gold" android:textSize="22sp" android:letterSpacing="0.4" android:textStyle="bold" />
+            <TextView android:id="@+id/pm_entropy_btnSound" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="end|center_vertical" android:gravity="center" android:text="🔊" android:textSize="20sp" />
+            <TextView android:id="@+id/pm_entropy_btnDemo" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="start|center_vertical" android:gravity="center" android:alpha="0.55" android:text="🎥" android:textSize="20sp" />
+        </FrameLayout>
+        <TextView android:id="@+id/pm_entropy_demoBanner" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:background="#40FF2D78" android:padding="8dp" android:text="🎥 DEMO MODE — screen capture &amp; mirroring ALLOWED. Do NOT generate a real seed. Resets on restart." android:textColor="@color/pm_entropy_pink" android:textSize="12sp" android:visibility="gone" />
+        <TextView android:id="@+id/pm_entropy_subtitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:text="PROVABLY FAIR BIP39 SEED DICE" android:textColor="#5A6080" android:textSize="10sp" android:letterSpacing="0.2" />
+        <TextView android:id="@+id/pm_entropy_pairingBanner" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:background="#33FFD700" android:padding="8dp" android:text="The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry." android:textColor="@color/pm_entropy_gold" android:textSize="12sp" android:visibility="gone" />
+    </LinearLayout>
+    <com.google.android.material.tabs.TabLayout android:id="@+id/pm_entropy_tabs" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/pm_entropy_bg" ns1:tabIndicatorColor="@color/pm_entropy_gold" ns1:tabSelectedTextColor="@color/pm_entropy_gold" ns1:tabTextColor="#5A6080" />
+    <androidx.viewpager.widget.ViewPager android:id="@+id/pm_entropy_pager" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+</LinearLayout>

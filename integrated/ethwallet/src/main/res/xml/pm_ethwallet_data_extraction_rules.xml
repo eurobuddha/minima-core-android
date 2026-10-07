@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   See backup_rules.xml. ethwallet_secure is excluded from both cloud backup and device-to-device
+   transfer: its Tink keysets are sealed by a device-bound Keystore key that does not travel with
+   them, so a restored copy is undecryptable and crashes the app on launch.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="ethwallet_secure.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="ethwallet_secure.xml" />
+    </device-transfer>
+</data-extraction-rules>

@@ -1,0 +1,208 @@
+package com.eurobuddha.mail.integratedcomms;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Local, persistent message + contact store (the web ChainMail kept this in MDS.sql; we use Android
+ * SQLite). Messages dedup on (hashref, randomid) so re-scanning the chain never double-inserts.
+ */
+public class CommsDb extends SQLiteOpenHelper {
+
+    private static final String DB = "minima_mail.db";
+    private static final int VERSION = 4;   // v4: + image (base64) on messages
+    private static final String MSG = "messages";
+    private static final String CON = "contacts";
+    private static final String META = "meta";
+
+    public CommsDb(Context ctx) { super(ctx, DB, null, VERSION); }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + MSG + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "hashref TEXT NOT NULL, fromname TEXT, frompublickey TEXT, topublickey TEXT," +
+                "subject TEXT, message TEXT, randomid TEXT NOT NULL," +
+                "incoming INTEGER, read INTEGER, date INTEGER, status TEXT, sentblock INTEGER," +
+                "type TEXT, amount TEXT, tokenid TEXT, tokenname TEXT, txpowid TEXT, image TEXT," +
+                "UNIQUE(hashref, randomid))");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_msg_hashref ON " + MSG + "(hashref)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + CON + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, publickey TEXT UNIQUE)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + META + " (k TEXT PRIMARY KEY, v TEXT)");
+    }
+
+    @Override public void onUpgrade(SQLiteDatabase db, int o, int n) {
+        onCreate(db);
+        for (String col : new String[]{"status TEXT", "sentblock INTEGER",
+                "type TEXT", "amount TEXT", "tokenid TEXT", "tokenname TEXT", "txpowid TEXT", "image TEXT"}) {
+            try { db.execSQL("ALTER TABLE " + MSG + " ADD COLUMN " + col); } catch (Exception ignored) {}
+        }
+    }
+
+    // ----- messages -----
+
+    /** Insert; returns the new row id, or -1 if this (hashref, randomid) was already stored. Idempotent. */
+    public long insert(MailMessage m) {
+        ContentValues v = new ContentValues();
+        v.put("hashref", m.hashref); v.put("fromname", m.fromname);
+        v.put("frompublickey", m.frompublickey); v.put("topublickey", m.topublickey);
+        v.put("subject", m.subject); v.put("message", m.message); v.put("randomid", m.randomid);
+        v.put("incoming", m.incoming ? 1 : 0); v.put("read", m.read ? 1 : 0); v.put("date", m.date);
+        v.put("status", m.status); v.put("sentblock", m.sentblock);
+        v.put("type", m.type); v.put("amount", m.amount); v.put("tokenid", m.tokenid);
+        v.put("tokenname", m.tokenname); v.put("txpowid", m.txpowid); v.put("image", m.image);
+        return getWritableDatabase().insertWithOnConflict(MSG, null, v, SQLiteDatabase.CONFLICT_IGNORE);
+    }
+
+    /** One row per thread = its latest message (SQLite bare-columns picks the MAX(date) row), newest first. */
+    public List<MailMessage> threads() {
+        // NB: '' AS image — the list only needs the type for a "🖼 Photo" preview, never the blob itself.
+        return query("SELECT id,hashref,fromname,frompublickey,topublickey,subject,message,randomid," +
+                "incoming,read,MAX(date) AS date,status,sentblock,type,amount,tokenid,tokenname,txpowid,'' AS image FROM " + MSG + " GROUP BY hashref ORDER BY date DESC", null);
+    }
+
+    /** All messages in a thread, oldest first (conversation order). */
+    public List<MailMessage> thread(String hashref) {
+        return query("SELECT id,hashref,fromname,frompublickey,topublickey,subject,message,randomid," +
+                "incoming,read,date,status,sentblock,type,amount,tokenid,tokenname,txpowid,image FROM " + MSG + " WHERE hashref=? ORDER BY date ASC", new String[]{hashref});
+    }
+
+    private static final String COLS = "id,hashref,fromname,frompublickey,topublickey,subject,message,randomid," +
+            "incoming,read,date,status,sentblock,type,amount,tokenid,tokenname,txpowid,image";
+
+    /** Outbox: outgoing messages that have NOT reached the chain — still posting, or failed. */
+    public List<MailMessage> outbox() {
+        return query("SELECT " + COLS + " FROM " + MSG +
+                " WHERE incoming=0 AND status IN ('posting','failed') ORDER BY date DESC", null);
+    }
+
+    /** Sent: outgoing messages the node accepted (on-chain or confirmed), newest first. */
+    public List<MailMessage> sent() {
+        return query("SELECT " + COLS + " FROM " + MSG +
+                " WHERE incoming=0 AND status IN ('sent','confirmed') ORDER BY date DESC", null);
+    }
+
+    /** Drawer badge: how many messages are stuck in the outbox. */
+    public int outboxCount() {
+        Cursor c = getReadableDatabase().rawQuery(
+                "SELECT COUNT(*) FROM " + MSG + " WHERE incoming=0 AND status IN ('posting','failed')", null);
+        try { return c.moveToFirst() ? c.getInt(0) : 0; } finally { c.close(); }
+    }
+
+    /** One message by row id (for outbox retry). */
+    public MailMessage message(long id) {
+        List<MailMessage> l = query("SELECT " + COLS + " FROM " + MSG + " WHERE id=?", new String[]{String.valueOf(id)});
+        return l.isEmpty() ? null : l.get(0);
+    }
+
+    public void setSentBlock(long id, long block) {
+        ContentValues v = new ContentValues(); v.put("sentblock", block);
+        getWritableDatabase().update(MSG, v, "id=?", new String[]{String.valueOf(id)});
+    }
+
+    public int unreadCount() {
+        Cursor c = getReadableDatabase().rawQuery("SELECT COUNT(*) FROM " + MSG + " WHERE incoming=1 AND read=0", null);
+        try { return c.moveToFirst() ? c.getInt(0) : 0; } finally { c.close(); }
+    }
+
+    public void markThreadRead(String hashref) {
+        ContentValues v = new ContentValues(); v.put("read", 1);
+        getWritableDatabase().update(MSG, v, "hashref=?", new String[]{hashref});
+    }
+
+    public void deleteThread(String hashref) {
+        getWritableDatabase().delete(MSG, "hashref=?", new String[]{hashref});
+    }
+
+    public void setStatus(long id, String status) {
+        ContentValues v = new ContentValues(); v.put("status", status);
+        getWritableDatabase().update(MSG, v, "id=?", new String[]{String.valueOf(id)});
+    }
+
+    /** Promote outgoing 'sent' messages to 'confirmed' once the chain has advanced past their send block. */
+    public void markConfirmed(int chainBlock) {
+        if (chainBlock <= 0) return;
+        getWritableDatabase().execSQL("UPDATE " + MSG + " SET status='confirmed' " +
+                "WHERE incoming=0 AND status='sent' AND sentblock>0 AND sentblock<=" + (chainBlock - 1));
+    }
+
+    private List<MailMessage> query(String sql, String[] args) {
+        List<MailMessage> out = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(sql, args);
+        try {
+            while (c.moveToNext()) {
+                MailMessage m = new MailMessage();
+                m.id = c.getLong(0); m.hashref = c.getString(1); m.fromname = c.getString(2);
+                m.frompublickey = c.getString(3); m.topublickey = c.getString(4);
+                m.subject = c.getString(5); m.message = c.getString(6); m.randomid = c.getString(7);
+                m.incoming = c.getInt(8) == 1; m.read = c.getInt(9) == 1; m.date = c.getLong(10);
+                m.status = c.getString(11); if (m.status == null) m.status = ""; m.sentblock = c.getLong(12);
+                m.type = c.getString(13); if (m.type == null) m.type = "text";
+                m.amount = nz(c.getString(14)); m.tokenid = nz(c.getString(15));
+                m.tokenname = nz(c.getString(16)); m.txpowid = nz(c.getString(17)); m.image = nz(c.getString(18));
+                out.add(m);
+            }
+        } finally { c.close(); }
+        return out;
+    }
+
+    // ----- contacts -----
+
+    public boolean addContact(String username, String publickey) {
+        ContentValues v = new ContentValues(); v.put("username", username); v.put("publickey", publickey);
+        return getWritableDatabase().insertWithOnConflict(CON, null, v, SQLiteDatabase.CONFLICT_REPLACE) != -1;
+    }
+
+    public void deleteContact(long id) { getWritableDatabase().delete(CON, "id=?", new String[]{String.valueOf(id)}); }
+
+    public List<String[]> contacts() {
+        List<String[]> out = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery("SELECT id,username,publickey FROM " + CON + " ORDER BY username COLLATE NOCASE", null);
+        try { while (c.moveToNext()) out.add(new String[]{c.getString(0), c.getString(1), c.getString(2)}); }
+        finally { c.close(); }
+        return out;
+    }
+
+    /** Contact name for a publickey, or null. */
+    public String contactName(String publickey) {
+        Cursor c = getReadableDatabase().rawQuery("SELECT username FROM " + CON + " WHERE publickey=?", new String[]{publickey});
+        try { return c.moveToFirst() ? c.getString(0) : null; } finally { c.close(); }
+    }
+
+    // ----- meta -----
+
+    public void setMeta(String k, String v) {
+        ContentValues cv = new ContentValues(); cv.put("k", k); cv.put("v", v);
+        getWritableDatabase().insertWithOnConflict(META, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    public String getMeta(String k, String def) {
+        Cursor c = getReadableDatabase().rawQuery("SELECT v FROM " + META + " WHERE k=?", new String[]{k});
+        try { return c.moveToFirst() ? c.getString(0) : def; } finally { c.close(); }
+    }
+
+    // ----- payaddr + archive (kept in meta; no schema change) -----
+
+    /** Remember a contact's Minima receiving address (piggybacked on their messages). */
+    public void setContactPayaddr(String publickey, String payaddr) {
+        if (payaddr != null && !payaddr.isEmpty()) setMeta("pa:" + publickey, payaddr);
+    }
+    public String contactPayaddr(String publickey) { return getMeta("pa:" + publickey, null); }
+
+    public void setArchived(String hashref, boolean on) { setMeta("arch:" + hashref, on ? "1" : ""); }
+    public java.util.Set<String> archivedSet() {
+        java.util.Set<String> s = new java.util.HashSet<>();
+        Cursor c = getReadableDatabase().rawQuery("SELECT k FROM " + META + " WHERE k LIKE 'arch:%' AND v='1'", null);
+        try { while (c.moveToNext()) s.add(c.getString(0).substring(5)); } finally { c.close(); }
+        return s;
+    }
+
+    private static String nz(String s) { return s == null ? "" : s; }
+}

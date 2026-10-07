@@ -1,0 +1,8 @@
+<resources>
+    <color name="pm_entropy_bg">#0A0E1A</color>
+    <color name="pm_entropy_panel">#121829</color>
+    <color name="pm_entropy_gold">#FFD700</color>
+    <color name="pm_entropy_pink">#FF2D78</color>
+    <color name="pm_entropy_cyan">#00E5FF</color>
+    <color name="pm_entropy_text">#EAEAF2</color>
+</resources>

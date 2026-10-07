@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
+    <queries>
+        <package android:name="com.eurobuddha.minimacore" />
+    </queries>
+    <application>
+        <activity android:name="com.eurobuddha.pandapools.MainActivity" android:exported="false" android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden" android:windowSoftInputMode="adjustResize" android:theme="@style/pm_pandapools_Theme.PandaPools">
+            </activity>
+        <service android:name="com.eurobuddha.pandapools.PoolKeepAliveService" android:exported="false" android:stopWithTask="false" android:foregroundServiceType="specialUse|dataSync">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Keeps the user's liquidity pools discoverable + tradeable on-chain (refreshes their reserves before they age out of the cascade) while the app is closed" />
+        </service>
+        <provider android:name="com.eurobuddha.pandapools.IntegratedFileProvider" android:authorities="${applicationId}.pandapools.fileprovider" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/pm_pandapools_file_paths" />
+        </provider>
+        <receiver android:name="com.eurobuddha.pandapools.BootReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.eurobuddha.pandapools.HeartbeatReceiver" android:exported="false" />
+    </application>
+</manifest>

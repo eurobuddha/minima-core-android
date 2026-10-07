@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Android 12+ backup/transfer rules — a DELIBERATE SPLIT, not a blanket disable.
+
+   NEVER to the cloud. This is a full Minima terminal and HistoryDB stores every command VERBATIM, with no
+   redaction (terminal/TerminalView.java:418 → terminal/HistoryDB.java, `terminalide.db`). Anything a user
+   typed goes in it: `vault action:restore … phrase:…`, `vault action:passwordlock password:…`, raw private
+   keys. Auto Backup was uploading that file to the user's cloud. The event log (`minimaevents.db`) is node
+   traffic and has no reason to travel either.
+
+   Device transfer keeps `scripts.db` ONLY. Those are the user's own KISS scripts, authored in this app, and
+   there is no export path for them — so a blanket disable would silently destroy real work when someone
+   moves to a new phone. A same-user device transfer is the one channel where carrying them is both safe
+   (no cloud copy) and clearly wanted. Everything else is excluded from both channels.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="external" path="." />
+        <exclude domain="root" path="." />
+    </cloud-backup>
+    <!-- An <include> makes this section allow-list only: anything not named here is excluded implicitly, so
+         `terminalide.db` (the verbatim command history) and `minimaevents.db` do NOT travel. Do not add
+         <exclude> entries alongside it — paths outside an included path are a lint error, not extra safety. -->
+    <device-transfer>
+        <include domain="database" path="scripts.db" />
+    </device-transfer>
+</data-extraction-rules>

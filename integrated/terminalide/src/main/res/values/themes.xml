@@ -1,0 +1,9 @@
+<resources>
+    
+    <style name="pm_terminalide_Base.Theme.Terminal" parent="Theme.Material3.Dark.NoActionBar">
+        
+        
+    </style>
+
+    <style name="pm_terminalide_Theme.Terminal" parent="pm_terminalide_Base.Theme.Terminal" />
+</resources>

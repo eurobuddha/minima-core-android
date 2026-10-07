@@ -1,6 +1,6 @@
 <resources>
-    <!-- Block flavor (org.minimarex.minimablock): forced -blockaskeyuses node. -->
-    <string name="app_name">BlackBear</string>
+    <!-- Block flavor (com.eurobuddha.minimablock): forced -blockaskeyuses node. -->
+    <string name="app_name">Minima Core</string>
     <!-- Block mode: keys.maxuses is roughly the last block a key signed at, not a count toward exhaustion. -->
     <string name="home_keyuses_label">Last key block</string>
     <!-- Block mode: the node derives key uses from the chain tip; this value is only a safety floor. -->

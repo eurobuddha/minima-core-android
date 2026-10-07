@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:id="@+id/pm_vestr_main" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="#0A0A0F" tools:context=".MainActivity">
+    <LinearLayout android:id="@+id/pm_vestr_header" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:background="#15151F" android:paddingStart="18dp" android:paddingEnd="18dp" android:paddingTop="16dp" android:paddingBottom="16dp" android:tag="pandamonium.app.toolbar">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="vestr" android:textColor="#F7931A" android:textStyle="bold" android:textSize="18sp" android:letterSpacing="0.04" />
+        <TextView android:id="@+id/pm_vestr_blockNo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="#—" android:textColor="#9A9AA8" android:textSize="12sp" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/pm_vestr_pairingBanner" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="#15151F" android:padding="16dp" android:visibility="gone">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="vestr is not enabled yet" android:textColor="#F7931A" android:textStyle="bold" android:textSize="15sp" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry." android:textColor="#9A9AA8" android:textSize="13sp" />
+        <Button android:id="@+id/pm_vestr_openNodeBtn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Open Minima Core" />
+    </LinearLayout>
+    <androidx.viewpager.widget.ViewPager android:id="@+id/pm_vestr_pager" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+    <LinearLayout android:id="@+id/pm_vestr_bottomBar" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:background="#0A0A0F" android:paddingTop="8dp" android:paddingBottom="8dp" />
+</LinearLayout>

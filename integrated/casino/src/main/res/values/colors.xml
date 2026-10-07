@@ -1,0 +1,10 @@
+<resources>
+    <color name="pm_casino_bg">#0A0E1A</color>
+    <color name="pm_casino_panel">#121829</color>
+    <color name="pm_casino_gold">#FFD700</color>
+    <color name="pm_casino_pink">#FF2D78</color>
+    <color name="pm_casino_cyan">#00E5FF</color>
+    <color name="pm_casino_text">#EAEAF2</color>
+    <color name="pm_casino_black">#FF000000</color>
+    <color name="pm_casino_white">#FFFFFFFF</color>
+</resources>
