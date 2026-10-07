@@ -172,12 +172,13 @@
   {
     "repo": "/Users/eurobuddha/Projects/minima/mininotes/mininotes",
     "commit": "b000a9509aa044858909ca859c715ade0120a876",
-    "push_pending": "Configured origin belongs to mininotesorg; need user-owned destination"
+    "pushed_to": "fork/history/mininotes-core-compatibility",
+    "release_destination": "Renamed signed minimaDocs build in eurobuddha/minimaDocs, branch minimadocs"
   },
   {
     "repo": "/Users/eurobuddha/Projects/minima/apks/pocketweb",
-    "commit": "1f30e6f7a46f72348d91d8aa7d5b13adcafa7231",
-    "push_pending": "No configured remote"
+    "commit": "d7c2e1754e2e7eeec12561c8c273b4df0c648996",
+    "pushed_to": "origin/android"
   },
   {
     "repo": "/Users/eurobuddha/Projects/minima/desktop/minima-core-apks",
@@ -212,6 +213,36 @@
   {
     "repo": "/Users/eurobuddha/Projects/minima/apks/NFTwallet",
     "commit": "8c1d0ee585074190ee72c9a4b4eacc087ec91497",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/tools/dappstore",
+    "commit": "f921c736e7fae4b75b23cb4d8a01192a8a97d960",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/desktop/minimacore-desktop",
+    "commit": "5f3c2d6f53b93ec9ea8a5b948e40c83da4f76033",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/desktop/minimaDesk",
+    "commit": "65e852013642b97a07ab5fab897fc87b567a592e",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/desktop/pandaget-desktop",
+    "commit": "bd30617af315b22d452e716e77ca3ebf374de678",
+    "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/mininotes/minimaDocs",
+    "commit": "3f41cf95ba1182fa2f2ce8fce05b915f8b11954d",
+    "pushed_to": "origin/minimadocs"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/desktop/minima-core-apks",
+    "commit": "e8a63a56d1c2562709e6483722915f98b1ab28c6",
     "pushed_to": "origin/main"
   }
 ]

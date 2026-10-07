@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-07",
+  "status": "published and public readbacks verified",
+  "release_assets": {
+    "android_apks": 39,
+    "desktop_installers": 9,
+    "minidapp_packages": 1,
+    "total": 49,
+    "github_releases": 42
+  },
+  "repositories": [
+    {
+      "defaultBranchRef": {
+        "name": "minimadocs"
+      },
+      "nameWithOwner": "eurobuddha/minimaDocs",
+      "url": "https://github.com/eurobuddha/minimaDocs",
+      "visibility": "PUBLIC"
+    },
+    {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "nameWithOwner": "eurobuddha/PocketWeb",
+      "url": "https://github.com/eurobuddha/PocketWeb",
+      "visibility": "PUBLIC"
+    }
+  ],
+  "minimaDocs": {
+    "version": "0.3.2",
+    "packageId": "com.eurobuddha.minimadocs",
+    "ci": {
+      "conclusion": "success",
+      "headSha": "3f41cf95ba1182fa2f2ce8fce05b915f8b11954d",
+      "status": "completed",
+      "url": "https://github.com/eurobuddha/minimaDocs/actions/runs/37663873823"
+    },
+    "history_branch": "history/mininotes-core-compatibility",
+    "note": "Existing public minimaDocs repository and renamed Android application reused; original Mininotes history preserved."
+  },
+  "PocketWeb": {
+    "version": "0.11.4",
+    "versionCode": 1104,
+    "android_branch": "android",
+    "release_tag": "android-v0.11.4",
+    "minidapp_main_branch_preserved": true
+  },
+  "core": {
+    "PandaBear": "1.9.10",
+    "BlackBear": "1.9.10",
+    "Pandamonium": "1.9.10",
+    "source_commit": "f7bcb5bdbed3b5be898d2d279ad10499f89ddb4b",
+    "fold_installed_version": "1.9.9",
+    "fold_note": "Owner confirmed working. Publication did not install 1.9.10 or alter device data."
+  },
+  "catalogue": {
+    "commit": "e8a63a56d1c2562709e6483722915f98b1ab28c6",
+    "entries": 58,
+    "validated_binaries": 57,
+    "wallet_version": "0.2.12",
+    "ipfs_readback": "All 58 names, package identities, versions, version codes and hashes match published catalogue."
+  },
+  "stores": {
+    "origin": "https://eurobuddha.com/pandadapps.json",
+    "mirror": "https://store.eurobuddha.com/pandadapps.json",
+    "ipfs": "https://ipfs.eurobuddha.com/",
+    "cid": "bafybeihqb7t52h5zusw65zizxktadkmkinvu4jhp7vcmiktoz5froos6su",
+    "appstore_version": "0.3.2",
+    "ipfs_local_pin": "published",
+    "filebase_remote_pin": "Unavailable; publisher could not read remote pin list. Local pin and public gateway verified."
+  },
+  "desktop_feeds": {
+    "https://eurobuddha.com/pandaapps/minimacore-desktop.json": "0.17.32",
+    "https://eurobuddha.com/pandaapps/minimadesk.json": "0.7.74"
+  },
+  "desktop_release_incident": "Existing tag workflows replaced initial Core Desktop/PandaGet uploads. Hash checks caught this before catalogue publication. Verified notarized Mac installers published with protected -notarized.dmg names; Windows/Linux installers from successful same-commit CI verified. Initial checksum files and local builds retained. Release workflows now disable overwriting and publishing scripts reject conflicting protected assets.",
+  "evidence": [
+    "publication-plan.json",
+    "publication-final-receipts.json",
+    "public-download-verification.json",
+    "library-commits.json",
+    "minimacore-desktop.json",
+    "minimadesk.json"
+  ],
+  "scope_limit": "Checks establish reviewed code, compatibility, builds, signatures and published asset integrity; no funded financial end-to-end transactions were performed. Concurrent unrelated source work remains unstaged."
+}

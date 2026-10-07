@@ -1,0 +1,639 @@
+[
+  {
+    "repo": "eurobuddha/minimaDocs",
+    "tag": "v0.3.2",
+    "url": "https://github.com/eurobuddha/minimaDocs/releases/tag/v0.3.2",
+    "assets": [
+      {
+        "id": 619306396,
+        "name": "minimaDocs-0.3.2.apk",
+        "size": 221893267,
+        "digest": "sha256:f46b125447220ba15c42645b20059a3880abc2390accc45d0e78544845ad34d5",
+        "browser_download_url": "https://github.com/eurobuddha/minimaDocs/releases/download/v0.3.2/minimaDocs-0.3.2.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-pandaapps",
+    "tag": "v0.4.5",
+    "url": "https://github.com/eurobuddha/minima-core-android-pandaapps/releases/tag/v0.4.5",
+    "assets": [
+      {
+        "id": 619315987,
+        "name": "pandaapps-0.4.5.apk",
+        "size": 12576706,
+        "digest": "sha256:c01aaa6bd7ac82eb5b2facc5645154762d540de08c49248557d7ac9b141febb3",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-pandaapps/releases/download/v0.4.5/pandaapps-0.4.5.apk"
+      },
+      {
+        "id": 619316393,
+        "name": "pandaget-0.4.5.apk",
+        "size": 12396502,
+        "digest": "sha256:973209babf2c78571ebb564d9ad08b403e777a47ebcb325871960c42ce7dae36",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-pandaapps/releases/download/v0.4.5/pandaget-0.4.5.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/maxima",
+    "tag": "v0.6.134",
+    "url": "https://github.com/eurobuddha/maxima/releases/tag/v0.6.134",
+    "assets": [
+      {
+        "id": 619317025,
+        "name": "parlons-0.6.134.apk",
+        "size": 66283265,
+        "digest": "sha256:263685b38eb379e6e2e942f8a6099adb823a370d7f6ec46b4eef1fdd592bd419",
+        "browser_download_url": "https://github.com/eurobuddha/maxima/releases/download/v0.6.134/parlons-0.6.134.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-terminalide",
+    "tag": "v0.3.2",
+    "url": "https://github.com/eurobuddha/minima-core-android-terminalide/releases/tag/v0.3.2",
+    "assets": [
+      {
+        "id": 619319480,
+        "name": "minima-terminal-ide-0.3.2.apk",
+        "size": 12123949,
+        "digest": "sha256:2784504af471d5389559bbc5bf54fc28d67f7f5a7d109c5d21c39518988af04b",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-terminalide/releases/download/v0.3.2/minima-terminal-ide-0.3.2.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-casino",
+    "tag": "v0.7.3",
+    "url": "https://github.com/eurobuddha/minima-core-android-casino/releases/tag/v0.7.3",
+    "assets": [
+      {
+        "id": 619320363,
+        "name": "ZeroEdgeCasino-0.7.3.apk",
+        "size": 14835265,
+        "digest": "sha256:dcfaab631ae264edef0ee66cd25096ed6d91e45a1b41af58ee5fe3f3d1965701",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-casino/releases/download/v0.7.3/ZeroEdgeCasino-0.7.3.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/openly",
+    "tag": "v0.2.10",
+    "url": "https://github.com/eurobuddha/openly/releases/tag/v0.2.10",
+    "assets": [
+      {
+        "id": 619321199,
+        "name": "Openly-0.2.10.apk",
+        "size": 16069720,
+        "digest": "sha256:d9e10addd6829694ed6b08d4304cb32af7121ea2e118d5b240ba080c3c5788e2",
+        "browser_download_url": "https://github.com/eurobuddha/openly/releases/download/v0.2.10/Openly-0.2.10.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-utxo",
+    "tag": "v0.4.33",
+    "url": "https://github.com/eurobuddha/minima-core-android-utxo/releases/tag/v0.4.33",
+    "assets": [
+      {
+        "id": 619322300,
+        "name": "minima-utxo-wallet-0.4.33.apk",
+        "size": 12795081,
+        "digest": "sha256:610e2decbd2f923c68e1e2b9418a6f62c5924bea5ceb9b6003e29324fae4c7f7",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-utxo/releases/download/v0.4.33/minima-utxo-wallet-0.4.33.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-history",
+    "tag": "v0.3.10",
+    "url": "https://github.com/eurobuddha/minima-core-android-history/releases/tag/v0.3.10",
+    "assets": [
+      {
+        "id": 619323110,
+        "name": "minima-history-0.3.10.apk",
+        "size": 12024561,
+        "digest": "sha256:249b77f4fbd35716ffe5d5f9f3ca268b05521c895a324fb74c293d326de534f0",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-history/releases/download/v0.3.10/minima-history-0.3.10.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-blockexplorer",
+    "tag": "v0.1.5",
+    "url": "https://github.com/eurobuddha/minima-core-android-blockexplorer/releases/tag/v0.1.5",
+    "assets": [
+      {
+        "id": 619323847,
+        "name": "minima-explorer-0.1.5.apk",
+        "size": 11967752,
+        "digest": "sha256:386b842e08c54d09dc0477d4784e05e6f48fb10734b807e4ff27fe7cf1de13a7",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-blockexplorer/releases/download/v0.1.5/minima-explorer-0.1.5.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-filez",
+    "tag": "v0.1.12",
+    "url": "https://github.com/eurobuddha/minima-core-android-filez/releases/tag/v0.1.12",
+    "assets": [
+      {
+        "id": 619324388,
+        "name": "minima-filez-0.1.12.apk",
+        "size": 11969404,
+        "digest": "sha256:3a9b66c905c6df766ad48cef8330b5b6cec61175dc112df9fdfef8bd7643ff8b",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-filez/releases/download/v0.1.12/minima-filez-0.1.12.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-vestr",
+    "tag": "v0.4.6",
+    "url": "https://github.com/eurobuddha/minima-core-android-vestr/releases/tag/v0.4.6",
+    "assets": [
+      {
+        "id": 619325071,
+        "name": "minima-vestr-0.4.6.apk",
+        "size": 12474691,
+        "digest": "sha256:950286605c16e9c98760d91a2fa75a2a3d0150e1af4b224528a20bc501b76d38",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-vestr/releases/download/v0.4.6/minima-vestr-0.4.6.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-futurecash",
+    "tag": "v0.2.13",
+    "url": "https://github.com/eurobuddha/minima-core-android-futurecash/releases/tag/v0.2.13",
+    "assets": [
+      {
+        "id": 619325850,
+        "name": "minima-futurecash-0.2.13.apk",
+        "size": 12523151,
+        "digest": "sha256:ed573544190eb07cc9382d1fa2d46ea52f510ba40ab4374b471368ab343bc045",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-futurecash/releases/download/v0.2.13/minima-futurecash-0.2.13.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/futurecash-next-apk",
+    "tag": "v0.1.8",
+    "url": "https://github.com/eurobuddha/futurecash-next-apk/releases/tag/v0.1.8",
+    "assets": [
+      {
+        "id": 619326354,
+        "name": "minima-futurecash-next-0.1.8.apk",
+        "size": 13503721,
+        "digest": "sha256:0789f4ade5bbd6a8dce83d54fcbe9c913fe852ff95cc8fbf1585632ddc6de69d",
+        "browser_download_url": "https://github.com/eurobuddha/futurecash-next-apk/releases/download/v0.1.8/minima-futurecash-next-0.1.8.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-atomix",
+    "tag": "v0.1.72",
+    "url": "https://github.com/eurobuddha/minima-core-android-atomix/releases/tag/v0.1.72",
+    "assets": [
+      {
+        "id": 619326923,
+        "name": "AtomiX-0.1.72.apk",
+        "size": 22547246,
+        "digest": "sha256:a9338d2f72ee41c1ee44645b17680483c7e4d27abc11fa8f79290c34cea38de6",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-atomix/releases/download/v0.1.72/AtomiX-0.1.72.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-ethwallet",
+    "tag": "v0.2.6",
+    "url": "https://github.com/eurobuddha/minima-core-android-ethwallet/releases/tag/v0.2.6",
+    "assets": [
+      {
+        "id": 619327854,
+        "name": "ethwallet-0.2.6.apk",
+        "size": 8777018,
+        "digest": "sha256:b0ac43953fc7851a1f5b061a8d9dd4bb2a66e99c99307c2847406f0df1833400",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-ethwallet/releases/download/v0.2.6/ethwallet-0.2.6.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-expert",
+    "tag": "v0.7.4",
+    "url": "https://github.com/eurobuddha/minima-core-android-expert/releases/tag/v0.7.4",
+    "assets": [
+      {
+        "id": 619328695,
+        "name": "minima-expert-0.7.4.apk",
+        "size": 53968021,
+        "digest": "sha256:cc164d7fd24d291db1ecf3e19b696a150afbbbb33ff7727b383617fb1e25e2b5",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-expert/releases/download/v0.7.4/minima-expert-0.7.4.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-faucet",
+    "tag": "v0.2.5",
+    "url": "https://github.com/eurobuddha/minima-core-android-faucet/releases/tag/v0.2.5",
+    "assets": [
+      {
+        "id": 619331201,
+        "name": "minima-faucet-0.2.5.apk",
+        "size": 11927738,
+        "digest": "sha256:835506d5bc22a18d0e7f6d8fefe77e63b8c43a48524fc1d3acd2e6d140ae2eb1",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-faucet/releases/download/v0.2.5/minima-faucet-0.2.5.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-merchshop",
+    "tag": "v0.4.4",
+    "url": "https://github.com/eurobuddha/minima-core-android-merchshop/releases/tag/v0.4.4",
+    "assets": [
+      {
+        "id": 619332158,
+        "name": "miniMall-Shop-0.4.4.apk",
+        "size": 15496278,
+        "digest": "sha256:0ed58fd07e9ac488d2df088811778432596c7218b541581f6c8d6e24a6cb0923",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-merchshop/releases/download/v0.4.4/miniMall-Shop-0.4.4.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-merchinbox",
+    "tag": "v0.5.3",
+    "url": "https://github.com/eurobuddha/minima-core-android-merchinbox/releases/tag/v0.5.3",
+    "assets": [
+      {
+        "id": 619333277,
+        "name": "miniMall-Inbox-0.5.3.apk",
+        "size": 15495484,
+        "digest": "sha256:2fcb54e4e0ddf9e019c21bbe26d6a7e08fafe50b321b0a82af623c508ff36ad0",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-merchinbox/releases/download/v0.5.3/miniMall-Inbox-0.5.3.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-merchstudio",
+    "tag": "v0.3.4",
+    "url": "https://github.com/eurobuddha/minima-core-android-merchstudio/releases/tag/v0.3.4",
+    "assets": [
+      {
+        "id": 619334252,
+        "name": "miniMall-Studio-0.3.4.apk",
+        "size": 15692672,
+        "digest": "sha256:a1cf3156205845539d9002a03d0840fd0da5ed0cb8a1b02bd359800d738fbd57",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-merchstudio/releases/download/v0.3.4/miniMall-Studio-0.3.4.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android",
+    "tag": "v1.9.10-PandaBear",
+    "url": "https://github.com/eurobuddha/minima-core-android/releases/tag/v1.9.10-PandaBear",
+    "assets": [
+      {
+        "id": 619334898,
+        "name": "minima-core-PandaBear-1.9.10.apk",
+        "size": 20699959,
+        "digest": "sha256:472bd4ceeb494d94c752b8e9be060f9a369be5a147355a6edbf14eba296c16b3",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android/releases/download/v1.9.10-PandaBear/minima-core-PandaBear-1.9.10.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android",
+    "tag": "v1.9.10-BlackBear",
+    "url": "https://github.com/eurobuddha/minima-core-android/releases/tag/v1.9.10-BlackBear",
+    "assets": [
+      {
+        "id": 619336026,
+        "name": "minima-core-BlackBear-1.9.10.apk",
+        "size": 20700487,
+        "digest": "sha256:f960490195423eff9d8ea11b2cbde1055e4f95fb680781be4745740b2f4bb9b9",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android/releases/download/v1.9.10-BlackBear/minima-core-BlackBear-1.9.10.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-terminal",
+    "tag": "v1.3.4",
+    "url": "https://github.com/eurobuddha/minima-core-android-terminal/releases/tag/v1.3.4",
+    "assets": [
+      {
+        "id": 619337353,
+        "name": "terminal-1.3.4.apk",
+        "size": 11972124,
+        "digest": "sha256:fcaf5279b8d5f9c9c0c7a3b69e5af027937a42cf111aaf7b009672d67b0355b3",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-terminal/releases/download/v1.3.4/terminal-1.3.4.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-pandapools",
+    "tag": "v0.9.66",
+    "url": "https://github.com/eurobuddha/minima-core-android-pandapools/releases/tag/v0.9.66",
+    "assets": [
+      {
+        "id": 619338362,
+        "name": "pandapools-0.9.66.apk",
+        "size": 17250235,
+        "digest": "sha256:991531e1f04d797904737c3cf35790d2f40dc08fc2f000ae73b38136e05d7de5",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-pandapools/releases/download/v0.9.66/pandapools-0.9.66.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-pandadex",
+    "tag": "v0.4.22",
+    "url": "https://github.com/eurobuddha/minima-core-android-pandadex/releases/tag/v0.4.22",
+    "assets": [
+      {
+        "id": 619339354,
+        "name": "pandadex-0.4.22.apk",
+        "size": 13770740,
+        "digest": "sha256:e0fdb17d1f9779fab5af2ba4d13c0f47e616bccab6c62172cf9f69510a089fd5",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-pandadex/releases/download/v0.4.22/pandadex-0.4.22.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-keyreuses",
+    "tag": "v0.1.3",
+    "url": "https://github.com/eurobuddha/minima-core-android-keyreuses/releases/tag/v0.1.3",
+    "assets": [
+      {
+        "id": 619340234,
+        "name": "minima-keyuses-0.1.3.apk",
+        "size": 11959770,
+        "digest": "sha256:38d8204c914dbd55fcfb0c1b16c5671e1211a162b6a5987649ca03356b54ec19",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-keyreuses/releases/download/v0.1.3/minima-keyuses-0.1.3.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-entropy",
+    "tag": "v0.1.9",
+    "url": "https://github.com/eurobuddha/minima-core-android-entropy/releases/tag/v0.1.9",
+    "assets": [
+      {
+        "id": 619341384,
+        "name": "Entropy-0.1.9.apk",
+        "size": 11989599,
+        "digest": "sha256:0890286928bcda2a68c6097d2c32520912ab019d5f7f4a9ebe3e9fa4376592f1",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-entropy/releases/download/v0.1.9/Entropy-0.1.9.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-nftwallet",
+    "tag": "v0.1.9",
+    "url": "https://github.com/eurobuddha/minima-core-android-nftwallet/releases/tag/v0.1.9",
+    "assets": [
+      {
+        "id": 619342467,
+        "name": "minima-nft-wallet-0.1.9.apk",
+        "size": 13813408,
+        "digest": "sha256:deb96336aa9279490412476a5ff597f2e8b7ce1a10b8e053b12a928b85ffa61d",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-nftwallet/releases/download/v0.1.9/minima-nft-wallet-0.1.9.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/statenft-suite",
+    "tag": "v0.7.18",
+    "url": "https://github.com/eurobuddha/statenft-suite/releases/tag/v0.7.18",
+    "assets": [
+      {
+        "id": 619343255,
+        "name": "atelier-0.7.18.apk",
+        "size": 39300127,
+        "digest": "sha256:35e3b1648344c32c134126a5b27200a4a2fe2b2abbb628f9a11baaef8d133c7b",
+        "browser_download_url": "https://github.com/eurobuddha/statenft-suite/releases/download/v0.7.18/atelier-0.7.18.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-salon",
+    "tag": "v0.11.34",
+    "url": "https://github.com/eurobuddha/minima-core-android-salon/releases/tag/v0.11.34",
+    "assets": [
+      {
+        "id": 619345369,
+        "name": "salon-0.11.34.apk",
+        "size": 17516046,
+        "digest": "sha256:364203ce1abccc308a5a850d4ec9ff248ca3ccf7f0b922ccb62c218b3c97cebd",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-salon/releases/download/v0.11.34/salon-0.11.34.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-mail",
+    "tag": "v0.5.11",
+    "url": "https://github.com/eurobuddha/minima-core-android-mail/releases/tag/v0.5.11",
+    "assets": [
+      {
+        "id": 619346096,
+        "name": "minima-mail-0.5.11.apk",
+        "size": 17607594,
+        "digest": "sha256:aba321bcba29af909dfd2610650b60d181238521a62d21bc84934eb42692030a",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-mail/releases/download/v0.5.11/minima-mail-0.5.11.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/maxima",
+    "tag": "portal-v0.2.83",
+    "url": "https://github.com/eurobuddha/maxima/releases/tag/portal-v0.2.83",
+    "assets": [
+      {
+        "id": 619346941,
+        "name": "parlons-cloud-portal-0.2.83-release.apk",
+        "size": 64104676,
+        "digest": "sha256:686d36b84ef8f168d61c5a9265ff99aab0d0a0a6b74201d02f05009e2378779c",
+        "browser_download_url": "https://github.com/eurobuddha/maxima/releases/download/portal-v0.2.83/parlons-cloud-portal-0.2.83-release.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android",
+    "tag": "v1.9.10-Pandamonium",
+    "url": "https://github.com/eurobuddha/minima-core-android/releases/tag/v1.9.10-Pandamonium",
+    "assets": [
+      {
+        "id": 619349014,
+        "name": "minima-core-Pandamonium-1.9.10.apk",
+        "size": 33054024,
+        "digest": "sha256:38301193a655d7c971abf959bbcec7a5764b76edf31ad2e78b5c2e5c0ff6430f",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android/releases/download/v1.9.10-Pandamonium/minima-core-Pandamonium-1.9.10.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-limit",
+    "tag": "v0.3.4",
+    "url": "https://github.com/eurobuddha/minima-core-android-limit/releases/tag/v0.3.4",
+    "assets": [
+      {
+        "id": 619350178,
+        "name": "limit-0.3.4.apk",
+        "size": 15371993,
+        "digest": "sha256:2de05d0ec7c1325b10431748532036594832363c9f2aecfebb3e62fc1138e6b4",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-limit/releases/download/v0.3.4/limit-0.3.4.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-nftstudio",
+    "tag": "v0.2.1",
+    "url": "https://github.com/eurobuddha/minima-core-android-nftstudio/releases/tag/v0.2.1",
+    "assets": [
+      {
+        "id": 619350980,
+        "name": "nftstudio-0.2.1.apk",
+        "size": 15676292,
+        "digest": "sha256:9fc3d1a538f46bf4774c18a70d51f9420e8bfc99103a421f8dd9bbc21c16de16",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-nftstudio/releases/download/v0.2.1/nftstudio-0.2.1.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-minimaswap",
+    "tag": "v0.18.5",
+    "url": "https://github.com/eurobuddha/minima-core-android-minimaswap/releases/tag/v0.18.5",
+    "assets": [
+      {
+        "id": 619351659,
+        "name": "minimaswap-0.18.5.apk",
+        "size": 22372422,
+        "digest": "sha256:10332a1653b36f9be324805e61f0005eda308377595416fdad4e5df2aa0b9d22",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-minimaswap/releases/download/v0.18.5/minimaswap-0.18.5.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/PocketWeb",
+    "tag": "android-v0.11.4",
+    "url": "https://github.com/eurobuddha/PocketWeb/releases/tag/android-v0.11.4",
+    "assets": [
+      {
+        "id": 619352680,
+        "name": "pocketweb-0.11.4-vc1104.apk",
+        "size": 22228396,
+        "digest": "sha256:738f21260e5691f3b74ba4374b0ad45a37070a831c1366bd1e2e3a99fcfeb3bf",
+        "browser_download_url": "https://github.com/eurobuddha/PocketWeb/releases/download/android-v0.11.4/pocketweb-0.11.4-vc1104.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-usdtswap",
+    "tag": "v0.1.7",
+    "url": "https://github.com/eurobuddha/minima-core-android-usdtswap/releases/tag/v0.1.7",
+    "assets": [
+      {
+        "id": 619353473,
+        "name": "usdtswap-0.1.7.apk",
+        "size": 22372970,
+        "digest": "sha256:24b1bcb09dc57af6e8cb097c9574a3dadcb010b3f76710a65712719ff06d9090",
+        "browser_download_url": "https://github.com/eurobuddha/minima-core-android-usdtswap/releases/download/v0.1.7/usdtswap-0.1.7.apk"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minimacore-desktop",
+    "tag": "v0.17.32",
+    "url": "https://github.com/eurobuddha/minimacore-desktop/releases/tag/v0.17.32",
+    "assets": [
+      {
+        "id": 619370148,
+        "name": "minimaCore-0.17.32-x64.AppImage",
+        "size": 188492860,
+        "digest": "sha256:9223971f4cfad59a00577c08d7ecf99c922820d811dea48668f4f3bc497acff3",
+        "browser_download_url": "https://github.com/eurobuddha/minimacore-desktop/releases/download/v0.17.32/minimaCore-0.17.32-x64.AppImage"
+      },
+      {
+        "id": 619373030,
+        "name": "minimaCore-0.17.32-x64.exe",
+        "size": 152248347,
+        "digest": "sha256:19fa94b04640d930b67603586de71d481cc37dcf1ff825f5996a8480fd595b00",
+        "browser_download_url": "https://github.com/eurobuddha/minimacore-desktop/releases/download/v0.17.32/minimaCore-0.17.32-x64.exe"
+      },
+      {
+        "id": 619386898,
+        "name": "minimaCore-0.17.32-arm64-notarized.dmg",
+        "size": 164669848,
+        "digest": "sha256:6694b77f6013c8c0d1e02888a257f048fb4cf1a3dd8cdbfdbf5699df7bb70ae6",
+        "browser_download_url": "https://github.com/eurobuddha/minimacore-desktop/releases/download/v0.17.32/minimaCore-0.17.32-arm64-notarized.dmg"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/pandaget-desktop",
+    "tag": "v0.1.3",
+    "url": "https://github.com/eurobuddha/pandaget-desktop/releases/tag/v0.1.3",
+    "assets": [
+      {
+        "id": 619378457,
+        "name": "PandaGet-0.1.3.AppImage",
+        "size": 109060726,
+        "digest": "sha256:ea551080329baa4536cbeec08bb51ae2a2fe1748feb467af0b2f084dfc55f737",
+        "browser_download_url": "https://github.com/eurobuddha/pandaget-desktop/releases/download/v0.1.3/PandaGet-0.1.3.AppImage"
+      },
+      {
+        "id": 619379650,
+        "name": "PandaGet.Setup.0.1.3.exe",
+        "size": 81955053,
+        "digest": "sha256:f30dc8d879f322c939b230babd00d1cf56216a8d483ecd87635cd859d2b00915",
+        "browser_download_url": "https://github.com/eurobuddha/pandaget-desktop/releases/download/v0.1.3/PandaGet.Setup.0.1.3.exe"
+      },
+      {
+        "id": 619393562,
+        "name": "PandaGet-0.1.3-arm64-notarized.dmg",
+        "size": 107355415,
+        "digest": "sha256:656e76e467e628f38c9680a9448b98a24885b1e537282fb427b36438c1e166fb",
+        "browser_download_url": "https://github.com/eurobuddha/pandaget-desktop/releases/download/v0.1.3/PandaGet-0.1.3-arm64-notarized.dmg"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minimaDesk",
+    "tag": "v0.7.74",
+    "url": "https://github.com/eurobuddha/minimaDesk/releases/tag/v0.7.74",
+    "assets": [
+      {
+        "id": 619376757,
+        "name": "minimaDesk-0.7.74.AppImage",
+        "size": 245030235,
+        "digest": "sha256:6f2a41945a5ab82abc9db6e35edd276130810a25f0bb2cdaa38ff8b8f91fcffa",
+        "browser_download_url": "https://github.com/eurobuddha/minimaDesk/releases/download/v0.7.74/minimaDesk-0.7.74.AppImage"
+      },
+      {
+        "id": 619383632,
+        "name": "minimaDesk.Setup.0.7.74.exe",
+        "size": 210135700,
+        "digest": "sha256:155d7289f4addde88dcf0523842420ccb6e470cc5efcac4eb4ae8f8526eb8f52",
+        "browser_download_url": "https://github.com/eurobuddha/minimaDesk/releases/download/v0.7.74/minimaDesk.Setup.0.7.74.exe"
+      },
+      {
+        "id": 619390545,
+        "name": "minimaDesk-0.7.74-arm64-notarized.dmg",
+        "size": 230105060,
+        "digest": "sha256:4abeff01ee3221c80228d2eaed0cef0ef10c96f52457ba9bbcbfab84116c674f",
+        "browser_download_url": "https://github.com/eurobuddha/minimaDesk/releases/download/v0.7.74/minimaDesk-0.7.74-arm64-notarized.dmg"
+      }
+    ]
+  },
+  {
+    "repo": "eurobuddha/minimacore-appstore",
+    "tag": "v0.3.2",
+    "url": "https://github.com/eurobuddha/minimacore-appstore/releases/tag/v0.3.2",
+    "assets": [
+      {
+        "id": 619399263,
+        "name": "minimaCore-App-Store-0.3.2.mds.zip",
+        "size": 92637,
+        "digest": "sha256:5e3c056185ad60b91b4e9137ce805c3f105a432f706c867b87199814728ecae3",
+        "browser_download_url": "https://github.com/eurobuddha/minimacore-appstore/releases/download/v0.3.2/minimaCore-App-Store-0.3.2.mds.zip"
+      }
+    ]
+  }
+]

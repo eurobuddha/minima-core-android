@@ -1,0 +1,23 @@
+{
+  "app": "minimaDesk",
+  "version": "0.7.74",
+  "date": "2026-10-07",
+  "notes": "Preserve the existing wallet when data-folder migration fails. Read-only previews do not relocate data; new wallet storage is durable. Signed and notarized Mac installer; native Windows and Linux builds.",
+  "platforms": {
+    "mac-arm64": {
+      "file": "https://github.com/eurobuddha/minimaDesk/releases/download/v0.7.74/minimaDesk-0.7.74-arm64-notarized.dmg",
+      "sha256": "4abeff01ee3221c80228d2eaed0cef0ef10c96f52457ba9bbcbfab84116c674f",
+      "size": 230105060
+    },
+    "win-x64": {
+      "file": "https://github.com/eurobuddha/minimaDesk/releases/download/v0.7.74/minimaDesk.Setup.0.7.74.exe",
+      "sha256": "155d7289f4addde88dcf0523842420ccb6e470cc5efcac4eb4ae8f8526eb8f52",
+      "size": 210135700
+    },
+    "linux-x64": {
+      "file": "https://github.com/eurobuddha/minimaDesk/releases/download/v0.7.74/minimaDesk-0.7.74.AppImage",
+      "sha256": "6f2a41945a5ab82abc9db6e35edd276130810a25f0bb2cdaa38ff8b8f91fcffa",
+      "size": 245030235
+    }
+  }
+}

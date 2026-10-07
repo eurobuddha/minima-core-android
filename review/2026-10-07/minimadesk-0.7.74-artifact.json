@@ -17,6 +17,7 @@
     "app and DMG stapled",
     "Gatekeeper app and DMG"
   ],
-  "published": false,
-  "ci": "https://github.com/eurobuddha/minimaDesk/actions/runs/37643351525"
+  "published": true,
+  "ci": "https://github.com/eurobuddha/minimaDesk/actions/runs/37643351525",
+  "published_url": "https://github.com/eurobuddha/minimaDesk/releases/download/v0.7.74/minimaDesk-0.7.74-arm64-notarized.dmg"
 }

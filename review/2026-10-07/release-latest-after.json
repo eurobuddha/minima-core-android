@@ -1,0 +1,158 @@
+[
+  {
+    "repo": "eurobuddha/PocketWeb",
+    "status": "Preserved MiniDapp latest channel; Android has explicit android-v0.11.4 release and catalogue listing"
+  },
+  {
+    "repo": "eurobuddha/futurecash-next-apk",
+    "latest": "v0.1.8"
+  },
+  {
+    "repo": "eurobuddha/maxima",
+    "latest": "v0.6.134"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android",
+    "latest": "v1.9.10-PandaBear"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-atomix",
+    "latest": "v0.1.72"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-blockexplorer",
+    "latest": "v0.1.5"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-casino",
+    "latest": "v0.7.3"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-entropy",
+    "latest": "v0.1.9"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-ethwallet",
+    "latest": "v0.2.6"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-expert",
+    "latest": "v0.7.4"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-faucet",
+    "latest": "v0.2.5"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-filez",
+    "latest": "v0.1.12"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-futurecash",
+    "latest": "v0.2.13"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-history",
+    "latest": "v0.3.10"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-keyreuses",
+    "latest": "v0.1.3"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-limit",
+    "latest": "v0.3.4"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-mail",
+    "latest": "v0.5.11"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-merchinbox",
+    "latest": "v0.5.3"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-merchshop",
+    "latest": "v0.4.4"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-merchstudio",
+    "latest": "v0.3.4"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-minimaswap",
+    "latest": "v0.18.5"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-nftstudio",
+    "latest": "v0.2.1"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-nftwallet",
+    "latest": "v0.1.9"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-pandaapps",
+    "latest": "v0.4.5"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-pandadex",
+    "latest": "v0.4.22"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-pandapools",
+    "latest": "v0.9.66"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-salon",
+    "latest": "v0.11.34"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-terminal",
+    "latest": "v1.3.4"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-terminalide",
+    "latest": "v0.3.2"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-usdtswap",
+    "latest": "v0.1.7"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-utxo",
+    "latest": "v0.4.33"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-vestr",
+    "latest": "v0.4.6"
+  },
+  {
+    "repo": "eurobuddha/minimaDesk",
+    "latest": "v0.7.74"
+  },
+  {
+    "repo": "eurobuddha/minimaDocs",
+    "latest": "v0.3.2"
+  },
+  {
+    "repo": "eurobuddha/minimacore-appstore",
+    "latest": "v0.3.2"
+  },
+  {
+    "repo": "eurobuddha/minimacore-desktop",
+    "latest": "v0.17.32"
+  },
+  {
+    "repo": "eurobuddha/openly",
+    "latest": "v0.2.10"
+  },
+  {
+    "repo": "eurobuddha/pandaget-desktop",
+    "latest": "v0.1.3"
+  },
+  {
+    "repo": "eurobuddha/statenft-suite",
+    "latest": "v0.7.18"
+  }
+]

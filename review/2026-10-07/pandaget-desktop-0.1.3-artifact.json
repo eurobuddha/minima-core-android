@@ -12,6 +12,7 @@
     "app and DMG stapled",
     "Gatekeeper app and DMG"
   ],
-  "published": false,
-  "ci": "https://github.com/eurobuddha/pandaget-desktop/actions/runs/37638468858"
+  "published": true,
+  "ci": "https://github.com/eurobuddha/pandaget-desktop/actions/runs/37638468858",
+  "published_url": "https://github.com/eurobuddha/pandaget-desktop/releases/download/v0.1.3/PandaGet-0.1.3-arm64-notarized.dmg"
 }

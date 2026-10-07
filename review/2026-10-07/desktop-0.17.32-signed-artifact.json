@@ -12,5 +12,6 @@
     "Gatekeeper app and DMG"
   ],
   "log": "review/2026-10-07/desktop-0.17.32-signed-build.log",
-  "published": false
+  "published": true,
+  "published_url": "https://github.com/eurobuddha/minimacore-desktop/releases/download/v0.17.32/minimaCore-0.17.32-arm64-notarized.dmg"
 }

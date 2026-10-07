@@ -1,0 +1,236 @@
+[
+  {
+    "repo": "eurobuddha/PocketWeb",
+    "tag": "v0.5.9",
+    "id": 303112467,
+    "published_at": "2026-03-30T10:29:46Z"
+  },
+  {
+    "repo": "eurobuddha/futurecash-next-apk",
+    "tag": "v0.1.7",
+    "id": 380374769,
+    "published_at": "2026-09-01T09:38:19Z"
+  },
+  {
+    "repo": "eurobuddha/maxima",
+    "tag": "v0.6.133",
+    "id": 403244772,
+    "published_at": "2026-10-04T22:58:25Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android",
+    "tag": "v1.7.4-PandaBear",
+    "id": 404544868,
+    "published_at": "2026-10-06T09:46:05Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-atomix",
+    "tag": "v0.1.71",
+    "id": 404544918,
+    "published_at": "2026-10-06T09:46:14Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-blockexplorer",
+    "tag": "v0.1.0",
+    "id": 376689208,
+    "published_at": "2026-08-25T20:18:59Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-casino",
+    "tag": "v0.7.2",
+    "id": 386611110,
+    "published_at": "2026-09-10T20:43:38Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-entropy",
+    "tag": "v0.1.8",
+    "id": 376689674,
+    "published_at": "2026-08-25T20:19:50Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-ethwallet",
+    "tag": "v0.2.5",
+    "id": 386848639,
+    "published_at": "2026-09-11T07:19:54Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-expert",
+    "tag": "v0.5.0",
+    "id": 376699902,
+    "published_at": "2026-08-25T20:36:42Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-faucet",
+    "tag": "v0.2.0",
+    "id": 376704574,
+    "published_at": "2026-08-25T20:44:32Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-filez",
+    "tag": "v0.1.11",
+    "id": 386848541,
+    "published_at": "2026-09-11T07:19:46Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-futurecash",
+    "tag": "v0.2.9",
+    "id": 376702135,
+    "published_at": "2026-08-25T20:40:54Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-history",
+    "tag": "v0.3.8",
+    "id": 386848716,
+    "published_at": "2026-09-11T07:20:03Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-keyreuses",
+    "tag": "v0.1.0",
+    "id": 376704230,
+    "published_at": "2026-08-25T20:43:52Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-limit",
+    "tag": "v0.3.1",
+    "id": 376696245,
+    "published_at": "2026-08-25T20:30:58Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-mail",
+    "tag": "v0.5.8",
+    "id": 395539720,
+    "published_at": "2026-09-24T09:50:56Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-merchinbox",
+    "tag": "v0.5.0",
+    "id": 376704937,
+    "published_at": "2026-08-25T20:45:09Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-merchshop",
+    "tag": "v0.4.0",
+    "id": 376690207,
+    "published_at": "2026-08-25T20:20:48Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-merchstudio",
+    "tag": "v0.3.3",
+    "id": 386848796,
+    "published_at": "2026-09-11T07:20:13Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-minimaswap",
+    "tag": "v0.9.3",
+    "id": 376721230,
+    "published_at": "2026-08-25T21:08:56Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-nftstudio",
+    "tag": "v0.2.0",
+    "id": 376721875,
+    "published_at": "2026-08-25T21:10:20Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-nftwallet",
+    "tag": "v0.1.5",
+    "id": 376705713,
+    "published_at": "2026-08-25T20:46:30Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-pandaapps",
+    "tag": "v0.4.4",
+    "id": 397762115,
+    "published_at": "2026-09-27T18:33:19Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-pandadex",
+    "tag": "v0.4.21",
+    "id": 392963966,
+    "published_at": "2026-09-21T13:01:18Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-pandapools",
+    "tag": "v0.9.64",
+    "id": 404544917,
+    "published_at": "2026-10-06T09:45:55Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-salon",
+    "tag": "v0.11.33",
+    "id": 375596456,
+    "published_at": "2026-08-24T09:55:55Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-terminal",
+    "tag": "v1.3.2",
+    "id": 376959324,
+    "published_at": "2026-08-26T07:49:28Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-terminalide",
+    "tag": "v0.3.1",
+    "id": 382175720,
+    "published_at": "2026-09-03T16:32:55Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-usdtswap",
+    "tag": "v0.1.4",
+    "id": 373661192,
+    "published_at": "2026-08-20T10:44:18Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-utxo",
+    "tag": "v0.4.5",
+    "id": 376697369,
+    "published_at": "2026-08-25T20:33:01Z"
+  },
+  {
+    "repo": "eurobuddha/minima-core-android-vestr",
+    "tag": "v0.4.0",
+    "id": 376722665,
+    "published_at": "2026-08-25T21:12:00Z"
+  },
+  {
+    "repo": "eurobuddha/minimaDesk",
+    "tag": "v0.7.73",
+    "id": 403245263,
+    "published_at": "2026-10-04T22:59:41Z"
+  },
+  {
+    "repo": "eurobuddha/minimaDocs",
+    "tag": "v0.3.1",
+    "id": 403947819,
+    "published_at": "2026-10-05T17:12:39Z"
+  },
+  {
+    "repo": "eurobuddha/minimacore-appstore",
+    "tag": "v0.2.2",
+    "id": 367565108,
+    "published_at": "2026-08-09T19:25:46Z"
+  },
+  {
+    "repo": "eurobuddha/minimacore-desktop",
+    "tag": "v0.17.31",
+    "id": 403742542,
+    "published_at": "2026-10-05T13:28:13Z"
+  },
+  {
+    "repo": "eurobuddha/openly",
+    "tag": "v0.2.6",
+    "id": 376724870,
+    "published_at": "2026-08-25T21:16:39Z"
+  },
+  {
+    "repo": "eurobuddha/pandaget-desktop",
+    "tag": "v0.1.2",
+    "id": 384350978,
+    "published_at": "2026-09-07T22:58:37Z"
+  },
+  {
+    "repo": "eurobuddha/statenft-suite",
+    "tag": "v0.7.15",
+    "id": 371201097,
+    "published_at": "2026-08-16T01:23:33Z"
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "app": "minimaCore Desktop",
+  "version": "0.17.32",
+  "date": "2026-10-07",
+  "notes": "Reviewed companion integration, namespace and recovery fixes. Signed and notarized Mac installer; native Windows and Linux builds.",
+  "platforms": {
+    "mac-arm64": {
+      "file": "https://github.com/eurobuddha/minimacore-desktop/releases/download/v0.17.32/minimaCore-0.17.32-arm64-notarized.dmg",
+      "sha256": "6694b77f6013c8c0d1e02888a257f048fb4cf1a3dd8cdbfdbf5699df7bb70ae6",
+      "size": 164669848
+    },
+    "win-x64": {
+      "file": "https://github.com/eurobuddha/minimacore-desktop/releases/download/v0.17.32/minimaCore-0.17.32-x64.exe",
+      "sha256": "19fa94b04640d930b67603586de71d481cc37dcf1ff825f5996a8480fd595b00",
+      "size": 152248347
+    },
+    "linux-x64": {
+      "file": "https://github.com/eurobuddha/minimacore-desktop/releases/download/v0.17.32/minimaCore-0.17.32-x64.AppImage",
+      "sha256": "9223971f4cfad59a00577c08d7ecf99c922820d811dea48668f4f3bc497acff3",
+      "size": 188492860
+    }
+  }
+}
