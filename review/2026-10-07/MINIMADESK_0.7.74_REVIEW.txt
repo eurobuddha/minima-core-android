@@ -1,0 +1,18 @@
+Code review — minimaDesk 0.7.74
+
+MAJOR — failed wallet-folder migration selected an empty destination (fixed).
+main/config.js swallowed rename failure and returned the absent destination, allowing a new wallet to appear instead of the existing one. It now retains the source on failure. Eight isolated regressions cover failure, success, existing destinations, old temporary storage, durable new storage, and the actual node argument builder.
+
+MAJOR — read-only resolution could relocate live data (fixed).
+Settings preview and status paths called a mutating defaultDataFolder. Only the actual startup argument builder now requests migration, after the existing adopt/stale-node checks. Read-only resolution and preview retain the current path without writes.
+
+MAJOR — new wallets could be created in temporary storage (fixed).
+Homes with whitespace previously selected os.tmpdir(). New wallets now use the durable home location; older temporary wallets are recognised and retained if startup relocation fails. Existing explicit configured paths remain in effect. The bundled store was refreshed to tested 0.3.2 so its install command quotes paths with spaces.
+
+Validation: eight data-folder tests, three RPC tests, six Parlons tests, three retired-host tests, TypeScript check and renderer build all pass. Bundled MiniDapp archive versions match manifest. Source commit 2788490115935013e7f55ff1060b80f569c6344a.
+
+Source commit pushed to origin/master after the transient GitHub server error cleared. Three-platform CI: https://github.com/eurobuddha/minimaDesk/actions/runs/37643351525 (passed on macOS, Windows and Linux).
+
+The local macOS 0.7.74 installer completed successfully: Developer ID, hardened runtime, strict deep signature verification, app and DMG notarization/stapling, and Gatekeeper acceptance all passed. SHA256: 4abeff01ee3221c80228d2eaed0cef0ef10c96f52457ba9bbcbfab84116c674f. Previous bundle and installers retained.
+
+Verdict: fixes pass local review/tests. Build verification complete; publication pending owner selection. No live node, wallet data, or installed application was opened or changed for this review.

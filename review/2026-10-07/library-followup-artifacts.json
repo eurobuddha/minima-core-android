@@ -1,0 +1,152 @@
+[
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-1.9.6-candidate.apk",
+    "sha256": "64b0928d3c9a5e5ba22ac6bf99c212cc5be792c2803a3c043f69158ff6d2a7e2",
+    "family_signature": true,
+    "former_namespace_scan": "clean"
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/futurecash/dist/futurecash-0.2.12.apk",
+    "sha256": "1672658216788c398af5eafe7accaf5c63713b08906208706a618d3c93273e3c",
+    "family_signature": true,
+    "former_namespace_scan": "clean"
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/keyreuses/dist/keyreuses-0.1.3.apk",
+    "sha256": "38d8204c914dbd55fcfb0c1b16c5671e1211a162b6a5987649ca03356b54ec19",
+    "family_signature": true,
+    "former_namespace_scan": "clean"
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-PandaBear-1.9.6-candidate.apk",
+    "sha256": "5f0ba7339207cb9f8b12c9ae2c5ba4b7e14e1176d6cedb4acf170bbfe312c88f",
+    "family_signature": true,
+    "tests": {
+      "tests": 113,
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-BlackBear-1.9.6-candidate.apk",
+    "sha256": "8e8fd803a8be78cf1f9db0b5478d4b96fc34afe5b217d8c4de67b925174efec0",
+    "family_signature": true,
+    "tests": {
+      "tests": 113,
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/maxima/build/account-import/dist/maxima-app-0.6.134-release.apk",
+    "sha256": "263685b38eb379e6e2e942f8a6099adb823a370d7f6ec46b4eef1fdd592bd419",
+    "family_signature": true,
+    "former_namespace_scan": "clean",
+    "tests": {
+      "tests": 38,
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/maxima/build/account-import/dist/parlons-cloud-portal-0.2.83-release.apk",
+    "sha256": "686d36b84ef8f168d61c5a9265ff99aab0d0a0a6b74201d02f05009e2378779c",
+    "family_signature": true,
+    "former_namespace_scan": "clean",
+    "tests": {
+      "tests": 28,
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-1.9.6-candidate2.apk",
+    "sha256": "1eabda7f965a06c3a766559c0dc8874cd31000235679234a64f4f34aab110749",
+    "family_signature": true,
+    "former_namespace_scan": "clean"
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/futurecash/dist/futurecash-0.2.13.apk",
+    "sha256": "ed573544190eb07cc9382d1fa2d46ea52f510ba40ab4374b471368ab343bc045",
+    "family_signature": true,
+    "former_namespace_scan": "clean"
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/vestr/dist/vestr-0.4.6.apk",
+    "sha256": "950286605c16e9c98760d91a2fa75a2a3d0150e1af4b224528a20bc501b76d38",
+    "family_signature": true,
+    "former_namespace_scan": "clean"
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-1.9.7-candidate.apk",
+    "sha256": "0bf7c542f2768420fa75264628ce6e9ce57d78000465ccb5c385a26182d29fb7",
+    "family_signature": true,
+    "installed_on": "R3GL805K7MB",
+    "validation": "Fold UI confirms History label; live block 2353941 and 3 connections after graceful restart"
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-1.9.8-candidate.apk",
+    "sha256": "110c0199f92b6273ac829a15575b0f46bafead65aae55c0be37aa0846c850086",
+    "family_signature": true,
+    "tests": {
+      "tests": 115,
+      "failures": 0,
+      "errors": 0
+    },
+    "device_test": "compactHeaderAndLongPressOrderPersist passed 19.968s on disposable emulator",
+    "installed_on": null
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/mail/dist/minima-mail-0.5.11.apk",
+    "sha256": "aba321bcba29af909dfd2610650b60d181238521a62d21bc84934eb42692030a",
+    "family_signature": true,
+    "former_namespace_scan": "clean"
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/pandapools/dist/pandapools-0.9.66.apk",
+    "sha256": "991531e1f04d797904737c3cf35790d2f40dc08fc2f000ae73b38136e05d7de5",
+    "family_signature": true,
+    "former_namespace_scan": "clean"
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-1.9.9-candidate.apk",
+    "sha256": "013bbafb6ae9d954ab23d15d237a99d9813cf1d7620beed091d8963ac7e3f53b",
+    "validation": "ADB install -r succeeded; installed version verified; Fold UI confirms centred Core title and left/right menus share the row (old tab top407px, new270px). User confirmed 1.9.9 installed and everything working well. Long-hold reorder passed prior emulator gesture/persistence test; physical drag was not completed before user confirmation.",
+    "installed_on": "R3GL805K7MB",
+    "version": "1.9.9-Pandamonium",
+    "versionCode": 80
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/history/dist/history-0.3.10.apk",
+    "sha256": "249b77f4fbd35716ffe5d5f9f3ca268b05521c895a324fb74c293d326de534f0",
+    "validation": "Two token metadata regressions passed; cached rows normalized on read without deleting data",
+    "installed_on": null
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/openly/dist/openly-0.2.10+9ea5508.apk",
+    "sha256": "d9e10addd6829694ed6b08d4304cb32af7121ea2e118d5b240ba080c3c5788e2",
+    "version": "0.2.10+9ea5508",
+    "versionCode": 210,
+    "family_signature": true,
+    "former_namespace_scan": "clean",
+    "tests": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  {
+    "artifact": "/Users/eurobuddha/Projects/minima/apks/NFTwallet/dist/NFTwallet-0.1.9.apk",
+    "sha256": "deb96336aa9279490412476a5ff597f2e8b7ce1a10b8e053b12a928b85ffa61d",
+    "package": "com.eurobuddha.nftwallet",
+    "version": "0.1.9",
+    "versionCode": 109,
+    "family_signature": true,
+    "former_namespace_scan": "clean",
+    "tests": {
+      "tests": 59,
+      "failures": 0,
+      "errors": 0
+    }
+  }
+]

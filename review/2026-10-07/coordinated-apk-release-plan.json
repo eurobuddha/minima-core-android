@@ -1,0 +1,468 @@
+{
+  "catalog": "local checked-out catalogue",
+  "entries": [
+    {
+      "name": "minimaDocs",
+      "listed_version": "0.3.1",
+      "listed_package": "com.eurobuddha.minimadocs",
+      "candidate": {
+        "package": "com.eurobuddha.minimadocs",
+        "versionCode": 302,
+        "version": "0.3.2",
+        "artifact": "/Users/eurobuddha/Projects/minima/mininotes/minimaDocs/android/dist/minimadocs-0.3.2.apk",
+        "sha256": "f46b125447220ba15c42645b20059a3880abc2390accc45d0e78544845ad34d5"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "PandaApps",
+      "listed_version": "0.4.4",
+      "listed_package": "com.eurobuddha.pandaapps",
+      "candidate": {
+        "package": "com.eurobuddha.pandaapps",
+        "versionCode": 405,
+        "version": "0.4.5",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/pandaapps/dist/pandaapps-0.4.5.apk",
+        "sha256": "c01aaa6bd7ac82eb5b2facc5645154762d540de08c49248557d7ac9b141febb3"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "PandaGet",
+      "listed_version": "0.4.4",
+      "listed_package": "com.eurobuddha.pandaget",
+      "candidate": {
+        "package": "com.eurobuddha.pandaget",
+        "versionCode": 405,
+        "version": "0.4.5",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/pandaapps/dist/pandaget-0.4.5.apk",
+        "sha256": "973209babf2c78571ebb564d9ad08b403e777a47ebcb325871960c42ce7dae36"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Parlons!",
+      "listed_version": "0.6.133",
+      "listed_package": "com.eurobuddha.maxima.app",
+      "candidate": {
+        "package": "com.eurobuddha.maxima.app",
+        "versionCode": 734,
+        "version": "0.6.134",
+        "artifact": "/Users/eurobuddha/Projects/minima/maxima/build/account-import/dist/maxima-app-0.6.134-release.apk",
+        "sha256": "263685b38eb379e6e2e942f8a6099adb823a370d7f6ec46b4eef1fdd592bd419"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Terminal IDE",
+      "listed_version": "0.3.1",
+      "listed_package": "com.eurobuddha.terminalide",
+      "candidate": {
+        "package": "com.eurobuddha.terminalide",
+        "versionCode": 302,
+        "version": "0.3.2",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/terminalide/dist/terminalide-0.3.2-candidate2.apk",
+        "sha256": "2784504af471d5389559bbc5bf54fc28d67f7f5a7d109c5d21c39518988af04b"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Zero Edge Casino",
+      "listed_version": "0.7.2",
+      "listed_package": "com.eurobuddha.casino",
+      "candidate": {
+        "package": "com.eurobuddha.casino",
+        "versionCode": 703,
+        "version": "0.7.3",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/casino/dist/casino-0.7.3.apk",
+        "sha256": "dcfaab631ae264edef0ee66cd25096ed6d91e45a1b41af58ee5fe3f3d1965701"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Openly",
+      "listed_version": "0.2.7",
+      "listed_package": "com.eurobuddha.openly",
+      "candidate": {
+        "package": "com.eurobuddha.openly",
+        "versionCode": 210,
+        "version": "0.2.10+9ea5508",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/openly/dist/openly-0.2.10+9ea5508.apk",
+        "sha256": "d9e10addd6829694ed6b08d4304cb32af7121ea2e118d5b240ba080c3c5788e2"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima UTXO Wallet",
+      "listed_version": "0.4.32",
+      "listed_package": "com.eurobuddha.utxo",
+      "candidate": {
+        "package": "com.eurobuddha.utxo",
+        "versionCode": 433,
+        "version": "0.4.33",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/utxo/dist/utxo-0.4.33-candidate2.apk",
+        "sha256": "610e2decbd2f923c68e1e2b9418a6f62c5924bea5ceb9b6003e29324fae4c7f7"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima History",
+      "listed_version": "0.3.8",
+      "listed_package": "com.eurobuddha.history",
+      "candidate": {
+        "package": "com.eurobuddha.history",
+        "versionCode": 310,
+        "version": "0.3.10",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/history/dist/history-0.3.10.apk",
+        "sha256": "249b77f4fbd35716ffe5d5f9f3ca268b05521c895a324fb74c293d326de534f0"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima Explorer",
+      "listed_version": "0.1.4",
+      "listed_package": "com.eurobuddha.blockexplorer",
+      "candidate": {
+        "package": "com.eurobuddha.blockexplorer",
+        "versionCode": 105,
+        "version": "0.1.5",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/blockexplorer/dist/blockexplorer-0.1.5-candidate2.apk",
+        "sha256": "386b842e08c54d09dc0477d4784e05e6f48fb10734b807e4ff27fe7cf1de13a7"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Filez",
+      "listed_version": "0.1.11",
+      "listed_package": "com.eurobuddha.filez",
+      "candidate": {
+        "package": "com.eurobuddha.filez",
+        "versionCode": 112,
+        "version": "0.1.12",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/filez/dist/filez-0.1.12-candidate2.apk",
+        "sha256": "3a9b66c905c6df766ad48cef8330b5b6cec61175dc112df9fdfef8bd7643ff8b"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima Vestr",
+      "listed_version": "0.4.4",
+      "listed_package": "com.eurobuddha.vestr",
+      "candidate": {
+        "package": "com.eurobuddha.vestr",
+        "versionCode": 406,
+        "version": "0.4.6",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/vestr/dist/vestr-0.4.6.apk",
+        "sha256": "950286605c16e9c98760d91a2fa75a2a3d0150e1af4b224528a20bc501b76d38"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "FutureCash",
+      "listed_version": "0.2.10",
+      "listed_package": "com.eurobuddha.futurecash",
+      "candidate": {
+        "package": "com.eurobuddha.futurecash",
+        "versionCode": 213,
+        "version": "0.2.13",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/futurecash/dist/futurecash-0.2.13.apk",
+        "sha256": "ed573544190eb07cc9382d1fa2d46ea52f510ba40ab4374b471368ab343bc045"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "FutureCash Next",
+      "listed_version": "0.1.7",
+      "listed_package": "com.eurobuddha.futurecashnext",
+      "candidate": {
+        "package": "com.eurobuddha.futurecashnext",
+        "versionCode": 108,
+        "version": "0.1.8",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/futurecash-next/dist/futurecash-next-0.1.8.apk",
+        "sha256": "0789f4ade5bbd6a8dce83d54fcbe9c913fe852ff95cc8fbf1585632ddc6de69d"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "AtomiX",
+      "listed_version": "0.1.71",
+      "listed_package": "com.eurobuddha.atomix",
+      "candidate": {
+        "package": "com.eurobuddha.atomix",
+        "versionCode": 172,
+        "version": "0.1.72",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/atomix/dist/atomix-0.1.72-candidate2.apk",
+        "sha256": "a9338d2f72ee41c1ee44645b17680483c7e4d27abc11fa8f79290c34cea38de6"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima ETH Wallet",
+      "listed_version": "0.2.5",
+      "listed_package": "com.eurobuddha.ethwallet",
+      "candidate": {
+        "package": "com.eurobuddha.ethwallet",
+        "versionCode": 206,
+        "version": "0.2.6",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/ethwallet/dist/ethwallet-0.2.6.apk",
+        "sha256": "b0ac43953fc7851a1f5b061a8d9dd4bb2a66e99c99307c2847406f0df1833400"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima Expert",
+      "listed_version": "0.7.3",
+      "listed_package": "com.eurobuddha.expert",
+      "candidate": {
+        "package": "com.eurobuddha.expert",
+        "versionCode": 704,
+        "version": "0.7.4",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/expert/dist/expert-0.7.4.apk",
+        "sha256": "cc164d7fd24d291db1ecf3e19b696a150afbbbb33ff7727b383617fb1e25e2b5"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima Faucet",
+      "listed_version": "0.2.4",
+      "listed_package": "com.eurobuddha.faucet",
+      "candidate": {
+        "package": "com.eurobuddha.faucet",
+        "versionCode": 205,
+        "version": "0.2.5",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/faucet/dist/faucet-0.2.5-candidate2.apk",
+        "sha256": "835506d5bc22a18d0e7f6d8fefe77e63b8c43a48524fc1d3acd2e6d140ae2eb1"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "miniMall",
+      "listed_version": "0.4.3",
+      "listed_package": "com.eurobuddha.merchshop",
+      "candidate": {
+        "package": "com.eurobuddha.merchshop",
+        "versionCode": 404,
+        "version": "0.4.4",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/merchshop/dist/merchshop-0.4.4.apk",
+        "sha256": "0ed58fd07e9ac488d2df088811778432596c7218b541581f6c8d6e24a6cb0923"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "miniMall Inbox",
+      "listed_version": "0.5.2",
+      "listed_package": "com.eurobuddha.merchinbox",
+      "candidate": {
+        "package": "com.eurobuddha.merchinbox",
+        "versionCode": 503,
+        "version": "0.5.3",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/merchinbox/dist/merchinbox-0.5.3.apk",
+        "sha256": "2fcb54e4e0ddf9e019c21bbe26d6a7e08fafe50b321b0a82af623c508ff36ad0"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "miniMall Studio",
+      "listed_version": "0.3.3",
+      "listed_package": "com.eurobuddha.merchstudio",
+      "candidate": {
+        "package": "com.eurobuddha.merchstudio",
+        "versionCode": 304,
+        "version": "0.3.4",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/merchstudio/dist/merchstudio-0.3.4.apk",
+        "sha256": "a1cf3156205845539d9002a03d0840fd0da5ed0cb8a1b02bd359800d738fbd57"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "minimaCore PandaBear",
+      "listed_version": "1.7.4-PandaBear",
+      "listed_package": "org.minimarex.minimacore",
+      "candidate": {
+        "package": "com.eurobuddha.minimacore",
+        "versionCode": 81,
+        "version": "1.9.10-PandaBear",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-PandaBear-1.9.10.apk",
+        "sha256": "472bd4ceeb494d94c752b8e9be060f9a369be5a147355a6edbf14eba296c16b3"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "minimaCore BlackBear",
+      "listed_version": "1.7.4-BlackBear",
+      "listed_package": "org.minimarex.minimablock",
+      "candidate": {
+        "package": "com.eurobuddha.minimablock",
+        "versionCode": 81,
+        "version": "1.9.10-BlackBear",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-BlackBear-1.9.10.apk",
+        "sha256": "f960490195423eff9d8ea11b2cbde1055e4f95fb680781be4745740b2f4bb9b9"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima Core",
+      "listed_version": "1.7",
+      "decision": "official build: existing hourly upstream sync retained; not a family namespace replacement"
+    },
+    {
+      "name": "Minima Terminal",
+      "listed_version": "1.3.3",
+      "listed_package": "org.minimarex.terminal",
+      "candidate": {
+        "package": "com.eurobuddha.terminal",
+        "versionCode": 8,
+        "version": "1.3.4",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/terminal/dist/terminal-1.3.4.apk",
+        "sha256": "fcaf5279b8d5f9c9c0c7a3b69e5af027937a42cf111aaf7b009672d67b0355b3"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima Wallet",
+      "listed_version": "0.2.12",
+      "decision": "keep 0.2.12 listed as owner instructed"
+    },
+    {
+      "name": "PandaPools",
+      "listed_version": "0.9.64",
+      "listed_package": "com.eurobuddha.pandapools",
+      "candidate": {
+        "package": "com.eurobuddha.pandapools",
+        "versionCode": 966,
+        "version": "0.9.66",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/pandapools/dist/pandapools-0.9.66.apk",
+        "sha256": "991531e1f04d797904737c3cf35790d2f40dc08fc2f000ae73b38136e05d7de5"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "PandaDEX",
+      "listed_version": "0.4.21",
+      "listed_package": "com.eurobuddha.pandadex",
+      "candidate": {
+        "package": "com.eurobuddha.pandadex",
+        "versionCode": 422,
+        "version": "0.4.22",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/pandadex/dist/pandadex-0.4.22.apk",
+        "sha256": "e0fdb17d1f9779fab5af2ba4d13c0f47e616bccab6c62172cf9f69510a089fd5"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "KeyUses",
+      "listed_version": "0.1.1",
+      "listed_package": "com.eurobuddha.keyreuses",
+      "candidate": {
+        "package": "com.eurobuddha.keyreuses",
+        "versionCode": 103,
+        "version": "0.1.3",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/keyreuses/dist/keyreuses-0.1.3.apk",
+        "sha256": "38d8204c914dbd55fcfb0c1b16c5671e1211a162b6a5987649ca03356b54ec19"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Brain Wallet",
+      "listed_version": "1.1.3",
+      "decision": "unchanged: offline derivation app, no node permissions, IPC, or network dependency"
+    },
+    {
+      "name": "Entropy",
+      "listed_version": "0.1.7",
+      "listed_package": "com.eurobuddha.entropy",
+      "candidate": {
+        "package": "com.eurobuddha.entropy",
+        "versionCode": 109,
+        "version": "0.1.9",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/entropy/dist/entropy-0.1.9.apk",
+        "sha256": "0890286928bcda2a68c6097d2c32520912ab019d5f7f4a9ebe3e9fa4376592f1"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima NFT Wallet",
+      "listed_version": "0.1.7",
+      "listed_package": "com.eurobuddha.nftwallet",
+      "candidate": {
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/NFTwallet/dist/NFTwallet-0.1.9.apk",
+        "sha256": "deb96336aa9279490412476a5ff597f2e8b7ce1a10b8e053b12a928b85ffa61d",
+        "package": "com.eurobuddha.nftwallet",
+        "version": "0.1.9",
+        "versionCode": 109,
+        "family_signature": true,
+        "former_namespace_scan": "clean",
+        "tests": {
+          "tests": 59,
+          "failures": 0,
+          "errors": 0
+        }
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Atelier",
+      "listed_version": "0.7.15",
+      "listed_package": "com.eurobuddha.statenft",
+      "candidate": {
+        "package": "com.eurobuddha.statenft",
+        "versionCode": 718,
+        "version": "0.7.18",
+        "artifact": "/Users/eurobuddha/Projects/minima/mds/statenft-suite/android/dist/statenft-0.7.18.apk",
+        "sha256": "35e3b1648344c32c134126a5b27200a4a2fe2b2abbb628f9a11baaef8d133c7b"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "The Salon",
+      "listed_version": "0.11.33",
+      "listed_package": "com.eurobuddha.salon",
+      "candidate": {
+        "package": "com.eurobuddha.salon",
+        "versionCode": 1134,
+        "version": "0.11.34",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/salon/dist/salon-0.11.34.apk",
+        "sha256": "364203ce1abccc308a5a850d4ec9ff248ca3ccf7f0b922ccb62c218b3c97cebd"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima Mail",
+      "listed_version": "0.5.8",
+      "listed_package": "com.eurobuddha.mail",
+      "candidate": {
+        "package": "com.eurobuddha.mail",
+        "versionCode": 511,
+        "version": "0.5.11",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/mail/dist/minima-mail-0.5.11.apk",
+        "sha256": "aba321bcba29af909dfd2610650b60d181238521a62d21bc84934eb42692030a"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Parlons Cloud Portal",
+      "listed_version": "0.2.82",
+      "listed_package": "com.eurobuddha.parlons.cloud",
+      "candidate": {
+        "package": "com.eurobuddha.parlons.cloud",
+        "versionCode": 283,
+        "version": "0.2.83",
+        "artifact": "/Users/eurobuddha/Projects/minima/maxima/build/account-import/dist/parlons-cloud-portal-0.2.83-release.apk",
+        "sha256": "686d36b84ef8f168d61c5a9265ff99aab0d0a0a6b74201d02f05009e2378779c"
+      },
+      "decision": "publication pending owner selection"
+    },
+    {
+      "name": "Minima Core Pandamonium",
+      "candidate": {
+        "package": "com.eurobuddha.pandamonium",
+        "versionCode": 81,
+        "version": "1.9.10-Pandamonium",
+        "artifact": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-1.9.10.apk",
+        "sha256": "38301193a655d7c971abf959bbcec7a5764b76edf31ad2e78b5c2e5c0ff6430f"
+      },
+      "decision": "new listing pending owner selection"
+    }
+  ],
+  "artifact_problems": []
+}

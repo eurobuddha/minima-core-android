@@ -203,5 +203,15 @@
     "repo": "/Users/eurobuddha/Projects/minima/desktop/minimacore-appstore",
     "commit": "c91bbb0d2ddaa7c784e3b6d04771577adb324d93",
     "pushed_to": "origin/main"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/desktop/minimaDesk",
+    "commit": "2788490115935013e7f55ff1060b80f569c6344a",
+    "pushed_to": "origin/master"
+  },
+  {
+    "repo": "/Users/eurobuddha/Projects/minima/apks/NFTwallet",
+    "commit": "8c1d0ee585074190ee72c9a4b4eacc087ec91497",
+    "pushed_to": "origin/main"
   }
 ]

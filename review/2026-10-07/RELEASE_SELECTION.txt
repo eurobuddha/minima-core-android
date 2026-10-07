@@ -1,0 +1,61 @@
+Release candidates — owner selection pending
+
+Coordinated Android release: 34 APKs (three Core builds and 31 companions). Companion discovery must be updated alongside the renamed Core packages. APK paths, version codes, and verified SHA256 values are recorded in coordinated-apk-release-plan.json.
+
+- minimaDocs: 0.3.2
+- PandaApps: 0.4.5
+- PandaGet: 0.4.5
+- Parlons!: 0.6.134
+- Terminal IDE: 0.3.2
+- Zero Edge Casino: 0.7.3
+- Openly: 0.2.10+9ea5508
+- Minima UTXO Wallet: 0.4.33
+- Minima History: 0.3.10
+- Minima Explorer: 0.1.5
+- Filez: 0.1.12
+- Minima Vestr: 0.4.6
+- FutureCash: 0.2.13
+- FutureCash Next: 0.1.8
+- AtomiX: 0.1.72
+- Minima ETH Wallet: 0.2.6
+- Minima Expert: 0.7.4
+- Minima Faucet: 0.2.5
+- miniMall: 0.4.4
+- miniMall Inbox: 0.5.3
+- miniMall Studio: 0.3.4
+- minimaCore PandaBear: 1.9.10-PandaBear
+- minimaCore BlackBear: 1.9.10-BlackBear
+- Minima Terminal: 1.3.4
+- PandaPools: 0.9.66
+- PandaDEX: 0.4.22
+- KeyUses: 0.1.3
+- Entropy: 0.1.9
+- Minima NFT Wallet: 0.1.9
+- Atelier: 0.7.18
+- The Salon: 0.11.34
+- Minima Mail: 0.5.11
+- Parlons Cloud Portal: 0.2.83
+- Minima Core Pandamonium: 1.9.10-Pandamonium
+
+Keep Minima Wallet 0.2.12 listed as explicitly requested. Keep the official upstream Minima Core hourly update workflow. Brain Wallet 1.1.3 is unchanged; it has no node IPC dependency.
+
+Build differences:
+PandaBear: Minima Core with classic startup policy.
+BlackBear: Minima Core with blocks-as-keyuses and low-RAM startup enforced.
+Pandamonium: Minima Core with integrated apps, blocks-as-keyuses and low-RAM enabled by default, plus the Settings classic-mode toggle that removes those defaults. External companion apps remain supported with the normal permission flow.
+
+The renamed Core package IDs are separate Android installation identities. Users of earlier IDs need their node backup and restore migration; an APK update cannot automatically inherit another package's private data. Historical downloads and data are retained. Pandamonium 1.9.9 remains on the owner's Fold and was confirmed working; 1.9.10 has not been installed there.
+
+Desktop/MiniDapp candidates:
+- Minima Core Desktop 0.17.32: macOS signed/notarized; macOS, Windows and Linux CI passed.
+- PandaGet Desktop 0.1.3: macOS signed/notarized; macOS, Windows and Linux CI passed.
+- minimaDesk 0.7.74: macOS signed/notarized; source pushed; macOS, Windows and Linux CI passed (37643351525).
+- Minima Core App Store MiniDapp 0.3.2: package verified; three path-quoting tests passed.
+
+Excluded from publication:
+- PocketWeb: local source committed; GitHub destination still needed.
+- Original Mininotes: local source committed; user-owned GitHub destination and release signing arrangement still needed; existing APK is unsigned.
+- C++ Core Preview: development preview; native protocol parity is not certified by this wrapper review.
+- Concurrent Wallet, Maxima and minimaDocs desktop work: not included in these release artifacts or staged by this task.
+
+Scope of verification: reviewed compatibility changes, unit/regression suites, build/lint/signature checks and earlier disposable-device registration tests. This does not claim a fresh end-to-end financial operation in every app or a complete audit of every pre-existing library feature. No live wallet transactions were performed.

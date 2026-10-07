@@ -1,0 +1,22 @@
+{
+  "path": "/Users/eurobuddha/Projects/minima/desktop/minimaDesk/dist/minimaDesk-0.7.74-arm64.dmg",
+  "size": 230105060,
+  "sha256": "4abeff01ee3221c80228d2eaed0cef0ef10c96f52457ba9bbcbfab84116c674f",
+  "version": "0.7.74",
+  "commit": "2788490115935013e7f55ff1060b80f569c6344a",
+  "checks": [
+    "8 data-folder regression tests",
+    "3 RPC tests",
+    "6 Parlons tests",
+    "3 retired-host tests",
+    "TypeScript",
+    "renderer build",
+    "Developer ID",
+    "hardened runtime",
+    "strict deep signature",
+    "app and DMG stapled",
+    "Gatekeeper app and DMG"
+  ],
+  "published": false,
+  "ci": "https://github.com/eurobuddha/minimaDesk/actions/runs/37643351525"
+}
