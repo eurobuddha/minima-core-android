@@ -1,0 +1,11 @@
+{
+  "tag": "v1.9.11-Pandamonium",
+  "url": "https://github.com/eurobuddha/minima-core-android/releases/tag/v1.9.11-Pandamonium",
+  "asset": {
+    "id": 621593840,
+    "name": "minima-core-Pandamonium-1.9.11.apk",
+    "size": 33054024,
+    "digest": "sha256:e02fdb72141bd5ebdd2bed7d09d6f104fe094720edf697278b92b1b44b056f15",
+    "browser_download_url": "https://github.com/eurobuddha/minima-core-android/releases/download/untagged-8f3ad9af593d65f55324/minima-core-Pandamonium-1.9.11.apk"
+  }
+}

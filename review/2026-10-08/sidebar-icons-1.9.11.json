@@ -20,6 +20,11 @@
     "findings": [],
     "verdict": "Approve"
   },
-  "published": false,
-  "installed_on_fold": false
+  "published": true,
+  "installed_on_fold": false,
+  "release_url": "https://github.com/eurobuddha/minima-core-android/releases/tag/v1.9.11-Pandamonium",
+  "catalogue_commit": "93e18f4014d09535774fc62414619a0e59be2b7f",
+  "ipfs_cid": "bafybeiaw6z4xufq45msq2c7hzvwng4vf75soxs423azv64nrtikfyaz2ey",
+  "publication_verification": "GitHub asset digest, downloaded release identity/signature/hash, all 58 catalogue entries, public IPFS pointer and full IPFS APK download verified.",
+  "remote_pin_note": "Filebase redundant pin unavailable; local IPFS pin and public gateway verified."
 }

@@ -1,0 +1,10 @@
+Minima Core — Pandamonium 1.9.11
+
+Each integrated app now shows its existing icon beside its title in the sidebar. Icons stay paired with their apps when you reorder the list. The Core row uses the Minima Core logo.
+
+The existing compact header, long-press reordering and saved app order remain in place. Standalone companion APK registration and permissions remain supported. Pandamonium still defaults to blocks-as-keyuses and low RAM, with the existing Classic mode startup setting.
+
+Validation: 115 unit tests passed; the existing emulator compact-header and long-press order-persistence regression passed; the sidebar was visually checked. Signed with the existing Minima Family certificate. Version code 82, package com.eurobuddha.pandamonium. This release has not been installed on the owner's Fold.
+
+Source: 9002bfb00948f9b797d42013626d4051fb79397a
+SHA-256: e02fdb72141bd5ebdd2bed7d09d6f104fe094720edf697278b92b1b44b056f15

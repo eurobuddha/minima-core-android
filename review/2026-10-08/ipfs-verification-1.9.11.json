@@ -1,0 +1,20 @@
+{
+  "cid": "bafybeiaw6z4xufq45msq2c7hzvwng4vf75soxs423azv64nrtikfyaz2ey",
+  "url": "https://ipfs.eurobuddha.com/ipfs/bafybeiaw6z4xufq45msq2c7hzvwng4vf75soxs423azv64nrtikfyaz2ey/apks/minima-core-Pandamonium-1.9.11.apk",
+  "sha256": "e02fdb72141bd5ebdd2bed7d09d6f104fe094720edf697278b92b1b44b056f15",
+  "size": 33054024,
+  "verified": true,
+  "row": {
+    "name": "Minima Core Pandamonium",
+    "category": "Core",
+    "source": "PandaApps",
+    "packageId": "com.eurobuddha.pandamonium",
+    "version": "1.9.11-Pandamonium",
+    "versionCode": 82,
+    "file": "apks/minima-core-Pandamonium-1.9.11.apk",
+    "sha256": "e02fdb72141bd5ebdd2bed7d09d6f104fe094720edf697278b92b1b44b056f15",
+    "repo": "https://github.com/eurobuddha/minima-core-android",
+    "icon": "apks/icons/minimacore-ui.png",
+    "description": "v1.9.11: app icons beside sidebar titles, following the saved order when reordered. Minima Core \u2014 Pandamonium build. Integrated companion apps, including Minima Mail and Minima Vestr. Compact header, History tab and persistent long-press sidebar ordering. Blocks-as-keyuses and low RAM are enabled by default; the classic-mode setting removes those defaults. v1.9.10: owned-versus-tracked coin handling, with ownership filtering applied before result limits. Standalone companion apps remain supported through their normal permissions. Use the matching eurobuddha companion updates. Migration from older Core package IDs requires backing up and restoring the node; shut down the old Core before starting this build. Run one Core at a time."
+  }
+}
