@@ -1,0 +1,25 @@
+{
+  "version": "1.9.11-Pandamonium",
+  "versionCode": 82,
+  "packageId": "com.eurobuddha.pandamonium",
+  "artifact": "dist/minima-core-Pandamonium-1.9.11.apk",
+  "sha256": "e02fdb72141bd5ebdd2bed7d09d6f104fe094720edf697278b92b1b44b056f15",
+  "certificate_sha256": "eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f",
+  "change": "Existing integrated launcher icons alongside sidebar titles; Core uses its manifest logo with selection-aware tint. Destination identity determines the icon after reordering.",
+  "validation": {
+    "unit_tests": 115,
+    "unit_failures": 0,
+    "release_build": "passed",
+    "release_signature": "verified Minima family certificate",
+    "emulator_navigation_regression": "compactHeaderAndLongPressOrderPersist passed",
+    "visual_check": "All 12 integrated app icons visibly aligned with titles after reorder. Visual review found the Core placeholder; replaced it with the manifest logo and rebuilt.",
+    "device": "disposable emulator-5580 only"
+  },
+  "review": {
+    "summary": "Pandamonium-only additive UI change reusing bundled resources and existing navigation rows. Launch targets, drag handlers, persistence, IPC and node parameters are unchanged.",
+    "findings": [],
+    "verdict": "Approve"
+  },
+  "published": false,
+  "installed_on_fold": false
+}

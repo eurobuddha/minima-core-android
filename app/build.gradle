@@ -118,8 +118,9 @@ android {
         // amounts or coin counts. New `coins own:true` filter for companion apps (NFT wallet)
         // that mean "the node's coins"; plain `coins relevant:true` still returns tracked coins
         // for watch-style apps (minimaWallet).
-        versionCode 81
-        versionName "1.9.10"
+        // vc82: existing app icons in the Pandamonium sidebar.
+        versionCode 82
+        versionName "1.9.11"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

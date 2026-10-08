@@ -128,6 +128,7 @@ public final class PandamoniumHooks {
                 TextView entry = text(activity, "", 16, TEXT);
                 entry.setGravity(Gravity.CENTER_VERTICAL);
                 entry.setPadding(dp(activity, 16), 0, dp(activity, 12), 0);
+                entry.setCompoundDrawablePadding(dp(activity, 12));
                 RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(-1, dp(activity, 50));
                 lp.bottomMargin = dp(activity, 4);
                 entry.setLayoutParams(lp);
@@ -137,6 +138,11 @@ public final class PandamoniumHooks {
                 final int destination = order.get(position);
                 TextView entry = (TextView) holder.itemView;
                 entry.setText(PandamoniumDestinations.NAMES[destination]);
+                android.graphics.drawable.Drawable icon = androidx.appcompat.content.res.AppCompatResources
+                        .getDrawable(activity, PandamoniumDestinations.ICONS[destination]).mutate();
+                if (destination == 0) icon.setTint(destination == selected ? BG : TEXT);
+                icon.setBounds(0, 0, dp(activity, 30), dp(activity, 30));
+                entry.setCompoundDrawablesRelative(icon, null, null, null);
                 entry.setTextColor(destination == selected ? BG : TEXT);
                 entry.setContentDescription(PandamoniumDestinations.NAMES[destination]
                         + (destination == selected ? ", selected" : ""));
