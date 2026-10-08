@@ -1,0 +1,16 @@
+{
+  "device": "R3GL805K7MB",
+  "core": {
+    "package": "com.eurobuddha.pandamonium",
+    "version": "1.9.10-Pandamonium",
+    "versionCode": 81
+  },
+  "store": {
+    "package": "com.eurobuddha.pandaapps",
+    "version": "0.4.4",
+    "versionCode": 404,
+    "declares_pandamonium_visibility": false
+  },
+  "resolution": "Published PandaApps 0.4.5 declares com.eurobuddha.pandamonium; update the store in place, then refresh. Core package matches 1.9.11 release.",
+  "device_changes": "None; read-only package inspection."
+}

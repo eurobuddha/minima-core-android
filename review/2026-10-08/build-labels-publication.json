@@ -1,0 +1,9 @@
+{
+  "catalogue_commit": "009a61358ba1861088943a15c69ff00991fd320f",
+  "labels": {
+    "com.eurobuddha.minimacore": "classic keys",
+    "com.eurobuddha.pandamonium": "fully loaded"
+  },
+  "ipfs_cid": "bafybeidjgucu7z575767tcnwlrwk7s3x6z5fqg7j5cr4myb7g2wwdc5d5a",
+  "verification": "Catalogue pre-push validation passed for all 58 entries and 57 binaries. Exact-commit GitHub and current public IPFS readbacks show both labels."
+}
