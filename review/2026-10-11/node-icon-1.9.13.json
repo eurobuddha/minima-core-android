@@ -1,0 +1,21 @@
+{
+  "version": "1.9.13-Pandamonium",
+  "versionCode": 84,
+  "packageId": "com.eurobuddha.pandamonium",
+  "artifact": "dist/minima-core-Pandamonium-1.9.13.apk",
+  "sha256": "758db06c2a85cb3e625de22bdcbc73df13e50e7f8589771ef8ee990e8449f4d7",
+  "change": "Use the official Minima MediaKit Node icon for the Pandamonium Node tab",
+  "source": "support/minima-mediakit/Minima_MediaKit/Assets/Icons svg/Node/Node.svg",
+  "validation": {
+    "release_build": "passed",
+    "official_svg_path": "exact match",
+    "family_signature": "verified"
+  },
+  "review": {
+    "summary": "Original 200-unit viewport and path preserved in a 25dp Android vector. Existing TabLayout tint applies. Flavor conditional leaves Home icon intact in other builds.",
+    "findings": [],
+    "verdict": "Approve"
+  },
+  "installed_on_fold": false,
+  "published": false
+}

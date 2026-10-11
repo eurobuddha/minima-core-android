@@ -27,5 +27,14 @@
     "verdict": "Approve"
   },
   "published": false,
-  "installed_on_fold": false
+  "installed_on_fold": true,
+  "fold_installation": {
+    "serial": "R3GL805K7MB",
+    "previous_version": "1.9.11-Pandamonium",
+    "version": "1.9.12-Pandamonium",
+    "versionCode": 83,
+    "method": "adb install -r after confirmed clean Core shutdown",
+    "data_cleared": false,
+    "verification": "Device package version checked; UI shows Wallet selected and wallet list present; tab order Wallet, History, Apps, Logs, Node."
+  }
 }

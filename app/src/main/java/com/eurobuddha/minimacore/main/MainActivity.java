@@ -111,7 +111,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         // Tab labels and content share the adapter positions for this build.
         tabs.getTabAt(MainAdapter.HOME_POSITION).setText(BuildConfig.PANDAMONIUM ? "Node" : "Home");
-        tabs.getTabAt(MainAdapter.HOME_POSITION).setIcon(R.drawable.ic_drawer_home);
+        tabs.getTabAt(MainAdapter.HOME_POSITION).setIcon(BuildConfig.PANDAMONIUM
+                ? R.drawable.ic_node : R.drawable.ic_drawer_home);
 
         tabs.getTabAt(MainAdapter.WALLET_POSITION).setText("Wallet");
         tabs.getTabAt(MainAdapter.WALLET_POSITION).setIcon(R.drawable.ic_minima);
