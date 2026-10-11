@@ -26,6 +26,28 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
     MainActivity mActivity;
 
     BaseView[] mAllViews;
+    private boolean hostVisible;
+    private int selectedPage;
+
+    public void setHostVisible(boolean visible, int page) {
+        if (!BuildConfig.PANDAMONIUM) return;
+        hostVisible = visible;
+        selectedPage = page;
+        updateVisibility();
+    }
+
+    public void selectPage(int page) {
+        if (!BuildConfig.PANDAMONIUM) { refreshPagerView(page); return; }
+        selectedPage = page;
+        updateVisibility();
+    }
+
+    private void updateVisibility() {
+        // Hide the previous page before activating the next one.
+        for (int i = 0; i < mAllViews.length; i++)
+            if (!hostVisible || i != selectedPage) mAllViews[i].setDisplayActive(false);
+        if (hostVisible) mAllViews[selectedPage].setDisplayActive(true);
+    }
 
     public static String RECEIVE_ADDRESS = null;
 
@@ -48,7 +70,7 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
 
     public void refreshPagerView(int zPosition){
         mAllViews[zPosition].refreshView();
-        mAllViews[zPosition].getMainView().invalidate();
+        if (mAllViews[zPosition].isDisplayActive()) mAllViews[zPosition].getMainView().invalidate();
     }
 
     public AppsView getAppsView(){
@@ -57,8 +79,7 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
 
     //Refresh the node dashboard..
     public void refreshHomeView(){
-        mAllViews[HOME_POSITION].refreshView();
-        mAllViews[HOME_POSITION].getMainView().invalidate();
+        refreshPagerView(HOME_POSITION);
     }
 
     @Override
@@ -92,7 +113,7 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
         for(int i=0;i<mAllViews.length;i++){
             if(mAllViews[i] != null){
                 mAllViews[i].refreshView();
-                mAllViews[i].getMainView().invalidate();
+                if (mAllViews[i].isDisplayActive()) mAllViews[i].getMainView().invalidate();
             }
         }
     }
@@ -101,6 +122,7 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
     public void destroyAllViews(){
         for(int i=0;i<mAllViews.length;i++){
             if(mAllViews[i] != null){
+                mAllViews[i].setDisplayActive(false);
                 mAllViews[i].onActivityDestroy();
             }
         }

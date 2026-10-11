@@ -54,13 +54,13 @@ public class BalanceView extends BaseView {
     private final Runnable mTick = new Runnable() {
         @Override
         public void run() {
-            if (destroyed) return;
+            if (destroyed || !isDisplayActive()) return;
             updateBreakdown();
             if (mMainView.getGlobalVisibleRect(new android.graphics.Rect())) {
                 mBalanceAdapter.refreshExpiredMetadata(mBalanceList.getFirstVisiblePosition(), mBalanceList.getLastVisiblePosition());
             }
             if(mBreakdown != null && mBreakdown.getWindowToken() != null){
-                mBreakdown.postDelayed(this, 10000);
+                main.postDelayed(this, 10000);
             }
         }
     };
@@ -125,12 +125,12 @@ public class BalanceView extends BaseView {
         if (android.os.Looper.myLooper() != android.os.Looper.getMainLooper()) {
             main.post(this::refreshView); return;
         }
-        if (destroyed) return;
+        if (destroyed || !isDisplayActive()) return;
 
         //Never stack timers when the tab is re-selected
         if(mBreakdown != null){
-            mBreakdown.removeCallbacks(mTick);
-            mBreakdown.postDelayed(mTick, 10000);
+            main.removeCallbacks(mTick);
+            main.postDelayed(mTick, 10000);
         }
 
         //Have we started
@@ -156,7 +156,7 @@ public class BalanceView extends BaseView {
     }
 
     private void applyBalance(JSONObject result) {
-        if (destroyed || getActivity().isFinishing() || getActivity().isDestroyed()) return;
+        if (destroyed || !isDisplayActive() || getActivity().isFinishing() || getActivity().isDestroyed()) return;
         if (!MinimaCMD.checkMinimaStarted()) { refreshView(); return; }
         Object balance = result == null ? null : result.get("response");
         if (result == null || Boolean.FALSE.equals(result.get("status")) || !(balance instanceof JSONArray)) {
@@ -228,6 +228,18 @@ public class BalanceView extends BaseView {
                 + "  ·  " + mCoinCount + " coins"
                 + "  ·  updated " + Format.ago(mLastBalanceUpdate)
                 + "  ·  tap a token for coins");
+    }
+
+    @Override protected void onShown() {
+        mBalanceAdapter.setDisplayActive(true);
+        updateBreakdown(); // Retained figures show their real age while reconciliation runs.
+        refreshView();
+    }
+
+    @Override protected void onHidden() {
+        refresh.invalidate();
+        main.removeCallbacks(mTick);
+        mBalanceAdapter.setDisplayActive(false);
     }
 
     @Override

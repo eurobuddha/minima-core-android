@@ -1,0 +1,79 @@
+{
+  "version": "1.9.14-Pandamonium",
+  "versionCode": 85,
+  "packageId": "com.eurobuddha.pandamonium",
+  "artifact": "dist/minima-core-Pandamonium-1.9.14.apk",
+  "sha256": "76a7c1ecafc3ecaed0680f7e606c2b524d011d922d0889a93b8e3f8335cbbeb7",
+  "certificate_sha256": "eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f",
+  "scope": "First display-sleep release: selected tab and visible host gate Core presentation work; Mail freshness timer follows visible Activity lifecycle",
+  "preserved": [
+    "AtomiX, PandaPools, PandaDEX financial code and schedules",
+    "Core node service and companion receiver/permissions",
+    "History capture and synchronization"
+  ],
+  "validation": {
+    "unit_tests": {
+      "core-pandamonium": {
+        "tests": 117,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "core-classic": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "core-block": {
+        "tests": 115,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "atomix": {
+        "tests": 260,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "pandapools": {
+        "tests": 300,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "pandadex": {
+        "tests": 701,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "minimaapi": {
+        "tests": 21,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "emulator": "2 tests passed: display sleep, stale timer/log callbacks, retained log catch-up, foreground/background, rapid switching, header, sidebar reorder persistence and recreation",
+    "importer": "Snapshot/provenance verification passed",
+    "release_build": "passed",
+    "release_signature": "verified"
+  },
+  "review": {
+    "summary": "Inspected all changed source. Reuses existing coalesced reads, retained log buffer, and shown/stopped lifecycle. Async reads are invalidated when hidden; log subscriptions capture their visibility generation. Apps refresh waits for the receiver DB while registration remains independent. No financial, history, service or receiver implementation changes.",
+    "resolved_findings": [
+      "Guard Apps display refresh before service database binding",
+      "Reject an old log subscription after hiding and reopening the Logs tab"
+    ],
+    "open_findings": [],
+    "verdict": "Approve"
+  },
+  "limitations": [
+    "Battery energy savings have not been measured on a physical device",
+    "No active funded-trade or Doze/reboot financial validation was performed; financial scheduling is unchanged"
+  ],
+  "installed_on_fold": false,
+  "published": false
+}

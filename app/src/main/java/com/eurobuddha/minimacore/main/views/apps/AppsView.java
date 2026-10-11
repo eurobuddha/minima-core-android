@@ -126,9 +126,13 @@ public class AppsView extends BaseView {
 
     @Override
     public void refreshView() {
+        if (!isDisplayActive()) return;
+        long generation = displayGeneration();
         mAppsList.post(new Runnable() {
             @Override
             public void run() {
+                if (!isDisplayActive() || generation != displayGeneration()
+                        || mAppsAdapter.getDatabase() == null) return;
                 mAppsAdapter.updateValues();
                 mAppsList.invalidate();
             }

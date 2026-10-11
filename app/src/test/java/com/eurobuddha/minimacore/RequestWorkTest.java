@@ -53,6 +53,33 @@ public class RequestWorkTest {
         assertEquals(Arrays.asList(2), rendered);
     }
 
+    @Test public void hideDropsQueuedFollowUpAndLateDelivery() {
+        Queue worker = new Queue(), ui = new Queue();
+        List<Integer> rendered = new ArrayList<>();
+        CoalescingRefresh<Integer> refresh = new CoalescingRefresh<>(worker, ui,
+                () -> 1, rendered::add, e -> fail());
+        refresh.request(); refresh.request();
+        worker.next(); // Reply is already queued when the screen is hidden.
+        refresh.invalidate(); ui.next();
+        assertTrue(rendered.isEmpty());
+        assertTrue(worker.tasks.isEmpty());
+    }
+
+    @Test public void rapidHideShowReconcilesOnceAfterOldReadCompletes() {
+        Queue worker = new Queue(), ui = new Queue();
+        AtomicInteger reads = new AtomicInteger(); List<Integer> rendered = new ArrayList<>();
+        CoalescingRefresh<Integer> refresh = new CoalescingRefresh<>(worker, ui,
+                reads::incrementAndGet, rendered::add, e -> fail());
+        refresh.request();
+        for (int i = 0; i < 20; i++) { refresh.invalidate(); refresh.request(); }
+        worker.next(); ui.next();
+        assertTrue(rendered.isEmpty());
+        assertEquals(1, worker.tasks.size());
+        worker.next(); ui.next();
+        assertEquals(Arrays.asList(2), rendered);
+        assertTrue(worker.tasks.isEmpty());
+    }
+
     @Test public void refreshCanRecoverFromReadFailureAndOverload() {
         AtomicInteger failures = new AtomicInteger();
         CoalescingRefresh<Integer> refresh = new CoalescingRefresh<>(Runnable::run, Runnable::run,

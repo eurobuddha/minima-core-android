@@ -120,8 +120,9 @@ android {
         // for watch-style apps (minimaWallet).
         // vc82: existing app icons in the Pandamonium sidebar.
         // vc83: Pandamonium opens on Wallet; Node follows Logs.
-        versionCode 84
-        versionName "1.9.13"
+        // vc85: sleep hidden Pandamonium display work, preserving financial services.
+        versionCode 85
+        versionName "1.9.14"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

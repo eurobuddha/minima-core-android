@@ -211,17 +211,20 @@ public class MainActivity extends AppCompatActivity {
         };
         // Subscribed only while this screen is visible.
 
-        ui.postDelayed(freshTick, 30000);
+        // Freshness display starts with the visible Activity.
     }
 
+    private boolean freshnessVisible;
     private final Runnable freshTick = new Runnable() {
         @Override public void run() {
+            if (!freshnessVisible) return;
             updateFreshness();
             ui.postDelayed(this, 30000);
         }
     };
 
     @Override protected void onDestroy() {
+        freshnessVisible = false;
         super.onDestroy();
         if (identityPrompt != null) identityPrompt.dismiss();
         ui.removeCallbacks(freshTick);
@@ -2389,9 +2392,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override protected void onStart() {
         super.onStart();
+        freshnessVisible = true;
+        ui.removeCallbacks(freshTick);
+        freshTick.run();
         DirectNodeEvents.subscribe(notifyReceiver, "NEWBLOCK", "NEWBALANCE");
     }
     @Override protected void onStop() {
+        freshnessVisible = false;
+        ui.removeCallbacks(freshTick);
         DirectNodeEvents.unsubscribe(notifyReceiver);
         super.onStop();
     }

@@ -34,6 +34,85 @@ public class NavigationRegressionTest {
         }
         return null;
     }
+
+    private static Object field(Object owner, String name) {
+        try {
+            java.lang.reflect.Field f=owner.getClass().getDeclaredField(name);
+            f.setAccessible(true); return f.get(owner);
+        } catch (ReflectiveOperationException e) { throw new AssertionError(e); }
+    }
+
+    @Test public void hiddenDisplaysSleepAndResumeWithoutLosingLogs() throws Exception {
+        assertEquals("true",InstrumentationRegistry.getArguments().getString("pandamoniumDisposable"));
+        assertTrue("Emulator only",android.os.Build.FINGERPRINT.contains("generic") || android.os.Build.MODEL.contains("sdk"));
+        android.content.Context ctx=InstrumentationRegistry.getInstrumentation().getTargetContext();
+        assertTrue("Reuse initialized disposable wallet",ctx.getSharedPreferences("main_prefs",0).getBoolean("SEED_SET",false));
+        ctx.startActivity(new Intent(ctx,com.eurobuddha.minimacore.StartActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        Activity core=await(PandamoniumDestinations.CLASSES[0]);
+        androidx.viewpager.widget.ViewPager pager=core.findViewById(com.eurobuddha.minimacore.R.id.main_pager);
+        com.eurobuddha.minimacore.main.MainAdapter adapter=(com.eurobuddha.minimacore.main.MainAdapter)pager.getAdapter();
+        com.eurobuddha.minimacore.main.BaseView[] pages=(com.eurobuddha.minimacore.main.BaseView[])field(adapter,"mAllViews");
+        com.eurobuddha.minimacore.main.BaseView wallet=pages[0], logs=pages[3], node=pages[4];
+        android.os.Handler walletHandler=(android.os.Handler)field(wallet,"main");
+        Runnable walletTick=(Runnable)field(wallet,"mTick");
+        String marker="battery-lifecycle-"+SystemClock.uptimeMillis();
+        AtomicReference<com.eurobuddha.minimacore.utils.LogBuffer.Sink> oldSink=new AtomicReference<>();
+        TextView logText=logs.getMainView().findViewById(com.eurobuddha.minimacore.R.id.logs_maintext);
+        ui(() -> {
+            pager.setCurrentItem(0,false);
+            assertTrue(wallet.isDisplayActive()); assertFalse(node.isDisplayActive()); assertFalse(logs.isDisplayActive());
+            assertTrue(walletHandler.hasCallbacks(walletTick));
+            pager.setCurrentItem(3,false);
+            oldSink.set((com.eurobuddha.minimacore.utils.LogBuffer.Sink)field(logs,"displaySink"));
+            assertFalse(walletHandler.hasCallbacks(walletTick));
+            // Queue an append, then hide before it can reach the TextView.
+            com.eurobuddha.minimacore.utils.LogBuffer.append(marker);
+            pager.setCurrentItem(0,false);
+        });
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        ui(() -> {
+            assertFalse("Late append must not redraw sleeping Logs",logText.getText().toString().contains(marker));
+            assertTrue("Archive retained while display slept",com.eurobuddha.minimacore.utils.LogBuffer.snapshot().contains(marker));
+            pager.setCurrentItem(3,false);
+            oldSink.get().onLine(marker+"-obsolete");
+        });
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        ui(() -> {
+            assertTrue("Logs catches up on show",logText.getText().toString().contains(marker));
+            assertFalse("Old subscription cannot append after resume",logText.getText().toString().contains(marker+"-obsolete"));
+            for(int i=0;i<20;i++) { pager.setCurrentItem(0,false); pager.setCurrentItem(3,false); }
+            assertFalse(wallet.isDisplayActive()); assertFalse(walletHandler.hasCallbacks(walletTick));
+            walletTick.run(); // A stale callback cannot start a hidden timer chain.
+            assertFalse(walletHandler.hasCallbacks(walletTick));
+            core.startActivity(new Intent(core,com.eurobuddha.mail.MainActivity.class));
+        });
+        Activity mail=await("com.eurobuddha.mail.MainActivity");
+        // Android may deliver the old host's onStop just after the new onResume.
+        long stopDeadline=SystemClock.elapsedRealtime()+5000;
+        while(logs.isDisplayActive() && SystemClock.elapsedRealtime()<stopDeadline) SystemClock.sleep(50);
+        android.os.Handler mailHandler=(android.os.Handler)field(mail,"ui");
+        Runnable mailTick=(Runnable)field(mail,"freshTick");
+        ui(() -> {
+            for(com.eurobuddha.minimacore.main.BaseView page:pages) assertFalse(page.isDisplayActive());
+            assertTrue((Boolean)field(mail,"freshnessVisible")); assertTrue(mailHandler.hasCallbacks(mailTick));
+            mail.startActivity(new Intent(mail,core.getClass()).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+        });
+        assertSame(core,await(PandamoniumDestinations.CLASSES[0]));
+        stopDeadline=SystemClock.elapsedRealtime()+5000;
+        while(SystemClock.elapsedRealtime()<stopDeadline) {
+            AtomicReference<Boolean> visible=new AtomicReference<>();
+            ui(() -> visible.set((Boolean)field(mail,"freshnessVisible")));
+            if(!visible.get())break; SystemClock.sleep(50);
+        }
+        ui(() -> {
+            assertFalse((Boolean)field(mail,"freshnessVisible")); assertFalse(mailHandler.hasCallbacks(mailTick));
+            mailTick.run(); assertFalse(mailHandler.hasCallbacks(mailTick));
+            assertTrue(logs.isDisplayActive()); assertFalse(wallet.isDisplayActive());
+            pager.setCurrentItem(0,false);
+            assertTrue(walletHandler.hasCallbacks(walletTick));
+            mail.finish();
+        });
+    }
     @Test public void compactHeaderAndLongPressOrderPersist() throws Exception {
         assertEquals("true",InstrumentationRegistry.getArguments().getString("pandamoniumDisposable"));
         assertTrue("Emulator only",android.os.Build.FINGERPRINT.contains("generic") || android.os.Build.MODEL.contains("sdk"));

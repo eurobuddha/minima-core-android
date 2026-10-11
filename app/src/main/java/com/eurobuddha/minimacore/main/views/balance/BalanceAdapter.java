@@ -28,14 +28,21 @@ public class BalanceAdapter extends BaseAdapter {
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
     private boolean destroyed;
-    private final Runnable mRefresh = () -> { if (!destroyed) notifyDataSetChanged(); };
+    private boolean displayActive = !com.eurobuddha.minimacore.BuildConfig.PANDAMONIUM;
+    private final Runnable mRefresh = () -> { if (!destroyed && displayActive) notifyDataSetChanged(); };
     private final java.util.function.Consumer<WebValidate.Result> validationDone = result -> scheduleRefresh();
 
     public void destroy() { destroyed = true; mHandler.removeCallbacks(mRefresh); }
 
+    public void setDisplayActive(boolean active) {
+        displayActive = active;
+        mHandler.removeCallbacks(mRefresh);
+        if (active && !destroyed) notifyDataSetChanged();
+    }
+
     /** Called while the wallet is visible; only redraw when a metadata check has expired. */
     public void refreshExpiredMetadata(int first, int last) {
-        if (destroyed) return;
+        if (destroyed || !displayActive) return;
         for (int index = Math.max(0, first); index <= Math.min(last, getCount() - 1); index++) {
             JSONObject bal = (JSONObject) mCurrentBalance.get(index);
             String id = String.valueOf(bal.get("tokenid"));
@@ -57,7 +64,7 @@ public class BalanceAdapter extends BaseAdapter {
 
     /** Coalesce async web-validation callbacks into a single re-render. */
     private void scheduleRefresh(){
-        if (destroyed || mActivity.isDestroyed() || mActivity.isFinishing()) return;
+        if (destroyed || !displayActive || mActivity.isDestroyed() || mActivity.isFinishing()) return;
         mHandler.removeCallbacks(mRefresh);
         mHandler.postDelayed(mRefresh, 120);
     }
@@ -118,12 +125,12 @@ public class BalanceAdapter extends BaseAdapter {
             icon.setBackground(null);
             icon.clearColorFilter();
             icon.setImageBitmap(Identicon.forToken(id, iconPx));
-            ImageLoader.loadOver(mActivity, meta.iconUrl, icon, null);
+            if (displayActive) ImageLoader.loadOver(mActivity, meta.iconUrl, icon, null);
 
             //Web-validation badge (async, cached): show only when the domain proves the token
             badge.setVisibility(View.GONE);
             if(meta.webvalidate != null && !meta.webvalidate.isEmpty()){
-                WebValidate.ensure(id, meta.webvalidate, validationDone);
+                if (displayActive) WebValidate.ensure(id, meta.webvalidate, validationDone);
                 if(Boolean.TRUE.equals(WebValidate.status(id, meta.webvalidate))){
                     badge.setImageBitmap(Identicon.checkBadge(badgePx));
                     badge.setVisibility(View.VISIBLE);

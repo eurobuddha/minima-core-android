@@ -16,6 +16,8 @@ The transport shares simultaneous identical `status`, `balance`, `block`, `netwo
 
 Filez streams the selected document directly into the guarded node file implementation, without an intermediate provider copy or an internal URI grant. Imports use unique temporary files and atomic replacement; base-folder containment, live-database protection and recursive-delete checks apply to both direct and external file clients.
 
+Pandamonium 1.9.14 gives Core pages an explicit selected-page and visible-host lifecycle. Wallet, Node, Logs and Apps presentation work sleeps while hidden; returning reconciles the retained view. LogBuffer continues recording, while callbacks from an earlier visible period cannot redraw the new one. The footer pauses when the Core host stops. MinimaMail’s freshness label timer follows onStart/onStop. History capture, standalone companion registration and all financial-service schedules are preserved. These changes reduce unnecessary display work; no battery-life percentage has been measured.
+
 All apps share one Android UID, process and embedded node wallet. They are not separate security sandboxes. Feature-specific stores and encryption aliases remain distinct. AtomiX retains its identity-mismatch halt and recovery exports, but its standalone whole-package clear-storage/uninstall actions are removed because they would erase every integrated app and the node.
 
 ## Build

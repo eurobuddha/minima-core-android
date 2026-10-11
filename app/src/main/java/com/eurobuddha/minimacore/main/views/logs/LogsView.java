@@ -29,7 +29,7 @@ import java.util.ArrayList;
  * MinimaService). Pause/Clear/Share + a substring filter + verbosity chips that
  * drive the node's `logs <subsystem>:true|false` command.
  */
-public class LogsView extends BaseView implements LogBuffer.Sink {
+public class LogsView extends BaseView {
 
     public int MAX_LOG_LENGTH = 30000;
 
@@ -44,6 +44,7 @@ public class LogsView extends BaseView implements LogBuffer.Sink {
     ChipGroup  mChips;
 
     boolean mPaused = false;
+    private LogBuffer.Sink displaySink;
 
     //Seed the chip states from the node once (when it's up)
     boolean mChipsSeeded = false;
@@ -118,10 +119,11 @@ public class LogsView extends BaseView implements LogBuffer.Sink {
                 @Override
                 public void onClick(View v) {
                     boolean on = ((Chip)v).isChecked();
+                    long generation = displayGeneration();
                     MinimaCMD.runMinima("logs "+key+":"+(on ? "true" : "false"), new MinimaCMDListener() {
                         @Override
                         public void cmdResult(JSONObject zResult) {
-                            seedChipsFrom(zResult);
+                            seedChipsFrom(zResult, generation);
                         }
                     });
                 }
@@ -132,29 +134,27 @@ public class LogsView extends BaseView implements LogBuffer.Sink {
 
     @Override
     public void refreshView(){
-        //Live-tail while (and after) the tab is shown
-        LogBuffer.setSink(this);
+        if (!isDisplayActive()) return;
+        // The service-owned buffer keeps recording while the display sleeps.
+        if (displaySink == null) {
+            long generation = displayGeneration();
+            // A callback already captured by the log thread belongs to this visibility epoch.
+            displaySink = line -> appendText(line, generation);
+        }
+        LogBuffer.setSink(displaySink);
         renderSnapshot();
 
         //Seed chip states from the node's current flags (once, when the node is up)
         if(!mChipsSeeded && MinimaCMD.checkMinimaStarted()){
             mChipsSeeded = true;
+            long generation = displayGeneration();
             MinimaCMD.runMinima("logs", new MinimaCMDListener() {
                 @Override
                 public void cmdResult(JSONObject zResult) {
-                    seedChipsFrom(zResult);
+                    seedChipsFrom(zResult, generation);
                 }
             });
         }
-    }
-
-    /** LogBuffer.Sink - called on the appender's thread. */
-    @Override
-    public void onLine(String zLine){
-        if(mPaused || !matchesFilter(zLine)){
-            return;
-        }
-        appendText(zLine);
     }
 
     private boolean matchesFilter(String zLine){
@@ -167,6 +167,8 @@ public class LogsView extends BaseView implements LogBuffer.Sink {
 
     /** Re-render the whole (filtered) buffer - used on show / resume / filter change. */
     private void renderSnapshot(){
+        if (!isDisplayActive()) return;
+        long generation = displayGeneration();
         ArrayList<String> lines = LogBuffer.snapshot();
         StringBuilder sb = new StringBuilder();
         for(String l : lines){
@@ -182,13 +184,14 @@ public class LogsView extends BaseView implements LogBuffer.Sink {
         mMainText.post(new Runnable() {
             @Override
             public void run() {
+                if (!isDisplayActive() || generation != displayGeneration()) return;
                 mMainText.setText(ftext);
                 scrollToBottom();
             }
         });
     }
 
-    private void seedChipsFrom(JSONObject zResult){
+    private void seedChipsFrom(JSONObject zResult, long generation){
         try{
             Object respobj = zResult.get("response");
             if(!(respobj instanceof JSONObject)){
@@ -198,6 +201,7 @@ public class LogsView extends BaseView implements LogBuffer.Sink {
             mChips.post(new Runnable() {
                 @Override
                 public void run() {
+                    if (!isDisplayActive() || generation != displayGeneration()) return;
                     for(int i=0; i<mChips.getChildCount(); i++){
                         Chip chip = (Chip) mChips.getChildAt(i);
                         Object val = resp.get((String) chip.getTag());
@@ -210,10 +214,13 @@ public class LogsView extends BaseView implements LogBuffer.Sink {
         }catch(Exception ignore){}
     }
 
-    public void appendText(String zText) {
+    private void appendText(String zText, long generation) {
+        if (!isDisplayActive() || generation != displayGeneration()) return;
         mMainText.post(new Runnable() {
             @Override
             public void run() {
+                if (!isDisplayActive() || generation != displayGeneration()
+                        || mPaused || !matchesFilter(zText)) return;
                 String text = mMainText.getText().toString();
                 int len     = text.length();
                 if(len > MAX_LOG_LENGTH){
@@ -228,16 +235,25 @@ public class LogsView extends BaseView implements LogBuffer.Sink {
     }
 
     private void scrollToBottom(){
+        long generation = displayGeneration();
         mScroller.post(new Runnable() {
             @Override
             public void run() {
+                if (!isDisplayActive() || generation != displayGeneration()) return;
                 mScroller.scrollTo(0,1000000);
             }
         });
     }
 
+    @Override protected void onHidden() {
+        LogBuffer.clearSink(displaySink);
+        displaySink = null;
+        mChipsSeeded = false;
+    }
+
     @Override
     public void onActivityDestroy() {
-        LogBuffer.clearSink(this);
+        LogBuffer.clearSink(displaySink);
+        displaySink = null;
     }
 }

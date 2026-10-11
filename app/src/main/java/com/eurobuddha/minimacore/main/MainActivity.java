@@ -74,6 +74,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     TextView mFooterLeft;
     TextView mFooterRight;
+    private boolean hostVisible;
+    private final android.os.Handler displayHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final com.eurobuddha.minimacore.utils.CoalescingRefresh<JSONObject> footerRefresh =
+            new com.eurobuddha.minimacore.utils.CoalescingRefresh<>(MinimaCMD.readExecutor(),
+                    displayHandler::post, () -> MinimaCMD.execute("keys"), this::renderFooterKeys,
+                    error -> logger.log("Footer refresh failed: " + error));
+
+    private boolean canRenderFooter() {
+        return (!BuildConfig.PANDAMONIUM || hostVisible) && !isFinishing() && !isDestroyed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 //Refresh View
-                mMainAdapter.refreshPagerView(tab.getPosition());
+                mMainAdapter.selectPage(tab.getPosition());
 
                 //Reflect the current tab in the toolbar title
                 setToolbarTitle(tab.getPosition());
@@ -208,8 +218,31 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         }
     }
 
+    @Override protected void onStart() {
+        super.onStart();
+        hostVisible = true;
+        if (mMainAdapter != null) mMainAdapter.setHostVisible(true, mMainPager.getCurrentItem());
+        if (BuildConfig.PANDAMONIUM && mFooterLeft != null) setFooterText();
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        // ViewPager restores its selected page after onStart during recreation.
+        if (BuildConfig.PANDAMONIUM && mMainAdapter != null)
+            mMainAdapter.setHostVisible(hostVisible, mMainPager.getCurrentItem());
+    }
+
+    @Override protected void onStop() {
+        hostVisible = false;
+        if (mMainAdapter != null) mMainAdapter.setHostVisible(false, mMainPager.getCurrentItem());
+        if (BuildConfig.PANDAMONIUM) footerRefresh.invalidate();
+        super.onStop();
+    }
+
     @Override
     protected void onDestroy() {
+        footerRefresh.close();
+        displayHandler.removeCallbacksAndMessages(null);
         super.onDestroy();
         if (MAIN_ACTIVITY == this) MAIN_ACTIVITY = null;
 
@@ -526,6 +559,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     public void setFooterText(){
 
+        if (!canRenderFooter()) return;
+
         //Have we started
         if(!MinimaCMD.checkMinimaStarted()){
             return;
@@ -536,7 +571,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void run() {
                 //Re-check inside the Runnable: the tip can be gone by the time this runs
                 //(mid-resync), and an NPE here is on the main thread.
-                if(!MinimaCMD.checkMinimaStarted()) return;
+                if(!canRenderFooter() || !MinimaCMD.checkMinimaStarted()) return;
                 TxPoW txp = MinimaDB.getDB().getTxPoWTree().getTip().getTxPoW();
 
                 int block = txp.getBlockNumber().getAsInt();
@@ -550,23 +585,17 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         });
 
         //Run some Minima Commands..
-        MinimaCMD.runMinima("keys", new MinimaCMDListener() {
-            @Override
-            public void cmdResult(JSONObject zResult) {
-                mFooterLeft.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        try{
-                            JSONObject resp = (JSONObject) zResult.get("response");
-                            int maxuses     = (int) resp.get("maxuses");
+        footerRefresh.request();
+    }
 
-                            mFooterLeft.setText((GeneralParams.USE_BLOCK_AS_KEYUSES ? "Last Key Block:" : "Key Uses:")+maxuses);
-
-                        }catch(Exception exc){}
-                    }
-                });
-            }
-        });
+    private void renderFooterKeys(JSONObject result) {
+        if (!canRenderFooter() || !MinimaCMD.checkMinimaStarted()) return;
+        try {
+            JSONObject resp = (JSONObject) result.get("response");
+            Object maxuses = resp.get("maxuses");
+            if (maxuses != null) mFooterLeft.setText(
+                    (GeneralParams.USE_BLOCK_AS_KEYUSES ? "Last Key Block:" : "Key Uses:") + maxuses);
+        } catch (Exception ignored) {}
     }
 
     @Override

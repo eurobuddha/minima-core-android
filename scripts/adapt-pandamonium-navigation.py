@@ -3,7 +3,31 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 A='{http://schemas.android.com/apk/res/android}'
 
+def adapt_mail_freshness(root):
+    """Only the display-age timer sleeps; mail scan/send completion is untouched."""
+    p=root/'mail/src/main/java/com/eurobuddha/mail/MainActivity.java'
+    s=p.read_text()
+    replacements={
+        '        ui.postDelayed(freshTick, 30000);':
+            '        // Freshness display starts with the visible Activity.',
+        '    private final Runnable freshTick = new Runnable() {':
+            '    private boolean freshnessVisible;\n    private final Runnable freshTick = new Runnable() {',
+        '            updateFreshness();\n            ui.postDelayed(this, 30000);':
+            '            if (!freshnessVisible) return;\n            updateFreshness();\n            ui.postDelayed(this, 30000);',
+        '    @Override protected void onDestroy() {\n        super.onDestroy();':
+            '    @Override protected void onDestroy() {\n        freshnessVisible = false;\n        super.onDestroy();',
+        '    @Override protected void onStart() {\n        super.onStart();':
+            '    @Override protected void onStart() {\n        super.onStart();\n        freshnessVisible = true;\n        ui.removeCallbacks(freshTick);\n        freshTick.run();',
+        '    @Override protected void onStop() {':
+            '    @Override protected void onStop() {\n        freshnessVisible = false;\n        ui.removeCallbacks(freshTick);',
+    }
+    for old,new in replacements.items():
+        assert s.count(old)==1, ('Mail freshness adaptation drift',old)
+        s=s.replace(old,new,1)
+    p.write_text(s)
+
 def adapt(root):
+    adapt_mail_freshness(root)
     # Native header rows retain their own controls; navigation is inserted at their left edge.
     for folder in root.iterdir():
         layout=folder/'src/main/res/layout'/('pm_'+folder.name.replace('-','_')+'_activity_main.xml')

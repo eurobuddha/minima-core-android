@@ -74,7 +74,7 @@ public class HomeView extends BaseView {
         if (android.os.Looper.myLooper() != android.os.Looper.getMainLooper()) {
             main.post(this::refreshView); return;
         }
-        if (destroyed) return;
+        if (destroyed || !isDisplayActive()) return;
         if (!MinimaCMD.checkMinimaStarted()) { refresh.invalidate(); return; }
         ((TextView)getMainView().findViewById(R.id.home_keyuses_caption)).setText(
                 org.minima.system.params.GeneralParams.USE_BLOCK_AS_KEYUSES
@@ -92,7 +92,7 @@ public class HomeView extends BaseView {
     }
 
     private void renderDashboard(JSONObject[] results) {
-        if (destroyed || getActivity().isFinishing() || getActivity().isDestroyed()) return;
+        if (destroyed || !isDisplayActive() || getActivity().isFinishing() || getActivity().isDestroyed()) return;
         try {
             JSONObject keys = (JSONObject) results[0].get("response");
             if (keys != null && keys.get("maxuses") != null) mKeyUses.setText(String.valueOf(keys.get("maxuses")));
@@ -109,6 +109,8 @@ public class HomeView extends BaseView {
             if (details.get("connected") != null) mConnections.setText(String.valueOf(details.get("connected")));
         } catch (Exception ignored) { }
     }
+
+    @Override protected void onHidden() { refresh.invalidate(); }
 
     @Override public void onActivityDestroy() {
         destroyed = true;
