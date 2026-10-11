@@ -1,5 +1,7 @@
 package com.eurobuddha.minimacore.main;
 
+import com.eurobuddha.minimacore.BuildConfig;
+
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -14,6 +16,13 @@ import com.eurobuddha.minimacore.utils.logger;
 
 public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
 
+    // Named positions keep service refreshes and companion permissions tied to their views.
+    public static final int HOME_POSITION = BuildConfig.PANDAMONIUM ? 4 : 0;
+    public static final int WALLET_POSITION = BuildConfig.PANDAMONIUM ? 0 : 1;
+    public static final int UTILITY_POSITION = BuildConfig.PANDAMONIUM ? 1 : 2;
+    public static final int APPS_POSITION = BuildConfig.PANDAMONIUM ? 2 : 3;
+    public static final int LOGS_POSITION = BuildConfig.PANDAMONIUM ? 3 : 4;
+
     MainActivity mActivity;
 
     BaseView[] mAllViews;
@@ -26,19 +35,15 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
         //Clear receive address
         RECEIVE_ADDRESS = null;
 
-        //Store of all current valid views..
-        //Tabs: Home / Wallet / Terminal / Apps / Logs  (Send + Receive are reached
-        //via buttons on the Wallet tab, launching SendActivity/ReceiveActivity).
-        //NB: Apps MUST stay at index 3 (getAppsView) and the dashboard at
-        //index 0 (refreshHomeView) so the service/DB wiring stays intact.
-        //New views are APPENDED (Logs=4) - never inserted before index 3.
+        // Reuse the same screens. Pandamonium starts with Wallet and puts Node after Logs;
+        // the other builds keep Home / Wallet / Terminal / Apps / Logs.
         mAllViews = new BaseView[5];
 
-        mAllViews[0] = new HomeView(mActivity);
-        mAllViews[1] = new BalanceView(mActivity);
-        mAllViews[2] = com.eurobuddha.minimacore.integrated.PandamoniumHooks.createUtilityTab(mActivity);
-        mAllViews[3] = new AppsView(mActivity);
-        mAllViews[4] = new LogsView(mActivity);
+        mAllViews[HOME_POSITION] = new HomeView(mActivity);
+        mAllViews[WALLET_POSITION] = new BalanceView(mActivity);
+        mAllViews[UTILITY_POSITION] = com.eurobuddha.minimacore.integrated.PandamoniumHooks.createUtilityTab(mActivity);
+        mAllViews[APPS_POSITION] = new AppsView(mActivity);
+        mAllViews[LOGS_POSITION] = new LogsView(mActivity);
     }
 
     public void refreshPagerView(int zPosition){
@@ -47,13 +52,13 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
     }
 
     public AppsView getAppsView(){
-        return (AppsView) mAllViews[3];
+        return (AppsView) mAllViews[APPS_POSITION];
     }
 
-    //Refresh the Balance..
+    //Refresh the node dashboard..
     public void refreshHomeView(){
-        mAllViews[0].refreshView();
-        mAllViews[0].getMainView().invalidate();
+        mAllViews[HOME_POSITION].refreshView();
+        mAllViews[HOME_POSITION].getMainView().invalidate();
     }
 
     @Override

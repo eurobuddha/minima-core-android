@@ -109,21 +109,21 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(mMainPager);
 
-        //Set up Tabs — Home / Wallet / Terminal / Apps
-        tabs.getTabAt(0).setText("Home");
-        tabs.getTabAt(0).setIcon(R.drawable.ic_drawer_home);
+        // Tab labels and content share the adapter positions for this build.
+        tabs.getTabAt(MainAdapter.HOME_POSITION).setText(BuildConfig.PANDAMONIUM ? "Node" : "Home");
+        tabs.getTabAt(MainAdapter.HOME_POSITION).setIcon(R.drawable.ic_drawer_home);
 
-        tabs.getTabAt(1).setText("Wallet");
-        tabs.getTabAt(1).setIcon(R.drawable.ic_minima);
+        tabs.getTabAt(MainAdapter.WALLET_POSITION).setText("Wallet");
+        tabs.getTabAt(MainAdapter.WALLET_POSITION).setIcon(R.drawable.ic_minima);
 
-        tabs.getTabAt(2).setText(BuildConfig.FLAVOR.equals("pandamonium") ? "History" : "Terminal");
-        tabs.getTabAt(2).setIcon(R.drawable.ic_edit_note);
+        tabs.getTabAt(MainAdapter.UTILITY_POSITION).setText(BuildConfig.PANDAMONIUM ? "History" : "Terminal");
+        tabs.getTabAt(MainAdapter.UTILITY_POSITION).setIcon(R.drawable.ic_edit_note);
 
-        tabs.getTabAt(3).setText("Apps");
-        tabs.getTabAt(3).setIcon(R.drawable.ic_dapps);
+        tabs.getTabAt(MainAdapter.APPS_POSITION).setText("Apps");
+        tabs.getTabAt(MainAdapter.APPS_POSITION).setIcon(R.drawable.ic_dapps);
 
-        tabs.getTabAt(4).setText("Logs");
-        tabs.getTabAt(4).setIcon(R.drawable.ic_edit_note);
+        tabs.getTabAt(MainAdapter.LOGS_POSITION).setText("Logs");
+        tabs.getTabAt(MainAdapter.LOGS_POSITION).setIcon(R.drawable.ic_edit_note);
 
         tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -159,11 +159,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     public void setToolbarTitle(int zPosition){
         String title;
         switch (zPosition){
-            case 1:  title = "Wallet";      break;
-            case 2:  title = BuildConfig.FLAVOR.equals("pandamonium") ? "History" : "Terminal";    break;
-            case 3:  title = "Apps";        break;
-            case 4:  title = "Logs";        break;
-            default: title = BuildConfig.FLAVOR.equals("pandamonium") ? "" : "Minima Core"; break;
+            case MainAdapter.WALLET_POSITION:  title = "Wallet";      break;
+            case MainAdapter.UTILITY_POSITION:  title = BuildConfig.PANDAMONIUM ? "History" : "Terminal";    break;
+            case MainAdapter.APPS_POSITION:  title = "Apps";        break;
+            case MainAdapter.LOGS_POSITION:  title = "Logs";        break;
+            default: title = BuildConfig.PANDAMONIUM ? "" : "Minima Core"; break;
         }
         if(getSupportActionBar() != null){
             getSupportActionBar().setTitle(BuildConfig.PANDAMONIUM ? "" : title);
@@ -512,8 +512,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             @Override
             public void run() {
                 try{
-                    //Wallet is index 1 - refresh it wherever the user happens to be
-                    mMainAdapter.refreshPagerView(1);
+                    // Refresh the wallet by its build-specific position.
+                    mMainAdapter.refreshPagerView(MainAdapter.WALLET_POSITION);
                     Toast.makeText(MainActivity.this, "Balance updated on chain", Toast.LENGTH_SHORT).show();
 
                 }catch(Throwable exc){

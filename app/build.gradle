@@ -119,8 +119,9 @@ android {
         // that mean "the node's coins"; plain `coins relevant:true` still returns tracked coins
         // for watch-style apps (minimaWallet).
         // vc82: existing app icons in the Pandamonium sidebar.
-        versionCode 82
-        versionName "1.9.11"
+        // vc83: Pandamonium opens on Wallet; Node follows Logs.
+        versionCode 83
+        versionName "1.9.12"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

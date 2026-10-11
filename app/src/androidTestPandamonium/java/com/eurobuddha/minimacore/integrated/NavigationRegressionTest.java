@@ -48,6 +48,13 @@ public class NavigationRegressionTest {
             Activity core=await(PandamoniumDestinations.CLASSES[0]);
             SystemClock.sleep(700);
             ui(() -> {
+                com.google.android.material.tabs.TabLayout tabs=core.findViewById(com.eurobuddha.minimacore.R.id.tabs);
+                String[] titles={"Wallet","History","Apps","Logs","Node"};
+                for(int i=0;i<titles.length;i++) assertEquals(titles[i],tabs.getTabAt(i).getText());
+                androidx.viewpager.widget.ViewPager pager=core.findViewById(com.eurobuddha.minimacore.R.id.main_pager);
+                assertEquals("Fresh launch opens Wallet",0,pager.getCurrentItem());
+                assertTrue("Wallet content is visible",core.findViewById(com.eurobuddha.minimacore.R.id.wallet_balance_list)
+                        .getGlobalVisibleRect(new android.graphics.Rect()));
                 androidx.appcompat.widget.Toolbar toolbar=core.findViewById(com.eurobuddha.minimacore.R.id.toolbar);
                 View brand=core.findViewById(android.R.id.content).findViewWithTag("pandamonium.navigation.brand");
                 assertSame(toolbar,brand.getParent());
@@ -146,7 +153,7 @@ public class NavigationRegressionTest {
             assertNotNull(brand); assertSame("Brand shares the menu row",toolbar,brand.getParent());
             assertEquals("No duplicate core title","",toolbar.getTitle());
             com.google.android.material.tabs.TabLayout tabs=core.findViewById(com.eurobuddha.minimacore.R.id.tabs);
-            assertEquals("History",tabs.getTabAt(2).getText()); tabs.getTabAt(2).select();
+            assertEquals("History",tabs.getTabAt(1).getText()); tabs.getTabAt(1).select();
         });
         SystemClock.sleep(1500);
         ui(() -> {
@@ -176,7 +183,7 @@ public class NavigationRegressionTest {
         SystemClock.sleep(800);
         Activity recreated=await(PandamoniumDestinations.CLASSES[0]);
         SystemClock.sleep(500);
-        ui(() -> ((com.google.android.material.tabs.TabLayout)recreated.findViewById(com.eurobuddha.minimacore.R.id.tabs)).getTabAt(2).select());
+        ui(() -> ((com.google.android.material.tabs.TabLayout)recreated.findViewById(com.eurobuddha.minimacore.R.id.tabs)).getTabAt(1).select());
         SystemClock.sleep(800);
         ui(() -> assertTrue(recreated.findViewById(com.eurobuddha.history.R.id.pm_history_recycler).isShown()));
     }
