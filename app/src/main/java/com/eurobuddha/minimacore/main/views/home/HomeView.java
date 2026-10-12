@@ -28,6 +28,7 @@ public class HomeView extends BaseView {
     TextView mBlock;
     TextView mBlockTime;
     TextView mConnections;
+    TextView mIncoming;
     TextView mPeers;
 
     private final android.os.Handler main = new android.os.Handler(android.os.Looper.getMainLooper());
@@ -47,6 +48,7 @@ public class HomeView extends BaseView {
         mBlock      = getMainView().findViewById(R.id.home_blocks);
         mBlockTime  = getMainView().findViewById(R.id.home_block_time);
         mConnections  = getMainView().findViewById(R.id.home_connections);
+        mIncoming     = getMainView().findViewById(R.id.home_incoming);
         mPeers      = getMainView().findViewById(R.id.home_peers);
         mVersion    = getMainView().findViewById(R.id.home_app_version);
 
@@ -107,6 +109,25 @@ public class HomeView extends BaseView {
             JSONObject network = (JSONObject) results[2].get("response");
             JSONObject details = (JSONObject) network.get("details");
             if (details.get("connected") != null) mConnections.setText(String.valueOf(details.get("connected")));
+
+            // Incoming peers, matching the Desktop pill ("N in"): count incoming connections,
+            // minus any self-dial — the node feeds its own public address to the peers checker
+            // and a hairpinned dial back to itself shows up as an inbound peer. keets links
+            // (synthetic 127.113.x.y) all arrive as incoming bridged sockets and count here —
+            // they are the phone's real inbound reachability.
+            String selfip = "";
+            try {
+                JSONObject p2p = (JSONObject) details.get("p2p");
+                String addr = String.valueOf(p2p.get("address"));
+                selfip = addr.contains(":") ? addr.substring(0, addr.indexOf(':')) : addr;
+            } catch (Exception ignored) { }
+            org.minima.utils.json.JSONArray conns = (org.minima.utils.json.JSONArray) network.get("connections");
+            int in = 0;
+            for (Object o : conns) {
+                JSONObject c = (JSONObject) o;
+                if (Boolean.TRUE.equals(c.get("incoming")) && !String.valueOf(c.get("host")).equals(selfip)) in++;
+            }
+            mIncoming.setText(String.valueOf(in));
         } catch (Exception ignored) { }
     }
 
