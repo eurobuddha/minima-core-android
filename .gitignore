@@ -16,3 +16,7 @@ local.properties
 
 /integrated/**/build/
 /review/pandamonium-emulator/
+# keets worklet artefacts — rebuilt by scripts/fetch-bare-kit.sh + scripts/pack-keets-worklet.sh
+app/libs/bare-kit.aar
+app/src/main/assets/keets.bundle
+app/src/main/jniLibs/

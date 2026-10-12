@@ -121,8 +121,8 @@ android {
         // vc82: existing app icons in the Pandamonium sidebar.
         // vc83: Pandamonium opens on Wallet; Node follows Logs.
         // vc85: sleep hidden Pandamonium display work, preserving financial services.
-        versionCode 86
-        versionName "1.9.15"
+        versionCode 87
+        versionName "1.9.16"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -179,6 +179,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            // keets/bare-kit ships a ~65MB runtime PER ABI. Release carries arm64-v8a only:
+            // 32-bit-only devices are overwhelmingly Android 9-, where the worklet is
+            // API-gated off anyway — they install and run classic-only (UnsatisfiedLinkError
+            // is caught). Debug keeps all ABIs for the emulator.
+            ndk { abiFilters 'arm64-v8a' }
         }
     }
     compileOptions {
@@ -209,6 +214,9 @@ dependencies {
     implementation libs.activity
     implementation libs.constraintlayout
     implementation files('libs/minima.jar')
+    // bare-kit: the mobile JS runtime hosting the keets sidecar worklet.
+    // NOT in git (~80MB) — scripts/fetch-bare-kit.sh builds it from the pinned release.
+    implementation files('libs/bare-kit.aar')
     implementation project(':minimaapi')
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

@@ -1,23 +1,23 @@
 {
   "app/build.gradle": {
-    "mtime": 1786299080.3918185,
-    "ast_hash": "0e051489cc3b34d9335b9f701b42a823",
+    "mtime": 1787522670.1574616,
+    "ast_hash": "b30fce8f9b176a0bb7244f52e153843f",
     "semantic_hash": ""
   },
   "app/release/baselineProfiles/0/app-release.dm": {
     "mtime": 1783029416.6525984,
-    "ast_hash": "1f6a0d3c735ac04fe5e0e84337c47faa",
-    "semantic_hash": "1f6a0d3c735ac04fe5e0e84337c47faa"
+    "ast_hash": "",
+    "semantic_hash": ""
   },
   "app/release/baselineProfiles/1/app-release.dm": {
     "mtime": 1783029416.6542068,
-    "ast_hash": "97305f4b08396648f051f24423200e7f",
-    "semantic_hash": "97305f4b08396648f051f24423200e7f"
+    "ast_hash": "",
+    "semantic_hash": ""
   },
   "app/release/output-metadata.json": {
     "mtime": 1783029416.6544979,
-    "ast_hash": "9692587ce325feb8d744f65ad685fd33",
-    "semantic_hash": "9692587ce325feb8d744f65ad685fd33"
+    "ast_hash": "",
+    "semantic_hash": ""
   },
   "app/src/androidTest/java/org/minimarex/minimacore/ExampleInstrumentedTest.java": {
     "mtime": 1781008201.0577693,
@@ -67,17 +67,17 @@
   "app/src/main/java/org/minimarex/minimacore/main/BaseView.java": {
     "mtime": 1785613313.44965,
     "ast_hash": "bc854627efee070406f1169e2a73df98",
-    "semantic_hash": ""
+    "semantic_hash": "bc854627efee070406f1169e2a73df98"
   },
   "app/src/main/java/org/minimarex/minimacore/main/MainActivity.java": {
     "mtime": 1785616655.9110582,
     "ast_hash": "a29c001a9df40700cf96280288e0ccc9",
-    "semantic_hash": ""
+    "semantic_hash": "a29c001a9df40700cf96280288e0ccc9"
   },
   "app/src/main/java/org/minimarex/minimacore/main/MainAdapter.java": {
     "mtime": 1785613316.6114879,
     "ast_hash": "5280f188edf3a3e05460be9848acaaa2",
-    "semantic_hash": ""
+    "semantic_hash": "5280f188edf3a3e05460be9848acaaa2"
   },
   "app/src/main/java/org/minimarex/minimacore/main/ParamsActivity.java": {
     "mtime": 1785227280.9903264,
@@ -97,17 +97,17 @@
   "app/src/main/java/org/minimarex/minimacore/main/views/apps/AppsView.java": {
     "mtime": 1785613339.6809208,
     "ast_hash": "9c5b110d4c3ce4664c4d2653531ad381",
-    "semantic_hash": ""
+    "semantic_hash": "9c5b110d4c3ce4664c4d2653531ad381"
   },
   "app/src/main/java/org/minimarex/minimacore/main/views/balance/BalanceAdapter.java": {
     "mtime": 1785615751.3818572,
     "ast_hash": "05dacc0d4d72efcaa596a7d82d447e1a",
-    "semantic_hash": ""
+    "semantic_hash": "05dacc0d4d72efcaa596a7d82d447e1a"
   },
   "app/src/main/java/org/minimarex/minimacore/main/views/balance/BalanceView.java": {
     "mtime": 1785615774.559503,
     "ast_hash": "bfff5cae1a3a4f3c629258e753387ccb",
-    "semantic_hash": ""
+    "semantic_hash": "bfff5cae1a3a4f3c629258e753387ccb"
   },
   "app/src/main/java/org/minimarex/minimacore/main/views/balance/tokens/IconResolver.java": {
     "mtime": 1785227280.9913116,
@@ -157,17 +157,17 @@
   "app/src/main/java/org/minimarex/minimacore/main/views/receive/ReceiveView.java": {
     "mtime": 1785615738.7608378,
     "ast_hash": "b330e6c40bcfba8802314c918088f570",
-    "semantic_hash": ""
+    "semantic_hash": "b330e6c40bcfba8802314c918088f570"
   },
   "app/src/main/java/org/minimarex/minimacore/main/views/send/SendActivity.java": {
     "mtime": 1785616205.5602427,
     "ast_hash": "78786261536f0f9c42ee706116b44c2f",
-    "semantic_hash": ""
+    "semantic_hash": "78786261536f0f9c42ee706116b44c2f"
   },
   "app/src/main/java/org/minimarex/minimacore/main/views/send/SendView.java": {
     "mtime": 1785616676.4532948,
     "ast_hash": "20c562be91d5f9e63cf565fffb22e19e",
-    "semantic_hash": ""
+    "semantic_hash": "20c562be91d5f9e63cf565fffb22e19e"
   },
   "app/src/main/java/org/minimarex/minimacore/main/views/send/TokenSpinnerAdapter.java": {
     "mtime": 1781008201.0658545,
@@ -187,7 +187,7 @@
   "app/src/main/java/org/minimarex/minimacore/receiver/MinimaReceiver.java": {
     "mtime": 1786299068.549893,
     "ast_hash": "77ed8280e8c6cd985a45be387d2da6c8",
-    "semantic_hash": ""
+    "semantic_hash": "77ed8280e8c6cd985a45be387d2da6c8"
   },
   "app/src/main/java/org/minimarex/minimacore/receiver/ReceiverDB.java": {
     "mtime": 1782212448.999741,
@@ -207,12 +207,12 @@
   "app/src/main/java/org/minimarex/minimacore/service/MinimaService.java": {
     "mtime": 1785616636.908659,
     "ast_hash": "c0f7a8cfd9329a5bfb2f34e814bc3568",
-    "semantic_hash": ""
+    "semantic_hash": "c0f7a8cfd9329a5bfb2f34e814bc3568"
   },
   "app/src/main/java/org/minimarex/minimacore/service/MinimaServiceListener.java": {
     "mtime": 1785616630.8045654,
     "ast_hash": "1aa54b6562be2f80a53910485c55fd56",
-    "semantic_hash": ""
+    "semantic_hash": "1aa54b6562be2f80a53910485c55fd56"
   },
   "app/src/main/java/org/minimarex/minimacore/utils/LogBuffer.java": {
     "mtime": 1785227280.9945402,
@@ -242,7 +242,7 @@
   "app/src/main/java/org/minimarex/minimacore/utils/logger.java": {
     "mtime": 1785613329.9146755,
     "ast_hash": "e17d2bea70e2eb99ee20eb9301bfa12c",
-    "semantic_hash": ""
+    "semantic_hash": "e17d2bea70e2eb99ee20eb9301bfa12c"
   },
   "app/src/test/java/org/minimarex/minimacore/ExampleUnitTest.java": {
     "mtime": 1781008201.071122,
@@ -270,9 +270,9 @@
     "semantic_hash": "afbba5e644e9d54d3102b6cb2352dbee"
   },
   "minimaapi/src/main/java/org/minimarex/minimaapi/MinimaAPI.java": {
-    "mtime": 1785227281.0099638,
-    "ast_hash": "4a3ac43359c3b01188c3aacef8e8e7a0",
-    "semantic_hash": "4a3ac43359c3b01188c3aacef8e8e7a0"
+    "mtime": 1786963059.9294155,
+    "ast_hash": "745ab01812a489868f5e78b395c0a88c",
+    "semantic_hash": "745ab01812a489868f5e78b395c0a88c"
   },
   "minimaapi/src/main/java/org/minimarex/minimaapi/MinimaAPIListener.java": {
     "mtime": 1782212449.0372188,
@@ -307,106 +307,121 @@
   "app/src/main/java/org/minimarex/minimacore/main/views/balance/coins/CoinDetailDialog.java": {
     "mtime": 1785615688.6090128,
     "ast_hash": "24eae4d3427d406145943afd6286571d",
-    "semantic_hash": ""
+    "semantic_hash": "24eae4d3427d406145943afd6286571d"
   },
   "app/src/main/java/org/minimarex/minimacore/main/views/balance/coins/CoinsAdapter.java": {
     "mtime": 1785615764.303825,
     "ast_hash": "b8c826cb0097d2442c60fc53db92d3a3",
-    "semantic_hash": ""
+    "semantic_hash": "b8c826cb0097d2442c60fc53db92d3a3"
   },
   "app/src/main/java/org/minimarex/minimacore/main/views/balance/coins/CoinsDialog.java": {
     "mtime": 1785616676.4529321,
     "ast_hash": "6e2d42b00f08e612650e9ce5671cc063",
-    "semantic_hash": ""
+    "semantic_hash": "6e2d42b00f08e612650e9ce5671cc063"
   },
   "app/src/main/java/org/minimarex/minimacore/utils/Clip.java": {
     "mtime": 1785613120.6973758,
     "ast_hash": "1fcf2ecb0002805e3ee310125ce26269",
-    "semantic_hash": ""
+    "semantic_hash": "1fcf2ecb0002805e3ee310125ce26269"
   },
   "app/src/main/java/org/minimarex/minimacore/utils/Format.java": {
     "mtime": 1785616129.0456672,
     "ast_hash": "b042a82144435594c4669b9f2d7dc607",
-    "semantic_hash": ""
+    "semantic_hash": "b042a82144435594c4669b9f2d7dc607"
   },
   "CLAUDE.md": {
-    "mtime": 1785227280.9796684,
-    "ast_hash": "4439d09bc81851d89f9ffcecc4136dcf",
-    "semantic_hash": ""
+    "mtime": 1786883108.3016405,
+    "ast_hash": "46e9035553a7ba076e59754595bc542a",
+    "semantic_hash": "46e9035553a7ba076e59754595bc542a"
   },
   "H2_VERIFYERROR_FIX.md": {
     "mtime": 1785227280.9800785,
     "ast_hash": "cc0bed9dc6149d89788460733b064c84",
-    "semantic_hash": ""
+    "semantic_hash": "cc0bed9dc6149d89788460733b064c84"
   },
   "README.md": {
     "mtime": 1783941488.2113998,
     "ast_hash": "e4bc471eb5e94a54bba1186bc55ab645",
-    "semantic_hash": ""
+    "semantic_hash": "e4bc471eb5e94a54bba1186bc55ab645"
   },
   "UPSTREAM_IPC_CHANGES.md": {
     "mtime": 1785227280.98048,
     "ast_hash": "fb83fb071e030f5806cbaedd0038164a",
-    "semantic_hash": ""
+    "semantic_hash": "fb83fb071e030f5806cbaedd0038164a"
   },
   "UPSTREAM_UI_CHANGES.md": {
     "mtime": 1785227280.9809666,
     "ast_hash": "654796c117a848aac655b5e1691dc870",
-    "semantic_hash": ""
+    "semantic_hash": "654796c117a848aac655b5e1691dc870"
   },
   "app/src/main/res/mipmap-hdpi/ic_launcher.webp": {
     "mtime": 1781008201.0694897,
     "ast_hash": "39d9bb21eb48f128a71c3f01ad3cd427",
-    "semantic_hash": ""
+    "semantic_hash": "39d9bb21eb48f128a71c3f01ad3cd427"
   },
   "app/src/main/res/mipmap-hdpi/ic_launcher_round.webp": {
     "mtime": 1781008201.0695512,
     "ast_hash": "70d6f58af3c76ee221c829b1ce9daa04",
-    "semantic_hash": ""
+    "semantic_hash": "70d6f58af3c76ee221c829b1ce9daa04"
   },
   "app/src/main/res/mipmap-mdpi/ic_launcher.webp": {
     "mtime": 1781008201.06963,
     "ast_hash": "d2acce71c7b46e5e9540d23a9f7b2166",
-    "semantic_hash": ""
+    "semantic_hash": "d2acce71c7b46e5e9540d23a9f7b2166"
   },
   "app/src/main/res/mipmap-mdpi/ic_launcher_round.webp": {
     "mtime": 1781008201.0696769,
     "ast_hash": "6376acb48f96a855ee95c113cd7fd616",
-    "semantic_hash": ""
+    "semantic_hash": "6376acb48f96a855ee95c113cd7fd616"
   },
   "app/src/main/res/mipmap-xhdpi/ic_launcher.webp": {
     "mtime": 1781008201.069762,
     "ast_hash": "bd087d80b70bec05a43c745f29dc3ffc",
-    "semantic_hash": ""
+    "semantic_hash": "bd087d80b70bec05a43c745f29dc3ffc"
   },
   "app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp": {
     "mtime": 1781008201.0698092,
     "ast_hash": "7479edd56ab712609f030054bffd7263",
-    "semantic_hash": ""
+    "semantic_hash": "7479edd56ab712609f030054bffd7263"
   },
   "app/src/main/res/mipmap-xxhdpi/ic_launcher.webp": {
     "mtime": 1781008201.0698884,
     "ast_hash": "ea180e8d1a2e8300cc998b987266b736",
-    "semantic_hash": ""
+    "semantic_hash": "ea180e8d1a2e8300cc998b987266b736"
   },
   "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp": {
     "mtime": 1781008201.0699775,
     "ast_hash": "947842742b29eeda80ee0805e1600366",
-    "semantic_hash": ""
+    "semantic_hash": "947842742b29eeda80ee0805e1600366"
   },
   "app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp": {
     "mtime": 1781008201.0700984,
     "ast_hash": "54ab624970c86c2146e76b93f27586f7",
-    "semantic_hash": ""
+    "semantic_hash": "54ab624970c86c2146e76b93f27586f7"
   },
   "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp": {
     "mtime": 1781008201.070188,
     "ast_hash": "9ee591be72fb336861a8044086054daa",
-    "semantic_hash": ""
+    "semantic_hash": "9ee591be72fb336861a8044086054daa"
   },
   "app/src/main/java/org/minimarex/minimacore/utils/Feedback.java": {
     "mtime": 1785616607.3420238,
     "ast_hash": "313681eaade0a428d0495903c9e6409c",
-    "semantic_hash": ""
+    "semantic_hash": "313681eaade0a428d0495903c9e6409c"
+  },
+  ".githooks/install.sh": {
+    "mtime": 1786883521.5028403,
+    "ast_hash": "f31b37c6d1b5d340a5623f1715457ea0",
+    "semantic_hash": "f31b37c6d1b5d340a5623f1715457ea0"
+  },
+  ".githooks/pre-commit": {
+    "mtime": 1786883521.4966273,
+    "ast_hash": "03526be838d5dd774506cc1f8b47f38c",
+    "semantic_hash": "03526be838d5dd774506cc1f8b47f38c"
+  },
+  "MINIMACORE_CHANGES_FOR_UPSTREAM_1.6.10-ui-h2.md": {
+    "mtime": 1786956207.8198671,
+    "ast_hash": "83850088dab882c31cbe2be17e613cf4",
+    "semantic_hash": "83850088dab882c31cbe2be17e613cf4"
   }
 }

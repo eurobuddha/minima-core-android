@@ -90,6 +90,10 @@ public class MinimaService extends Service {
     //Minima Main Starter
     public static Minima minima;
 
+    //keets sidecar as a bare-kit worklet (phone dialable by Noise pubkey)
+    private final com.eurobuddha.minimacore.keets.KeetsWorklet mKeetsWorklet =
+            new com.eurobuddha.minimacore.keets.KeetsWorklet();
+
     //Used to update the Notification
     Handler mHandler;
 
@@ -398,6 +402,18 @@ public class MinimaService extends Service {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (!serviceDestroyed && !mHaveStartedShutdown) {
                         minima.mainStarter(vars.toArray(new String[0]));
+
+                        //keets: phone dialable by pubkey over HyperDHT. Started after the
+                        //node so GeneralParams and the per-boot token exist; delayed so the
+                        //NIO server is listening before the first bridged stream arrives.
+                        SharedPreferences kp = getSharedPreferences("main_prefs", MODE_PRIVATE);
+                        if (kp.getBoolean("keets_enabled", true)) {
+                            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                                if (!serviceDestroyed && !mHaveStartedShutdown) {
+                                    mKeetsWorklet.start(MinimaService.this);
+                                }
+                            }, 15000);
+                        }
                     }
                 });
             }
@@ -565,6 +581,9 @@ public class MinimaService extends Service {
         //Have started shutdown
         mHaveStartedShutdown = true;
         logger.log("Minima Service onDestroy start");
+
+        //Stop the keets worklet before the node quits
+        mKeetsWorklet.terminate();
 
         //QUIT nicely..
         try{

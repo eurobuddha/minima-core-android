@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- bare-kit declares minSdk 29; we stay 28 and gate the keets worklet on
+         Build.VERSION.SDK_INT >= 29 at runtime (KeetsWorklet). API 28 devices run
+         the node classic-only — nothing from bare-kit is touched there. -->
+    <uses-sdk tools:overrideLibrary="to.holepunch.bare.kit" />
+
     <!-- Need Notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
