@@ -21,7 +21,7 @@ PACK="$(npm root -g)/bare-pack/bin.js"
 IMPORTS="$(mktemp).json"
 trap 'rm -f "$IMPORTS"' EXIT
 cat > "$IMPORTS" <<'EOF'
-{ "net": "bare-tcp", "fs": "bare-fs", "path": "bare-path", "process": "bare-process" }
+{ "net": "bare-tcp", "fs": "bare-fs", "path": "bare-path", "process": "bare-process", "http": "bare-http1" }
 EOF
 
 mkdir -p app/src/main/assets
