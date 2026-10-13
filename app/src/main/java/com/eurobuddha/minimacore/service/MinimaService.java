@@ -311,6 +311,14 @@ public class MinimaService extends Service {
 
         vars.add("-allowallip");
 
+        //keets: the worklet (not the node) runs the sidecar, but the node must still
+        //know the transport exists — the `keets` command refuses without -keets, which
+        //starved the chat drainer (proven on the Fold 2026-10-13). KeetsManager with no
+        //-keetssidecar path spawns nothing, and its MDS poller is gated off.
+        if (pref.getBoolean("keets_enabled", true)) {
+            vars.add("-keets");
+        }
+
         // Pandamonium can opt into classic mode; other flavors retain their fixed policy.
         // Minima.main resets GeneralParams before applying these arguments on every restart.
         com.eurobuddha.minimacore.main.StartupMode.addArguments(vars,

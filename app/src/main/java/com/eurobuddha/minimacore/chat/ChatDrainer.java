@@ -42,6 +42,7 @@ public class ChatDrainer {
 
     private static java.lang.Thread mThread = null;
     private static volatile boolean mStop = false;
+    private static String mLastErr = null;
 
     public static synchronized void start(MinimaService zService) {
         if (mThread != null) return;
@@ -69,7 +70,14 @@ public class ChatDrainer {
             if (!MinimaCMD.checkMinimaStarted()) continue;
             try {
                 JSONObject res = MinimaCMD.execute("keets action:inbox");
-                if (!(Boolean) res.getOrDefault("status", false)) continue;   // keets off / sidecar starting
+                if (!(Boolean) res.getOrDefault("status", false)) {
+                    //sidecar starting is normal — but log a CHANGED error so a wedged
+                    //command path is never silent (the 401 token bug cost a device test)
+                    String err = "" + res.get("error");
+                    if (!err.equals(mLastErr)) { mLastErr = err; logger.log("[CHAT] inbox unavailable: " + err); }
+                    continue;
+                }
+                mLastErr = null;
                 JSONArray inbox = (JSONArray) res.get("response");
                 int fresh = 0;
                 String lastFrom = null, lastName = null, lastBody = null;

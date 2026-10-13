@@ -47,16 +47,32 @@
                 android:textSize="13sp" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/chat_empty"
+        <LinearLayout
+            android:id="@+id/chat_empty_box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="32dp"
+            android:orientation="vertical"
             android:gravity="center"
-            android:lineSpacingExtra="4dp"
-            android:textColor="@color/core_text_mid"
-            android:text="No chats yet.\n\nTap + to start one — scan your friend's QR or paste their address. Messages are end-to-end encrypted and need no server: delivered instantly when they're online, held safely for them when they're not."
-            android:visibility="gone" />
+            android:padding="28dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/chat_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:textColor="@color/core_text_mid"
+                android:text="No chats yet.\n\nStart one by scanning your friend's QR code or pasting their address. Messages are end-to-end encrypted and need no server: delivered instantly when they're online, held safely for them when they're not." />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/chat_empty_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:paddingHorizontal="28dp"
+                android:text="Start a new chat" />
+        </LinearLayout>
 
         <ListView
             android:id="@+id/chat_threads"

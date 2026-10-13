@@ -20,6 +20,13 @@ public class LogsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logs);
         setTitle("Logs");
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.logs_container), (v, insets) -> {
+            android.graphics.Insets bars = insets.getInsets(
+                    androidx.core.view.WindowInsetsCompat.Type.systemBars()
+                    | androidx.core.view.WindowInsetsCompat.Type.ime()).toPlatformInsets();
+            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return insets;
+        });
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mLogsView = new LogsView(this);

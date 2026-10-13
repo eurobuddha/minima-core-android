@@ -39,7 +39,7 @@ public class ChatView extends BaseView {
 
     private static String mMyPub = null;   // cached (stable per datadir)
 
-    private final TextView mEmpty;
+    private final View mEmpty;
     private final TextView mMyName;
     private final ThreadAdapter mAdapter;
     private Runnable mScanRequest = null;  // wired by MainActivity (launcher must register pre-STARTED)
@@ -49,7 +49,7 @@ public class ChatView extends BaseView {
     public ChatView(Activity zActivity) {
         super(zActivity, R.layout.view_chat);
 
-        mEmpty = getMainView().findViewById(R.id.chat_empty);
+        mEmpty = getMainView().findViewById(R.id.chat_empty_box);
         mMyName = getMainView().findViewById(R.id.chat_myname);
         ListView list = getMainView().findViewById(R.id.chat_threads);
         mAdapter = new ThreadAdapter();
@@ -59,6 +59,7 @@ public class ChatView extends BaseView {
 
         FloatingActionButton fab = getMainView().findViewById(R.id.chat_fab);
         fab.setOnClickListener(v -> showNewChat());
+        getMainView().findViewById(R.id.chat_empty_start).setOnClickListener(v -> showNewChat());
 
         list.setOnItemClickListener((parent, view, position, id) -> {
             ChatDb.Thread t = (ChatDb.Thread) mAdapter.getItem(position);

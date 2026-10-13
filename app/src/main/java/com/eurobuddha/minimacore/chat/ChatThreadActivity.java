@@ -60,6 +60,7 @@ public class ChatThreadActivity extends AppCompatActivity {
         if (mPubkey == null) { finish(); return; }
 
         mToolbar = findViewById(R.id.chat_thread_toolbar);
+        com.eurobuddha.minimacore.utils.KeyboardInsets.install(this, findViewById(R.id.chat_thread_main), mToolbar);
         refreshTitle();
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
