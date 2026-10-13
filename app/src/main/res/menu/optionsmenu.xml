@@ -9,6 +9,12 @@
 <!--        app:showAsAction="never" />-->
 
     <item
+        android:id="@+id/mainmenu_logs"
+        android:orderInCategory="100"
+        android:title="Logs"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/mainmenu_backup"
         android:orderInCategory="100"
         android:title="Backup &amp; Recovery"

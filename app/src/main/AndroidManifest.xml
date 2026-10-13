@@ -79,6 +79,8 @@
         <activity android:name=".launcher.restore.SeedSyncServiceActivity"></activity>
         <activity android:name=".main.SeedSyncActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.views.terminal.TerminalActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".main.views.logs.LogsActivity"></activity>
+        <activity android:name=".chat.ChatThreadActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.ParamsActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.backup.BackupActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.backup.BackupCreateActivity" android:windowSoftInputMode="adjustResize"></activity>

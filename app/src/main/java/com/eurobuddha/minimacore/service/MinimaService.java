@@ -411,6 +411,8 @@ public class MinimaService extends Service {
                             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                                 if (!serviceDestroyed && !mHaveStartedShutdown) {
                                     mKeetsWorklet.start(MinimaService.this);
+                                    //Chat: the ONE drainer of the keets message inbox
+                                    com.eurobuddha.minimacore.chat.ChatDrainer.start(MinimaService.this);
                                 }
                             }, 15000);
                         }
@@ -583,6 +585,7 @@ public class MinimaService extends Service {
         logger.log("Minima Service onDestroy start");
 
         //Stop the keets worklet before the node quits
+        com.eurobuddha.minimacore.chat.ChatDrainer.stop();
         mKeetsWorklet.terminate();
 
         //QUIT nicely..

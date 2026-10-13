@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import com.eurobuddha.minimacore.main.views.apps.AppsView;
 import com.eurobuddha.minimacore.main.views.balance.BalanceView;
 import com.eurobuddha.minimacore.main.views.home.HomeView;
-import com.eurobuddha.minimacore.main.views.logs.LogsView;
+import com.eurobuddha.minimacore.chat.ChatView;
 import com.eurobuddha.minimacore.main.views.terminal.TerminalView;
 import com.eurobuddha.minimacore.utils.logger;
 
@@ -21,7 +21,7 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
     public static final int WALLET_POSITION = BuildConfig.PANDAMONIUM ? 0 : 1;
     public static final int UTILITY_POSITION = BuildConfig.PANDAMONIUM ? 1 : 2;
     public static final int APPS_POSITION = BuildConfig.PANDAMONIUM ? 2 : 3;
-    public static final int LOGS_POSITION = BuildConfig.PANDAMONIUM ? 3 : 4;
+    public static final int CHAT_POSITION = BuildConfig.PANDAMONIUM ? 3 : 4;   // was Logs (now in the overflow menu)
 
     MainActivity mActivity;
 
@@ -57,15 +57,16 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
         //Clear receive address
         RECEIVE_ADDRESS = null;
 
-        // Reuse the same screens. Pandamonium starts with Wallet and puts Node after Logs;
-        // the other builds keep Home / Wallet / Terminal / Apps / Logs.
+        // Reuse the same screens. Pandamonium starts with Wallet and puts Node after Chat;
+        // the other builds keep Home / Wallet / Terminal / Apps / Chat. Logs moved to the
+        // toolbar overflow menu (LogsActivity) when Chat took its tab slot (1.9.20).
         mAllViews = new BaseView[5];
 
         mAllViews[HOME_POSITION] = new HomeView(mActivity);
         mAllViews[WALLET_POSITION] = new BalanceView(mActivity);
         mAllViews[UTILITY_POSITION] = com.eurobuddha.minimacore.integrated.PandamoniumHooks.createUtilityTab(mActivity);
         mAllViews[APPS_POSITION] = new AppsView(mActivity);
-        mAllViews[LOGS_POSITION] = new LogsView(mActivity);
+        mAllViews[CHAT_POSITION] = new ChatView(mActivity);
     }
 
     public void refreshPagerView(int zPosition){
@@ -75,6 +76,10 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
 
     public AppsView getAppsView(){
         return (AppsView) mAllViews[APPS_POSITION];
+    }
+
+    public BaseView getChatView(){
+        return mAllViews[CHAT_POSITION];
     }
 
     //Refresh the node dashboard..

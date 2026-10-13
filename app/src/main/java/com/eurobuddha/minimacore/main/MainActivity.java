@@ -113,6 +113,21 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         mMainAdapter = new MainAdapter(this);
 
+        //Chat QR scanner: launchers must register before STARTED (SendActivity pattern)
+        androidx.activity.result.ActivityResultLauncher<com.journeyapps.barcodescanner.ScanOptions> chatScan =
+                registerForActivityResult(new com.journeyapps.barcodescanner.ScanContract(), result -> {
+                    if (result != null && result.getContents() != null) {
+                        ((com.eurobuddha.minimacore.chat.ChatView) mMainAdapter.getChatView())
+                                .onScanResult(result.getContents());
+                    }
+                });
+        ((com.eurobuddha.minimacore.chat.ChatView) mMainAdapter.getChatView()).setOnScanRequest(() ->
+                chatScan.launch(new com.journeyapps.barcodescanner.ScanOptions()
+                        .setDesiredBarcodeFormats(com.journeyapps.barcodescanner.ScanOptions.QR_CODE)
+                        .setPrompt("Scan a keets address QR")
+                        .setBeepEnabled(false)
+                        .setOrientationLocked(false)));
+
         mMainPager = findViewById(R.id.main_pager);
         mMainPager.setAdapter(mMainAdapter);
 
@@ -133,8 +148,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         tabs.getTabAt(MainAdapter.APPS_POSITION).setText("Apps");
         tabs.getTabAt(MainAdapter.APPS_POSITION).setIcon(R.drawable.ic_dapps);
 
-        tabs.getTabAt(MainAdapter.LOGS_POSITION).setText("Logs");
-        tabs.getTabAt(MainAdapter.LOGS_POSITION).setIcon(R.drawable.ic_edit_note);
+        tabs.getTabAt(MainAdapter.CHAT_POSITION).setText("Chat");
+        tabs.getTabAt(MainAdapter.CHAT_POSITION).setIcon(R.drawable.ic_chat);
 
         tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -173,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             case MainAdapter.WALLET_POSITION:  title = "Wallet";      break;
             case MainAdapter.UTILITY_POSITION:  title = BuildConfig.PANDAMONIUM ? "History" : "Terminal";    break;
             case MainAdapter.APPS_POSITION:  title = "Apps";        break;
-            case MainAdapter.LOGS_POSITION:  title = "Logs";        break;
+            case MainAdapter.CHAT_POSITION:  title = "Chat";        break;
             default: title = BuildConfig.PANDAMONIUM ? "" : "Minima Core"; break;
         }
         if(getSupportActionBar() != null){
@@ -308,6 +323,13 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             case R.id.mainmenu_screenshots :
 
                 toggleScreenshots(item);
+
+                return true;
+
+            case R.id.mainmenu_logs :
+
+                MainActivity.this.startActivity(new Intent(MainActivity.this,
+                        com.eurobuddha.minimacore.main.views.logs.LogsActivity.class));
 
                 return true;
 
