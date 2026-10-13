@@ -31,14 +31,18 @@ mkdir -p app/src/main/assets
     --out "$OLDPWD/app/src/main/assets/keets.bundle" index.js )
 echo "packed app/src/main/assets/keets.bundle ($(du -h app/src/main/assets/keets.bundle | cut -f1))"
 
-# addon prebuilds → jniLibs, named lib<module>.<version>.so (bare's linked: convention)
+# addon prebuilds → jniLibs, named lib<module>.<version>.so (bare's linked: convention).
+# Walk node_modules RECURSIVELY: npm nests a second copy when versions conflict
+# (bare-tty/node_modules/bare-signals@5 vs top-level @4), and the bundle requires the
+# nested version — missing it is a native CANNOT_LOAD abort on-device (proven 2026-10-13).
 declare -a MAP=("android-arm64:arm64-v8a" "android-arm:armeabi-v7a" "android-x64:x86_64")
 COUNT=0
-for moddir in "$SIDECAR"/node_modules/*/; do
+while IFS= read -r predir; do
+  moddir="$(dirname "$predir")"
   mod="$(basename "$moddir")"
   for pair in "${MAP[@]}"; do
     host="${pair%%:*}"; abi="${pair##*:}"
-    pre="$moddir/prebuilds/$host/$mod.bare"
+    pre="$predir/$host/$mod.bare"
     if [ -f "$pre" ]; then
       ver="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$moddir/package.json" | head -1)"
       mkdir -p "app/src/main/jniLibs/$abi"
@@ -46,5 +50,5 @@ for moddir in "$SIDECAR"/node_modules/*/; do
       COUNT=$((COUNT+1))
     fi
   done
-done
+done < <(find "$SIDECAR/node_modules" -type d -name prebuilds)
 echo "linked $COUNT addon prebuilds into app/src/main/jniLibs/"
