@@ -100,6 +100,7 @@ public class ChatDrainer {
                             if (t != 0) upto = t;
                         }
                         db.markPeerRead(from, upto);
+                        fanout(zService, msg, d, from);
                         MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
                         for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
                         continue;
@@ -108,6 +109,7 @@ public class ChatDrainer {
                         if (d.addr.matches("(0x|Mx)[0-9A-Za-z]+")) {
                             db.ensureContact(from, d.name);
                             db.setContactPayAddr(from, d.addr);
+                            fanout(zService, msg, d, from);
                         }
                         MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
                         for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
@@ -154,19 +156,7 @@ public class ChatDrainer {
                                  : d.body;
 
                         // companion fan-out — the Android twin of the MDS KEETS event
-                        JSONObject ev = new JSONObject();
-                        ev.put("event", "KEETS");
-                        JSONObject data = new JSONObject();
-                        data.put("id", m.msgid);
-                        data.put("from", from);
-                        data.put("ts", m.ts);
-                        data.put("payload", msg.get("payload"));
-                        data.put("message", d.body);
-                        data.put("name", d.name);
-                        data.put("ref", d.ref);
-                        data.put("via", m.via);
-                        ev.put("data", data);
-                        zService.sendBroadcastNotify(ev, false);
+                        fanout(zService, msg, d, from);
                     }
                     // ack ONLY after the durable store write
                     MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
@@ -179,6 +169,29 @@ public class ChatDrainer {
                 logger.log("[CHAT] drainer: " + exc);
             }
         }
+    }
+
+    /** Companion fan-out — the Android twin of the MDS KEETS event. Real messages
+     *  AND the read/payaddr controls go out (a companion chat app needs ticks and
+     *  pay addresses); payaddr-req stays node-answered only, or two apps would
+     *  both reply. Controls are forwarded, never stored. */
+    private static void fanout(MinimaService zService, JSONObject zMsg, ChatSchema.Decoded zD, String zFrom) {
+        try {
+            JSONObject ev = new JSONObject();
+            ev.put("event", "KEETS");
+            JSONObject data = new JSONObject();
+            data.put("id", zD.id != null ? zD.id : (String) zMsg.get("id"));
+            data.put("from", zFrom);
+            data.put("ts", zD.ts != 0 ? zD.ts : Long.parseLong("" + zMsg.get("ts")));
+            data.put("payload", zMsg.get("payload"));
+            data.put("message", zD.body);
+            data.put("name", zD.name);
+            data.put("ref", zD.ref);
+            data.put("state", zD.state);
+            data.put("via", zMsg.get("via"));
+            ev.put("data", data);
+            zService.sendBroadcastNotify(ev, false);
+        } catch (Exception e) { /* fan-out must never break the drain */ }
     }
 
     private static void notifyUser(MinimaService zService, int zFresh, String zFrom, String zName, String zBody) {
