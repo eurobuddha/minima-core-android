@@ -266,6 +266,31 @@ public class ChatThreadActivity extends AppCompatActivity {
             try {
                 android.graphics.Bitmap bm = BitmapFactory.decodeStream(getContentResolver().openInputStream(zUri));
                 if (bm == null) throw new Exception("could not read image");
+
+                //EXIF orientation: cameras store rotation as metadata, decodeStream ignores
+                //it — without this, portrait photos arrive rotated (the known bug from the
+                //family's earlier chat apps)
+                try {
+                    java.io.InputStream exifIn = getContentResolver().openInputStream(zUri);
+                    android.media.ExifInterface exif = new android.media.ExifInterface(exifIn);
+                    int o = exif.getAttributeInt(android.media.ExifInterface.TAG_ORIENTATION,
+                            android.media.ExifInterface.ORIENTATION_NORMAL);
+                    exifIn.close();
+                    android.graphics.Matrix mx = new android.graphics.Matrix();
+                    switch (o) {
+                        case android.media.ExifInterface.ORIENTATION_ROTATE_90:  mx.postRotate(90);  break;
+                        case android.media.ExifInterface.ORIENTATION_ROTATE_180: mx.postRotate(180); break;
+                        case android.media.ExifInterface.ORIENTATION_ROTATE_270: mx.postRotate(270); break;
+                        case android.media.ExifInterface.ORIENTATION_FLIP_HORIZONTAL: mx.postScale(-1, 1); break;
+                        case android.media.ExifInterface.ORIENTATION_FLIP_VERTICAL:   mx.postScale(1, -1); break;
+                        case android.media.ExifInterface.ORIENTATION_TRANSPOSE:  mx.postRotate(90);  mx.postScale(-1, 1); break;
+                        case android.media.ExifInterface.ORIENTATION_TRANSVERSE: mx.postRotate(270); mx.postScale(-1, 1); break;
+                    }
+                    if (!mx.isIdentity()) {
+                        bm = android.graphics.Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), mx, true);
+                    }
+                } catch (Exception e) { /* no exif — keep as decoded */ }
+
                 int max = 1280;
                 if (bm.getWidth() > max || bm.getHeight() > max) {
                     float sc = Math.min((float) max / bm.getWidth(), (float) max / bm.getHeight());
