@@ -5,4 +5,6 @@
     <!-- File-bridge exports: the node's base folder (backups, archive exports, .txn files).
          URIs are only ever minted by the FILE 'get' action and granted per requesting package. -->
     <files-path name="nodefiles" path="." />
+    <!-- Chat photo cache: shared read-only when the user taps Share in the photo viewer -->
+    <cache-path name="chatimg" path="chatimg/" />
 </paths>

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -54,7 +55,6 @@ public class ChatThreadActivity extends AppCompatActivity {
     private MsgAdapter mAdapter;
     private Toolbar mToolbar;
     private ActivityResultLauncher<String> mPickImage;
-    private final java.util.concurrent.ConcurrentHashMap<String, Bitmap> mImgCache = new java.util.concurrent.ConcurrentHashMap<>();
     private final Runnable mOnNewMessage = () -> runOnUiThread(() -> {
         ChatDb.get(this).markThreadRead(mPubkey);
         sendReadReceipt();
@@ -334,30 +334,6 @@ public class ChatThreadActivity extends AppCompatActivity {
         }, "chat-image-send").start();
     }
 
-    /** Fetch + cache an image ref; calls back on main with the bitmap (or null). */
-    private void loadImage(String zRef, java.util.function.Consumer<Bitmap> zCb) {
-        Bitmap c = mImgCache.get(zRef);
-        if (c != null) { zCb.accept(c); return; }
-        new Thread(() -> {
-            try {
-                java.io.File dir = new java.io.File(getCacheDir(), "chatimg");
-                dir.mkdirs();
-                java.io.File f = new java.io.File(dir, Integer.toHexString(zRef.hashCode()) + ".jpg");
-                Bitmap bm;
-                if (!f.exists()) {
-                    JSONObject r = MinimaCMD.execute("keets action:fetch url:" + zRef + " file:" + f.getAbsolutePath());
-                    if (!(Boolean) r.getOrDefault("status", false)) throw new Exception("fetch failed");
-                }
-                bm = BitmapFactory.decodeFile(f.getAbsolutePath());
-                if (bm != null) mImgCache.put(zRef, bm);
-                final Bitmap fin = bm;
-                runOnUiThread(() -> zCb.accept(fin));
-            } catch (Exception exc) {
-                runOnUiThread(() -> zCb.accept(null));
-            }
-        }, "chat-image-load").start();
-    }
-
     private void sendMessage(String zText) {
         SharedPreferences prefs = getSharedPreferences("main_prefs", Context.MODE_PRIVATE);
         String myname = prefs.getString("chat_name", "");
@@ -458,8 +434,14 @@ public class ChatThreadActivity extends AppCompatActivity {
                 image.setVisibility(View.VISIBLE);
                 image.setImageResource(android.R.drawable.stat_sys_download);
                 final String ref = m.ref;
-                loadImage(ref, bm -> {
+                ChatImages.load(ChatThreadActivity.this, ref, bm -> {
                     if (bm != null && ref.equals(m.ref)) image.setImageBitmap(bm);
+                });
+                image.setOnClickListener(v -> {
+                    Intent viewer = new Intent(ChatThreadActivity.this, ChatImageActivity.class);
+                    viewer.putExtra("ref", ref);
+                    viewer.putExtra("caption", m.body);
+                    startActivity(viewer);
                 });
             } else if ("payment".equals(m.state)) {
                 String who = m.incoming ? "received" : "sent";
