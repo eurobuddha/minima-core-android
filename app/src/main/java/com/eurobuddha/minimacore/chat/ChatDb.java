@@ -24,7 +24,7 @@ public class ChatDb extends SQLiteOpenHelper {
     }
 
     private ChatDb(Context zContext) {
-        super(zContext, "keetchat.db", null, 1);
+        super(zContext, "keetchat.db", null, 2);
     }
 
     @Override
@@ -32,21 +32,35 @@ public class ChatDb extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE messages (" +
                 "msgid TEXT PRIMARY KEY, pubkey TEXT NOT NULL, incoming INTEGER NOT NULL," +
                 "body TEXT NOT NULL, name TEXT DEFAULT '', ref TEXT DEFAULT ''," +
-                "ts INTEGER NOT NULL, via TEXT DEFAULT '', read INTEGER DEFAULT 0)");
+                "ts INTEGER NOT NULL, via TEXT DEFAULT '', read INTEGER DEFAULT 0," +
+                "state TEXT DEFAULT '', amt TEXT DEFAULT '', tokname TEXT DEFAULT ''," +
+                "txid TEXT DEFAULT '', peerread INTEGER DEFAULT 0)");
         db.execSQL("CREATE INDEX idx_messages_pubkey ON messages(pubkey, ts)");
         // contact = keets pubkey (0x + 64 hex, ALWAYS stored and shown in full);
         // maximapk reserved for the Parlons interop era
         db.execSQL("CREATE TABLE contacts (" +
                 "pubkey TEXT PRIMARY KEY, name TEXT NOT NULL, maximapk TEXT DEFAULT ''," +
+                "payaddr TEXT DEFAULT '', lastreceipt TEXT DEFAULT ''," +
                 "added INTEGER NOT NULL)");
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldV, int newV) {}
+    public void onUpgrade(SQLiteDatabase db, int oldV, int newV) {
+        if (oldV < 2) {
+            for (String c : new String[]{"state TEXT DEFAULT ''", "amt TEXT DEFAULT ''",
+                    "tokname TEXT DEFAULT ''", "txid TEXT DEFAULT ''", "peerread INTEGER DEFAULT 0"}) {
+                try { db.execSQL("ALTER TABLE messages ADD COLUMN " + c); } catch (Exception e) {}
+            }
+            for (String c : new String[]{"payaddr TEXT DEFAULT ''", "lastreceipt TEXT DEFAULT ''"}) {
+                try { db.execSQL("ALTER TABLE contacts ADD COLUMN " + c); } catch (Exception e) {}
+            }
+        }
+    }
 
     public static class Msg {
         public String msgid, pubkey, body, name, ref, via;
-        public boolean incoming, read;
+        public String state = "", amt = "", tokname = "", txid = "";
+        public boolean incoming, read, peerread;
         public long ts;
     }
 
@@ -68,6 +82,11 @@ public class ChatDb extends SQLiteOpenHelper {
         v.put("ts", m.ts);
         v.put("via", m.via == null ? "" : m.via);
         v.put("read", m.read ? 1 : 0);
+        v.put("state", m.state == null ? "" : m.state);
+        v.put("amt", m.amt == null ? "" : m.amt);
+        v.put("tokname", m.tokname == null ? "" : m.tokname);
+        v.put("txid", m.txid == null ? "" : m.txid);
+        v.put("peerread", m.peerread ? 1 : 0);
         return getWritableDatabase().insertWithOnConflict("messages", null, v, SQLiteDatabase.CONFLICT_IGNORE) != -1;
     }
 
@@ -80,13 +99,15 @@ public class ChatDb extends SQLiteOpenHelper {
     public ArrayList<Msg> thread(String zPubkey) {
         ArrayList<Msg> out = new ArrayList<>();
         Cursor c = getReadableDatabase().rawQuery(
-                "SELECT msgid,pubkey,incoming,body,name,ref,ts,via,read FROM messages WHERE pubkey=? ORDER BY ts ASC, rowid ASC",
+                "SELECT msgid,pubkey,incoming,body,name,ref,ts,via,read,state,amt,tokname,txid,peerread FROM messages WHERE pubkey=? ORDER BY ts ASC, rowid ASC",
                 new String[]{zPubkey});
         while (c.moveToNext()) {
             Msg m = new Msg();
             m.msgid = c.getString(0); m.pubkey = c.getString(1); m.incoming = c.getInt(2) == 1;
             m.body = c.getString(3); m.name = c.getString(4); m.ref = c.getString(5);
             m.ts = c.getLong(6); m.via = c.getString(7); m.read = c.getInt(8) == 1;
+            m.state = c.getString(9); m.amt = c.getString(10); m.tokname = c.getString(11);
+            m.txid = c.getString(12); m.peerread = c.getInt(13) == 1;
             out.add(m);
         }
         c.close();
@@ -150,6 +171,51 @@ public class ChatDb extends SQLiteOpenHelper {
         String n = c.moveToNext() ? c.getString(0) : null;
         c.close();
         return n == null ? zPubkey : n;
+    }
+
+    /** Read receipt from the peer: mark our outgoing messages up to zUptoTs as peer-read. */
+    public void markPeerRead(String zPubkey, long zUptoTs) {
+        getWritableDatabase().execSQL(
+                "UPDATE messages SET peerread=1 WHERE pubkey=? AND incoming=0 AND ts<=?",
+                new Object[]{zPubkey, zUptoTs});
+    }
+
+    public void setContactPayAddr(String zPubkey, String zAddr) {
+        ContentValues v = new ContentValues();
+        v.put("payaddr", zAddr);
+        getWritableDatabase().update("contacts", v, "pubkey=?", new String[]{zPubkey});
+    }
+
+    public String contactPayAddr(String zPubkey) {
+        Cursor c = getReadableDatabase().rawQuery("SELECT payaddr FROM contacts WHERE pubkey=?", new String[]{zPubkey});
+        String a = c.moveToNext() ? c.getString(0) : "";
+        c.close();
+        return a == null ? "" : a;
+    }
+
+    /** Receipt dedupe: the newest incoming msgid we have receipted to this contact. */
+    public String lastReceipt(String zPubkey) {
+        Cursor c = getReadableDatabase().rawQuery("SELECT lastreceipt FROM contacts WHERE pubkey=?", new String[]{zPubkey});
+        String a = c.moveToNext() ? c.getString(0) : "";
+        c.close();
+        return a == null ? "" : a;
+    }
+
+    public void setLastReceipt(String zPubkey, String zMsgId) {
+        ContentValues v = new ContentValues();
+        v.put("lastreceipt", zMsgId);
+        getWritableDatabase().update("contacts", v, "pubkey=?", new String[]{zPubkey});
+    }
+
+    /** Newest incoming message in a thread (for receipts). */
+    public Msg latestIncoming(String zPubkey) {
+        ArrayList<Msg> all = thread(zPubkey);
+        for (int i = all.size() - 1; i >= 0; i--) if (all.get(i).incoming) return all.get(i);
+        return null;
+    }
+
+    public void deleteMessage(String zMsgId) {
+        getWritableDatabase().delete("messages", "msgid=?", new String[]{zMsgId});
     }
 
     public void removeContact(String zPubkey) {

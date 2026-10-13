@@ -43,6 +43,8 @@ public class ChatDrainer {
     private static java.lang.Thread mThread = null;
     private static volatile boolean mStop = false;
     private static String mLastErr = null;
+    //payaddr auto-responder guard: a peer gets one address reply per 10 minutes
+    private static final java.util.HashMap<String, Long> mPayAddrReplied = new java.util.HashMap<>();
 
     public static synchronized void start(MinimaService zService) {
         if (mThread != null) return;
@@ -89,6 +91,40 @@ public class ChatDrainer {
                     catch (Exception e) { raw = "" + msg.get("message"); }
                     ChatSchema.Decoded d = ChatSchema.decode(raw);
 
+                    //Control messages: consumed, never stored or notified
+                    if (d.state.equals("read")) {
+                        db.markPeerRead(from, d.ts != 0 ? d.ts : System.currentTimeMillis());
+                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
+                        for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
+                        continue;
+                    }
+                    if (d.state.equals("payaddr")) {
+                        if (d.addr.matches("(0x|Mx)[0-9A-Za-z]+")) {
+                            db.ensureContact(from, d.name);
+                            db.setContactPayAddr(from, d.addr);
+                        }
+                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
+                        for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
+                        continue;
+                    }
+                    if (d.state.equals("payaddr-req")) {
+                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
+                        Long last = mPayAddrReplied.get(from);
+                        if (last == null || System.currentTimeMillis() - last > 10 * 60 * 1000) {
+                            mPayAddrReplied.put(from, System.currentTimeMillis());
+                            JSONObject ga = MinimaCMD.execute("getaddress");
+                            if ((Boolean) ga.getOrDefault("status", false)) {
+                                String myaddr = (String) ((JSONObject) ga.get("response")).get("miniaddress");
+                                org.minima.utils.json.JSONObject reply = ChatSchema.base("", "", "");
+                                reply.put("state", "payaddr");
+                                reply.put("addr", myaddr);
+                                MinimaCMD.execute("keets action:send to:" + from +
+                                        " datahex:" + ChatSchema.toDataHex(reply.toString()));
+                            }
+                        }
+                        continue;
+                    }
+
                     ChatDb.Msg m = new ChatDb.Msg();
                     m.msgid = d.id != null ? d.id : (String) msg.get("id");
                     m.pubkey = from;
@@ -98,13 +134,16 @@ public class ChatDrainer {
                     m.ref = d.ref;
                     m.ts = d.ts != 0 ? d.ts : Long.parseLong("" + msg.get("ts"));
                     m.via = (String) msg.get("via");
+                    m.state = d.state; m.amt = d.amt; m.tokname = d.tokname; m.txid = d.txid;
                     boolean isNew = db.addMessage(m);
                     if (isNew) {
                         db.ensureContact(from, d.name);
                         fresh++;
                         lastFrom = from;
                         lastName = db.contactName(from);
-                        lastBody = d.body;
+                        lastBody = d.state.equals("image") ? "📷 Photo"
+                                 : d.state.equals("payment") ? "💸 " + d.amt + " " + (d.tokname.equals("") ? "Minima" : d.tokname)
+                                 : d.body;
 
                         // companion fan-out — the Android twin of the MDS KEETS event
                         JSONObject ev = new JSONObject();

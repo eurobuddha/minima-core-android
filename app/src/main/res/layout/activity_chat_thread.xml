@@ -31,6 +31,16 @@
         android:background="@color/core_surface"
         android:padding="8dp">
 
+        <ImageButton
+            android:id="@+id/chat_attach"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_attach"
+            android:contentDescription="Attach"
+            app:tint="@color/core_text_mid"
+            xmlns:app="http://schemas.android.com/apk/res-auto" />
+
         <EditText
             android:id="@+id/chat_input"
             android:layout_width="0dp"

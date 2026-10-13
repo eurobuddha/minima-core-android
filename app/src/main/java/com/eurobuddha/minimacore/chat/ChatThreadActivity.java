@@ -20,8 +20,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.widget.ImageButton;
 
 import com.eurobuddha.minimacore.R;
 import com.eurobuddha.minimacore.utils.MinimaCMD;
@@ -46,8 +53,11 @@ public class ChatThreadActivity extends AppCompatActivity {
     private String mPubkey;
     private MsgAdapter mAdapter;
     private Toolbar mToolbar;
+    private ActivityResultLauncher<String> mPickImage;
+    private final java.util.concurrent.ConcurrentHashMap<String, Bitmap> mImgCache = new java.util.concurrent.ConcurrentHashMap<>();
     private final Runnable mOnNewMessage = () -> runOnUiThread(() -> {
         ChatDb.get(this).markThreadRead(mPubkey);
+        sendReadReceipt();
         mAdapter.reload();
     });
 
@@ -58,6 +68,9 @@ public class ChatThreadActivity extends AppCompatActivity {
 
         mPubkey = getIntent().getStringExtra("pubkey");
         if (mPubkey == null) { finish(); return; }
+
+        mPickImage = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                uri -> { if (uri != null) sendImage(uri); });
 
         mToolbar = findViewById(R.id.chat_thread_toolbar);
         com.eurobuddha.minimacore.utils.KeyboardInsets.install(this, findViewById(R.id.chat_thread_main), mToolbar);
@@ -71,6 +84,14 @@ public class ChatThreadActivity extends AppCompatActivity {
         ListView list = findViewById(R.id.chat_msgs);
         mAdapter = new MsgAdapter();
         list.setAdapter(mAdapter);
+
+        ImageButton attach = findViewById(R.id.chat_attach);
+        attach.setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setItems(new String[]{"📷 Photo", "💸 Send payment", "🏷 Request their pay address"}, (d, which) -> {
+                    if (which == 0) mPickImage.launch("image/*");
+                    else if (which == 1) startPayment();
+                    else requestPayAddr(true);
+                }).show());
 
         EditText input = findViewById(R.id.chat_input);
         FloatingActionButton send = findViewById(R.id.chat_send);
@@ -140,6 +161,7 @@ public class ChatThreadActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         ChatDb.get(this).markThreadRead(mPubkey);
+        sendReadReceipt();
         mAdapter.reload();
         ChatDrainer.UI_LISTENERS.add(mOnNewMessage);
     }
@@ -148,6 +170,167 @@ public class ChatThreadActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         ChatDrainer.UI_LISTENERS.remove(mOnNewMessage);
+    }
+
+    /** Tell the peer we read up to the newest incoming message (blue ticks their side). */
+    private void sendReadReceipt() {
+        new Thread(() -> {
+            ChatDb db = ChatDb.get(this);
+            ChatDb.Msg latest = db.latestIncoming(mPubkey);
+            if (latest == null || latest.msgid.equals(db.lastReceipt(mPubkey))) return;
+            db.setLastReceipt(mPubkey, latest.msgid);
+            org.minima.utils.json.JSONObject r = ChatSchema.base("", "", "");
+            r.put("state", "read");
+            r.put("ref", latest.msgid);
+            MinimaCMD.execute("keets action:send to:" + mPubkey + " datahex:" + ChatSchema.toDataHex(r.toString()));
+        }, "chat-receipt").start();
+    }
+
+    /** Ask the peer for a Minima pay address (their node auto-answers). */
+    private void requestPayAddr(boolean zToast) {
+        new Thread(() -> {
+            org.minima.utils.json.JSONObject r = ChatSchema.base("", "", "");
+            r.put("state", "payaddr-req");
+            MinimaCMD.execute("keets action:send to:" + mPubkey + " datahex:" + ChatSchema.toDataHex(r.toString()));
+        }, "chat-payaddr-req").start();
+        if (zToast) Toast.makeText(this, "Address requested — arrives automatically when they're online", Toast.LENGTH_SHORT).show();
+    }
+
+    // ---- payments -------------------------------------------------------------
+    private void startPayment() {
+        String payaddr = ChatDb.get(this).contactPayAddr(mPubkey);
+        if (payaddr.equals("")) {
+            requestPayAddr(false);
+            Toast.makeText(this, "No pay address for this contact yet — requested it. Try again once they reply.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        View v = getLayoutInflater().inflate(R.layout.dialog_chat_pay, null);
+        ((TextView) v.findViewById(R.id.pay_to)).setText(payaddr);
+        new AlertDialog.Builder(this)
+                .setTitle("Send Minima")
+                .setView(v)
+                .setPositiveButton("Send", (d, w) -> {
+                    String amt = ((EditText) v.findViewById(R.id.pay_amount)).getText().toString().trim();
+                    if (!amt.matches("[0-9]+(\\.[0-9]+)?") || amt.equals("0")) {
+                        Toast.makeText(this, "Enter a valid amount", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    doPayment(payaddr, amt);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void doPayment(String zAddr, String zAmt) {
+        Toast.makeText(this, "Sending " + zAmt + " Minima…", Toast.LENGTH_SHORT).show();
+        MinimaCMD.runMinima("send address:" + zAddr + " amount:" + zAmt, zResult -> {
+            boolean ok = (Boolean) zResult.getOrDefault("status", false);
+            if (!ok) {
+                runOnUiThread(() -> Toast.makeText(this, "Payment failed: " + zResult.get("error"), Toast.LENGTH_LONG).show());
+                return;
+            }
+            String txid = "";
+            try { txid = "" + ((JSONObject) zResult.get("response")).get("txpowid"); } catch (Exception e) {}
+
+            SharedPreferences prefs = getSharedPreferences("main_prefs", Context.MODE_PRIVATE);
+            org.minima.utils.json.JSONObject pm = ChatSchema.base(prefs.getString("chat_name", ""), "", "");
+            pm.put("state", "payment");
+            pm.put("amt", zAmt);
+            pm.put("tokname", "Minima");
+            pm.put("txid", txid);
+            pm.put("addr", zAddr);
+            String payload = pm.toString();
+            String msgid = ChatSchema.decode(payload).id;
+
+            ChatDb.Msg m = new ChatDb.Msg();
+            m.msgid = msgid; m.pubkey = mPubkey; m.incoming = false;
+            m.body = ""; m.state = "payment"; m.amt = zAmt; m.tokname = "Minima"; m.txid = txid;
+            m.ts = System.currentTimeMillis(); m.via = ""; m.read = true;
+            ChatDb.get(this).addMessage(m);
+            runOnUiThread(() -> mAdapter.reload());
+
+            MinimaCMD.runMinima("keets action:send to:" + mPubkey + " datahex:" + ChatSchema.toDataHex(payload),
+                    zR2 -> runOnUiThread(() -> {
+                        boolean ok2 = (Boolean) zR2.getOrDefault("status", false);
+                        String via = ok2 ? (String) ((JSONObject) zR2.get("response")).get("delivered") : "FAILED";
+                        ChatDb.get(this).setVia(msgid, via);
+                        mAdapter.reload();
+                    }));
+        });
+    }
+
+    // ---- photos ---------------------------------------------------------------
+    private void sendImage(Uri zUri) {
+        Toast.makeText(this, "Publishing photo…", Toast.LENGTH_SHORT).show();
+        new Thread(() -> {
+            try {
+                android.graphics.Bitmap bm = BitmapFactory.decodeStream(getContentResolver().openInputStream(zUri));
+                if (bm == null) throw new Exception("could not read image");
+                int max = 1280;
+                if (bm.getWidth() > max || bm.getHeight() > max) {
+                    float sc = Math.min((float) max / bm.getWidth(), (float) max / bm.getHeight());
+                    bm = android.graphics.Bitmap.createScaledBitmap(bm,
+                            Math.round(bm.getWidth() * sc), Math.round(bm.getHeight() * sc), true);
+                }
+                java.io.File tmp = new java.io.File(getCacheDir(), "chat-out-" + System.currentTimeMillis() + ".jpg");
+                java.io.FileOutputStream fos = new java.io.FileOutputStream(tmp);
+                bm.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, fos);
+                fos.close();
+
+                //file: hand-off — megabyte params break the command tokenizer
+                JSONObject pub = MinimaCMD.execute("keets action:publish path:/chat/img-" +
+                        System.currentTimeMillis() + ".jpg file:" + tmp.getAbsolutePath());
+                tmp.delete();
+                if (!(Boolean) pub.getOrDefault("status", false)) throw new Exception("" + pub.get("error"));
+                String url = (String) ((JSONObject) pub.get("response")).get("url");
+
+                SharedPreferences prefs = getSharedPreferences("main_prefs", Context.MODE_PRIVATE);
+                org.minima.utils.json.JSONObject im = ChatSchema.base(prefs.getString("chat_name", ""), "", url);
+                im.put("state", "image");
+                String payload = im.toString();
+                String msgid = ChatSchema.decode(payload).id;
+
+                ChatDb.Msg m = new ChatDb.Msg();
+                m.msgid = msgid; m.pubkey = mPubkey; m.incoming = false;
+                m.body = ""; m.state = "image"; m.ref = url;
+                m.ts = System.currentTimeMillis(); m.via = ""; m.read = true;
+                ChatDb.get(this).addMessage(m);
+                runOnUiThread(() -> mAdapter.reload());
+
+                JSONObject sr = MinimaCMD.execute("keets action:send to:" + mPubkey +
+                        " datahex:" + ChatSchema.toDataHex(payload));
+                String via = (Boolean) sr.getOrDefault("status", false)
+                        ? (String) ((JSONObject) sr.get("response")).get("delivered") : "FAILED";
+                ChatDb.get(this).setVia(msgid, via);
+                runOnUiThread(() -> mAdapter.reload());
+            } catch (Exception exc) {
+                runOnUiThread(() -> Toast.makeText(this, "Photo failed: " + exc.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        }, "chat-image-send").start();
+    }
+
+    /** Fetch + cache an image ref; calls back on main with the bitmap (or null). */
+    private void loadImage(String zRef, java.util.function.Consumer<Bitmap> zCb) {
+        Bitmap c = mImgCache.get(zRef);
+        if (c != null) { zCb.accept(c); return; }
+        new Thread(() -> {
+            try {
+                java.io.File dir = new java.io.File(getCacheDir(), "chatimg");
+                dir.mkdirs();
+                java.io.File f = new java.io.File(dir, Integer.toHexString(zRef.hashCode()) + ".jpg");
+                Bitmap bm;
+                if (!f.exists()) {
+                    JSONObject r = MinimaCMD.execute("keets action:fetch url:" + zRef + " file:" + f.getAbsolutePath());
+                    if (!(Boolean) r.getOrDefault("status", false)) throw new Exception("fetch failed");
+                }
+                bm = BitmapFactory.decodeFile(f.getAbsolutePath());
+                if (bm != null) mImgCache.put(zRef, bm);
+                final Bitmap fin = bm;
+                runOnUiThread(() -> zCb.accept(fin));
+            } catch (Exception exc) {
+                runOnUiThread(() -> zCb.accept(null));
+            }
+        }, "chat-image-load").start();
     }
 
     private void sendMessage(String zText) {
@@ -228,6 +411,7 @@ public class ChatThreadActivity extends AppCompatActivity {
 
             LinearLayout rowBox = row.findViewById(R.id.msg_row);
             LinearLayout bubble = row.findViewById(R.id.msg_bubble);
+            ImageView image = row.findViewById(R.id.msg_image);
             TextView body = row.findViewById(R.id.msg_body);
             TextView attach = row.findViewById(R.id.msg_attach);
             TextView meta = row.findViewById(R.id.msg_meta);
@@ -239,24 +423,77 @@ public class ChatThreadActivity extends AppCompatActivity {
             meta.setTextColor(fg);
             attach.setTextColor(fg);
 
-            body.setText(m.body);
+            image.setVisibility(View.GONE);
+            attach.setVisibility(View.GONE);
+            body.setVisibility(View.VISIBLE);
 
-            if (m.ref != null && !m.ref.equals("")) {
-                attach.setVisibility(View.VISIBLE);
-                attach.setText("📎 Attachment — tap to copy link");
+            if ("image".equals(m.state) && m.ref != null && !m.ref.equals("")) {
+                body.setVisibility(m.body.equals("") ? View.GONE : View.VISIBLE);
+                body.setText(m.body);
+                image.setVisibility(View.VISIBLE);
+                image.setImageResource(android.R.drawable.stat_sys_download);
                 final String ref = m.ref;
-                attach.setOnClickListener(v -> {
-                    // the FULL keets:// url lands on the clipboard (never truncated)
-                    ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                    cm.setPrimaryClip(ClipData.newPlainText("keets media url", ref));
-                    Toast.makeText(ChatThreadActivity.this, "Link copied", Toast.LENGTH_SHORT).show();
+                loadImage(ref, bm -> {
+                    if (bm != null && ref.equals(m.ref)) image.setImageBitmap(bm);
                 });
+            } else if ("payment".equals(m.state)) {
+                String who = m.incoming ? "received" : "sent";
+                body.setText("💸 " + (m.incoming ? "Payment received" : "Payment sent") + "\n"
+                        + m.amt + " " + (m.tokname.equals("") ? "Minima" : m.tokname));
+                attach.setVisibility(View.VISIBLE);
+                attach.setText("tap for txid");
+                final String txid = m.txid;
+                attach.setOnClickListener(v -> new AlertDialog.Builder(ChatThreadActivity.this)
+                        .setTitle("Transaction id")
+                        .setMessage(txid)
+                        .setPositiveButton("Copy", (d, w) -> {
+                            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                            cm.setPrimaryClip(ClipData.newPlainText("txid", txid));
+                            Toast.makeText(ChatThreadActivity.this, "txid copied", Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("Close", null)
+                        .show());
             } else {
-                attach.setVisibility(View.GONE);
+                body.setText(m.body);
+                if (m.ref != null && !m.ref.equals("")) {
+                    attach.setVisibility(View.VISIBLE);
+                    attach.setText("📎 Attachment — tap to copy link");
+                    final String ref = m.ref;
+                    attach.setOnClickListener(v -> {
+                        // the FULL keets:// url lands on the clipboard (never truncated)
+                        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        cm.setPrimaryClip(ClipData.newPlainText("keets media url", ref));
+                        Toast.makeText(ChatThreadActivity.this, "Link copied", Toast.LENGTH_SHORT).show();
+                    });
+                }
             }
 
+            //ticks: 🕓 sending · ✓ at mailbox · ✓✓ delivered · blue ✓✓ read by them
             String when = mTime.format(new Date(m.ts));
-            meta.setText(m.incoming ? when : when + "  " + ChatUi.statusGlyph(m.via));
+            if (m.incoming) {
+                meta.setText(when);
+            } else if (m.peerread) {
+                meta.setText(when + "  ✓✓");
+                meta.setTextColor(Color.parseColor("#7DD3FC"));
+            } else {
+                meta.setText(when + "  " + ChatUi.statusGlyph(m.via));
+            }
+
+            //long-press: copy / delete (local)
+            bubble.setOnLongClickListener(v -> {
+                new AlertDialog.Builder(ChatThreadActivity.this)
+                        .setItems(new String[]{"Copy text", "Delete (this device)"}, (d, which) -> {
+                            if (which == 0) {
+                                ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                cm.setPrimaryClip(ClipData.newPlainText("message", m.body));
+                                Toast.makeText(ChatThreadActivity.this, "Copied", Toast.LENGTH_SHORT).show();
+                            } else {
+                                ChatDb.get(ChatThreadActivity.this).deleteMessage(m.msgid);
+                                reload();
+                            }
+                        }).show();
+                return true;
+            });
             return row;
         }
     }

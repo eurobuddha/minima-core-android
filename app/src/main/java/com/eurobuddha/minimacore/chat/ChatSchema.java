@@ -29,10 +29,22 @@ public final class ChatSchema {
         public String ref  = "";
         public long   ts   = 0; // 0 = none on the wire
         public boolean legacy = false;
+        // Parlons-native extras (ChatMessage field names) — all optional
+        public String state = "";    // "", image, payment, read, payaddr-req, payaddr
+        public String addr  = "";    // payaddr / payment destination
+        public String amt   = "";    // payment amount
+        public String tok   = "";    // payment tokenid
+        public String tokname = "";  // payment token name
+        public String txid  = "";    // payment txpowid
     }
 
     /** Build an outgoing payload. Returns the JSON string; its id is readable via decode(). */
     public static String encode(String zName, String zBody, String zRef) {
+        return base(zName, zBody, zRef).toString();
+    }
+
+    /** A control/typed payload: state = image | payment | read | payaddr-req | payaddr. */
+    public static JSONObject base(String zName, String zBody, String zRef) {
         JSONObject m = new JSONObject();
         m.put("application", APPLICATION);
         m.put("id", "kc-" + System.currentTimeMillis() + "-" + (RAND.nextInt(900000000) + 100000000));
@@ -40,7 +52,7 @@ public final class ChatSchema {
         m.put("name", zName == null ? "" : zName);
         m.put("ts", System.currentTimeMillis());
         if (zRef != null && !zRef.equals("")) m.put("ref", zRef);
-        return m.toString();
+        return m;
     }
 
     /** Parse an incoming payload (utf8 text). Never throws. */
@@ -61,6 +73,12 @@ public final class ChatSchema {
                     if (ref instanceof String) d.ref = (String) ref;
                     Object ts = m.get("ts");
                     if (ts instanceof Number) d.ts = ((Number) ts).longValue();
+                    d.state   = str(m.get("state"));
+                    d.addr    = str(m.get("addr"));
+                    d.amt     = str(m.get("amt"));
+                    d.tok     = str(m.get("tok"));
+                    d.tokname = str(m.get("tokname"));
+                    d.txid    = str(m.get("txid"));
                     return d;
                 }
             }
@@ -69,6 +87,8 @@ public final class ChatSchema {
         d.legacy = true;
         return d;
     }
+
+    private static String str(Object o) { return o instanceof String ? (String) o : ""; }
 
     /** utf8 → 0x hex, for `keets action:send datahex:` (no command-quoting pitfalls). */
     public static String toDataHex(String zPayload) {
