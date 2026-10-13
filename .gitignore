@@ -20,3 +20,5 @@ local.properties
 app/libs/bare-kit.aar
 app/src/main/assets/keets.bundle
 app/src/main/jniLibs/
+__pycache__/
+*.pyc
