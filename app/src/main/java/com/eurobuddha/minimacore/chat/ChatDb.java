@@ -124,7 +124,7 @@ public class ChatDb extends SQLiteOpenHelper {
                 " (SELECT COUNT(*) FROM messages m WHERE m.pubkey=ct.pubkey AND incoming=1 AND read=0)" +
                 " FROM (SELECT pubkey, name, added FROM contacts" +
                 "       UNION SELECT DISTINCT pubkey, pubkey, 0 FROM messages WHERE pubkey NOT IN (SELECT pubkey FROM contacts)) ct" +
-                " ORDER BY 4 IS NULL, 4 DESC, ct.added ASC", null);
+                " ORDER BY 4 DESC, ct.added ASC", null);   // SQLite sorts NULL last under DESC
         while (c.moveToNext()) {
             Thread t = new Thread();
             t.pubkey = c.getString(0);
@@ -166,11 +166,27 @@ public class ChatDb extends SQLiteOpenHelper {
         getWritableDatabase().update("contacts", v, "pubkey=?", new String[]{zPubkey});
     }
 
+    /** True if a contact row exists (user-added, or auto-created by a real message). */
+    public boolean hasContact(String zPubkey) {
+        Cursor c = getReadableDatabase().rawQuery("SELECT 1 FROM contacts WHERE pubkey=?", new String[]{zPubkey});
+        boolean has = c.moveToNext();
+        c.close();
+        return has;
+    }
+
     public String contactName(String zPubkey) {
         Cursor c = getReadableDatabase().rawQuery("SELECT name FROM contacts WHERE pubkey=?", new String[]{zPubkey});
         String n = c.moveToNext() ? c.getString(0) : null;
         c.close();
         return n == null ? zPubkey : n;
+    }
+
+    /** A message's own timestamp, 0 if unknown (receipt ref resolution). */
+    public long messageTs(String zMsgId) {
+        Cursor c = getReadableDatabase().rawQuery("SELECT ts FROM messages WHERE msgid=?", new String[]{zMsgId});
+        long t = c.moveToNext() ? c.getLong(0) : 0;
+        c.close();
+        return t;
     }
 
     /** Read receipt from the peer: mark our outgoing messages up to zUptoTs as peer-read. */

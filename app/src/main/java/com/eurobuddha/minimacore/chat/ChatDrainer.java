@@ -93,7 +93,13 @@ public class ChatDrainer {
 
                     //Control messages: consumed, never stored or notified
                     if (d.state.equals("read")) {
-                        db.markPeerRead(from, d.ts != 0 ? d.ts : System.currentTimeMillis());
+                        //prefer the referenced message's own timestamp (peer clocks drift)
+                        long upto = d.ts != 0 ? d.ts : System.currentTimeMillis();
+                        if (!d.ref.equals("")) {
+                            long t = db.messageTs(d.ref);
+                            if (t != 0) upto = t;
+                        }
+                        db.markPeerRead(from, upto);
                         MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
                         for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
                         continue;
@@ -109,8 +115,10 @@ public class ChatDrainer {
                     }
                     if (d.state.equals("payaddr-req")) {
                         MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
+                        //contacts only: answering strangers links the chat identity to the wallet
+                        //(control messages never create contacts, so a cold caller gets nothing)
                         Long last = mPayAddrReplied.get(from);
-                        if (last == null || System.currentTimeMillis() - last > 10 * 60 * 1000) {
+                        if (db.hasContact(from) && (last == null || System.currentTimeMillis() - last > 10 * 60 * 1000)) {
                             mPayAddrReplied.put(from, System.currentTimeMillis());
                             JSONObject ga = MinimaCMD.execute("getaddress");
                             if ((Boolean) ga.getOrDefault("status", false)) {

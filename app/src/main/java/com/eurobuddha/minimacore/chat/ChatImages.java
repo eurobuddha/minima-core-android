@@ -34,7 +34,17 @@ public final class ChatImages {
     public static File file(Context zContext, String zRef) {
         File dir = new File(zContext.getCacheDir(), "chatimg");
         dir.mkdirs();
-        return new File(dir, Integer.toHexString(zRef.hashCode()) + ".jpg");
+        // sha256 of the FULL ref — a 32-bit hashCode collides silently (wrong photo)
+        String key;
+        try {
+            byte[] h = java.security.MessageDigest.getInstance("SHA-256").digest(zRef.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 20; i++) sb.append(String.format("%02x", h[i]));
+            key = sb.toString();
+        } catch (Exception e) {
+            key = Integer.toHexString(zRef.hashCode());
+        }
+        return new File(dir, key + ".jpg");
     }
 
     /** Load (cache-first, else P2P fetch). Callback on the MAIN thread; null = failed. */

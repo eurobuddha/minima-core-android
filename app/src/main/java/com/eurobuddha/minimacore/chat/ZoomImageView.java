@@ -55,6 +55,12 @@ public class ZoomImageView extends AppCompatImageView {
             }
 
             @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                performClick();
+                return true;
+            }
+
+            @Override
             public boolean onDoubleTap(MotionEvent e) {
                 animateTo(mScale > 1.01f ? 1f : DOUBLE_TAP_ZOOM, e.getX(), e.getY());
                 return true;

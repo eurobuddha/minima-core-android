@@ -264,7 +264,19 @@ public class ChatThreadActivity extends AppCompatActivity {
         Toast.makeText(this, "Publishing photo…", Toast.LENGTH_SHORT).show();
         new Thread(() -> {
             try {
-                android.graphics.Bitmap bm = BitmapFactory.decodeStream(getContentResolver().openInputStream(zUri));
+                //two-pass decode: a modern camera JPEG at full resolution is hundreds of MB
+                //of bitmap — bound it near the 1280px target BEFORE decoding pixels
+                BitmapFactory.Options probe = new BitmapFactory.Options();
+                probe.inJustDecodeBounds = true;
+                java.io.InputStream probeIn = getContentResolver().openInputStream(zUri);
+                BitmapFactory.decodeStream(probeIn, null, probe);
+                probeIn.close();
+                int sample = 1;
+                while (probe.outWidth / (sample * 2) >= 1280 || probe.outHeight / (sample * 2) >= 1280) sample *= 2;
+                BitmapFactory.Options opts = new BitmapFactory.Options();
+                opts.inSampleSize = sample;
+                android.graphics.Bitmap bm = BitmapFactory.decodeStream(
+                        getContentResolver().openInputStream(zUri), null, opts);
                 if (bm == null) throw new Exception("could not read image");
 
                 //EXIF orientation: cameras store rotation as metadata, decodeStream ignores
@@ -444,7 +456,6 @@ public class ChatThreadActivity extends AppCompatActivity {
                     startActivity(viewer);
                 });
             } else if ("payment".equals(m.state)) {
-                String who = m.incoming ? "received" : "sent";
                 body.setText("💸 " + (m.incoming ? "Payment received" : "Payment sent") + "\n"
                         + m.amt + " " + (m.tokname.equals("") ? "Minima" : m.tokname));
                 attach.setVisibility(View.VISIBLE);
