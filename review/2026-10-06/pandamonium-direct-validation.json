@@ -1,0 +1,25 @@
+{
+  "version": "1.9.0-Pandamonium",
+  "versionCode": 71,
+  "apk": "dist/pandamonium-1.9.0.apk",
+  "bytes": 32803826,
+  "sha256": "59e418f6895e924f429462b8784a714f5554e240b9a79e9b0440bfc473f427c9",
+  "unit_executions": 1649,
+  "unit_counts": {
+    "app/testPandamoniumDebugUnitTest": 106,
+    "app/testClassicDebugUnitTest": 106,
+    "app/testBlockDebugUnitTest": 106,
+    "minimaapi/testDebugUnitTest": 16,
+    "integrated/futurecash-next/testDebugUnitTest": 28,
+    "integrated/casino/testDebugUnitTest": 25,
+    "integrated/entropy/testDebugUnitTest": 5,
+    "integrated/atomix/testDebugUnitTest": 260,
+    "integrated/pandadex/testDebugUnitTest": 701,
+    "integrated/pandapools/testDebugUnitTest": 296
+  },
+  "lint_errors": 0,
+  "lint_warnings": 317,
+  "emulator": "Offline disposable Android 36.1; dedicated integration fixture passed in 54.958 seconds",
+  "physical_devices_accessed": false,
+  "published": false
+}

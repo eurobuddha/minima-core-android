@@ -1,0 +1,57 @@
+PASS actual Android receipt fixture recovers identical posted ID
+PASS altered header, wrong hash and malformed parents cannot recover
+PASS MiniNumber signed bytes and fractional scale agree with Java codec
+PASS elapsed blocks, old confirmed status and elapsed time never confirm
+PASS failed receipts beyond 120 are preserved
+PASS old receipt matches only reconstructed identity and requires independent proof
+PASS new receipts retain immutable transaction identity across mining
+PASS withdrawal derives from spent reserves and identical header time on both devices
+PASS all confirmations rotate beyond the former 150-record limit
+PASS transport errors and malformed confirmation replies preserve last verified evidence
+PASS not-found evidence replaces a previous green confirmation
+PASS public address lookup stores third-party transactions outside wallet accounting
+PASS timeline retains old failures and joins exact IDs without using amount/time guesses
+PASS reloaded SQL store preserves original IDs and proof metadata
+PASS a skipped history reply is incomplete and cannot mark backfill or repair finished
+PASS failed public lookup stays visible and never deletes cached transactions
+PASS MDS Activity renders real counts, transaction times and original receipt IDs
+PASS storage read failures retain the last visible snapshot and report the error
+18 tests passed
+✔ tests/activity-chain.test.cjs (1208.779791ms)
+✔ current live reserves beat expired proofs; restore quarantines even a higher current counter (65.966458ms)
+✔ stale snapshot falls back to current archive IDs, validated by receiver before import (26.279875ms)
+✔ wrong-address proof, failed imports and archive outage preserve unresolved recipe and report zero (43.913083ms)
+✔ invalid recipe and covenant address mismatch never track, import or save (15.840875ms)
+✔ failed durable recipe write prevents tracking/import and retains signing hold in memory (7.279458ms)
+✔ crowded address uses saved exact IDs and ordinary reads preserve owner metadata (17.838583ms)
+✔ dust and raw token amount never count as fully recovered reserves (12.883792ms)
+✔ actual input script key is checked after delayed key read and newly installed hold (11.889291ms)
+✔ failed signing confirmation keeps latch even if rollback SQL fails; successful retry clears it durably (18.186458ms)
+✔ backup discards proofs if reserves move mid-export and retains current counter floor (28.894459ms)
+✔ archive endpoint and command whitelist reject credential and command injection (9.079666ms)
+✔ headless shipped service blocks signatures for quarantined actual auto signer (15.827167ms)
+✔ old-schema upgrade quarantines existing recipes while an explicitly new pool is trusted (18.059417ms)
+✔ read-only MDS signing never creates pending commands; restore cancels only owned pool transaction IDs (22.653334ms)
+✔ corrupt existing Desktop database cannot be silently replaced (1.139125ms)
+✔ MDS archive stream rejects oversized content and aborts the request (7.963791ms)
+✔ headless refresh validates KMIN and preserves oldest leg age without browser timers (9.194417ms)
+✔ discovery preserves a confirmed signing state; unknown new discovery remains held (22.7715ms)
+✔ foreign cleanup never untracks a recipe restored while a coin reply was delayed (11.901375ms)
+✔ foreign and unchanged owned reserve scans never flush the whole database (17.22075ms)
+✔ Book discovery populates both young reserve ages for the foreground refresh gate (7.819542ms)
+✔ the signing gate names WHICH problem it is (8.193875ms)
+✔ a backup is proven usable before it is handed over (7.813542ms)
+✔ stranding warns early enough to act, and never on an unknown age (8.014625ms)
+✔ a forward that moved only one leg does NOT finish the job (7.946042ms)
+✔ the collect queue is durable and only an empty read clears it (7.870083ms)
+✔ one card per pool, carrying BOTH identifiers and the retire action (13.181167ms)
+✔ no cards at all until ownership is known (11.674209ms)
+✔ retiring a pool hides it without losing anything needed to reclaim it (20.160167ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1214.885625

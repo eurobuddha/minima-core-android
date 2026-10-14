@@ -1,0 +1,107 @@
+INSTRUMENTATION_STATUS: class=org.minimarex.minimacore.integrated.PandamoniumIntegrationTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+org.minimarex.minimacore.integrated.PandamoniumIntegrationTest:
+INSTRUMENTATION_STATUS: test=embeddedNodeAndEveryNativeDestination
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=org.minimarex.minimacore.integrated.PandamoniumIntegrationTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stack=androidx.test.espresso.base.RootViewPicker$RootViewWithoutFocusException: Waited for the root of the view hierarchy to have window focus and not request layout for 10 seconds. If you specified a non default root matcher, it may be picking a root that never takes focus. Root:
+Root{application-window-token=android.view.ViewRootImpl$W@d9a1b0c, window-token=android.view.ViewRootImpl$W@d9a1b0c, has-window-focus=false, layout-params-type=2, layout-params-string={(0,0)(wrapxwrap) gr=CENTER sim={adjust=pan} ty=APPLICATION fmt=TRANSLUCENT wanim=0x103030e
+  fl=DIM_BEHIND ALT_FOCUSABLE_IM SPLIT_TOUCH HARDWARE_ACCELERATED
+  pfl=EDGE_TO_EDGE_ENFORCED
+  bhv=DEFAULT
+  fitTypes=statusBars navigationBars captionBar systemOverlays
+  frameRateBoostOnTouch=true
+  dvrrWindowFrameRateHint=true}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1024, height=619, has-focus=false, has-focusable=true, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(wrapxwrap) gr=CENTER sim={adjust=pan} ty=APPLICATION fmt=TRANSLUCENT wanim=0x103030e
+  fl=DIM_BEHIND ALT_FOCUSABLE_IM SPLIT_TOUCH HARDWARE_ACCELERATED
+  pfl=EDGE_TO_EDGE_ENFORCED
+  bhv=DEFAULT
+  fitTypes=statusBars navigationBars captionBar systemOverlays
+  frameRateBoostOnTouch=true
+  dvrrWindowFrameRateHint=true}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}}
+	at dalvik.system.VMStack.getThreadStackTrace(Native Method)
+	at java.lang.Thread.getStackTrace(Thread.java:2842)
+	at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:34)
+	at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:26)
+	at androidx.test.espresso.base.DefaultFailureHandler$TypedFailureHandler.handle(DefaultFailureHandler.java:158)
+	at androidx.test.espresso.base.DefaultFailureHandler.handle(DefaultFailureHandler.java:120)
+	at androidx.test.espresso.ViewInteraction.waitForAndHandleInteractionResults(ViewInteraction.java:385)
+	at androidx.test.espresso.ViewInteraction.desugaredPerform(ViewInteraction.java:212)
+	at androidx.test.espresso.ViewInteraction.perform(ViewInteraction.java:140)
+	at org.minimarex.minimacore.integrated.PandamoniumIntegrationTest.confirmDialog(PandamoniumIntegrationTest.java:304)
+	at org.minimarex.minimacore.integrated.PandamoniumIntegrationTest.verifyModeSwitch(PandamoniumIntegrationTest.java:332)
+	at org.minimarex.minimacore.integrated.PandamoniumIntegrationTest.embeddedNodeAndEveryNativeDestination(PandamoniumIntegrationTest.java:295)
+
+INSTRUMENTATION_STATUS: stream=
+Error in embeddedNodeAndEveryNativeDestination(org.minimarex.minimacore.integrated.PandamoniumIntegrationTest):
+androidx.test.espresso.base.RootViewPicker$RootViewWithoutFocusException: Waited for the root of the view hierarchy to have window focus and not request layout for 10 seconds. If you specified a non default root matcher, it may be picking a root that never takes focus. Root:
+Root{application-window-token=android.view.ViewRootImpl$W@d9a1b0c, window-token=android.view.ViewRootImpl$W@d9a1b0c, has-window-focus=false, layout-params-type=2, layout-params-string={(0,0)(wrapxwrap) gr=CENTER sim={adjust=pan} ty=APPLICATION fmt=TRANSLUCENT wanim=0x103030e
+  fl=DIM_BEHIND ALT_FOCUSABLE_IM SPLIT_TOUCH HARDWARE_ACCELERATED
+  pfl=EDGE_TO_EDGE_ENFORCED
+  bhv=DEFAULT
+  fitTypes=statusBars navigationBars captionBar systemOverlays
+  frameRateBoostOnTouch=true
+  dvrrWindowFrameRateHint=true}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1024, height=619, has-focus=false, has-focusable=true, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(wrapxwrap) gr=CENTER sim={adjust=pan} ty=APPLICATION fmt=TRANSLUCENT wanim=0x103030e
+  fl=DIM_BEHIND ALT_FOCUSABLE_IM SPLIT_TOUCH HARDWARE_ACCELERATED
+  pfl=EDGE_TO_EDGE_ENFORCED
+  bhv=DEFAULT
+  fitTypes=statusBars navigationBars captionBar systemOverlays
+  frameRateBoostOnTouch=true
+  dvrrWindowFrameRateHint=true}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}}
+	at dalvik.system.VMStack.getThreadStackTrace(Native Method)
+	at java.lang.Thread.getStackTrace(Thread.java:2842)
+	at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:34)
+	at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:26)
+	at androidx.test.espresso.base.DefaultFailureHandler$TypedFailureHandler.handle(DefaultFailureHandler.java:158)
+	at androidx.test.espresso.base.DefaultFailureHandler.handle(DefaultFailureHandler.java:120)
+	at androidx.test.espresso.ViewInteraction.waitForAndHandleInteractionResults(ViewInteraction.java:385)
+	at androidx.test.espresso.ViewInteraction.desugaredPerform(ViewInteraction.java:212)
+	at androidx.test.espresso.ViewInteraction.perform(ViewInteraction.java:140)
+	at org.minimarex.minimacore.integrated.PandamoniumIntegrationTest.confirmDialog(PandamoniumIntegrationTest.java:304)
+	at org.minimarex.minimacore.integrated.PandamoniumIntegrationTest.verifyModeSwitch(PandamoniumIntegrationTest.java:332)
+	at org.minimarex.minimacore.integrated.PandamoniumIntegrationTest.embeddedNodeAndEveryNativeDestination(PandamoniumIntegrationTest.java:295)
+
+INSTRUMENTATION_STATUS: test=embeddedNodeAndEveryNativeDestination
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 123.168
+There was 1 failure:
+1) embeddedNodeAndEveryNativeDestination(org.minimarex.minimacore.integrated.PandamoniumIntegrationTest)
+androidx.test.espresso.base.RootViewPicker$RootViewWithoutFocusException: Waited for the root of the view hierarchy to have window focus and not request layout for 10 seconds. If you specified a non default root matcher, it may be picking a root that never takes focus. Root:
+Root{application-window-token=android.view.ViewRootImpl$W@d9a1b0c, window-token=android.view.ViewRootImpl$W@d9a1b0c, has-window-focus=false, layout-params-type=2, layout-params-string={(0,0)(wrapxwrap) gr=CENTER sim={adjust=pan} ty=APPLICATION fmt=TRANSLUCENT wanim=0x103030e
+  fl=DIM_BEHIND ALT_FOCUSABLE_IM SPLIT_TOUCH HARDWARE_ACCELERATED
+  pfl=EDGE_TO_EDGE_ENFORCED
+  bhv=DEFAULT
+  fitTypes=statusBars navigationBars captionBar systemOverlays
+  frameRateBoostOnTouch=true
+  dvrrWindowFrameRateHint=true}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1024, height=619, has-focus=false, has-focusable=true, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(wrapxwrap) gr=CENTER sim={adjust=pan} ty=APPLICATION fmt=TRANSLUCENT wanim=0x103030e
+  fl=DIM_BEHIND ALT_FOCUSABLE_IM SPLIT_TOUCH HARDWARE_ACCELERATED
+  pfl=EDGE_TO_EDGE_ENFORCED
+  bhv=DEFAULT
+  fitTypes=statusBars navigationBars captionBar systemOverlays
+  frameRateBoostOnTouch=true
+  dvrrWindowFrameRateHint=true}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}}
+	at dalvik.system.VMStack.getThreadStackTrace(Native Method)
+	at java.lang.Thread.getStackTrace(Thread.java:2842)
+	at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:34)
+	at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:26)
+	at androidx.test.espresso.base.DefaultFailureHandler$TypedFailureHandler.handle(DefaultFailureHandler.java:158)
+	at androidx.test.espresso.base.DefaultFailureHandler.handle(DefaultFailureHandler.java:120)
+	at androidx.test.espresso.ViewInteraction.waitForAndHandleInteractionResults(ViewInteraction.java:385)
+	at androidx.test.espresso.ViewInteraction.desugaredPerform(ViewInteraction.java:212)
+	at androidx.test.espresso.ViewInteraction.perform(ViewInteraction.java:140)
+	at org.minimarex.minimacore.integrated.PandamoniumIntegrationTest.confirmDialog(PandamoniumIntegrationTest.java:304)
+	at org.minimarex.minimacore.integrated.PandamoniumIntegrationTest.verifyModeSwitch(PandamoniumIntegrationTest.java:332)
+	at org.minimarex.minimacore.integrated.PandamoniumIntegrationTest.embeddedNodeAndEveryNativeDestination(PandamoniumIntegrationTest.java:295)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

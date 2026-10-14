@@ -82,6 +82,10 @@
         <activity android:name=".main.views.terminal.TerminalActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.views.logs.LogsActivity"></activity>
         <activity android:name=".chat.ChatThreadActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity
+            android:name=".maxchat.MaxThreadActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
         <activity android:name=".chat.ChatImageActivity"></activity>
         <activity android:name=".main.ParamsActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.backup.BackupActivity" android:windowSoftInputMode="adjustResize"></activity>

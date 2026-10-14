@@ -22,3 +22,11 @@ app/src/main/assets/keets.bundle
 app/src/main/jniLibs/
 __pycache__/
 *.pyc
+
+# vendored transport core module - build output never in git
+/maxima-core/build/
+/review/**/build/
+/dist/minima-1.7.apk*
+/review/2026-10-07/
+/review/**/build/
+/dist/

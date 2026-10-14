@@ -121,8 +121,8 @@ android {
         // vc82: existing app icons in the Pandamonium sidebar.
         // vc83: Pandamonium opens on Wallet; Node follows Logs.
         // vc85: sleep hidden Pandamonium display work, preserving financial services.
-        versionCode 98
-        versionName "1.9.27"
+        versionCode 103
+        versionName "1.9.32"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -218,6 +218,9 @@ dependencies {
     // NOT in git (~80MB) — scripts/fetch-bare-kit.sh builds it from the pinned release.
     implementation files('libs/bare-kit.aar')
     implementation project(':minimaapi')
+    // Parlons/Maxima transport core, vendored under maxima-core/ (MAX# contacts in Chat).
+    // The fork's node has NO Maxima - the app carries the clean-room core itself, like mininotes.
+    implementation project(':maxima-core')
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

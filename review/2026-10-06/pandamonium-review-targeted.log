@@ -1,0 +1,111 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/Users/eurobuddha/.gradle/wrapper/dists/gradle-8.11.1-bin/bpt9gzteqjrbo1mjrsomdt32c/gradle-8.11.1/lib/native-platform-0.22-milestone-26.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+> Task :minimaapi:preBuild UP-TO-DATE
+> Task :minimaapi:preDebugBuild UP-TO-DATE
+> Task :minimaapi:generateDebugResValues UP-TO-DATE
+> Task :minimaapi:generateDebugResources UP-TO-DATE
+> Task :minimaapi:packageDebugResources UP-TO-DATE
+> Task :minimaapi:parseDebugLocalResources UP-TO-DATE
+> Task :minimaapi:generateDebugRFile UP-TO-DATE
+> Task :minimaapi:javaPreCompileDebug UP-TO-DATE
+> Task :minimaapi:compileDebugJavaWithJavac
+> Task :minimaapi:preDebugUnitTestBuild UP-TO-DATE
+> Task :minimaapi:bundleLibRuntimeToJarDebug
+> Task :minimaapi:bundleLibCompileToJarDebug
+> Task :minimaapi:generateDebugUnitTestStubRFile UP-TO-DATE
+> Task :minimaapi:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :minimaapi:compileDebugUnitTestJavaWithJavac
+> Task :minimaapi:processDebugJavaRes NO-SOURCE
+> Task :minimaapi:processDebugUnitTestJavaRes NO-SOURCE
+> Task :minimaapi:testDebugUnitTest
+> Task :integrated-futurecash-next:preBuild UP-TO-DATE
+> Task :integrated-futurecash-next:preDebugBuild UP-TO-DATE
+> Task :integrated-futurecash-next:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-futurecash-next:generateDebugResValues UP-TO-DATE
+> Task :integrated-futurecash-next:generateDebugResources UP-TO-DATE
+> Task :integrated-futurecash-next:packageDebugResources UP-TO-DATE
+> Task :integrated-futurecash-next:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-futurecash-next:generateDebugRFile UP-TO-DATE
+> Task :integrated-futurecash-next:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-futurecash-next:compileDebugJavaWithJavac
+> Task :integrated-futurecash-next:preDebugUnitTestBuild UP-TO-DATE
+> Task :integrated-futurecash-next:bundleLibRuntimeToJarDebug
+> Task :integrated-futurecash-next:bundleLibCompileToJarDebug
+> Task :integrated-futurecash-next:generateDebugUnitTestStubRFile UP-TO-DATE
+> Task :integrated-futurecash-next:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :integrated-futurecash-next:compileDebugUnitTestJavaWithJavac
+> Task :integrated-futurecash-next:processDebugJavaRes NO-SOURCE
+> Task :integrated-futurecash-next:processDebugUnitTestJavaRes NO-SOURCE
+> Task :integrated-futurecash-next:testDebugUnitTest
+> Task :integrated-ethwallet:preBuild UP-TO-DATE
+> Task :integrated-ethwallet:preDebugBuild UP-TO-DATE
+> Task :integrated-ethwallet:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-ethwallet:generateDebugResValues UP-TO-DATE
+> Task :integrated-ethwallet:generateDebugResources UP-TO-DATE
+> Task :integrated-ethwallet:packageDebugResources UP-TO-DATE
+> Task :integrated-ethwallet:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-ethwallet:generateDebugRFile UP-TO-DATE
+> Task :integrated-ethwallet:javaPreCompileDebug UP-TO-DATE
+
+> Task :integrated-ethwallet:compileDebugJavaWithJavac
+Note: /Users/eurobuddha/Projects/minima/apks/base/integrated/ethwallet/src/main/java/com/eurobuddha/ethwallet/MainActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :integrated-ethwallet:preDebugUnitTestBuild UP-TO-DATE
+> Task :integrated-ethwallet:bundleLibCompileToJarDebug
+> Task :integrated-ethwallet:bundleLibRuntimeToJarDebug
+> Task :integrated-ethwallet:generateDebugUnitTestStubRFile UP-TO-DATE
+> Task :integrated-ethwallet:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :integrated-ethwallet:compileDebugUnitTestJavaWithJavac
+> Task :integrated-ethwallet:processDebugJavaRes NO-SOURCE
+> Task :integrated-ethwallet:processDebugUnitTestJavaRes NO-SOURCE
+> Task :integrated-ethwallet:testDebugUnitTest
+> Task :integrated-casino:preBuild UP-TO-DATE
+> Task :integrated-casino:preDebugBuild UP-TO-DATE
+> Task :integrated-casino:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-casino:generateDebugResValues UP-TO-DATE
+> Task :integrated-casino:generateDebugResources UP-TO-DATE
+> Task :integrated-casino:packageDebugResources UP-TO-DATE
+> Task :integrated-casino:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-casino:generateDebugRFile UP-TO-DATE
+> Task :integrated-casino:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-casino:compileDebugJavaWithJavac
+> Task :integrated-casino:preDebugUnitTestBuild UP-TO-DATE
+> Task :integrated-casino:generateDebugUnitTestStubRFile UP-TO-DATE
+> Task :integrated-casino:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :integrated-casino:bundleLibRuntimeToJarDebug
+> Task :integrated-casino:processDebugJavaRes NO-SOURCE
+> Task :integrated-casino:processDebugUnitTestJavaRes NO-SOURCE
+> Task :integrated-casino:bundleLibCompileToJarDebug
+> Task :integrated-pandadex:preBuild UP-TO-DATE
+> Task :integrated-casino:compileDebugUnitTestJavaWithJavac
+> Task :integrated-casino:testDebugUnitTest
+> Task :integrated-pandadex:preDebugBuild UP-TO-DATE
+> Task :integrated-pandadex:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-pandadex:generateDebugResValues UP-TO-DATE
+> Task :integrated-pandadex:generateDebugResources UP-TO-DATE
+> Task :integrated-pandadex:packageDebugResources UP-TO-DATE
+> Task :integrated-pandadex:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-pandadex:generateDebugRFile UP-TO-DATE
+> Task :integrated-pandadex:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-pandadex:compileDebugJavaWithJavac
+> Task :integrated-pandadex:preDebugUnitTestBuild UP-TO-DATE
+> Task :integrated-pandadex:generateDebugUnitTestStubRFile UP-TO-DATE
+> Task :integrated-pandadex:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :integrated-pandadex:processDebugJavaRes NO-SOURCE
+> Task :integrated-pandadex:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :integrated-pandadex:bundleLibRuntimeToJarDebug
+> Task :integrated-pandadex:bundleLibCompileToJarDebug
+
+> Task :integrated-pandadex:compileDebugUnitTestJavaWithJavac
+Note: /Users/eurobuddha/Projects/minima/apks/base/integrated/pandadex/src/test/java/com/eurobuddha/pandadex/DexHistoryTest.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :integrated-pandadex:testDebugUnitTest
+[Incubating] Problems report is available at: file:///Users/eurobuddha/Projects/minima/apks/base/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 35s
+70 actionable tasks: 25 executed, 45 up-to-date

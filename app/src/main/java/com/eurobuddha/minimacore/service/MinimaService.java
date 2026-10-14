@@ -421,6 +421,8 @@ public class MinimaService extends Service {
                                     mKeetsWorklet.start(MinimaService.this);
                                     //Chat: the ONE drainer of the keets message inbox
                                     com.eurobuddha.minimacore.chat.ChatDrainer.start(MinimaService.this);
+                                    //Parlons contacts in the same Chat tab: the app's own Maxima client
+                                    com.eurobuddha.minimacore.maxchat.MaxChat.start(MinimaService.this);
                                 }
                             }, 15000);
                         }
@@ -594,6 +596,7 @@ public class MinimaService extends Service {
 
         //Stop the keets worklet before the node quits
         com.eurobuddha.minimacore.chat.ChatDrainer.stop();
+        com.eurobuddha.minimacore.maxchat.MaxChat.stop();
         mKeetsWorklet.terminate();
 
         //QUIT nicely..

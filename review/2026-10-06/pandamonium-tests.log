@@ -1,0 +1,372 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/Users/eurobuddha/.gradle/wrapper/dists/gradle-8.11.1-bin/bpt9gzteqjrbo1mjrsomdt32c/gradle-8.11.1/lib/native-platform-0.22-milestone-26.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:prePandamoniumDebugBuild UP-TO-DATE
+> Task :app:generatePandamoniumDebugBuildConfig UP-TO-DATE
+> Task :app:javaPreCompilePandamoniumDebug UP-TO-DATE
+> Task :integrated-atomix:preBuild UP-TO-DATE
+> Task :integrated-atomix:preDebugBuild UP-TO-DATE
+> Task :integrated-atomix:writeDebugAarMetadata UP-TO-DATE
+> Task :integrated-blockexplorer:preBuild UP-TO-DATE
+> Task :integrated-blockexplorer:preDebugBuild UP-TO-DATE
+> Task :integrated-blockexplorer:writeDebugAarMetadata UP-TO-DATE
+> Task :integrated-casino:preBuild UP-TO-DATE
+> Task :integrated-casino:preDebugBuild UP-TO-DATE
+> Task :integrated-casino:writeDebugAarMetadata UP-TO-DATE
+> Task :integrated-entropy:preBuild UP-TO-DATE
+> Task :integrated-entropy:preDebugBuild UP-TO-DATE
+> Task :integrated-entropy:writeDebugAarMetadata UP-TO-DATE
+> Task :integrated-ethwallet:preBuild UP-TO-DATE
+> Task :integrated-ethwallet:preDebugBuild UP-TO-DATE
+> Task :integrated-ethwallet:writeDebugAarMetadata UP-TO-DATE
+> Task :integrated-filez:preBuild UP-TO-DATE
+> Task :integrated-filez:preDebugBuild UP-TO-DATE
+> Task :integrated-filez:writeDebugAarMetadata UP-TO-DATE
+> Task :integrated-futurecash-next:preBuild UP-TO-DATE
+> Task :integrated-futurecash-next:preDebugBuild UP-TO-DATE
+> Task :integrated-futurecash-next:writeDebugAarMetadata UP-TO-DATE
+> Task :integrated-history:preBuild UP-TO-DATE
+> Task :integrated-history:preDebugBuild UP-TO-DATE
+> Task :integrated-history:writeDebugAarMetadata UP-TO-DATE
+> Task :integrated-pandadex:preBuild UP-TO-DATE
+> Task :integrated-pandadex:preDebugBuild UP-TO-DATE
+> Task :integrated-pandadex:writeDebugAarMetadata UP-TO-DATE
+> Task :integrated-pandapools:preBuild UP-TO-DATE
+> Task :integrated-pandapools:preDebugBuild UP-TO-DATE
+> Task :integrated-pandapools:writeDebugAarMetadata UP-TO-DATE
+> Task :integrated-terminalide:preBuild UP-TO-DATE
+> Task :integrated-terminalide:preDebugBuild UP-TO-DATE
+> Task :integrated-terminalide:writeDebugAarMetadata UP-TO-DATE
+> Task :minimaapi:preBuild UP-TO-DATE
+> Task :minimaapi:preDebugBuild UP-TO-DATE
+> Task :minimaapi:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkPandamoniumDebugAarMetadata UP-TO-DATE
+> Task :app:generatePandamoniumDebugResValues UP-TO-DATE
+> Task :integrated-atomix:generateDebugResValues UP-TO-DATE
+> Task :integrated-atomix:generateDebugResources UP-TO-DATE
+> Task :integrated-atomix:packageDebugResources UP-TO-DATE
+> Task :integrated-blockexplorer:generateDebugResValues UP-TO-DATE
+> Task :integrated-blockexplorer:generateDebugResources UP-TO-DATE
+> Task :integrated-blockexplorer:packageDebugResources UP-TO-DATE
+> Task :integrated-casino:generateDebugResValues UP-TO-DATE
+> Task :integrated-casino:generateDebugResources UP-TO-DATE
+> Task :integrated-casino:packageDebugResources UP-TO-DATE
+> Task :integrated-entropy:generateDebugResValues UP-TO-DATE
+> Task :integrated-entropy:generateDebugResources UP-TO-DATE
+> Task :integrated-entropy:packageDebugResources UP-TO-DATE
+> Task :integrated-ethwallet:generateDebugResValues UP-TO-DATE
+> Task :integrated-ethwallet:generateDebugResources UP-TO-DATE
+> Task :integrated-ethwallet:packageDebugResources UP-TO-DATE
+> Task :integrated-filez:generateDebugResValues UP-TO-DATE
+> Task :integrated-filez:generateDebugResources UP-TO-DATE
+> Task :integrated-filez:packageDebugResources UP-TO-DATE
+> Task :integrated-futurecash-next:generateDebugResValues UP-TO-DATE
+> Task :integrated-futurecash-next:generateDebugResources UP-TO-DATE
+> Task :integrated-futurecash-next:packageDebugResources UP-TO-DATE
+> Task :integrated-history:generateDebugResValues UP-TO-DATE
+> Task :integrated-history:generateDebugResources UP-TO-DATE
+> Task :integrated-history:packageDebugResources UP-TO-DATE
+> Task :integrated-pandadex:generateDebugResValues UP-TO-DATE
+> Task :integrated-pandadex:generateDebugResources UP-TO-DATE
+> Task :integrated-pandadex:packageDebugResources UP-TO-DATE
+> Task :integrated-pandapools:generateDebugResValues UP-TO-DATE
+> Task :integrated-pandapools:generateDebugResources UP-TO-DATE
+> Task :integrated-pandapools:packageDebugResources UP-TO-DATE
+> Task :integrated-terminalide:generateDebugResValues UP-TO-DATE
+> Task :integrated-terminalide:generateDebugResources UP-TO-DATE
+> Task :integrated-terminalide:packageDebugResources UP-TO-DATE
+> Task :minimaapi:generateDebugResValues UP-TO-DATE
+> Task :minimaapi:generateDebugResources UP-TO-DATE
+> Task :minimaapi:packageDebugResources UP-TO-DATE
+> Task :app:mapPandamoniumDebugSourceSetPaths UP-TO-DATE
+> Task :app:generatePandamoniumDebugResources UP-TO-DATE
+> Task :app:mergePandamoniumDebugResources UP-TO-DATE
+> Task :app:packagePandamoniumDebugResources UP-TO-DATE
+> Task :app:parsePandamoniumDebugLocalResources UP-TO-DATE
+> Task :app:createPandamoniumDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksPandamoniumDebug UP-TO-DATE
+> Task :integrated-atomix:extractDeepLinksDebug UP-TO-DATE
+> Task :integrated-atomix:processDebugManifest UP-TO-DATE
+> Task :integrated-blockexplorer:extractDeepLinksDebug UP-TO-DATE
+> Task :integrated-blockexplorer:processDebugManifest UP-TO-DATE
+> Task :integrated-casino:extractDeepLinksDebug UP-TO-DATE
+> Task :integrated-casino:processDebugManifest UP-TO-DATE
+> Task :integrated-entropy:extractDeepLinksDebug UP-TO-DATE
+> Task :integrated-entropy:processDebugManifest UP-TO-DATE
+> Task :integrated-ethwallet:extractDeepLinksDebug UP-TO-DATE
+> Task :integrated-ethwallet:processDebugManifest UP-TO-DATE
+> Task :integrated-filez:extractDeepLinksDebug UP-TO-DATE
+> Task :integrated-filez:processDebugManifest UP-TO-DATE
+> Task :integrated-futurecash-next:extractDeepLinksDebug UP-TO-DATE
+> Task :integrated-futurecash-next:processDebugManifest UP-TO-DATE
+> Task :integrated-history:extractDeepLinksDebug UP-TO-DATE
+> Task :integrated-history:processDebugManifest UP-TO-DATE
+> Task :integrated-pandadex:extractDeepLinksDebug UP-TO-DATE
+> Task :integrated-pandadex:processDebugManifest UP-TO-DATE
+> Task :integrated-pandapools:extractDeepLinksDebug UP-TO-DATE
+> Task :integrated-pandapools:processDebugManifest UP-TO-DATE
+> Task :integrated-terminalide:extractDeepLinksDebug UP-TO-DATE
+> Task :integrated-terminalide:processDebugManifest UP-TO-DATE
+> Task :minimaapi:extractDeepLinksDebug UP-TO-DATE
+> Task :minimaapi:processDebugManifest UP-TO-DATE
+> Task :app:processPandamoniumDebugMainManifest UP-TO-DATE
+> Task :app:processPandamoniumDebugManifest UP-TO-DATE
+> Task :app:processPandamoniumDebugManifestForPackage UP-TO-DATE
+> Task :integrated-atomix:compileDebugLibraryResources UP-TO-DATE
+> Task :integrated-atomix:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-atomix:generateDebugRFile UP-TO-DATE
+> Task :integrated-blockexplorer:compileDebugLibraryResources UP-TO-DATE
+> Task :integrated-blockexplorer:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-blockexplorer:generateDebugRFile UP-TO-DATE
+> Task :integrated-casino:compileDebugLibraryResources UP-TO-DATE
+> Task :integrated-casino:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-casino:generateDebugRFile UP-TO-DATE
+> Task :integrated-entropy:compileDebugLibraryResources UP-TO-DATE
+> Task :integrated-entropy:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-entropy:generateDebugRFile UP-TO-DATE
+> Task :integrated-ethwallet:compileDebugLibraryResources UP-TO-DATE
+> Task :integrated-ethwallet:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-ethwallet:generateDebugRFile UP-TO-DATE
+> Task :integrated-filez:compileDebugLibraryResources UP-TO-DATE
+> Task :integrated-filez:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-filez:generateDebugRFile UP-TO-DATE
+> Task :integrated-futurecash-next:compileDebugLibraryResources UP-TO-DATE
+> Task :integrated-futurecash-next:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-futurecash-next:generateDebugRFile UP-TO-DATE
+> Task :integrated-history:compileDebugLibraryResources UP-TO-DATE
+> Task :integrated-history:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-history:generateDebugRFile UP-TO-DATE
+> Task :integrated-pandadex:compileDebugLibraryResources UP-TO-DATE
+> Task :integrated-pandadex:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-pandadex:generateDebugRFile UP-TO-DATE
+> Task :integrated-pandapools:compileDebugLibraryResources UP-TO-DATE
+> Task :integrated-pandapools:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-pandapools:generateDebugRFile UP-TO-DATE
+> Task :integrated-terminalide:compileDebugLibraryResources UP-TO-DATE
+> Task :integrated-terminalide:parseDebugLocalResources UP-TO-DATE
+> Task :integrated-terminalide:generateDebugRFile UP-TO-DATE
+> Task :minimaapi:compileDebugLibraryResources UP-TO-DATE
+> Task :minimaapi:parseDebugLocalResources UP-TO-DATE
+> Task :minimaapi:generateDebugRFile UP-TO-DATE
+> Task :app:processPandamoniumDebugResources UP-TO-DATE
+> Task :integrated-atomix:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-atomix:javaPreCompileDebug UP-TO-DATE
+> Task :minimaapi:javaPreCompileDebug UP-TO-DATE
+> Task :minimaapi:compileDebugJavaWithJavac UP-TO-DATE
+> Task :minimaapi:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :integrated-atomix:compileDebugJavaWithJavac UP-TO-DATE
+> Task :integrated-atomix:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :integrated-blockexplorer:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-blockexplorer:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-blockexplorer:compileDebugJavaWithJavac UP-TO-DATE
+> Task :integrated-blockexplorer:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :integrated-casino:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-casino:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-casino:compileDebugJavaWithJavac UP-TO-DATE
+> Task :integrated-casino:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :integrated-entropy:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-entropy:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-entropy:compileDebugJavaWithJavac UP-TO-DATE
+> Task :integrated-entropy:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :integrated-ethwallet:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-ethwallet:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-ethwallet:compileDebugJavaWithJavac UP-TO-DATE
+> Task :integrated-ethwallet:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :integrated-filez:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-filez:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-filez:compileDebugJavaWithJavac UP-TO-DATE
+> Task :integrated-filez:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :integrated-futurecash-next:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-futurecash-next:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-futurecash-next:compileDebugJavaWithJavac UP-TO-DATE
+> Task :integrated-futurecash-next:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :integrated-history:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-history:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-history:compileDebugJavaWithJavac UP-TO-DATE
+> Task :integrated-history:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :integrated-pandadex:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-pandadex:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-pandadex:compileDebugJavaWithJavac UP-TO-DATE
+> Task :integrated-pandadex:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :integrated-pandapools:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-pandapools:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-pandapools:compileDebugJavaWithJavac UP-TO-DATE
+> Task :integrated-pandapools:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :integrated-terminalide:generateDebugBuildConfig UP-TO-DATE
+> Task :integrated-terminalide:javaPreCompileDebug UP-TO-DATE
+> Task :integrated-terminalide:compileDebugJavaWithJavac UP-TO-DATE
+> Task :integrated-terminalide:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:compilePandamoniumDebugJavaWithJavac UP-TO-DATE
+> Task :app:prePandamoniumDebugUnitTestBuild UP-TO-DATE
+> Task :app:processPandamoniumDebugJavaRes NO-SOURCE
+> Task :app:processPandamoniumDebugUnitTestJavaRes NO-SOURCE
+> Task :app:javaPreCompilePandamoniumDebugUnitTest
+> Task :integrated-atomix:processDebugJavaRes NO-SOURCE
+> Task :integrated-blockexplorer:processDebugJavaRes NO-SOURCE
+> Task :integrated-casino:processDebugJavaRes NO-SOURCE
+> Task :integrated-entropy:processDebugJavaRes NO-SOURCE
+> Task :integrated-blockexplorer:bundleLibRuntimeToJarDebug
+> Task :integrated-ethwallet:processDebugJavaRes NO-SOURCE
+> Task :integrated-filez:processDebugJavaRes NO-SOURCE
+> Task :integrated-entropy:bundleLibRuntimeToJarDebug
+> Task :integrated-ethwallet:bundleLibRuntimeToJarDebug
+> Task :integrated-futurecash-next:processDebugJavaRes NO-SOURCE
+> Task :integrated-filez:bundleLibRuntimeToJarDebug
+> Task :integrated-history:processDebugJavaRes NO-SOURCE
+> Task :integrated-pandadex:processDebugJavaRes NO-SOURCE
+> Task :integrated-history:bundleLibRuntimeToJarDebug
+> Task :integrated-casino:bundleLibRuntimeToJarDebug
+> Task :integrated-pandapools:processDebugJavaRes NO-SOURCE
+> Task :integrated-futurecash-next:bundleLibRuntimeToJarDebug
+> Task :integrated-terminalide:processDebugJavaRes NO-SOURCE
+> Task :minimaapi:processDebugJavaRes NO-SOURCE
+> Task :app:preClassicDebugBuild UP-TO-DATE
+> Task :minimaapi:bundleLibRuntimeToJarDebug
+> Task :app:generateClassicDebugBuildConfig
+> Task :integrated-atomix:bundleLibRuntimeToJarDebug
+> Task :app:javaPreCompileClassicDebug
+> Task :integrated-terminalide:bundleLibRuntimeToJarDebug
+> Task :app:generateClassicDebugResValues
+> Task :app:bundlePandamoniumDebugClassesToRuntimeJar
+> Task :app:bundlePandamoniumDebugClassesToCompileJar
+> Task :app:mapClassicDebugSourceSetPaths
+> Task :app:checkClassicDebugAarMetadata
+> Task :integrated-pandadex:bundleLibRuntimeToJarDebug
+> Task :integrated-pandapools:bundleLibRuntimeToJarDebug
+
+> Task :app:compilePandamoniumDebugUnitTestJavaWithJavac
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :app:testPandamoniumDebugUnitTest
+> Task :app:generateClassicDebugResources
+> Task :app:packageClassicDebugResources
+> Task :app:createClassicDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksClassicDebug
+> Task :app:parseClassicDebugLocalResources
+> Task :app:processClassicDebugMainManifest
+> Task :app:processClassicDebugManifest
+> Task :app:preClassicDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileClassicDebugUnitTest
+> Task :app:processClassicDebugJavaRes NO-SOURCE
+> Task :app:processClassicDebugUnitTestJavaRes NO-SOURCE
+> Task :app:preBlockDebugBuild UP-TO-DATE
+> Task :app:generateBlockDebugBuildConfig
+> Task :app:javaPreCompileBlockDebug
+> Task :app:generateBlockDebugResValues
+> Task :app:checkBlockDebugAarMetadata
+> Task :app:mapBlockDebugSourceSetPaths
+> Task :app:generateBlockDebugResources
+> Task :app:mergeClassicDebugResources
+> Task :app:packageBlockDebugResources
+> Task :app:createBlockDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksBlockDebug
+> Task :app:parseBlockDebugLocalResources
+> Task :app:processBlockDebugMainManifest
+> Task :app:processBlockDebugManifest
+> Task :app:preBlockDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileBlockDebugUnitTest
+> Task :app:processBlockDebugJavaRes NO-SOURCE
+> Task :app:processBlockDebugUnitTestJavaRes NO-SOURCE
+> Task :minimaapi:preDebugUnitTestBuild UP-TO-DATE
+> Task :minimaapi:generateDebugUnitTestStubRFile UP-TO-DATE
+> Task :minimaapi:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:mergeBlockDebugResources
+> Task :minimaapi:compileDebugUnitTestJavaWithJavac
+> Task :minimaapi:processDebugUnitTestJavaRes NO-SOURCE
+> Task :minimaapi:testDebugUnitTest
+> Task :integrated-ethwallet:preDebugUnitTestBuild UP-TO-DATE
+> Task :integrated-ethwallet:javaPreCompileDebugUnitTest
+> Task :integrated-ethwallet:processDebugUnitTestJavaRes NO-SOURCE
+> Task :integrated-atomix:preDebugUnitTestBuild UP-TO-DATE
+> Task :integrated-atomix:javaPreCompileDebugUnitTest
+> Task :app:processBlockDebugManifestForPackage
+> Task :integrated-atomix:processDebugUnitTestJavaRes NO-SOURCE
+> Task :integrated-pandapools:preDebugUnitTestBuild UP-TO-DATE
+> Task :integrated-pandapools:javaPreCompileDebugUnitTest
+> Task :integrated-pandapools:processDebugUnitTestJavaRes
+> Task :integrated-futurecash-next:preDebugUnitTestBuild UP-TO-DATE
+> Task :integrated-futurecash-next:javaPreCompileDebugUnitTest
+> Task :integrated-futurecash-next:processDebugUnitTestJavaRes NO-SOURCE
+> Task :integrated-pandadex:preDebugUnitTestBuild UP-TO-DATE
+> Task :integrated-pandadex:javaPreCompileDebugUnitTest
+> Task :app:processClassicDebugManifestForPackage
+> Task :integrated-atomix:generateDebugUnitTestStubRFile
+> Task :integrated-pandapools:generateDebugUnitTestStubRFile
+> Task :integrated-ethwallet:generateDebugUnitTestStubRFile
+> Task :integrated-ethwallet:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :integrated-ethwallet:testDebugUnitTest NO-SOURCE
+> Task :integrated-futurecash-next:generateDebugUnitTestStubRFile
+> Task :integrated-pandadex:generateDebugUnitTestStubRFile
+
+> Task :integrated-atomix:compileDebugUnitTestJavaWithJavac
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :app:processClassicDebugResources
+> Task :app:processBlockDebugResources
+> Task :integrated-atomix:testDebugUnitTest
+
+> Task :app:compileClassicDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :app:bundleClassicDebugClassesToRuntimeJar
+> Task :app:bundleClassicDebugClassesToCompileJar
+
+> Task :app:compileBlockDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :app:compileClassicDebugUnitTestJavaWithJavac
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :app:testClassicDebugUnitTest
+> Task :app:bundleBlockDebugClassesToRuntimeJar
+> Task :app:bundleBlockDebugClassesToCompileJar
+> Task :integrated-pandapools:compileDebugUnitTestJavaWithJavac
+
+> Task :app:compileBlockDebugUnitTestJavaWithJavac
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :app:testBlockDebugUnitTest
+> Task :integrated-pandapools:testDebugUnitTest
+> Task :integrated-futurecash-next:compileDebugUnitTestJavaWithJavac
+> Task :integrated-futurecash-next:testDebugUnitTest
+
+> Task :integrated-pandadex:compileDebugUnitTestJavaWithJavac
+Note: /Users/eurobuddha/Projects/minima/apks/base/integrated/pandadex/src/test/java/com/eurobuddha/pandadex/DexHistoryTest.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :integrated-pandadex:processDebugUnitTestJavaRes
+
+> Task :integrated-pandadex:testDebugUnitTest
+
+CreationEvidenceTest > archivedDisposableNodeJsonMatchesTheIndependentCreationRequestShape FAILED
+    java.nio.file.NoSuchFileException at CreationEvidenceTest.java:139
+
+705 tests completed, 1 failed
+
+> Task :integrated-pandadex:testDebugUnitTest FAILED
+[Incubating] Problems report is available at: file:///Users/eurobuddha/Projects/minima/apks/base/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':integrated-pandadex:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///Users/eurobuddha/Projects/minima/apks/base/integrated/pandadex/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+BUILD FAILED in 39s
+254 actionable tasks: 81 executed, 173 up-to-date

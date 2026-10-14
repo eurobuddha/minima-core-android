@@ -1,0 +1,16 @@
+{
+  "package": "org.minimarex.pandamonium",
+  "versionCode": "71",
+  "versionName": "1.9.0-Pandamonium",
+  "launcher": "org.minimarex.minimacore.StartActivity",
+  "extra_processes": 0,
+  "legacy_node_relays": 0,
+  "internal_notification_receivers": 0,
+  "backup_enabled": false,
+  "providers": [
+    "org.minimarex.pandamonium.ipcresponses",
+    "org.minimarex.pandamonium.pandapools.fileprovider",
+    "org.minimarex.pandamonium.terminalide.fileprovider",
+    "org.minimarex.pandamonium.androidx-startup"
+  ]
+}

@@ -22,6 +22,7 @@ dependencyResolutionManagement {
 rootProject.name = "Minima Core"
 include ':app'
 include ':minimaapi'
+include ':maxima-core'   // the Parlons/Maxima transport core, vendored (MAX# contacts in Chat)
 
 // Reviewed source snapshots of the existing native companion apps.
 ['ethwallet','atomix','pandapools','futurecash-next','pandadex','casino','blockexplorer','filez','history','vestr','entropy','terminalide','mail'].each { feature ->

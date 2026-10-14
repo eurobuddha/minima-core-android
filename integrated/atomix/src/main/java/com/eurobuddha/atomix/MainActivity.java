@@ -1947,10 +1947,38 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
+        boolean hosted = "com.eurobuddha.pandamonium".equals(getPackageName());
+        if (hosted) {
+            // render() rebuilds this whole tree every ~30s, so the HOST's one-shot
+            // menu insertion dies with the first rebuild (proven on the Fold: the
+            // hamburger vanished). The tag below tells the host to stand down and
+            // this header draws its own hamburger on every rebuild instead.
+            header.setTag("pandamonium.app.toolbar.self");
+            TextView burger = new TextView(this);
+            burger.setText("\u2630");
+            burger.setTextColor(Design.TEXT());
+            burger.setTextSize(20f);
+            burger.setGravity(Gravity.CENTER);
+            burger.setContentDescription("Open Minima Core menu");
+            Design.pressable(burger);
+            burger.setOnClickListener(v -> {
+                View shell = getWindow().getDecorView()
+                        .findViewWithTag("pandamonium.navigation.shell");
+                if (shell instanceof androidx.drawerlayout.widget.DrawerLayout) {
+                    ((androidx.drawerlayout.widget.DrawerLayout) shell)
+                            .openDrawer(Gravity.LEFT);
+                }
+            });
+            header.addView(burger, new LinearLayout.LayoutParams(dp(44), dp(44)));
+        }
 
         TextView brand = new TextView(this);
         brand.setText("AtomiX");
         brand.setTextColor(Design.TEXT()); brand.setTextSize(21f); brand.setTypeface(Design.sansBold()); brand.setLetterSpacing(-0.01f);
+        if (hosted) {
+            // Hamburger left, title centred in the remaining span.
+            brand.setGravity(Gravity.CENTER);
+        }
         header.addView(brand, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
         // Currency selector — the active market's identity (accent-tinted). Tap to switch MINIMA ↔ mxUSDT: the

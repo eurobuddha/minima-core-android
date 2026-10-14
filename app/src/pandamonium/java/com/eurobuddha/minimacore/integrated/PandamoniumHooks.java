@@ -246,6 +246,10 @@ public final class PandamoniumHooks {
 
     private static void installMenu(AppCompatActivity activity, ViewGroup original,
                                     LinearLayout column, Button menu) {
+        // An app that REBUILDS its header at runtime (AtomiX re-renders every ~30s)
+        // draws its own nav button each rebuild and opts out here - anything we
+        // insert once would die with the first rebuild.
+        if (original.findViewWithTag("pandamonium.app.toolbar.self") != null) return;
         View target = activity instanceof com.eurobuddha.minimacore.main.MainActivity
                 ? original.findViewById(com.eurobuddha.minimacore.R.id.toolbar)
                 : original.findViewWithTag("pandamonium.app.toolbar");

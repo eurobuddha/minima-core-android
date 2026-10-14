@@ -1,6 +1,6 @@
 <resources>
     <!-- Block mode by default; Classic mode is selectable in Startup Params. -->
-    <string name="app_name">Minima Core</string>
+    <string name="app_name">Pandamonium</string>
     <!-- Block mode: keys.maxuses is roughly the last block a key signed at, not a count toward exhaustion. -->
     <string name="home_keyuses_label">Last key block</string>
     <!-- Block mode: the node derives key uses from the chain tip; this value is only a safety floor. -->

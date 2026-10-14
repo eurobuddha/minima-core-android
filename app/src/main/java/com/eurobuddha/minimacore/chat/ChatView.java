@@ -63,10 +63,34 @@ public class ChatView extends BaseView {
 
         list.setOnItemClickListener((parent, view, position, id) -> {
             ChatDb.Thread t = (ChatDb.Thread) mAdapter.getItem(position);
+            if (com.eurobuddha.minimacore.maxchat.MaxChatThreads.isMax(t.pubkey)) {
+                Intent it = new Intent(mActivity,
+                        com.eurobuddha.minimacore.maxchat.MaxThreadActivity.class);
+                it.putExtra("peer", com.eurobuddha.minimacore.maxchat.MaxChatThreads.peer(t.pubkey));
+                mActivity.startActivity(it);
+                return;
+            }
             openThread(t.pubkey);
         });
         list.setOnItemLongClickListener((parent, view, position, id) -> {
             ChatDb.Thread t = (ChatDb.Thread) mAdapter.getItem(position);
+            if (com.eurobuddha.minimacore.maxchat.MaxChatThreads.isMax(t.pubkey)) {
+                // Parlons rows live in the engine, not ChatDb - a ChatDb write here
+                // would plant a phantom "max:" contact row that duplicates forever.
+                new AlertDialog.Builder(mActivity)
+                        .setTitle(t.name)
+                        .setItems(new String[]{"Delete chat"}, (d, which) -> {
+                            String peer = com.eurobuddha.minimacore.maxchat.MaxChatThreads.peer(t.pubkey);
+                            new Thread(() -> {
+                                try {
+                                    com.eurobuddha.minimacore.maxchat.MaxChat.removeContact(peer);
+                                } catch (Exception ignored) {
+                                }
+                                mActivity.runOnUiThread(this::refreshView);
+                            }, "maxchat-remove").start();
+                        }).show();
+                return true;
+            }
             new AlertDialog.Builder(mActivity)
                     .setTitle(t.name)
                     .setItems(new String[]{"Rename", "Delete chat"}, (d, which) -> {
@@ -77,6 +101,7 @@ public class ChatView extends BaseView {
         });
 
         ChatDrainer.UI_LISTENERS.add(mOnNewMessage);
+        com.eurobuddha.minimacore.maxchat.MaxChat.UI_LISTENERS.add(mOnNewMessage);
     }
 
     /** MainActivity wires the QR scanner through here (ActivityResult launchers must pre-register). */
@@ -85,9 +110,17 @@ public class ChatView extends BaseView {
     /** MainActivity routes the scan result back. */
     public void onScanResult(String zContents) {
         if (zContents == null) return;
-        String pub = zContents.trim().toLowerCase();
+        String raw = zContents.trim();
+        if (raw.regionMatches(true, 0, "MAX#", 0, 4)
+                || raw.matches("(?s)Mx[0-9A-Za-z]+@\\S+:\\d+")) {
+            if (mPendingScanTarget != null) {
+                mPendingScanTarget.setText(raw);
+            }
+            return;
+        }
+        String pub = raw.toLowerCase();
         if (!pub.matches("0x[0-9a-f]{64}")) {
-            Toast.makeText(mActivity, "Not a keets address QR", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, "Not a keets or Parlons address QR", Toast.LENGTH_SHORT).show();
             return;
         }
         if (mPendingScanTarget != null) {
@@ -101,6 +134,7 @@ public class ChatView extends BaseView {
     @Override
     public void onActivityDestroy() {
         ChatDrainer.UI_LISTENERS.remove(mOnNewMessage);
+        com.eurobuddha.minimacore.maxchat.MaxChat.UI_LISTENERS.remove(mOnNewMessage);
     }
 
     private void openThread(String zPubkey) {
@@ -128,6 +162,32 @@ public class ChatView extends BaseView {
         } else {
             addr.setText("Node starting — try again in a moment");
         }
+
+        // The Parlons address (the app's own Maxima identity) under the keets one.
+        // Permanent MAX# where a directory holds us, else the live Mx...@host:port.
+        TextView max = new TextView(mActivity);
+        max.setTextIsSelectable(true);
+        max.setTextSize(11);
+        max.setPadding(32, 24, 32, 8);
+        max.setText("Parlons address: starting…");
+        ((android.widget.LinearLayout) v).addView(max);
+        new Thread(() -> {
+            String perm = com.eurobuddha.minimacore.maxchat.MaxChat.permanentAddress();
+            java.util.List<String> live = com.eurobuddha.minimacore.maxchat.MaxChat.myAddresses();
+            String show = !perm.equals("") ? perm : live.isEmpty() ? "" : live.get(0);
+            mActivity.runOnUiThread(() -> {
+                if (show.equals("")) {
+                    max.setText("Parlons address: no relay yet — try again in a moment");
+                    return;
+                }
+                max.setText("YOUR PARLONS ADDRESS (tap to copy)\n" + show);
+                max.setOnClickListener(b -> {
+                    ClipboardManager cm = (ClipboardManager) mActivity.getSystemService(Context.CLIPBOARD_SERVICE);
+                    cm.setPrimaryClip(ClipData.newPlainText("parlons address", show));
+                    Toast.makeText(mActivity, "Parlons address copied", Toast.LENGTH_SHORT).show();
+                });
+            });
+        }, "maxchat-addr").start();
 
         v.findViewById(R.id.identity_copy).setOnClickListener(b -> {
             if (mMyPub == null) return;
@@ -165,10 +225,30 @@ public class ChatView extends BaseView {
         });
 
         dlg.setOnShowListener(d -> dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(b -> {
-            String pub = addrIn.getText().toString().trim().toLowerCase();
+            String raw = addrIn.getText().toString().trim();
+            if (raw.regionMatches(true, 0, "MAX#", 0, 4)
+                    || raw.matches("(?s)Mx[0-9A-Za-z]+@\\S+:\\d+")) {
+                dlg.dismiss();
+                mPendingScanTarget = null;
+                Toast.makeText(mActivity, "Adding Parlons contact…", Toast.LENGTH_SHORT).show();
+                new Thread(() -> {
+                    try {
+                        com.eurobuddha.minimacore.maxchat.MaxChat.addContact(raw);
+                        mActivity.runOnUiThread(() -> {
+                            Toast.makeText(mActivity, "Parlons contact added", Toast.LENGTH_SHORT).show();
+                            refreshView();
+                        });
+                    } catch (Exception e) {
+                        mActivity.runOnUiThread(() -> Toast.makeText(mActivity,
+                                "Could not add: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    }
+                }, "maxchat-add").start();
+                return;
+            }
+            String pub = raw.toLowerCase();
             String name = nameIn.getText().toString().trim();
             if (!pub.matches("0x[0-9a-f]{64}")) {
-                addrIn.setError("A keets address is 0x + 64 hex characters");
+                addrIn.setError("A keets address is 0x + 64 hex — or paste a Parlons MAX#… / Mx…@host:port address");
                 return;
             }
             ChatDb.get(mActivity).putContact(pub, name.equals("") ? null : name);
@@ -226,6 +306,8 @@ public class ChatView extends BaseView {
         void reload() {
             new Thread(() -> {
                 ArrayList<ChatDb.Thread> t = ChatDb.get(mActivity).threads();
+                t.addAll(com.eurobuddha.minimacore.maxchat.MaxChatThreads.list());
+                t.sort((a, b) -> Long.compare(b.lastTs, a.lastTs));
                 mActivity.runOnUiThread(() -> {
                     mThreads = t;
                     mEmpty.setVisibility(t.isEmpty() ? View.VISIBLE : View.GONE);

@@ -1,0 +1,60 @@
+✔ current live reserves beat expired proofs; restore quarantines even a higher current counter (80.284667ms)
+✔ stale snapshot falls back to current archive IDs, validated by receiver before import (24.678041ms)
+✔ wrong-address proof, failed imports and archive outage preserve unresolved recipe and report zero (43.928917ms)
+✔ invalid recipe and covenant address mismatch never track, import or save (15.960291ms)
+✔ failed durable recipe write prevents tracking/import and retains signing hold in memory (8.157583ms)
+✔ crowded address uses saved exact IDs and ordinary reads preserve owner metadata (18.075666ms)
+✔ dust and raw token amount never count as fully recovered reserves (14.400958ms)
+✔ actual input script key is checked after delayed key read and newly installed hold (13.425083ms)
+✔ failed signing confirmation keeps latch even if rollback SQL fails; successful retry clears it durably (19.898833ms)
+✔ backup discards proofs if reserves move mid-export and retains current counter floor (31.432417ms)
+✔ archive endpoint and command whitelist reject credential and command injection (9.42075ms)
+✔ headless shipped service blocks signatures for quarantined actual auto signer (18.179625ms)
+✔ old-schema upgrade quarantines existing recipes while an explicitly new pool is trusted (19.717583ms)
+✔ read-only MDS signing never creates pending commands; restore cancels only owned pool transaction IDs (23.145375ms)
+✔ corrupt existing Desktop database cannot be silently replaced (1.342375ms)
+✔ MDS archive stream rejects oversized content and aborts the request (8.702084ms)
+✔ headless refresh validates KMIN and preserves oldest leg age without browser timers (10.026708ms)
+✔ discovery preserves a confirmed signing state; unknown new discovery remains held (22.766583ms)
+✔ foreign cleanup never untracks a recipe restored while a coin reply was delayed (13.839167ms)
+✔ foreign and unchanged owned reserve scans never flush the whole database (18.97025ms)
+✔ Book discovery populates both young reserve ages for the foreground refresh gate (8.044666ms)
+✔ the signing gate names WHICH problem it is (7.866958ms)
+✔ a backup is proven usable before it is handed over (8.177208ms)
+✔ stranding warns early enough to act, and never on an unknown age (7.780916ms)
+✔ a forward that moved only one leg does NOT finish the job (8.014834ms)
+✔ the collect queue is durable and only an empty read clears it (8.007666ms)
+✔ one card per pool, carrying BOTH identifiers and the retire action (15.044125ms)
+✔ no cards at all until ownership is known (13.753625ms)
+✔ retiring a pool hides it without losing anything needed to reclaim it (23.151875ms)
+✖ block-mode keys reach the real signing boundary and recovery confirmation (9.083375ms)
+✔ block-mode support preserves legacy exhaustion and restored-key quarantine (13.137833ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 30
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 592.7575
+
+✖ failing tests:
+
+test at tests/reserve-recovery.test.cjs:273:1
+✖ block-mode keys reach the real signing boundary and recovery confirmation (9.083375ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'Owner signing is paused or the current signing key could not be verified.'
+  - null
+  
+      at TestContext.<anonymous> (/Users/eurobuddha/Projects/minima/mds/pandapools-mds/tests/reserve-recovery.test.cjs:277:10)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Owner signing is paused or the current signing key could not be verified.',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
