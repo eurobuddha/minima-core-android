@@ -164,21 +164,11 @@ public class MaxThreadActivity extends AppCompatActivity {
     private void sendPhoto(android.net.Uri zUri) {
         new Thread(() -> {
             try {
-                java.io.InputStream in = getContentResolver().openInputStream(zUri);
-                android.graphics.Bitmap bm = android.graphics.BitmapFactory.decodeStream(in);
-                in.close();
-                if (bm == null) {
-                    throw new Exception("could not read image");
-                }
-                int max = 1280;
-                if (bm.getWidth() > max || bm.getHeight() > max) {
-                    float sc = Math.min((float) max / bm.getWidth(), (float) max / bm.getHeight());
-                    bm = android.graphics.Bitmap.createScaledBitmap(bm,
-                            Math.round(bm.getWidth() * sc), Math.round(bm.getHeight() * sc), true);
-                }
-                java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
-                bm.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, bos);
-                sendMediaBytes(bos.toByteArray(), "image/jpeg", "");
+                // shared pipeline: EXIF rotation + 1280px + JPEG q80
+                byte[] jpeg = com.eurobuddha.minimacore.chat.ChatPhoto.encodeForSend(this, zUri);
+                // sendMediaBytes toasts, so it must run on the main thread
+                // (it spawns its own send thread for the slow publish)
+                runOnUiThread(() -> sendMediaBytes(jpeg, "image/jpeg", ""));
             } catch (Exception e) {
                 runOnUiThread(() -> Toast.makeText(this,
                         "Photo failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
@@ -363,6 +353,7 @@ public class MaxThreadActivity extends AppCompatActivity {
 
             LinearLayout audio = row.findViewById(R.id.msg_audio);
             image.setVisibility(View.GONE);
+            image.setTag(null);   // a recycled image row must not accept stale decodes
             attach.setVisibility(View.GONE);
             audio.setVisibility(View.GONE);
             body.setVisibility(View.VISIBLE);
@@ -405,13 +396,8 @@ public class MaxThreadActivity extends AppCompatActivity {
                 image.setImageResource(android.R.drawable.stat_sys_download);
                 final String mbody = e.body;
                 image.setTag(mbody);
-                MaxMedia.load(MaxThreadActivity.this, mbody, f -> {
-                    if (f == null || !mbody.equals(image.getTag())) {
-                        return;   // recycled row or failed fetch
-                    }
-                    android.graphics.Bitmap bm =
-                            android.graphics.BitmapFactory.decodeFile(f.getAbsolutePath());
-                    if (bm != null) {
+                MaxMedia.loadBitmap(MaxThreadActivity.this, mbody, bm -> {
+                    if (bm != null && mbody.equals(image.getTag())) {
                         image.setImageBitmap(bm);
                     }
                 });

@@ -24,6 +24,46 @@ public final class MaxMedia {
         void done(File zFile);   // main thread; null = not available
     }
 
+    public interface BitmapCallback {
+        void done(android.graphics.Bitmap zBm);   // main thread; null = not available
+    }
+
+    // Decoded-image cache: decode off-main ONCE, not on every bind
+    // (receipt ticks and play/pause both notifyDataSetChanged the whole list).
+    private static final android.util.LruCache<String, android.graphics.Bitmap> BITMAPS =
+            new android.util.LruCache<String, android.graphics.Bitmap>(
+                    (int) (Runtime.getRuntime().maxMemory() / 8)) {
+                @Override protected int sizeOf(String k, android.graphics.Bitmap b) {
+                    return b.getByteCount();
+                }
+            };
+
+    /** Resolve a ChatMedia IMAGE body to a decoded bitmap (cached, bg decode). */
+    public static void loadBitmap(Context zCtx, String zBody, BitmapCallback zCb) {
+        Handler main = new Handler(Looper.getMainLooper());
+        String ref = ChatMedia.ref(zBody);
+        android.graphics.Bitmap hit = ref == null ? null : BITMAPS.get(ref);
+        if (hit != null) {
+            main.post(() -> zCb.done(hit));
+            return;
+        }
+        load(zCtx, zBody, f -> {
+            if (f == null) {
+                zCb.done(null);
+                return;
+            }
+            new Thread(() -> {
+                android.graphics.Bitmap bm =
+                        android.graphics.BitmapFactory.decodeFile(f.getAbsolutePath());
+                if (bm != null && ref != null) {
+                    BITMAPS.put(ref, bm);
+                }
+                final android.graphics.Bitmap out = bm;
+                main.post(() -> zCb.done(out));
+            }, "maxchat-image-decode").start();
+        });
+    }
+
     private MaxMedia() {
     }
 
@@ -66,9 +106,9 @@ public final class MaxMedia {
                     }
                 }
                 if (bytes != null && bytes.length > 0) {
-                    FileOutputStream fos = new FileOutputStream(f);
-                    fos.write(bytes);
-                    fos.close();
+                    try (FileOutputStream fos = new FileOutputStream(f)) {
+                        fos.write(bytes);
+                    }
                     got = f;
                 }
             } catch (Exception ignored) {

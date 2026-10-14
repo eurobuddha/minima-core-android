@@ -261,59 +261,14 @@ public class ChatThreadActivity extends AppCompatActivity {
     }
 
     // ---- photos ---------------------------------------------------------------
-    private void sendImage(Uri zUri) {
-        Toast.makeText(this, "Publishing photo…", Toast.LENGTH_SHORT).show();
+    private void sendImage(android.net.Uri zUri) {
         new Thread(() -> {
             try {
-                //two-pass decode: a modern camera JPEG at full resolution is hundreds of MB
-                //of bitmap — bound it near the 1280px target BEFORE decoding pixels
-                BitmapFactory.Options probe = new BitmapFactory.Options();
-                probe.inJustDecodeBounds = true;
-                java.io.InputStream probeIn = getContentResolver().openInputStream(zUri);
-                BitmapFactory.decodeStream(probeIn, null, probe);
-                probeIn.close();
-                int sample = 1;
-                while (probe.outWidth / (sample * 2) >= 1280 || probe.outHeight / (sample * 2) >= 1280) sample *= 2;
-                BitmapFactory.Options opts = new BitmapFactory.Options();
-                opts.inSampleSize = sample;
-                android.graphics.Bitmap bm = BitmapFactory.decodeStream(
-                        getContentResolver().openInputStream(zUri), null, opts);
-                if (bm == null) throw new Exception("could not read image");
-
-                //EXIF orientation: cameras store rotation as metadata, decodeStream ignores
-                //it — without this, portrait photos arrive rotated (the known bug from the
-                //family's earlier chat apps)
-                try {
-                    java.io.InputStream exifIn = getContentResolver().openInputStream(zUri);
-                    android.media.ExifInterface exif = new android.media.ExifInterface(exifIn);
-                    int o = exif.getAttributeInt(android.media.ExifInterface.TAG_ORIENTATION,
-                            android.media.ExifInterface.ORIENTATION_NORMAL);
-                    exifIn.close();
-                    android.graphics.Matrix mx = new android.graphics.Matrix();
-                    switch (o) {
-                        case android.media.ExifInterface.ORIENTATION_ROTATE_90:  mx.postRotate(90);  break;
-                        case android.media.ExifInterface.ORIENTATION_ROTATE_180: mx.postRotate(180); break;
-                        case android.media.ExifInterface.ORIENTATION_ROTATE_270: mx.postRotate(270); break;
-                        case android.media.ExifInterface.ORIENTATION_FLIP_HORIZONTAL: mx.postScale(-1, 1); break;
-                        case android.media.ExifInterface.ORIENTATION_FLIP_VERTICAL:   mx.postScale(1, -1); break;
-                        case android.media.ExifInterface.ORIENTATION_TRANSPOSE:  mx.postRotate(90);  mx.postScale(-1, 1); break;
-                        case android.media.ExifInterface.ORIENTATION_TRANSVERSE: mx.postRotate(270); mx.postScale(-1, 1); break;
-                    }
-                    if (!mx.isIdentity()) {
-                        bm = android.graphics.Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), mx, true);
-                    }
-                } catch (Exception e) { /* no exif — keep as decoded */ }
-
-                int max = 1280;
-                if (bm.getWidth() > max || bm.getHeight() > max) {
-                    float sc = Math.min((float) max / bm.getWidth(), (float) max / bm.getHeight());
-                    bm = android.graphics.Bitmap.createScaledBitmap(bm,
-                            Math.round(bm.getWidth() * sc), Math.round(bm.getHeight() * sc), true);
-                }
+                byte[] jpeg = ChatPhoto.encodeForSend(this, zUri);
                 java.io.File tmp = new java.io.File(getCacheDir(), "chat-out-" + System.currentTimeMillis() + ".jpg");
-                java.io.FileOutputStream fos = new java.io.FileOutputStream(tmp);
-                bm.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, fos);
-                fos.close();
+                try (java.io.FileOutputStream fos = new java.io.FileOutputStream(tmp)) {
+                    fos.write(jpeg);
+                }
 
                 //file: hand-off — megabyte params break the command tokenizer
                 JSONObject pub = MinimaCMD.execute("keets action:publish path:/chat/img-" +

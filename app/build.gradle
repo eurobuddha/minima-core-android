@@ -121,8 +121,8 @@ android {
         // vc82: existing app icons in the Pandamonium sidebar.
         // vc83: Pandamonium opens on Wallet; Node follows Logs.
         // vc85: sleep hidden Pandamonium display work, preserving financial services.
-        versionCode 106
-        versionName "1.9.35"
+        versionCode 107
+        versionName "1.9.36"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
