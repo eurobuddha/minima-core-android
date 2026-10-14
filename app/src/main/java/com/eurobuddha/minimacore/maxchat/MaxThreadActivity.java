@@ -76,8 +76,16 @@ public class MaxThreadActivity extends AppCompatActivity {
         mAdapter = new MsgAdapter();
         list.setAdapter(mAdapter);
 
+        mPickImage = registerForActivityResult(
+                new androidx.activity.result.contract.ActivityResultContracts.GetContent(),
+                uri -> { if (uri != null) sendPhoto(uri); });
         EditText input = findViewById(R.id.chat_input);
-        findViewById(R.id.chat_attach).setVisibility(View.GONE);   // media: follow-up
+        findViewById(R.id.chat_attach).setOnClickListener(v ->
+                new android.app.AlertDialog.Builder(this)
+                        .setItems(new String[]{"📷 Photo", "🎤 Voice note"}, (d, which) -> {
+                            if (which == 0) mPickImage.launch("image/*");
+                            else startVoiceNote();
+                        }).show());
         findViewById(R.id.chat_send).setOnClickListener(v -> {
             String text = input.getText().toString().trim();
             if (text.isEmpty()) {
@@ -111,8 +119,154 @@ public class MaxThreadActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        stopAudio();
+        if (mActiveRecorder != null) {
+            mActiveRecorder.stopQuiet();
+            mActiveRecorder = null;
+        }
         MaxChat.UI_LISTENERS.remove(mOnChange);
         super.onDestroy();
+    }
+
+    private androidx.activity.result.ActivityResultLauncher<String> mPickImage;
+    private com.eurobuddha.minimacore.chat.VoiceNote mActiveRecorder;
+    private android.media.MediaPlayer mPlayer;
+    private String mPlayingRef = "";
+    private String mLoadingRef = "";
+    private static final int REQ_RECORD_AUDIO = 74;
+
+    private void startVoiceNote() {
+        if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO},
+                    REQ_RECORD_AUDIO);
+            return;
+        }
+        mActiveRecorder = com.eurobuddha.minimacore.chat.VoiceRecordDialog.show(this,
+                (bytes, mime, secs, wave) -> sendMediaBytes(bytes, mime,
+                        com.eurobuddha.minimacore.chat.VoiceRecordDialog.fmtSecs(secs)
+                                + (wave == null || wave.isEmpty() ? "" : "|" + wave)));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int zReq, String[] zPerms, int[] zGrants) {
+        super.onRequestPermissionsResult(zReq, zPerms, zGrants);
+        if (zReq == REQ_RECORD_AUDIO && zGrants.length > 0) {
+            if (zGrants[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                startVoiceNote();
+            } else {
+                Toast.makeText(this, "Microphone permission needed for voice notes",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void sendPhoto(android.net.Uri zUri) {
+        new Thread(() -> {
+            try {
+                java.io.InputStream in = getContentResolver().openInputStream(zUri);
+                android.graphics.Bitmap bm = android.graphics.BitmapFactory.decodeStream(in);
+                in.close();
+                if (bm == null) {
+                    throw new Exception("could not read image");
+                }
+                int max = 1280;
+                if (bm.getWidth() > max || bm.getHeight() > max) {
+                    float sc = Math.min((float) max / bm.getWidth(), (float) max / bm.getHeight());
+                    bm = android.graphics.Bitmap.createScaledBitmap(bm,
+                            Math.round(bm.getWidth() * sc), Math.round(bm.getHeight() * sc), true);
+                }
+                java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                bm.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, bos);
+                sendMediaBytes(bos.toByteArray(), "image/jpeg", "");
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(this,
+                        "Photo failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        }, "maxchat-photo").start();
+    }
+
+    /** Publish + send any media through the engine (blocks on the mesh publish). */
+    private void sendMediaBytes(byte[] zBytes, String zMime, String zCaption) {
+        ChatEngine chat = MaxChat.chat();
+        MaximaNode node = MaxChat.node();
+        Contact c = node == null ? null : node.contact(mPeer);
+        if (chat == null || c == null) {
+            Toast.makeText(this, "Parlons transport not ready", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(this, "Sending…", Toast.LENGTH_SHORT).show();
+        new Thread(() -> {
+            try {
+                chat.sendMedia(c, zBytes, zMime, zCaption);
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(this,
+                        "Send failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+            runOnUiThread(mAdapter::reload);
+        }, "maxchat-media-send").start();
+    }
+
+    private void toggleAudio(String zBody, Runnable zOnState) {
+        final String ref = ChatMedia.ref(zBody);
+        if (ref == null) {
+            return;
+        }
+        if (mPlayer != null && ref.equals(mPlayingRef)) {
+            if (mPlayer.isPlaying()) {
+                mPlayer.pause();
+            } else {
+                mPlayer.start();
+            }
+            zOnState.run();
+            return;
+        }
+        if (ref.equals(mLoadingRef)) {
+            return;
+        }
+        stopAudio();
+        mLoadingRef = ref;
+        MaxMedia.load(this, zBody, f -> {
+            if (!ref.equals(mLoadingRef) || isDestroyed() || isFinishing()) {
+                return;
+            }
+            mLoadingRef = "";
+            if (f == null) {
+                Toast.makeText(this, "Voice note not available yet", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            try {
+                mPlayer = new android.media.MediaPlayer();
+                mPlayer.setAudioAttributes(new android.media.AudioAttributes.Builder()
+                        .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build());
+                mPlayer.setDataSource(f.getAbsolutePath());
+                mPlayer.prepare();
+                mPlayingRef = ref;
+                mPlayer.setOnCompletionListener(mp -> {
+                    mPlayingRef = "";
+                    zOnState.run();
+                });
+                mPlayer.start();
+                zOnState.run();
+            } catch (Exception e) {
+                stopAudio();
+                Toast.makeText(this, "Playback failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void stopAudio() {
+        mLoadingRef = "";
+        if (mPlayer != null) {
+            try {
+                mPlayer.release();
+            } catch (Exception ignored) {
+            }
+            mPlayer = null;
+        }
+        mPlayingRef = "";
     }
 
     private String title() {
@@ -207,13 +361,66 @@ public class MaxThreadActivity extends AppCompatActivity {
             meta.setTextColor(fg);
             attach.setTextColor(fg);
 
+            LinearLayout audio = row.findViewById(R.id.msg_audio);
             image.setVisibility(View.GONE);
             attach.setVisibility(View.GONE);
+            audio.setVisibility(View.GONE);
             body.setVisibility(View.VISIBLE);
-            body.setText(ChatMedia.isMedia(e.body) ? "📷 Photo (view in Parlons)"
-                    : ChatPay.isPayment(e.body)
-                        ? "💸 " + ChatPay.amount(e.body) + " " + ChatPay.tokenName(e.body)
-                        : e.body);
+
+            String mime = ChatMedia.isMedia(e.body) ? ChatMedia.mime(e.body) : null;
+            if (mime != null && mime.startsWith("audio")) {
+                // caption is "M:SS|waveformhex" - same convention everywhere
+                String cap = ChatMedia.caption(e.body);
+                String dur = cap;
+                String waveHex = "";
+                int bar = cap.indexOf('|');
+                if (bar > 0) {
+                    dur = cap.substring(0, bar);
+                    waveHex = cap.substring(bar + 1);
+                }
+                body.setVisibility(View.GONE);
+                audio.setVisibility(View.VISIBLE);
+                TextView btn = row.findViewById(R.id.msg_audio_btn);
+                com.eurobuddha.minimacore.chat.WaveformView wv = row.findViewById(R.id.msg_audio_wave);
+                TextView time = row.findViewById(R.id.msg_audio_time);
+                btn.setTextColor(fg);
+                time.setTextColor(fg);
+                wv.setInk(fg);
+                wv.setBars(waveHex.isEmpty()
+                        ? new int[com.eurobuddha.minimacore.chat.WaveformView.BAR_COUNT]
+                        : com.eurobuddha.minimacore.chat.WaveformView.decode(waveHex));
+                time.setText(dur);
+                final String mbody = e.body;
+                final String mref = ChatMedia.ref(e.body);
+                btn.setText(mref != null && mref.equals(mPlayingRef)
+                        && mPlayer != null && mPlayer.isPlaying() ? "\u23f8" : "\u25b6");
+                View.OnClickListener play = v -> toggleAudio(mbody, this::notifyDataSetChanged);
+                btn.setOnClickListener(play);
+                audio.setOnClickListener(play);
+            } else if (mime != null && mime.startsWith("image")) {
+                String cap = ChatMedia.caption(e.body);
+                body.setVisibility(cap.isEmpty() ? View.GONE : View.VISIBLE);
+                body.setText(cap);
+                image.setVisibility(View.VISIBLE);
+                image.setImageResource(android.R.drawable.stat_sys_download);
+                final String mbody = e.body;
+                image.setTag(mbody);
+                MaxMedia.load(MaxThreadActivity.this, mbody, f -> {
+                    if (f == null || !mbody.equals(image.getTag())) {
+                        return;   // recycled row or failed fetch
+                    }
+                    android.graphics.Bitmap bm =
+                            android.graphics.BitmapFactory.decodeFile(f.getAbsolutePath());
+                    if (bm != null) {
+                        image.setImageBitmap(bm);
+                    }
+                });
+            } else {
+                body.setText(ChatMedia.isMedia(e.body) ? ChatMedia.preview(e.body)
+                        : ChatPay.isPayment(e.body)
+                            ? "💸 " + ChatPay.amount(e.body) + " " + ChatPay.tokenName(e.body)
+                            : e.body);
+            }
             meta.setText(mTime.format(new java.util.Date(e.time)) + ticks(e));
             return row;
         }

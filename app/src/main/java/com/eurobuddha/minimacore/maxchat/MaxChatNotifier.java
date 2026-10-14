@@ -30,7 +30,7 @@ final class MaxChatNotifier {
         try {
             Contact c = zNode.contact(zEntry.sender);
             String who = c != null && !c.name.isEmpty() ? c.name : "Parlons contact";
-            String what = ChatMedia.isMedia(zEntry.body) ? "📷 Photo"
+            String what = ChatMedia.isMedia(zEntry.body) ? ChatMedia.preview(zEntry.body)
                     : ChatPay.isPayment(zEntry.body) ? "💸 Payment"
                     : zEntry.body;
 

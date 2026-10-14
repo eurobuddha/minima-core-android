@@ -78,7 +78,7 @@ public final class MaxChatThreads {
 
     /** List preview, matching the keets rows' style. */
     public static String preview(ChatEngine.Entry zE) {
-        String p = ChatMedia.isMedia(zE.body) ? "📷 Photo"
+        String p = ChatMedia.isMedia(zE.body) ? ChatMedia.preview(zE.body)
                 : ChatPay.isPayment(zE.body) ? "💸 Payment"
                 : zE.body;
         return zE.mine ? "You: " + p : p;

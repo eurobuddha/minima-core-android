@@ -46,6 +46,7 @@ public final class MaxChat {
 
     private static volatile MaximaNode sNode;
     private static volatile ChatEngine sChat;
+    private static volatile com.eurobuddha.maxima.core.media.MediaService sMedia;
     private static ScheduledExecutorService sKeeper;
     private static volatile boolean sStarting;
     /** Bumped by stop(); the start thread refuses to publish into a newer epoch. */
@@ -65,6 +66,11 @@ public final class MaxChat {
     /** The node, or null while starting. */
     public static MaximaNode node() {
         return sNode;
+    }
+
+    /** The media mesh service, or null while starting. */
+    public static com.eurobuddha.maxima.core.media.MediaService media() {
+        return sMedia;
     }
 
     /**
@@ -91,7 +97,18 @@ public final class MaxChat {
                     node.setName(myName);
                 }
 
+                // photos/voice notes: the Parlons media mesh (bounded local shelf;
+                // the peer's relays hold replicas while this phone sleeps)
+                com.eurobuddha.maxima.core.store.BlobStore blobs =
+                        new com.eurobuddha.maxima.core.store.BlobStore(
+                                new File(app.getFilesDir(), "maxchat/media"),
+                                256L * 1024 * 1024);
+                com.eurobuddha.maxima.core.media.MediaService media =
+                        new com.eurobuddha.maxima.core.media.MediaService(node, blobs);
+                node.setLocalBlobs(blobs);
+
                 ChatEngine chat = new ChatEngine(node);
+                chat.setMediaService(media);
                 chat.setStoreAsync(FileStore.coalescing(
                         new File(app.getFilesDir(), "maxchat/chat"), 2000), () -> fire());
                 chat.setSendReadReceipts(readReceipts(app));
@@ -128,6 +145,7 @@ public final class MaxChat {
                     }
                     sChat = chat;
                     sNode = node;
+                    sMedia = media;
                 }
 
                 // The pool only dials hosts it is handed (an empty floor attaches to
@@ -186,6 +204,7 @@ public final class MaxChat {
         MaximaNode node = sNode;
         sNode = null;
         sChat = null;
+        sMedia = null;
         if (node != null) {
             new Thread(node::stop, "maxchat-stop").start();
         }

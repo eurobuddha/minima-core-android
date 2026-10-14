@@ -359,10 +359,6 @@ public class ChatThreadActivity extends AppCompatActivity {
         return Math.round(zDp * getResources().getDisplayMetrics().density);
     }
 
-    private static String fmtSecs(int zSecs) {
-        return (zSecs / 60) + ":" + String.format("%02d", zSecs % 60);
-    }
-
     private void startVoiceNote() {
         if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
                 != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -387,109 +383,8 @@ public class ChatThreadActivity extends AppCompatActivity {
     }
 
     private void recordVoiceDialog() {
-        final VoiceNote rec = new VoiceNote(this);
-        try {
-            rec.start();
-        } catch (Exception e) {
-            Toast.makeText(this, "Microphone unavailable", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        mActiveRecorder = rec;
-        LinearLayout box = new LinearLayout(this);
-        box.setOrientation(LinearLayout.VERTICAL);
-        box.setPadding(dp(22), dp(18), dp(22), dp(6));
-        final WaveformView wave = new WaveformView(this);
-        wave.setInk(getColor(R.color.minima_orange));
-        LinearLayout.LayoutParams wlp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(44));
-        wlp.bottomMargin = dp(10);
-        box.addView(wave, wlp);
-        LinearLayout rowBox = new LinearLayout(this);
-        rowBox.setOrientation(LinearLayout.HORIZONTAL);
-        rowBox.setGravity(Gravity.CENTER_VERTICAL);
-        box.addView(rowBox);
-        final java.util.ArrayList<Integer> samples = new java.util.ArrayList<>();
-        final TextView dot = new TextView(this);
-        dot.setText("\u25cf");
-        dot.setTextColor(0xFFE0524D);
-        dot.setTextSize(16);
-        final TextView timer = new TextView(this);
-        timer.setTextSize(28);
-        timer.setTypeface(android.graphics.Typeface.MONOSPACE);
-        timer.setTextColor(getColor(R.color.core_text));
-        timer.setPadding(dp(14), 0, 0, 0);
-        timer.setText("0:00");
-        rowBox.addView(dot);
-        rowBox.addView(timer);
-
-        final AlertDialog dlg = new AlertDialog.Builder(this)
-                .setTitle("Voice note")
-                .setView(box)
-                .setPositiveButton("Send", null)
-                .setNegativeButton("Cancel", null)
-                .create();
-        dlg.setCanceledOnTouchOutside(false);
-        dlg.show();
-
-        final android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
-        final Runnable sampler = new Runnable() {
-            @Override public void run() {
-                int a = rec.amplitude();
-                samples.add(a);
-                wave.append(a);
-                if (rec.elapsedSeconds() < VoiceNote.MAX_SECONDS) {
-                    h.postDelayed(this, 100);
-                }
-            }
-        };
-        h.post(sampler);
-        final Runnable tick = new Runnable() {
-            @Override public void run() {
-                int sSec = rec.elapsedSeconds();
-                dot.setAlpha(dot.getAlpha() > 0.5f ? 0.25f : 1f);
-                if (sSec >= VoiceNote.MAX_SECONDS) {
-                    timer.setText(fmtSecs(VoiceNote.MAX_SECONDS) + "  max");
-                    rec.stopQuiet();   // recorder hard-caps too (setMaxDuration)
-                } else {
-                    timer.setText(fmtSecs(sSec));
-                    h.postDelayed(this, 500);
-                }
-            }
-        };
-        h.post(tick);
-
-        dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            h.removeCallbacksAndMessages(null);
-            rec.stopQuiet();
-            byte[] bytes;
-            int secs = rec.recordedSeconds();
-            try {
-                bytes = rec.bytes();
-            } catch (Exception e) {
-                Toast.makeText(this, "Recording failed", Toast.LENGTH_SHORT).show();
-                dlg.dismiss();
-                return;
-            }
-            dlg.dismiss();
-            if (bytes == null || bytes.length == 0 || secs < 1) {
-                Toast.makeText(this, "Too short — hold on a moment longer", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            sendAudio(bytes, rec.mime(), secs,
-                    WaveformView.encode(WaveformView.summarise(samples)));
-        });
-        dlg.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> {
-            h.removeCallbacksAndMessages(null);
-            rec.cancel();
-            dlg.dismiss();
-        });
-        dlg.setOnDismissListener(d -> {
-            h.removeCallbacksAndMessages(null);
-            rec.stopQuiet();
-            if (mActiveRecorder == rec) {
-                mActiveRecorder = null;
-            }
-        });
+        mActiveRecorder = VoiceRecordDialog.show(this,
+                (bytes, mime, secs, wave) -> sendAudio(bytes, mime, secs, wave));
     }
 
     /** Publish the note over keets and send a state:"audio" message whose body
@@ -513,7 +408,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                 if (!(Boolean) pub.getOrDefault("status", false)) throw new Exception("" + pub.get("error"));
                 String url = (String) ((JSONObject) pub.get("response")).get("url");
 
-                String cap = fmtSecs(zSecs)
+                String cap = VoiceRecordDialog.fmtSecs(zSecs)
                         + (zWave == null || zWave.isEmpty() ? "" : "|" + zWave);
                 SharedPreferences prefs = getSharedPreferences("main_prefs", Context.MODE_PRIVATE);
                 org.minima.utils.json.JSONObject im = ChatSchema.base(prefs.getString("chat_name", ""), cap, url);
