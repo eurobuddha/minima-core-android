@@ -119,7 +119,9 @@ public class ChatDb extends SQLiteOpenHelper {
         ArrayList<Thread> out = new ArrayList<>();
         Cursor c = getReadableDatabase().rawQuery(
                 "SELECT ct.pubkey, ct.name," +
-                " (SELECT body FROM messages m WHERE m.pubkey=ct.pubkey ORDER BY ts DESC, rowid DESC LIMIT 1)," +
+                // preview: a state-carrying last message shows a label, not its raw body
+                " (SELECT CASE m.state WHEN 'audio' THEN '🎤 Voice note' WHEN 'image' THEN '📷 Photo' ELSE m.body END" +
+                "   FROM messages m WHERE m.pubkey=ct.pubkey ORDER BY ts DESC, rowid DESC LIMIT 1)," +
                 " (SELECT MAX(ts) FROM messages m WHERE m.pubkey=ct.pubkey)," +
                 " (SELECT COUNT(*) FROM messages m WHERE m.pubkey=ct.pubkey AND incoming=1 AND read=0)" +
                 " FROM (SELECT pubkey, name, added FROM contacts" +

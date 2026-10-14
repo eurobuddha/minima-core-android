@@ -87,9 +87,10 @@ public class ChatThreadActivity extends AppCompatActivity {
 
         ImageButton attach = findViewById(R.id.chat_attach);
         attach.setOnClickListener(v -> new AlertDialog.Builder(this)
-                .setItems(new String[]{"📷 Photo", "💸 Send payment", "🏷 Request their pay address"}, (d, which) -> {
+                .setItems(new String[]{"📷 Photo", "🎤 Voice note", "💸 Send payment", "🏷 Request their pay address"}, (d, which) -> {
                     if (which == 0) mPickImage.launch("image/*");
-                    else if (which == 1) startPayment();
+                    else if (which == 1) startVoiceNote();
+                    else if (which == 2) startPayment();
                     else requestPayAddr(true);
                 }).show());
 
@@ -346,6 +347,250 @@ public class ChatThreadActivity extends AppCompatActivity {
         }, "chat-image-send").start();
     }
 
+    // ---- voice notes (ported from Parlons ChatActivity) -------------------
+
+    private static final int REQ_RECORD_AUDIO = 73;
+    private VoiceNote mActiveRecorder;
+    private android.media.MediaPlayer mPlayer;
+    private String mPlayingRef = "";
+
+    private int dp(int zDp) {
+        return Math.round(zDp * getResources().getDisplayMetrics().density);
+    }
+
+    private static String fmtSecs(int zSecs) {
+        return (zSecs / 60) + ":" + String.format("%02d", zSecs % 60);
+    }
+
+    private void startVoiceNote() {
+        if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO},
+                    REQ_RECORD_AUDIO);
+            return;
+        }
+        recordVoiceDialog();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int zReq, String[] zPerms, int[] zGrants) {
+        super.onRequestPermissionsResult(zReq, zPerms, zGrants);
+        if (zReq == REQ_RECORD_AUDIO && zGrants.length > 0
+                && zGrants[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            recordVoiceDialog();
+        }
+    }
+
+    private void recordVoiceDialog() {
+        final VoiceNote rec = new VoiceNote(this);
+        mActiveRecorder = rec;
+        try {
+            rec.start();
+        } catch (Exception e) {
+            Toast.makeText(this, "Microphone unavailable", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setPadding(dp(22), dp(18), dp(22), dp(6));
+        final WaveformView wave = new WaveformView(this);
+        wave.setInk(getColor(R.color.minima_orange));
+        LinearLayout.LayoutParams wlp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(44));
+        wlp.bottomMargin = dp(10);
+        box.addView(wave, wlp);
+        LinearLayout rowBox = new LinearLayout(this);
+        rowBox.setOrientation(LinearLayout.HORIZONTAL);
+        rowBox.setGravity(Gravity.CENTER_VERTICAL);
+        box.addView(rowBox);
+        final java.util.ArrayList<Integer> samples = new java.util.ArrayList<>();
+        final TextView dot = new TextView(this);
+        dot.setText("\u25cf");
+        dot.setTextColor(0xFFE0524D);
+        dot.setTextSize(16);
+        final TextView timer = new TextView(this);
+        timer.setTextSize(28);
+        timer.setTypeface(android.graphics.Typeface.MONOSPACE);
+        timer.setTextColor(getColor(R.color.core_text));
+        timer.setPadding(dp(14), 0, 0, 0);
+        timer.setText("0:00");
+        rowBox.addView(dot);
+        rowBox.addView(timer);
+
+        final AlertDialog dlg = new AlertDialog.Builder(this)
+                .setTitle("Voice note")
+                .setView(box)
+                .setPositiveButton("Send", null)
+                .setNegativeButton("Cancel", null)
+                .create();
+        dlg.setCanceledOnTouchOutside(false);
+        dlg.show();
+
+        final android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
+        final Runnable sampler = new Runnable() {
+            @Override public void run() {
+                int a = rec.amplitude();
+                samples.add(a);
+                wave.append(a);
+                if (rec.elapsedSeconds() < VoiceNote.MAX_SECONDS) {
+                    h.postDelayed(this, 100);
+                }
+            }
+        };
+        h.post(sampler);
+        final Runnable tick = new Runnable() {
+            @Override public void run() {
+                int sSec = rec.elapsedSeconds();
+                dot.setAlpha(dot.getAlpha() > 0.5f ? 0.25f : 1f);
+                if (sSec >= VoiceNote.MAX_SECONDS) {
+                    timer.setText(fmtSecs(VoiceNote.MAX_SECONDS) + "  max");
+                    rec.stopQuiet();   // recorder hard-caps too (setMaxDuration)
+                } else {
+                    timer.setText(fmtSecs(sSec));
+                    h.postDelayed(this, 500);
+                }
+            }
+        };
+        h.post(tick);
+
+        dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            h.removeCallbacksAndMessages(null);
+            rec.stopQuiet();
+            byte[] bytes;
+            int secs = rec.recordedSeconds();
+            try {
+                bytes = rec.bytes();
+            } catch (Exception e) {
+                Toast.makeText(this, "Recording failed", Toast.LENGTH_SHORT).show();
+                dlg.dismiss();
+                return;
+            }
+            dlg.dismiss();
+            if (bytes == null || bytes.length == 0 || secs < 1) {
+                Toast.makeText(this, "Too short — hold on a moment longer", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            sendAudio(bytes, rec.mime(), secs,
+                    WaveformView.encode(WaveformView.summarise(samples)));
+        });
+        dlg.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> {
+            h.removeCallbacksAndMessages(null);
+            rec.cancel();
+            dlg.dismiss();
+        });
+        dlg.setOnDismissListener(d -> {
+            h.removeCallbacksAndMessages(null);
+            rec.stopQuiet();
+            if (mActiveRecorder == rec) {
+                mActiveRecorder = null;
+            }
+        });
+    }
+
+    /** Publish the note over keets and send a state:"audio" message whose body
+     *  is "M:SS|waveformhex" - the Parlons caption convention, so every
+     *  flavour draws the real shape without decoding audio. */
+    private void sendAudio(final byte[] zBytes, final String zMime, final int zSecs, final String zWave) {
+        Toast.makeText(this, "Sending voice note…", Toast.LENGTH_SHORT).show();
+        new Thread(() -> {
+            try {
+                String ext = zMime.contains("ogg") ? ".ogg" : ".m4a";
+                java.io.File tmp = new java.io.File(getCacheDir(),
+                        "chat-vn-" + System.currentTimeMillis() + ext);
+                java.io.FileOutputStream fos = new java.io.FileOutputStream(tmp);
+                fos.write(zBytes);
+                fos.close();
+
+                //file: hand-off — megabyte params break the command tokenizer
+                JSONObject pub = MinimaCMD.execute("keets action:publish path:/chat/vn-" +
+                        System.currentTimeMillis() + ext + " file:" + tmp.getAbsolutePath());
+                tmp.delete();
+                if (!(Boolean) pub.getOrDefault("status", false)) throw new Exception("" + pub.get("error"));
+                String url = (String) ((JSONObject) pub.get("response")).get("url");
+
+                String cap = fmtSecs(zSecs)
+                        + (zWave == null || zWave.isEmpty() ? "" : "|" + zWave);
+                SharedPreferences prefs = getSharedPreferences("main_prefs", Context.MODE_PRIVATE);
+                org.minima.utils.json.JSONObject im = ChatSchema.base(prefs.getString("chat_name", ""), cap, url);
+                im.put("state", "audio");
+                String payload = im.toString();
+                String msgid = ChatSchema.decode(payload).id;
+
+                ChatDb.Msg m = new ChatDb.Msg();
+                m.msgid = msgid; m.pubkey = mPubkey; m.incoming = false;
+                m.body = cap; m.state = "audio"; m.ref = url;
+                m.ts = System.currentTimeMillis(); m.via = ""; m.read = true;
+                ChatDb.get(this).addMessage(m);
+                runOnUiThread(() -> mAdapter.reload());
+
+                JSONObject sr = MinimaCMD.execute("keets action:send to:" + mPubkey +
+                        " datahex:" + ChatSchema.toDataHex(payload));
+                String via = (Boolean) sr.getOrDefault("status", false)
+                        ? (String) ((JSONObject) sr.get("response")).get("delivered") : "FAILED";
+                ChatDb.get(this).setVia(msgid, via);
+                runOnUiThread(() -> mAdapter.reload());
+            } catch (Exception exc) {
+                runOnUiThread(() -> Toast.makeText(this, "Voice note failed: " + exc.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        }, "chat-voice-send").start();
+    }
+
+    /** Play/pause one note; a second tap pauses, a different note switches. */
+    private void toggleAudio(String zRef, Runnable zOnState) {
+        if (mPlayer != null && zRef.equals(mPlayingRef)) {
+            if (mPlayer.isPlaying()) {
+                mPlayer.pause();
+            } else {
+                mPlayer.start();
+            }
+            zOnState.run();
+            return;
+        }
+        stopAudio();
+        ChatAudio.load(this, zRef, f -> {
+            if (f == null) {
+                Toast.makeText(this, "Voice note not available yet", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            try {
+                mPlayer = new android.media.MediaPlayer();
+                mPlayer.setAudioAttributes(new android.media.AudioAttributes.Builder()
+                        .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build());
+                mPlayer.setDataSource(f.getAbsolutePath());
+                mPlayer.prepare();
+                mPlayingRef = zRef;
+                mPlayer.setOnCompletionListener(mp -> {
+                    mPlayingRef = "";
+                    zOnState.run();
+                });
+                mPlayer.start();
+                zOnState.run();
+            } catch (Exception e) {
+                stopAudio();
+                Toast.makeText(this, "Playback failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void stopAudio() {
+        if (mPlayer != null) {
+            try {
+                mPlayer.release();
+            } catch (Exception ignored) {
+            }
+            mPlayer = null;
+        }
+        mPlayingRef = "";
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopAudio();
+        super.onDestroy();
+    }
+
     private void sendMessage(String zText) {
         SharedPreferences prefs = getSharedPreferences("main_prefs", Context.MODE_PRIVATE);
         String myname = prefs.getString("chat_name", "");
@@ -436,11 +681,40 @@ public class ChatThreadActivity extends AppCompatActivity {
             meta.setTextColor(fg);
             attach.setTextColor(fg);
 
+            LinearLayout audio = row.findViewById(R.id.msg_audio);
             image.setVisibility(View.GONE);
             attach.setVisibility(View.GONE);
+            audio.setVisibility(View.GONE);
             body.setVisibility(View.VISIBLE);
 
-            if ("image".equals(m.state) && m.ref != null && !m.ref.equals("")) {
+            if ("audio".equals(m.state) && m.ref != null && !m.ref.equals("")) {
+                // body is "M:SS|waveformhex" (the Parlons caption convention)
+                String dur = m.body;
+                String waveHex = "";
+                int bar = m.body.indexOf('|');
+                if (bar > 0) {
+                    dur = m.body.substring(0, bar);
+                    waveHex = m.body.substring(bar + 1);
+                }
+                body.setVisibility(View.GONE);
+                audio.setVisibility(View.VISIBLE);
+                TextView btn = row.findViewById(R.id.msg_audio_btn);
+                WaveformView wv = row.findViewById(R.id.msg_audio_wave);
+                TextView time = row.findViewById(R.id.msg_audio_time);
+                btn.setTextColor(fg);
+                time.setTextColor(fg);
+                wv.setInk(fg);
+                wv.setBars(waveHex.isEmpty() ? new int[WaveformView.BAR_COUNT]
+                        : WaveformView.decode(waveHex));
+                time.setText(dur);
+                final String ref = m.ref;
+                btn.setText(ref.equals(mPlayingRef) && mPlayer != null && mPlayer.isPlaying()
+                        ? "\u23f8" : "\u25b6");
+                View.OnClickListener play = v ->
+                        toggleAudio(ref, () -> notifyDataSetChanged());
+                btn.setOnClickListener(play);
+                audio.setOnClickListener(play);
+            } else if ("image".equals(m.state) && m.ref != null && !m.ref.equals("")) {
                 body.setVisibility(m.body.equals("") ? View.GONE : View.VISIBLE);
                 body.setText(m.body);
                 image.setVisibility(View.VISIBLE);

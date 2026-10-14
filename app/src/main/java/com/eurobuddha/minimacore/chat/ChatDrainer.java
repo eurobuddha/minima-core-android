@@ -152,6 +152,7 @@ public class ChatDrainer {
                         lastFrom = from;
                         lastName = db.contactName(from);
                         lastBody = d.state.equals("image") ? "📷 Photo"
+                                 : d.state.equals("audio") ? "🎤 Voice note"
                                  : d.state.equals("payment") ? "💸 " + d.amt + " " + (d.tokname.equals("") ? "Minima" : d.tokname)
                                  : d.body;
 

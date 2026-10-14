@@ -41,6 +41,32 @@
             android:textStyle="italic"
             android:visibility="gone" />
 
+        <LinearLayout
+        android:id="@+id/msg_audio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/msg_audio_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:text="\u25b6" />
+        <com.eurobuddha.minimacore.chat.WaveformView
+            android:id="@+id/msg_audio_wave"
+            android:layout_width="150dp"
+            android:layout_height="36dp" />
+        <TextView
+            android:id="@+id/msg_audio_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:textSize="12sp" />
+    </LinearLayout>
+
         <TextView
             android:id="@+id/msg_meta"
             android:layout_width="wrap_content"
