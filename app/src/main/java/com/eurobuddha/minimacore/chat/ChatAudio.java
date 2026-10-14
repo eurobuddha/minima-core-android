@@ -34,6 +34,12 @@ public final class ChatAudio {
     /** Fetch (or reuse the cached copy of) the audio behind a keets:// ref. */
     public static void load(Context zCtx, String zRef, Callback zCb) {
         Handler main = new Handler(Looper.getMainLooper());
+        // An inbound ref is untrusted: whitespace would inject extra command
+        // parameters into the fetch below. One guard covers the whole path.
+        if (zRef == null || !zRef.matches("keets://\\S+")) {
+            main.post(() -> zCb.done(null));
+            return;
+        }
         File f = file(zCtx, zRef);
         if (f.isFile() && f.length() > 0) {
             main.post(() -> zCb.done(f));
@@ -49,6 +55,10 @@ public final class ChatAudio {
                     got = f;
                 }
             } catch (Exception ignored) {
+            }
+            if (got == null) {
+                // a partial write must not become a permanent 'cache hit'
+                f.delete();
             }
             final File out = got;
             main.post(() -> zCb.done(out));

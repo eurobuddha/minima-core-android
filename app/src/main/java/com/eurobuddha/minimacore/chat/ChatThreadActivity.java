@@ -353,6 +353,7 @@ public class ChatThreadActivity extends AppCompatActivity {
     private VoiceNote mActiveRecorder;
     private android.media.MediaPlayer mPlayer;
     private String mPlayingRef = "";
+    private String mLoadingRef = "";
 
     private int dp(int zDp) {
         return Math.round(zDp * getResources().getDisplayMetrics().density);
@@ -375,21 +376,25 @@ public class ChatThreadActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int zReq, String[] zPerms, int[] zGrants) {
         super.onRequestPermissionsResult(zReq, zPerms, zGrants);
-        if (zReq == REQ_RECORD_AUDIO && zGrants.length > 0
-                && zGrants[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            recordVoiceDialog();
+        if (zReq == REQ_RECORD_AUDIO && zGrants.length > 0) {
+            if (zGrants[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                recordVoiceDialog();
+            } else {
+                Toast.makeText(this, "Microphone permission needed for voice notes",
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
     private void recordVoiceDialog() {
         final VoiceNote rec = new VoiceNote(this);
-        mActiveRecorder = rec;
         try {
             rec.start();
         } catch (Exception e) {
             Toast.makeText(this, "Microphone unavailable", Toast.LENGTH_SHORT).show();
             return;
         }
+        mActiveRecorder = rec;
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(22), dp(18), dp(22), dp(6));
@@ -546,8 +551,16 @@ public class ChatThreadActivity extends AppCompatActivity {
             zOnState.run();
             return;
         }
+        if (zRef.equals(mLoadingRef)) {
+            return;   // fetch already in flight - a double-tap must not double-play
+        }
         stopAudio();
+        mLoadingRef = zRef;
         ChatAudio.load(this, zRef, f -> {
+            if (!zRef.equals(mLoadingRef) || isDestroyed() || isFinishing()) {
+                return;   // superseded by another tap, or the screen is gone
+            }
+            mLoadingRef = "";
             if (f == null) {
                 Toast.makeText(this, "Voice note not available yet", Toast.LENGTH_SHORT).show();
                 return;
@@ -575,6 +588,7 @@ public class ChatThreadActivity extends AppCompatActivity {
     }
 
     private void stopAudio() {
+        mLoadingRef = "";
         if (mPlayer != null) {
             try {
                 mPlayer.release();
@@ -588,6 +602,12 @@ public class ChatThreadActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         stopAudio();
+        if (mActiveRecorder != null) {
+            // the dialog's dismiss listener never fires on activity death -
+            // without this the mic records on until the 60s cap
+            mActiveRecorder.stopQuiet();
+            mActiveRecorder = null;
+        }
         super.onDestroy();
     }
 
