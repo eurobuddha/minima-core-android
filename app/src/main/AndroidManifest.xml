@@ -48,6 +48,7 @@
          which IS the Minima node's data directory: wallet.db and the node's private keys. Auto Backup was
          uploading a spendable wallet to the user's cloud and could reconstitute a signing node on any phone -->
     <application
+        android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
