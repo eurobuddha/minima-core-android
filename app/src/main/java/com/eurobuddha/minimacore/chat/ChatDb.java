@@ -240,4 +240,26 @@ public class ChatDb extends SQLiteOpenHelper {
         getWritableDatabase().delete("contacts", "pubkey=?", new String[]{zPubkey});
         getWritableDatabase().delete("messages", "pubkey=?", new String[]{zPubkey});
     }
+
+    /** Clear a conversation but KEEP the contact (it stays in the new-chat picker).
+     *  This is "Delete chat"; {@link #removeContact} is the explicit "Delete contact". */
+    public void clearMessages(String zPubkey) {
+        getWritableDatabase().delete("messages", "pubkey=?", new String[]{zPubkey});
+    }
+
+    /** Every saved keets contact (name + pubkey), for the new-chat picker — includes
+     *  contacts with no messages. Name falls back to the full pubkey (never truncated). */
+    public ArrayList<Thread> contactList() {
+        ArrayList<Thread> out = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(
+                "SELECT pubkey, name FROM contacts ORDER BY name COLLATE NOCASE", null);
+        while (c.moveToNext()) {
+            Thread t = new Thread();
+            t.pubkey = c.getString(0);
+            t.name = c.getString(1);
+            out.add(t);
+        }
+        c.close();
+        return out;
+    }
 }

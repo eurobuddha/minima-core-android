@@ -79,22 +79,18 @@ public class ChatView extends BaseView {
                 // would plant a phantom "max:" contact row that duplicates forever.
                 new AlertDialog.Builder(mActivity)
                         .setTitle(t.name)
-                        .setItems(new String[]{"Delete chat"}, (d, which) -> {
+                        .setItems(new String[]{"Delete chat", "Delete contact"}, (d, which) -> {
                             String peer = com.eurobuddha.minimacore.maxchat.MaxChatThreads.peer(t.pubkey);
-                            new Thread(() -> {
-                                try {
-                                    com.eurobuddha.minimacore.maxchat.MaxChat.removeContact(peer);
-                                } catch (Exception ignored) {
-                                }
-                                mActivity.runOnUiThread(this::refreshView);
-                            }, "maxchat-remove").start();
+                            if (which == 0) clearMaxChat(peer, t.name);
+                            else deleteMaxContact(peer, t.name);
                         }).show();
                 return true;
             }
             new AlertDialog.Builder(mActivity)
-                    .setTitle(t.name)
-                    .setItems(new String[]{"Rename", "Delete chat"}, (d, which) -> {
+                    .setTitle(t.name.startsWith("0x") ? "New contact" : t.name)
+                    .setItems(new String[]{"Rename", "Delete chat", "Delete contact"}, (d, which) -> {
                         if (which == 0) renameContact(t);
+                        else if (which == 1) clearChat(t);
                         else deleteContact(t);
                     }).show();
             return true;
@@ -224,6 +220,25 @@ public class ChatView extends BaseView {
             if (mScanRequest != null) mScanRequest.run();
         });
 
+        // Saved-contacts picker: the elegant way to re-reach someone whose chat you
+        // cleared. Label carries the count; disabled with a hint when there are none.
+        com.google.android.material.button.MaterialButton pick = v.findViewById(R.id.newchat_pick);
+        TextView pickHint = v.findViewById(R.id.newchat_pick_hint);
+        pick.setOnClickListener(b -> showContactPicker(dlg));
+        new Thread(() -> {
+            int n = ChatDb.get(mActivity).contactList().size()
+                    + com.eurobuddha.minimacore.maxchat.MaxChat.contacts().size();
+            mActivity.runOnUiThread(() -> {
+                if (n == 0) {
+                    pick.setEnabled(false);
+                    pick.setText("No saved contacts yet");
+                    pickHint.setText("Contacts you've chatted with will appear here");
+                } else {
+                    pick.setText("Choose a saved contact (" + n + ")");
+                }
+            });
+        }, "chat-contact-count").start();
+
         dlg.setOnShowListener(d -> dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(b -> {
             String raw = addrIn.getText().toString().trim();
             if (raw.regionMatches(true, 0, "MAX#", 0, 4)
@@ -274,16 +289,180 @@ public class ChatView extends BaseView {
                 .show();
     }
 
-    private void deleteContact(ChatDb.Thread zT) {
+    private String niceName(ChatDb.Thread zT) {
+        return zT.name == null || zT.name.startsWith("0x") ? "this contact" : zT.name;
+    }
+
+    // ---- delete: "Delete chat" keeps the contact, "Delete contact" removes it ----
+
+    /** keets: clear the conversation, keep the contact (stays in the picker). */
+    private void clearChat(ChatDb.Thread zT) {
         new AlertDialog.Builder(mActivity)
                 .setTitle("Delete chat")
-                .setMessage("Delete this chat and its history? This cannot be undone.")
-                .setPositiveButton("Delete", (d, w) -> {
+                .setMessage("Clear this conversation? " + niceName(zT)
+                        + " stays in your contacts — you can start a new chat anytime.")
+                .setPositiveButton("Delete chat", (d, w) -> {
+                    ChatDb.get(mActivity).clearMessages(zT.pubkey);
+                    refreshView();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    /** keets: remove the contact and its history for good. */
+    private void deleteContact(ChatDb.Thread zT) {
+        new AlertDialog.Builder(mActivity)
+                .setTitle("Delete contact")
+                .setMessage("Permanently remove " + niceName(zT) + " and this conversation? "
+                        + "You'll need their address again to reconnect. This cannot be undone.")
+                .setPositiveButton("Delete contact", (d, w) -> {
                     ChatDb.get(mActivity).removeContact(zT.pubkey);
                     refreshView();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+
+    /** Parlons: clear the conversation, keep the contact. */
+    private void clearMaxChat(String zPeer, String zName) {
+        new AlertDialog.Builder(mActivity)
+                .setTitle("Delete chat")
+                .setMessage("Clear this conversation? The contact stays in your list.")
+                .setPositiveButton("Delete chat", (d, w) -> new Thread(() -> {
+                    try { com.eurobuddha.minimacore.maxchat.MaxChat.clearConversation(zPeer); }
+                    catch (Exception ignored) {}
+                    mActivity.runOnUiThread(this::refreshView);
+                }, "maxchat-clear").start())
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    /** Parlons: remove the contact for good (also notifies the peer). */
+    private void deleteMaxContact(String zPeer, String zName) {
+        new AlertDialog.Builder(mActivity)
+                .setTitle("Delete contact")
+                .setMessage("Permanently remove this Parlons contact and conversation? "
+                        + "This cannot be undone.")
+                .setPositiveButton("Delete contact", (d, w) -> new Thread(() -> {
+                    try { com.eurobuddha.minimacore.maxchat.MaxChat.removeContact(zPeer); }
+                    catch (Exception ignored) {}
+                    mActivity.runOnUiThread(this::refreshView);
+                }, "maxchat-remove").start())
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    // ---- saved-contacts picker (shown from the New chat sheet) -------------
+
+    private void showContactPicker(AlertDialog zParent) {
+        new Thread(() -> {
+            ArrayList<PickItem> items = new ArrayList<>();
+            for (ChatDb.Thread t : ChatDb.get(mActivity).contactList()) {
+                items.add(new PickItem(t.pubkey, t.name, false));
+            }
+            for (com.eurobuddha.maxima.core.contacts.Contact c
+                    : com.eurobuddha.minimacore.maxchat.MaxChat.contacts()) {
+                items.add(new PickItem(c.publicKey, c.name, true));
+            }
+            items.sort((a, b) -> a.label().compareToIgnoreCase(b.label()));
+            mActivity.runOnUiThread(() -> showPickerDialog(zParent, items));
+        }, "chat-contact-pick").start();
+    }
+
+    private void showPickerDialog(AlertDialog zParent, ArrayList<PickItem> zAll) {
+        View v = LayoutInflater.from(mActivity).inflate(R.layout.dialog_contact_pick, null);
+        ListView list = v.findViewById(R.id.pick_list);
+        TextView empty = v.findViewById(R.id.pick_empty);
+        EditText search = v.findViewById(R.id.pick_search);
+
+        PickAdapter adapter = new PickAdapter(zAll);
+        list.setAdapter(adapter);
+        empty.setVisibility(zAll.isEmpty() ? View.VISIBLE : View.GONE);
+
+        AlertDialog dlg = new AlertDialog.Builder(mActivity)
+                .setTitle("Choose a contact")
+                .setView(v)
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        search.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void onTextChanged(CharSequence s, int a, int b, int c) {
+                adapter.filter(s.toString());
+                empty.setVisibility(adapter.getCount() == 0 ? View.VISIBLE : View.GONE);
+                empty.setText("No matching contacts");
+            }
+            @Override public void afterTextChanged(android.text.Editable s) {}
+        });
+
+        list.setOnItemClickListener((parent, view, pos, id) -> {
+            PickItem it = (PickItem) adapter.getItem(pos);
+            dlg.dismiss();
+            zParent.dismiss();
+            mPendingScanTarget = null;
+            if (it.isMax) {
+                Intent in = new Intent(mActivity,
+                        com.eurobuddha.minimacore.maxchat.MaxThreadActivity.class);
+                in.putExtra("peer", it.pubkey);
+                mActivity.startActivity(in);
+            } else {
+                openThread(it.pubkey);
+            }
+        });
+        dlg.show();
+    }
+
+    /** A pickable contact: keets (ChatDb) or Parlons (engine), unified for the picker. */
+    private static class PickItem {
+        final String pubkey;   // raw routing key (keets 0x… or Parlons RSA pubkey)
+        final String name;
+        final boolean isMax;
+        PickItem(String zPubkey, String zName, boolean zMax) {
+            pubkey = zPubkey; name = zName; isMax = zMax;
+        }
+        boolean named() {
+            return name != null && !name.equals("") && !name.equals("noname")
+                    && !name.startsWith("0x") && !name.startsWith("MAX#") && !name.startsWith("Mx");
+        }
+        String label() { return named() ? name : "New " + (isMax ? "Parlons" : "keets") + " contact"; }
+    }
+
+    private class PickAdapter extends BaseAdapter {
+        private final ArrayList<PickItem> mAll;
+        private ArrayList<PickItem> mShown;
+        PickAdapter(ArrayList<PickItem> zAll) { mAll = zAll; mShown = zAll; }
+
+        void filter(String zQuery) {
+            String s = zQuery.trim().toLowerCase();
+            if (s.isEmpty()) {
+                mShown = mAll;
+            } else {
+                ArrayList<PickItem> f = new ArrayList<>();
+                for (PickItem it : mAll) {
+                    if (it.label().toLowerCase().contains(s) || it.pubkey.toLowerCase().contains(s)) {
+                        f.add(it);
+                    }
+                }
+                mShown = f;
+            }
+            notifyDataSetChanged();
+        }
+
+        @Override public int getCount() { return mShown.size(); }
+        @Override public Object getItem(int position) { return mShown.get(position); }
+        @Override public long getItemId(int position) { return position; }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View row = convertView != null ? convertView
+                    : mActivity.getLayoutInflater().inflate(R.layout.chat_contact_row, parent, false);
+            PickItem it = mShown.get(position);
+            String label = it.label();
+            ((TextView) row.findViewById(R.id.row_name)).setText(label);
+            ((TextView) row.findViewById(R.id.row_sub)).setText(it.isMax ? "Parlons" : "Keets");
+            ChatUi.avatar(row.findViewById(R.id.row_avatar), label, it.pubkey);
+            return row;
+        }
     }
 
     @Override
@@ -305,8 +484,15 @@ public class ChatView extends BaseView {
 
         void reload() {
             new Thread(() -> {
-                ArrayList<ChatDb.Thread> t = ChatDb.get(mActivity).threads();
-                t.addAll(com.eurobuddha.minimacore.maxchat.MaxChatThreads.list());
+                ArrayList<ChatDb.Thread> all = ChatDb.get(mActivity).threads();
+                all.addAll(com.eurobuddha.minimacore.maxchat.MaxChatThreads.list());
+                // The Chats list shows conversations only. A contact with no messages
+                // (never messaged, or a chat you deleted) isn't lost — it lives in the
+                // New chat → "Choose a saved contact" picker.
+                ArrayList<ChatDb.Thread> t = new ArrayList<>();
+                for (ChatDb.Thread th : all) {
+                    if (th.lastTs > 0) t.add(th);
+                }
                 t.sort((a, b) -> Long.compare(b.lastTs, a.lastTs));
                 mActivity.runOnUiThread(() -> {
                     mThreads = t;

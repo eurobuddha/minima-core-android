@@ -118,6 +118,44 @@ public class MaxThreadActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.max_thread_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.maxmenu_clear) {
+            new android.app.AlertDialog.Builder(this)
+                    .setTitle("Delete chat")
+                    .setMessage("Clear this conversation? The contact stays in your list — "
+                            + "you can start a new chat anytime.")
+                    .setPositiveButton("Delete chat", (d, w) -> new Thread(() -> {
+                        try { MaxChat.clearConversation(mPeer); } catch (Exception ignored) {}
+                        runOnUiThread(this::finish);
+                    }, "maxchat-clear").start())
+                    .setNegativeButton("Cancel", null)
+                    .show();
+            return true;
+        }
+        if (id == R.id.maxmenu_delete) {
+            new android.app.AlertDialog.Builder(this)
+                    .setTitle("Delete contact")
+                    .setMessage("Permanently remove this Parlons contact and conversation? "
+                            + "This cannot be undone.")
+                    .setPositiveButton("Delete contact", (d, w) -> new Thread(() -> {
+                        try { MaxChat.removeContact(mPeer); } catch (Exception ignored) {}
+                        runOnUiThread(this::finish);
+                    }, "maxchat-remove").start())
+                    .setNegativeButton("Cancel", null)
+                    .show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onDestroy() {
         stopAudio();
         if (mActiveRecorder != null) {

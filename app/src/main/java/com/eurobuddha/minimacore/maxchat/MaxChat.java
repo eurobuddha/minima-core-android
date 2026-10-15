@@ -235,7 +235,20 @@ public final class MaxChat {
         }
     }
 
-    /** Remove a Parlons contact and its conversation. Blocking - off the main thread. */
+    /** Clear a conversation but KEEP the contact (it stays in the new-chat picker).
+     *  This is "Delete chat" for a Parlons row; {@link #removeContact} is the
+     *  explicit "Delete contact". Blocking - off the main thread. */
+    public static void clearConversation(String zPubkey) throws Exception {
+        ChatEngine chat = sChat;
+        if (chat == null) {
+            throw new IllegalStateException("Parlons transport not running");
+        }
+        chat.clearConversation(zPubkey);
+        fire();
+    }
+
+    /** Remove a Parlons contact and its conversation (notifies the peer).
+     *  Blocking - off the main thread. */
     public static void removeContact(String zPubkey) throws Exception {
         MaximaNode node = sNode;
         ChatEngine chat = sChat;

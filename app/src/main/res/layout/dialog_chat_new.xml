@@ -1,22 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:paddingHorizontal="20dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="4dp">
+
+    <!-- Primary action: pick someone you already know. Count filled in by code. -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/newchat_pick"
+        style="@style/Widget.MinimaCore.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose a saved contact"
+        android:textAlignment="viewStart"
+        app:icon="@drawable/ic_drawer_contacts"
+        app:iconGravity="start" />
+
+    <TextView
+        android:id="@+id/newchat_pick_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:text="Pick someone you've chatted with before"
+        android:textColor="@color/core_text_faint"
+        android:textSize="12sp" />
+
+    <!-- Labelled divider -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="14dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@color/core_surface_variant" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            android:text="ADD SOMEONE NEW"
+            android:textColor="@color/core_text_faint"
+            android:textSize="11sp"
+            android:letterSpacing="0.08" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@color/core_surface_variant" />
+    </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/newchat_scan"
+        style="@style/Widget.MinimaCore.Button.Outlined"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Scan their QR code" />
+        android:text="Scan their QR code"
+        app:icon="@drawable/ic_qr_code"
+        app:iconGravity="start" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:gravity="center"
-        android:text="— or paste their address —"
+        android:text="— or paste an address —"
         android:textColor="@color/core_text_faint"
         android:textSize="13sp" />
 
@@ -24,8 +82,8 @@
         android:id="@+id/newchat_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="0x… address"
+        android:layout_marginTop="10dp"
+        android:hint="keets 0x… or Parlons MAX# / Mx…@host:port"
         android:fontFamily="monospace"
         android:textSize="13sp"
         android:inputType="text"

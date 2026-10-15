@@ -143,11 +143,25 @@ public class ChatThreadActivity extends AppCompatActivity {
                     .setPositiveButton("Done", null).show();
             return true;
         }
-        if (id == R.id.chatmenu_delete) {
+        if (id == R.id.chatmenu_clear) {
             new AlertDialog.Builder(this)
                     .setTitle("Delete chat")
-                    .setMessage("Delete this chat and its history? This cannot be undone.")
-                    .setPositiveButton("Delete", (d, w) -> {
+                    .setMessage("Clear this conversation? The contact stays in your list — "
+                            + "you can start a new chat anytime.")
+                    .setPositiveButton("Delete chat", (d, w) -> {
+                        ChatDb.get(this).clearMessages(mPubkey);
+                        finish();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+            return true;
+        }
+        if (id == R.id.chatmenu_delete) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Delete contact")
+                    .setMessage("Permanently remove this contact and the conversation? "
+                            + "You'll need their address again to reconnect. This cannot be undone.")
+                    .setPositiveButton("Delete contact", (d, w) -> {
                         ChatDb.get(this).removeContact(mPubkey);
                         finish();
                     })
