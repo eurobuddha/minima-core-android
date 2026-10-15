@@ -34,7 +34,60 @@ public final class PandamoniumHooks {
     private static final int MUTED = Color.rgb(161, 174, 172);
     private static final int ACCENT = Color.rgb(218, 225, 153);
 
+    private static final String NAV_PREFS = "pandamonium_navigation";
+    private static final String KEY_DISABLED = "app_disabled";
+
     private PandamoniumHooks() {}
+
+    // ---- integrated apps (the Apps tab's Internal list) --------------------
+
+    private static java.util.Set<Integer> disabledSet(android.content.SharedPreferences nav) {
+        java.util.Set<Integer> out = new java.util.HashSet<>();
+        String saved = nav.getString(KEY_DISABLED, "");
+        if (saved != null && !saved.isEmpty()) for (String name : saved.split(",")) {
+            int idx = PandamoniumDestinations.indexFor(name);
+            if (idx > 0) out.add(idx);   // 0 (the host) can never be disabled
+        }
+        return out;
+    }
+
+    /** All of our integrated apps with their on/off state, for the Apps tab. */
+    public static java.util.List<IntegratedApp> integratedApps(android.content.Context ctx) {
+        android.content.SharedPreferences nav =
+                ctx.getSharedPreferences(NAV_PREFS, android.content.Context.MODE_PRIVATE);
+        java.util.Set<Integer> disabled = disabledSet(nav);
+        java.util.List<IntegratedApp> out = new java.util.ArrayList<>();
+        for (int i = 0; i < PandamoniumDestinations.NAMES.length; i++) {
+            android.graphics.drawable.Drawable icon = androidx.appcompat.content.res.AppCompatResources
+                    .getDrawable(ctx, PandamoniumDestinations.ICONS[i]);
+            boolean locked = (i == 0);                       // Minima Core — the host
+            boolean enabled = locked || !disabled.contains(i);
+            out.add(new IntegratedApp(i, PandamoniumDestinations.NAMES[i], icon, enabled, locked));
+        }
+        return out;
+    }
+
+    /** Turn an integrated app on/off. Off apps drop out of the drawer until re-enabled. */
+    public static void setIntegratedEnabled(android.content.Context ctx, int id, boolean enabled) {
+        if (id <= 0) return;                                 // never disable the host
+        android.content.SharedPreferences nav =
+                ctx.getSharedPreferences(NAV_PREFS, android.content.Context.MODE_PRIVATE);
+        java.util.Set<Integer> disabled = disabledSet(nav);
+        if (enabled) disabled.remove(id); else disabled.add(id);
+        java.util.List<String> names = new java.util.ArrayList<>();
+        for (int d : disabled) if (d > 0 && d < PandamoniumDestinations.CLASSES.length) {
+            names.add(PandamoniumDestinations.CLASSES[d]);
+        }
+        nav.edit().putString(KEY_DISABLED, String.join(",", names)).apply();
+    }
+
+    /** The drawer's destination order with disabled apps removed (host always kept). */
+    private static java.util.List<Integer> drawerOrder(android.content.SharedPreferences nav) {
+        java.util.List<Integer> order = PandamoniumOrder.decode(nav.getString("app_order", ""));
+        java.util.Set<Integer> disabled = disabledSet(nav);
+        order.removeIf(d -> d != 0 && disabled.contains(d));
+        return order;
+    }
 
     public static void initialize(android.content.Context context) {
         com.eurobuddha.minimaapi.direct.DirectNodeApi.install(new EmbeddedNodeTransport(context));
@@ -115,11 +168,11 @@ public final class PandamoniumHooks {
         entries.setTag("pandamonium.navigation.entries");
         entries.setLayoutManager(new LinearLayoutManager(activity));
         class AppList extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-            final java.util.List<Integer> order = PandamoniumOrder.decode(navigation.getString("app_order", ""));
+            final java.util.List<Integer> order = drawerOrder(navigation);
             boolean dragging;
             AppList() { setHasStableIds(true); }
             void reload() {
-                java.util.List<Integer> saved = PandamoniumOrder.decode(navigation.getString("app_order", ""));
+                java.util.List<Integer> saved = drawerOrder(navigation);
                 if (!dragging && !order.equals(saved)) { order.clear(); order.addAll(saved); notifyDataSetChanged(); }
             }
             @Override public long getItemId(int position) { return order.get(position); }

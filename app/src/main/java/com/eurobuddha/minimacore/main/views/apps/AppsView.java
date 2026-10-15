@@ -16,19 +16,32 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.material.tabs.TabLayout;
+
 import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.integrated.IntegratedApp;
+import com.eurobuddha.minimacore.integrated.PandamoniumHooks;
 import com.eurobuddha.minimacore.main.BaseView;
 import com.eurobuddha.minimacore.receiver.ReceiverDB;
 import com.eurobuddha.minimacore.utils.MinimaCMD;
 import com.eurobuddha.minimacore.utils.MinimaCMDListener;
 import com.eurobuddha.minimacore.utils.logger;
 
+import java.util.List;
+
 public class AppsView extends BaseView {
 
     ListView mAppsList;
     AppsAdapter mAppsAdapter;
+
+    // Internal tab: our own integrated apps (Pandamonium only; empty elsewhere).
+    TabLayout mTabs;
+    View mInternalPane, mExternalPane;
+    ListView mInternalList;
+    IntegratedAppsAdapter mInternalAdapter;
+    boolean mHasInternal;
 
     public AppsView(Activity zActivity){
         super(zActivity, R.layout.view_apps);
@@ -48,6 +61,34 @@ public class AppsView extends BaseView {
                 showInfoDialog(app);
             }
         });
+
+        //Internal tab — only when this build ships integrated apps (Pandamonium).
+        mTabs          = getMainView().findViewById(R.id.apps_tabs);
+        mInternalPane  = getMainView().findViewById(R.id.apps_internal_pane);
+        mExternalPane  = getMainView().findViewById(R.id.apps_external_pane);
+        mInternalList  = getMainView().findViewById(R.id.apps_internal_list);
+        mInternalAdapter = new IntegratedAppsAdapter(zActivity);
+        mInternalList.setAdapter(mInternalAdapter);
+
+        List<IntegratedApp> integrated = PandamoniumHooks.integratedApps(zActivity);
+        mHasInternal = !integrated.isEmpty();
+        if (mHasInternal) {
+            mInternalAdapter.setItems(integrated);
+            mTabs.setVisibility(View.VISIBLE);
+            mTabs.addTab(mTabs.newTab().setText("Internal"));
+            mTabs.addTab(mTabs.newTab().setText("External"));
+            mTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override public void onTabSelected(TabLayout.Tab tab) { showInternal(tab.getPosition() == 0); }
+                @Override public void onTabUnselected(TabLayout.Tab tab) {}
+                @Override public void onTabReselected(TabLayout.Tab tab) {}
+            });
+            showInternal(true); // open on Internal
+        }
+    }
+
+    private void showInternal(boolean zInternal){
+        mInternalPane.setVisibility(zInternal ? View.VISIBLE : View.GONE);
+        mExternalPane.setVisibility(zInternal ? View.GONE : View.VISIBLE);
     }
 
     public void showInfoDialog(JSONObject zApp){
@@ -127,6 +168,8 @@ public class AppsView extends BaseView {
     @Override
     public void refreshView() {
         if (!isDisplayActive()) return;
+        //Internal list is cheap and prefs-backed — keep it current with the drawer.
+        if (mHasInternal) mInternalAdapter.setItems(PandamoniumHooks.integratedApps(mActivity));
         long generation = displayGeneration();
         mAppsList.post(new Runnable() {
             @Override
