@@ -415,17 +415,20 @@ public class MinimaService extends Service {
                         //node so GeneralParams and the per-boot token exist; delayed so the
                         //NIO server is listening before the first bridged stream arrives.
                         SharedPreferences kp = getSharedPreferences("main_prefs", MODE_PRIVATE);
-                        if (kp.getBoolean("keets_enabled", true)) {
-                            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                                if (!serviceDestroyed && !mHaveStartedShutdown) {
+                        boolean keetsOn = kp.getBoolean("keets_enabled", true);
+                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                            if (!serviceDestroyed && !mHaveStartedShutdown) {
+                                if (keetsOn) {
                                     mKeetsWorklet.start(MinimaService.this);
                                     //Chat: the ONE drainer of the keets message inbox
                                     com.eurobuddha.minimacore.chat.ChatDrainer.start(MinimaService.this);
-                                    //Parlons contacts in the same Chat tab: the app's own Maxima client
-                                    com.eurobuddha.minimacore.maxchat.MaxChat.start(MinimaService.this);
                                 }
-                            }, 15000);
-                        }
+                                //Parlons contacts in the same Chat tab: the app's own
+                                //Maxima client - independent of the keets transport, so
+                                //disabling keets must not kill MAX# chat.
+                                com.eurobuddha.minimacore.maxchat.MaxChat.start(MinimaService.this);
+                            }
+                        }, 15000);
                     }
                 });
             }

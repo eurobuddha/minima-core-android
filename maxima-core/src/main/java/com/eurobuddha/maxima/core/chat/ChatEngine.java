@@ -1397,22 +1397,33 @@ public final class ChatEngine {
             if (zMsg.type == ChatMessage.TYPE_TEXT && ChatMedia.isMedia(zMsg.body)) {
                 byte[] bytes = mediaBytes(zMsg.body);
                 String caption = ChatMedia.caption(zMsg.body);
+                String mime = ChatMedia.mime(zMsg.body);
+                boolean isAudio = mime != null && mime.startsWith("audio");
                 if (bytes != null) {
                     try {
-                        String mime = ChatMedia.mime(zMsg.body);
-                        String ext = mime != null && mime.contains("png") ? ".png" : ".jpg";
                         // Path keyed by MESSAGE id: republishing the same entry
                         // (manual retry, redelivery) overwrites, never accumulates.
-                        String url = kt.publish("/parlons/img-"
-                                + zMsg.id.replaceAll("[^A-Za-z0-9_-]", "") + ext, bytes);
+                        String id = zMsg.id.replaceAll("[^A-Za-z0-9_-]", "");
+                        if (isAudio) {
+                            String ext = mime.contains("mp4") ? ".m4a"
+                                    : mime.contains("wav") ? ".wav" : ".ogg";
+                            String url = kt.publish("/parlons/vn-" + id + ext, bytes);
+                            return kt.send(pk, KeetsWire.audio(zMsg.id, mNode.name(), zMsg.time, url, caption));
+                        }
+                        String ext = mime != null && mime.contains("png") ? ".png" : ".jpg";
+                        String url = kt.publish("/parlons/img-" + id + ext, bytes);
                         return kt.send(pk, KeetsWire.image(zMsg.id, mNode.name(), zMsg.time, url, caption));
                     } catch (Exception publishFailed) {
                         // e.g. media too large for an IPC transport - fall
                         // through to the caption, like the classic bridge
                     }
                 }
+                String kind = isAudio ? "[voice note]" : "[photo]";
+                // an audio caption is "M:SS|waveformhex" - the peer should see
+                // the duration, never the raw waveform hex
+                String shown = isAudio ? caption.split("\\|")[0] : caption;
                 ChatMessage fb = ChatMessage.text(zMsg.id,
-                        caption.isEmpty() ? "[photo]" : caption + " [photo]", zMsg.time);
+                        shown.isEmpty() ? kind : shown + " " + kind, zMsg.time);
                 return kt.send(pk, KeetsWire.encode(fb, mNode.name()));
             }
             String wire = KeetsWire.encode(zMsg, mNode.name());
@@ -1480,6 +1491,12 @@ public final class ChatEngine {
             handleText(from, im);
             return true;
         }
+        if ("audio".equals(k.state)) {
+            mNode.storeKeetsContact(from, k.name);
+            ChatMessage au = ChatMessage.text(k.id, ingestKeetsAudio(k.ref, k.body), k.ts);
+            handleText(from, au);
+            return true;
+        }
         ChatMessage cm = KeetsWire.toChatMessage(k);
         if (cm == null) {
             return true;   // unknown state: consumed, never stored
@@ -1515,7 +1532,7 @@ public final class ChatEngine {
     private String ingestKeetsImage(String zRef, String zCaption) {
         KeetsTransport kt = mKeets;
         try {
-            if (kt != null && mMedia != null && zRef != null && !zRef.isEmpty()) {
+            if (kt != null && mMedia != null && KeetsTransport.validRef(zRef)) {
                 byte[] bytes = kt.fetch(zRef);
                 if (bytes != null && bytes.length > 0) {
                     return ChatMedia.wrap("image/jpeg", publishRef(bytes, "image/jpeg"), zCaption);
@@ -1524,6 +1541,26 @@ public final class ChatEngine {
         } catch (Exception ignored) {
         }
         return ((zCaption == null || zCaption.isEmpty()) ? "[photo]" : zCaption + " [photo]")
+                + (zRef == null || zRef.isEmpty() ? "" : " " + zRef);
+    }
+
+    /** An inbound keets voice note, same pattern as the photo ingest. The mime
+     *  comes from the published path's extension (KeetChat sends .ogg/.m4a). */
+    private String ingestKeetsAudio(String zRef, String zCaption) {
+        KeetsTransport kt = mKeets;
+        try {
+            if (kt != null && mMedia != null && KeetsTransport.validRef(zRef)) {
+                byte[] bytes = kt.fetch(zRef);
+                if (bytes != null && bytes.length > 0) {
+                    String clean = zRef.split("\\?")[0].toLowerCase();
+                    String mime = clean.endsWith(".m4a") ? "audio/mp4"
+                            : clean.endsWith(".wav") ? "audio/wav" : "audio/ogg";
+                    return ChatMedia.wrap(mime, publishRef(bytes, mime), zCaption);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return ((zCaption == null || zCaption.isEmpty()) ? "[voice note]" : zCaption + " [voice note]")
                 + (zRef == null || zRef.isEmpty() ? "" : " " + zRef);
     }
 

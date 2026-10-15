@@ -30,3 +30,5 @@ __pycache__/
 /review/2026-10-07/
 /review/**/build/
 /dist/
+review/
+app/release/

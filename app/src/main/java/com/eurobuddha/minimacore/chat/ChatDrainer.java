@@ -106,8 +106,9 @@ public class ChatDrainer {
                         continue;
                     }
                     if (d.state.equals("payaddr")) {
-                        if (d.addr.matches("(0x|Mx)[0-9A-Za-z]+")) {
-                            db.ensureContact(from, d.name);
+                        //contacts only: a control message must never create a contact,
+                        //or any stranger can plant a payee row with their address
+                        if (db.hasContact(from) && d.addr.matches("(0x|Mx)[0-9A-Za-z]+")) {
                             db.setContactPayAddr(from, d.addr);
                             fanout(zService, msg, d, from);
                         }
@@ -142,7 +143,7 @@ public class ChatDrainer {
                     m.body = d.body;
                     m.name = d.name;
                     m.ref = d.ref;
-                    m.ts = d.ts != 0 ? d.ts : Long.parseLong("" + msg.get("ts"));
+                    m.ts = d.ts != 0 ? d.ts : envTs(msg);
                     m.via = (String) msg.get("via");
                     m.state = d.state; m.amt = d.amt; m.tokname = d.tokname; m.txid = d.txid;
                     boolean isNew = db.addMessage(m);
@@ -172,6 +173,14 @@ public class ChatDrainer {
         }
     }
 
+    /** The envelope ts, or now when absent/garbled — a bad peer timestamp must
+     *  never abort the drain batch (the message would sit unacked and redeliver,
+     *  blocking everything behind it). */
+    private static long envTs(JSONObject zMsg) {
+        try { return Long.parseLong("" + zMsg.get("ts")); }
+        catch (Exception e) { return System.currentTimeMillis(); }
+    }
+
     /** Companion fan-out — the Android twin of the MDS KEETS event. Real messages
      *  AND the read/payaddr controls go out (a companion chat app needs ticks and
      *  pay addresses); payaddr-req stays node-answered only, or two apps would
@@ -183,7 +192,7 @@ public class ChatDrainer {
             JSONObject data = new JSONObject();
             data.put("id", zD.id != null ? zD.id : (String) zMsg.get("id"));
             data.put("from", zFrom);
-            data.put("ts", zD.ts != 0 ? zD.ts : Long.parseLong("" + zMsg.get("ts")));
+            data.put("ts", zD.ts != 0 ? zD.ts : envTs(zMsg));
             data.put("payload", zMsg.get("payload"));
             data.put("message", zD.body);
             data.put("name", zD.name);

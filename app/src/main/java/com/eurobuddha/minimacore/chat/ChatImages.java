@@ -49,6 +49,13 @@ public final class ChatImages {
 
     /** Load (cache-first, else P2P fetch). Callback on the MAIN thread; null = failed. */
     public static void load(Context zContext, String zRef, Consumer<Bitmap> zCb) {
+        // Untrusted inbound ref interpolated into a node command (whitespace-split,
+        // last-key-wins tokenizer) - same gate as ChatAudio, or a hostile ref
+        // rewrites the command.
+        if (zRef == null || !zRef.matches("keets://\\S+")) {
+            MAIN.post(() -> zCb.accept(null));
+            return;
+        }
         Bitmap hit = MEM.get(zRef);
         if (hit != null) { zCb.accept(hit); return; }
         Context app = zContext.getApplicationContext();
