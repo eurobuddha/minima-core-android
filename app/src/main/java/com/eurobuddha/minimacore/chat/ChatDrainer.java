@@ -29,6 +29,12 @@ import java.util.Base64;
  * The node's own MDS-event poller is gated off on this line (no MDS), so inbox
  * messages wait here until this drainer runs — nothing is lost while the app is off:
  * offline messages additionally sit at the keets fleet mailboxes.
+ *
+ * Known, accepted half-mirror (reverse of the Parlons no-mirror rule): this app
+ * stores EVERY inbound keets message, including from contacts the user "owns" in
+ * the Parlons app — so those threads show inbound-only here. A chat lives in the
+ * app where the user added the contact; this app is the node and keeps the
+ * durable copy regardless.
  */
 public class ChatDrainer {
 
@@ -133,6 +139,14 @@ public class ChatDrainer {
                                         " datahex:" + ChatSchema.toDataHex(reply.toString()));
                             }
                         }
+                        continue;
+                    }
+
+                    //Unknown states: a future control type must never become a
+                    //garbage chat row (the keetchat 0.2.1 lesson) - ack + consume
+                    if (!d.state.equals("") && !d.state.equals("image")
+                            && !d.state.equals("audio") && !d.state.equals("payment")) {
+                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
                         continue;
                     }
 
