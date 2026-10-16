@@ -1,86 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  A token in the wallet list, with a six-decimal amount summary and full token id.
-  Tap opens exact amounts and that token's coins; long-press copies the token id.
+  Compact token row (minimaWallet-style): one line — icon · name · amount · count. The locked/
+  unconfirmed breakdown stays terse and the full token id is hidden here; tapping the row opens
+  CoinsDialog for full detail (with a "Copy token ID" button), and the drawer-style drag handles
+  reordering. balance_tokenid is kept (GONE) so BalanceAdapter needs no change.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:baselineAligned="false"
     android:background="@color/core_surface"
     android:foreground="?attr/selectableItemBackground"
     android:paddingHorizontal="16dp"
-    android:paddingVertical="13dp">
+    android:paddingVertical="11dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:baselineAligned="false">
+    <!-- token icon (identicon fallback, real icon loaded over) + web-validation badge -->
+    <FrameLayout
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/bg_token_tile">
 
-        <!-- token icon (identicon fallback, real icon loaded over) + web-validation badge -->
-        <FrameLayout
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/bg_token_tile">
+        <ImageView
+            android:id="@+id/balance_tokenicon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="Token icon" />
 
-            <ImageView
-                android:id="@+id/balance_tokenicon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:contentDescription="Token icon" />
+        <ImageView
+            android:id="@+id/balance_tokenbadge"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_gravity="bottom|end"
+            android:visibility="gone"
+            android:contentDescription="Web validated" />
+    </FrameLayout>
 
-            <ImageView
-                android:id="@+id/balance_tokenbadge"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_gravity="bottom|end"
-                android:visibility="gone"
-                android:contentDescription="Web validated" />
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/balance_tokenname"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAppearance="@style/TextAppearance.MinimaCore.BodyStrong" />
-
-    </LinearLayout>
-
-    <!-- Full-width summary: large balances cannot displace the token name. -->
     <TextView
-        android:id="@+id/balance_tokenamount"
-        android:layout_width="match_parent"
+        android:id="@+id/balance_tokenname"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:breakStrategy="simple"
-        android:hyphenationFrequency="none"
-        android:fontFeatureSettings="tnum"
+        android:layout_weight="1"
+        android:layout_marginEnd="10dp"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:textAppearance="@style/TextAppearance.MinimaCore.BodyStrong" />
 
-    <!-- locked / unconfirmed / coin count for THIS token -->
-    <TextView
-        android:id="@+id/balance_breakdown"
-        android:breakStrategy="simple"
-        android:hyphenationFrequency="none"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:lineSpacingMultiplier="1.2"
-        android:textAppearance="@style/TextAppearance.MinimaCore.Caption"
-        android:textColor="@color/core_text_faint"
-        android:textSize="12sp" />
+        android:orientation="vertical"
+        android:gravity="end">
 
-    <!-- full token id, wrapped. Never ellipsized. -->
+        <TextView
+            android:id="@+id/balance_tokenamount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textAlignment="viewEnd"
+            android:fontFeatureSettings="tnum"
+            android:textAppearance="@style/TextAppearance.MinimaCore.BodyStrong" />
+
+        <!-- terse: coin count, plus locked/unconfirmed only when non-zero (BalanceAdapter builds it) -->
+        <TextView
+            android:id="@+id/balance_breakdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textAlignment="viewEnd"
+            android:textAppearance="@style/TextAppearance.MinimaCore.Caption"
+            android:textColor="@color/core_text_faint"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- full token id lives here for the adapter to populate, but is hidden in the compact row -->
     <TextView
         android:id="@+id/balance_tokenid"
-        style="@style/MonoBlock"
-        android:layout_marginTop="4dp"
-        android:textSize="11sp"
-        android:textColor="@color/core_text_faint" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
 </LinearLayout>

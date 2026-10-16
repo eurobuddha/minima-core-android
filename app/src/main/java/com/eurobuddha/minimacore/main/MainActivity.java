@@ -89,6 +89,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //App-open lock wins over everything else: show the PIN screen before any content.
+        if (com.eurobuddha.minimacore.lock.LockActivity.redirectIfLocked(this)) return;
+
         if (SeedSyncActivity.redirectIfPending(this)) return;
 
         MAIN_ACTIVITY = this;
@@ -150,6 +153,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         tabs.getTabAt(MainAdapter.CHAT_POSITION).setText("Chat");
         tabs.getTabAt(MainAdapter.CHAT_POSITION).setIcon(R.drawable.ic_chat);
+
+        //Slightly smaller tab icons. TabLayout has no icon-size attribute, so inset each icon to
+        //shrink the glyph (~24dp -> ~18dp).
+        int inset = Math.round(getResources().getDisplayMetrics().density * 3);
+        for (int i = 0; i < tabs.getTabCount(); i++) {
+            TabLayout.Tab t = tabs.getTabAt(i);
+            if (t != null && t.getIcon() != null) {
+                t.setIcon(new android.graphics.drawable.InsetDrawable(t.getIcon(), inset));
+            }
+        }
 
         tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -295,6 +308,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         if(ss != null){
             ss.setChecked(MinimaApplication.screenshotsAllowed(this));
         }
+        //"Lock now" only makes sense once a PIN is set - otherwise there would be no way back in.
+        MenuItem lock = menu.findItem(R.id.mainmenu_locknow);
+        if(lock != null){
+            lock.setVisible(com.eurobuddha.minimacore.lock.AppLock.isEnabled(this));
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -343,6 +361,24 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             case R.id.mainmenu_params :
 
                 MainActivity.this.startActivity(new Intent(MainActivity.this, ParamsActivity.class));
+
+                return true;
+
+            case R.id.mainmenu_applock :
+
+                MainActivity.this.startActivity(new Intent(MainActivity.this,
+                        com.eurobuddha.minimacore.lock.LockSettingsActivity.class));
+
+                return true;
+
+            case R.id.mainmenu_locknow :
+
+                //Lock on demand: only if a PIN is set, else there is no way back in.
+                if (com.eurobuddha.minimacore.lock.AppLock.isEnabled(this)) {
+                    com.eurobuddha.minimacore.lock.AppLock.get().lock();
+                    MainActivity.this.startActivity(new Intent(MainActivity.this,
+                            com.eurobuddha.minimacore.lock.LockActivity.class));
+                }
 
                 return true;
 

@@ -89,6 +89,16 @@
             android:exported="false" />
         <activity android:name=".chat.ChatImageActivity"></activity>
         <activity android:name=".main.ParamsActivity" android:windowSoftInputMode="adjustResize"></activity>
+
+        <!-- App-open lock (PIN + optional biometric). singleTop so repeated gate launches
+             do not stack; exported=false - it is reachable only from inside the app. -->
+        <activity android:name=".lock.LockActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+        <activity android:name=".lock.LockSettingsActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
         <activity android:name=".main.backup.BackupActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.backup.BackupCreateActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".main.backup.RestoreFileActivity" android:windowSoftInputMode="adjustResize"></activity>

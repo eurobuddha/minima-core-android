@@ -112,6 +112,7 @@ public class CoinsDialog {
         mDialog = new MaterialAlertDialogBuilder(mActivity)
                 .setTitle(zTokenName == null ? "Coins" : zTokenName+" coins")
                 .setView(body)
+                .setNeutralButton("Copy token ID", null)   // click overridden below so it doesn't dismiss
                 .setPositiveButton("Close", null)
                 .create();
 
@@ -121,6 +122,13 @@ public class CoinsDialog {
         });
 
         mDialog.show();
+
+        //Copy the FULL token id (RULE 1 - never truncated). Overriding the click keeps the dialog open.
+        android.widget.Button copy = mDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+        if (copy != null) {
+            copy.setOnClickListener(v ->
+                    Clip.copy(mActivity, "tokenid", mTokenId, "Token ID copied"));
+        }
 
         //Guard first: with no tip the node answers status:true with an EMPTY array,
         //which would otherwise read as "you have no coins"

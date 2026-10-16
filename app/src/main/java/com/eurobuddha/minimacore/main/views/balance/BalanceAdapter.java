@@ -32,6 +32,18 @@ public class BalanceAdapter extends BaseAdapter {
     private final Runnable mRefresh = () -> { if (!destroyed && displayActive) notifyDataSetChanged(); };
     private final java.util.function.Consumer<WebValidate.Result> validationDone = result -> scheduleRefresh();
 
+    //Optional extra observer: a RecyclerView adapter (Pandamonium reorder list) can't observe a
+    //BaseAdapter, so it hooks in here to be refreshed whenever this adapter changes. Null on
+    //classic/BlackBear (ListView observes the BaseAdapter directly).
+    private Runnable mExtraNotify;
+    public void setExtraNotify(Runnable zExtraNotify){ mExtraNotify = zExtraNotify; }
+
+    @Override
+    public void notifyDataSetChanged(){
+        super.notifyDataSetChanged();
+        if (mExtraNotify != null) mExtraNotify.run();
+    }
+
     public void destroy() { destroyed = true; mHandler.removeCallbacks(mRefresh); }
 
     public void setDisplayActive(boolean active) {
@@ -60,6 +72,43 @@ public class BalanceAdapter extends BaseAdapter {
     public void updateValues(JSONArray zCurrentBalance){
         mCurrentBalance = zCurrentBalance;
         notifyDataSetChanged();
+    }
+
+    // ---- drag-reorder support (Pandamonium) --------------------------------------------------
+
+    /** The tokenid at a position (for pinning + persistence). */
+    public String tokenidAt(int position){
+        return String.valueOf(((JSONObject) mCurrentBalance.get(position)).get("tokenid"));
+    }
+
+    /** The current token order, top to bottom. */
+    public java.util.List<String> tokenids(){
+        java.util.List<String> ids = new java.util.ArrayList<>();
+        for (int i = 0; i < mCurrentBalance.size(); i++) ids.add(tokenidAt(i));
+        return ids;
+    }
+
+    /** Move a row during a drag. The caller is responsible for notifying its RecyclerView. */
+    public void moveItem(int from, int to){
+        if (from < 0 || to < 0 || from >= mCurrentBalance.size() || to >= mCurrentBalance.size()) return;
+        Object moved = mCurrentBalance.remove(from);
+        mCurrentBalance.add(to, moved);
+    }
+
+    /** Reorder the held tokens to the given tokenid order; tokens not listed are kept (appended). */
+    public void applyTokenOrder(java.util.List<String> zDesired){
+        JSONArray reordered = new JSONArray();
+        java.util.LinkedHashMap<String, JSONObject> byId = new java.util.LinkedHashMap<>();
+        for (int i = 0; i < mCurrentBalance.size(); i++){
+            JSONObject j = (JSONObject) mCurrentBalance.get(i);
+            byId.put(String.valueOf(j.get("tokenid")), j);
+        }
+        for (String tid : zDesired){
+            JSONObject j = byId.remove(tid);
+            if (j != null) reordered.add(j);
+        }
+        for (JSONObject leftover : byId.values()) reordered.add(leftover);
+        mCurrentBalance = reordered;
     }
 
     /** Coalesce async web-validation callbacks into a single re-render. */

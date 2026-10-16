@@ -121,8 +121,13 @@ android {
         // vc82: existing app icons in the Pandamonium sidebar.
         // vc83: Pandamonium opens on Wallet; Node follows Logs.
         // vc85: sleep hidden Pandamonium display work, preserving financial services.
-        versionCode 111
-        versionName "1.9.40"
+        // vc112: opt-in app-open lock (PIN + optional fingerprint/face) across all three flavours.
+        // A UI gate only - the node keeps running in its foreground service behind the lock; the
+        // seed stays where it is (main_prefs, allowBackup off). PIN verified via VaultCrypto
+        // (PBKDF2->AES-GCM sentinel), biometric via BiometricUnlock (AndroidKeyStore), both lifted
+        // from apks/wallet. Off by default; auto-lock delay default 1 min, configurable.
+        versionCode 112
+        versionName "1.9.41"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -208,6 +213,9 @@ dependencies {
 
     //SVG token icons (some Minima tokens carry inline/URL SVG art)
     implementation 'com.caverock:androidsvg-aar:1.4'
+
+    //App-open lock: fingerprint/face unlock (the PIN is always the fallback)
+    implementation 'androidx.biometric:biometric:1.1.0'
 
     implementation libs.appcompat
     implementation libs.material

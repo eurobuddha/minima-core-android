@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Wallet layout for all bears: the "Total balance" block is compact — just the headline (sendable)
+  amount, with an expand arrow that reveals the confirmed/locked/unconfirmed/coins breakdown. The
+  token list is a drag-reorderable RecyclerView (long-press to move; BalanceView wires the
+  ItemTouchHelper). wallet_balance_header / wallet_balance_expand / wallet_balance_recycler are
+  declared in values/ids.xml; BalanceView guards on their presence.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
@@ -7,14 +14,32 @@
     android:orientation="vertical"
     android:background="@color/core_bg">
 
-    <!-- ===== Total balance ===== -->
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- ===== Total balance (tap the row to reveal the breakdown) ===== -->
+    <LinearLayout
+        android:id="@id/wallet_balance_header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:paddingHorizontal="16dp"
         android:paddingTop="18dp"
-        android:text="Total balance"
-        android:textAppearance="@style/TextAppearance.MinimaCore.Caption" />
+        android:foreground="?attr/selectableItemBackground">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Total balance"
+            android:textAppearance="@style/TextAppearance.MinimaCore.Caption" />
+
+        <ImageView
+            android:id="@id/wallet_balance_expand"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_chevron_down"
+            app:tint="@color/core_text_faint"
+            android:contentDescription="Show balance details" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,7 +71,8 @@
             android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
     </LinearLayout>
 
-    <!-- what makes up that number: confirmed / locked / unconfirmed / coin count / staleness -->
+    <!-- what makes up that number: confirmed / locked / unconfirmed / coin count / staleness.
+         Collapsed by default; BalanceView toggles it from the header row above. -->
     <TextView
         android:id="@+id/wallet_balance_breakdown"
         android:breakStrategy="simple"
@@ -56,6 +82,7 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="16dp"
         android:paddingTop="6dp"
+        android:visibility="gone"
         android:textAppearance="@style/TextAppearance.MinimaCore.Caption"
         android:textColor="@color/core_text_faint"
         android:textSize="12sp"
@@ -99,14 +126,12 @@
         android:text="Tokens"
         android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
 
-    <ListView
-        android:id="@+id/wallet_balance_list"
+    <!-- Drag-reorderable token list (long-press to move). BalanceView wires the ItemTouchHelper. -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@id/wallet_balance_recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="@color/core_bg"
-        android:divider="@color/core_outline"
-        android:dividerHeight="1dp"
-        android:scrollbars="none"
-        android:listSelector="@android:color/transparent" />
+        android:scrollbars="none" />
 </LinearLayout>

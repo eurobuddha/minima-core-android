@@ -27,6 +27,19 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/mainmenu_locknow"
+        android:orderInCategory="100"
+        android:title="Lock now"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/mainmenu_applock"
+        android:orderInCategory="100"
+        android:title="App Lock"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/mainmenu_shutdown"
         android:orderInCategory="100"
         android:title="Shutdown"

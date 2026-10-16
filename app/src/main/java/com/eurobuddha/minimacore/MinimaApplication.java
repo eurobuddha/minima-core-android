@@ -19,6 +19,10 @@ public class MinimaApplication extends Application {
     public static final String PREF_ALLOW_SS  = "ALLOW_SCREENSHOTS";
     private final java.util.Set<Activity> activities = java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
 
+    //Count of started (foreground) activities, so we can tell a true app background (0) from
+    //ordinary in-app navigation (never reaches 0). Drives the app-open lock's re-lock timer.
+    private int mStartedActivities = 0;
+
     /** Update retained app windows too, including windows in the background or multi-window. */
     public void setScreenshotsAllowed(boolean allowed) {
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().putBoolean(PREF_ALLOW_SS, allowed).apply();
@@ -68,7 +72,22 @@ public class MinimaApplication extends Application {
             }
 
             @Override
-            public void onActivityStarted(Activity activity) {}
+            public void onActivityStarted(Activity activity) {
+                //0 -> 1 means the app just came to the foreground. If that return crossed the
+                //auto-lock delay, re-lock and cover the now-visible screen with the lock. A
+                //background->foreground return does NOT re-run MainActivity.onCreate, so the
+                //onCreate gate cannot catch this; a cold start (never unlocked) returns false
+                //here and is left to that gate instead.
+                if (mStartedActivities == 0) {
+                    boolean justLocked =
+                            com.eurobuddha.minimacore.lock.AppLock.get().maybeRelock(MinimaApplication.this);
+                    if (justLocked && !(activity instanceof com.eurobuddha.minimacore.lock.LockActivity)) {
+                        activity.startActivity(new android.content.Intent(
+                                activity, com.eurobuddha.minimacore.lock.LockActivity.class));
+                    }
+                }
+                mStartedActivities++;
+            }
             @Override
             public void onActivityResumed(Activity activity) {
                 applyScreenshotPolicy(activity);
@@ -77,7 +96,13 @@ public class MinimaApplication extends Application {
             @Override
             public void onActivityPaused(Activity activity) {}
             @Override
-            public void onActivityStopped(Activity activity) {}
+            public void onActivityStopped(Activity activity) {
+                //1 -> 0 means the app just went to the background: start the auto-lock clock.
+                if (--mStartedActivities <= 0) {
+                    mStartedActivities = 0;
+                    com.eurobuddha.minimacore.lock.AppLock.get().markBackgrounded();
+                }
+            }
             @Override
             public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
             @Override

@@ -6,6 +6,12 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
 import com.eurobuddha.minimacore.R;
@@ -29,6 +35,11 @@ public class BalanceView extends BaseView {
     private boolean destroyed;
 
     ListView mBalanceList;
+
+    //Pandamonium: drag-reorderable RecyclerView instead of the ListView (null on classic/BlackBear).
+    RecyclerView mRecycler;
+    LinearLayoutManager mRecyclerLayout;
+    WalletReorderAdapter mReorder;
 
     TextView mTotalBalance;
 
@@ -57,7 +68,7 @@ public class BalanceView extends BaseView {
             if (destroyed || !isDisplayActive()) return;
             updateBreakdown();
             if (mMainView.getGlobalVisibleRect(new android.graphics.Rect())) {
-                mBalanceAdapter.refreshExpiredMetadata(mBalanceList.getFirstVisiblePosition(), mBalanceList.getLastVisiblePosition());
+                refreshVisibleMetadata();
             }
             if(mBreakdown != null && mBreakdown.getWindowToken() != null){
                 main.postDelayed(this, 10000);
@@ -70,38 +81,56 @@ public class BalanceView extends BaseView {
 
         mBalanceAdapter = new BalanceAdapter(zActivity);
 
-        mBalanceList = getMainView().findViewById(R.id.wallet_balance_list);
-        mBalanceList.setAdapter(mBalanceAdapter);
+        mBalanceList = getMainView().findViewById(R.id.wallet_balance_list);          // classic/BlackBear
+        mRecycler    = getMainView().findViewById(R.id.wallet_balance_recycler);      // Pandamonium
 
         mTotalBalance = getMainView().findViewById(R.id.wallet_total_balance);
         mBreakdown    = getMainView().findViewById(R.id.wallet_balance_breakdown);
 
-        //Any token row - Minima is just tokenid 0x00 on the same path
-        mBalanceList.setOnItemClickListener((parent, view, position, id) -> {
-            try{
-                JSONObject bal   = (JSONObject) mBalanceAdapter.getItem(position);
-                String     tid   = String.valueOf(bal.get("tokenid"));
-                TokenMeta  meta  = TokenMeta.parse(bal.get("token"), tid);
+        //Pandamonium: the breakdown is collapsed behind an expand arrow in the header. These ids
+        //exist only in the pandamonium header layout; null elsewhere, so classic/BlackBear keep
+        //the breakdown always shown.
+        final View expandRow   = getMainView().findViewById(R.id.wallet_balance_header);
+        final View expandArrow = getMainView().findViewById(R.id.wallet_balance_expand);
+        if (expandRow != null && expandArrow != null && mBreakdown != null) {
+            mBreakdown.setVisibility(View.GONE);
+            expandRow.setOnClickListener(v -> {
+                boolean show = mBreakdown.getVisibility() != View.VISIBLE;
+                mBreakdown.setVisibility(show ? View.VISIBLE : View.GONE);
+                expandArrow.animate().rotation(show ? 180f : 0f).setDuration(150).start();
+            });
+        }
 
-                mOpenCoins = CoinsDialog.show(getActivity(), tid, meta.name,
-                        String.valueOf(bal.get("sendable")), String.valueOf(bal.get("confirmed")));
+        if (mBalanceList != null) {
+            //Classic/BlackBear: the existing ListView. Tap opens coins; long-press copies the token id.
+            mBalanceList.setAdapter(mBalanceAdapter);
+            mBalanceList.setOnItemClickListener((parent, view, position, id) -> openCoins(position));
+            //Long-press copies the full token id. Wired on the ListView, not the row view -
+            //a long-click listener set on the row itself can swallow the item click.
+            mBalanceList.setOnItemLongClickListener((parent, view, position, id) -> {
+                copyTokenId(position);
+                return true;
+            });
+        } else if (mRecycler != null) {
+            //Pandamonium: drag-to-reorder RecyclerView. Long-press starts the drag (like the app
+            //drawer), so copying the token id moves to the tap-to-open coins dialog.
+            mRecyclerLayout = new LinearLayoutManager(zActivity);
+            mRecycler.setLayoutManager(mRecyclerLayout);
+            mReorder = new WalletReorderAdapter(mBalanceAdapter, this::openCoins);
+            mRecycler.setAdapter(mReorder);
 
-            }catch(Throwable exc){
-                logger.log("Could not open coins : "+exc);
-            }
-        });
+            DividerItemDecoration divider = new DividerItemDecoration(zActivity, DividerItemDecoration.VERTICAL);
+            divider.setDrawable(ContextCompat.getDrawable(zActivity, R.drawable.divider_hairline));
+            mRecycler.addItemDecoration(divider);
 
-        //Long-press copies the full token id. Wired on the ListView, not the row view -
-        //a long-click listener set on the row itself can swallow the item click.
-        mBalanceList.setOnItemLongClickListener((parent, view, position, id) -> {
-            try{
-                JSONObject bal = (JSONObject) mBalanceAdapter.getItem(position);
-                Clip.copy(getActivity(), "tokenid", String.valueOf(bal.get("tokenid")), "Token ID copied");
-            }catch(Throwable exc){
-                logger.log("Could not copy token id : "+exc);
-            }
-            return true;
-        });
+            //A RecyclerView can't observe a BaseAdapter: refresh it whenever BalanceAdapter changes
+            //(async icon loads / web validation), but never mid-drag.
+            mBalanceAdapter.setExtraNotify(() -> {
+                if (mReorder != null && !mReorder.dragging) mReorder.notifyDataSetChanged();
+            });
+
+            attachReorder();
+        }
 
         getMainView().findViewById(R.id.wallet_btn_send).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,6 +147,76 @@ public class BalanceView extends BaseView {
         });
 
         refreshView();
+    }
+
+    /** Open the coins (full detail) for the token at a list position. */
+    private void openCoins(int position){
+        try{
+            JSONObject bal  = (JSONObject) mBalanceAdapter.getItem(position);
+            String     tid  = String.valueOf(bal.get("tokenid"));
+            TokenMeta  meta = TokenMeta.parse(bal.get("token"), tid);
+            mOpenCoins = CoinsDialog.show(getActivity(), tid, meta.name,
+                    String.valueOf(bal.get("sendable")), String.valueOf(bal.get("confirmed")));
+        }catch(Throwable exc){
+            logger.log("Could not open coins : "+exc);
+        }
+    }
+
+    /** Copy the full token id (ListView long-press path; Pandamonium uses the coins dialog button). */
+    private void copyTokenId(int position){
+        try{
+            JSONObject bal = (JSONObject) mBalanceAdapter.getItem(position);
+            Clip.copy(getActivity(), "tokenid", String.valueOf(bal.get("tokenid")), "Token ID copied");
+        }catch(Throwable exc){
+            logger.log("Could not copy token id : "+exc);
+        }
+    }
+
+    /** Only the RecyclerView path: long-press drag-to-reorder, Minima pinned first, order persisted. */
+    private void attachReorder(){
+        ItemTouchHelper.SimpleCallback cb = new ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+            @Override public int getDragDirs(RecyclerView rv, RecyclerView.ViewHolder vh){
+                //Pin Minima (position 0): it can't be dragged.
+                return vh.getBindingAdapterPosition() > 0 ? super.getDragDirs(rv, vh) : 0;
+            }
+            @Override public boolean onMove(RecyclerView rv, RecyclerView.ViewHolder from, RecyclerView.ViewHolder to){
+                int s = from.getBindingAdapterPosition();
+                int e = to.getBindingAdapterPosition();
+                //Both ends > 0 so nothing can drop above the pinned Minima row either.
+                if (s <= 0 || e <= 0 || s >= mBalanceAdapter.getCount() || e >= mBalanceAdapter.getCount()) return false;
+                mBalanceAdapter.moveItem(s, e);
+                mReorder.notifyItemMoved(s, e);
+                TokenOrder.prefs(getActivity()).edit()
+                        .putString(TokenOrder.KEY, TokenOrder.encode(mBalanceAdapter.tokenids())).apply();
+                return true;
+            }
+            @Override public void onSwiped(RecyclerView.ViewHolder vh, int direction){}
+            @Override public void onSelectedChanged(RecyclerView.ViewHolder vh, int actionState){
+                mReorder.dragging = actionState == ItemTouchHelper.ACTION_STATE_DRAG;
+                if (mReorder.dragging && vh != null){
+                    vh.itemView.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS);
+                    vh.itemView.setAlpha(0.85f);
+                }
+                super.onSelectedChanged(vh, actionState);
+            }
+            @Override public void clearView(RecyclerView rv, RecyclerView.ViewHolder vh){
+                super.clearView(rv, vh);
+                vh.itemView.setAlpha(1f);
+            }
+        };
+        new ItemTouchHelper(cb).attachToRecyclerView(mRecycler);
+    }
+
+    /** Ask the adapter to re-check web validation for the visible rows (ListView or RecyclerView). */
+    private void refreshVisibleMetadata(){
+        if (mBalanceList != null) {
+            mBalanceAdapter.refreshExpiredMetadata(
+                    mBalanceList.getFirstVisiblePosition(), mBalanceList.getLastVisiblePosition());
+        } else if (mRecyclerLayout != null) {
+            mBalanceAdapter.refreshExpiredMetadata(
+                    mRecyclerLayout.findFirstVisibleItemPosition(), mRecyclerLayout.findLastVisibleItemPosition());
+        }
     }
 
     @Override
@@ -170,6 +269,14 @@ public class BalanceView extends BaseView {
     private void refreshBalance(JSONArray balance) {
         if (destroyed) return;
         mBalanceAdapter.updateValues(balance);
+        //Pandamonium: lay the tokens out in the user's saved order (new tokens appended), unless a
+        //drag is in progress (don't yank rows out from under the finger).
+        if (mReorder != null && !mReorder.dragging) {
+            mBalanceAdapter.applyTokenOrder(TokenOrder.decode(
+                    TokenOrder.prefs(getActivity()).getString(TokenOrder.KEY, null),
+                    mBalanceAdapter.tokenids()));
+            mReorder.notifyDataSetChanged();
+        }
         updateTotal(balance);
     }
 
