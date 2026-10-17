@@ -2218,3 +2218,23 @@ Findings: no source/build blocker found for this increment. Fold layout/focus an
 Verdict: approve this source increment with host validation; full release remains incomplete.
 
 Next: PandaDEX Trade/Chart/Tape/Orders/Assets/Maker text and notifications; residual PandaPools diagnostics; earlier financial/accessibility work; safe Fold runtime validation; signed versioned builds, commit/push and publication only GitHub fork/PandaApps/eurobuddha.com.
+
+
+## PandaDEX trading screen and local commits — 2026-10-18
+
+Previous goal turn made progress (PandaDEX shell). Revalidated425 source hashes. User explicitly requested a local commit of all work so far; committed1,086 files as f1c8232f1c219984a34c3c83c46b4f4c4b7ac697, WIP: preserve multilingual Bear and integrated app implementation. Worktree was clean after that commit. No push/publication. This increment adds regression tests and completes host validation of the TradeView changes saved in that WIP commit. No device use; Fold R3GL805K7MB only.
+
+Reuse: read all786lines of TradeView, confirmed exact byte equality with standalone apks/pandadex TradeView; inspected existing Pending.Row descriptions/status, OrdersTab stale/unresolved messages, MainActivity node/readiness helpers, PriceMath and Util formatting; complete ReceiptPresentationTest and PriceDisplayTest. Reused PandaPools Swap label/hint/retained-message binding, existing DexMessages generator, Language.join and literal captures. Existing decimal input filters, listeners and calculators preserved.
+
+Added62 messages (4,922 total),44 fixed aliases and22 patterns (74DEX exact aliases total). Ticker/stat labels, order book sources, buy/sell controls, price/amount hints, totals, GTC and advanced controls/help, quote progress/refusals, last-trade ages, open orders and receipt evidence states translate. Existing amount precision and raw numeric strings preserved. Input text is never language-bound. Minimum48dp targets and a heading above tick choices accommodate longer labels; edit/cancel icons have translated accessibility descriptions. MainActivity transaction confirmation/action dialogs are a later scope and are not claimed complete.
+
+Five tests reuse actual Pending.Row receipts, original receipt test factory and TradeView.amountText: action/phase/lock preservation, buy/sell identity and exact six-decimal prices, legacy/unreadable evidence, downward-rounded book/pool amounts, nested age/clock translations and hostile unknown diagnostics.710 PandaDEX +9localization JVM pass (719). All3debug variants and AndroidTest compile in1m12s. All19 pinned imports reproduce; catalogue/transport/new-diff checks pass.
+
+Reviewed full TradeView diff. Eight existing methods are byte-identical to standalone:applyPercent,levelPrice,cumMax,requestDepth,depthKey,amountText,revealEntryAboveKeyboard,onDetachedFromWindow. submit() is identical after removing its one busy-label binding wrapper. No routing, rounding, coin selection, quote callback, order ownership, unresolved-action guard, persistence or signing changes.186 original DEX files remain unchanged; other protected engines/public-key audit/nodejar unchanged. Evidence build/localization/dex-trade-validation.json has429source hashes. Fold runtime/visual checks still pending.
+
+### Code Review
+Summary: translation is applied at display boundaries; existing forms, financial calculations and receipt evidence remain authoritative. Exact numeric captures and nested status resources keep accepted submission distinct from on-chain confirmation.
+Findings: no blocking source/build defect identified in this increment. Device layout/input/lifecycle validation remains pending. Existing input sanitization and transaction algorithms were not redesigned.
+Verdict: approve this increment with host validation. Full release incomplete; second local commit will preserve the added tests and checkpoint documentation.
+
+Next: PandaDEX transaction dialogs and Chart/Tape/Orders/Assets/Maker/notifications, residual diagnostics and earlier financial/accessibility findings, safe Fold validation, signed versioned deliverables, commit/push and authorized publication to GitHub fork/PandaApps/eurobuddha.com.
