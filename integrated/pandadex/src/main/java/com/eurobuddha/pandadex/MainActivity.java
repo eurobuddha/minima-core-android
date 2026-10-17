@@ -2096,21 +2096,32 @@ public class MainActivity extends AppCompatActivity {
     /** Same explicit restart-and-reconcile recovery as PandaPools WalletTools. */
     public void resolveInterruptedWrite() {
         if (!interruptedWrite()) { toast("No interrupted write to resolve"); return; }
-        new AlertDialog.Builder(this, Design.dialogTheme()).setTitle("Resolve interrupted write")
-                .setMessage("A node write lost its reply and may have completed. First restart MinimaCore to stop old commands, "
-                        + "then check Orders, Tape and your balances. Clearing this pause neither undoes nor retries a transaction. "
-                        + "The maker will stay disarmed until you review and publish it again."
-                        + "\n\nInterrupted command:\n" + node.interruptedWriteDetails())
-                .setNegativeButton("Keep paused", null)
-                .setNeutralButton("Copy details", (d, w) -> {
+        final NodeApi recoveryNode = node;
+        final String reviewedWrite = recoveryNode.interruptedWriteId();
+        final String reviewedDetails = recoveryNode.interruptedWriteDetails();
+        new LanguageDialog(this, Design.dialogTheme()).setTitle(DexMessages.message("Resolve interrupted write"))
+                .setMessage(Language.msg(l10n_dex_write_recovery_body, DexMessages.message(reviewedDetails)))
+                .setNegativeButton(DexMessages.message("Keep paused"), null)
+                .setNeutralButton(DexMessages.message("Copy details"), (d, w) -> {
                     android.content.ClipboardManager clipboard = (android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
-                    if (clipboard != null) clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Interrupted PandaDEX write", node.interruptedWriteDetails()));
+                    if (clipboard != null) clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Interrupted PandaDEX write", reviewedDetails));
                 })
-                .setPositiveButton("I restarted and checked", (dialog, which) -> {
-                    makerCfg.reload(); makerCfg.armed = false; makerCfg.save();
-                    toast(node.acknowledgeInterruptedWrite() ? "Safety pause cleared. Review your orders and balances." : "A write is still active. Keep paused.");
+                .setPositiveButton(DexMessages.message("I restarted and checked"), (dialog, which) -> {
+                    if (node != recoveryNode || !reviewedWrite.equals(recoveryNode.interruptedWriteId())) {
+                        toast("The reviewed write changed, a write is still active, or the safety state could not be saved. Keep paused."); return;
+                    }
+                    if (!disarmMakerForRecovery(makerCfg)) {
+                        toast("The maker could not be saved as disarmed. The safety pause remains; check storage and review again."); repaint(); return;
+                    }
+                    toast(recoveryNode.acknowledgeInterruptedWrite(reviewedWrite) ? "Safety pause cleared. Review your orders and balances." : "The reviewed write changed, a write is still active, or the safety state could not be saved. Keep paused.");
                     repaint();
                 }).show();
+    }
+
+    static boolean disarmMakerForRecovery(MakerConfig config) {
+        config.reload();
+        config.armed = false;
+        return config.saveUserAction();
     }
 
     private static void appendUnavailable(StringBuilder sb, BigDecimal locked, BigDecimal unconfirmed) {

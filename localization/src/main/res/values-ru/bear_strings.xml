@@ -6338,4 +6338,33 @@
     <string name="l10n_dex_selecting_composite_sell">"Продажа: запрос принят · Выбор монет для пулов: %1$s, лимитных заявок: %2$s"</string>
     <!-- Arguments: amount -->
     <string name="l10n_dex_posted_sell">"Отправлено — ожидается подтверждение блоком: продажа %1$s MINIMA"</string>
+    <string name="l10n_dex_signing_paused" formatted="false">"ПОДПИСАНИЕ ПРИОСТАНОВЛЕНО"</string>
+    <string name="l10n_dex_write_lost_reply" formatted="false">"Ответ на запись узла потерян. Она могла завершиться."</string>
+    <string name="l10n_dex_review_trade_receipt" formatted="false">"Посмотреть квитанцию отправки и проверить снова"</string>
+    <string name="l10n_dex_available_trade" formatted="false">"ДОСТУПНО ДЛЯ ТОРГОВЛИ"</string>
+    <!-- Arguments: price -->
+    <string name="l10n_dex_sendable_mid">"Только доступные для отправки средства, по средней цене книги %1$s"</string>
+    <string name="l10n_dex_waiting_book_price" formatted="false">"Ожидание актуальной цены книги."</string>
+    <string name="l10n_dex_waiting_balances" formatted="false">"Ожидание балансов кошелька от MinimaCore."</string>
+    <string name="l10n_dex_minima_available" formatted="false">"MINIMA · доступно для торговли"</string>
+    <string name="l10n_dex_mxusd_available" formatted="false">"MxUSD · доступно для торговли"</string>
+    <string name="l10n_dex_receive" formatted="false">"ПОЛУЧИТЬ"</string>
+    <string name="l10n_dex_address_missing" formatted="false">"Адрес не загружен"</string>
+    <string name="l10n_dex_tap_copy" formatted="false">"Нажмите, чтобы скопировать"</string>
+    <string name="l10n_dex_receive_loading" formatted="false">"Загрузка адреса получения из MinimaCore…"</string>
+    <string name="l10n_dex_need_mxusd" formatted="false">"НУЖЕН MxUSD?"</string>
+    <string name="l10n_dex_bridge_help" formatted="false">"MxUSD — обёрнутый токен USDT в Minima. Переведите через мост mxusd.global или обменяйте ERC20 USDT ↔ MxUSD в AtomiX."</string>
+    <!-- Arguments: confirmed, locked, unconfirmed, coins, age -->
+    <string name="l10n_dex_asset_breakdown">"Подтверждено %1$s · Заблокировано ≈ %2$s · Не подтверждено %3$s · Монет: %4$s · Обновлено %5$s"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_in_orders">"В заявках PandaDEX %1$s"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_in_saved_orders">"В сохранённых заявках PandaDEX %1$s"</string>
+    <string name="l10n_dex_no_write_paused" formatted="false">"Нет прерванной записи для разбора"</string>
+    <string name="l10n_dex_copy_details" formatted="false">"Скопировать подробности"</string>
+    <string name="l10n_dex_older_write_details" formatted="false">"Для этой старой квитанции сведения о команде недоступны."</string>
+    <!-- Arguments: command -->
+    <string name="l10n_dex_write_recovery_body">"Ответ на запись узла потерян, и она могла завершиться. Сначала перезапустите MinimaCore, чтобы остановить старые команды, затем проверьте заявки, ленту сделок и балансы. Снятие паузы не отменяет и не повторяет транзакцию. Мейкер останется выключенным до повторной проверки и публикации.\n\nПрерванная команда:\n%1$s"</string>
+    <string name="l10n_dex_write_pause_cleared" formatted="false">"Пауза безопасности снята. Проверьте заявки и балансы."</string>
+    <string name="l10n_dex_maker_disarm_failed" formatted="false">"Не удалось сохранить выключенное состояние мейкера. Пауза безопасности остаётся; проверьте хранилище и повторите проверку."</string>
 </resources>

@@ -2244,3 +2244,24 @@ Findings: no blocking source/build defect introduced in this increment. Both tra
 Verdict: approve this increment with host validation; the full release remains incomplete.
 
 Evidence: build/localization/dex-quotes-validation.json (443 source hashes). Next: export, Assets, Maker, notifications and dynamic diagnostics; remaining financial/accessibility findings; safe Fold runtime validation; signed versioned builds and publication to the authorized GitHub fork, PandaApps and eurobuddha.com.
+
+
+## PandaDEX Assets and interrupted-write recovery — 2026-10-18
+
+Previous goal turn made progress and committed quote/review translations as f52d66d. Revalidated 443 tracked source hashes and the clean worktree. Inspected standalone AssetsTab, TradeExportSession/Writer, balance parsing/tests, NodeApi recovery and command dispatch, MakerConfig persistence, MakerSnapshotWriteTest and MakerWithdrawalDurabilityTest. Assets, exporter and export session matched the donor exactly. Reused shared display bindings and PandaPools NodeApi/PoolsReviewedWriteTest; the recovery helper is copied byte-for-byte, with only test package/class names adapted. Export translation remains next after the recovery defects found in this review.
+
+Added 24 messages (5,094 total; 205 exact DEX aliases, 67 patterns), reusing existing shared recovery/copy/age resources. Assets translates available funds, confirmed/locked/unconfirmed balances, saved/current orders, receive placeholders, bridge help, ages and recovery dialogs. Raw address and copied command text stay literal. Balance parsing, valuation and existing age arithmetic are unchanged. Recovery/copy controls have 48dp targets.
+
+### Code Review
+
+Summary: Assets display now follows the shared language choice. Three recovery defects were repaired using the existing implementation and persistence boundaries.
+
+- MAJOR, resolved — an old acknowledgement dialog could clear a newer pending write. Capture the NodeApi, marker and displayed details when the dialog opens; reject a changed connection/marker. The copied details now match the reviewed command. NodeApi accepts only the reviewed marker and refuses active writes.
+- MAJOR, resolved — a failed SharedPreferences clear can still alter memory. Reused PandaPools' process latch and marker rollback, keeping signing blocked until the clear succeeds durably.
+- MAJOR, resolved — recovery ignored a failed maker-disarm save. Reused MakerConfig.reload/saveUserAction and require success before clearing the safety pause; latest tracked orders are retained.
+
+Validation: six inherited reviewed-write tests exercise stale/missing consent, active writes, failed clear, throwing rollback and latch retention. Five new tests cover actual balance categories/unknown-versus-zero, connection placeholders, exact amounts/command text, failed maker disarm and reloading latest prepared-order tracking. 738 PandaDEX + 9 localization JVM tests pass (747). All three debug variants and AndroidTest compile; all 19 pinned imports reproduce. Catalogue, transport and diff checks pass. No device use; Fold R3GL805K7MB only.
+
+The reviewed NodeApi recovery section exactly matches PandaPools. Command dispatch, balance parsing, asset valuation and age calculations are byte-identical to their previous bodies. 179 original DEX files and all other protected engine/public-key audit/node-JAR hashes are unchanged. NodeApi's old hash and reviewed replacement are saved separately, preserving the original baseline. Fold runtime/visual validation remains pending.
+
+Verdict: approve this increment with host validation. Full signed release remains incomplete. Evidence: build/localization/dex-assets-validation.json (450 source hashes). Next: export, Maker, notifications and dynamic diagnostics; remaining financial/accessibility findings; safe Fold validation; signed versioned deliverables and publication to GitHub fork, PandaApps and eurobuddha.com.

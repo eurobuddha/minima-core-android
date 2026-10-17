@@ -1,4 +1,6 @@
 package com.eurobuddha.pandadex;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.annotation.SuppressLint;
 import android.content.ClipData;
@@ -31,9 +33,9 @@ public final class AssetsTab extends LinearLayout {
         addView(body);
     }
 
-    private TextView t(String s, int color, float size, android.graphics.Typeface tf) {
+    private TextView t(CharSequence s, int color, float size, android.graphics.Typeface tf) {
         TextView v = new TextView(getContext());
-        v.setText(s);
+        Language.setText(v, DexMessages.message(s));
         v.setTextColor(color);
         v.setTextSize(size);
         v.setTypeface(tf);
@@ -60,6 +62,7 @@ public final class AssetsTab extends LinearLayout {
             pause.addView(t("SIGNING PAUSED", Design.ACCENT(), 12f, Design.sansBold()));
             pause.addView(t("A node write lost its reply. It may have completed.", Design.TEXT(), 12f, Design.sans()));
             TextView resolve = t("Resolve interrupted write", Design.ACCENT(), 14f, Design.sansBold());
+            resolve.setMinHeight(Design.dp(act, 48));
             resolve.setPadding(0, Design.dp(getContext(), 16), 0, Design.dp(getContext(), 16));
             resolve.setOnClickListener(v -> act.resolveInterruptedWrite()); pause.addView(resolve);
         }
@@ -68,6 +71,7 @@ public final class AssetsTab extends LinearLayout {
             LinearLayout receipt = card();
             receipt.addView(t("TRADE STILL BEING CHECKED", Design.ACCENT(), 12f, Design.sansBold()));
             TextView review = t("View submitted receipt and check again", Design.TEXT(), 13f, Design.sans());
+            review.setMinHeight(Design.dp(act, 48));
             review.setPadding(0, Design.dp(getContext(), 16), 0, Design.dp(getContext(), 16));
             review.setOnClickListener(v -> act.reviewUnresolvedTrade()); receipt.addView(review);
         }
@@ -107,7 +111,7 @@ public final class AssetsTab extends LinearLayout {
         LinearLayout recv = card();
         recv.addView(t("RECEIVE", Design.DIM(), 10f, Design.sansBold()));
         String addr = act.receiveAddress();
-        TextView a = t(addr.isEmpty() ? "Address not loaded" : addr, Design.TEXT(), 10f, Design.mono());
+        TextView a = t(addr.isEmpty() ? DexMessages.message("Address not loaded") : Language.join(addr), Design.TEXT(), 10f, Design.mono());
         recv.addView(a);
         TextView copy = t(addr.isEmpty() ? act.receiveLoadingMessage() : "Tap to copy", Design.ACCENT(), 9.5f, Design.sans());
         recv.addView(copy);
@@ -117,7 +121,11 @@ public final class AssetsTab extends LinearLayout {
             cm.setPrimaryClip(ClipData.newPlainText("address", addr));
             act.toast("Address copied");
         });
-        if (!addr.isEmpty()) Design.pressable(recv);
+        if (!addr.isEmpty()) {
+            recv.setMinimumHeight(Design.dp(act, 48));
+            Language.description(recv, DexMessages.message("Tap to copy"));
+            Design.pressable(recv);
+        }
 
         LinearLayout bridge = card();
         bridge.addView(t("NEED MxUSD?", Design.DIM(), 10f, Design.sansBold()));
@@ -136,17 +144,18 @@ public final class AssetsTab extends LinearLayout {
             c.setOnClickListener(v -> act.retryBalances());
         } else {
         c.addView(t(PriceMath.fmt(sendable), Design.IN(), 18f, Design.monoBold()));
-        c.addView(t("confirmed " + PriceMath.fmt(confirmed)
-                + "  ·  locked ≈ " + PriceMath.fmt(locked)
-                + "  ·  unconfirmed " + PriceMath.fmt(unconfirmed)
-                + "  ·  " + coins + " coins"
-                + "  ·  updated " + age(updatedAtMs),
+        c.addView(t(balanceBreakdown(confirmed, locked, unconfirmed, coins, updatedAtMs),
                 Design.DIM2(), 9.5f, Design.mono()));
         }
         if (inDexOrders.signum() > 0) {
             c.addView(t((act.makerBookReady() ? "in PandaDEX orders " : "in saved PandaDEX orders ") + PriceMath.fmt(inDexOrders),
                     Design.ACCENT(), 9.5f, Design.mono()));
         }
+    }
+
+    static CharSequence balanceBreakdown(BigDecimal confirmed, BigDecimal locked, BigDecimal unconfirmed, int coins, long updatedAtMs) {
+        return Language.msg(l10n_dex_asset_breakdown, PriceMath.fmt(confirmed), PriceMath.fmt(locked),
+                PriceMath.fmt(unconfirmed), coins, DexMessages.message(age(updatedAtMs)));
     }
 
     private static String age(long updatedAtMs) {

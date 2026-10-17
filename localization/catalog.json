@@ -30883,5 +30883,149 @@
     "zh-Hans": "已提交 — 等待区块确认卖出 {amount} MINIMA",
     "ru": "Отправлено — ожидается подтверждение блоком: продажа {amount} MINIMA",
     "uk": "Надіслано — очікується підтвердження блоком: продаж {amount} MINIMA"
+  },
+  "dex.signingPaused": {
+    "en": "SIGNING PAUSED",
+    "zh-Hans": "签名已暂停",
+    "ru": "ПОДПИСАНИЕ ПРИОСТАНОВЛЕНО",
+    "uk": "ПІДПИСАННЯ ПРИЗУПИНЕНО"
+  },
+  "dex.writeLostReply": {
+    "en": "A node write lost its reply. It may have completed.",
+    "zh-Hans": "节点写入操作的回复丢失。操作可能已完成。",
+    "ru": "Ответ на запись узла потерян. Она могла завершиться.",
+    "uk": "Відповідь на запис вузла втрачено. Він міг завершитися."
+  },
+  "dex.reviewTradeReceipt": {
+    "en": "View submitted receipt and check again",
+    "zh-Hans": "查看提交凭据并重新检查",
+    "ru": "Посмотреть квитанцию отправки и проверить снова",
+    "uk": "Переглянути квитанцію надсилання й перевірити знову"
+  },
+  "dex.availableTrade": {
+    "en": "AVAILABLE TO TRADE",
+    "zh-Hans": "可用于交易",
+    "ru": "ДОСТУПНО ДЛЯ ТОРГОВЛИ",
+    "uk": "ДОСТУПНО ДЛЯ ТОРГІВЛІ"
+  },
+  "dex.sendableMid": {
+    "en": "sendable funds only, valued at book mid {price}",
+    "zh-Hans": "仅可发送资金，按订单簿中间价 {price} 估值",
+    "ru": "Только доступные для отправки средства, по средней цене книги {price}",
+    "uk": "Лише доступні для надсилання кошти, за середньою ціною книги {price}"
+  },
+  "dex.waitingBookPrice": {
+    "en": "Waiting for a current book price.",
+    "zh-Hans": "正在等待当前订单簿价格。",
+    "ru": "Ожидание актуальной цены книги.",
+    "uk": "Очікування актуальної ціни книги."
+  },
+  "dex.waitingBalances": {
+    "en": "Waiting for wallet balances from MinimaCore.",
+    "zh-Hans": "正在等待 MinimaCore 的钱包余额。",
+    "ru": "Ожидание балансов кошелька от MinimaCore.",
+    "uk": "Очікування балансів гаманця від MinimaCore."
+  },
+  "dex.minimaAvailable": {
+    "en": "MINIMA · available to trade",
+    "zh-Hans": "MINIMA · 可用于交易",
+    "ru": "MINIMA · доступно для торговли",
+    "uk": "MINIMA · доступно для торгівлі"
+  },
+  "dex.mxusdAvailable": {
+    "en": "MxUSD · available to trade",
+    "zh-Hans": "MxUSD · 可用于交易",
+    "ru": "MxUSD · доступно для торговли",
+    "uk": "MxUSD · доступно для торгівлі"
+  },
+  "dex.receive": {
+    "en": "RECEIVE",
+    "zh-Hans": "接收",
+    "ru": "ПОЛУЧИТЬ",
+    "uk": "ОТРИМАТИ"
+  },
+  "dex.addressMissing": {
+    "en": "Address not loaded",
+    "zh-Hans": "地址尚未加载",
+    "ru": "Адрес не загружен",
+    "uk": "Адресу не завантажено"
+  },
+  "dex.tapCopy": {
+    "en": "Tap to copy",
+    "zh-Hans": "点击复制",
+    "ru": "Нажмите, чтобы скопировать",
+    "uk": "Натисніть, щоб скопіювати"
+  },
+  "dex.receiveLoading": {
+    "en": "Loading receive address from MinimaCore…",
+    "zh-Hans": "正在从 MinimaCore 加载接收地址…",
+    "ru": "Загрузка адреса получения из MinimaCore…",
+    "uk": "Завантаження адреси отримання з MinimaCore…"
+  },
+  "dex.needMxusd": {
+    "en": "NEED MxUSD?",
+    "zh-Hans": "需要 MxUSD？",
+    "ru": "НУЖЕН MxUSD?",
+    "uk": "ПОТРІБЕН MxUSD?"
+  },
+  "dex.bridgeHelp": {
+    "en": "MxUSD is the wrapped-USDT token on Minima. Bridge in at mxusd.global, or swap ERC20 USDT ↔ MxUSD with AtomiX.",
+    "zh-Hans": "MxUSD 是 Minima 上的封装 USDT 代币。可在 mxusd.global 跨链转入，或通过 AtomiX 交换 ERC20 USDT ↔ MxUSD。",
+    "ru": "MxUSD — обёрнутый токен USDT в Minima. Переведите через мост mxusd.global или обменяйте ERC20 USDT ↔ MxUSD в AtomiX.",
+    "uk": "MxUSD — обгорнутий токен USDT у Minima. Переведіть через міст mxusd.global або обміняйте ERC20 USDT ↔ MxUSD в AtomiX."
+  },
+  "dex.assetBreakdown": {
+    "en": "confirmed {confirmed} · locked ≈ {locked} · unconfirmed {unconfirmed} · {coins} coins · updated {age}",
+    "zh-Hans": "已确认 {confirmed} · 锁定 ≈ {locked} · 未确认 {unconfirmed} · {coins} 枚币 · 更新于 {age}",
+    "ru": "Подтверждено {confirmed} · Заблокировано ≈ {locked} · Не подтверждено {unconfirmed} · Монет: {coins} · Обновлено {age}",
+    "uk": "Підтверджено {confirmed} · Заблоковано ≈ {locked} · Не підтверджено {unconfirmed} · Монет: {coins} · Оновлено {age}"
+  },
+  "dex.inOrders": {
+    "en": "in PandaDEX orders {amount}",
+    "zh-Hans": "PandaDEX 订单中 {amount}",
+    "ru": "В заявках PandaDEX {amount}",
+    "uk": "В ордерах PandaDEX {amount}"
+  },
+  "dex.inSavedOrders": {
+    "en": "in saved PandaDEX orders {amount}",
+    "zh-Hans": "已保存的 PandaDEX 订单中 {amount}",
+    "ru": "В сохранённых заявках PandaDEX {amount}",
+    "uk": "У збережених ордерах PandaDEX {amount}"
+  },
+  "dex.noWritePaused": {
+    "en": "No interrupted write to resolve",
+    "zh-Hans": "没有需要处理的中断写入",
+    "ru": "Нет прерванной записи для разбора",
+    "uk": "Немає прерваного запису для розбору"
+  },
+  "dex.copyDetails": {
+    "en": "Copy details",
+    "zh-Hans": "复制详情",
+    "ru": "Скопировать подробности",
+    "uk": "Скопіювати подробиці"
+  },
+  "dex.olderWriteDetails": {
+    "en": "Command details unavailable for this older receipt.",
+    "zh-Hans": "此旧凭据没有可用的命令详情。",
+    "ru": "Для этой старой квитанции сведения о команде недоступны.",
+    "uk": "Для цієї старої квитанції відомості про команду недоступні."
+  },
+  "dex.writeRecoveryBody": {
+    "en": "A node write lost its reply and may have completed. First restart MinimaCore to stop old commands, then check Orders, Tape and your balances. Clearing this pause neither undoes nor retries a transaction. The maker will stay disarmed until you review and publish it again.\n\nInterrupted command:\n{command}",
+    "zh-Hans": "节点写入操作的回复丢失，操作可能已完成。请先重启 MinimaCore 以停止旧命令，再检查订单、成交记录和余额。解除暂停不会撤销或重试任何交易。做市将保持停用，直到您重新检查并发布。\n\n中断的命令：\n{command}",
+    "ru": "Ответ на запись узла потерян, и она могла завершиться. Сначала перезапустите MinimaCore, чтобы остановить старые команды, затем проверьте заявки, ленту сделок и балансы. Снятие паузы не отменяет и не повторяет транзакцию. Мейкер останется выключенным до повторной проверки и публикации.\n\nПрерванная команда:\n{command}",
+    "uk": "Відповідь на запис вузла втрачено, і він міг завершитися. Спершу перезапустіть MinimaCore, щоб зупинити старі команди, потім перевірте ордери, стрічку угод і баланси. Зняття паузи не скасовує й не повторює транзакцію. Мейкер залишиться вимкненим до повторної перевірки та публікації.\n\nПрервана команда:\n{command}"
+  },
+  "dex.writePauseCleared": {
+    "en": "Safety pause cleared. Review your orders and balances.",
+    "zh-Hans": "安全暂停已解除。请检查您的订单和余额。",
+    "ru": "Пауза безопасности снята. Проверьте заявки и балансы.",
+    "uk": "Паузу безпеки знято. Перевірте ордери та баланси."
+  },
+  "dex.makerDisarmFailed": {
+    "en": "The maker could not be saved as disarmed. The safety pause remains; check storage and review again.",
+    "zh-Hans": "无法保存做市的停用状态。安全暂停仍然有效；请检查存储空间并重新确认。",
+    "ru": "Не удалось сохранить выключенное состояние мейкера. Пауза безопасности остаётся; проверьте хранилище и повторите проверку.",
+    "uk": "Не вдалося зберегти вимкнений стан мейкера. Пауза безпеки залишається; перевірте сховище та повторіть перевірку."
   }
 }

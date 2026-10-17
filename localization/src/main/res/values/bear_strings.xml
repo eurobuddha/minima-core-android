@@ -6276,4 +6276,33 @@
     <string name="l10n_dex_selecting_composite_sell">"Sell request accepted · selecting wallet coins for %1$s pool(s) and %2$s limit order(s)"</string>
     <!-- Arguments: amount -->
     <string name="l10n_dex_posted_sell">"Posted — waiting for a block to confirm your sell of %1$s MINIMA"</string>
+    <string name="l10n_dex_signing_paused" formatted="false">"SIGNING PAUSED"</string>
+    <string name="l10n_dex_write_lost_reply" formatted="false">"A node write lost its reply. It may have completed."</string>
+    <string name="l10n_dex_review_trade_receipt" formatted="false">"View submitted receipt and check again"</string>
+    <string name="l10n_dex_available_trade" formatted="false">"AVAILABLE TO TRADE"</string>
+    <!-- Arguments: price -->
+    <string name="l10n_dex_sendable_mid">"sendable funds only, valued at book mid %1$s"</string>
+    <string name="l10n_dex_waiting_book_price" formatted="false">"Waiting for a current book price."</string>
+    <string name="l10n_dex_waiting_balances" formatted="false">"Waiting for wallet balances from MinimaCore."</string>
+    <string name="l10n_dex_minima_available" formatted="false">"MINIMA · available to trade"</string>
+    <string name="l10n_dex_mxusd_available" formatted="false">"MxUSD · available to trade"</string>
+    <string name="l10n_dex_receive" formatted="false">"RECEIVE"</string>
+    <string name="l10n_dex_address_missing" formatted="false">"Address not loaded"</string>
+    <string name="l10n_dex_tap_copy" formatted="false">"Tap to copy"</string>
+    <string name="l10n_dex_receive_loading" formatted="false">"Loading receive address from MinimaCore…"</string>
+    <string name="l10n_dex_need_mxusd" formatted="false">"NEED MxUSD?"</string>
+    <string name="l10n_dex_bridge_help" formatted="false">"MxUSD is the wrapped-USDT token on Minima. Bridge in at mxusd.global, or swap ERC20 USDT ↔ MxUSD with AtomiX."</string>
+    <!-- Arguments: confirmed, locked, unconfirmed, coins, age -->
+    <string name="l10n_dex_asset_breakdown">"confirmed %1$s · locked ≈ %2$s · unconfirmed %3$s · %4$s coins · updated %5$s"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_in_orders">"in PandaDEX orders %1$s"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_in_saved_orders">"in saved PandaDEX orders %1$s"</string>
+    <string name="l10n_dex_no_write_paused" formatted="false">"No interrupted write to resolve"</string>
+    <string name="l10n_dex_copy_details" formatted="false">"Copy details"</string>
+    <string name="l10n_dex_older_write_details" formatted="false">"Command details unavailable for this older receipt."</string>
+    <!-- Arguments: command -->
+    <string name="l10n_dex_write_recovery_body">"A node write lost its reply and may have completed. First restart MinimaCore to stop old commands, then check Orders, Tape and your balances. Clearing this pause neither undoes nor retries a transaction. The maker will stay disarmed until you review and publish it again.\n\nInterrupted command:\n%1$s"</string>
+    <string name="l10n_dex_write_pause_cleared" formatted="false">"Safety pause cleared. Review your orders and balances."</string>
+    <string name="l10n_dex_maker_disarm_failed" formatted="false">"The maker could not be saved as disarmed. The safety pause remains; check storage and review again."</string>
 </resources>

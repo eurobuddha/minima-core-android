@@ -68,6 +68,7 @@ public class NodeApi {
         });
     }
     private static String activeWrite = "";
+    private static volatile boolean failedWriteAcknowledgement;
     Context context() { return mContext.getApplicationContext(); }
 
     static boolean writesFunds(String command) {
@@ -78,15 +79,36 @@ public class NodeApi {
     private android.content.SharedPreferences writePrefs() {
         return mContext.getSharedPreferences(WRITE_PREFS, Context.MODE_PRIVATE);
     }
-    private boolean hasPendingWrite() { return !writePrefs().getString("pending", "").isEmpty(); }
+    private boolean hasPendingWrite() { return failedWriteAcknowledgement || !writePrefs().getString("pending", "").isEmpty(); }
     public String interruptedWriteDetails() {
         return writePrefs().getString("command", "Command details unavailable for this older receipt.");
     }
     public boolean hasInterruptedWrite() { return hasPendingWrite() && activeWrite.isEmpty(); }
     /** Only invoked after the user's explicit restart-and-reconcile confirmation. */
-    public boolean acknowledgeInterruptedWrite() {
-        return activeWrite.isEmpty() && writePrefs().edit().remove("pending").commit();
+    public String interruptedWriteId() { return writePrefs().getString("pending", ""); }
+    public boolean acknowledgeInterruptedWrite(String expected) {
+        String previous = interruptedWriteId();
+        String marker = previous.isEmpty() ? java.util.UUID.randomUUID().toString() : previous;
+        return acknowledgeReviewedWrite(expected, previous, activeWrite,
+                () -> writePrefs().edit().remove("pending").commit(),
+                () -> writePrefs().edit().putString("pending", marker).commit());
     }
+
+    /** UI and node callbacks run on the main Looper. Consent applies only to the reviewed marker. */
+    static boolean acknowledgeReviewedWrite(String expected, String current, String active,
+                                            java.util.function.BooleanSupplier clear, Runnable rollback) {
+        if (expected == null || !expected.equals(current) || !active.isEmpty()) return false;
+        return commitWriteAcknowledgement(clear, rollback);
+    }
+
+    static boolean commitWriteAcknowledgement(java.util.function.BooleanSupplier clear, Runnable rollback) {
+        failedWriteAcknowledgement = true;
+        try { if (clear.getAsBoolean()) { failedWriteAcknowledgement = false; return true; } }
+        catch (Exception e) { /* keep process latch */ }
+        try { rollback.run(); } catch (Exception e) { /* keep process latch */ }
+        return false;
+    }
+    static boolean writeAcknowledgementFailed() { return failedWriteAcknowledgement; }
 
     private static final long READ_TIMEOUT_MS = 30000;
     private static final long WRITE_TIMEOUT_MS = 180000;   // build + proof-of-work + post is slow on mobile

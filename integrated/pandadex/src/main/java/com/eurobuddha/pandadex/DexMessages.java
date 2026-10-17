@@ -217,6 +217,33 @@ public final class DexMessages {
             case "Remaining limit order not placed — review the trade first": return Language.msg(l10n_dex_review_before_rest);
             case "Buy request accepted · selecting wallet coins": return Language.msg(l10n_dex_selecting_buy);
             case "Sell request accepted · selecting wallet coins": return Language.msg(l10n_dex_selecting_sell);
+            case "Resolve interrupted write": return Language.msg(l10n_atomix_recovery_resolve);
+            case "Keep paused": return Language.msg(l10n_atomix_recovery_keep);
+            case "I restarted and checked": return Language.msg(l10n_pools_restarted_checked);
+            case "Address copied": return Language.msg(l10n_wallet_address_copied);
+            case "OK": return Language.msg(l10n_common_ok);
+            case "never": return Language.msg(l10n_nft_wallet_never);
+            case "SIGNING PAUSED": return Language.msg(l10n_dex_signing_paused);
+            case "A node write lost its reply. It may have completed.": return Language.msg(l10n_dex_write_lost_reply);
+            case "TRADE STILL BEING CHECKED": return Language.msg(l10n_dex_trade_checking_title);
+            case "View submitted receipt and check again": return Language.msg(l10n_dex_review_trade_receipt);
+            case "AVAILABLE TO TRADE": return Language.msg(l10n_dex_available_trade);
+            case "Waiting for a current book price.": return Language.msg(l10n_dex_waiting_book_price);
+            case "Waiting for wallet balances from MinimaCore.": return Language.msg(l10n_dex_waiting_balances);
+            case "MINIMA · available to trade": return Language.msg(l10n_dex_minima_available);
+            case "MxUSD · available to trade": return Language.msg(l10n_dex_mxusd_available);
+            case "RECEIVE": return Language.msg(l10n_dex_receive);
+            case "Address not loaded": return Language.msg(l10n_dex_address_missing);
+            case "Tap to copy": return Language.msg(l10n_dex_tap_copy);
+            case "Loading receive address from MinimaCore…": return Language.msg(l10n_dex_receive_loading);
+            case "NEED MxUSD?": return Language.msg(l10n_dex_need_mxusd);
+            case "MxUSD is the wrapped-USDT token on Minima. Bridge in at mxusd.global, or swap ERC20 USDT ↔ MxUSD with AtomiX.": return Language.msg(l10n_dex_bridge_help);
+            case "No interrupted write to resolve": return Language.msg(l10n_dex_no_write_paused);
+            case "Copy details": return Language.msg(l10n_dex_copy_details);
+            case "Command details unavailable for this older receipt.": return Language.msg(l10n_dex_older_write_details);
+            case "Safety pause cleared. Review your orders and balances.": return Language.msg(l10n_dex_write_pause_cleared);
+            case "The reviewed write changed, a write is still active, or the safety state could not be saved. Keep paused.": return Language.msg(l10n_pools_keep_write_paused);
+            case "The maker could not be saved as disarmed. The safety pause remains; check storage and review again.": return Language.msg(l10n_dex_maker_disarm_failed);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {
@@ -293,8 +320,13 @@ public final class DexMessages {
         java.util.regex.Pattern.compile("Buy\\ request\\ accepted\\ ·\\ selecting\\ wallet\\ coins\\ for\\ (-?[0-9]+)\\ pool\\(s\\)\\ and\\ (-?[0-9]+)\\ limit\\ order\\(s\\)"),
         java.util.regex.Pattern.compile("Posted\\ —\\ waiting\\ for\\ a\\ block\\ to\\ confirm\\ your\\ buy\\ of\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA"),
         java.util.regex.Pattern.compile("Sell\\ request\\ accepted\\ ·\\ selecting\\ wallet\\ coins\\ for\\ (-?[0-9]+)\\ pool\\(s\\)\\ and\\ (-?[0-9]+)\\ limit\\ order\\(s\\)"),
-        java.util.regex.Pattern.compile("Posted\\ —\\ waiting\\ for\\ a\\ block\\ to\\ confirm\\ your\\ sell\\ of\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA")
+        java.util.regex.Pattern.compile("Posted\\ —\\ waiting\\ for\\ a\\ block\\ to\\ confirm\\ your\\ sell\\ of\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA"),
+        java.util.regex.Pattern.compile("(-?[0-9]+)m\\ ago"),
+        java.util.regex.Pattern.compile("(-?[0-9]+)h\\ ago"),
+        java.util.regex.Pattern.compile("sendable\\ funds\\ only,\\ valued\\ at\\ book\\ mid\\ (-?[0-9]+(?:\\.[0-9]+)?)"),
+        java.util.regex.Pattern.compile("in\\ PandaDEX\\ orders\\ (-?[0-9]+(?:\\.[0-9]+)?)"),
+        java.util.regex.Pattern.compile("in\\ saved\\ PandaDEX\\ orders\\ (-?[0-9]+(?:\\.[0-9]+)?)")
     };
-    private static final int[] RESOURCES={l10n_dex_total_value,l10n_dex_last_trade_age,l10n_dex_book_pool_amount,l10n_dex_pool_amount,l10n_pools_seconds_ago,l10n_dex_minutes_ago,l10n_dex_minutes_ago,l10n_dex_hours_ago,l10n_dex_hours_ago,l10n_dex_days_ago,l10n_dex_days_ago,l10n_dex_clock_seconds,l10n_dex_clock_minutes,l10n_dex_receipt_cancel_buy,l10n_dex_receipt_cancel_sell,l10n_dex_receipt_update_buy,l10n_dex_receipt_update_sell,l10n_dex_receipt_place_buy,l10n_dex_receipt_place_sell,l10n_dex_receipt_submitted,l10n_dex_receipt_posting,l10n_dex_receipt_unknown,l10n_dex_cancel_all_count,l10n_dex_age_blocks,l10n_dex_age_at_check,l10n_dex_order_trade_volume,l10n_dex_order_notional,l10n_dex_order_pnl,l10n_dex_order_pnl_positive,l10n_dex_owner_page,l10n_dex_owner_depth,l10n_dex_reprice_failure,l10n_dex_cancel_failure,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_mixed,l10n_dex_cancelling_progress,l10n_dex_sweep_buying,l10n_dex_sweep_buying,l10n_dex_sweep_selling,l10n_dex_sweep_selling,l10n_dex_quote_buying,l10n_dex_quote_selling,l10n_dex_quote_average,l10n_dex_quote_effective,l10n_dex_quote_book,l10n_dex_quote_book,l10n_dex_quote_pool,l10n_dex_quote_pool,l10n_dex_quote_impact,l10n_dex_quote_worst,l10n_dex_quote_book_leg,l10n_dex_quote_book_partial,l10n_dex_quote_partial,l10n_dex_quote_pool_leg,l10n_dex_quote_rest,l10n_dex_order_status,l10n_dex_trade_failure,l10n_dex_selecting_composite_buy,l10n_dex_posted_buy,l10n_dex_selecting_composite_sell,l10n_dex_posted_sell};
-    private static final boolean[][] DIAGNOSTIC={{false},{true},{false,false},{false},{false},{false},{false},{false},{false},{false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{true},{false},{false},{false},{false,false,false},{false},{false},{false},{false,false},{false},{true},{true},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false},{false},{false,false},{false,false},{false,false,false},{false,false,false},{false,false,false},{false,false,false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{false,false},{false},{false,false},{false}};
+    private static final int[] RESOURCES={l10n_dex_total_value,l10n_dex_last_trade_age,l10n_dex_book_pool_amount,l10n_dex_pool_amount,l10n_pools_seconds_ago,l10n_dex_minutes_ago,l10n_dex_minutes_ago,l10n_dex_hours_ago,l10n_dex_hours_ago,l10n_dex_days_ago,l10n_dex_days_ago,l10n_dex_clock_seconds,l10n_dex_clock_minutes,l10n_dex_receipt_cancel_buy,l10n_dex_receipt_cancel_sell,l10n_dex_receipt_update_buy,l10n_dex_receipt_update_sell,l10n_dex_receipt_place_buy,l10n_dex_receipt_place_sell,l10n_dex_receipt_submitted,l10n_dex_receipt_posting,l10n_dex_receipt_unknown,l10n_dex_cancel_all_count,l10n_dex_age_blocks,l10n_dex_age_at_check,l10n_dex_order_trade_volume,l10n_dex_order_notional,l10n_dex_order_pnl,l10n_dex_order_pnl_positive,l10n_dex_owner_page,l10n_dex_owner_depth,l10n_dex_reprice_failure,l10n_dex_cancel_failure,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_mixed,l10n_dex_cancelling_progress,l10n_dex_sweep_buying,l10n_dex_sweep_buying,l10n_dex_sweep_selling,l10n_dex_sweep_selling,l10n_dex_quote_buying,l10n_dex_quote_selling,l10n_dex_quote_average,l10n_dex_quote_effective,l10n_dex_quote_book,l10n_dex_quote_book,l10n_dex_quote_pool,l10n_dex_quote_pool,l10n_dex_quote_impact,l10n_dex_quote_worst,l10n_dex_quote_book_leg,l10n_dex_quote_book_partial,l10n_dex_quote_partial,l10n_dex_quote_pool_leg,l10n_dex_quote_rest,l10n_dex_order_status,l10n_dex_trade_failure,l10n_dex_selecting_composite_buy,l10n_dex_posted_buy,l10n_dex_selecting_composite_sell,l10n_dex_posted_sell,l10n_dex_minutes_ago,l10n_dex_hours_ago,l10n_dex_sendable_mid,l10n_dex_in_orders,l10n_dex_in_saved_orders};
+    private static final boolean[][] DIAGNOSTIC={{false},{true},{false,false},{false},{false},{false},{false},{false},{false},{false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{true},{false},{false},{false},{false,false,false},{false},{false},{false},{false,false},{false},{true},{true},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false},{false},{false,false},{false,false},{false,false,false},{false,false,false},{false,false,false},{false,false,false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{false,false},{false},{false,false},{false},{false},{false},{false},{false},{false}};
 }

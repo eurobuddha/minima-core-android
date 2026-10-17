@@ -177,7 +177,34 @@
     "Trade outcome unresolved. The remaining limit order was not placed; the trade is still being checked.": "dex.restNotPlaced",
     "Remaining limit order not placed — review the trade first": "dex.reviewBeforeRest",
     "Buy request accepted · selecting wallet coins": "dex.selectingBuy",
-    "Sell request accepted · selecting wallet coins": "dex.selectingSell"
+    "Sell request accepted · selecting wallet coins": "dex.selectingSell",
+    "Resolve interrupted write": "atomixRecovery.resolve",
+    "Keep paused": "atomixRecovery.keep",
+    "I restarted and checked": "pools.restartedChecked",
+    "Address copied": "wallet.addressCopied",
+    "OK": "common.ok",
+    "never": "nftWallet.never",
+    "SIGNING PAUSED": "dex.signingPaused",
+    "A node write lost its reply. It may have completed.": "dex.writeLostReply",
+    "TRADE STILL BEING CHECKED": "dex.tradeCheckingTitle",
+    "View submitted receipt and check again": "dex.reviewTradeReceipt",
+    "AVAILABLE TO TRADE": "dex.availableTrade",
+    "Waiting for a current book price.": "dex.waitingBookPrice",
+    "Waiting for wallet balances from MinimaCore.": "dex.waitingBalances",
+    "MINIMA · available to trade": "dex.minimaAvailable",
+    "MxUSD · available to trade": "dex.mxusdAvailable",
+    "RECEIVE": "dex.receive",
+    "Address not loaded": "dex.addressMissing",
+    "Tap to copy": "dex.tapCopy",
+    "Loading receive address from MinimaCore…": "dex.receiveLoading",
+    "NEED MxUSD?": "dex.needMxusd",
+    "MxUSD is the wrapped-USDT token on Minima. Bridge in at mxusd.global, or swap ERC20 USDT ↔ MxUSD with AtomiX.": "dex.bridgeHelp",
+    "No interrupted write to resolve": "dex.noWritePaused",
+    "Copy details": "dex.copyDetails",
+    "Command details unavailable for this older receipt.": "dex.olderWriteDetails",
+    "Safety pause cleared. Review your orders and balances.": "dex.writePauseCleared",
+    "The reviewed write changed, a write is still active, or the safety state could not be saved. Keep paused.": "pools.keepWritePaused",
+    "The maker could not be saved as disarmed. The safety pause remains; check storage and review again.": "dex.makerDisarmFailed"
   },
   "patterns": [
     {
@@ -647,6 +674,41 @@
         "number"
       ],
       "key": "dex.postedSell"
+    },
+    {
+      "template": "{0}m ago",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.minutesAgo"
+    },
+    {
+      "template": "{0}h ago",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.hoursAgo"
+    },
+    {
+      "template": "sendable funds only, valued at book mid {0}",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.sendableMid"
+    },
+    {
+      "template": "in PandaDEX orders {0}",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.inOrders"
+    },
+    {
+      "template": "in saved PandaDEX orders {0}",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.inSavedOrders"
     }
   ]
 }

@@ -6245,4 +6245,33 @@
     <string name="l10n_dex_selecting_composite_sell">"卖出请求已接受 · 正在为 %1$s 个池和 %2$s 个限价单选择钱包币"</string>
     <!-- Arguments: amount -->
     <string name="l10n_dex_posted_sell">"已提交 — 等待区块确认卖出 %1$s MINIMA"</string>
+    <string name="l10n_dex_signing_paused" formatted="false">"签名已暂停"</string>
+    <string name="l10n_dex_write_lost_reply" formatted="false">"节点写入操作的回复丢失。操作可能已完成。"</string>
+    <string name="l10n_dex_review_trade_receipt" formatted="false">"查看提交凭据并重新检查"</string>
+    <string name="l10n_dex_available_trade" formatted="false">"可用于交易"</string>
+    <!-- Arguments: price -->
+    <string name="l10n_dex_sendable_mid">"仅可发送资金，按订单簿中间价 %1$s 估值"</string>
+    <string name="l10n_dex_waiting_book_price" formatted="false">"正在等待当前订单簿价格。"</string>
+    <string name="l10n_dex_waiting_balances" formatted="false">"正在等待 MinimaCore 的钱包余额。"</string>
+    <string name="l10n_dex_minima_available" formatted="false">"MINIMA · 可用于交易"</string>
+    <string name="l10n_dex_mxusd_available" formatted="false">"MxUSD · 可用于交易"</string>
+    <string name="l10n_dex_receive" formatted="false">"接收"</string>
+    <string name="l10n_dex_address_missing" formatted="false">"地址尚未加载"</string>
+    <string name="l10n_dex_tap_copy" formatted="false">"点击复制"</string>
+    <string name="l10n_dex_receive_loading" formatted="false">"正在从 MinimaCore 加载接收地址…"</string>
+    <string name="l10n_dex_need_mxusd" formatted="false">"需要 MxUSD？"</string>
+    <string name="l10n_dex_bridge_help" formatted="false">"MxUSD 是 Minima 上的封装 USDT 代币。可在 mxusd.global 跨链转入，或通过 AtomiX 交换 ERC20 USDT ↔ MxUSD。"</string>
+    <!-- Arguments: confirmed, locked, unconfirmed, coins, age -->
+    <string name="l10n_dex_asset_breakdown">"已确认 %1$s · 锁定 ≈ %2$s · 未确认 %3$s · %4$s 枚币 · 更新于 %5$s"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_in_orders">"PandaDEX 订单中 %1$s"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_in_saved_orders">"已保存的 PandaDEX 订单中 %1$s"</string>
+    <string name="l10n_dex_no_write_paused" formatted="false">"没有需要处理的中断写入"</string>
+    <string name="l10n_dex_copy_details" formatted="false">"复制详情"</string>
+    <string name="l10n_dex_older_write_details" formatted="false">"此旧凭据没有可用的命令详情。"</string>
+    <!-- Arguments: command -->
+    <string name="l10n_dex_write_recovery_body">"节点写入操作的回复丢失，操作可能已完成。请先重启 MinimaCore 以停止旧命令，再检查订单、成交记录和余额。解除暂停不会撤销或重试任何交易。做市将保持停用，直到您重新检查并发布。\n\n中断的命令：\n%1$s"</string>
+    <string name="l10n_dex_write_pause_cleared" formatted="false">"安全暂停已解除。请检查您的订单和余额。"</string>
+    <string name="l10n_dex_maker_disarm_failed" formatted="false">"无法保存做市的停用状态。安全暂停仍然有效；请检查存储空间并重新确认。"</string>
 </resources>
