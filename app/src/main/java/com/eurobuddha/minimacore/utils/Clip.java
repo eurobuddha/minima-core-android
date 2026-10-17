@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.utils;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -36,7 +39,7 @@ public class Clip {
 
         ClipboardManager cm = (ClipboardManager) zContext.getSystemService(Context.CLIPBOARD_SERVICE);
         if(cm == null){
-            Toast.makeText(zContext, "Clipboard unavailable", Toast.LENGTH_SHORT).show();
+            Toast.makeText(zContext, Language.msg(l10n_core_wallet_clipboard), Toast.LENGTH_SHORT).show();
             return;
         }
 

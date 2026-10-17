@@ -15,6 +15,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import org.minima.utils.BIP39;
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import com.eurobuddha.minimacore.utils.KeyboardInsets;
 import com.eurobuddha.minimacore.launcher.LauncherActivity;
 import com.eurobuddha.minimacore.launcher.StartServiceActivity;
@@ -34,7 +36,7 @@ public class NewWalletRestoreActivity extends AppCompatActivity {
 
 
         Toolbar tb = findViewById(R.id.toolbar);
-        tb.setTitle("New Wallet");
+        Language.toolbarTitle(tb, Language.msg(l10n_launcher_new_wallet));
         setSupportActionBar(tb);
         KeyboardInsets.install(this, findViewById(R.id.restorewallet_main), tb);
 
@@ -46,7 +48,7 @@ public class NewWalletRestoreActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String seed = mSeedInput.getText().toString().trim();
                 if(seed.equals("")){
-                    logger.showDialog(NewWalletRestoreActivity.this,"Seed Error","Cannot have an empty seed");
+                    logger.showDialog(NewWalletRestoreActivity.this,Language.msg(l10n_onboarding_seed_error),Language.msg(l10n_onboarding_empty_seed));
                     return;
                 }
 
@@ -55,11 +57,11 @@ public class NewWalletRestoreActivity extends AppCompatActivity {
                     String newseed = BIP39.cleanSeedPhrase(seed);
                     setSeedText(newseed);
                 }catch (IllegalArgumentException exc){
-                    logger.showDialog(NewWalletRestoreActivity.this,"Seed Error","There is an invalid word in your seed");
+                    logger.showDialog(NewWalletRestoreActivity.this,Language.msg(l10n_onboarding_seed_error),Language.msg(l10n_onboarding_invalid_word));
                     return;
                 }
 
-                logger.showDialog(NewWalletRestoreActivity.this,"Seed Phrase","Your seed phrase is now valid!");
+                logger.showDialog(NewWalletRestoreActivity.this,Language.msg(l10n_onboarding_seed_phrase),Language.msg(l10n_onboarding_valid_seed));
             }
         });
 
@@ -71,14 +73,14 @@ public class NewWalletRestoreActivity extends AppCompatActivity {
                 //Get the seed
                 String seed = mSeedInput.getText().toString().trim();
                 if(seed.equals("")){
-                    logger.showDialog(NewWalletRestoreActivity.this,"Seed Error","Cannot have an empty seed");
+                    logger.showDialog(NewWalletRestoreActivity.this,Language.msg(l10n_onboarding_seed_error),Language.msg(l10n_onboarding_empty_seed));
                     return;
                 }
 
 //                //Get the Node
 //                String seed = mSeedInput.getText().toString().trim();
 //                if(seed.equals("")){
-//                    logger.showDialog(NewWalletRestoreActivity.this,"Seed Error","Cannot have an empty seed");
+//                    logger.showDialog(NewWalletRestoreActivity.this,Language.msg(l10n_onboarding_seed_error),Language.msg(l10n_onboarding_empty_seed));
 //                    return;
 //                }
 

@@ -25,6 +25,7 @@ __pycache__/
 
 # vendored transport core module - build output never in git
 /maxima-core/build/
+/localization/build/
 /review/**/build/
 /dist/minima-1.7.apk*
 /review/2026-10-07/

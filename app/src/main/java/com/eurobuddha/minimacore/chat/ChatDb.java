@@ -66,6 +66,8 @@ public class ChatDb extends SQLiteOpenHelper {
 
     public static class Thread {
         public String pubkey, name, lastBody;
+        public String lastState = "";
+        public boolean lastMine;
         public long lastTs;
         public int unread;
     }
@@ -119,11 +121,12 @@ public class ChatDb extends SQLiteOpenHelper {
         ArrayList<Thread> out = new ArrayList<>();
         Cursor c = getReadableDatabase().rawQuery(
                 "SELECT ct.pubkey, ct.name," +
-                // preview: a state-carrying last message shows a label, not its raw body
-                " (SELECT CASE m.state WHEN 'audio' THEN '🎤 Voice note' WHEN 'image' THEN '📷 Photo' ELSE m.body END" +
+                // Retain typed metadata so only display labels are translated.
+                " (SELECT m.body" +
                 "   FROM messages m WHERE m.pubkey=ct.pubkey ORDER BY ts DESC, rowid DESC LIMIT 1)," +
                 " (SELECT MAX(ts) FROM messages m WHERE m.pubkey=ct.pubkey)," +
-                " (SELECT COUNT(*) FROM messages m WHERE m.pubkey=ct.pubkey AND incoming=1 AND read=0)" +
+                " (SELECT COUNT(*) FROM messages m WHERE m.pubkey=ct.pubkey AND incoming=1 AND read=0)," +
+                " (SELECT m.state FROM messages m WHERE m.pubkey=ct.pubkey ORDER BY ts DESC, rowid DESC LIMIT 1)" +
                 " FROM (SELECT pubkey, name, added FROM contacts" +
                 "       UNION SELECT DISTINCT pubkey, pubkey, 0 FROM messages WHERE pubkey NOT IN (SELECT pubkey FROM contacts)) ct" +
                 " ORDER BY 4 DESC, ct.added ASC", null);   // SQLite sorts NULL last under DESC
@@ -134,6 +137,7 @@ public class ChatDb extends SQLiteOpenHelper {
             t.lastBody = c.isNull(2) ? "" : c.getString(2);
             t.lastTs = c.isNull(3) ? 0 : c.getLong(3);
             t.unread = c.getInt(4);
+            t.lastState = c.isNull(5) ? "" : c.getString(5);
             out.add(t);
         }
         c.close();

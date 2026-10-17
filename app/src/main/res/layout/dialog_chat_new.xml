@@ -12,6 +12,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/newchat_pick"
         style="@style/Widget.MinimaCore.Button"
+        android:tag="l10n:text=l10n_chat_choose_saved"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Choose a saved contact"
@@ -21,6 +22,7 @@
 
     <TextView
         android:id="@+id/newchat_pick_hint"
+        android:tag="l10n:text=l10n_chat_pick_hint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
@@ -45,6 +47,7 @@
             android:background="@color/core_surface_variant" />
 
         <TextView
+            android:tag="l10n:text=l10n_chat_add_new"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingHorizontal="12dp"
@@ -63,6 +66,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/newchat_scan"
         style="@style/Widget.MinimaCore.Button.Outlined"
+        android:tag="l10n:text=l10n_chat_scan_qr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Scan their QR code"
@@ -70,6 +74,7 @@
         app:iconGravity="start" />
 
     <TextView
+        android:tag="l10n:text=l10n_chat_paste_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
@@ -80,6 +85,7 @@
 
     <EditText
         android:id="@+id/newchat_address"
+        android:tag="l10n:hint=l10n_chat_address_hint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -91,6 +97,7 @@
 
     <EditText
         android:id="@+id/newchat_name"
+        android:tag="l10n:hint=l10n_chat_optional_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

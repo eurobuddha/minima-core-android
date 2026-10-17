@@ -1,4 +1,7 @@
 package com.eurobuddha.entropy;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.content.Context;
 import android.graphics.Color;
@@ -55,24 +58,24 @@ public final class Ui {
         return l;
     }
 
-    public static TextView text(Context c, String s, int color, float sp, boolean bold) {
+    public static TextView text(Context c, CharSequence s, int color, float sp, boolean bold) {
         TextView t = new TextView(c);
-        t.setText(s);
+        Language.setText(t, s);
         t.setTextColor(color);
         t.setTextSize(sp);
         t.setTypeface(bold ? Theme.pixel() : Theme.body(), bold ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
         return t;
     }
 
-    public static TextView label(Context c, String s) {
-        TextView t = text(c, s.toUpperCase(), Theme.dim(), 10, false);
+    public static TextView label(Context c, CharSequence s) {
+        TextView t = text(c, Language.upper(s), Theme.dim(), 10, false);
         t.setLetterSpacing(0.1f);
         return t;
     }
 
-    public static Button button(Context c, String s, int bg, int fg) {
+    public static Button button(Context c, CharSequence s, int bg, int fg) {
         Button b = new Button(c);
-        b.setText(s);
+        Language.setText(b, s);
         b.setAllCaps(true);
         b.setTextColor(fg);
         b.setTextSize(12);
@@ -86,8 +89,8 @@ public final class Ui {
     }
 
     /** A small rounded badge (e.g. phase / odds). */
-    public static TextView badge(Context c, String s, int fg, int bg) {
-        TextView t = text(c, s.toUpperCase(), fg, 9, true);
+    public static TextView badge(Context c, CharSequence s, int fg, int bg) {
+        TextView t = text(c, Language.upper(s), fg, 9, true);
         t.setLetterSpacing(0.08f);
         t.setBackground(rounded(bg, 0, 4, c));
         t.setPadding(dp(c, 7), dp(c, 3), dp(c, 7), dp(c, 3));

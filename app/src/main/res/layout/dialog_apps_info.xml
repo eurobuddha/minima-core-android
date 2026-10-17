@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        android:text="Package"
+        android:text="Package" android:tag="l10n:text=l10n_apps_package"
         android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
 
     <TextView
@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Enabled"
+        android:text="Enabled" android:tag="l10n:text=l10n_wallet_bio_enabled"
         android:textColor="@color/core_text"
         android:textAppearance="@style/TextAppearance.MinimaCore.Body" />
 
@@ -34,7 +34,7 @@
         android:id="@+id/app_info_admin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Admin"
+        android:text="Admin" android:tag="l10n:text=l10n_apps_admin"
         android:textColor="@color/core_text"
         android:textAppearance="@style/TextAppearance.MinimaCore.Body" />
 
@@ -45,7 +45,7 @@
         android:paddingHorizontal="12dp"
         android:paddingVertical="10dp"
         android:background="@drawable/bg_token_tile"
-        android:text="Do NOT enable ADMIN unless you trust the App."
+        android:text="Do NOT enable ADMIN unless you trust the App." android:tag="l10n:text=l10n_apps_admin_warning"
         android:textAppearance="@style/TextAppearance.MinimaCore.Caption"
         android:textColor="@color/status_warn" />
 </LinearLayout>

@@ -1,4 +1,8 @@
 package com.eurobuddha.terminalide.ide;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.app.Activity;
 import android.content.Intent;
@@ -57,13 +61,19 @@ public class ScriptsView extends BaseView {
     @Override
     public void refreshView() {
         mScripts = mDB.getAll();
-        List<String> labels = new ArrayList<>();
+        List<CharSequence> labels = new ArrayList<>();
         for (ScriptDB.Script s : mScripts) {
-            String when = DateUtils.getRelativeTimeSpanString(s.modified).toString();
+            CharSequence when = Language.since(s.modified);
             String deployed = s.address.isEmpty() ? "" : "  ⛓ " + shorten(s.address);
-            labels.add(s.name + "\n" + s.source.trim().length() + " chars · " + when + deployed);
+            labels.add(Language.join(s.name, "\n", Language.msg(l10n_terminal_editor_chars, s.source.trim().length()), " · ", when, deployed));
         }
-        mList.setAdapter(new ArrayAdapter<>(mActivity, android.R.layout.simple_list_item_1, labels));
+        mList.setAdapter(new ArrayAdapter<CharSequence>(mActivity, android.R.layout.simple_list_item_1, labels) {
+            @Override public android.view.View getView(int position, android.view.View recycled, android.view.ViewGroup parent) {
+                android.view.View view = super.getView(position, recycled, parent);
+                Language.setText(view.findViewById(android.R.id.text1), getItem(position));
+                return view;
+            }
+        });
         mEmpty.setVisibility(mScripts.isEmpty() ? android.view.View.VISIBLE : android.view.View.GONE);
     }
 
@@ -72,55 +82,53 @@ public class ScriptsView extends BaseView {
     }
 
     private void newScriptDialog() {
-        new AlertDialog.Builder(mActivity)
-                .setTitle("New script from…")
-                .setItems(Templates.names(), (d, which) -> nameDialog(which))
-                .setNegativeButton("Cancel", null)
+        ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
+                .setTitle(Language.msg(l10n_terminal_editor_new_from))
+                .setItems(new CharSequence[]{Language.msg(l10n_terminal_editor_blank), Language.msg(l10n_terminal_editor_signature), Language.msg(l10n_terminal_editor_timelock), Language.msg(l10n_terminal_editor_hashlock), Language.msg(l10n_terminal_editor_multisig), Language.msg(l10n_terminal_editor_random), Language.msg(l10n_terminal_editor_covenant)}, (d, which) -> nameDialog(which))
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     private void nameDialog(int templateIdx) {
         EditText name = new EditText(mActivity);
-        name.setHint("Script name");
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Name the script")
+        Language.hint(name, Language.msg(l10n_terminal_editor_name));
+        ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
+                .setTitle(Language.msg(l10n_terminal_editor_name_title))
                 .setView(name)
-                .setPositiveButton("Create", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_terminal_editor_create), (d, w) -> {
                     String n = name.getText().toString().trim();
-                    if (n.isEmpty()) n = Templates.ALL[templateIdx][0].equals("Blank")
-                            ? "untitled" : Templates.ALL[templateIdx][0];
-                    long id = mDB.insert(n, Templates.ALL[templateIdx][1]);
+                    if (n.isEmpty()) n = TemplateText.name(templateIdx);
+                    long id = mDB.insert(n, TemplateText.source(templateIdx));
                     refreshView();
                     openEditor(id);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     private void scriptActionsDialog(ScriptDB.Script s) {
-        new AlertDialog.Builder(mActivity)
+        ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
                 .setTitle(s.name)
-                .setItems(new String[]{"Open", "Duplicate", "Delete"}, (d, which) -> {
+                .setItems(new CharSequence[]{Language.msg(l10n_terminal_editor_open), Language.msg(l10n_terminal_editor_duplicate), Language.msg(l10n_backup_delete)}, (d, which) -> {
                     if (which == 0) {
                         openEditor(s.id);
                     } else if (which == 1) {
-                        mDB.insert(s.name + " copy", s.source);
+                        mDB.insert(Language.msg(l10n_terminal_template_copy, s.name).toString(), s.source);
                         refreshView();
                     } else {
-                        new AlertDialog.Builder(mActivity)
-                                .setTitle("Delete '" + s.name + "'?")
-                                .setMessage("This only deletes the local copy. A deployed script "
-                                        + "stays on the node (use removescript to untrack it).")
-                                .setPositiveButton("Delete", (dd, ww) -> {
+                        ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
+                                .setTitle(Language.msg(l10n_terminal_editor_delete_title, s.name))
+                                .setMessage(Language.msg(l10n_terminal_editor_delete_body))
+                                .setPositiveButton(Language.msg(l10n_backup_delete), (dd, ww) -> {
                                     mDB.delete(s.id);
                                     refreshView();
-                                    Toast.makeText(mActivity, "Deleted", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mActivity, Language.msg(l10n_terminal_ide_deleted), Toast.LENGTH_SHORT).show();
                                 })
-                                .setNegativeButton("Cancel", null)
+                                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                                 .show();
                     }
                 })
-                .setNegativeButton("Close", null)
+                .setNegativeButton(Language.msg(l10n_language_close), null)
                 .show();
     }
 
@@ -142,17 +150,17 @@ public class ScriptsView extends BaseView {
     /** Browse scripts registered on the node (the `scripts` command) and import them. */
     private void showNodeScripts() {
         if (mNode == null) return;
-        Toast.makeText(mActivity, "Loading node scripts…", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mActivity, Language.msg(l10n_terminal_editor_loading), Toast.LENGTH_SHORT).show();
         mNode.cmd("scripts", new NodeApi.Cb() {
             @Override
             public void onResult(JSONObject json) {
                 JSONArray arr = json.optJSONArray("response");
                 if (arr == null || arr.length() == 0) {
-                    Toast.makeText(mActivity, "No scripts on the node", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, Language.msg(l10n_terminal_editor_no_node_scripts), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 int n = arr.length();
-                String[] labels = new String[n];
+                CharSequence[] labels = new CharSequence[n];
                 String[] scripts = new String[n];
                 String[] addresses = new String[n];
                 for (int i = 0; i < n; i++) {
@@ -160,7 +168,7 @@ public class ScriptsView extends BaseView {
                     if (s == null) {   // malformed element — don't NPE
                         scripts[i] = "";
                         addresses[i] = "";
-                        labels[i] = "(unreadable script entry)";
+                        labels[i] = Language.msg(l10n_terminal_editor_unreadable);
                         continue;
                     }
                     scripts[i] = s.optString("script", "");
@@ -168,40 +176,40 @@ public class ScriptsView extends BaseView {
                     boolean def = s.optBoolean("default", false);
                     String snippet = scripts[i].length() > 60
                             ? scripts[i].substring(0, 60) + "…" : scripts[i];
-                    labels[i] = (def ? "[wallet] " : "") + shorten(addresses[i]) + "\n" + snippet;
+                    labels[i] = Language.join(def ? Language.msg(l10n_terminal_editor_wallet) : "", shorten(addresses[i]), "\n", snippet);
                 }
-                new AlertDialog.Builder(mActivity)
-                        .setTitle("Scripts on node (" + n + ")")
+                ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
+                        .setTitle(Language.msg(l10n_terminal_editor_node_scripts, n))
                         .setItems(labels, (d, which) -> nodeScriptActions(
                                 addresses[which], scripts[which]))
-                        .setNegativeButton("Close", null)
+                        .setNegativeButton(Language.msg(l10n_language_close), null)
                         .show();
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(mActivity, "Node error: " + message, Toast.LENGTH_LONG).show();
+                Toast.makeText(mActivity, Language.msg(l10n_terminal_editor_node_error, com.eurobuddha.terminalide.terminal.TerminalMessages.message(message)), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void nodeScriptActions(String address, String script) {
-        new AlertDialog.Builder(mActivity)
+        ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
                 .setTitle(shorten(address))
                 .setMessage(script)
-                .setPositiveButton("Import to library", (d, w) -> {
-                    long id = mDB.insert("from node " + shorten(address), script);
+                .setPositiveButton(Language.msg(l10n_terminal_editor_import), (d, w) -> {
+                    long id = mDB.insert(Language.msg(l10n_terminal_template_from_node, shorten(address)).toString(), script);
                     mDB.setAddress(id, address);
                     refreshView();
                     openEditor(id);
                 })
-                .setNeutralButton("Copy address", (d, w) -> {
+                .setNeutralButton(Language.msg(l10n_wallet_copy_address), (d, w) -> {
                     android.content.ClipboardManager cb = (android.content.ClipboardManager)
                             mActivity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
                     cb.setPrimaryClip(android.content.ClipData.newPlainText("address", address));
-                    Toast.makeText(mActivity, "Copied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, Language.msg(l10n_history_copied), Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 }

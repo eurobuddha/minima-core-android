@@ -1,4 +1,7 @@
 package com.eurobuddha.casino;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -36,6 +39,7 @@ public class CasinoService extends Service {
     private static final String CH_ALERT = "casino_alert";
     private static final int FG_ID = 5101;
     private int alertId = 2000;
+    private boolean foregroundActive = false;
 
     private NodeApi node;
     private SecretStore secrets;
@@ -80,7 +84,17 @@ public class CasinoService extends Service {
         return START_STICKY;
     }
 
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        createChannels();
+        if (foregroundActive) {
+            NotificationManager nm = getSystemService(NotificationManager.class);
+            if (nm != null) nm.notify(FG_ID, foregroundNotification());
+        }
+    }
+
     @Override public void onDestroy() {
+        foregroundActive = false;
         super.onDestroy();
         if (node != null) node.onDestroy();
         if (receiver != null) { try { DirectNodeEvents.unsubscribe(receiver); } catch (Exception ignored) {} }
@@ -252,20 +266,29 @@ public class CasinoService extends Service {
     private void createChannels() {
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationManager nm = getSystemService(NotificationManager.class);
-            nm.createNotificationChannel(new NotificationChannel(CH_FG, "Casino background",
-                    NotificationManager.IMPORTANCE_LOW));
-            nm.createNotificationChannel(new NotificationChannel(CH_ALERT, "Casino results",
-                    NotificationManager.IMPORTANCE_DEFAULT));
+            if (nm == null) return;
+            NotificationChannel foregroundChannel = nm.getNotificationChannel(CH_FG);
+            if (foregroundChannel == null) foregroundChannel = new NotificationChannel(CH_FG, Language.text(this, l10n_casino_background_channel), NotificationManager.IMPORTANCE_LOW);
+            foregroundChannel.setName(Language.text(this, l10n_casino_background_channel));
+            nm.createNotificationChannel(foregroundChannel);
+            NotificationChannel alertChannel = nm.getNotificationChannel(CH_ALERT);
+            if (alertChannel == null) alertChannel = new NotificationChannel(CH_ALERT, Language.text(this, l10n_casino_results_channel), NotificationManager.IMPORTANCE_DEFAULT);
+            alertChannel.setName(Language.text(this, l10n_casino_results_channel));
+            nm.createNotificationChannel(alertChannel);
         }
     }
 
-    private boolean startForegroundCompat() {
-        Notification n = new NotificationCompat.Builder(this, CH_FG)
+    private Notification foregroundNotification() {
+        return new NotificationCompat.Builder(this, CH_FG)
                 .setContentTitle("Zero Edge Casino")
-                .setContentText("Auto-revealing & resolving your bets")
+                .setContentText(Language.text(this, l10n_casino_background_watching))
                 .setSmallIcon(android.R.drawable.ic_menu_view)
                 .setOngoing(true)
                 .build();
+    }
+
+    private boolean startForegroundCompat() {
+        Notification n = foregroundNotification();
         try {
             if (Build.VERSION.SDK_INT >= 34) {
                 startForeground(FG_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
@@ -274,6 +297,7 @@ public class CasinoService extends Service {
             } else {
                 startForeground(FG_ID, n);
             }
+            foregroundActive = true;
             return true;
         } catch (Exception unavailable) { return false; }
     }
@@ -281,14 +305,15 @@ public class CasinoService extends Service {
     @Override public void onTimeout(int startId) { stopGracefully(); }
     @Override public void onTimeout(int startId, int type) { stopGracefully(); }
     private void stopGracefully() {
+        foregroundActive = false;
         try { stopForeground(STOP_FOREGROUND_REMOVE); } catch (Exception ignored) {}
         stopSelf();
     }
 
     private void notifyAlert(String title, String body) {
         Notification n = new NotificationCompat.Builder(this, CH_ALERT)
-                .setContentTitle(title)
-                .setContentText(body)
+                .setContentTitle(CasinoMessages.message(title))
+                .setContentText(CasinoMessages.message(body))
                 .setSmallIcon(android.R.drawable.ic_menu_view)
                 .setAutoCancel(true)
                 .build();

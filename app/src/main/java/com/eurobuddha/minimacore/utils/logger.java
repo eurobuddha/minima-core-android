@@ -4,7 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import com.eurobuddha.minimacore.i18n.Language;
 
 import com.eurobuddha.minimacore.R;
 
@@ -13,19 +14,19 @@ public class logger {
         Log.d("Minima-Core",zLog);
     }
 
-    public static void showDialog(Context zContext, String zTitle, String zMessage){
+    public static void showDialog(Context zContext, CharSequence zTitle, CharSequence zMessage){
         showDialog(zContext, zTitle, zMessage, new Runnable() {
             @Override
             public void run() {}
         });
     }
 
-    public static void showDialog(Context zContext, String zTitle, String zMessage, Runnable zOnOK){
-        new MaterialAlertDialogBuilder(zContext)
+    public static void showDialog(Context zContext, CharSequence zTitle, CharSequence zMessage, Runnable zOnOK){
+        new LanguageDialog(zContext)
                 .setTitle(zTitle)
                 .setMessage(zMessage)
                 .setIcon(R.drawable.ic_minima)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
+                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_ok), new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int whichButton) {
                         zOnOK.run();
                     }}).show();

@@ -1,6 +1,9 @@
 package com.eurobuddha.minimacore.main.views.logs;
 
 import android.app.Activity;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.text.Editable;
@@ -71,11 +74,12 @@ public class LogsView extends BaseView {
         });
 
         mPauseBut = mMainView.findViewById(R.id.logs_pause);
+        Language.setText(mPauseBut, Language.msg(l10n_logs_pause));
         mPauseBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPaused = !mPaused;
-                mPauseBut.setText(mPaused ? "Resume" : "Pause");
+                Language.setText(mPauseBut, Language.msg(mPaused ? l10n_logs_resume : l10n_logs_pause));
                 if(!mPaused){
                     //Catch up with everything buffered while frozen
                     renderSnapshot();
@@ -102,17 +106,21 @@ public class LogsView extends BaseView {
                 }
                 Intent send = new Intent(Intent.ACTION_SEND);
                 send.setType("text/plain");
-                send.putExtra(Intent.EXTRA_SUBJECT, "Minima node log");
+                send.putExtra(Intent.EXTRA_SUBJECT, Language.text(getActivity(), l10n_logs_subject));
                 send.putExtra(Intent.EXTRA_TEXT, text);
-                getActivity().startActivity(Intent.createChooser(send, "Share node log"));
+                getActivity().startActivity(Intent.createChooser(send, Language.text(getActivity(), l10n_logs_share_title)));
             }
         });
 
         //Verbosity chips
         mChips = mMainView.findViewById(R.id.logs_chips);
-        for(String key : CHIP_KEYS){
+        int[] labels = {l10n_logs_scripts, l10n_logs_mining, l10n_logs_blocks,
+                l10n_logs_networking, l10n_logs_ibd};
+        for(int i = 0; i < CHIP_KEYS.length; i++){
+            String key = CHIP_KEYS[i];
             Chip chip = new Chip(zActivity);
-            chip.setText(key);
+            if (i < labels.length) Language.setText(chip, Language.msg(labels[i]));
+            else chip.setText("Maxima");
             chip.setCheckable(true);
             chip.setTag(key);
             chip.setOnClickListener(new View.OnClickListener() {

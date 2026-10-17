@@ -1,4 +1,8 @@
 package com.eurobuddha.terminalide.ide;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -36,6 +40,35 @@ import java.util.List;
  */
 public class ScriptEditorActivity extends AppCompatActivity {
 
+    @Override public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        menu.add(0, 1, 0, Language.msg(l10n_terminal_editor_reference));
+        menu.add(0, 2, 1, Language.msg(l10n_terminal_ide_docs));
+        return true;
+    }
+    private final java.util.Set<AlertDialog> languageDialogs = new java.util.HashSet<>();
+    private LanguageDialog languageDialog() {
+        return new LanguageDialog(this) {
+            @Override public AlertDialog create() {
+                AlertDialog dialog = super.create();
+                languageDialogs.add(dialog);
+                dialog.setOnDismissListener(d -> languageDialogs.remove(dialog));
+                return dialog;
+            }
+        };
+    }
+    private void refreshLanguage() {
+        Toolbar toolbar = findViewById(R.id.pm_terminalide_editor_toolbar);
+        if (toolbar == null) return;
+        if (toolbar.getMenu().findItem(1) != null) toolbar.getMenu().findItem(1).setTitle(Language.msg(l10n_terminal_editor_reference));
+        if (toolbar.getMenu().findItem(2) != null) toolbar.getMenu().findItem(2).setTitle(Language.msg(l10n_terminal_ide_docs));
+    }
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        refreshLanguage();
+    }
+    @Override protected void onResume() { super.onResume(); refreshLanguage(); }
+
     ScriptDB mDB;
     NodeApi mNode;
     long mScriptId;
@@ -56,6 +89,7 @@ public class ScriptEditorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pm_terminalide_activity_script_editor);
         View editorRoot = findViewById(R.id.pm_terminalide_editor_root);
+        Language.apply(editorRoot);
         ViewCompat.setOnApplyWindowInsetsListener(editorRoot, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
@@ -68,12 +102,11 @@ public class ScriptEditorActivity extends AppCompatActivity {
         ViewCompat.requestApplyInsets(editorRoot);
 
         Toolbar tb = findViewById(R.id.pm_terminalide_editor_toolbar);
-        tb.setTitle("Script Editor");
+        Language.toolbarTitle(tb, Language.msg(l10n_terminal_editor_title));
         setSupportActionBar(tb);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         tb.setNavigationOnClickListener(v -> finish());
-        tb.getMenu().add(0, 1, 0, "KISS VM reference");
-        tb.getMenu().add(0, 2, 1, "Minima docs");
+
         tb.setOnMenuItemClickListener(mi -> {
             if (mi.getItemId() == 1) {
                 showKissReference();
@@ -93,7 +126,7 @@ public class ScriptEditorActivity extends AppCompatActivity {
         mScriptId = getIntent().getLongExtra("script_id", -1);
         ScriptDB.Script script = mDB.get(mScriptId);
         if (script == null) {
-            Toast.makeText(this, "Script not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, Language.msg(l10n_terminal_editor_not_found), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -103,9 +136,13 @@ public class ScriptEditorActivity extends AppCompatActivity {
         mStatusLine = findViewById(R.id.pm_terminalide_editor_status);
         mRunConfig = findViewById(R.id.pm_terminalide_editor_runconfig);
         mState = findViewById(R.id.pm_terminalide_editor_state);
+        Language.hint(mState, Language.msg(l10n_terminal_editor_state, "{\"0\":\"0xFF..\",\"6\":\"1\"}"));
         mPrevState = findViewById(R.id.pm_terminalide_editor_prevstate);
+        Language.hint(mPrevState, Language.msg(l10n_terminal_editor_prevstate, "{\"0\":\"0xFF..\",\"6\":\"0\"}"));
         mGlobals = findViewById(R.id.pm_terminalide_editor_globals);
+        Language.hint(mGlobals, Language.msg(l10n_terminal_editor_globals, "{\"@COINAGE\":\"64\",\"@AMOUNT\":\"10\"}"));
         mSignatures = findViewById(R.id.pm_terminalide_editor_signatures);
+        Language.hint(mSignatures, Language.msg(l10n_terminal_editor_signatures, "[\"0xFF..\"]"));
         mResults = findViewById(R.id.pm_terminalide_editor_results);
 
         mName.setText(script.name);
@@ -117,7 +154,7 @@ public class ScriptEditorActivity extends AppCompatActivity {
         if (!script.testState.isEmpty() || !script.testPrevState.isEmpty()
                 || !script.testGlobals.isEmpty() || !script.testSignatures.isEmpty()) {
             mRunConfig.setVisibility(View.VISIBLE);
-            ((Button) findViewById(R.id.pm_terminalide_editor_toggle_config)).setText("▼ Test inputs");
+            Language.setText((Button) findViewById(R.id.pm_terminalide_editor_toggle_config), Language.msg(l10n_terminal_editor_inputs_open));
         }
         mChipScroller = findViewById(R.id.pm_terminalide_editor_chipscroller);
         mChipRow = findViewById(R.id.pm_terminalide_editor_chiprow);
@@ -138,7 +175,7 @@ public class ScriptEditorActivity extends AppCompatActivity {
         toggle.setOnClickListener(v -> {
             boolean show = mRunConfig.getVisibility() != View.VISIBLE;
             mRunConfig.setVisibility(show ? View.VISIBLE : View.GONE);
-            toggle.setText(show ? "▼ Test inputs" : "▶ Test inputs");
+            Language.setText(toggle, show ? Language.msg(l10n_terminal_editor_inputs_open) : Language.msg(l10n_terminal_editor_inputs_closed));
         });
 
         findViewById(R.id.pm_terminalide_editor_check).setOnClickListener(v -> check());
@@ -146,8 +183,7 @@ public class ScriptEditorActivity extends AppCompatActivity {
         findViewById(R.id.pm_terminalide_editor_deploy).setOnClickListener(v -> deployDialog(script));
 
         if (!script.address.isEmpty()) {
-            mResults.setText(OutputFormatter.colored("⛓ Deployed at: " + script.address,
-                    OutputFormatter.COL_STRING));
+            setResults(Language.msg(l10n_terminal_editor_deployed_at, script.address), OutputFormatter.COL_STRING);
         }
 
         updateStatus();
@@ -159,7 +195,7 @@ public class ScriptEditorActivity extends AppCompatActivity {
         // mName is null when onCreate bailed out (missing script) — onPause still fires.
         if (mScriptId < 0 || mName == null) return;
         String name = mName.getText().toString().trim();
-        if (name.isEmpty()) name = "untitled";
+        if (name.isEmpty()) name = Language.msg(l10n_terminal_template_untitled).toString();
         mDB.update(mScriptId, name, mEditor.getText().toString());
         mDB.saveTestInputs(mScriptId,
                 mState.getText().toString().trim(),
@@ -176,6 +212,8 @@ public class ScriptEditorActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        for (AlertDialog dialog : new java.util.ArrayList<>(languageDialogs)) dialog.dismiss();
+        languageDialogs.clear();
         super.onDestroy();
         if (mNode != null) mNode.onDestroy();
         if (mDB != null) mDB.close();
@@ -183,32 +221,21 @@ public class ScriptEditorActivity extends AppCompatActivity {
 
     /** Bundled KISS VM language reference (assets/kissvm.txt). */
     private void showKissReference() {
-        String ref;
-        try {
-            java.io.InputStream in = getAssets().open("kissvm.txt");
-            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
-            byte[] buf = new byte[8192];
-            int n;
-            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
-            in.close();
-            ref = out.toString("UTF-8");
-        } catch (java.io.IOException e) {
-            ref = "Reference unavailable";
-        }
+        CharSequence ref = Language.msg(l10n_terminal_reference_body);
         TextView tv = new TextView(this);
         tv.setTypeface(android.graphics.Typeface.MONOSPACE);
         tv.setTextSize(12);
         tv.setTextColor(OutputFormatter.COL_PLAIN);
         tv.setTextIsSelectable(true);
-        tv.setText(ref);
+        Language.setText(tv, ref);
         int pad = (int) (getResources().getDisplayMetrics().density * 16);
         android.widget.ScrollView scroller = new android.widget.ScrollView(this);
         scroller.setPadding(pad, pad / 2, pad, pad / 2);
         scroller.addView(tv);
-        new AlertDialog.Builder(this)
-                .setTitle("KISS VM reference")
+        languageDialog()
+                .setTitle(Language.msg(l10n_terminal_editor_reference))
                 .setView(scroller)
-                .setPositiveButton("Close", null)
+                .setPositiveButton(Language.msg(l10n_language_close), null)
                 .show();
     }
 
@@ -301,12 +328,12 @@ public class ScriptEditorActivity extends AppCompatActivity {
             if (l.error) errors++; else warns++;
         }
         int len = src.trim().length();
-        String sizecol = len > KissVm.MAX_SAFE_CHARS ? "OVER LIMIT" : (len + "/" + KissVm.MAX_SAFE_CHARS);
-        String line = sizecol + " chars";
-        if (errors > 0) line += " · ✖ " + errors;
-        if (warns > 0) line += " · ⚠ " + warns;
-        if (errors == 0 && warns == 0) line += " · ✓ no lint issues";
-        mStatusLine.setText(line);
+        CharSequence size = len > KissVm.MAX_SAFE_CHARS ? Language.msg(l10n_terminal_editor_over_limit) : (len + "/" + KissVm.MAX_SAFE_CHARS);
+        Language.TextBuilder line = new Language.TextBuilder().append(Language.msg(l10n_terminal_editor_chars, size));
+        if (errors > 0) line.append(" · ✖ ").append(errors);
+        if (warns > 0) line.append(" · ⚠ ").append(warns);
+        if (errors == 0 && warns == 0) line.append(" · ✓ ").append(Language.msg(l10n_terminal_editor_no_issues));
+        Language.setText(mStatusLine, line.build());
         mStatusLine.setTextColor(errors > 0 || len > KissVm.MAX_SAFE_CHARS
                 ? OutputFormatter.COL_ERROR
                 : (warns > 0 ? OutputFormatter.COL_BOOL : OutputFormatter.COL_DIM));
@@ -314,15 +341,19 @@ public class ScriptEditorActivity extends AppCompatActivity {
 
     private void showLints() {
         if (mLints == null || mLints.isEmpty()) {
-            Toast.makeText(this, "No lint issues", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, Language.msg(l10n_terminal_editor_no_issues), Toast.LENGTH_SHORT).show();
             return;
         }
-        StringBuilder sb = new StringBuilder();
-        for (LintEngine.Lint l : mLints) sb.append(l.toString()).append("\n\n");
-        new AlertDialog.Builder(this)
-                .setTitle("Lint results")
-                .setMessage(sb.toString().trim())
-                .setPositiveButton("OK", null)
+        Language.TextBuilder sb = new Language.TextBuilder();
+        for (int i=0;i<mLints.size();i++) {
+            LintEngine.Lint lint = mLints.get(i);
+            if (i>0) sb.append("\n\n");
+            sb.append(lint.error ? "✖ " : "⚠ ").append(EditorMessages.message(lint.message));
+        }
+        languageDialog()
+                .setTitle(Language.msg(l10n_terminal_editor_lint_results))
+                .setMessage(sb.build())
+                .setPositiveButton(Language.msg(l10n_common_ok), null)
                 .show();
     }
 
@@ -339,12 +370,11 @@ public class ScriptEditorActivity extends AppCompatActivity {
 
     private boolean validScript(String flat) {
         if (flat.isEmpty()) {
-            Toast.makeText(this, "Script is empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, Language.msg(l10n_terminal_editor_empty), Toast.LENGTH_SHORT).show();
             return false;
         }
         if (flat.contains("\"")) {
-            Toast.makeText(this, "Double quotes are not supported in scripts sent over the "
-                    + "command line — use [ ] string blocks", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, Language.msg(l10n_terminal_editor_quotes), Toast.LENGTH_LONG).show();
             return false;
         }
         return true;
@@ -374,7 +404,7 @@ public class ScriptEditorActivity extends AppCompatActivity {
         String flat = flatScript();
         if (!validScript(flat)) return;
         save();
-        setResults("… checking with the node VM", OutputFormatter.COL_DIM);
+        setResults(Language.msg(l10n_terminal_editor_checking), OutputFormatter.COL_DIM);
         mNode.cmd("runscript script:\"" + flat + "\"", new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) { showCheckResult(json, false); }
             @Override public void onError(String message) { showNodeError(message); }
@@ -393,10 +423,10 @@ public class ScriptEditorActivity extends AppCompatActivity {
                     + jsonParam("globals", mGlobals, false)
                     + jsonParam("signatures", mSignatures, true);
         } catch (IllegalArgumentException e) {
-            setResults("✖ " + e.getMessage(), OutputFormatter.COL_ERROR);
+            setResults(Language.join("✖ ", EditorMessages.error(e)), OutputFormatter.COL_ERROR);
             return;
         }
-        setResults("… running in the node VM", OutputFormatter.COL_DIM);
+        setResults(Language.msg(l10n_terminal_editor_running), OutputFormatter.COL_DIM);
         mNode.cmd(cmd, new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) { showCheckResult(json, true); }
             @Override public void onError(String message) { showNodeError(message); }
@@ -405,12 +435,12 @@ public class ScriptEditorActivity extends AppCompatActivity {
 
     private void showCheckResult(JSONObject json, boolean fullRun) {
         if (!json.optBoolean("status", false)) {
-            setResults("✖ " + json.optString("error", "runscript failed"), OutputFormatter.COL_ERROR);
+            setResults(Language.join("✖ ", json.has("error") ? json.optString("error") : Language.msg(l10n_terminal_editor_run_failed)), OutputFormatter.COL_ERROR);
             return;
         }
         JSONObject resp = json.optJSONObject("response");
         if (resp == null) {
-            setResults("✖ empty response", OutputFormatter.COL_ERROR);
+            setResults(Language.msg(l10n_terminal_editor_empty_response), OutputFormatter.COL_ERROR);
             return;
         }
         boolean parseok = resp.optBoolean("parseok", false);
@@ -418,24 +448,24 @@ public class ScriptEditorActivity extends AppCompatActivity {
         String address = clean != null ? clean.optString("address", "?") : "?";
         String cleanScript = clean != null ? clean.optString("script", "") : "";
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(parseok ? "✓ parse OK" : "✖ PARSE FAILED — this script would make coins unspendable");
-        sb.append("\nAddress: ").append(address);
-        sb.append("\nClean (").append(cleanScript.length()).append(" chars): ").append(cleanScript);
+        Language.TextBuilder sb = new Language.TextBuilder();
+        sb.append(parseok ? Language.msg(l10n_terminal_editor_parse_ok) : Language.msg(l10n_terminal_editor_parse_failed));
+        sb.append("\n").append(Language.msg(l10n_terminal_editor_address, address));
+        sb.append("\n").append(Language.msg(l10n_terminal_editor_clean, cleanScript.length(), cleanScript));
 
         if (fullRun) {
             boolean success = resp.optBoolean("success", false);
             boolean monotonic = resp.optBoolean("monotonic", false);
-            sb.append("\n\nResult: ").append(success ? "✓ RETURN TRUE (spendable)" : "✖ RETURN FALSE");
-            sb.append("\nMonotonic: ").append(monotonic);
+            sb.append("\n\n").append(Language.msg(l10n_terminal_editor_result, success ? Language.msg(l10n_terminal_editor_spendable) : "✖ RETURN FALSE"));
+            sb.append("\n").append(Language.msg(l10n_terminal_editor_monotonic, monotonic));
             Object vars = resp.opt("variables");
-            if (vars != null) sb.append("\n\nVariables:\n").append(vars);
+            if (vars != null) sb.append("\n\n").append(Language.msg(l10n_terminal_editor_variables)).append("\n").append(vars.toString());
             Object trace = resp.opt("trace");
-            if (trace != null) sb.append("\n\nTrace:\n").append(trace.toString().replace("\\n", "\n"));
-            setResults(sb.toString(), success && parseok
+            if (trace != null) sb.append("\n\n").append(Language.msg(l10n_terminal_editor_trace)).append("\n").append(trace.toString().replace("\\n", "\n"));
+            setResults(sb.build(), success && parseok
                     ? OutputFormatter.COL_STRING : OutputFormatter.COL_ERROR);
         } else {
-            setResults(sb.toString(), parseok ? OutputFormatter.COL_STRING : OutputFormatter.COL_ERROR);
+            setResults(sb.build(), parseok ? OutputFormatter.COL_STRING : OutputFormatter.COL_ERROR);
         }
     }
 
@@ -445,28 +475,24 @@ public class ScriptEditorActivity extends AppCompatActivity {
         save();
 
         View v = getLayoutInflater().inflate(R.layout.pm_terminalide_dialog_deploy, null);
+        Language.apply(v);
         CheckBox trackall = v.findViewById(R.id.pm_terminalide_deploy_trackall);
-        new AlertDialog.Builder(this)
-                .setTitle("Deploy script to node")
-                .setMessage("newscript registers this script's address with your node so it "
-                        + "tracks coins locked by it. This does not spend anything.\n\n"
-                        + "NOTE: everyone who deploys the same script text gets the SAME "
-                        + "address — with trackall on, your wallet shows every coin anyone "
-                        + "ever locks there (this is how test/burn debris ends up in "
-                        + "wallets). Leave trackall off for shared or template scripts.")
+        languageDialog()
+                .setTitle(Language.msg(l10n_terminal_editor_deploy_title))
+                .setMessage(Language.msg(l10n_terminal_editor_deploy_body))
                 .setView(v)
-                .setPositiveButton("Deploy", (d, w) -> deploy(flat, trackall.isChecked()))
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_terminal_editor_deploy), (d, w) -> deploy(flat, trackall.isChecked()))
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     private void deploy(String flat, boolean trackall) {
-        setResults("… deploying via newscript", OutputFormatter.COL_DIM);
+        setResults(Language.msg(l10n_terminal_editor_deploying), OutputFormatter.COL_DIM);
         mNode.cmd("newscript trackall:" + trackall + " script:\"" + flat + "\"", new NodeApi.Cb() {
             @Override
             public void onResult(JSONObject json) {
                 if (!json.optBoolean("status", false)) {
-                    setResults("✖ " + json.optString("error", "newscript failed"), OutputFormatter.COL_ERROR);
+                    setResults(Language.join("✖ ", json.has("error") ? json.optString("error") : Language.msg(l10n_terminal_editor_newscript_failed)), OutputFormatter.COL_ERROR);
                     return;
                 }
                 JSONObject resp = json.optJSONObject("response");
@@ -474,8 +500,7 @@ public class ScriptEditorActivity extends AppCompatActivity {
                 if (!address.isEmpty()) {
                     mDB.setAddress(mScriptId, address);
                 }
-                setResults("✓ Deployed — node now tracks coins at:\n" + address
-                        + "\n\nSend funds to it with:\nsend address:" + address + " amount:...",
+                setResults(Language.msg(l10n_terminal_editor_deployed, address, address),
                         OutputFormatter.COL_STRING);
             }
 
@@ -486,14 +511,15 @@ public class ScriptEditorActivity extends AppCompatActivity {
 
     private void showNodeError(String message) {
         if (NodeApi.ERR_NOT_ENABLED.equals(message)) {
-            setResults("The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry.",
+            setResults(Language.msg(l10n_explorer_node_retry),
                     OutputFormatter.COL_ERROR);
         } else {
-            setResults("✖ " + message, OutputFormatter.COL_ERROR);
+            setResults(Language.join("✖ ", com.eurobuddha.terminalide.terminal.TerminalMessages.message(message)), OutputFormatter.COL_ERROR);
         }
     }
 
-    private void setResults(String text, int color) {
-        mResults.setText(OutputFormatter.colored(text, color));
+    private void setResults(CharSequence text, int color) {
+        Language.setText(mResults, text);
+        mResults.setTextColor(color);
     }
 }

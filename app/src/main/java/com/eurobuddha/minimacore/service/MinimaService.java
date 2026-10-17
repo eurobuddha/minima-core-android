@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.service;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import com.eurobuddha.minimacore.BuildConfig;
 
 import android.app.Notification;
@@ -160,7 +163,7 @@ public class MinimaService extends Service {
         // Create our notification channel here & add channel to Manager's list
         NotificationChannel serviceChannel = new NotificationChannel(
                 CHANNEL_ID,
-                "Minima Node Foreground Service Channel",
+                Language.text(this, l10n_notification_node),
                 NotificationManager.IMPORTANCE_LOW
         );
 

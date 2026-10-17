@@ -1,4 +1,7 @@
 package com.eurobuddha.casino;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.Manifest;
 import com.eurobuddha.minimaapi.direct.DirectNodeEvents;
@@ -39,6 +42,25 @@ import java.util.Set;
  * the dapp, so it's interoperable with it (identical script address).
  */
 public class MainActivity extends AppCompatActivity {
+
+    private final java.util.Set<androidx.appcompat.app.AlertDialog> languageDialogs = new java.util.HashSet<>();
+    private com.eurobuddha.minimacore.i18n.LanguageDialog languageDialog() {
+        return new com.eurobuddha.minimacore.i18n.LanguageDialog(this) {
+            @Override public androidx.appcompat.app.AlertDialog create() {
+                androidx.appcompat.app.AlertDialog value = super.create();
+                languageDialogs.add(value);
+                value.setOnDismissListener(d -> languageDialogs.remove(value));
+                return value;
+            }
+        };
+    }
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        // Rebind the existing pages; no rebuild, node read, secret generation or bet action.
+        if (pager != null && pager.getAdapter() != null) for (int i=0;i<tabs.getTabCount();i++)
+            tabs.getTabAt(i).setText(pager.getAdapter().getPageTitle(i).toString());
+    }
 
     public static final int TAB_PLAY = 0, TAB_HOUSE = 1, TAB_MYBETS = 2, TAB_HISTORY = 3;
 
@@ -98,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Theme.load(this);
         setContentView(R.layout.pm_casino_activity_main);
+        Language.apply(findViewById(R.id.pm_casino_main));
 
         View root = findViewById(R.id.pm_casino_main);
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
@@ -150,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         // then re-queried. Discovery and My Bets retain every currency for manual claims/cancels.
         ccyBtn.setOnClickListener(v -> {
             Theme.setDollar(this, !Theme.dollar());
-            balance = "0"; balanceTv.setText("0");   // clear stale figure until the new token loads
+            balance = "0"; CasinoMessages.text(balanceTv, "0");   // clear stale figure until the new token loads
             buildTabs();          // recreate every tab view so it picks up the new accent + labels
             refreshAll();
             requestReload();      // re-query balance + bets for the new currency
@@ -199,6 +222,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override protected void onDestroy() {
+        for (androidx.appcompat.app.AlertDialog value : new java.util.ArrayList<>(languageDialogs)) value.dismiss();
+        languageDialogs.clear();
         super.onDestroy();
         ui.removeCallbacks(reloadTask);
         if (node != null) node.onDestroy();
@@ -356,7 +381,7 @@ public class MainActivity extends AppCompatActivity {
                 else if (resp instanceof JSONObject) b0 = (JSONObject) resp;
                 if (b0 != null) {
                     balance = b0.optString("sendable", "0");
-                    balanceTv.setText(Currency.display(balance) + Currency.suffix());
+                    CasinoMessages.text(balanceTv, Currency.display(balance) + Currency.suffix());
                 }
             }
             @Override public void onError(String message) {}
@@ -373,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
                     if (b.isEmpty()) { JSONObject h = r.optJSONObject("header"); if (h != null) b = h.optString("block", ""); }
                     int prev = chainBlock;
                     try { chainBlock = Integer.parseInt(b); } catch (Exception ignored) {}
-                    blockTv.setText("#" + chainBlock);
+                    CasinoMessages.text(blockTv, "#" + chainBlock);
                     if (chainBlock != prev) pulseDot();
                 }
                 fetchBetsAndProcess();
@@ -703,10 +728,10 @@ public class MainActivity extends AppCompatActivity {
         for (BaseView v : views) v.refresh();
         TimeoutClaims claims = new TimeoutClaims(bets, myKeys, chainBlock);
         timeoutBanner.setVisibility(claims.coinids.isEmpty() ? View.GONE : View.VISIBLE);
-        timeoutBanner.setText(claims.summary() + " · Open My Bets →");
+        CasinoMessages.text(timeoutBanner, claims.summary() + " · Open My Bets →");
     }
 
-    private void updateSoundBtn() { soundBtn.setText(Theme.sound() ? "SND" : "MUTE"); }
+    private void updateSoundBtn() { CasinoMessages.text(soundBtn, Theme.sound() ? "SND" : "MUTE"); Language.description(soundBtn, Language.msg(Theme.sound() ? l10n_casino_sound_on : l10n_casino_sound_off)); }
 
     /** (Re)build the four tab views and wire them to the pager/tabs. Called at startup and on a
      *  currency switch — recreating the views is the simplest way to make ones built in their
@@ -715,7 +740,7 @@ public class MainActivity extends AppCompatActivity {
     private void buildTabs() {
         int cur = (pager.getAdapter() != null) ? pager.getCurrentItem() : 0;
         views = new BaseView[]{ new PlayView(this), new HouseView(this), new MyBetsView(this), new HistoryView(this) };
-        pager.setAdapter(new MainPager(views, new String[]{"PLAY", "HOUSE", "MY BETS", "HISTORY"}));
+        pager.setAdapter(new MainPager(views, new CharSequence[]{Language.upper(CasinoMessages.message("PLAY")), Language.upper(CasinoMessages.message("HOUSE")), Language.upper(CasinoMessages.message("MY BETS")), Language.upper(CasinoMessages.message("HISTORY"))}));
         tabs.setupWithViewPager(pager);
         if (cur >= 0 && cur < views.length) pager.setCurrentItem(cur, false);
         applyAccent();
@@ -734,7 +759,8 @@ public class MainActivity extends AppCompatActivity {
             tabs.setTabTextColors(Theme.text(), accent);
         }
         if (ccyBtn != null) {
-            ccyBtn.setText(Currency.label());
+            CasinoMessages.text(ccyBtn, Currency.label());
+            Language.description(ccyBtn, Language.msg(l10n_casino_currency_help, Currency.label()));
             ccyBtn.setBackgroundTintList(android.content.res.ColorStateList.valueOf(accent));
         }
     }
@@ -767,7 +793,7 @@ public class MainActivity extends AppCompatActivity {
         ui.postDelayed(reloadTask, 400);
     }
 
-    public void toast(String msg) { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); }
+    public void toast(String msg) { Toast.makeText(this, CasinoMessages.message(msg), Toast.LENGTH_SHORT).show(); }
 
     // ===== activity log =====
     /** Append a timestamped, colour-coded line to the activity log and the always-visible ticker. */
@@ -779,7 +805,7 @@ public class MainActivity extends AppCompatActivity {
         while (logLines.size() > 60) logLines.removeLast();
         if (tickerTv != null) {
             tickerTv.setTextColor(logColor(type));
-            tickerTv.setText((type == LOG_WARN ? "⏳ " : type == LOG_ERR ? "✕ " : type == LOG_OK ? "✓ " : "› ") + msg);
+            CasinoMessages.text(tickerTv, Language.join(type == LOG_WARN ? "⏳ " : type == LOG_ERR ? "✕ " : type == LOG_OK ? "✓ " : "› ", CasinoMessages.message(msg)));
         }
     }
 
@@ -793,13 +819,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showLogDialog() {
-        StringBuilder sb = new StringBuilder();
-        for (String l : logLines) sb.append(l).append('\n');
-        if (sb.length() == 0) sb.append("No activity yet.");
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Activity log")
-                .setMessage(sb.toString())
-                .setPositiveButton("Close", null)
+        Language.TextBuilder sb = new Language.TextBuilder();
+        for (String l : logLines) sb.append(CasinoMessages.logLine(l)).append("\n");
+        if (logLines.isEmpty()) sb.append(CasinoMessages.message("No activity yet."));
+        languageDialog()
+                .setTitle(CasinoMessages.message("Activity log"))
+                .setMessage(sb.build())
+                .setPositiveButton(CasinoMessages.message("Close"), null)
                 .show();
     }
 

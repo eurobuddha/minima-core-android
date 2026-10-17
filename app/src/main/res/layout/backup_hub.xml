@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Backup &amp; Recovery"
-                android:textAppearance="@style/TextAppearance.MinimaCore.Display" />
+                android:textAppearance="@style/TextAppearance.MinimaCore.Display"  android:tag="l10n:text=l10n_menu_backup" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -45,7 +45,7 @@
                 android:text="Save a copy of this node, put it back, or rebuild it from another node."
                 android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                 android:textColor="@color/core_text_mid"
-                android:lineSpacingMultiplier="1.3" />
+                android:lineSpacingMultiplier="1.3"  android:tag="l10n:text=l10n_backup_hub_help" />
 
             <!-- The keys-created gate. Every command behind these rows begins with
                  vault.checkAllKeysCreated(), so it is stated once here instead of failing

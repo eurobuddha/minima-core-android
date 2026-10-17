@@ -1,6 +1,7 @@
 package com.eurobuddha.minimacore.chat;
 
 import android.graphics.Color;
+import com.eurobuddha.minimacore.i18n.Language;
 import android.graphics.drawable.GradientDrawable;
 import android.widget.TextView;
 
@@ -24,7 +25,8 @@ public final class ChatUi {
         zView.setBackground(d);
         String initial = "?";
         if (zName != null && !zName.equals("")) {
-            initial = zName.substring(0, 1).toUpperCase();
+            // Same Unicode boundary calculation as Parlons CloudChatsPage.oneLine.
+            initial = zName.substring(0, zName.offsetByCodePoints(0, 1)).toUpperCase(Language.locale());
             if (zName.startsWith("0x")) initial = "#";
         }
         zView.setText(initial);
@@ -38,24 +40,18 @@ public final class ChatUi {
         then.setTimeInMillis(zTs);
         if (now.get(Calendar.YEAR) == then.get(Calendar.YEAR)
                 && now.get(Calendar.DAY_OF_YEAR) == then.get(Calendar.DAY_OF_YEAR)) {
-            return DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(zTs));
+            return Language.date(zTs, "Hm");
         }
         long days = (now.getTimeInMillis() - zTs) / (24L * 3600 * 1000);
         if (days < 7) {
-            return new java.text.SimpleDateFormat("EEE").format(new Date(zTs));
+            return Language.date(zTs, "EEE");
         }
-        return DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(zTs));
+        return Language.date(zTs, "yMd");
     }
 
     /** Date-separator label: Today / Yesterday / full date. */
-    public static String dayLabel(long zTs) {
-        Calendar now = Calendar.getInstance();
-        Calendar then = Calendar.getInstance();
-        then.setTimeInMillis(zTs);
-        if (sameDay(now, then)) return "Today";
-        now.add(Calendar.DAY_OF_YEAR, -1);
-        if (sameDay(now, then)) return "Yesterday";
-        return new java.text.SimpleDateFormat("EEE, d MMM yyyy").format(new Date(zTs));
+    public static String dayLabel(android.content.Context context, long zTs) {
+        return Language.dayLabel(context, zTs, false);
     }
 
     public static boolean sameDay(long zA, long zB) {

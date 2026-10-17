@@ -8,6 +8,8 @@ def adapt_ui(root):
         if p.suffix not in ('.java','.xml'):continue
         s=p.read_text()
         if p.suffix=='.xml':
+            if any(name in p.relative_to(root).parts for name in ('utxo', 'NFTwallet')):
+                s=s.replace('This wallet is not enabled yet', 'The embedded node is not ready')
             s=re.sub(r'android:text="[^"]*(?:Minima Core → Apps|MinimaCore → Apps)[^"]*"',lambda m:'android:text="'+replacement+'"',s)
         else:
             # Whole standalone strings (no changes to command logic).

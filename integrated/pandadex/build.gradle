@@ -15,6 +15,7 @@ android {
     }
 }
 dependencies {
+    implementation project(':localization')
     implementation project(':minimaapi')
     implementation libs.appcompat
     implementation libs.material

@@ -6,6 +6,23 @@ ANDROID='{http://schemas.android.com/apk/res/android}'
 ET.register_namespace('android',ANDROID[1:-1])
 
 def adapt(root):
+    # Reproduce 1.9.32's shared codec dependency; importing old copies would
+    # reintroduce duplicate classes. Refuse to discard a copy that has diverged.
+    shared = Path(__file__).resolve().parents[1] / 'maxima-core/src/main/java/com/eurobuddha/maxima/core'
+    copies = root / 'pandapools/src/main/java/com/eurobuddha/maxima/core'
+    for relative in ('msg/Magic.java', 'msg/TxHeader.java', 'codec/MiniData.java',
+                     'codec/MiniByte.java', 'codec/Hex.java', 'codec/Reads.java',
+                     'codec/MiniNumber.java', 'codec/Streamable.java'):
+        duplicate = copies / relative
+        assert duplicate.read_bytes() == (shared / relative).read_bytes(), ('Shared codec drift', relative)
+        duplicate.unlink()
+    gradle = root / 'pandapools/build.gradle'
+    source = gradle.read_text()
+    assert source.count('dependencies {') == 1, 'PandaPools dependencies drift'
+    gradle.write_text(source.replace('dependencies {', """dependencies {
+    // Shared Maxima codec classes now come from the vendored transport core
+    // (they were byte-identical copies; D8 refuses the duplicate).
+    implementation project(':maxima-core')""", 1))
     for name in ('pandapools','pandadex'):
         for filename in ('NodeTransport.java','NodeTransportService.java'):
             for p in (root/name/'src/main/java').rglob(filename): p.unlink()
@@ -35,7 +52,7 @@ def adapt(root):
             s=re.sub(r'\s*if \(!DirectNodeApi.checkMinimaID\([^\n]+\n','\n',s)
             s=re.sub(r'\s*(?:final )?String (?:data|message) = \w+.getStringExtra\(MinimaAPIMessages.MINIMA_API_NOTIFY_DATA\);\n','\n',s)
             s=re.sub(r'\s*if \((?:data|message) == null\) return;\n','\n',s)
-            s=s.replace('new JSONObject(data).optString','nodeEvent.optString').replace('JSONObject json = new JSONObject(message);','JSONObject json = nodeEvent;')
+            s=s.replace('new org.json.JSONObject(data).optString','nodeEvent.optString').replace('new JSONObject(data).optString','nodeEvent.optString').replace('JSONObject json = new JSONObject(message);','JSONObject json = nodeEvent;')
             s=s.replace('new JSONObject(i.getStringExtra(MinimaAPIMessages.MINIMA_API_NOTIFY_DATA)).optString', 'nodeEvent.optString')
             s=s.replace('intent.getStringExtra("event")','nodeEvent.optString("event")')
             s=re.sub(r'ContextCompat.registerReceiver\(this, (\w+),\s*new IntentFilter\((?:MinimaAPIMessages.MINIMA_API_NOTIFY|NodeTransportService.EVENT_ACTION)\), ContextCompat.RECEIVER_\w+\);',r'DirectNodeEvents.subscribe(\1);',s)
@@ -130,7 +147,213 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     p=root/'pandadex/build.gradle';s=p.read_text();s=s.replace('dependencies {', "dependencies {\n    implementation project(':minimaapi')");p.write_text(s)
     spec=importlib.util.spec_from_file_location('integrated_safety',Path(__file__).with_name('adapt-pandamonium-safety.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('integrated_key_audit',Path(__file__).with_name('adapt-pandamonium-key-audit.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('integrated_malls',Path(__file__).with_name('adapt-pandamonium-malls.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('integrated_nft',Path(__file__).with_name('adapt-pandamonium-nft.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('integrated_wallet',Path(__file__).with_name('adapt-pandamonium-wallet.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
     spec=importlib.util.spec_from_file_location('integrated_navigation',Path(__file__).with_name('adapt-pandamonium-navigation.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('history_languages',Path(__file__).with_name('adapt-pandamonium-history-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('wallet_languages',Path(__file__).with_name('adapt-pandamonium-wallet-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('wallet_tabs_languages',Path(__file__).with_name('adapt-pandamonium-wallet-tabs-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('wallet_settings_languages',Path(__file__).with_name('adapt-pandamonium-wallet-settings-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('wallet_settings_details_languages',Path(__file__).with_name('adapt-pandamonium-wallet-settings-details-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('wallet_nft_languages',Path(__file__).with_name('adapt-pandamonium-wallet-nft-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+
+    spec=importlib.util.spec_from_file_location("wallet_audit",Path(__file__).with_name("adapt-pandamonium-wallet-audit.py"))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('wallet_runtime',Path(__file__).with_name('adapt-pandamonium-wallet-runtime.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('wallet_retry',Path(__file__).with_name('adapt-pandamonium-wallet-retry.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('wallet_settings_work',Path(__file__).with_name('adapt-pandamonium-wallet-settings-work.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('wallet_signing_work',Path(__file__).with_name('adapt-pandamonium-wallet-signing-work.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('wallet_error_languages',Path(__file__).with_name('adapt-pandamonium-wallet-error-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('wallet_startup',Path(__file__).with_name('adapt-pandamonium-wallet-startup.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('future_languages',Path(__file__).with_name('adapt-pandamonium-future-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('future_panels',Path(__file__).with_name('adapt-pandamonium-future-panels.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('future_notices',Path(__file__).with_name('adapt-pandamonium-future-notices.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('explorer_languages',Path(__file__).with_name('adapt-pandamonium-explorer-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('terminal_languages',Path(__file__).with_name('adapt-pandamonium-terminal-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('terminal_editor_languages',Path(__file__).with_name('adapt-pandamonium-terminal-editor-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('terminal_txn_languages',Path(__file__).with_name('adapt-pandamonium-terminal-txn-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('terminal_reference_languages',Path(__file__).with_name('adapt-pandamonium-terminal-reference-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('terminal_help_languages',Path(__file__).with_name('adapt-pandamonium-terminal-help-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('eth_languages',Path(__file__).with_name('adapt-pandamonium-eth-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('entropy_languages',Path(__file__).with_name('adapt-pandamonium-entropy-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('filez_languages',Path(__file__).with_name('adapt-pandamonium-filez-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('vestr_languages',Path(__file__).with_name('adapt-pandamonium-vestr-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('mail_languages',Path(__file__).with_name('adapt-pandamonium-mail-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('utxo_languages',Path(__file__).with_name('adapt-pandamonium-utxo-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('utxo_wallet_languages',Path(__file__).with_name('adapt-pandamonium-utxo-wallet-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('utxo_history_languages',Path(__file__).with_name('adapt-pandamonium-utxo-history-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_shell_languages',Path(__file__).with_name('adapt-pandamonium-nft-shell-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_details_languages',Path(__file__).with_name('adapt-pandamonium-nft-details-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_gallery_languages',Path(__file__).with_name('adapt-pandamonium-nft-gallery-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_send_languages',Path(__file__).with_name('adapt-pandamonium-nft-send-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_actions_languages',Path(__file__).with_name('adapt-pandamonium-nft-actions-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_burial',Path(__file__).with_name('adapt-pandamonium-nft-burial.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_departure',Path(__file__).with_name('adapt-pandamonium-nft-departure.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_mint_languages',Path(__file__).with_name('adapt-pandamonium-nft-mint-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_mint_guards',Path(__file__).with_name('adapt-pandamonium-nft-mint-guards.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_wallet_languages',Path(__file__).with_name('adapt-pandamonium-nft-wallet-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_tools_languages',Path(__file__).with_name('adapt-pandamonium-nft-tools-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_transactions',Path(__file__).with_name('adapt-pandamonium-nft-transactions.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_outcomes',Path(__file__).with_name('adapt-pandamonium-nft-outcomes.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_journal',Path(__file__).with_name('adapt-pandamonium-nft-journal.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_prepared_send',Path(__file__).with_name('adapt-pandamonium-nft-prepared-send.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_consolidation',Path(__file__).with_name('adapt-pandamonium-nft-consolidation.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_tool_review',Path(__file__).with_name('adapt-pandamonium-nft-tool-review.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('nft_history_languages',Path(__file__).with_name('adapt-pandamonium-nft-history-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('casino_languages',Path(__file__).with_name('adapt-pandamonium-casino-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+
+    spec=importlib.util.spec_from_file_location('mall_shop_languages',Path(__file__).with_name('adapt-pandamonium-mall-shop-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    inbox_spec = importlib.util.spec_from_file_location("mall_inbox_languages", Path(__file__).with_name("adapt-pandamonium-mall-inbox-languages.py"))
+    inbox_module = importlib.util.module_from_spec(inbox_spec)
+    inbox_spec.loader.exec_module(inbox_module)
+    inbox_module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('mall_studio_languages',Path(__file__).with_name('adapt-pandamonium-mall-studio-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('mall_studio_refresh',Path(__file__).with_name('adapt-pandamonium-mall-studio-refresh.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('mall_studio_export',Path(__file__).with_name('adapt-pandamonium-mall-studio-export.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('atomix_languages',Path(__file__).with_name('adapt-pandamonium-atomix-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_notices',Path(__file__).with_name('adapt-pandamonium-atomix-notices.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_otc',Path(__file__).with_name('adapt-pandamonium-atomix-otc.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_currency',Path(__file__).with_name('adapt-pandamonium-atomix-currency.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_amounts',Path(__file__).with_name('adapt-pandamonium-atomix-amounts.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_market',Path(__file__).with_name('adapt-pandamonium-atomix-market.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_market_inputs',Path(__file__).with_name('adapt-pandamonium-atomix-market-inputs.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_history',Path(__file__).with_name('adapt-pandamonium-atomix-history.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_swap',Path(__file__).with_name('adapt-pandamonium-atomix-swap.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_operation',Path(__file__).with_name('adapt-pandamonium-atomix-operation.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_recovery',Path(__file__).with_name('adapt-pandamonium-atomix-recovery.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_report',Path(__file__).with_name('adapt-pandamonium-atomix-report.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_swap_inputs',Path(__file__).with_name('adapt-pandamonium-atomix-swap-inputs.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('pools_languages',Path(__file__).with_name('adapt-pandamonium-pools-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('pools_collection',Path(__file__).with_name('adapt-pandamonium-pools-collection.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('dex_languages',Path(__file__).with_name('adapt-pandamonium-dex-languages.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
 if __name__=='__main__': adapt(Path(sys.argv[1]))

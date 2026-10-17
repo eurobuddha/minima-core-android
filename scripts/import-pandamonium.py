@@ -4,21 +4,22 @@ Financial algorithms are retained; explicit adapters change packaging, node tran
 The lock file records source commits and hashes, including local uncommitted source changes.
 """
 from pathlib import Path
-import hashlib, json, re, shutil, subprocess, sys, tempfile, xml.etree.ElementTree as ET
+import hashlib, json, os, re, shutil, subprocess, sys, tempfile, xml.etree.ElementTree as ET
 import importlib.util
 spec = importlib.util.spec_from_file_location("direct_adapt", Path(__file__).with_name("adapt-pandamonium-direct.py"))
 direct_adapt = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(direct_adapt)
 
 ROOT = Path(__file__).resolve().parents[1]
-APPS = ['ethwallet','atomix','pandapools','futurecash-next','pandadex','casino','blockexplorer','filez','history','vestr','entropy','terminalide','mail']
+APPS = ['ethwallet','atomix','pandapools','futurecash-next','pandadex','casino','blockexplorer','filez','history','vestr','entropy','terminalide','mail','utxo','merchshop','merchstudio','merchinbox','NFTwallet','wallet']
 HOST = 'com.eurobuddha.pandamonium'
 ANDROID = '{http://schemas.android.com/apk/res/android}'
 ET.register_namespace('android', ANDROID[1:-1])
 ET.register_namespace('tools', 'http://schemas.android.com/tools')
 
 def import_app(name, target_root=None):
-    source = ROOT.parent / name
+    # An isolated worktree can reuse the established sibling source checkout.
+    source = Path(os.environ.get('PANDAMONIUM_SOURCE_ROOT', ROOT.parent)) / name
     target = (target_root or ROOT / 'integrated') / name
     if target.exists():
         raise SystemExit(f'{target} exists: review/remove the snapshot explicitly before reimporting')
@@ -26,7 +27,7 @@ def import_app(name, target_root=None):
     namespace = re.search(r"namespace '([^']+)'", gradle)[1]
     version = re.search(r'versionName "([^"]+)"', gradle)[1]
     code = re.search(r'versionCode (\d+)', gradle)[1]
-    prefix = 'pm_' + name.replace('-', '_') + '_'
+    prefix = 'pm_' + name.replace('-', '_').lower() + '_'
     resources = {}
     for path in (source/'app/src/main/res').rglob('*'):
         if not path.is_file(): continue
@@ -75,6 +76,11 @@ def import_app(name, target_root=None):
                 alias = 'pandamonium_'+name+'_master'
                 text = text.replace('new MasterKey.Builder(ctx)', 'new MasterKey.Builder(ctx, "'+alias+'")')
                 text = text.replace('"_androidx_security_master_key_"','"'+alias+'"')
+            # UTXO and NFT Wallet standalone apps both use utxo_history.db. Each
+            # embedded wallet must own its history; this feature has no old host data.
+            if name == 'utxo' and filename == 'HistoryDb.java':
+                assert text.count('\"utxo_history.db\"') == 1, 'UTXO database name drift'
+                text = text.replace('\"utxo_history.db\"', '\"pandamonium_utxo_history.db\"')
             # Base's foreground node uses 1001 too; keep its notification independent.
             if name == 'casino': text = text.replace('int FG_ID = 1001;', 'int FG_ID = 5101;')
         return text

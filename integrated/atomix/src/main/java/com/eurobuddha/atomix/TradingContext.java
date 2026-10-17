@@ -98,6 +98,12 @@ public enum TradingContext {
         if (prefs != null) prefs.edit().putString(PREF_KEY, ctx.key).apply();
     }
 
+    /** Resolve the persisted market key without guessing from the current selection. */
+    public static TradingContext forKey(String key) {
+        for (TradingContext context : values()) if (context.key.equals(key)) return context;
+        return null;
+    }
+
     public TradingContext other() { return this == MINIMA ? MXUSDT : MINIMA; }
 
     /** Display label for a specific token id — used by SETTLEMENT notifications, which can be for a swap in

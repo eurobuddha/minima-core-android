@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.main.views.balance.coins;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.app.Activity;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -11,7 +14,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import com.eurobuddha.minimacore.main.views.balance.BalanceAdapter;
 
 import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
@@ -60,7 +64,7 @@ public class CoinsDialog {
         String      error;
     }
 
-    public static CoinsDialog show(Activity zActivity, String zTokenId, String zTokenName,
+    public static CoinsDialog show(Activity zActivity, String zTokenId, CharSequence zTokenName,
                                    String zSendable, String zConfirmed){
         CoinsDialog cd = new CoinsDialog(zActivity, zTokenId, zConfirmed);
         cd.open(zTokenName, zSendable, zConfirmed);
@@ -75,10 +79,11 @@ public class CoinsDialog {
     }
 
     /** Runs on the UI thread. The window is up before the node is asked anything. */
-    private void open(String zTokenName, String zSendable, String zConfirmed){
+    private void open(CharSequence zTokenName, String zSendable, String zConfirmed){
 
         LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View body = inflater.inflate(R.layout.dialog_wallet_coins, null);
+        Language.apply(body);
 
         TextView header = body.findViewById(R.id.coins_header);
         mStatus         = body.findViewById(R.id.coins_status);
@@ -86,13 +91,13 @@ public class CoinsDialog {
         mList           = body.findViewById(R.id.coins_list);
 
         //Sendable leads - it is the spendable figure. confirmed includes locked coins.
-        StringBuilder hdr = new StringBuilder("sendable ").append(Format.tidyAmount(safe(zSendable)));
+        Language.TextBuilder hdr = new Language.TextBuilder().append(Language.msg(l10n_core_wallet_sendable_amount, Format.tidyAmount(safe(zSendable))));
         String lockedAmt = Format.subtract(zConfirmed, zSendable);
         if(!"—".equals(lockedAmt) && !"0".equals(lockedAmt)){
-            hdr.append("  ·  locked ").append(lockedAmt);
+            hdr.append("  ·  ").append(Language.msg(l10n_core_wallet_locked_amount, lockedAmt));
         }
-        hdr.append("  ·  confirmed ").append(Format.tidyAmount(safe(zConfirmed)));
-        header.setText(hdr.toString());
+        hdr.append("  ·  ").append(Language.msg(l10n_core_wallet_confirmed_amount, Format.tidyAmount(safe(zConfirmed))));
+        Language.setText(header, hdr.build());
 
         mList.setAdapter(mAdapter);
         mList.setOnItemClickListener((parent, view, position, id) -> {
@@ -103,17 +108,17 @@ public class CoinsDialog {
         //Long-press copies the full coin id straight out of the list
         mList.setOnItemLongClickListener((parent, view, position, id) -> {
             JSONObject coin = (JSONObject) mAdapter.getItem(position);
-            Clip.copy(mActivity, "coinid", String.valueOf(coin.get("coinid")), "Coin ID copied");
+            Clip.copy(mActivity, "coinid", String.valueOf(coin.get("coinid")), Language.msg(l10n_core_wallet_coin_copied).toString());
             return true;
         });
 
-        setStatus("Reading coins…", R.color.core_text_faint);
+        setStatus(Language.msg(l10n_core_wallet_reading), R.color.core_text_faint);
 
-        mDialog = new MaterialAlertDialogBuilder(mActivity)
-                .setTitle(zTokenName == null ? "Coins" : zTokenName+" coins")
+        mDialog = new LanguageDialog(mActivity)
+                .setTitle(zTokenName == null ? Language.msg(l10n_wallet_coins) : Language.msg(l10n_core_wallet_token_coins, zTokenName))
                 .setView(body)
-                .setNeutralButton("Copy token ID", null)   // click overridden below so it doesn't dismiss
-                .setPositiveButton("Close", null)
+                .setNeutralButton(Language.msg(l10n_nft_copy_token_id), null)   // click overridden below so it doesn't dismiss
+                .setPositiveButton(Language.msg(l10n_language_close), null)
                 .create();
 
         mDialog.setOnDismissListener(d -> {
@@ -127,13 +132,18 @@ public class CoinsDialog {
         android.widget.Button copy = mDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
         if (copy != null) {
             copy.setOnClickListener(v ->
-                    Clip.copy(mActivity, "tokenid", mTokenId, "Token ID copied"));
+                    Clip.copy(mActivity, "tokenid", mTokenId, Language.msg(l10n_core_wallet_token_copied).toString()));
+        }
+
+        if (!Format.isValidTokenId(mTokenId)) {
+            setStatus(Language.msg(l10n_send_invalid_token), R.color.status_bad);
+            return;
         }
 
         //Guard first: with no tip the node answers status:true with an EMPTY array,
         //which would otherwise read as "you have no coins"
         if(!MinimaCMD.checkMinimaStarted()){
-            setStatus("Node not started — no coin data yet.", R.color.status_warn);
+            setStatus(Language.msg(l10n_core_wallet_no_node), R.color.status_warn);
             return;
         }
 
@@ -208,12 +218,12 @@ public class CoinsDialog {
 
         if(zResult.error != null){
             //Deliberately distinct from the empty state - a failed query is not an empty wallet
-            setStatus("⚠ Coins query failed — "+zResult.error, R.color.status_bad);
+            setStatus(Language.msg(l10n_core_wallet_query_failed, zResult.error), R.color.status_bad);
             return;
         }
 
         if(zResult.coins == null || zResult.coins.size() == 0){
-            setStatus("No coins for this token.", R.color.core_text_faint);
+            setStatus(Language.msg(l10n_core_wallet_no_coins), R.color.core_text_faint);
             return;
         }
 
@@ -232,22 +242,22 @@ public class CoinsDialog {
             }
         }
 
-        StringBuilder foot = new StringBuilder();
-        foot.append(zResult.coins.size()).append(" coins");
+        Language.TextBuilder foot = new Language.TextBuilder();
+        foot.append(BalanceAdapter.coinCount(String.valueOf(zResult.coins.size())));
         if(zResult.sendableIds != null){
-            foot.append("  ·  ").append(locked).append(" locked");
+            foot.append("  ·  ").append(Language.msg(l10n_core_wallet_locked_count, locked));
         }
-        foot.append("  ·  sum ").append(Format.tidyAmount(zResult.sum));
+        foot.append("  ·  ").append(Language.msg(l10n_core_wallet_sum, Format.tidyAmount(zResult.sum)));
 
         //Cross-check against the balance the wallet screen is showing
         if(differs(zResult.sum, mConfirmed)){
-            foot.append("\n⚠ sum ≠ confirmed (").append(Format.tidyAmount(safe(mConfirmed))).append(")");
+            foot.append("\n").append(Language.msg(l10n_core_wallet_sum_mismatch, Format.tidyAmount(safe(mConfirmed))));
             mFooter.setTextColor(ContextCompat.getColor(mActivity, R.color.status_warn));
         }else{
             mFooter.setTextColor(ContextCompat.getColor(mActivity, R.color.core_text_faint));
         }
 
-        mFooter.setText(foot.toString());
+        Language.setText(mFooter, foot.build());
         mFooter.setVisibility(View.VISIBLE);
     }
 
@@ -283,8 +293,8 @@ public class CoinsDialog {
         mList.setLayoutParams(lp);
     }
 
-    private void setStatus(String zText, int zColorRes){
-        mStatus.setText(zText);
+    private void setStatus(CharSequence zText, int zColorRes){
+        Language.setText(mStatus, zText);
         mStatus.setTextColor(ContextCompat.getColor(mActivity, zColorRes));
         mStatus.setVisibility(View.VISIBLE);
         mList.setVisibility(View.GONE);

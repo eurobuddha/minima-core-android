@@ -1,6 +1,9 @@
 package com.eurobuddha.minimacore.lock;
 
 import android.content.Context;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
@@ -119,13 +122,13 @@ public final class BiometricUnlock {
             cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.ENCRYPT_MODE, key);
         } catch (Exception e) {
-            zCallback.onError("Could not initialise secure key: " + e.getMessage(), false);
+            zCallback.onError(Language.text(zActivity, l10n_biometric_key_error, e.getMessage()), false);
             return;
         }
 
-        BiometricPrompt.PromptInfo info = promptInfo(
-                "Enable biometric unlock",
-                "Confirm it's you to protect your app PIN");
+        BiometricPrompt.PromptInfo info = promptInfo(zActivity,
+                Language.text(zActivity, l10n_biometric_enable),
+                Language.text(zActivity, l10n_biometric_protect_pin));
 
         prompt(zActivity, cipher, info, new BiometricPrompt.AuthenticationCallback() {
             @Override
@@ -137,7 +140,7 @@ public final class BiometricUnlock {
                     zCallback.onSuccess();
                 } catch (Exception e) {
                     disable(zActivity);
-                    zCallback.onError("Could not store PIN: " + e.getMessage(), false);
+                    zCallback.onError(Language.text(zActivity, l10n_biometric_store_error, e.getMessage()), false);
                 }
             }
 
@@ -162,7 +165,7 @@ public final class BiometricUnlock {
         String ctB64 = p.getString(K_CT, null);
         String ivB64 = p.getString(K_IV, null);
         if (ctB64 == null || ivB64 == null) {
-            zCallback.onError("Biometric unlock is not set up", false);
+            zCallback.onError(Language.text(zActivity, l10n_biometric_not_set_up), false);
             return;
         }
 
@@ -174,23 +177,22 @@ public final class BiometricUnlock {
             SecretKey key = loadKey();
             if (key == null) {
                 clearStored(zActivity);
-                zCallback.onError("Biometric key missing — re-enable biometric unlock", true);
+                zCallback.onError(Language.text(zActivity, l10n_biometric_key_missing), true);
                 return;
             }
             cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_BITS, iv));
         } catch (KeyPermanentlyInvalidatedException invalidated) {
             disable(zActivity);
-            zCallback.onError("Biometrics changed — biometric unlock was reset. "
-                    + "Unlock with your PIN, then re-enable it.", true);
+            zCallback.onError(Language.text(zActivity, l10n_biometric_reset), true);
             return;
         } catch (Exception e) {
-            zCallback.onError("Could not initialise secure key: " + e.getMessage(), false);
+            zCallback.onError(Language.text(zActivity, l10n_biometric_key_error, e.getMessage()), false);
             return;
         }
 
-        BiometricPrompt.PromptInfo info = promptInfo(
-                "Unlock Minima", "Confirm it's you to unlock");
+        BiometricPrompt.PromptInfo info = promptInfo(zActivity,
+                Language.text(zActivity, l10n_biometric_unlock), Language.text(zActivity, l10n_biometric_confirm));
 
         prompt(zActivity, cipher, info, new BiometricPrompt.AuthenticationCallback() {
             @Override
@@ -200,7 +202,7 @@ public final class BiometricUnlock {
                     byte[] plain = c.doFinal(ct);
                     zCallback.onPassphrase(new String(plain, java.nio.charset.StandardCharsets.UTF_8));
                 } catch (Exception e) {
-                    zCallback.onError("Could not decrypt PIN: " + e.getMessage(), false);
+                    zCallback.onError(Language.text(zActivity, l10n_biometric_decrypt_error, e.getMessage()), false);
                 }
             }
 
@@ -222,16 +224,16 @@ public final class BiometricUnlock {
         try {
             bp.authenticate(zInfo, new BiometricPrompt.CryptoObject(zCipher));
         } catch (Exception e) {   // e.g. a device rejecting the crypto+authenticator combo — report instead of crashing
-            zCb.onAuthenticationError(BiometricPrompt.ERROR_HW_UNAVAILABLE, "Biometric prompt failed: " + e.getMessage());
+            zCb.onAuthenticationError(BiometricPrompt.ERROR_HW_UNAVAILABLE, Language.text(zActivity, l10n_biometric_prompt_error, e.getMessage()));
         }
     }
 
-    private static BiometricPrompt.PromptInfo promptInfo(String zTitle, String zSubtitle) {
+    private static BiometricPrompt.PromptInfo promptInfo(Context context, String zTitle, String zSubtitle) {
         BiometricPrompt.PromptInfo.Builder b = new BiometricPrompt.PromptInfo.Builder()
                 .setTitle(zTitle)
                 .setSubtitle(zSubtitle)
                 .setAllowedAuthenticators(allowedAuthenticators())
-                .setNegativeButtonText("Use PIN");   // required whenever DEVICE_CREDENTIAL isn't an allowed authenticator
+                .setNegativeButtonText(Language.text(context, l10n_biometric_use_pin));   // required whenever DEVICE_CREDENTIAL isn't an allowed authenticator
         return b.build();
     }
 

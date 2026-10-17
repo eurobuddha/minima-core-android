@@ -5,7 +5,7 @@ public final class PandamoniumDestinations {
     private PandamoniumDestinations() {}
     public static final String[] NAMES = {
         "Minima Core", "ETH Wallet", "AtomiX", "PandaPools", "Future Cash Next", "PandaDEX",
-        "Zero Edge Casino", "Minima Explorer", "Filez", "Minima Vestr", "Entropy", "Terminal IDE", "MinimaMail"
+        "Zero Edge Casino", "Minima Explorer", "Filez", "Minima Vestr", "Entropy", "Terminal IDE", "MinimaMail", "UTXO Wallet", "miniMall", "NFT Wallet", "minimaWallet"
     };
     // Existing launcher artwork, indexed by destination identity rather than display order.
     public static final int[] ICONS = {
@@ -21,7 +21,11 @@ public final class PandamoniumDestinations {
         com.eurobuddha.vestr.R.mipmap.pm_vestr_ic_launcher,
         com.eurobuddha.entropy.R.mipmap.pm_entropy_ic_launcher,
         com.eurobuddha.terminalide.R.mipmap.pm_terminalide_ic_launcher,
-        com.eurobuddha.mail.R.mipmap.pm_mail_ic_launcher
+        com.eurobuddha.mail.R.mipmap.pm_mail_ic_launcher,
+        com.eurobuddha.utxo.R.mipmap.pm_utxo_ic_launcher,
+        com.eurobuddha.merchshop.R.mipmap.pm_merchshop_ic_launcher,
+        com.eurobuddha.nftwallet.R.mipmap.pm_nftwallet_ic_launcher,
+        com.eurobuddha.wallet.R.mipmap.pm_wallet_ic_launcher
     };
     public static final String[] CLASSES = {
         "com.eurobuddha.minimacore.main.MainActivity", "com.eurobuddha.ethwallet.MainActivity",
@@ -30,13 +34,21 @@ public final class PandamoniumDestinations {
         "com.eurobuddha.casino.MainActivity", "com.eurobuddha.blockexplorer.MainActivity",
         "com.eurobuddha.filez.MainActivity",
         "com.eurobuddha.vestr.MainActivity",
-        "com.eurobuddha.entropy.MainActivity", "com.eurobuddha.terminalide.MainActivity", "com.eurobuddha.mail.MainActivity"
+        "com.eurobuddha.entropy.MainActivity", "com.eurobuddha.terminalide.MainActivity", "com.eurobuddha.mail.MainActivity",
+        "com.eurobuddha.utxo.MainActivity",
+        "com.eurobuddha.minimacore.integrated.MallActivity",
+        "com.eurobuddha.nftwallet.MainActivity",
+        "com.eurobuddha.wallet.MainActivity"
     };
     public static int indexFor(String activityClass) {
         for (int i = 0; i < CLASSES.length; i++) {
             if (CLASSES[i].equals(activityClass)) return i;
         }
         if (activityClass.equals("com.eurobuddha.terminalide.ide.ScriptEditorActivity")) return indexFor("com.eurobuddha.terminalide.MainActivity");
+        if (activityClass.equals("com.eurobuddha.merchshop.MainActivity")
+                || activityClass.equals("com.eurobuddha.merchstudio.MainActivity")
+                || activityClass.equals("com.eurobuddha.merchinbox.MainActivity"))
+            return indexFor("com.eurobuddha.minimacore.integrated.MallActivity");
         return -1;
     }
 }

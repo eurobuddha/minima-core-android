@@ -1,4 +1,6 @@
 package com.eurobuddha.pandapools;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.app.AlertDialog;
 import android.text.Editable;
@@ -57,7 +59,7 @@ public class MyLpView extends BaseView {
         // pendingCreate is armed), the worry-and-resubmit loop the pending-create lifecycle prevents. Each
         // transaction completion re-scans with busy=false, so no update is lost.
         @Override public void onPools(List<Pool> pools) { if (busy) return; render(pools); }
-        @Override public void onError(String msg) { status("Scan error: " + msg); }
+        @Override public void onError(String msg) { status(Language.msg(l10n_pools_lp_scan_error, PoolsMessages.message(msg))); }
     };
     // A create that's been posted but not yet discovered on-chain — drives the persistent "confirming…"
     // card (so we never flash "No pools yet"), the duplicate-create guard, and a fast self-poll so the
@@ -184,15 +186,14 @@ public class MyLpView extends BaseView {
         if (pendingCreate != null) {
             for (Pool p : mine) if (p.address != null && p.address.equalsIgnoreCase(pendingCreate.address)) { pendingLive = true; break; }
             if (pendingLive) {
-                status("Pool live ✓   MINIMA / " + pendingLabel + " is now earning fees.");
+                status(Language.msg(l10n_pools_lp_live, pendingLabel));
                 pendingCreate = null; stopPendingPoll();
             } else if (act.chainBlock() > 0 && act.chainBlock() - pendingBlock > 20) {
                 // Safety release: never let a stuck pending-create block re-creates forever (funds are safe —
                 // the covenant parse-guard means nothing moved unless it compiled; a real pool shows via normal
                 // discovery). Drop the tracking so the create-guard frees up.
                 pendingCreate = null; stopPendingPoll();
-                status("Your pool hasn't appeared after ~20 blocks — it may just be slow. Switch tabs to refresh, "
-                        + "or check the Activity tab. You can create again if needed.");
+                status(Language.msg(l10n_pools_lp_delayed));
             }
         }
 
@@ -225,30 +226,29 @@ public class MyLpView extends BaseView {
 
         if (mine.isEmpty()) {
             if (pendingCreate != null) {
-                value.setText("Confirming…");
-                sub.setText("Your new pool is being written on-chain.");
+                Language.setText(value, Language.msg(l10n_nft_confirming));
+                Language.setText(sub, Language.msg(l10n_pools_lp_writing));
                 // keep the "Submitted ✓ … confirming" status — do NOT wipe it
             } else if (!unavailable.isEmpty()) {
-                value.setText("Reserves unavailable");
-                sub.setText(unavailable.size() + " saved pool(s) need a live reserve check.");
+                Language.setText(value, Language.msg(l10n_pools_lp_unavailable));
+                Language.setText(sub, Language.msg(l10n_pools_lp_check_count, unavailable.size()));
                 // This branch never cleared the status, so the layout's initial "Loading your pools…"
                 // stayed on screen for good — above cards that had already finished loading and were
                 // telling the user something was wrong. Saying "loading" after loading finished is how a
                 // transient state gets read as a permanent fault.
                 status("");
             } else {
-                value.setText("No pools yet");
-                sub.setText(myKeys.isEmpty() ? "Pair the node to see your liquidity."
-                        : "Create a pool to start earning the swap fee.");
+                Language.setText(value, Language.msg(l10n_pools_lp_none));
+                Language.setText(sub, myKeys.isEmpty() ? Language.msg(l10n_pools_lp_connect)
+                        : Language.msg(l10n_pools_lp_start));
                 if (!pendingLive) status("");
             }
             return;
         }
         BigDecimal totalMinima = BigDecimal.ZERO;
         for (Pool p : mine) totalMinima = totalMinima.add(p.reserveM);
-        value.setText(trim(totalMinima) + " MINIMA reserves");
-        sub.setText(mine.size() + " visible pool(s) · token reserves shown below"
-                + (unavailable.isEmpty() ? "" : " · " + unavailable.size() + " unavailable"));
+        Language.setText(value, Language.msg(l10n_pools_lp_minima_reserves, trim(totalMinima)));
+        Language.setText(sub, Language.join(Language.msg(l10n_pools_lp_visible_count, mine.size()), unavailable.isEmpty() ? "" : Language.msg(l10n_pools_lp_unavailable_count, unavailable.size())));
         if (pendingCreate == null && !pendingLive) status("");
         for (Pool p : mine) list.addView(lpCard(p));
     }
@@ -258,7 +258,7 @@ public class MyLpView extends BaseView {
      *  never abbreviated: a truncated identifier cannot be pasted into an explorer. */
     private void identifiers(LinearLayout card, Pool p) {
         TextView ids = new TextView(act);
-        ids.setText("Pool: " + p.address + (p.opk == null || p.opk.isEmpty() ? "" : "\nOwner key: " + p.opk));
+        Language.setText(ids, Language.join(Language.msg(l10n_pools_lp_pool_id, p.address), p.opk == null || p.opk.isEmpty() ? "" : Language.join("\n", Language.msg(l10n_pools_lp_owner_key, p.opk))));
         ids.setTextColor(Design.dim());
         ids.setTextIsSelectable(true);
         card.addView(ids);
@@ -266,16 +266,15 @@ public class MyLpView extends BaseView {
 
     private View signingPausedCard(Pool p) {
         LinearLayout card = dialogBox(); Ui.card(card);
-        card.addView(text("Owner signing paused", Design.amber(), 16, true));
+        card.addView(text(Language.msg(l10n_pools_lp_signing_paused), Design.amber(), 16, true));
         identifiers(card, p);
         TextView detail = new TextView(act);
-        detail.setText("PandaPools cannot tell how many of this owner key's one-time signatures have already "
-                + "been used, so it has stopped signing for this pool. Automatic refresh is paused too.");
+        Language.setText(detail, Language.msg(l10n_pools_lp_signing_note));
         card.addView(detail);
         // Deliberately NOT styled like the read-only actions. Confirming enables unlimited owner signing
         // for this key: if this device is not the one holding the newest counter, that is signature reuse.
         Button confirm = new Button(act);
-        confirm.setText("Confirm wallet signing state");
+        Language.setText(confirm, Language.msg(l10n_pools_lp_confirm_signing));
         confirm.setTextColor(Design.red());
         confirm.setOnClickListener(v -> confirmSigningState(p.opk));
         card.addView(confirm);
@@ -286,23 +285,27 @@ public class MyLpView extends BaseView {
     private View retiredCard() {
         LinearLayout card = dialogBox(); Ui.card(card);
         List<Pool> gone = OwnPoolStore.retired(act);
-        card.addView(text(gone.size() + " closed pool(s) kept for recovery", Design.dim(), 14, false));
+        card.addView(text(Language.msg(l10n_pools_lp_retired_count, gone.size()), Design.dim(), 14, false));
         TextView note = new TextView(act);
-        note.setText("Their recipes are still saved and still go into your backups — they are just out of the way. "
-                + "If a close never actually landed, the pool reappears here on its own.");
+        Language.setText(note, Language.msg(l10n_pools_lp_retired_note));
         note.setTextColor(Design.dim());
         card.addView(note);
-        Button show = new Button(act); show.setText("Show closed pools");
+        Button show = new Button(act); Language.setText(show, Language.msg(l10n_pools_lp_show_closed));
         show.setOnClickListener(v -> {
-            StringBuilder b = new StringBuilder();
-            for (Pool p : gone) b.append("Pool: ").append(p.address)
-                    .append(p.opk == null || p.opk.isEmpty() ? "" : "\nOwner key: " + p.opk).append("\n\n");
-            new AlertDialog.Builder(act).setTitle("Closed pools").setMessage(b.toString().trim())
-                    .setNeutralButton("Bring back", (d, w) -> {
+            Language.TextBuilder b = new Language.TextBuilder();
+            boolean first = true;
+            for (Pool p : gone) {
+                if (!first) b.append("\n\n");
+                first = false;
+                b.append(Language.msg(l10n_pools_lp_pool_id, p.address))
+                        .append(p.opk == null || p.opk.isEmpty() ? "" : Language.join("\n", Language.msg(l10n_pools_lp_owner_key, p.opk)));
+            }
+            act.languageDialog().setTitle(Language.msg(l10n_pools_lp_closed)).setMessage(b.build())
+                    .setNeutralButton(Language.msg(l10n_pools_lp_bring_back), (d, w) -> {
                         for (Pool p : gone) OwnPoolStore.setRetired(act, p.address, false);
-                        status("Closed pools are showing again."); act.pools().refresh();
+                        status(Language.msg(l10n_pools_lp_showing_closed)); act.pools().refresh();
                     })
-                    .setPositiveButton("Close", null).show();
+                    .setPositiveButton(Language.msg(l10n_language_close), null).show();
         });
         card.addView(show);
         return card;
@@ -312,26 +315,22 @@ public class MyLpView extends BaseView {
         LinearLayout card = dialogBox();
         Ui.card(card);
         boolean held = p.signingStateUnverified || OwnPoolStore.confirmationFailed(p.opk);
-        card.addView(text("Saved pool · reserves not found", Design.dim(), 16, true));
+        card.addView(text(Language.msg(l10n_pools_lp_saved_missing), Design.dim(), 16, true));
         identifiers(card, p);
         TextView note = new TextView(act);
-        note.setText("This node cannot currently see both of this pool's reserve coins. That is what a pool that "
-                + "has been closed looks like, and also what one looks like on a node that is still catching up.\n\n"
-                + (mine(p) ? "The owner key for it is on this device."
-                           : "The owner key for it is NOT on this device. Restore the matching MinimaCore wallet backup.")
-                + (held ? " Owner signing is paused for it — see below." : ""));
+        Language.setText(note, Language.msg(l10n_pools_lp_missing_note, mine(p) ? Language.msg(l10n_pools_lp_key_here) : Language.msg(l10n_pools_lp_key_missing), held ? Language.msg(l10n_pools_lp_pause_suffix) : ""));
         card.addView(note);
-        Button recover = new Button(act); recover.setText("Check for reserves"); card.addView(recover);
-        Button close = new Button(act); close.setText("It's closed — put it away");
+        Button recover = new Button(act); Language.setText(recover, Language.msg(l10n_pools_lp_check_reserves)); card.addView(recover);
+        Button close = new Button(act); Language.setText(close, Language.msg(l10n_pools_lp_put_away));
         close.setOnClickListener(v -> {
             OwnPoolStore.setRetired(act, p.address, true);
-            status("Put away. The recipe is still saved and still goes into your backups.");
+            status(Language.msg(l10n_pools_lp_put_away_done));
             act.pools().refresh();
         });
         card.addView(close);
         if (held) {
             Button confirm = new Button(act);
-            confirm.setText("Confirm wallet signing state");
+            Language.setText(confirm, Language.msg(l10n_pools_lp_confirm_signing));
             confirm.setTextColor(Design.red());
             confirm.setOnClickListener(v -> confirmSigningState(p.opk));
             card.addView(confirm);
@@ -342,7 +341,7 @@ public class MyLpView extends BaseView {
                 JSONObject root = new JSONObject().put("pandapools_backup", 3)
                         .put("pools", new JSONArray().put(Recovery.baseEntry(p)));
                 restoreJson(root.toString());
-            } catch (Exception e) { status("Could not read the saved pool recipe."); }
+            } catch (Exception e) { status(Language.msg(l10n_pools_lp_recipe_unreadable)); }
         });
         return card;
     }
@@ -361,13 +360,12 @@ public class MyLpView extends BaseView {
         card.setLayoutParams(lp);
 
         int el = Math.max(0, act.chainBlock() - pendingBlock);
-        card.addView(text("MINIMA / " + pendingLabel + "   ·   confirming…", Design.amber(), 16, true));
-        String st = el <= 3 ? ("Writing on-chain — block " + el + " of ~3")
-                            : ("Writing on-chain — " + el + " blocks (taking a little longer than usual)");
-        card.addView(kv("Status", st));
+        card.addView(text(Language.msg(l10n_pools_lp_confirming_pair, pendingLabel), Design.amber(), 16, true));
+        CharSequence st = el <= 3 ? Language.msg(l10n_pools_lp_writing_block, el) : Language.msg(l10n_pools_lp_writing_long, el);
+        card.addView(kv(Language.msg(l10n_utxo_status), st));
         if (pendingCreate.reserveM != null && pendingCreate.reserveT != null)
-            card.addView(kv("Seeding", trim(pendingCreate.reserveM) + " MINIMA  +  " + trim(pendingCreate.reserveT) + " " + pendingLabel));
-        card.addView(kv("", "It will appear here automatically — no need to resubmit.  (Tap to dismiss.)"));
+            card.addView(kv(Language.msg(l10n_pools_lp_seeding), trim(pendingCreate.reserveM) + " MINIMA  +  " + trim(pendingCreate.reserveT) + " " + pendingLabel));
+        card.addView(kv("", Language.msg(l10n_pools_lp_appear_automatically)));
         // Escape hatch: dismissing clears the create-guard so a stalled node can never wedge new creates.
         card.setOnClickListener(v -> { pendingCreate = null; stopPendingPoll(); status(""); act.pools().requestNow(poolListener); });
         return card;
@@ -406,16 +404,16 @@ public class MyLpView extends BaseView {
         card.setLayoutParams(lp);
 
         card.addView(text("MINIMA / " + p.tokenLabel(), Design.heading(), 16, true));
-        card.addView(kv("Your liquidity", trim(p.reserveM) + " MINIMA  +  " + trim(p.reserveT) + " " + p.tokenLabel()));
+        card.addView(kv(Language.msg(l10n_pools_lp_liquidity), trim(p.reserveM) + " MINIMA  +  " + trim(p.reserveT) + " " + p.tokenLabel()));
         int oldest = p.reserveBlockM > 0 && p.reserveBlockT > 0 ? Math.min(p.reserveBlockM, p.reserveBlockT) : 0;
         // Unknown age (oldest == 0) is NOT stale — same rule StrandingWatch follows. Warning about a pool
         // whose reserve blocks simply have not been read yet is how a warning gets trained out of a user.
         if (oldest > 0 && act.chainBlock() - oldest > PoolRefresher.REFRESH_BLOCKS)
-            card.addView(text("Reserve proofs need attention. Older reserves may require fresh archive proofs after a node reset; keep a current wallet backup and pool recipe.", Design.amber(), 13, false));
+            card.addView(text(Language.msg(l10n_pools_lp_proof_warning), Design.amber(), 13, false));
 
         BigDecimal value = p.reserveM.multiply(TWO);
-        card.addView(kv("Value now", "≈ " + trim(value) + " MINIMA"));
-        card.addView(kv("Pool price", trim8(p.spotPrice()) + " " + p.tokenLabel() + " / MINIMA"));
+        card.addView(kv(Language.msg(l10n_pools_lp_value), "≈ " + trim(value) + " MINIMA"));
+        card.addView(kv(Language.msg(l10n_pools_lp_price), trim8(p.spotPrice()) + " " + p.tokenLabel() + " / MINIMA"));
 
         // fees earned: LP value grows ∝ √(K) at constant price, and K grows only from fees, so the fee share
         // of the position is (1 − 1/√(K/Kbase)). Kbase is the product at the LAST liquidity change (from the
@@ -427,7 +425,7 @@ public class MyLpView extends BaseView {
         if (feeBase.signum() > 0) growth = Math.max(0, p.k().divide(feeBase, MC).subtract(BigDecimal.ONE).doubleValue());
         double feeMult = Math.sqrt(1.0 + growth);
         double feesMinima = value.doubleValue() * (1.0 - 1.0 / feeMult);
-        card.addView(kvColored("Fees earned", "≈ " + fmt(feesMinima) + " MINIMA  (+" + fmt(growth * 100.0) + "%)", Design.success()));
+        card.addView(kvColored(Language.msg(l10n_pools_lp_fees), "≈ " + fmt(feesMinima) + " MINIMA  (+" + fmt(growth * 100.0) + "%)", Design.success()));
 
         // impermanent loss + price move vs the opening snapshot (if this app opened the pool)
         if (snap != null && snap.initPrice.signum() > 0 && p.spotPrice().signum() > 0) {
@@ -435,10 +433,10 @@ public class MyLpView extends BaseView {
             double r = pnow / p0;
             double priceMove = (r - 1.0) * 100.0;
             double il = (2.0 * Math.sqrt(r) / (1.0 + r) - 1.0) * 100.0;   // ≤ 0, price-divergence loss vs holding
-            card.addView(kv("Price since open", (priceMove >= 0 ? "+" : "") + fmt(priceMove) + "%"));
-            card.addView(kvColored("Impermanent loss", fmt(il) + "%  vs holding", il < -0.01 ? Design.amber() : Design.dim()));
+            card.addView(kv(Language.msg(l10n_pools_lp_price_move), (priceMove >= 0 ? "+" : "") + fmt(priceMove) + "%"));
+            card.addView(kvColored(Language.msg(l10n_pools_lp_loss), Language.msg(l10n_pools_lp_compared_holding, fmt(il)), il < -0.01 ? Design.amber() : Design.dim()));
             int ageBlocks = act.chainBlock() - snap.block;
-            if (ageBlocks > 0) card.addView(kv("Age", ageBlocks + " blocks  (~" + fmt(ageBlocks * 50.0 / 3600.0) + " h)"));
+            if (ageBlocks > 0) card.addView(kv(Language.msg(l10n_core_wallet_age), Language.msg(l10n_pools_lp_age, ageBlocks, fmt(ageBlocks * 50.0 / 3600.0))));
         }
 
         // KMIN health: ratio K / KMIN, 1.0 fresh → 2.0 = must migrate
@@ -449,7 +447,7 @@ public class MyLpView extends BaseView {
         card.addView(discoverabilityRow(p));
         card.addView(actionRow(p, ratio));
         // what-if: open the calculator seeded with THIS pool's live reserves (display only, nothing posted)
-        TextView calc = text("What if the price moves?  Pool calculator ›", Design.accent(), 12, true);
+        TextView calc = text(Language.msg(l10n_pools_lp_what_if), Design.accent(), 12, true);
         calc.setGravity(Gravity.END);
         calc.setPadding(0, Ui.dp(act, 10), 0, 0);
         calc.setOnClickListener(v -> PoolCalcDialog.show(act, p));
@@ -469,9 +467,9 @@ public class MyLpView extends BaseView {
 
         LinearLayout row = new LinearLayout(act);
         row.setOrientation(LinearLayout.HORIZONTAL);
-        TextView label = text("Floor headroom", Design.dim(), 12, false);
+        TextView label = text(Language.msg(l10n_pools_lp_headroom), Design.dim(), 12, false);
         label.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        TextView pct = text((warn ? "migrate soon" : "healthy"), warn ? Design.amber() : Design.dim(), 12, false);
+        TextView pct = text((warn ? Language.msg(l10n_pools_lp_migrate_soon) : Language.msg(l10n_pools_lp_healthy)), warn ? Design.amber() : Design.dim(), 12, false);
         row.addView(label); row.addView(pct);
         wrap.addView(row);
 
@@ -499,11 +497,11 @@ public class MyLpView extends BaseView {
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(0, Ui.dp(act, 14), 0, 0);
         boolean mustMigrate = ratio.doubleValue() >= 1.85;
-        row.addView(actionBtn(mustMigrate ? "Add (full)" : "Add", () -> showAddDialog(p), false));
+        row.addView(actionBtn(mustMigrate ? Language.msg(l10n_pools_lp_add_full) : Language.msg(l10n_mail_add), () -> showAddDialog(p), false));
         row.addView(gap());
-        row.addView(actionBtn("Migrate", () -> showMigrateDialog(p), mustMigrate));
+        row.addView(actionBtn(Language.msg(l10n_pools_lp_migrate), () -> showMigrateDialog(p), mustMigrate));
         row.addView(gap());
-        row.addView(actionBtn("Close", () -> confirmClose(p), false));
+        row.addView(actionBtn(Language.msg(l10n_language_close), () -> confirmClose(p), false));
         return row;
     }
 
@@ -518,19 +516,12 @@ public class MyLpView extends BaseView {
         int owned = BackupState.ownedCount(act);
         boolean never = !BackupState.everExported(act);
         LinearLayout card = dialogBox(); Ui.card(card);
-        card.addView(text(never ? "Your pools are not backed up" : "Your backup is out of date",
+        card.addView(text(never ? Language.msg(l10n_pools_lp_backup_needed) : Language.msg(l10n_pools_lp_backup_changed),
                 Design.amber(), 16, true));
         TextView detail = new TextView(act);
-        detail.setText(never
-                ? (owned == 1 ? "Your pool exists only on this phone." : "Your " + owned + " pools exist only on this phone.")
-                        + " PandaPools keeps their contracts here, and that copy is deliberately never sent to any "
-                        + "cloud — so if this phone is lost or wiped, recovery depends on having either a "
-                        + "PandaPools pool file or a current MinimaCore wallet backup. Right now you have "
-                        + "neither. Save one."
-                : "Your saved backup file no longer covers every pool you own, so a pool created since then "
-                        + "could not be recovered from it. Save a fresh one.");
+        Language.setText(detail, never ? Language.msg(l10n_pools_lp_backup_missing_body, owned) : Language.msg(l10n_pools_lp_backup_changed_body));
         detail.setTextIsSelectable(true); card.addView(detail);
-        Button back = new Button(act); back.setText("Back up now");
+        Button back = new Button(act); Language.setText(back, Language.msg(l10n_pools_lp_backup_now));
         back.setOnClickListener(v -> doBackup()); card.addView(back);
         return card;
     }
@@ -555,17 +546,17 @@ public class MyLpView extends BaseView {
         final String addr = ready.address;
 
         LinearLayout card = dialogBox(); Ui.card(card);
-        card.addView(text("Add coin proofs to your pool file", Design.dim(), 15, true));
+        card.addView(text(Language.msg(l10n_pools_lp_add_proofs), Design.dim(), 15, true));
         TextView detail = new TextView(act);
-        detail.setText("Your pool has confirmed, so a fresh backup can now include its reserve coin proofs. Those "
-                + "make recovery quicker; they are not required, and your saved file already recovers this pool "
-                + "through an archive lookup. Worth doing when convenient.\n\n" + addr);
+        Language.setText(detail, Language.msg(l10n_pools_lp_proofs_available, addr));
         detail.setTextIsSelectable(true); card.addView(detail);
         LinearLayout row = new LinearLayout(act); row.setOrientation(LinearLayout.HORIZONTAL);
-        Button again = new Button(act); again.setText("Back up again");
-        again.setOnClickListener(v -> { clearProofless(addr); doBackup(); });
-        Button later = new Button(act); later.setText("Not now");
+        Button again = new Button(act); Language.setText(again, Language.msg(l10n_pools_lp_backup_again));
+        again.setOnClickListener(v -> doBackup());
+        Button later = new Button(act); Language.setText(later, Language.msg(l10n_pools_lp_not_now));
         later.setOnClickListener(v -> { prooflessDismissed = true; act.pools().refresh(); });
+        again.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        later.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         row.addView(again); row.addView(later); card.addView(row);
         return card;
     }
@@ -601,22 +592,14 @@ public class MyLpView extends BaseView {
      */
     private View interruptedExitCard(ExitStore.Record r) {
         LinearLayout card = dialogBox(); Ui.card(card);
-        card.addView(text("A withdrawal was interrupted", Design.amber(), 16, true));
+        card.addView(text(Language.msg(l10n_pools_lp_exit_interrupted), Design.amber(), 16, true));
         TextView detail = new TextView(act);
         boolean unknown = r.stateOf() == ExitStore.State.UNCERTAIN;
-        detail.setText((unknown
-                ? "PandaPools sent a withdrawal for this pool but never got confirmation of the outcome, so it "
-                        + "does not know whether it posted."
-                : "PandaPools was withdrawing this pool when it stopped, so it does not know whether the "
-                        + "withdrawal posted.")
-                + " It will NOT retry on its own: if the first one did land, a second would spend the same coins "
-                + "again and use another of the owner key's one-time signatures.\n\n"
-                + "Check Activity, or look this pool up on a block explorer. If the reserves are gone, the "
-                + "withdrawal worked and \"Collect withdrawn funds to my wallet\" finishes the job. If they are "
-                + "still there, use Withdraw on this pool's card.\n\n"
-                + "Pool: " + r.address
-                + (r.closeTxpowid == null || r.closeTxpowid.isEmpty() ? "" : "\nTransaction: " + r.closeTxpowid)
-                + (r.reason == null || r.reason.isEmpty() ? "" : "\n\n" + r.reason));
+        Language.setText(detail, Language.join(
+                unknown ? Language.msg(l10n_pools_lp_exit_uncertain) : Language.msg(l10n_pools_lp_exit_stopped),
+                "\n\n", Language.msg(l10n_pools_lp_exit_check), "\n\n", Language.msg(l10n_pools_lp_pool_id, r.address),
+                r.closeTxpowid == null || r.closeTxpowid.isEmpty() ? "" : Language.join("\n", Language.msg(l10n_pools_transaction_id_detail, r.closeTxpowid)),
+                r.reason == null || r.reason.isEmpty() ? "" : Language.join("\n\n", PoolsMessages.message(r.reason))));
         detail.setTextIsSelectable(true); card.addView(detail);
         Ui.copyable(detail, "pool address", r.address);
         return card;
@@ -633,23 +616,17 @@ public class MyLpView extends BaseView {
     private View pendingCollectCard(PendingCollect.Entry e) {
         boolean stranded = e.statusOf() == PendingCollect.Status.STRANDED;
         LinearLayout card = dialogBox(); Ui.card(card);
-        card.addView(text(stranded ? "Withdrawn funds cannot be moved from this address"
-                                   : "Withdrawn funds still being moved to your wallet",
+        card.addView(text(stranded ? Language.msg(l10n_pools_lp_collect_stranded)
+                                   : Language.msg(l10n_pools_lp_collect_pending),
                 stranded ? Design.amber() : Design.dim(), 15, true));
         TextView detail = new TextView(act);
-        detail.setText((stranded
-                ? "This is the address your pool was closed to. PandaPools cannot move the funds because "
-                        + "this wallet cannot sign for it — that address is not one of the 64 addresses a seed "
-                        + "phrase rebuilds. Restore the matching complete MinimaCore wallet backup (the one from "
-                        + "the device that owned the pool), then use Collect. A seed on its own will not do it."
-                : "Your pool's withdrawal landed at its owner payout address and PandaPools is moving it into "
-                        + "your wallet. It keeps trying in the background, including after the app is closed, "
-                        + "and stops only once the address is empty.")
-                + "\n\n" + e.oadr
-                + (e.lastError == null || e.lastError.isEmpty() ? "" : "\n\n" + e.lastError));
+        Language.setText(detail, Language.join(
+                stranded ? Language.msg(l10n_pools_lp_collect_stranded_body) : Language.msg(l10n_pools_lp_collect_pending_body),
+                "\n\n", e.oadr,
+                e.lastError == null || e.lastError.isEmpty() ? "" : Language.join("\n\n", PoolsMessages.message(e.lastError))));
         detail.setTextIsSelectable(true); card.addView(detail);
         Ui.copyable(detail, "payout address", e.oadr);
-        Button now = new Button(act); now.setText(stranded ? "Try again" : "Collect now");
+        Button now = new Button(act); Language.setText(now, stranded ? Language.msg(l10n_pools_lp_try_again) : Language.msg(l10n_pools_lp_collect_now));
         now.setOnClickListener(v -> doCollect()); card.addView(now);
         return card;
     }
@@ -667,13 +644,16 @@ public class MyLpView extends BaseView {
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(0, Ui.dp(act, 10), 0, 0);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        String msg = !known ? "Discoverability: checking…"
-                : fresh ? "Others can find this pool ✓"
-                : "Others may not see this pool now";
+        CharSequence msg = !known ? Language.msg(l10n_pools_lp_discovery_checking)
+                : fresh ? Language.msg(l10n_pools_lp_discovery_fresh)
+                : Language.msg(l10n_pools_lp_discovery_old);
         TextView hint = text(msg, (fresh || !known) ? Design.dim() : Design.amber(), 12, false);
         hint.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        TextView btn = text("Re-publish", Design.accent(), 12, true);
+        TextView btn = text(Language.msg(l10n_pools_lp_republish), Design.accent(), 12, true);
         btn.setPadding(Ui.dp(act, 12), Ui.dp(act, 6), 0, Ui.dp(act, 6));
+        btn.setMinHeight(Ui.dp(act, 48));
+        btn.setMaxWidth(Ui.dp(act, 150));
+        btn.setGravity(Gravity.CENTER);
         btn.setOnClickListener(v -> { if (!busy) republish(p); });
         row.addView(hint); row.addView(btn);
         return row;
@@ -683,7 +663,7 @@ public class MyLpView extends BaseView {
      *  (owner-signed, no fund movement) so other nodes rediscover it. Re-reads the live coin first — refresh
      *  spends the covenant coin, so a stale snapshot would fail with "already spent (the pool moved)". */
     private void republish(Pool p) {
-        busy = true; status("Re-publishing your pool so others can find it…");
+        busy = true; status(Language.msg(l10n_pools_lp_republishing));
         ensureOwner(java.util.Collections.singletonList(p.opk), blocked -> {
             OwnerKeyRecovery.Blocked why = blockedKey(p.opk, blocked);
             if (why != null) {
@@ -692,19 +672,18 @@ public class MyLpView extends BaseView {
             }
             withFreshCoins(p, () -> mgr.refresh(p, new PoolManager.Result() {
                 @Override public void onPosted(String txpowid) {
-                    act.runOnUiThread(() -> { busy = false; status("Pool re-published ✓ " + txpowid
-                            + " — fresh reserves + registry beacon; other nodes will rediscover it shortly.", txpowid); act.pools().refresh(); });
+                    act.runOnUiThread(() -> { busy = false; status(Language.msg(l10n_pools_lp_republish_submitted, txpowid), txpowid); act.pools().refresh(); });
                 }
                 @Override public void onFailed(String message) {
-                    act.runOnUiThread(() -> { busy = false; status("Re-publish: " + message); });
+                    act.runOnUiThread(() -> { busy = false; status(Language.msg(l10n_pools_lp_republish_error, PoolsMessages.message(message))); });
                 }
             }));
         });
     }
 
-    private TextView actionBtn(String label, Runnable onClick, boolean highlight) {
+    private TextView actionBtn(CharSequence label, Runnable onClick, boolean highlight) {
         TextView t = new TextView(act);
-        t.setText(label); t.setTextSize(13); t.setGravity(Gravity.CENTER);
+        Language.setText(t, label); t.setMinHeight(Ui.dp(act, 48)); t.setTextSize(13); t.setGravity(Gravity.CENTER);
         t.setPadding(Ui.dp(act, 10), Ui.dp(act, 11), Ui.dp(act, 10), Ui.dp(act, 11));
         t.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         if (highlight) Ui.primaryButton(t); else Ui.outlineButton(t);
@@ -726,6 +705,13 @@ public class MyLpView extends BaseView {
         return tokenid != null && tokenid.equalsIgnoreCase(USDT_TOKENID);
     }
 
+    /** Only known application source labels translate; oracle values and unknown labels stay literal. */
+    private CharSequence createPriceSource(String source) {
+        if ("MEXC market".equals(source)) return Language.msg(l10n_pools_create_market_source);
+        if ("live pools".equals(source)) return Language.msg(l10n_pools_create_pool_source);
+        return source;
+    }
+
     private static final class Anchor { final BigDecimal price; final String source; Anchor(BigDecimal p, String s) { price = p; source = s; } }
 
     /** The opening-price anchor, best-first: (1) a fresh MEXC mid; (2) the aggregate spot of live USDT pools;
@@ -743,7 +729,7 @@ public class MyLpView extends BaseView {
         Anchor a = resolveAnchor();
         if (a != null) { createFormPriced(tokenid, decimals, tokenName, tokAvail, minimaAvail, a.price, a.source); return; }
         // no cached MEXC and no live pool → try a one-shot MEXC fetch before deciding priced-vs-manual
-        status("Checking market price…");
+        status(Language.msg(l10n_pools_create_checking_price));
         PriceOracle.fetch(new PriceOracle.Cb() {
             @Override public void onPrice(BigDecimal mid) {
                 if (act.isFinishing() || act.isDestroyed()) return;
@@ -763,8 +749,7 @@ public class MyLpView extends BaseView {
         // loop that stranded funds before.
         if (pendingCreate != null) {
             int el = Math.max(0, act.chainBlock() - pendingBlock);
-            status("Your MINIMA / " + pendingLabel + " pool is still confirming (block " + Math.min(el, 3)
-                    + " of ~3) — wait for it to go live before creating another.");
+            status(Language.msg(l10n_pools_create_pending, pendingLabel, Math.min(el, 3)));
             return;
         }
         // Before anything else: explain what owning a pool obliges the user to do, and get it acknowledged.
@@ -782,28 +767,15 @@ public class MyLpView extends BaseView {
     private void showCreateObligations(Runnable proceed) {
         LinearLayout box = dialogBox();
 
-        box.addView(text("Two things this pool will need from you", Design.heading(), 16, true));
+        box.addView(text(Language.msg(l10n_pools_create_obligations_heading), Design.heading(), 16, true));
 
         TextView one = new TextView(act);
-        one.setText("1.  This app must run on this phone regularly.\n\n"
-                + "Your pool's reserve coins have to be recreated about every 900 blocks — roughly twice a day. "
-                + "PandaPools does that automatically while it can run. If it cannot, other wallets stop finding "
-                + "your pool, and after about 1700 blocks its coins drop out of the chain's recent window and can "
-                + "only be recovered through a MegaMMR archive.");
+        Language.setText(one, Language.msg(l10n_pools_create_keep_running, PoolRefresher.REFRESH_BLOCKS));
         one.setPadding(0, Ui.dp(act, 10), 0, 0);
         one.setTextColor(Design.text()); box.addView(one);
 
         TextView two = new TextView(act);
-        two.setText("2.  A seed phrase on its own is NOT enough — but one backup is.\n\n"
-                + "Your pool's owner key is created separately from your 64 default keys, so a seed rebuilds "
-                + "everything EXCEPT that key. Either of these fills the gap:\n\n"
-                + "•  a current MinimaCore wallet backup — the easy one. It restores the owner key and how many "
-                + "of its one-time signatures have been used, so recovery just works.\n"
-                + "•  a PandaPools pool file + your seed — also works. The file records which key your pool "
-                + "uses and how many signatures it had spent; your seed rebuilds the key itself. You then run "
-                + "one node command to set the key's signature counter before it can sign.\n\n"
-                + "Keep at least one. With neither, a pool whose beacon has aged out of the last ~1700 blocks "
-                + "cannot be reached at all.");
+        Language.setText(two, Language.msg(l10n_pools_create_keep_backups));
         two.setPadding(0, Ui.dp(act, 14), 0, 0);
         two.setTextColor(Design.text()); box.addView(two);
 
@@ -812,13 +784,10 @@ public class MyLpView extends BaseView {
         final TextView batt = new TextView(act);
         batt.setPadding(0, Ui.dp(act, 14), 0, 0);
         final Button fix = new Button(act);
-        fix.setText("Fix this");
+        Language.setText(fix, Language.msg(l10n_pools_create_fix_battery));
         final Runnable refreshBatt = () -> {
             boolean ok = act.isBatteryExempt();
-            batt.setText(ok ? "Battery optimisation: exempt ✓  Android will let PandaPools refresh this pool "
-                            + "while the app is closed."
-                    : "⚠  Android's battery optimisation will stop PandaPools refreshing this pool while the app "
-                            + "is closed. This is the single biggest cause of a pool going dark.");
+            Language.setText(batt, ok ? Language.msg(l10n_pools_create_battery_exempt) : Language.msg(l10n_pools_create_battery_restricted));
             batt.setTextColor(ok ? Design.dim() : Design.amber());
             fix.setVisibility(ok ? View.GONE : View.VISIBLE);
         };
@@ -828,8 +797,7 @@ public class MyLpView extends BaseView {
         box.addView(fix);
 
         final android.widget.CheckBox ack = new android.widget.CheckBox(act);
-        ack.setText("I understand: I must keep this app running, and I need both the pool file and a current "
-                + "wallet backup.");
+        Language.setText(ack, Language.msg(l10n_pools_create_backup_acknowledgement));
         ack.setPadding(0, Ui.dp(act, 16), 0, 0);
         box.addView(ack);
 
@@ -837,16 +805,15 @@ public class MyLpView extends BaseView {
         // exemption screen at all, so blocking creation outright would be worse than a pool the user can still
         // close -- but they must say out loud that they are taking the manual burden on.
         final android.widget.CheckBox manual = new android.widget.CheckBox(act);
-        manual.setText("I understand Android may stop PandaPools refreshing this pool, and I will open the app "
-                + "at least once a day.");
+        Language.setText(manual, Language.msg(l10n_pools_create_battery_acknowledgement));
         manual.setPadding(0, Ui.dp(act, 8), 0, 0);
         box.addView(manual);
 
-        final AlertDialog dlg = new AlertDialog.Builder(act)
-                .setTitle("Before you create a pool")
+        final androidx.appcompat.app.AlertDialog dlg = act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_create_before_title))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Continue", null)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_wallet_continue), null)
+                .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                 .create();
         dlg.setOnShowListener(d -> {
             refreshBatt.run();
@@ -855,9 +822,9 @@ public class MyLpView extends BaseView {
                 refreshBatt.run();
                 boolean exempt = act.isBatteryExempt();
                 manual.setVisibility(exempt ? View.GONE : View.VISIBLE);
-                if (!ack.isChecked()) { toast("Tick the box to confirm you understand."); return; }
+                if (!ack.isChecked()) { toast(Language.msg(l10n_pools_create_acknowledge_required)); return; }
                 if (!exempt && !manual.isChecked()) {
-                    toast("Either fix battery optimisation, or tick the second box.");
+                    toast(Language.msg(l10n_pools_create_battery_required));
                     return;
                 }
                 act.ensureNotificationPermissionNow();   // so THIS pool's keep-alive notice is not suppressed
@@ -894,9 +861,9 @@ public class MyLpView extends BaseView {
                     toks.add(new String[]{tid, name + "  ·  " + trim(sendable) + " avail", String.valueOf(dec),
                             name, sendable.toPlainString()});
                 }
-                if (toks.isEmpty()) { info("Get mxUSDT first", "PandaPools creates MINIMA / USDT pools — the pair with a live market price, so a pool always opens at the true rate. Your wallet holds no mxUSDT; receive some first, then create a pool."); return; }
-                String[] labels = new String[toks.size()];
-                for (int i = 0; i < toks.size(); i++) labels[i] = toks.get(i)[1];
+                if (toks.isEmpty()) { info(Language.msg(l10n_pools_create_get_token_title), Language.msg(l10n_pools_create_get_token_body)); return; }
+                CharSequence[] labels = new CharSequence[toks.size()];
+                for (int i = 0; i < toks.size(); i++) labels[i] = Language.msg(l10n_pools_create_available_token, toks.get(i)[3], trim(Util.decOr(toks.get(i)[4], BigDecimal.ZERO)));
                 final BigDecimal mAvail = minimaAvail[0];
                 // One market-fed token → skip the picker and go straight in; otherwise let the user choose.
                 if (toks.size() == 1) {
@@ -904,16 +871,16 @@ public class MyLpView extends BaseView {
                     dispatchCreate(t[0], Integer.parseInt(t[2]), t[3], Util.decOr(t[4], BigDecimal.ZERO), mAvail);
                     return;
                 }
-                new AlertDialog.Builder(act)
-                        .setTitle("Pool MINIMA with…")
+                act.languageDialog()
+                        .setTitle(Language.msg(l10n_pools_create_choose_token))
                         .setItems(labels, (d, w) -> {
                             String[] t = toks.get(w);
                             dispatchCreate(t[0], Integer.parseInt(t[2]), t[3], Util.decOr(t[4], BigDecimal.ZERO), mAvail);
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                         .show();
             }
-            @Override public void onError(String m) { info("Error", "Could not read your balance: " + m); }
+            @Override public void onError(String m) { info(Language.msg(l10n_seed_sync_error), Language.msg(l10n_pools_create_balance_error, PoolsMessages.message(m))); }
         });
     }
 
@@ -927,7 +894,7 @@ public class MyLpView extends BaseView {
     private void createFormPriced(String tokenid, int decimals, String tokenName, BigDecimal tokAvail,
                                   BigDecimal minimaAvail, BigDecimal initPrice, String initSource) {
         LinearLayout box = dialogBox();
-        EditText usdtAmt = field(box, tokenName + " to provide  (≈ US$)", "e.g. 1.90");
+        EditText usdtAmt = field(box, Language.msg(l10n_pools_create_provide_token, tokenName), Language.msg(l10n_pools_create_example_usdt));
         TextView info = new TextView(act);
         info.setTextColor(Design.dim()); info.setTextSize(13);
         info.setPadding(0, Ui.dp(act, 12), 0, 0);
@@ -938,34 +905,34 @@ public class MyLpView extends BaseView {
 
         final Runnable update = () -> {
             BigDecimal p = price[0];
-            if (p == null || p.signum() <= 0) { info.setText("Fetching MINIMA/USDT market price…"); return; }
+            if (p == null || p.signum() <= 0) { Language.setText(info, Language.msg(l10n_pools_create_fetching_price)); return; }
             // most USDT the MINIMA balance can balance at the anchor price, and the smaller of that vs USDT held
             BigDecimal usdtCap = minimaAvail.multiply(p).min(tokAvail).setScale(decimals, RoundingMode.DOWN);
-            StringBuilder sb = new StringBuilder();
-            sb.append("Price: ").append(trim8(p)).append(" USDT/MINIMA (").append(source[0]).append(")\n");
-            sb.append("You have: ").append(trim(minimaAvail)).append(" MINIMA · ").append(trim(tokAvail)).append(" ").append(tokenName).append("\n");
+            Language.TextBuilder sb = new Language.TextBuilder();
+            sb.append(Language.msg(l10n_pools_create_price_preview, trim8(p), createPriceSource(source[0])));
+            sb.append(Language.msg(l10n_pools_create_balance_preview, trim(minimaAvail), trim(tokAvail), tokenName));
             BigDecimal u = parse(usdtAmt.getText().toString());
             if (u == null || u.signum() <= 0) {
-                sb.append("Enter the USDT amount to provide (max ≈ ").append(trim(usdtCap)).append(").");
+                sb.append(Language.msg(l10n_pools_create_enter_up_to, trim(usdtCap)));
             } else {
                 BigDecimal minima = u.divide(p, 6, RoundingMode.UP);
-                sb.append("MINIMA required:  ").append(trim(minima)).append("\n");
-                sb.append("Total pool value:  ≈ US$ ").append(trim2(u.multiply(TWO)));
+                sb.append(Language.msg(l10n_pools_create_minima_required, trim(minima)));
+                sb.append(Language.msg(l10n_pools_create_total_value, trim2(u.multiply(TWO))));
                 if (minima.compareTo(minimaAvail) > 0)
-                    sb.append("\n⚠ Not enough MINIMA — reduce USDT to ≤ ").append(trim(usdtCap)).append(".");
+                    sb.append(Language.msg(l10n_pools_create_minima_short, trim(usdtCap)));
                 if (u.compareTo(tokAvail) > 0)
-                    sb.append("\n⚠ You only have ").append(trim(tokAvail)).append(" ").append(tokenName).append(".");
+                    sb.append(Language.msg(l10n_pools_create_token_short, trim(tokAvail), tokenName));
             }
-            info.setText(sb.toString());
+            Language.setText(info, sb.build());
         };
         watch(usdtAmt, update);
 
-        final AlertDialog dlg = new AlertDialog.Builder(act)
-                .setTitle("Create MINIMA / " + tokenName + " pool")
+        final androidx.appcompat.app.AlertDialog dlg = act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_create_pool_title, tokenName))
                 .setView(box)
-                .setPositiveButton("Create", null)     // wired in onShow so invalid input doesn't dismiss
-                .setNeutralButton("↻ Price", null)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_terminal_editor_create), null)     // wired in onShow so invalid input doesn't dismiss
+                .setNeutralButton(Language.msg(l10n_pools_create_refresh_price), null)
+                .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                 .create();
 
         final PriceOracle.Cb fetchCb = new PriceOracle.Cb() {
@@ -984,15 +951,15 @@ public class MyLpView extends BaseView {
             Button refresh = dlg.getButton(AlertDialog.BUTTON_NEUTRAL);
             create.setOnClickListener(v -> {
                 BigDecimal p = price[0];
-                if (p == null || p.signum() <= 0) { toast("No price yet — tap ↻ and retry."); return; }
+                if (p == null || p.signum() <= 0) { toast(Language.msg(l10n_pools_create_no_price)); return; }
                 BigDecimal u = parse(usdtAmt.getText().toString());
-                if (u == null || u.signum() <= 0) { toast("Enter the USDT amount."); return; }
+                if (u == null || u.signum() <= 0) { toast(Language.msg(l10n_pools_create_enter_usdt)); return; }
                 BigDecimal minima = u.divide(p, 6, RoundingMode.UP);
-                if (minima.compareTo(minimaAvail) > 0 || u.compareTo(tokAvail) > 0) { toast("Not enough balance for that amount."); return; }
+                if (minima.compareTo(minimaAvail) > 0 || u.compareTo(tokAvail) > 0) { toast(Language.msg(l10n_pools_create_balance_short)); return; }
                 dlg.dismiss();
                 confirmCreate(tokenid, decimals, tokenName, minima, u, p, source[0], false);
             });
-            refresh.setOnClickListener(v -> { info.setText("Refreshing price…"); PriceOracle.fetch(fetchCb); });
+            refresh.setOnClickListener(v -> { Language.setText(info, Language.msg(l10n_pools_create_refreshing_price)); PriceOracle.fetch(fetchCb); });
             update.run();
         });
         dlg.show();
@@ -1003,18 +970,15 @@ public class MyLpView extends BaseView {
      *  (so a fat-fingered USD amount or a bootstrap price can't slip through un-noticed). */
     private void confirmCreate(String tokenid, int decimals, String tokenName, BigDecimal minima, BigDecimal usdt,
                                BigDecimal price, String source, boolean bootstrap) {
-        String priceLine = bootstrap
-                ? "⚠ No market price available — YOU are setting the opening price."
-                : "Opens at " + trim8(price) + " USDT/MINIMA  (matches " + source + " ✓)";
-        String msg = "MINIMA / " + tokenName + " pool\n\n"
-                + trim(minima) + " MINIMA  +  " + trim(usdt) + " " + tokenName + "\n"
-                + priceLine + "\n\n"
-                + "The 0.5% swap fee goes to liquidity providers.";
-        new AlertDialog.Builder(act)
-                .setTitle("Create this pool?")
+        CharSequence priceLine = bootstrap
+                ? Language.msg(l10n_pools_create_manual_price_warning)
+                : Language.msg(l10n_pools_create_reference_price, trim8(price), createPriceSource(source));
+        CharSequence msg = Language.msg(l10n_pools_create_review, tokenName, trim(minima), trim(usdt), priceLine);
+        act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_create_review_title))
                 .setMessage(msg)
-                .setPositiveButton("Create", (d, w) -> doCreate(tokenid, decimals, tokenName, minima, usdt))
-                .setNegativeButton("Back", null)
+                .setPositiveButton(Language.msg(l10n_terminal_editor_create), (d, w) -> doCreate(tokenid, decimals, tokenName, minima, usdt))
+                .setNegativeButton(Language.msg(l10n_explorer_back), null)
                 .show();
     }
 
@@ -1023,46 +987,43 @@ public class MyLpView extends BaseView {
      *  the confirm step, because nothing can check the ratio. This is the only free-ratio path in the app. */
     private void createFormManual(String tokenid, int decimals, String tokenName) {
         LinearLayout box = dialogBox();
-        TextView intro = text("No market price is available (MEXC is unreachable and there are no live MINIMA / "
-                + tokenName + " pools to match). You are setting the OPENING PRICE yourself — set it to the true "
-                + "market rate, or arbitrageurs will correct it at your expense.", Design.dim(), 12, false);
+        TextView intro = text(Language.msg(l10n_pools_create_manual_intro, tokenName), Design.dim(), 12, false);
         intro.setPadding(0, 0, 0, Ui.dp(act, 4));
         box.addView(intro);
-        EditText mAmt = field(box, "MINIMA to deposit", "e.g. 100");
-        EditText tAmt = field(box, tokenName + " to deposit", "e.g. 0.56");
+        EditText mAmt = field(box, Language.msg(l10n_pools_create_deposit_minima), Language.msg(l10n_pools_create_example_minima));
+        EditText tAmt = field(box, Language.msg(l10n_pools_create_deposit_token, tokenName), Language.msg(l10n_pools_create_example_token));
         TextView preview = new TextView(act);
         preview.setTextColor(Design.dim()); preview.setTextSize(13);
         preview.setPadding(0, Ui.dp(act, 10), 0, 0);
         box.addView(preview);
         final android.widget.CheckBox ack = new android.widget.CheckBox(act);
-        ack.setText("I understand I'm setting the opening price with no market to check it against.");
+        Language.setText(ack, Language.msg(l10n_pools_create_manual_acknowledgement));
         ack.setTextColor(Design.dim()); ack.setTextSize(12);
         box.addView(ack);
 
         Runnable update = () -> {
             BigDecimal x = parse(mAmt.getText().toString());
             BigDecimal y = parse(tAmt.getText().toString());
-            if (x == null || y == null || x.signum() <= 0 || y.signum() <= 0) { preview.setText("Enter both amounts."); return; }
-            if (!PoolCovenant.sizeOk(x, y)) { preview.setText("Amounts too large (x × y must be < 2^64)."); return; }
+            if (x == null || y == null || x.signum() <= 0 || y.signum() <= 0) { Language.setText(preview, Language.msg(l10n_pools_create_enter_both)); return; }
+            if (!PoolCovenant.sizeOk(x, y)) { Language.setText(preview, Language.msg(l10n_pools_create_amounts_large)); return; }
             BigDecimal yc = y.setScale(decimals, RoundingMode.DOWN);   // the actual on-grain reserve
             BigDecimal price = yc.divide(x, MC);
-            preview.setText("Opening price:  " + trim8(price) + " " + tokenName + " / MINIMA\n"
-                    + "Product floor (KMIN):  " + PoolCovenant.kmin(x, yc));
+            Language.setText(preview, Language.msg(l10n_pools_create_manual_preview, trim8(price), tokenName, PoolCovenant.kmin(x, yc)));
         };
         watch(mAmt, update); watch(tAmt, update); update.run();
 
-        final AlertDialog dlg = new AlertDialog.Builder(act)
-                .setTitle("Create MINIMA / " + tokenName + " pool")
+        final androidx.appcompat.app.AlertDialog dlg = act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_create_pool_title, tokenName))
                 .setView(box)
-                .setPositiveButton("Create", null)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_terminal_editor_create), null)
+                .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                 .create();
         dlg.setOnShowListener(d -> dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             BigDecimal x = parse(mAmt.getText().toString());
             BigDecimal y = parse(tAmt.getText().toString());
-            if (x == null || y == null || x.signum() <= 0 || y.signum() <= 0) { toast("Enter both amounts."); return; }
-            if (!PoolCovenant.sizeOk(x, y)) { toast("Amounts too large (x × y must be < 2^64)."); return; }
-            if (!ack.isChecked()) { toast("Tick the box to confirm you're setting the price."); return; }
+            if (x == null || y == null || x.signum() <= 0 || y.signum() <= 0) { toast(Language.msg(l10n_pools_create_enter_both)); return; }
+            if (!PoolCovenant.sizeOk(x, y)) { toast(Language.msg(l10n_pools_create_amounts_large)); return; }
+            if (!ack.isChecked()) { toast(Language.msg(l10n_pools_create_manual_required)); return; }
             BigDecimal yc = y.setScale(decimals, RoundingMode.DOWN);
             BigDecimal price = yc.divide(x, MC);
             dlg.dismiss();
@@ -1072,7 +1033,7 @@ public class MyLpView extends BaseView {
     }
 
     private void doCreate(String tokenid, int decimals, String tokenName, BigDecimal x, BigDecimal y) {
-        busy = true; status("Creating your MINIMA / " + tokenName + " pool…");
+        busy = true; status(Language.msg(l10n_pools_create_creating, tokenName));
         mgr.createPool(tokenid, decimals, x, y, new PoolManager.CreateResult() {
             @Override public void onCreated(Pool pool, String txpowid) {
                 pool.tokName = tokenName;   // nice label for the confirming card
@@ -1084,19 +1045,16 @@ public class MyLpView extends BaseView {
                 act.runOnUiThread(() -> {
                     busy = false;
                     pendingCreate = pool; pendingBlock = act.chainBlock(); pendingLabel = tokenName;
-                    status("Submitted ✓ " + txpowid + " — your pool is confirming on-chain (usually 1–3 blocks). "
-                            + "It will appear below automatically; no need to resubmit.");
+                    status(Language.msg(l10n_pools_create_submitted, txpowid));
                     startPendingPoll();
                     act.pools().refresh();
-                    // The pool now exists on chain and its recipe is on this phone only. Force the off-device
-                    // export immediately: the window where the pool is unrecoverable starts NOW, and a user who
-                    // closes the app here has a live pool with no backup and no prompt telling them so.
+                    // Save the new recipe immediately while creation is awaiting confirmation.
                     forceBackupAfterCreate(pool);
                 });
             }
             @Override public void onFailed(String message) {
                 ActivityLog.recordFailed(act, ActivityLog.CREATE, "Create MINIMA / " + tokenName + " pool", message);
-                act.runOnUiThread(() -> { busy = false; status("Create: " + message); });
+                act.runOnUiThread(() -> { busy = false; status(Language.msg(l10n_pools_create_failure, PoolsMessages.message(message))); });
             }
         });
     }
@@ -1107,10 +1065,11 @@ public class MyLpView extends BaseView {
         LinearLayout box = dialogBox();
         // Deposits must be in the pool's ratio so they never move the price — the user enters ONLY the
         // MINIMA side and the token side is dictated (read-only) by the pool price. No lopsided adds.
-        EditText mAmt = field(box, "MINIMA to add", "e.g. 50");
+        EditText mAmt = field(box, Language.msg(l10n_pools_liquidity_minima_to_add), Language.msg(l10n_pools_liquidity_example));
         TextView note = new TextView(act);
         note.setTextColor(Design.dim()); note.setTextSize(13);
         note.setPadding(0, Ui.dp(act, 10), 0, 0);
+        Language.setText(note, Language.msg(l10n_pools_liquidity_add_prompt, p.tokenLabel()));
         box.addView(note);
         final BigDecimal price = p.spotPrice();
         final BigDecimal[] tSide = { BigDecimal.ZERO };
@@ -1119,28 +1078,26 @@ public class MyLpView extends BaseView {
             if (m != null && m.signum() > 0) {
                 BigDecimal t = m.multiply(price).setScale(p.tokDecimals, RoundingMode.DOWN);
                 tSide[0] = t;
-                note.setText("Balanced at the pool price: this also adds " + trim(t) + " " + p.tokenLabel()
-                        + ".\nBoth sides are added in the pool's ratio so the price doesn't move.");
+                Language.setText(note, Language.msg(l10n_pools_liquidity_add_preview, trim(t), p.tokenLabel()));
             } else {
                 tSide[0] = BigDecimal.ZERO;
-                note.setText("Enter the MINIMA to add; the " + p.tokenLabel()
-                        + " side is set automatically at the pool price so the deposit stays balanced.");
+                Language.setText(note, Language.msg(l10n_pools_liquidity_add_prompt, p.tokenLabel()));
             }
         });
-        new AlertDialog.Builder(act)
-                .setTitle("Add liquidity")
-                .setView(box)
-                .setPositiveButton("Add", (d, w) -> {
+        act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_add_liquidity))
+                .setView(wrapScroll(box))
+                .setPositiveButton(Language.msg(l10n_terminal_txn_add), (d, w) -> {
                     BigDecimal m = parse(mAmt.getText().toString());
-                    if (m == null || m.signum() <= 0) { toast("Enter the MINIMA amount to add."); return; }
+                    if (m == null || m.signum() <= 0) { toast(Language.msg(l10n_pools_liquidity_add_required)); return; }
                     doDeposit(p, m, tSide[0]);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                 .show();
     }
 
     private void doDeposit(Pool p, BigDecimal m, BigDecimal tPreview) {
-        busy = true; status("Adding liquidity…");
+        busy = true; status(Language.msg(l10n_pools_liquidity_adding));
         final BigDecimal fm = m;
         // Re-read the live pool coin first — a deposit grows reserves in place and so spends the current
         // covenant coin; a stale snapshot would fail with "already spent (the pool moved)".
@@ -1156,11 +1113,11 @@ public class MyLpView extends BaseView {
                     LpStore.updateFeeBase(act, p.address, p.reserveM.add(fm), p.reserveT.add(ft));
                     ActivityLog.record(act, ActivityLog.DEPOSIT, "Add to MINIMA / " + p.tokenLabel() + "  ·  "
                             + trim(fm) + " MINIMA + " + trim(ft) + " " + p.tokenLabel(), txpowid, act.chainBlock());
-                    act.runOnUiThread(() -> { busy = false; status("Liquidity added ✓ " + txpowid + " — confirming on-chain.", txpowid); act.pools().refresh(); });
+                    act.runOnUiThread(() -> { busy = false; status(Language.msg(l10n_pools_liquidity_add_submitted, txpowid), txpowid); act.pools().refresh(); });
                 }
                 @Override public void onFailed(String message) {
                     ActivityLog.recordFailed(act, ActivityLog.DEPOSIT, "Add to MINIMA / " + p.tokenLabel(), message);
-                    act.runOnUiThread(() -> { busy = false; status("Add: " + message); });
+                    act.runOnUiThread(() -> { busy = false; status(Language.msg(l10n_pools_liquidity_add_failure, PoolsMessages.message(message))); });
                 }
             });
         });
@@ -1172,24 +1129,22 @@ public class MyLpView extends BaseView {
         LinearLayout box = dialogBox();
         TextView blurb = new TextView(act);
         blurb.setTextColor(Design.dim()); blurb.setTextSize(13);
-        blurb.setText("Migrate resets the pool at a fresh address with the KMIN floor recomputed for the new "
-                + "size. Your current reserves return to you and the new reserves are taken from your wallet. "
-                + "Defaults keep the same size.");
+        Language.setText(blurb, Language.msg(l10n_pools_liquidity_migrate_body, Language.msg(l10n_pools_recovery_collect)));
         blurb.setPadding(0, 0, 0, Ui.dp(act, 10));
         box.addView(blurb);
-        EditText mAmt = field(box, "New MINIMA reserve", trim(p.reserveM));
-        EditText tAmt = field(box, "New " + p.tokenLabel() + " reserve", trim(p.reserveT));
+        EditText mAmt = field(box, Language.msg(l10n_pools_liquidity_new_minima), trim(p.reserveM));
+        EditText tAmt = field(box, Language.msg(l10n_pools_liquidity_new_token, p.tokenLabel()), trim(p.reserveT));
         mAmt.setText(trim(p.reserveM)); tAmt.setText(trim(p.reserveT));
-        new AlertDialog.Builder(act)
-                .setTitle("Migrate pool")
-                .setView(box)
-                .setPositiveButton("Migrate", (d, w) -> {
+        act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_migrate_pool))
+                .setView(wrapScroll(box))
+                .setPositiveButton(Language.msg(l10n_pools_lp_migrate), (d, w) -> {
                     BigDecimal x = parse(mAmt.getText().toString());
                     BigDecimal y = parse(tAmt.getText().toString());
-                    if (x == null || y == null) { toast("Enter the new reserves."); return; }
+                    if (x == null || y == null) { toast(Language.msg(l10n_pools_liquidity_reserves_required)); return; }
                     doMigrate(p, x, y);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                 .show();
     }
 
@@ -1216,19 +1171,19 @@ public class MyLpView extends BaseView {
      *  the pool can't be read or now shows no reserves. Reuses {@link PoolRefresher#readLiveReserves}. */
     private void withFreshCoins(Pool p, Runnable action) {
         NodeApi n = act.node();
-        if (n == null) { act.runOnUiThread(() -> { busy = false; status("No node connection — try again in a moment."); }); return; }
+        if (n == null) { act.runOnUiThread(() -> { busy = false; status(Language.msg(l10n_pools_liquidity_no_node)); }); return; }
         PoolRefresher.readLiveReserves(n, p, ok -> act.runOnUiThread(() -> {
-            if (!ok) { busy = false; status("Couldn't read the pool's current reserves — refresh and try again."); return; }
+            if (!ok) { busy = false; status(Language.msg(l10n_pools_liquidity_reserves_unreadable)); return; }
             action.run();
         }));
     }
 
     private void doMigrate(Pool p, BigDecimal x, BigDecimal y) {
-        busy = true; status("Migrating your pool…");
+        busy = true; status(Language.msg(l10n_pools_liquidity_migrating));
         ensureOwner(java.util.Collections.singletonList(p.opk), blocked -> {
             OwnerKeyRecovery.Blocked why = blockedKey(p.opk, blocked);
             if (why != null) {
-                act.runOnUiThread(() -> { busy = false; status(why.message()); });
+                act.runOnUiThread(() -> { busy = false; status(PoolsMessages.message(why.message())); });
                 return;
             }
             // Scanned pools never carry kidx — the recipes do. Enrich before migrate so the NEW recipe
@@ -1252,11 +1207,11 @@ public class MyLpView extends BaseView {
                     OwnPoolStore.setRetired(act, p.address, true);
                     ActivityLog.record(act, ActivityLog.MIGRATE, "Migrate MINIMA / " + p.tokenLabel() + " pool  ·  new size "
                             + trim(pool.reserveM) + " MINIMA + " + trim(pool.reserveT) + " " + p.tokenLabel(), txpowid, act.chainBlock());
-                    act.runOnUiThread(() -> { busy = false; status("Migrated ✓ " + txpowid + " — confirming on-chain.", txpowid); act.pools().refresh(); });
+                    act.runOnUiThread(() -> { busy = false; status(Language.msg(l10n_pools_liquidity_migrate_submitted, txpowid), txpowid); act.pools().refresh(); });
                 }
                 @Override public void onFailed(String message) {
                     ActivityLog.recordFailed(act, ActivityLog.MIGRATE, "Migrate MINIMA / " + p.tokenLabel() + " pool", message);
-                    act.runOnUiThread(() -> { busy = false; status("Migrate: " + message); });
+                    act.runOnUiThread(() -> { busy = false; status(Language.msg(l10n_pools_liquidity_migrate_failure, PoolsMessages.message(message))); });
                 }
             }));
         });
@@ -1265,18 +1220,16 @@ public class MyLpView extends BaseView {
     // ---- close ----
 
     private void confirmClose(Pool p) {
-        new AlertDialog.Builder(act)
-                .setTitle("Withdraw all liquidity?")
-                .setMessage("This closes the MINIMA / " + p.tokenLabel() + " pool and sweeps "
-                        + trim(p.reserveM) + " MINIMA + " + trim(p.reserveT) + " " + p.tokenLabel()
-                        + " (including earned fees) back to your wallet.")
-                .setPositiveButton("Withdraw", (d, w) -> {
-                    busy = true; status("Closing pool…");
+        act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_liquidity_close_title))
+                .setMessage(Language.msg(l10n_pools_liquidity_close_body, p.tokenLabel(), trim(p.reserveM), trim(p.reserveT), p.oadr))
+                .setPositiveButton(Language.msg(l10n_atomix_otc_withdraw), (d, w) -> {
+                    busy = true; status(Language.msg(l10n_pools_liquidity_closing));
                     final String closeOadr = p.oadr;
                     ensureOwner(java.util.Collections.singletonList(p.opk), blocked -> {
                         OwnerKeyRecovery.Blocked why = blockedKey(p.opk, blocked);
                         if (why != null) {
-                            act.runOnUiThread(() -> { busy = false; status(why.message()); });
+                            act.runOnUiThread(() -> { busy = false; status(PoolsMessages.message(why.message())); });
                             return;
                         }
                         // The cached pool coin can be stale — a counterparty swap, or this node's own
@@ -1302,7 +1255,7 @@ public class MyLpView extends BaseView {
                                 ActivityLog.record(act, ActivityLog.CLOSE, closeSummary, txpowid, act.chainBlock());
                                 act.runOnUiThread(() -> {
                                     busy = false;
-                                    status("Pool closed ✓ " + txpowid + " — moving funds to a wallet address (confirming on-chain)…", txpowid);
+                                    status(Language.msg(l10n_pools_liquidity_close_submitted, txpowid), txpowid);
                                     act.pools().refresh();
                                     // Second hop: once the covenant→$OADR sweep confirms, forward it to a default-64
                                     // wallet address so the withdrawn funds survive a seed-only restore.
@@ -1312,18 +1265,18 @@ public class MyLpView extends BaseView {
                             @Override public void onFailed(String message) {
                                 if (!retried[0] && message != null && message.contains("already spent")) {
                                     retried[0] = true;   // the pool moved between our read and the post — re-read once
-                                    act.runOnUiThread(() -> { status("The pool moved — retrying with its current coin…"); attempt[0].run(); });
+                                    act.runOnUiThread(() -> { status(Language.msg(l10n_pools_liquidity_close_retry)); attempt[0].run(); });
                                     return;
                                 }
                                 ActivityLog.recordFailed(act, ActivityLog.CLOSE, closeSummary, message);
-                                act.runOnUiThread(() -> { busy = false; status("Close: " + message); });
+                                act.runOnUiThread(() -> { busy = false; status(Language.msg(l10n_pools_liquidity_close_failure, PoolsMessages.message(message))); });
                             }
                             });
                         });
                         attempt[0].run();
                     });
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                 .show();
     }
 
@@ -1341,7 +1294,7 @@ public class MyLpView extends BaseView {
      *
      * Now the address is queued durably ({@link PendingCollect}) and the job is finished by
      * {@link CollectSweeper} from the keep-alive pass, which survives app death and Doze and only clears
-     * an entry once the address reads back EMPTY. The immediate attempt below is an optimisation, not
+     * an entry after verified withdrawal confirmation and a fresh empty-address read. This attempt is an optimisation, not
      * the mechanism.
      */
     private void collectAfterClose(final String oadr, final int unusedTries) {
@@ -1351,7 +1304,7 @@ public class MyLpView extends BaseView {
             NodeApi n = act.node();
             if (n == null) return;              // the keep-alive pass will pick it up
             new CollectSweeper(act, n).run((cleared, pending, stranded) -> act.runOnUiThread(() -> {
-                if (cleared > 0) status("Withdrawn funds moved to your wallet ✓");
+                if (cleared > 0) status(Language.msg(l10n_pools_collection_checked_empty));
                 act.pools().refresh();
             }));
         }, 20000);
@@ -1366,26 +1319,24 @@ public class MyLpView extends BaseView {
             if (p.oadr != null && !p.oadr.isEmpty()) oadrs.add(p.oadr);
             if (p.opk != null && !p.opk.isEmpty()) opks.add(p.opk);
         }
-        if (oadrs.isEmpty()) { status("No pools on record to collect from."); return; }
-        status("Collecting withdrawn funds to your wallet…");
+        if (oadrs.isEmpty()) { status(Language.msg(l10n_pools_liquidity_no_collect_pools)); return; }
+        status(Language.msg(l10n_pools_liquidity_collecting));
         // $OADR is RETURN SIGNEDBY($OPK), so the auto sweep needs every owner key. The pre-flight is read-only.
         // ONE unusable key aborts the WHOLE sweep: core's consolidation picks its own inputs, so a sweep that
         // proceeded could select a coin belonging to the blocked key and sign with it. Aborting is therefore the
         // correct behaviour, not a limitation — a per-pool sweep would be a separate change.
         ensureOwner(opks, blocked -> {
             if (blocked != null && !blocked.isEmpty()) {
-                status("Nothing collected.\n\n" + OwnerKeyRecovery.worst(blocked).message()); return;
+                status(Language.msg(l10n_pools_liquidity_collect_blocked, PoolsMessages.message(OwnerKeyRecovery.worst(blocked).message()))); return;
             }
             final String skipped = "";
             mgr.sweepOwnerFunds(oadrs, (addressesForwarded, coins, error) -> act.runOnUiThread(() -> {
                 if (addressesForwarded > 0) {
-                    status("Submitted collection from " + addressesForwarded + " pool"
-                            + (addressesForwarded == 1 ? "" : "s") + " to your wallet. Check Activity for confirmation." + skipped);
+                    status(Language.join(Language.msg(l10n_pools_liquidity_collect_submitted, addressesForwarded), skipped));
                     act.pools().refresh();
-                } else status(error.isEmpty() ? "No available, stateless coins to collect at your pool payout addresses." + skipped
-                        : "Collection could not finish: " + error);
-                if (addressesForwarded > 0 && !error.isEmpty()) status("Submitted collection from " + addressesForwarded
-                        + " address(es). Other collection attempts failed: " + error);
+                } else status(error.isEmpty() ? Language.join(Language.msg(l10n_pools_liquidity_nothing_available), skipped)
+                        : Language.msg(l10n_pools_liquidity_collect_failure, PoolsMessages.message(error)));
+                if (addressesForwarded > 0 && !error.isEmpty()) status(Language.msg(l10n_pools_liquidity_collect_partial, addressesForwarded, PoolsMessages.message(error)));
             }));
         });
     }
@@ -1401,8 +1352,7 @@ public class MyLpView extends BaseView {
         if (reannounceChecked || allFunded == null || allFunded.isEmpty() || act.node() == null) return;
         reannounceChecked = true;
         reannouncer.refreshFaded(new ArrayList<>(allFunded), posted -> {
-            if (posted > 0) status("Re-published " + posted + " pool" + (posted == 1 ? "" : "s")
-                    + " to the registry so fresh nodes can find " + (posted == 1 ? "it" : "them") + ".");
+            if (posted > 0) status(Language.msg(l10n_pools_liquidity_reannounce_submitted, posted));
         });
     }
 
@@ -1414,8 +1364,7 @@ public class MyLpView extends BaseView {
         if (refreshChecked || mine == null || mine.isEmpty() || act.node() == null || act.chainBlock() <= 0) return;
         refreshChecked = true;
         refresher.refreshAging(new ArrayList<>(mine), act.chainBlock(), posted -> {
-            if (posted > 0) status("Refreshed " + posted + " pool" + (posted == 1 ? "" : "s")
-                    + " so " + (posted == 1 ? "it stays" : "they stay") + " visible to other devices.");
+            if (posted > 0) status(Language.msg(l10n_pools_liquidity_refresh_submitted, posted));
         });
     }
 
@@ -1431,27 +1380,23 @@ public class MyLpView extends BaseView {
      */
     private void showStatementDialog() {
         if (myPools.isEmpty()) {
-            Toast.makeText(act, "No pools to report on yet.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(act, Language.msg(l10n_pools_calc_statement_empty), Toast.LENGTH_SHORT).show();
             return;
         }
         LinearLayout box = dialogBox();
-        TextView t = text("A statement for each pool you own: what you put in, your own trades against it, "
-                + "what is in the pool now, and the profit.\n\nTrades listed are YOUR transactions only — "
-                + "not every trade against the pool. The profit figures are unaffected: they read the pool's "
-                + "reserves live, so everyone else's trading is already in them.",
-                Design.text(), 13, false);
+        TextView t = text(Language.msg(l10n_pools_calc_statement_body), Design.text(), 13, false);
         box.addView(t);
-        new AlertDialog.Builder(act)
-                .setTitle("Export statement")
-                .setView(box)
-                .setPositiveButton("Save file…", (d, w) -> runStatement(false))
-                .setNeutralButton("Share…", (d, w) -> runStatement(true))
-                .setNegativeButton("Cancel", null)
+        act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_calc_statement_title))
+                .setView(wrapScroll(box))
+                .setPositiveButton(Language.msg(l10n_pools_calc_save), (d, w) -> runStatement(false))
+                .setNeutralButton(Language.msg(l10n_pools_calc_share), (d, w) -> runStatement(true))
+                .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                 .show();
     }
 
     private void runStatement(final boolean share) {
-        status("Building statement…");
+        status(Language.msg(l10n_pools_calc_building));
         final PandaAddrBook book = new PandaAddrBook(act);
         book.seed();
         book.addAll(myPools);
@@ -1462,7 +1407,7 @@ public class MyLpView extends BaseView {
                 if (share) shareStatement(csv, filename, report); else saveStatement(csv, filename, report);
             }
             @Override public void onError(String message) {
-                status("Export failed: " + message);
+                status(Language.msg(l10n_pools_calc_export_failure, PoolsMessages.message(message)));
             }
         });
     }
@@ -1471,37 +1416,42 @@ public class MyLpView extends BaseView {
         act.pickSaveCsv(filename, uri -> {
             if (uri == null) return;                       // cancelled
             boolean ok = ExportWriter.writeTo(act, uri, csv);
-            Toast.makeText(act, ok ? "Saved  ·  " + ExportWriter.describe(report) : "Could not write the file",
+            Toast.makeText(act, ok ? Language.msg(l10n_pools_calc_saved, statementDescription(report)) : Language.msg(l10n_pools_calc_write_failure),
                     Toast.LENGTH_LONG).show();
         });
     }
 
     private void shareStatement(String csv, String filename, PoolStatement.Report report) {
         java.io.File f = ExportWriter.stageForShare(act, filename, csv);
-        if (f == null) { Toast.makeText(act, "Could not prepare the file", Toast.LENGTH_LONG).show(); return; }
+        if (f == null) { Toast.makeText(act, Language.msg(l10n_pools_calc_prepare_failure), Toast.LENGTH_LONG).show(); return; }
         try {
             android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(
                     act, act.getPackageName() + ".pandapools.fileprovider", f);
             android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_SEND);
             i.setType("text/csv");
             i.putExtra(android.content.Intent.EXTRA_STREAM, uri);
-            i.putExtra(android.content.Intent.EXTRA_SUBJECT, "PandaPools statement");
-            i.putExtra(android.content.Intent.EXTRA_TEXT, ExportWriter.describe(report));
+            i.putExtra(android.content.Intent.EXTRA_SUBJECT, Language.msg(l10n_pools_calc_subject).toString());
+            i.putExtra(android.content.Intent.EXTRA_TEXT, statementDescription(report).toString());
             i.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            act.startActivity(android.content.Intent.createChooser(i, "Send statement"));
+            act.startActivity(android.content.Intent.createChooser(i, Language.msg(l10n_pools_calc_send)));
         } catch (Exception e) {
-            Toast.makeText(act, "Could not share the file", Toast.LENGTH_LONG).show();
+            Toast.makeText(act, Language.msg(l10n_pools_calc_share_failure), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private CharSequence statementDescription(PoolStatement.Report report) {
+        return Language.join(Language.msg(l10n_pools_calc_summary, report.poolCount, report.tradeRows),
+                report.unreconciled > 0 ? Language.msg(l10n_pools_calc_flagged, report.unreconciled) : "");
     }
 
     private void showRecoveryDialog() {
         // "Check a backup file" sits directly above Restore on purpose: it answers the same question without
         // changing anything, so nobody has to commit to a restore just to find out whether their file is good.
-        String[] items = { "Collect withdrawn funds to my wallet", "Back up my pools to a file",
-                "Check a backup file (changes nothing)", "Restore pools from a file",
-                "Archive connection", "Confirm wallet signing state", "How recovery works" };
-        new AlertDialog.Builder(act)
-                .setTitle("Pool recovery")
+        CharSequence[] items = { Language.msg(l10n_pools_recovery_collect), Language.msg(l10n_pools_recovery_backup),
+                Language.msg(l10n_pools_recovery_check), Language.msg(l10n_pools_recovery_restore),
+                Language.msg(l10n_pools_recovery_archive), Language.msg(l10n_pools_lp_confirm_signing), Language.msg(l10n_pools_recovery_how) };
+        act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_recovery_title))
                 .setItems(items, (d, w) -> {
                     if (w == 0) doCollect();
                     else if (w == 1) doBackup();
@@ -1511,7 +1461,7 @@ public class MyLpView extends BaseView {
                     else if (w == 5) confirmSigningState();
                     else showRecoveryGuide();
                 })
-                .setNegativeButton("Close", null)
+                .setNegativeButton(Language.msg(l10n_language_close), null)
                 .show();
     }
 
@@ -1519,55 +1469,55 @@ public class MyLpView extends BaseView {
         EditText input = new EditText(act);
         input.setSingleLine(true); input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
         input.setText(ArchiveNode.setting(act));
-        new AlertDialog.Builder(act).setTitle("Archive connection")
-                .setMessage("HTTPS URL of a public read-only Minima MegaMMR RPC service. Only the pool address and public coin IDs are queried. This is an RPC URL, not a P2P host:port. Leave blank to use this node and backup proofs only.")
-                .setView(input).setPositiveButton("Save", (d, w) -> {
-                    if (ArchiveNode.save(act, input.getText().toString())) status("Archive connection saved.");
-                    else status("Enter an HTTPS URL without credentials, query parameters or a fragment.");
-                }).setNegativeButton("Cancel", null).show();
+        act.languageDialog().setTitle(Language.msg(l10n_pools_recovery_archive))
+                .setMessage(Language.msg(l10n_pools_recovery_archive_help))
+                .setView(input).setPositiveButton(Language.msg(l10n_common_save), (d, w) -> {
+                    if (ArchiveNode.save(act, input.getText().toString())) status(Language.msg(l10n_pools_recovery_archive_saved));
+                    else status(Language.msg(l10n_pools_recovery_archive_invalid));
+                }).setNegativeButton(Language.msg(l10n_pools_cancel), null).show();
     }
 
     /** The recovery menu's entry point: no pool in hand, so it still has to ask which key. */
     private void confirmSigningState() {
-        if (act.node() == null) { info("Signing remains paused", "Connect the node before checking its wallet state."); return; }
+        if (act.node() == null) { info(Language.msg(l10n_pools_recovery_signing_paused), Language.msg(l10n_pools_recovery_connect_wallet)); return; }
         List<String> keys = new ArrayList<>();
         for (Pool p : OwnPoolStore.all(act)) if ((p.signingStateUnverified || OwnPoolStore.confirmationFailed(p.opk)) && !keys.contains(p.opk)) keys.add(p.opk);
-        if (keys.isEmpty()) { info("Wallet signing state", "No restored owner keys are awaiting confirmation."); return; }
+        if (keys.isEmpty()) { info(Language.msg(l10n_pools_recovery_wallet_state), Language.msg(l10n_pools_recovery_no_keys)); return; }
         if (keys.size() == 1) { confirmSigningState(keys.get(0)); return; }
-        new AlertDialog.Builder(act).setTitle("Select restored owner key")
+        act.languageDialog().setTitle(Language.msg(l10n_pools_recovery_select_key))
                 .setItems(keys.toArray(new String[0]), (d, i) -> confirmSigningState(keys.get(i)))
-                .setNegativeButton("Close", null).show();
+                .setNegativeButton(Language.msg(l10n_language_close), null).show();
     }
 
     /** Confirm ONE key — the one on the card the user tapped. A card that names a key must not then open a
      *  picker listing every key: that is how someone attests to the wrong one. */
     private void confirmSigningState(String key) {
-        if (act.node() == null) { info("Signing remains paused", "Connect the node before checking its wallet state."); return; }
+        if (act.node() == null) { info(Language.msg(l10n_pools_recovery_signing_paused), Language.msg(l10n_pools_recovery_connect_wallet)); return; }
         if (key == null || key.isEmpty()) { confirmSigningState(); return; }
-        new AlertDialog.Builder(act).setTitle("Confirm current wallet signing state")
-                .setMessage(key + "\n\nOnly continue if this node holds the latest complete wallet signing state and every other copy of this wallet has stopped signing. A seed, old backup, or counter above the recipe's recorded count cannot prove this.\n\nConfirming enables owner actions and automatic pool refresh for this key.")
-                .setNegativeButton("Keep signing paused", null)
-                .setPositiveButton("I have verified this", (dd, w) -> {
+        act.languageDialog().setTitle(Language.msg(l10n_pools_recovery_confirm_state))
+                .setMessage(Language.msg(l10n_pools_recovery_confirm_body, key))
+                .setNegativeButton(Language.msg(l10n_pools_recovery_keep_paused), null)
+                .setPositiveButton(Language.msg(l10n_pools_recovery_verified), (dd, w) -> {
                     act.node().cmd("keys action:list publickey:" + key, new NodeApi.Cb() {
                         public void onResult(JSONObject j) {
                             Integer uses = KeyUses.extractUses(j, key);
                             if (uses != null && OwnPoolStore.acknowledgeSigningState(act, key, uses)) {
-                                status("Signing state confirmed by you. Owner actions are enabled."); act.pools().refresh();
-                            } else info("Signing remains paused", "The owner key is missing, exhausted, below a recorded count, or the confirmation could not be saved.");
+                                status(Language.msg(l10n_pools_recovery_confirmed)); act.pools().refresh();
+                            } else info(Language.msg(l10n_pools_recovery_signing_paused), Language.msg(l10n_pools_recovery_confirmation_failed));
                         }
-                        public void onError(String m) { info("Signing remains paused", "Could not verify the owner key on this node."); }
+                        public void onError(String m) { info(Language.msg(l10n_pools_recovery_signing_paused), Language.msg(l10n_pools_recovery_key_unreadable)); }
                     });
                 }).show();
     }
 
     private void doBackup() {
-        status("Preparing backup…");
+        status(Language.msg(l10n_pools_lp_preparing_backup));
         final java.util.List<Pool> owned = OwnPoolStore.all(act);
         recovery.backup(act, new ArrayList<>(myPools), act.chainBlock(), new Recovery.BackupCb() {
             @Override public void onBackup(String json) {
                 act.pickSaveFile("pandapools-backup.json", uri -> {
-                    if (uri == null) { status("Backup cancelled."); return; }
-                    if (!writeUri(uri, json)) { status("Could not write the backup file."); return; }
+                    if (uri == null) { status(Language.msg(l10n_pools_lp_backup_cancelled)); return; }
+                    if (!writeUri(uri, json)) { status(Language.msg(l10n_pools_lp_backup_write_failed)); return; }
                     // A write that did not throw is NOT evidence the file is usable. Read it back and prove it
                     // can recover every pool: a truncated or partially-written backup otherwise fails for the
                     // first time during a real recovery, which is the worst possible moment to discover it.
@@ -1575,36 +1525,20 @@ public class MyLpView extends BaseView {
                     int written = json.getBytes(java.nio.charset.StandardCharsets.UTF_8).length;
                     String problem = BackupState.verifyExport(readBack, owned, written);
                     if (problem != null) {
-                        status("Backup NOT verified: " + problem);
-                        info("Backup could not be verified",
-                                "PandaPools saved the file but could not read it back intact: " + problem + ".\n\n"
-                                + "Do not rely on it. Try a different location — a local folder rather than a "
-                                + "cloud-synced one, which may not have finished writing.");
+                        status(Language.msg(l10n_pools_lp_backup_unverified, PoolsMessages.message(problem)));
+                        info(Language.msg(l10n_pools_lp_backup_verify_failed),
+                                Language.msg(l10n_pools_lp_backup_readback_failed, PoolsMessages.message(problem)));
                         return;
                     }
                     BackupState.recordVerifiedExport(act, owned);
                     clearProoflessWithProofs(readBack);   // any pool whose entry now carries proofs is done
-                    status("Backup saved and verified ✓");
-                    info("Backup saved and verified",
-                            "PandaPools read the file back and confirmed it can rebuild "
-                            + (owned.size() == 1 ? "your pool's contract" : "all " + owned.size() + " of your pools' contracts") + ".\n\n"
-                            + (json.contains("proof_warning")
-                                ? "Some reserve coin proofs were unavailable or changed while exporting, so they are not in the file. That is not a problem: proofs are only a shortcut, they expire anyway, and recovery works from the recipe plus an archive lookup.\n\n"
-                                : "The coin proofs inside it expire; the recipes do not, and they are what recovery actually needs.\n\n")
-                            + "THIS FILE NEEDS YOUR SEED PHRASE WITH IT. It holds your pool contracts and which "
-                            + "key each pool uses, but not the keys themselves — your seed rebuilds those. What "
-                            + "neither carries is how many of that key's one-time signatures have been spent, so "
-                            + "recovery ends with one node command that sets the counter before the key can sign. "
-                            + "PandaPools will show you that command with the numbers filled in.\n\n"
-                            + "A current MinimaCore wallet backup is the shortcut: it restores the key AND its "
-                            + "counter, so there is no command to run. Either route works — keep at least one, "
-                            + "somewhere off this phone.\n\n"
-                            + "To recover: install PandaPools on the new node, restore the wallet backup if you "
-                            + "have one, then My LP → Back up / Restore → Restore.");
+                    status(Language.msg(l10n_pools_lp_backup_verified_status));
+                    info(Language.msg(l10n_pools_lp_backup_verified_title),
+                            Language.msg(l10n_pools_lp_backup_verified_body, owned.size(), json.contains("proof_warning") ? Language.msg(l10n_pools_lp_backup_proofs_missing) : Language.msg(l10n_pools_lp_backup_proofs_expire)));
                     act.pools().refresh();   // re-render so the "not backed up" banner clears
                 });
             }
-            @Override public void onError(String msg) { status(msg); }
+            @Override public void onError(String msg) { status(PoolsMessages.message(msg)); }
         });
     }
 
@@ -1623,17 +1557,11 @@ public class MyLpView extends BaseView {
     private void forceBackupAfterCreate(Pool pool) {
         final String addr = pool == null ? "" : pool.address;
         markProofless(addr);
-        AlertDialog dlg = new AlertDialog.Builder(act)
-                .setTitle("Save your pool file now")
-                .setMessage("Your pool is live on chain. Its contract exists on this phone only, and PandaPools "
-                        + "never sends that copy to any cloud — so right now, if this phone is lost or wiped, "
-                        + "recovering this pool would depend on a current MinimaCore wallet backup, and you may "
-                        + "not have one. This file is the other way back.\n\n"
-                        + "Saving takes one tap. PandaPools will read the file back and check it before calling "
-                        + "it saved.\n\n"
-                        + "Pool: " + addr)
+        androidx.appcompat.app.AlertDialog dlg = act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_recovery_save_now))
+                .setMessage(Language.msg(l10n_pools_recovery_save_now_body, addr))
                 .setCancelable(false)
-                .setPositiveButton("Save file…", (d, w) -> doBackup())
+                .setPositiveButton(Language.msg(l10n_pools_recovery_save_file), (d, w) -> doBackup())
                 .create();
         dlg.show();
         TextView body = dlg.findViewById(android.R.id.message);
@@ -1654,22 +1582,22 @@ public class MyLpView extends BaseView {
     /** Open a backup file and report on it without changing anything. */
     private void doCheckBackup() {
         act.pickOpenFile(uri -> {
-            if (uri == null) { status("Check cancelled."); return; }
+            if (uri == null) { status(Language.msg(l10n_pools_recovery_check_cancelled)); return; }
             String json = readUri(uri);
-            if (json == null || json.isEmpty()) { status("Could not read that file."); return; }
+            if (json == null || json.isEmpty()) { status(Language.msg(l10n_pools_recovery_file_unreadable)); return; }
             NodeApi n = act.node();
-            if (n == null) { status("Connect the node before checking a backup file."); return; }
+            if (n == null) { status(Language.msg(l10n_pools_recovery_connect_check)); return; }
             if (busy) return;
             busy = true;
-            status("Checking that backup file…");
+            status(Language.msg(l10n_pools_recovery_checking));
             new BackupCheck(n).check(json, new BackupCheck.Cb() {
-                @Override public void onProgress(String line) { act.runOnUiThread(() -> status(line)); }
+                @Override public void onProgress(String line) { act.runOnUiThread(() -> status(PoolsMessages.message(line))); }
                 @Override public void onDone(String report, int usable, int total) {
                     act.runOnUiThread(() -> {
                         busy = false;
-                        status(total == 0 ? "That file isn't a PandaPools backup."
-                                : "Checked " + total + (total == 1 ? " pool." : " pools."));
-                        copyableReport("Backup check", report);
+                        status(total == 0 ? Language.msg(l10n_pools_recovery_not_backup)
+                                : Language.msg(l10n_pools_recovery_checked, total));
+                        copyableReport(Language.msg(l10n_pools_recovery_check_title), report);
                     });
                 }
             });
@@ -1677,9 +1605,9 @@ public class MyLpView extends BaseView {
     }
 
     /** A selectable, copyable report dialog — identifiers in these reports are the point of them. */
-    private void copyableReport(String title, String report) {
+    private void copyableReport(CharSequence title, String report) {
         TextView body = new TextView(act);
-        body.setText(report);
+        Language.setText(body, PoolsMessages.report(report));
         body.setTextIsSelectable(true);
         body.setTypeface(android.graphics.Typeface.MONOSPACE);
         body.setTextSize(11f);
@@ -1688,41 +1616,29 @@ public class MyLpView extends BaseView {
         body.setPadding(pad, pad, pad, pad);
         android.widget.ScrollView scroll = new android.widget.ScrollView(act);
         scroll.addView(body);
-        new AlertDialog.Builder(act).setTitle(title).setView(scroll)
-                .setPositiveButton("OK", null)
-                .setNeutralButton("Copy", (d, w) -> {
-                    Ui.copyable(body, "backup check", report);
-                    body.performClick();
+        act.languageDialog().setTitle(title).setView(scroll)
+                .setPositiveButton(Language.msg(l10n_pools_ok), null)
+                .setNeutralButton(Language.msg(l10n_wallet_copy), (d, w) -> {
+                    Ui.copy(body, "backup check", body.getText().toString());
                 }).show();
     }
 
     private void doRestore() {
         // The one place a user can still back out, so it carries the whole warning. Restore no longer only
         // inspects: it withdraws. "Check a backup file" is the look-only path and is named in the message.
-        new AlertDialog.Builder(act)
-                .setTitle("Restore and withdraw")
-                .setMessage("Restoring will rebuild your pools' contracts on this node and then WITHDRAW every "
-                        + "pool whose reserves it can verify, straight away, without asking again.\n\n"
-                        + "That is deliberate. A restored pool cannot refresh itself — PandaPools will not sign "
-                        + "automatically for a recipe whose signing history it cannot verify — so leaving it live "
-                        + "means it ages out of the chain's recent window and becomes unrecoverable. Withdrawing "
-                        + "uses two of the owner key's one-time signatures and ends the risk.\n\n"
-                        + "Pools are NOT withdrawn if anything looks wrong: a signature counter below what the "
-                        + "backup recorded, no recorded counter at all, or reserves young enough that another "
-                        + "device is still running this wallet.\n\n"
-                        + "Only want to look at the file? Use \"Check a backup file\" instead — it changes nothing.\n\n"
-                        + "To keep a restored pool running instead, cancel, restore the matching MinimaCore wallet "
-                        + "backup, and confirm its signing state.")
-                .setPositiveButton("Restore and withdraw", (d, w) -> pickRestoreFile())
-                .setNegativeButton("Cancel", null)
+        act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_recovery_restore_withdraw))
+                .setMessage(Language.msg(l10n_pools_recovery_restore_warning))
+                .setPositiveButton(Language.msg(l10n_pools_recovery_restore_withdraw), (d, w) -> pickRestoreFile())
+                .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                 .show();
     }
 
     private void pickRestoreFile() {
         act.pickOpenFile(uri -> {
-            if (uri == null) { status("Restore cancelled."); return; }
+            if (uri == null) { status(Language.msg(l10n_pools_recovery_restore_cancelled)); return; }
             String json = readUri(uri);
-            if (json == null || json.isEmpty()) { status("Could not read that file."); return; }
+            if (json == null || json.isEmpty()) { status(Language.msg(l10n_pools_recovery_file_unreadable)); return; }
             restoreJson(json, true);
         });
     }
@@ -1735,27 +1651,23 @@ public class MyLpView extends BaseView {
     private void restoreJson(String json, boolean withdraw) {
             if (busy) return;
             busy = true;
-            status("Restoring pools…");
-            final StringBuilder log = new StringBuilder();
+            status(Language.msg(l10n_pools_recovery_restoring));
+            final Language.TextBuilder log = new Language.TextBuilder();
             final List<Pool> verified = new ArrayList<>();
             recovery.restore(act, json, act.chainBlock(), new Recovery.RestoreCb() {
-                @Override public void onProgress(String line) { log.append(line).append('\n'); status("Restoring… " + line); }
+                @Override public void onProgress(String line) { CharSequence translated = PoolsMessages.report(line); log.append(translated).append('\n'); status(Language.msg(l10n_pools_recovery_restore_progress, translated)); }
                 @Override public void onVerified(Pool p) { verified.add(p); }
                 @Override public void onDone(int restored, int total) {
                     if (total == 0) {
                         busy = false;
-                        status("That file isn't a PandaPools backup.");
-                        info("Nothing restored", "That file isn't a readable PandaPools backup — pick the "
-                                + "pandapools-backup.json you saved from Back up.");
+                        status(Language.msg(l10n_pools_recovery_not_backup));
+                        info(Language.msg(l10n_pools_recovery_nothing), Language.msg(l10n_pools_recovery_pick_backup));
                         return;
                     }
                     if (!withdraw || verified.isEmpty()) {
                         busy = false;
-                        status("Reserve check finished ·  " + restored + " of " + total + " pool(s) verified.");
-                        info(restored == total ? "Reserves verified" : "Recovery needs attention", restored + " of " + total + " pool(s) have both reserves verified on this node.\n\n"
-                                + log.toString().trim() + (withdraw
-                                    ? "\n\nNothing was withdrawn, because no pool's reserves could be verified. Saved recipes remain available below."
-                                    : "\n\nSaved recipes remain available below. This was a reserve check only; nothing was withdrawn."));
+                        status(Language.msg(l10n_pools_recovery_reserve_checked, restored, total));
+                        info(restored == total ? Language.msg(l10n_pools_recovery_reserve_verified) : Language.msg(l10n_pools_recovery_needs_attention), Language.join(Language.msg(l10n_pools_recovery_reserve_count, restored, total), "\n\n", log.build(), "\n\n", withdraw ? Language.msg(l10n_pools_recovery_none_withdrawn) : Language.msg(l10n_pools_recovery_check_only)));
                         loadKeys();
                         act.pools().refresh();
                         return;
@@ -1773,29 +1685,24 @@ public class MyLpView extends BaseView {
      * one. So Restore finishes the job, and the alternative (confirming the wallet's signing state to keep the
      * pool alive) stays available as the deliberate expert path.
      */
-    private void autoWithdraw(List<Pool> verified, StringBuilder log, int restored, int total) {
-        status("Withdrawing restored pools…");
+    private void autoWithdraw(List<Pool> verified, Language.TextBuilder log, int restored, int total) {
+        status(Language.msg(l10n_pools_recovery_withdrawing));
         NodeApi n = act.node();
-        if (n == null) { busy = false; status("Connect the node to withdraw the restored pools."); return; }
+        if (n == null) { busy = false; status(Language.msg(l10n_pools_recovery_connect_withdraw)); return; }
         new RestoreExit(act, n).run(verified, act.chainBlock(), new RestoreExit.Cb() {
             @Override public void onProgress(String line) {
-                log.append(line).append('\n');
-                act.runOnUiThread(() -> status(line));
+                log.append(PoolsMessages.message(line)).append('\n');
+                act.runOnUiThread(() -> status(PoolsMessages.message(line)));
             }
             @Override public void onDone(int withdrawn, int skipped) {
                 act.runOnUiThread(() -> {
                     busy = false;
-                    status(withdrawn + " pool(s) withdrawn, " + skipped + " not withdrawn.");
-                    info(skipped == 0 ? "Restored and withdrawn" : "Restored — some pools need you",
-                            restored + " of " + total + " pool(s) had verified reserves.\n\n"
-                            + withdrawn + " withdrawn to your wallet. " + skipped + " not withdrawn.\n\n"
-                            + log.toString().trim()
-                            + "\n\nA restored pool cannot refresh itself, so it would have aged out of the chain's "
-                            + "recent window and become unrecoverable. Withdrawing ends that. Each withdrawal used "
-                            + "two of the owner key's one-time signatures and nothing else.\n\n"
-                            + "No signing-state problem was detected for the pools withdrawn. That is not proof "
-                            + "their keys were unused: a signature the original device made that never reached the "
-                            + "chain cannot be detected by anything.");
+                    int notSubmitted = Math.max(skipped, verified.size() - withdrawn);
+                    status(Language.msg(l10n_pools_recovery_withdraw_counts, withdrawn, notSubmitted));
+                    info(notSubmitted == 0 ? Language.msg(l10n_pools_recovery_submitted_title) : Language.msg(l10n_pools_recovery_partial_title),
+                            Language.join(Language.msg(l10n_pools_recovery_reserve_count, restored, total), "\n\n",
+                                    Language.msg(l10n_pools_recovery_withdraw_counts, withdrawn, notSubmitted), "\n\n", log.build(),
+                                    "\n\n", Language.msg(l10n_pools_recovery_withdraw_note)));
                     loadKeys();
                     act.pools().refresh();
                 });
@@ -1804,14 +1711,7 @@ public class MyLpView extends BaseView {
     }
 
     private void showRecoveryGuide() {
-        info("How pool recovery works", "Keep both a current MinimaCore wallet backup and your PandaPools recipe file. "
-                + "The wallet backup preserves keys and signing state; the recipe records the pool contracts.\n\n"
-                + "Restore the matching wallet in MinimaCore, then restore the recipes here. Check live reserves before spending. "
-                + "A seed or recipe alone does not establish which one-time signatures were used. PandaPools will not automatically recreate missing owner keys. "
-                + "Do not run two restored copies of the same wallet and sign from both.\n\n"
-                + "Coin proofs in recipe backups expire. If live reserves are missing, Recover reserves checks the backup proofs, this node's MegaMMR, and your configured archive connection. The receiving node validates proofs before import. "
-                + "An empty local lookup does not prove the funds were spent. Recovery needs an available archive or fresh proofs; a recipe alone cannot reconstruct chain proofs.\n\n"
-                + "Restored recipes pause owner signing, including automatic refresh, until you confirm current wallet signing state. Check both reserve amounts and signing status before withdrawing.");
+        info(Language.msg(l10n_pools_recovery_guide_title), Language.msg(l10n_pools_recovery_guide_body));
     }
 
     private boolean writeUri(android.net.Uri uri, String content) {
@@ -1845,13 +1745,13 @@ public class MyLpView extends BaseView {
         return box;
     }
 
-    private EditText field(LinearLayout box, String label, String hint) {
+    private EditText field(LinearLayout box, CharSequence label, CharSequence hint) {
         TextView l = text(label, Design.dim(), 12, false);
         l.setPadding(0, Ui.dp(act, 8), 0, Ui.dp(act, 2));
         box.addView(l);
         EditText e = new EditText(act);
         e.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        e.setHint(hint); e.setTextColor(Design.heading()); e.setHintTextColor(Design.dim2());
+        Language.hint(e, hint); e.setTextColor(Design.heading()); e.setHintTextColor(Design.dim2());
         e.setTextSize(16);
         box.addView(e);
         return e;
@@ -1865,16 +1765,16 @@ public class MyLpView extends BaseView {
         });
     }
 
-    private TextView text(String s, int color, int sp, boolean bold) {
+    private TextView text(CharSequence s, int color, int sp, boolean bold) {
         TextView t = new TextView(act);
-        t.setText(s); t.setTextColor(color); t.setTextSize(sp);
+        Language.setText(t, s); t.setTextColor(color); t.setTextSize(sp);
         t.setTypeface(bold ? Design.typefaceBold() : Design.typeface());
         return t;
     }
 
-    private View kv(String k, String v) { return kvColored(k, v, Design.text()); }
+    private View kv(CharSequence k, CharSequence v) { return kvColored(k, v, Design.text()); }
 
-    private View kvColored(String k, String v, int valueColor) {
+    private View kvColored(CharSequence k, CharSequence v, int valueColor) {
         LinearLayout row = new LinearLayout(act);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(0, Ui.dp(act, 4), 0, 0);
@@ -1898,21 +1798,21 @@ public class MyLpView extends BaseView {
         return BigDecimal.valueOf(d).setScale(4, RoundingMode.DOWN).stripTrailingZeros().toPlainString();
     }
 
-    private void status(String s) { status(s, null); }
+    private void status(CharSequence s) { status(s, null); }
 
     /** Status line, optionally tap-to-copy. `copyValue` is the FULL identifier the message mentions — a
      *  TxPoW id in a confirmation is the one thing a user needs to paste into an explorer, so it is printed
      *  whole (the row wraps) and one tap puts the complete value on the clipboard. */
-    private void status(String s, String copyValue) {
+    private void status(CharSequence s, String copyValue) {
         TextView st = find(R.id.pm_pandapools_lpStatus);
-        st.setVisibility(s.isEmpty() ? View.GONE : View.VISIBLE);
-        st.setText(s);
+        st.setVisibility(s.length() == 0 ? View.GONE : View.VISIBLE);
+        Language.setText(st, s);
         if (copyValue == null || copyValue.isEmpty()) { st.setOnClickListener(null); st.setClickable(false); }
         else Ui.copyable(st, "transaction id", copyValue);
     }
-    private void toast(String s) { status(s); }
-    private void info(String title, String msg) {
-        AlertDialog dialog = new AlertDialog.Builder(act).setTitle(title).setMessage(msg).setPositiveButton("OK", null).show();
+    private void toast(CharSequence s) { status(s); }
+    private void info(CharSequence title, CharSequence msg) {
+        androidx.appcompat.app.AlertDialog dialog = act.languageDialog().setTitle(title).setMessage(msg).setPositiveButton(Language.msg(l10n_pools_ok), null).show();
         TextView message = dialog.findViewById(android.R.id.message);
         if (message != null) message.setTextIsSelectable(true);
     }

@@ -36,7 +36,8 @@ public class KeyAuditTest {
                               new KeyAudit.LocalKey(PK2, 4, 262144)),
                 Arrays.asList(new KeyAudit.Usage(PK1, addr(PK1), 10, 25),
                               new KeyAudit.Usage(PK2, addr(PK2), 3, 3)),
-                Collections.<KeyAudit.Reuse>emptyList());
+                Arrays.asList(new KeyAudit.Reuse(addr(PK1), false, 0),
+                              new KeyAudit.Reuse(addr(PK2), false, 0)));
 
         assertEquals(KeyAudit.Verdict.OK, r.verdict);
         assertEquals(KeyAudit.Status.OK, r.rows.get(0).status());

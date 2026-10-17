@@ -1,4 +1,6 @@
 package com.eurobuddha.vestr;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -31,16 +33,16 @@ public class CreatorView extends BaseView {
         container.removeAllViews();
 
         // Create flow hands the vesting script address to the activity so it can lock funds to that contract.
-        container.addView(button("＋  Create a contract", true, v -> {
+        container.addView(button(Language.msg(l10n_vestr_create_action), true, v -> {
             Intent i = new Intent(act, CreateContractActivity.class);
             i.putExtra("script", act.scriptAddress());
             act.startActivity(i);
         }));
-        container.addView(button("≈  Calculate a contract", false,
+        container.addView(button(Language.msg(l10n_vestr_calculate_action), false,
                 v -> act.startActivity(new Intent(act, CalculatorActivity.class))));
 
         TextView h = new TextView(act);
-        h.setText("My contracts");
+        Language.setText(h, Language.msg(l10n_vestr_my_contracts));
         h.setTextColor(VestrDesign.TEXT);
         h.setTextSize(16f);
         h.setTypeface(Typeface.DEFAULT_BOLD);
@@ -50,7 +52,7 @@ public class CreatorView extends BaseView {
         List<Contract> contracts = act.contracts();
         if (contracts.isEmpty()) {
             TextView empty = new TextView(act);
-            empty.setText("You have no vesting contracts yet.");
+            Language.setText(empty, Language.msg(l10n_vestr_no_contracts));
             empty.setTextColor(VestrDesign.DIM);
             empty.setTextSize(14f);
             empty.setGravity(Gravity.CENTER);
@@ -63,9 +65,9 @@ public class CreatorView extends BaseView {
     }
 
     /** Build a rounded full-width action button (TextView, not Button, for the flat look); {@code primary} = yellow accent. */
-    private View button(String text, boolean primary, View.OnClickListener onClick) {
+    private View button(CharSequence text, boolean primary, View.OnClickListener onClick) {
         TextView b = new TextView(act);
-        b.setText(text);
+        Language.setText(b, text);
         b.setTextColor(primary ? VestrDesign.ON_YELLOW : VestrDesign.TEXT_ON_DARK);
         b.setTextSize(15f);
         b.setTypeface(Typeface.DEFAULT_BOLD);

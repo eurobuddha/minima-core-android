@@ -22,22 +22,30 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import com.eurobuddha.minimacore.service.MinimaService;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 /** Native app screens retain their own activities and lifecycle within one APK.
  * DrawerLayout/container pattern reused from Minima Mail; this drawer opens on the left.
  */
 public final class PandamoniumHooks {
     private static final String TAG = "pandamonium.navigation.shell";
-    private static final int BG = Color.rgb(18, 23, 27);
-    private static final int PANEL = Color.rgb(25, 32, 36);
-    private static final int TEXT = Color.rgb(244, 244, 235);
-    private static final int MUTED = Color.rgb(161, 174, 172);
-    private static final int ACCENT = Color.rgb(218, 225, 153);
+    static final int BG = Color.rgb(18, 23, 27);
+    static final int PANEL = Color.rgb(25, 32, 36);
+    static final int TEXT = Color.rgb(244, 244, 235);
+    static final int MUTED = Color.rgb(161, 174, 172);
+    static final int ACCENT = Color.rgb(218, 225, 153);
 
     private static final String NAV_PREFS = "pandamonium_navigation";
     private static final String KEY_DISABLED = "app_disabled";
 
     private PandamoniumHooks() {}
+    public static boolean requiresSecureScreen(android.app.Activity activity) {
+        return (activity instanceof com.eurobuddha.wallet.MainActivity
+                && ((com.eurobuddha.wallet.MainActivity) activity).isSensitiveScreen())
+                || (activity instanceof com.eurobuddha.entropy.MainActivity
+                && !((com.eurobuddha.entropy.MainActivity) activity).demoMode());
+    }
 
     // ---- integrated apps (the Apps tab's Internal list) --------------------
 
@@ -90,7 +98,13 @@ public final class PandamoniumHooks {
     }
 
     public static void initialize(android.content.Context context) {
+        com.eurobuddha.wallet.MainActivity.installScreenshotPolicy(() ->
+                com.eurobuddha.minimacore.MinimaApplication.screenshotsAllowed(context));
         com.eurobuddha.minimaapi.direct.DirectNodeApi.install(new EmbeddedNodeTransport(context));
+        com.eurobuddha.wallet.EmbeddedWallet.install(() ->
+                EmbeddedNodeTransport.canExecute(org.minima.system.Main.getInstance())
+                && (!com.eurobuddha.minimacore.lock.AppLock.isEnabled(context)
+                    || com.eurobuddha.minimacore.lock.AppLock.get().isUnlocked()));
         android.os.Handler main = new android.os.Handler(android.os.Looper.getMainLooper());
         com.eurobuddha.minimaapi.direct.DirectNodeEvents.install(action -> main.post(action));
         com.eurobuddha.minimaapi.direct.DirectNodeEvents.subscribe(
@@ -131,10 +145,12 @@ public final class PandamoniumHooks {
         menu.setTextColor(ACCENT);
         menu.setBackgroundColor(Color.TRANSPARENT);
         menu.setPadding(0, 0, 0, 0);
-        menu.setContentDescription("Open Minima Core menu");
+        Language.description(menu, Language.msg(l10n_drawer_open));
 
         boolean coreScreen = activity instanceof com.eurobuddha.minimacore.main.MainActivity;
+        boolean walletScreen = activity instanceof com.eurobuddha.wallet.MainActivity;
         if (!coreScreen) {
+            if (walletScreen) header.addView(menu, new LinearLayout.LayoutParams(dp(activity, 48), dp(activity, 48)));
             header.addView(titles, new LinearLayout.LayoutParams(0, dp(activity, 52), 1));
             column.addView(header);
         }
@@ -145,7 +161,7 @@ public final class PandamoniumHooks {
             content.removeView(child);
             original.addView(child, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
         }
-        installMenu(activity, original, column, menu);
+        if (!walletScreen) installMenu(activity, original, column, menu);
         if (coreScreen) {
             androidx.appcompat.widget.Toolbar toolbar = original.findViewById(com.eurobuddha.minimacore.R.id.toolbar);
             toolbar.addView(titles, new androidx.appcompat.widget.Toolbar.LayoutParams(
@@ -197,8 +213,9 @@ public final class PandamoniumHooks {
                 icon.setBounds(0, 0, dp(activity, 30), dp(activity, 30));
                 entry.setCompoundDrawablesRelative(icon, null, null, null);
                 entry.setTextColor(destination == selected ? BG : TEXT);
-                entry.setContentDescription(PandamoniumDestinations.NAMES[destination]
-                        + (destination == selected ? ", selected" : ""));
+                Language.description(entry, destination == selected
+                        ? Language.msg(l10n_drawer_selected, PandamoniumDestinations.NAMES[destination])
+                        : PandamoniumDestinations.NAMES[destination]);
                 entry.setSelected(destination == selected);
                 GradientDrawable shape = new GradientDrawable();
                 shape.setColor(destination == selected ? ACCENT : PANEL);
@@ -209,7 +226,7 @@ public final class PandamoniumHooks {
                     drawer.closeDrawer(Gravity.LEFT);
                     if (PandamoniumDestinations.CLASSES[destination].equals(activity.getClass().getName())) return;
                     if (destination != 0 && (MinimaService.minima == null || MinimaService.haveStartedShutdown())) {
-                        Toast.makeText(activity, "Start your node in Minima Core before opening an app.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity, Language.text(activity, l10n_drawer_start_node), Toast.LENGTH_LONG).show();
                         return;
                     }
                     Intent intent = new Intent();
@@ -248,15 +265,28 @@ public final class PandamoniumHooks {
             }
         }).attachToRecyclerView(entries);
         panel.addView(entries, new LinearLayout.LayoutParams(-1, 0, 1));
+        Button language = new Button(activity);
+        language.setTag("pandamonium.navigation.language");
+        Language.setText(language, Language.msg(l10n_language_title));
+        language.setAllCaps(false);
+        language.setTextColor(ACCENT);
+        language.setBackgroundColor(Color.TRANSPARENT);
+        language.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        language.setMinHeight(dp(activity, 48));
+        language.setOnClickListener(v -> {
+            drawer.closeDrawer(Gravity.LEFT);
+            Language.choose(activity, false);
+        });
+        panel.addView(language, new LinearLayout.LayoutParams(-1, -2));
         TextView mode = text(activity, modeLabel(), 11, MUTED);
         mode.setPadding(0, dp(activity, 12), 0, 0);
         panel.addView(mode);
         int width = Math.min(dp(activity, 330), (int)(activity.getResources().getDisplayMetrics().widthPixels * .88f));
         drawer.addView(panel, new DrawerLayout.LayoutParams(width, -1, Gravity.LEFT));
-        drawer.setDrawerTitle(Gravity.LEFT, "Minima Core apps");
+        drawer.setDrawerTitle(Gravity.LEFT, Language.text(activity, l10n_drawer_apps));
         menu.setOnClickListener(v -> {
             appList.reload();
-            mode.setText(modeLabel());
+            Language.setText(mode, modeLabel());
             drawer.openDrawer(Gravity.LEFT);
         });
 
@@ -265,7 +295,12 @@ public final class PandamoniumHooks {
         };
         activity.getOnBackPressedDispatcher().addCallback(activity, back);
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
-            @Override public void onDrawerOpened(View view) { appList.reload(); back.setEnabled(true); }
+            @Override public void onDrawerOpened(View view) {
+                appList.reload();
+                Language.setText(mode, modeLabel());
+                drawer.setDrawerTitle(Gravity.LEFT, Language.text(activity, l10n_drawer_apps));
+                back.setEnabled(true);
+            }
             @Override public void onDrawerClosed(View view) { back.setEnabled(false); menu.requestFocus(); }
         });
         content.addView(drawer, new ViewGroup.LayoutParams(-1, -1));
@@ -313,7 +348,7 @@ public final class PandamoniumHooks {
                     new androidx.appcompat.graphics.drawable.DrawerArrowDrawable(activity);
             icon.setColor(ACCENT);
             toolbar.setNavigationIcon(icon);
-            toolbar.setNavigationContentDescription("Open Minima Core menu");
+            Language.navigationDescription(toolbar, Language.msg(l10n_drawer_open));
             toolbar.setNavigationOnClickListener(v -> menu.performClick());
         } else if (target instanceof LinearLayout && ((LinearLayout) target).getOrientation() == LinearLayout.HORIZONTAL) {
             ((LinearLayout) target).addView(menu, 0, new LinearLayout.LayoutParams(dp(activity, 48), dp(activity, 48)));
@@ -336,14 +371,14 @@ public final class PandamoniumHooks {
         }
     }
 
-    private static String modeLabel() {
+    private static CharSequence modeLabel() {
         return org.minima.system.params.GeneralParams.USE_BLOCK_AS_KEYUSES
-                ? "Block key uses · low-RAM node" : "Classic mode";
+                ? Language.msg(l10n_drawer_block_mode) : Language.msg(l10n_drawer_classic_mode);
     }
 
-    private static TextView text(Activity a, String value, int size, int color) {
-        TextView view = new TextView(a); view.setText(value); view.setTextSize(size); view.setTextColor(color);
+    static TextView text(Activity a, CharSequence value, int size, int color) {
+        TextView view = new TextView(a); Language.setText(view, value); view.setTextSize(size); view.setTextColor(color);
         view.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL)); return view;
     }
-    private static int dp(Activity a, int value) { return Math.round(value * a.getResources().getDisplayMetrics().density); }
+    static int dp(Activity a, int value) { return Math.round(value * a.getResources().getDisplayMetrics().density); }
 }

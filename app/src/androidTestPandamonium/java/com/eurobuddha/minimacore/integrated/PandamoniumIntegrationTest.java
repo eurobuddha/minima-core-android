@@ -307,7 +307,8 @@ public class PandamoniumIntegrationTest {
             android.view.MenuItem toggle = new android.widget.PopupMenu(home, home.findViewById(android.R.id.content)).getMenu().add("Allow Screenshots");
             home.toggleScreenshots(toggle);
             for (Activity screen : retainedScreens) if (!screen.isDestroyed()) assertEquals("Allow updates retained window: " + screen.getClass().getName(),
-                    0, screen.getWindow().getAttributes().flags & android.view.WindowManager.LayoutParams.FLAG_SECURE);
+                    PandamoniumHooks.requiresSecureScreen(screen) ? android.view.WindowManager.LayoutParams.FLAG_SECURE : 0,
+                    screen.getWindow().getAttributes().flags & android.view.WindowManager.LayoutParams.FLAG_SECURE);
             home.toggleScreenshots(toggle);
             for (Activity screen : retainedScreens) if (!screen.isDestroyed()) assertTrue("Block updates retained window: " + screen.getClass().getName(),
                     (screen.getWindow().getAttributes().flags & android.view.WindowManager.LayoutParams.FLAG_SECURE) != 0);
@@ -329,7 +330,8 @@ public class PandamoniumIntegrationTest {
             ui(() -> origin.startActivity(new Intent().setClassName(ctx.getPackageName(), name)
                     .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)));
             Activity screen = await(name, 20_000);
-            ui(() -> assertEquals("Allow screenshots on resumed screen: " + name, 0,
+            ui(() -> assertEquals("Allow screenshots on resumed screen: " + name,
+                    PandamoniumHooks.requiresSecureScreen(screen) ? android.view.WindowManager.LayoutParams.FLAG_SECURE : 0,
                     screen.getWindow().getAttributes().flags & android.view.WindowManager.LayoutParams.FLAG_SECURE));
         }
     }

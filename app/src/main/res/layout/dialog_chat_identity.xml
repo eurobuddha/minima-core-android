@@ -8,6 +8,7 @@
 
     <ImageView
         android:id="@+id/identity_qr"
+        android:tag="l10n:description=l10n_chat_qr_description"
         android:layout_width="240dp"
         android:layout_height="240dp"
         android:contentDescription="Your address as a QR code" />
@@ -26,6 +27,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/identity_copy"
+        android:tag="l10n:text=l10n_wallet_copy_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -33,6 +35,7 @@
 
     <EditText
         android:id="@+id/identity_name"
+        android:tag="l10n:hint=l10n_chat_display_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"

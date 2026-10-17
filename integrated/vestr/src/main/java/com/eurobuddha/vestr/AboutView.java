@@ -1,4 +1,6 @@
 package com.eurobuddha.vestr;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.graphics.Typeface;
 import android.view.Gravity;
@@ -26,15 +28,14 @@ public class AboutView extends BaseView {
         container.removeAllViews();
 
         TextView title = new TextView(act);
-        title.setText("vestr");
+        Language.setText(title, "vestr");
         title.setTextColor(VestrDesign.TEXT);
         title.setTextSize(28f);
         title.setTypeface(Typeface.DEFAULT_BOLD);
         container.addView(title);
 
         TextView blurb = new TextView(act);
-        blurb.setText("Lock tokens in a vesting contract that releases gradually over time. "
-                + "Create a contract, track it, and withdraw what has vested.");
+        Language.setText(blurb, Language.msg(l10n_vestr_intro));
         blurb.setTextColor(VestrDesign.DIM);
         blurb.setTextSize(15f);
         blurb.setLineSpacing(0, 1.3f);
@@ -42,11 +43,11 @@ public class AboutView extends BaseView {
         container.addView(blurb);
 
         // Two entry points into the main flows — primary (yellow) routes to Creator, secondary (black) to Collector.
-        container.addView(cta("Create a contract", true, v -> act.goToTab(MainActivity.TAB_CREATOR)));
-        container.addView(cta("Collect from a contract", false, v -> act.goToTab(MainActivity.TAB_COLLECTOR)));
+        container.addView(cta(Language.msg(l10n_vestr_create), true, v -> act.goToTab(MainActivity.TAB_CREATOR)));
+        container.addView(cta(Language.msg(l10n_vestr_collect_from), false, v -> act.goToTab(MainActivity.TAB_COLLECTOR)));
 
         TextView foot = new TextView(act);
-        foot.setText("Contracts are an on-chain Minima smart contract — fully interoperable with the vestr MiniDapp.");
+        Language.setText(foot, Language.msg(l10n_vestr_footer));
         foot.setTextColor(VestrDesign.DIM_2);
         foot.setTextSize(11f);
         foot.setGravity(Gravity.CENTER);
@@ -55,9 +56,9 @@ public class AboutView extends BaseView {
     }
 
     /** Build a full-width call-to-action button; {@code primary} picks the yellow accent vs the black secondary style. */
-    private Button cta(String text, boolean primary, android.view.View.OnClickListener onClick) {
+    private Button cta(CharSequence text, boolean primary, android.view.View.OnClickListener onClick) {
         Button b = new Button(act);
-        b.setText(text);
+        Language.setText(b, text);
         b.setAllCaps(false);
         b.setTextSize(15f);
         b.setTypeface(Typeface.DEFAULT_BOLD);

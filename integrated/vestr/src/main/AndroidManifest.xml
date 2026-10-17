@@ -5,10 +5,10 @@
         <package android:name="com.eurobuddha.minimacore" />
     </queries>
     <application>
-        <activity android:name="com.eurobuddha.vestr.MainActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo">
+        <activity android:name="com.eurobuddha.vestr.MainActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo" android:configChanges="locale|layoutDirection|screenLayout">
             </activity>
-        <activity android:name="com.eurobuddha.vestr.CreateContractActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo" />
-        <activity android:name="com.eurobuddha.vestr.ContractDetailActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo" />
-        <activity android:name="com.eurobuddha.vestr.CalculatorActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo" />
+        <activity android:name="com.eurobuddha.vestr.CreateContractActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo" android:configChanges="locale|layoutDirection|screenLayout" />
+        <activity android:name="com.eurobuddha.vestr.ContractDetailActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo" android:configChanges="locale|layoutDirection|screenLayout" />
+        <activity android:name="com.eurobuddha.vestr.CalculatorActivity" android:exported="false" android:theme="@style/pm_vestr_Theme.Utxo" android:configChanges="locale|layoutDirection|screenLayout" />
     </application>
 </manifest>

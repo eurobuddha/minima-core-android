@@ -1,4 +1,7 @@
 package com.eurobuddha.casino;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -33,8 +36,11 @@ final class TimeoutAlerts {
             return;
         }
         if (claims.coinids.equals(previous)) return;
-        nm.createNotificationChannel(new NotificationChannel(CHANNEL, "Casino timeout claims",
-                NotificationManager.IMPORTANCE_DEFAULT));
+        NotificationChannel channel = nm.getNotificationChannel(CHANNEL);
+        if (channel == null) channel = new NotificationChannel(CHANNEL, Language.text(context, l10n_casino_timeout_channel),
+                NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setName(Language.text(context, l10n_casino_timeout_channel));
+        nm.createNotificationChannel(channel);
         if (!nm.areNotificationsEnabled()
                 || nm.getNotificationChannel(CHANNEL).getImportance() == NotificationManager.IMPORTANCE_NONE) return;
 
@@ -43,10 +49,10 @@ final class TimeoutAlerts {
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent tap = PendingIntent.getActivity(context, ID, open,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        String body = claims.summary() + ". Tap to open My Bets.";
+        CharSequence body = CasinoMessages.message(claims.summary() + ". Tap to open My Bets.");
         try {
             nm.notify(TAG, ID, new NotificationCompat.Builder(context, CHANNEL)
-                    .setContentTitle("Casino timeout claims")
+                    .setContentTitle(Language.text(context, l10n_casino_timeout_channel))
                     .setContentText(body)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
                     .setSmallIcon(android.R.drawable.ic_menu_view)

@@ -6,6 +6,7 @@ import org.json.JSONObject;
 /** PandaPools NodeApi's persisted interrupted-write protocol, shared by all AtomiX SDK instances. */
 final class WriteSafety {
     private static String active = "";
+    private static boolean failedAcknowledgement;
     private WriteSafety() {}
 
     static boolean writesFunds(String command) {
@@ -32,7 +33,7 @@ final class WriteSafety {
     static final String WHY_CALLBACK   = "CALLBACK";     // our own callback threw after the reply
 
     static synchronized boolean begin(SharedPreferences prefs, String id, String command) {
-        if (!prefs.getString("pending", "").isEmpty()) return false;
+        if (failedAcknowledgement || !prefs.getString("pending", "").isEmpty()) return false;
         // Stamp the command and time WITH the id, and clear any stale reason, in one commit. If the
         // process dies from here until returned(), "pending" survives on disk while `active` (a
         // static) does not - so the pause latches with NO log line anywhere. An empty reason is
@@ -90,7 +91,7 @@ final class WriteSafety {
      */
     static synchronized String describe(SharedPreferences prefs) {
         String id = prefs.getString("pending", "");
-        if (id.isEmpty()) return null;
+        if (id.isEmpty()) return failedAcknowledgement ? "A node write lost its reply and may have completed." : null;
         String cmd  = prefs.getString("pending_cmd", "");
         String when = prefs.getString("pending_why", "");
         long at     = prefs.getLong("pending_at", 0);
@@ -116,14 +117,35 @@ final class WriteSafety {
 
     /** Simulate the process dying: `active` is a static and does not survive, `pending` does.
      *  Matches the SignGate.resetForTest() seam used elsewhere in this package. */
-    static synchronized void resetForTest() { active = ""; }
+    static synchronized void resetForTest() { active = ""; failedAcknowledgement = false; }
 
     static synchronized boolean interrupted(SharedPreferences prefs) {
-        return active.isEmpty() && !prefs.getString("pending", "").isEmpty();
+        return active.isEmpty() && (failedAcknowledgement || !prefs.getString("pending", "").isEmpty());
     }
     static synchronized boolean acknowledge(SharedPreferences prefs) {
         if (!active.isEmpty()) return false;
-        return prefs.edit().remove("pending").remove("pending_cmd").remove("pending_at")
-                           .remove("pending_why").commit();
+        String previous = prefs.getString("pending", "");
+        String marker = previous.isEmpty() ? java.util.UUID.randomUUID().toString() : previous;
+        String command = prefs.getString("pending_cmd", "");
+        String reason = prefs.getString("pending_why", "");
+        long at = prefs.getLong("pending_at", 0);
+        return commitAcknowledgement(() -> prefs.edit().remove("pending").remove("pending_cmd")
+                        .remove("pending_at").remove("pending_why").commit(),
+                () -> prefs.edit().putString("pending", marker).putString("pending_cmd", command)
+                        .putLong("pending_at", at).putString("pending_why", reason).commit());
+    }
+
+    // Reuse the wallet retry flow's expected-state check before clearing reviewed evidence.
+    static synchronized boolean acknowledge(SharedPreferences prefs, String expected) {
+        if (expected == null || !expected.equals(prefs.getString("pending", ""))) return false;
+        return acknowledge(prefs);
+    }
+
+    static synchronized boolean commitAcknowledgement(java.util.function.BooleanSupplier clear, Runnable rollback) {
+        failedAcknowledgement = true;
+        try { if (clear.getAsBoolean()) { failedAcknowledgement = false; return true; } }
+        catch (Exception e) { /* keep process latch */ }
+        try { rollback.run(); } catch (Exception e) { /* keep process latch */ }
+        return false;
     }
 }

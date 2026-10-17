@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
     <application>
-        <activity android:name="com.eurobuddha.atomix.MainActivity" android:exported="false" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode" android:windowSoftInputMode="adjustResize" android:theme="@style/pm_atomix_Theme.Utxo">
+        <activity android:name="com.eurobuddha.atomix.MainActivity" android:exported="false" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode|locale|layoutDirection" android:windowSoftInputMode="adjustResize" android:theme="@style/pm_atomix_Theme.Utxo">
             </activity>
         <service android:name="com.eurobuddha.atomix.SwapService" android:exported="false" android:stopWithTask="false" android:foregroundServiceType="specialUse">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Keeps the user's pegged market published on-chain and progresses in-flight atomic swaps while the app is closed" />

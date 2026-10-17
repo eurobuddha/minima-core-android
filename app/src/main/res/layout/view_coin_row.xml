@@ -42,7 +42,7 @@
             android:background="@drawable/bg_pill"
             android:paddingHorizontal="9dp"
             android:paddingVertical="3dp"
-            android:text="LOCKED"
+            android:text="LOCKED" android:tag="l10n:text=l10n_core_wallet_locked"
             android:textSize="10sp"
             android:textStyle="bold"
             android:letterSpacing="0.06"

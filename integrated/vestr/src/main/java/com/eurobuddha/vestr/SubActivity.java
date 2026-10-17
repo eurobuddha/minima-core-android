@@ -1,4 +1,6 @@
 package com.eurobuddha.vestr;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -15,6 +17,32 @@ import androidx.appcompat.app.AppCompatActivity;
  *  small form-building helpers in the vestr style. */
 public abstract class SubActivity extends AppCompatActivity {
 
+    // Android caches the calendar grid locale. Recreate its window using the platform's
+    // saved picker state, keeping callbacks and unconfirmed values without submitting them.
+    private final java.util.Map<android.app.AlertDialog, java.util.function.Supplier<? extends android.app.AlertDialog>> languagePickers = new java.util.LinkedHashMap<>();
+    protected <T extends android.app.AlertDialog> T languagePicker(java.util.function.Supplier<T> factory) {
+        T picker = factory.get();
+        languagePickers.put(picker, factory);
+        picker.setOnDismissListener(d -> languagePickers.remove(picker));
+        picker.setOnShowListener(d -> {
+            Language.setText(picker.getButton(android.app.AlertDialog.BUTTON_POSITIVE), Language.msg(android.R.string.ok));
+            Language.setText(picker.getButton(android.app.AlertDialog.BUTTON_NEGATIVE), Language.msg(android.R.string.cancel));
+        });
+        return picker;
+    }
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        for (java.util.Map.Entry<android.app.AlertDialog, java.util.function.Supplier<? extends android.app.AlertDialog>> entry : new java.util.ArrayList<>(languagePickers.entrySet())) {
+            android.app.AlertDialog old = entry.getKey();
+            Bundle state = old.onSaveInstanceState();
+            old.setOnDismissListener(null);
+            old.dismiss();
+            languagePickers.remove(old);
+            android.app.AlertDialog replacement = languagePicker(entry.getValue());
+            replacement.onRestoreInstanceState(state);
+        }
+    }
     protected NodeApi node;
     protected LinearLayout form;
 
@@ -24,6 +52,7 @@ public abstract class SubActivity extends AppCompatActivity {
         super.onCreate(b);
         setContentView(R.layout.pm_vestr_activity_sub);
         final View root = findViewById(R.id.pm_vestr_subRoot);
+        Language.apply(root);
         final View header = findViewById(R.id.pm_vestr_subHeader);
         form = findViewById(R.id.pm_vestr_formContainer);
         final int headerTop = header.getPaddingTop();
@@ -45,19 +74,19 @@ public abstract class SubActivity extends AppCompatActivity {
     protected abstract void init();
 
     /** Release the node binding so we don't leak the service connection. */
-    @Override protected void onDestroy() { super.onDestroy(); if (node != null) node.onDestroy(); }
+    @Override protected void onDestroy() { for (android.app.AlertDialog d : new java.util.ArrayList<>(languagePickers.keySet())) d.dismiss(); languagePickers.clear(); super.onDestroy(); if (node != null) node.onDestroy(); }
 
     /** Set the header title. */
-    protected void title(String t) { ((TextView) findViewById(R.id.pm_vestr_subTitle)).setText(t); }
+    protected void title(CharSequence t) { Language.setText((TextView) findViewById(R.id.pm_vestr_subTitle), t); }
 
     // ---- form helpers ----
     // These build the vestr-styled form rows in code (no XML) and append them to `form` in order;
     // the caller keeps the returned view to read/update it later.
 
     /** Bold caption row above an input. */
-    protected TextView label(String text) {
+    protected TextView label(CharSequence text) {
         TextView t = new TextView(this);
-        t.setText(text);
+        Language.setText(t, text);
         t.setTextColor(VestrDesign.LABEL);
         t.setTextSize(13f);
         t.setTypeface(Typeface.DEFAULT_BOLD);
@@ -67,9 +96,9 @@ public abstract class SubActivity extends AppCompatActivity {
     }
 
     /** Carded text field; inputType is one of the T_* constants below. */
-    protected EditText input(String hint, int inputType) {
+    protected EditText input(CharSequence hint, int inputType) {
         EditText e = new EditText(this);
-        e.setHint(hint);
+        Language.hint(e, hint);
         e.setHintTextColor(VestrDesign.DIM_2);
         e.setTextColor(VestrDesign.TEXT);
         e.setTextSize(15f);
@@ -85,9 +114,9 @@ public abstract class SubActivity extends AppCompatActivity {
     }
 
     /** Carded tappable row that looks like an input but opens a picker (date/time); caller sets the click + updates its text. */
-    protected TextView pickerButton(String initial) {
+    protected TextView pickerButton(CharSequence initial) {
         TextView t = new TextView(this);
-        t.setText(initial);
+        Language.setText(t, initial);
         t.setTextColor(VestrDesign.TEXT);
         t.setTextSize(15f);
         t.setPadding(dp(14), dp(13), dp(14), dp(13));
@@ -101,9 +130,9 @@ public abstract class SubActivity extends AppCompatActivity {
     }
 
     /** Full-width yellow CTA with top margin; caller attaches the action. */
-    protected TextView primaryButton(String text) {
+    protected TextView primaryButton(CharSequence text) {
         TextView b = new TextView(this);
-        b.setText(text);
+        Language.setText(b, text);
         b.setTextColor(VestrDesign.ON_YELLOW);
         b.setTextSize(16f);
         b.setTypeface(Typeface.DEFAULT_BOLD);
@@ -133,9 +162,9 @@ public abstract class SubActivity extends AppCompatActivity {
     }
 
     /** Show msg on the status line, green for ok / red for error. */
-    protected void setStatus(TextView t, String msg, boolean ok) {
+    protected void setStatus(TextView t, CharSequence msg, boolean ok) {
         t.setVisibility(View.VISIBLE);
-        t.setText(msg);
+        Language.setText(t, msg);
         t.setTextColor(ok ? VestrDesign.GREEN : VestrDesign.RED);
     }
 

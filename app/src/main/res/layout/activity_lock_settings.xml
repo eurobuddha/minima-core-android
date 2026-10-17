@@ -33,14 +33,15 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="App lock"
+                android:text="@string/l10n_menu_app_lock" android:tag="l10n:text=l10n_menu_app_lock"
                 android:textAppearance="@style/TextAppearance.MinimaCore.Display" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Require a PIN (and optional fingerprint/face) to open the app. Your node keeps running in the background while the app is locked — only the screen is protected."
+                android:text="@string/l10n_lock_help"
+                android:tag="l10n:text=l10n_lock_help"
                 android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                 android:textColor="@color/core_text_mid"
                 android:lineSpacingMultiplier="1.3" />
@@ -50,7 +51,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Require a PIN to open the app"
+                android:text="@string/l10n_lock_require_pin"
+                android:tag="l10n:text=l10n_lock_require_pin"
                 android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                 android:textColor="@color/core_text" />
 
@@ -66,32 +68,36 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Use fingerprint / face"
+                    android:text="@string/l10n_lock_use_biometric"
+                    android:tag="l10n:text=l10n_lock_use_biometric"
                     android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                     android:textColor="@color/core_text" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Unlock with biometrics. Your PIN always works as a fallback."
+                    android:text="@string/l10n_lock_biometric_help"
+                    android:tag="l10n:text=l10n_lock_biometric_help"
                     android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                     android:textSize="12sp"
                     android:textColor="@color/core_text_mid" />
 
-                <TextView style="@style/FormLabel" android:text="Auto-lock" />
+                <TextView style="@style/FormLabel" android:text="@string/l10n_lock_auto_lock"
+        android:tag="l10n:text=l10n_lock_auto_lock" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/lock_autolock"
                     style="@style/Widget.MinimaCore.Button.Outlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="After 1 minute" />
+                    android:text="@string/l10n_lock_one_minute" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="How long the app stays unlocked after you leave it before it locks again."
+                    android:text="@string/l10n_lock_delay_help"
+                    android:tag="l10n:text=l10n_lock_delay_help"
                     android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                     android:textSize="12sp"
                     android:textColor="@color/core_text_mid" />
@@ -102,7 +108,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Change PIN" />
+                    android:text="@string/l10n_lock_change_pin"
+                    android:tag="l10n:text=l10n_lock_change_pin" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

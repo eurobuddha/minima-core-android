@@ -1,7 +1,11 @@
 package com.eurobuddha.minimacore.main.views.apps;
 
 import android.app.Activity;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import androidx.appcompat.app.AlertDialog;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -42,6 +46,7 @@ public class AppsView extends BaseView {
     ListView mInternalList;
     IntegratedAppsAdapter mInternalAdapter;
     boolean mHasInternal;
+    private AlertDialog infoDialog;
 
     public AppsView(Activity zActivity){
         super(zActivity, R.layout.view_apps);
@@ -75,8 +80,8 @@ public class AppsView extends BaseView {
         if (mHasInternal) {
             mInternalAdapter.setItems(integrated);
             mTabs.setVisibility(View.VISIBLE);
-            mTabs.addTab(mTabs.newTab().setText("Internal"));
-            mTabs.addTab(mTabs.newTab().setText("External"));
+            mTabs.addTab(mTabs.newTab().setText(Language.text(getActivity(), l10n_apps_internal)));
+            mTabs.addTab(mTabs.newTab().setText(Language.text(getActivity(), l10n_apps_external)));
             mTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override public void onTabSelected(TabLayout.Tab tab) { showInternal(tab.getPosition() == 0); }
                 @Override public void onTabUnselected(TabLayout.Tab tab) {}
@@ -95,6 +100,7 @@ public class AppsView extends BaseView {
 
         LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService(mActivity.LAYOUT_INFLATER_SERVICE);
         View dialogview = inflater.inflate(R.layout.dialog_apps_info, null);
+        Language.apply(dialogview);
 
         final String packageclass   = (String)zApp.get("package");
         final String packageid      = (String)zApp.get("packageid");
@@ -130,7 +136,7 @@ public class AppsView extends BaseView {
 
         //Get the ICON
         Drawable icon = null;
-        String   pname = "";
+        String   pname = packageclass;
         try{
             PackageManager pkgmanager = mActivity.getPackageManager();
 
@@ -143,15 +149,16 @@ public class AppsView extends BaseView {
             logger.log("Package not found.. "+packageclass+" "+e);
         }
 
-        new MaterialAlertDialogBuilder(getActivity())
+        if (infoDialog != null) infoDialog.dismiss();
+        infoDialog = new LanguageDialog(getActivity())
                 .setTitle(pname)
                 .setView(dialogview)
                 .setIcon(icon)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
+                .setPositiveButton(Language.msg(android.R.string.ok), new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int whichButton) {
                         AppsView.this.refreshView();
                     }})
-                .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                .setNegativeButton(Language.msg(l10n_backup_delete), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mAppsAdapter.getDatabase().delete(packageclass, packageid);
@@ -159,6 +166,17 @@ public class AppsView extends BaseView {
                     }
                 }).show();
 
+    }
+
+    @Override public void languageChanged() {
+        if (mTabs.getTabCount() == 2) {
+            mTabs.getTabAt(0).setText(Language.text(getActivity(), l10n_apps_internal));
+            mTabs.getTabAt(1).setText(Language.text(getActivity(), l10n_apps_external));
+        }
+    }
+
+    @Override public void onActivityDestroy() {
+        if (infoDialog != null) { infoDialog.dismiss(); infoDialog = null; }
     }
 
     public void setDatabase(ReceiverDB zDB){

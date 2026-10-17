@@ -4,7 +4,7 @@
         <package android:name="com.eurobuddha.minimacore" />
     </queries>
     <application>
-        <activity android:name="com.eurobuddha.entropy.MainActivity" android:exported="false" android:screenOrientation="portrait" android:theme="@style/pm_entropy_Theme.Entropy">
+        <activity android:name="com.eurobuddha.entropy.MainActivity" android:exported="false" android:screenOrientation="portrait" android:theme="@style/pm_entropy_Theme.Entropy" android:configChanges="locale|layoutDirection|screenLayout">
             </activity>
     </application>
 </manifest>

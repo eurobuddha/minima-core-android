@@ -1,4 +1,6 @@
 package com.eurobuddha.vestr;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.graphics.Typeface;
 import android.view.Gravity;
@@ -28,7 +30,7 @@ public class CollectorView extends BaseView {
         container.removeAllViews();
 
         TextView h = new TextView(act);
-        h.setText("Collect");
+        Language.setText(h, Language.msg(l10n_vestr_collect));
         h.setTextColor(VestrDesign.TEXT);
         h.setTextSize(22f);
         h.setTypeface(Typeface.DEFAULT_BOLD);
@@ -36,7 +38,7 @@ public class CollectorView extends BaseView {
         container.addView(h);
 
         TextView blurb = new TextView(act);
-        blurb.setText("Open a contract to withdraw the tokens that have vested.");
+        Language.setText(blurb, Language.msg(l10n_vestr_collect_help));
         blurb.setTextColor(VestrDesign.DIM);
         blurb.setTextSize(14f);
         blurb.setPadding(0, 0, 0, dp(16));
@@ -45,7 +47,7 @@ public class CollectorView extends BaseView {
         List<Contract> contracts = act.contracts();
         if (contracts.isEmpty()) {
             TextView empty = new TextView(act);
-            empty.setText("Nothing to collect yet.");
+            Language.setText(empty, Language.msg(l10n_vestr_no_collect));
             empty.setTextColor(VestrDesign.DIM);
             empty.setTextSize(14f);
             empty.setGravity(Gravity.CENTER);

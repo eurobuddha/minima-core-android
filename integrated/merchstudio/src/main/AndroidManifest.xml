@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <package android:name="com.eurobuddha.minimacore" />
+    </queries>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <application>
+        <activity android:name="com.eurobuddha.merchstudio.MainActivity" android:exported="false" android:windowSoftInputMode="adjustResize" android:theme="@style/pm_merchstudio_Theme.Utxo" android:configChanges="locale|layoutDirection|screenLayout">
+            </activity>
+        <provider android:name="com.eurobuddha.merchstudio.IntegratedFileProvider" android:authorities="${applicationId}.merchstudio.fileprovider" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/pm_merchstudio_file_paths" />
+        </provider>
+    </application>
+</manifest>

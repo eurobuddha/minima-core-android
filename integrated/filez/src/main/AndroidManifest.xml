@@ -5,7 +5,7 @@
         <package android:name="com.eurobuddha.pandaapps" />
     </queries>
     <application>
-        <activity android:name="com.eurobuddha.filez.MainActivity" android:exported="false" android:theme="@style/pm_filez_Theme.Utxo">
+        <activity android:name="com.eurobuddha.filez.MainActivity" android:exported="false" android:theme="@style/pm_filez_Theme.Utxo" android:configChanges="locale|layoutDirection|screenLayout">
             </activity>
     </application>
 </manifest>

@@ -10,6 +10,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import com.eurobuddha.minimacore.main.MainActivity;
 
 /**
@@ -74,7 +77,7 @@ public class LockActivity extends AppCompatActivity {
             AppLock.get().unlock();
             proceed();
         } else {
-            showError("Wrong PIN");
+            showError(Language.msg(l10n_lock_wrong_pin));
             mPin.setText("");
         }
     }
@@ -88,7 +91,7 @@ public class LockActivity extends AppCompatActivity {
                     proceed();
                 } else {
                     // Stored PIN no longer matches (changed without re-enrolling) — type it instead.
-                    showError("Biometric is out of date — enter your PIN");
+                    showError(Language.msg(l10n_lock_stale_biometric));
                 }
             }
             @Override public void onError(String message, boolean permanentlyInvalidated) {
@@ -99,8 +102,8 @@ public class LockActivity extends AppCompatActivity {
         });
     }
 
-    private void showError(String zMsg) {
-        mError.setText(zMsg);
+    private void showError(CharSequence zMsg) {
+        Language.setText(mError, zMsg);
         mError.setVisibility(View.VISIBLE);
     }
 

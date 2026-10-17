@@ -43,44 +43,52 @@ public final class EthWallet {
         return org.web3j.utils.Numeric.toHexStringWithPrefixZeroPadded(creds.getEcKeyPair().getPrivateKey(), 64);
     }
 
-    /** Derive the ETH key from the node seed (deterministic, not stored). */
+    /** Validate before constructing or publishing credentials. Reuses ETH Wallet's exact 32-byte check. */
+    private static Credentials nodeCredentials(JSONObject reply) {
+        if (reply == null || !Boolean.TRUE.equals(reply.opt("status"))) throw new IllegalArgumentException();
+        JSONObject response = reply.optJSONObject("response");
+        Object raw = response == null ? null : response.opt("seedrandom");
+        if (!(raw instanceof String)) throw new IllegalArgumentException();
+        String hex = ((String) raw).trim();
+        if (hex.startsWith("0x") || hex.startsWith("0X")) hex = hex.substring(2);
+        if (!hex.matches("[0-9a-fA-F]{64}")) throw new IllegalArgumentException();
+        BigInteger scalar = new BigInteger(hex, 16);
+        if (scalar.signum() <= 0 || scalar.compareTo(org.web3j.crypto.Sign.CURVE_PARAMS.getN()) >= 0)
+            throw new IllegalArgumentException();
+        return Credentials.create("0x" + hex);
+    }
+
+    /** Derive without allowing a malformed response or exception to expose or replace a key. */
     public void deriveFromNode(NodeApi node, final Handler ui, final Cb cb) {
         node.cmd("seedrandom modifier:ethbridge", new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) {
-                JSONObject r = j.optJSONObject("response");
-                String sr = r == null ? "" : r.optString("seedrandom", "");
-                if (sr.isEmpty()) { post(ui, () -> cb.err("Node returned no seedrandom — is the node write-enabled?")); return; }
-                try {
-                    creds = Credentials.create(sr.startsWith("0x") ? sr : "0x" + sr);
-                    imported = false;
-                    final String a = creds.getAddress();
-                    post(ui, () -> cb.ok(a));
-                } catch (Exception e) {
-                    post(ui, () -> cb.err("Key derivation failed: " + e.getMessage()));
+            @Override public void onResult(JSONObject reply) {
+                final Credentials candidate;
+                final String address;
+                try { candidate = nodeCredentials(reply); address = candidate.getAddress(); }
+                catch (Exception invalid) {
+                    post(ui, () -> cb.err("Node returned an invalid Ethereum key. Not using it."));
+                    return;
                 }
+                creds = candidate;
+                imported = false;
+                post(ui, () -> cb.ok(address));
             }
-            @Override public void onError(String m) { post(ui, () -> cb.err(m)); }
+            @Override public void onError(String ignored) {
+                post(ui, () -> cb.err("Ethereum key derivation failed. Retry when the node is ready."));
+            }
         });
     }
 
-    /** What ETH address would this node's seed derive RIGHT NOW? Same command as deriveFromNode, but the key
-     *  is used to compute the address and then dropped — {@code creds} is NOT touched. Lets IdentityWatch ask
-     *  "does my in-use wallet still belong to this node?" without swapping the wallet out from under a swap
-     *  (and without a code path that could silently replace a funded key). Never logs the key. */
+    /** Read the node's current address without replacing the in-use wallet or echoing secret data. */
     public void probeNodeAddress(NodeApi node, final Handler ui, final Cb cb) {
         node.cmd("seedrandom modifier:ethbridge", new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) {
-                JSONObject r = j.optJSONObject("response");
-                String sr = r == null ? "" : r.optString("seedrandom", "");
-                if (sr.isEmpty()) { post(ui, () -> cb.err("no seedrandom")); return; }
-                try {
-                    final String a = Credentials.create(sr.startsWith("0x") ? sr : "0x" + sr).getAddress();
-                    post(ui, () -> cb.ok(a));
-                } catch (Exception e) {
-                    post(ui, () -> cb.err("probe failed"));   // never echo the exception: it can carry key material
-                }
+            @Override public void onResult(JSONObject reply) {
+                final String address;
+                try { address = nodeCredentials(reply).getAddress(); }
+                catch (Exception invalid) { post(ui, () -> cb.err("probe failed")); return; }
+                post(ui, () -> cb.ok(address));
             }
-            @Override public void onError(String m) { post(ui, () -> cb.err(m)); }
+            @Override public void onError(String ignored) { post(ui, () -> cb.err("probe failed")); }
         });
     }
 

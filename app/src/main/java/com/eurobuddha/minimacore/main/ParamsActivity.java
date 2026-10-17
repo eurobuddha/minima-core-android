@@ -1,6 +1,8 @@
 package com.eurobuddha.minimacore.main;
 
-import android.app.AlertDialog;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -72,7 +74,7 @@ public class ParamsActivity extends AppCompatActivity {
 
 
         Toolbar tb = findViewById(R.id.toolbar);
-        tb.setTitle("Startup Params");
+        Language.toolbarTitle(tb, Language.msg(l10n_menu_params));
         setSupportActionBar(tb);
         KeyboardInsets.install(this, findViewById(R.id.params_main), tb);
 
@@ -99,7 +101,7 @@ public class ParamsActivity extends AppCompatActivity {
         mRpcPassword    = findViewById(R.id.params_rpc_password);
         mRpcPasswordRow = findViewById(R.id.params_rpc_password_row);
         findViewById(R.id.params_rpc_password_copy).setOnClickListener(v ->
-                Clip.copySensitive(this, "Minima RPC password", mRpcPassword.getText().toString(), "RPC password copied"));
+                Clip.copySensitive(this, Language.text(this, l10n_params_rpc_clipboard), mRpcPassword.getText().toString(), Language.text(this, l10n_params_rpc_copied)));
         mRpcSwitch.setOnCheckedChangeListener((b, on) -> renderRpcPassword(on));
         renderRpcPassword(mRpcSwitch.isChecked());
 
@@ -109,7 +111,7 @@ public class ParamsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(saveParams()){
                     Toast.makeText(ParamsActivity.this,
-                            "Saved - applies when the node restarts", Toast.LENGTH_LONG).show();
+                            Language.msg(l10n_params_saved), Toast.LENGTH_LONG).show();
                     finish();
                 }
             }
@@ -127,19 +129,18 @@ public class ParamsActivity extends AppCompatActivity {
                     return;
                 }
 
-                new AlertDialog.Builder(ParamsActivity.this)
-                        .setTitle("Restart node?")
-                        .setMessage("The node will shut down cleanly and start again with the new parameters. " +
-                                "This takes a minute - companion apps reconnect automatically.")
+                new LanguageDialog(ParamsActivity.this)
+                        .setTitle(Language.msg(l10n_params_restart_title))
+                        .setMessage(Language.msg(l10n_params_restart_body))
                         .setIcon(R.drawable.ic_minima)
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
+                        .setPositiveButton(Language.msg(android.R.string.yes), new DialogInterface.OnClickListener(){
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 if(MainActivity.MAIN_ACTIVITY != null){
                                     MainActivity.MAIN_ACTIVITY.restartMinima();
                                 }
                                 finish();
                             }})
-                        .setNegativeButton(android.R.string.no, null)
+                        .setNegativeButton(Language.msg(android.R.string.no), null)
                         .show();
             }
         });
@@ -178,14 +179,13 @@ public class ParamsActivity extends AppCompatActivity {
         while(tok.hasMoreTokens()){
             String t = tok.nextToken();
             if (BuildConfig.PANDAMONIUM && StartupMode.isManagedArgument(t)) {
-                showDialog("Managed parameter", t + " is controlled by the Classic mode toggle above.");
+                showDialog(Language.msg(l10n_params_managed), Language.msg(l10n_params_managed_body, t));
                 return false;
             }
             for(String blocked : BLOCKED_FLAGS){
                 if(t.equals(blocked)){
-                    showDialog("Blocked parameter",
-                            t + " cannot be set here.\n\nWipe/seed flags are blocked for safety and " +
-                            "app-managed flags (data folder, server mode, ..) are set by the app or the toggles.");
+                    showDialog(Language.msg(l10n_params_blocked),
+                            Language.msg(l10n_params_blocked_body, t));
                     return false;
                 }
             }
@@ -194,8 +194,8 @@ public class ParamsActivity extends AppCompatActivity {
         //Validate against the node's own parser so errors surface NOW, not as a
         //silent skip at boot
         if(!extra.equals("") && !ParamConfigurer.checkParams(extra)){
-            showDialog("Invalid parameters",
-                    "The node's parameter parser rejected this string. Check flag names and values:\n\n" + extra);
+            showDialog(Language.msg(l10n_params_invalid),
+                    Language.msg(l10n_params_invalid_body, extra));
             return false;
         }
 
@@ -207,19 +207,19 @@ public class ParamsActivity extends AppCompatActivity {
         if (BuildConfig.PANDAMONIUM) editor.putBoolean(StartupMode.PREF_CLASSIC_MODE, mClassicSwitch.isChecked());
         editor.putString(PREF_EXTRA_PARAMS, extra);
         if (!editor.commit()) {
-            showDialog("Could not save", "Startup settings could not be saved. Please try again before restarting.");
+            showDialog(Language.msg(l10n_params_save_failed), Language.msg(l10n_params_save_failed_body));
             return false;
         }
 
         return true;
     }
 
-    private void showDialog(String zTitle, String zMessage){
-        new AlertDialog.Builder(this)
+    private void showDialog(CharSequence zTitle, CharSequence zMessage){
+        new LanguageDialog(this)
                 .setTitle(zTitle)
                 .setMessage(zMessage)
                 .setIcon(R.drawable.ic_minima)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
+                .setPositiveButton(Language.msg(android.R.string.yes), new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int whichButton) {
 
                     }}).show();

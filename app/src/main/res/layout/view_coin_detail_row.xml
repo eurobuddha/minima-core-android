@@ -42,7 +42,7 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:paddingHorizontal="10dp"
-            android:text="COPY"
+            android:text="COPY" android:tag="l10n:text=l10n_wallet_copy"
             android:textSize="11sp" />
     </LinearLayout>
 </LinearLayout>

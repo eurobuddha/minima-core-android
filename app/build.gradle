@@ -126,8 +126,9 @@ android {
         // seed stays where it is (main_prefs, allowBackup off). PIN verified via VaultCrypto
         // (PBKDF2->AES-GCM sentinel), biometric via BiometricUnlock (AndroidKeyStore), both lifted
         // from apks/wallet. Off by default; auto-lock delay default 1 min, configurable.
-        versionCode 112
-        versionName "1.9.41"
+        // vc113: explicit English, Chinese, Russian and Ukrainian selection across all bears.
+        versionCode 113
+        versionName "1.9.42"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -226,6 +227,7 @@ dependencies {
     // NOT in git (~80MB) — scripts/fetch-bare-kit.sh builds it from the pinned release.
     implementation files('libs/bare-kit.aar')
     implementation project(':minimaapi')
+    implementation project(':localization')
     // Parlons/Maxima transport core, vendored under maxima-core/ (MAX# contacts in Chat).
     // The fork's node has NO Maxima - the app carries the clean-room core itself, like mininotes.
     implementation project(':maxima-core')
@@ -250,4 +252,10 @@ dependencies {
     pandamoniumImplementation project(':integrated-entropy')
     pandamoniumImplementation project(':integrated-terminalide')
     pandamoniumImplementation project(':integrated-mail')
+    pandamoniumImplementation project(':integrated-utxo')
+    pandamoniumImplementation project(':integrated-merchshop')
+    pandamoniumImplementation project(':integrated-merchstudio')
+    pandamoniumImplementation project(':integrated-merchinbox')
+    pandamoniumImplementation project(':integrated-NFTwallet')
+    pandamoniumImplementation project(':integrated-wallet')
 }

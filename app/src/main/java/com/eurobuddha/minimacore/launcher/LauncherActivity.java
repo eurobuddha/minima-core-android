@@ -52,6 +52,8 @@ public class LauncherActivity extends AppCompatActivity {
         //Clean launcher — no title, the M logo speaks for itself (matches design)
         tb.setTitle("");
         setSupportActionBar(tb);
+        findViewById(R.id.launcher_language).setOnClickListener(
+                v -> com.eurobuddha.minimacore.i18n.Language.choose(this, false));
         KeyboardInsets.install(this, findViewById(R.id.launcher_main), tb);
 
         View startup = findViewById(R.id.launcher_button_params);
@@ -102,6 +104,11 @@ public class LauncherActivity extends AppCompatActivity {
         mDatabase.close();
         */
 
+    }
+
+    @Override public void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+        com.eurobuddha.minimacore.i18n.Language.configurationChanged(this);
     }
 
     @Override

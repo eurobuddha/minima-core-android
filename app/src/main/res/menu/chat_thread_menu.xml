@@ -4,21 +4,21 @@
 
     <item
         android:id="@+id/chatmenu_rename"
-        android:title="Rename contact"
+        android:title="@string/l10n_chat_rename_contact"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/chatmenu_address"
-        android:title="View address &amp; QR"
+        android:title="@string/l10n_chat_view_address"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/chatmenu_clear"
-        android:title="Delete chat"
+        android:title="@string/l10n_chat_delete_chat"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/chatmenu_delete"
-        android:title="Delete contact"
+        android:title="@string/l10n_chat_delete_contact"
         app:showAsAction="never" />
 </menu>

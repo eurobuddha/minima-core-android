@@ -1,5 +1,11 @@
 package com.eurobuddha.history;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+import static com.eurobuddha.minimacore.i18n.R.plurals.*;
+
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -49,11 +55,11 @@ public class Ownership {
         return keys.contains(v) || owned.contains(v);
     }
 
-    public static String label(Kind k) {
+    public static CharSequence label(Kind k) {
         switch (k) {
-            case OWNED:    return "YOURS";
-            case CONTRACT: return "CONTRACT";
-            case EXTERNAL: return "EXTERNAL";
+            case OWNED:    return Language.msg(l10n_history_yours);
+            case CONTRACT: return Language.msg(l10n_history_contract);
+            case EXTERNAL: return Language.msg(l10n_history_external);
             default:       return "";
         }
     }

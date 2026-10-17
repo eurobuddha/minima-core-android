@@ -1,4 +1,7 @@
 package com.eurobuddha.pandapools;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -32,7 +35,7 @@ public class PoolsView extends BaseView {
     // Receives the shared PoolRepository's scan result (one scan for the whole app, not one per tab).
     private final PoolBook.Listener poolListener = new PoolBook.Listener() {
         @Override public void onPools(List<Pool> pools) { render(pools); }
-        @Override public void onError(String msg) { status("Scan error: " + msg); }
+        @Override public void onError(String msg) { status(Language.msg(l10n_pools_scan_error, msg)); }
     };
 
     public PoolsView(MainActivity a) {
@@ -48,7 +51,7 @@ public class PoolsView extends BaseView {
         indivTab.setOnClickListener(v -> setMode(false));
         combinedTab.setOnClickListener(v -> setMode(true));
         styleTabs();
-        status("Scanning the pool registry…");
+        status(Language.msg(l10n_pools_scanning));
     }
 
     private void setMode(boolean comb) {
@@ -72,13 +75,12 @@ public class PoolsView extends BaseView {
         list.removeAllViews();
         TextView summary = find(R.id.pm_pandapools_poolsSummary);
         if (pools.isEmpty()) {
-            summary.setText("no active pools");
-            status("No live pools found in the registry yet. Create one to seed liquidity.");
+            Language.setText(summary, Language.msg(l10n_pools_no_active));
+            status(Language.msg(l10n_pools_no_live));
             return;
         }
         BigDecimal aggMinima = VirtualCurve.totalMinima(pools);
-        summary.setText(pools.size() + (pools.size() == 1 ? " pool" : " pools")
-                + " · " + trim(aggMinima) + " MINIMA aggregate depth");
+        Language.setText(summary, Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_pools_summary, pools.size(), pools.size(), trim(aggMinima)));
         status("");
         find(R.id.pm_pandapools_poolsStatus).setVisibility(View.GONE);
         if (combined) { renderCombined(list, pools); return; }
@@ -94,7 +96,7 @@ public class PoolsView extends BaseView {
             if (g == null) { g = new ArrayList<>(); groups.put(p.tok, g); }
             g.add(p);
         }
-        if (groups.isEmpty()) { status("No funded pools to combine yet."); return; }
+        if (groups.isEmpty()) { status(Language.msg(l10n_pools_no_funded)); return; }
         for (List<Pool> g : groups.values()) list.addView(combinedCard(g));
     }
 
@@ -114,11 +116,11 @@ public class PoolsView extends BaseView {
         BigDecimal price = VirtualCurve.aggregatePrice(g);   // reserve-weighted token per MINIMA
         BigDecimal totT = totM.multiply(price);              // summed token side (derived from the two aggregates)
         BigDecimal depth = PoolRouter.aggregateDepth(g);     // MINIMA depth actually routable (deepest MAX_POOLS)
-        card.addView(line("MINIMA / " + tl + "  ·  combined", Design.accent(), 15, true));
-        card.addView(kv("pools combined", String.valueOf(g.size())));
-        card.addView(kv("total reserves", trim(totM) + " MINIMA  ·  " + trim(totT) + " " + tl));
-        card.addView(kv("aggregate spot price", trim8(price) + " " + tl + " / MINIMA"));
-        card.addView(kv("tradeable depth", trim(depth) + " MINIMA"));
+        card.addView(line(Language.msg(l10n_pools_combined_title, tl), Design.accent(), 15, true));
+        card.addView(kv(Language.msg(l10n_pools_combined_count), String.valueOf(g.size())));
+        card.addView(kv(Language.msg(l10n_pools_total_reserves), trim(totM) + " MINIMA  ·  " + trim(totT) + " " + tl));
+        card.addView(kv(Language.msg(l10n_pools_aggregate_price), trim8(price) + " " + tl + " / MINIMA"));
+        card.addView(kv(Language.msg(l10n_pools_depth), trim(depth) + " MINIMA"));
         return card;
     }
 
@@ -135,38 +137,38 @@ public class PoolsView extends BaseView {
 
         String tl = p.tokenLabel();
         card.addView(line("MINIMA / " + tl, Design.heading(), 15, true));
-        card.addView(kv("reserves", trim(p.reserveM) + " MINIMA  ·  " + trim(p.reserveT) + " " + tl));
-        card.addView(kv("spot price", trim8(p.spotPrice()) + " " + tl + " / MINIMA"));
+        card.addView(kv(Language.msg(l10n_pools_reserves), trim(p.reserveM) + " MINIMA  ·  " + trim(p.reserveT) + " " + tl));
+        card.addView(kv(Language.msg(l10n_pools_spot_price), trim8(p.spotPrice()) + " " + tl + " / MINIMA"));
         BigDecimal fg = p.feeGrowth().multiply(new BigDecimal("100"));
-        card.addView(kv("fees accrued (K/KMIN−1)", trim8(fg) + " %"));
+        card.addView(kv(Language.msg(l10n_pools_fees), trim8(fg) + " %"));
         // Address is shown truncated but the FULL value is one tap away (copied verbatim to the clipboard) —
         // never leave an identifier with no way to recover it in full.
         final String fullAddr = p.address;
-        View poolRow = kv("pool", p.address + "  (tap to copy)");   // full covenant address: it is what an explorer needs
+        View poolRow = kv(Language.msg(l10n_pools_pool), Language.msg(l10n_pools_copy_value, p.address));   // full covenant address: it is what an explorer needs
         Ui.copyable(poolRow, "pool address", fullAddr);
         card.addView(poolRow);
         return card;
     }
 
-    private TextView line(String s, int color, int sp, boolean bold) {
+    private TextView line(CharSequence s, int color, int sp, boolean bold) {
         TextView t = new TextView(act);
-        t.setText(s); t.setTextColor(color); t.setTextSize(sp);
+        Language.setText(t, s); t.setTextColor(color); t.setTextSize(sp);
         t.setTypeface(bold ? Design.typefaceBold() : Design.typeface());
         return t;
     }
 
-    private View kv(String k, String v) {
+    private View kv(CharSequence k, CharSequence v) {
         LinearLayout row = new LinearLayout(act);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(0, dp(3), 0, 0);
         TextView kk = new TextView(act);
-        kk.setText(k); kk.setTextColor(Design.dim()); kk.setTextSize(12);
+        Language.setText(kk, k); kk.setTextColor(Design.dim()); kk.setTextSize(12);
         // Label keeps its natural width (capped), NOT weight-1: a weighted label was starved to ~1 char
         // (and wrapped one glyph per line) whenever the value string filled the row.
         kk.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         kk.setMaxWidth(dp(190));
         TextView vv = new TextView(act);
-        vv.setText(v); vv.setTextColor(Design.text()); vv.setTextSize(12);
+        Language.setText(vv, v); vv.setTextColor(Design.text()); vv.setTextSize(12);
         vv.setTypeface(Typeface.MONOSPACE);
         vv.setGravity(Gravity.END);
         vv.setSingleLine(false);   // a long value wraps within its own column instead of overflowing it
@@ -178,10 +180,10 @@ public class PoolsView extends BaseView {
         return row;
     }
 
-    private void status(String s) {
+    private void status(CharSequence s) {
         TextView st = find(R.id.pm_pandapools_poolsStatus);
-        st.setVisibility(s.isEmpty() ? View.GONE : View.VISIBLE);
-        st.setText(s);
+        st.setVisibility(s.length() == 0 ? View.GONE : View.VISIBLE);
+        Language.setText(st, s);
     }
 
     private static String trim(BigDecimal b) {

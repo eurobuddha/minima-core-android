@@ -1,0 +1,29 @@
+<resources>
+    <style name="pm_utxo_Base.Theme.Utxo" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
+
+    <style name="pm_utxo_Theme.Utxo" parent="pm_utxo_Base.Theme.Utxo" />
+
+    
+    <style name="pm_utxo_Theme.Utxo.Dialog.Light" parent="Theme.Material3.Light.Dialog.Alert">
+        <item name="colorPrimary">#FFB93D0B</item>
+        <item name="colorSurface">#FFFFFFFF</item>
+        <item name="colorSurfaceContainerHigh">#FFFFFFFF</item>
+        <item name="colorOnSurface">#FF0A0A0A</item>
+        <item name="colorOnSurfaceVariant">#FF5F5F5F</item>
+    </style>
+    <style name="pm_utxo_Theme.Utxo.Dialog.OriginalDark" parent="Theme.Material3.Dark.Dialog.Alert">
+        <item name="colorPrimary">#FFFF5A1F</item>
+        <item name="colorSurface">#FF000000</item>
+        <item name="colorSurfaceContainerHigh">#FF000000</item>
+        <item name="colorOnSurface">#FFF5F5F5</item>
+        <item name="colorOnSurfaceVariant">#FF8E8E8E</item>
+    </style>
+    <style name="pm_utxo_Theme.Utxo.Dialog.Native" parent="Theme.Material3.Dark.Dialog.Alert">
+        <item name="colorPrimary">#FFF7931A</item>
+        <item name="colorSurface">#FF0A0A0F</item>
+        <item name="colorSurfaceContainerHigh">#FF0A0A0F</item>
+        <item name="colorOnSurface">#FFFFFFFF</item>
+        <item name="colorOnSurfaceVariant">#FF9A9AA8</item>
+    </style>
+</resources>

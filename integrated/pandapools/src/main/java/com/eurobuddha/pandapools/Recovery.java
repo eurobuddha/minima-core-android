@@ -265,7 +265,7 @@ public class Recovery {
         if (e == null) { done.run(); return; }
         final String script = e.optString("script", "");
         final String addr = e.optString("addr", "");
-        final String label = addr.isEmpty() ? "pool" : addr;
+        final String label = addr.isEmpty() ? "pool" : FundingCoins.hex(addr) ? addr : JSONObject.quote(addr);
         if (script.isEmpty()) { cb.onProgress("Skipped " + label + " (no covenant in backup)."); done.run(); return; }
 
         if (!validRecipe(e)) { cb.onProgress("Skipped " + label + " (invalid recipe fields)."); done.run(); return; }

@@ -1,4 +1,6 @@
 package com.eurobuddha.pandapools;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -124,12 +126,11 @@ public class WalletView extends BaseView {
     private void renderCards() {
         container.removeAllViews();
         container.addView(receiveHeader());
-        if (!balanceError.isEmpty()) container.addView(mono("Balance refresh failed: " + balanceError
-                + (balances.isEmpty() ? "" : " Showing the last successful read."), 12f, Design.amber(), false));
+        if (!balanceError.isEmpty()) container.addView(mono(Language.msg(l10n_pools_balance_error, PoolsMessages.message(balanceError), balances.isEmpty() ? "" : Language.msg(l10n_pools_last_read)), 12f, Design.amber(), false));
         if (balances.isEmpty()) {
             TextView tv = new TextView(act);
-            tv.setText(unpaired ? "The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry."
-                    : loading ? "Loading balances…" : "No balances yet.");
+            Language.setText(tv, unpaired ? Language.msg(l10n_pools_node_unavailable)
+                    : loading ? Language.msg(l10n_pools_loading_balances) : Language.msg(l10n_pools_no_balances));
             tv.setTextColor(Design.dim()); tv.setGravity(Gravity.CENTER); tv.setPadding(0, dp(40), 0, 0);
             container.addView(tv);
             return;
@@ -147,33 +148,36 @@ public class WalletView extends BaseView {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(MP, WC);
         lp.bottomMargin = dp(10); box.setLayoutParams(lp);
 
-        TextView label = mono("AVAILABLE TO POOL", 10f, Design.dim(), true);
+        TextView label = mono(Language.msg(l10n_pools_available_to_pool), 10f, Design.dim(), true);
         label.setLetterSpacing(0.08f);
         box.addView(label);
-        TextView note = mono("Sendable balances below — funds locked in your pools show as LOCKED.", 11f, Design.dim(), false);
+        TextView note = mono(Language.msg(l10n_pools_balance_note), 11f, Design.dim(), false);
         note.setPadding(0, dp(3), 0, dp(8));
         box.addView(note);
 
-        TextView addr = mono(receiveAddr.isEmpty() ? "…" : "Receive:  " + receiveAddr, 12f, Design.accent(), false);
+        TextView addr = mono(receiveAddr.isEmpty() ? "…" : Language.msg(l10n_pools_receive_address, receiveAddr), 12f, Design.accent(), false);
         // Wraps rather than ellipsising: a middle-truncated address is unusable, and this is the value a
         // sender has to reproduce exactly.
         addr.setSingleLine(false);
         Ui.copyable(addr, "address", receiveAddr);
         box.addView(addr);
-        TextView hint = mono("tap to copy your receive address", 10f, Design.dim(), false);
+        TextView hint = mono(Language.msg(l10n_pools_receive_copy), 10f, Design.dim(), false);
         hint.setPadding(0, dp(3), 0, 0);
         box.addView(hint);
-        TextView tools = mono("Consolidate MINIMA coins", 14f, Design.accent(), true);
+        TextView tools = mono(Language.msg(l10n_pools_consolidate_minima), 14f, Design.accent(), true);
         tools.setPadding(0, dp(12), 0, dp(12));
+        tools.setMinHeight(dp(48));
         tools.setOnClickListener(v -> new WalletTools(act).showConsolidate(Util.MINIMA_TOKENID, "MINIMA"));
         box.addView(tools);
-        TextView check = mono("Check node connection", 14f, Design.accent(), true);
+        TextView check = mono(Language.msg(l10n_pools_check_node), 14f, Design.accent(), true);
         check.setPadding(0, dp(12), 0, dp(12));
+        check.setMinHeight(dp(48));
         check.setOnClickListener(v -> new WalletTools(act).checkNode()); box.addView(check);
         if (act.node().hasInterruptedWrite()) {
-            TextView resolve = mono("Resolve interrupted write", 14f, Design.amber(), true);
+            TextView resolve = mono(Language.msg(l10n_pools_resolve_write), 14f, Design.amber(), true);
             resolve.setPadding(0, dp(12), 0, dp(12));
-            resolve.setOnClickListener(v -> new WalletTools(act).resolveInterruptedWrite()); box.addView(resolve);
+            resolve.setMinHeight(dp(48));
+        resolve.setOnClickListener(v -> new WalletTools(act).resolveInterruptedWrite()); box.addView(resolve);
         }
         return box;
     }
@@ -258,7 +262,7 @@ public class WalletView extends BaseView {
         TextView amt = mono(Util.tidyAmount(b.sendable), 17f, Design.heading(), true);
         amt.setGravity(Gravity.END);
         amtCol.addView(amt);
-        TextView cnt = mono((b.coins + (b.coins == 1 ? " coin" : " coins")).toUpperCase(), 10f, Design.dim(), false);
+        TextView cnt = mono(Language.upper(Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_pools_coin_count, b.coins, b.coins)), 10f, Design.dim(), false);
         cnt.setLetterSpacing(0.04f); cnt.setGravity(Gravity.END); cnt.setPadding(0, dp(3), 0, 0);
         amtCol.addView(cnt);
         card.addView(top);
@@ -266,7 +270,7 @@ public class WalletView extends BaseView {
 
         // The full breakdown, ALWAYS — zeros included. Hiding a zero is what made this unreadable: on a node
         // whose funds are all in a pool you saw a headline 0 and nothing explaining where the money went.
-        TextView bd = mono(b.breakdown(lastBalanceUpdate, System.currentTimeMillis()), 11.5f, Design.dim(), false);
+        TextView bd = mono(PoolsMessages.message(b.breakdown(lastBalanceUpdate, System.currentTimeMillis())), 11.5f, Design.dim(), false);
         bd.setPadding(0, dp(6), 0, 0);
         card.addView(bd);
 
@@ -299,68 +303,69 @@ public class WalletView extends BaseView {
         if (b.hasIcon()) {
             big.setOnClickListener(v -> showImageFull(b.meta.iconUrl));
             TextView hint = new TextView(act);
-            hint.setText(b.isNft() ? "Tap image for full resolution" : "Tap image to enlarge");
+            Language.setText(hint, b.isNft() ? Language.msg(l10n_pools_full_resolution) : Language.msg(l10n_pools_enlarge_image));
             hint.setTextColor(Design.dim()); hint.setTextSize(11f); hint.setGravity(Gravity.CENTER);
             hint.setPadding(0, 0, 0, dp(8)); box.addView(hint);
         }
 
         TextView title = new TextView(act);
-        title.setText(b.name + (b.isNft() ? "   ·  NFT" : ""));
+        Language.setText(title, b.name + (b.isNft() ? "   ·  NFT" : ""));
         title.setTextColor(Design.accent()); title.setTextSize(18f);
         title.setGravity(Gravity.CENTER); title.setTypeface(Design.typeface(), Typeface.BOLD);
         title.setPadding(0, 0, 0, dp(8)); box.addView(title);
 
         // All four, always — same rule as the card. A hidden zero is what we're fixing.
-        addKv(box, "Sendable", Util.tidyAmount(b.sendable));
-        addKv(box, "Confirmed", Util.tidyAmount(b.confirmed));
-        addKv(box, "Unconfirmed", Util.tidyAmount(b.unconfirmed));
-        addKv(box, "Locked ≈", b.locked());
-        addKv(box, "Coins", String.valueOf(b.coins));
-        addKv(box, "Supply", Util.tidyAmount(b.total));
-        if (notEmpty(b.meta.ticker)) addKv(box, "Ticker", b.meta.ticker);
-        if (notEmpty(b.meta.decimals)) addKv(box, "Decimals", b.meta.decimals);
-        if (notEmpty(b.meta.owner)) addKv(box, "Owner", b.meta.owner);
+        addKv(box, Language.msg(l10n_pools_sendable), Util.tidyAmount(b.sendable));
+        addKv(box, Language.msg(l10n_pools_confirmed), Util.tidyAmount(b.confirmed));
+        addKv(box, Language.msg(l10n_pools_unconfirmed), Util.tidyAmount(b.unconfirmed));
+        addKv(box, Language.msg(l10n_pools_locked), b.locked());
+        addKv(box, Language.msg(l10n_pools_coins_label), String.valueOf(b.coins));
+        addKv(box, Language.msg(l10n_pools_supply), Util.tidyAmount(b.total));
+        if (notEmpty(b.meta.ticker)) addKv(box, Language.msg(l10n_pools_ticker), b.meta.ticker);
+        if (notEmpty(b.meta.decimals)) addKv(box, Language.msg(l10n_pools_decimals), b.meta.decimals);
+        if (notEmpty(b.meta.owner)) addKv(box, Language.msg(l10n_pools_owner), b.meta.owner);
 
-        TextView consolidate = mono("Consolidate " + b.name + " coins", 14f, Design.accent(), true);
+        TextView consolidate = mono(Language.msg(l10n_pools_consolidate_token, b.name), 14f, Design.accent(), true);
         consolidate.setPadding(0, dp(12), 0, dp(12));
+        consolidate.setMinHeight(dp(48));
         consolidate.setOnClickListener(v -> new WalletTools(act).showConsolidate(b.tokenid, b.name));
         box.addView(consolidate);
-        box.addView(sectionLabel("Coins"));
+        box.addView(sectionLabel(Language.msg(l10n_pools_coins_label)));
         TextView coinsView = new TextView(act);
-        coinsView.setText("Loading coins…");
+        Language.setText(coinsView, Language.msg(l10n_pools_loading_coins));
         coinsView.setTextColor(Design.dim()); coinsView.setTextSize(12f); coinsView.setTypeface(Typeface.MONOSPACE);
         // Selectable so any single coinid can be lifted out; the copy row below grabs the whole list at once.
         coinsView.setTextIsSelectable(true);
         TextView copyAll = new TextView(act);
-        copyAll.setText("copy all coins");
+        Language.setText(copyAll, Language.msg(l10n_pools_copy_coins));
         copyAll.setTextColor(Design.accent()); copyAll.setTextSize(12f);
         copyAll.setPadding(0, dp(2), 0, dp(6));
+        copyAll.setMinHeight(dp(48));
         copyAll.setOnClickListener(v -> {
             CharSequence all = coinsView.getText();
             if (all == null || all.length() == 0) return;
-            Ui.copyable(copyAll, "coins", all.toString());
-            copyAll.performClick();
+            Ui.copy(copyAll, "coins", all.toString());
         });
         box.addView(copyAll);
         box.addView(coinsView);
         loadCoins(b, coinsView);
 
-        box.addView(sectionLabel("Token ID"));
+        box.addView(sectionLabel(Language.msg(l10n_pools_token_id)));
         TextView idv = new TextView(act);
-        idv.setText(b.tokenid); idv.setTextColor(Design.text()); idv.setTextSize(12f);
+        Language.setText(idv, b.tokenid); idv.setTextColor(Design.text()); idv.setTextSize(12f);
         idv.setTextIsSelectable(true); idv.setTypeface(Typeface.MONOSPACE);
         box.addView(idv);
 
         if (notEmpty(b.meta.description)) {
-            box.addView(sectionLabel("Description"));
+            box.addView(sectionLabel(Language.msg(l10n_pools_description)));
             TextView d = new TextView(act);
-            d.setText(b.meta.description); d.setTextColor(Design.dim()); d.setTextSize(13f);
+            Language.setText(d, b.meta.description); d.setTextColor(Design.dim()); d.setTextSize(13f);
             box.addView(d);
         }
-        if (notEmpty(b.meta.externalUrl)) box.addView(linkRow("Website", b.meta.externalUrl));
-        if (notEmpty(b.meta.webvalidate)) box.addView(linkRow("Web validation", b.meta.webvalidate));
+        if (notEmpty(b.meta.externalUrl)) box.addView(linkRow(Language.msg(l10n_pools_website), b.meta.externalUrl));
+        if (notEmpty(b.meta.webvalidate)) box.addView(linkRow(Language.msg(l10n_pools_web_validation), b.meta.webvalidate));
 
-        new AlertDialog.Builder(act).setView(sv).setPositiveButton("Close", null).show();
+        act.languageDialog().setView(sv).setPositiveButton(Language.msg(l10n_language_close), null).show();
     }
 
     // ---- coin list (AtomiX's coin dump, tagged for PandaPools) ----
@@ -374,37 +379,36 @@ public class WalletView extends BaseView {
      * alone cannot protect legacy nodes: Android may kill the receiver before delivering a reply.
      */
     private void loadCoins(TokenBalance b, TextView out) {
-        if (act.node() == null) { out.setText("No node connection."); return; }
+        if (act.node() == null) { Language.setText(out, Language.msg(l10n_pools_no_connection)); return; }
         if (addrBook == null) { addrBook = new PandaAddrBook(act); addrBook.seed(); }
         act.node().cmd("balance tokenid:" + b.tokenid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 int count = FundingCoins.coinsFor(j, b.tokenid);
                 if (!FundingCoins.listIsSafe(count)) {
-                    out.setText(count < 0 ? "Coin count unavailable. Try again when the node responds."
-                            : "The node reports " + count + " coins. Full coin listing is paused to protect this phone's node connection. "
-                            + "Balances above remain available. Use Consolidate to combine wallet coins."); return;
+                    Language.setText(out, count < 0 ? Language.msg(l10n_pools_coin_count_unavailable)
+                            : Language.msg(l10n_pools_coin_list_paused, count)); return;
                 }
                 final String base = "coins relevant:true tokenid:" + b.tokenid;
                 act.node().cmd(base + " sendable:true", new NodeApi.Cb() {
                     @Override public void onResult(JSONObject js) {
-                        if (FundingCoins.rows(js) == null) { out.setText("Could not read spendable coins. Try again."); return; }
+                        if (FundingCoins.rows(js) == null) { Language.setText(out, Language.msg(l10n_pools_spendable_read_failed)); return; }
                         withSendable(base, sendableIds(js), out);
                     }
-                    @Override public void onError(String m) { out.setText("Could not load coins: " + m); }
+                    @Override public void onError(String m) { Language.setText(out, Language.msg(l10n_pools_load_coins_failed, PoolsMessages.message(m))); }
                 });
             }
-            @Override public void onError(String m) { out.setText("Could not load coins: " + m); }
+            @Override public void onError(String m) { Language.setText(out, Language.msg(l10n_pools_load_coins_failed, PoolsMessages.message(m))); }
         });
     }
 
     private void withSendable(final String base, final java.util.Set<String> sendable, final TextView out) {
         act.node().cmd(base, new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) { out.setText(renderCoins(j, sendable, false)); }
+            @Override public void onResult(JSONObject j) { Language.setText(out, renderCoins(j, sendable, false)); }
             @Override public void onError(String m) {
-                if (!NodeApi.ERR_TOO_LONG.equals(m)) { out.setText("Couldn't load coins: " + m); return; }
+                if (!NodeApi.ERR_TOO_LONG.equals(m)) { Language.setText(out, Language.msg(l10n_pools_load_coins_failed, PoolsMessages.message(m))); return; }
                 act.node().cmd(base + " sendable:true", new NodeApi.Cb() {
-                    @Override public void onResult(JSONObject j2) { out.setText(renderCoins(j2, sendable, true)); }
-                    @Override public void onError(String m2) { out.setText("Too many coins to list."); }
+                    @Override public void onResult(JSONObject j2) { Language.setText(out, renderCoins(j2, sendable, true)); }
+                    @Override public void onError(String m2) { Language.setText(out, Language.msg(l10n_pools_too_many_coins)); }
                 });
             }
         });
@@ -425,8 +429,8 @@ public class WalletView extends BaseView {
 
     private CharSequence renderCoins(JSONObject j, java.util.Set<String> sendable, boolean sendableOnly) {
         JSONArray arr = FundingCoins.rows(j);
-        if (arr == null) return "Could not read coins. Try again.";
-        if (arr.length() == 0) return "No coins.";
+        if (arr == null) return Language.msg(l10n_pools_coins_read_failed);
+        if (arr.length() == 0) return Language.msg(l10n_pools_no_coins);
         List<Coin> list = new ArrayList<>();
         for (int i = 0; i < arr.length(); i++) {
             JSONObject c = arr.optJSONObject(i);
@@ -435,22 +439,25 @@ public class WalletView extends BaseView {
         Collections.sort(list, (x, y) -> bd(y.amount).compareTo(bd(x.amount)));
 
         // EVERY coin, with its FULL coinid — this is the audit view, so nothing is capped or elided.
-        StringBuilder sb = new StringBuilder();
-        if (sendableOnly) sb.append("(the node's reply was over its size cap — sendable coins only)\n\n");
+        Language.TextBuilder sb = new Language.TextBuilder();
+        boolean first = true;
+        if (sendableOnly) sb.append(Language.msg(l10n_pools_sendable_only)).append("\n\n");
         for (Coin c : list) {
+            if (!first) sb.append("\n");
+            first = false;
             sb.append(Util.tidyAmount(c.amount))
               .append(state(c, sendable))
               .append(tag(c))
-              .append('\n').append(c.coinid).append('\n');
+              .append('\n').append(c.coinid);
         }
-        return sb.toString().trim();
+        return sb.build();
     }
 
     /** Spendable or locked, straight from the node's own sendable set — blank if that query didn't answer,
      *  because guessing which coins are spendable is exactly what this list exists to avoid. */
-    private String state(Coin c, java.util.Set<String> sendable) {
+    private CharSequence state(Coin c, java.util.Set<String> sendable) {
         if (sendable == null) return "";
-        return sendable.contains(c.coinid) ? "   spendable" : "   locked";
+        return sendable.contains(c.coinid) ? Language.msg(l10n_pools_spendable_tag) : Language.msg(l10n_pools_locked_tag);
     }
 
     /**
@@ -459,9 +466,9 @@ public class WalletView extends BaseView {
      * so naming them turns the list into an answer rather than a wall of hashes. Anything locked but
      * untagged is held by something else — another contract, or an owner payout address awaiting collection.
      */
-    private String tag(Coin c) {
-        if (addrBook.contains(c.address) || addrBook.contains(c.miniaddress)) return "  (pool)";
-        if (PoolCovenant.SENTINEL.equalsIgnoreCase(c.address)) return "  (beacon)";
+    private CharSequence tag(Coin c) {
+        if (addrBook.contains(c.address) || addrBook.contains(c.miniaddress)) return Language.msg(l10n_pools_pool_tag);
+        if (PoolCovenant.SENTINEL.equalsIgnoreCase(c.address)) return Language.msg(l10n_pools_beacon_tag);
         return "";
     }
 
@@ -471,16 +478,16 @@ public class WalletView extends BaseView {
         iv.setBackgroundColor(0xFF000000);
         iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
         ImageLoader.loadFull(act, url, iv, R.drawable.pm_pandapools_ic_coin_placeholder);
-        AlertDialog dlg = new AlertDialog.Builder(act).setView(iv).create();
+        AlertDialog dlg = act.languageDialog().setView(iv).create();
         iv.setOnClickListener(v -> dlg.dismiss());
         dlg.show();
     }
 
     // ---- drawing / small helpers ----
 
-    private TextView mono(String s, float sp, int color, boolean bold) {
+    private TextView mono(CharSequence s, float sp, int color, boolean bold) {
         TextView t = new TextView(act);
-        t.setText(s); t.setTextColor(color); t.setTextSize(sp);
+        Language.setText(t, s); t.setTextColor(color); t.setTextSize(sp);
         t.setTypeface(Design.typeface(), bold ? Typeface.BOLD : Typeface.NORMAL);
         return t;
     }
@@ -521,28 +528,28 @@ public class WalletView extends BaseView {
         }
     }
 
-    private void addKv(LinearLayout box, String label, String value) {
+    private void addKv(LinearLayout box, CharSequence label, String value) {
         LinearLayout r = new LinearLayout(act);
         r.setOrientation(LinearLayout.HORIZONTAL); r.setPadding(0, dp(4), 0, dp(4));
-        TextView l = new TextView(act); l.setText(label); l.setTextColor(Design.dim()); l.setTextSize(13f);
-        TextView v = new TextView(act); v.setText(value); v.setTextColor(Design.text()); v.setTextSize(13f); v.setGravity(Gravity.END);
+        TextView l = new TextView(act); Language.setText(l, label); l.setTextColor(Design.dim()); l.setTextSize(13f);
+        TextView v = new TextView(act); Language.setText(v, value); v.setTextColor(Design.text()); v.setTextSize(13f); v.setGravity(Gravity.END);
         r.addView(l, new LinearLayout.LayoutParams(0, WC, 1f));
         r.addView(v, new LinearLayout.LayoutParams(0, WC, 1.6f));
         box.addView(r);
     }
 
-    private TextView sectionLabel(String s) {
+    private TextView sectionLabel(CharSequence s) {
         TextView t = new TextView(act);
-        t.setText(s); t.setAllCaps(true); t.setTextColor(Design.dim()); t.setTextSize(11f);
+        Language.setText(t, s); t.setAllCaps(true); t.setTextColor(Design.dim()); t.setTextSize(11f);
         t.setPadding(0, dp(12), 0, dp(2));
         return t;
     }
 
-    private LinearLayout linkRow(String label, String url) {
+    private LinearLayout linkRow(CharSequence label, String url) {
         LinearLayout r = new LinearLayout(act);
         r.setOrientation(LinearLayout.HORIZONTAL); r.setPadding(0, dp(8), 0, dp(8));
-        TextView l = new TextView(act); l.setText(label); l.setTextColor(Design.dim()); l.setTextSize(13f);
-        TextView v = new TextView(act); v.setText("↗ open"); v.setTextColor(Design.accent()); v.setTextSize(13f); v.setGravity(Gravity.END);
+        TextView l = new TextView(act); Language.setText(l, label); l.setTextColor(Design.dim()); l.setTextSize(13f);
+        TextView v = new TextView(act); Language.setText(v, Language.msg(l10n_pools_open_link)); v.setTextColor(Design.accent()); v.setTextSize(13f); v.setGravity(Gravity.END);
         r.addView(l, new LinearLayout.LayoutParams(0, WC, 1f));
         r.addView(v, new LinearLayout.LayoutParams(0, WC, 1f));
         r.setOnClickListener(x -> {

@@ -69,8 +69,9 @@ public final class MaxChatThreads {
                                      ChatEngine.Entry zLast, ChatEngine zChat) {
         ChatDb.Thread t = new ChatDb.Thread();
         t.pubkey = PREFIX + zPeer;
-        t.name = (zName == null || zName.isEmpty()) ? "Parlons contact" : zName;
-        t.lastBody = zLast == null ? "" : preview(zLast);
+        t.name = (zName == null || zName.isEmpty()) ? "" : zName;
+        t.lastBody = zLast == null ? "" : zLast.body;
+        t.lastMine = zLast != null && zLast.mine;
         t.lastTs = zLast == null ? 0 : zLast.time;
         t.unread = zChat.unread(zPeer);
         return t;

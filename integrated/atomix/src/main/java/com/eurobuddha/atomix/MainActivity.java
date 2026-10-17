@@ -1,6 +1,9 @@
 package com.eurobuddha.atomix;
 
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ClipData;
@@ -137,10 +140,12 @@ public class MainActivity extends AppCompatActivity {
     private ActivityResultLauncher<String> csvLauncher;   // Activity → Export CSV (SAF CreateDocument; no FileProvider/permission)
     // ---- tabs ----
     private static final int TAB_SWAP = 0, TAB_WALLET = 1, TAB_ACTIVITY = 2, TAB_MARKET = 3, TAB_OTC = 4;
-    private static final String[] TAB_LABELS = {"Swap", "Wallet", "Activity", "Market", "OTC"};
+    private static final CharSequence[] TAB_LABELS = {Language.msg(l10n_atomix_ui_swap), Language.msg(l10n_tab_wallet), Language.msg(l10n_atomix_ui_activity), Language.msg(l10n_atomix_ui_market), Language.msg(l10n_atomix_ui_otc)};
     private int currentTab = TAB_SWAP;
     private final TextView[] tabPills = new TextView[5];
     private boolean swapSell = true;    // Swap tab direction: true = Sell mxUSDT, false = Buy mxUSDT
+    private String otcSellDraft, otcBuyDraft;
+    private boolean otcInputFocused;
     private String swapAmount = "";     // Swap tab "you send" amount — persists across tree rebuilds
     private boolean swapInputFocused = false;   // suppress background render() while typing the swap amount
     private boolean swapSyncing = false;        // guard so the send/receive fields don't loop while syncing
@@ -340,6 +345,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override protected void onDestroy() {
+        for (AlertDialog value : new java.util.ArrayList<>(languageDialogs)) value.dismiss();
+        languageDialogs.clear();
         super.onDestroy();
         // Release any in-flight sweep BEFORE tearing down: clear the static SWEEP_ACTIVE (else SwapService would
         // stand down forever and never drive the locked legs), and drop every queued confirm-poll callback so
@@ -414,7 +421,7 @@ public class MainActivity extends AppCompatActivity {
     private void toggleTheme() {
         Design.toggle(this);
         applyChrome();
-        toast(Design.isDark() ? "Dark theme" : "Light theme");
+        toast(Design.isDark() ? Language.msg(l10n_atomix_ui_dark) : Language.msg(l10n_atomix_ui_light));
         render();
     }
 
@@ -422,14 +429,10 @@ public class MainActivity extends AppCompatActivity {
     private void switchCurrencyDialog() {
         final TradingContext target = TradingContext.active().other();
         dialog()
-            .setTitle("Switch to " + target.coinLabel + "?")
-            .setMessage("AtomiX publishes and market-makes in ONE currency at a time. Switching to "
-                    + target.coinLabel + " re-themes the app and moves your order/market-making to the "
-                    + target.coinLabel + " book.\n\nYour current " + TradingContext.active().coinLabel
-                    + " orders simply stop being maintained (they age off the book). Any in-flight swaps in "
-                    + "either currency keep settling safely in the background — switching never strands them.")
-            .setPositiveButton("Switch to " + target.coinLabel, (d, w) -> doSwitchCurrency(target))
-            .setNegativeButton("Cancel", null)
+            .setTitle(Language.msg(l10n_atomix_ui_switch_title, target.coinLabel))
+            .setMessage(Language.msg(l10n_atomix_ui_switch_body, target.coinLabel, target.coinLabel, TradingContext.active().coinLabel))
+            .setPositiveButton(Language.msg(l10n_atomix_ui_switch_action, target.coinLabel), (d, w) -> doSwitchCurrency(target))
+            .setNegativeButton(Language.msg(l10n_common_cancel), null)
             .show();
     }
 
@@ -544,7 +547,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** AlertDialog builder whose chrome follows the in-app theme (dark/light). */
-    private AlertDialog.Builder dialog() { return new AlertDialog.Builder(this, Design.dialogTheme()); }
+    private final java.util.Set<AlertDialog> languageDialogs = new java.util.HashSet<>();
+    private LanguageDialog dialog() {
+        Context themed = new androidx.appcompat.view.ContextThemeWrapper(this, Design.dialogTheme());
+        return new LanguageDialog(themed) {
+            private android.content.DialogInterface.OnDismissListener dismissed;
+            @Override public LanguageDialog setOnDismissListener(android.content.DialogInterface.OnDismissListener action) {
+                dismissed = action; return this;
+            }
+            @Override public AlertDialog create() {
+                setBackground(ContextCompat.getDrawable(themed, Design.isDark() ? R.drawable.pm_atomix_dialog_bg_dark : R.drawable.pm_atomix_dialog_bg_light));
+                AlertDialog value = super.create(); languageDialogs.add(value);
+                final android.content.DialogInterface.OnDismissListener callback = dismissed;
+                value.setOnDismissListener(d -> { languageDialogs.remove(value); if (callback != null) callback.onDismiss(d); });
+                return value;
+            }
+        };
+    }
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config); Language.configurationChanged(this); AtomixMessages.ensureChannels(this);
+    }
+    private CharSequence glowLabel(Design.Glow value) {
+        switch (value) {
+            case OFF: return Language.msg(l10n_atomix_ui_glow_off);
+            case CALM: return Language.msg(l10n_atomix_ui_glow_calm);
+            case LIVELY: return Language.msg(l10n_atomix_ui_glow_lively);
+            default: return Language.msg(l10n_atomix_ui_glow_insistent);
+        }
+    }
 
     /** The active currency's coin label ("MINIMA" / "mxUSDT") for user-facing strings. */
     private static String ccy() { return TradingContext.active().coinLabel; }
@@ -556,7 +586,7 @@ public class MainActivity extends AppCompatActivity {
         // Say WHICH fault this is. A wedged node and a disabled app both stop the app dead, but the
         // remedies are opposite, and telling a user to enable an already-enabled app wastes the one
         // moment they are looking at the screen.
-        if (!enabled) pairingBanner.setText(nodeOfflineText());
+        if (!enabled) Language.setText(pairingBanner, nodeOfflineText());
         pairingBanner.setVisibility(enabled ? View.GONE : View.VISIBLE);
         SwapLog.d("fg paired=" + enabled);
         if (enabled) {
@@ -581,7 +611,7 @@ public class MainActivity extends AppCompatActivity {
             walletDeriving = true;
             wallet.deriveFromNode(node, ui, new EthWallet.Cb() {
                 @Override public void ok(String address) { walletDeriving = false; ethAddr = address; ethErr = null; render(); fetchEthBalances(true); maybeStartEngine(); }
-                @Override public void err(String msg) { walletDeriving = false; ethErr = msg; SwapLog.w("fg eth wallet derive failed"); render(); }   // msg may echo key material — screen only, never logcat
+                @Override public void err(String msg) { walletDeriving = false; ethErr = msg; SwapLog.w("fg eth wallet derive failed"); render(); }   // key errors are fixed safe messages; never expose raw node material
             });
         }
         if (identity == null && !identityRequesting) setupIdentity();
@@ -665,7 +695,7 @@ public class MainActivity extends AppCompatActivity {
                 CommsIdentity id = CommsIdentity.fromSeed(ls, seed, TradingContext.active().hkdfContext);
                 ui.post(() -> { identity = id; crypto = new LocalEcCryptoProvider(ls, id); identityRequesting = false; SwapLog.d("fg comms identity ready"); render(); scanOrderBook(); scanOtc(); });
             } catch (Exception e) {
-                ui.post(() -> { identityRequesting = false; toast("Identity error: " + e.getMessage()); });
+                ui.post(() -> { identityRequesting = false; toast(Language.msg(l10n_atomix_notice_identity_failed)); });
             }
         });
     }
@@ -695,14 +725,12 @@ public class MainActivity extends AppCompatActivity {
     /** Diagnostic: list the coins the node counts as relevant to this wallet, by address — so we can see
      *  exactly what inflates the balance (e.g. shared order-book / HTLC / casino coins vs your simple coins). */
     private void minimaCoinDump() {
-        toast("Reading coins…");
+        toast(Language.msg(l10n_atomix_report_reading));
         final String token = TradingContext.active().tokenId;
         minima.myRelevantCoins(coins -> {
                 if (!token.equals(TradingContext.active().tokenId)) return;
-                StringBuilder sb = new StringBuilder();
-                sb.append("sendable ").append(Util.tidyAmount(minimaBal))
-                  .append("   confirmed ").append(Util.tidyAmount(minimaConfirmed)).append("\n")
-                  .append(coins.length()).append(" relevant coins:\n\n");
+                Language.TextBuilder sb = new Language.TextBuilder();
+                sb.append(Language.msg(l10n_atomix_report_balance, AtomixMessages.message(Util.tidyAmount(minimaBal)), Util.tidyAmount(minimaConfirmed), coins.length()));
                 java.math.BigDecimal sum = java.math.BigDecimal.ZERO;
                 for (int i = 0; i < coins.length(); i++) {
                     JSONObject c = coins.optJSONObject(i);
@@ -711,52 +739,48 @@ public class MainActivity extends AppCompatActivity {
                     String addr = c.optString("address", "");
                     try { sum = sum.add(new java.math.BigDecimal(amt)); } catch (Exception ignore) {}
                     String mx = c.optString("miniaddress", "");
-                    String tag = "";
-                    if (MinimaHtlc.HTLC_ADDRESS.equalsIgnoreCase(mx)) tag = " (swap HTLC)";
-                    else if (SwapOrderBook.address().equalsIgnoreCase(addr)) tag = " (order book)";
+                    CharSequence tag = "";
+                    if (MinimaHtlc.HTLC_ADDRESS.equalsIgnoreCase(mx)) tag = Language.msg(l10n_atomix_report_htlc);
+                    else if (SwapOrderBook.address().equalsIgnoreCase(addr)) tag = Language.msg(l10n_atomix_report_book);
                     sb.append(Util.tidyAmount(amt)).append("   ")
                       .append(addr).append(tag).append("\n");   // RULE 1: full address (the dump is a scrollable text view)
                 }
-                sb.append("\nsum of relevant coins ").append(Util.tidyAmount(sum.toPlainString()));
-                showText("Coin breakdown", sb.toString());
-        }, m -> showText("Coin breakdown", "Failed: " + m), balance -> {
+                sb.append(Language.msg(l10n_atomix_report_sum, Util.tidyAmount(sum.toPlainString())));
+                showText(Language.msg(l10n_atomix_report_breakdown), sb.build());
+        }, m -> showText(Language.msg(l10n_atomix_report_breakdown), Language.msg(l10n_atomix_report_coin_failed, m)), balance -> {
             if (!token.equals(TradingContext.active().tokenId)) return;
             modalOpen = true;
-            dialog().setTitle("Coin breakdown")
-                    .setMessage("Sendable: " + balance.sendable + "\nConfirmed: " + balance.confirmed
-                            + "\nUnconfirmed: " + balance.unconfirmed + "\nCoins: " + balance.coins
-                            + "\n\nThe detailed reply is too large to request safely from older nodes. "
-                            + "Consolidate spendable coins to bring the wallet below " + MinimaHtlc.maxSafeCoinRows(token) + " coins.")
-                    .setPositiveButton("Consolidate", (d, w) -> consolidateDialog())
-                    .setNegativeButton("Close", null)
+            dialog().setTitle(Language.msg(l10n_atomix_report_breakdown))
+                    .setMessage(Language.msg(l10n_atomix_report_oversized, balance.sendable, balance.confirmed, balance.unconfirmed, balance.coins, MinimaHtlc.maxSafeCoinRows(token)))
+                    .setPositiveButton(Language.msg(l10n_atomix_operation_consolidate), (d, w) -> consolidateDialog())
+                    .setNegativeButton(Language.msg(l10n_language_close), null)
                     .setOnDismissListener(d -> { modalOpen = false; render(); }).show();
         });
     }
 
-    private void showText(String title, String body) {
+    private void showText(CharSequence title, CharSequence body) {
         if (isFinishing() || isDestroyed()) return;
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(12), dp(20), dp(4));
         TextView t = new TextView(this);
-        t.setText(body); t.setTextColor(Design.TEXT()); t.setTextSize(12.5f);
+        Language.setText(t, body); t.setTextColor(Design.TEXT()); t.setTextSize(12.5f);
         t.setTypeface(Design.mono()); t.setTextIsSelectable(true);
         box.addView(t);
         modalOpen = true;
         dialog().setTitle(title).setView(wrapScroll(box))
-                .setPositiveButton("Close", null)
+                .setPositiveButton(Language.msg(l10n_language_close), null)
                 .setOnDismissListener(d -> { modalOpen = false; render(); }).show();
     }
 
     /** Full Minima balance breakdown so the displayed numbers are never a black box. */
-    private String minimaBreakdown() {
+    private CharSequence minimaBreakdown() {
         String locked = "—";
         try {
             locked = Util.fmt5(new java.math.BigDecimal(minimaConfirmed).subtract(new java.math.BigDecimal(minimaBal)).toPlainString());
         } catch (Exception ignore) {}
-        String ago = lastMinimaUpdate == 0 ? "never" : ((System.currentTimeMillis() - lastMinimaUpdate) / 1000) + "s ago";
-        return "confirmed " + Util.fmt5(minimaConfirmed) + "  ·  locked ≈ " + locked
-                + "  ·  unconfirmed " + Util.fmt5(minimaUnconfirmed) + "  ·  " + minimaCoins + " coins  ·  updated " + ago;
+        CharSequence ago = lastMinimaUpdate == 0 ? Language.msg(l10n_atomix_ui_never) : Language.since(lastMinimaUpdate);
+        return Language.msg(l10n_atomix_ui_balance_details, Util.fmt5(minimaConfirmed), locked, Util.fmt5(minimaUnconfirmed), minimaCoins, ago);
     }
 
     /** Refresh both wallet balances. showLoading=false → silent (periodic) update, no "…" flicker. */
@@ -964,8 +988,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void publishOrder() {
-        if (identity == null || myMinimaPk == null) { toast("Still connecting to your node…"); return; }
-        if (!wallet.ready()) { toast("ETH wallet not ready yet"); return; }
+        if (identity == null || myMinimaPk == null) { toast(Language.msg(l10n_mail_still_connecting)); return; }
+        if (!wallet.ready()) { toast(Language.msg(l10n_atomix_ui_wallet_not_ready)); return; }
         if (prefs.getBoolean(PriceOracle.P_ENABLE, false) && !PriceOracle.fresh()) {
             // Pegged: grab a live price first so a user-tapped Publish never quotes a stale one.
             orderStatus = "Fetching " + PriceOracle.source() + " price…"; render();
@@ -977,7 +1001,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void publishOrderNow() {
         final Order o = baseOrder();
-        if (o == null) { toast("Enable at least one pair in your order first"); return; }
+        if (o == null) { toast(Language.msg(l10n_atomix_market_enable_pair)); return; }
         // Pegged ladders are regenerated around the oracle mid at EVERY publish. Only when there's NO usable
         // price at all does it refuse; a stale-but-known price publishes a widened defensive ladder (stay-live).
         final int peg = PriceOracle.applyPeg(o, prefs);
@@ -1113,7 +1137,7 @@ public class MainActivity extends AppCompatActivity {
      *  emptied/disabled one publishes an empty order as a TOMBSTONE (freshest-per-signer + empty effectiveBids/
      *  Asks ⇒ peers drop my liquidity on their next scan) and stops auto-publishing. Only runs for a LIVE order. */
     private void pushOrderEdit(Order o) {
-        if (IdentityWatch.halted()) { toast("Halted: app keys don't match your node"); return; }
+        if (IdentityWatch.halted()) { toast(Language.msg(l10n_atomix_otc_halted)); return; }
         if (identity == null || myMinimaPk == null || !wallet.ready()) return;
         final boolean live = o.hasLiquidity();
         final int peg = live ? PriceOracle.applyPeg(o, prefs) : PriceOracle.PEG_OFF;
@@ -1166,74 +1190,67 @@ public class MainActivity extends AppCompatActivity {
         box.setPadding(dp(20), dp(8), dp(20), dp(8));
 
         TextView hint = new TextView(this);
-        hint.setText("Your depth ladder for " + ccy() + " / " + sym + "  (price = USDT per " + ccy() + "):\n"
-                + "•  ASKS — where YOU SELL " + ccy() + " (higher).   BIDS — where YOU BUY (lower).\n"
-                + "•  Each level's amount is a per-take cap. Leave rows blank to skip them.\n"
-                + "•  Tip: make your best level your largest — old-app takers only see your best price.");
+        Language.setText(hint, Language.msg(l10n_atomix_market_editor_help, ccy(), sym, ccy()));
         hint.setTextColor(Design.DIM()); hint.setTextSize(12f); hint.setTypeface(Design.sans()); hint.setLineSpacing(dp(2), 1f); hint.setPadding(0, 0, 0, dp(10));
         box.addView(hint);
 
         final SwitchCompat sw = new SwitchCompat(this);
-        sw.setText("Enabled"); sw.setTextColor(Design.DIM()); sw.setChecked(p.enable);
+        Language.setText(sw, Language.msg(l10n_atomix_market_enabled)); sw.setTextColor(Design.DIM()); sw.setChecked(p.enable);
         box.addView(sw);
 
         // ---- auto-MM: peg the ladder to the live MEXC mxUSDT/USDT market ----
-        box.addView(fieldLabel("AUTO MARKET-MAKE — PEG TO " + PriceOracle.source()));
+        box.addView(fieldLabel(Language.msg(l10n_atomix_market_auto_market, PriceOracle.source())));
         final SwitchCompat pegSw = new SwitchCompat(this);
-        pegSw.setText("Peg ladder to " + PriceOracle.source() + " (auto-reprice)");
+        Language.setText(pegSw, Language.msg(l10n_atomix_market_peg, PriceOracle.source()));
         pegSw.setTextColor(Design.DIM());
         pegSw.setChecked(prefs.getBoolean(PriceOracle.P_ENABLE, false));
         box.addView(pegSw);
         final TextView pegPx = new TextView(this);
         pegPx.setTextColor(Design.DIM()); pegPx.setTextSize(11.5f); pegPx.setTypeface(Design.mono());
         pegPx.setPadding(0, dp(2), 0, dp(2));
-        pegPx.setText(PriceOracle.describe());
+        Language.setText(pegPx, MarketMessages.message(PriceOracle.describe()));
         box.addView(pegPx);
         TextView pegHint = new TextView(this);
-        pegHint.setText("While pegged, the ladder regenerates around the " + PriceOracle.source() + " mid (± step %, "
-                + "your size per level) at every publish, and re-publishes when the market moves ≥ your threshold. "
-                + "If the feed goes down your order is withdrawn for safety, then restored when it recovers. "
-                + PriceOracle.source() + "'s " + ccy() + " market is THIN — keep step % above its typical spread and "
-                + "level sizes small; you auto-trade at these prices.");
+        Language.setText(pegHint, TradingContext.active().pricingParity ? Language.msg(l10n_atomix_market_parity_help) : Language.msg(l10n_atomix_market_peg_help, PriceOracle.source(), ccy()));
         pegHint.setTextColor(Design.DIM2()); pegHint.setTextSize(11f); pegHint.setTypeface(Design.sans());
         pegHint.setLineSpacing(dp(2), 1f); pegHint.setPadding(0, 0, 0, dp(4));
         box.addView(pegHint);
         LinearLayout pegRow = new LinearLayout(this);
-        pegRow.setOrientation(LinearLayout.HORIZONTAL); pegRow.setGravity(Gravity.CENTER_VERTICAL); pegRow.setPadding(0, dp(2), 0, dp(2));
-        final EditText biasE = genField("skew ±%"), repE = genField("reprice ≥ %");
+        pegRow.setOrientation(LinearLayout.VERTICAL); pegRow.setGravity(Gravity.CENTER_VERTICAL); pegRow.setPadding(0, dp(2), 0, dp(2));
+        final EditText biasE = genField(Language.msg(l10n_atomix_market_skew)), repE = genField(Language.msg(l10n_atomix_market_reprice));
         biasE.setFilters(new InputFilter[]{ (source, start, end, dest, dstart, dend) -> {   // skew may be negative
             String r = dest.toString().substring(0, dstart) + source.subSequence(start, end) + dest.toString().substring(dend);
             return (r.isEmpty() || r.matches("-?[0-9]*\\.?[0-9]*")) ? null : "";
         }});
-        biasE.setText(prefs.getString(PriceOracle.P_BIAS, ""));
-        repE.setText(prefs.getString(PriceOracle.P_REPRICE, "1"));
-        LinearLayout.LayoutParams pr1 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); pr1.rightMargin = dp(6);
-        LinearLayout.LayoutParams pr2 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        pegRow.addView(biasE, pr1); pegRow.addView(repE, pr2);
+        Language.setText(biasE, prefs.getString(PriceOracle.P_BIAS, ""));
+        Language.setText(repE, prefs.getString(PriceOracle.P_REPRICE, "1"));
+        LinearLayout.LayoutParams pr1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); pr1.rightMargin = dp(6);
+        LinearLayout.LayoutParams pr2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        pegRow.addView(fieldLabel(Language.msg(l10n_atomix_market_skew))); pegRow.addView(biasE, pr1); pegRow.addView(fieldLabel(Language.msg(l10n_atomix_market_reprice))); pegRow.addView(repE, pr2);
         box.addView(pegRow);
 
         // ladder params — the rows regenerate automatically as these change (no Generate button). "levels" =
         // how many tranches/side to build (1 = a single tight level); the peg reuses the same count.
-        box.addView(fieldLabel("AUTO-FILL (mid · step % · levels, then ask/bid size — seeds the rungs; edit any rung after)"));
-        LinearLayout gen = new LinearLayout(this); gen.setOrientation(LinearLayout.HORIZONTAL); gen.setGravity(Gravity.CENTER_VERTICAL); gen.setPadding(0, dp(4), 0, dp(2));
-        final EditText midE = genField("mid"), stepE = genField("step %"), levelsE = genField("levels");
+        box.addView(fieldLabel(Language.msg(l10n_atomix_market_auto_fill)));
+        LinearLayout gen = new LinearLayout(this); gen.setOrientation(LinearLayout.VERTICAL); gen.setGravity(Gravity.CENTER_VERTICAL); gen.setPadding(0, dp(4), 0, dp(2));
+        final EditText midE = genField(Language.msg(l10n_atomix_market_mid)), stepE = genField(Language.msg(l10n_atomix_market_step)), levelsE = genField(Language.msg(l10n_atomix_market_levels));
         levelsE.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        levelsE.setText(prefs.getString(PriceOracle.P_LEVELS, "1"));   // default 1 tranche/side; up to MAX_LEVELS opt-in
-        if (pegSw.isChecked()) stepE.setText(prefs.getString(PriceOracle.P_STEP, ""));   // step doubles as the peg's spacing
-        LinearLayout.LayoutParams g1 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); g1.rightMargin = dp(6);
-        LinearLayout.LayoutParams g2 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); g2.rightMargin = dp(6);
-        LinearLayout.LayoutParams g4 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.6f);
-        gen.addView(midE, g1); gen.addView(stepE, g2); gen.addView(levelsE, g4);
+        Language.setText(levelsE, prefs.getString(PriceOracle.P_LEVELS, "1"));   // default 1 tranche/side; up to MAX_LEVELS opt-in
+        if (pegSw.isChecked()) Language.setText(stepE, prefs.getString(PriceOracle.P_STEP, ""));   // step doubles as the peg's spacing
+        LinearLayout.LayoutParams g1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); g1.rightMargin = dp(6);
+        LinearLayout.LayoutParams g2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); g2.rightMargin = dp(6);
+        LinearLayout.LayoutParams g4 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        gen.addView(fieldLabel(Language.msg(l10n_atomix_market_mid))); gen.addView(midE, g1); gen.addView(fieldLabel(Language.msg(l10n_atomix_market_step))); gen.addView(stepE, g2); gen.addView(fieldLabel(Language.msg(l10n_atomix_market_levels))); gen.addView(levelsE, g4);
         box.addView(gen);
         // independent per-side sizes — a blank/zero side is NOT seeded or published (one-sided market)
-        LinearLayout genS = new LinearLayout(this); genS.setOrientation(LinearLayout.HORIZONTAL); genS.setGravity(Gravity.CENTER_VERTICAL); genS.setPadding(0, dp(2), 0, dp(2));
-        final EditText askSizeE = genField("ask size"), bidSizeE = genField("bid size");
+        LinearLayout genS = new LinearLayout(this); genS.setOrientation(LinearLayout.VERTICAL); genS.setGravity(Gravity.CENTER_VERTICAL); genS.setPadding(0, dp(2), 0, dp(2));
+        final EditText askSizeE = genField(Language.msg(l10n_atomix_market_ask_size)), bidSizeE = genField(Language.msg(l10n_atomix_market_bid_size));
         String legacySize = prefs.getString(PriceOracle.P_SIZE, "");
-        askSizeE.setText(prefs.getString(PriceOracle.P_ASK_SIZE, legacySize));
-        bidSizeE.setText(prefs.getString(PriceOracle.P_BID_SIZE, legacySize));
-        LinearLayout.LayoutParams gs1 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); gs1.rightMargin = dp(6);
-        LinearLayout.LayoutParams gs2 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        genS.addView(askSizeE, gs1); genS.addView(bidSizeE, gs2);
+        Language.setText(askSizeE, prefs.getString(PriceOracle.P_ASK_SIZE, legacySize));
+        Language.setText(bidSizeE, prefs.getString(PriceOracle.P_BID_SIZE, legacySize));
+        LinearLayout.LayoutParams gs1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); gs1.rightMargin = dp(6);
+        LinearLayout.LayoutParams gs2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        genS.addView(fieldLabel(Language.msg(l10n_atomix_market_ask_size))); genS.addView(askSizeE, gs1); genS.addView(fieldLabel(Language.msg(l10n_atomix_market_bid_size))); genS.addView(bidSizeE, gs2);
         box.addView(genS);
 
         // Live balances — used to seed a pre-ladder (0.8.x) order's synthetic size so a no-op Save keeps it live.
@@ -1243,7 +1260,7 @@ public class MainActivity extends AppCompatActivity {
         // ASKS (maker sells mxUSDT, higher) — laid out ORDER-BOOK style: highest (A6) at the top, best/lowest
         // ask A1 at the BOTTOM adjacent to the bids, so the spread sits in the middle. askRows[] stays indexed
         // A1..A6 (A1 = best); only the visual insertion order is reversed.
-        TextView ah = new TextView(this); ah.setText("ASKS — you SELL " + ccy() + " (higher price)");
+        TextView ah = new TextView(this); Language.setText(ah, Language.msg(l10n_atomix_market_asks, ccy()));
         ah.setTextColor(Design.RED()); ah.setTextSize(12.5f); ah.setTypeface(Design.sansBold()); ah.setLetterSpacing(0.03f); ah.setPadding(0, dp(12), 0, dp(2));
         box.addView(ah);
         final EditText[][] askRows = new EditText[Order.MAX_LEVELS][];
@@ -1255,7 +1272,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // BIDS (maker buys mxUSDT, lower)
-        TextView bh = new TextView(this); bh.setText("BIDS — you BUY " + ccy() + " (lower price)");
+        TextView bh = new TextView(this); Language.setText(bh, Language.msg(l10n_atomix_market_bids, ccy()));
         bh.setTextColor(Design.IN()); bh.setTextSize(12.5f); bh.setTypeface(Design.sansBold()); bh.setLetterSpacing(0.03f); bh.setPadding(0, dp(12), 0, dp(2));
         box.addView(bh);
         final EditText[][] bidRows = new EditText[Order.MAX_LEVELS][];
@@ -1266,13 +1283,27 @@ public class MainActivity extends AppCompatActivity {
             bidRows[i] = numRow2(box, "B" + (i + 1), px, am, Design.IN());
         }
 
-        final EditText minE = numRow(box, "min " + ccy() + " / trade", p.min);
+        final EditText minE = numRow(box, Language.msg(l10n_atomix_market_minimum, ccy()), p.min);
 
         final TextView pv = new TextView(this); pv.setTextSize(12f); pv.setTypeface(Design.sans()); pv.setLineSpacing(dp(2), 1f); pv.setPadding(0, dp(10), 0, dp(2));
         box.addView(pv);
+        final boolean[] revealError = {false};
+        // As in Future Cash tabs, reveal only after the translated view has its final layout.
+        pv.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (revealError[0]) view.post(() -> {
+                if (revealError[0] && view.isAttachedToWindow())
+                    view.requestRectangleOnScreen(new android.graphics.Rect(0, 0, view.getWidth(), view.getHeight()), true);
+            });
+        });
 
-        final Runnable upd = () -> updateLadderPreview(pv, askRows, bidRows);
+        final EditText[] parameters = {biasE, repE, midE, stepE, levelsE, askSizeE, bidSizeE, minE};
+        final Runnable upd = () -> {
+            revealError[0] = false;
+            if (!marketParametersValid(parameters, pegSw.isChecked())) { invalidMarketDraft(pv); return; }
+            updateLadderPreview(pv, askRows, bidRows);
+        };
         TextWatcher w = onChange(upd);
+        repE.addTextChangedListener(w); minE.addTextChangedListener(w);
         for (EditText[] row : askRows) { row[0].addTextChangedListener(w); row[1].addTextChangedListener(w); }
         for (EditText[] row : bidRows) { row[0].addTextChangedListener(w); row[1].addTextChangedListener(w); }
         upd.run();
@@ -1282,13 +1313,15 @@ public class MainActivity extends AppCompatActivity {
         final boolean[] pegAwaitFill = { false };
         final boolean[] filling = { false };   // programmatic setText below must not re-trigger the param auto-gen watcher
         final Runnable fillFromPeg = () -> {
+            if (!marketParametersValid(parameters, pegSw.isChecked())) { invalidMarketDraft(pv); return; }
             double m = PriceOracle.mid();
             if (!(m > 0) || !PriceOracle.fresh()) return;
             double bias = Math.max(-20, Math.min(20, parseD(biasE.getText().toString(), 0)));
             double quoted = m * (1 + bias / 100.0);
+            if (!MarketDraft.generation(quoted, parseD(stepE.getText().toString(), 0), parseD(askSizeE.getText().toString(), 0), parseD(bidSizeE.getText().toString(), 0), Math.max(1, Math.min(Order.MAX_LEVELS, (int) parseD(levelsE.getText().toString(), 1))))) { invalidMarketDraft(pv); return; }
             filling[0] = true;
             try {
-                midE.setText(trimSig(quoted));
+                Language.setText(midE, trimSig(quoted));
                 double step = parseD(stepE.getText().toString(), 0);
                 double askSize = parseD(askSizeE.getText().toString(), 0), bidSize = parseD(bidSizeE.getText().toString(), 0);
                 if (step <= 0 || !(askSize > 0 || bidSize > 0)) return;   // mid shown; rows need step + at least one side sized
@@ -1310,7 +1343,7 @@ public class MainActivity extends AppCompatActivity {
         final Runnable[] pegTick = new Runnable[1];
         pegTick[0] = () -> {
             if (!dlgOpen[0]) return;   // dialog dismissed → stop polling
-            pegPx.setText(PriceOracle.describe());
+            Language.setText(pegPx, MarketMessages.message(PriceOracle.describe()));
             if (pegSw.isChecked()) {
                 PriceOracle.refreshAsync();
                 if (pegAwaitFill[0]) fillFromPeg.run();   // fill once the first price lands
@@ -1325,13 +1358,14 @@ public class MainActivity extends AppCompatActivity {
             if (on) {
                 PriceOracle.refreshAsync();
                 if (PriceOracle.fresh()) fillFromPeg.run();
-                else { pegAwaitFill[0] = true; toast("Fetching " + PriceOracle.source() + " price…"); }
+                else { pegAwaitFill[0] = true; toast(Language.msg(l10n_atomix_market_fetching, PriceOracle.source())); }
             }
         });
 
         // Manual generation (unpegged): silent — it fires per keystroke, so invalid/partial params just
         // pause row updates rather than toasting on every character.
         final Runnable genManual = () -> {
+            if (!marketParametersValid(parameters, pegSw.isChecked())) { invalidMarketDraft(pv); return; }
             double mid = parseD(midE.getText().toString(), 0);
             double step = parseD(stepE.getText().toString(), 0);
             double askSize = parseD(askSizeE.getText().toString(), 0), bidSize = parseD(bidSizeE.getText().toString(), 0);
@@ -1355,6 +1389,9 @@ public class MainActivity extends AppCompatActivity {
         // reprice threshold doesn't shape the rows).
         final Runnable autoGen = () -> {
             if (filling[0]) return;
+            revealError[0] = false;
+            if (!marketParametersValid(parameters, pegSw.isChecked())) { invalidMarketDraft(pv); return; }
+            upd.run();
             if (pegSw.isChecked()) {
                 if (PriceOracle.fresh()) fillFromPeg.run();
                 else { pegAwaitFill[0] = true; PriceOracle.refreshAsync(); }   // pegTick fills once the price lands
@@ -1366,57 +1403,91 @@ public class MainActivity extends AppCompatActivity {
         levelsE.addTextChangedListener(gw);   // changing the level count re-fills the rows (blanks the extras)
 
         modalOpen = true;
-        dialog()
-                .setTitle("My market / ladder")
+        final AlertDialog editor = dialog()
+                .setTitle(Language.msg(l10n_atomix_market_editor))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Save", (d, w2) -> {
-                    p.enable = sw.isChecked();
-                    p.asks.clear(); p.bids.clear();
-                    for (EditText[] row : askRows) p.asks.add(new Order.Level(parseD(row[0].getText().toString(), 0), parseD(row[1].getText().toString(), 0)));
-                    for (EditText[] row : bidRows) p.bids.add(new Order.Level(parseD(row[0].getText().toString(), 0), parseD(row[1].getText().toString(), 0)));
-                    p.min = parseD(minE.getText().toString(), p.min);
-                    // Editor is authoritative: a side the user leaves with no valid levels is OFF. Zero its scalar
-                    // first so sanitize (which only DERIVES a scalar when a side HAS levels) can't leave a stale
-                    // legacy price live — otherwise the engine's empty-ladder fallback would keep trading it.
-                    p.buy = 0; p.sell = 0;
-                    Order.sanitize(p);   // drop blanks/invalids, cap 6, sort, derive best-level scalars for non-empty sides
-                    // Persist the auto-MM peg config (SwapService republishes from the same prefs). Step/size are
-                    // the quick-generate fields — the peg reuses them as its ladder parameters.
-                    boolean pegOn = pegSw.isChecked();
-                    double pStep = parseD(stepE.getText().toString(), 0);
-                    double pAskSize = parseD(askSizeE.getText().toString(), 0), pBidSize = parseD(bidSizeE.getText().toString(), 0);
-                    if (pegOn && (pStep <= 0 || !(pAskSize > 0 || pBidSize > 0))) { pegOn = false; toast("Peg needs a step % and an ask or bid size — saved with peg OFF"); }
-                    double pBias = Math.max(-20, Math.min(20, parseD(biasE.getText().toString(), 0)));
-                    double pRep = Math.max(0.1, parseD(repE.getText().toString(), 1));
-                    int pLevels = Math.max(1, Math.min(Order.MAX_LEVELS, (int) parseD(levelsE.getText().toString(), 1)));
-                    double pSize = Math.max(pAskSize, pBidSize);   // legacy P_SIZE fallback (older builds read one shared size)
-                    prefs.edit().putBoolean(PriceOracle.P_ENABLE, pegOn)
-                            .putString(PriceOracle.P_STEP, pStep > 0 ? trimSig(pStep) : "")
-                            .putString(PriceOracle.P_SIZE, pSize > 0 ? trimSig(pSize) : "")
-                            .putString(PriceOracle.P_ASK_SIZE, pAskSize > 0 ? trimSig(pAskSize) : "")
-                            .putString(PriceOracle.P_BID_SIZE, pBidSize > 0 ? trimSig(pBidSize) : "")
-                            .putString(PriceOracle.P_LEVELS, String.valueOf(pLevels))
-                            .putString(PriceOracle.P_BIAS, pBias != 0 ? trimSig(pBias) : "")
-                            .putString(PriceOracle.P_REPRICE, trimSig(pRep))
-                            .putBoolean(PriceOracle.P_WITHDRAWN, pegOn && prefs.getBoolean(PriceOracle.P_WITHDRAWN, false))
-                            .putBoolean(PriceOracle.P_TOMBSTONED, pegOn && prefs.getBoolean(PriceOracle.P_TOMBSTONED, false))
-                            .apply();
-                    saveOrder(o);
-                    if (p.enable && p.asks.isEmpty() && p.bids.isEmpty())
-                        toast("Enabled, but no levels set — add a bid or ask to publish");
-                    else
-                        toast(Order.crossed(p) ? "⚠ Saved, but your best bid ≥ best ask (crossed market)" : "Ladder saved");
-                    // If an order is already live, reflect this edit in the book NOW — especially a DISABLE, which
-                    // publishes a tombstone so it's withdrawn in seconds, not after the ~30-min auto-republish.
-                    if (prefs.getBoolean("auto_publish", false)) pushOrderEdit(o);
-                })
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_common_save), null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .setOnDismissListener(d -> { dlgOpen[0] = false; pegTickRef = null; modalOpen = false; render(); })
                 .show();
+        editor.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            if (!marketParametersValid(parameters, pegSw.isChecked()) || !marketRowsValid(askRows, bidRows)) { revealError[0] = true; invalidMarketDraft(pv); pv.post(() -> pv.requestRectangleOnScreen(new android.graphics.Rect(0, 0, pv.getWidth(), pv.getHeight()), true)); return; }
+
+            p.enable = sw.isChecked();
+            p.asks.clear(); p.bids.clear();
+            for (EditText[] row : askRows) p.asks.add(new Order.Level(parseD(row[0].getText().toString(), 0), parseD(row[1].getText().toString(), 0)));
+            for (EditText[] row : bidRows) p.bids.add(new Order.Level(parseD(row[0].getText().toString(), 0), parseD(row[1].getText().toString(), 0)));
+            p.min = parseD(minE.getText().toString(), p.min);
+            // Editor is authoritative: a side the user leaves with no valid levels is OFF. Zero its scalar
+            // first so sanitize (which only DERIVES a scalar when a side HAS levels) can't leave a stale
+            // legacy price live — otherwise the engine's empty-ladder fallback would keep trading it.
+            p.buy = 0; p.sell = 0;
+            Order.sanitize(p);   // drop blanks/invalids, cap 6, sort, derive best-level scalars for non-empty sides
+            // Persist the auto-MM peg config (SwapService republishes from the same prefs). Step/size are
+            // the quick-generate fields — the peg reuses them as its ladder parameters.
+            boolean pegOn = pegSw.isChecked();
+            double pStep = parseD(stepE.getText().toString(), 0);
+            double pAskSize = parseD(askSizeE.getText().toString(), 0), pBidSize = parseD(bidSizeE.getText().toString(), 0);
+            if (pegOn && (pStep <= 0 || !(pAskSize > 0 || pBidSize > 0))) { pegOn = false; toast(Language.msg(l10n_atomix_market_peg_off)); }
+            double pBias = Math.max(-20, Math.min(20, parseD(biasE.getText().toString(), 0)));
+            double pRep = Math.max(0.1, parseD(repE.getText().toString(), 1));
+            int pLevels = Math.max(1, Math.min(Order.MAX_LEVELS, (int) parseD(levelsE.getText().toString(), 1)));
+            double pSize = Math.max(pAskSize, pBidSize);   // legacy P_SIZE fallback (older builds read one shared size)
+            prefs.edit().putBoolean(PriceOracle.P_ENABLE, pegOn)
+                    .putString(PriceOracle.P_STEP, pStep > 0 ? trimSig(pStep) : "")
+                    .putString(PriceOracle.P_SIZE, pSize > 0 ? trimSig(pSize) : "")
+                    .putString(PriceOracle.P_ASK_SIZE, pAskSize > 0 ? trimSig(pAskSize) : "")
+                    .putString(PriceOracle.P_BID_SIZE, pBidSize > 0 ? trimSig(pBidSize) : "")
+                    .putString(PriceOracle.P_LEVELS, String.valueOf(pLevels))
+                    .putString(PriceOracle.P_BIAS, pBias != 0 ? trimSig(pBias) : "")
+                    .putString(PriceOracle.P_REPRICE, trimSig(pRep))
+                    .putBoolean(PriceOracle.P_WITHDRAWN, pegOn && prefs.getBoolean(PriceOracle.P_WITHDRAWN, false))
+                    .putBoolean(PriceOracle.P_TOMBSTONED, pegOn && prefs.getBoolean(PriceOracle.P_TOMBSTONED, false))
+                    .apply();
+            saveOrder(o);
+            if (p.enable && p.asks.isEmpty() && p.bids.isEmpty())
+                toast(Language.msg(l10n_atomix_market_no_levels));
+            else
+                toast(Order.crossed(p) ? Language.msg(l10n_atomix_market_saved_crossed) : Language.msg(l10n_atomix_market_saved));
+            // If an order is already live, reflect this edit in the book NOW — especially a DISABLE, which
+            // publishes a tombstone so it's withdrawn in seconds, not after the ~30-min auto-republish.
+            if (prefs.getBoolean("auto_publish", false)) pushOrderEdit(o);
+            editor.dismiss();
+        });
+    }
+
+    private boolean marketParametersValid(EditText[] fields, boolean pegged) {
+        String[] raw = new String[fields.length];
+        for (int i = 0; i < fields.length; i++) raw[i] = fields[i].getText().toString();
+        if (!MarketDraft.parameters(raw)) return false;
+        if (!pegged) return true;
+        double bias = Math.max(-20, Math.min(20, MarketDraft.number(raw[0], true, 0)));
+        double quoted = PriceOracle.mid() * (1 + bias / 100.0);
+        int levels = Math.max(1, Math.min(Order.MAX_LEVELS, (int) MarketDraft.number(raw[4], false, 1)));
+        return MarketDraft.generation(quoted, MarketDraft.number(raw[3], false, 0),
+                MarketDraft.number(raw[5], false, 0), MarketDraft.number(raw[6], false, 0), levels);
+    }
+
+    private boolean marketRowsValid(EditText[][]... sides) {
+        for (EditText[][] side : sides) {
+            String[][] raw = new String[side.length][2];
+            for (int i = 0; i < side.length; i++) {
+                raw[i][0] = side[i][0].getText().toString();
+                raw[i][1] = side[i][1].getText().toString();
+            }
+            if (!MarketDraft.rows(raw)) return false;
+        }
+        return true;
+    }
+
+    private void invalidMarketDraft(TextView preview) {
+        Language.setText(preview, Language.msg(l10n_atomix_market_invalid_number));
+        preview.setTextColor(Design.RED());
     }
 
     /** Live ladder summary in the editor: level counts, best prices, side totals, crossed warning. */
     private void updateLadderPreview(TextView pv, EditText[][] askRows, EditText[][] bidRows) {
+        if (!marketRowsValid(askRows, bidRows)) { invalidMarketDraft(pv); return; }
         int nA = 0, nB = 0; double bestAsk = Double.MAX_VALUE, bestBid = 0, sumA = 0, sumB = 0;
         for (EditText[] row : askRows) {
             double px = parseD(row[0].getText().toString(), 0), am = parseD(row[1].getText().toString(), 0);
@@ -1427,13 +1498,13 @@ public class MainActivity extends AppCompatActivity {
             if (px > 0 && am > 0) { nB++; sumB += am; if (px > bestBid) bestBid = px; }
         }
         if (nA > 0 && nB > 0 && bestBid >= bestAsk) {
-            pv.setText("⚠ Crossed — best bid " + fmtPrice(bestBid) + " ≥ best ask " + fmtPrice(bestAsk) + ": you'd sell cheaper than you buy");
+            Language.setText(pv, Language.msg(l10n_atomix_market_crossed, fmtPrice(bestBid), fmtPrice(bestAsk)));
             pv.setTextColor(Design.RED());
             return;
         }
-        String bidS = nB > 0 ? (nB + " lvl · best " + fmtPrice(bestBid) + " · " + abbrev(sumB) + " M") : "none";
-        String askS = nA > 0 ? (nA + " lvl · best " + fmtPrice(bestAsk) + " · " + abbrev(sumA) + " M") : "none";
-        pv.setText("BIDS  " + bidS + "\nASKS  " + askS);
+        CharSequence bidS = nB > 0 ? Language.msg(l10n_atomix_market_preview_side, nB, fmtPrice(bestBid), abbrev(sumB), ccy()) : Language.msg(l10n_atomix_market_none);
+        CharSequence askS = nA > 0 ? Language.msg(l10n_atomix_market_preview_side, nA, fmtPrice(bestAsk), abbrev(sumA), ccy()) : Language.msg(l10n_atomix_market_none);
+        Language.setText(pv, Language.msg(l10n_atomix_market_preview, bidS, askS));
         pv.setTextColor(Design.DIM());
     }
 
@@ -1465,18 +1536,18 @@ public class MainActivity extends AppCompatActivity {
         }});
     }
 
-    private EditText numRow(LinearLayout parent, String label, double value) {
+    private EditText numRow(LinearLayout parent, CharSequence label, double value) {
         return numRow(parent, label, value, Design.DIM());
     }
 
-    private EditText numRow(LinearLayout parent, String label, double value, int labelColor) {
+    private EditText numRow(LinearLayout parent, CharSequence label, double value, int labelColor) {
         LinearLayout r = new LinearLayout(this);
         r.setOrientation(LinearLayout.HORIZONTAL);
         r.setGravity(Gravity.CENTER_VERTICAL);
-        TextView t = new TextView(this); t.setText(label); t.setTextColor(labelColor); t.setTextSize(13f); t.setTypeface(Design.sans());
+        TextView t = new TextView(this); Language.setText(t, label); t.setTextColor(labelColor); t.setTextSize(13f); t.setTypeface(Design.sans());
         EditText e = new EditText(this);
         decimalInput(e);
-        e.setText(trim(value)); e.setTextColor(Design.TEXT()); e.setTextSize(15f); e.setGravity(Gravity.END); e.setTypeface(Design.mono());
+        Language.setText(e, trim(value)); e.setTextColor(Design.TEXT()); e.setTextSize(15f); e.setGravity(Gravity.END); e.setTypeface(Design.mono());
         r.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         r.addView(e, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         parent.addView(r);
@@ -1487,29 +1558,31 @@ public class MainActivity extends AppCompatActivity {
     private EditText[] numRow2(LinearLayout parent, String label, double price, double amount, int labelColor) {
         LinearLayout r = new LinearLayout(this);
         r.setOrientation(LinearLayout.HORIZONTAL); r.setGravity(Gravity.CENTER_VERTICAL); r.setPadding(0, dp(2), 0, dp(2));
-        TextView t = new TextView(this); t.setText(label); t.setTextColor(labelColor); t.setTextSize(12.5f); t.setTypeface(Design.mono());
+        TextView t = new TextView(this); Language.setText(t, label); t.setTextColor(labelColor); t.setTextSize(12.5f); t.setTypeface(Design.mono());
         EditText pe = new EditText(this); decimalInput(pe);
-        pe.setHint("price"); pe.setHintTextColor(Design.DIM2());
-        pe.setText(price > 0 ? trimSig(price) : ""); pe.setTextColor(Design.TEXT()); pe.setTextSize(14f); pe.setGravity(Gravity.END); pe.setTypeface(Design.mono());
+        Language.hint(pe, Language.msg(l10n_atomix_market_price)); pe.setHintTextColor(Design.DIM2());
+        Language.setText(pe, price > 0 ? trimSig(price) : ""); pe.setTextColor(Design.TEXT()); pe.setTextSize(14f); pe.setGravity(Gravity.END); pe.setTypeface(Design.mono());
         EditText ae = new EditText(this); decimalInput(ae);
-        ae.setHint(ccy()); ae.setHintTextColor(Design.DIM2());
-        ae.setText(amount > 0 ? trimSig(amount) : ""); ae.setTextColor(Design.TEXT()); ae.setTextSize(14f); ae.setGravity(Gravity.END); ae.setTypeface(Design.mono());
-        TextView clr = new TextView(this); clr.setText("✕"); clr.setTextColor(Design.DIM2()); clr.setTextSize(15f);
+        Language.hint(ae, ccy()); ae.setHintTextColor(Design.DIM2());
+        Language.setText(ae, amount > 0 ? trimSig(amount) : ""); ae.setTextColor(Design.TEXT()); ae.setTextSize(14f); ae.setGravity(Gravity.END); ae.setTypeface(Design.mono());
+        TextView clr = new TextView(this); Language.setText(clr, "✕"); clr.setTextColor(Design.DIM2()); clr.setTextSize(15f);
         clr.setTypeface(Design.sans()); clr.setGravity(Gravity.CENTER); clr.setPadding(dp(8), dp(4), dp(2), dp(4));
-        clr.setOnClickListener(v -> { pe.setText(""); ae.setText(""); });   // clear this level (watcher then refreshes the preview)
+        clr.setOnClickListener(v -> { Language.setText(pe, ""); Language.setText(ae, ""); });   // clear this level (watcher then refreshes the preview)
+        Language.description(clr, Language.msg(l10n_atomix_market_clear, label));
+        clr.setMinimumWidth(dp(48)); clr.setMinimumHeight(dp(48));
         Design.pressable(clr);
         LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(dp(26), LinearLayout.LayoutParams.WRAP_CONTENT);
         LinearLayout.LayoutParams plp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); plp.leftMargin = dp(6);
         LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); alp.leftMargin = dp(8);
-        LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(dp(30), LinearLayout.LayoutParams.WRAP_CONTENT); clp.leftMargin = dp(2);
+        LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(dp(48), LinearLayout.LayoutParams.WRAP_CONTENT); clp.leftMargin = dp(2);
         r.addView(t, tlp); r.addView(pe, plp); r.addView(ae, alp); r.addView(clr, clp);
         parent.addView(r);
         return new EditText[]{ pe, ae };
     }
 
-    private EditText genField(String hint) {
+    private EditText genField(CharSequence hint) {
         EditText e = new EditText(this); decimalInput(e);
-        e.setHint(hint); e.setHintTextColor(Design.DIM2());
+        Language.hint(e, hint); e.setHintTextColor(Design.DIM2());
         e.setTextColor(Design.TEXT()); e.setTextSize(14f); e.setTypeface(Design.mono()); e.setGravity(Gravity.CENTER);
         return e;
     }
@@ -1523,7 +1596,7 @@ public class MainActivity extends AppCompatActivity {
      *   - Buy mxUSDT  → you give USDT, receive mxUSDT at the maker's BUY price (the higher / ask).
      */
     private void takeOrderDialog(Order maker, String symbol, boolean sellMinima, final double price, final double maxAmount) {
-        if (price <= 0) return;
+        if (!Double.isFinite(price) || price <= 0) return;
         Order.Pair p = maker.pairs.get(symbol);
         final double min = p != null ? p.min : 0;   // maker's global per-trade minimum
 
@@ -1531,15 +1604,12 @@ public class MainActivity extends AppCompatActivity {
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(12), dp(20), dp(4));
         TextView info = new TextView(this);
-        info.setText((sellMinima ? "Sell " + ccy() + " → " + symbol : "Buy " + ccy() + " ← " + symbol)
-                + "\nPrice: " + trim(price) + " " + symbol + " per " + ccy()
-                + "\nThis level: up to " + abbrev(maxAmount) + " " + ccy()
-                + (min > 0 ? "\nMin: " + trim(min) + " " + ccy() : ""));
+        Language.setText(info, Language.msg(l10n_atomix_market_take_info, sellMinima ? Language.msg(l10n_atomix_market_take_sell, ccy(), symbol) : Language.msg(l10n_atomix_market_take_buy, ccy(), symbol), trim(price), symbol, ccy(), abbrev(maxAmount), ccy(), min > 0 ? Language.msg(l10n_atomix_market_take_min, trim(min), ccy()) : ""));
         info.setTextColor(Design.DIM()); info.setTextSize(13f); info.setTypeface(Design.sans()); info.setLineSpacing(dp(3), 1f); info.setPadding(0, 0, 0, dp(10));
         box.addView(info);
 
         final EditText amt = new EditText(this);
-        amt.setHint(ccy() + " to " + (sellMinima ? "sell" : "buy"));
+        Language.hint(amt, sellMinima ? Language.msg(l10n_atomix_market_amount_sell, ccy()) : Language.msg(l10n_atomix_market_amount_buy, ccy()));
         decimalInput(amt);
         amt.setTextColor(Design.TEXT()); amt.setHintTextColor(Design.DIM2()); amt.setTextSize(16f); amt.setTypeface(Design.mono());
         box.addView(amt);
@@ -1550,45 +1620,57 @@ public class MainActivity extends AppCompatActivity {
 
         amt.addTextChangedListener(new SimpleWatcher(() -> {
             String usdt = computeUsdt(amt.getText().toString(), price);
-            out.setText(usdt == null ? "" : (sellMinima ? "You receive ≈ " : "You pay ≈ ") + usdt + " " + symbol);
+            Language.setText(out, usdt == null ? "" : (sellMinima ? Language.msg(l10n_atomix_market_receive, usdt, symbol) : Language.msg(l10n_atomix_market_pay, usdt, symbol)));
         }));
 
         // RULE 1: the title's shortened key is a glance label — put the FULL counterparty key in the body,
         // copyable, so the user can verify who they're about to lock funds with.
         if (maker.signerPk != null && !maker.signerPk.isEmpty()) {
             TextView cpv = new TextView(this);
-            cpv.setText("Counterparty\n" + maker.signerPk);
+            Language.setText(cpv, Language.msg(l10n_atomix_market_counterparty, maker.signerPk));
             cpv.setTextColor(Design.DIM()); cpv.setTextSize(11f); cpv.setTypeface(Design.mono()); cpv.setPadding(0, dp(8), 0, 0);
-            cpv.setOnLongClickListener(v -> { copy(maker.signerPk, "Counterparty key copied"); return true; });
+            cpv.setOnLongClickListener(v -> { copy(maker.signerPk, Language.msg(l10n_atomix_market_counterparty_copied)); return true; });
             box.addView(cpv);
         }
 
         modalOpen = true;
-        dialog()
-                .setTitle((sellMinima ? "Sell " + ccy() : "Buy " + ccy()) + " · " + Util.shorten(maker.signerPk))
-                .setView(box)
-                .setPositiveButton("Start swap", (d, w) -> {
-                    String minima = amt.getText().toString().trim();
-                    String usdt = computeUsdt(minima, price);
-                    if (usdt == null) { toast("Enter a valid " + ccy() + " amount"); return; }
-                    // Client-side guards are UX-only — the maker's engine guard is authoritative — but catch the
-                    // obvious auto-declines before locking any coins on-chain.
-                    double m = parseD(minima, 0);
-                    if (m > maxAmount + 1e-9) { toast("This level takes up to " + abbrev(maxAmount) + " " + ccy() + " — more will be auto-declined"); return; }
-                    if (min > 0 && m < min) { toast("Below the maker's minimum (" + trim(min) + " " + ccy() + ")"); return; }
-                    startSwap(maker, symbol, sellMinima, minima, usdt);
-                })
-                .setNegativeButton("Cancel", null)
+        final AlertDialog editor = dialog()
+                .setTitle(Language.join(sellMinima ? Language.msg(l10n_atomix_otc_sell, ccy()) : Language.msg(l10n_atomix_otc_buy, ccy()), " · ", Util.shorten(maker.signerPk)))
+                .setView(wrapScroll(box))
+                .setPositiveButton(Language.msg(l10n_atomix_market_start), null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .setOnDismissListener(d -> { modalOpen = false; render(); })
                 .show();
+        editor.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String raw = amt.getText().toString();
+            if (!positiveSwapAmount(raw)) { Language.setText(out, Language.msg(l10n_atomix_market_amount_invalid, ccy())); return; }
+            String minima = MinimaHtlc.grain(raw);
+            String usdt = computeUsdt(minima, price);
+            if (usdt == null) { Language.setText(out, Language.msg(l10n_atomix_market_amount_invalid, ccy())); return; }
+            // Client-side guards are UX-only — the maker's engine guard is authoritative — but catch the
+            // obvious auto-declines before locking any coins on-chain.
+            double m = parseD(minima, 0);
+            if (m > maxAmount + 1e-9) { toast(Language.msg(l10n_atomix_market_too_large, abbrev(maxAmount), ccy())); return; }
+            if (min > 0 && m < min) { toast(Language.msg(l10n_atomix_market_too_small, trim(min), ccy())); return; }
+            startSwap(maker, symbol, sellMinima, minima, usdt);
+            editor.dismiss();
+        });
+    }
+
+    /** Match the existing six-decimal trade grain before a quote or review is offered. */
+    private static boolean positiveSwapAmount(String raw) {
+        double value = MarketDraft.number(raw, false, Double.NaN);
+        return Double.isFinite(value) && value > 0 && new BigDecimal(MinimaHtlc.grain(raw)).signum() > 0;
     }
 
     /** USDT side for a mxUSDT amount at a given price (USDT per mxUSDT). */
     private String computeUsdt(String minimaAmount, double price) {
+        if (!positiveSwapAmount(minimaAmount) || !Double.isFinite(price) || price <= 0) return null;
         try {
-            BigDecimal m = new BigDecimal(minimaAmount.trim());
+            BigDecimal m = new BigDecimal(MinimaHtlc.grain(minimaAmount));
             if (m.signum() <= 0 || price <= 0) return null;
             BigDecimal usdt = m.multiply(BigDecimal.valueOf(price)).setScale(6, RoundingMode.DOWN);
+            if (usdt.signum() <= 0 || !Double.isFinite(usdt.doubleValue())) return null;
             return Util.tidyAmount(usdt.stripTrailingZeros().toPlainString());
         } catch (Exception e) { return null; }
     }
@@ -1652,7 +1734,7 @@ public class MainActivity extends AppCompatActivity {
         // A SELL sweep and an in-flight coin-split both pick mxUSDT coins unpinned — if they'd collide, the sweep
         // could lose leg 1 and abort. Splits finish within ~a block; ask the user to retry rather than risk it.
         if (plan.sell && (SwapEngine.isConsolidating() || (engine != null && engine.isSplitting()))) {
-            toast("Wallet coins are being prepared — try the sell again after confirmation.");
+            toast(Language.msg(l10n_atomix_operation_preparing));
             return;
         }
         sweepRun = plan; sweepIdx = 0; sweepOk = 0;
@@ -1776,17 +1858,17 @@ public class MainActivity extends AppCompatActivity {
 
             ImageView ic = new ImageView(this);
             ic.setImageResource(icons[i]);
-            ic.setColorFilter(sel ? Design.ACCENT() : Design.DIM());
+            ic.setColorFilter(sel ? Design.TEXT() : Design.DIM());
             ic.setLayoutParams(new LinearLayout.LayoutParams(dp(22), dp(22)));
             tabIcons[i] = ic;
 
             TextView p = new TextView(this);
-            p.setText(TAB_LABELS[i]);
+            Language.setText(p, TAB_LABELS[i]);
             p.setGravity(Gravity.CENTER);
             p.setTextSize(10.5f);
             p.setTypeface(Design.sans());
             p.setPadding(0, dp(4), 0, 0);
-            p.setTextColor(sel ? Design.ACCENT() : Design.DIM());
+            p.setTextColor(sel ? Design.TEXT() : Design.DIM());
             tabPills[i] = p;
 
             cell.addView(ic);
@@ -1806,13 +1888,14 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < tabPills.length; i++) {
             boolean sel = i == currentTab;
             if (tabCells[i] != null) tabCells[i].setBackground(Design.roundBg(this, sel ? Design.ACCENT_SOFT() : 0x00000000, 14));
-            if (tabIcons[i] != null) tabIcons[i].setColorFilter(sel ? Design.ACCENT() : Design.DIM());
-            if (tabPills[i] != null) tabPills[i].setTextColor(sel ? Design.ACCENT() : Design.DIM());
+            if (tabIcons[i] != null) tabIcons[i].setColorFilter(sel ? Design.TEXT() : Design.DIM());
+            if (tabPills[i] != null) tabPills[i].setTextColor(sel ? Design.TEXT() : Design.DIM());
         }
     }
 
     private void setTab(int t) {
         if (t == currentTab) return;
+        otcInputFocused = false;
         swapInputFocused = false;   // leaving the Swap tab clears the typing guard
         currentTab = t;
         // Entering a book-rendering tab (Swap / Market) → refresh the book NOW. The periodic poll only scans while
@@ -1830,10 +1913,11 @@ public class MainActivity extends AppCompatActivity {
         if (isFinishing() || isDestroyed()) return;
         // Never rebuild the view tree while a dialog with text inputs is open — a background render
         // (watcher / balance callback) restarts the IME and resets the cursor mid-typing. We re-render
-        // once when the dialog dismisses. (All text entry lives in guarded dialogs, never inline in a tab.)
+        // once when the dialog dismisses. Inline swap/OTC drafts have their own focus guards below.
         if (modalOpen) return;
         // While the user is typing the swap amount, don't rebuild the tree under them (would reset the IME/cursor).
         if (swapInputFocused && currentTab == TAB_SWAP) return;
+        if (otcInputFocused && currentTab == TAB_OTC && !IdentityWatch.halted()) return;
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
         col.setPadding(dp(16), dp(14), dp(16), dp(24));
@@ -1875,13 +1959,12 @@ public class MainActivity extends AppCompatActivity {
         clp.topMargin = dp(14);
 
         TextView title = new TextView(this);
-        title.setText("⛔  Wallet mismatch — AtomiX is halted");
+        Language.setText(title, Language.msg(l10n_atomix_ui_mismatch_title));
         title.setTextColor(Design.RED()); title.setTextSize(18f); title.setTypeface(Design.sansBold());
         card.addView(title);
 
         TextView why = new TextView(this);
-        why.setText("Your node's seed no longer matches the keys this app is holding. Trading, publishing and "
-                + "new swaps are stopped. Swaps already in flight keep settling — that part is safe to leave running.");
+        Language.setText(why, Language.msg(l10n_atomix_ui_mismatch_body));
         why.setTextColor(Design.DIM()); why.setTextSize(13f);
         why.setPadding(0, dp(8), 0, dp(12));
         card.addView(why);
@@ -1889,18 +1972,14 @@ public class MainActivity extends AppCompatActivity {
         // RULE 1: show the FULL keys here — this is the fund-recovery moment where the user needs to check a
         // block explorer / open a support ticket, so the identifiers must be complete and copyable, never
         // truncated. The block is selectable and long-press copies the whole thing.
-        StringBuilder detail = new StringBuilder();
-        if (IdentityWatch.minimaMismatch())
-            detail.append("Minima identity: ORPHANED\n  this app  ").append(IdentityWatch.orphanedPk())
-                  .append("\n  your node does not own it\n\n");
-        if (IdentityWatch.ethMismatch())
-            detail.append("ETH wallet: STALE\n  in use   ").append(IdentityWatch.staleEth())
-                  .append("\n  node now ").append(IdentityWatch.nodeEth()).append('\n');
+        Language.TextBuilder detail = new Language.TextBuilder();
+        if (IdentityWatch.minimaMismatch()) detail.append(Language.msg(l10n_atomix_ui_orphaned, IdentityWatch.orphanedPk())).append("\n\n");
+        if (IdentityWatch.ethMismatch()) detail.append(Language.msg(l10n_atomix_ui_stale, IdentityWatch.staleEth(), IdentityWatch.nodeEth()));
         TextView det = new TextView(this);
-        det.setText(detail.toString().trim());
+        Language.setText(det, detail.build());
         det.setTextColor(Design.TEXT()); det.setTextSize(12f); det.setTypeface(android.graphics.Typeface.MONOSPACE);
         det.setTextIsSelectable(true);
-        det.setOnLongClickListener(v -> { copy(det.getText().toString(), "Recovery details copied"); return true; });
+        det.setOnLongClickListener(v -> { copy(det.getText().toString(), Language.msg(l10n_atomix_ui_recovery_copied)); return true; });
         card.addView(det);
 
         int unsettled = 0;
@@ -1910,22 +1989,18 @@ public class MainActivity extends AppCompatActivity {
                         && !SwapDb.ST_ERROR.equals(s.status)) unsettled++;
         } catch (Exception ignore) {}
         TextView warn = new TextView(this);
-        warn.setText("⚠  Minima Core shares one installation and wallet. Clearing app storage or uninstalling "
-                + "would erase the node and every integrated app, including claim secrets for "
-                + unsettled + " unsettled swap" + (unsettled == 1 ? "" : "s")
-                + ". Preserve your node backup and swap recovery information. Export or sweep the stale ETH "
-                + "wallet if needed. AtomiX remains halted while these identities differ.");
+        Language.setText(warn, Language.msg(l10n_atomix_ui_mismatch_warning, unsettled));
         warn.setTextColor(Design.RED()); warn.setTextSize(12f);
         warn.setPadding(0, dp(14), 0, dp(14));
         card.addView(warn);
 
         if (IdentityWatch.ethMismatch()) {
-            TextView exp = Design.pill(this, "🔑  Export the stale ETH key", Design.SURFACE2(), Design.TEXT());
+            TextView exp = Design.pill(this, Language.msg(l10n_atomix_ui_export_stale), Design.SURFACE2(), Design.TEXT());
             exp.setOnClickListener(v -> exportKeyDialog());
             Design.pressable(exp);
             card.addView(exp, pillRow());
 
-            TextView sweep = Design.pill(this, "↑  Sweep funds to the node wallet", Design.SURFACE2(), Design.TEXT());
+            TextView sweep = Design.pill(this, Language.msg(l10n_atomix_ui_sweep_stale), Design.SURFACE2(), Design.TEXT());
             sweep.setOnClickListener(v -> sendDialog());
             Design.pressable(sweep);
             card.addView(sweep, pillRow());
@@ -1955,11 +2030,11 @@ public class MainActivity extends AppCompatActivity {
             // this header draws its own hamburger on every rebuild instead.
             header.setTag("pandamonium.app.toolbar.self");
             TextView burger = new TextView(this);
-            burger.setText("\u2630");
+            Language.setText(burger, "\u2630");
             burger.setTextColor(Design.TEXT());
             burger.setTextSize(20f);
             burger.setGravity(Gravity.CENTER);
-            burger.setContentDescription("Open Minima Core menu");
+            com.eurobuddha.minimacore.i18n.Language.description(burger, com.eurobuddha.minimacore.i18n.Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_drawer_open));
             Design.pressable(burger);
             burger.setOnClickListener(v -> {
                 View shell = getWindow().getDecorView()
@@ -1969,11 +2044,11 @@ public class MainActivity extends AppCompatActivity {
                             .openDrawer(Gravity.LEFT);
                 }
             });
-            header.addView(burger, new LinearLayout.LayoutParams(dp(44), dp(44)));
+            header.addView(burger, new LinearLayout.LayoutParams(dp(48), dp(48)));
         }
 
         TextView brand = new TextView(this);
-        brand.setText("AtomiX");
+        Language.setText(brand, "AtomiX");
         brand.setTextColor(Design.TEXT()); brand.setTextSize(21f); brand.setTypeface(Design.sansBold()); brand.setLetterSpacing(-0.01f);
         if (hosted) {
             // Hamburger left, title centred in the remaining span.
@@ -1987,20 +2062,23 @@ public class MainActivity extends AppCompatActivity {
         // actionPill, not pill: this sat 8dp from the Mainnet chip wearing the SAME fill, text colour and
         // radius as that chip, which is not tappable - so people read it as a badge and never tried it.
         // The ⇄ and the accent stroke are what distinguish it, and both are static; the glow is a bonus.
+        LinearLayout marketHeader = new LinearLayout(this);
+        marketHeader.setOrientation(LinearLayout.HORIZONTAL);
+        marketHeader.setGravity(Gravity.CENTER_VERTICAL);
         TradingContext target = TradingContext.active().other();
         TextView ccyPill = Design.actionPill(this, "⇄", TradingContext.active().coinLabel,
-                Design.ACCENT_SOFT(), Design.ACCENT());
+                Design.ACCENT_SOFT(), Design.TEXT());
         ccyPill.setTextSize(12f);
         // The app's first accessibility label. A glyph-only affordance is no affordance to a screen
         // reader, and this control decides which market your money is in.
-        ccyPill.setContentDescription("Trading " + TradingContext.active().coinLabel
-                + ". Tap to switch to " + target.coinLabel + ".");
+        Language.description(ccyPill, Language.msg(l10n_atomix_ui_trading_description, TradingContext.active().coinLabel, target.coinLabel));
+        ccyPill.setMinimumHeight(dp(48));
         ccyPill.setOnClickListener(v -> switchCurrencyDialog());
         // Long-press cycles the glow strength while we tune it — long-press is free on this view and the
         // idiom already exists on the wallet card. Toasts the level so a screenshot records which is which.
         ccyPill.setOnLongClickListener(v -> {
             Design.Glow g = Design.cycleGlow(this);
-            toast("Pill glow: " + g.name().toLowerCase(java.util.Locale.ROOT));
+            toast(Language.msg(l10n_atomix_ui_glow, glowLabel(g)));
             startCcyGlow(ccyPill);
             return true;
         });
@@ -2008,21 +2086,24 @@ public class MainActivity extends AppCompatActivity {
         startCcyGlow(ccyPill);
         LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         clp.rightMargin = dp(8);
-        header.addView(ccyPill, clp);
+        marketHeader.addView(ccyPill, clp);
 
         TextView theme = Design.pill(this, Design.isDark() ? "☾" : "☀", Design.SURFACE2(), Design.DIM());
         theme.setTextSize(13f);
+        Language.description(theme, Design.isDark() ? Language.msg(l10n_atomix_ui_light) : Language.msg(l10n_atomix_ui_dark));
+        theme.setMinimumHeight(dp(48)); theme.setMinimumWidth(dp(48));
         theme.setOnClickListener(v -> toggleTheme());
         Design.pressable(theme);
         LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         tlp.rightMargin = dp(8);
         header.addView(theme, tlp);
 
-        header.addView(mainnetChip());
         col.addView(header);
+        marketHeader.addView(mainnetChip());
+        col.addView(marketHeader);
 
         TextView sub = new TextView(this);
-        sub.setText("v" + BuildConfig.VERSION_NAME + (chainBlock > 0 ? "  ·  block " + chainBlock : "") + "  ·  real funds");
+        Language.setText(sub, Language.join("v", BuildConfig.VERSION_NAME, chainBlock > 0 ? Language.join("  ·  ", Language.msg(l10n_atomix_ui_block, chainBlock)) : "", "  ·  ", Language.msg(l10n_atomix_ui_real_funds)));
         sub.setTextColor(Design.DIM2()); sub.setTextSize(12f); sub.setTypeface(Design.sans()); sub.setPadding(0, dp(3), 0, dp(12));
         col.addView(sub);
     }
@@ -2041,16 +2122,16 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout.LayoutParams dlp = new LinearLayout.LayoutParams(dp(6), dp(6)); dlp.rightMargin = dp(6);
         chip.addView(dot, dlp);
         TextView t = new TextView(this);
-        t.setText("Mainnet"); t.setTextColor(Design.ACCENT()); t.setTextSize(11f); t.setTypeface(Design.sansBold());
+        Language.setText(t, Language.msg(l10n_atomix_ui_mainnet)); t.setTextColor(Design.TEXT()); t.setTextSize(11f); t.setTypeface(Design.sansBold());
         chip.addView(t);
         return chip;
     }
 
     // ---- Swap tab (guided, beginner-first) ----
 
-    private TextView segTab(String label, boolean active, Runnable onTap) {
+    private TextView segTab(CharSequence label, boolean active, Runnable onTap) {
         TextView t = new TextView(this);
-        t.setText(label); t.setGravity(Gravity.CENTER); t.setTextSize(14f);
+        Language.setText(t, label); t.setGravity(Gravity.CENTER); t.setTextSize(14f);
         t.setPadding(dp(12), dp(12), dp(12), dp(12));
         t.setBackground(Design.roundBg(this, active ? Design.ACCENT() : Design.SURFACE2(), 12));
         t.setTextColor(active ? Design.ON_ACCENT() : Design.DIM());
@@ -2062,20 +2143,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void renderSwapTab(LinearLayout col) {
         TextView h = new TextView(this);
-        h.setText("Swap " + ccy() + " ⇄ USDT");
+        Language.setText(h, Language.msg(l10n_atomix_swap_title, ccy()));
         h.setTextColor(Design.TEXT()); h.setTextSize(18f); h.setTypeface(Design.sansBold());
         h.setPadding(0, dp(4), 0, dp(2));
         col.addView(h);
         TextView sh = new TextView(this);
-        sh.setText("Enter an amount — see exactly what you'll get at the best price.");
+        Language.setText(sh, Language.msg(l10n_atomix_swap_intro));
         sh.setTextColor(Design.DIM()); sh.setTextSize(12.5f); sh.setTypeface(Design.sans()); sh.setPadding(0, 0, 0, dp(12));
         col.addView(sh);
 
         // direction toggle (segmented)
         LinearLayout seg = new LinearLayout(this);
         seg.setOrientation(LinearLayout.HORIZONTAL);
-        TextView sellTab = segTab("Sell " + ccy(), swapSell, () -> { swapInputFocused = false; if (!swapSell) { swapSell = true; } render(); });
-        TextView buyTab = segTab("Buy " + ccy(), !swapSell, () -> { swapInputFocused = false; if (swapSell) { swapSell = false; } render(); });
+        TextView sellTab = segTab(Language.msg(l10n_atomix_otc_sell, ccy()), swapSell, () -> { swapInputFocused = false; if (!swapSell) { swapSell = true; } render(); });
+        TextView buyTab = segTab(Language.msg(l10n_atomix_otc_buy, ccy()), !swapSell, () -> { swapInputFocused = false; if (swapSell) { swapSell = false; } render(); });
         LinearLayout.LayoutParams sp1 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); sp1.rightMargin = dp(5);
         LinearLayout.LayoutParams sp2 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); sp2.leftMargin = dp(5);
         seg.addView(sellTab, sp1); seg.addView(buyTab, sp2);
@@ -2100,14 +2181,14 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout.LayoutParams elp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             elp.topMargin = dp(14); empty.setLayoutParams(elp);
             TextView none = new TextView(this);
-            none.setText("No one is quoting a " + (swapSell ? "buy" : "sell") + " price right now.");
+            Language.setText(none, swapSell ? Language.msg(l10n_atomix_swap_no_buy) : Language.msg(l10n_atomix_swap_no_sell));
             none.setTextColor(Design.TEXT()); none.setTextSize(14.5f); none.setTypeface(Design.sansBold());
             empty.addView(none);
             TextView sub2 = new TextView(this);
-            sub2.setText("Check back soon, or open Market to place your own order and wait for a match.");
+            Language.setText(sub2, Language.msg(l10n_atomix_swap_no_quote_help));
             sub2.setTextColor(Design.DIM()); sub2.setTextSize(12.5f); sub2.setTypeface(Design.sans()); sub2.setLineSpacing(dp(3), 1f); sub2.setPadding(0, dp(6), 0, dp(2));
             empty.addView(sub2);
-            TextView go = Design.pill(this, "Open Market", Design.SURFACE2(), Design.TEXT());
+            TextView go = Design.pill(this, Language.msg(l10n_atomix_swap_market), Design.SURFACE2(), Design.TEXT());
             LinearLayout.LayoutParams glp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             glp.topMargin = dp(12); go.setLayoutParams(glp); go.setOnClickListener(v -> setTab(TAB_MARKET)); Design.pressable(go);
             empty.addView(go);
@@ -2127,15 +2208,15 @@ public class MainActivity extends AppCompatActivity {
         clp.topMargin = dp(14); card.setLayoutParams(clp);
 
         // YOU SEND (editable)
-        card.addView(fieldLabel("YOU SEND"));
+        card.addView(fieldLabel(Language.msg(l10n_atomix_swap_send)));
         LinearLayout sendRow = new LinearLayout(this);
         sendRow.setOrientation(LinearLayout.HORIZONTAL); sendRow.setGravity(Gravity.CENTER_VERTICAL);
         sendRow.setPadding(0, dp(6), 0, dp(4));
         sendRow.addView(coinChip(sellMinima));
         final EditText amt = new EditText(this);
-        decimalInput(amt);
-        amt.setText(swapAmount);
-        amt.setHint("0.00"); amt.setHintTextColor(Design.DIM2());
+        decimalInput(amt); Language.description(amt, Language.msg(l10n_atomix_swap_send));
+        Language.setText(amt, swapAmount);
+        Language.hint(amt, "0.00"); amt.setHintTextColor(Design.DIM2());
         amt.setTextColor(Design.TEXT()); amt.setTextSize(26f); amt.setTypeface(Design.monoBold());
         amt.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
         amt.setBackground(null); amt.setPadding(dp(8), 0, 0, 0);
@@ -2151,10 +2232,11 @@ public class MainActivity extends AppCompatActivity {
         View l1 = new View(this); l1.setBackgroundColor(Design.BORDER());
         View l2 = new View(this); l2.setBackgroundColor(Design.BORDER());
         TextView flip = new TextView(this);
-        flip.setText("⇅"); flip.setGravity(Gravity.CENTER); flip.setTextColor(Design.ACCENT()); flip.setTextSize(16f); flip.setTypeface(Design.sansBold());
+        Language.setText(flip, "⇅"); flip.setGravity(Gravity.CENTER); flip.setTextColor(Design.ACCENT()); flip.setTextSize(16f); flip.setTypeface(Design.sansBold());
         flip.setBackground(Design.stroked(this, Design.SURFACE2(), 19));
         flip.setOnClickListener(v -> { swapInputFocused = false; swapSell = !swapSell; render(); }); Design.pressable(flip);
-        int fs = dp(38);
+        Language.description(flip, Language.msg(l10n_atomix_swap_flip));
+        int fs = dp(48);
         LinearLayout.LayoutParams llL = new LinearLayout.LayoutParams(0, dp(1), 1f);
         LinearLayout.LayoutParams llF = new LinearLayout.LayoutParams(fs, fs); llF.leftMargin = dp(12); llF.rightMargin = dp(12);
         LinearLayout.LayoutParams llR = new LinearLayout.LayoutParams(0, dp(1), 1f);
@@ -2162,19 +2244,19 @@ public class MainActivity extends AppCompatActivity {
         card.addView(flipRow);
 
         // YOU RECEIVE — editable too, so you can enter either side (mxUSDT or USDT)
-        card.addView(fieldLabel("YOU RECEIVE (estimate)"));
+        card.addView(fieldLabel(Language.msg(l10n_atomix_swap_receive)));
         LinearLayout recvRow = new LinearLayout(this);
         recvRow.setOrientation(LinearLayout.HORIZONTAL); recvRow.setGravity(Gravity.CENTER_VERTICAL);
         recvRow.setPadding(0, dp(6), 0, dp(2));
         recvRow.addView(coinChip(!sellMinima));
         final EditText recv = new EditText(this);
-        decimalInput(recv);
-        recv.setHint("0.00"); recv.setHintTextColor(Design.DIM2());
+        decimalInput(recv); Language.description(recv, Language.msg(l10n_atomix_swap_receive));
+        Language.hint(recv, "0.00"); recv.setHintTextColor(Design.DIM2());
         recv.setTextColor(Design.ACCENT()); recv.setTextSize(26f); recv.setTypeface(Design.monoBold());
         recv.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
         recv.setBackground(null); recv.setPadding(dp(8), 0, 0, 0);
         String r0 = sellMinima ? computeUsdt(swapAmount, price) : computeMinima(swapAmount, price);
-        recv.setText(r0 == null ? "" : r0);
+        Language.setText(recv, r0 == null ? "" : r0);
         recv.setOnFocusChangeListener((v, has) -> { swapInputFocused = has; if (!has) ui.postDelayed(this::render, 250); });
         recvRow.addView(recv, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         card.addView(recvRow);
@@ -2184,13 +2266,13 @@ public class MainActivity extends AppCompatActivity {
             if (swapSyncing) return;
             swapAmount = amt.getText().toString();
             String rr = sellMinima ? computeUsdt(swapAmount, price) : computeMinima(swapAmount, price);
-            swapSyncing = true; recv.setText(rr == null ? "" : rr); swapSyncing = false;
+            swapSyncing = true; Language.setText(recv, rr == null ? "" : rr); swapSyncing = false;
         }));
         recv.addTextChangedListener(new SimpleWatcher(() -> {
             if (swapSyncing) return;
             String rstr = recv.getText().toString();
             String ss = sellMinima ? computeMinima(rstr, price) : computeUsdt(rstr, price);   // inverse: receive → send
-            swapSyncing = true; amt.setText(ss == null ? "" : ss); swapSyncing = false;
+            swapSyncing = true; Language.setText(amt, ss == null ? "" : ss); swapSyncing = false;
             swapAmount = amt.getText().toString();
         }));
 
@@ -2198,9 +2280,7 @@ public class MainActivity extends AppCompatActivity {
         double bestCap = sellMinima ? best.bidCap : best.askCap;
         double depth = sweepDepthMinima(sellMinima);
         TextView bp = new TextView(this);
-        bp.setText("Best price " + fmtPrice(price) + " USDT/" + ccy() + "  ·  up to ~" + abbrev(bestCap) + " at best"
-                + (depth > bestCap + 1e-9 ? ", ~" + abbrev(depth) + " across the book" : "")
-                + (sellMinima ? "" : "  ·  ETH gas per part"));
+        Language.setText(bp, Language.msg(l10n_atomix_swap_best, fmtPrice(price), ccy(), abbrev(bestCap), depth > bestCap + 1e-9 ? Language.msg(l10n_atomix_swap_depth, abbrev(depth)) : "", sellMinima ? "" : Language.msg(l10n_atomix_swap_gas_suffix)));
         bp.setTextColor(Design.DIM2()); bp.setTextSize(11.5f); bp.setTypeface(Design.sans()); bp.setPadding(0, dp(12), 0, 0);
         card.addView(bp);
 
@@ -2209,18 +2289,20 @@ public class MainActivity extends AppCompatActivity {
             double curPct = buySlippage() * 100;
             boolean is2 = Math.abs(curPct - 2) < 0.001, is42 = Math.abs(curPct - 4.2) < 0.001;
             LinearLayout slip = new LinearLayout(this);
-            slip.setOrientation(LinearLayout.HORIZONTAL); slip.setGravity(Gravity.CENTER_VERTICAL);
+            slip.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout options = new LinearLayout(this); options.setOrientation(LinearLayout.HORIZONTAL);
             LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             slp.topMargin = dp(10); slip.setLayoutParams(slp);
-            TextView lbl = new TextView(this); lbl.setText("Max slippage"); lbl.setTextColor(Design.DIM()); lbl.setTextSize(11.5f); lbl.setTypeface(Design.sans());
+            TextView lbl = new TextView(this); Language.setText(lbl, Language.msg(l10n_atomix_swap_slippage)); lbl.setTextColor(Design.DIM()); lbl.setTextSize(11.5f); lbl.setTypeface(Design.sans());
             slip.addView(lbl);
-            slip.addView(slipPill("2%", is2, () -> setBuySlippage(2)));
-            slip.addView(slipPill("4.2%", is42, () -> setBuySlippage(4.2)));
-            slip.addView(slipPill((!is2 && !is42) ? pctStr(curPct) + "%" : "Custom", !is2 && !is42, this::customSlippageDialog));
+            options.addView(slipPill("2%", is2, () -> setBuySlippage(2)));
+            options.addView(slipPill("4.2%", is42, () -> setBuySlippage(4.2)));
+            options.addView(slipPill((!is2 && !is42) ? pctStr(curPct) + "%" : Language.msg(l10n_atomix_swap_custom), !is2 && !is42, this::customSlippageDialog));
+            slip.addView(options);
             card.addView(slip);
         }
 
-        TextView cta = button("Review swap");
+        TextView cta = button(Language.msg(l10n_atomix_swap_review));
         LinearLayout.LayoutParams blp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         blp.topMargin = dp(16); cta.setLayoutParams(blp);
         cta.setOnClickListener(v -> onSwapCta(sellMinima, (sellMinima ? amt : recv).getText().toString().trim(), best));   // mxUSDT-side field
@@ -2233,16 +2315,16 @@ public class MainActivity extends AppCompatActivity {
 
         if (orderStatus != null) {
             TextView stt = new TextView(this);
-            stt.setText(orderStatus);
+            Language.setText(stt, OperationMessages.message(orderStatus));
             stt.setTextColor(orderStatus.startsWith("✓") ? Design.IN() : Design.DIM());
             stt.setTextSize(12.5f); stt.setTypeface(Design.sans()); stt.setPadding(dp(2), dp(12), dp(2), 0);
             col.addView(stt);
         }
     }
 
-    private TextView fieldLabel(String s) {
+    private TextView fieldLabel(CharSequence s) {
         TextView t = new TextView(this);
-        t.setText(s); t.setTextColor(Design.DIM()); t.setTextSize(11f); t.setTypeface(Design.sans()); t.setLetterSpacing(0.06f);
+        Language.setText(t, s); t.setTextColor(Design.DIM()); t.setTextSize(11f); t.setTypeface(Design.sans()); t.setLetterSpacing(0.06f);
         return t;
     }
 
@@ -2251,7 +2333,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout chip = new LinearLayout(this);
         chip.setOrientation(LinearLayout.HORIZONTAL); chip.setGravity(Gravity.CENTER_VERTICAL);
         TextView circle = new TextView(this);
-        circle.setText(minima ? "M" : "$"); circle.setGravity(Gravity.CENTER);
+        Language.setText(circle, minima ? "M" : "$"); circle.setGravity(Gravity.CENTER);
         circle.setTextColor(minima ? Design.ON_ACCENT() : 0xFFFFFFFF);
         circle.setTypeface(Design.sansBold()); circle.setTextSize(15f);
         android.graphics.drawable.GradientDrawable cg = new android.graphics.drawable.GradientDrawable();
@@ -2261,10 +2343,10 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(dp(34), dp(34)); clp.rightMargin = dp(10);
         chip.addView(circle, clp);
         LinearLayout colc = new LinearLayout(this); colc.setOrientation(LinearLayout.VERTICAL);
-        TextView tk = new TextView(this); tk.setText(minima ? ccy() : "USDT"); tk.setTextColor(Design.TEXT()); tk.setTextSize(15f); tk.setTypeface(Design.sansBold());
+        TextView tk = new TextView(this); Language.setText(tk, minima ? ccy() : "USDT"); tk.setTextColor(Design.TEXT()); tk.setTextSize(15f); tk.setTypeface(Design.sansBold());
         TextView sub = new TextView(this);
         String usdt = tokenBals.get("USDT");
-        sub.setText(minima ? ("avail " + abbrev(parseD(minimaBal, 0))) : ("avail " + (usdt != null ? Util.tidyAmount(usdt) : "—")));
+        Language.setText(sub, Language.msg(l10n_atomix_swap_available, minima ? abbrev(parseD(minimaBal, 0)) : (usdt != null ? Util.tidyAmount(usdt) : "—")));
         sub.setTextColor(Design.DIM()); sub.setTextSize(11f); sub.setTypeface(Design.sans());
         colc.addView(tk); colc.addView(sub);
         chip.addView(colc);
@@ -2273,10 +2355,12 @@ public class MainActivity extends AppCompatActivity {
 
     /** mxUSDT you'd receive for a USDT amount at a given price (USDT per mxUSDT). */
     private String computeMinima(String usdtAmount, double price) {
+        if (!positiveSwapAmount(usdtAmount) || !Double.isFinite(price) || price <= 0) return null;
         try {
-            BigDecimal u = new BigDecimal(usdtAmount.trim());
+            BigDecimal u = new BigDecimal(MinimaHtlc.grain(usdtAmount));
             if (u.signum() <= 0 || price <= 0) return null;
-            BigDecimal m = u.divide(BigDecimal.valueOf(price), 6, RoundingMode.DOWN);   // 6dp mxUSDT/USDT trade grain
+            BigDecimal m = u.divide(BigDecimal.valueOf(price), 6, RoundingMode.DOWN);
+            if (m.signum() <= 0 || !Double.isFinite(m.doubleValue())) return null;   // 6dp mxUSDT/USDT trade grain
             return Util.tidyAmount(m.stripTrailingZeros().toPlainString());
         } catch (Exception e) { return null; }
     }
@@ -2284,28 +2368,26 @@ public class MainActivity extends AppCompatActivity {
     /** Confirm the inline swap, then start it via the existing engine path. */
     private void reviewSwap(Order maker, boolean sellMinima, String sendStr, double price, double maxAmount) {
         swapInputFocused = false;   // leaving the amount field — let the panel re-render live from here on
-        if (sendStr.isEmpty()) { toast("Enter an amount to " + (sellMinima ? "sell" : "spend")); return; }
+        if (sendStr.isEmpty()) { toast(sellMinima ? Language.msg(l10n_atomix_swap_enter_sell) : Language.msg(l10n_atomix_swap_enter_spend)); return; }
+        if (!positiveSwapAmount(sendStr)) { toast(Language.msg(l10n_atomix_swap_valid)); return; }
         final String minima, usdt;
         if (sellMinima) { minima = MinimaHtlc.grain(sendStr); usdt = computeUsdt(minima, price); }   // 6dp trade grain, both legs consistent
-        else { usdt = sendStr; minima = computeMinima(sendStr, price); }
-        if (minima == null || usdt == null) { toast("Enter a valid amount"); return; }
+        else { usdt = MinimaHtlc.grain(sendStr); minima = computeMinima(usdt, price); }
+        if (minima == null || usdt == null) { toast(Language.msg(l10n_atomix_swap_valid)); return; }
         // UX-only cap check against the best level (the maker's guard is authoritative) — stop over-sizing before a lock.
         if (maxAmount > 0 && parseD(minima, 0) > maxAmount + 1e-9) {
-            toast("Best level takes up to " + abbrev(maxAmount) + " " + ccy() + " — reduce the amount"); return;
+            toast(Language.msg(l10n_atomix_swap_best_cap, abbrev(maxAmount), ccy())); return;
         }
         // NI-1 (RULE 1): show the FULL counterparty key on its own line at the moment funds are committed —
         // never a truncated form the user can't verify against the maker.
-        String msg = sellMinima
-                ? ("Sell  " + minima + " " + ccy() + "\nReceive  ≈ " + usdt + " USDT\n\nBest price " + fmtPrice(price) + " USDT/" + ccy() + "\nCounterparty\n" + maker.signerPk
-                    + "\n\nThis locks your " + ccy() + " on-chain. Continue?")
-                : ("Buy  ≈ " + minima + " " + ccy() + "\nPay  " + usdt + " USDT (+ ETH gas)\n\nBest price " + fmtPrice(price) + " USDT/" + ccy() + "\nCounterparty\n" + maker.signerPk
-                    + "\n\nThis locks your USDT on-chain. Continue?");
+        CharSequence msg = sellMinima ? Language.msg(l10n_atomix_swap_sell_body, minima, ccy(), usdt, fmtPrice(price), ccy(), maker.signerPk, ccy())
+                : Language.msg(l10n_atomix_swap_buy_body, minima, ccy(), usdt, fmtPrice(price), ccy(), maker.signerPk);
         modalOpen = true;
         dialog()
-                .setTitle(sellMinima ? "Review — Sell " + ccy() : "Review — Buy " + ccy())
+                .setTitle(sellMinima ? Language.msg(l10n_atomix_swap_review_sell, ccy()) : Language.msg(l10n_atomix_swap_review_buy, ccy()))
                 .setMessage(msg)
-                .setPositiveButton("Start swap", (d, w) -> { swapAmount = ""; startSwap(maker, "USDT", sellMinima, minima, usdt); })
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_atomix_swap_start), (d, w) -> { swapAmount = ""; startSwap(maker, "USDT", sellMinima, minima, usdt); })
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .setOnDismissListener(d -> { modalOpen = false; render(); })
                 .show();
     }
@@ -2314,20 +2396,21 @@ public class MainActivity extends AppCompatActivity {
     /** {@code minimaStr} is the mxUSDT amount to sell / to buy (the mxUSDT-side field). */
     private void onSwapCta(boolean sell, String minimaStr, Best best) {
         swapInputFocused = false;   // leaving the amount field — panel re-renders live from here (0.8.1 lesson)
-        if (minimaStr.isEmpty()) { toast("Enter how much " + ccy() + " to " + (sell ? "sell" : "buy")); return; }
+        if (minimaStr.isEmpty()) { toast(sell ? Language.msg(l10n_atomix_swap_enter_coin_sell, ccy()) : Language.msg(l10n_atomix_swap_enter_coin_buy, ccy())); return; }
+        if (!positiveSwapAmount(minimaStr)) { toast(Language.msg(l10n_atomix_swap_valid_coin, ccy())); return; }
         scanOrderBook();   // kick a fresh book scan now (async) so it's current by the time the user confirms the
                            // review dialog — the startLeg liveness guard then re-checks against that fresh book.
         final Order bestMaker = sell ? best.bidMaker : best.askMaker;
         final double bestPrice = sell ? best.bestBid : best.bestAsk;
         final double bestCap = sell ? best.bidCap : best.askCap;   // mxUSDT
-        if (bestMaker == null || bestPrice <= 0) { toast("No quote available right now."); return; }
+        if (bestMaker == null || !Double.isFinite(bestPrice) || bestPrice <= 0) { toast(Language.msg(l10n_atomix_swap_no_quote)); return; }
         final double EPS = 1e-9;
         final double want = parseD(minimaStr, 0);
-        if (want <= 0) { toast("Enter a valid " + ccy() + " amount."); return; }
+        if (want <= 0) { toast(Language.msg(l10n_atomix_swap_valid_coin, ccy())); return; }
 
         if (sell) {
             if (want > parseD(minimaBal, 0) + EPS) {
-                toast("You only have ~" + abbrev(parseD(minimaBal, 0)) + " " + ccy() + " available to sell."); return;
+                toast(Language.msg(l10n_atomix_swap_only_have, abbrev(parseD(minimaBal, 0)), ccy())); return;
             }
             if (want <= bestCap + EPS) { reviewSwap(bestMaker, true, minimaStr, bestPrice, bestCap); return; }   // single (send = mxUSDT)
             SweepPlan plan = buildSweepPlan(true, minimaStr, 0);
@@ -2341,85 +2424,75 @@ public class MainActivity extends AppCompatActivity {
         if (plan.legs.isEmpty()) { toast(sweepEmptyMsg(plan)); return; }
         double haveUsdt = parseD(Util.tidyAmount(tokenBals.get("USDT")), 0);
         if (plan.totalUsdt > haveUsdt + EPS) {
-            toast("Need ≈ " + trimSig(plan.totalUsdt) + " USDT for " + abbrev(plan.filledMinima) + " " + ccy() + " (within "
-                    + pctStr(buySlippage() * 100) + "%) — you have " + trimSig(haveUsdt) + "."); return;
+            toast(Language.msg(l10n_atomix_swap_need, trimSig(plan.totalUsdt), abbrev(plan.filledMinima), ccy(), pctStr(buySlippage() * 100), trimSig(haveUsdt))); return;
         }
         reviewSweep(plan);
     }
 
-    private String sweepEmptyMsg(SweepPlan p) {
-        if ("below-min".equals(p.stopReason)) return "That's below the makers' minimum trade size.";
-        return "No liquidity available to fill that right now.";
+    private CharSequence sweepEmptyMsg(SweepPlan p) {
+        if ("below-min".equals(p.stopReason)) return Language.msg(l10n_atomix_swap_below_min);
+        return Language.msg(l10n_atomix_swap_no_liquidity);
     }
 
     /** Review a multi-leg market sweep: blended avg/worst price, per-leg breakdown, totals, partial-fill note. */
     private void reviewSweep(SweepPlan plan) {
-        if (plan == null || plan.legs.isEmpty()) { toast("Nothing available to fill right now."); return; }
+        if (plan == null || plan.legs.isEmpty()) { toast(Language.msg(l10n_atomix_swap_nothing)); return; }
         final boolean sell = plan.sell;
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(12), dp(20), dp(4));
 
         TextView head = new TextView(this);
-        head.setText(sell
-                ? ("Sell " + abbrev(plan.filledMinima) + " " + ccy() + " in " + plan.legs.size() + (plan.legs.size() == 1 ? " part" : " parts"))
-                : ("Buy ≈ " + abbrev(plan.filledMinima) + " " + ccy() + " for ≈ " + trimSig(plan.totalUsdt) + " USDT in " + plan.legs.size() + (plan.legs.size() == 1 ? " part" : " parts")));
+        Language.setText(head, sell ? Language.msg(l10n_atomix_swap_sweep_sell_head, abbrev(plan.filledMinima), ccy(), plan.legs.size()) : Language.msg(l10n_atomix_swap_sweep_buy_head, abbrev(plan.filledMinima), ccy(), trimSig(plan.totalUsdt), plan.legs.size()));
         head.setTextColor(Design.TEXT()); head.setTextSize(15f); head.setTypeface(Design.sansBold()); head.setPadding(0, 0, 0, dp(6));
         box.addView(head);
 
         TextView metrics = new TextView(this);
-        metrics.setText("Avg " + fmtPrice(plan.avgPrice) + "  ·  worst " + fmtPrice(plan.worstPrice) + " USDT/" + ccy()
-                + (!sell && plan.slippagePct > 0 ? "  ·  within " + pctStr(plan.slippagePct) + "% slippage" : ""));
+        Language.setText(metrics, Language.msg(l10n_atomix_swap_metrics, fmtPrice(plan.avgPrice), fmtPrice(plan.worstPrice), ccy(), !sell && plan.slippagePct > 0 ? Language.msg(l10n_atomix_swap_within, pctStr(plan.slippagePct)) : ""));
         metrics.setTextColor(Design.DIM()); metrics.setTextSize(12.5f); metrics.setTypeface(Design.sans()); metrics.setPadding(0, 0, 0, dp(8));
         box.addView(metrics);
 
         for (int i = 0; i < plan.legs.size(); i++) {
             SweepLeg leg = plan.legs.get(i);
             TextView r = new TextView(this);
-            r.setText("Part " + (i + 1) + " · " + leg.minima + " " + ccy() + " @ " + fmtPrice(leg.price) + " → " + leg.usdt + " USDT · " + shortAddr(leg.maker.signerPk));
+            Language.setText(r, Language.msg(l10n_atomix_swap_part, i + 1, leg.minima, ccy(), fmtPrice(leg.price), leg.usdt, shortAddr(leg.maker.signerPk)));
             r.setTextColor(Design.TEXT()); r.setTextSize(12f); r.setTypeface(Design.mono()); r.setPadding(0, dp(2), 0, dp(2));
             final String legPk = leg.maker.signerPk;   // RULE 1: long-press copies the full leg maker key
-            if (legPk != null && !legPk.isEmpty()) r.setOnClickListener(v -> copy(legPk, "Counterparty key copied"));
+            if (legPk != null && !legPk.isEmpty()) r.setOnClickListener(v -> copy(legPk, Language.msg(l10n_atomix_market_counterparty_copied)));
             box.addView(r);
         }
 
         TextView totals = new TextView(this);
-        totals.setText(sell
-                ? ("Total: sell " + trimSig(plan.filledMinima) + " " + ccy() + " · receive ≈ " + trimSig(plan.totalUsdt) + " USDT")
-                : ("Total: pay ≈ " + trimSig(plan.totalUsdt) + " USDT · receive ≈ " + trimSig(plan.filledMinima) + " " + ccy()));
+        Language.setText(totals, sell ? Language.msg(l10n_atomix_swap_total_sell, trimSig(plan.filledMinima), ccy(), trimSig(plan.totalUsdt)) : Language.msg(l10n_atomix_swap_total_buy, trimSig(plan.totalUsdt), trimSig(plan.filledMinima), ccy()));
         totals.setTextColor(Design.ACCENT()); totals.setTextSize(12.5f); totals.setTypeface(Design.sansBold()); totals.setPadding(0, dp(8), 0, dp(2));
         box.addView(totals);
 
         if (plan.partial) {
             TextView pw = new TextView(this);
-            String msg = "Fills " + abbrev(plan.filledMinima) + " of " + abbrev(plan.target) + " " + ccy() + " — ";
-            if (!sell && "slippage".equals(plan.stopReason))
-                msg += "the rest is priced beyond your " + pctStr(plan.slippagePct) + "% slippage.";
-            else
-                msg += "the rest isn't available in the book right now.";
-            pw.setText(msg);
+            CharSequence msg = Language.msg(l10n_atomix_swap_partial, abbrev(plan.filledMinima), abbrev(plan.target), ccy(), !sell && "slippage".equals(plan.stopReason) ? Language.msg(l10n_atomix_swap_partial_slip, pctStr(plan.slippagePct)) : Language.msg(l10n_atomix_swap_partial_book));
+            Language.setText(pw, msg);
             pw.setTextColor(Design.RED()); pw.setTextSize(12f); pw.setTypeface(Design.sans()); pw.setLineSpacing(dp(2), 1f); pw.setPadding(0, dp(8), 0, dp(2));
             box.addView(pw);
         }
 
         if (!sell) {
             TextView gas = new TextView(this);
-            gas.setText("Each part is a separate Ethereum transaction — you pay ETH gas " + plan.legs.size() + " times.");
+            Language.setText(gas, Language.msg(l10n_atomix_swap_sweep_gas, plan.legs.size()));
             gas.setTextColor(Design.DIM2()); gas.setTextSize(11.5f); gas.setTypeface(Design.sans()); gas.setPadding(0, dp(8), 0, dp(2));
             box.addView(gas);
         }
 
         TextView note = new TextView(this);
-        note.setText("Parts run one at a time. If one can't start we stop and you keep the rest; unmatched parts auto-refund after the timelock.");
+        Language.setText(note, Language.msg(l10n_atomix_swap_sweep_note));
         note.setTextColor(Design.DIM2()); note.setTextSize(11.5f); note.setTypeface(Design.sans()); note.setLineSpacing(dp(2), 1f); note.setPadding(0, dp(8), 0, dp(2));
         box.addView(note);
 
         modalOpen = true;
         dialog()
-                .setTitle(sell ? "Review — Sweep sell" : "Review — Sweep buy")
+                .setTitle(sell ? Language.msg(l10n_atomix_swap_sweep_sell_title) : Language.msg(l10n_atomix_swap_sweep_buy_title))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Start sweep", (d, w) -> { swapAmount = ""; startSweep(plan); })
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_atomix_swap_start_sweep), (d, w) -> { swapAmount = ""; startSweep(plan); })
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .setOnDismissListener(d -> { modalOpen = false; render(); })
                 .show();
     }
@@ -2433,17 +2506,17 @@ public class MainActivity extends AppCompatActivity {
         lp.topMargin = dp(18); box.setLayoutParams(lp);
 
         TextView t = new TextView(this);
-        t.setText("YOUR SWAP"); t.setTextColor(Design.DIM()); t.setTextSize(11f); t.setLetterSpacing(0.06f); t.setTypeface(Design.sans()); t.setPadding(dp(2), 0, 0, dp(8));
+        Language.setText(t, Language.msg(l10n_atomix_swap_your)); t.setTextColor(Design.DIM()); t.setTextSize(11f); t.setLetterSpacing(0.06f); t.setTypeface(Design.sans()); t.setPadding(dp(2), 0, 0, dp(8));
         box.addView(t);
 
         // pre-flight readiness
-        box.addView(stagePill("Node connected", paired ? STG_DONE : STG_WARN));
+        box.addView(stagePill(Language.msg(l10n_atomix_swap_node), paired ? STG_DONE : STG_WARN));
         if (swapSell) {
-            box.addView(stagePill(ccy() + " ready to sell", parseD(minimaBal, 0) > 0 ? STG_DONE : STG_WARN));
+            box.addView(stagePill(Language.msg(l10n_atomix_swap_ready_sell, ccy()), parseD(minimaBal, 0) > 0 ? STG_DONE : STG_WARN));
         } else {
             String usdt = tokenBals.get("USDT");
-            box.addView(stagePill("USDT ready to spend", (usdt != null && parseD(usdt, 0) > 0) ? STG_DONE : STG_WARN));
-            box.addView(stagePill("ETH for gas", parseD(ethBal.replace(" ETH", ""), 0) > 0 ? STG_DONE : STG_WARN));
+            box.addView(stagePill(Language.msg(l10n_atomix_swap_ready_usdt), (usdt != null && parseD(usdt, 0) > 0) ? STG_DONE : STG_WARN));
+            box.addView(stagePill(Language.msg(l10n_atomix_swap_gas), parseD(ethBal.replace(" ETH", ""), 0) > 0 ? STG_DONE : STG_WARN));
         }
 
         // live swap legs (if a swap is in flight or just finished)
@@ -2451,25 +2524,24 @@ public class MainActivity extends AppCompatActivity {
         if (sw != null) {
             // which swap this panel is tracking (disambiguates concurrent swaps)
             TextView which = new TextView(this);
-            which.setText(sw.sellAmount + " " + sw.sellToken + "  →  " + sw.buyAmount + " " + sw.buyToken
-                    + "   ·   " + (sw.role == null ? "" : sw.role.toLowerCase()));
+            Language.setText(which, Language.join(sw.sellAmount, " ", sw.sellToken, "  →  ", sw.buyAmount, " ", sw.buyToken, "   ·   ", historyRole(sw.role)));
             which.setTextColor(Design.TEXT()); which.setTextSize(13f); which.setTypeface(Design.mono()); which.setPadding(dp(2), dp(2), 0, dp(6));
             box.addView(which);
             if (SwapDb.ST_REFUNDED.equals(sw.status)) {
-                box.addView(stagePill("Timed out — " + sw.sellAmount + " " + sw.sellToken + " refunded", STG_WARN));
+                box.addView(stagePill(Language.msg(l10n_atomix_swap_stage_refund, sw.sellAmount, sw.sellToken), STG_WARN));
             } else {
                 int active = stageIndex(sw.status);   // index of the first not-yet-done leg
-                box.addView(stagePill("Locked your " + sw.sellAmount + " " + sw.sellToken, legState(1, active)));
-                box.addView(stagePill("Counterparty locks their side", legState(2, active)));
-                box.addView(stagePill("Claim your " + sw.buyAmount + " " + sw.buyToken, legState(3, active)));
-                box.addView(stagePill("Swap complete", legState(4, active)));
+                box.addView(stagePill(Language.msg(l10n_atomix_swap_stage_lock, sw.sellAmount, sw.sellToken), legState(1, active)));
+                box.addView(stagePill(Language.msg(l10n_atomix_swap_stage_counterparty), legState(2, active)));
+                box.addView(stagePill(Language.msg(l10n_atomix_swap_stage_claim, sw.buyAmount, sw.buyToken), legState(3, active)));
+                box.addView(stagePill(Language.msg(l10n_atomix_swap_stage_complete), legState(4, active)));
             }
             TextView detail = new TextView(this);
-            detail.setText(statusDetail(sw));
+            Language.setText(detail, statusDetail(sw));
             detail.setTextColor(Design.DIM()); detail.setTextSize(12f); detail.setTypeface(Design.sans()); detail.setLineSpacing(dp(2), 1f); detail.setPadding(dp(2), dp(8), 0, 0);
             box.addView(detail);
             if (!isTerminal(sw)) {
-                TextView chk = Design.pill(this, "Check now", Design.SURFACE2(), Design.TEXT());
+                TextView chk = Design.pill(this, Language.msg(l10n_atomix_history_check), Design.SURFACE2(), Design.TEXT());
                 LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 clp.topMargin = dp(8); chk.setLayoutParams(clp);
                 chk.setOnClickListener(v -> checkNow(sw.hash)); Design.pressable(chk);
@@ -2478,20 +2550,20 @@ public class MainActivity extends AppCompatActivity {
             int more = activeSwapCount() - (isTerminal(sw) ? 0 : 1);
             if (more > 0) {
                 TextView moreTv = new TextView(this);
-                moreTv.setText("+ " + more + " more swap" + (more == 1 ? "" : "s") + " in flight — see Activity");
+                Language.setText(moreTv, Language.msg(l10n_atomix_swap_more, more));
                 moreTv.setTextColor(Design.DIM2()); moreTv.setTextSize(11.5f); moreTv.setTypeface(Design.sans()); moreTv.setPadding(dp(2), dp(8), 0, 0);
                 moreTv.setOnClickListener(v -> openHistory(0));
                 Design.pressable(moreTv);
                 box.addView(moreTv);
             }
         } else {
-            box.addView(stagePill("Enter an amount and tap Review to begin", STG_PENDING));
+            box.addView(stagePill(Language.msg(l10n_atomix_swap_begin), STG_PENDING));
         }
         col.addView(box);
     }
 
     /** A stage row: coloured status dot + label. state ∈ {pending, active, done, warn}. */
-    private LinearLayout stagePill(String label, int state) {
+    private LinearLayout stagePill(CharSequence label, int state) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL); row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(2), dp(5), dp(2), dp(5));
@@ -2508,14 +2580,14 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout.LayoutParams dlp = new LinearLayout.LayoutParams(dp(9), dp(9)); dlp.leftMargin = dp(2); dlp.rightMargin = dp(12);
         row.addView(dot, dlp);
         TextView t = new TextView(this);
-        t.setText(label); t.setTextSize(13f);
+        Language.setText(t, label); t.setTextSize(13f);
         switch (state) {
             case STG_ACTIVE: t.setTextColor(Design.TEXT()); t.setTypeface(Design.sansBold()); break;
             case STG_DONE:   t.setTextColor(Design.TEXT()); t.setTypeface(Design.sans()); break;
             case STG_WARN:   t.setTextColor(STAGE_WARN_COLOR); t.setTypeface(Design.sans()); break;
             default:         t.setTextColor(Design.DIM()); t.setTypeface(Design.sans()); break;
         }
-        row.addView(t);
+        row.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         return row;
     }
 
@@ -2625,10 +2697,10 @@ public class MainActivity extends AppCompatActivity {
      *  STRING (not a double product), so {@code lockedUsdt ≥ minima × price} holds to the last tick against the
      *  maker's own BigDecimal guard while I still receive my target mxUSDT. Non-finite/garbage input → null (no throw). */
     private static String ceilUsdt(String minima, double price) {
-        if (minima == null || !Double.isFinite(price) || price <= 0) return null;
+        if (!positiveSwapAmount(minima) || !Double.isFinite(price) || price <= 0) return null;
         try {
             BigDecimal u = new BigDecimal(minima.trim()).multiply(BigDecimal.valueOf(price)).setScale(6, RoundingMode.UP);
-            if (u.signum() <= 0) return null;
+            if (u.signum() <= 0 || !Double.isFinite(u.doubleValue())) return null;
             String s = Util.tidyAmount(u.stripTrailingZeros().toPlainString());
             return (s.isEmpty() || "0".equals(s)) ? null : s;
         } catch (Exception e) { return null; }
@@ -2657,6 +2729,7 @@ public class MainActivity extends AppCompatActivity {
         final String sym = "USDT";
         final double EPS = 1e-9, GRAIN = 1e-6;
         SweepPlan plan = new SweepPlan(sell);
+        if (!positiveSwapAmount(targetStr) || !Double.isFinite(slippage) || slippage < 0 || slippage > 0.5) { plan.stopReason = "book-exhausted"; return plan; }
         plan.slippagePct = slippage * 100;
         double target = parseD(targetStr, 0);   // mxUSDT to sell (sell) or mxUSDT to buy (buy)
         plan.target = target;
@@ -2675,7 +2748,7 @@ public class MainActivity extends AppCompatActivity {
             Order maker = (Order) row[0];
             Order.Level lvl = (Order.Level) row[1];
             double price = lvl.price;
-            if (price <= 0) continue;
+            if (!Double.isFinite(price) || price <= 0) continue;
 
             // BUY slippage cap — never pay more than best × (1+slippage) per mxUSDT.
             if (!sell && bestPrice > 0 && slippage > 0 && price > bestPrice * (1 + slippage) + EPS) {
@@ -2693,7 +2766,7 @@ public class MainActivity extends AppCompatActivity {
                 double rm = remMinima.containsKey(maker) ? remMinima.get(maker) : maker.minimaAvail;
                 capMinima = Math.min(lvl.amount, rm);
             }
-            if (capMinima <= EPS) continue;
+            if (!Double.isFinite(capMinima) || capMinima <= EPS) continue;
 
             double takeMinima = Math.min(capMinima, remaining);
             if (takeMinima <= EPS) continue;
@@ -2712,6 +2785,7 @@ public class MainActivity extends AppCompatActivity {
             if (leg.minimaD <= EPS || leg.usdtD <= EPS) continue;
             if (mn > 0 && leg.minimaD < mn - EPS) { skippedForMin = true; continue; }   // grain floor slipped below min — skip (strict: never emit a leg the maker auto-declines)
 
+            if (!Double.isFinite(plan.filledMinima + leg.minimaD) || !Double.isFinite(plan.totalUsdt + leg.usdtD)) { plan.partial = true; break; }
             if (bestPrice <= 0) bestPrice = price;   // anchor slippage on the FIRST leg actually taken (best fillable)
             plan.legs.add(leg);
             plan.filledMinima += leg.minimaD;
@@ -2736,17 +2810,20 @@ public class MainActivity extends AppCompatActivity {
 
     // ---- buy slippage tolerance (deliver the mxUSDT target across deeper legs, capped at best × (1+slippage)) ----
 
-    private double buySlippage() { return prefs.getFloat("buy_slippage_pct", 4.2f) / 100.0; }   // fraction, default 4.2%
+    private double buySlippage() { double pct = prefs.getFloat("buy_slippage_pct", 4.2f);
+        return Double.isFinite(pct) && pct >= 0.1f && pct <= 50 ? pct / 100.0 : 0.042; }   // fraction, default 4.2%
 
-    private TextView slipPill(String label, boolean active, Runnable onTap) {
+    private TextView slipPill(CharSequence label, boolean active, Runnable onTap) {
         TextView p = Design.pill(this, label, active ? Design.ACCENT_SOFT() : Design.SURFACE2(), active ? Design.ACCENT() : Design.DIM());
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.leftMargin = dp(6); p.setLayoutParams(lp);
+        p.setMinimumHeight(dp(48)); p.setMinimumWidth(dp(48));
         p.setOnClickListener(v -> onTap.run()); Design.pressable(p);
         return p;
     }
 
     private void setBuySlippage(double pct) {
+        if (!Double.isFinite(pct)) return;
         prefs.edit().putFloat("buy_slippage_pct", (float) Math.max(0.1, Math.min(50, pct))).apply();
         render();
     }
@@ -2755,21 +2832,31 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL); box.setPadding(dp(20), dp(12), dp(20), dp(4));
         TextView h = new TextView(this);
-        h.setText("The most above the best price you'll pay per " + ccy() + " when a buy fills across deeper levels.");
+        Language.setText(h, Language.msg(l10n_atomix_swap_slippage_help, ccy()));
         h.setTextColor(Design.DIM()); h.setTextSize(12.5f); h.setTypeface(Design.sans()); h.setLineSpacing(dp(2), 1f); h.setPadding(0, 0, 0, dp(10));
         box.addView(h);
         final EditText e = new EditText(this); decimalInput(e);
-        e.setText(trim(buySlippage() * 100)); e.setHint("%"); e.setHintTextColor(Design.DIM2());
+        Language.setText(e, trim(buySlippage() * 100)); Language.hint(e, "%"); e.setHintTextColor(Design.DIM2());
         e.setTextColor(Design.TEXT()); e.setTextSize(16f); e.setTypeface(Design.mono());
         box.addView(e);
         modalOpen = true;
-        dialog()
-                .setTitle("Custom max slippage")
+        final AlertDialog editor = dialog()
+                .setTitle(Language.msg(l10n_atomix_swap_slippage_title))
                 .setView(box)
-                .setPositiveButton("Set", (d, w) -> setBuySlippage(parseD(e.getText().toString(), 4.2)))
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_atomix_swap_set), null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .setOnDismissListener(d -> { modalOpen = false; render(); })
                 .show();
+        editor.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            double pct = MarketDraft.number(e.getText().toString(), false, Double.NaN);
+            if (!Double.isFinite(pct)) {
+                Language.setText(h, Language.msg(l10n_atomix_market_invalid_number));
+                h.setTextColor(Design.RED());
+                return;
+            }
+            setBuySlippage(pct);
+            editor.dismiss();
+        });
     }
 
     private void consolidateDialog() {
@@ -2780,27 +2867,23 @@ public class MainActivity extends AppCompatActivity {
             int runs = (int) Math.max(0L, ((long) b.coins - cap + 17L) / 18L);
             String label = MinimaHtlc.MINIMA_TOKENID.equals(token) ? "MINIMA" : "MxUSD";
             modalOpen = true;
-            dialog().setTitle("Consolidate " + label)
-                    .setMessage(b.coins + " wallet coins · read limit " + cap + ".\n\n"
-                            + (runs > 0 ? "At least about " + runs + " runs to reach the limit. " : "Your wallet is within the read limit. ")
-                            + "Each run asks the node to merge up to 20 spendable coins into 2, with at most 5 signing addresses. Locked coins cannot be merged.\n\n"
-                            + "Run once signs one self-send on your node and consumes one-time signing keys. Preview does not sign. "
-                            + "Wait for new coins to age 3 blocks before running again. No automatic repeats.")
-                    .setNeutralButton("Preview", (d, w) -> consolidateOnce(token, true))
-                    .setPositiveButton("Run once", (d, w) -> consolidateOnce(token, false))
-                    .setNegativeButton("Cancel", null)
+            dialog().setTitle(Language.msg(l10n_atomix_operation_title, label))
+                    .setMessage(Language.msg(l10n_atomix_operation_body, b.coins, cap, runs > 0 ? Language.msg(l10n_atomix_operation_runs, runs) : Language.msg(l10n_atomix_operation_within)))
+                    .setNeutralButton(Language.msg(l10n_atomix_operation_preview), (d, w) -> consolidateOnce(token, true))
+                    .setPositiveButton(Language.msg(l10n_atomix_operation_run), (d, w) -> consolidateOnce(token, false))
+                    .setNegativeButton(Language.msg(l10n_common_cancel), null)
                     .setOnDismissListener(d -> { modalOpen = false; render(); }).show();
-        }, e -> showText("Consolidate", e));
+        }, e -> showText(Language.msg(l10n_atomix_operation_consolidate), OperationMessages.message(e)));
     }
 
     private void consolidateOnce(String token, boolean preview) {
-        if (!token.equals(TradingContext.active().tokenId)) { toast("Trading currency changed; reopen Consolidate"); return; }
-        if (IdentityWatch.halted()) { toast("Halted: app keys don't match your node"); return; }
-        if (!SwapEngine.beginConsolidate()) { toast("Wallet busy — wait for the current lock or consolidation"); return; }
+        if (!token.equals(TradingContext.active().tokenId)) { toast(Language.msg(l10n_atomix_operation_changed)); return; }
+        if (IdentityWatch.halted()) { toast(Language.msg(l10n_atomix_otc_halted)); return; }
+        if (!SwapEngine.beginConsolidate()) { toast(Language.msg(l10n_atomix_operation_busy)); return; }
         final MinimaHtlc target = minima;
         java.util.function.Consumer<String> fail = e -> {
             SwapEngine.endConsolidate();
-            if (!isFinishing() && !isDestroyed()) showText("Consolidate", e);
+            if (!isFinishing() && !isDestroyed()) showText(Language.msg(l10n_atomix_operation_consolidate), OperationMessages.message(e));
         };
         target.tokenBalance(b -> {
             if (!token.equals(TradingContext.active().tokenId)) { fail.accept("Trading currency changed; reopen Consolidate"); return; }
@@ -2819,7 +2902,7 @@ public class MainActivity extends AppCompatActivity {
                         if (preview) {
                             target.previewConsolidate(20, r -> {
                                 SwapEngine.endConsolidate();
-                                showText("Consolidation preview — no transaction sent", r.toString());
+                                showText(Language.msg(l10n_atomix_operation_preview_title), r.toString());
                             }, fail);
                             return;
                         }
@@ -2830,10 +2913,10 @@ public class MainActivity extends AppCompatActivity {
                             public void ok(String txpowid) {
                                 SwapEngine.endConsolidate();
                                 target.tokenBalance(after -> {
-                                    if (!isFinishing() && !isDestroyed()) showText("Consolidation submitted",
-                                            "Coins: " + b.coins + " → " + after.coins + " · waiting for new coins to age 3 blocks.\n\nTransaction: " + txpowid);
+                                    if (!isFinishing() && !isDestroyed()) showText(Language.msg(l10n_atomix_operation_submitted_title),
+                                            Language.msg(l10n_atomix_operation_submitted, b.coins, after.coins, txpowid));
                                     fetchMinimaBalance();
-                                }, e -> showText("Consolidation submitted", "Refresh your balance after confirmation.\nTransaction: " + txpowid));
+                                }, e -> showText(Language.msg(l10n_atomix_operation_submitted_title), Language.msg(l10n_atomix_operation_refresh, txpowid)));
                             }
                         });
                     }
@@ -2846,24 +2929,25 @@ public class MainActivity extends AppCompatActivity {
 
     private void renderWalletTab(LinearLayout col) {
         if (node != null && node.hasInterruptedWrite()) {
-            TextView resolve = Design.pill(this, "Resolve interrupted write", Design.SURFACE2(), Design.RED());
+            TextView resolve = Design.pill(this, Language.msg(l10n_atomix_recovery_resolve), Design.SURFACE2(), Design.RED());
             // Say WHICH write and WHY. The old text told everyone to "First restart MinimaCore",
             // which is right only for a timeout; for the other causes the node already answered (or
             // was never asked) and restarting it achieves nothing - observed live twice, 2026-09-23.
-            String detail = node.interruptedWriteDetail();
-            resolve.setOnClickListener(v -> new AlertDialog.Builder(this)
-                    .setTitle("Resolve interrupted write")
-                    .setMessage((detail == null ? "A node write lost its reply and may have completed." : detail)
-                            + "\n\nCheck your transactions and balances before clearing this. Clearing the "
-                            + "pause does not undo or retry a transaction.")
-                    .setNegativeButton("Keep paused", null)
-                    .setPositiveButton("I have checked", (d, w) -> {
-                        toast(node.acknowledgeInterruptedWrite() ? "Pause cleared. Review balances before starting a new trade." : "A write is still active; keep paused.");
+            final com.eurobuddha.atomix.integratedcomms.NodeApi recoveryNode = node;
+            final String pausedWrite = recoveryNode.interruptedWriteId();
+            String detail = recoveryNode.interruptedWriteDetail();
+            resolve.setMinimumHeight(dp(48));
+            resolve.setOnClickListener(v -> dialog()
+                    .setTitle(Language.msg(l10n_atomix_recovery_resolve))
+                    .setMessage(Language.msg(l10n_atomix_recovery_body, detail == null ? Language.msg(l10n_atomix_recovery_unknown) : RecoveryMessages.message(detail)))
+                    .setNegativeButton(Language.msg(l10n_atomix_recovery_keep), null)
+                    .setPositiveButton(Language.msg(l10n_atomix_recovery_checked), (d, w) -> {
+                        toast(recoveryNode.acknowledgeInterruptedWrite(pausedWrite) ? Language.msg(l10n_atomix_recovery_cleared) : Language.msg(l10n_atomix_recovery_still));
                         render();
                     }).show());
             col.addView(resolve);
         }
-        LinearLayout minimaCard = walletCard("Minima · available to swap", Util.fmt5(minimaBal) + " " + ccy(), minimaBreakdown() + "  ·  long-press for coins", Design.ACCENT());
+        LinearLayout minimaCard = walletCard(Language.msg(l10n_atomix_ui_available), Language.join(AtomixMessages.message(Util.fmt5(minimaBal)), " ", ccy()), Language.join(minimaBreakdown(), "  ·  ", Language.msg(l10n_atomix_ui_coin_hold)), Design.ACCENT());
         minimaCard.setOnLongClickListener(v -> { minimaCoinDump(); return true; });
         col.addView(minimaCard);
         minimaBalView = (TextView) minimaCard.findViewWithTag(TAG_BAL);   // fresh ref each render (tree is rebuilt)
@@ -2873,16 +2957,16 @@ public class MainActivity extends AppCompatActivity {
             if (count >= 10) {
                 boolean blocked = count > MinimaHtlc.maxSafeCoinRows(TradingContext.active().tokenId);
                 TextView consolidate = Design.pill(this, blocked
-                        ? count + " coins — buys are being declined. Consolidate."
-                        : "Consolidate ▸ " + count + " coins into fewer", Design.SURFACE2(), blocked ? Design.RED() : Design.ACCENT());
+                        ? Language.msg(l10n_atomix_ui_consolidate_blocked, count)
+                        : Language.msg(l10n_atomix_ui_consolidate_offer, count), Design.SURFACE2(), blocked ? Design.RED() : Design.ACCENT());
                 consolidate.setOnClickListener(v -> consolidateDialog());
                 col.addView(consolidate);
             }
         } catch (NumberFormatException | ArithmeticException ignored) { /* balance is not available yet */ }
 
-        String addrLine = ethAddr == null ? (ethErr == null ? "deriving from node seed…" : "—") : shortAddr(ethAddr);
+        CharSequence addrLine = ethAddr == null ? (ethErr == null ? Language.msg(l10n_atomix_ui_deriving) : "—") : shortAddr(ethAddr);
         LinearLayout ethCard = walletCard("Ethereum · " + net.label, ethBal, addrLine, Design.TEXT());
-        if (ethAddr != null) ethCard.setOnClickListener(v -> copy(ethAddr, "Ethereum address copied"));
+        if (ethAddr != null) ethCard.setOnClickListener(v -> copy(ethAddr, Language.msg(l10n_atomix_ui_address_copied)));
         col.addView(ethCard);
         ethBalView = (TextView) ethCard.findViewWithTag(TAG_BAL);
         tokenBalViews.clear();
@@ -2898,26 +2982,32 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout walletActions = new LinearLayout(this);
             walletActions.setOrientation(LinearLayout.HORIZONTAL);
             walletActions.setPadding(0, dp(8), 0, 0);
-            TextView refreshBal = Design.pill(this, "↻  Refresh", Design.SURFACE2(), Design.TEXT());
-            refreshBal.setOnClickListener(v -> { toast("Refreshing balances…"); refreshBalances(true); });
-            TextView fund = Design.pill(this, "⤓  Fund / QR", Design.SURFACE2(), Design.TEXT());
+            TextView refreshBal = Design.pill(this, Language.msg(l10n_atomix_ui_refresh), Design.SURFACE2(), Design.TEXT());
+            refreshBal.setOnClickListener(v -> { toast(Language.msg(l10n_atomix_ui_refreshing)); refreshBalances(true); });
+            TextView fund = Design.pill(this, Language.msg(l10n_atomix_ui_fund), Design.SURFACE2(), Design.TEXT());
             fund.setOnClickListener(v -> receiveDialog());
-            TextView send = Design.pill(this, "↑  Send", Design.SURFACE2(), Design.TEXT());
+            TextView send = Design.pill(this, Language.msg(l10n_atomix_ui_send), Design.SURFACE2(), Design.TEXT());
             send.setOnClickListener(v -> sendDialog());
-            TextView exportKey = Design.pill(this, "🔑  Export key", Design.SURFACE2(), Design.DIM());
+            TextView exportKey = Design.pill(this, Language.msg(l10n_atomix_ui_export_key), Design.SURFACE2(), Design.DIM());
             exportKey.setOnClickListener(v -> exportKeyDialog());
-            LinearLayout.LayoutParams gap = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            gap.rightMargin = dp(8);
-            walletActions.addView(refreshBal, gap);
-            walletActions.addView(fund, gap);
-            walletActions.addView(send, gap);
-            walletActions.addView(exportKey);
+            walletActions.setOrientation(LinearLayout.VERTICAL);
+            for (TextView[] pair : new TextView[][]{{refreshBal, fund}, {send, exportKey}}) {
+                LinearLayout row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                for (TextView action : pair) {
+                    action.setMinimumHeight(dp(48));
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+                    lp.setMargins(dp(2), dp(3), dp(2), dp(3));
+                    row.addView(action, lp);
+                }
+                walletActions.addView(row);
+            }
             col.addView(walletActions);
         }
 
         if (ethErr != null) {
             TextView err = new TextView(this);
-            err.setText("⚠ " + ethErr);
+            Language.setText(err, Language.join("⚠ ", AtomixMessages.message(ethErr)));
             err.setTextColor(Design.RED()); err.setTextSize(12f); err.setPadding(dp(2), dp(8), dp(2), 0);
             col.addView(err);
         }
@@ -2940,14 +3030,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void renderMarketTab(LinearLayout col) {
         TextView hint = new TextView(this);
-        hint.setText("The live order book. Tap a price to trade, or publish your own offer.");
+        Language.setText(hint, Language.msg(l10n_atomix_market_hint));
         hint.setTextColor(Design.DIM()); hint.setTextSize(12.5f); hint.setTypeface(Design.sans()); hint.setPadding(0, dp(2), 0, dp(2));
         col.addView(hint);
 
         PriceOracle.refreshAsync();   // keep the reference price current while the tab is watched (rate-limited)
         if (PriceOracle.mid() > 0) {
             TextView mexc = new TextView(this);
-            mexc.setText(PriceOracle.describe());
+            Language.setText(mexc, MarketMessages.message(PriceOracle.describe()));
             mexc.setTextColor(Design.DIM()); mexc.setTextSize(11.5f); mexc.setTypeface(Design.mono()); mexc.setPadding(0, dp(2), 0, dp(2));
             col.addView(mexc);
         }
@@ -2957,17 +3047,17 @@ public class MainActivity extends AppCompatActivity {
         obHeader.setGravity(Gravity.CENTER_VERTICAL);
         obHeader.setPadding(0, dp(14), 0, dp(2));
         TextView obTitle = new TextView(this);
-        obTitle.setText("Order book  ·  " + orderBook.size() + " live");
+        Language.setText(obTitle, Language.msg(l10n_atomix_market_book, orderBook.size()));
         obTitle.setTextColor(Design.TEXT()); obTitle.setTextSize(16f); obTitle.setTypeface(Design.sansBold());
         obHeader.addView(obTitle, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        TextView refresh = Design.pill(this, "Refresh", Design.SURFACE2(), Design.DIM());
+        TextView refresh = Design.pill(this, Language.msg(l10n_atomix_market_refresh), Design.SURFACE2(), Design.DIM());
         refresh.setOnClickListener(v -> scanOrderBook());
         obHeader.addView(refresh);
         col.addView(obHeader);
 
         if (orderBook.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText(paired ? "No live orders yet. Publish one, or wait for a counterparty." : "Connect your node to see the order book.");
+            Language.setText(empty, paired ? Language.msg(l10n_atomix_market_empty) : Language.msg(l10n_atomix_market_connect));
             empty.setTextColor(Design.DIM()); empty.setTextSize(12.5f); empty.setTypeface(Design.sans()); empty.setPadding(dp(2), dp(6), dp(2), 0);
             col.addView(empty);
         } else {
@@ -2977,11 +3067,11 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout btns = new LinearLayout(this);
         btns.setOrientation(LinearLayout.HORIZONTAL);
         btns.setClipChildren(false); btns.setClipToPadding(false);   // don't clip the CTA elevation shadow
-        TextView editBtn = button("Edit my order");
+        TextView editBtn = button(Language.msg(l10n_atomix_market_edit));
         editBtn.setBackground(Design.roundBg(this, Design.SURFACE2(), 14));
         editBtn.setTextColor(Design.TEXT());
         editBtn.setOnClickListener(v -> editOrderDialog());
-        TextView publish = button("Publish");
+        TextView publish = button(Language.msg(l10n_atomix_market_publish));
         publish.setOnClickListener(v -> publishOrder());
         LinearLayout.LayoutParams e1 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
         e1.rightMargin = dp(6); e1.topMargin = dp(14);
@@ -2992,31 +3082,23 @@ public class MainActivity extends AppCompatActivity {
 
         if (orderStatus != null) {
             TextView st = new TextView(this);
-            st.setText(orderStatus);
+            Language.setText(st, OperationMessages.message(orderStatus));
             st.setTextColor(orderStatus.startsWith("✓") ? Design.IN() : Design.DIM());
             st.setTextSize(12.5f); st.setTypeface(Design.sans()); st.setPadding(dp(2), dp(10), dp(2), 0);
             col.addView(st);
         }
     }
 
-    private void showInfo(String title, String body) {
-        dialog().setTitle(title).setMessage(body).setPositiveButton("Got it", null).show();
+    private void showInfo(CharSequence title, CharSequence body) {
+        dialog().setTitle(title).setMessage(body).setPositiveButton(Language.msg(l10n_atomix_ui_got_it), null).show();
     }
 
     private void showWelcome() {
         prefs.edit().putBoolean("seen_welcome", true).apply();
         dialog()
-                .setTitle("Welcome to AtomiX")
-                .setMessage("Swap " + ccy() + " ⇄ USDT trustlessly across chains — no middleman ever holds your funds.\n\n"
-                        + "To trade you'll need:\n"
-                        + "•  Minima Core’s embedded node running\n"
-                        + "•  Some " + ccy() + " to sell — or USDT plus a little ETH (for gas) to buy " + ccy() + "\n\n"
-                        + "Your keys are derived from your Minima node seed, so it's the same wallet on any device.\n\n"
-                        + "Tabs:  Swap (quick trade)  ·  Wallet (your money)  ·  Activity (your swaps)  ·  "
-                        + "Market (full order book)  ·  OTC (private deals).\n\n"
-                        + "OTC lets you negotiate a size + price directly with a liquidity provider — propose, "
-                        + "counter, accept — and the agreed deal settles as the same trustless atomic swap.")
-                .setPositiveButton("Get started", null)
+                .setTitle(Language.msg(l10n_atomix_ui_welcome))
+                .setMessage(Language.msg(l10n_atomix_ui_welcome_body, ccy(), ccy(), ccy()))
+                .setPositiveButton(Language.msg(l10n_atomix_ui_started), null)
                 .show();
     }
 
@@ -3034,14 +3116,14 @@ public class MainActivity extends AppCompatActivity {
         if (show.isEmpty() && hidden == 0) return;
 
         TextView title = new TextView(this);
-        title.setText("Your swaps");
+        Language.setText(title, Language.msg(l10n_atomix_history_your));
         title.setTextColor(Design.TEXT()); title.setTextSize(16f); title.setTypeface(Design.sansBold());
         title.setPadding(0, dp(22), 0, dp(2));
         col.addView(title);
         for (SwapDb.Swap s : show) col.addView(swapCard(s));
         if (hidden > 0) {
             TextView h = new TextView(this);
-            h.setText(hidden + " finished swap" + (hidden == 1 ? "" : "s") + " hidden — tap for history");
+            Language.setText(h, Language.msg(l10n_atomix_history_hidden, hidden));
             h.setTextColor(Design.DIM()); h.setTextSize(11.5f); h.setTypeface(Design.sans()); h.setPadding(dp(2), dp(6), 0, dp(2));
             h.setOnClickListener(v -> openHistory(0));
             col.addView(h);
@@ -3065,18 +3147,21 @@ public class MainActivity extends AppCompatActivity {
         renderActiveSwaps(col);   // live/resumable swap cards + "N finished hidden" link (empty → adds nothing)
 
         LinearLayout tabs = new LinearLayout(this);
-        tabs.setOrientation(LinearLayout.HORIZONTAL); tabs.setPadding(0, dp(18), 0, dp(8));
-        LinearLayout.LayoutParams gap = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        gap.rightMargin = dp(8);
-        TextView t0 = Design.pill(this, "My swaps", historyTab == 0 ? Design.ACCENT() : Design.SURFACE2(), historyTab == 0 ? Design.ON_ACCENT() : Design.DIM());
+        tabs.setOrientation(LinearLayout.VERTICAL); tabs.setPadding(0, dp(18), 0, dp(8));
+        LinearLayout.LayoutParams gap = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        gap.bottomMargin = dp(8);
+        TextView t0 = Design.pill(this, Language.msg(l10n_atomix_history_mine), historyTab == 0 ? Design.ACCENT() : Design.SURFACE2(), historyTab == 0 ? Design.ON_ACCENT() : Design.DIM());
+        t0.setMinimumHeight(dp(48));
         t0.setOnClickListener(v -> openHistory(0));
-        TextView t1 = Design.pill(this, "Market history", historyTab == 1 ? Design.ACCENT() : Design.SURFACE2(), historyTab == 1 ? Design.ON_ACCENT() : Design.DIM());
+        TextView t1 = Design.pill(this, Language.msg(l10n_atomix_history_market), historyTab == 1 ? Design.ACCENT() : Design.SURFACE2(), historyTab == 1 ? Design.ON_ACCENT() : Design.DIM());
+        t1.setMinimumHeight(dp(48));
         t1.setOnClickListener(v -> openHistory(1));
         tabs.addView(t0, gap); tabs.addView(t1);
         // Export CSV — all your swaps (maker + taker), one file. Sits with the My-swaps history.
-        LinearLayout.LayoutParams gapx = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        gapx.leftMargin = dp(8);
-        TextView tex = Design.pill(this, "⬇ Export CSV", Design.SURFACE2(), Design.DIM());
+        LinearLayout.LayoutParams gapx = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        gapx.topMargin = dp(8);
+        TextView tex = Design.pill(this, Language.msg(l10n_atomix_history_export), Design.SURFACE2(), Design.DIM());
+        tex.setMinimumHeight(dp(48));
         tex.setOnClickListener(v -> exportSwapsCsv());
         tabs.addView(tex, gapx);
         col.addView(tabs);
@@ -3091,7 +3176,7 @@ public class MainActivity extends AppCompatActivity {
         if (db == null) return;
         java.util.List<SwapDb.Swap> all = new java.util.ArrayList<>();
         for (SwapDb.Swap s : db.allSwaps()) if (visibleHere(s)) all.add(s);
-        if (all.isEmpty()) { col.addView(dimNote("No " + ccy() + " swaps yet — your completed and refunded swaps will appear here.")); return; }
+        if (all.isEmpty()) { col.addView(dimNote(Language.msg(l10n_atomix_history_empty, ccy()))); return; }
         for (SwapDb.Swap s : all) col.addView(historySwapCard(s));
     }
 
@@ -3106,25 +3191,24 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout top = new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL); top.setGravity(Gravity.CENTER_VERTICAL);
         TextView line = new TextView(this);
-        line.setText(s.sellAmount + " " + s.sellToken + "  →  " + s.buyAmount + " " + s.buyToken);
+        Language.setText(line, s.sellAmount + " " + s.sellToken + "  →  " + s.buyAmount + " " + s.buyToken);
         line.setTextColor(Design.TEXT()); line.setTextSize(14f); line.setTypeface(Design.mono());
         top.addView(line, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         top.addView(Design.pill(this, statusLabel(s), statusBg(s), statusFg(s)));
         c.addView(top);
 
         TextView meta = new TextView(this);
-        String when = android.text.format.DateUtils.getRelativeTimeSpanString(
-                s.created, System.currentTimeMillis(), android.text.format.DateUtils.MINUTE_IN_MILLIS).toString();
+        CharSequence when = Language.since(s.created);
         String cp = (s.counterparty == null || s.counterparty.isEmpty()) ? "" : "  ·  " + shortAddr(s.counterparty);
-        meta.setText(when + "  ·  " + s.role.toLowerCase() + cp);
+        Language.setText(meta, Language.join(when, "  ·  ", historyRole(s.role), cp));
         meta.setTextColor(Design.DIM2()); meta.setTextSize(11.5f); meta.setTypeface(Design.sans()); meta.setPadding(0, dp(5), 0, 0);
         // NI-1 (RULE 1): the counterparty is shown truncated — long-press copies the FULL value.
         if (s.counterparty != null && !s.counterparty.isEmpty())
-            meta.setOnClickListener(v -> copy(s.counterparty, "Counterparty copied"));
+            meta.setOnClickListener(v -> copy(s.counterparty, Language.msg(l10n_atomix_market_counterparty_copied)));
         c.addView(meta);
 
         TextView detail = new TextView(this);
-        detail.setText(statusDetail(s));
+        Language.setText(detail, statusDetail(s));
         detail.setTextColor(Design.DIM()); detail.setTextSize(12f); detail.setTypeface(Design.sans()); detail.setPadding(0, dp(3), 0, 0);
         c.addView(detail);
 
@@ -3141,21 +3225,27 @@ public class MainActivity extends AppCompatActivity {
         java.util.List<SwapDb.MarketTrade> chartData = db.executedTrades(200, tok);
         java.util.List<SwapDb.MarketTrade> recent = db.recentTrades(50, tok);
 
-        MarketChartView chart = new MarketChartView(this);
-        chart.setBackground(Design.card(this, 14));
-        chart.setData(chartData);
-        LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(180));
-        clp.topMargin = dp(6); chart.setLayoutParams(clp);
-        col.addView(chart);
+        if (chartData.size() < 2) {
+            TextView emptyChart = dimNote(chartData.isEmpty() ? Language.msg(l10n_atomix_history_collecting) : Language.msg(l10n_atomix_history_one_trade));
+            emptyChart.setGravity(Gravity.CENTER); emptyChart.setMinimumHeight(dp(180));
+            emptyChart.setBackground(Design.card(this, 14)); col.addView(emptyChart);
+        } else {
+            MarketChartView chart = new MarketChartView(this);
+            chart.setBackground(Design.card(this, 14));
+            chart.setData(chartData);
+            LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(180));
+            clp.topMargin = dp(6); chart.setLayoutParams(clp);
+            col.addView(chart);
+        }
 
         TextView stats = new TextView(this);
         String last = chartData.isEmpty() ? "—" : fmtPrice(chartData.get(chartData.size() - 1).price);
-        stats.setText("last " + last + " USDT/" + ccy() + "  ·  " + countByStatus(recent) + "  ·  price only (buy/sell not shown)");
+        Language.setText(stats, Language.msg(l10n_atomix_history_stats, last, ccy(), countByStatus(recent)));
         stats.setTextColor(Design.DIM2()); stats.setTextSize(11f); stats.setTypeface(Design.sans()); stats.setPadding(dp(2), dp(8), 0, dp(6));
         col.addView(stats);
 
         if (recent.isEmpty()) {
-            col.addView(dimNote("No market trades observed yet. AtomiX records " + ccy() + " swaps network-wide as they happen — it can't backfill, so history builds from now on."));
+            col.addView(dimNote(Language.msg(l10n_atomix_history_market_empty, ccy())));
             return;
         }
         for (SwapDb.MarketTrade t : recent) col.addView(tradeRow(t));
@@ -3170,39 +3260,38 @@ public class MainActivity extends AppCompatActivity {
         lp.topMargin = dp(6); r.setLayoutParams(lp);
 
         TextView when = new TextView(this);
-        when.setText(android.text.format.DateUtils.getRelativeTimeSpanString(
-                t.observedAt, System.currentTimeMillis(), android.text.format.DateUtils.MINUTE_IN_MILLIS).toString());
+        Language.setText(when, Language.since(t.observedAt));
         when.setTextColor(Design.DIM2()); when.setTextSize(11f); when.setTypeface(Design.sans());
         r.addView(when, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
         TextView price = new TextView(this);
-        price.setText(fmtPrice(t.price)); price.setTextColor(Design.TEXT()); price.setTextSize(14f); price.setTypeface(Design.mono());
+        Language.setText(price, fmtPrice(t.price)); price.setTextColor(Design.TEXT()); price.setTextSize(14f); price.setTypeface(Design.mono());
         r.addView(price);
 
         TextView size = new TextView(this);
-        size.setText("  " + abbrev(parseD(t.sizeMinima, 0)) + " M"); size.setTextColor(Design.DIM()); size.setTextSize(12f); size.setTypeface(Design.mono());
+        Language.setText(size, "  " + abbrev(parseD(t.sizeMinima, 0)) + " " + ccy()); size.setTextColor(Design.DIM()); size.setTextSize(12f); size.setTypeface(Design.mono());
         size.setPadding(dp(8), 0, dp(8), 0);
         r.addView(size);
 
         boolean exec = SwapDb.MT_EXECUTED.equals(t.status), ref = SwapDb.MT_REFUNDED.equals(t.status);
         int bg = exec ? Design.IN() : (ref ? Design.RED() : Design.SURFACE2());
         int fg = (exec || ref) ? Design.ON_ACCENT() : Design.DIM();
-        r.addView(Design.pill(this, exec ? "filled" : ref ? "cancelled" : "open", bg, fg));
+        r.addView(Design.pill(this, exec ? Language.msg(l10n_atomix_history_filled) : ref ? Language.msg(l10n_atomix_history_cancelled) : Language.msg(l10n_atomix_history_open), bg, fg));
         return r;
     }
 
-    private String countByStatus(java.util.List<SwapDb.MarketTrade> ts) {
+    private CharSequence countByStatus(java.util.List<SwapDb.MarketTrade> ts) {
         int ex = 0, op = 0;
         for (SwapDb.MarketTrade t : ts) {
             if (SwapDb.MT_EXECUTED.equals(t.status)) ex++;
             else if (SwapDb.MT_OPEN.equals(t.status)) op++;
         }
-        return ex + " filled · " + op + " open";
+        return Language.msg(l10n_atomix_history_counts, ex, op);
     }
 
-    private TextView dimNote(String s) {
+    private TextView dimNote(CharSequence s) {
         TextView t = new TextView(this);
-        t.setText(s); t.setTextColor(Design.DIM()); t.setTextSize(12.5f); t.setTypeface(Design.sans());
+        Language.setText(t, s); t.setTextColor(Design.DIM()); t.setTextSize(12.5f); t.setTypeface(Design.sans());
         t.setLineSpacing(dp(3), 1f); t.setPadding(dp(2), dp(12), dp(2), 0);
         return t;
     }
@@ -3236,10 +3325,10 @@ public class MainActivity extends AppCompatActivity {
     private void confirmHideSwap(String hash) {
         modalOpen = true;
         dialog()
-                .setTitle("Hide this swap?")
-                .setMessage("This only removes the card. If any funds were locked on-chain they still auto-refund at the timelock — hiding doesn't touch them.")
-                .setPositiveButton("Hide", (d, w) -> dismissSwap(hash))
-                .setNegativeButton("Cancel", null)
+                .setTitle(Language.msg(l10n_atomix_history_hide_title))
+                .setMessage(Language.msg(l10n_atomix_history_hide_help))
+                .setPositiveButton(Language.msg(l10n_atomix_history_hide), (d, w) -> dismissSwap(hash))
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .setOnDismissListener(d -> { modalOpen = false; render(); })
                 .show();
     }
@@ -3255,12 +3344,13 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout top = new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL); top.setGravity(Gravity.CENTER_VERTICAL);
         TextView line = new TextView(this);
-        line.setText(s.sellAmount + " " + s.sellToken + "  →  " + s.buyAmount + " " + s.buyToken);
+        Language.setText(line, s.sellAmount + " " + s.sellToken + "  →  " + s.buyAmount + " " + s.buyToken);
         line.setTextColor(Design.TEXT()); line.setTextSize(14f); line.setTypeface(Design.mono());
         top.addView(line, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         top.addView(Design.pill(this, statusLabel(s), statusBg(s), statusFg(s)));
         {
             TextView x = Design.pill(this, "✕", Design.SURFACE2(), Design.DIM());
+            Language.description(x, Language.msg(l10n_atomix_history_hide_description)); x.setMinimumWidth(dp(48)); x.setMinimumHeight(dp(48));
             LinearLayout.LayoutParams xlp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             xlp.leftMargin = dp(6); x.setLayoutParams(xlp);
             // terminal → dismiss immediately; still-open (e.g. a stuck swap whose lock never landed) → confirm first.
@@ -3270,12 +3360,12 @@ public class MainActivity extends AppCompatActivity {
         c.addView(top);
 
         TextView detail = new TextView(this);
-        detail.setText(statusDetail(s));
+        Language.setText(detail, statusDetail(s));
         detail.setTextColor(Design.DIM()); detail.setTextSize(12.5f); detail.setTypeface(Design.sans()); detail.setPadding(0, dp(5), 0, 0);
         c.addView(detail);
 
         TextView meta = new TextView(this);
-        meta.setText(s.role.toLowerCase() + "  ·  " + countdown(s));
+        Language.setText(meta, Language.join(historyRole(s.role), "  ·  ", countdown(s)));
         meta.setTextColor(Design.DIM2()); meta.setTextSize(11.5f); meta.setTypeface(Design.sans()); meta.setPadding(0, dp(3), 0, 0);
         c.addView(meta);
 
@@ -3283,14 +3373,14 @@ public class MainActivity extends AppCompatActivity {
         String err = swapErrorNote(s.hash);
         if (err != null) {
             TextView e = new TextView(this);
-            e.setText("⚠ " + err);
+            Language.setText(e, Language.join("⚠ ", AtomixMessages.message(err)));
             e.setTextColor(Design.RED()); e.setTextSize(12f); e.setPadding(0, dp(4), 0, 0);
             c.addView(e);
         }
 
         // a manual "Check now" that runs a live on-chain inspection AND advances the swap
         if (!SwapDb.ST_COMPLETE.equals(s.status) && !SwapDb.ST_REFUNDED.equals(s.status)) {
-            TextView check = Design.pill(this, "Check now", Design.SURFACE2(), Design.TEXT());
+            TextView check = Design.pill(this, Language.msg(l10n_atomix_history_check), Design.SURFACE2(), Design.TEXT());
             LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             clp.topMargin = dp(8); check.setLayoutParams(clp);
             check.setOnClickListener(v -> checkNow(s.hash));
@@ -3312,7 +3402,7 @@ public class MainActivity extends AppCompatActivity {
 
     /** Force a poll (advance) + run the live inspector and show the report. */
     private void checkNow(String hash) {
-        toast("Checking…");
+        toast(Language.msg(l10n_atomix_history_checking));
         if (engine == null) return;
         engine.poll();
         refreshBalances(true);
@@ -3320,53 +3410,60 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showReport(String hash, java.util.List<String> lines) {
-        StringBuilder sb = new StringBuilder();
-        for (String l : lines) sb.append(l).append("\n\n");
+        Language.TextBuilder sb = new Language.TextBuilder();
+        boolean first = true;
+        for (String l : lines) {
+            if (!first) sb.append("\n\n");
+            sb.append(ReportMessages.message(l)); first = false;
+        }
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(12), dp(20), dp(4));
         TextView t = new TextView(this);
-        t.setText(sb.toString().trim());
+        Language.setText(t, sb.build());
         t.setTextColor(Design.TEXT()); t.setTextSize(13f); t.setTextIsSelectable(true);
         box.addView(t);
         modalOpen = true;
         dialog()
-                .setTitle("Swap status")
+                .setTitle(Language.msg(l10n_atomix_history_report))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Check again", (d, w) -> checkNow(hash))
-                .setNegativeButton("Close", null)
+                .setPositiveButton(Language.msg(l10n_atomix_history_again), (d, w) -> checkNow(hash))
+                .setNegativeButton(Language.msg(l10n_language_close), null)
                 .setOnDismissListener(d -> { modalOpen = false; render(); })
                 .show();
     }
 
     /** Plain-language description of where a swap is, so "waiting" isn't ambiguous. */
-    private String statusDetail(SwapDb.Swap s) {
+    private CharSequence statusDetail(SwapDb.Swap s) {
+        if (s.status == null) return "";
         boolean initiator = "INITIATOR".equals(s.role);
         switch (s.status) {
             case SwapDb.ST_STARTED:
-                return "Locked your " + s.sellAmount + " " + s.sellToken + " — waiting for the counterparty to lock their side.";
+                return Language.msg(l10n_atomix_history_started, s.sellAmount, s.sellToken);
             case SwapDb.ST_LOCKED:
-                return initiator ? "Counterparty locked — claiming your funds next."
-                        : "You locked your side — waiting for the counterparty to reveal the secret.";
+                return initiator ? Language.msg(l10n_atomix_history_locked_initiator)
+                        : Language.msg(l10n_atomix_history_locked_responder);
             case SwapDb.ST_CLAIMING:
-                return "Counterparty locked — claiming your " + s.buyAmount + " " + s.buyToken + " now.";
+                return Language.msg(l10n_atomix_history_claiming_detail, s.buyAmount, s.buyToken);
             case SwapDb.ST_COMPLETE:
-                return "Done — received " + s.buyAmount + " " + s.buyToken + ".";
+                return Language.msg(l10n_atomix_history_complete_detail, s.buyAmount, s.buyToken);
             case SwapDb.ST_REFUNDED:
-                return "Timed out — your " + s.sellAmount + " " + s.sellToken + " was refunded.";
+                return Language.msg(l10n_atomix_history_refunded_detail, s.sellAmount, s.sellToken);
             default:
                 return "";
         }
     }
 
-    private String statusLabel(SwapDb.Swap s) {
+    private CharSequence statusLabel(SwapDb.Swap s) {
+        if (s.status == null) return "";
         switch (s.status) {
-            case SwapDb.ST_STARTED:  return "waiting";
-            case SwapDb.ST_LOCKED:   return "locked";
-            case SwapDb.ST_CLAIMING: return "claiming";
-            case SwapDb.ST_COMPLETE: return "complete";
-            case SwapDb.ST_REFUNDED: return "refunded";
-            default: return s.status.toLowerCase();
+            case SwapDb.ST_STARTED:  return Language.msg(l10n_atomix_history_waiting);
+            case SwapDb.ST_LOCKED:   return Language.msg(l10n_atomix_history_locked);
+            case SwapDb.ST_CLAIMING: return Language.msg(l10n_atomix_history_claiming);
+            case SwapDb.ST_COMPLETE: return Language.msg(l10n_atomix_history_complete);
+            case SwapDb.ST_REFUNDED: return Language.msg(l10n_atomix_history_refunded);
+            case SwapDb.ST_ERROR: return Language.msg(l10n_atomix_history_error);
+            default: return s.status == null ? "" : s.status;
         }
     }
     private int statusBg(SwapDb.Swap s) {
@@ -3381,18 +3478,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** Time left on MY locked leg (the one I'd refund). Minima leg → blocks; ETH leg → wall-clock. */
-    private String countdown(SwapDb.Swap s) {
-        if (SwapDb.ST_COMPLETE.equals(s.status)) return "done";
-        if (SwapDb.ST_REFUNDED.equals(s.status)) return "reclaimed";
+    private CharSequence countdown(SwapDb.Swap s) {
+        if (SwapDb.ST_COMPLETE.equals(s.status)) return Language.msg(l10n_atomix_history_done);
+        if (SwapDb.ST_REFUNDED.equals(s.status)) return Language.msg(l10n_atomix_history_reclaimed);
         if (s.myTimelock <= 0) return "";
         if (s.myLegIsMinima) {
-            return "refundable at block " + s.myTimelock;
+            return Language.msg(l10n_atomix_history_block, s.myTimelock);
         }
         long now = System.currentTimeMillis() / 1000L;
         long left = s.myTimelock - now;
-        if (left <= 0) return "refund window open";
+        if (left <= 0) return Language.msg(l10n_atomix_history_window);
         long mins = left / 60;
-        return "refundable in ~" + mins + " min";
+        return Language.msg(l10n_atomix_history_minutes, mins);
     }
 
     /**
@@ -3426,7 +3523,7 @@ public class MainActivity extends AppCompatActivity {
         double bestAsk = asksAgg.isEmpty() ? 0 : ((Order.Level) asksAgg.get(0)[1]).price;
         if (bestBid > 0 && bestAsk > 0) {
             TextView sp = new TextView(this);
-            sp.setText("spread " + fmtPrice(bestAsk - bestBid) + " " + sym + "  ·  " + sym + " per " + ccy() + ", size in " + ccy());
+            Language.setText(sp, Language.msg(l10n_atomix_market_spread, fmtPrice(bestAsk - bestBid), sym, sym, ccy(), ccy()));
             sp.setTextColor(Design.DIM2()); sp.setTextSize(11f); sp.setTypeface(Design.sans()); sp.setPadding(dp(2), dp(4), 0, dp(4));
             col.addView(sp);
         }
@@ -3434,8 +3531,8 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout legend = new LinearLayout(this);
         legend.setOrientation(LinearLayout.HORIZONTAL);
         legend.setPadding(dp(6), dp(4), dp(6), dp(2));
-        TextView lL = new TextView(this); lL.setText("SELL " + ccy() + " (bid)"); lL.setTextColor(Design.IN()); lL.setTextSize(11f); lL.setTypeface(Design.sansBold()); lL.setLetterSpacing(0.04f);
-        TextView lR = new TextView(this); lR.setText("BUY " + ccy() + " (ask)"); lR.setTextColor(Design.RED()); lR.setTextSize(11f); lR.setTypeface(Design.sansBold()); lR.setLetterSpacing(0.04f); lR.setGravity(Gravity.END);
+        TextView lL = new TextView(this); Language.setText(lL, Language.msg(l10n_atomix_market_sell_bid, ccy())); lL.setTextColor(Design.IN()); lL.setTextSize(11f); lL.setTypeface(Design.sansBold()); lL.setLetterSpacing(0.04f);
+        TextView lR = new TextView(this); Language.setText(lR, Language.msg(l10n_atomix_market_buy_ask, ccy())); lR.setTextColor(Design.RED()); lR.setTextSize(11f); lR.setTypeface(Design.sansBold()); lR.setLetterSpacing(0.04f); lR.setGravity(Gravity.END);
         legend.addView(lL, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         legend.addView(lR, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         col.addView(legend);
@@ -3449,7 +3546,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if (rows > shown) {
             TextView more = new TextView(this);
-            more.setText("+ " + (rows - shown) + " more level" + (rows - shown == 1 ? "" : "s"));
+            Language.setText(more, Language.msg(l10n_atomix_market_more, rows - shown));
             more.setTextColor(Design.DIM2()); more.setTextSize(11f); more.setTypeface(Design.sans()); more.setPadding(dp(2), dp(6), 0, 0);
             col.addView(more);
         }
@@ -3468,7 +3565,7 @@ public class MainActivity extends AppCompatActivity {
         row.setOrientation(LinearLayout.HORIZONTAL); row.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout left = depthHalf(sym, bidMr, true, best);
         LinearLayout right = depthHalf(sym, askMr, false, best);
-        TextView div = new TextView(this); div.setText("│"); div.setTextColor(Design.DIM2()); div.setTextSize(14f); div.setPadding(dp(8), 0, dp(8), 0);
+        TextView div = new TextView(this); Language.setText(div, "│"); div.setTextColor(Design.DIM2()); div.setTextSize(14f); div.setPadding(dp(8), 0, dp(8), 0);
         row.addView(left, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         row.addView(div);
         row.addView(right, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
@@ -3494,12 +3591,12 @@ public class MainActivity extends AppCompatActivity {
                 : quoteHalf(fmtPrice(lvl.price), abbrev(cap), Design.RED(), best, false, best));
         boolean mine = isMine(maker);
         TextView tag = new TextView(this);
-        tag.setText(mine ? "you" : shortAddr(maker.signerPk));
+        Language.setText(tag, mine ? Language.msg(l10n_atomix_market_you) : shortAddr(maker.signerPk));
         tag.setTextColor(mine ? Design.ACCENT() : Design.DIM2()); tag.setTextSize(9.5f); tag.setTypeface(Design.sans());
         tag.setGravity(isBid ? Gravity.START : Gravity.END);
         // NI-1 (RULE 1): the displayed key is truncated — long-press copies the FULL value to the clipboard.
         if (!mine && maker.signerPk != null && !maker.signerPk.isEmpty())
-            tag.setOnClickListener(v -> copy(maker.signerPk, "Counterparty key copied"));
+            tag.setOnClickListener(v -> copy(maker.signerPk, Language.msg(l10n_atomix_market_counterparty_copied)));
         half.addView(tag);
         if (!mine && cap > 0) {
             half.setOnClickListener(v -> takeOrderDialog(maker, sym, isBid, lvl.price, cap));
@@ -3523,13 +3620,13 @@ public class MainActivity extends AppCompatActivity {
         String priceText = leftHalf ? b : a;
 
         TextView size = new TextView(this);
-        size.setText(sizeText); size.setTextColor(Design.DIM()); size.setTextSize(big ? 13f : 12f); size.setTypeface(Design.mono());
+        Language.setText(size, sizeText); size.setTextColor(Design.DIM()); size.setTextSize(big ? 13f : 12f); size.setTypeface(Design.mono());
         TextView price = new TextView(this);
-        price.setText(priceText); price.setTextColor(priceColor); price.setTextSize(big ? 18.5f : 15f);
+        Language.setText(price, priceText); price.setTextColor(priceColor); price.setTextSize(big ? 18.5f : 15f);
         price.setTypeface(best ? Design.monoBold() : Design.mono());
 
         if (leftHalf) { size.setPadding(0, 0, dp(8), 0); h.addView(size); h.addView(price); }
-        else { price.setPadding(dp(8), 0, 0, 0); h.addView(price); h.addView(size); }
+        else { price.setPadding(0, 0, dp(8), 0); h.addView(price); h.addView(size); }
         return h;
     }
 
@@ -3549,38 +3646,38 @@ public class MainActivity extends AppCompatActivity {
         return java.math.BigDecimal.valueOf(v).setScale(10, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
     }
 
-    private LinearLayout walletCard(String title, String big, String sub, int bigColor) {
+    private LinearLayout walletCard(CharSequence title, CharSequence big, CharSequence sub, int bigColor) {
         LinearLayout c = new LinearLayout(this);
         c.setOrientation(LinearLayout.VERTICAL);
         c.setBackground(Design.card(this, 16));
         c.setPadding(dp(16), dp(15), dp(16), dp(15));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.topMargin = dp(10); c.setLayoutParams(lp);
-        TextView t = new TextView(this); t.setText(title); t.setTextColor(Design.DIM()); t.setTextSize(12f); t.setTypeface(Design.sans());
-        TextView v = new TextView(this); v.setText(big); v.setTextColor(bigColor); v.setTextSize(22f); v.setTag(TAG_BAL);
+        TextView t = new TextView(this); Language.setText(t, title); t.setTextColor(Design.DIM()); t.setTextSize(12f); t.setTypeface(Design.sans());
+        TextView v = new TextView(this); Language.setText(v, big); v.setTextColor(bigColor); v.setTextSize(22f); v.setTag(TAG_BAL);
         v.setTypeface(Design.monoBold()); v.setPadding(0, dp(4), 0, 0);   // balances in tabular mono
         c.addView(t); c.addView(v);
         if (sub != null) {
-            TextView s = new TextView(this); s.setText(sub); s.setTextColor(Design.DIM()); s.setTextSize(12.5f); s.setTypeface(Design.sans()); s.setPadding(0, dp(6), 0, 0);
+            TextView s = new TextView(this); Language.setText(s, sub); s.setTextColor(Design.DIM()); s.setTextSize(12.5f); s.setTypeface(Design.sans()); s.setPadding(0, dp(6), 0, 0);
             c.addView(s);
         }
         return c;
     }
 
-    private LinearLayout kv(String k, String val) {
+    private LinearLayout kv(CharSequence k, CharSequence val) {
         LinearLayout r = new LinearLayout(this);
         r.setOrientation(LinearLayout.HORIZONTAL);
         r.setPadding(dp(4), dp(9), dp(4), dp(3));
-        TextView a = new TextView(this); a.setText(k); a.setTextColor(Design.DIM()); a.setTextSize(14f); a.setTypeface(Design.sans());
-        TextView v = new TextView(this); v.setText(val); v.setTextColor(Design.TEXT()); v.setTextSize(14f); v.setGravity(Gravity.END); v.setTag(TAG_BAL); v.setTypeface(Design.mono());
+        TextView a = new TextView(this); Language.setText(a, k); a.setTextColor(Design.DIM()); a.setTextSize(14f); a.setTypeface(Design.sans());
+        TextView v = new TextView(this); Language.setText(v, val); v.setTextColor(Design.TEXT()); v.setTextSize(14f); v.setGravity(Gravity.END); v.setTag(TAG_BAL); v.setTypeface(Design.mono());
         r.addView(a, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         r.addView(v, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         return r;
     }
 
-    private TextView button(String label) {
+    private TextView button(CharSequence label) {
         TextView t = new TextView(this);
-        t.setText(label);
+        Language.setText(t, label);
         t.setTextColor(Design.ON_ACCENT());
         t.setBackground(Design.ripple(Design.gradientCta(this)));
         t.setGravity(Gravity.CENTER);
@@ -3600,8 +3697,9 @@ public class MainActivity extends AppCompatActivity {
      *  constructs NodeApi, so every view builder must tolerate a null node — 0.1.62 shipped without this
      *  guard and crashed on launch. With no NodeApi there is no verdict yet, which is exactly the
      *  "nothing has replied" case. */
-    private String nodeOfflineText() {
-        return node == null ? NodeApi.offlineMessage(NodeApi.Offline.UNREACHABLE, false) : node.offlineMessage();
+    private CharSequence nodeOfflineText() {
+        if (node != null && node.offline() == NodeApi.Offline.REFUSED) return Language.msg(l10n_atomix_ui_node_not_ready);
+        return node != null && node.everReplied() ? Language.msg(l10n_atomix_ui_node_stopped) : Language.msg(l10n_atomix_ui_node_waiting);
     }
 
     private TextView buildPairingBanner() {
@@ -3609,7 +3707,7 @@ public class MainActivity extends AppCompatActivity {
         // The node lists companions by their app LABEL — this one registers as "AtomiX", so naming the legacy
         // app here sent users hunting Minima Core → Apps for an entry that isn't there.
         // Text is set per-state in onPaired(); this is only the first paint before any verdict exists.
-        t.setText(NodeApi.offlineMessage(NodeApi.Offline.UNREACHABLE, false));
+        Language.setText(t, nodeOfflineText());
         t.setTextColor(Design.ON_ACCENT()); t.setBackgroundColor(Design.ACCENT());
         t.setPadding(dp(16), dp(10), dp(16), dp(10)); t.setTextSize(13f); t.setTypeface(Design.sansBold());
         return t;
@@ -3618,14 +3716,14 @@ public class MainActivity extends AppCompatActivity {
     // ---- receive / fund + key export ----
 
     private void receiveDialog() {
-        if (ethAddr == null) { toast("ETH wallet not ready yet"); return; }
+        if (ethAddr == null) { toast(Language.msg(l10n_atomix_ui_wallet_not_ready)); return; }
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(12), dp(20), dp(4));
         box.setGravity(Gravity.CENTER_HORIZONTAL);
 
         TextView addr = new TextView(this);
-        addr.setText(ethAddr);
+        Language.setText(addr, ethAddr);
         addr.setTextColor(Design.TEXT()); addr.setTextSize(13f);
         addr.setTypeface(Design.mono());
         addr.setTextIsSelectable(true);
@@ -3646,22 +3744,22 @@ public class MainActivity extends AppCompatActivity {
         }
 
         TextView note = new TextView(this);
-        note.setText("Same address on all EVM networks — fund it with " + net.label + " ETH and tokens.");
+        Language.setText(note, Language.msg(l10n_atomix_ui_fund_help, net.label));
         note.setTextColor(Design.DIM2()); note.setTextSize(12f); note.setGravity(Gravity.CENTER);
         note.setPadding(0, dp(14), 0, 0);
         box.addView(note);
 
         dialog()
-                .setTitle("Receive / Fund · " + net.label)
+                .setTitle(Language.msg(l10n_atomix_ui_fund_title, net.label))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Copy address", (d, w) -> copy(ethAddr, "ETH address copied"))
-                .setNegativeButton("Close", null)
+                .setPositiveButton(Language.msg(l10n_wallet_copy_address), (d, w) -> copy(ethAddr, Language.msg(l10n_atomix_ui_eth_copied)))
+                .setNegativeButton(Language.msg(l10n_language_close), null)
                 .show();
     }
 
     // ---- manual Send (parity twin of the MDS wallet's Send — user decision 2026-07-19: both apps have it) ----
     private void sendDialog() {
-        if (!wallet.ready()) { toast("ETH wallet not ready yet"); return; }
+        if (!wallet.ready()) { toast(Language.msg(l10n_atomix_ui_wallet_not_ready)); return; }
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(12), dp(20), dp(4));
@@ -3686,7 +3784,7 @@ public class MainActivity extends AppCompatActivity {
         box.addView(toggles);
 
         final EditText toE = new EditText(this);
-        toE.setHint("0x… recipient"); toE.setTextColor(Design.TEXT()); toE.setTextSize(13f); toE.setTypeface(Design.mono());
+        Language.hint(toE, Language.msg(l10n_atomix_ui_recipient)); toE.setTextColor(Design.TEXT()); toE.setTextSize(13f); toE.setTypeface(Design.mono());
         toE.setSingleLine(true);
         box.addView(toE);
 
@@ -3694,38 +3792,38 @@ public class MainActivity extends AppCompatActivity {
         amtRow.setOrientation(LinearLayout.HORIZONTAL); amtRow.setGravity(Gravity.CENTER_VERTICAL);
         final EditText amtE = new EditText(this);
         decimalInput(amtE);
-        amtE.setHint("0.00"); amtE.setTextColor(Design.TEXT()); amtE.setTextSize(17f); amtE.setTypeface(Design.mono());
-        TextView maxB = Design.pill(this, "Max", Design.SURFACE2(), Design.TEXT());
+        Language.hint(amtE, "0.00"); amtE.setTextColor(Design.TEXT()); amtE.setTextSize(17f); amtE.setTypeface(Design.mono());
+        TextView maxB = Design.pill(this, Language.msg(l10n_wallet_max), Design.SURFACE2(), Design.TEXT());
         maxB.setOnClickListener(v -> io.execute(() -> {
             try {
                 if (ethSel[0]) {
                     BigInteger gp = EthRpc.hexToBig(rpc.callStr("eth_gasPrice", new org.json.JSONArray()));
                     BigInteger bf = rpc.baseFeePerGasOrZero();   // MA-6: reserve at the same effective price EthTx broadcasts at
                     final String m = EthWallet.format(EthSend.maxEthSendWei(ethWeiRaw, gp, bf), 18, 8);
-                    ui.post(() -> amtE.setText(m));
+                    ui.post(() -> Language.setText(amtE, m));
                 } else {
                     final String m = EthWallet.format(usdtRawBal, net.tokens[0].decimals, 6);
-                    ui.post(() -> amtE.setText(m));
+                    ui.post(() -> Language.setText(amtE, m));
                 }
-            } catch (Exception e) { ui.post(() -> toast("Could not read gas price — try again")); }
+            } catch (Exception e) { ui.post(() -> toast(Language.msg(l10n_atomix_ui_gas_error))); }
         }));
         amtRow.addView(amtE, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         amtRow.addView(maxB);
         box.addView(amtRow);
 
         TextView warn = new TextView(this);
-        warn.setText("Sends are irreversible. Double-check the address.");
+        Language.setText(warn, Language.msg(l10n_atomix_ui_irreversible));
         warn.setTextColor(Design.DIM()); warn.setTextSize(12f); warn.setPadding(0, dp(8), 0, 0);
         box.addView(warn);
 
         // Review handler attached post-show so an invalid form shows its error WITHOUT dismissing the dialog.
-        final android.app.AlertDialog d = dialog()
-                .setTitle("Send from this wallet")
+        final AlertDialog d = dialog()
+                .setTitle(Language.msg(l10n_atomix_ui_send_title))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Review", null)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_eth_wallet_review), null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
-        d.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+        d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             final boolean eth = ethSel[0];
             final String to = toE.getText().toString().trim(), amt = amtE.getText().toString().trim();
             io.execute(() -> {
@@ -3737,17 +3835,16 @@ public class MainActivity extends AppCompatActivity {
                     final String fee = EthWallet.format(
                             EthSend.gasReserveWei(gp, bf, eth ? EthSend.GAS_ETH : EthSend.GAS_ERC20), 18, 8);
                     ui.post(() -> { d.dismiss(); sendReviewDialog(eth, to, amt, fee); });
-                } catch (Exception e) { ui.post(() -> toast("Could not read gas price — try again")); }
+                } catch (Exception e) { ui.post(() -> toast(Language.msg(l10n_atomix_ui_gas_error))); }
             });
         });
     }
 
     private void sendReviewDialog(boolean eth, String to, String amt, String feeEth) {
         dialog()
-                .setTitle("Review — Send " + (eth ? "ETH" : "USDT"))
-                .setMessage("Send  " + amt + " " + (eth ? "ETH" : "USDT") + "\nTo  " + to
-                        + "\n\nNetwork fee  ≈ " + feeEth + " ETH\nThis cannot be undone.")
-                .setPositiveButton("Send now", (dd, w) -> io.execute(() -> {
+                .setTitle(Language.msg(l10n_atomix_ui_review_title, eth ? "ETH" : "USDT"))
+                .setMessage(Language.msg(l10n_atomix_ui_review_body, amt, eth ? "ETH" : "USDT", to, feeEth))
+                .setPositiveButton(Language.msg(l10n_atomix_ui_send_now), (dd, w) -> io.execute(() -> {
                     try {
                         String tx = eth
                                 ? EthSend.sendEth(rpc, wallet.creds(), net.chainId, to, EthSend.parseUnits(amt, 18))
@@ -3756,51 +3853,65 @@ public class MainActivity extends AppCompatActivity {
                         SwapLog.d("manual send " + (eth ? "ETH" : "USDT") + " " + amt + " tx=" + tx);
                         // NI-1 (RULE 1): a tx hash in a transient toast is otherwise unrecoverable — copy the FULL
                         // hash to the clipboard so the user can look up their own send on a block explorer.
-                        ui.post(() -> { copy(tx, "Sent — full tx hash copied (updates once mined)"); fetchEthBalances(true); });
+                        ui.post(() -> { copy(tx, Language.msg(l10n_atomix_ui_tx_copied)); fetchEthBalances(true); });
                     } catch (Exception e) {
-                        ui.post(() -> toast("Send failed: " + e.getMessage()));
+                        ui.post(() -> toast(Language.msg(l10n_atomix_ui_send_failed, e.getMessage())));
                     }
                 }))
-                .setNegativeButton("Back", (dd, w) -> sendDialog())
+                .setNegativeButton(Language.msg(l10n_explorer_back), (dd, w) -> sendDialog())
                 .show();
     }
 
     private void exportKeyDialog() {
-        if (!wallet.ready()) { toast("ETH wallet not ready yet"); return; }
+        if (!wallet.ready()) { toast(Language.msg(l10n_atomix_ui_wallet_not_ready)); return; }
         dialog()
-                .setTitle("Export ETH private key")
-                .setMessage("This key controls your ETH funds. Anyone who sees it can take them. It is also "
-                        + "derived from your Minima node seed. Never share it or type it into a website.")
-                .setPositiveButton("Reveal key", (d, w) -> revealKeyDialog())
-                .setNegativeButton("Cancel", null)
+                .setTitle(Language.msg(l10n_atomix_ui_export_title))
+                .setMessage(Language.msg(l10n_atomix_ui_export_warning))
+                .setPositiveButton(Language.msg(l10n_atomix_ui_reveal), (d, w) -> revealKeyDialog())
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     private void revealKeyDialog() {
         final String pk = wallet.privateKeyHex();
-        if (pk == null) { toast("ETH wallet not ready yet"); return; }
+        if (pk == null) { toast(Language.msg(l10n_atomix_ui_wallet_not_ready)); return; }
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(12), dp(20), dp(4));
 
         TextView warn = new TextView(this);
-        warn.setText("⚠ Keep this secret.");
+        Language.setText(warn, Language.msg(l10n_atomix_ui_secret));
         warn.setTextColor(Design.RED()); warn.setTextSize(12.5f); warn.setPadding(0, 0, 0, dp(10));
         box.addView(warn);
 
         TextView key = new TextView(this);
-        key.setText(pk);
+        Language.setText(key, pk);
         key.setTextColor(Design.TEXT()); key.setTextSize(13f);
         key.setTypeface(Design.mono());
         key.setTextIsSelectable(true);
         box.addView(key);
 
-        dialog()
-                .setTitle("ETH private key")
+        AlertDialog secret = dialog()
+                .setTitle(Language.msg(l10n_atomix_ui_private_key))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Copy key", (d, w) -> copy(pk, "Private key copied"))
-                .setNegativeButton("Close", null)
-                .show();
+                .setPositiveButton(Language.msg(l10n_atomix_ui_copy_key), (d, w) -> copyPrivateKey(pk))
+                .setNegativeButton(Language.msg(l10n_language_close), null)
+                .create();
+        if (secret.getWindow() != null) secret.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE);
+        secret.show();
+    }
+
+    private void copyPrivateKey(String value) {
+        ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        if (cm == null) return;
+        ClipData clip = ClipData.newPlainText("AtomiX", value);
+        if (Build.VERSION.SDK_INT >= 33) {
+            android.os.PersistableBundle extras = new android.os.PersistableBundle();
+            extras.putBoolean(android.content.ClipDescription.EXTRA_IS_SENSITIVE, true);
+            clip.getDescription().setExtras(extras);
+        }
+        cm.setPrimaryClip(clip);
+        toast(Language.msg(l10n_atomix_ui_key_copied));
     }
 
     private String shortAddr(String a) {
@@ -3808,7 +3919,7 @@ public class MainActivity extends AppCompatActivity {
         return a.substring(0, 8) + "…" + a.substring(a.length() - 6);
     }
 
-    private void copy(String text, String toast) {
+    private void copy(String text, CharSequence toast) {
         ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         if (cm != null) { cm.setPrimaryClip(ClipData.newPlainText("AtomiX", text)); toast(toast); }   // label shows in the Android 13+ clipboard preview
     }
@@ -3823,9 +3934,22 @@ public class MainActivity extends AppCompatActivity {
 
     // ============================================================ OTC deals tab
 
+    private void rememberOtcDraft(EditText field, boolean sell) {
+        field.addTextChangedListener(new SimpleWatcher(() -> {
+            if (sell) otcSellDraft = field.getText().toString(); else otcBuyDraft = field.getText().toString();
+        }));
+        field.setOnFocusChangeListener((view, focused) -> {
+            otcInputFocused = focused;
+            if (!focused) ui.postDelayed(this::render, 250);
+        });
+    }
+    private void finishOtcEditing(View container) {
+        container.setFocusableInTouchMode(true); container.requestFocus(); otcInputFocused = false;
+    }
+
     private void renderOtcTab(LinearLayout col) {
         TextView intro = new TextView(this);
-        intro.setText("Negotiate a custom size + price directly with a liquidity provider, then settle as a trustless HTLC swap.");
+        Language.setText(intro, Language.msg(l10n_atomix_otc_intro));
         intro.setTextColor(Design.DIM()); intro.setTextSize(12f); intro.setTypeface(Design.sans());
         intro.setLineSpacing(dp(2), 1f); intro.setPadding(0, 0, 0, dp(10));
         col.addView(intro);
@@ -3845,136 +3969,156 @@ public class MainActivity extends AppCompatActivity {
         return box;
     }
 
-    private void otcSectionHead(LinearLayout col, String s) {
+    private void otcSectionHead(LinearLayout col, CharSequence s) {
         TextView t = new TextView(this);
-        t.setText(s); t.setTextColor(Design.DIM()); t.setTextSize(12f); t.setTypeface(Design.sansBold()); t.setLetterSpacing(0.05f);
+        Language.setText(t, s); t.setTextColor(Design.DIM()); t.setTextSize(12f); t.setTypeface(Design.sansBold()); t.setLetterSpacing(0.05f);
         t.setPadding(0, dp(8), 0, dp(6)); col.addView(t);
     }
 
+    private static double otcNumber(String value, double fallback) {
+        double parsed = parseD(value, fallback);
+        return Double.isFinite(parsed) ? parsed : fallback;
+    }
+
     private void renderOtcAvailability(LinearLayout col) {
-        otcSectionHead(col, "MY AVAILABILITY");
+        otcSectionHead(col, Language.msg(l10n_atomix_otc_availability));
         LinearLayout box = otcCardBox(col);
         final boolean enabled = prefs.getBoolean("otc_enable", false);
 
-        box.addView(fieldLabel("I SELL " + ccy() + " up to"));
+        box.addView(fieldLabel(Language.msg(l10n_atomix_otc_sell_limit, ccy())));
         final EditText sellE = new EditText(this); decimalInput(sellE);
-        sellE.setHint("max " + ccy() + " (blank = off)"); sellE.setHintTextColor(Design.DIM2());
-        sellE.setText(prefs.getString("otc_sell_size", "")); sellE.setTextColor(Design.TEXT()); sellE.setTextSize(15f); sellE.setTypeface(Design.mono());
+        Language.hint(sellE, Language.msg(l10n_atomix_otc_max_hint, ccy())); sellE.setHintTextColor(Design.DIM2());
+        if (otcSellDraft == null) otcSellDraft = prefs.getString("otc_sell_size", "");
+        Language.setText(sellE, otcSellDraft); rememberOtcDraft(sellE, true); sellE.setTextColor(Design.TEXT()); sellE.setTextSize(15f); sellE.setTypeface(Design.mono());
         box.addView(sellE);
 
-        box.addView(fieldLabel("I BUY " + ccy() + " up to"));
+        box.addView(fieldLabel(Language.msg(l10n_atomix_otc_buy_limit, ccy())));
         final EditText buyE = new EditText(this); decimalInput(buyE);
-        buyE.setHint("max " + ccy() + " (blank = off)"); buyE.setHintTextColor(Design.DIM2());
-        buyE.setText(prefs.getString("otc_buy_size", "")); buyE.setTextColor(Design.TEXT()); buyE.setTextSize(15f); buyE.setTypeface(Design.mono());
+        Language.hint(buyE, Language.msg(l10n_atomix_otc_max_hint, ccy())); buyE.setHintTextColor(Design.DIM2());
+        if (otcBuyDraft == null) otcBuyDraft = prefs.getString("otc_buy_size", "");
+        Language.setText(buyE, otcBuyDraft); rememberOtcDraft(buyE, false); buyE.setTextColor(Design.TEXT()); buyE.setTextSize(15f); buyE.setTypeface(Design.mono());
         box.addView(buyE);
 
         TextView st = new TextView(this);
-        st.setText(enabled ? "● Live — LPs can negotiate with you" : "○ Off"); st.setTextColor(enabled ? Design.IN() : Design.DIM());
+        Language.setText(st, enabled ? Language.msg(l10n_atomix_otc_live) : Language.msg(l10n_atomix_otc_off)); st.setTextColor(enabled ? Design.IN() : Design.DIM());
         st.setTextSize(12f); st.setTypeface(Design.sans()); st.setPadding(0, dp(8), 0, dp(8)); box.addView(st);
 
         LinearLayout btns = new LinearLayout(this); btns.setOrientation(LinearLayout.HORIZONTAL);
-        TextView pubBtn = Design.pill(this, enabled ? "Update" : "Go live", Design.ACCENT(), Design.ON_ACCENT());
+        TextView pubBtn = Design.pill(this, enabled ? Language.msg(l10n_atomix_otc_update) : Language.msg(l10n_atomix_otc_go_live), Design.ACCENT(), Design.ON_ACCENT());
         pubBtn.setOnClickListener(v -> {
-            double sell = parseD(sellE.getText().toString(), 0), buy = parseD(buyE.getText().toString(), 0);
-            if (sell <= 0 && buy <= 0) { toast("Enter a sell and/or buy size"); return; }
+            double sell = otcNumber(sellE.length() == 0 ? "0" : sellE.getText().toString(), Double.NaN), buy = otcNumber(buyE.length() == 0 ? "0" : buyE.getText().toString(), Double.NaN);
+            if (!Double.isFinite(sell) || !Double.isFinite(buy) || sell < 0 || buy < 0 || (sell <= 0 && buy <= 0)) { toast(Language.msg(l10n_atomix_otc_enter_size)); return; }
+            finishOtcEditing(box);
             prefs.edit().putString("otc_sell_size", sell > 0 ? trim(sell) : "").putString("otc_buy_size", buy > 0 ? trim(buy) : "")
                     .putBoolean("otc_enable", true).putBoolean("otc_auto", true).apply();
             publishOtcOffer(sell, buy);
         });
-        Design.pressable(pubBtn); btns.addView(pubBtn);
+        Design.pressable(pubBtn); pubBtn.setMinimumHeight(dp(48)); btns.addView(pubBtn, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         if (enabled) {
-            TextView wd = Design.pill(this, "Withdraw", Design.SURFACE2(), Design.TEXT());
-            wd.setOnClickListener(v -> withdrawOtcOffer()); Design.pressable(wd);
-            LinearLayout.LayoutParams wlp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT); wlp.leftMargin = dp(8);
+            TextView wd = Design.pill(this, Language.msg(l10n_atomix_otc_withdraw), Design.SURFACE2(), Design.TEXT());
+            wd.setOnClickListener(v -> { finishOtcEditing(box); withdrawOtcOffer(); }); Design.pressable(wd);
+            LinearLayout.LayoutParams wlp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); wd.setMinimumHeight(dp(48)); wlp.leftMargin = dp(8);
             btns.addView(wd, wlp);
         }
         box.addView(btns);
     }
 
     private void renderOtcProviders(LinearLayout col) {
-        otcSectionHead(col, "LIQUIDITY PROVIDERS");
+        otcSectionHead(col, Language.msg(l10n_atomix_otc_providers));
         boolean any = false;
         for (final OtcOffer o : otcBook.values()) {
             if (!o.hasLiquidity() || o.commsPublicId == null || o.commsPublicId.isEmpty()) continue;
             any = true;
             LinearLayout box = otcCardBox(col);
-            StringBuilder sides = new StringBuilder();
-            if (o.sells()) sides.append("sells up to ").append(trimSig(o.sellSize)).append(" " + ccy());
-            if (o.buys()) { if (sides.length() > 0) sides.append("   ·   "); sides.append("buys up to ").append(trimSig(o.buySize)).append(" " + ccy()); }
+            Language.TextBuilder sides = new Language.TextBuilder();
+            if (o.sells()) sides.append(Language.msg(l10n_atomix_otc_sells, trimSig(o.sellSize), ccy()));
+            if (o.buys()) { if (o.sells()) sides.append("   ·   "); sides.append(Language.msg(l10n_atomix_otc_buys, trimSig(o.buySize), ccy())); }
             TextView t = new TextView(this);
-            t.setText(sides.toString()); t.setTextColor(Design.TEXT()); t.setTextSize(14.5f); t.setTypeface(Design.sansBold()); box.addView(t);
-            TextView who = new TextView(this); who.setText("LP " + shortAddr(o.signerPk));
+            Language.setText(t, sides.build()); t.setTextColor(Design.TEXT()); t.setTextSize(14.5f); t.setTypeface(Design.sansBold()); box.addView(t);
+            TextView who = new TextView(this); Language.setText(who, Language.msg(l10n_atomix_otc_provider, shortAddr(o.signerPk)));
             who.setTextColor(Design.DIM()); who.setTextSize(12f); who.setTypeface(Design.sans()); who.setPadding(0, dp(4), 0, dp(8)); box.addView(who);
             // NI-1 (RULE 1): the LP key is shown truncated — long-press copies the FULL value.
             if (o.signerPk != null && !o.signerPk.isEmpty())
-                who.setOnClickListener(v -> copy(o.signerPk, "LP key copied"));
+                who.setOnClickListener(v -> copy(o.signerPk, Language.msg(l10n_atomix_otc_key_copied)));
             LinearLayout row = new LinearLayout(this); row.setOrientation(LinearLayout.HORIZONTAL);
             if (o.sells()) {   // LP sells → I can BUY mxUSDT from them
-                TextView b = Design.pill(this, "Buy " + ccy(), Design.ACCENT(), Design.ON_ACCENT());
+                TextView b = Design.pill(this, Language.msg(l10n_atomix_otc_buy, ccy()), Design.ACCENT(), Design.ON_ACCENT());
                 b.setOnClickListener(v -> otcProposeDialog(o, OtcOffer.LP_SELLS_MINIMA)); Design.pressable(b);
                 LinearLayout.LayoutParams m = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT); m.rightMargin = dp(8);
                 row.addView(b, m);
             }
             if (o.buys()) {    // LP buys → I can SELL mxUSDT to them
-                TextView s = Design.pill(this, "Sell " + ccy(), Design.SURFACE2(), Design.TEXT());
+                TextView s = Design.pill(this, Language.msg(l10n_atomix_otc_sell, ccy()), Design.SURFACE2(), Design.TEXT());
                 s.setOnClickListener(v -> otcProposeDialog(o, OtcOffer.LP_BUYS_MINIMA)); Design.pressable(s);
                 row.addView(s);
             }
             box.addView(row);
         }
-        if (!any) { TextView none = new TextView(this); none.setText("No OTC LPs online right now."); none.setTextColor(Design.DIM()); none.setTextSize(13f); none.setTypeface(Design.sans()); none.setPadding(0, 0, 0, dp(10)); col.addView(none); }
+        if (!any) { TextView none = new TextView(this); Language.setText(none, Language.msg(l10n_atomix_otc_no_providers)); none.setTextColor(Design.DIM()); none.setTextSize(13f); none.setTypeface(Design.sans()); none.setPadding(0, 0, 0, dp(10)); col.addView(none); }
+    }
+
+    private CharSequence otcCurrency(OtcDb.Deal deal) {
+        return deal.market() == null ? Language.msg(l10n_atomix_otc_unknown_market) : deal.market().coinLabel;
     }
 
     private void renderOtcDeals(LinearLayout col) {
-        otcSectionHead(col, "MY DEALS");
+        otcSectionHead(col, Language.msg(l10n_atomix_otc_deals));
         java.util.List<OtcDb.Deal> deals = otcDb == null ? new java.util.ArrayList<>() : otcDb.allDeals();
         boolean any = false;
         for (final OtcDb.Deal d : deals) {
             any = true;
             LinearLayout box = otcCardBox(col);
-            String dir = OtcOffer.LP_SELLS_MINIMA.equals(d.side)
-                    ? (OtcDb.ROLE_INSTIGATOR.equals(d.role) ? "BUY " : "SELL ")
-                    : (OtcDb.ROLE_INSTIGATOR.equals(d.role) ? "SELL " : "BUY ");
+            boolean buying = OtcOffer.LP_SELLS_MINIMA.equals(d.side)
+                    ? OtcDb.ROLE_INSTIGATOR.equals(d.role) : !OtcDb.ROLE_INSTIGATOR.equals(d.role);
             TextView t = new TextView(this);
-            t.setText(dir + d.amount + " " + ccy() + " @ " + d.price + " USDT");
+            Language.setText(t, buying ? Language.msg(l10n_atomix_otc_buy_terms, d.amount, otcCurrency(d), d.price) : Language.msg(l10n_atomix_otc_sell_terms, d.amount, otcCurrency(d), d.price));
             t.setTextColor(Design.TEXT()); t.setTextSize(15f); t.setTypeface(Design.sansBold()); box.addView(t);
             TextView st = new TextView(this);
-            st.setText(otcStatusText(d)); st.setTextColor(otcStatusColor(d)); st.setTextSize(12.5f); st.setTypeface(Design.sans()); st.setPadding(0, dp(4), 0, dp(2)); box.addView(st);
-            if (otc != null && OtcDb.TURN_ME.equals(d.whoseTurn) && (OtcDb.ST_PROPOSED.equals(d.status) || OtcDb.ST_COUNTERED.equals(d.status))) {
-                LinearLayout row = new LinearLayout(this); row.setOrientation(LinearLayout.HORIZONTAL); row.setPadding(0, dp(8), 0, 0);
-                TextView acc = Design.pill(this, "Accept", Design.IN(), Design.ON_ACCENT());
+            Language.setText(st, otcStatusText(d)); st.setTextColor(otcStatusColor(d)); st.setTextSize(12.5f); st.setTypeface(Design.sans()); st.setPadding(0, dp(4), 0, dp(2)); box.addView(st);
+            if (!d.inActiveMarket()) {
+                TextView marketHint = fieldLabel(d.market() == null ? Language.msg(l10n_atomix_otc_unknown_market_help)
+                        : Language.msg(l10n_atomix_otc_switch_market, d.market().coinLabel));
+                box.addView(marketHint);
+            }
+            if (d.inActiveMarket() && otc != null && OtcDb.TURN_ME.equals(d.whoseTurn) && (OtcDb.ST_PROPOSED.equals(d.status) || OtcDb.ST_COUNTERED.equals(d.status))) {
+                LinearLayout row = new LinearLayout(this); row.setOrientation(LinearLayout.VERTICAL); row.setPadding(0, dp(8), 0, 0);
+                TextView acc = Design.pill(this, Language.msg(l10n_atomix_otc_accept), Design.IN(), Design.ON_ACCENT());
                 acc.setOnClickListener(v -> {
-                    String fundErr = otcCheckFunds(d.role, d.side, d.amount, d.price);
+                    CharSequence fundErr = otcCheckFunds(d.role, d.side, d.amount, d.price);
                     if (fundErr != null) { toast(fundErr); return; }
-                    otc.accept(d, otcRes("Accepted"));
+                    otc.accept(d, otcRes(Language.msg(l10n_atomix_otc_accepted)));
                 });
-                TextView cnt = Design.pill(this, "Counter", Design.SURFACE2(), Design.TEXT());
+                TextView cnt = Design.pill(this, Language.msg(l10n_atomix_otc_counter), Design.SURFACE2(), Design.TEXT());
                 cnt.setOnClickListener(v -> otcCounterDialog(d));
-                TextView rej = Design.pill(this, "Reject", Design.SURFACE2(), Design.RED());
-                rej.setOnClickListener(v -> otc.reject(d, otcRes("Rejected")));
+                TextView rej = Design.pill(this, Language.msg(l10n_atomix_otc_reject), Design.SURFACE2(), Design.RED());
+                rej.setOnClickListener(v -> otc.reject(d, otcRes(Language.msg(l10n_atomix_otc_rejected))));
                 Design.pressable(acc); Design.pressable(cnt); Design.pressable(rej);
                 LinearLayout.LayoutParams m = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT); m.rightMargin = dp(8);
-                row.addView(acc, m); row.addView(cnt, m); row.addView(rej); box.addView(row);
+                for (TextView action : new TextView[]{acc, cnt, rej}) {
+                    action.setMinimumHeight(dp(48));
+                    row.addView(action, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                }
+                box.addView(row);
             }
         }
-        if (!any) { TextView none = new TextView(this); none.setText("No OTC deals yet."); none.setTextColor(Design.DIM()); none.setTextSize(13f); none.setTypeface(Design.sans()); col.addView(none); }
+        if (!any) { TextView none = new TextView(this); Language.setText(none, Language.msg(l10n_atomix_otc_no_deals)); none.setTextColor(Design.DIM()); none.setTextSize(13f); none.setTypeface(Design.sans()); col.addView(none); }
     }
 
-    private OtcController.SendResult otcRes(String okMsg) {
+    private OtcController.SendResult otcRes(CharSequence okMsg) {
         return new OtcController.SendResult() {
             @Override public void ok() { ui.post(() -> { toast(okMsg); if (currentTab == TAB_OTC && !modalOpen) render(); }); }
-            @Override public void err(String m) { ui.post(() -> toast("OTC: " + m)); }
+            @Override public void err(String m) { ui.post(() -> toast(Language.join("OTC: ", AtomixMessages.message(m)))); }
         };
     }
 
-    private String otcStatusText(OtcDb.Deal d) {
+    private CharSequence otcStatusText(OtcDb.Deal d) {
         if (OtcDb.ST_PROPOSED.equals(d.status) || OtcDb.ST_COUNTERED.equals(d.status))
-            return OtcDb.TURN_ME.equals(d.whoseTurn) ? "Your move — accept, counter or reject" : "Waiting for the counterparty…";
-        if (OtcDb.ST_AGREED.equals(d.status)) return "Agreed — settling";
-        if (OtcDb.ST_EXECUTING.equals(d.status)) return "Executing — HTLC legs locking";
-        if (OtcDb.ST_COMPLETE.equals(d.status)) return "Complete";
-        if (OtcDb.ST_REJECTED.equals(d.status)) return "Rejected";
-        if (OtcDb.ST_EXPIRED.equals(d.status)) return "Expired";
+            return OtcDb.TURN_ME.equals(d.whoseTurn) ? Language.msg(l10n_atomix_otc_your_move) : Language.msg(l10n_atomix_otc_waiting);
+        if (OtcDb.ST_AGREED.equals(d.status)) return Language.msg(l10n_atomix_otc_agreed);
+        if (OtcDb.ST_EXECUTING.equals(d.status)) return Language.msg(l10n_atomix_otc_executing);
+        if (OtcDb.ST_COMPLETE.equals(d.status)) return Language.msg(l10n_atomix_otc_complete);
+        if (OtcDb.ST_REJECTED.equals(d.status)) return Language.msg(l10n_atomix_otc_rejected);
+        if (OtcDb.ST_EXPIRED.equals(d.status)) return Language.msg(l10n_atomix_otc_expired);
         return d.status;
     }
     private int otcStatusColor(OtcDb.Deal d) {
@@ -3986,20 +4130,21 @@ public class MainActivity extends AppCompatActivity {
     /** Pre-check that I can fund the leg I'll lock for an OTC deal (my role + the deal's side), from cached balances.
      *  Returns null if OK (or the balance is unknown), else a user-facing shortfall message. The on-chain lock is the
      *  authoritative backstop — this is a fast UX guard so I never offer/accept terms I can't fund. */
-    private String otcCheckFunds(String role, String side, String amount, String price) {
-        double amt = parseD(amount, 0), pr = parseD(price, 0);
+    private CharSequence otcCheckFunds(String role, String side, String amount, String price) {
+        if (!OtcController.validTerms(amount, price)) return Language.msg(l10n_atomix_otc_enter_terms);
+        double amt = otcNumber(amount, 0), pr = otcNumber(price, 0);
         boolean iLockMinima = (OtcDb.ROLE_INSTIGATOR.equals(role) && OtcOffer.LP_BUYS_MINIMA.equals(side))
                 || (OtcDb.ROLE_LP.equals(role) && OtcOffer.LP_SELLS_MINIMA.equals(side));
         if (iLockMinima) {                                               // I'd lock mxUSDT = amount
-            double have = parseD(minimaBal, -1);                         // "sendable" (tradeable) mxUSDT
+            double have = otcNumber(minimaBal, -1);                         // "sendable" (tradeable) mxUSDT
             if (have < 0) return null;                                   // unknown → don't block; execute is the gate
-            if (amt > have + 1e-9) return "Not enough " + ccy() + " — need " + trim(amt) + ", have " + trim(have);
+            if (amt > have + 1e-9) return Language.msg(l10n_atomix_otc_funds, ccy(), trim(amt), trim(have));
         } else {                                                        // I'd lock USDT = amount × price
             String u = tokenBals.get("USDT");
             if (u == null) return null;                                 // not loaded → don't block
-            double have = parseD(Util.tidyAmount(u), -1), need = amt * pr;
+            double have = otcNumber(Util.tidyAmount(u), -1), need = amt * pr;
             if (have < 0) return null;
-            if (need > have + 1e-9) return "Not enough USDT — need " + trim(need) + ", have " + trim(have);
+            if (need > have + 1e-9) return Language.msg(l10n_atomix_otc_funds, "USDT", trim(need), trim(have));
         }
         return null;
     }
@@ -4008,49 +4153,51 @@ public class MainActivity extends AppCompatActivity {
         final boolean iBuy = OtcOffer.LP_SELLS_MINIMA.equals(dealSide);
         final double cap = lp.capFor(dealSide);
         LinearLayout box = new LinearLayout(this); box.setOrientation(LinearLayout.VERTICAL); box.setPadding(dp(4), dp(4), dp(4), dp(4));
-        box.addView(fieldLabel(ccy() + " amount (≤ " + trimSig(cap) + ")"));
+        box.addView(fieldLabel(Language.msg(l10n_atomix_otc_capped_amount, ccy(), trimSig(cap))));
         final EditText amtE = new EditText(this); decimalInput(amtE); amtE.setTextColor(Design.TEXT()); amtE.setTextSize(16f); amtE.setTypeface(Design.mono()); box.addView(amtE);
-        box.addView(fieldLabel("Price (USDT per " + ccy() + ")"));
+        box.addView(fieldLabel(Language.msg(l10n_atomix_otc_price, ccy())));
         final EditText prE = new EditText(this); decimalInput(prE); prE.setTextColor(Design.TEXT()); prE.setTextSize(16f); prE.setTypeface(Design.mono()); box.addView(prE);
         modalOpen = true;
-        dialog().setTitle(iBuy ? "Buy " + ccy() : "Sell " + ccy())
+        dialog().setTitle(iBuy ? Language.msg(l10n_atomix_otc_buy, ccy()) : Language.msg(l10n_atomix_otc_sell, ccy()))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Send offer", (dg, w) -> {
-                    double a = parseD(amtE.getText().toString(), 0), p = parseD(prE.getText().toString(), 0);
-                    if (a <= 0 || p <= 0) { toast("Enter amount + price"); return; }
-                    if (a > cap + 1e-9) { toast("Above the LP's max size"); return; }
-                    String fundErr = otcCheckFunds(OtcDb.ROLE_INSTIGATOR, dealSide, trim(a), trimSig(p));
+                .setPositiveButton(Language.msg(l10n_atomix_otc_send_offer), (dg, w) -> {
+                    double a = otcNumber(amtE.getText().toString(), 0), p = otcNumber(prE.getText().toString(), 0);
+                    if (a <= 0 || p <= 0 || !Double.isFinite(a) || !Double.isFinite(p) || !OtcController.validTerms(trim(a), trimSig(p))) { toast(Language.msg(l10n_atomix_otc_enter_terms)); return; }
+                    if (a > cap + 1e-9) { toast(Language.msg(l10n_atomix_otc_above_limit)); return; }
+                    CharSequence fundErr = otcCheckFunds(OtcDb.ROLE_INSTIGATOR, dealSide, trim(a), trimSig(p));
                     if (fundErr != null) { toast(fundErr); return; }
-                    if (otc != null) otc.propose(lp, dealSide, trim(a), trimSig(p), otcRes("Offer sent"));
+                    if (otc != null) otc.propose(lp, dealSide, trim(a), trimSig(p), otcRes(Language.msg(l10n_atomix_otc_offer_sent)));
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .setOnDismissListener(dg -> { modalOpen = false; render(); })
                 .show();
     }
 
     private void otcCounterDialog(final OtcDb.Deal d) {
+        if (!d.inActiveMarket()) { toast(Language.msg(l10n_atomix_otc_market_unavailable)); return; }
         LinearLayout box = new LinearLayout(this); box.setOrientation(LinearLayout.VERTICAL); box.setPadding(dp(4), dp(4), dp(4), dp(4));
-        box.addView(fieldLabel(ccy() + " amount"));
-        final EditText amtE = new EditText(this); decimalInput(amtE); amtE.setText(d.amount); amtE.setTextColor(Design.TEXT()); amtE.setTextSize(16f); amtE.setTypeface(Design.mono()); box.addView(amtE);
-        box.addView(fieldLabel("Price (USDT per " + ccy() + ")"));
-        final EditText prE = new EditText(this); decimalInput(prE); prE.setText(d.price); prE.setTextColor(Design.TEXT()); prE.setTextSize(16f); prE.setTypeface(Design.mono()); box.addView(prE);
+        box.addView(fieldLabel(Language.msg(l10n_atomix_otc_amount, ccy())));
+        final EditText amtE = new EditText(this); decimalInput(amtE); Language.setText(amtE, d.amount); amtE.setTextColor(Design.TEXT()); amtE.setTextSize(16f); amtE.setTypeface(Design.mono()); box.addView(amtE);
+        box.addView(fieldLabel(Language.msg(l10n_atomix_otc_price, ccy())));
+        final EditText prE = new EditText(this); decimalInput(prE); Language.setText(prE, d.price); prE.setTextColor(Design.TEXT()); prE.setTextSize(16f); prE.setTypeface(Design.mono()); box.addView(prE);
         modalOpen = true;
-        dialog().setTitle("Counter-offer").setView(wrapScroll(box))
-                .setPositiveButton("Send counter", (dg, w) -> {
-                    double a = parseD(amtE.getText().toString(), 0), p = parseD(prE.getText().toString(), 0);
-                    if (a <= 0 || p <= 0) { toast("Enter amount + price"); return; }
-                    String fundErr = otcCheckFunds(d.role, d.side, trim(a), trimSig(p));
+        dialog().setTitle(Language.msg(l10n_atomix_otc_counter_offer)).setView(wrapScroll(box))
+                .setPositiveButton(Language.msg(l10n_atomix_otc_send_counter), (dg, w) -> {
+                    double a = otcNumber(amtE.getText().toString(), 0), p = otcNumber(prE.getText().toString(), 0);
+                    if (a <= 0 || p <= 0 || !Double.isFinite(a) || !Double.isFinite(p) || !OtcController.validTerms(trim(a), trimSig(p))) { toast(Language.msg(l10n_atomix_otc_enter_terms)); return; }
+                    CharSequence fundErr = otcCheckFunds(d.role, d.side, trim(a), trimSig(p));
                     if (fundErr != null) { toast(fundErr); return; }
-                    if (otc != null) otc.counter(d, trim(a), trimSig(p), otcRes("Counter sent"));
+                    if (otc != null) otc.counter(d, trim(a), trimSig(p), otcRes(Language.msg(l10n_atomix_otc_counter_sent)));
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .setOnDismissListener(dg -> { modalOpen = false; render(); })
                 .show();
     }
 
     private void publishOtcOffer(double sellSize, double buySize) {
-        if (IdentityWatch.halted()) { toast("Halted: app keys don't match your node"); return; }
-        if (identity == null || myMinimaPk == null || !wallet.ready()) { toast("Still connecting…"); return; }
+        if (!Double.isFinite(sellSize) || !Double.isFinite(buySize) || sellSize < 0 || buySize < 0) { toast(Language.msg(l10n_atomix_otc_enter_size)); return; }
+        if (IdentityWatch.halted()) { toast(Language.msg(l10n_atomix_otc_halted)); return; }
+        if (identity == null || myMinimaPk == null || !wallet.ready()) { toast(Language.msg(l10n_atomix_otc_connecting)); return; }
         if (!PublishGate.tryAcquire(PublishGate.OTC)) {
             // A keep-alive publish (old sizes) is in flight. Zero the ok-stamp AND bump the gen: the
             // in-flight publish's onSent is gen-checked, so it can no longer re-stamp over our zero —
@@ -4058,7 +4205,7 @@ public class MainActivity extends AppCompatActivity {
             PublishGate.bumpGen();
             prefs.edit().putLong("otc_last_publish_ok", 0).apply();
             SwapLog.d("fg OTC publish deferred — gate busy, stamp zeroed + gen bumped");
-            toast("Publishing busy — your sizes go live shortly");
+            toast(Language.msg(l10n_atomix_otc_busy));
             return;
         }
         final long gen = PublishGate.gen();
@@ -4071,12 +4218,12 @@ public class MainActivity extends AppCompatActivity {
                 if (gen != PublishGate.gen()) { SwapLog.d("fg OTC publish superseded — stamp skipped"); return; }
                 prefs.edit().putLong("otc_last_publish_ok", System.currentTimeMillis()).apply();
                 SwapLog.d("fg OTC publish OK " + txpowid);
-                ui.post(() -> { toast("You're live for OTC"); render(); });
+                ui.post(() -> { toast(Language.msg(l10n_atomix_otc_published)); render(); });
             }
             @Override public void onFailed(String message) {
                 PublishGate.release(PublishGate.OTC);
                 SwapLog.w("fg OTC publish FAIL: " + message);
-                ui.post(() -> toast("OTC publish failed: " + message));
+                ui.post(() -> toast(Language.msg(l10n_atomix_otc_publish_failed, message)));
             }
         });
     }
@@ -4088,7 +4235,7 @@ public class MainActivity extends AppCompatActivity {
         o.sellSize = 0; o.buySize = 0; o.enable = false;
         o.minimaPublicKey = myMinimaPk; o.ethAddress = ethAddr == null ? "" : ethAddr; o.commsPublicId = identity.publicId();
         OtcBook.publish(node, ls, identity, o, new CommsTransport.SendCb() {
-            @Override public void onSent(String txpowid) { ui.post(() -> { toast("Withdrawn"); render(); }); }
+            @Override public void onSent(String txpowid) { ui.post(() -> { toast(Language.msg(l10n_atomix_otc_withdrawn)); render(); }); }
             @Override public void onFailed(String message) { ui.post(() -> render()); }
         });
     }
@@ -4101,13 +4248,13 @@ public class MainActivity extends AppCompatActivity {
         if (identity == null || myMinimaPk == null || !wallet.ready()) return;
         if (!prefs.getBoolean("otc_auto", false)) return;
         if (System.currentTimeMillis() - prefs.getLong("otc_last_publish_ok", 0) < REPUBLISH_INTERVAL_MS) return;
-        publishOtcOffer(parseD(prefs.getString("otc_sell_size", "0"), 0), parseD(prefs.getString("otc_buy_size", "0"), 0));
+        publishOtcOffer(otcNumber(prefs.getString("otc_sell_size", "0"), 0), otcNumber(prefs.getString("otc_buy_size", "0"), 0));
     }
 
     private int dp(int v) { return Design.dp(this, v); }
     // ===================== Export trading history to CSV (maker + taker) =====================
     private void exportSwapsCsv() {
-        if (db == null || db.allSwaps().isEmpty()) { toast("No swaps to export"); return; }
+        if (db == null || db.allSwaps().isEmpty()) { toast(Language.msg(l10n_atomix_history_no_export)); return; }
         csvLauncher.launch("atomix-trades.csv");
     }
 
@@ -4141,11 +4288,17 @@ public class MainActivity extends AppCompatActivity {
                     os.write(sb.toString().getBytes(StandardCharsets.UTF_8));
                 }
                 final int n = all.size();
-                ui.post(() -> toast("Exported " + n + " trades to CSV"));
+                ui.post(() -> toast(Language.msg(l10n_atomix_history_exported, n)));
             } catch (Exception e) {
-                ui.post(() -> toast("CSV export failed: " + (e.getMessage() == null ? "error" : e.getMessage())));
+                ui.post(() -> toast(Language.msg(l10n_atomix_history_export_failed, e.getMessage() == null ? Language.msg(l10n_atomix_history_error) : e.getMessage())));
             }
         }).start();
+    }
+
+    private CharSequence historyRole(String role) {
+        if ("RESPONDER".equals(role)) return Language.msg(l10n_atomix_history_maker);
+        if ("INITIATOR".equals(role)) return Language.msg(l10n_atomix_history_taker);
+        return role == null ? "" : role;
     }
 
     private static String roleLabel(String r) { return "RESPONDER".equals(r) ? "Maker" : ("INITIATOR".equals(r) ? "Taker" : (r == null ? "" : r)); }
@@ -4204,7 +4357,7 @@ public class MainActivity extends AppCompatActivity {
         return "\"" + s.replace("\"", "\"\"") + "\"";
     }
 
-    private void toast(String s) { Toast.makeText(this, s, Toast.LENGTH_SHORT).show(); }
+    private void toast(CharSequence s) { Toast.makeText(this, s, Toast.LENGTH_SHORT).show(); }
 
     // ---- notifications ----
 
@@ -4222,29 +4375,24 @@ public class MainActivity extends AppCompatActivity {
     private void postNotification(String title, String body) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
                 && ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            toast(title + " — " + body);
+            toast(Language.join(AtomixMessages.message(title), " — ", AtomixMessages.message(body)));
             return;
         }
         NotificationManager nm = getSystemService(NotificationManager.class);
         if (nm == null) return;
         NotificationCompat.Builder n = new NotificationCompat.Builder(this, CH)
                 .setSmallIcon(android.R.drawable.stat_sys_upload_done)
-                .setContentTitle(title)
-                .setContentText(body)
+                .setContentTitle(AtomixMessages.message(title))
+                .setContentText(AtomixMessages.message(body))
                 // BigTextStyle so a full identifier (e.g. the ETH address in "Add ETH for gas") survives the
                 // shade instead of being ellipsised by the system — RULE 1. SwapService.alert already does this.
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(AtomixMessages.message(body)))
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         nm.notify("pandamonium.atomix.ui", notifId.incrementAndGet(), n.build());
     }
 
-    private void ensureChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager nm = getSystemService(NotificationManager.class);
-            if (nm != null) nm.createNotificationChannel(new NotificationChannel(CH, "Swaps", NotificationManager.IMPORTANCE_DEFAULT));
-        }
-    }
+    private void ensureChannel() { AtomixMessages.ensureChannels(this); }
 
     private void requestNotifPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU

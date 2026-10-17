@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.main.views.receive;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.view.View;
@@ -38,7 +41,7 @@ public class ReceiveView extends BaseView {
             public void onClick(View v) {
                 String addr = mAddressText.getText().toString().trim();
                 if(!addr.isEmpty()){
-                    Clip.copy(getActivity(), "address", addr, "Address copied");
+                    Clip.copy(getActivity(), "address", addr, Language.msg(l10n_wallet_address_copied).toString());
                 }
             }
         });

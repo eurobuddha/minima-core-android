@@ -1,80 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="6dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="12dp" android:paddingBottom="6dp">
 
-        <TextView
-            android:id="@+id/pm_pandapools_actPersonal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="MY ACTIVITY"
-            android:textSize="12sp"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:paddingTop="7dp"
-            android:paddingBottom="7dp" />
+        <TextView android:id="@+id/pm_pandapools_actPersonal" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/l10n_pools_my_activity" android:textSize="12sp" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="7dp" android:paddingBottom="7dp" android:tag="l10n:text=l10n_pools_my_activity" android:layout_weight="1" android:minHeight="48dp" android:gravity="center" />
 
-        <View
-            android:layout_width="8dp"
-            android:layout_height="1dp" />
+        <View android:layout_width="8dp" android:layout_height="1dp" />
 
-        <TextView
-            android:id="@+id/pm_pandapools_actGlobal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ALL POOLS"
-            android:textSize="12sp"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:paddingTop="7dp"
-            android:paddingBottom="7dp" />
+        <TextView android:id="@+id/pm_pandapools_actGlobal" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/l10n_pools_all_pools" android:textSize="12sp" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="7dp" android:paddingBottom="7dp" android:tag="l10n:text=l10n_pools_all_pools" android:layout_weight="1" android:minHeight="48dp" android:gravity="center" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <TextView
-            android:id="@+id/pm_pandapools_actRefresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="↻"
-            android:textSize="16sp"
-            android:padding="6dp" />
+        <TextView android:id="@+id/pm_pandapools_actRefresh" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="↻" android:textSize="16sp" android:padding="6dp" android:minHeight="48dp" android:minWidth="48dp" android:gravity="center" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/pm_pandapools_actStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:textSize="12sp"
-        android:visibility="gone" />
+    <TextView android:id="@+id/pm_pandapools_actStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="4dp" android:paddingBottom="4dp" android:textSize="12sp" android:visibility="gone" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
 
-        <LinearLayout
-            android:id="@+id/pm_pandapools_actContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp" />
+        <LinearLayout android:id="@+id/pm_pandapools_actContainer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="12dp" />
     </ScrollView>
 </LinearLayout>

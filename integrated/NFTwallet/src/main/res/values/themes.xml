@@ -1,0 +1,6 @@
+<resources>
+    <style name="pm_nftwallet_Base.Theme.NFTWallet" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
+
+    <style name="pm_nftwallet_Theme.NFTWallet" parent="pm_nftwallet_Base.Theme.NFTWallet" />
+</resources>

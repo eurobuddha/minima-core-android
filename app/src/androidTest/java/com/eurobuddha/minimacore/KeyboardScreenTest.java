@@ -30,6 +30,7 @@ import com.eurobuddha.minimacore.main.ParamsActivity;
 import com.eurobuddha.minimacore.main.SeedSyncActivity;
 import com.eurobuddha.minimacore.main.views.send.SendActivity;
 import com.eurobuddha.minimacore.main.views.terminal.TerminalActivity;
+import com.eurobuddha.minimacore.main.views.logs.LogsActivity;
 import com.eurobuddha.minimacore.utils.KeyboardInsets;
 
 import java.io.File;
@@ -52,6 +53,21 @@ public class KeyboardScreenTest {
         check(SendActivity.class, R.id.send_main, R.id.wallet_send_address, false, R.id.wallet_send_sendbutton);
     }
 
+    @Test public void ukrainianSendButtonRemainsReachable() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        assertEquals("true", InstrumentationRegistry.getArguments().getString("bearLanguagesDisposable"));
+        assertEquals("ranchu", android.os.Build.HARDWARE);
+        assertNull(org.minima.system.Main.getInstance());
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() ->
+                com.eurobuddha.minimacore.i18n.Language.select(context, "uk"));
+        try {
+            check(SendActivity.class, R.id.send_main, R.id.wallet_send_address, false, R.id.wallet_send_sendbutton);
+        } finally {
+            InstrumentationRegistry.getInstrumentation().runOnMainSync(() ->
+                    com.eurobuddha.minimacore.i18n.Language.select(context, "en"));
+        }
+    }
+
     @Test public void resyncButtonRemainsReachable() {
         check(SeedSyncActivity.class, R.id.sync_main, R.id.seed_sync_host, false, R.id.seed_sync_proceed);
     }
@@ -64,6 +80,11 @@ public class KeyboardScreenTest {
     @Test public void newWalletButtonsRemainReachable() {
         check(NewWalletRestoreActivity.class, R.id.restorewallet_main, R.id.restorewallet_seed, false,
                 R.id.restorewallet_button_check, R.id.restorewallet_button_proceed);
+    }
+
+    @Test public void logsFilterAndActionsRemainReachable() {
+        check(LogsActivity.class, R.id.logs_main, R.id.logs_filter, false,
+                R.id.logs_pause, R.id.logs_clear, R.id.logs_share);
     }
 
     @Test public void terminalInputAndRunStayAboveKeyboard() {

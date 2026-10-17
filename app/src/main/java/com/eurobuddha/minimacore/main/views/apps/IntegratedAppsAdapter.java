@@ -1,6 +1,9 @@
 package com.eurobuddha.minimacore.main.views.apps;
 
 import android.content.Context;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +47,7 @@ public class IntegratedAppsAdapter extends BaseAdapter {
         View row = convertView != null ? convertView
                 : mInflater.inflate(R.layout.view_apps_internal_row, parent, false);
 
+        Language.apply(row);
         final IntegratedApp app = mItems.get(position);
         ImageView icon = row.findViewById(R.id.int_app_icon);
         TextView name  = row.findViewById(R.id.int_app_name);
@@ -52,8 +56,8 @@ public class IntegratedAppsAdapter extends BaseAdapter {
 
         icon.setImageDrawable(app.icon);
         name.setText(app.name);
-        state.setText(app.locked ? "Always on"
-                : app.enabled ? "In app drawer" : "Hidden from drawer");
+        Language.setText(state, Language.msg(app.locked ? l10n_apps_always_on
+                : app.enabled ? l10n_apps_in_drawer : l10n_apps_hidden));
 
         // Clear the listener before setChecked so recycled rows don't fire a toggle.
         sw.setOnCheckedChangeListener(null);

@@ -1,17 +1,17 @@
 package com.eurobuddha.minimacore.main.views.send;
 
+import com.eurobuddha.minimacore.i18n.Language;
+
 import android.content.Context;
 import android.widget.ArrayAdapter;
 
 import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
-import org.minima.utils.json.parser.JSONParser;
-import org.minima.utils.json.parser.ParseException;
 import com.eurobuddha.minimacore.R;
 
 import java.util.ArrayList;
 
-public class TokenSpinnerAdapter extends ArrayAdapter<String> {
+public class TokenSpinnerAdapter extends ArrayAdapter<CharSequence> {
 
     JSONArray mBalance;
 
@@ -25,25 +25,9 @@ public class TokenSpinnerAdapter extends ArrayAdapter<String> {
 
         mBalance = zBalance;
 
-        //Get a string list
-        ArrayList<String> tokens = new ArrayList<>();
-        for(int i=0;i<mBalance.size();i++){
-            JSONObject bal = (JSONObject) mBalance.get(i);
-
-            String tokenid = bal.getString("tokenid").toString();
-            if(tokenid.equals("0x00")){
-                tokens.add("Minima");
-            }else{
-                String fullname = bal.get("token").toString();
-
-                try {
-                    JSONObject namejson = (JSONObject) new JSONParser().parse(fullname);
-                    tokens.add(namejson.getString("name").toString());
-
-                } catch (ParseException e) {
-                    tokens.add(fullname);
-                }
-            }
+        ArrayList<CharSequence> tokens = new ArrayList<>();
+        for (int i=0; i<mBalance.size(); i++) {
+            tokens.add(com.eurobuddha.minimacore.utils.TokenUtils.getTokenDisplayName((JSONObject)mBalance.get(i)));
         }
 
         //Add the new
@@ -52,7 +36,20 @@ public class TokenSpinnerAdapter extends ArrayAdapter<String> {
         notifyDataSetChanged();
     }
 
+    @Override public android.view.View getView(int position, android.view.View recycled, android.view.ViewGroup parent) {
+        android.view.View row = super.getView(position, recycled, parent);
+        Language.setText(row.findViewById(R.id.send_spinner_text), getItem(position));
+        return row;
+    }
+
+    @Override public android.view.View getDropDownView(int position, android.view.View recycled, android.view.ViewGroup parent) {
+        android.view.View row = super.getDropDownView(position, recycled, parent);
+        Language.setText(row.findViewById(R.id.send_spinner_text), getItem(position));
+        return row;
+    }
+
     public JSONObject getToken(int zPosition){
+        if (mBalance == null || zPosition < 0 || zPosition >= mBalance.size()) return null;
         JSONObject bal = (JSONObject) mBalance.get(zPosition);
         return bal;
     }

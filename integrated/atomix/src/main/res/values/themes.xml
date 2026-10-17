@@ -5,7 +5,13 @@
     <style name="pm_atomix_Theme.Utxo" parent="pm_atomix_Base.Theme.Utxo" />
 
     
-    <style name="pm_atomix_SwapDialogDark" parent="android:Theme.Material.Dialog.Alert">
+    <style name="pm_atomix_SwapDialogDark" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">#F7931A</item>
+        <item name="colorAccent">#F7931A</item>
+        <item name="colorSurface">#12151C</item>
+        <item name="colorSurfaceContainerHigh">#12151C</item>
+        <item name="colorOnSurface">#EEF0F4</item>
+        <item name="colorOnSurfaceVariant">#8B909C</item>
         <item name="android:colorBackground">#12151C</item>
         <item name="android:textColorPrimary">#EEF0F4</item>
         <item name="android:textColorSecondary">#8B909C</item>
@@ -23,7 +29,13 @@
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
-    <style name="pm_atomix_SwapDialogLight" parent="android:Theme.Material.Light.Dialog.Alert">
+    <style name="pm_atomix_SwapDialogLight" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">#8F4A00</item>
+        <item name="colorAccent">#8F4A00</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorSurfaceContainerHigh">#FFFFFF</item>
+        <item name="colorOnSurface">#181B22</item>
+        <item name="colorOnSurfaceVariant">#6F7583</item>
         <item name="android:colorBackground">#FFFFFF</item>
         <item name="android:textColorPrimary">#181B22</item>
         <item name="android:textColorSecondary">#8B909C</item>

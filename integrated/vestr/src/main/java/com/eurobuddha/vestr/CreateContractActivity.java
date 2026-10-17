@@ -1,4 +1,6 @@
 package com.eurobuddha.vestr;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -25,12 +27,12 @@ import java.util.Random;
 /** Create a vesting contract — token, withdrawal address, amount, start/end, grace, burn → send state:{}. */
 public class CreateContractActivity extends SubActivity {
 
-    private final SimpleDateFormat fmt = new SimpleDateFormat("dd MMM yyyy  HH:mm", Locale.ENGLISH);
+
 
     private String script = "";
     private int tip = 0;
     private final List<String> tokenIds = new ArrayList<>();
-    private final List<String> tokenNames = new ArrayList<>();
+    private final List<CharSequence> tokenNames = new ArrayList<>();
 
     private Spinner tokenSpinner, graceSpinner;
     private EditText addressInput, amountInput, burnInput, passwordInput;
@@ -40,7 +42,7 @@ public class CreateContractActivity extends SubActivity {
     /** Build the form, then kick off the three async fetches (tip, token list, default address). */
     @Override
     protected void init() {
-        title("Create a contract");
+        title(Language.msg(l10n_vestr_create));
         script = getIntent().getStringExtra("script");
         if (script == null) script = "";
         buildForm();
@@ -51,50 +53,50 @@ public class CreateContractActivity extends SubActivity {
 
     /** Lay out every field; spinners start seeded with Minima and get replaced once fetches land. */
     private void buildForm() {
-        label("Token");
+        label(Language.msg(l10n_vestr_token));
         tokenSpinner = new Spinner(this);
         tokenNames.add("Minima"); tokenIds.add("0x00");
         tokenSpinner.setAdapter(tokenAdapter());
         form.addView(tokenSpinner);
 
-        label("Withdrawal address");
-        addressInput = input("Mx… or 0x…", T_TEXT);
+        label(Language.msg(l10n_vestr_withdrawal));
+        addressInput = input(Language.msg(l10n_vestr_address_hint), T_TEXT);
 
-        label("Token amount");
+        label(Language.msg(l10n_vestr_amount));
         amountInput = input("0.0", T_DEC);
 
-        label("Contract start");
-        startBtn = pickerButton("Select start date & time");
-        startBtn.setOnClickListener(v -> pickDateTime(startMs, ms -> { startMs = ms; startBtn.setText(fmt.format(ms)); }));
+        label(Language.msg(l10n_vestr_start));
+        startBtn = pickerButton(Language.msg(l10n_vestr_pick_start));
+        startBtn.setOnClickListener(v -> pickDateTime(startMs, ms -> { startMs = ms; Language.setText(startBtn, Language.stamp(ms, "yMMMdHm")); }));
 
-        label("Contract end");
-        endBtn = pickerButton("Select end date & time");
-        endBtn.setOnClickListener(v -> pickDateTime(endMs, ms -> { endMs = ms; endBtn.setText(fmt.format(ms)); }));
+        label(Language.msg(l10n_vestr_end));
+        endBtn = pickerButton(Language.msg(l10n_vestr_pick_end));
+        endBtn.setOnClickListener(v -> pickDateTime(endMs, ms -> { endMs = ms; Language.setText(endBtn, Language.stamp(ms, "yMMMdHm")); }));
 
-        label("Grace period (time between collections)");
+        label(Language.msg(l10n_vestr_grace_help));
         graceSpinner = new Spinner(this);
-        List<String> graces = new ArrayList<>();
-        for (VestingContract.Grace g : VestingContract.Grace.values()) graces.add(g.label);
-        ArrayAdapter<String> ga = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, graces);
+        List<CharSequence> graces = new ArrayList<>();
+        for (VestingContract.Grace g : VestingContract.Grace.values()) graces.add(VestrText.grace(g));
+        ArrayAdapter<CharSequence> ga = VestrText.choices(this, graces);
         ga.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         graceSpinner.setAdapter(ga);
         graceSpinner.setSelection(1);   // Daily (the dapp default)
         form.addView(graceSpinner);
 
-        label("Burn (optional, MINIMA)");
+        label(Language.msg(l10n_vestr_burn));
         burnInput = input("0", T_DEC);
 
-        label("Vault password (only if your node is locked)");
-        passwordInput = input("Vault password", T_PASS);
+        label(Language.msg(l10n_vestr_password_help));
+        passwordInput = input(Language.msg(l10n_vestr_password), T_PASS);
 
-        createBtn = primaryButton("Review & create");
+        createBtn = primaryButton(Language.msg(l10n_vestr_review_create));
         createBtn.setOnClickListener(v -> submit());
         status = status();
     }
 
     /** Spinner adapter backed by the live tokenNames list (rebuilt when the balance fetch returns). */
-    private ArrayAdapter<String> tokenAdapter() {
-        ArrayAdapter<String> a = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tokenNames);
+    private ArrayAdapter<CharSequence> tokenAdapter() {
+        ArrayAdapter<CharSequence> a = VestrText.choices(this, tokenNames);
         a.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         return a;
     }
@@ -123,8 +125,8 @@ public class CreateContractActivity extends SubActivity {
                     JSONObject b = arr.optJSONObject(i);
                     if (b == null) continue;
                     String tid = b.optString("tokenid", "0x00");
-                    String name = Util.isMinima(tid) ? "Minima" : Util.tokenName(b.opt("token"), tid);
-                    tokenIds.add(tid); tokenNames.add(name + "  (" + Util.tidyAmount(b.optString("sendable", "0")) + ")");
+                    CharSequence name = VestrText.token(b.opt("token"), tid);
+                    tokenIds.add(tid); tokenNames.add(Language.join(name, "  (", Util.tidyAmount(b.optString("sendable", "0")), ")"));
                 }
                 if (tokenIds.isEmpty()) { tokenIds.add("0x00"); tokenNames.add("Minima"); }
                 tokenSpinner.setAdapter(tokenAdapter());
@@ -139,7 +141,7 @@ public class CreateContractActivity extends SubActivity {
             @Override public void onResult(JSONObject j) {
                 JSONObject r = j.optJSONObject("response");
                 String a = r == null ? "" : r.optString("miniaddress", r.optString("address", ""));
-                if (!a.isEmpty() && addressInput.getText().length() == 0) addressInput.setText(a);
+                if (!a.isEmpty() && addressInput.getText().length() == 0) Language.setText(addressInput, a);
             }
             @Override public void onError(String m) {}
         });
@@ -159,24 +161,24 @@ public class CreateContractActivity extends SubActivity {
         // Validation order matters: each guard assumes the earlier ones passed (amount parsed before
         // sign check; both dates picked before the future/ordering checks; tip last so a still-syncing
         // node fails with the friendliest message rather than a confusing earlier one).
-        if (addr.isEmpty() || !Util.isValidAddress(addr)) { setStatus(status, "Enter a valid withdrawal address.", false); return; }
+        if (addr.isEmpty() || !Util.isValidAddress(addr)) { setStatus(status, Language.msg(l10n_vestr_valid_address), false); return; }
         final BigDecimal amount;
-        try { amount = new BigDecimal(amountStr); } catch (Exception e) { setStatus(status, "Enter a valid amount.", false); return; }
-        if (amount.signum() <= 0) { setStatus(status, "Amount must be greater than zero.", false); return; }
-        if (startMs == 0) { setStatus(status, "Pick a start date.", false); return; }
-        if (endMs == 0) { setStatus(status, "Pick an end date.", false); return; }
-        if (startMs <= System.currentTimeMillis()) { setStatus(status, "Start must be in the future.", false); return; }
-        if (endMs <= startMs) { setStatus(status, "End must be after the start.", false); return; }
-        if (tip == 0) { setStatus(status, "Still syncing the chain tip — try again in a moment.", false); return; }
+        try { amount = new BigDecimal(amountStr); } catch (Exception e) { setStatus(status, Language.msg(l10n_vestr_valid_amount), false); return; }
+        if (amount.signum() <= 0) { setStatus(status, Language.msg(l10n_vestr_positive), false); return; }
+        if (startMs == 0) { setStatus(status, Language.msg(l10n_vestr_start_required), false); return; }
+        if (endMs == 0) { setStatus(status, Language.msg(l10n_vestr_end_required), false); return; }
+        if (startMs <= System.currentTimeMillis()) { setStatus(status, Language.msg(l10n_vestr_future_start), false); return; }
+        if (endMs <= startMs) { setStatus(status, Language.msg(l10n_vestr_end_after), false); return; }
+        if (tip == 0) { setStatus(status, Language.msg(l10n_vestr_syncing_tip), false); return; }
 
         // Resolve to the 0x hex form — the contract compares GETOUTADDR (always 0x) against state[0],
         // so a user-entered Mx... address must be normalised here or the on-chain check would never match.
         // checkaddress runs async, so the actual send is deferred to doSend() in the callback below.
         createBtn.setEnabled(false);
-        setStatus(status, "Validating address…", true);
+        setStatus(status, Language.msg(l10n_vestr_validating), true);
         node.cmd("checkaddress address:" + addr, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
-                if (!j.optBoolean("status", false)) { createBtn.setEnabled(true); setStatus(status, "That isn't a valid Minima address.", false); return; }
+                if (!j.optBoolean("status", false)) { createBtn.setEnabled(true); setStatus(status, Language.msg(l10n_vestr_invalid_address), false); return; }
                 JSONObject r = j.optJSONObject("response");
                 String hex = r == null ? "" : r.optString("0x", "");
                 if (hex.isEmpty()) hex = addr;
@@ -184,7 +186,7 @@ public class CreateContractActivity extends SubActivity {
             }
             @Override public void onError(String m) {
                 createBtn.setEnabled(true);
-                setStatus(status, NodeApi.ERR_NOT_ENABLED.equals(m) ? "The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry." : "Could not validate the address.", false);
+                setStatus(status, NodeApi.ERR_NOT_ENABLED.equals(m) ? Language.msg(l10n_explorer_node_retry) : Language.msg(l10n_vestr_validate_failed), false);
             }
         });
     }
@@ -219,23 +221,23 @@ public class CreateContractActivity extends SubActivity {
         if (!burn.isEmpty() && isPositive(burn)) cmd.append(" burn:").append(burn);
 
         createBtn.setEnabled(false);
-        setStatus(status, "Creating contract…", true);
+        setStatus(status, Language.msg(l10n_vestr_creating), true);
         node.cmd(cmd.toString(), new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 boolean ok = j.optBoolean("status", false);
                 boolean pending = j.optBoolean("pending", false);
                 if (ok || pending) {
-                    setStatus(status, pending ? "Pending — approve it in Minima Core, then it will appear in your contracts."
-                            : "✓ Contract created. It will appear in your contracts shortly.", true);
+                    setStatus(status, pending ? Language.msg(l10n_vestr_pending)
+                            : Language.msg(l10n_vestr_created), true);
                     startBtn.postDelayed(CreateContractActivity.this::finish, 1400);
                 } else {
                     createBtn.setEnabled(true);
-                    setStatus(status, j.optString("error", "Could not create the contract."), false);
+                    setStatus(status, j.has("error") ? j.optString("error") : Language.msg(l10n_vestr_create_failed), false);
                 }
             }
             @Override public void onError(String m) {
                 createBtn.setEnabled(true);
-                setStatus(status, NodeApi.ERR_NOT_ENABLED.equals(m) ? "The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry." : m, false);
+                setStatus(status, NodeApi.ERR_NOT_ENABLED.equals(m) ? Language.msg(l10n_explorer_node_retry) : VestrMessages.message(m), false);
             }
         });
     }
@@ -251,13 +253,13 @@ public class CreateContractActivity extends SubActivity {
         if (initial > 0) c.setTimeInMillis(initial);
         // DatePicker first; its onDateSet writes Y/M/D into c, then opens the TimePicker which writes
         // H/M and finally hands the full timestamp to cb. cb never fires if the user cancels either dialog.
-        new DatePickerDialog(this, (dp, y, mo, d) -> {
+        languagePicker(() -> new DatePickerDialog(this, (dp, y, mo, d) -> {
             c.set(Calendar.YEAR, y); c.set(Calendar.MONTH, mo); c.set(Calendar.DAY_OF_MONTH, d);
-            new TimePickerDialog(this, (tp, h, mi) -> {
+            languagePicker(() -> new TimePickerDialog(this, (tp, h, mi) -> {
                 c.set(Calendar.HOUR_OF_DAY, h); c.set(Calendar.MINUTE, mi); c.set(Calendar.SECOND, 0);
                 cb.on(c.getTimeInMillis());
-            }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show();
-        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+            }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true)).show();
+        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH))).show();
     }
 
     /** True if s parses as a strictly-positive number. */

@@ -1,6 +1,9 @@
 package com.eurobuddha.minimacore.main.views.terminal;
 
 import android.content.Intent;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -42,7 +45,7 @@ public class TerminalActivity extends AppCompatActivity {
 
 
         Toolbar tb = findViewById(R.id.toolbar);
-        tb.setTitle("Terminal");
+        Language.toolbarTitle(tb, Language.msg(l10n_tab_terminal));
         setSupportActionBar(tb);
         KeyboardInsets.install(this, findViewById(R.id.sync_main), tb);
 
@@ -51,20 +54,16 @@ public class TerminalActivity extends AppCompatActivity {
         mMainText.setTypeface(Typeface.MONOSPACE);
         mMainText.setTextIsSelectable(true);
 
-        appendText("**********************************************");
-        appendText("*  __  __  ____  _  _  ____  __  __    __    *");
-        appendText("* (  \\/  )(_  _)( \\( )(_  _)(  \\/  )  /__\\   *");
-        appendText("*  )    (  _)(_  )  (  _)(_  )    (  /(__)\\  *");
-        appendText("* (_/\\/\\_)(____)(_)\\_)(____)(_/\\/\\_)(__)(__) *");
-        appendText("*                                            *");
-        appendText("**********************************************");
-        appendText("Welcome to Minima Core "+ GlobalParams.getFullMicroVersion());
-        appendText("You can run commands in this Terminal..");
+        TerminalView.bindBanner(findViewById(R.id.main));
 
         mInput      = findViewById(R.id.terminal_input);
         mInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                // Match the configured Send action; unrelated IME actions must retain the draft.
+                if (actionId != EditorInfo.IME_ACTION_DONE && actionId != EditorInfo.IME_ACTION_SEND
+                        && !(event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                        && event.getAction() == KeyEvent.ACTION_DOWN)) return false;
                 String cmd = mInput.getText().toString().trim();
                 mInput.post(new Runnable() {
                     @Override
@@ -73,7 +72,7 @@ public class TerminalActivity extends AppCompatActivity {
                     }
                 });
 
-                if(actionId == EditorInfo.IME_ACTION_DONE){
+                if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEND){
                     runCMD(cmd);
                     return true;
                 }

@@ -1,4 +1,7 @@
 package com.eurobuddha.entropy;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.text.Editable;
 import android.text.InputType;
@@ -46,11 +49,11 @@ public class LastWordView extends BaseView {
     private void build() {
         var c = act;
         LinearLayout card = Ui.card(c);
-        card.addView(Ui.label(c, "Last-word (checksum) calculator"));
+        card.addView(Ui.label(c, Language.msg(l10n_entropy_last_calculator)));
 
         LinearLayout topRow = Ui.row(c);
-        btnHide = Ui.button(c, "🙈 Hide", Theme.panel2(), Theme.dim());
-        btnClear = Ui.button(c, "↺ Clear all", Theme.panel2(), Theme.dim());
+        btnHide = Ui.button(c, Language.msg(l10n_entropy_hide), Theme.panel2(), Theme.dim());
+        btnClear = Ui.button(c, Language.msg(l10n_entropy_clear), Theme.panel2(), Theme.dim());
         btnHide.setLayoutParams(Ui.lpRow(c, 1));
         btnClear.setLayoutParams(Ui.lpRow(c, 1));
         btnHide.setOnClickListener(v -> setHidden(!hidden));
@@ -73,9 +76,7 @@ public class LastWordView extends BaseView {
         card.addView(lenRow);
 
         TextView hint = Ui.text(c,
-                "Every BIP39 word is unique after 4 letters, so boxes auto-complete as soon as the " +
-                "word is unambiguous. The final word packs entropy bits plus the SHA-256 checksum, " +
-                "so it is calculated, never typed.", Theme.dim(), 11, false);
+                Language.msg(l10n_entropy_last_hint), Theme.dim(), 11, false);
         Ui.marginTop(hint, Ui.dp(c, 8));
         card.addView(hint);
 
@@ -90,7 +91,7 @@ public class LastWordView extends BaseView {
         Ui.marginTop(suggScroll, Ui.dp(c, 4));
         card.addView(suggScroll);
 
-        btnCalc = Ui.button(c, "Calculate valid last words", Theme.gold(), Theme.onAccent());
+        btnCalc = Ui.button(c, Language.msg(l10n_entropy_calculate), Theme.gold(), Theme.onAccent());
         btnCalc.setOnClickListener(v -> calc());
         btnCalc.setEnabled(false);
         btnCalc.setAlpha(0.4f);
@@ -104,10 +105,10 @@ public class LastWordView extends BaseView {
         container.addView(card);
 
         resultsCard = Ui.card(c);
-        resultsCard.addView(Ui.label(c, "Valid last words"));
-        TextView rHint = Ui.text(c, "tap a word to use it as your final word, or:", Theme.dim(), 10, false);
+        resultsCard.addView(Ui.label(c, Language.msg(l10n_entropy_valid_words)));
+        TextView rHint = Ui.text(c, Language.msg(l10n_entropy_tap_word), Theme.dim(), 10, false);
         resultsCard.addView(rHint);
-        btnRandom = Ui.button(c, "🎲 Pick one at random (node + device entropy)", Theme.panel2(), Theme.cyan());
+        btnRandom = Ui.button(c, Language.msg(l10n_entropy_random), Theme.panel2(), Theme.cyan());
         btnRandom.setOnClickListener(v -> pickRandom());
         Ui.marginTop(btnRandom, Ui.dp(c, 6));
         resultsCard.addView(btnRandom);
@@ -136,7 +137,7 @@ public class LastWordView extends BaseView {
         candidates = null;
         resultsCard.setVisibility(View.GONE);
         candGrid.removeAllViews();
-        status.setText("");
+        Language.setText(status, "");
         LinearLayout row = null;
         for (int i = 0; i < wordsTarget; i++) {
             if (i % 3 == 0) {
@@ -197,7 +198,7 @@ public class LastWordView extends BaseView {
         String v = e.getText().toString().toLowerCase().replaceAll("[^a-z]", "");
         if (!v.equals(e.getText().toString())) {
             muteWatcher = true;
-            e.setText(v);
+            Language.setText(e, v);
             e.setSelection(v.length());
             muteWatcher = false;
         }
@@ -228,7 +229,7 @@ public class LastWordView extends BaseView {
     private void commit(int idx, String w) {
         muteWatcher = true;
         EditText e = boxes.get(idx);
-        e.setText(w);
+        Language.setText(e, w);
         e.setSelection(w.length());
         muteWatcher = false;
         prevLens.set(idx, w.length());
@@ -286,32 +287,31 @@ public class LastWordView extends BaseView {
         }
         if (lastBox != null && lastBox.getText().length() > 0) {
             muteWatcher = true;
-            lastBox.setText("");
+            Language.setText(lastBox, "");
             muteWatcher = false;
         }
     }
 
     private void calc() {
         if (act.selfTestError() != null) {
-            setStatus("Blocked — startup self-test failed: " + act.selfTestError(), true);
+            setStatus(Language.msg(l10n_entropy_blocked_startup, EntropyMessages.message(act.selfTestError())), true);
             return;
         }
         List<String> words = typedWords();
         if (words == null) return;
         Bip39.LastWords res = Bip39.lastWordCandidates(words);
-        if (res.error != null) { setStatus(res.error, true); return; }
+        if (res.error != null) { setStatus(EntropyMessages.message(res.error), true); return; }
         // gate: every candidate must pass the checksum validator
         for (String cand : res.candidates) {
             List<String> full = new ArrayList<>(words);
             full.add(cand);
             if (!Bip39.check(full)) {
-                setStatus("INTERNAL MISMATCH — results suppressed (candidate failed validation).", true);
+                setStatus(Language.msg(l10n_entropy_result_mismatch), true);
                 return;
             }
         }
         candidates = res.candidates;
-        setStatus(res.candidates.size() + " valid last words (" + res.free + " free bits + " + res.cs +
-                "-bit checksum) — all checksum-validated", false);
+        setStatus(Language.msg(l10n_entropy_candidate_status, res.candidates.size(), res.free, res.cs), false);
         candGrid.removeAllViews();
         LinearLayout row = null;
         for (int i = 0; i < candidates.size(); i++) {
@@ -329,7 +329,7 @@ public class LastWordView extends BaseView {
             LinearLayout.LayoutParams lp = Ui.lpRow(act, 1);
             lp.leftMargin = i % 4 == 0 ? 0 : Ui.dp(act, 4);
             t.setLayoutParams(lp);
-            t.setOnClickListener(v -> pick(w, "chosen manually"));
+            t.setOnClickListener(v -> pick(w, Language.msg(l10n_entropy_manual)));
             row.addView(t);
         }
         // pad the final row so columns stay aligned
@@ -347,11 +347,11 @@ public class LastWordView extends BaseView {
         setHiddenTransforms();
     }
 
-    private void pick(String w, String how) {
+    private void pick(String w, CharSequence how) {
         muteWatcher = true;
-        lastBox.setText(w);
+        Language.setText(lastBox, w);
         muteWatcher = false;
-        setStatus("Phrase complete — word " + wordsTarget + " = \"" + w + "\" (" + how + "). Valid BIP39 ✓", false);
+        setStatus(Language.msg(l10n_entropy_complete, wordsTarget, w, how), false);
         if (Theme.sound()) Sfx.chime();
     }
 
@@ -359,12 +359,12 @@ public class LastWordView extends BaseView {
         if (candidates == null || candidates.isEmpty()) return;
         // candidate count is a power of two, so mod of a uniform value is exactly uniform
         act.engine().randomN((n, src) -> pick(candidates.get((int) (n % candidates.size())),
-                RollEngine.SRC_NODE_DEVICE.equals(src) ? "picked by SHA3(node ++ device) entropy" : "picked by device entropy"));
+                RollEngine.SRC_NODE_DEVICE.equals(src) ? Language.msg(l10n_entropy_picked_node) : Language.msg(l10n_entropy_picked_device)));
     }
 
     private void setHidden(boolean on) {
         hidden = on;
-        btnHide.setText(on ? "👁 Show" : "🙈 Hide");
+        Language.setText(btnHide, on ? Language.msg(l10n_entropy_show) : Language.msg(l10n_entropy_hide));
         setHiddenTransforms();
     }
 
@@ -376,8 +376,8 @@ public class LastWordView extends BaseView {
         status.setVisibility(hidden ? View.INVISIBLE : View.VISIBLE);
     }
 
-    private void setStatus(String s, boolean err) {
-        status.setText(s);
+    private void setStatus(CharSequence s, boolean err) {
+        Language.setText(status, s);
         status.setTextColor(err ? Theme.red() : Theme.green());
     }
 

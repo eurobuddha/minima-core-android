@@ -160,6 +160,7 @@ public final class ActivityLog {
         String transaction = transactionId(txpow);
         String minedId = txpow == null ? "" : txpow.optString("txpowid", "");
         if (transaction.isEmpty() || !FundingCoins.hex(minedId)) return;
+        PendingCollect.observe(ctx, txpow);
         List<Entry> entries = list(ctx); boolean changed = false;
         for (Entry e : entries) if (!e.failed && transaction.equalsIgnoreCase(e.transactionId)
                 && !minedId.equalsIgnoreCase(e.txpowid)) {

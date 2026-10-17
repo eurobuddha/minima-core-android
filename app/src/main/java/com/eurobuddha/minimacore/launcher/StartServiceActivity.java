@@ -1,7 +1,10 @@
 package com.eurobuddha.minimacore.launcher;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import androidx.appcompat.app.AlertDialog;
+import android.widget.ProgressBar;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +29,7 @@ public class StartServiceActivity extends AppCompatActivity implements ServiceCo
     private MinimaService minima;
     private boolean bound, active, finished, initialized;
     private long deadline;
-    private ProgressDialog progress;
+    private AlertDialog progress;
     private AlertDialog message;
     private final Runnable poll = this::checkStartup;
 
@@ -34,11 +37,14 @@ public class StartServiceActivity extends AppCompatActivity implements ServiceCo
         super.onCreate(savedInstanceState);
         if (SeedSyncActivity.redirectIfPending(this)) return;
         initialized = true;
-        progress = new ProgressDialog(this);
-        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progress.setTitle("Minima starting…");
-        progress.setMessage("Waiting for the node to finish starting.");
-        progress.setIndeterminate(true);
+        ProgressBar indicator = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        indicator.setIndeterminate(true);
+        int padding = Math.round(24 * getResources().getDisplayMetrics().density);
+        indicator.setPadding(padding, padding / 3, padding, padding / 2);
+        progress = new LanguageDialog(this)
+                .setTitle(Language.msg(l10n_startup_starting))
+                .setMessage(Language.msg(l10n_startup_waiting))
+                .setView(indicator).create();
         progress.setCancelable(true);
         progress.setCanceledOnTouchOutside(false);
         progress.setOnCancelListener(dialog -> finish());
@@ -78,18 +84,18 @@ public class StartServiceActivity extends AppCompatActivity implements ServiceCo
             openMain();
         } else if (state == StartupState.FAILED) {
             progress.dismiss();
-            message = new AlertDialog.Builder(this).setTitle("Startup error")
-                    .setMessage("The node reported a startup error. Open Minima to inspect the logs and resync options.")
+            message = new LanguageDialog(this).setTitle(Language.msg(l10n_startup_error))
+                    .setMessage(Language.msg(l10n_startup_error_body))
                     .setIcon(R.drawable.ic_minima)
-                    .setPositiveButton("Open Minima", (d, w) -> { finished = true; openMain(); })
-                    .setNegativeButton("Close", (d, w) -> finish())
+                    .setPositiveButton(Language.msg(l10n_startup_open), (d, w) -> { finished = true; openMain(); })
+                    .setNegativeButton(Language.msg(l10n_language_close), (d, w) -> finish())
                     .setOnCancelListener(d -> finish()).show();
         } else if (SystemClock.elapsedRealtime() >= deadline) {
             progress.dismiss();
-            message = new AlertDialog.Builder(this).setTitle("Startup is taking longer")
-                    .setMessage("The node has not reported that it is ready. You can keep waiting or close this screen; the node can continue starting in the background.")
-                    .setPositiveButton("Keep waiting", (d, w) -> { message = null; waitForMinimaToStartUp(); })
-                    .setNegativeButton("Close", (d, w) -> finish())
+            message = new LanguageDialog(this).setTitle(Language.msg(l10n_startup_slow))
+                    .setMessage(Language.msg(l10n_startup_slow_body))
+                    .setPositiveButton(Language.msg(l10n_startup_keep_waiting), (d, w) -> { message = null; waitForMinimaToStartUp(); })
+                    .setNegativeButton(Language.msg(l10n_language_close), (d, w) -> finish())
                     .setOnCancelListener(d -> finish()).show();
         } else {
             if (!progress.isShowing()) progress.show();
@@ -115,13 +121,13 @@ public class StartServiceActivity extends AppCompatActivity implements ServiceCo
             startForegroundService(intent);
             bound = bindService(intent, this, Context.BIND_AUTO_CREATE);
         } catch (RuntimeException e) {
-            message = new AlertDialog.Builder(this).setTitle("Could not start Minima")
-                    .setMessage("Android could not connect to the node service. Please try again.")
-                    .setPositiveButton("Retry", (d, w) -> {
+            message = new LanguageDialog(this).setTitle(Language.msg(l10n_seed_sync_start_failed))
+                    .setMessage(Language.msg(l10n_startup_connection_failed))
+                    .setPositiveButton(Language.msg(l10n_startup_retry), (d, w) -> {
                         message = null; startMinimaService();
                         if (message == null) waitForMinimaToStartUp();
                     })
-                    .setNegativeButton("Close", (d, w) -> finish())
+                    .setNegativeButton(Language.msg(l10n_language_close), (d, w) -> finish())
                     .setOnCancelListener(d -> finish()).show();
         }
     }

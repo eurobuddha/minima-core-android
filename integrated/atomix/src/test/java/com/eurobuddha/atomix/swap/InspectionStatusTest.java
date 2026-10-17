@@ -7,13 +7,15 @@ public class InspectionStatusTest {
         String state = SwapEngine.ethClaimStatus(new EthHtlc.Contract(), false);
         assertEquals("locked; waiting for the secret", state); assertFalse(state.contains("claimable"));
     }
-    /** A row with no recorded transaction is the phantom-lock case: the report must SAY so, not point at a
-     *  line it never prints. Live 2026-09-20 — a 7500 MINIMA leg the 1024-block lookup could not find. */
-    @Test public void aRowWithNoRecordedTransactionSaysTheLegWasNeverPosted() {
+    /** PostCb.err may follow a broadcast whose reply was lost; no recorded id proves no outcome. */
+    @Test public void missingLocalAcknowledgementDoesNotProveNoFundsLocked() {
         String none = SwapEngine.recordedTxnSummary(0);
         assertTrue(none.contains("NONE"));
-        assertTrue(none.contains("never posted"));
-        assertTrue("must state the funds are safe", none.contains("Nothing is locked"));
+        assertTrue(none.contains("broadcast may have completed"));
+        assertTrue(none.contains("Check the on-chain state"));
+        assertFalse(none.contains("Nothing is locked"));
+        assertFalse(none.contains("nothing needs refunding"));
+        assertFalse(none.contains("never posted"));
     }
 
     @Test public void recordedTransactionsAreCountedNotSilentlyDropped() {

@@ -1,128 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/pm_terminalide_ide_bg"
-    android:padding="8dp">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <EditText
-            android:id="@+id/pm_terminalide_txn_id"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:typeface="monospace"
-            android:textSize="14sp"
-            android:textColor="@color/pm_terminalide_ide_text"
-            android:textColorHint="@color/pm_terminalide_ide_dim"
-            android:hint="transaction id (e.g. mytxn)"
-            android:inputType="text|textNoSuggestions" />
-
-        <Button
-            android:id="@+id/pm_terminalide_txn_create"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Create" />
-
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@color/pm_terminalide_ide_bg" android:padding="8dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+        <EditText android:id="@+id/pm_terminalide_txn_id" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:singleLine="true" android:typeface="monospace" android:textSize="14sp" android:textColor="@color/pm_terminalide_ide_text" android:textColorHint="@color/pm_terminalide_ide_dim" android:hint="@string/l10n_terminal_txn_id_hint" android:inputType="text|textNoSuggestions" android:tag="l10n:hint=l10n_terminal_txn_id_hint" />
+        <Button android:id="@+id/pm_terminalide_txn_create" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/l10n_terminal_editor_create" android:tag="l10n:text=l10n_terminal_editor_create" />
     </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:typeface="monospace"
-        android:textSize="11sp"
-        android:textColor="@color/pm_terminalide_ide_dim"
-        android:paddingBottom="4dp"
-        android:text="flow: create → inputs → outputs → state → SIGN → BASICS → POST" />
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button android:id="@+id/pm_terminalide_txn_addinput" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="+ Input" />
-            <Button android:id="@+id/pm_terminalide_txn_addoutput" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="+ Output" />
-            <Button android:id="@+id/pm_terminalide_txn_change" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="+ Change" />
-            <Button android:id="@+id/pm_terminalide_txn_setstate" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="State" />
-            <Button android:id="@+id/pm_terminalide_txn_sign" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="Sign" />
-            <Button android:id="@+id/pm_terminalide_txn_basics" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="Basics" />
-            <Button android:id="@+id/pm_terminalide_txn_post" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="Post" />
-
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:typeface="monospace" android:textSize="11sp" android:textColor="@color/pm_terminalide_ide_dim" android:paddingBottom="4dp" android:text="@string/l10n_terminal_txn_flow" android:tag="l10n:text=l10n_terminal_txn_flow" />
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
+            <Button android:id="@+id/pm_terminalide_txn_addinput" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_terminal_txn_input_button" android:tag="l10n:text=l10n_terminal_txn_input_button" />
+            <Button android:id="@+id/pm_terminalide_txn_addoutput" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_terminal_txn_output_button" android:tag="l10n:text=l10n_terminal_txn_output_button" />
+            <Button android:id="@+id/pm_terminalide_txn_change" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_terminal_txn_change_button" android:tag="l10n:text=l10n_terminal_txn_change_button" />
+            <Button android:id="@+id/pm_terminalide_txn_setstate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_nft_state" android:tag="l10n:text=l10n_nft_state" />
+            <Button android:id="@+id/pm_terminalide_txn_sign" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_terminal_txn_sign" android:tag="l10n:text=l10n_terminal_txn_sign" />
+            <Button android:id="@+id/pm_terminalide_txn_basics" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_terminal_txn_basics" android:tag="l10n:text=l10n_terminal_txn_basics" />
+            <Button android:id="@+id/pm_terminalide_txn_post" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_terminal_txn_post" android:tag="l10n:text=l10n_terminal_txn_post" />
         </LinearLayout>
-
     </HorizontalScrollView>
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button android:id="@+id/pm_terminalide_txn_check" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="Check" />
-            <Button android:id="@+id/pm_terminalide_txn_export" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="Export" />
-            <Button android:id="@+id/pm_terminalide_txn_import" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="Import" />
-            <Button android:id="@+id/pm_terminalide_txn_list" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="List all" />
-            <Button android:id="@+id/pm_terminalide_txn_delete" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="Delete" />
-
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
+            <Button android:id="@+id/pm_terminalide_txn_check" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_terminal_editor_check" android:tag="l10n:text=l10n_terminal_editor_check" />
+            <Button android:id="@+id/pm_terminalide_txn_export" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_wallet_export" android:tag="l10n:text=l10n_wallet_export" />
+            <Button android:id="@+id/pm_terminalide_txn_import" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_wallet_import" android:tag="l10n:text=l10n_wallet_import" />
+            <Button android:id="@+id/pm_terminalide_txn_list" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_terminal_txn_list" android:tag="l10n:text=l10n_terminal_txn_list" />
+            <Button android:id="@+id/pm_terminalide_txn_delete" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="4dp" android:text="@string/l10n_backup_delete" android:tag="l10n:text=l10n_backup_delete" />
         </LinearLayout>
-
     </HorizontalScrollView>
-
-    <TextView
-        android:id="@+id/pm_terminalide_txn_summary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:typeface="monospace"
-        android:textSize="12sp"
-        android:textColor="@color/pm_terminalide_ide_text"
-        android:padding="6dp"
-        android:background="@color/pm_terminalide_ide_bg_light"
-        android:text="no transaction — set an id and Create" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingTop="6dp">
-
-        <TextView
-            android:id="@+id/pm_terminalide_txn_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:typeface="monospace"
-            android:textSize="12sp"
-            android:textIsSelectable="true"
-            android:textColor="@color/pm_terminalide_ide_dim"
-            android:text="The workbench builds raw UTXO transactions with the node&#8217;s txn* commands.\n\nRules it enforces for you:\n• inputs must equal outputs — the difference BURNS\n• sign BEFORE basics, then post\n• status:true = accepted (async mining — istransaction:false is normal)\n• delete abandoned txns or their input coins stay locked" />
-
+    <TextView android:id="@+id/pm_terminalide_txn_summary" android:layout_width="match_parent" android:layout_height="wrap_content" android:typeface="monospace" android:textSize="12sp" android:textColor="@color/pm_terminalide_ide_text" android:padding="6dp" android:background="@color/pm_terminalide_ide_bg_light" android:text="@string/l10n_terminal_txn_no_txn" android:tag="l10n:text=l10n_terminal_txn_no_txn" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:paddingTop="6dp">
+        <TextView android:id="@+id/pm_terminalide_txn_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:typeface="monospace" android:textSize="12sp" android:textIsSelectable="true" android:textColor="@color/pm_terminalide_ide_dim" android:text="@string/l10n_terminal_txn_help" android:tag="l10n:text=l10n_terminal_txn_help" />
     </ScrollView>
-
 </LinearLayout>

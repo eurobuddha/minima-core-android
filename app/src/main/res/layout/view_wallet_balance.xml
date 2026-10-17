@@ -29,7 +29,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Total balance"
+            android:text="Total balance" android:tag="l10n:text=l10n_core_wallet_total"
             android:textAppearance="@style/TextAppearance.MinimaCore.Caption" />
 
         <ImageView
@@ -38,7 +38,7 @@
             android:layout_height="22dp"
             android:src="@drawable/ic_chevron_down"
             app:tint="@color/core_text_faint"
-            android:contentDescription="Show balance details" />
+            android:contentDescription="Show balance details" android:tag="l10n:description=l10n_core_wallet_show_details" />
     </LinearLayout>
 
     <LinearLayout
@@ -104,7 +104,7 @@
             android:layout_height="50dp"
             android:layout_weight="1"
             android:layout_marginEnd="6dp"
-            android:text="Send" />
+            android:text="Send" android:tag="l10n:text=l10n_wallet_send" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/wallet_btn_receive"
@@ -113,7 +113,7 @@
             android:layout_height="50dp"
             android:layout_weight="1"
             android:layout_marginStart="6dp"
-            android:text="Receive" />
+            android:text="Receive" android:tag="l10n:text=l10n_wallet_receive" />
     </LinearLayout>
 
     <!-- ===== Tokens ===== -->
@@ -123,7 +123,7 @@
         android:paddingHorizontal="16dp"
         android:paddingTop="18dp"
         android:paddingBottom="8dp"
-        android:text="Tokens"
+        android:text="Tokens" android:tag="l10n:text=l10n_core_wallet_tokens"
         android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
 
     <!-- Drag-reorderable token list (long-press to move). BalanceView wires the ItemTouchHelper. -->

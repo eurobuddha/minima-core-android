@@ -62,7 +62,8 @@ public class NodeApi {
         android.util.Log.w("SwapPub", "write pause latched: " + detail);
     }
     /** Invoked only by the explicit restart-and-reconcile action in Wallet. */
-    public boolean acknowledgeInterruptedWrite() { return WriteSafety.acknowledge(writePrefs()); }
+    public String interruptedWriteId() { return writePrefs().getString("pending", ""); }
+    public boolean acknowledgeInterruptedWrite(String expected) { return WriteSafety.acknowledge(writePrefs(), expected); }
 
     private static final long READ_TIMEOUT_MS = 30000;
     private static final long WRITE_TIMEOUT_MS = 180000;   // build + proof-of-work + post is slow on mobile

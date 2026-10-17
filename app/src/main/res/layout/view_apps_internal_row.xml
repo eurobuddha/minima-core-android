@@ -15,7 +15,7 @@
         android:background="@drawable/bg_token_tile"
         android:padding="6dp"
         android:scaleType="fitCenter"
-        android:contentDescription="App icon" />
+        android:contentDescription="App icon" android:tag="l10n:description=l10n_apps_icon" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -38,8 +38,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
-            android:maxLines="1"
-            android:ellipsize="end"
             android:text="state"
             android:textAppearance="@style/TextAppearance.MinimaCore.Caption"
             android:textColor="@color/core_text_faint" />
@@ -50,5 +48,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:contentDescription="Enable app" />
+        android:contentDescription="Enable app" android:tag="l10n:description=l10n_apps_enable" />
 </LinearLayout>

@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.chat;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -57,8 +60,8 @@ public class ChatDrainer {
         mStop = false;
 
         NotificationManager nm = (NotificationManager) zService.getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationChannel ch = new NotificationChannel(CHANNEL_ID, "Chat messages", NotificationManager.IMPORTANCE_HIGH);
-        ch.setDescription("Incoming KeetChat messages");
+        NotificationChannel ch = new NotificationChannel(CHANNEL_ID, Language.text(zService, l10n_notification_chat), NotificationManager.IMPORTANCE_HIGH);
+        ch.setDescription(Language.text(zService, l10n_notification_chat_help));
         nm.createNotificationChannel(ch);
 
         mThread = new java.lang.Thread(() -> runLoop(zService), "keets-chat-drainer");

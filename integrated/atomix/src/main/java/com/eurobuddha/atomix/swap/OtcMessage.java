@@ -78,9 +78,15 @@ public final class OtcMessage {
 
     /** Seal this message to {@code to} and post it to the OTC channel (one 1-nano coin at {@link #address()}). */
     public void send(NodeApi node, CryptoProvider crypto, CommsTransport.SendCb cb) {
+        send(node, crypto, TradingContext.active(), cb);
+    }
+    /** Capture the channel before sealing; a selection change cannot reroute this deal's message. */
+    public void send(NodeApi node, CryptoProvider crypto, TradingContext market, CommsTransport.SendCb cb) {
+        if (market == null) { cb.onFailed(OtcController.MARKET_ERROR); return; }
+        final String destination = market.otcChatAddr;
         try {
             String blob = crypto.seal(to, toWire());
-            CommsTransport.postBlob(node, address(), CommsTransport.MESSAGE_AMOUNT, CommsTransport.NATIVE, blob, null, cb);
+            CommsTransport.postBlob(node, destination, CommsTransport.MESSAGE_AMOUNT, CommsTransport.NATIVE, blob, null, cb);
         } catch (Exception e) { cb.onFailed("otc send: " + e.getMessage()); }
     }
 }

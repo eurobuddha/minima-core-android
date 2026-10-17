@@ -1,6 +1,9 @@
 package com.eurobuddha.minimacore.main.views.terminal;
 
 import android.app.Activity;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.graphics.Typeface;
 import android.text.method.ScrollingMovementMethod;
 import android.view.KeyEvent;
@@ -40,20 +43,16 @@ public class TerminalView extends BaseView  {
         mMainText.setTypeface(Typeface.MONOSPACE);
         mMainText.setTextIsSelectable(true);
 
-        appendText("**********************************************");
-        appendText("*  __  __  ____  _  _  ____  __  __    __    *");
-        appendText("* (  \\/  )(_  _)( \\( )(_  _)(  \\/  )  /__\\   *");
-        appendText("*  )    (  _)(_  )  (  _)(_  )    (  /(__)\\  *");
-        appendText("* (_/\\/\\_)(____)(_)\\_)(____)(_/\\/\\_)(__)(__) *");
-        appendText("*                                            *");
-        appendText("**********************************************");
-        appendText("Welcome to Minima Core "+ GlobalParams.getFullMicroVersion());
-        appendText("You can run commands in this Terminal..");
+        bindBanner(mMainView);
 
         mInput      = mMainView.findViewById(R.id.terminal_input);
         mInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                // Match the configured Send action; unrelated IME actions must retain the draft.
+                if (actionId != EditorInfo.IME_ACTION_DONE && actionId != EditorInfo.IME_ACTION_SEND
+                        && !(event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                        && event.getAction() == KeyEvent.ACTION_DOWN)) return false;
                 String cmd = mInput.getText().toString().trim();
                 mInput.post(new Runnable() {
                     @Override
@@ -62,7 +61,7 @@ public class TerminalView extends BaseView  {
                     }
                 });
 
-                if(actionId == EditorInfo.IME_ACTION_DONE){
+                if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEND){
                     runCMD(cmd);
                     return true;
                 }
@@ -103,6 +102,31 @@ public class TerminalView extends BaseView  {
                 runCMD(cmd);
             }
         });
+    }
+
+    /** Keep app-owned banner text live while command output stays literal, as in Parlons TerminalView. */
+    public static void bindBanner(View root) {
+        TextView banner = root.findViewById(R.id.terminal_banner);
+        banner.setTypeface(Typeface.MONOSPACE);
+        Language.setText(banner, Language.join(
+                "\n",
+                "**********************************************",
+                "\n",
+                "*  __  __  ____  _  _  ____  __  __    __    *",
+                "\n",
+                "* (  \\/  )(_  _)( \\( )(_  _)(  \\/  )  /__\\   *",
+                "\n",
+                "*  )    (  _)(_  )  (  _)(_  )    (  /(__)\\  *",
+                "\n",
+                "* (_/\\/\\_)(____)(_)\\_)(____)(_/\\/\\_)(__)(__) *",
+                "\n",
+                "*                                            *",
+                "\n",
+                "**********************************************",
+                "\n",
+                Language.msg(l10n_terminal_welcome, GlobalParams.getFullMicroVersion()),
+                "\n",
+                Language.msg(l10n_terminal_help)));
     }
 
     public void runCMD(String zCommand){

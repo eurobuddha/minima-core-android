@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 /**
  * A password box with a reveal toggle.
@@ -32,18 +34,20 @@ public final class PasswordField {
     }
 
     /** For dialogs, which build their views in code. */
-    public static PasswordField inflate(Context context, ViewGroup parent, String hint) {
+    public static PasswordField inflate(Context context, ViewGroup parent, CharSequence hint) {
         View row = LayoutInflater.from(context).inflate(R.layout.view_password_field, parent, false);
         EditText input = row.findViewById(R.id.password_input);
-        input.setHint(hint);
+        Language.hint(input, hint);
         attach(input, row.findViewById(R.id.password_toggle));
         return new PasswordField(row, input);
     }
 
     /** For layouts that already declare the pair. */
     public static void attach(EditText input, ImageButton toggle) {
+        Language.description(toggle, Language.msg((input.getInputType() & InputType.TYPE_MASK_VARIATION) == InputType.TYPE_TEXT_VARIATION_PASSWORD
+                ? l10n_backup_show_password : l10n_backup_hide_password));
         toggle.setOnClickListener(v -> {
-            boolean hidden = (input.getInputType() & InputType.TYPE_TEXT_VARIATION_PASSWORD) != 0;
+            boolean hidden = (input.getInputType() & InputType.TYPE_MASK_VARIATION) == InputType.TYPE_TEXT_VARIATION_PASSWORD;
             int start = input.getSelectionStart();
             int end = input.getSelectionEnd();
             input.setInputType(hidden
@@ -52,12 +56,12 @@ public final class PasswordField {
             // setInputType resets the selection, so put it back.
             input.setSelection(Math.max(0, start), Math.max(0, end));
             toggle.setImageResource(hidden ? R.drawable.ic_visibility_off : R.drawable.ic_visibility);
-            toggle.setContentDescription(hidden ? "Hide password" : "Show password");
+            Language.description(toggle, hidden ? Language.msg(l10n_backup_hide_password) : Language.msg(l10n_backup_show_password));
         });
     }
 
     public View view() { return row; }
     public EditText input() { return input; }
     public String text() { return input.getText().toString(); }
-    public void setError(String message) { input.setError(message); }
+    public void setError(CharSequence message) { Language.error(input, message); }
 }

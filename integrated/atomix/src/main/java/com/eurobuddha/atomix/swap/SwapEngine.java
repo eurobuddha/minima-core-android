@@ -311,7 +311,12 @@ public final class SwapEngine {
     /** As above, with the OTC bit: {@code otc=true} sets HTLC state[7]=TRUE so the ladder auto-responder skips it
      *  and only the negotiated OTC responder locks the counter-leg. */
     public void startMinimaToErc20(Order maker, String sellMinima, String tokenSymbol, String buyTokenAmount, boolean otc, StartCb result) {
+        startMinimaToErc20(maker, sellMinima, tokenSymbol, buyTokenAmount, otc, com.eurobuddha.atomix.TradingContext.active(), result);
+    }
+
+    void startMinimaToErc20(Order maker, String sellMinima, String tokenSymbol, String buyTokenAmount, boolean otc, com.eurobuddha.atomix.TradingContext market, StartCb result) {
         if (!ready()) { result.err("Not ready"); return; }
+        if (market == null || market != com.eurobuddha.atomix.TradingContext.active() || !market.tokenId.equalsIgnoreCase(minima.activeToken())) { result.err(OtcController.MARKET_ERROR); return; }
         // M3: a responder burst-lock (or a coin-split) draws mxUSDT from the SAME coin pool that this
         // user-initiated node-auto-select lock does; both could pick the same coin → one tx is rejected as a
         // double-spend (fund-safe) but can leave a phantom LOCKED row. Decline briefly while a responder lock or
@@ -330,8 +335,10 @@ public final class SwapEngine {
         final String reqToken = "ETH:" + token.address;
         minima.generateSecret(new MinimaHtlc.SecretCb() {
             @Override public void ok(String secret, String hash) {
+                if (market != com.eurobuddha.atomix.TradingContext.active()) { cb.err(OtcController.MARKET_ERROR); return; }
                 minima.currentBlock(new MinimaHtlc.BlockCb() {
                     @Override public void ok(int block) {
+                        if (market != com.eurobuddha.atomix.TradingContext.active()) { cb.err(OtcController.MARKET_ERROR); return; }
                         final int timelock = block + TIMELOCK_BLOCKS;
                         // M2: record the secret + swap row BEFORE the lock broadcast (parity with
                         // startErc20ToMinima). If lock() mines but its response is lost, the secret + row survive
@@ -342,7 +349,7 @@ public final class SwapEngine {
                         db.insertSecret(hash, secret);
                         db.insertMyHtlc(hash, buyTokenAmount, reqToken);
                         SwapDb.Swap s = baseSwap(hash, "INITIATOR", "MINIMA_TO_ERC20",
-                                com.eurobuddha.atomix.TradingContext.active().coinLabel, sellMinima, tokenSymbol, buyTokenAmount, maker.ethAddress);
+                                market.coinLabel, sellMinima, tokenSymbol, buyTokenAmount, maker.ethAddress);
                         s.myTimelock = timelock; s.myLegIsMinima = true; s.status = SwapDb.ST_STARTED;
                         db.upsertSwap(s);
                         notifier.onSwapsChanged();
@@ -371,21 +378,32 @@ public final class SwapEngine {
      *  derived from the LP's side; amounts from the negotiated terms (USDT = amount × price, at 6-dp). Returns the
      *  hashlock via cb — the caller then sends an EXECUTE message so the LP responds against this exact hash. */
     public void executeOtcDeal(OtcDb.Deal deal, StartCb cb) {
+        if (!OtcController.validDeal(deal)) { cb.err("enter amount + price"); return; }
+        final com.eurobuddha.atomix.TradingContext market = deal == null ? null : deal.market();
+        if (market == null || market != com.eurobuddha.atomix.TradingContext.active()
+                || !market.tokenId.equalsIgnoreCase(minima.activeToken())) {
+            cb.err(OtcController.MARKET_ERROR); return;
+        }
         Order lp = new Order();
         lp.minimaPublicKey = deal.peerMinimaPk;
         lp.ethAddress = deal.peerEthAddr;
         lp.commsPublicId = deal.peerCommsId;
         String usdt = dec(deal.amount).multiply(dec(deal.price)).setScale(6, java.math.RoundingMode.DOWN).toPlainString();
         if (OtcOffer.LP_SELLS_MINIMA.equals(deal.side))
-            startErc20ToMinima(lp, "USDT", usdt, deal.amount, true, cb);   // LP sells mxUSDT → I BUY: lock USDT
+            startErc20ToMinima(lp, "USDT", usdt, deal.amount, true, market, cb);   // LP sells mxUSDT → I BUY: lock USDT
         else
-            startMinimaToErc20(lp, deal.amount, "USDT", usdt, true, cb);    // LP buys mxUSDT → I SELL: lock mxUSDT
+            startMinimaToErc20(lp, deal.amount, "USDT", usdt, true, market, cb);    // LP buys mxUSDT → I SELL: lock mxUSDT
     }
 
     /** As above, with the OTC bit: {@code otc=true} sets the ETH contract's otc flag so the ladder auto-responder
      *  skips it and only the negotiated OTC responder locks the counter-leg. */
     public void startErc20ToMinima(Order maker, String tokenSymbol, String sellTokenAmount, String buyMinima, boolean otc, StartCb cb) {
+        startErc20ToMinima(maker, tokenSymbol, sellTokenAmount, buyMinima, otc, com.eurobuddha.atomix.TradingContext.active(), cb);
+    }
+
+    void startErc20ToMinima(Order maker, String tokenSymbol, String sellTokenAmount, String buyMinima, boolean otc, com.eurobuddha.atomix.TradingContext market, StartCb cb) {
         if (!ready()) { cb.err("Not ready"); return; }
+        if (market == null || market != com.eurobuddha.atomix.TradingContext.active() || !market.tokenId.equalsIgnoreCase(minima.activeToken())) { cb.err(OtcController.MARKET_ERROR); return; }
         final EthNet.Token token = net.token(tokenSymbol);
         if (token == null) { cb.err("Unknown token " + tokenSymbol); return; }
         // M1: request the mxUSDT at the 6dp trade grain. The responder locks grain(amount) (6dp), so a >6dp
@@ -394,8 +412,10 @@ public final class SwapEngine {
         final String reqMinima = MinimaHtlc.grain(buyMinima);
         minima.generateSecret(new MinimaHtlc.SecretCb() {
             @Override public void ok(String secret, String hash) {
+                if (market != com.eurobuddha.atomix.TradingContext.active()) { cb.err(OtcController.MARKET_ERROR); return; }
                 submitIo(() -> {
                     try {
+                        if (market != com.eurobuddha.atomix.TradingContext.active()) { ui.post(() -> cb.err(OtcController.MARKET_ERROR)); return; }
                         Credentials creds = wallet.creds();
                         EthHtlc eth = new EthHtlc(rpc, creds, net);
                         BigInteger sellRaw = parseUnits(sellTokenAmount, token.decimals);
@@ -403,6 +423,7 @@ public final class SwapEngine {
                         ensureAllowanceBlocking(eth, token.address, sellRaw);
                         // F2: base the timelock on CHAIN time (what the vault enforces), not the device clock.
                         final long timelock = ethChainNow() + TIMELOCK_SECS;
+                        if (market != com.eurobuddha.atomix.TradingContext.active()) { ui.post(() -> cb.err(OtcController.MARKET_ERROR)); return; }
                         // CR-1: record the secret + swap row SYNCHRONOUSLY (on this io thread) BEFORE the lock
                         // broadcast. These were posted to the UI thread, but a busy or destroyed main thread can
                         // DROP the post while newContract has already mined — and there is NO contractsAsSender
@@ -414,7 +435,7 @@ public final class SwapEngine {
                         db.insertSecret(hash, secret);
                         db.insertMyHtlc(hash, reqMinima, "minima");
                         SwapDb.Swap s = baseSwap(hash, "INITIATOR", "ERC20_TO_MINIMA",
-                                tokenSymbol, sellTokenAmount, com.eurobuddha.atomix.TradingContext.active().coinLabel, reqMinima, maker.minimaPublicKey);
+                                tokenSymbol, sellTokenAmount, market.coinLabel, reqMinima, maker.minimaPublicKey);
                         s.myTimelock = timelock; s.myLegIsMinima = false; s.status = SwapDb.ST_STARTED;
                         s.contractId = EthHtlc.contractId(hash);
                         db.upsertSwap(s);
@@ -603,19 +624,11 @@ public final class SwapEngine {
         ui.post(() -> cb.report(out));
     }
 
-    /** The recorded-transaction line, which is printed on EVERY inspection — including, and especially, when
-     *  there is nothing to print. The swap row and the secret are written BEFORE the lock is broadcast (see
-     *  startMinimaToErc20's M2 note) so that a lost reply cannot strand a claimable leg; the flip side is that a
-     *  row exists even when the broadcast never happened, and logEvent only runs on the PostCb.ok path. So "no
-     *  recorded transaction" is not an absence of evidence — it is the evidence: nothing was ever posted.
-     *  Before this line the report said "Check the recorded transaction below" and then printed nothing at all,
-     *  which is how a phantom row read as an unexplained stall (live, 2026-09-20: a 7500 MINIMA leg that the
-     *  1024-block lookup could not find because it had never been broadcast). */
+    /** A missing local acknowledgement cannot distinguish an unposted write from a lost reply.
+     * The swap and secret are saved before broadcast; only PostCb.ok records the transaction id. */
     static String recordedTxnSummary(int recordedCount) {
         if (recordedCount > 0) return "Recorded transactions: " + recordedCount + " (listed above).";
-        return "Recorded transactions: NONE. This row was saved before its broadcast, and no transaction id was "
-                + "ever returned — so the leg was almost certainly never posted to the chain. Nothing is locked "
-                + "and nothing needs refunding; the row clears itself at the refund block.";
+        return "Recorded transactions: NONE. No transaction id is recorded locally. A broadcast may have completed despite a lost reply. Check the on-chain state before retrying or deciding whether funds need recovery.";
     }
 
     /** Body of the "Add ETH for gas" notification. RULE 1: the wallet is named IN FULL, because this is the
@@ -1530,13 +1543,9 @@ public final class SwapEngine {
         if (otcDb == null) return null;
         OtcDb.Deal d = otcDb.dealByHash(hash);
         if (d == null || !OtcDb.ROLE_LP.equals(d.role)) return null;
-        // FUND-SAFETY (combine): an AGREED/EXECUTING OTC deal persists across a currency switch. Never respond to
-        // (lock the counter-leg for) a deal negotiated in a currency that is not the ACTIVE one — its amount/price
-        // are that currency's, so locking the now-active token against them would misprice. This is the single
-        // chokepoint for BOTH otcVerifyBuy (ETH-leg-first) and otcVerifySell (Minima-leg-first). (A pre-stamp
-        // legacy row has null currency → treated as active, matching old single-currency behaviour.)
-        if (d.currency != null && !d.currency.isEmpty()
-                && !com.eurobuddha.atomix.TradingContext.active().key.equals(d.currency)) return null;
+        // Both responder paths need explicit attribution. Unknown legacy deals remain visible,
+        // but cannot create a new liability using a guessed market. Existing claim/refund paths are separate.
+        if (!d.inActiveMarket() || !d.market().tokenId.equalsIgnoreCase(minima.activeToken())) return null;
         if (!OtcDb.ST_AGREED.equals(d.status) && !OtcDb.ST_EXECUTING.equals(d.status)) return null;
         String ss = swapStatus(hash);   // never re-respond to a hash whose swap already finished
         if (SwapDb.ST_COMPLETE.equals(ss) || SwapDb.ST_REFUNDED.equals(ss) || SwapDb.ST_ERROR.equals(ss)) return null;
@@ -1561,6 +1570,7 @@ public final class SwapEngine {
      *  counterparty, and both amounts must equal the negotiated terms. */
     /* package-private (not private) so unit tests can drive this OTC fund-safety boundary directly. */
     boolean otcVerifyBuy(EthHtlc.Contract c, OtcDb.Deal d) {
+        if (!OtcController.validDeal(d)) return false;
         if (!OtcOffer.LP_SELLS_MINIMA.equals(d.side)) return false;
         EthNet.Token usdt = net.token("USDT");
         if (usdt == null || c.tokenContract == null || !c.tokenContract.equalsIgnoreCase(usdt.address)) return false;  // MUST settle in real USDT
@@ -1569,7 +1579,7 @@ public final class SwapEngine {
         BigDecimal wantMinima = dec(d.amount), wantUsdt = dec(d.amount).multiply(dec(d.price));
         BigDecimal gotMinima = dec(EthWallet.format(c.requestAmount, 18, 18));                        // mxUSDT they request = what I lock
         BigDecimal gotUsdt = dec(EthWallet.format(c.amount, decimalsOf(c.tokenContract), 18));        // USDT they locked
-        return approxEq(gotMinima, wantMinima) && approxEq(gotUsdt, wantUsdt);
+        return gotMinima.signum() > 0 && gotUsdt.signum() > 0 && approxEq(gotMinima, wantMinima) && approxEq(gotUsdt, wantUsdt);
     }
 
     /** Verify an incoming Minima lock (instigator SELLS mxUSDT, I'm the LP buying) EXACTLY matches the agreed deal
@@ -1577,6 +1587,7 @@ public final class SwapEngine {
      *  token must be the agreed USDT, and both amounts must equal the negotiated terms. */
     /* package-private (not private) so unit tests can drive this OTC fund-safety boundary directly. */
     boolean otcVerifySell(JSONObject coin, OtcDb.Deal d, String reqTokenAddr) {
+        if (!OtcController.validDeal(d)) return false;
         if (!OtcOffer.LP_BUYS_MINIMA.equals(d.side)) return false;
         if (!minima.activeToken().equalsIgnoreCase(coin.optString("tokenid", "0x00"))) return false;  // active-currency token only (OTC negotiated live in the active market)
         if (!keyEq(MinimaHtlc.stateAt(coin, 4), myMinimaPk)) return false;                            // mxUSDT to me
@@ -1587,7 +1598,7 @@ public final class SwapEngine {
         BigDecimal wantMinima = dec(d.amount), wantUsdt = dec(d.amount).multiply(dec(d.price));
         BigDecimal gotMinima = dec(MinimaHtlc.coinAmount(coin));                    // mxUSDT they locked
         BigDecimal gotUsdt = dec(MinimaHtlc.stateAt(coin, 1));                        // USDT they request = what I lock
-        return approxEq(gotMinima, wantMinima) && approxEq(gotUsdt, wantUsdt);
+        return gotMinima.signum() > 0 && gotUsdt.signum() > 0 && approxEq(gotMinima, wantMinima) && approxEq(gotUsdt, wantUsdt);
     }
 
     private Order.Pair pairFor(String tokenAddr) {

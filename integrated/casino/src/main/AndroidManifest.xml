@@ -8,7 +8,7 @@
         <package android:name="com.eurobuddha.minimacore" />
     </queries>
     <application>
-        <activity android:name="com.eurobuddha.casino.MainActivity" android:exported="false" android:theme="@style/pm_casino_Theme.Casino">
+        <activity android:name="com.eurobuddha.casino.MainActivity" android:exported="false" android:theme="@style/pm_casino_Theme.Casino" android:configChanges="locale|layoutDirection|screenLayout">
             </activity>
         <service android:name="com.eurobuddha.casino.CasinoService" android:exported="false" android:foregroundServiceType="specialUse|dataSync">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Watches the embedded chain to reveal and resolve the user’s outstanding casino bets before their deadlines" />

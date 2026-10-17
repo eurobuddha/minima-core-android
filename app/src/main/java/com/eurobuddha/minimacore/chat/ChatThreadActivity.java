@@ -1,6 +1,6 @@
 package com.eurobuddha.minimacore.chat;
 
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -32,6 +32,10 @@ import android.net.Uri;
 import android.widget.ImageButton;
 
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import com.eurobuddha.minimacore.utils.MinimaCMD;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.zxing.BarcodeFormat;
@@ -51,6 +55,19 @@ import java.util.Date;
  */
 public class ChatThreadActivity extends AppCompatActivity {
 
+    private final java.util.Set<AlertDialog> dialogs = new java.util.HashSet<>();
+    private LanguageDialog dialog() {
+        return new LanguageDialog(this) {
+            @Override public AlertDialog create() {
+                AlertDialog value = super.create();
+                dialogs.add(value);
+                value.setOnDismissListener(d -> dialogs.remove(value));
+                return value;
+            }
+        };
+    }
+
+
     private String mPubkey;
     private MsgAdapter mAdapter;
     private Toolbar mToolbar;
@@ -65,6 +82,7 @@ public class ChatThreadActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_thread);
+        Language.apply(findViewById(android.R.id.content));
 
         mPubkey = getIntent().getStringExtra("pubkey");
         if (mPubkey == null) { finish(); return; }
@@ -74,20 +92,18 @@ public class ChatThreadActivity extends AppCompatActivity {
 
         mToolbar = findViewById(R.id.chat_thread_toolbar);
         com.eurobuddha.minimacore.utils.KeyboardInsets.install(this, findViewById(R.id.chat_thread_main), mToolbar);
-        refreshTitle();
         setSupportActionBar(mToolbar);
+        refreshTitle();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mToolbar.setNavigationOnClickListener(v -> finish());
-        mToolbar.setOnMenuItemClickListener(this::onMenu);
-        mToolbar.inflateMenu(R.menu.chat_thread_menu);
 
         ListView list = findViewById(R.id.chat_msgs);
         mAdapter = new MsgAdapter();
         list.setAdapter(mAdapter);
 
         ImageButton attach = findViewById(R.id.chat_attach);
-        attach.setOnClickListener(v -> new AlertDialog.Builder(this)
-                .setItems(new String[]{"📷 Photo", "🎤 Voice note", "💸 Send payment", "🏷 Request their pay address"}, (d, which) -> {
+        attach.setOnClickListener(v -> dialog()
+                .setItems(new CharSequence[]{Language.msg(l10n_media_photo), Language.msg(l10n_media_voice), Language.msg(l10n_chat_pay_action), Language.msg(l10n_chat_request_pay)}, (d, which) -> {
                     if (which == 0) mPickImage.launch("image/*");
                     else if (which == 1) startVoiceNote();
                     else if (which == 2) startPayment();
@@ -104,30 +120,55 @@ public class ChatThreadActivity extends AppCompatActivity {
         });
     }
 
-    private void refreshTitle() {
-        String name = ChatDb.get(this).contactName(mPubkey);
-        mToolbar.setTitle(name.startsWith("0x") ? "New contact" : name);
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        if (mToolbar != null) { refreshTitle(); refreshMenu(); }
+        if (mAdapter != null) mAdapter.notifyDataSetChanged();
+    }
+    private void refreshMenu() {
+        android.view.Menu menu = mToolbar.getMenu();
+        if (menu.findItem(R.id.chatmenu_rename) != null) menu.findItem(R.id.chatmenu_rename).setTitle(Language.text(this, l10n_chat_rename_contact));
+        if (menu.findItem(R.id.chatmenu_address) != null) menu.findItem(R.id.chatmenu_address).setTitle(Language.text(this, l10n_chat_view_address));
+        if (menu.findItem(R.id.chatmenu_clear) != null) menu.findItem(R.id.chatmenu_clear).setTitle(Language.text(this, l10n_chat_delete_chat));
+        if (menu.findItem(R.id.chatmenu_delete) != null) menu.findItem(R.id.chatmenu_delete).setTitle(Language.text(this, l10n_chat_delete_contact));
     }
 
+    private void refreshTitle() {
+        String name = ChatDb.get(this).contactName(mPubkey);
+        CharSequence title = name.startsWith("0x") ? Language.msg(l10n_chat_new_contact) : name;
+        getSupportActionBar().setTitle(title);
+        Language.toolbarTitle(mToolbar, title);
+    }
+
+    @Override public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.chat_thread_menu, menu);
+        refreshMenu();
+        return true;
+    }
+    @Override public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        return onMenu(item) || super.onOptionsItemSelected(item);
+    }
     private boolean onMenu(android.view.MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.chatmenu_rename) {
             EditText input = new EditText(this);
             String cur = ChatDb.get(this).contactName(mPubkey);
             input.setText(cur.startsWith("0x") ? "" : cur);
-            new AlertDialog.Builder(this)
-                    .setTitle("Contact name")
+            dialog()
+                    .setTitle(Language.msg(l10n_chat_contact_name))
                     .setView(input)
-                    .setPositiveButton("Save", (d, w) -> {
+                    .setPositiveButton(Language.msg(l10n_common_save), (d, w) -> {
                         ChatDb.get(this).putContact(mPubkey, input.getText().toString().trim());
                         refreshTitle();
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(Language.msg(l10n_common_cancel), null)
                     .show();
             return true;
         }
         if (id == R.id.chatmenu_address) {
             View v = LayoutInflater.from(this).inflate(R.layout.dialog_chat_identity, null);
+            Language.apply(v);
             ((TextView) v.findViewById(R.id.identity_address)).setText(mPubkey);
             v.findViewById(R.id.identity_name).setVisibility(View.GONE);
             try {
@@ -137,35 +178,33 @@ public class ChatThreadActivity extends AppCompatActivity {
             v.findViewById(R.id.identity_copy).setOnClickListener(b -> {
                 ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 cm.setPrimaryClip(ClipData.newPlainText("keets address", mPubkey));
-                Toast.makeText(this, "Address copied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, Language.msg(l10n_wallet_address_copied), Toast.LENGTH_SHORT).show();
             });
-            new AlertDialog.Builder(this).setTitle("Contact address").setView(v)
-                    .setPositiveButton("Done", null).show();
+            dialog().setTitle(Language.msg(l10n_chat_contact_address)).setView(v)
+                    .setPositiveButton(Language.msg(l10n_chat_done), null).show();
             return true;
         }
         if (id == R.id.chatmenu_clear) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Delete chat")
-                    .setMessage("Clear this conversation? The contact stays in your list — "
-                            + "you can start a new chat anytime.")
-                    .setPositiveButton("Delete chat", (d, w) -> {
+            dialog()
+                    .setTitle(Language.msg(l10n_chat_delete_chat))
+                    .setMessage(Language.msg(l10n_chat_clear_thread))
+                    .setPositiveButton(Language.msg(l10n_chat_delete_chat), (d, w) -> {
                         ChatDb.get(this).clearMessages(mPubkey);
                         finish();
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(Language.msg(l10n_common_cancel), null)
                     .show();
             return true;
         }
         if (id == R.id.chatmenu_delete) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Delete contact")
-                    .setMessage("Permanently remove this contact and the conversation? "
-                            + "You'll need their address again to reconnect. This cannot be undone.")
-                    .setPositiveButton("Delete contact", (d, w) -> {
+            dialog()
+                    .setTitle(Language.msg(l10n_chat_delete_contact))
+                    .setMessage(Language.msg(l10n_chat_remove_thread))
+                    .setPositiveButton(Language.msg(l10n_chat_delete_contact), (d, w) -> {
                         ChatDb.get(this).removeContact(mPubkey);
                         finish();
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(Language.msg(l10n_common_cancel), null)
                     .show();
             return true;
         }
@@ -175,6 +214,7 @@ public class ChatThreadActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (mPubkey == null || mAdapter == null) return;
         ChatDb.get(this).markThreadRead(mPubkey);
         sendReadReceipt();
         mAdapter.reload();
@@ -208,7 +248,7 @@ public class ChatThreadActivity extends AppCompatActivity {
             r.put("state", "payaddr-req");
             MinimaCMD.execute("keets action:send to:" + mPubkey + " datahex:" + ChatSchema.toDataHex(r.toString()));
         }, "chat-payaddr-req").start();
-        if (zToast) Toast.makeText(this, "Address requested — arrives automatically when they're online", Toast.LENGTH_SHORT).show();
+        if (zToast) Toast.makeText(this, Language.msg(l10n_chat_address_requested), Toast.LENGTH_SHORT).show();
     }
 
     // ---- payments -------------------------------------------------------------
@@ -216,32 +256,33 @@ public class ChatThreadActivity extends AppCompatActivity {
         String payaddr = ChatDb.get(this).contactPayAddr(mPubkey);
         if (payaddr.equals("")) {
             requestPayAddr(false);
-            Toast.makeText(this, "No pay address for this contact yet — requested it. Try again once they reply.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, Language.msg(l10n_chat_no_pay_address), Toast.LENGTH_LONG).show();
             return;
         }
         View v = getLayoutInflater().inflate(R.layout.dialog_chat_pay, null);
+        Language.apply(v);
         ((TextView) v.findViewById(R.id.pay_to)).setText(payaddr);
-        new AlertDialog.Builder(this)
-                .setTitle("Send Minima")
+        dialog()
+                .setTitle(Language.msg(l10n_chat_send_minima))
                 .setView(v)
-                .setPositiveButton("Send", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_wallet_send), (d, w) -> {
                     String amt = ((EditText) v.findViewById(R.id.pay_amount)).getText().toString().trim();
                     if (!amt.matches("[0-9]+(\\.[0-9]+)?") || amt.equals("0")) {
-                        Toast.makeText(this, "Enter a valid amount", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, Language.msg(l10n_chat_valid_amount), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     doPayment(payaddr, amt);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     private void doPayment(String zAddr, String zAmt) {
-        Toast.makeText(this, "Sending " + zAmt + " Minima…", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, Language.msg(l10n_chat_sending_amount, zAmt), Toast.LENGTH_SHORT).show();
         MinimaCMD.runMinima("send address:" + zAddr + " amount:" + zAmt, zResult -> {
             boolean ok = (Boolean) zResult.getOrDefault("status", false);
             if (!ok) {
-                runOnUiThread(() -> Toast.makeText(this, "Payment failed: " + zResult.get("error"), Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_payment_failed, String.valueOf(zResult.get("error"))), Toast.LENGTH_LONG).show());
                 return;
             }
             String txid = "";
@@ -311,7 +352,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                 ChatDb.get(this).setVia(msgid, via);
                 runOnUiThread(() -> mAdapter.reload());
             } catch (Exception exc) {
-                runOnUiThread(() -> Toast.makeText(this, "Photo failed: " + exc.getMessage(), Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_photo_failed, String.valueOf(exc.getMessage())), Toast.LENGTH_LONG).show());
             }
         }, "chat-image-send").start();
     }
@@ -345,7 +386,7 @@ public class ChatThreadActivity extends AppCompatActivity {
             if (zGrants[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 recordVoiceDialog();
             } else {
-                Toast.makeText(this, "Microphone permission needed for voice notes",
+                Toast.makeText(this, Language.msg(l10n_chat_microphone_permission),
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -360,7 +401,7 @@ public class ChatThreadActivity extends AppCompatActivity {
      *  is "M:SS|waveformhex" - the Parlons caption convention, so every
      *  flavour draws the real shape without decoding audio. */
     private void sendAudio(final byte[] zBytes, final String zMime, final int zSecs, final String zWave) {
-        Toast.makeText(this, "Sending voice note…", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, Language.msg(l10n_chat_sending_voice), Toast.LENGTH_SHORT).show();
         new Thread(() -> {
             try {
                 String ext = zMime.contains("ogg") ? ".ogg" : ".m4a";
@@ -399,7 +440,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                 ChatDb.get(this).setVia(msgid, via);
                 runOnUiThread(() -> mAdapter.reload());
             } catch (Exception exc) {
-                runOnUiThread(() -> Toast.makeText(this, "Voice note failed: " + exc.getMessage(), Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_voice_failed, String.valueOf(exc.getMessage())), Toast.LENGTH_LONG).show());
             }
         }, "chat-voice-send").start();
     }
@@ -426,7 +467,7 @@ public class ChatThreadActivity extends AppCompatActivity {
             }
             mLoadingRef = "";
             if (f == null) {
-                Toast.makeText(this, "Voice note not available yet", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, Language.msg(l10n_chat_voice_unavailable), Toast.LENGTH_SHORT).show();
                 return;
             }
             try {
@@ -446,7 +487,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                 zOnState.run();
             } catch (Exception e) {
                 stopAudio();
-                Toast.makeText(this, "Playback failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, Language.msg(l10n_chat_playback_failed), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -465,6 +506,8 @@ public class ChatThreadActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        for (AlertDialog value : new java.util.ArrayList<>(dialogs)) value.dismiss();
+        dialogs.clear();
         stopAudio();
         if (mActiveRecorder != null) {
             // the dialog's dismiss listener never fires on activity death -
@@ -496,19 +539,19 @@ public class ChatThreadActivity extends AppCompatActivity {
                     if (ok) via = (String) ((JSONObject) zResult.get("response")).get("delivered");
                     ChatDb.get(this).setVia(msgid, via);
                     mAdapter.reload();
-                    if (!ok) Toast.makeText(this, "Not sent — check the node is running", Toast.LENGTH_LONG).show();
+                    if (!ok) Toast.makeText(this, Language.msg(l10n_chat_not_sent), Toast.LENGTH_LONG).show();
                 }));
     }
 
     // ---- messages + day separators ------------------------------------------
     private static class Item {
         ChatDb.Msg msg;      // null = date separator
-        String day;
+        long day;
     }
 
     private class MsgAdapter extends BaseAdapter {
         private ArrayList<Item> mItems = new ArrayList<>();
-        private final DateFormat mTime = DateFormat.getTimeInstance(DateFormat.SHORT);
+
 
         void reload() {
             new Thread(() -> {
@@ -518,7 +561,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                 for (ChatDb.Msg m : msgs) {
                     if (lastDay == 0 || !ChatUi.sameDay(lastDay, m.ts)) {
                         Item sep = new Item();
-                        sep.day = ChatUi.dayLabel(m.ts);
+                        sep.day = m.ts;
                         items.add(sep);
                     }
                     lastDay = m.ts;
@@ -526,7 +569,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                     it.msg = m;
                     items.add(it);
                 }
-                runOnUiThread(() -> { mItems = items; notifyDataSetChanged(); });
+                runOnUiThread(() -> { if (!isFinishing() && !isDestroyed()) { mItems = items; notifyDataSetChanged(); } });
             }, "chat-thread-load").start();
         }
 
@@ -543,13 +586,14 @@ public class ChatThreadActivity extends AppCompatActivity {
             if (it.msg == null) {
                 View row = convertView != null ? convertView
                         : getLayoutInflater().inflate(R.layout.chat_date_row, parent, false);
-                ((TextView) row.findViewById(R.id.date_text)).setText(it.day);
+                ((TextView) row.findViewById(R.id.date_text)).setText(ChatUi.dayLabel(ChatThreadActivity.this, it.day));
                 return row;
             }
 
             ChatDb.Msg m = it.msg;
             View row = convertView != null ? convertView
                     : getLayoutInflater().inflate(R.layout.chat_msg_row, parent, false);
+            Language.apply(row);
 
             LinearLayout rowBox = row.findViewById(R.id.msg_row);
             LinearLayout bubble = row.findViewById(R.id.msg_bubble);
@@ -567,6 +611,7 @@ public class ChatThreadActivity extends AppCompatActivity {
 
             LinearLayout audio = row.findViewById(R.id.msg_audio);
             image.setVisibility(View.GONE);
+            image.setTag(null);
             attach.setVisibility(View.GONE);
             audio.setVisibility(View.GONE);
             body.setVisibility(View.VISIBLE);
@@ -594,18 +639,21 @@ public class ChatThreadActivity extends AppCompatActivity {
                 final String ref = m.ref;
                 btn.setText(ref.equals(mPlayingRef) && mPlayer != null && mPlayer.isPlaying()
                         ? "\u23f8" : "\u25b6");
+                Language.description(btn, Language.msg(ref.equals(mPlayingRef) && mPlayer != null && mPlayer.isPlaying()
+                        ? l10n_chat_pause_voice : l10n_chat_play_voice));
                 View.OnClickListener play = v ->
                         toggleAudio(ref, () -> notifyDataSetChanged());
                 btn.setOnClickListener(play);
                 audio.setOnClickListener(play);
             } else if ("image".equals(m.state) && m.ref != null && !m.ref.equals("")) {
                 body.setVisibility(m.body.equals("") ? View.GONE : View.VISIBLE);
-                body.setText(m.body);
+                Language.setText(body, m.body);
                 image.setVisibility(View.VISIBLE);
                 image.setImageResource(android.R.drawable.stat_sys_download);
                 final String ref = m.ref;
+                image.setTag(ref);
                 ChatImages.load(ChatThreadActivity.this, ref, bm -> {
-                    if (bm != null && ref.equals(m.ref)) image.setImageBitmap(bm);
+                    if (bm != null && ref.equals(image.getTag())) image.setImageBitmap(bm);
                 });
                 image.setOnClickListener(v -> {
                     Intent viewer = new Intent(ChatThreadActivity.this, ChatImageActivity.class);
@@ -614,55 +662,55 @@ public class ChatThreadActivity extends AppCompatActivity {
                     startActivity(viewer);
                 });
             } else if ("payment".equals(m.state)) {
-                body.setText("💸 " + (m.incoming ? "Payment received" : "Payment sent") + "\n"
-                        + m.amt + " " + (m.tokname.equals("") ? "Minima" : m.tokname));
+                Language.setText(body, Language.join("💸 ", Language.msg(m.incoming ? l10n_chat_payment_received : l10n_chat_payment_sent), "\n",
+                        m.amt, " ", (m.tokname.equals("") ? "Minima" : m.tokname)));
                 attach.setVisibility(View.VISIBLE);
-                attach.setText("tap for txid");
+                Language.setText(attach, Language.msg(l10n_chat_tap_txid));
                 final String txid = m.txid;
-                attach.setOnClickListener(v -> new AlertDialog.Builder(ChatThreadActivity.this)
-                        .setTitle("Transaction id")
+                attach.setOnClickListener(v -> dialog()
+                        .setTitle(Language.msg(l10n_chat_txid_title))
                         .setMessage(txid)
-                        .setPositiveButton("Copy", (d, w) -> {
+                        .setPositiveButton(Language.msg(l10n_wallet_copy), (d, w) -> {
                             ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                             cm.setPrimaryClip(ClipData.newPlainText("txid", txid));
-                            Toast.makeText(ChatThreadActivity.this, "txid copied", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ChatThreadActivity.this, Language.msg(l10n_chat_txid_copied), Toast.LENGTH_SHORT).show();
                         })
-                        .setNegativeButton("Close", null)
+                        .setNegativeButton(Language.msg(l10n_language_close), null)
                         .show());
             } else {
-                body.setText(m.body);
+                Language.setText(body, m.body);
                 if (m.ref != null && !m.ref.equals("")) {
                     attach.setVisibility(View.VISIBLE);
-                    attach.setText("📎 Attachment — tap to copy link");
+                    Language.setText(attach, Language.msg(l10n_chat_attachment_copy));
                     final String ref = m.ref;
                     attach.setOnClickListener(v -> {
                         // the FULL keets:// url lands on the clipboard (never truncated)
                         ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                         cm.setPrimaryClip(ClipData.newPlainText("keets media url", ref));
-                        Toast.makeText(ChatThreadActivity.this, "Link copied", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChatThreadActivity.this, Language.msg(l10n_chat_link_copied), Toast.LENGTH_SHORT).show();
                     });
                 }
             }
 
             //ticks: 🕓 sending · ✓ at mailbox · ✓✓ delivered · blue ✓✓ read by them
-            String when = mTime.format(new Date(m.ts));
+            CharSequence when = Language.stamp(m.ts, "Hm");
             if (m.incoming) {
-                meta.setText(when);
+                Language.setText(meta, when);
             } else if (m.peerread) {
-                meta.setText(when + "  ✓✓");
+                Language.setText(meta, Language.join(when, "  ✓✓"));
                 meta.setTextColor(Color.parseColor("#7DD3FC"));
             } else {
-                meta.setText(when + "  " + ChatUi.statusGlyph(m.via));
+                Language.setText(meta, Language.join(when, "  ", ChatUi.statusGlyph(m.via)));
             }
 
             //long-press: copy / delete (local)
             bubble.setOnLongClickListener(v -> {
-                new AlertDialog.Builder(ChatThreadActivity.this)
-                        .setItems(new String[]{"Copy text", "Delete (this device)"}, (d, which) -> {
+                dialog()
+                        .setItems(new CharSequence[]{Language.msg(l10n_chat_copy_text), Language.msg(l10n_chat_delete_local)}, (d, which) -> {
                             if (which == 0) {
                                 ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                                 cm.setPrimaryClip(ClipData.newPlainText("message", m.body));
-                                Toast.makeText(ChatThreadActivity.this, "Copied", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ChatThreadActivity.this, Language.msg(l10n_history_copied), Toast.LENGTH_SHORT).show();
                             } else {
                                 ChatDb.get(ChatThreadActivity.this).deleteMessage(m.msgid);
                                 reload();

@@ -1,5 +1,9 @@
 package com.eurobuddha.blockexplorer;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
+
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -60,20 +64,14 @@ public final class Util {
         return tidyAmount(coin.optString("amount", "0"));
     }
 
-    public static String relative(long ms) {
+    public static CharSequence relative(long ms) {
         if (ms <= 0) return "";
-        long d = System.currentTimeMillis() - ms;
-        if (d < 0) d = 0;
-        if (d < 60000) return "just now";
-        if (d < 3600000) return (d / 60000) + "m ago";
-        if (d < 86400000) return (d / 3600000) + "h ago";
-        if (d < 7 * 86400000L) return (d / 86400000) + "d ago";
-        return new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH).format(new Date(ms));
+        return System.currentTimeMillis() - ms < 7 * 86400000L
+                ? Language.since(ms) : Language.stamp(ms, "yMMMd");
     }
 
-    public static String dateTime(long ms) {
-        if (ms <= 0) return "—";
-        return new SimpleDateFormat("dd MMM yyyy  HH:mm:ss", Locale.ENGLISH).format(new Date(ms));
+    public static CharSequence dateTime(long ms) {
+        return ms <= 0 ? "—" : Language.stamp(ms, "yMMMdHms");
     }
 
     /** timemilli comes back as a string of milliseconds. */

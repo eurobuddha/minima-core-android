@@ -1,4 +1,6 @@
 package com.eurobuddha.pandapools;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -84,6 +86,7 @@ public class ActivityView extends BaseView {
         publicSync = new PoolHistorySync(a, addrBook, this::scheduleRender);
 
         refreshTv.setTextColor(Design.accent());
+        Language.description(refreshTv, Language.msg(l10n_pools_refresh_activity));
         statusTv.setTextColor(Design.dim());
         personalTab.setOnClickListener(v -> setScope(false));
         globalTab.setOnClickListener(v -> setScope(true));
@@ -169,11 +172,11 @@ public class ActivityView extends BaseView {
     private void render() {
         root.setBackgroundColor(Design.bg());
         container.setBackgroundColor(Design.bg());
-        String state = ActivityLog.checkStatus();
-        String publicState = publicSync.status();
-        if (!publicState.isEmpty()) state = publicState + (state.isEmpty() ? "" : " · " + state);
-        if (sync.isRunning()) state = "Syncing node history…" + (state.isEmpty() ? "" : " · " + state);
-        statusTv.setText(state); statusTv.setVisibility(state.isEmpty() ? View.GONE : View.VISIBLE);
+        CharSequence state = PoolsMessages.message(ActivityLog.checkStatus());
+        CharSequence publicState = PoolsMessages.message(publicSync.status());
+        if (publicState.length() > 0) state = Language.join(publicState, state.length() == 0 ? "" : Language.join(" · ", state));
+        if (sync.isRunning()) state = Language.join(Language.msg(l10n_pools_syncing_history), state.length() == 0 ? "" : Language.join(" · ", state));
+        Language.setText(statusTv, state); statusTv.setVisibility(state.length() == 0 ? View.GONE : View.VISIBLE);
         container.removeAllViews();
         if (showGlobal) renderGlobal(); else renderPersonal();
     }
@@ -187,10 +190,10 @@ public class ActivityView extends BaseView {
     private void renderPersonal() {
         List<ActivityTimeline.Row> rows = ActivityTimeline.merge(ActivityLog.list(act), storedHistory(), this::isPersonalPanda);
         if (rows.isEmpty()) {
-            empty(sync.isRunning() ? "Loading your history…" : "No transactions recorded yet.");
+            empty(sync.isRunning() ? Language.msg(l10n_pools_loading_history) : Language.msg(l10n_pools_no_transactions));
             return;
         }
-        container.addView(header("TRANSACTIONS · NEWEST FIRST"));
+        container.addView(header(Language.msg(l10n_pools_newest_transactions)));
         List<String> ids = new ArrayList<>();
         for (int i = 0; i < Math.min(shown, rows.size()); i++) {
             ActivityTimeline.Row row = rows.get(i);
@@ -209,9 +212,9 @@ public class ActivityView extends BaseView {
         for (HistoryEntry tx : storedHistory()) all.put(tx.txpowid.toLowerCase(Locale.ROOT), tx);
         for (HistoryEntry tx : all.values()) events.addAll(PoolActivity.from(tx, addrBook));
         events.sort((a, b) -> Long.compare(b.transaction.timemilli, a.transaction.timemilli));
-        container.addView(header("POOL TRANSACTIONS · NEWEST FIRST"));
+        container.addView(header(Language.msg(l10n_pools_newest_pool_transactions)));
         if (events.isEmpty()) container.addView(line(sync.isRunning()
-                ? "Loading transactions from the node…" : "No pool transactions found in this node's stored history.",
+                ? Language.msg(l10n_pools_loading_node_transactions) : Language.msg(l10n_pools_no_pool_transactions),
                 Design.dim(), 12f, false));
         List<String> ids = new ArrayList<>();
         for (int i = 0; i < Math.min(shown, events.size()); i++) {
@@ -223,8 +226,8 @@ public class ActivityView extends BaseView {
         // Preserve the old observations, but never present their device-local time as a transaction time.
         List<GlobalFeed.Event> observations = GlobalFeed.list(act);
         if (!observations.isEmpty()) {
-            container.addView(header("PREVIOUS LOCAL OBSERVATIONS"));
-            container.addView(line("These were inferred from pool scans. They are not verified transaction records.",
+            container.addView(header(Language.msg(l10n_pools_previous_observations)));
+            container.addView(line(Language.msg(l10n_pools_observations_note),
                     Design.dim(), 12f, false));
             for (GlobalFeed.Event observation : observations) container.addView(globalRow(observation));
         }
@@ -232,8 +235,9 @@ public class ActivityView extends BaseView {
 
     private void showMore(int total) {
         if (total <= shown) return;
-        TextView more = line("Show more (" + (total - shown) + " remaining) ▾", Design.accent(), 13f, true);
+        TextView more = line(Language.msg(l10n_pools_show_more, total - shown), Design.accent(), 13f, true);
         more.setGravity(Gravity.CENTER); more.setPadding(0, dp(12), 0, dp(12));
+        more.setMinHeight(dp(48));
         more.setOnClickListener(v -> { shown += SHOW_STEP; render(); });
         container.addView(more);
     }
@@ -243,22 +247,22 @@ public class ActivityView extends BaseView {
         String tokenName = Util.tokenNameCached(event.tokenid);
         if (tokenName == null || tokenName.isEmpty()) tokenName = event.tokenid.equals(tx.tokenid)
                 ? tx.tokenName : event.tokenid;
-        String action;
+        CharSequence action;
         switch (event.kind) {
-            case GlobalFeed.CREATE: action = "Pool creation"; break;
-            case GlobalFeed.ADD: action = "Liquidity addition"; break;
-            case GlobalFeed.WITHDRAW: action = "Liquidity withdrawal"; break;
-            case GlobalFeed.SWAP: action = event.minimaIn ? "MINIMA sale" : "MINIMA purchase"; break;
-            default: action = "Pool reserves changed";
+            case GlobalFeed.CREATE: action = Language.msg(l10n_pools_pool_creation); break;
+            case GlobalFeed.ADD: action = Language.msg(l10n_pools_liquidity_addition); break;
+            case GlobalFeed.WITHDRAW: action = Language.msg(l10n_pools_liquidity_withdrawal); break;
+            case GlobalFeed.SWAP: action = event.minimaIn ? Language.msg(l10n_pools_minima_sale) : Language.msg(l10n_pools_minima_purchase); break;
+            default: action = Language.msg(l10n_pools_reserves_changed);
         }
         LinearLayout row = new LinearLayout(act); row.setOrientation(LinearLayout.VERTICAL);
         row.setPadding(dp(8), dp(12), dp(8), dp(12));
-        row.addView(line(action + " · " + trim(event.minima) + " MINIMA / " + trim(event.token) + " " + tokenName,
+        row.addView(line(Language.join(action, " · ", trim(event.minima), " MINIMA / ", trim(event.token), " ", tokenName),
                 Design.text(), 14f, true));
-        row.addView(line(event.pool + " · Transaction " + absolute(tx.timemilli), Design.dim(), 12f, false));
-        row.addView(line(tx.verifiedAt == 0 ? "Waiting for node check" : ActivityLog.confirmationText(tx.verifiedDepth),
+        row.addView(line(Language.join(event.pool, " · ", Language.msg(l10n_pools_transaction_when, absolute(tx.timemilli))), Design.dim(), 12f, false));
+        row.addView(line(tx.verifiedAt == 0 ? Language.msg(l10n_pools_waiting_node_check) : PoolsMessages.confirmation(tx.verifiedDepth),
                 tx.verifiedDepth >= ActivityLog.CONFIRM_BLOCKS ? Design.success() : Design.amber(), 11f, false));
-        if (tx.verifiedAt > 0) row.addView(line("Checked " + relative(tx.verifiedAt), Design.dim(), 11f, false));
+        if (tx.verifiedAt > 0) row.addView(line(Language.msg(l10n_pools_checked_when, relative(tx.verifiedAt)), Design.dim(), 11f, false));
         row.setOnClickListener(v -> showDetail(tx));
         return row;
     }
@@ -281,28 +285,29 @@ public class ActivityView extends BaseView {
         TextView title = line(prettyType(e.type), Design.heading(), 14f, true);
         title.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         top.addView(title);
-        top.addView(statusChip(e.statusText(cb), e.failed ? Design.red() : e.confirmed(cb) ? Design.success() : Design.amber()));
+        top.addView(statusChip(PoolsMessages.activityStatus(e, cb), e.failed ? Design.red() : e.confirmed(cb) ? Design.success() : Design.amber()));
         card.addView(top);
 
-        card.addView(line(e.summary, Design.text(), 13f, false));
-        String meta = (history != null && history.timemilli > 0 ? "Transaction " : "Submitted ") + absolute(eventTime);
-        if (e.failed && e.failMsg != null && !e.failMsg.isEmpty()) meta += " · " + e.failMsg;
-        else if (e.txpowid != null && !e.txpowid.isEmpty()) meta = e.txpowid + "  ·  " + meta;
+        card.addView(line(PoolsMessages.activitySummary(e), Design.text(), 13f, false));
+        CharSequence meta = history != null && history.timemilli > 0
+                ? Language.msg(l10n_pools_transaction_when, absolute(eventTime)) : Language.msg(l10n_pools_submitted_when, absolute(eventTime));
+        if (e.failed && e.failMsg != null && !e.failMsg.isEmpty()) meta = Language.join(meta, " · ", PoolsMessages.message(e.failMsg));
+        else if (e.txpowid != null && !e.txpowid.isEmpty()) meta = Language.join(e.txpowid, "  ·  ", meta);
         TextView sub = line(meta, Design.dim(), 12f, false);
         sub.setPadding(0, dp(3), 0, 0);
         card.addView(sub);
-        if (e.verifiedAt > 0) card.addView(line("Checked " + relative(e.verifiedAt), Design.dim(), 11f, false));
-        card.setOnClickListener(v -> new androidx.appcompat.app.AlertDialog.Builder(act)
-                .setTitle(e.statusText(cb))
-                .setMessage("TxPoW: " + (e.txpowid == null ? "Unavailable" : e.txpowid)
-                        + (e.originalTxpowid != null && !e.originalTxpowid.equalsIgnoreCase(e.txpowid)
-                        ? "\n\nOriginal submission ID: " + e.originalTxpowid : "")
-                        + "\n\n" + (history != null ? "Transaction time: " : "Submitted: ") + absolute(eventTime)
-                        + "\n\nTransaction: " + (e.transactionId.isEmpty() ? "Not saved by the older build" : e.transactionId)
-                        + (e.verifiedAt > 0 ? "\n\nLast node check: " + new java.util.Date(e.verifiedAt) : "")
-                        + (e.transactionId.isEmpty() && e.verifiedDepth < 0
-                        ? "\n\nHistory sync checks this older receipt against mined transaction headers. A match requires its exact cryptographic hash; amounts and times alone are insufficient." : ""))
-                .setPositiveButton("OK", null).show());
+        if (e.verifiedAt > 0) card.addView(line(Language.msg(l10n_pools_checked_when, relative(e.verifiedAt)), Design.dim(), 11f, false));
+        card.setOnClickListener(v -> act.languageDialog()
+                .setTitle(PoolsMessages.activityStatus(e, cb))
+                .setMessage(Language.join(
+                        Language.msg(l10n_pools_receipt_txpow, e.txpowid == null ? Language.msg(l10n_pools_value_unavailable) : e.txpowid),
+                        e.originalTxpowid != null && !e.originalTxpowid.equalsIgnoreCase(e.txpowid)
+                                ? Language.join("\n\n", Language.msg(l10n_pools_original_id, e.originalTxpowid)) : "",
+                        "\n\n", history != null ? Language.msg(l10n_pools_transaction_time, absolute(eventTime)) : Language.msg(l10n_pools_submitted_time, absolute(eventTime)),
+                        "\n\n", Language.msg(l10n_pools_transaction_id_detail, e.transactionId.isEmpty() ? Language.msg(l10n_pools_older_id_missing) : e.transactionId),
+                        e.verifiedAt > 0 ? Language.join("\n\n", Language.msg(l10n_pools_last_node_check, Language.stamp(e.verifiedAt, "yMMMdHmsz"))) : "",
+                        e.transactionId.isEmpty() && e.verifiedDepth < 0 ? Language.join("\n\n", Language.msg(l10n_pools_receipt_match_note)) : ""))
+                .setPositiveButton(Language.msg(l10n_pools_ok), null).show());
         return card;
     }
 
@@ -329,18 +334,18 @@ public class ActivityView extends BaseView {
         boolean reshuffle = n.isReshuffle();
         String swapLegs = n.swapLegsDisplay();   // both legs when this tx is a two-token swap
         TextView line1 = new TextView(act);
-        line1.setText(swapLegs != null ? swapLegs
+        Language.setText(line1, swapLegs != null ? swapLegs
                 : reshuffle ? n.grossDisplay()
                 : (sign + Util.tidyAmount(n.amount) + "  " + n.tokenName));
         line1.setTextColor(color); line1.setTextSize(15f); line1.setTypeface(Design.typefaceBold());
         TextView line2 = new TextView(act);
         String cp = (n.counterparty == null || n.counterparty.isEmpty()) ? "" : n.counterparty + "  ·  ";
-        line2.setText((reshuffle ? n.reshuffleLabel() + "  ·  " : cp) + absolute(n.timemilli));
+        Language.setText(line2, Language.join(reshuffle ? Language.join(PoolsMessages.reshuffle(n), "  ·  ") : cp, absolute(n.timemilli)));
         line2.setTextColor(Design.dim()); line2.setTextSize(12f);
         mid.addView(line1); mid.addView(line2);
-        mid.addView(line(n.verifiedAt == 0 ? "Waiting for node check" : ActivityLog.confirmationText(n.verifiedDepth),
+        mid.addView(line(n.verifiedAt == 0 ? Language.msg(l10n_pools_waiting_node_check) : PoolsMessages.confirmation(n.verifiedDepth),
                 n.verifiedDepth >= ActivityLog.CONFIRM_BLOCKS ? Design.success() : Design.amber(), 11f, false));
-        if (n.verifiedAt > 0) mid.addView(line("Checked " + relative(n.verifiedAt), Design.dim(), 10f, false));
+        if (n.verifiedAt > 0) mid.addView(line(Language.msg(l10n_pools_checked_when, relative(n.verifiedAt)), Design.dim(), 10f, false));
         row.addView(mid);
 
         TextView right = new TextView(act);
@@ -360,31 +365,31 @@ public class ActivityView extends BaseView {
         row.setPadding(dp(8), dp(11), dp(8), dp(11));
 
         String m = trim(ev.minimaAmt), t = trim8(ev.tokenAmt), tl = ev.tokenLabel;
-        String glyphStr, desc, line2Str;
+        String glyphStr;
+        CharSequence desc, line2Str;
         int glyphColor;
-        String poolTime = ev.pool + "  ·  Observed on this phone " + absolute(ev.ts)
-                + " · Transaction time unknown";
+        CharSequence poolTime = Language.msg(l10n_pools_observation_time, ev.pool, absolute(ev.ts));
         switch (ev.kind) {
             case GlobalFeed.CREATE:
                 glyphStr = "✦"; glyphColor = Design.success();
-                desc = "Pool first seen (unverified) · " + m + " MINIMA / " + t + " " + tl;
+                desc = Language.join(Language.msg(l10n_pools_observed_create), " · ", m, " MINIMA / ", t, " ", tl);
                 line2Str = poolTime;
                 break;
             case GlobalFeed.ADD:
                 glyphStr = "+"; glyphColor = Design.success();
-                desc = "Reserve increase observed (unverified) · +" + m + " MINIMA / +" + t + " " + tl;
+                desc = Language.join(Language.msg(l10n_pools_observed_add), " · +", m, " MINIMA / +", t, " ", tl);
                 line2Str = poolTime;
                 break;
             case GlobalFeed.WITHDRAW:
                 glyphStr = "−"; glyphColor = Design.red();
-                desc = "Reserve decrease or disappearance observed (unverified) · " + m + " MINIMA / " + t + " " + tl;
+                desc = Language.join(Language.msg(l10n_pools_observed_withdraw), " · ", m, " MINIMA / ", t, " ", tl);
                 line2Str = poolTime;
                 break;
             default:   // SWAP
                 glyphStr = "⇄"; glyphColor = Design.accent();
-                desc = ev.minimaIn ? ("Reserve change observed (unverified): sold " + m + " MINIMA  →  " + t + " " + tl)
-                                   : ("Reserve change observed (unverified): bought " + m + " MINIMA  ←  " + t + " " + tl);
-                line2Str = trim8(ev.price) + " " + tl + "/MINIMA  ·  " + poolTime;
+                desc = ev.minimaIn ? (Language.join(Language.msg(l10n_pools_observed_sold), " ", m, " MINIMA  →  ", t, " ", tl))
+                                   : (Language.join(Language.msg(l10n_pools_observed_bought), " ", m, " MINIMA  ←  ", t, " ", tl));
+                line2Str = Language.join(trim8(ev.price), " ", tl, "/MINIMA  ·  ", poolTime);
         }
 
         TextView glyph = new TextView(act);
@@ -396,9 +401,9 @@ public class ActivityView extends BaseView {
         mid.setPadding(dp(6), 0, dp(6), 0);
         mid.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         TextView line1 = new TextView(act);
-        line1.setText(desc); line1.setTextColor(Design.text()); line1.setTextSize(14f); line1.setTypeface(Design.typefaceBold());
+        Language.setText(line1, desc); line1.setTextColor(Design.text()); line1.setTextSize(14f); line1.setTypeface(Design.typefaceBold());
         TextView line2 = new TextView(act);
-        line2.setText(line2Str);
+        Language.setText(line2, line2Str);
         line2.setTextColor(Design.dim()); line2.setTextSize(12f);
         mid.addView(line1); mid.addView(line2);
         row.addView(mid);
@@ -411,22 +416,22 @@ public class ActivityView extends BaseView {
         LinearLayout box = new LinearLayout(act);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(12), dp(20), dp(12));
-        kv(box, "Direction", n.direction);
-        kv(box, "Amount", (n.incoming ? "+" : "sent".equals(n.direction) ? "−" : "") + Util.tidyAmount(n.amount) + " " + n.tokenName);
-        kv(box, "Block", String.valueOf(n.block));
-        kv(box, "Time", new SimpleDateFormat("dd MMM yyyy  HH:mm:ss", Locale.ENGLISH).format(new Date(n.timemilli)));
+        kv(box, Language.msg(l10n_history_direction), PoolsMessages.direction(n.direction));
+        kv(box, Language.msg(l10n_history_amount), (n.incoming ? "+" : "sent".equals(n.direction) ? "−" : "") + Util.tidyAmount(n.amount) + " " + n.tokenName);
+        kv(box, Language.msg(l10n_history_block), String.valueOf(n.block));
+        kv(box, Language.msg(l10n_history_date_time), Language.stamp(n.timemilli, "yMMMdHms"));
         copyRow(box, "Txpow id", n.txpowid);
         if (n.counterparty != null && !n.counterparty.isEmpty()) copyRow(box, n.incoming ? "From" : "To", n.counterparty);
-        addBreakdown(box, "Inputs", n.inputs);
-        addBreakdown(box, "Outputs", n.outputs);
+        addBreakdown(box, Language.msg(l10n_history_inputs), n.inputs);
+        addBreakdown(box, Language.msg(l10n_history_outputs), n.outputs);
         ScrollView sv = new ScrollView(act);
         sv.addView(box);
-        new AlertDialog.Builder(act).setTitle("Transaction").setView(sv).setPositiveButton("Close", null).show();
+        act.languageDialog().setTitle(Language.msg(l10n_history_transaction)).setView(sv).setPositiveButton(Language.msg(l10n_language_close), null).show();
     }
 
-    private void kv(LinearLayout p, String k, String v) {
+    private void kv(LinearLayout p, CharSequence k, CharSequence v) {
         TextView t = new TextView(act);
-        t.setText(k + ":  " + v);
+        Language.setText(t, Language.join(k, ":  ", v));
         t.setTextColor(Design.text()); t.setTextSize(13f); t.setPadding(0, dp(4), 0, dp(4));
         p.addView(t);
     }
@@ -435,12 +440,12 @@ public class ActivityView extends BaseView {
         p.addView(Ui.identifierRow(act, k, v));
     }
 
-    private void addBreakdown(LinearLayout p, String title, String json) {
+    private void addBreakdown(LinearLayout p, CharSequence title, String json) {
         try {
             JSONArray a = new JSONArray(json);
             if (a.length() == 0) return;
             TextView h = new TextView(act);
-            h.setText(title);
+            Language.setText(h, title);
             h.setTextColor(Design.accent()); h.setTextSize(12f); h.setTypeface(Design.typefaceBold()); h.setPadding(0, dp(8), 0, dp(2));
             p.addView(h);
             for (int i = 0; i < a.length(); i++) {
@@ -449,7 +454,7 @@ public class ActivityView extends BaseView {
                 String tid = c.optString("tokenid", "0x00");
                 String tok = Util.isMinima(tid) ? "Minima" : tid;
                 TextView t = new TextView(act);
-                t.setText("• " + Util.tidyAmount(c.optString("amount", "")) + " " + tok + "  →  " + c.optString("addr", ""));
+                Language.setText(t, "• " + Util.tidyAmount(c.optString("amount", "")) + " " + tok + "  →  " + c.optString("addr", ""));
                 t.setTextColor(Design.dim()); t.setTextSize(12f); t.setPadding(dp(6), dp(1), 0, dp(1));
                 p.addView(t);
             }
@@ -458,60 +463,55 @@ public class ActivityView extends BaseView {
 
     // ---- helpers ----
 
-    private TextView header(String s) {
+    private TextView header(CharSequence s) {
         TextView t = new TextView(act);
-        t.setText(s); t.setAllCaps(true); t.setTextColor(Design.dim()); t.setTextSize(11f);
+        Language.setText(t, s); t.setAllCaps(true); t.setTextColor(Design.dim()); t.setTextSize(11f);
         t.setLetterSpacing(0.1f); t.setPadding(dp(2), dp(12), 0, dp(4));
         return t;
     }
 
-    private void empty(String s) {
+    private void empty(CharSequence s) {
         TextView t = new TextView(act);
-        t.setText(s); t.setTextColor(Design.dim()); t.setGravity(Gravity.CENTER); t.setPadding(dp(8), dp(48), dp(8), 0);
+        Language.setText(t, s); t.setTextColor(Design.dim()); t.setGravity(Gravity.CENTER); t.setPadding(dp(8), dp(48), dp(8), 0);
         container.addView(t);
     }
 
-    private TextView statusChip(String s, int color) {
+    private TextView statusChip(CharSequence s, int color) {
         TextView t = new TextView(act);
-        t.setText(s); t.setTextColor(color); t.setTextSize(11f); t.setTypeface(Design.typefaceBold());
+        Language.setText(t, s); t.setTextColor(color); t.setTextSize(11f); t.setTypeface(Design.typefaceBold());
         t.setPadding(dp(8), dp(3), dp(8), dp(3));
+        t.setMaxWidth(dp(160));
         android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
         g.setColor(Ui.withAlpha(color, 30)); g.setCornerRadius(dp(100)); g.setStroke(Math.max(1, dp(1)), Ui.withAlpha(color, 120));
         t.setBackground(g);
         return t;
     }
 
-    private TextView line(String s, int color, float sp, boolean bold) {
+    private TextView line(CharSequence s, int color, float sp, boolean bold) {
         TextView t = new TextView(act);
-        t.setText(s); t.setTextColor(color); t.setTextSize(sp);
+        Language.setText(t, s); t.setTextColor(color); t.setTextSize(sp);
         t.setTypeface(bold ? Design.typefaceBold() : Design.typeface());
         return t;
     }
 
-    private static String prettyType(String type) {
+    private static CharSequence prettyType(String type) {
         switch (type) {
-            case ActivityLog.CONSOLIDATE: return "Consolidate coins";
-            case ActivityLog.CREATE:  return "Create pool";
-            case ActivityLog.SWAP:    return "Swap";
-            case ActivityLog.DEPOSIT: return "Add liquidity";
-            case ActivityLog.MIGRATE: return "Migrate pool";
-            case ActivityLog.CLOSE:   return "Withdraw / close";
+            case ActivityLog.CONSOLIDATE: return Language.msg(l10n_pools_consolidate_coins);
+            case ActivityLog.CREATE:  return Language.msg(l10n_pools_create_pool);
+            case ActivityLog.SWAP:    return Language.msg(l10n_pools_swap_action);
+            case ActivityLog.DEPOSIT: return Language.msg(l10n_pools_add_liquidity);
+            case ActivityLog.MIGRATE: return Language.msg(l10n_pools_migrate_pool);
+            case ActivityLog.CLOSE:   return Language.msg(l10n_pools_withdraw_close);
             default:                  return type;
         }
     }
 
-    private static String absolute(long ms) {
-        return ms <= 0 ? "Unknown" : new SimpleDateFormat("dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).format(new Date(ms));
+    private static CharSequence absolute(long ms) {
+        return ms <= 0 ? Language.msg(l10n_pools_unknown) : Language.stamp(ms, "yMMMdHmsz");
     }
-
-    private static String relative(long ms) {
+    private static CharSequence relative(long ms) {
         if (ms <= 0) return "";
-        long d = System.currentTimeMillis() - ms;
-        if (d < 60000) return "just now";
-        if (d < 3600000) return (d / 60000) + "m ago";
-        if (d < 86400000) return (d / 3600000) + "h ago";
-        if (d < 7 * 86400000L) return (d / 86400000) + "d ago";
-        return new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH).format(new Date(ms));
+        return System.currentTimeMillis() - ms < 7 * 86400000L ? Language.since(ms) : Language.stamp(ms, "yMMMd");
     }
 
     private static String trim(BigDecimal b) { return b == null ? "—" : b.stripTrailingZeros().toPlainString(); }

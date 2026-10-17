@@ -33,18 +33,18 @@ public class MinimaApplication extends Application {
         // These screens already deliberately protect secrets independently of the general toggle.
         boolean sensitive = activity instanceof com.eurobuddha.minimacore.main.backup.VaultActivity
                 || activity instanceof com.eurobuddha.minimacore.main.backup.BackupCreateActivity
-                || activity instanceof com.eurobuddha.minimacore.main.backup.RestoreFileActivity;
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        boolean debug = (activity.getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-        boolean allowed = prefs.getBoolean(PREF_ALLOW_SS, debug);
+                || activity instanceof com.eurobuddha.minimacore.main.backup.RestoreFileActivity
+                || com.eurobuddha.minimacore.integrated.PandamoniumHooks.requiresSecureScreen(activity);
+        boolean allowed = screenshotsAllowed(this);
         if (sensitive || !allowed) activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         else activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
     }
 
-    /** Whether screenshots are currently allowed (persisted, default false). */
+    /** Persisted screenshot policy: release builds default off; debug builds default on. */
     public static boolean screenshotsAllowed(Context zContext){
         SharedPreferences prefs = zContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        return prefs.getBoolean(PREF_ALLOW_SS, false);
+        boolean debug = (zContext.getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        return prefs.getBoolean(PREF_ALLOW_SS, debug);
     }
     @Override
     public void onCreate() {
@@ -55,7 +55,15 @@ public class MinimaApplication extends Application {
 
         //Make all activities no screenshot
         setupActivityListener();
+        com.eurobuddha.minimacore.i18n.Language.initialize(this,
+                () -> !com.eurobuddha.minimacore.lock.AppLock.isEnabled(this)
+                        || com.eurobuddha.minimacore.lock.AppLock.get().isUnlocked());
         com.eurobuddha.minimacore.integrated.PandamoniumHooks.initialize(this);
+    }
+
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        com.eurobuddha.minimacore.i18n.Language.configurationChanged(this);
     }
 
     private void setupActivityListener() {

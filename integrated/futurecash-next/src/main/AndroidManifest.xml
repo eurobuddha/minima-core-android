@@ -12,7 +12,7 @@
         <package android:name="com.eurobuddha.minimacore" />
     </queries>
     <application>
-        <activity android:name="com.eurobuddha.futurecashnext.MainActivity" android:exported="false" android:windowSoftInputMode="adjustResize" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode|navigation" android:theme="@style/pm_futurecash_next_Theme.FutureCash">
+        <activity android:name="com.eurobuddha.futurecashnext.MainActivity" android:exported="false" android:windowSoftInputMode="adjustResize" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode|navigation|locale|layoutDirection" android:theme="@style/pm_futurecash_next_Theme.FutureCash">
             </activity>
         <service android:name="com.eurobuddha.futurecashnext.GuardianService" android:exported="false" android:stopWithTask="false" android:foregroundServiceType="specialUse|dataSync">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Watches the chain for the user's matured time-locked payments, collects them, and immediately moves any landing on a reused one-time key to a safe address" />

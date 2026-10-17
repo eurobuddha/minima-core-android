@@ -1,6 +1,7 @@
 package com.eurobuddha.pandapools;
 
-import android.app.AlertDialog;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -39,7 +40,7 @@ public class SwapView extends BaseView {
     // quote/inputs aren't reset under the user; doSwap re-scans via pools().refresh() when the post lands.
     private final PoolBook.Listener poolListener = new PoolBook.Listener() {
         @Override public void onPools(List<Pool> pools) { if (posting) return; renderPools(pools); }
-        @Override public void onError(String msg) { if (!posting) setBusy("Scan error: " + msg); }
+        @Override public void onError(String msg) { if (!posting) setBusy(Language.msg(l10n_pools_scan_error, msg)); }
     };
 
     private EditText amount;
@@ -88,6 +89,7 @@ public class SwapView extends BaseView {
         status.setTextColor(Design.dim());
         flip.setTextColor(Design.accent());
         flip.setTypeface(Design.typefaceBold());
+        Language.description(flip, Language.msg(l10n_pools_flip_description));
 
         flip.setOnClickListener(v -> { minimaToToken = !minimaToToken; syncLabels(); requote(); });
         swapBtn.setOnClickListener(v -> confirmAndSwap());
@@ -115,7 +117,7 @@ public class SwapView extends BaseView {
         List<List<Pool>> byTok = PoolRouter.byToken(pools);
         if (byTok.isEmpty()) {
             pairPools.clear();
-            poolLine.setText("No live pools yet — create one in the My LP tab to seed liquidity.");
+            Language.setText(poolLine, PoolsMessages.message("No live pools yet — create one in the My LP tab to seed liquidity."));
             swapBtn.setEnabled(false); Ui.primaryButton(swapBtn);
             out.setText("0.0");
             quotePanel.removeAllViews();
@@ -128,8 +130,7 @@ public class SwapView extends BaseView {
         pairLabel = pairPools.get(0).tokenLabel();
         BigDecimal depth = PoolRouter.aggregateDepth(pairPools);
         int n = pairPools.size();
-        poolLine.setText("MINIMA / " + pairLabel + "   ·   " + n + (n == 1 ? " pool" : " pools")
-                + "   ·   depth " + trim(depth) + " MINIMA");
+        Language.setText(poolLine, Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_pools_swap_pool_summary, n, pairLabel, n, trim(depth)));
         syncLabels();
         renderBalances(); // paint instantly from the cached snapshot against the now-current pair…
         loadBalances();   // …then refresh the cache (also fires on onNewBlock via scan) and re-render
@@ -176,7 +177,7 @@ public class SwapView extends BaseView {
         balanceLine.setVisibility(View.VISIBLE);
         // ALWAYS show BOTH halves; round DOWN to 6 dp. The node returns up to 42 dp for MINIMA — that giant
         // number filled the line and pushed the "· <Y> <LABEL>" tail out of view (the "missing USDT" bug).
-        balanceLine.setText("Your balance: " + fmt6s(m) + " MINIMA  ·  " + fmt6s(t) + " " + pairLabel);
+        Language.setText(balanceLine, Language.msg(l10n_pools_swap_balance, fmt6s(m), fmt6s(t), pairLabel));
         refreshMarketFeed();   // kick a background fetch + a one-shot repaint
         renderMarket();        // paint whatever snapshot we have right now
     }
@@ -209,19 +210,18 @@ public class SwapView extends BaseView {
         BigDecimal poolSpot = sumT.divide(sumM, 12, RoundingMode.DOWN);            // USDT per MINIMA
 
         marketLine.setVisibility(View.VISIBLE);
-        if (!MarketPrice.fresh()) { marketLine.setText("Market price unavailable (MEXC)"); return; }
+        if (!MarketPrice.fresh()) { Language.setText(marketLine, PoolsMessages.message("Market price unavailable (MEXC)")); return; }
 
         BigDecimal mid = BigDecimal.valueOf(MarketPrice.mid());   // fresh() ⇒ mid > 0
         BigDecimal pct = poolSpot.subtract(mid).divide(mid, 8, RoundingMode.DOWN).multiply(new BigDecimal("100"));
-        String verdict;
+        CharSequence verdict;
         if (pct.abs().compareTo(new BigDecimal("0.1")) < 0) {
-            verdict = "at market";
+            verdict = Language.msg(l10n_pools_at_market);
         } else {
             String mag = pct.abs().setScale(1, RoundingMode.HALF_UP).toPlainString();
-            verdict = mag + "% " + (pct.signum() > 0 ? "above market" : "below market");
+            verdict = Language.msg(pct.signum() > 0 ? l10n_pools_above_market : l10n_pools_below_market, mag);
         }
-        marketLine.setText("Market ≈ " + fmt6(mid) + " USDT/MINIMA (MEXC)  ·  Pool " + fmt6(poolSpot)
-                + "  ·  " + verdict);
+        Language.setText(marketLine, Language.msg(l10n_pools_market_compare, fmt6(mid), fmt6(poolSpot), verdict));
     }
 
     /** True only when the current pair token is USDT (the MEXC feed is MINIMA/USDT — nothing else compares). */
@@ -241,8 +241,8 @@ public class SwapView extends BaseView {
     }
 
     private void syncLabels() {
-        fromTok.setText(minimaToToken ? "MINIMA" : pairLabel);
-        toTok.setText(minimaToToken ? pairLabel : "MINIMA");
+        Language.setText(fromTok, minimaToToken ? "MINIMA" : pairLabel);
+        Language.setText(toTok, minimaToToken ? pairLabel : "MINIMA");
     }
 
     // ---- live quote (routed) ----
@@ -267,13 +267,13 @@ public class SwapView extends BaseView {
         addRow2("Rate", "≈ " + trim8(r.effPrice) + " " + pairLabel + " / MINIMA");
         addRow2("Price impact", impact(r) + " %");
         if (r.poolsAvailable > 1)
-            addRow2("Routed across", r.poolsUsed + " of " + r.poolsAvailable + " pools"
-                    + (r.capped ? " (top " + PoolRouter.MAX_POOLS + ")" : ""));
+            addRow2("Routed across", Language.join(Language.msg(l10n_pools_route_count, r.poolsUsed, r.poolsAvailable),
+                    r.capped ? Language.msg(l10n_pools_route_cap, PoolRouter.MAX_POOLS) : ""));
         addRow2("Pool fee (0.50%)", "kept by LPs");
         addRow2("You receive", trim(r.totalOut) + " " + (minimaToToken ? pairLabel : "MINIMA"));
 
         swapBtn.setEnabled(!posting);
-        swapBtn.setText(posting ? "SWAPPING…" : "SWAP");
+        Language.setText(swapBtn, PoolsMessages.message(posting ? "SWAPPING…" : "SWAP"));
         Ui.primaryButton(swapBtn);
     }
 
@@ -297,20 +297,18 @@ public class SwapView extends BaseView {
 
         String pay  = trim(r.totalIn) + " " + (dir ? "MINIMA" : pairLabel);
         String recv = trim(r.totalOut) + " " + (dir ? pairLabel : "MINIMA");
-        String routed = r.poolsUsed > 1 ? "\nRouted across " + r.poolsUsed + " pools in one transaction." : "";
-        new AlertDialog.Builder(act)
-                .setTitle("Confirm swap")
-                .setMessage("Pay  " + pay + "\nReceive  " + recv + "\n\nPrice impact " + impact(r) + "%." + routed
-                        + "\n\nThis posts a real on-chain transaction — if a pool moves before it confirms the "
-                        + "swap is rejected (you keep your funds).")
-                .setPositiveButton("Swap", (d, w) -> doSwap(r, dir))
-                .setNegativeButton("Cancel", null)
+        CharSequence routed = r.poolsUsed > 1 ? Language.msg(l10n_pools_route_review, r.poolsUsed) : "";
+        act.languageDialog()
+                .setTitle(Language.msg(l10n_pools_confirm_swap))
+                .setMessage(Language.msg(l10n_pools_swap_review, pay, recv, impact(r), routed))
+                .setPositiveButton(Language.msg(l10n_pools_swap_action), (d, w) -> doSwap(r, dir))
+                .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                 .show();
     }
 
     private void doSwap(PoolRouter.Route r, boolean dir) {
         posting = true;
-        swapBtn.setEnabled(false); swapBtn.setText("SWAPPING…"); Ui.primaryButton(swapBtn);
+        swapBtn.setEnabled(false); Language.setText(swapBtn, PoolsMessages.message("SWAPPING…")); Ui.primaryButton(swapBtn);
         setStatus("Building + posting your swap…", Design.dim());
         final String fromT = dir ? "MINIMA" : pairLabel, toT = dir ? pairLabel : "MINIMA";
         final String summary = "−" + trim8(r.totalIn) + " " + fromT + "  ·  +" + trim8(r.totalOut) + " " + toT;
@@ -320,8 +318,8 @@ public class SwapView extends BaseView {
                 act.runOnUiThread(() -> {
                     posting = false;
                     amount.setText("");
-                    setStatus("Swap submitted. Check Activity for confirmation. " + txpowid, Design.amber());
-                    swapBtn.setEnabled(true); swapBtn.setText("SWAP"); Ui.primaryButton(swapBtn);
+                    setStatus(Language.msg(l10n_pools_swap_submitted, txpowid), Design.amber());
+                    swapBtn.setEnabled(true); Language.setText(swapBtn, PoolsMessages.message("SWAP")); Ui.primaryButton(swapBtn);
                     act.pools().refresh();
                 });
             }
@@ -329,8 +327,8 @@ public class SwapView extends BaseView {
                 ActivityLog.recordFailed(act, ActivityLog.SWAP, summary, message);
                 act.runOnUiThread(() -> {
                     posting = false;
-                    setStatus("Swap: " + message, NodeApi.ERR_WRITE_UNCERTAIN.equals(message) ? Design.amber() : Design.red());
-                    swapBtn.setEnabled(true); swapBtn.setText("SWAP"); Ui.primaryButton(swapBtn);
+                    setStatus(Language.msg(l10n_pools_swap_failure, PoolsMessages.message(message)), NodeApi.ERR_WRITE_UNCERTAIN.equals(message) ? Design.amber() : Design.red());
+                    swapBtn.setEnabled(true); Language.setText(swapBtn, PoolsMessages.message("SWAP")); Ui.primaryButton(swapBtn);
                 });
             }
         });
@@ -338,25 +336,29 @@ public class SwapView extends BaseView {
 
     // ---- small helpers ----
 
-    private void addRow2(String k, String v) {
+    private void addRow2(CharSequence k, CharSequence v) {
         LinearLayout row = new LinearLayout(act);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(0, Ui.dp(act, 4), 0, Ui.dp(act, 4));
         TextView kk = new TextView(act);
-        kk.setText(k); kk.setTextColor(Design.dim()); kk.setTextSize(13);
+        Language.setText(kk, PoolsMessages.message(k)); kk.setTextColor(Design.dim()); kk.setTextSize(13);
         kk.setTypeface(Design.typeface());
-        kk.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        kk.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        kk.setMaxWidth(Ui.dp(act, 190));
         TextView vv = new TextView(act);
-        vv.setText(v); vv.setTextColor(Design.text()); vv.setTextSize(13);
+        Language.setText(vv, PoolsMessages.message(v)); vv.setTextColor(Design.text()); vv.setTextSize(13);
         vv.setTypeface(Design.typeface());
         vv.setGravity(Gravity.END);
+        LinearLayout.LayoutParams vlp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        vlp.leftMargin = Ui.dp(act, 8);
+        vv.setLayoutParams(vlp);
         row.addView(kk); row.addView(vv);
         quotePanel.addView(row);
     }
 
-    private void addRow(String s, int color) {
+    private void addRow(CharSequence s, int color) {
         TextView t = new TextView(act);
-        t.setText(s); t.setTextColor(color); t.setTextSize(13);
+        Language.setText(t, PoolsMessages.message(s)); t.setTextColor(color); t.setTextSize(13);
         t.setPadding(0, Ui.dp(act, 4), 0, Ui.dp(act, 4));
         quotePanel.addView(t);
     }
@@ -372,15 +374,17 @@ public class SwapView extends BaseView {
         int cb = act.chainBlock();
 
         TextView h = new TextView(act);
-        h.setText("RECENT ACTIVITY"); h.setAllCaps(true); h.setTextColor(Design.dim()); h.setTextSize(11);
+        Language.setText(h, PoolsMessages.message("RECENT ACTIVITY")); h.setAllCaps(true); h.setTextColor(Design.dim()); h.setTextSize(11);
         h.setLetterSpacing(0.1f); h.setPadding(0, 0, 0, Ui.dp(act, 6));
         swapActivity.addView(h);
 
         for (ActivityLog.Entry e : recent) swapActivity.addView(activityRow(e, cb));
 
         TextView all = new TextView(act);
-        all.setText("See all  →  Activity"); all.setTextColor(Design.accent()); all.setTextSize(13);
+        Language.setText(all, PoolsMessages.message("See all  →  Activity")); all.setTextColor(Design.accent()); all.setTextSize(13);
         all.setTypeface(Design.typefaceBold()); all.setPadding(0, Ui.dp(act, 10), 0, 0);
+        all.setMinHeight(Ui.dp(act, 48));
+        all.setGravity(Gravity.CENTER_VERTICAL);
         all.setOnClickListener(v -> act.goToTab(MainActivity.TAB_ACTIVITY));
         swapActivity.addView(all);
     }
@@ -392,28 +396,29 @@ public class SwapView extends BaseView {
         row.setPadding(0, Ui.dp(act, 5), 0, Ui.dp(act, 5));
 
         TextView desc = new TextView(act);
-        desc.setText(e.summary); desc.setTextColor(Design.text()); desc.setTextSize(13);
+        Language.setText(desc, PoolsMessages.activitySummary(e)); desc.setTextColor(Design.text()); desc.setTextSize(13);
         // Wraps instead of clipping at one line: a summary can carry a full tokenid when a token name has
         // not resolved, and this row has no tap-to-copy of its own to recover a clipped one from.
-        desc.setMaxLines(3);
+        // Preserve the full identifier when a summary wraps over several lines.
         desc.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         row.addView(desc);
 
         int color = e.failed ? Design.red() : e.confirmed(cb) ? Design.success() : Design.amber();
         TextView st = new TextView(act);
-        st.setText(e.statusText(cb)); st.setTextColor(color); st.setTextSize(11);
+        Language.setText(st, PoolsMessages.activityStatus(e, cb)); st.setTextColor(color); st.setTextSize(11);
         st.setTypeface(Design.typefaceBold()); st.setGravity(Gravity.END);
         st.setPadding(Ui.dp(act, 8), 0, 0, 0);
+        st.setMaxWidth(Ui.dp(act, 150));
         row.addView(st);
         return row;
     }
 
-    private void setBusy(String s) { poolLine.setText(s); swapBtn.setEnabled(false); Ui.primaryButton(swapBtn); }
-    private void setStatus(String s, int color) {
-        status.setVisibility(s.isEmpty() ? View.GONE : View.VISIBLE);
-        status.setText(s); status.setTextColor(color);
+    private void setBusy(CharSequence s) { Language.setText(poolLine, PoolsMessages.message(s)); swapBtn.setEnabled(false); Ui.primaryButton(swapBtn); }
+    private void setStatus(CharSequence s, int color) {
+        status.setVisibility(s.length() == 0 ? View.GONE : View.VISIBLE);
+        Language.setText(status, PoolsMessages.message(s)); status.setTextColor(color);
     }
-    private void toast(String s) { setStatus(s, Design.amber()); }
+    private void toast(CharSequence s) { setStatus(s, Design.amber()); }
 
     private static BigDecimal parse(String s) {
         if (s == null) return null;

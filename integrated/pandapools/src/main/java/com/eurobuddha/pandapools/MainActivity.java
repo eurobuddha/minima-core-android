@@ -1,4 +1,7 @@
 package com.eurobuddha.pandapools;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.content.Intent;
 import android.net.Uri;
@@ -84,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
         getDelegate().setLocalNightMode(
                 Design.isDark() ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(R.layout.pm_pandapools_activity_main);
+        Language.apply(findViewById(R.id.pm_pandapools_main));
+        Language.description(findViewById(R.id.pm_pandapools_designToggle), Language.msg(l10n_pools_style_description));
 
         // Register the SAF pickers early — registerForActivityResult must run before the Activity is started.
         saveDocLauncher = registerForActivityResult(new ActivityResultContracts.CreateDocument("application/json"), uri -> {
@@ -103,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         String ver = "?";
         try { ver = getPackageManager().getPackageInfo(getPackageName(), 0).versionName; } catch (Exception ignore) {}
         // version on the shared header → visible on every tab, so it's always clear which build is installed
-        ((TextView) findViewById(R.id.pm_pandapools_brandSub)).setText("LIQUIDITY POOLS   ·   v" + ver);
+        Language.setText((TextView) findViewById(R.id.pm_pandapools_brandSub), Language.join(Language.msg(l10n_pools_subtitle), "   ·   v", ver));
         blockNo = findViewById(R.id.pm_pandapools_blockNo);
         pairingBanner = findViewById(R.id.pm_pandapools_pairingBanner);
         pairingBanner.setVisibility(View.GONE);
@@ -111,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.pm_pandapools_designToggle).setOnClickListener(v -> {
             // Don't recreate() (which tears down NodeApi) while a tx is building/posting — it would strand
             // the in-flight CmdChain (no callback, no txndelete). Ask the user to finish first.
-            if (anyViewBusy()) { android.widget.Toast.makeText(this, "Finish your transaction first, then switch theme.", android.widget.Toast.LENGTH_SHORT).show(); return; }
+            if (anyViewBusy()) { android.widget.Toast.makeText(this, Language.msg(l10n_pools_busy_theme), android.widget.Toast.LENGTH_SHORT).show(); return; }
             // Design.next() RETURNS the next mode; it does not mutate state. The old code
             // (Design.next(); Design.set(this, Design.mode())) discarded that return and re-set the
             // CURRENT mode — so the toggle silently did nothing. Persist next()'s result directly.
@@ -136,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         // tabs — Swap · Pools · My LP · Wallet (available balances) · Activity (personal + global history)
         views = new BaseView[]{ new SwapView(this), new PoolsView(this), new MyLpView(this),
                 new WalletView(this), new ActivityView(this) };
-        String[] titles = { "SWAP", "POOLS", "MY LP", "WALLET", "ACTIVITY" };
+        CharSequence[] titles = { Language.msg(l10n_pools_swap), Language.msg(l10n_pools_pools), Language.msg(l10n_pools_my_lp), Language.msg(l10n_pools_wallet), Language.msg(l10n_pools_activity) };
         pager = findViewById(R.id.pm_pandapools_pager);
         pager.setAdapter(new MainPager(views, titles));
         pager.setOffscreenPageLimit(views.length);   // keep all tabs alive so background sync/polls run
@@ -204,8 +209,7 @@ public class MainActivity extends AppCompatActivity {
                     android.net.Uri.parse("package:" + getPackageName())));
         } catch (Exception unavailable) {
             android.widget.Toast.makeText(this,
-                    "This device has no battery-optimisation screen. Exclude PandaPools from battery "
-                            + "optimisation for Minima Core in Android Settings.",
+                    Language.msg(l10n_pools_battery_missing),
                     android.widget.Toast.LENGTH_LONG).show();
         }
     }
@@ -524,6 +528,31 @@ public class MainActivity extends AppCompatActivity {
     /** Jump to a tab by index (e.g. the "See all → Activity" link under the Swap window). */
     public void goToTab(int index) { if (pager != null && index >= 0 && index < views.length) pager.setCurrentItem(index); }
 
+    private final java.util.Set<androidx.appcompat.app.AlertDialog> languageDialogs = new java.util.HashSet<>();
+    com.eurobuddha.minimacore.i18n.LanguageDialog languageDialog() { return languageDialog(this); }
+    com.eurobuddha.minimacore.i18n.LanguageDialog languageDialog(int theme) {
+        return languageDialog(new androidx.appcompat.view.ContextThemeWrapper(this, theme));
+    }
+    private com.eurobuddha.minimacore.i18n.LanguageDialog languageDialog(android.content.Context context) {
+        return new com.eurobuddha.minimacore.i18n.LanguageDialog(context) {
+            @Override public androidx.appcompat.app.AlertDialog create() {
+                androidx.appcompat.app.AlertDialog value = super.create();
+                languageDialogs.add(value);
+                value.setOnDismissListener(d -> languageDialogs.remove(value));
+                return value;
+            }
+        };
+    }
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        // Retain pages, inputs, current tab and pending callbacks. Changing language does not refresh pools.
+        TabLayout tabs = findViewById(R.id.pm_pandapools_tabs);
+        if (pager != null && pager.getAdapter() != null && tabs != null)
+            for (int i = 0; i < tabs.getTabCount(); i++)
+                tabs.getTabAt(i).setText(pager.getAdapter().getPageTitle(i).toString());
+    }
+
     @Override protected void onStop() {
         super.onStop();
         // Backgrounded: stop the block poll and let each view cancel its repeating polls so we don't drain
@@ -540,6 +569,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override protected void onDestroy() {
+        for (androidx.appcompat.app.AlertDialog value : new java.util.ArrayList<>(languageDialogs)) value.dismiss();
+        languageDialogs.clear();
         super.onDestroy();
         // Stop the block poll and view callbacks BEFORE closing the node/DB so no straggler poll reopens a closed HistoryDb.
         stopPolling();

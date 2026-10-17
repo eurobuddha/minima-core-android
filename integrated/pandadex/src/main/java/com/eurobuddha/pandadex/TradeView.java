@@ -1,4 +1,6 @@
 package com.eurobuddha.pandadex;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
@@ -106,9 +108,9 @@ public final class TradeView extends LinearLayout {
         return d + (d == 1 ? " day ago" : " days ago");
     }
 
-    private TextView tv(String s, float size, int color, Typeface tf) {
+    private TextView tv(CharSequence s, float size, int color, Typeface tf) {
         TextView t = new TextView(getContext());
-        t.setText(s);
+        Language.setText(t, DexMessages.message(s));
         t.setTextSize(size);
         t.setTextColor(color);
         t.setTypeface(tf);
@@ -173,19 +175,23 @@ public final class TradeView extends LinearLayout {
     private void buildLadder() {
         LinearLayout c = card();
         LinearLayout head = new LinearLayout(getContext());
+        head.setOrientation(VERTICAL);
         head.setGravity(Gravity.CENTER_VERTICAL);
         head.addView(tv("ORDER BOOK", 10f, Design.DIM(), Design.sansBold()),
-                new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
+                new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         groupIdx = getContext().getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
                 .getInt(KEY_GROUP, 0);
         if (groupIdx < 0 || groupIdx >= GROUPS.length) groupIdx = 0;
         groupRow = new LinearLayout(getContext());
+        groupRow.setPadding(0, dp(4), 0, dp(4));
         for (int i = 0; i < GROUPS.length; i++) {
             final int idx = i;
             TextView g = tv(GROUP_LABELS[i], 10f,
                     i == groupIdx ? Design.ON_ACCENT() : Design.DIM(), Design.mono());
             // a real tap target — the old 6x2dp chips were nearly unhittable
             g.setPadding(dp(9), dp(6), dp(9), dp(6));
+            g.setMinHeight(dp(48));
+            g.setGravity(Gravity.CENTER);
             g.setOnClickListener(v -> {
                 groupIdx = idx;
                 getContext().getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
@@ -195,11 +201,11 @@ public final class TradeView extends LinearLayout {
                 act.repaintTrade();
             });
             Design.pressable(g);
-            LayoutParams glp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            LayoutParams glp = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f);
             glp.leftMargin = dp(4);
             groupRow.addView(g, glp);
         }
-        head.addView(groupRow);
+        head.addView(groupRow, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         restyleGroups();
         c.addView(head);
 
@@ -289,6 +295,7 @@ public final class TradeView extends LinearLayout {
         for (TextView t : new TextView[]{buyTab, sellTab}) {
             t.setGravity(Gravity.CENTER);
             t.setPadding(0, dp(9), 0, dp(9));
+            t.setMinHeight(dp(48));
             tabs.addView(t, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         }
         buyTab.setOnClickListener(v -> setMode(true));
@@ -307,6 +314,7 @@ public final class TradeView extends LinearLayout {
             b.setPadding(0, dp(5), 0, dp(5));
             b.setBackground(Design.stroked(getContext(), Design.SURFACE2(), 8));
             final int fp = p;
+            b.setMinHeight(dp(48));
             b.setOnClickListener(v -> applyPercent(fp));
             Design.pressable(b);
             LayoutParams lp = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f);
@@ -322,16 +330,18 @@ public final class TradeView extends LinearLayout {
         LinearLayout opts = new LinearLayout(getContext());
         opts.setGravity(Gravity.CENTER_VERTICAL);
         gtcTv = tv("∞ GTC on", 11f, Design.ACCENT(), Design.sans());
+        gtcTv.setMinHeight(dp(48)); gtcTv.setGravity(Gravity.CENTER_VERTICAL);
         gtcTv.setOnClickListener(v -> {
             gtcOn = !gtcOn;
-            gtcTv.setText(gtcOn ? "∞ GTC on" : "GTC off");
+            Language.setText(gtcTv, DexMessages.message(gtcOn ? "∞ GTC on" : "GTC off"));
             gtcTv.setTextColor(gtcOn ? Design.ACCENT() : Design.DIM2());
         });
         opts.addView(gtcTv, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         advTv = tv("Advanced ▾", 10f, Design.DIM2(), Design.sans());
+        advTv.setMinHeight(dp(48)); advTv.setGravity(Gravity.CENTER_VERTICAL);
         advTv.setOnClickListener(v -> {
             advBox.setVisibility(advBox.getVisibility() == VISIBLE ? GONE : VISIBLE);
-            advTv.setText(advBox.getVisibility() == VISIBLE ? "Advanced ▴" : "Advanced ▾");
+            Language.setText(advTv, DexMessages.message(advBox.getVisibility() == VISIBLE ? "Advanced ▴" : "Advanced ▾"));
         });
         opts.addView(advTv);
         opts.setPadding(0, dp(6), 0, 0);
@@ -365,6 +375,7 @@ public final class TradeView extends LinearLayout {
         c.addView(adv);
 
         ctaBtn = tv("BUY MINIMA", 14f, Design.ON_ACCENT(), Design.sansBold());
+        ctaBtn.setMinHeight(dp(48));
         ctaBtn.setGravity(Gravity.CENTER);
         ctaBtn.setPadding(0, dp(12), 0, dp(12));
         LayoutParams cl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
@@ -389,7 +400,8 @@ public final class TradeView extends LinearLayout {
 
     private EditText input(String hint) {
         EditText e = new EditText(getContext());
-        e.setHint(hint);
+        Language.hint(e, DexMessages.message(hint));
+        e.setMinHeight(dp(48));
         e.setHintTextColor(Design.DIM2());
         e.setTextColor(Design.TEXT());
         e.setTypeface(Design.mono());
@@ -420,7 +432,7 @@ public final class TradeView extends LinearLayout {
         buyTab.setTextColor(buy ? Color.WHITE : Design.DIM());
         sellTab.setBackground(Design.roundBg(getContext(), !buy ? Design.RED() : Design.SURFACE2(), 10));
         sellTab.setTextColor(!buy ? Color.WHITE : Design.DIM());
-        ctaBtn.setText(buy ? "BUY MINIMA" : "SELL MINIMA");
+        Language.setText(ctaBtn, DexMessages.message(buy ? "BUY MINIMA" : "SELL MINIMA"));
         ctaBtn.setBackground(Design.ripple(Design.roundBg(getContext(), buy ? Design.IN() : Design.RED(), 12)));
         updateTotal();
     }
@@ -445,10 +457,10 @@ public final class TradeView extends LinearLayout {
         BigDecimal p = Util.dec(priceIn.getText().toString());
         BigDecimal a = Util.dec(amountIn.getText().toString());
         if (p.signum() > 0 && a.signum() > 0) {
-            totalTv.setText("Total: " + PriceMath.fmt(
-                    PriceMath.up(a.multiply(p, PriceMath.MC), PriceMath.USDT_DP)) + " MxUSD");
+            Language.setText(totalTv, DexMessages.message("Total: " + PriceMath.fmt(
+                    PriceMath.up(a.multiply(p, PriceMath.MC), PriceMath.USDT_DP)) + " MxUSD"));
         } else {
-            totalTv.setText("Total: —");
+            Language.setText(totalTv, DexMessages.message("Total: —"));
         }
     }
 
@@ -466,7 +478,7 @@ public final class TradeView extends LinearLayout {
         final List<Order5> orders = new ArrayList<>(act.book().values());
         final List<Pool> pools = new ArrayList<>(act.pools());
         quoting = true;
-        ctaBtn.setEnabled(false); ctaBtn.setText("Calculating quote…");
+        ctaBtn.setEnabled(false); Language.setText(ctaBtn, DexMessages.message("Calculating quote…"));
         quoteExec.execute(() -> {
             try {
                 SweepPlanner.Plan plan = SweepPlanner.plan(orders, buy, amount, price, block);
@@ -527,7 +539,7 @@ public final class TradeView extends LinearLayout {
     /** Re-render every read-only section. Inputs are NEVER touched here. */
     public void render(Map<String, Order5> book, boolean syncing, long chainBlock,
                        List<Pending.Row> pending) {
-        syncDot.setText(syncing ? "● syncing" : "● live");
+        Language.setText(syncDot, DexMessages.message(syncing ? "● syncing" : "● live"));
         syncDot.setTextColor(syncing ? Design.DIM() : Design.IN());
 
         // ---- the headline price is ALWAYS the last trade, with its age ----
@@ -535,7 +547,7 @@ public final class TradeView extends LinearLayout {
         if (lt == null) {
             lastPriceTv.setText("—");
             lastPriceTv.setTextColor(Design.DIM());
-            priceKindTv.setText("no trades observed yet");
+            Language.setText(priceKindTv, DexMessages.message("no trades observed yet"));
             priceKindTv.setTextColor(Design.DIM2());
         } else {
             BigDecimal price = (BigDecimal) lt[0];
@@ -551,7 +563,7 @@ public final class TradeView extends LinearLayout {
                 if (shownPrice == null) lastPriceTv.setTextColor(Design.TEXT());
             }
             shownPrice = price;
-            priceKindTv.setText("last trade · " + ago(ageMs));
+            Language.setText(priceKindTv, DexMessages.message("last trade · " + ago(ageMs)));
             priceKindTv.setTextColor(Design.DIM());
         }
 
@@ -656,7 +668,7 @@ public final class TradeView extends LinearLayout {
                         bestAsk == null ? null : bestAsk.getKey(),
                         bestAsk == null ? null : bestAsk.getValue().add(poolAsks.getOrDefault(bestAsk.getKey(), BigDecimal.ZERO)));
         centerPriceTv.setText(reference == null ? "—" : PriceMath.fmtPrice(reference));
-        centerPriceTv.setContentDescription("Size-weighted price of the best displayed bid and offer, including pool and limit liquidity");
+        Language.description(centerPriceTv, Language.msg(l10n_dex_weighted_price_help));
         centerPriceTv.setTextColor(Design.TEXT());
     }
 
@@ -752,8 +764,8 @@ public final class TradeView extends LinearLayout {
             if (!o.isMine(act.keys(), act.addrs())) continue;
             any = true;
             LinearLayout row = orderRowShell();
-            String label = (o.sell ? "SELL " : "BUY ") + PriceMath.fmt(o.minimaAmount())
-                    + " @ " + PriceMath.fmtPrice(o.price()) + (o.gtc ? "  ∞" : "");
+            CharSequence label = Language.join(DexMessages.message(o.sell ? "SELL" : "BUY"), " ",
+                    PriceMath.fmt(o.minimaAmount()), " @ ", PriceMath.fmtPrice(o.price()), o.gtc ? "  ∞" : "");
             row.addView(tv(label, 11f, o.sell ? Design.RED() : Design.IN(), Design.mono()),
                     new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
             if (o.expired(chainBlock)) {
@@ -763,9 +775,13 @@ public final class TradeView extends LinearLayout {
                 row.addView(tv(OrdersTab.UNRESOLVED_ACTION, 9.5f, Design.ACCENT(), Design.sans()));
             } else {
                 TextView edit = tv(" ✎ ", 13f, Design.DIM(), Design.sans());
+                edit.setMinWidth(dp(48)); edit.setMinHeight(dp(48)); edit.setGravity(Gravity.CENTER);
+                Language.description(edit, Language.msg(l10n_dex_edit_order));
                 edit.setOnClickListener(v -> act.editOrder(o));
                 row.addView(edit);
                 TextView cancel = tv(" ✕ ", 13f, Design.RED(), Design.sans());
+                cancel.setMinWidth(dp(48)); cancel.setMinHeight(dp(48)); cancel.setGravity(Gravity.CENTER);
+                Language.description(cancel, Language.msg(l10n_dex_cancel_order));
                 cancel.setOnClickListener(v -> act.cancelOrder(o));
                 row.addView(cancel);
             }

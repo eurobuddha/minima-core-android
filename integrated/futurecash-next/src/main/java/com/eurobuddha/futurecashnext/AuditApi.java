@@ -162,13 +162,14 @@ public final class AuditApi {
             final JSONObject o = arr.optJSONObject(i);
             if (o == null) continue;
             final String pk = o.optString("publickey", "");
-            if (pk.isEmpty()) continue;   // the backend inlines {publickey, error} for bad shapes
+            if (pk.isEmpty() || o.has("error")) continue;
             // rowStats(): the hosted backend emits spend_blocks/spent_coins; the CoinScanner JSON
             // form uses onchain_signatures/spent_coins_upperbound (index.html:219-226).
-            final long sigs = o.has("spend_blocks")
-                    ? o.optLong("spend_blocks", 0) : o.optLong("onchain_signatures", 0);
-            final long coins = o.has("spent_coins")
-                    ? o.optLong("spent_coins", 0) : o.optLong("spent_coins_upperbound", 0);
+            final long sigs = exactCount(o, o.has("spend_blocks")
+                    ? "spend_blocks" : "onchain_signatures");
+            final long coins = exactCount(o, o.has("spent_coins")
+                    ? "spent_coins" : "spent_coins_upperbound");
+            if (sigs < 0 || coins < 0) continue;
             out.add(new KeyAudit.Usage(pk, o.optString("address", ""), sigs, coins));
         }
     }
@@ -179,10 +180,19 @@ public final class AuditApi {
             final JSONObject o = arr.optJSONObject(i);
             if (o == null) continue;
             final String addr = o.optString("address", "");
-            if (addr.isEmpty()) continue;
-            out.add(new KeyAudit.Reuse(addr, o.optString("miniaddress", ""),
-                    o.optBoolean("reused", false), o.optLong("reuse_count", 0)));
+            long count = exactCount(o, "reuse_count");
+            if (addr.isEmpty() || o.has("error") || !(o.opt("reused") instanceof Boolean) || count < 0) continue;
+            boolean reused = (Boolean) o.opt("reused");
+            if (!reused && count != 0) continue;
+            out.add(new KeyAudit.Reuse(addr, o.optString("miniaddress", ""), reused, reused ? Math.max(1, count) : 0));
         }
+    }
+
+    private static long exactCount(JSONObject row, String field) {
+        try {
+            long count = new java.math.BigDecimal(row.get(field).toString()).longValueExact();
+            return count >= 0 ? count : -1;
+        } catch (Exception invalid) { return -1; }
     }
 
     /* ---------- transport ---------- */

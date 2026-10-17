@@ -1,4 +1,7 @@
 package com.eurobuddha.casino;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.view.Gravity;
 import android.view.View;
@@ -63,15 +66,14 @@ public class PlayView extends BaseView {
         LinearLayout card = Ui.card(act);
 
         LinearLayout header = Ui.row(act);
-        TextView title = Ui.text(act, g.icon + "  " + g.name, Theme.text(), 14, true);
+        TextView title = Ui.text(act, Language.join(g.icon, "  ", CasinoMessages.message(g.name)), Theme.text(), 14, true);
         header.addView(title, Ui.lpRow(act, 1));
         header.addView(Ui.badge(act, g.oddsAgainst() + ":1", Theme.bg(), Theme.gold()));
         card.addView(header);
 
         TextView info = Ui.text(act,
-                "Stake " + Currency.show(b.betAmount, b.tokenid()) + " · pot "
-                        + Currency.show(b.totalAmount, b.tokenid()) + " · win "
-                        + Currency.show(Util.miniNum(Util.dec(b.betAmount).multiply(java.math.BigDecimal.valueOf(g.payout))), b.tokenid()),
+                Language.msg(l10n_casino_stakes, Currency.show(b.betAmount, b.tokenid()), Currency.show(b.totalAmount, b.tokenid()),
+                        Currency.show(Util.miniNum(Util.dec(b.betAmount).multiply(java.math.BigDecimal.valueOf(g.payout))), b.tokenid())),
                 Theme.dim(), 11, false);
         info.setPadding(0, Ui.dp(act, 6), 0, Ui.dp(act, 10));
         card.addView(info);
@@ -144,18 +146,18 @@ public class PlayView extends BaseView {
     }
 
     private void onTake(Bet b, Button take, TextView status) {
-        if (!act.identityReady()) { status.setTextColor(Theme.red()); status.setText("Identity not loaded yet"); return; }
+        if (!act.identityReady()) { status.setTextColor(Theme.red()); CasinoMessages.text(status, "Identity not loaded yet"); return; }
         if (taking.contains(b.coinid())) return;          // already taking this bet — ignore re-taps
         int pick = picks.containsKey(b.coinid()) ? picks.get(b.coinid()) : 0;
         taking.add(b.coinid());                           // guard: survives refresh until it leaves phase 0
         take.setEnabled(false);
         status.setTextColor(Theme.cyan());
-        status.setText("Taking bet… (generating secret, building tx)");
+        CasinoMessages.text(status, "Taking bet… (generating secret, building tx)");
         Sfx.cardDeal();
         act.txn().take(b, pick, new CasinoTxn.Result() {
             @Override public void onPosted(String txpowid) {
                 status.setTextColor(Theme.amber());
-                status.setText("Bet taken — confirming, then waiting for house reveal…");
+                CasinoMessages.text(status, "Bet taken — confirming, then waiting for house reveal…");
                 act.markPending(act.pendingTake(), "Took " + b.gameName() + " bet · picked "
                         + b.game().pickLabel(pick));
                 act.switchTab(MainActivity.TAB_MYBETS);
@@ -165,7 +167,7 @@ public class PlayView extends BaseView {
                 taking.remove(b.coinid());                // failed — allow a retry
                 take.setEnabled(true);
                 status.setTextColor(Theme.red());
-                status.setText(message);
+                CasinoMessages.text(status, message);
                 act.log("Take failed: " + message, MainActivity.LOG_ERR);
             }
         });

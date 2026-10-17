@@ -33,14 +33,14 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Your recovery seed"
+                android:text="Your recovery seed" android:tag="l10n:text=l10n_onboarding_recovery_seed"
                 android:textAppearance="@style/TextAppearance.MinimaCore.Display" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Write these words down and keep them safe. Anyone with this seed controls your funds — and it cannot be recovered if lost."
+                android:text="Write these words down and keep them safe. Anyone with this seed controls your funds — and it cannot be recovered if lost." android:tag="l10n:text=l10n_onboarding_save_seed_help"
                 android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                 android:textColor="@color/core_text_mid"
                 android:lineSpacingMultiplier="1.3" />
@@ -67,9 +67,10 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/newwallet_button_proceed"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="wrap_content"
+                android:minHeight="52dp"
                 android:layout_marginTop="28dp"
-                android:text="I've saved it — Proceed" />
+                android:text="I've saved it — Proceed" android:tag="l10n:text=l10n_onboarding_saved_seed" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

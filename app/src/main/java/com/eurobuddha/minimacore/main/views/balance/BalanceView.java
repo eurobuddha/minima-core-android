@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.main.views.balance;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
@@ -94,10 +97,12 @@ public class BalanceView extends BaseView {
         final View expandArrow = getMainView().findViewById(R.id.wallet_balance_expand);
         if (expandRow != null && expandArrow != null && mBreakdown != null) {
             mBreakdown.setVisibility(View.GONE);
+            Language.description(expandArrow, Language.msg(l10n_core_wallet_show_details));
             expandRow.setOnClickListener(v -> {
                 boolean show = mBreakdown.getVisibility() != View.VISIBLE;
                 mBreakdown.setVisibility(show ? View.VISIBLE : View.GONE);
                 expandArrow.animate().rotation(show ? 180f : 0f).setDuration(150).start();
+                Language.description(expandArrow, show ? Language.msg(l10n_core_wallet_hide_details) : Language.msg(l10n_core_wallet_show_details));
             });
         }
 
@@ -155,7 +160,7 @@ public class BalanceView extends BaseView {
             JSONObject bal  = (JSONObject) mBalanceAdapter.getItem(position);
             String     tid  = String.valueOf(bal.get("tokenid"));
             TokenMeta  meta = TokenMeta.parse(bal.get("token"), tid);
-            mOpenCoins = CoinsDialog.show(getActivity(), tid, meta.name,
+            mOpenCoins = CoinsDialog.show(getActivity(), tid, meta.nameProvided ? meta.name : Language.msg(l10n_wallet_token),
                     String.valueOf(bal.get("sendable")), String.valueOf(bal.get("confirmed")));
         }catch(Throwable exc){
             logger.log("Could not open coins : "+exc);
@@ -166,7 +171,7 @@ public class BalanceView extends BaseView {
     private void copyTokenId(int position){
         try{
             JSONObject bal = (JSONObject) mBalanceAdapter.getItem(position);
-            Clip.copy(getActivity(), "tokenid", String.valueOf(bal.get("tokenid")), "Token ID copied");
+            Clip.copy(getActivity(), "tokenid", String.valueOf(bal.get("tokenid")), Language.msg(l10n_core_wallet_token_copied).toString());
         }catch(Throwable exc){
             logger.log("Could not copy token id : "+exc);
         }
@@ -324,17 +329,15 @@ public class BalanceView extends BaseView {
         }
 
         if(mLastBalanceUpdate == 0){
-            mBreakdown.setText("node not connected");
+            Language.setText(mBreakdown, Language.msg(l10n_core_wallet_disconnected));
             return;
         }
 
-        mBreakdown.setText(
-                  "confirmed "  + Format.summaryAmount(mConfirmed)
-                + "  ·  locked ≈ "   + Format.summaryAmount(Format.subtract(mConfirmed, mSendable))
-                + "  ·  unconfirmed " + Format.summaryAmount(mUnconfirmed)
-                + "  ·  " + mCoinCount + " coins"
-                + "  ·  updated " + Format.ago(mLastBalanceUpdate)
-                + "  ·  tap a token for coins");
+        Language.setText(mBreakdown, Language.msg(l10n_core_wallet_breakdown,
+                Format.summaryAmount(mConfirmed),
+                Format.summaryAmount(Format.subtract(mConfirmed, mSendable)),
+                Format.summaryAmount(mUnconfirmed), BalanceAdapter.coinCount(mCoinCount),
+                Language.since(mLastBalanceUpdate)));
     }
 
     @Override protected void onShown() {

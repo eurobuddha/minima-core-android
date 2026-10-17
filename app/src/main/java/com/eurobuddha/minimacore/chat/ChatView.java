@@ -1,7 +1,11 @@
 package com.eurobuddha.minimacore.chat;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import com.eurobuddha.minimacore.i18n.ChatPreview;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -45,6 +49,39 @@ public class ChatView extends BaseView {
     private Runnable mScanRequest = null;  // wired by MainActivity (launcher must register pre-STARTED)
     private EditText mPendingScanTarget = null;
     private final Runnable mOnNewMessage = () -> mActivity.runOnUiThread(this::refreshView);
+    private boolean destroyed;
+    private final java.util.Set<AlertDialog> dialogs = new java.util.HashSet<>();
+
+    private boolean alive() { return !destroyed && !mActivity.isFinishing() && !mActivity.isDestroyed(); }
+    private LanguageDialog dialog() {
+        return new LanguageDialog(mActivity) {
+            @Override public AlertDialog create() {
+                AlertDialog value = super.create();
+                dialogs.add(value);
+                value.setOnDismissListener(d -> {
+                    dialogs.remove(value);
+                    if (mPendingScanTarget != null && value.findViewById(R.id.newchat_address) == mPendingScanTarget)
+                        mPendingScanTarget = null;
+                });
+                return value;
+            }
+        };
+    }
+    private CharSequence displayName(ChatDb.Thread t) {
+        if (t.name == null || t.name.isEmpty()) return Language.msg(l10n_chat_parlons_contact);
+        return t.name.startsWith("0x") ? Language.msg(l10n_chat_new_contact) : t.name;
+    }
+    static CharSequence preview(ChatDb.Thread t) {
+        if (com.eurobuddha.minimacore.maxchat.MaxChatThreads.isMax(t.pubkey)) {
+            CharSequence body = ChatPreview.message(t.lastBody);
+            return t.lastMine ? Language.msg(l10n_chat_you_preview, body) : body;
+        }
+        if ("image".equals(t.lastState)) return Language.msg(l10n_media_photo);
+        if ("audio".equals(t.lastState)) return Language.msg(l10n_media_voice);
+        return t.lastBody;
+    }
+    @Override public void languageChanged() { mAdapter.notifyDataSetChanged(); }
+
 
     public ChatView(Activity zActivity) {
         super(zActivity, R.layout.view_chat);
@@ -77,18 +114,18 @@ public class ChatView extends BaseView {
             if (com.eurobuddha.minimacore.maxchat.MaxChatThreads.isMax(t.pubkey)) {
                 // Parlons rows live in the engine, not ChatDb - a ChatDb write here
                 // would plant a phantom "max:" contact row that duplicates forever.
-                new AlertDialog.Builder(mActivity)
-                        .setTitle(t.name)
-                        .setItems(new String[]{"Delete chat", "Delete contact"}, (d, which) -> {
+                dialog()
+                        .setTitle(displayName(t))
+                        .setItems(new CharSequence[]{Language.msg(l10n_chat_delete_chat), Language.msg(l10n_chat_delete_contact)}, (d, which) -> {
                             String peer = com.eurobuddha.minimacore.maxchat.MaxChatThreads.peer(t.pubkey);
                             if (which == 0) clearMaxChat(peer, t.name);
                             else deleteMaxContact(peer, t.name);
                         }).show();
                 return true;
             }
-            new AlertDialog.Builder(mActivity)
-                    .setTitle(t.name.startsWith("0x") ? "New contact" : t.name)
-                    .setItems(new String[]{"Rename", "Delete chat", "Delete contact"}, (d, which) -> {
+            dialog()
+                    .setTitle(displayName(t))
+                    .setItems(new CharSequence[]{Language.msg(l10n_chat_rename), Language.msg(l10n_chat_delete_chat), Language.msg(l10n_chat_delete_contact)}, (d, which) -> {
                         if (which == 0) renameContact(t);
                         else if (which == 1) clearChat(t);
                         else deleteContact(t);
@@ -105,22 +142,24 @@ public class ChatView extends BaseView {
 
     /** MainActivity routes the scan result back. */
     public void onScanResult(String zContents) {
-        if (zContents == null) return;
+        if (!alive() || zContents == null) return;
         String raw = zContents.trim();
         if (raw.regionMatches(true, 0, "MAX#", 0, 4)
                 || raw.matches("(?s)Mx[0-9A-Za-z]+@\\S+:\\d+")) {
             if (mPendingScanTarget != null) {
                 mPendingScanTarget.setText(raw);
+                Language.error(mPendingScanTarget, null);
             }
             return;
         }
         String pub = raw.toLowerCase();
         if (!pub.matches("0x[0-9a-f]{64}")) {
-            Toast.makeText(mActivity, "Not a keets or Parlons address QR", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, Language.msg(l10n_chat_bad_qr), Toast.LENGTH_SHORT).show();
             return;
         }
         if (mPendingScanTarget != null) {
             mPendingScanTarget.setText(pub);
+            Language.error(mPendingScanTarget, null);
         } else {
             ChatDb.get(mActivity).ensureContact(pub, null);
             openThread(pub);
@@ -129,6 +168,10 @@ public class ChatView extends BaseView {
 
     @Override
     public void onActivityDestroy() {
+        destroyed = true;
+        mPendingScanTarget = null;
+        for (AlertDialog value : new java.util.ArrayList<>(dialogs)) value.dismiss();
+        dialogs.clear();
         ChatDrainer.UI_LISTENERS.remove(mOnNewMessage);
         com.eurobuddha.minimacore.maxchat.MaxChat.UI_LISTENERS.remove(mOnNewMessage);
     }
@@ -142,6 +185,7 @@ public class ChatView extends BaseView {
     // ---- identity sheet: QR + full address + copy + display name ----------
     private void showIdentity() {
         View v = LayoutInflater.from(mActivity).inflate(R.layout.dialog_chat_identity, null);
+        Language.apply(v);
         TextView addr = v.findViewById(R.id.identity_address);
         ImageView qr = v.findViewById(R.id.identity_qr);
         EditText name = v.findViewById(R.id.identity_name);
@@ -156,7 +200,7 @@ public class ChatView extends BaseView {
                 qr.setImageBitmap(bm);
             } catch (Exception e) {}
         } else {
-            addr.setText("Node starting — try again in a moment");
+            Language.setText(addr, Language.msg(l10n_chat_node_starting));
         }
 
         // The Parlons address (the app's own Maxima identity) under the keets one.
@@ -165,22 +209,23 @@ public class ChatView extends BaseView {
         max.setTextIsSelectable(true);
         max.setTextSize(11);
         max.setPadding(32, 24, 32, 8);
-        max.setText("Parlons address: starting…");
+        Language.setText(max, Language.msg(l10n_chat_parlons_starting));
         ((android.widget.LinearLayout) v).addView(max);
         new Thread(() -> {
             String perm = com.eurobuddha.minimacore.maxchat.MaxChat.permanentAddress();
             java.util.List<String> live = com.eurobuddha.minimacore.maxchat.MaxChat.myAddresses();
             String show = !perm.equals("") ? perm : live.isEmpty() ? "" : live.get(0);
             mActivity.runOnUiThread(() -> {
+                if (!alive() || !v.isAttachedToWindow()) return;
                 if (show.equals("")) {
-                    max.setText("Parlons address: no relay yet — try again in a moment");
+                    Language.setText(max, Language.msg(l10n_chat_no_relay));
                     return;
                 }
-                max.setText("YOUR PARLONS ADDRESS (tap to copy)\n" + show);
+                Language.setText(max, Language.msg(l10n_chat_parlons_address, show));
                 max.setOnClickListener(b -> {
                     ClipboardManager cm = (ClipboardManager) mActivity.getSystemService(Context.CLIPBOARD_SERVICE);
                     cm.setPrimaryClip(ClipData.newPlainText("parlons address", show));
-                    Toast.makeText(mActivity, "Parlons address copied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, Language.msg(l10n_chat_parlons_copied), Toast.LENGTH_SHORT).show();
                 });
             });
         }, "maxchat-addr").start();
@@ -189,13 +234,13 @@ public class ChatView extends BaseView {
             if (mMyPub == null) return;
             ClipboardManager cm = (ClipboardManager) mActivity.getSystemService(Context.CLIPBOARD_SERVICE);
             cm.setPrimaryClip(ClipData.newPlainText("keets address", mMyPub));
-            Toast.makeText(mActivity, "Address copied", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, Language.msg(l10n_wallet_address_copied), Toast.LENGTH_SHORT).show();
         });
 
-        new AlertDialog.Builder(mActivity)
-                .setTitle("My address")
+        dialog()
+                .setTitle(Language.msg(l10n_chat_my_address))
                 .setView(v)
-                .setPositiveButton("Done", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_chat_done), (d, w) -> {
                     prefs.edit().putString("chat_name", name.getText().toString().trim()).apply();
                     refreshView();
                 })
@@ -205,14 +250,15 @@ public class ChatView extends BaseView {
     // ---- new chat: scan or paste -------------------------------------------
     private void showNewChat() {
         View v = LayoutInflater.from(mActivity).inflate(R.layout.dialog_chat_new, null);
+        Language.apply(v);
         EditText addrIn = v.findViewById(R.id.newchat_address);
         EditText nameIn = v.findViewById(R.id.newchat_name);
 
-        AlertDialog dlg = new AlertDialog.Builder(mActivity)
-                .setTitle("New chat")
+        AlertDialog dlg = dialog()
+                .setTitle(Language.msg(l10n_chat_new_chat))
                 .setView(v)
-                .setPositiveButton("Start chat", null)   // set below so bad input doesn't dismiss
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_chat_start_chat), null)   // set below so bad input doesn't dismiss
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .create();
 
         v.findViewById(R.id.newchat_scan).setOnClickListener(b -> {
@@ -229,12 +275,13 @@ public class ChatView extends BaseView {
             int n = ChatDb.get(mActivity).contactList().size()
                     + com.eurobuddha.minimacore.maxchat.MaxChat.contacts().size();
             mActivity.runOnUiThread(() -> {
+                if (!alive() || !dlg.isShowing()) return;
                 if (n == 0) {
                     pick.setEnabled(false);
-                    pick.setText("No saved contacts yet");
-                    pickHint.setText("Contacts you've chatted with will appear here");
+                    Language.setText(pick, Language.msg(l10n_chat_no_contacts));
+                    Language.setText(pickHint, Language.msg(l10n_chat_contacts_hint));
                 } else {
-                    pick.setText("Choose a saved contact (" + n + ")");
+                    Language.setText(pick, Language.msg(l10n_chat_choose_count, Integer.toString(n)));
                 }
             });
         }, "chat-contact-count").start();
@@ -245,17 +292,17 @@ public class ChatView extends BaseView {
                     || raw.matches("(?s)Mx[0-9A-Za-z]+@\\S+:\\d+")) {
                 dlg.dismiss();
                 mPendingScanTarget = null;
-                Toast.makeText(mActivity, "Adding Parlons contact…", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, Language.msg(l10n_chat_adding), Toast.LENGTH_SHORT).show();
                 new Thread(() -> {
                     try {
                         com.eurobuddha.minimacore.maxchat.MaxChat.addContact(raw);
                         mActivity.runOnUiThread(() -> {
-                            Toast.makeText(mActivity, "Parlons contact added", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mActivity, Language.msg(l10n_chat_added), Toast.LENGTH_SHORT).show();
                             refreshView();
                         });
                     } catch (Exception e) {
                         mActivity.runOnUiThread(() -> Toast.makeText(mActivity,
-                                "Could not add: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                                Language.msg(l10n_chat_add_failed, String.valueOf(e.getMessage())), Toast.LENGTH_LONG).show());
                     }
                 }, "maxchat-add").start();
                 return;
@@ -263,7 +310,7 @@ public class ChatView extends BaseView {
             String pub = raw.toLowerCase();
             String name = nameIn.getText().toString().trim();
             if (!pub.matches("0x[0-9a-f]{64}")) {
-                addrIn.setError("A keets address is 0x + 64 hex — or paste a Parlons MAX#… / Mx…@host:port address");
+                Language.error(addrIn, Language.msg(l10n_chat_bad_address));
                 return;
             }
             ChatDb.get(mActivity).putContact(pub, name.equals("") ? null : name);
@@ -278,77 +325,74 @@ public class ChatView extends BaseView {
     private void renameContact(ChatDb.Thread zT) {
         EditText input = new EditText(mActivity);
         input.setText(zT.name.startsWith("0x") ? "" : zT.name);
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Contact name")
+        dialog()
+                .setTitle(Language.msg(l10n_chat_contact_name))
                 .setView(input)
-                .setPositiveButton("Save", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_common_save), (d, w) -> {
                     ChatDb.get(mActivity).putContact(zT.pubkey, input.getText().toString().trim());
                     refreshView();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
-    private String niceName(ChatDb.Thread zT) {
-        return zT.name == null || zT.name.startsWith("0x") ? "this contact" : zT.name;
+    private CharSequence niceName(ChatDb.Thread zT) {
+        return zT.name == null || zT.name.startsWith("0x") ? Language.msg(l10n_chat_this_contact) : zT.name;
     }
 
     // ---- delete: "Delete chat" keeps the contact, "Delete contact" removes it ----
 
     /** keets: clear the conversation, keep the contact (stays in the picker). */
     private void clearChat(ChatDb.Thread zT) {
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Delete chat")
-                .setMessage("Clear this conversation? " + niceName(zT)
-                        + " stays in your contacts — you can start a new chat anytime.")
-                .setPositiveButton("Delete chat", (d, w) -> {
+        dialog()
+                .setTitle(Language.msg(l10n_chat_delete_chat))
+                .setMessage(Language.msg(l10n_chat_clear_named, niceName(zT)))
+                .setPositiveButton(Language.msg(l10n_chat_delete_chat), (d, w) -> {
                     ChatDb.get(mActivity).clearMessages(zT.pubkey);
                     refreshView();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     /** keets: remove the contact and its history for good. */
     private void deleteContact(ChatDb.Thread zT) {
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Delete contact")
-                .setMessage("Permanently remove " + niceName(zT) + " and this conversation? "
-                        + "You'll need their address again to reconnect. This cannot be undone.")
-                .setPositiveButton("Delete contact", (d, w) -> {
+        dialog()
+                .setTitle(Language.msg(l10n_chat_delete_contact))
+                .setMessage(Language.msg(l10n_chat_remove_named, niceName(zT)))
+                .setPositiveButton(Language.msg(l10n_chat_delete_contact), (d, w) -> {
                     ChatDb.get(mActivity).removeContact(zT.pubkey);
                     refreshView();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     /** Parlons: clear the conversation, keep the contact. */
     private void clearMaxChat(String zPeer, String zName) {
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Delete chat")
-                .setMessage("Clear this conversation? The contact stays in your list.")
-                .setPositiveButton("Delete chat", (d, w) -> new Thread(() -> {
+        dialog()
+                .setTitle(Language.msg(l10n_chat_delete_chat))
+                .setMessage(Language.msg(l10n_chat_clear_body))
+                .setPositiveButton(Language.msg(l10n_chat_delete_chat), (d, w) -> new Thread(() -> {
                     try { com.eurobuddha.minimacore.maxchat.MaxChat.clearConversation(zPeer); }
                     catch (Exception ignored) {}
                     mActivity.runOnUiThread(this::refreshView);
                 }, "maxchat-clear").start())
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     /** Parlons: remove the contact for good (also notifies the peer). */
     private void deleteMaxContact(String zPeer, String zName) {
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Delete contact")
-                .setMessage("Permanently remove this Parlons contact and conversation? "
-                        + "This cannot be undone.")
-                .setPositiveButton("Delete contact", (d, w) -> new Thread(() -> {
+        dialog()
+                .setTitle(Language.msg(l10n_chat_delete_contact))
+                .setMessage(Language.msg(l10n_chat_remove_parlons))
+                .setPositiveButton(Language.msg(l10n_chat_delete_contact), (d, w) -> new Thread(() -> {
                     try { com.eurobuddha.minimacore.maxchat.MaxChat.removeContact(zPeer); }
                     catch (Exception ignored) {}
                     mActivity.runOnUiThread(this::refreshView);
                 }, "maxchat-remove").start())
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
@@ -364,13 +408,16 @@ public class ChatView extends BaseView {
                     : com.eurobuddha.minimacore.maxchat.MaxChat.contacts()) {
                 items.add(new PickItem(c.publicKey, c.name, true));
             }
-            items.sort((a, b) -> a.label().compareToIgnoreCase(b.label()));
-            mActivity.runOnUiThread(() -> showPickerDialog(zParent, items));
+            items.sort((a, b) -> a.label().toString().compareToIgnoreCase(b.label().toString()));
+            mActivity.runOnUiThread(() -> {
+                if (alive() && zParent.isShowing()) showPickerDialog(zParent, items);
+            });
         }, "chat-contact-pick").start();
     }
 
     private void showPickerDialog(AlertDialog zParent, ArrayList<PickItem> zAll) {
         View v = LayoutInflater.from(mActivity).inflate(R.layout.dialog_contact_pick, null);
+        Language.apply(v);
         ListView list = v.findViewById(R.id.pick_list);
         TextView empty = v.findViewById(R.id.pick_empty);
         EditText search = v.findViewById(R.id.pick_search);
@@ -379,10 +426,10 @@ public class ChatView extends BaseView {
         list.setAdapter(adapter);
         empty.setVisibility(zAll.isEmpty() ? View.VISIBLE : View.GONE);
 
-        AlertDialog dlg = new AlertDialog.Builder(mActivity)
-                .setTitle("Choose a contact")
+        AlertDialog dlg = dialog()
+                .setTitle(Language.msg(l10n_chat_choose_contact))
                 .setView(v)
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .create();
 
         search.addTextChangedListener(new android.text.TextWatcher() {
@@ -390,7 +437,7 @@ public class ChatView extends BaseView {
             @Override public void onTextChanged(CharSequence s, int a, int b, int c) {
                 adapter.filter(s.toString());
                 empty.setVisibility(adapter.getCount() == 0 ? View.VISIBLE : View.GONE);
-                empty.setText("No matching contacts");
+                Language.setText(empty, Language.msg(l10n_chat_no_matches));
             }
             @Override public void afterTextChanged(android.text.Editable s) {}
         });
@@ -424,7 +471,7 @@ public class ChatView extends BaseView {
             return name != null && !name.equals("") && !name.equals("noname")
                     && !name.startsWith("0x") && !name.startsWith("MAX#") && !name.startsWith("Mx");
         }
-        String label() { return named() ? name : "New " + (isMax ? "Parlons" : "keets") + " contact"; }
+        CharSequence label() { return named() ? name : Language.msg(l10n_chat_new_typed_contact, isMax ? "Parlons" : "keets"); }
     }
 
     private class PickAdapter extends BaseAdapter {
@@ -433,13 +480,13 @@ public class ChatView extends BaseView {
         PickAdapter(ArrayList<PickItem> zAll) { mAll = zAll; mShown = zAll; }
 
         void filter(String zQuery) {
-            String s = zQuery.trim().toLowerCase();
+            String s = zQuery.trim().toLowerCase(java.util.Locale.ROOT);
             if (s.isEmpty()) {
                 mShown = mAll;
             } else {
                 ArrayList<PickItem> f = new ArrayList<>();
                 for (PickItem it : mAll) {
-                    if (it.label().toLowerCase().contains(s) || it.pubkey.toLowerCase().contains(s)) {
+                    if (it.label().toString().toLowerCase(java.util.Locale.ROOT).contains(s) || it.pubkey.toLowerCase(java.util.Locale.ROOT).contains(s)) {
                         f.add(it);
                     }
                 }
@@ -457,16 +504,17 @@ public class ChatView extends BaseView {
             View row = convertView != null ? convertView
                     : mActivity.getLayoutInflater().inflate(R.layout.chat_contact_row, parent, false);
             PickItem it = mShown.get(position);
-            String label = it.label();
-            ((TextView) row.findViewById(R.id.row_name)).setText(label);
+            CharSequence label = it.label();
+            Language.setText(row.findViewById(R.id.row_name), label);
             ((TextView) row.findViewById(R.id.row_sub)).setText(it.isMax ? "Parlons" : "Keets");
-            ChatUi.avatar(row.findViewById(R.id.row_avatar), label, it.pubkey);
+            ChatUi.avatar(row.findViewById(R.id.row_avatar), label.toString(), it.pubkey);
             return row;
         }
     }
 
     @Override
     public void refreshView() {
+        if (!alive()) return;
         if (mMyPub == null && MinimaCMD.checkMinimaStarted()) {
             MinimaCMD.runMinima("keets action:info", zResult -> {
                 if ((Boolean) zResult.getOrDefault("status", false)) {
@@ -495,6 +543,7 @@ public class ChatView extends BaseView {
                 }
                 t.sort((a, b) -> Long.compare(b.lastTs, a.lastTs));
                 mActivity.runOnUiThread(() -> {
+                    if (!alive()) return;
                     mThreads = t;
                     mEmpty.setVisibility(t.isEmpty() ? View.VISIBLE : View.GONE);
                     notifyDataSetChanged();
@@ -513,10 +562,10 @@ public class ChatView extends BaseView {
             ChatDb.Thread t = mThreads.get(position);
 
             // a contact that is still its own pubkey shows as "New contact" — hex stays out of the list
-            String display = t.name.startsWith("0x") ? "New contact" : t.name;
-            ((TextView) row.findViewById(R.id.row_name)).setText(display);
-            ChatUi.avatar(row.findViewById(R.id.row_avatar), display, t.pubkey);
-            ((TextView) row.findViewById(R.id.row_last)).setText(t.lastBody);
+            CharSequence display = displayName(t);
+            Language.setText(row.findViewById(R.id.row_name), display);
+            ChatUi.avatar(row.findViewById(R.id.row_avatar), display.toString(), t.pubkey);
+            Language.setText(row.findViewById(R.id.row_last), preview(t));
             ((TextView) row.findViewById(R.id.row_time)).setText(ChatUi.listTime(t.lastTs));
 
             TextView unread = row.findViewById(R.id.row_unread);

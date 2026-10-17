@@ -1,4 +1,6 @@
 package com.eurobuddha.vestr;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -19,7 +21,7 @@ import java.util.Locale;
 /** Vesting calculator — preview tokens released per grace period before creating a contract. */
 public class CalculatorActivity extends SubActivity {
 
-    private final SimpleDateFormat fmt = new SimpleDateFormat("dd MMM yyyy  HH:mm", Locale.ENGLISH);
+
     private int tip = 0;
     private long startMs = 0, endMs = 0;
     private EditText amountInput;
@@ -29,30 +31,30 @@ public class CalculatorActivity extends SubActivity {
     /** Build the preview form and fetch the chain tip (needed to convert dates to block heights). */
     @Override
     protected void init() {
-        title("Calculate a contract");
+        title(Language.msg(l10n_vestr_calculate_title));
 
-        label("Token amount");
+        label(Language.msg(l10n_vestr_amount));
         amountInput = input("0.0", T_DEC);
 
-        label("Contract start");
-        startBtn = pickerButton("Select start date & time");
-        startBtn.setOnClickListener(v -> pick(startMs, ms -> { startMs = ms; startBtn.setText(fmt.format(ms)); }));
+        label(Language.msg(l10n_vestr_start));
+        startBtn = pickerButton(Language.msg(l10n_vestr_pick_start));
+        startBtn.setOnClickListener(v -> pick(startMs, ms -> { startMs = ms; Language.setText(startBtn, Language.stamp(ms, "yMMMdHm")); }));
 
-        label("Contract end");
-        endBtn = pickerButton("Select end date & time");
-        endBtn.setOnClickListener(v -> pick(endMs, ms -> { endMs = ms; endBtn.setText(fmt.format(ms)); }));
+        label(Language.msg(l10n_vestr_end));
+        endBtn = pickerButton(Language.msg(l10n_vestr_pick_end));
+        endBtn.setOnClickListener(v -> pick(endMs, ms -> { endMs = ms; Language.setText(endBtn, Language.stamp(ms, "yMMMdHm")); }));
 
-        label("Grace period");
+        label(Language.msg(l10n_vestr_grace));
         graceSpinner = new Spinner(this);
-        List<String> g = new ArrayList<>();
-        for (VestingContract.Grace gr : VestingContract.Grace.values()) g.add(gr.label);
-        ArrayAdapter<String> ga = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, g);
+        List<CharSequence> g = new ArrayList<>();
+        for (VestingContract.Grace gr : VestingContract.Grace.values()) g.add(VestrText.grace(gr));
+        ArrayAdapter<CharSequence> ga = VestrText.choices(this, g);
         ga.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         graceSpinner.setAdapter(ga);
         graceSpinner.setSelection(1);
         form.addView(graceSpinner);
 
-        primaryButton("Calculate").setOnClickListener(v -> calculate());
+        primaryButton(Language.msg(l10n_vestr_calculate)).setOnClickListener(v -> calculate());
         result = status();
 
         node.cmd("block", new NodeApi.Cb() {
@@ -69,16 +71,16 @@ public class CalculatorActivity extends SubActivity {
         // Same guard ordering as Create: parse amount, then dates picked, then ordering, then tip last.
         BigDecimal amount;
         try { amount = new BigDecimal(amountInput.getText().toString().trim()); }
-        catch (Exception e) { setStatus(result, "Enter a valid amount.", false); return; }
-        if (startMs == 0 || endMs == 0) { setStatus(result, "Pick start and end dates.", false); return; }
-        if (endMs <= startMs) { setStatus(result, "End must be after the start.", false); return; }
-        if (tip == 0) { setStatus(result, "Still syncing — try again in a moment.", false); return; }
+        catch (Exception e) { setStatus(result, Language.msg(l10n_vestr_valid_amount), false); return; }
+        if (startMs == 0 || endMs == 0) { setStatus(result, Language.msg(l10n_vestr_pick_both), false); return; }
+        if (endMs <= startMs) { setStatus(result, Language.msg(l10n_vestr_end_after), false); return; }
+        if (tip == 0) { setStatus(result, Language.msg(l10n_vestr_syncing), false); return; }
 
         long startBlock = VestingContract.blockHeightForDate(tip, startMs);
         long endBlock = VestingContract.blockHeightForDate(tip, endMs);
         VestingContract.Grace grace = VestingContract.Grace.values()[graceSpinner.getSelectedItemPosition()];
         BigDecimal perGrace = VestingContract.paymentPerGrace(amount, startBlock, endBlock, grace.blocks());
-        setStatus(result, "Released per " + grace.label + ": " + ContractUi.amount(perGrace), true);
+        setStatus(result, Language.msg(l10n_vestr_released, VestrText.grace(grace), ContractUi.amount(perGrace)), true);
     }
 
     /** Callback delivering the chosen instant in epoch millis. */
@@ -90,12 +92,12 @@ public class CalculatorActivity extends SubActivity {
         if (initial > 0) c.setTimeInMillis(initial);
         // DatePicker first, then TimePicker chained off its result; cb gets the full timestamp, and
         // never fires if the user cancels either dialog.
-        new DatePickerDialog(this, (dp, y, mo, d) -> {
+        languagePicker(() -> new DatePickerDialog(this, (dp, y, mo, d) -> {
             c.set(Calendar.YEAR, y); c.set(Calendar.MONTH, mo); c.set(Calendar.DAY_OF_MONTH, d);
-            new TimePickerDialog(this, (tp, h, mi) -> {
+            languagePicker(() -> new TimePickerDialog(this, (tp, h, mi) -> {
                 c.set(Calendar.HOUR_OF_DAY, h); c.set(Calendar.MINUTE, mi); c.set(Calendar.SECOND, 0);
                 cb.on(c.getTimeInMillis());
-            }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show();
-        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+            }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true)).show();
+        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH))).show();
     }
 }

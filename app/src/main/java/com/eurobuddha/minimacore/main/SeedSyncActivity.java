@@ -1,6 +1,8 @@
 package com.eurobuddha.minimacore.main;
 
-import android.app.AlertDialog;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -67,8 +69,10 @@ public class SeedSyncActivity extends AppCompatActivity {
         Toolbar tb = findViewById(R.id.toolbar);
         // This screen shows progress for whatever destructive job is live, not only a host resync
         // - redirectIfPending routes a restore back here too.
-        tb.setTitle(session.job() == null || session.job().kind() == ResyncJob.Kind.HOST_RESYNC
-                ? "Resync node" : session.label() + " node");
+        Language.Message title = Language.msg("Restore".equals(operationLabel()) ? l10n_resync_restore_title
+                : "Seed restore".equals(operationLabel()) ? l10n_resync_seed_title : l10n_resync_title);
+        Language.toolbarTitle(tb, title);
+        Language.setText(findViewById(R.id.seed_sync_heading), title);
         setSupportActionBar(tb);
         KeyboardInsets.install(this, findViewById(R.id.sync_main), tb);
         host = findViewById(R.id.seed_sync_host);
@@ -78,6 +82,8 @@ public class SeedSyncActivity extends AppCompatActivity {
         status = findViewById(R.id.seed_sync_status);
         elapsed = findViewById(R.id.seed_sync_elapsed);
         terminal = findViewById(R.id.seed_sync_log);
+        Language.setText(status, Language.msg(l10n_resync_ready));
+        Language.setText(elapsed, Language.msg(l10n_resync_node_output));
         progress = findViewById(R.id.seed_sync_progress);
         logScroll = findViewById(R.id.seed_sync_log_scroll);
         proceed.setOnClickListener(v -> confirmResync());
@@ -90,7 +96,8 @@ public class SeedSyncActivity extends AppCompatActivity {
             render();
         });
         findViewById(R.id.seed_sync_copy).setOnClickListener(v ->
-                Clip.copy(this, "Resync log", terminal.getText().toString(), "Resync log copied"));
+                Clip.copy(this, Language.text(this, l10n_resync_log), terminal.getText().toString(),
+                        Language.text(this, l10n_resync_log_copied)));
         render();
     }
 
@@ -103,33 +110,29 @@ public class SeedSyncActivity extends AppCompatActivity {
     private void confirmResync() {
         String requestedHost = host.getText().toString().trim();
         if (!ResyncSession.validHost(requestedHost)) {
-            host.setError("Enter a hostname or IPv4 address and a port from 1 to 65535");
+            Language.error(host, Language.msg(l10n_resync_host_error));
             return;
         }
-        new AlertDialog.Builder(this)
-                .setTitle("Resync this node?")
-                .setMessage("Minima will rebuild its chain data from " + requestedHost + ".\n\n"
-                        + "\u2022 Your wallet and seed phrase are not touched.\n"
-                        + "\u2022 The node stops when it finishes and you restart it here.\n"
-                        + "\u2022 Any transaction still waiting to be mined is dropped.\n\n"
-                        + "This can take a while on a slow connection.")
-                .setPositiveButton("Resync", (d, w) -> startResync())
-                .setNegativeButton("Cancel", null)
+        new LanguageDialog(this)
+                .setTitle(Language.msg(l10n_resync_confirm_title))
+                .setMessage(Language.msg(l10n_resync_confirm_body, requestedHost))
+                .setPositiveButton(Language.msg(l10n_resync_operation), (d, w) -> startResync())
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     private void startResync() {
         String requestedHost = host.getText().toString().trim();
         if (!ResyncSession.validHost(requestedHost)) {
-            host.setError("Enter a hostname or IPv4 address and a port from 1 to 65535");
+            Language.error(host, Language.msg(l10n_resync_host_error));
             return;
         }
-        host.setError(null);
+        Language.error(host, null);
         // Shared with the health check's automatic path - see ResyncLauncher for why the
         // pending flag, the alarms and the service binding all have to be handled here.
         ResyncLauncher.Result result = ResyncLauncher.begin(this, ResyncJob.hostResync(requestedHost));
         if (!result.started) {
-            setTextIfChanged(status, result.error);
+            setTextIfChanged(status, launchError(result.error));
         }
         render();
     }
@@ -159,10 +162,12 @@ public class SeedSyncActivity extends AppCompatActivity {
         boolean nodeDown = !selfShutsDown || MinimaService.isShutdownComplete();
         host.setEnabled(!running && !succeeded && !waitingToRestart);
         proceed.setEnabled(!running && !succeeded && !waitingToRestart);
-        setTextIfChanged(proceed, running ? "Resyncing…" : failed ? "Retry resync" : "Resync Node");
-        boolean hostJob = session.job() == null || session.job().kind() == ResyncJob.Kind.HOST_RESYNC;
+        setTextIfChanged(proceed, Language.msg(running ? l10n_resync_working : failed ? l10n_resync_retry : l10n_resync_title));
+        boolean hostJob = "Resync".equals(operationLabel());
         // A restore has no host to type - hide the input rather than offer a field it ignores.
         host.setVisibility(hostJob ? View.VISIBLE : View.GONE);
+        findViewById(R.id.seed_sync_host_help).setVisibility(hostJob ? View.VISIBLE : View.GONE);
+        findViewById(R.id.seed_sync_host_label).setVisibility(hostJob ? View.VISIBLE : View.GONE);
         proceed.setVisibility(hostJob ? View.VISIBLE : View.GONE);
         progress.setVisibility(running || waitingToRestart || (succeeded && !nodeDown)
                 ? View.VISIBLE : View.GONE);
@@ -170,26 +175,28 @@ public class SeedSyncActivity extends AppCompatActivity {
         restart.setEnabled(!waitingToRestart && (!succeeded || nodeDown));
         if (running) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            setTextIfChanged(status, session.label() + " in progress. Keep Minima Core running; wait for completion before restarting.");
+            setTextIfChanged(status, Language.msg(l10n_resync_in_progress, operation()));
         } else if (!waitingToRestart) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             if (succeeded) {
-                setTextIfChanged(status, nodeDown
-                        ? session.label() + " complete. You can restart the node now — no phone reboot is needed."
-                        : session.result());
+                setTextIfChanged(status, Language.msg(nodeDown ? l10n_resync_complete : l10n_resync_waiting_complete, operation()));
                 if (prefs.getBoolean(PREF_PENDING, false)) {
                     // Only a job that actually used a host should overwrite the default peer.
                     if (session.job() != null && session.job().setsDefaultPeer()) Peers.setDefaultPeers(this, session.host());
                     prefs.edit().putBoolean(PREF_PENDING, false).apply();
                 }
             } else if (failed) {
-                setTextIfChanged(status, session.label() + " not completed. " + session.result() + "\nYou can retry, or restart the node and check its status.");
+                // A missing job in FAILED means a process interruption, not a node reply.
+                // Keep the original result/log intact; only the application summary is translated.
+                setTextIfChanged(status, session.job() == null
+                        ? Language.msg(l10n_resync_interrupted, operation())
+                        : Language.msg(l10n_resync_failed, operation(), session.result()));
                 if (prefs.getBoolean(PREF_PENDING, false)) prefs.edit().putBoolean(PREF_PENDING, false).apply();
             }
         }
         if (state != ResyncSession.State.IDLE) {
             long seconds = session.elapsedSeconds(System.nanoTime());
-            setTextIfChanged(elapsed, "Elapsed " + (seconds / 60) + "m " + (seconds % 60) + "s · latest 600 node log entries");
+            setTextIfChanged(elapsed, Language.msg(l10n_resync_elapsed, seconds / 60, seconds % 60));
         }
         long revision = session.log.revision();
         if (revision != renderedRevision) {
@@ -199,7 +206,7 @@ public class SeedSyncActivity extends AppCompatActivity {
             if (atBottom) logScroll.post(() -> logScroll.fullScroll(View.FOCUS_DOWN));
         }
         if (waitingToRestart) {
-            setTextIfChanged(status, "Waiting for the node to shut down safely…");
+            setTextIfChanged(status, Language.msg(l10n_resync_waiting_shutdown));
             if (MinimaService.isShutdownComplete()) {
                 leaving = true;
                 session.reset();
@@ -211,7 +218,33 @@ public class SeedSyncActivity extends AppCompatActivity {
         }
     }
 
-    private static void setTextIfChanged(TextView view, String text) {
-        if (!text.contentEquals(view.getText())) view.setText(text);
+    /** Persisted names belong to the recovery protocol; translate only at the view boundary. */
+    private String operationLabel() {
+        if (session.job() != null) return session.job().label();
+        return session.state() == ResyncSession.State.FAILED
+                ? prefs.getString(PREF_PENDING_LABEL, "Resync") : "Resync";
+    }
+
+    private Language.Message operation() {
+        String label = operationLabel();
+        return Language.msg("Restore".equals(label) ? l10n_resync_restore_operation
+                : "Seed restore".equals(label) ? l10n_resync_seed_operation : l10n_resync_operation);
+    }
+
+    public static CharSequence launchError(String error) {
+        if (error == null) return "";
+        switch (error) {
+            case "Check the details and try again": return Language.msg(l10n_resync_invalid_details);
+            case "The node is not running. Restart the node before continuing.": return Language.msg(l10n_resync_node_stopped);
+            case "Could not save progress state. Check available storage and try again.": return Language.msg(l10n_resync_save_failed);
+            case "Another resync is already in progress.": return Language.msg(l10n_resync_already_running);
+            case "Another restore is already in progress.": return Language.msg(l10n_backup_restore_running);
+            case "Another seed restore is already in progress.": return Language.msg(l10n_backup_seed_restore_running);
+            default: return error;
+        }
+    }
+
+    private static void setTextIfChanged(TextView view, CharSequence text) {
+        if (!text.toString().contentEquals(view.getText())) Language.setText(view, text);
     }
 }

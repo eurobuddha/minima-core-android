@@ -1,4 +1,6 @@
 package com.eurobuddha.vestr;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -40,7 +42,7 @@ public final class ContractUi {
 
         // Avatar glyph: "M" for native Minima, else first letter of the token name (or "?" when unnamed).
         TextView icon = new TextView(act);
-        icon.setText(c.isMinima() ? "M" : (c.tokenName.isEmpty() ? "?" : c.tokenName.substring(0, 1).toUpperCase()));
+        Language.setText(icon, c.isMinima() ? "M" : (c.tokenName.isEmpty() ? "?" : c.tokenName.substring(0, 1).toUpperCase()));
         icon.setTextColor(VestrDesign.ON_YELLOW);
         icon.setTextSize(18f);
         icon.setTypeface(Typeface.DEFAULT_BOLD);
@@ -59,13 +61,13 @@ public final class ContractUi {
         titleCol.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         // No user nickname in the model — label by the truncated coin UID instead.
         TextView nick = new TextView(act);
-        nick.setText("Contract " + shortHex(c.uid));
+        Language.setText(nick, Language.msg(l10n_vestr_contract_uid, shortHex(c.uid)));
         nick.setTextColor(VestrDesign.DIM);
         nick.setTextSize(12f);
         nick.setSingleLine(true);
         titleCol.addView(nick);
         TextView amt = new TextView(act);
-        amt.setText(amount(c.amount) + " " + c.tokenName);
+        Language.setText(amt, Language.join(amount(c.amount), " ", VestrText.token(c.raw.opt("token"), c.tokenid)));
         amt.setTextColor(VestrDesign.TEXT);
         amt.setTextSize(16f);
         amt.setTypeface(Typeface.DEFAULT_BOLD);
@@ -81,8 +83,8 @@ public final class ContractUi {
         LinearLayout left = new LinearLayout(act);
         left.setOrientation(LinearLayout.VERTICAL);
         left.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        left.addView(kv(act, "Total vested", amount(c.total), true));
-        left.addView(kv(act, "Collected", amount(c.collected()), true));
+        left.addView(kv(act, Language.msg(l10n_vestr_total_vested), amount(c.total), true));
+        left.addView(kv(act, Language.msg(l10n_vestr_collected), amount(c.collected()), true));
         body.addView(left);
 
         LinearLayout right = new LinearLayout(act);
@@ -90,7 +92,7 @@ public final class ContractUi {
         right.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         right.setGravity(Gravity.END);
         // Right column: collect cadence (grace period) plus human-readable start/end timing.
-        right.addView(rightLine(act, "Collect " + grace(c.graceHours), VestrDesign.DIM));
+        right.addView(rightLine(act, Language.msg(l10n_vestr_collect_cadence, grace(c.graceHours)), VestrDesign.DIM));
         right.addView(rightLine(act, relative(c.startMs, "start"), VestrDesign.DIM_2));
         right.addView(rightLine(act, relative(c.endMs, "end"), VestrDesign.DIM_2));
         body.addView(right);
@@ -108,9 +110,9 @@ public final class ContractUi {
     // ---- helpers ----
 
     /** "key: value" label line for the body's left column; {@code bold} emphasises headline figures. */
-    private static View kv(MainActivity act, String k, String v, boolean bold) {
+    private static View kv(MainActivity act, CharSequence k, String v, boolean bold) {
         TextView t = new TextView(act);
-        t.setText(k + ": " + v);
+        Language.setText(t, Language.join(k, ": ", v));
         t.setTextColor(VestrDesign.TEXT);
         t.setTextSize(13f);
         if (bold) t.setTypeface(Typeface.DEFAULT_BOLD);
@@ -119,9 +121,9 @@ public final class ContractUi {
     }
 
     /** End-aligned single text line for the body's right (timing) column, in the given dim colour. */
-    private static View rightLine(MainActivity act, String s, int color) {
+    private static View rightLine(MainActivity act, CharSequence s, int color) {
         TextView t = new TextView(act);
-        t.setText(s);
+        Language.setText(t, s);
         t.setTextColor(color);
         t.setTextSize(12f);
         t.setGravity(Gravity.END);
@@ -130,8 +132,8 @@ public final class ContractUi {
     }
 
     /** Map a grace-period in hours to its human label (e.g. "daily", "weekly") via the contract's Grace enum. */
-    static String grace(int hours) {
-        return VestingContract.Grace.fromHours(hours).label;
+    static CharSequence grace(int hours) {
+        return VestrText.grace(VestingContract.Grace.fromHours(hours));
     }
 
     /** Format a token amount: cap at 6 decimals (round down — never overstate), drop trailing zeros. */
@@ -151,19 +153,17 @@ public final class ContractUi {
     }
 
     /** "starts in 3 days" / "started 2 days ago" / "ends in …". */
-    static String relative(long whenMs, String verb) {
+    static CharSequence relative(long whenMs, String verb) {
         if (whenMs <= 0) return "";
         long diff = whenMs - System.currentTimeMillis();
         boolean past = diff < 0;
-        String v = (verb.equals("start") ? (past ? "started " : "starts ") : (past ? "ended " : "ends "));
         long a = Math.abs(diff);
-        long days = TimeUnit.MILLISECONDS.toDays(a);
-        long hours = TimeUnit.MILLISECONDS.toHours(a);
-        long mins = TimeUnit.MILLISECONDS.toMinutes(a);
-        String span = days > 0 ? days + (days == 1 ? " day" : " days")
-                : hours > 0 ? hours + (hours == 1 ? " hour" : " hours")
-                : mins + (mins == 1 ? " min" : " mins");
-        return v + (past ? span + " ago" : "in " + span);
+        long days = TimeUnit.MILLISECONDS.toDays(a), hours = TimeUnit.MILLISECONDS.toHours(a), mins = TimeUnit.MILLISECONDS.toMinutes(a);
+        int count = (int)Math.min(Integer.MAX_VALUE, days > 0 ? days : hours > 0 ? hours : mins);
+        int unit = days > 0 ? com.eurobuddha.minimacore.i18n.R.plurals.l10n_vestr_days
+                : hours > 0 ? com.eurobuddha.minimacore.i18n.R.plurals.l10n_vestr_hours : com.eurobuddha.minimacore.i18n.R.plurals.l10n_vestr_minutes;
+        return Language.msg("start".equals(verb) ? (past ? l10n_vestr_started_ago : l10n_vestr_starts_in)
+                : (past ? l10n_vestr_ended_ago : l10n_vestr_ends_in), Language.count(unit, count));
     }
 
     /** Convert density-independent pixels to raw pixels using the device's display density. */

@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Private keys"
-                android:textAppearance="@style/TextAppearance.MinimaCore.Display" />
+                android:textAppearance="@style/TextAppearance.MinimaCore.Display"  android:tag="l10n:text=l10n_backup_private_keys" />
 
             <TextView
                 android:id="@+id/vault_state"
@@ -69,7 +69,7 @@
 
             <!-- Seed phrase. Hidden until asked for: it should never be sitting on screen by
                  default, and it is the whole wallet in twelve to twenty-four words. -->
-            <TextView style="@style/FormLabel" android:text="Seed phrase" />
+            <TextView style="@style/FormLabel" android:text="Seed phrase"  android:tag="l10n:text=l10n_onboarding_seed_phrase" />
 
             <TextView
                 android:id="@+id/vault_phrase_hint"
@@ -78,7 +78,7 @@
                 android:text="Anyone who reads these words owns your funds. Write them down somewhere only you can reach — never in a photo, a note app or a message."
                 android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                 android:textColor="@color/core_text_mid"
-                android:lineSpacingMultiplier="1.25" />
+                android:lineSpacingMultiplier="1.25"  android:tag="l10n:text=l10n_vault_seed_warning" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/vault_reveal"
@@ -101,7 +101,7 @@
                 android:id="@+id/vault_seed_label"
                 style="@style/FormLabel"
                 android:text="Seed"
-                android:visibility="gone" />
+                android:visibility="gone"  android:tag="l10n:text=l10n_vault_seed" />
 
             <TextView
                 android:id="@+id/vault_seed"
@@ -118,11 +118,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:visibility="gone"
-                android:text="Copy seed phrase" />
+                android:text="Copy seed phrase"  android:tag="l10n:text=l10n_vault_copy_seed" />
 
             <View style="@style/HomeDivider" android:layout_marginTop="24dp" />
 
-            <TextView style="@style/FormLabel" android:text="Actions" />
+            <TextView style="@style/FormLabel" android:text="Actions"  android:tag="l10n:text=l10n_vault_actions" />
 
             <LinearLayout
                 android:id="@+id/vault_actions"

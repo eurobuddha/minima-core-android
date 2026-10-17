@@ -1,4 +1,7 @@
 package com.eurobuddha.pandapools;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.content.Context;
 import android.graphics.Color;
@@ -102,19 +105,23 @@ public final class Ui {
      */
     public static void copyable(final View v, final String label, final String fullValue) {
         if (v == null || fullValue == null || fullValue.isEmpty()) return;
-        v.setOnClickListener(view -> {
-            Context c = view.getContext();
+        v.setOnClickListener(view -> copy(view, label, fullValue));
+    }
+
+    /** Copy a current public value without replacing the caller's click listener. */
+    public static void copy(View v, String label, String fullValue) {
+        if (v == null || fullValue == null || fullValue.isEmpty()) return;
+            Context c = v.getContext();
             android.content.ClipboardManager cm =
                     (android.content.ClipboardManager) c.getSystemService(Context.CLIPBOARD_SERVICE);
-            if (cm != null) cm.setPrimaryClip(android.content.ClipData.newPlainText(label, fullValue));
-            android.widget.Toast.makeText(c, "Copied " + label, android.widget.Toast.LENGTH_SHORT).show();
-        });
+            if (cm != null) cm.setPrimaryClip(android.content.ClipData.newPlainText(PoolsMessages.message(label).toString(), fullValue));
+            android.widget.Toast.makeText(c, Language.msg(l10n_pools_copied, PoolsMessages.message(label)), android.widget.Toast.LENGTH_SHORT).show();
     }
 
     /** A monospaced, wrapping, tap-to-copy row for one full identifier. */
     public static TextView identifierRow(Context c, String label, String fullValue) {
         TextView t = new TextView(c);
-        t.setText(label + ":  " + fullValue + "   (tap to copy)");
+        Language.setText(t, Language.msg(l10n_pools_identifier, PoolsMessages.message(label), fullValue));
         t.setTextColor(Design.dim());
         t.setTextSize(12f);
         t.setTypeface(android.graphics.Typeface.MONOSPACE);

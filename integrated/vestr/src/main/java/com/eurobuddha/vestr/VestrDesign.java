@@ -26,19 +26,19 @@ public final class VestrDesign {
     public static final int TEXT         = 0xFFFFFFFF;
     public static final int TEXT_ON_DARK = 0xFFFFFFFF;
     public static final int DIM          = 0xFF9A9AA8;   // secondary text
-    public static final int DIM_2        = 0xFF6A6A78;
+    public static final int DIM_2        = 0xFF9A9AA8;
     public static final int DIVIDER      = 0xFF2A2A38;
 
     // ---- accent text / status ----
     public static final int ON_YELLOW    = 0xFF0A0A0F;   // dark text on the orange accent
     public static final int GREEN        = 0xFF2ECC71;   // positive / collectible
     public static final int GREEN_BG     = 0x332ECC71;
-    public static final int RED          = 0xFFE74C3C;
+    public static final int RED          = 0xFFFF5B5B;
     public static final int RED_BG       = 0x33E74C3C;
     public static final int LABEL        = 0xFFF7931A;   // form labels (orange)
 
     // ---- bottom nav ----
     public static final int NAV_BG       = 0xFF0A0A0F;
     public static final int NAV_ACTIVE   = 0xFFF7931A;
-    public static final int NAV_INACTIVE = 0xFF6A6A78;
+    public static final int NAV_INACTIVE = 0xFF9A9AA8;
 }

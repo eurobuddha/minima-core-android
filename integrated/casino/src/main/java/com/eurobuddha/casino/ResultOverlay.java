@@ -1,4 +1,7 @@
 package com.eurobuddha.casino;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.view.Gravity;
 import android.view.View;
@@ -31,11 +34,12 @@ public final class ResultOverlay {
         LinearLayout card = Ui.col(act);
         card.setGravity(Gravity.CENTER_HORIZONTAL);
         FrameLayout.LayoutParams clp = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         clp.gravity = Gravity.CENTER;
+        clp.leftMargin = clp.rightMargin = Ui.dp(act, 20);
         card.setLayoutParams(clp);
 
-        TextView game_t = Ui.text(act, game.icon + "  " + game.name.toUpperCase(), Theme.dim(), 12, true);
+        TextView game_t = Ui.text(act, Language.join(game.icon, "  ", Language.upper(CasinoMessages.message(game.name))), Theme.dim(), 12, true);
         game_t.setGravity(Gravity.CENTER);
         game_t.setPadding(0, 0, 0, Ui.dp(act, 14));
         card.addView(game_t);
@@ -80,10 +84,10 @@ public final class ResultOverlay {
         final Runnable settle = () -> {
             if (settled[0]) return;
             settled[0] = true;
-            title.setText(iWon ? "YOU WIN" : "YOU LOSE");
-            detail.setText((iWon ? "+" : "-") + Currency.show(profit, tokenid) + "\nPicked "
-                    + game.pickLabel(pick) + "  ·  Rolled "
-                    + (result >= 0 ? game.pickLabel(result) : "—"));
+            CasinoMessages.text(title, iWon ? "YOU WIN" : "YOU LOSE");
+            CasinoMessages.text(detail, Language.msg(l10n_casino_result_detail, (iWon ? "+" : "-") + Currency.show(profit, tokenid),
+                    CasinoMessages.message(game.pickLabel(pick)),
+                    result >= 0 ? CasinoMessages.message(game.pickLabel(result)) : "—"));
             title.setVisibility(View.VISIBLE);
             detail.setVisibility(View.VISIBLE);
             hint.setVisibility(View.VISIBLE);

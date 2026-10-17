@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.service;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -329,8 +332,8 @@ public final class NodeHealthMonitor {
         // IMPORTANCE_DEFAULT, unlike the silent LOW service channel: the whole problem in
         // the 2026-09-11 incident was that nothing ever said anything was wrong.
         NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID, "Minima node health", NotificationManager.IMPORTANCE_DEFAULT);
-        channel.setDescription("Tells you when the node needs a resync");
+                CHANNEL_ID, Language.text(context, l10n_notification_health), NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setDescription(Language.text(context, l10n_notification_health_help));
         manager.createNotificationChannel(channel);
     }
 

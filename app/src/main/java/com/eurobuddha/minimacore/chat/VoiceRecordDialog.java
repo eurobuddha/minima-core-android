@@ -1,13 +1,17 @@
 package com.eurobuddha.minimacore.chat;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import java.util.ArrayList;
 
@@ -26,7 +30,7 @@ public final class VoiceRecordDialog {
     }
 
     public static String fmtSecs(int zSecs) {
-        return (zSecs / 60) + ":" + String.format("%02d", zSecs % 60);
+        return (zSecs / 60) + ":" + String.format(java.util.Locale.UK, "%02d", zSecs % 60);
     }
 
     /** Show the dialog and start recording. Returns the recorder so the caller
@@ -36,7 +40,7 @@ public final class VoiceRecordDialog {
         try {
             rec.start();
         } catch (Exception e) {
-            Toast.makeText(zAct, "Microphone unavailable", Toast.LENGTH_SHORT).show();
+            Toast.makeText(zAct, Language.msg(l10n_chat_no_microphone), Toast.LENGTH_SHORT).show();
             return null;
         }
         int pad = Math.round(22 * zAct.getResources().getDisplayMetrics().density);
@@ -69,11 +73,11 @@ public final class VoiceRecordDialog {
         rowBox.addView(dot);
         rowBox.addView(timer);
 
-        final AlertDialog dlg = new AlertDialog.Builder(zAct)
-                .setTitle("Voice note")
+        final AlertDialog dlg = new LanguageDialog(zAct)
+                .setTitle(Language.msg(l10n_chat_voice_note))
                 .setView(box)
-                .setPositiveButton("Send", null)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_wallet_send), null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .create();
         dlg.setCanceledOnTouchOutside(false);
         dlg.show();
@@ -95,7 +99,7 @@ public final class VoiceRecordDialog {
                 int sSec = rec.elapsedSeconds();
                 dot.setAlpha(dot.getAlpha() > 0.5f ? 0.25f : 1f);
                 if (sSec >= VoiceNote.MAX_SECONDS) {
-                    timer.setText(fmtSecs(VoiceNote.MAX_SECONDS) + "  max");
+                    Language.setText(timer, Language.msg(l10n_chat_max_duration, fmtSecs(VoiceNote.MAX_SECONDS)));
                     rec.stopQuiet();   // recorder hard-caps too (setMaxDuration)
                 } else {
                     timer.setText(fmtSecs(sSec));
@@ -113,13 +117,13 @@ public final class VoiceRecordDialog {
             try {
                 bytes = rec.bytes();
             } catch (Exception e) {
-                Toast.makeText(zAct, "Recording failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(zAct, Language.msg(l10n_chat_recording_failed), Toast.LENGTH_SHORT).show();
                 dlg.dismiss();
                 return;
             }
             dlg.dismiss();
             if (bytes == null || bytes.length == 0 || secs < 1) {
-                Toast.makeText(zAct, "Too short — hold on a moment longer", Toast.LENGTH_SHORT).show();
+                Toast.makeText(zAct, Language.msg(l10n_chat_recording_short), Toast.LENGTH_SHORT).show();
                 return;
             }
             zDone.recorded(bytes, rec.mime(), secs,
@@ -133,6 +137,15 @@ public final class VoiceRecordDialog {
         dlg.setOnDismissListener(d -> {
             h.removeCallbacksAndMessages(null);
             rec.stopQuiet();
+        });
+        // Activity destruction can detach the window without an onDismiss callback.
+        // Use the same window lifecycle hook as LanguageDialog to stop its UI timers.
+        dlg.getWindow().getDecorView().addOnAttachStateChangeListener(new android.view.View.OnAttachStateChangeListener() {
+            @Override public void onViewAttachedToWindow(android.view.View view) {}
+            @Override public void onViewDetachedFromWindow(android.view.View view) {
+                h.removeCallbacksAndMessages(null);
+                rec.stopQuiet();
+            }
         });
         return rec;
     }

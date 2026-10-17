@@ -1,4 +1,6 @@
 package com.eurobuddha.vestr;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -32,7 +34,7 @@ public class ContractDetailActivity extends SubActivity {
     /** Parse the contract coin passed in via intent, render it, then fetch the tip to run the maths. */
     @Override
     protected void init() {
-        title("Contract");
+        title(Language.msg(l10n_vestr_contract));
         try { c = Contract.from(new JSONObject(getIntent().getStringExtra("coin"))); }
         catch (Exception e) { finish(); return; }
         render();
@@ -98,12 +100,12 @@ public class ContractDetailActivity extends SubActivity {
         hb.setCornerRadius(dp(10));
         hero.setBackground(hb);
         TextView hl = new TextView(this);
-        hl.setText("Available to collect");
+        Language.setText(hl, Language.msg(l10n_vestr_available));
         hl.setTextColor(VestrDesign.DIM);
         hl.setTextSize(13f);
         hero.addView(hl);
         availableTv = new TextView(this);
-        availableTv.setText((!mathsReady ? "…" : ContractUi.amount(canCollect)) + " " + c.tokenName);
+        Language.setText(availableTv, Language.join(!mathsReady ? "…" : ContractUi.amount(canCollect), " ", VestrText.token(c.raw.opt("token"), c.tokenid)));
         availableTv.setTextColor(collectable ? VestrDesign.GREEN : VestrDesign.TEXT);
         availableTv.setTextSize(26f);
         availableTv.setTypeface(Typeface.DEFAULT_BOLD);
@@ -111,35 +113,35 @@ public class ContractDetailActivity extends SubActivity {
         form.addView(hero);
 
         // Collected / Vested / Remaining
-        addStat("Collected", ContractUi.amount(c.collected()) + " " + c.tokenName);
-        addStat("Total vested", ContractUi.amount(c.total) + " " + c.tokenName);
-        addStat("Remaining in contract", ContractUi.amount(c.amount) + " " + c.tokenName);
+        addStat(Language.msg(l10n_vestr_collected), Language.join(ContractUi.amount(c.collected()), " ", VestrText.token(c.raw.opt("token"), c.tokenid)));
+        addStat(Language.msg(l10n_vestr_total_vested), Language.join(ContractUi.amount(c.total), " ", VestrText.token(c.raw.opt("token"), c.tokenid)));
+        addStat(Language.msg(l10n_vestr_remaining), Language.join(ContractUi.amount(c.amount), " ", VestrText.token(c.raw.opt("token"), c.tokenid)));
 
         // Schedule
-        addStat("Collect every", VestingContract.Grace.fromHours(c.graceHours).label);
+        addStat(Language.msg(l10n_vestr_collect_every), VestrText.grace(VestingContract.Grace.fromHours(c.graceHours)));
         if (tip > 0) {
             long gr = c.graceBlocksRemaining(tip);
-            addStat("Grace remaining", gr == 0 ? "ready" : gr + " blocks");
+            addStat(Language.msg(l10n_vestr_grace_remaining), gr == 0 ? Language.msg(l10n_vestr_ready) : Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_vestr_blocks, (int)Math.min(Integer.MAX_VALUE, gr)));
         }
-        addStat("Starts", ContractUi.relative(c.startMs, "start"));
-        addStat("Ends", ContractUi.relative(c.endMs, "end"));
+        addStat(Language.msg(l10n_vestr_starts), ContractUi.relative(c.startMs, "start"));
+        addStat(Language.msg(l10n_vestr_ends), ContractUi.relative(c.endMs, "end"));
         if (tip > 0) {
-            addStat("Start block", String.valueOf(c.startBlock));
-            addStat("End block", String.valueOf(c.endBlock));
+            addStat(Language.msg(l10n_vestr_start_block), String.valueOf(c.startBlock));
+            addStat(Language.msg(l10n_vestr_end_block), String.valueOf(c.endBlock));
         }
 
         // Copyable ids
-        addCopy("Token id", c.tokenid);
-        addCopy("Coin id", c.coinid);
-        addCopy("Withdrawal address", c.unlockAddr);
-        addCopy("Contract id", c.uid);
+        addCopy(Language.msg(l10n_vestr_token_id), c.tokenid);
+        addCopy(Language.msg(l10n_vestr_coin_id), c.coinid);
+        addCopy(Language.msg(l10n_vestr_withdrawal), c.unlockAddr);
+        addCopy(Language.msg(l10n_vestr_contract_id), c.uid);
 
         // Network fee
-        label("Network fee (burn, optional)");
+        label(Language.msg(l10n_vestr_network_fee));
         burnInput = input("0", T_DEC);
 
-        collectBtn = primaryButton(collectable ? "Collect " + ContractUi.amount(canCollect) + " " + c.tokenName
-                : (!mathsReady ? "Loading…" : "Nothing to collect yet"));
+        collectBtn = primaryButton(collectable ? Language.msg(l10n_vestr_collect_amount, ContractUi.amount(canCollect), VestrText.token(c.raw.opt("token"), c.tokenid))
+                : (!mathsReady ? Language.msg(l10n_vestr_loading) : Language.msg(l10n_vestr_nothing)));
         collectBtn.setEnabled(collectable);
         collectBtn.setAlpha(collectable ? 1f : 0.4f);
         collectBtn.setOnClickListener(v -> collect(canCollect));
@@ -147,44 +149,46 @@ public class ContractDetailActivity extends SubActivity {
     }
 
     /** Append a key/value stat row (label left, bold value right). */
-    private void addStat(String k, String v) {
+    private void addStat(CharSequence k, CharSequence v) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(0, dp(8), 0, dp(8));
         TextView kt = new TextView(this);
-        kt.setText(k);
+        Language.setText(kt, k);
         kt.setTextColor(VestrDesign.DIM);
         kt.setTextSize(14f);
         kt.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         row.addView(kt);
         TextView vt = new TextView(this);
-        vt.setText(v == null ? "" : v);
+        Language.setText(vt, v == null ? "" : v);
         vt.setTextColor(VestrDesign.TEXT);
         vt.setTextSize(14f);
         vt.setTypeface(Typeface.DEFAULT_BOLD);
+        vt.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        vt.setGravity(Gravity.END);
         row.addView(vt);
         form.addView(row);
     }
 
     /** Append a monospace id row that copies its value to the clipboard on tap. */
-    private void addCopy(String k, final String v) {
+    private void addCopy(CharSequence k, final String v) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.VERTICAL);
         row.setPadding(0, dp(8), 0, dp(8));
         TextView kt = new TextView(this);
-        kt.setText(k);
+        Language.setText(kt, k);
         kt.setTextColor(VestrDesign.DIM);
         kt.setTextSize(12f);
         row.addView(kt);
         TextView vt = new TextView(this);
-        vt.setText(v);
+        Language.setText(vt, v);
         vt.setTextColor(VestrDesign.TEXT);
         vt.setTextSize(12f);
         vt.setTypeface(Typeface.MONOSPACE);
         vt.setOnClickListener(view -> {
             ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE))
                     .setPrimaryClip(ClipData.newPlainText(k, v));
-            Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, Language.msg(l10n_vestr_copied), Toast.LENGTH_SHORT).show();
         });
         row.addView(vt);
         form.addView(row);
@@ -224,7 +228,7 @@ public class ContractDetailActivity extends SubActivity {
         cmds.add(post);
 
         collectBtn.setEnabled(false);
-        setStatus(status, "Collecting…", true);
+        setStatus(status, Language.msg(l10n_vestr_collecting), true);
         runSequence(cmds, 0, id);
     }
 
@@ -234,27 +238,27 @@ public class ContractDetailActivity extends SubActivity {
         // command finishes (and didn't fail) before the next mutates the same txn. Index past the end = done.
         if (i >= cmds.size()) {
             node.cmd("txndelete id:" + id, null);
-            setStatus(status, "✓ Collected — tokens will arrive shortly.", true);
+            setStatus(status, Language.msg(l10n_vestr_collected_ok), true);
             collectBtn.postDelayed(this::finish, 1400);
             return;
         }
         node.cmd(cmds.get(i), new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 // every build step returns status:true; txnpost returns the posted txpow
-                if (!j.optBoolean("status", false)) { fail(j.optString("error", "Collect failed"), id); return; }
+                if (!j.optBoolean("status", false)) { fail(j.has("error") ? j.optString("error") : Language.msg(l10n_vestr_collect_failed), id); return; }
                 runSequence(cmds, i + 1, id);
             }
             @Override public void onError(String m) {
-                fail(NodeApi.ERR_NOT_ENABLED.equals(m) ? "The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry." : m, id);
+                fail(NodeApi.ERR_NOT_ENABLED.equals(m) ? Language.msg(l10n_explorer_node_retry) : VestrMessages.message(m), id);
             }
         });
     }
 
     /** Abort: drop the half-built txn, re-enable the button, and surface the error. */
-    private void fail(String msg, String id) {
+    private void fail(CharSequence msg, String id) {
         node.cmd("txndelete id:" + id, null);
         collectBtn.setEnabled(true);
-        setStatus(status, "Failed: " + msg, false);
+        setStatus(status, Language.msg(l10n_vestr_failed, msg), false);
     }
 
     /** True if s parses as a strictly-positive number. */

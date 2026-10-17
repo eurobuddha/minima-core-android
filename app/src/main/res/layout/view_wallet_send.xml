@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
-            android:text="Token"
+            android:text="Token" android:tag="l10n:text=l10n_wallet_token"
             android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
 
         <Spinner
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="6dp"
-            android:text="Amount"
+            android:text="Amount" android:tag="l10n:text=l10n_history_amount"
             android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
 
         <LinearLayout
@@ -70,13 +70,14 @@
                 android:id="@+id/wallet_send_max"
                 style="@style/Widget.MinimaCore.Button.Outlined"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
+                android:minHeight="44dp"
                 android:layout_marginStart="8dp"
                 android:minWidth="0dp"
                 android:paddingHorizontal="16dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="Max" />
+                android:text="Max" android:tag="l10n:text=l10n_wallet_max" />
         </LinearLayout>
 
         <TextView
@@ -84,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="6dp"
-            android:text="To address"
+            android:text="To address" android:tag="l10n:text=l10n_send_to"
             android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
 
         <LinearLayout
@@ -104,7 +105,7 @@
                 android:inputType="textNoSuggestions|textMultiLine"
                 android:breakStrategy="simple"
                 android:hyphenationFrequency="none"
-                android:hint="Mx… or 0x…"
+                android:hint="Mx… or 0x…" android:tag="l10n:hint=l10n_send_address_hint"
                 android:textColor="@color/core_text"
                 android:textColorHint="@color/core_text_faint"
                 android:textAppearance="@style/TextAppearance.MinimaCore.Body" />
@@ -113,21 +114,23 @@
                 android:id="@+id/wallet_send_scan"
                 style="@style/Widget.MinimaCore.Button.Outlined"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
+                android:minHeight="44dp"
                 android:layout_marginStart="8dp"
                 android:minWidth="0dp"
                 android:paddingHorizontal="16dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="Scan"
+                android:text="Scan" android:tag="l10n:text=l10n_send_scan;description=l10n_send_scan_description"
                 android:contentDescription="Scan a recipient address QR code" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/wallet_send_sendbutton"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content"
+            android:minHeight="52dp"
             android:layout_marginTop="28dp"
-            android:text="Send Funds" />
+            android:text="Send Funds" android:tag="l10n:text=l10n_send_funds" />
     </LinearLayout>
 </ScrollView>

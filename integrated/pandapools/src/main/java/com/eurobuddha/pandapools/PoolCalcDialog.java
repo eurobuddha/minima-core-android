@@ -1,6 +1,7 @@
 package com.eurobuddha.pandapools;
 
-import android.app.AlertDialog;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
@@ -30,7 +31,7 @@ public final class PoolCalcDialog {
     private static final int SLIDER_STEPS = 800;   // log10 multiple −4 … +4 in 0.01 steps
     private static final double[] CHIPS = { 0.01, 0.1, 0.25, 0.5, 1, 2, 4, 10, 100 };
 
-    private final Context ctx;
+    private final MainActivity ctx;
     private EditText inX, inY, inTok, inP, inFee, inVol;
     private SeekBar slider;
     private TextView derived, outMinima, outToken, outRatio, outValue, outHold, outMove, outFees, outK, outBreakEven, note;
@@ -38,10 +39,10 @@ public final class PoolCalcDialog {
     private boolean syncing = false;   // guards the price-field ↔ slider echo loop
     private String tok = "mxUSDT";
 
-    private PoolCalcDialog(Context c) { ctx = c; }
+    private PoolCalcDialog(MainActivity c) { ctx = c; }
 
     /** Open the calculator. {@code seed} (nullable) pre-fills the starting pool from a live pool's reserves. */
-    public static void show(Context c, Pool seed) {
+    public static void show(MainActivity c, Pool seed) {
         PoolCalcDialog d = new PoolCalcDialog(c);
         d.build(seed);
     }
@@ -52,30 +53,28 @@ public final class PoolCalcDialog {
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(pad, Ui.dp(ctx, 8), pad, Ui.dp(ctx, 8));
 
-        TextView blurb = text("A PandaPool sits on MINIMA × token = K at every price, so the reserves, their ratio and the "
-                + "pool's value follow from the price alone. Enter a starting pool, then move the price. Nothing here "
-                + "touches your funds.", Design.dim(), 13, false);
+        TextView blurb = text(Language.msg(l10n_pools_calc_intro), Design.dim(), 13, false);
         box.addView(blurb);
 
         // ---- starting pool
-        box.addView(section("STARTING POOL"));
+        box.addView(section(Language.msg(l10n_pools_calc_starting)));
         String seedX = "100000", seedY = "500";
         if (seed != null && seed.funded()) {
             seedX = seed.reserveM.stripTrailingZeros().toPlainString();
             seedY = seed.reserveT.stripTrailingZeros().toPlainString();
             tok = seed.tokenLabel();
         }
-        inX = field(box, "MINIMA you add", seedX);
-        inY = field(box, tok + " you add", seedY);
-        inTok = field(box, "Token symbol", tok);
+        inX = field(box, Language.msg(l10n_pools_calc_minima_add), seedX);
+        inY = field(box, Language.msg(l10n_pools_calc_token_add, tokenLabel()), seedY);
+        inTok = field(box, Language.msg(l10n_pools_calc_symbol), tok);
         inTok.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         derived = text("", Design.dim(), 12, false);
         derived.setPadding(0, Ui.dp(ctx, 6), 0, 0);
         box.addView(derived);
 
         // ---- price
-        box.addView(section("PRICE NOW"));
-        inP = field(box, "MINIMA price in " + tok, PoolCalc.fmtPrice(Double.parseDouble(seedY) / Double.parseDouble(seedX)));
+        box.addView(section(Language.msg(l10n_pools_calc_price_section)));
+        inP = field(box, Language.msg(l10n_pools_calc_price, tokenLabel()), PoolCalc.fmtPrice(Double.parseDouble(seedY) / Double.parseDouble(seedX)));
         inP.setTextSize(20);
         slider = new SeekBar(ctx);
         slider.setMax(SLIDER_STEPS);
@@ -88,7 +87,7 @@ public final class PoolCalcDialog {
         ends.setOrientation(LinearLayout.HORIZONTAL);
         TextView l = text("÷10,000", Design.dim2(), 11, false);
         l.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        TextView mid = text("entry", Design.dim2(), 11, false);
+        TextView mid = text(Language.msg(l10n_pools_calc_entry), Design.dim2(), 11, false);
         mid.setGravity(Gravity.CENTER);
         mid.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         TextView r = text("×10,000", Design.dim2(), 11, false);
@@ -99,42 +98,37 @@ public final class PoolCalcDialog {
         box.addView(chipRow());
 
         // ---- fees
-        box.addView(section("FEES EARNED"));
-        inFee = field(box, "Swap fee rate (%)", "0.5");
-        inVol = field(box, "Volume traded through the pool, in " + tok + " value", "0");
-        note = text("PandaPools keeps 0.5 % of every swap's input inside the pool. Both directions count as volume. "
-                + "Fees are valued at the current price, so pool value with fees is exactly the fee-free value plus "
-                + "the fees kept.", Design.dim2(), 11, false);
+        box.addView(section(Language.msg(l10n_pools_calc_fees_section)));
+        inFee = field(box, Language.msg(l10n_pools_calc_rate), "0.5");
+        inVol = field(box, Language.msg(l10n_pools_calc_volume, tokenLabel()), "0");
+        note = text(Language.msg(l10n_pools_calc_fee_note), Design.dim2(), 11, false);
         note.setPadding(0, Ui.dp(ctx, 6), 0, 0);
         box.addView(note);
 
         // ---- results
-        box.addView(section("THE POOL AT THIS PRICE"));
-        outMinima = kv(box, "MINIMA in pool");
-        outToken = kv(box, tok + " in pool");
-        outRatio = kv(box, "Ratio MINIMA : " + tok);
-        outValue = kv(box, "Pool value, fees included");
-        outHold = kv(box, "Versus holding both amounts");
-        outMove = kv(box, "Price move from entry");
-        outFees = kv(box, "Fees kept by the pool");
-        outK = kv(box, "K with fees");
-        outBreakEven = kv(box, "Volume to break even with holding");
+        box.addView(section(Language.msg(l10n_pools_calc_results)));
+        outMinima = kv(box, Language.msg(l10n_pools_calc_minima_pool));
+        outToken = kv(box, Language.msg(l10n_pools_calc_token_pool, tokenLabel()));
+        outRatio = kv(box, Language.msg(l10n_pools_calc_ratio, tokenLabel()));
+        outValue = kv(box, Language.msg(l10n_pools_calc_value));
+        outHold = kv(box, Language.msg(l10n_pools_calc_hold));
+        outMove = kv(box, Language.msg(l10n_pools_calc_move));
+        outFees = kv(box, Language.msg(l10n_pools_calc_fees));
+        outK = kv(box, Language.msg(l10n_pools_calc_k));
+        outBreakEven = kv(box, Language.msg(l10n_pools_calc_break_even));
 
         // ---- curve
-        box.addView(section("WHERE THE POOL SITS ON ITS CURVE"));
+        box.addView(section(Language.msg(l10n_pools_calc_curve)));
         curve = new CurveView(ctx);
         LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Ui.dp(ctx, 220));
         clp.topMargin = Ui.dp(ctx, 6);
         curve.setLayoutParams(clp);
         box.addView(curve);
-        TextView legend = text("Small dot = entry · large accent dot = now · dashed = K at entry (the KMIN floor) once fees lift the curve. "
-                + "The slope of the curve at the pool's point is the price.", Design.dim2(), 11, false);
+        TextView legend = text(Language.msg(l10n_pools_calc_legend), Design.dim2(), 11, false);
         legend.setPadding(0, Ui.dp(ctx, 6), 0, 0);
         box.addView(legend);
 
-        TextView reading = text("MINIMA in pool = √(K ÷ price); token in pool = √(K × price). Each 4× move in price moves "
-                + "each reserve 2×. The pool is 50 % MINIMA and 50 % token by value at every price — only the counts change. "
-                + "Neither side ever reaches zero: 90 % of one side is gone at ×100 or ÷100, 99 % at ×10,000 or ÷10,000.",
+        TextView reading = text(Language.msg(l10n_pools_calc_reading),
                 Design.dim(), 12, false);
         reading.setPadding(0, Ui.dp(ctx, 14), 0, 0);
         box.addView(reading);
@@ -165,10 +159,10 @@ public final class PoolCalcDialog {
         ScrollView scroll = new ScrollView(ctx);
         scroll.addView(box);
         render();
-        new AlertDialog.Builder(ctx)
-                .setTitle("Pool calculator")
+        ctx.languageDialog()
+                .setTitle(Language.msg(l10n_pools_calc_title))
                 .setView(scroll)
-                .setPositiveButton("Done", null)
+                .setPositiveButton(Language.msg(l10n_pools_calc_done), null)
                 .show();
     }
 
@@ -197,9 +191,11 @@ public final class PoolCalcDialog {
 
     private void onTokChanged() {
         String t = inTok.getText().toString().trim();
-        tok = t.isEmpty() ? "token" : t;
+        tok = t;
         render();
     }
+
+    private CharSequence tokenLabel() { return tok.isEmpty() ? Language.msg(l10n_pools_calc_token) : tok; }
 
     private void setPriceFromMultiple(double m) {
         double p0 = entryPrice();
@@ -211,29 +207,32 @@ public final class PoolCalcDialog {
     }
 
     private void render() {
+        // Relabel the existing controls; never rewrite raw amounts or the token-symbol field.
+        Language.setText(labelOf(inY), Language.msg(l10n_pools_calc_token_add, tokenLabel()));
+        Language.setText(labelOf(inP), Language.msg(l10n_pools_calc_price, tokenLabel()));
+        Language.setText(labelOf(inVol), Language.msg(l10n_pools_calc_volume, tokenLabel()));
         double x0 = num(inX), y0 = num(inY), p = num(inP), fee = num(inFee), vol = num(inVol);
         if (Double.isNaN(fee)) fee = 0; if (Double.isNaN(vol)) vol = 0;
         PoolCalc.Result r = PoolCalc.compute(x0, y0, p, fee, vol);
-        labelOf(outToken).setText(tok + " in pool");
-        labelOf(outRatio).setText("Ratio MINIMA : " + tok);
+        Language.setText(labelOf(outToken), Language.msg(l10n_pools_calc_token_pool, tokenLabel()));
+        Language.setText(labelOf(outRatio), Language.msg(l10n_pools_calc_ratio, tokenLabel()));
         if (r == null) {
-            derived.setText("Enter a MINIMA amount, a " + tok + " amount and a price above zero.");
-            for (TextView t : new TextView[]{ outMinima, outToken, outRatio, outValue, outHold, outMove, outFees, outK, outBreakEven }) t.setText("—");
+            Language.setText(derived, Language.msg(l10n_pools_calc_required, tokenLabel()));
+            for (TextView t : new TextView[]{ outMinima, outToken, outRatio, outValue, outHold, outMove, outFees, outK, outBreakEven }) Language.setText(t, "—");
             curve.set(null, tok);
             return;
         }
-        derived.setText("Entry price " + PoolCalc.fmtPrice(r.entryPrice) + " " + tok + " per MINIMA  ·  K " + PoolCalc.fmt(r.k)
-                + "  ·  " + PoolCalc.fmt(x0 / y0) + " : 1 MINIMA per " + tok + "  ·  entry value " + PoolCalc.fmt(2 * y0) + " " + tok);
-        outMinima.setText(PoolCalc.fmt(r.minima) + "  (" + PoolCalc.fmt(r.minima / x0 * 100) + " % of what you added)");
-        outToken.setText(PoolCalc.fmt(r.token) + "  (" + PoolCalc.fmt(r.token / y0 * 100) + " % of what you added)");
-        outRatio.setText(PoolCalc.fmt(r.ratio) + " : 1  (always 1 ÷ price)");
-        outValue.setText(PoolCalc.fmt(r.value) + " " + tok + "  =  " + PoolCalc.fmt(r.token) + " in MINIMA + " + PoolCalc.fmt(r.token) + " in " + tok);
-        outHold.setText((r.vsHoldPct > 0.005 ? "+" : "") + PoolCalc.fmt(r.vsHoldPct) + " %  (holding would be worth " + PoolCalc.fmt(r.hold) + " " + tok + ")");
+        Language.setText(derived, Language.msg(l10n_pools_calc_derived, PoolCalc.fmtPrice(r.entryPrice), tokenLabel(), PoolCalc.fmt(r.k), PoolCalc.fmt(x0 / y0), PoolCalc.fmt(2 * y0)));
+        Language.setText(outMinima, Language.msg(l10n_pools_calc_reserve_value, PoolCalc.fmt(r.minima), PoolCalc.fmt(r.minima / x0 * 100)));
+        Language.setText(outToken, Language.msg(l10n_pools_calc_reserve_value, PoolCalc.fmt(r.token), PoolCalc.fmt(r.token / y0 * 100)));
+        Language.setText(outRatio, Language.msg(l10n_pools_calc_ratio_value, PoolCalc.fmt(r.ratio)));
+        Language.setText(outValue, Language.msg(l10n_pools_calc_pool_value, PoolCalc.fmt(r.value), tokenLabel(), PoolCalc.fmt(r.token)));
+        Language.setText(outHold, Language.msg(l10n_pools_calc_hold_value, (r.vsHoldPct > 0.005 ? "+" : "") + PoolCalc.fmt(r.vsHoldPct), PoolCalc.fmt(r.hold), tokenLabel()));
         outHold.setTextColor(r.vsHoldPct < -0.005 ? Design.red() : r.vsHoldPct > 0.005 ? Design.success() : Design.text());
-        outMove.setText(PoolCalc.fmtMove(r.move) + "  (" + PoolCalc.fmtPrice(r.entryPrice) + " → " + PoolCalc.fmtPrice(p) + ")");
-        outFees.setText(PoolCalc.fmt(r.feesKept) + " " + tok);
-        outK.setText(PoolCalc.fmt(r.kWithFees) + "  (+" + PoolCalc.fmt(r.kGrowthPct) + " %)");
-        outBreakEven.setText(Double.isNaN(r.breakEvenVolume) ? "— (fee is 0)" : PoolCalc.fmt(r.breakEvenVolume) + " " + tok);
+        Language.setText(outMove, PoolCalc.fmtMove(r.move) + "  (" + PoolCalc.fmtPrice(r.entryPrice) + " → " + PoolCalc.fmtPrice(p) + ")");
+        Language.setText(outFees, Language.join(PoolCalc.fmt(r.feesKept), " ", tokenLabel()));
+        Language.setText(outK, PoolCalc.fmt(r.kWithFees) + "  (+" + PoolCalc.fmt(r.kGrowthPct) + " %)");
+        Language.setText(outBreakEven, Double.isNaN(r.breakEvenVolume) ? Language.msg(l10n_pools_calc_no_fee) : Language.join(PoolCalc.fmt(r.breakEvenVolume), " ", tokenLabel()));
         // keep the slider in step with a typed price
         double lm = Math.max(-4, Math.min(4, Math.log10(r.move)));
         int want = (int) Math.round(lm * 100) + SLIDER_STEPS / 2;
@@ -243,21 +242,21 @@ public final class PoolCalcDialog {
 
     // ---- widgets ----
 
-    private TextView text(String s, int color, int sp, boolean bold) {
+    private TextView text(CharSequence s, int color, int sp, boolean bold) {
         TextView t = new TextView(ctx);
-        t.setText(s); t.setTextColor(color); t.setTextSize(sp);
+        Language.setText(t, s); t.setTextColor(color); t.setTextSize(sp);
         t.setTypeface(bold ? Design.typefaceBold() : Design.typeface());
         return t;
     }
 
-    private TextView section(String s) {
+    private TextView section(CharSequence s) {
         TextView t = text(s, Design.dim(), 11, true);
         t.setLetterSpacing(0.1f);
         t.setPadding(0, Ui.dp(ctx, 18), 0, Ui.dp(ctx, 2));
         return t;
     }
 
-    private EditText field(LinearLayout box, String label, String value) {
+    private EditText field(LinearLayout box, CharSequence label, String value) {
         TextView l = text(label, Design.dim(), 12, false);
         l.setPadding(0, Ui.dp(ctx, 8), 0, Ui.dp(ctx, 2));
         box.addView(l);
@@ -271,7 +270,7 @@ public final class PoolCalcDialog {
     }
 
     /** A label/value pair; the value TextView is returned and its label is reachable via {@link #labelOf}. */
-    private TextView kv(LinearLayout box, String label) {
+    private TextView kv(LinearLayout box, CharSequence label) {
         LinearLayout row = new LinearLayout(ctx);
         row.setOrientation(LinearLayout.VERTICAL);
         row.setPadding(0, Ui.dp(ctx, 7), 0, 0);
@@ -292,7 +291,8 @@ public final class PoolCalcDialog {
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(0, Ui.dp(ctx, 8), 0, 0);
         for (double m : CHIPS) {
-            TextView c = text(m == 1 ? "entry" : PoolCalc.fmtMove(m), Design.dim(), 12, true);
+            TextView c = text(m == 1 ? Language.msg(l10n_pools_calc_entry) : PoolCalc.fmtMove(m), Design.dim(), 12, true);
+            c.setMinHeight(Ui.dp(ctx, 48)); c.setMinWidth(Ui.dp(ctx, 48)); c.setGravity(Gravity.CENTER);
             c.setPadding(Ui.dp(ctx, 12), Ui.dp(ctx, 6), Ui.dp(ctx, 12), Ui.dp(ctx, 6));
             Ui.chip(c, m == 1);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -350,6 +350,11 @@ public final class PoolCalcDialog {
 
         void set(State st, String tokenLabel) { s = st; tok = tokenLabel; invalidate(); }
 
+        @Override protected void onConfigurationChanged(android.content.res.Configuration config) {
+            super.onConfigurationChanged(config);
+            invalidate();
+        }
+
         @Override protected void onDraw(Canvas cv) {
             super.onDraw(cv);
             if (s == null) return;
@@ -368,9 +373,9 @@ public final class PoolCalcDialog {
                 label.setTextAlign(Paint.Align.RIGHT); cv.drawText(yl, L - Ui.dp(getContext(), 6), gy + Ui.dp(getContext(), 4), label);
             }
             label.setTextAlign(Paint.Align.RIGHT);
-            cv.drawText("MINIMA in pool →", L + pw, T + ph + Ui.dp(getContext(), 26), label);
+            cv.drawText(Language.msg(l10n_pools_calc_axis_minima).toString(), L + pw, T + ph + Ui.dp(getContext(), 26), label);
             label.setTextAlign(Paint.Align.LEFT);
-            cv.drawText(tok + " in pool ↑", L + Ui.dp(getContext(), 4), T - Ui.dp(getContext(), 4), label);
+            cv.drawText(Language.msg(l10n_pools_calc_axis_token, tok.isEmpty() ? Language.msg(l10n_pools_calc_token) : tok).toString(), L + Ui.dp(getContext(), 4), T - Ui.dp(getContext(), 4), label);
 
             Path c2 = curvePath(s.k2, xmax, ymax, L, T, pw, ph);
             Path wash = new Path(c2);
@@ -390,7 +395,7 @@ public final class PoolCalcDialog {
             cv.drawCircle(nx, ny, r2 + rg, ring); cv.drawCircle(nx, ny, r2, dot);
             // one label: the current state, placed on whichever side has room
             label.setColor(Design.heading());
-            String now = "now " + PoolCalc.fmtPrice(s.p) + ": " + PoolCalc.fmt(s.x) + " · " + PoolCalc.fmt(s.y);
+            String now = Language.msg(l10n_pools_calc_now, PoolCalc.fmtPrice(s.p), PoolCalc.fmt(s.x), PoolCalc.fmt(s.y)).toString();
             boolean right = nx < L + pw * 0.55f;
             label.setTextAlign(right ? Paint.Align.LEFT : Paint.Align.RIGHT);
             float ly = ny < T + Ui.dp(getContext(), 20) ? ny + Ui.dp(getContext(), 20) : ny - Ui.dp(getContext(), 12);

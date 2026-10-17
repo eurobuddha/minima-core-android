@@ -15,6 +15,8 @@ import java.net.URLDecoder;
 public class TokenMeta {
 
     public String name = "Token";
+    /** True only for a nonempty supplied name (or the native Minima brand). */
+    public boolean nameProvided = false;
     public String ticker = "";
     public String iconUrl = "";
     public String description = "";
@@ -31,6 +33,7 @@ public class TokenMeta {
         TokenMeta m = new TokenMeta();
         if (isMinima(tokenid)) {
             m.name = "Minima";
+            m.nameProvided = true;
             m.ticker = "MINIMA";
             return m;
         }
@@ -38,7 +41,7 @@ public class TokenMeta {
         JSONObject t = asObject(token);
         if (t == null) {
             //Plain string name (or nothing useful)
-            if (token != null) m.name = token.toString();
+            if (token != null) { m.name = token.toString(); m.nameProvided = !m.name.isEmpty(); }
             return m;
         }
 
@@ -47,8 +50,10 @@ public class TokenMeta {
         if (nameNode instanceof JSONObject) {
             meta = (JSONObject) nameNode;
             m.name = optStr(meta, "name", "Token");
+            m.nameProvided = meta.get("name") != null && !m.name.isEmpty();
         } else if (nameNode != null) {
             m.name = nameNode.toString();
+            m.nameProvided = !m.name.isEmpty();
         }
 
         // Canonical icon location is token.url; resolve it (artimage / data / http / svg / base64).

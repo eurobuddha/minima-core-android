@@ -272,7 +272,9 @@ public class PoolManager {
                         if (tchange.signum() > 0)
                             cmds.add("txnoutput id:" + txid + " amount:" + amt(tchange) + " address:" + tChg + tokArg + " storestate:false");
                         addAnnounceState(cmds, txid, np);
-                        ownerSignPost(txid, p.opk, cmds, new Result() {
+                        final String payoutAddress = p.oadr;
+                        ownerSignPost(txid, p.opk, cmds,
+                                (post, fail) -> CollectConfirmation.beforePost(node, txid, payoutAddress, post, fail), new Result() {
                             @Override public void onPosted(String txpowid) { cb.onCreated(np, txpowid); }
                             @Override public void onFailed(String message) { cb.onFailed(message); }
                         });
@@ -297,7 +299,9 @@ public class PoolManager {
         cmds.add("txninput id:" + txid + " coinid:" + p.coinidT);   // 1 -> owner exit
         cmds.add("txnoutput id:" + txid + " amount:" + amt(p.reserveM) + " address:" + p.oadr + " storestate:false");
         cmds.add("txnoutput id:" + txid + " amount:" + amt(p.reserveT) + " address:" + p.oadr + tokArg + " storestate:false");
-        ownerSignPost(txid, p.opk, cmds, cb);
+        final String payoutAddress = p.oadr;
+        ownerSignPost(txid, p.opk, cmds,
+                (post, fail) -> CollectConfirmation.beforePost(node, txid, payoutAddress, post, fail), cb);
     }
 
     // ===================================================================== FORWARD TO DEFAULT WALLET
@@ -518,6 +522,10 @@ public class PoolManager {
     // ===================================================================== helpers
 
     private void ownerSignPost(String txid, String opk, List<String> cmds, Result cb) {
+        ownerSignPost(txid, opk, cmds, null, cb);
+    }
+
+    private void ownerSignPost(String txid, String opk, List<String> cmds, TxPost.BeforePost beforePost, Result cb) {
         // Append the signing lines BEFORE the pre-flight, so the pre-flight judges the transaction that will
         // actually run. A check against a half-built list cannot evaluate an exit exemption — whose whole
         // premise is verifying the real command list — and would refuse a permitted close.
@@ -528,7 +536,7 @@ public class PoolManager {
             if (!blocked.isEmpty()) {
                 cb.onFailed("Nothing was posted.\n\n" + OwnerKeyRecovery.worst(blocked).message()); return;
             }
-            TxPost.checkThenPost(node, txid, cmds, new TxPost.Done() {
+            TxPost.checkThenPost(node, txid, cmds, java.util.Collections.emptyList(), beforePost, new TxPost.Done() {
                 @Override public void ok(String txpowid) { cb.onPosted(txpowid); }
                 @Override public void fail(String message) { cb.onFailed(message); }
             });

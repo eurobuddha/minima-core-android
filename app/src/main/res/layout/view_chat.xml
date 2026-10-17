@@ -31,7 +31,8 @@
 
             <TextView
                 android:id="@+id/chat_myaddress_label"
-                android:layout_width="0dp"
+                android:tag="l10n:text=l10n_chat_my_address_qr"
+        android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="12dp"
@@ -58,7 +59,8 @@
 
             <TextView
                 android:id="@+id/chat_empty"
-                android:layout_width="match_parent"
+                android:tag="l10n:text=l10n_chat_empty"
+        android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:lineSpacingExtra="4dp"
@@ -67,7 +69,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/chat_empty_start"
-                android:layout_width="wrap_content"
+                android:tag="l10n:text=l10n_chat_start_new"
+        android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:paddingHorizontal="28dp"
@@ -84,6 +87,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/chat_fab"
+        android:tag="l10n:description=l10n_chat_new_chat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

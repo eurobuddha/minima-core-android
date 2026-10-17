@@ -51,6 +51,9 @@ public final class OtcDb {
         public String currency;          // TradingContext.key the deal was negotiated in (fund-safety: an OTC
                                          // response only fires while THIS currency is active — see otcLpDeal)
         public long created, updated;
+        public TradingContext market() { return TradingContext.forKey(currency); }
+        public boolean inMarket(TradingContext context) { return context != null && market() == context; }
+        public boolean inActiveMarket() { return inMarket(TradingContext.active()); }
     }
 
     public static final class Msg {
@@ -77,7 +80,11 @@ public final class OtcDb {
         v.put("status", d.status); v.put("whoseturn", d.whoseTurn); v.put("hash", normHash(d.hash));
         // Stamp the negotiating currency on first write (a deal is negotiated within ONE active-currency session)
         // so the OTC responder can refuse to act on it after the user switches currency.
-        if (d.currency == null || d.currency.isEmpty()) d.currency = TradingContext.active().key;
+        if (d.currency == null || d.currency.isEmpty()) {
+            Deal existing = getDeal(d.ref);
+            // Preserve unknown legacy attribution on updates; never adopt the newly selected market.
+            d.currency = existing == null ? TradingContext.active().key : existing.currency;
+        }
         v.put("currency", d.currency);
         if (d.created == 0) d.created = System.currentTimeMillis();
         v.put("created", d.created); v.put("updated", System.currentTimeMillis());

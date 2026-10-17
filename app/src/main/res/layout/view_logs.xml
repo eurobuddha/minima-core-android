@@ -9,52 +9,61 @@
         android:id="@+id/logs_controlrow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:gravity="center_vertical"
         android:background="@color/core_surface"
         android:padding="8dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/logs_pause"
-            style="@style/Widget.MinimaCore.Button.Outlined"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="0dp"
-            android:paddingHorizontal="12dp"
-            android:text="Pause" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/logs_clear"
-            style="@style/Widget.MinimaCore.Button.Outlined"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="0dp"
-            android:layout_marginStart="6dp"
-            android:paddingHorizontal="12dp"
-            android:text="Clear" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/logs_pause"
+                style="@style/Widget.MinimaCore.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="Pause" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/logs_share"
-            style="@style/Widget.MinimaCore.Button.Outlined"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="0dp"
-            android:layout_marginStart="6dp"
-            android:paddingHorizontal="12dp"
-            android:text="Share" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/logs_clear"
+                style="@style/Widget.MinimaCore.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:layout_marginStart="6dp"
+                android:paddingHorizontal="12dp"
+                android:text="Clear" android:tag="l10n:text=l10n_logs_clear" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/logs_share"
+                style="@style/Widget.MinimaCore.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:layout_marginStart="6dp"
+                android:paddingHorizontal="12dp"
+                android:text="Share" android:tag="l10n:text=l10n_logs_share" />
+
+        </LinearLayout>
 
         <EditText
             android:id="@+id/logs_filter"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:singleLine="true"
             android:background="@drawable/bg_token_tile"
             android:paddingHorizontal="12dp"
             android:paddingVertical="8dp"
             android:fontFamily="monospace"
-            android:hint="Filter"
+            android:hint="Filter" android:tag="l10n:hint=l10n_logs_filter"
             android:textColor="@color/core_text"
             android:textColorHint="@color/core_text_faint"
             android:textSize="13sp"

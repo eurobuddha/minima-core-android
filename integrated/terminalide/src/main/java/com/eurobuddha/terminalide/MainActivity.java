@@ -1,4 +1,8 @@
 package com.eurobuddha.terminalide;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.content.ActivityNotFoundException;
 import com.eurobuddha.minimaapi.direct.DirectNodeEvents;
@@ -31,6 +35,43 @@ import org.json.JSONObject;
 import com.eurobuddha.minimaapi.direct.DirectNodeApi;
 
 public class MainActivity extends AppCompatActivity {
+
+    private CharSequence mNodeSubtitle = "";
+    private final java.util.Set<AlertDialog> languageDialogs = new java.util.HashSet<>();
+    public LanguageDialog languageDialog() {
+        return new LanguageDialog(this) {
+            @Override public AlertDialog create() {
+                AlertDialog dialog = super.create();
+                languageDialogs.add(dialog);
+                dialog.setOnDismissListener(d -> languageDialogs.remove(dialog));
+                return dialog;
+            }
+        };
+    }
+    private void setNodeSubtitle(CharSequence text) {
+        mNodeSubtitle = text;
+        mToolbar.setSubtitle(text);
+    }
+    private void refreshLanguage() {
+        if (mToolbar == null) return;
+        mToolbar.setSubtitle(mNodeSubtitle);
+        Menu menu = mToolbar.getMenu();
+        if (menu.findItem(MENU_SELECT) != null) menu.findItem(MENU_SELECT).setTitle((mAdapter != null && mAdapter.getTerminalView().isSelectionMode() ? Language.msg(l10n_terminal_ide_exit_select) : Language.msg(l10n_terminal_ide_select_output)));
+        if (menu.findItem(MENU_COPYALL) != null) menu.findItem(MENU_COPYALL).setTitle(Language.msg(l10n_terminal_ide_copy_output));
+        if (menu.findItem(MENU_EXPORT) != null) menu.findItem(MENU_EXPORT).setTitle(Language.msg(l10n_terminal_ide_export_session));
+        if (menu.findItem(MENU_CLEAR) != null) menu.findItem(MENU_CLEAR).setTitle(Language.msg(l10n_terminal_ide_clear));
+        if (menu.findItem(MENU_DOCS) != null) menu.findItem(MENU_DOCS).setTitle(Language.msg(l10n_terminal_ide_docs));
+        if (menu.findItem(MENU_ABOUT) != null) menu.findItem(MENU_ABOUT).setTitle(Language.msg(l10n_terminal_ide_about));
+        TabLayout tabs = findViewById(R.id.pm_terminalide_tabs);
+        CharSequence[] titles = {Language.msg(l10n_tab_terminal), Language.msg(l10n_logs_scripts), Language.msg(l10n_terminal_ide_txn), Language.msg(l10n_menu_logs)};
+        for (int i=0;i<titles.length;i++) if (tabs.getTabAt(i) != null) tabs.getTabAt(i).setText(titles[i]);
+        com.eurobuddha.terminalide.terminal.TerminalLabel.refreshTree(findViewById(android.R.id.content));
+    }
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        refreshLanguage();
+    }
 
     private static final int MENU_CLEAR   = 1;
     private static final int MENU_ABOUT   = 2;
@@ -76,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         // On Android 14 the window then genuinely resizes for the keyboard (adjustResize);
         // on Android 15 edge-to-edge is enforced and this listener pads for bars + IME.
         View root = findViewById(R.id.pm_terminalide_main);
+        Language.apply(root);
         ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
@@ -107,9 +149,9 @@ public class MainActivity extends AppCompatActivity {
             if (result.getResultCode() != RESULT_OK || uri == null || text == null) return;
             try {
                 SessionExport.writeTo(this, uri, text);
-                Toast.makeText(this, "Session saved", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, Language.msg(l10n_terminal_ide_session_saved), Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
-                Toast.makeText(this, "Save failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, Language.msg(l10n_terminal_ide_save_failed, com.eurobuddha.terminalide.terminal.TerminalMessages.error(e)), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -120,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabs = findViewById(R.id.pm_terminalide_tabs);
         tabs.setupWithViewPager(mMainPager);
-        String[] titles = {"Terminal", "Scripts", "Txn", "Logs"};
+        CharSequence[] titles = {Language.msg(l10n_tab_terminal), Language.msg(l10n_logs_scripts), Language.msg(l10n_terminal_ide_txn), Language.msg(l10n_menu_logs)};
         for (int i = 0; i < titles.length; i++) {
             TabLayout.Tab t = tabs.getTabAt(i);
             if (t != null) t.setText(titles[i]);
@@ -164,24 +206,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onError(String message) {
                 if (!NodeApi.ERR_NOT_ENABLED.equals(message)) {
-                    mToolbar.setSubtitle("node offline?");
+                    setNodeSubtitle(Language.msg(l10n_terminal_ide_offline));
                 }
             }
         });
     }
 
     private void setBlock(String block) {
-        if (!block.isEmpty()) mToolbar.setSubtitle("block " + block);
+        if (!block.isEmpty()) setNodeSubtitle(Language.msg(l10n_terminal_ide_block, block));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, MENU_SELECT, 0, "Select & copy output");
-        menu.add(0, MENU_COPYALL, 1, "Copy all output");
-        menu.add(0, MENU_EXPORT, 2, "Export session…");
-        menu.add(0, MENU_CLEAR, 3, "Clear terminal");
-        menu.add(0, MENU_DOCS, 4, "Minima docs");
-        menu.add(0, MENU_ABOUT, 5, "About");
+        menu.add(0, MENU_SELECT, 0, Language.msg(l10n_terminal_ide_select_output));
+        menu.add(0, MENU_COPYALL, 1, Language.msg(l10n_terminal_ide_copy_output));
+        menu.add(0, MENU_EXPORT, 2, Language.msg(l10n_terminal_ide_export_session));
+        menu.add(0, MENU_CLEAR, 3, Language.msg(l10n_terminal_ide_clear));
+        menu.add(0, MENU_DOCS, 4, Language.msg(l10n_terminal_ide_docs));
+        menu.add(0, MENU_ABOUT, 5, Language.msg(l10n_terminal_ide_about));
         return true;
     }
 
@@ -190,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
         MenuItem select = menu.findItem(MENU_SELECT);
         if (select != null && mAdapter != null) {
             select.setTitle(mAdapter.getTerminalView().isSelectionMode()
-                    ? "Exit select mode" : "Select & copy output");
+                    ? Language.msg(l10n_terminal_ide_exit_select) : Language.msg(l10n_terminal_ide_select_output));
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -199,13 +241,13 @@ public class MainActivity extends AppCompatActivity {
     private void showExportDialog() {
         final String text = mAdapter.getTerminalView().exportText();
         if (text.trim().isEmpty()) {
-            Toast.makeText(this, "Nothing to export yet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, Language.msg(l10n_terminal_ide_nothing_export), Toast.LENGTH_SHORT).show();
             return;
         }
         final String filename = SessionExport.timestampedName("minima-terminal");
-        String[] actions = {"Save to file…", "Share…", "Copy to clipboard"};
-        new AlertDialog.Builder(this)
-                .setTitle("Export session (" + (SessionExport.utf8Len(text) / 1024) + " KB)")
+        CharSequence[] actions = {Language.msg(l10n_terminal_ide_save_file), Language.msg(l10n_terminal_ide_share), Language.msg(l10n_terminal_ide_copy_clipboard)};
+        languageDialog()
+                .setTitle(Language.msg(l10n_terminal_ide_export_title, SessionExport.utf8Len(text) / 1024))
                 .setItems(actions, (d, which) -> {
                     if (which == 0) {
                         mPendingExport = text;
@@ -213,16 +255,16 @@ public class MainActivity extends AppCompatActivity {
                             mSaveLauncher.launch(SessionExport.createDocumentIntent(filename));
                         } catch (ActivityNotFoundException e) {
                             mPendingExport = null;
-                            Toast.makeText(this, "No file picker on this device",
+                            Toast.makeText(this, Language.msg(l10n_terminal_ide_no_picker),
                                     Toast.LENGTH_LONG).show();
                         }
                     } else if (which == 1) {
-                        SessionExport.share(this, text, filename, "Share terminal session");
+                        SessionExport.share(this, text, filename, Language.msg(l10n_terminal_ide_share_session));
                     } else {
                         SessionExport.copy(this, text, "Minima terminal session");
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
@@ -253,19 +295,10 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (item.getItemId() == MENU_ABOUT) {
-            new AlertDialog.Builder(this)
+            languageDialog()
                     .setTitle("Terminal IDE")
-                    .setMessage("Professional tooling for the Minima protocol:\n\n"
-                            + "• Terminal — full node command line with history, autocomplete "
-                            + "and colorized output\n"
-                            + "• Scripts — KISS VM editor with lint, offline testing (the node's "
-                            + "own VM) and deploy\n"
-                            + "• Txn — guided manual-UTXO transaction workbench\n\n"
-                            + "Long-press any output block to copy or share it. Menu → "
-                            + "Select & copy for drag-selection, Export session to save "
-                            + "or share the whole log.\n\n"
-                            + "Connected directly to Minima Core’s embedded Minima node.")
-                    .setPositiveButton("OK", null)
+                    .setMessage(Language.msg(l10n_terminal_ide_about_body))
+                    .setPositiveButton(Language.msg(l10n_common_ok), null)
                     .show();
             return true;
         }
@@ -275,11 +308,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        refreshLanguage();
         fetchBlock();
     }
 
     @Override
     protected void onDestroy() {
+        for (AlertDialog dialog : new java.util.ArrayList<>(languageDialogs)) dialog.dismiss();
+        languageDialogs.clear();
         super.onDestroy();
         if (mReceiverRegistered) DirectNodeEvents.unsubscribe(mNotifyReceiver);
         if (mNode != null) mNode.onDestroy();

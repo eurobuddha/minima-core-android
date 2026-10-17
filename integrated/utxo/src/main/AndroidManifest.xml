@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <queries>
+        <package android:name="com.eurobuddha.minimacore" />
+    </queries>
+    <application>
+        <activity android:name="com.eurobuddha.utxo.MainActivity" android:exported="false" android:windowSoftInputMode="adjustResize" android:theme="@style/pm_utxo_Theme.Utxo" android:configChanges="locale|layoutDirection|screenLayout">
+            </activity>
+    </application>
+</manifest>

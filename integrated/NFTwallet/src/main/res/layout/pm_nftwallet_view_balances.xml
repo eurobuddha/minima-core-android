@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@color/pm_nftwallet_ux_bg">
+    <EditText android:id="@+id/pm_nftwallet_balSearch" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_marginEnd="12dp" android:layout_marginTop="10dp" android:hint="@string/l10n_nft_wallet_balance_search" android:textColorHint="@color/pm_nftwallet_ux_subtext" android:textColor="@color/pm_nftwallet_ux_text" android:background="@color/pm_nftwallet_ux_input" android:padding="10dp" android:inputType="text" android:maxLines="1" android:textSize="13sp" android:tag="l10n:hint=l10n_nft_wallet_balance_search" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:id="@+id/pm_nftwallet_balancesContainer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="12dp" />
+    </ScrollView>
+</LinearLayout>

@@ -1,4 +1,7 @@
 package com.eurobuddha.pandadex;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import com.eurobuddha.minimaapi.direct.DirectNodeEvents;
 import android.content.Context;
@@ -438,7 +441,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         LinearLayout header = new LinearLayout(this);
-        headerChrome = header;
+        LinearLayout headerGroup = new LinearLayout(this);
+        headerGroup.setOrientation(LinearLayout.VERTICAL);
+        headerChrome = headerGroup;
+        headerGroup.addView(header);
+        LinearLayout nodeRow = new LinearLayout(this);
+        nodeRow.setGravity(Gravity.CENTER_VERTICAL);
+        nodeRow.setPadding(pad, 0, pad, Design.dp(this, 6));
+        headerGroup.addView(nodeRow);
         header.setTag("pandamonium.app.toolbar");
         header.setGravity(Gravity.CENTER_VERTICAL);
         header.setPadding(pad, pad, pad, Design.dp(this, 6));
@@ -463,6 +473,9 @@ public class MainActivity extends AppCompatActivity {
         // called Design.toggle, so the light mode was unreachable.
         TextView themePill = Design.pill(this, Design.isDark() ? "☀" : "☾",
                 Design.SURFACE2(), Design.DIM());
+        themePill.setMinWidth(Design.dp(this, 48));
+        themePill.setMinHeight(Design.dp(this, 48));
+        Language.description(themePill, Language.msg(Design.isDark() ? l10n_dex_theme_light : l10n_dex_theme_dark));
         themePill.setOnClickListener(v -> toggleTheme());
         Design.pressable(themePill);
         LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(
@@ -471,13 +484,14 @@ public class MainActivity extends AppCompatActivity {
         header.addView(themePill, tp);
 
         pairPill = Design.pill(this, "PAIRING…", Design.SURFACE2(), Design.DIM());
-        header.addView(pairPill);
+        Language.setText(pairPill, DexMessages.message("PAIRING…"));
+        nodeRow.addView(pairPill, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         blockPill = Design.pill(this, "# —", Design.SURFACE2(), Design.DIM());
         LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         bp.leftMargin = Design.dp(this, 6);
-        header.addView(blockPill, bp);
-        root.addView(header);
+        nodeRow.addView(blockPill, bp);
+        root.addView(headerGroup);
 
         ScrollView scroller = new ScrollView(this);
         content = new FrameLayout(this);
@@ -523,15 +537,27 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < TAB_NAMES.length; i++) {
             final int idx = i;
             TextView t = new TextView(this);
-            t.setText(TAB_NAMES[i]);
+            Language.setText(t, DexMessages.message(TAB_NAMES[i]));
             t.setTextSize(10f);
             t.setTypeface(Design.sansBold());
             t.setGravity(Gravity.CENTER);
-            t.setPadding(0, Design.dp(this, 11), 0, Design.dp(this, 11));
+            t.setPadding(Design.dp(this, 12), Design.dp(this, 11), Design.dp(this, 12), Design.dp(this, 11));
+            t.setMinHeight(Design.dp(this, 48));
+            t.setMinWidth(Design.dp(this, 72));
+            // Future Cash's retained selected-tab reveal: no focus move or screen rebuild.
+            t.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) ->
+                    view.post(() -> {
+                        if (view.isAttachedToWindow() && tab == idx)
+                            view.requestRectangleOnScreen(new android.graphics.Rect(0, 0, view.getWidth(), view.getHeight()), true);
+                    }));
             t.setOnClickListener(v -> selectTab(idx));
-            tabBar.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+            tabBar.addView(t, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         }
-        root.addView(tabBar);
+        android.widget.HorizontalScrollView tabScroll = new android.widget.HorizontalScrollView(this);
+        tabScroll.setHorizontalScrollBarEnabled(false);
+        tabScroll.setFillViewport(true);
+        tabScroll.addView(tabBar, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
+        root.addView(tabScroll);
 
         footer = new TextView(this);
         footer.setText("v" + BuildConfig.VERSION_NAME);
@@ -546,6 +572,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void selectTab(int idx) {
         tab = idx;
+        android.view.View selected = tabBar.getChildAt(idx);
+        selected.post(() -> {
+            if (selected.isAttachedToWindow() && tab == idx)
+                selected.requestRectangleOnScreen(new android.graphics.Rect(0, 0, selected.getWidth(), selected.getHeight()), true);
+        });
         inputFocused = false;
         for (int i = 0; i < tabBar.getChildCount(); i++) {
             TextView t = (TextView) tabBar.getChildAt(i);
@@ -565,7 +596,7 @@ public class MainActivity extends AppCompatActivity {
     private void repaint() {
         if (pairPill == null || isFinishing() || isDestroyed()) return;
         renderActivityLog();
-        pairPill.setText(nodeLabel(paired, pairingKnown));
+        Language.setText(pairPill, DexMessages.message(nodeLabel(paired, pairingKnown)));
         pairPill.setTextColor(paired ? Design.IN() : Design.ACCENT());
         blockPill.setText("# " + (chainBlock > 0 ? chainBlock : "—"));
         for (int i = 0; i < tabBar.getChildCount(); i++) {
@@ -694,20 +725,20 @@ public class MainActivity extends AppCompatActivity {
     private void renderActivityLog() {
         if (logBox == null) return;
         logBox.setVisibility(logLines.isEmpty() ? android.view.View.GONE : android.view.View.VISIBLE);
-        logTitle.setText((busy ? "TRANSACTION IN PROGRESS" : awaitingFill != null ? "CHECKING ON-CHAIN" : "ACTIVITY LOG")
-                + " · tap for log");
-        StringBuilder recent = new StringBuilder();
+        Language.setText(logTitle, Language.msg(l10n_dex_log_tap,
+                DexMessages.message(busy ? "TRANSACTION IN PROGRESS" : awaitingFill != null ? "CHECKING ON-CHAIN" : "ACTIVITY LOG")));
+        Language.TextBuilder recent = new Language.TextBuilder();
         int count = 0;
         for (String line : logLines) {
             if (count++ == 3) break;
-            if (recent.length() > 0) recent.append('\n');
-            recent.append(line);
+            if (count > 1) recent.append('\n');
+            recent.append(DexMessages.logLine(line));
         }
-        logText.setText(recent.toString());
+        Language.setText(logText, recent.build());
         if (logDialogText != null) {
-            String full = fullLogText();
-            if (!android.text.TextUtils.equals(logDialogText.getText(), full)) {
-                logDialogText.setText(full);
+            CharSequence full = fullLogText();
+            if (!android.text.TextUtils.equals(logDialogText.getText(), full.toString())) {
+                Language.setText(logDialogText, full);
                 stickLogToBottom();
             }
         }
@@ -716,10 +747,17 @@ public class MainActivity extends AppCompatActivity {
     /** The pill shows three lines newest-first, because the newest is the one you need to see.
      *  The expanded log is a TERMINAL: oldest at the top, newest at the bottom, scrolled to the
      *  end. logLines is newest-first, so the dialog reads it backwards. */
-    private String fullLogText() {
+    private CharSequence fullLogText() {
         java.util.List<String> chronological = new java.util.ArrayList<>(logLines);
         java.util.Collections.reverse(chronological);
-        return android.text.TextUtils.join("\n\n", chronological);
+        Language.TextBuilder display = new Language.TextBuilder();
+        boolean first = true;
+        for (String line : chronological) {
+            if (!first) display.append("\n\n");
+            first = false;
+            display.append(DexMessages.logLine(line));
+        }
+        return display.build();
     }
 
     /** Follow the newest line, unless the reader has scrolled up — then leave them where they are. */
@@ -734,15 +772,15 @@ public class MainActivity extends AppCompatActivity {
     private void showActivityLog() {
         if (activityLogDialog != null && activityLogDialog.isShowing()) return;
         TextView text = new TextView(this);
-        text.setText(fullLogText());
+        Language.setText(text, fullLogText());
         text.setTypeface(Design.mono()); text.setTextSize(12f); text.setTextColor(Design.TEXT());
         text.setTextIsSelectable(true);
         int pad = Design.dp(this,16); text.setPadding(pad,pad,pad,pad);
         ScrollView scroll = new ScrollView(this); scroll.addView(text);
         logDialogScroll = scroll;
         text.setAccessibilityLiveRegion(android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE);
-        AlertDialog dialog = new AlertDialog.Builder(this,Design.dialogTheme()).setTitle("Activity log")
-                .setView(scroll).setPositiveButton("Close",null).create();
+        AlertDialog dialog = new LanguageDialog(this,Design.dialogTheme()).setTitle(DexMessages.message("Activity log"))
+                .setView(scroll).setPositiveButton(DexMessages.message("Close"),null).create();
         activityLogDialog = dialog;
         logDialogText = text;
         dialog.setOnDismissListener(closed -> {
@@ -1975,7 +2013,7 @@ public class MainActivity extends AppCompatActivity {
     public java.util.Set<String> filling() { return filling; }
 
     public void toast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, DexMessages.message(msg), Toast.LENGTH_SHORT).show();
     }
 
     public void exportTradeReconciliation() {
@@ -2011,6 +2049,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // ------------------------------------------------------------------ lifecycle
+
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        // Retain forms, tab, focus, callbacks and live transaction objects. Only rebind display text.
+        Language.configurationChanged(this);
+    }
 
     @Override protected void onResume() {
         super.onResume();

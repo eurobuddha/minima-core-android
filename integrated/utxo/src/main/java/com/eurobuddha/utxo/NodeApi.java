@@ -1,0 +1,161 @@
+package com.eurobuddha.utxo;
+
+import android.app.Activity;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+
+import org.json.JSONObject;
+import com.eurobuddha.minimaapi.direct.DirectNodeApi;
+import com.eurobuddha.minimaapi.MinimaAPIListener;
+
+/**
+ * Thin wrapper around the Minima Core native IPC SDK.
+ *
+ * - Holds the single {@link DirectNodeApi} instance (which connects to the embedded node).
+ * - Runs node commands and delivers the result back ON THE MAIN THREAD (the raw SDK callback
+ *   arrives on the broadcast-receiver thread), with a timeout so a missing/stopped node
+ *   surfaces an error instead of hanging.
+ * - Detects the "app not enabled in Minima Core" reply and routes it to a pairing listener
+ *   so the UI can show the approve-me banner.
+ */
+public class NodeApi {
+
+    public interface Cb {
+        void onResult(JSONObject json);
+        void onError(String message);
+    }
+
+    public interface PairingListener {
+        void onEnabled(boolean enabled);
+    }
+
+    /** Returned as the error message when the node says we are not enabled yet. */
+    public static final String ERR_NOT_ENABLED = "NOT_ENABLED";
+    /** The timeout message. A timed-out WRITE (txnsign) is NOT a failure — the node may still finish the
+     *  proof-of-work and post; callers must treat it as unknown, never as "not sent". */
+    public static final String ERR_TIMEOUT = "The embedded node did not respond. Check its status in Minima Core.";
+    public static boolean isTimeout(String message) { return ERR_TIMEOUT.equals(message); }
+    /** A pre-1.3.0 node answered an oversized reply with its "Result too long" stub (256,000-char cap). */
+    public static final String ERR_TOO_LONG = "Node reply exceeded the IPC limit — update Minima Core (needs 1.3.0+).";
+    public static boolean isTooLong(String message) { return ERR_TOO_LONG.equals(message); }
+
+    private static final long READ_TIMEOUT_MS = 30000;
+    private static final long WRITE_TIMEOUT_MS = 180000;   // build + proof-of-work + post is slow on mobile
+
+    /** Transaction/PoW commands can take a long time on a phone; reads are quick. */
+    private static long timeoutFor(String command) {
+        String c = command == null ? "" : command.trim();
+        if (c.startsWith("send") || c.startsWith("consolidate") || c.startsWith("txnsign")
+                || c.startsWith("txnpost") || c.startsWith("tokencreate") || c.startsWith("txnbasics")) {
+            return WRITE_TIMEOUT_MS;
+        }
+        return READ_TIMEOUT_MS;
+    }
+
+    private static String firstWord(String c) {
+        if (c == null) return "?";
+        int sp = c.trim().indexOf(' ');
+        return sp < 0 ? c.trim() : c.trim().substring(0, sp);
+    }
+
+    private final DirectNodeApi mApi;
+    private final Handler mMain = new Handler(Looper.getMainLooper());
+    private final PairingListener mPairing;
+    private final Context mContext;
+    // Pending timeout Runnables (main-thread only) so they can be cancelled on destroy.
+    private final java.util.HashSet<Runnable> mPending = new java.util.HashSet<>();
+    private boolean mReleased = false;
+
+    public NodeApi(Context ctx, PairingListener pairing) {
+        mContext = ctx;
+        mPairing = pairing;
+        // Embedded readiness callback; no registration or app permission handshake.
+        mApi = new DirectNodeApi(ctx, new MinimaAPIListener() {
+            @Override
+            public void response(JSONObject zResponse) {
+                final boolean enabled = zResponse.optBoolean("enabled", false);
+                mMain.post(() -> {
+                    if (dead()) return;
+                    if (mPairing != null) mPairing.onEnabled(enabled);
+                });
+            }
+        });
+    }
+
+    /** True once the hosting Activity is gone — don't deliver callbacks into dead views. */
+    private boolean dead() {
+        return mContext instanceof Activity
+                && (((Activity) mContext).isFinishing() || ((Activity) mContext).isDestroyed());
+    }
+
+    public void cmd(String command, Cb cb) {
+        if (mReleased) return;
+        final boolean[] done = {false};
+        final Runnable[] ref = new Runnable[1];
+        final Runnable timeout = () -> {
+            mPending.remove(ref[0]);
+            if (done[0] || dead()) return;
+            done[0] = true;
+            if (cb != null) cb.onError(ERR_TIMEOUT);
+        };
+        ref[0] = timeout;
+        mPending.add(timeout);
+        mMain.postDelayed(timeout, timeoutFor(command));
+
+        mApi.Command(command, new MinimaAPIListener() {
+            @Override
+            public void response(JSONObject zResponse) {
+                mMain.post(() -> {
+                    if (done[0]) return;
+                    done[0] = true;
+                    mMain.removeCallbacks(timeout);
+                    mPending.remove(timeout);
+                    if (dead()) return;   // cleaned up above; just don't touch dead views
+
+                    // "enabled":false only appears on the gating reply; real command
+                    // responses omit the key, so default true.
+                    if (!zResponse.optBoolean("enabled", true)) {
+                        if (mPairing != null) mPairing.onEnabled(false);
+                        if (cb != null) cb.onError(ERR_NOT_ENABLED);
+                        return;
+                    }
+                    // A pre-file-transport node (< 1.3.0-ui-h2) answers an oversized reply with the
+                    // {"status":false,"response":"Result too long! MAX(256000)"} stub instead of the
+                    // content:// hand-off — surface it as an error, never as an empty result.
+                    Object resp = zResponse.opt("response");
+                    boolean tooLong = !zResponse.optBoolean("status", true) && resp instanceof String
+                            && ((String) resp).contains("too long");
+                    // Support diagnostic (command keyword, reply size, overflow flag; no addresses/ids).
+                    // Serialising a 180K reply on the UI thread is not free, so only when enabled:
+                    //   adb shell setprop log.tag.NodeApi DEBUG   then   adb logcat -s NodeApi
+                    if (android.util.Log.isLoggable("NodeApi", android.util.Log.DEBUG)) {
+                        android.util.Log.d("NodeApi", firstWord(command) + " reply " + zResponse.toString().length()
+                                + " chars" + (tooLong ? " — TOO LONG (node < 1.3.0 reply cap)" : ""));
+                    }
+                    if (tooLong) {
+                        if (cb != null) cb.onError(ERR_TOO_LONG);
+                        return;
+                    }
+                    // Any other status:false is a REJECTED command ({"status":false,"error":"..."}) — it must
+                    // surface as an error, never reach onResult looking like success. (TxnBuilder used to
+                    // chain txninput→txnoutput→txnsign straight through such replies and report "sent".)
+                    if (!zResponse.optBoolean("status", true)) {
+                        String err = zResponse.optString("error", "");
+                        if (err.isEmpty() && resp instanceof String) err = (String) resp;
+                        if (cb != null) cb.onError(err.isEmpty() ? "Node rejected the command." : err);
+                        return;
+                    }
+                    if (cb != null) cb.onResult(zResponse);
+                });
+            }
+        });
+    }
+
+    public void onDestroy() {
+        mReleased = true;
+        for (Runnable r : mPending) mMain.removeCallbacks(r);
+        mPending.clear();
+        if (mApi != null) mApi.onDestroy();
+    }
+}

@@ -1,8 +1,6 @@
 package com.eurobuddha.minimacore.launcher.restore;
 
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,6 +13,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import org.minima.utils.BIP39;
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import com.eurobuddha.minimacore.utils.KeyboardInsets;
 import com.eurobuddha.minimacore.main.ResyncJob;
 import com.eurobuddha.minimacore.launcher.LauncherActivity;
@@ -34,17 +34,20 @@ public class RestoreWalletSyncActivity extends AppCompatActivity {
 
 
         Toolbar tb = findViewById(R.id.toolbar);
-        tb.setTitle("Restore Wallet");
+        Language.toolbarTitle(tb, Language.msg(l10n_launcher_restore_wallet));
         setSupportActionBar(tb);
         KeyboardInsets.install(this, findViewById(R.id.restorewallet_main), tb);
 
+        boolean block = com.eurobuddha.minimacore.main.StartupMode.usesBlockKeys(
+                getSharedPreferences("main_prefs", MODE_PRIVATE));
+        CharSequence intro = Language.msg(com.eurobuddha.minimacore.BuildConfig.PANDAMONIUM
+                ? l10n_restore_intro_pandamonium : block ? l10n_restore_intro_block : l10n_restore_intro_classic);
         if (com.eurobuddha.minimacore.BuildConfig.PANDAMONIUM) {
-            boolean block = com.eurobuddha.minimacore.main.StartupMode.usesBlockKeys(
-                    getSharedPreferences("main_prefs", MODE_PRIVATE));
-            android.widget.TextView intro = findViewById(R.id.restorewallet_intro);
-            intro.setText(getString(block ? R.string.block_mode_title : R.string.classic_mode_title)
-                    + "\n\n" + getString(R.string.restore_intro));
+            intro = Language.join(Language.msg(block ? l10n_drawer_block_mode : l10n_drawer_classic_mode), "\n\n", intro);
         }
+        Language.setText(findViewById(R.id.restorewallet_intro), intro);
+        Language.setText(findViewById(R.id.restorewallet_keyuses_label), Language.msg(
+                com.eurobuddha.minimacore.BuildConfig.BLOCK_KEYUSES ? l10n_restore_key_uses_floor : l10n_restore_key_uses));
 
         mSeedInput      = findViewById(R.id.restorewallet_seed);
         mKeyUsesInput   = findViewById(R.id.restorewallet_keyuses);
@@ -56,7 +59,7 @@ public class RestoreWalletSyncActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String seed = mSeedInput.getText().toString().trim();
                 if(seed.equals("")){
-                    showDialog("Seed Error","Cannot have an empty seed");
+                    showDialog(Language.msg(l10n_onboarding_seed_error), Language.msg(l10n_onboarding_empty_seed));
                     return;
                 }
 
@@ -65,11 +68,11 @@ public class RestoreWalletSyncActivity extends AppCompatActivity {
                     String newseed = BIP39.cleanSeedPhrase(seed);
                     setSeedText(newseed);
                 }catch (IllegalArgumentException exc){
-                    showDialog("Seed Error","There is an invalid word in your seed");
+                    showDialog(Language.msg(l10n_onboarding_seed_error), Language.msg(l10n_onboarding_invalid_word));
                     return;
                 }
 
-                showDialog("Seed Phrase","Your seed phrase is now valid!");
+                showDialog(Language.msg(l10n_onboarding_seed_phrase), Language.msg(l10n_onboarding_valid_seed));
             }
         });
 
@@ -81,7 +84,7 @@ public class RestoreWalletSyncActivity extends AppCompatActivity {
                 //Get the seed
                 String seed = mSeedInput.getText().toString().trim();
                 if(seed.equals("")){
-                    showDialog("Seed Error","Cannot have an empty seed");
+                    showDialog(Language.msg(l10n_onboarding_seed_error), Language.msg(l10n_onboarding_empty_seed));
                     return;
                 }
 
@@ -90,7 +93,7 @@ public class RestoreWalletSyncActivity extends AppCompatActivity {
                 try{
                     keyuses = Integer.parseInt(keyusesstr);
                 }catch(NumberFormatException exc){
-                    showDialog("Key uses","Key uses must be a whole number.");
+                    showDialog(Language.msg(l10n_restore_key_uses), Language.msg(l10n_restore_key_uses_integer));
                     return;
                 }
                 //Same floor as the in-app seed rebuild: keyuses:0 says no key was ever used, and
@@ -98,8 +101,8 @@ public class RestoreWalletSyncActivity extends AppCompatActivity {
                 int maxKeyUses = ResyncJob.maxKeyUses(com.eurobuddha.minimacore.main.StartupMode.usesBlockKeys(
                         getSharedPreferences("main_prefs", MODE_PRIVATE)));
                 if(keyuses < ResyncJob.MIN_KEY_USES || keyuses > maxKeyUses){
-                    showDialog("Key uses","Key uses must be between "+ResyncJob.MIN_KEY_USES
-                            +" and "+maxKeyUses+". Higher than any previous restore of this seed.");
+                    showDialog(Language.msg(l10n_restore_key_uses), Language.msg(l10n_restore_key_uses_range,
+                            ResyncJob.MIN_KEY_USES, maxKeyUses));
                     return;
                 }
 
@@ -135,16 +138,7 @@ public class RestoreWalletSyncActivity extends AppCompatActivity {
         });
     }
 
-    private void showDialog(String zTitle, String zMessage){
-        new AlertDialog.Builder(this)
-                .setTitle(zTitle)
-                .setMessage(zMessage)
-                .setIcon(R.drawable.ic_minima)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
-                    public void onClick(DialogInterface dialog, int whichButton) {
-
-                    }}).show();
+    private void showDialog(CharSequence title, CharSequence message) {
+        logger.showDialog(this, title, message);
     }
-
-
 }

@@ -17,9 +17,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import com.eurobuddha.minimacore.main.ResyncJob;
 import com.eurobuddha.minimacore.utils.Clip;
 import com.eurobuddha.minimacore.utils.KeyboardInsets;
@@ -70,7 +73,7 @@ public class BackupCreateActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.backup_create);
         Toolbar tb = findViewById(R.id.toolbar);
-        tb.setTitle("Create backup");
+        Language.toolbarTitle(tb, Language.msg(l10n_backup_create));
         setSupportActionBar(tb);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         tb.setNavigationOnClickListener(v -> finish());
@@ -93,7 +96,7 @@ public class BackupCreateActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(name.getText())) name.setText(suggestedName());
         go.setOnClickListener(v -> attemptBackup());
         copy.setOnClickListener(v ->
-                Clip.copy(this, "Backup path", run.path(), "Full path copied"));
+                Clip.copy(this, Language.text(this, l10n_backup_path), run.path(), Language.text(this, l10n_backup_path_copied)));
         export.setOnClickListener(v -> confirmExport());
     }
 
@@ -119,22 +122,22 @@ public class BackupCreateActivity extends AppCompatActivity {
         String again = confirm.getText().toString();
 
         if (!ResyncJob.validFilename(file)) {
-            name.setError("Letters, numbers, dot, dash and underscore only - no folders");
+            Language.error(name, Language.msg(l10n_backup_invalid_name));
             return;
         }
-        name.setError(null);
+        Language.error(name, null);
         if (!ResyncJob.validPassword(pass)) {
             // The node's own help says letters and numbers only, and its command tokeniser
             // silently rewrites anything else - see ResyncJob.
-            password.setError("Letters and numbers only");
+            Language.error(password, Language.msg(l10n_backup_invalid_password));
             return;
         }
-        password.setError(null);
+        Language.error(password, null);
         if (!pass.equals(again)) {
-            confirm.setError("The two passwords do not match");
+            Language.error(confirm, Language.msg(l10n_backup_mismatch));
             return;
         }
-        confirm.setError(null);
+        Language.error(confirm, null);
 
         NodeKeys.Status keys = NodeKeys.read();
         if (!keys.ready) {
@@ -143,7 +146,7 @@ public class BackupCreateActivity extends AppCompatActivity {
         }
 
         if (!run.start(file, pass, again)) {
-            setTextIfChanged(status, "A backup is already running.");
+            setTextIfChanged(status, Language.msg(l10n_backup_already_running));
             return;
         }
         handler.post(tick);
@@ -156,31 +159,31 @@ public class BackupCreateActivity extends AppCompatActivity {
         boolean done = state == BackupRun.State.SUCCEEDED;
 
         go.setEnabled(!running);
-        setTextIfChanged(go, running ? "Creating…" : done ? "Create another" : "Create backup");
+        setTextIfChanged(go, running ? Language.msg(l10n_backup_creating) : done ? Language.msg(l10n_backup_create_another) : Language.msg(l10n_backup_create));
         name.setEnabled(!running);
         password.setEnabled(!running);
         confirm.setEnabled(!running);
         progress.setVisibility(running ? View.VISIBLE : View.GONE);
 
         if (running) {
-            setTextIfChanged(status, "Writing the backup. The node is locked while it copies, so this can take a while.");
+            setTextIfChanged(status, Language.msg(l10n_backup_writing));
         } else if (done) {
             boolean located = !run.path().isEmpty();
             // Exporting needs a path. Without one the backup still exists - say so and point at
             // the list that will show it, rather than claiming a failure the folder disproves.
             setTextIfChanged(status, located
-                    ? "Backup created."
-                    : "Backup created, but the node did not report the file name. Find it under Restore from file.");
+                    ? Language.msg(l10n_backup_created)
+                    : Language.msg(l10n_backup_created_no_name));
             detail.setVisibility(located ? View.VISIBLE : View.GONE);
             path.setVisibility(located ? View.VISIBLE : View.GONE);
             copy.setVisibility(located ? View.VISIBLE : View.GONE);
             export.setVisibility(located ? View.VISIBLE : View.GONE);
             if (located) {
-                setTextIfChanged(detail, "Size " + run.size() + " · block " + run.block() + " · saved in the node folder as");
+                setTextIfChanged(detail, Language.msg(l10n_backup_details, run.size(), run.block()));
                 setTextIfChanged(path, run.path());
             }
         } else if (state == BackupRun.State.FAILED) {
-            setTextIfChanged(status, "Backup failed. " + run.error());
+            setTextIfChanged(status, Language.msg(l10n_backup_failed, run.error()));
             detail.setVisibility(View.GONE);
             path.setVisibility(View.GONE);
             copy.setVisibility(View.GONE);
@@ -196,30 +199,28 @@ public class BackupCreateActivity extends AppCompatActivity {
      * rather than letting a file picker imply it is routine.
      */
     private void confirmExport() {
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Save a copy off this phone?")
-                .setMessage("This file contains your wallet's private keys, encrypted with the password you just set.\n\n"
-                        + "Anyone who gets both the file and that password controls your funds. "
-                        + "Think about where you are putting it - a shared or cloud-synced folder is not private.")
-                .setPositiveButton("Choose location", (d, w) -> exportLauncher.launch(run.filename()))
-                .setNegativeButton("Cancel", null)
+        new LanguageDialog(this)
+                .setTitle(Language.msg(l10n_backup_export_title))
+                .setMessage(Language.msg(l10n_backup_export_warning))
+                .setPositiveButton(Language.msg(l10n_backup_choose_location), (d, w) -> exportLauncher.launch(run.filename()))
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     private void onExportDestinationChosen(Uri destination) {
         if (destination == null) return;   // the user backed out of the picker
         final File source = new File(run.path());
-        setTextIfChanged(status, "Saving a copy…");
+        setTextIfChanged(status, Language.msg(l10n_backup_saving_copy));
         // Off the main thread: this streams the whole backup.
         MinimaCMD.readExecutor().execute(() -> {
-            String message;
+            CharSequence message;
             try {
                 long copied = NodeFiles.exportTo(this, source, destination);
-                message = "Saved " + NodeFiles.formatBytes(copied) + " to the location you chose.";
+                message = Language.msg(l10n_backup_copy_saved, NodeFiles.formatBytes(copied));
             } catch (Exception exc) {
-                message = "Could not save the copy. " + (exc.getMessage() == null ? exc.toString() : exc.getMessage());
+                message = Language.msg(l10n_backup_copy_failed, (exc.getMessage() == null ? exc.toString() : exc.getMessage()));
             }
-            final String done = message;
+            final CharSequence done = message;
             handler.post(() -> {
                 if (isFinishing() || isDestroyed()) return;
                 setTextIfChanged(status, done);
@@ -227,7 +228,7 @@ public class BackupCreateActivity extends AppCompatActivity {
         });
     }
 
-    private static void setTextIfChanged(TextView view, String text) {
-        if (!text.contentEquals(view.getText())) view.setText(text);
+    private static void setTextIfChanged(TextView view, CharSequence text) {
+        if (!text.toString().contentEquals(view.getText())) Language.setText(view, text);
     }
 }

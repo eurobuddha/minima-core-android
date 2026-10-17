@@ -1,6 +1,9 @@
 package com.eurobuddha.minimacore.main.views.home;
 
 import android.app.Activity;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
@@ -15,9 +18,6 @@ import com.eurobuddha.minimacore.utils.MinimaCMD;
 import com.eurobuddha.minimacore.utils.logger;
 import com.eurobuddha.minimacore.main.BaseView;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Random;
 
 public class HomeView extends BaseView {
@@ -38,7 +38,6 @@ public class HomeView extends BaseView {
                     main::post, HomeView::readDashboard, this::renderDashboard,
                     error -> logger.log("Dashboard refresh failed: " + error));
 
-    private SimpleDateFormat DATEFORMAT = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.ENGLISH);
 
     public HomeView(Activity zActivity){
         super(zActivity, R.layout.view_home);
@@ -65,6 +64,11 @@ public class HomeView extends BaseView {
             }
         });
 
+        Language.setText(mKeyUses, Language.msg(l10n_home_connecting));
+        Language.setText(getMainView().findViewById(R.id.home_keyuses_caption),
+                Language.msg(com.eurobuddha.minimacore.main.StartupMode.usesBlockKeys(
+                        zActivity.getSharedPreferences("main_prefs", Activity.MODE_PRIVATE))
+                        ? l10n_home_key_block : l10n_restore_key_uses));
         refreshView();
     }
 
@@ -77,17 +81,25 @@ public class HomeView extends BaseView {
             main.post(this::refreshView); return;
         }
         if (destroyed || !isDisplayActive()) return;
-        if (!MinimaCMD.checkMinimaStarted()) { refresh.invalidate(); return; }
-        ((TextView)getMainView().findViewById(R.id.home_keyuses_caption)).setText(
-                org.minima.system.params.GeneralParams.USE_BLOCK_AS_KEYUSES
-                        ? R.string.keyuses_block_caption : R.string.keyuses_classic_caption);
+        boolean ready = MinimaCMD.checkMinimaStarted();
+        TextView status = getMainView().findViewById(R.id.home_status);
+        Language.setText(status, Language.msg(ready ? l10n_home_online : l10n_home_waiting));
+        int color = androidx.core.content.ContextCompat.getColor(getActivity(),
+                ready ? R.color.status_good : R.color.core_text_faint);
+        status.setTextColor(color);
+        androidx.core.view.ViewCompat.setBackgroundTintList(getMainView().findViewById(R.id.home_status_dot),
+                android.content.res.ColorStateList.valueOf(color));
+        if (!ready) { refresh.invalidate(); return; }
+        Language.setText(getMainView().findViewById(R.id.home_keyuses_caption),
+                Language.msg(org.minima.system.params.GeneralParams.USE_BLOCK_AS_KEYUSES
+                        ? l10n_home_key_block : l10n_restore_key_uses));
         refresh.request();
         // Block/version rendering stays cheap; all command work is bounded and coalesced.
         mMinima.setText(GlobalParams.getFullMicroVersion());
         try {
             TxPoW tip = MinimaDB.getDB().getTxPoWTree().getTip().getTxPoW();
             mBlock.setText(tip.getBlockNumber().toString());
-            mBlockTime.setText(DATEFORMAT.format(new Date(tip.getTimeMilli().getAsLong())));
+            Language.setText(mBlockTime, Language.stamp(tip.getTimeMilli().getAsLong(), "yMMMdHms"));
         } catch (Exception ignored) { /* Node may be shutting down. */ }
         try { mVersion.setText(getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName); }
         catch (Exception ignored) { }
@@ -103,7 +115,7 @@ public class HomeView extends BaseView {
             JSONObject peers = (JSONObject) results[1].get("response");
             String list = peers.getString("peerslist");
             String[] items = list == null || list.isEmpty() ? new String[0] : list.split(",");
-            mPeers.setText(items.length == 0 ? "No peers" : items[new Random().nextInt(items.length)]);
+            Language.setText(mPeers, items.length == 0 ? Language.msg(l10n_home_no_peers) : items[new Random().nextInt(items.length)]);
         } catch (Exception ignored) { }
         try {
             JSONObject network = (JSONObject) results[2].get("response");

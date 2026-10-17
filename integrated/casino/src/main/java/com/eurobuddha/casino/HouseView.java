@@ -1,4 +1,7 @@
 package com.eurobuddha.casino;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -38,10 +41,10 @@ public class HouseView extends BaseView {
         for (Game g : Game.values()) presetRow.addView(presetButton(g));
         card.addView(presetRow);
 
-        card.addView(Ui.label(act, "Bet amount (" + Currency.label() + ")"));
+        card.addView(Ui.label(act, Language.msg(l10n_casino_bet_amount, Currency.label())));
         amount = new EditText(act);
         amount.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        amount.setText("1");
+        CasinoMessages.text(amount, "1");
         amount.setTextColor(Theme.text());
         amount.setBackground(Ui.rounded(Theme.panel2(), Theme.border(), 6, act));
         amount.setPadding(Ui.dp(act, 12), Ui.dp(act, 10), Ui.dp(act, 12), Ui.dp(act, 10));
@@ -77,7 +80,7 @@ public class HouseView extends BaseView {
     }
 
     private TextView presetButton(Game g) {
-        TextView t = Ui.text(act, g.icon + "\n" + g.key.toUpperCase() + "\n" + g.oddsAgainst() + ":1",
+        TextView t = Ui.text(act, Language.join(g.icon, "\n", CasinoMessages.message(g.key.toUpperCase(java.util.Locale.ROOT)), "\n", g.oddsAgainst(), ":1"),
                 Theme.text(), 12, true);
         t.setGravity(Gravity.CENTER);
         t.setPadding(0, Ui.dp(act, 10), 0, Ui.dp(act, 10));
@@ -106,29 +109,28 @@ public class HouseView extends BaseView {
         if (stake.compareTo(BigDecimal.ZERO) <= 0) stake = bet;
         BigDecimal pot = stake.add(bet);
         BigDecimal win = bet.multiply(BigDecimal.valueOf(selected.payout));
-        summary.setText("You lock " + Currency.show(Util.miniNum(stake)) + " · player stakes " + Currency.show(Util.miniNum(bet))
-                + "\nPot " + Currency.show(Util.miniNum(pot)) + " · player wins " + Currency.show(Util.miniNum(win))
-                + " at " + selected.oddsAgainst() + ":1 (1/" + selected.range + " chance)");
+        CasinoMessages.text(summary, Language.msg(l10n_casino_house_summary, Currency.show(Util.miniNum(stake)), Currency.show(Util.miniNum(bet)),
+                Currency.show(Util.miniNum(pot)), Currency.show(Util.miniNum(win)), selected.oddsAgainst(), selected.range));
     }
 
     private void onCreate() {
-        if (!act.identityReady()) { status.setTextColor(Theme.red()); status.setText("Identity not loaded yet"); return; }
+        if (!act.identityReady()) { status.setTextColor(Theme.red()); CasinoMessages.text(status, "Identity not loaded yet"); return; }
         BigDecimal bet = Util.dec(amount.getText().toString());
-        if (bet.compareTo(BigDecimal.ZERO) <= 0) { status.setTextColor(Theme.red()); status.setText("Enter a valid bet amount"); return; }
+        if (bet.compareTo(BigDecimal.ZERO) <= 0) { status.setTextColor(Theme.red()); CasinoMessages.text(status, "Enter a valid bet amount"); return; }
         status.setTextColor(Theme.cyan());
-        status.setText("Generating secret & sending…");
+        CasinoMessages.text(status, "Generating secret & sending…");
         Sfx.chipStack();
         act.txn().create(selected, bet, new CasinoTxn.Result() {
             @Override public void onPosted(String txpowid) {
                 status.setTextColor(Theme.amber());
-                status.setText("Bet sent — confirming over the next few blocks…");
+                CasinoMessages.text(status, "Bet sent — confirming over the next few blocks…");
                 act.markPending(act.pendingCreate(), "Created " + selected.name + " bet ("
                         + Currency.show(Util.miniNum(bet)) + " · " + selected.oddsAgainst() + ":1)");
                 act.requestReload();
             }
             @Override public void onFailed(String message) {
                 status.setTextColor(Theme.red());
-                status.setText(message);
+                CasinoMessages.text(status, message);
                 act.log("Create failed: " + message, MainActivity.LOG_ERR);
             }
         });

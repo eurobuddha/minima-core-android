@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.main.views.balance.coins;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +64,8 @@ public class CoinsAdapter extends BaseAdapter {
         if(row == null){
             row = inflater.inflate(R.layout.view_coin_row, null);
         }
+
+        Language.apply(row);
 
         TextView amount = row.findViewById(R.id.coin_amount);
         TextView coinid = row.findViewById(R.id.coin_id);

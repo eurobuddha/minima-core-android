@@ -11,6 +11,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import org.minima.utils.BIP39;
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import com.eurobuddha.minimacore.utils.KeyboardInsets;
 
 public class NewWalletActivity extends AppCompatActivity {
@@ -23,7 +25,7 @@ public class NewWalletActivity extends AppCompatActivity {
 
 
         Toolbar tb = findViewById(R.id.toolbar);
-        tb.setTitle("New Wallet");
+        Language.toolbarTitle(tb, Language.msg(l10n_launcher_new_wallet));
         setSupportActionBar(tb);
         KeyboardInsets.install(this, findViewById(R.id.newwallet_main), tb);
 

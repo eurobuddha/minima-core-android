@@ -1,13 +1,13 @@
 package com.eurobuddha.casino;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 /** HISTORY tab — resolved bets with P&L. */
 public class HistoryView extends BaseView {
@@ -19,7 +19,6 @@ public class HistoryView extends BaseView {
     private static final int RENDER_LIMIT = 250;
 
     private final LinearLayout container;
-    private final SimpleDateFormat fmt = new SimpleDateFormat("dd MMM HH:mm", Locale.getDefault());
 
     public HistoryView(MainActivity a) {
         super(a, R.layout.pm_casino_view_container);
@@ -44,7 +43,7 @@ public class HistoryView extends BaseView {
         LinearLayout subRow = Ui.row(act);
         subRow.setPadding(0, Ui.dp(act, 2), 0, Ui.dp(act, 12));
         int n = mine.size();
-        String caption = "Your " + n + " " + Currency.label() + " bet" + (n == 1 ? "" : "s") + ".";
+        CharSequence caption = Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_casino_history_count, n, n, Currency.label());
         subRow.addView(Ui.text(act, caption, Theme.dim(), 11, false), Ui.lpRow(act, 1));
         if (!mine.isEmpty()) {
             BigDecimal net = BigDecimal.ZERO;
@@ -53,14 +52,14 @@ public class HistoryView extends BaseView {
                 net = r.won ? net.add(p) : net.subtract(p);
             }
             int sign = net.signum();
-            String netTxt = "Net " + (sign < 0 ? "-" : "+") + Currency.show(Util.miniNum(net.abs()), tok);
+            CharSequence netTxt = Language.msg(l10n_casino_history_net, (sign < 0 ? "-" : "+") + Currency.show(Util.miniNum(net.abs()), tok));
             int netColor = sign > 0 ? Theme.green() : sign < 0 ? Theme.red() : Theme.dim();
             subRow.addView(Ui.text(act, netTxt, netColor, 11, true));
         }
         container.addView(subRow);
 
         if (mine.isEmpty()) {
-            TextView empty = Ui.text(act, "No completed " + Currency.label() + " bets yet.", Theme.dim(), 12, false);
+            TextView empty = Ui.text(act, Language.msg(l10n_casino_history_empty, Currency.label()), Theme.dim(), 12, false);
             empty.setGravity(Gravity.CENTER);
             empty.setPadding(0, Ui.dp(act, 40), 0, 0);
             container.addView(empty);
@@ -70,7 +69,7 @@ public class HistoryView extends BaseView {
         for (int i = 0; i < shown; i++) container.addView(row(mine.get(i)));
         if (mine.size() > shown) {
             TextView more = Ui.text(act,
-                    "+ " + (mine.size() - shown) + " older bets — counted in Net above, not shown here.",
+                    Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_casino_history_older, mine.size() - shown),
                     Theme.dim(), 10, false);
             more.setGravity(Gravity.CENTER);
             more.setPadding(0, Ui.dp(act, 8), 0, Ui.dp(act, 4));
@@ -87,13 +86,13 @@ public class HistoryView extends BaseView {
     private LinearLayout row(ResolvedBet r) {
         LinearLayout card = Ui.card(act);
         LinearLayout top = Ui.row(act);
-        top.addView(Ui.text(act, r.game + "  ·  " + r.role, Theme.text(), 13, true), Ui.lpRow(act, 1));
+        top.addView(Ui.text(act, Language.join(CasinoMessages.message(r.game), "  ·  ", CasinoMessages.message(r.role)), Theme.text(), 13, true), Ui.lpRow(act, 1));
         TextView pl = Ui.text(act, (r.won ? "+" : "-") + Currency.show(r.profit, r.tokenid), r.won ? Theme.green() : Theme.red(), 13, true);
         top.addView(pl);
         card.addView(top);
 
         TextView detail = Ui.text(act,
-                "Picked " + r.pickLabel + " · rolled " + r.resultLabel + "  ·  " + fmt.format(new Date(r.time)),
+                Language.msg(l10n_casino_history_detail, CasinoMessages.message(r.pickLabel), CasinoMessages.message(r.resultLabel), Language.stamp(r.time, "MMMdHm")),
                 Theme.dim(), 10, false);
         detail.setPadding(0, Ui.dp(act, 5), 0, 0);
         card.addView(detail);

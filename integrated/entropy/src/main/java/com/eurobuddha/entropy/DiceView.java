@@ -1,4 +1,7 @@
 package com.eurobuddha.entropy;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.graphics.Typeface;
 import android.os.Handler;
@@ -56,7 +59,7 @@ public class DiceView extends BaseView {
 
         // ---- setup card ----
         LinearLayout setup = Ui.card(c);
-        setup.addView(Ui.label(c, "Phrase length"));
+        setup.addView(Ui.label(c, Language.msg(l10n_entropy_phrase_length)));
         LinearLayout lenRow = Ui.row(c);
         for (int i = 0; i < LENGTHS.length; i++) {
             final int n = LENGTHS[i];
@@ -70,10 +73,10 @@ public class DiceView extends BaseView {
         setup.addView(lenRow);
 
         setup.addView(spacer(8));
-        setup.addView(Ui.label(c, "Dice mode"));
+        setup.addView(Ui.label(c, Language.msg(l10n_entropy_dice_mode)));
         LinearLayout modeRow = Ui.row(c);
-        btnDigital = Ui.button(c, "Digital (node + device)", Theme.panel2(), Theme.dim());
-        btnPhysical = Ui.button(c, "Physical dice", Theme.panel2(), Theme.dim());
+        btnDigital = Ui.button(c, Language.msg(l10n_entropy_digital), Theme.panel2(), Theme.dim());
+        btnPhysical = Ui.button(c, Language.msg(l10n_entropy_physical), Theme.panel2(), Theme.dim());
         btnDigital.setLayoutParams(Ui.lpRow(c, 1));
         btnPhysical.setLayoutParams(Ui.lpRow(c, 1));
         btnDigital.setOnClickListener(v -> { if (!busy) { physical = false; refreshChips(); refreshMode(); } });
@@ -83,15 +86,13 @@ public class DiceView extends BaseView {
         modeRow.addView(btnPhysical);
         setup.addView(modeRow);
 
-        sourceLine = Ui.text(c, "checking entropy sources…", Theme.dim(), 11, false);
+        sourceLine = Ui.text(c, Language.msg(l10n_entropy_checking), Theme.dim(), 11, false);
         sourceLine.setTypeface(Theme.mono());
         Ui.marginTop(sourceLine, Ui.dp(c, 8));
         setup.addView(sourceLine);
 
         TextView advisory = Ui.text(c,
-                "⚠ SECURITY — you are generating a real wallet seed. Go offline / airplane mode, " +
-                "make sure nobody can see the screen, and write the words on paper only. " +
-                "Nothing is stored: closing this app destroys the phrase forever.",
+                Language.msg(l10n_entropy_security),
                 Theme.gold(), 11, false);
         advisory.setBackground(Ui.rounded(0x22FFD700, 0x44FFD700, 6, c));
         int p = Ui.dp(c, 10);
@@ -102,7 +103,7 @@ public class DiceView extends BaseView {
 
         // ---- roll card ----
         rollCard = Ui.card(c);
-        rollCard.addView(Ui.label(c, "Collect entropy"));
+        rollCard.addView(Ui.label(c, Language.msg(l10n_entropy_collect)));
 
         progress = new ProgressBar(c, null, android.R.attr.progressBarStyleHorizontal);
         progress.setMax(1000);
@@ -127,15 +128,15 @@ public class DiceView extends BaseView {
         Ui.marginTop(diceRow, Ui.dp(c, 8));
         rollCard.addView(diceRow);
 
-        btnThrow = Ui.button(c, "Throw 5 dice", Theme.gold(), Theme.onAccent());
+        btnThrow = Ui.button(c, Language.msg(l10n_entropy_throw), Theme.gold(), Theme.onAccent());
         btnThrow.setOnClickListener(v -> throwDice());
         Ui.marginTop(btnThrow, Ui.dp(c, 8));
         rollCard.addView(btnThrow);
 
-        btnAuto = Ui.button(c, "Auto-roll: off", Theme.panel2(), Theme.dim());
+        btnAuto = Ui.button(c, Language.msg(l10n_entropy_auto_off), Theme.panel2(), Theme.dim());
         btnAuto.setOnClickListener(v -> {
             auto = !auto;
-            btnAuto.setText(auto ? "Auto-roll: on" : "Auto-roll: off");
+            Language.setText(btnAuto, auto ? Language.msg(l10n_entropy_auto_on) : Language.msg(l10n_entropy_auto_off));
             btnAuto.setTextColor(auto ? Theme.gold() : Theme.dim());
             if (auto && !busy && !done) throwDice();
         });
@@ -145,8 +146,7 @@ public class DiceView extends BaseView {
         // physical pad
         padWrap = Ui.col(c);
         physAdvisory = Ui.text(c,
-                "⚠ Use a REAL, fair die and enter every roll exactly as it lands. Typing numbers " +
-                "\"randomly\" from your head produces a weak, guessable seed.",
+                Language.msg(l10n_entropy_physical_warning),
                 Theme.gold(), 11, false);
         physAdvisory.setBackground(Ui.rounded(0x22FFD700, 0x44FFD700, 6, c));
         physAdvisory.setPadding(p, p, p, p);
@@ -162,7 +162,7 @@ public class DiceView extends BaseView {
         Ui.marginTop(padRow1, Ui.dp(c, 8));
         padWrap.addView(padRow1);
         padWrap.addView(padRow2);
-        Button undo = Ui.button(c, "↺ Undo last", Theme.panel2(), Theme.dim());
+        Button undo = Ui.button(c, Language.msg(l10n_entropy_undo), Theme.panel2(), Theme.dim());
         undo.setOnClickListener(v -> {
             if (done || faces.isEmpty()) return;
             faces.remove(faces.size() - 1);
@@ -190,11 +190,11 @@ public class DiceView extends BaseView {
 
         // ---- done card ----
         doneCard = Ui.card(c);
-        doneCard.addView(Ui.label(c, "Your seed phrase"));
+        doneCard.addView(Ui.label(c, Language.msg(l10n_entropy_your_phrase)));
         wordGrid = Ui.col(c);
         Ui.marginTop(wordGrid, Ui.dp(c, 8));
         doneCard.addView(wordGrid);
-        btnReveal = Ui.button(c, "👁 Tap to reveal", Theme.panel2(), Theme.dim());
+        btnReveal = Ui.button(c, Language.msg(l10n_entropy_reveal), Theme.panel2(), Theme.dim());
         btnReveal.setOnClickListener(v -> { revealed = !revealed; renderWords(); });
         Ui.marginTop(btnReveal, Ui.dp(c, 6));
         doneCard.addView(btnReveal);
@@ -205,11 +205,9 @@ public class DiceView extends BaseView {
         doneCard.addView(doneSummary);
 
         doneCard.addView(spacer(8));
-        doneCard.addView(Ui.label(c, "Verify fairness"));
+        doneCard.addView(Ui.label(c, Language.msg(l10n_entropy_fairness)));
         TextView vHint = Ui.text(c,
-                "Maths is bit-identical to iancoleman/bip39 v0.4.3 (locked by fixed vectors produced " +
-                "from the genuine code — see the Entropy repo tests). Roll history below: paste into " +
-                "bip39-standalone.html (Raw entropy mode) to reproduce the phrase.",
+                Language.msg(l10n_entropy_fairness_hint),
                 Theme.dim(), 11, false);
         Ui.marginTop(vHint, Ui.dp(c, 4));
         doneCard.addView(vHint);
@@ -221,34 +219,30 @@ public class DiceView extends BaseView {
         Ui.marginTop(verifyRolls, Ui.dp(c, 6));
         doneCard.addView(verifyRolls);
 
-        btnAudit = Ui.button(c, "Show per-roll audit log", Theme.panel2(), Theme.dim());
+        btnAudit = Ui.button(c, Language.msg(l10n_entropy_show_audit), Theme.panel2(), Theme.dim());
         auditWrap = Ui.col(c);
         auditWrap.setVisibility(View.GONE);
         auditLog = Ui.text(c, "", Theme.dim(), 9, false);
         auditLog.setTypeface(Theme.mono());
         auditLog.setTextIsSelectable(true);
         TextView auditWarn = Ui.text(c,
-                "⚠ This log reveals every roll's secrets (A + B) — anyone who sees it can " +
-                "recompute the entire seed phrase. Treat it exactly like the seed words.",
+                Language.msg(l10n_entropy_audit_warning),
                 Theme.gold(), 10, false);
         auditWrap.addView(auditWarn);
         TextView auditHint = Ui.text(c,
-                "Each digital face = SHA3(node_secret ++ device_secret) → first 4 bytes mod 6 " +
-                "(values ≥ 4294967292 rerolled — zero modulo bias). Verify any roll in a Minima " +
-                "terminal: runscript script:\"LET h=SHA3(CONCAT(<A> <B>)) LET n=NUMBER(SUBSET(0 4 h)) " +
-                "LET r=n%6 RETURN TRUE\"", Theme.dim(), 10, false);
+                Language.msg(l10n_entropy_audit_hint, "runscript script:\"LET h=SHA3(CONCAT(<A> <B>)) LET n=NUMBER(SUBSET(0 4 h)) LET r=n%6 RETURN TRUE\""), Theme.dim(), 10, false);
         auditWrap.addView(auditHint);
         auditWrap.addView(auditLog);
         btnAudit.setOnClickListener(v -> {
             boolean show = auditWrap.getVisibility() != View.VISIBLE;
             auditWrap.setVisibility(show ? View.VISIBLE : View.GONE);
-            btnAudit.setText(show ? "Hide per-roll audit log" : "Show per-roll audit log");
+            Language.setText(btnAudit, show ? Language.msg(l10n_entropy_hide_audit) : Language.msg(l10n_entropy_show_audit));
         });
         Ui.marginTop(btnAudit, Ui.dp(c, 8));
         doneCard.addView(btnAudit);
         doneCard.addView(auditWrap);
 
-        btnStartOver = Ui.button(c, "Wipe & start over", Theme.pink(), Theme.onAccent());
+        btnStartOver = Ui.button(c, Language.msg(l10n_entropy_wipe), Theme.pink(), Theme.onAccent());
         btnStartOver.setOnClickListener(v -> wipe());
         Ui.marginTop(btnStartOver, Ui.dp(c, 10));
         doneCard.addView(btnStartOver);
@@ -294,23 +288,23 @@ public class DiceView extends BaseView {
         int target = Bip39.entTarget(wordsTarget);
         int b = bits().length();
         progress.setProgress(Math.min(1000, b * 1000 / target));
-        progressLabel.setText(Math.min(b, target) + " / " + target + " bits — " + faces.size() + " rolls");
+        Language.setText(progressLabel, Language.msg(l10n_entropy_progress, Math.min(b, target), target, faces.size()));
         StringBuilder sb = new StringBuilder();
         for (int f : faces) sb.append(f);
-        ticker.setText(sb.toString());
+        Language.setText(ticker, sb.toString());
     }
 
-    public void setSourceLine(String s, boolean ok) {
-        sourceLine.setText(s);
+    public void setSourceLine(CharSequence s, boolean ok) {
+        Language.setText(sourceLine, s);
         sourceLine.setTextColor(ok ? Theme.green() : Theme.amber());
     }
 
     // ---- digital throw ----
     private void throwDice() {
         if (busy || done) return;
-        if (act.selfTestError() != null) { setStatus("Blocked — self-test failed: " + act.selfTestError(), true); return; }
+        if (act.selfTestError() != null) { setStatus(Language.msg(l10n_entropy_blocked_self, EntropyMessages.message(act.selfTestError())), true); return; }
         if (blockedByDemo()) return;
-        if (!act.engineReady()) { setStatus("Verifying entropy sources — one moment…", true); return; }
+        if (!act.engineReady()) { setStatus(Language.msg(l10n_entropy_verifying), true); return; }
         busy = true;
         setStatus("", false);
         for (DiceRollView d : dice) d.startTumbling();
@@ -345,8 +339,8 @@ public class DiceView extends BaseView {
         if (failed) {
             for (DiceRollView d : dice) { d.cancel(); d.setIdleFace(0); }
             busy = false; auto = false;
-            btnAuto.setText("Auto-roll: off"); btnAuto.setTextColor(Theme.dim());
-            setStatus("Entropy source error — nothing recorded. Try again.", true);
+            Language.setText(btnAuto, Language.msg(l10n_entropy_auto_off)); btnAuto.setTextColor(Theme.dim());
+            setStatus(Language.msg(l10n_entropy_source_error), true);
             return;
         }
         if (Theme.sound()) Sfx.diceRoll(); // ONE shared sound for the whole 5-die throw
@@ -375,7 +369,7 @@ public class DiceView extends BaseView {
     // ---- physical ----
     private void physicalTap(int face) {
         if (done || busy || !physical) return;
-        if (act.selfTestError() != null) { setStatus("Blocked — self-test failed: " + act.selfTestError(), true); return; }
+        if (act.selfTestError() != null) { setStatus(Language.msg(l10n_entropy_blocked_self, EntropyMessages.message(act.selfTestError())), true); return; }
         if (blockedByDemo()) return;
         faces.add(face);
         audits.add(new RollEngine.Audit(RollEngine.SRC_PHYSICAL, "", "", face - 1, face));
@@ -394,7 +388,7 @@ public class DiceView extends BaseView {
         // the checksum validator must accept our own output or nothing is shown
         if (!Bip39.check(phrase)) {
             phrase = null; done = false;
-            setStatus("INTERNAL MISMATCH — phrase suppressed. Wipe and retry.", true);
+            setStatus(Language.msg(l10n_entropy_phrase_mismatch), true);
             return;
         }
         if (Theme.sound()) Sfx.chime();
@@ -403,41 +397,47 @@ public class DiceView extends BaseView {
 
         Map<String, Integer> src = new HashMap<>();
         for (RollEngine.Audit a : audits) src.merge(a.src, 1, Integer::sum);
-        StringBuilder parts = new StringBuilder();
+        Language.TextBuilder parts = new Language.TextBuilder();
+        boolean firstSource = true;
         for (Map.Entry<String, Integer> e : src.entrySet()) {
-            if (parts.length() > 0) parts.append(", ");
-            parts.append(e.getValue()).append(" × ").append(e.getKey());
+            if (!firstSource) parts.append(", ");
+            firstSource = false;
+            parts.append(e.getValue()).append(" × ").append(sourceLabel(e.getKey()));
         }
-        StringBuilder sum = new StringBuilder();
-        sum.append(faces.size()).append(" rolls → ").append(all.length()).append(" unbiased bits → ")
-           .append(ent.length()).append(" entropy bits + ").append(ent.length() / 32)
-           .append("-bit SHA-256 checksum = ").append(phrase.size()).append(" words\nsources: ").append(parts);
+        Language.TextBuilder sum = new Language.TextBuilder().append(Language.msg(l10n_entropy_summary, faces.size(), all.length(), ent.length(), ent.length() / 32, phrase.size(), parts.build()));
         if (src.containsKey(RollEngine.SRC_DEVICE_ONLY))
-            sum.append("\n⚠ some rolls used a single entropy source (node unavailable)");
+            sum.append(Language.msg(l10n_entropy_single_warning));
         if (src.containsKey(RollEngine.SRC_PHYSICAL)) {
             Map<Integer, Integer> fc = new HashMap<>();
             int maxc = 0;
             for (int f : faces) { int v = fc.merge(f, 1, Integer::sum); if (v > maxc) maxc = v; }
             if (fc.size() < 4 || maxc * 2 > faces.size())
-                sum.append("\n⚠ roll distribution looks non-random — use a real, fair die");
+                sum.append(Language.msg(l10n_entropy_distribution_warning));
         }
-        doneSummary.setText(sum.toString());
+        Language.setText(doneSummary, sum.build());
 
         StringBuilder rollStr = new StringBuilder();
         for (int f : faces) rollStr.append(f);
-        verifyRolls.setText(rollStr.toString());
+        Language.setText(verifyRolls, rollStr.toString());
 
-        StringBuilder log = new StringBuilder();
+        Language.TextBuilder log = new Language.TextBuilder();
         for (int i = 0; i < audits.size(); i++) {
             RollEngine.Audit a = audits.get(i);
-            if (RollEngine.SRC_PHYSICAL.equals(a.src)) log.append("#").append(i + 1).append(" face:").append(a.face).append(" (physical)\n");
-            else if (RollEngine.SRC_DEVICE_ONLY.equals(a.src)) log.append("#").append(i + 1).append(" face:").append(a.face).append(" (device CSPRNG only)\n");
-            else log.append("#").append(i + 1).append(" A:").append(a.a).append(" B:").append(a.b).append(" n:").append(a.n).append(" face:").append(a.face).append("\n");
+            if (RollEngine.SRC_PHYSICAL.equals(a.src)) log.append(Language.msg(l10n_entropy_audit_physical,i+1,a.face));
+            else if (RollEngine.SRC_DEVICE_ONLY.equals(a.src)) log.append(Language.msg(l10n_entropy_audit_device,i+1,a.face));
+            else log.append(Language.msg(l10n_entropy_audit_combined,i+1,a.a,a.b,a.n,a.face));
         }
-        auditLog.setText(log.toString());
+        Language.setText(auditLog, log.build());
 
         rollCard.setVisibility(View.GONE);
         doneCard.setVisibility(View.VISIBLE);
+    }
+
+    private static CharSequence sourceLabel(String source) {
+        if (RollEngine.SRC_NODE_DEVICE.equals(source)) return Language.msg(l10n_entropy_source_node);
+        if (RollEngine.SRC_DEVICE_ONLY.equals(source)) return Language.msg(l10n_entropy_source_device);
+        if (RollEngine.SRC_PHYSICAL.equals(source)) return Language.msg(l10n_entropy_source_physical);
+        return source;
     }
 
     private void renderWords() {
@@ -462,20 +462,20 @@ public class DiceView extends BaseView {
             t.setLayoutParams(lp);
             row.addView(t);
         }
-        btnReveal.setText(revealed ? "🙈 Tap to hide" : "👁 Tap to reveal");
+        Language.setText(btnReveal, revealed ? Language.msg(l10n_entropy_conceal) : Language.msg(l10n_entropy_reveal));
     }
 
     /** Rolls captured on a mirrored/recorded screen are seed material — never collect any. */
     private boolean blockedByDemo() {
         if (!act.demoMode()) return false;
         auto = false;
-        btnAuto.setText("Auto-roll: off"); btnAuto.setTextColor(Theme.dim());
-        setStatus("Blocked — demo mode is ON (screen capture enabled). Turn it off to roll.", true);
+        Language.setText(btnAuto, Language.msg(l10n_entropy_auto_off)); btnAuto.setTextColor(Theme.dim());
+        setStatus(Language.msg(l10n_entropy_blocked_demo), true);
         return true;
     }
 
-    private void setStatus(String s, boolean err) {
-        status.setText(s);
+    private void setStatus(CharSequence s, boolean err) {
+        Language.setText(status, s);
         status.setTextColor(err ? Theme.red() : Theme.dim());
     }
 
@@ -489,11 +489,11 @@ public class DiceView extends BaseView {
         faces.clear(); audits.clear();
         phrase = null;
         busy = false; auto = false; done = false; revealed = false;
-        btnAuto.setText("Auto-roll: off"); btnAuto.setTextColor(Theme.dim());
+        Language.setText(btnAuto, Language.msg(l10n_entropy_auto_off)); btnAuto.setTextColor(Theme.dim());
         wordGrid.removeAllViews();
-        doneSummary.setText(""); verifyRolls.setText(""); auditLog.setText("");
+        Language.setText(doneSummary, ""); Language.setText(verifyRolls, ""); Language.setText(auditLog, "");
         auditWrap.setVisibility(View.GONE);
-        btnAudit.setText("Show per-roll audit log");
+        Language.setText(btnAudit, Language.msg(l10n_entropy_show_audit));
         setStatus("", false);
         for (int i = 0; i < DICE; i++) { dice[i].cancel(); dice[i].setIdleFace(i % 6); }
         doneCard.setVisibility(View.GONE);

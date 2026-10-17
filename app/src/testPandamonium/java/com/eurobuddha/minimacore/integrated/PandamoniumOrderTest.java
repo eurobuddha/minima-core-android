@@ -26,4 +26,16 @@ public class PandamoniumOrderTest {
         assertEquals(PandamoniumDestinations.CLASSES.length, new HashSet<>(order).size());
         assertEquals(order.size(), new HashSet<>(order).size());
     }
+    @Test public void walletAppendsWithoutChangingExistingDestinationIdentities() {
+        int wallet = PandamoniumDestinations.indexFor("com.eurobuddha.wallet.MainActivity");
+        assertEquals(16, wallet);
+        assertEquals("minimaWallet", PandamoniumDestinations.NAMES[wallet]);
+        assertEquals(PandamoniumDestinations.NAMES.length, PandamoniumDestinations.CLASSES.length);
+        assertEquals(PandamoniumDestinations.NAMES.length, PandamoniumDestinations.ICONS.length);
+        String saved = String.join(",", java.util.Arrays.copyOfRange(PandamoniumDestinations.CLASSES, 1, wallet));
+        List<Integer> order = PandamoniumOrder.decode(saved);
+        for (int i = 0; i <= wallet; i++) assertEquals(Integer.valueOf(i), order.get(i));
+        assertEquals(order, PandamoniumOrder.decode(PandamoniumOrder.encode(order)));
+    }
+
 }

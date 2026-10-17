@@ -1,6 +1,10 @@
 package com.eurobuddha.minimacore.launcher.restore;
 
-import android.app.ProgressDialog;
+import androidx.appcompat.app.AlertDialog;
+import android.widget.ProgressBar;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -32,19 +36,21 @@ public class SeedSyncServiceActivity extends AppCompatActivity implements Servic
     /** Set in onDestroy so the startup-wait thread stops instead of spinning past the screen. */
     volatile boolean mDestroyed = false;
 
-    ProgressDialog mProgress;
+    AlertDialog mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mProgress = new ProgressDialog(this);
-        mProgress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgress.setTitle("Syncing Minima Wallet..");
-        mProgress.setMessage("Please wait...");
-        mProgress.setIndeterminate(true);
+        ProgressBar indicator = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        indicator.setIndeterminate(true);
+        int padding = Math.round(24 * getResources().getDisplayMetrics().density);
+        indicator.setPadding(padding, padding / 3, padding, padding / 2);
+        mProgress = new LanguageDialog(this)
+                .setTitle(Language.msg(l10n_seed_sync_title))
+                .setMessage(Language.msg(l10n_seed_sync_wait))
+                .setView(indicator).create();
         mProgress.setCanceledOnTouchOutside(false);
-
         mProgress.show();
 
         //Start the Service..
@@ -73,8 +79,8 @@ public class SeedSyncServiceActivity extends AppCompatActivity implements Servic
                     runOnUiThread(() -> {
                         if(isFinishing() || isDestroyed()) return;
                         mProgress.dismiss();
-                        logger.showDialog(SeedSyncServiceActivity.this, "Could not start Minima",
-                                "The node service did not come up in time. Open Minima and try the restore again.",
+                        logger.showDialog(SeedSyncServiceActivity.this, Language.msg(l10n_seed_sync_start_failed),
+                                Language.msg(l10n_seed_sync_start_failed_body),
                                 SeedSyncServiceActivity.this::finish);
                     });
                     return;
@@ -110,6 +116,7 @@ public class SeedSyncServiceActivity extends AppCompatActivity implements Servic
     protected void onDestroy() {
         super.onDestroy();
         mDestroyed = true;
+        if (mProgress != null) mProgress.dismiss();
 
         //Unbind from the service..
         if(mMinima != null) {
@@ -161,7 +168,8 @@ public class SeedSyncServiceActivity extends AppCompatActivity implements Servic
                 @Override
                 public void run() {
                     if (mProgress.isShowing()) {
-                        mProgress.setMessage("Generating Keys : " + zKeys + " / " + Wallet.NUMBER_GETADDRESS_KEYS);
+                        Language.setText(mProgress.findViewById(android.R.id.message),
+                                Language.msg(l10n_seed_sync_generating, zKeys, Wallet.NUMBER_GETADDRESS_KEYS));
                     }
                 }
             });
@@ -170,7 +178,8 @@ public class SeedSyncServiceActivity extends AppCompatActivity implements Servic
                 @Override
                 public void run() {
                     if (mProgress.isShowing()) {
-                        mProgress.setMessage("Syncing to MegaMMR @ "+ Peers.getDefaultPeers(SeedSyncServiceActivity.this));
+                        Language.setText(mProgress.findViewById(android.R.id.message),
+                                Language.msg(l10n_seed_sync_syncing, Peers.getDefaultPeers(SeedSyncServiceActivity.this)));
                     }
                 }
             });
@@ -201,7 +210,8 @@ public class SeedSyncServiceActivity extends AppCompatActivity implements Servic
                     SeedSyncServiceActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            logger.showDialog(SeedSyncServiceActivity.this, "Error", error+"\n\nResync your node when Minima starts..", new Runnable() {
+                            if (isFinishing() || isDestroyed()) return;
+                            logger.showDialog(SeedSyncServiceActivity.this, Language.msg(l10n_seed_sync_error), Language.msg(l10n_seed_sync_resync_after_start, error), new Runnable() {
                                 @Override
                                 public void run() {
                                     //Start Main..

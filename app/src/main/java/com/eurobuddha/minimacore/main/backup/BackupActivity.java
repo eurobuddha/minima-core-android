@@ -11,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import com.eurobuddha.minimacore.utils.SystemBars;
 import com.eurobuddha.minimacore.main.SeedSyncActivity;
 
@@ -31,7 +34,7 @@ public class BackupActivity extends AppCompatActivity {
         setContentView(R.layout.backup_hub);
 
         Toolbar tb = findViewById(R.id.toolbar);
-        tb.setTitle("Backup & Recovery");
+        Language.toolbarTitle(tb, Language.msg(l10n_menu_backup));
         setSupportActionBar(tb);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         tb.setNavigationOnClickListener(v -> finish());
@@ -50,27 +53,27 @@ public class BackupActivity extends AppCompatActivity {
     }
 
     private void buildRows() {
-        addRow("Create backup",
-                "Write an encrypted .bak of this node, then save a copy off the phone.",
+        addRow(Language.msg(l10n_backup_create),
+                Language.msg(l10n_backup_create_help),
                 v -> startActivity(new Intent(this, BackupCreateActivity.class)));
 
-        addRow("Restore from file",
-                "Put a backup back on this node, optionally catching up to the chain tip afterwards.",
+        addRow(Language.msg(l10n_backup_restore),
+                Language.msg(l10n_backup_restore_help),
                 v -> startActivity(new Intent(this, RestoreFileActivity.class)));
 
-        addRow("Resync node",
-                "Rebuild this node's chain from a MegaMMR node. Your wallet and seed phrase are not touched.",
+        addRow(Language.msg(l10n_resync_title),
+                Language.msg(l10n_backup_resync_help),
                 v -> startActivity(new Intent(this, SeedSyncActivity.class)));
 
-        addRow("Private keys",
-                "Seed phrase, lock and unlock, wipe and restore, or rebuild this wallet from a phrase.",
+        addRow(Language.msg(l10n_backup_private_keys),
+                Language.msg(l10n_backup_private_help),
                 v -> startActivity(new Intent(this, VaultActivity.class)));
     }
 
-    private void addRow(String title, String subtitle, View.OnClickListener onClick) {
+    private void addRow(CharSequence title, CharSequence subtitle, View.OnClickListener onClick) {
         View row = LayoutInflater.from(this).inflate(R.layout.view_backup_row, rows, false);
-        ((TextView) row.findViewById(R.id.backup_row_title)).setText(title);
-        ((TextView) row.findViewById(R.id.backup_row_subtitle)).setText(subtitle);
+        Language.setText(row.findViewById(R.id.backup_row_title), title);
+        Language.setText(row.findViewById(R.id.backup_row_subtitle), subtitle);
         row.setOnClickListener(onClick);
         rows.addView(row);
     }
@@ -80,7 +83,7 @@ public class BackupActivity extends AppCompatActivity {
         NodeKeys.Status status = NodeKeys.read();
         boolean blocked = !status.ready;
         gate.setVisibility(blocked ? View.VISIBLE : View.GONE);
-        if (blocked) gate.setText(status.message());
+        if (blocked) Language.setText(gate, status.message());
         for (int i = 0; i < rows.getChildCount(); i++) {
             View row = rows.getChildAt(i);
             row.setEnabled(!blocked);

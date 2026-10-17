@@ -1,5 +1,9 @@
 package com.eurobuddha.futurecashnext;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -108,9 +112,9 @@ public final class Design {
     // ---- drawables / view helpers ----
 
     /** A rounded chip. Text uses Inter. */
-    public static TextView pill(Context c, String text, int bg, int fg) {
+    public static TextView pill(Context c, CharSequence text, int bg, int fg) {
         TextView t = new TextView(c);
-        t.setText(text);
+        Language.setText(t, text);
         t.setTextColor(fg);
         t.setTextSize(11f);
         t.setTypeface(sans());

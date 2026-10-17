@@ -19,6 +19,8 @@ public final class TxPost {
 
     public interface Done { void ok(String txpowid); void fail(String message); }
 
+    interface BeforePost { void prepare(Runnable post, java.util.function.Consumer<String> fail); }
+
     private TxPost() {}
 
     static final NodeApi.Cb NOOP = new NodeApi.Cb() {
@@ -89,6 +91,11 @@ public final class TxPost {
     }
 
     static void checkThenPost(NodeApi node, String txid, List<String> cmdsThroughBasics, List<String> ownerKeys, Done done) {
+        checkThenPost(node, txid, cmdsThroughBasics, ownerKeys, null, done);
+    }
+
+    static void checkThenPost(NodeApi node, String txid, List<String> cmdsThroughBasics, List<String> ownerKeys,
+                              BeforePost beforePost, Done done) {
         // Both scans go through the shared Cmd parser, which refuses a duplicated parameter instead of
         // resolving it. This layer LOCKS the coins and authorises the signature; CmdChain verifies them at the
         // signature boundary. The two must never disagree about which coins a command spends.
@@ -118,11 +125,11 @@ public final class TxPost {
         });
         submit(() -> OwnerKeyRecovery.ensure(node.context(), node, guardedKeys, cmdsThroughBasics, blocked -> {
             if (!blocked.isEmpty()) { gatedDone.fail("Nothing was posted.\n\n" + OwnerKeyRecovery.worst(blocked).message()); return; }
-            runChain(node, txid, cmdsThroughBasics, gatedDone);
+            runChain(node, txid, cmdsThroughBasics, beforePost, gatedDone);
         }));
     }
 
-    private static void runChain(NodeApi node, String txid, List<String> cmdsThroughBasics, Done done) {
+    private static void runChain(NodeApi node, String txid, List<String> cmdsThroughBasics, BeforePost beforePost, Done done) {
         List<String> cmds = new ArrayList<>(cmdsThroughBasics);
         cmds.add("txncheck id:" + txid);
         CmdChain.run(node, cmds, "txndelete id:" + txid, new CmdChain.Done() {
@@ -132,7 +139,7 @@ public final class TxPost {
                     node.cmd("txndelete id:" + txid, NOOP);
                     done.fail(invalid); return;
                 }
-                node.cmd("txnpost id:" + txid, new NodeApi.Cb() {
+                Runnable post = () -> node.cmd("txnpost id:" + txid, new NodeApi.Cb() {
                     @Override public void onResult(JSONObject j) {
                         if (j.optBoolean("status", false)) {
                             node.cmd("txndelete id:" + txid, NOOP);
@@ -146,6 +153,11 @@ public final class TxPost {
                         if (!NodeApi.ERR_WRITE_UNCERTAIN.equals(m)) node.cmd("txndelete id:" + txid, NOOP);
                         done.fail(m);
                     }
+                });
+                if (beforePost == null) post.run();
+                else beforePost.prepare(post, message -> {
+                    node.cmd("txndelete id:" + txid, NOOP);
+                    done.fail(message);
                 });
             }
             @Override public void fail(String message) { done.fail(message); }

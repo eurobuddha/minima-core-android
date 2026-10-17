@@ -1,6 +1,9 @@
 package com.eurobuddha.minimacore.main.views.apps;
 
 import android.content.Context;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -25,7 +28,7 @@ public class AppsAdapter extends BaseAdapter {
 
     Context mContext;
 
-    private static LayoutInflater inflater = null;
+    private final LayoutInflater inflater;
 
     ReceiverDB mDatabase;
 
@@ -72,6 +75,7 @@ public class AppsAdapter extends BaseAdapter {
             row = inflater.inflate(R.layout.view_apps_row, null);
         }
 
+        Language.apply(row);
         ImageView img         = row.findViewById(R.id.apps_icon);
         TextView appname      = row.findViewById(R.id.apps_name);
         TextView apppackage  = row.findViewById(R.id.apps_package);
@@ -83,6 +87,8 @@ public class AppsAdapter extends BaseAdapter {
 
         String packageclass = (String)app.get("package");
         apppackage.setText(packageclass);
+        appname.setText(packageclass);
+        img.setImageDrawable(null);
 
         //Get the ICON
         try{
@@ -100,21 +106,14 @@ public class AppsAdapter extends BaseAdapter {
             logger.log("Package not found.. "+packageclass+" "+e);
         }
 
-        String admin = "";
-        if((int)app.get("admin")==1){
-            admin = " [ADMIN]";
-        }
+        CharSequence state = Language.msg((int)app.get("penabled") == 0
+                ? l10n_apps_disabled : l10n_wallet_bio_enabled);
+        Language.setText(appenabled, (int)app.get("admin") == 1
+                ? Language.join(state, Language.msg(l10n_apps_admin_tag)) : state);
 
-        if((int)app.get("penabled")==0){
-            appenabled.setText("Disabled"+admin);
-        }else{
-            appenabled.setText("Enabled"+admin);
-        }
-
-        //The date
-        long timemilli  = (long)app.get("lastused");
-        String date     = MinimaService.DATEFORMAT.format(new Date(timemilli));
-        applastused.setText(date);
+        // Display dates follow the selected language; stored timestamps remain unchanged.
+        long timemilli = (long)app.get("lastused");
+        Language.setText(applastused, Language.stamp(timemilli, "yMMMdHms"));
 
         return row;
     }

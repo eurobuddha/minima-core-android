@@ -1,4 +1,6 @@
 package com.eurobuddha.futurecashnext;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -47,6 +49,7 @@ public class GuardianService extends Service {
     private DirectNodeEvents.Listener receiver;
     private ExecutorService worker;
     private volatile boolean started = false;
+    private boolean foregroundActive = false;
 
     @Override public IBinder onBind(Intent intent) { return null; }
 
@@ -148,7 +151,14 @@ public class GuardianService extends Service {
         super.onTaskRemoved(rootIntent);
     }
 
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Notifier.ensureChannels(this);
+        if (foregroundActive) refreshNotification(this);
+    }
+
     @Override public void onDestroy() {
+        foregroundActive = false;
         super.onDestroy();
         if (receiver != null) { try { DirectNodeEvents.unsubscribe(receiver); } catch (Exception ignored) {} }
         if (worker != null) worker.shutdownNow();
@@ -170,6 +180,7 @@ public class GuardianService extends Service {
             } else {
                 startForeground(FG_ID, n);
             }
+            foregroundActive = true;
             return true;
         } catch (Exception e) {
             return false;   // ForegroundServiceStartNotAllowedException etc. — don't crash
@@ -184,12 +195,9 @@ public class GuardianService extends Service {
      */
     private static Notification buildNotification(Context ctx) {
         final boolean auto = new Cfg(ctx).is(Cfg.AUTO_COLLECT_SAFE, false);
-        final String text = auto
-                ? "Watching your stakes — collecting matured ones, rescuing at-risk ones"
-                : "Rescuing at-risk stakes only. Auto-collect is OFF — matured clean stakes are "
-                  + "NOT collected until you turn it on in the app.";
+        final String text = Language.text(ctx, auto ? l10n_future_notice_auto_on : l10n_future_notice_auto_off);
         return new NotificationCompat.Builder(ctx, Notifier.CH_FG)
-                .setContentTitle("Future Cash guardian")
+                .setContentTitle(Language.text(ctx, l10n_future_notice_title))
                 .setContentText(text)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
                 .setSmallIcon(android.R.drawable.ic_lock_idle_lock)
@@ -210,6 +218,7 @@ public class GuardianService extends Service {
     @Override public void onTimeout(int startId, int fgsType) { stopGracefully(); }
 
     private void stopGracefully() {
+        foregroundActive = false;
         try { stopForeground(STOP_FOREGROUND_REMOVE); } catch (Exception ignored) {}
         stopSelf();
     }

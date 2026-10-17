@@ -8,6 +8,6 @@
     android:minWidth="48dp"
     android:minHeight="48dp"
     android:paddingHorizontal="8dp"
-    android:text="@string/hide_keyboard"
+    android:text="@string/hide_keyboard" android:tag="l10n:text=l10n_keyboard_hide"
     android:textSize="12sp"
     android:visibility="gone" />

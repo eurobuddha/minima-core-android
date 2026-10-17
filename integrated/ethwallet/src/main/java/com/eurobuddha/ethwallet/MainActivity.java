@@ -1,5 +1,10 @@
 package com.eurobuddha.ethwallet;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
+
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -57,6 +62,31 @@ import java.util.concurrent.Executors;
  */
 public class MainActivity extends AppCompatActivity implements NodeApi.PairingListener {
 
+    private final java.util.Set<AlertDialog> languageDialogs = new java.util.HashSet<>();
+    private LanguageDialog languageDialog() {
+        return new LanguageDialog(this) {
+            private android.content.DialogInterface.OnDismissListener dismissed;
+            @Override public LanguageDialog setOnDismissListener(android.content.DialogInterface.OnDismissListener action) {
+                dismissed = action;
+                return this;
+            }
+            @Override public AlertDialog create() {
+                AlertDialog value = super.create();
+                languageDialogs.add(value);
+                final android.content.DialogInterface.OnDismissListener callback = dismissed;
+                value.setOnDismissListener(d -> {
+                    languageDialogs.remove(value);
+                    if (callback != null) callback.onDismiss(d);
+                });
+                return value;
+            }
+        };
+    }
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+    }
+
     private static final String PREFS = "ethwallet";
     /** Pref holding the address this node derived last time — see {@link #deriveNow}. */
     private static final String PIN = "derivedAddr";
@@ -80,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
     private boolean modalOpen = false;
     private boolean paired = false;
 
-    private String ethAddr, ethBal = "—", ethErr;
+    private String ethAddr, ethBal = "—";
+    private CharSequence ethErr;
     private final Map<String, String> tokenBals = new LinkedHashMap<>();   // symbol -> formatted balance
     private long lastUpdate = 0;
 
@@ -113,14 +144,14 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
 
         scanLauncher = registerForActivityResult(new ScanContract(), result -> {
             if (result.getContents() != null && pendingRecipient != null)
-                pendingRecipient.setText(cleanAddr(result.getContents()));
+                Language.setText(pendingRecipient, cleanAddr(result.getContents()));
         });
         authLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), r -> {
             Runnable action = pendingAuthAction;
             pendingAuthAction = null;
             if (action == null) return;
             if (r.getResultCode() == RESULT_OK) action.run();
-            else toast("Cancelled");
+            else toast(Language.msg(l10n_eth_wallet_cancelled));
         });
 
         render();
@@ -135,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
     }
 
     @Override protected void onDestroy() {
+        for (AlertDialog value : new java.util.ArrayList<>(languageDialogs)) value.dismiss();
+        languageDialogs.clear();
         super.onDestroy();
         if (node != null) node.onDestroy();
         io.shutdownNow();
@@ -157,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
      * Devices with no secure lockscreen have nothing to check against, so the action runs directly —
      * the caller is still responsible for an explicit warning step.
      */
-    private void authThen(String title, String detail, Runnable action) {
+    private void authThen(CharSequence title, CharSequence detail, Runnable action) {
         android.app.KeyguardManager km = (android.app.KeyguardManager) getSystemService(KEYGUARD_SERVICE);
         android.content.Intent i = (km == null || !km.isDeviceSecure())
                 ? null : km.createConfirmDeviceCredentialIntent(title, detail);
@@ -175,8 +208,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
             String key = v.available() ? v.loadKey() : null;
             if (key != null) { wallet.importKey(key); ethAddr = wallet.address(); render(); refresh(); return; }
             // Preserve the selected source while storage is unavailable; a later launch can retry.
-            ethErr = "The imported key could not be read. Existing encrypted data has been preserved. "
-                    + "Unlock the device and restart Minima Core to retry.";
+            ethErr = Language.msg(l10n_eth_wallet_storage_unavailable);
             render();
             return;
         }
@@ -188,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
      * Ensure the IPC exists and that we end up with a key. The first call constructs {@link NodeApi},
      * whose REGISTER reply drives {@link #onEnabled}; later calls have no register to wait for, so they
      * must derive directly. Missing that second branch left "Switch wallet source -> Pair with node"
-     * a silent no-op that stranded the app on "Setting up wallet…" until it was force-quit.
+     * a silent no-op that stranded the app on Language.msg(l10n_eth_wallet_setting_up) until it was force-quit.
      */
     private void connectNode() {
         if (node == null) { node = new NodeApi(this, this); return; }
@@ -212,8 +244,8 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
             @Override public void err(String msg) {
                 if (gone()) return;
                 ethErr = NodeApi.ERR_NOT_ENABLED.equals(msg)
-                        ? "The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry."
-                        : msg;
+                        ? Language.msg(l10n_explorer_node_retry)
+                        : EthMessages.message(msg);
                 render();
             }
             @Override public void addressChanged(String was, String now) {
@@ -233,22 +265,20 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         modalOpen = true;
         LinearLayout box = colBox();
         TextView warn = new TextView(this);
-        warn.setText("Your node is deriving a DIFFERENT Ethereum address than it did before.");
+        Language.setText(warn, Language.msg(l10n_eth_wallet_address_warning));
         warn.setTextColor(Design.RED); warn.setTextSize(14f); warn.setPadding(0, 0, 0, dp(10));
         box.addView(warn);
-        box.addView(kvLine("Was", shortAddr(was)));
-        box.addView(kvLine("Now", shortAddr(now)));
+        box.addView(kvLine(Language.msg(l10n_eth_wallet_was), shortAddr(was)));
+        box.addView(kvLine(Language.msg(l10n_eth_wallet_now), shortAddr(now)));
         TextView note = new TextView(this);
-        note.setText("\nAny funds you already hold are at the OLD address — they do not move. "
-                + "This is expected only if you reset or restored your node with a different seed phrase. "
-                + "If you did not, stop and check your node before continuing.");
+        Language.setText(note, Language.msg(l10n_eth_wallet_address_warning_body));
         note.setTextColor(Design.DIM); note.setTextSize(12.5f);
         box.addView(note);
-        new AlertDialog.Builder(this).setTitle("Address changed")
+        languageDialog().setTitle(Language.msg(l10n_eth_wallet_address_changed))
                 .setView(wrapScroll(box))
                 .setCancelable(false)
-                .setNegativeButton("Cancel", (d, w) -> { modalOpen = false; ethErr = "Derivation stopped — the node's address changed."; render(); })
-                .setPositiveButton("I reset my node — use the new address", (d, w) -> {
+                .setNegativeButton(Language.msg(l10n_eth_wallet_cancel), (d, w) -> { modalOpen = false; ethErr = Language.msg(l10n_eth_wallet_stopped); render(); })
+                .setPositiveButton(Language.msg(l10n_eth_wallet_adopt_address), (d, w) -> {
                     modalOpen = false;
                     prefs.edit().remove(PIN).apply();   // drop the pin, then re-derive unpinned and re-pin
                     deriveNow();
@@ -274,15 +304,15 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         modalOpen = true;
         LinearLayout box = colBox();
         TextView t = new TextView(this);
-        t.setText("Choose how this wallet gets its Ethereum key. Either way it's the SAME address as minimaSwap.");
+        Language.setText(t, Language.msg(l10n_eth_wallet_source_body));
         t.setTextColor(Design.DIM); t.setTextSize(13f); t.setPadding(0, 0, 0, dp(12));
         box.addView(t);
-        new AlertDialog.Builder(this)
-                .setTitle("Set up wallet")
+        languageDialog()
+                .setTitle(Language.msg(l10n_eth_wallet_setup))
                 .setView(wrapScroll(box))
                 .setCancelable(false)
-                .setPositiveButton("Use embedded wallet", (d, w) -> { prefs.edit().putString("source", "node").apply(); modalOpen = false; retryNode(); render(); })
-                .setNeutralButton("Import key", (d, w) -> { modalOpen = false; importDialog(); })
+                .setPositiveButton(Language.msg(l10n_eth_wallet_embedded), (d, w) -> { prefs.edit().putString("source", "node").apply(); modalOpen = false; retryNode(); render(); })
+                .setNeutralButton(Language.msg(l10n_eth_wallet_import_key), (d, w) -> { modalOpen = false; importDialog(); })
                 .show();
     }
 
@@ -290,37 +320,37 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         modalOpen = true;
         LinearLayout box = colBox();
         TextView t = new TextView(this);
-        t.setText("Paste the private key you exported from minimaSwap (0x + 64 hex). It's stored encrypted on this device only.");
+        Language.setText(t, Language.msg(l10n_eth_wallet_import_body));
         t.setTextColor(Design.DIM); t.setTextSize(13f); t.setPadding(0, 0, 0, dp(10));
         box.addView(t);
         EditText in = new EditText(this);
-        in.setHint("0x…");
+        Language.hint(in, "0x…");
         in.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         box.addView(in);
-        new AlertDialog.Builder(this)
-                .setTitle("Import private key")
+        languageDialog()
+                .setTitle(Language.msg(l10n_eth_wallet_import_private))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Import", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_eth_wallet_import), (d, w) -> {
                     modalOpen = false;
                     String k = in.getText().toString().trim();
                     // A private key is EXACTLY 32 bytes — Credentials.create accepts any hex length and would
                     // silently produce a different (wrong) address, so validate the length/charset first.
-                    if (!k.replaceFirst("^0x", "").matches("[0-9a-fA-F]{64}")) { toast("Key must be 0x + 64 hex chars"); importDialog(); return; }
+                    if (!k.replaceFirst("^0x", "").matches("[0-9a-fA-F]{64}")) { toast(Language.msg(l10n_eth_wallet_key_length)); importDialog(); return; }
                     try {
                         wallet.importKey(k);
                         // Only remember "import" as the source if the key actually reached the secure
                         // store — otherwise the next launch would look for a key that isn't there.
                         if (vault().saveKey(wallet.privateKeyHex())) {
                             prefs.edit().putString("source", "import").apply();
-                            toast("Imported " + shortAddr(wallet.address()));
+                            toast(Language.msg(l10n_eth_wallet_imported, shortAddr(wallet.address())));
                         } else {
-                            toast("Secure storage unavailable — key active for this session only");
+                            toast(Language.msg(l10n_eth_wallet_session_only));
                         }
                         ethAddr = wallet.address(); ethErr = null;
                         render(); refresh();
-                    } catch (Exception e) { toast("Invalid key"); sourcePicker(); }
+                    } catch (Exception e) { toast(Language.msg(l10n_eth_wallet_invalid_key)); sourcePicker(); }
                 })
-                .setNegativeButton("Back", (d, w) -> { modalOpen = false; sourcePicker(); })
+                .setNegativeButton(Language.msg(l10n_eth_wallet_back), (d, w) -> { modalOpen = false; sourcePicker(); })
                 .setOnCancelListener(d -> { modalOpen = false; sourcePicker(); })
                 .show();
     }
@@ -340,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                 }
                 onUi(() -> { ethBal = eth; tokenBals.clear(); tokenBals.putAll(bals); ethErr = null; lastUpdate = System.currentTimeMillis(); render(); });
             } catch (Exception e) {
-                onUi(() -> { ethErr = "RPC: " + e.getMessage(); render(); });
+                onUi(() -> { ethErr = Language.join("RPC: ", EthMessages.error(e)); render(); });
             }
         });
     }
@@ -354,20 +384,20 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.HORIZONTAL); header.setGravity(Gravity.CENTER_VERTICAL);
         TextView brand = new TextView(this);
-        brand.setText("ETH Wallet"); brand.setTextColor(Design.TEXT); brand.setTextSize(22f);
+        Language.setText(brand, "ETH Wallet"); brand.setTextColor(Design.TEXT); brand.setTextSize(22f);
         brand.setTypeface(brand.getTypeface(), android.graphics.Typeface.BOLD);
         header.addView(brand, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        header.addView(Design.pill(this, "Mainnet · real funds", Design.ACCENT, Design.ON_ACCENT));
+        header.addView(Design.pill(this, Language.msg(l10n_eth_wallet_mainnet), Design.ACCENT, Design.ON_ACCENT));
         col.addView(header);
 
         TextView sub = new TextView(this);
-        sub.setText("v" + BuildConfig.VERSION_NAME + "  ·  " + (wallet.isImported() ? "imported key" : "node-derived") + (lastUpdate > 0 ? "  ·  updated " + ago(lastUpdate) : ""));
+        Language.setText(sub, Language.join("v", BuildConfig.VERSION_NAME, "  ·  ", wallet.isImported() ? Language.msg(l10n_eth_wallet_imported_key) : Language.msg(l10n_eth_wallet_node_derived), lastUpdate > 0 ? Language.join("  ·  ", Language.msg(l10n_eth_wallet_updated, Language.since(lastUpdate))) : ""));
         sub.setTextColor(Design.DIM2); sub.setTextSize(12f); sub.setPadding(0, dp(2), 0, dp(12));
         col.addView(sub);
 
         if (!wallet.ready()) {
             TextView w = new TextView(this);
-            w.setText(ethErr != null ? "⚠ " + ethErr : "Setting up wallet…");
+            Language.setText(w, ethErr != null ? Language.join("⚠ ", ethErr) : Language.msg(l10n_eth_wallet_setting_up));
             w.setTextColor(ethErr != null ? Design.RED : Design.DIM); w.setTextSize(13f);
             col.addView(w);
             scroller.removeAllViews(); scroller.addView(col);
@@ -376,9 +406,9 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
 
         // address card → receive
         LinearLayout addrCard = card();
-        TextView at = new TextView(this); at.setText("Your address  ·  tap to receive");
+        TextView at = new TextView(this); Language.setText(at, Language.msg(l10n_eth_wallet_your_address));
         at.setTextColor(Design.DIM); at.setTextSize(12.5f);
-        TextView av = new TextView(this); av.setText(shortAddr(ethAddr));
+        TextView av = new TextView(this); Language.setText(av, shortAddr(ethAddr));
         av.setTextColor(Design.TEXT); av.setTextSize(16f); av.setPadding(0, dp(3), 0, 0);
         addrCard.addView(at); addrCard.addView(av);
         addrCard.setOnClickListener(v -> receiveDialog());
@@ -388,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         col.addView(assetRow("ETH", TW_ETH, "Ethereum", ethBal + " ETH", () -> sendDialog("ETH"), null));
 
         if (ethErr != null) {
-            TextView err = new TextView(this); err.setText("⚠ " + ethErr);
+            TextView err = new TextView(this); Language.setText(err, Language.join("⚠ ", ethErr));
             err.setTextColor(Design.RED); err.setTextSize(12f); err.setPadding(dp(2), dp(6), 0, 0);
             col.addView(err);
         }
@@ -404,16 +434,16 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         // actions
         LinearLayout actions = new LinearLayout(this);
         actions.setOrientation(LinearLayout.HORIZONTAL); actions.setPadding(0, dp(12), 0, 0);
-        addPill(actions, "↑  Send", () -> sendDialog("ETH"));
-        addPill(actions, "↓  Receive", this::receiveDialog);
-        addPill(actions, "↻  Refresh", () -> { toast("Refreshing…"); refresh(); });
+        addPill(actions, Language.msg(l10n_eth_wallet_send_action), () -> sendDialog("ETH"));
+        addPill(actions, Language.msg(l10n_eth_wallet_receive_action), this::receiveDialog);
+        addPill(actions, Language.msg(l10n_eth_wallet_refresh_action), () -> { toast(Language.msg(l10n_eth_wallet_refreshing)); refresh(); });
         col.addView(actions);
 
         LinearLayout actions2 = new LinearLayout(this);
         actions2.setOrientation(LinearLayout.HORIZONTAL); actions2.setPadding(0, dp(8), 0, 0);
-        addPill(actions2, "+  Add token", this::addTokenDialog);
+        addPill(actions2, Language.msg(l10n_eth_wallet_add_token_action), this::addTokenDialog);
         addPill(actions2, "↗  Etherscan", this::viewAddressOnEtherscan);
-        addPill(actions2, "⚙  Settings", this::settingsDialog);
+        addPill(actions2, Language.msg(l10n_eth_wallet_settings_action), this::settingsDialog);
         col.addView(actions2);
 
         scroller.removeAllViews();
@@ -437,38 +467,37 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
             box.addView(iv);
         }
         TextView a = new TextView(this);
-        a.setText(ethAddr); a.setTextSize(13f); a.setTextIsSelectable(true);
+        Language.setText(a, ethAddr); a.setTextSize(13f); a.setTextIsSelectable(true);
         a.setTypeface(android.graphics.Typeface.MONOSPACE);
         box.addView(a);
         TextView note = new TextView(this);
-        note.setText("Same address on all EVM networks. Send only Ethereum-mainnet assets here.");
+        Language.setText(note, Language.msg(l10n_eth_wallet_receive_body));
         note.setTextColor(Design.DIM2); note.setTextSize(11.5f); note.setPadding(0, dp(8), 0, 0);
         box.addView(note);
-        new AlertDialog.Builder(this).setTitle("Receive")
+        languageDialog().setTitle(Language.msg(l10n_eth_wallet_receive))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Copy", (d, w) -> { copy(ethAddr); toast("Address copied"); })
-                .setNegativeButton("Close", null)
+                .setPositiveButton(Language.msg(l10n_eth_wallet_copy), (d, w) -> { copy(ethAddr); toast(Language.msg(l10n_eth_wallet_address_copied)); })
+                .setNegativeButton(Language.msg(l10n_eth_wallet_close), null)
                 .setOnDismissListener(d -> modalOpen = false)
                 .show();
     }
 
     /**
      * Two-step export: an explicit blocking warning, THEN a device-credential confirmation, and only
-     * then the key. Previously Settings -> "Export private key" showed the key immediately, so two taps
+     * then the key. Previously Settings -> Language.msg(l10n_eth_wallet_export_key) showed the key immediately, so two taps
      * on an unlocked phone exported a mainnet key (and the README claimed a warning that did not exist).
      */
     private void exportKeyFlow() {
-        if (wallet.privateKeyHex() == null) { toast("No key yet"); return; }
+        if (wallet.privateKeyHex() == null) { toast(Language.msg(l10n_eth_wallet_no_key)); return; }
         modalOpen = true;
-        new AlertDialog.Builder(this)
-                .setTitle("Export private key")
-                .setMessage("Anyone who sees this key can take these funds, permanently and irreversibly. "
-                        + "Only continue if you are alone and know exactly why you need it.")
-                .setPositiveButton("I understand — show it", (d, w) -> {
+        languageDialog()
+                .setTitle(Language.msg(l10n_eth_wallet_export_key))
+                .setMessage(Language.msg(l10n_eth_wallet_export_warning))
+                .setPositiveButton(Language.msg(l10n_eth_wallet_show_key), (d, w) -> {
                     modalOpen = false;
-                    authThen("Export private key", "Confirm it's you before the key is shown", this::revealKeyDialog);
+                    authThen(Language.msg(l10n_eth_wallet_export_key), Language.msg(l10n_eth_wallet_confirm_identity), this::revealKeyDialog);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_eth_wallet_cancel), null)
                 .setOnDismissListener(d -> modalOpen = false)
                 .show();
     }
@@ -479,17 +508,17 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         modalOpen = true;
         LinearLayout box = colBox();
         TextView warn = new TextView(this);
-        warn.setText("Anyone with this key controls these funds. Never share it.");
+        Language.setText(warn, Language.msg(l10n_eth_wallet_private_warning));
         warn.setTextColor(Design.RED); warn.setTextSize(12.5f); warn.setPadding(0, 0, 0, dp(10));
         box.addView(warn);
         TextView key = new TextView(this);
-        key.setText(k); key.setTextSize(13f); key.setTextIsSelectable(true);
+        Language.setText(key, k); key.setTextSize(13f); key.setTextIsSelectable(true);
         key.setTypeface(android.graphics.Typeface.MONOSPACE);
         box.addView(key);
-        AlertDialog dlg = new AlertDialog.Builder(this).setTitle("Private key")
+        AlertDialog dlg = languageDialog().setTitle(Language.msg(l10n_eth_wallet_private_key))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Copy", (d, w) -> { copy(k, true); toast("Key copied — clipboard clears in 60s"); })
-                .setNegativeButton("Close", null)
+                .setPositiveButton(Language.msg(l10n_eth_wallet_copy), (d, w) -> { copy(k, true); toast(Language.msg(l10n_eth_wallet_key_copied)); })
+                .setNegativeButton(Language.msg(l10n_eth_wallet_close), null)
                 .setOnDismissListener(d -> modalOpen = false)
                 .create();
         // Keep the key out of screenshots, screen recordings and the recents thumbnail.
@@ -514,35 +543,37 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         final TextView tokenLine = new TextView(this);
         tokenLine.setTextColor(Design.ACCENT); tokenLine.setTextSize(15f);
         tokenLine.setPadding(0, 0, 0, dp(8));
-        final Runnable setTok = () -> tokenLine.setText("Token: " + chosen[0] + "  (tap to change · balance " + balOf(chosen[0]) + ")");
+        final Runnable setTok = () -> Language.setText(tokenLine, Language.msg(l10n_eth_wallet_token_balance, chosen[0], balOf(chosen[0])));
         setTok.run();
         tokenLine.setOnClickListener(v -> {
             String[] arr = syms.toArray(new String[0]);
-            new AlertDialog.Builder(this).setTitle("Send which token")
+            languageDialog().setTitle(Language.msg(l10n_eth_wallet_which_token))
                     .setItems(arr, (d, i) -> { chosen[0] = arr[i]; setTok.run(); }).show();
         });
         box.addView(tokenLine);
 
         final EditText to = new EditText(this);
-        to.setHint("Recipient 0x…");
+        Language.hint(to, Language.msg(l10n_eth_wallet_recipient));
         to.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         box.addView(to);
-        TextView scan = Design.pill(this, "⌗  Scan QR", Design.SURFACE2, Design.TEXT);
-        scan.setOnClickListener(v -> { pendingRecipient = to; scanLauncher.launch(new ScanOptions().setBeepEnabled(false).setOrientationLocked(false).setPrompt("Scan recipient address")); });
+        TextView scan = Design.pill(this, Language.msg(l10n_eth_wallet_scan), Design.SURFACE2, Design.TEXT);
+        scan.setMinimumHeight(dp(48));
+        scan.setOnClickListener(v -> { pendingRecipient = to; scanLauncher.launch(new ScanOptions().setBeepEnabled(false).setOrientationLocked(false).setPrompt(Language.msg(l10n_eth_wallet_scan_prompt).toString())); });
         LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         sp.topMargin = dp(8); scan.setLayoutParams(sp);
         box.addView(scan);
 
         final EditText amt = new EditText(this);
-        amt.setHint("Amount");
+        Language.hint(amt, Language.msg(l10n_eth_wallet_amount));
         amt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         LinearLayout.LayoutParams ap = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         ap.topMargin = dp(8); amt.setLayoutParams(ap);
         box.addView(amt);
-        TextView max = Design.pill(this, "MAX", Design.SURFACE2, Design.DIM);
+        TextView max = Design.pill(this, Language.msg(l10n_eth_wallet_max), Design.SURFACE2, Design.DIM);
+        max.setMinimumHeight(dp(48));
         max.setOnClickListener(v -> {
-            if (!"ETH".equals(chosen[0])) { amt.setText(balOf(chosen[0])); return; }   // ERC20: gas is paid in ETH
-            toast("Reserving gas…");                                                    // ETH: leave enough for the fee
+            if (!"ETH".equals(chosen[0])) { Language.setText(amt, balOf(chosen[0])); return; }   // ERC20: gas is paid in ETH
+            toast(Language.msg(l10n_eth_wallet_reserving));                                                    // ETH: leave enough for the fee
             io.execute(() -> {
                 try {
                     BigInteger wei = wallet.ethBalanceWei(rpc);
@@ -550,21 +581,21 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                     BigInteger fee = BigInteger.valueOf(21000).multiply(gp.multiply(BigInteger.valueOf(17)).divide(BigInteger.TEN)); // reserve for the High tier
                     BigInteger spend = wei.subtract(fee);
                     String out = spend.signum() > 0 ? EthWallet.format(spend, 18, 8) : "0";
-                    onUi(() -> amt.setText(out));
-                } catch (Exception e) { onUi(() -> amt.setText(balOf("ETH"))); }
+                    onUi(() -> Language.setText(amt, out));
+                } catch (Exception e) { onUi(() -> Language.setText(amt, balOf("ETH"))); }
             });
         });
         LinearLayout.LayoutParams mp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         mp.topMargin = dp(8); max.setLayoutParams(mp);
         box.addView(max);
 
-        new AlertDialog.Builder(this).setTitle("Send")
+        languageDialog().setTitle(Language.msg(l10n_eth_wallet_send))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Review", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_eth_wallet_review), (d, w) -> {
                     modalOpen = false;
                     confirmSend(chosen[0], to.getText().toString().trim(), amt.getText().toString().trim());
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_eth_wallet_cancel), null)
                 .setOnDismissListener(d -> modalOpen = false)
                 .show();
     }
@@ -574,31 +605,31 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         // characters to -1 without throwing, so "0x" + 40 junk chars silently becomes a VALID signed
         // transaction to a mangled address — funds gone, unrecoverable. The ERC20 path happens to be
         // caught by new Address(), the native ETH path was not.
-        if (!ADDR.matcher(to).matches()) { toast("Bad recipient address"); return; }
+        if (!ADDR.matcher(to).matches()) { toast(Language.msg(l10n_eth_wallet_bad_recipient)); return; }
         // EIP-55: a mixed-case address carries a checksum, so a typo is detectable. All-lower and
         // all-upper are legacy un-checksummed forms and stay allowed.
         if (!to.equals(to.toLowerCase()) && !to.equals(to.toUpperCase())) {
             String sum;
             try { sum = Keys.toChecksumAddress(to); } catch (Exception e) { sum = null; }
-            if (sum != null && !sum.equals(to)) { toast("Address checksum failed — check for a typo"); return; }
+            if (sum != null && !sum.equals(to)) { toast(Language.msg(l10n_eth_wallet_bad_checksum)); return; }
         }
-        if (to.equalsIgnoreCase(wallet.address())) { toast("That's your own address"); return; }
+        if (to.equalsIgnoreCase(wallet.address())) { toast(Language.msg(l10n_eth_wallet_own_address)); return; }
         final BigDecimal amtDec;
         // The decimal keypad emits the LOCALE's separator — a comma across most of Europe, which
         // BigDecimal rejects. Normalise before parsing so decimals are enterable everywhere.
         final String normalised = amount.replace(',', '.').trim();
         try { amtDec = new BigDecimal(normalised); if (amtDec.signum() <= 0) throw new Exception(); }
-        catch (Exception e) { toast("Bad amount"); return; }
+        catch (Exception e) { toast(Language.msg(l10n_eth_wallet_bad_amount)); return; }
 
-        toast("Estimating fee…");
+        toast(Language.msg(l10n_eth_wallet_estimating));
         io.execute(() -> {
             try {
                 final boolean isEth = "ETH".equals(sym);
                 final EthNet.Token tk = isEth ? null : tokenBySym(sym);
-                if (!isEth && tk == null) { onUi(() -> toast("Token " + sym + " is no longer in your list")); return; }
+                if (!isEth && tk == null) { onUi(() -> toast(Language.msg(l10n_eth_wallet_missing_token, sym))); return; }
                 final int decimals = isEth ? 18 : tk.decimals;
                 final BigInteger raw = amtDec.movePointRight(decimals).toBigInteger();
-                if (raw.signum() <= 0) { onUi(() -> toast("Amount is below the token's smallest unit")); return; }
+                if (raw.signum() <= 0) { onUi(() -> toast(Language.msg(l10n_eth_wallet_below_unit))); return; }
                 final String data = isEth ? null : FunctionEncoder.encode(new Function("transfer",
                         java.util.Arrays.asList(new Address(to), new Uint256(raw)), Collections.emptyList()));
                 final String txTo = isEth ? to : tk.address;
@@ -616,7 +647,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                             || m.contains("gas required");
                     boolean transport = !rejected && (m.contains("timeout") || m.contains("timed out")
                             || m.contains("connect") || m.contains("resolve") || m.contains("non-json"));
-                    if (!transport) { onUi(() -> toast("Won't send: " + ge.getMessage())); return; }
+                    if (!transport) { onUi(() -> toast(Language.msg(l10n_eth_wallet_refuse, EthMessages.error(ge)))); return; }
                     gasLimit = BigInteger.valueOf(isEth ? 21000 : 90000);
                 }
                 BigInteger gp = rpc.gasPrice(); if (gp.signum() <= 0) gp = BigInteger.valueOf(2_000_000_000L);
@@ -626,39 +657,37 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                 final BigInteger topGp = gp.multiply(BigInteger.valueOf(FEE_MULT[FEE_MULT.length - 1])).divide(BigInteger.valueOf(100));
                 if (topGp.compareTo(EthTx.MAX_GAS_PRICE) > 0) {
                     final String g = EthTx.gwei(gp);
-                    onUi(() -> toast("Won't send: " + rpcHost() + " reports a gas price of " + g
-                            + " gwei, far above normal. Check the RPC endpoint in Settings.")); return;
+                    onUi(() -> toast(Language.msg(l10n_eth_wallet_high_price, rpcHost(), g))); return;
                 }
                 if (gasLimit.compareTo(EthTx.MAX_GAS_LIMIT) > 0) {
                     final BigInteger gl = gasLimit;
-                    onUi(() -> toast("Won't send: " + rpcHost() + " estimated " + gl
-                            + " gas for this transfer, far above normal. Check the RPC endpoint in Settings.")); return;
+                    onUi(() -> toast(Language.msg(l10n_eth_wallet_high_gas, rpcHost(), gl))); return;
                 }
                 final BigInteger gasLimitF = gasLimit, baseGp = gp;
                 onUi(() -> showConfirm(sym, to, normalised, isEth, txTo, data, value, gasLimitF, baseGp));
             } catch (Exception e) {
-                onUi(() -> toast("Couldn't prepare: " + e.getMessage()));
+                onUi(() -> toast(Language.msg(l10n_eth_wallet_prepare_failed, EthMessages.error(e))));
             }
         });
     }
 
     // Fee tiers as a percentage of the network base gas price (gwei): slower → faster.
-    private static final String[] FEE_TIERS = {"Low", "Medium", "High"};
+    private static final CharSequence[] FEE_TIERS = {Language.msg(l10n_eth_wallet_low), Language.msg(l10n_eth_wallet_medium), Language.msg(l10n_eth_wallet_high)};
     private static final int[] FEE_MULT = {100, 130, 170};
 
     private void showConfirm(String sym, String to, String amount, boolean isEth, String txTo, String data, BigInteger value, BigInteger gasLimit, BigInteger baseGp) {
         modalOpen = true;
         final int[] tier = {1};   // default Medium
         LinearLayout box = colBox();
-        box.addView(kvLine("Send", amount + " " + sym));
+        box.addView(kvLine(Language.msg(l10n_eth_wallet_send), amount + " " + sym));
         TextView toLabel = new TextView(this);
-        toLabel.setText("To"); toLabel.setTextColor(Design.DIM); toLabel.setTextSize(12.5f);
+        Language.setText(toLabel, Language.msg(l10n_eth_wallet_to)); toLabel.setTextColor(Design.DIM); toLabel.setTextSize(12.5f);
         toLabel.setPadding(0, dp(6), 0, 0);
         box.addView(toLabel);
         box.addView(fullAddrBlock(to));
 
         TextView feeLabel = new TextView(this);
-        feeLabel.setText("Network fee"); feeLabel.setTextColor(Design.DIM); feeLabel.setTextSize(12.5f);
+        Language.setText(feeLabel, Language.msg(l10n_eth_wallet_network_fee)); feeLabel.setTextColor(Design.DIM); feeLabel.setTextSize(12.5f);
         feeLabel.setPadding(0, dp(8), 0, dp(4));
         box.addView(feeLabel);
 
@@ -675,24 +704,25 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
             }
             BigInteger gp = baseGp.multiply(BigInteger.valueOf(FEE_MULT[tier[0]])).divide(BigInteger.valueOf(100));
             BigInteger feeWei = gasLimit.multiply(gp);
-            feeVal.setText("~" + EthWallet.format(feeWei, 18, 8) + " ETH  ·  " + EthWallet.format(gp, 9, 2) + " gwei");
+            Language.setText(feeVal, "~" + EthWallet.format(feeWei, 18, 8) + " ETH  ·  " + EthWallet.format(gp, 9, 2) + " gwei");
 
             // Neither number is ours — both came from an RPC. Flag anything abnormal at the moment
             // of commitment, recomputed per tier so switching Low/Medium/High updates the warning.
-            String w = null;
+            CharSequence w = null;
             if (gp.compareTo(EthTx.WARN_GAS_PRICE) > 0 || gasLimit.compareTo(EthTx.WARN_GAS_LIMIT) > 0) {
-                w = "⚠ Unusually high network fee — check before sending.";
+                w = Language.msg(l10n_eth_wallet_fee_warning);
             } else if (isEth && value.signum() > 0 && feeWei.multiply(BigInteger.valueOf(4)).compareTo(value) > 0) {
                 // ETH only: for an ERC20 the fee is ETH and the amount is tokens, so the ratio is meaningless.
                 long pct = feeWei.multiply(BigInteger.valueOf(100)).divide(value).longValue();
-                w = "⚠ The fee is about " + pct + "% of the amount you're sending.";
+                w = Language.msg(l10n_eth_wallet_fee_percent, pct);
             }
-            feeWarn.setText(w == null ? "" : w);
+            Language.setText(feeWarn, w == null ? "" : w);
             feeWarn.setVisibility(w == null ? View.GONE : View.VISIBLE);
         };
         for (int i = 0; i < FEE_TIERS.length; i++) {
             final int idx = i;
             TextView p = Design.pill(this, FEE_TIERS[i], Design.SURFACE2, Design.DIM);
+            p.setMinimumHeight(dp(48));
             p.setOnClickListener(v -> { tier[0] = idx; paint.run(); });
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
             lp.rightMargin = i < FEE_TIERS.length - 1 ? dp(6) : 0;
@@ -706,12 +736,12 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         box.addView(feeWarn);
         paint.run();
 
-        new AlertDialog.Builder(this).setTitle("Confirm send")
+        languageDialog().setTitle(Language.msg(l10n_eth_wallet_confirm_send))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Send", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_eth_wallet_send), (d, w) -> {
                     modalOpen = false;
                     final BigInteger gasPrice = baseGp.multiply(BigInteger.valueOf(FEE_MULT[tier[0]])).divide(BigInteger.valueOf(100));
-                    toast("Broadcasting…");
+                    toast(Language.msg(l10n_eth_wallet_broadcasting));
                     io.execute(() -> {
                         try {
                             String tx = EthTx.send(rpc, wallet.creds(), net.chainId, txTo, data, isEth ? value : BigInteger.ZERO, gasLimit, gasPrice);
@@ -720,11 +750,11 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                             prefs.edit().putString("lastTx", tx).apply();
                             onUi(() -> { sentDialog(tx); refresh(); });
                         } catch (Exception e) {
-                            onUi(() -> toast("Send failed: " + e.getMessage()));
+                            onUi(() -> toast(Language.msg(l10n_eth_wallet_send_failed, EthMessages.error(e))));
                         }
                     });
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_eth_wallet_cancel), null)
                 .setOnDismissListener(d -> modalOpen = false)
                 .show();
     }
@@ -733,13 +763,13 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         modalOpen = true;
         LinearLayout box = colBox();
         TextView t = new TextView(this);
-        t.setText("Broadcast.\n\n" + tx); t.setTextSize(12.5f);
+        Language.setText(t, Language.msg(l10n_eth_wallet_broadcast, tx)); t.setTextSize(12.5f);
         t.setTypeface(android.graphics.Typeface.MONOSPACE); t.setTextIsSelectable(true);
         box.addView(t);
-        new AlertDialog.Builder(this).setTitle("Sent")
+        languageDialog().setTitle(Language.msg(l10n_eth_wallet_sent))
                 .setView(wrapScroll(box))
-                .setPositiveButton("View on Etherscan", (d, w) -> openUrl(net.explorerTx + tx))
-                .setNegativeButton("Close", null)
+                .setPositiveButton(Language.msg(l10n_eth_wallet_etherscan), (d, w) -> openUrl(net.explorerTx + tx))
+                .setNegativeButton(Language.msg(l10n_eth_wallet_close), null)
                 .setOnDismissListener(d -> modalOpen = false)
                 .show();
     }
@@ -750,37 +780,37 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         modalOpen = true;
         LinearLayout box = colBox();
         TextView t = new TextView(this);
-        t.setText("Paste an ERC20 contract address. Symbol + decimals are read from the chain.");
+        Language.setText(t, Language.msg(l10n_eth_wallet_add_token_body));
         t.setTextColor(Design.DIM); t.setTextSize(13f); t.setPadding(0, 0, 0, dp(10));
         box.addView(t);
         EditText in = new EditText(this);
-        in.setHint("0x… contract");
+        Language.hint(in, Language.msg(l10n_eth_wallet_contract_hint));
         in.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         box.addView(in);
-        new AlertDialog.Builder(this).setTitle("Add token")
+        languageDialog().setTitle(Language.msg(l10n_eth_wallet_add_token))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Add", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_eth_wallet_add), (d, w) -> {
                     modalOpen = false;
                     String addr = in.getText().toString().trim();
-                    if (!ADDR.matcher(addr).matches()) { toast("Bad contract address"); return; }
-                    if (tokens.has(addr)) { toast("Already added"); return; }
-                    toast("Reading token…");
+                    if (!ADDR.matcher(addr).matches()) { toast(Language.msg(l10n_eth_wallet_bad_contract)); return; }
+                    if (tokens.has(addr)) { toast(Language.msg(l10n_eth_wallet_already_added)); return; }
+                    toast(Language.msg(l10n_eth_wallet_reading_token));
                     io.execute(() -> {
                         try {
                             EthNet.Token tk = TokenStore.fetch(rpc, addr);
-                            onUi(() -> { tokens.add(tk); toast("Added " + tk.symbol); render(); refresh(); });
-                        } catch (Exception e) { onUi(() -> toast("Not an ERC20? " + e.getMessage())); }
+                            onUi(() -> { tokens.add(tk); toast(Language.msg(l10n_eth_wallet_added, tk.symbol)); render(); refresh(); });
+                        } catch (Exception e) { onUi(() -> toast(Language.msg(l10n_eth_wallet_not_erc20, EthMessages.error(e)))); }
                     });
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_eth_wallet_cancel), null)
                 .setOnDismissListener(d -> modalOpen = false)
                 .show();
     }
 
     private void tokenMenu(EthNet.Token tk) {
         modalOpen = true;
-        new AlertDialog.Builder(this).setTitle(tk.symbol)
-                .setItems(new String[]{"Send " + tk.symbol, "View on Etherscan", "Remove from list"}, (d, i) -> {
+        languageDialog().setTitle(tk.symbol)
+                .setItems(new CharSequence[]{Language.msg(l10n_eth_wallet_send_token, tk.symbol), Language.msg(l10n_eth_wallet_etherscan), Language.msg(l10n_eth_wallet_remove_token)}, (d, i) -> {
                     modalOpen = false;
                     if (i == 0) sendDialog(tk.symbol);
                     else if (i == 1) openUrl(ETHERSCAN + "token/" + tk.address + (ethAddr == null ? "" : "?a=" + ethAddr));
@@ -794,8 +824,8 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
 
     private void settingsDialog() {
         modalOpen = true;
-        new AlertDialog.Builder(this).setTitle("Settings")
-                .setItems(new String[]{"Export private key", "RPC endpoint", "Add token", "View address on Etherscan", "View last transaction", "Switch wallet source"}, (d, i) -> {
+        languageDialog().setTitle(Language.msg(l10n_eth_wallet_settings))
+                .setItems(new CharSequence[]{Language.msg(l10n_eth_wallet_export_key), Language.msg(l10n_eth_wallet_rpc_endpoint), Language.msg(l10n_eth_wallet_add_token), Language.msg(l10n_eth_wallet_view_address), Language.msg(l10n_eth_wallet_last_tx), Language.msg(l10n_eth_wallet_switch_source)}, (d, i) -> {
                     modalOpen = false;
                     switch (i) {
                         case 0: exportKeyFlow(); break;
@@ -811,7 +841,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
     }
 
     private void viewAddressOnEtherscan() {
-        if (ethAddr == null) { toast("No address yet"); return; }
+        if (ethAddr == null) { toast(Language.msg(l10n_eth_wallet_no_address)); return; }
         openUrl(ETHERSCAN + "address/" + ethAddr);
     }
 
@@ -819,7 +849,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
      *  during {@link #sentDialog} can't lose the only reference to a live transaction. */
     private void viewLastTx() {
         String tx = prefs.getString("lastTx", null);
-        if (tx == null) { toast("No transaction sent from this device yet"); return; }
+        if (tx == null) { toast(Language.msg(l10n_eth_wallet_no_tx)); return; }
         openUrl(net.explorerTx + tx);
     }
 
@@ -827,35 +857,35 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         modalOpen = true;
         LinearLayout box = colBox();
         EditText in = new EditText(this);
-        in.setText(rpc.url());
+        Language.setText(in, rpc.url());
         in.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
         box.addView(in);
         TextView note = new TextView(this);
-        note.setText("Falls back to public keyless nodes automatically if this one fails.");
+        Language.setText(note, Language.msg(l10n_eth_wallet_rpc_fallback));
         note.setTextColor(Design.DIM2); note.setTextSize(11.5f); note.setPadding(0, dp(8), 0, 0);
         box.addView(note);
-        new AlertDialog.Builder(this).setTitle("RPC endpoint")
+        languageDialog().setTitle(Language.msg(l10n_eth_wallet_rpc_endpoint))
                 .setView(wrapScroll(box))
-                .setPositiveButton("Save", (d, w) -> { modalOpen = false; String u = in.getText().toString().trim(); if (!u.isEmpty()) { prefs.edit().putString("rpc", u).apply(); rpc.setUrl(u); refresh(); } })
-                .setNeutralButton("Default", (d, w) -> { modalOpen = false; prefs.edit().remove("rpc").apply(); rpc.setUrl(net.defaultRpc); refresh(); })
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_eth_wallet_save), (d, w) -> { modalOpen = false; String u = in.getText().toString().trim(); if (!u.isEmpty()) { prefs.edit().putString("rpc", u).apply(); rpc.setUrl(u); refresh(); } })
+                .setNeutralButton(Language.msg(l10n_eth_wallet_default), (d, w) -> { modalOpen = false; prefs.edit().remove("rpc").apply(); rpc.setUrl(net.defaultRpc); refresh(); })
+                .setNegativeButton(Language.msg(l10n_eth_wallet_cancel), null)
                 .setOnDismissListener(d -> modalOpen = false)
                 .show();
     }
 
     private void switchSourceDialog() {
         modalOpen = true;
-        new AlertDialog.Builder(this).setTitle("Switch wallet source")
-                .setMessage("Re-derive from the node, or import a different key. (This doesn't move funds.)")
-                .setPositiveButton("Use embedded wallet", (d, w) -> {
+        languageDialog().setTitle(Language.msg(l10n_eth_wallet_switch_source))
+                .setMessage(Language.msg(l10n_eth_wallet_switch_body))
+                .setPositiveButton(Language.msg(l10n_eth_wallet_embedded), (d, w) -> {
                     modalOpen = false;
                     prefs.edit().putString("source", "node").apply();
                     wallet.clear(); ethAddr = null; ethErr = null;
                     retryNode();   // NOT connectNode(): with the IPC already up there is no register to wait for
                     render();
                 })
-                .setNeutralButton("Import key", (d, w) -> { modalOpen = false; wallet.clear(); ethAddr = null; importDialog(); })
-                .setNegativeButton("Cancel", null)
+                .setNeutralButton(Language.msg(l10n_eth_wallet_import_key), (d, w) -> { modalOpen = false; wallet.clear(); ethAddr = null; importDialog(); })
+                .setNegativeButton(Language.msg(l10n_eth_wallet_cancel), null)
                 .setOnDismissListener(d -> modalOpen = false)
                 .show();
     }
@@ -909,8 +939,8 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
 
         LinearLayout colc = new LinearLayout(this);
         colc.setOrientation(LinearLayout.VERTICAL);
-        TextView t = new TextView(this); t.setText(title); t.setTextColor(Design.DIM); t.setTextSize(12.5f);
-        TextView v = new TextView(this); v.setText(value); v.setTextColor(Design.ACCENT); v.setTextSize(20f);
+        TextView t = new TextView(this); Language.setText(t, title); t.setTextColor(Design.DIM); t.setTextSize(12.5f);
+        TextView v = new TextView(this); Language.setText(v, value); v.setTextColor(Design.ACCENT); v.setTextSize(20f);
         v.setTypeface(v.getTypeface(), android.graphics.Typeface.BOLD); v.setPadding(0, dp(2), 0, 0);
         colc.addView(t); colc.addView(v);
         c.addView(colc, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
@@ -940,10 +970,11 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         cv.drawText(t, sz / 2f, sz / 2f - rb.exactCenterY(), p);
         return bm;
     }
-    private void addPill(LinearLayout row, String label, Runnable onClick) {
+    private void addPill(LinearLayout row, CharSequence label, Runnable onClick) {
         TextView p = Design.pill(this, label, Design.SURFACE2, Design.TEXT);
+        p.setMinimumHeight(dp(48));
         p.setOnClickListener(v -> onClick.run());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
         lp.rightMargin = dp(8); p.setLayoutParams(lp);
         row.addView(p);
     }
@@ -963,19 +994,19 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         t.setTextSize(14f);
         t.setLineSpacing(dp(2), 1f);
         t.setPadding(0, dp(2), 0, dp(6));
-        if (addr == null) { t.setText("—"); return t; }
+        if (addr == null) { Language.setText(t, "—"); return t; }
         android.text.SpannableString s = new android.text.SpannableString(addr);
         int head = Math.min(8, addr.length());              // "0x" + 6 hex
         int tail = Math.max(head, addr.length() - 6);
         s.setSpan(new android.text.style.ForegroundColorSpan(Design.ACCENT), 0, head, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         s.setSpan(new android.text.style.ForegroundColorSpan(Design.ACCENT), tail, addr.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        t.setText(s);
+        Language.setText(t, s);
         return t;
     }
 
-    private TextView kvLine(String k, String v) {
+    private TextView kvLine(CharSequence k, CharSequence v) {
         TextView t = new TextView(this);
-        t.setText(k + ":  " + v); t.setTextSize(14f); t.setPadding(0, dp(4), 0, dp(4));
+        Language.setText(t, Language.join(k, ":  ", v)); t.setTextSize(14f); t.setPadding(0, dp(4), 0, dp(4));
         return t;
     }
 
@@ -987,10 +1018,10 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         b.setBackgroundColor(0xFF3A2A00);
         b.setPadding(dp(16), dp(10), dp(16), dp(10));
         TextView t = new TextView(this);
-        t.setText("The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry.");
+        Language.setText(t, Language.msg(l10n_explorer_node_retry));
         t.setTextColor(Design.ACCENT); t.setTextSize(12.5f);
         b.addView(t);
-        b.setOnClickListener(v -> { toast("Retrying…"); retryNode(); });
+        b.setOnClickListener(v -> { toast(Language.msg(l10n_eth_wallet_retrying)); retryNode(); });
         return b;
     }
 
@@ -1003,7 +1034,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
     }
 
     private int dp(int v) { return Design.dp(this, v); }
-    private void toast(String s) { Toast.makeText(this, s, Toast.LENGTH_SHORT).show(); }
+    private void toast(CharSequence s) { Toast.makeText(this, s, Toast.LENGTH_SHORT).show(); }
     private void copy(String s) { copy(s, false); }
 
     /** Copy to the clipboard. Sensitive values are flagged so Android 13+ hides them from the paste
@@ -1011,7 +1042,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
     private void copy(String s, boolean sensitive) {
         android.content.ClipboardManager cm = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         if (cm == null) return;
-        android.content.ClipData clip = android.content.ClipData.newPlainText(sensitive ? "private key" : "eth", s);
+        android.content.ClipData clip = android.content.ClipData.newPlainText(sensitive ? Language.text(this, l10n_eth_wallet_private_key) : "eth", s);
         if (sensitive && android.os.Build.VERSION.SDK_INT >= 33) {
             android.os.PersistableBundle extras = new android.os.PersistableBundle();
             extras.putBoolean(android.content.ClipDescription.EXTRA_IS_SENSITIVE, true);
@@ -1040,11 +1071,11 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
     }
     private void openUrl(String url) {
         try { startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))); }
-        catch (Exception e) { toast("No browser"); }
+        catch (Exception e) { toast(Language.msg(l10n_eth_wallet_no_browser)); }
     }
     /** Host of the RPC that actually answered — named in fee warnings so the user knows who to distrust. */
-    private String rpcHost() {
-        try { return new java.net.URL(rpc.url()).getHost(); } catch (Exception e) { return "the RPC"; }
+    private CharSequence rpcHost() {
+        try { return new java.net.URL(rpc.url()).getHost(); } catch (Exception e) { return Language.msg(l10n_eth_wallet_rpc); }
     }
 
     private static String shortAddr(String a) {
@@ -1059,8 +1090,5 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         int q = s.indexOf('?'); if (q > 0) s = s.substring(0, q);
         return s.trim();
     }
-    private static String ago(long t) {
-        long s = (System.currentTimeMillis() - t) / 1000;
-        return s < 60 ? s + "s ago" : (s / 60) + "m ago";
-    }
+
 }

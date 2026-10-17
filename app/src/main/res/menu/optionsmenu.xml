@@ -11,51 +11,56 @@
     <item
         android:id="@+id/mainmenu_logs"
         android:orderInCategory="100"
-        android:title="Logs"
+        android:title="@string/l10n_menu_logs"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/mainmenu_backup"
         android:orderInCategory="100"
-        android:title="Backup &amp; Recovery"
+        android:title="@string/l10n_menu_backup"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/mainmenu_params"
         android:orderInCategory="100"
-        android:title="Startup Params"
+        android:title="@string/l10n_menu_params"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/mainmenu_locknow"
         android:orderInCategory="100"
-        android:title="Lock now"
+        android:title="@string/l10n_menu_lock_now"
         android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/mainmenu_applock"
         android:orderInCategory="100"
-        android:title="App Lock"
+        android:title="@string/l10n_menu_app_lock"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/mainmenu_shutdown"
         android:orderInCategory="100"
-        android:title="Shutdown"
+        android:title="@string/l10n_menu_shutdown"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/mainmenu_wipeminima"
         android:orderInCategory="100"
-        android:title="Reset Minima"
+        android:title="@string/l10n_menu_reset"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/mainmenu_screenshots"
         android:orderInCategory="100"
-        android:title="Allow Screenshots"
+        android:title="@string/l10n_menu_screenshots"
         android:checkable="true"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/mainmenu_language"
+        android:orderInCategory="100"
+        android:title="@string/l10n_language_title"
+        app:showAsAction="never" />
 </menu>

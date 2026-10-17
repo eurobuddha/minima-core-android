@@ -15,6 +15,8 @@ android {
     }
 }
 dependencies {
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    implementation project(':localization')
     // Shared Maxima codec classes now come from the vendored transport core
     // (they were byte-identical copies; D8 refuses the duplicate).
     implementation project(':maxima-core')

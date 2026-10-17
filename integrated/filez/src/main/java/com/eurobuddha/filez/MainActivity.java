@@ -1,4 +1,8 @@
 package com.eurobuddha.filez;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.content.Context;
 import android.content.Intent;
@@ -56,10 +60,48 @@ import java.util.concurrent.Executors;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private final java.util.Set<AlertDialog> languageDialogs = new java.util.HashSet<>();
+    private final java.util.Map<PopupMenu, java.util.Map<android.view.MenuItem, CharSequence>> languageMenus = new java.util.LinkedHashMap<>();
+    private LanguageDialog languageDialog() {
+        return new LanguageDialog(this) {
+            @Override public AlertDialog create() {
+                AlertDialog value = super.create();
+                languageDialogs.add(value);
+                value.setOnDismissListener(d -> languageDialogs.remove(value));
+                return value;
+            }
+        };
+    }
+    private void showLanguageMenu(PopupMenu menu) {
+        java.util.Map<android.view.MenuItem, CharSequence> labels = new java.util.LinkedHashMap<>();
+        for (int i=0;i<menu.getMenu().size();i++) {
+            android.view.MenuItem item = menu.getMenu().getItem(i);
+            labels.put(item,item.getTitle());
+        }
+        languageMenus.put(menu,labels);
+        menu.setOnDismissListener(m -> languageMenus.remove(m));
+        menu.show();
+    }
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        for (PopupMenu menu : new java.util.ArrayList<>(languageMenus.keySet())) {
+            java.util.Map<android.view.MenuItem, CharSequence> labels = languageMenus.get(menu);
+            // Recreate only the popup window so its cached width follows the new labels.
+            // Keep the menu items, action listeners and original translation descriptors.
+            menu.setOnDismissListener(null);
+            menu.dismiss();
+            for (java.util.Map.Entry<android.view.MenuItem, CharSequence> entry : labels.entrySet())
+                entry.getKey().setTitle(entry.getValue().toString());
+            menu.setOnDismissListener(m -> languageMenus.remove(m));
+            menu.show();
+        }
+    }
+
     public static final String NODE_PKG = "com.eurobuddha.pandamonium";
     public static final String PANDAAPPS_PKG = "com.eurobuddha.pandaapps";
     private static final String IMPORT_DIR = "imports";
-    private static final String MSG_NO_NODE = "The embedded node did not respond. Check its status in Minima Core.";
+    private static final CharSequence MSG_NO_NODE = Language.msg(l10n_terminal_ide_timeout);
 
     private NodeApi node;
 
@@ -88,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.pm_filez_activity_main);
+        Language.apply(findViewById(R.id.pm_filez_main));
         header = findViewById(R.id.pm_filez_header);
         title = findViewById(R.id.pm_filez_title);
         status = findViewById(R.id.pm_filez_status);
@@ -152,8 +195,8 @@ public class MainActivity extends AppCompatActivity {
     private void onPaired(boolean enabled) {
         if (!enabled) {
             // Reset the wording - showAdminBanner/showOldNodeBanner may have rewritten it earlier
-            pairingTitle.setText("Filez is not enabled yet");
-            pairingText.setText("The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry.");
+            Language.setText(pairingTitle, Language.msg(l10n_filez_not_enabled));
+            Language.setText(pairingText, Language.msg(l10n_explorer_node_retry));
             resetBannerButton();
         }
         pairingBanner.setVisibility(enabled ? View.GONE : View.VISIBLE);
@@ -162,25 +205,25 @@ public class MainActivity extends AppCompatActivity {
 
     /** FILE verbs need the Admin toggle too — the node tells us in the error text. */
     private void showAdminBanner() {
-        pairingTitle.setText("Filez needs Admin access");
-        pairingText.setText("The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry.");
+        Language.setText(pairingTitle, Language.msg(l10n_filez_admin));
+        Language.setText(pairingText, Language.msg(l10n_explorer_node_retry));
         resetBannerButton();
         pairingBanner.setVisibility(View.VISIBLE);
     }
 
     /** The node answers normal commands but not FILE — it's alive but pre-1.3.1 (no file bridge). */
     private void showOldNodeBanner() {
-        pairingTitle.setText("Minima Core update needed");
-        pairingText.setText("Your Minima Core is running but doesn't have the file bridge.\nInstall \"Minima Core — New UI (Preview)\" 1.3.1 or newer from PandaApps, then come back.");
+        Language.setText(pairingTitle, Language.msg(l10n_filez_update));
+        Language.setText(pairingText, Language.msg(l10n_filez_old_node));
         Button btn = findViewById(R.id.pm_filez_openNodeBtn);
-        btn.setText("Open PandaApps");
+        Language.setText(btn, Language.msg(l10n_filez_panda_apps));
         btn.setOnClickListener(v -> openPandaApps());
         pairingBanner.setVisibility(View.VISIBLE);
     }
 
     private void resetBannerButton() {
         Button btn = findViewById(R.id.pm_filez_openNodeBtn);
-        btn.setText("Open Minima Core");
+        Language.setText(btn, Language.msg(l10n_filez_open_core));
         btn.setOnClickListener(v -> openMinimaCore());
     }
 
@@ -189,15 +232,15 @@ public class MainActivity extends AppCompatActivity {
      * normal commands fine — probe with a cheap `block` to tell the two cases apart.
      */
     private void onFileTimeout() {
-        status.setText("Checking Minima Core version…");
+        Language.setText(status, Language.msg(l10n_filez_checking_version));
         node.cmd("block", 8000, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 showOldNodeBanner();
-                status.setText("Minima Core needs updating for file access");
+                Language.setText(status, Language.msg(l10n_filez_update_files));
             }
             @Override public void onError(String m) {
                 // ERR_NOT_ENABLED -> the pairing listener already showed the enable banner
-                if (!NodeApi.ERR_NOT_ENABLED.equals(m)) status.setText(MSG_NO_NODE);
+                if (!NodeApi.ERR_NOT_ENABLED.equals(m)) Language.setText(status, MSG_NO_NODE);
             }
         });
     }
@@ -206,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
     private void handleFileCallError(String m) {
         if (NodeApi.ERR_NOT_ENABLED.equals(m)) return;      // banner shown via pairing listener
         if (NodeApi.ERR_TIMEOUT.equals(m)) { onFileTimeout(); return; }
-        status.setText(m);
+        Language.setText(status, m);
         toast(m);
     }
 
@@ -242,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
                 ok = clip != null && clip.getItemCount() > 0
                         && value.contentEquals(String.valueOf(clip.getItemAt(0).coerceToText(this)));
             } catch (Exception ignored) {}
-            toast(ok ? "Copied" : "Copy blocked by the system — long-press the path in file details, or use Share path");
+            toast(ok ? Language.msg(l10n_filez_copied) : Language.msg(l10n_filez_copy_blocked));
         }, 200);
     }
 
@@ -251,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
         if (loading) return;
         loading = true;
         fetchNodeRoot();
-        status.setText("Loading…");
+        Language.setText(status, Language.msg(l10n_filez_loading));
         node.file("list", path, null, null, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 loading = false;
@@ -285,10 +328,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateHeader(int count) {
         boolean root = currentPath.equals("/");
-        title.setText(root ? "Filez — node folder" : currentPath);
+        Language.setText(title, root ? Language.msg(l10n_filez_root) : currentPath);
         backBtn.setVisibility(root ? View.GONE : View.VISIBLE);
-        status.setText(count + (count == 1 ? " item" : " items")
-                + (root ? "  ·  backups, exports & imports live here" : ""));
+        Language.setText(status, Language.join(Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_filez_items, count), root ? Language.msg(l10n_filez_root_hint) : ""));
     }
 
     private void navigateUp() {
@@ -298,20 +340,21 @@ public class MainActivity extends AppCompatActivity {
 
     /** A failed FILE response — admin gating gets the banner, the rest a toast + status line. */
     private void onFileError(JSONObject j) {
-        String err = j.optString("error", j.optString("response", "File action failed"));
-        if (err.contains("ADMIN")) { showAdminBanner(); status.setText("Waiting for Admin access…"); return; }
-        status.setText(err);
-        Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+        String err = j.optString("error", j.optString("response", null));
+        CharSequence display = err == null ? Language.msg(l10n_filez_file_failed) : err;
+        if (err != null && err.contains("ADMIN")) { showAdminBanner(); Language.setText(status, Language.msg(l10n_filez_waiting_admin)); return; }
+        Language.setText(status, display);
+        Toast.makeText(this, display, Toast.LENGTH_LONG).show();
     }
 
     // ---- menus ----
 
     private void showMainMenu(View anchor) {
         PopupMenu m = new PopupMenu(this, anchor);
-        m.getMenu().add(0, 1, 0, "Import file here");
-        m.getMenu().add(0, 2, 1, "New folder");
-        m.getMenu().add(0, 3, 2, "Create node backup");
-        m.getMenu().add(0, 4, 3, "Refresh");
+        m.getMenu().add(0, 1, 0, Language.msg(l10n_filez_import_here));
+        m.getMenu().add(0, 2, 1, Language.msg(l10n_filez_new_folder));
+        m.getMenu().add(0, 3, 2, Language.msg(l10n_filez_create_backup));
+        m.getMenu().add(0, 4, 3, Language.msg(l10n_filez_refresh));
         m.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case 1: importLauncher.launch(new String[]{"*/*"}); return true;
@@ -321,25 +364,25 @@ public class MainActivity extends AppCompatActivity {
                 default: return false;
             }
         });
-        m.show();
+        showLanguageMenu(m);
     }
 
     private void showEntryMenu(View anchor, FileEntry e) {
         PopupMenu m = new PopupMenu(this, anchor);
-        if (!e.isdir) m.getMenu().add(0, 1, 0, "Export to phone…");
-        m.getMenu().add(0, 4, 1, "Copy path");
-        m.getMenu().add(0, 2, 2, "Rename");
-        m.getMenu().add(0, 3, 3, "Delete");
+        if (!e.isdir) m.getMenu().add(0, 1, 0, Language.msg(l10n_filez_export_phone));
+        m.getMenu().add(0, 4, 1, Language.msg(l10n_filez_copy_path));
+        m.getMenu().add(0, 2, 2, Language.msg(l10n_filez_rename));
+        m.getMenu().add(0, 3, 3, Language.msg(l10n_filez_delete));
         m.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case 1: startExport(e); return true;
-                case 4: copyToClipboard("path", terminalPathFor(Util.joinPath(currentPath, e.name))); return true;
+                case 4: copyToClipboard(Language.text(this, l10n_filez_path_label), terminalPathFor(Util.joinPath(currentPath, e.name))); return true;
                 case 2: promptRename(e); return true;
                 case 3: confirmDelete(e); return true;
                 default: return false;
             }
         });
-        m.show();
+        showLanguageMenu(m);
     }
 
     /** Mirrors the web Filez File page exactly: Name / Size / File Type / Location sections
@@ -352,9 +395,9 @@ public class MainActivity extends AppCompatActivity {
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(12), dp(20), dp(12));
 
-        detailSection(box, "Size", Util.formatBytes(e.size));
-        detailSection(box, "File Type", Util.getExtension(e.name));
-        detailSection(box, "Location", location);
+        detailSection(box, Language.msg(l10n_filez_size), Util.formatBytes(e.size));
+        detailSection(box, Language.msg(l10n_filez_type), e.name.lastIndexOf('.') < 0 || e.name.endsWith(".") ? Language.msg(l10n_filez_generic_type) : Util.getExtension(e.name));
+        detailSection(box, Language.msg(l10n_filez_location), location);
 
         // Live self-check: ask the node to resolve the EXACT Location string the way a
         // terminal file: argument resolves, and print the verdict right in the dialog.
@@ -362,60 +405,60 @@ public class MainActivity extends AppCompatActivity {
         check.setTextSize(12f);
         check.setPadding(0, dp(6), 0, dp(6));
         check.setTextColor(FilezDesign.DIM);
-        check.setText("Checking path with node…");
+        Language.setText(check, Language.msg(l10n_filez_checking_path));
         box.addView(check);
         node.file("stat", location, null, null, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
-                if (!j.optBoolean("status", false)) { check.setText(""); return; }
+                if (!j.optBoolean("status", false)) { Language.setText(check, ""); return; }
                 if (j.optBoolean("exists", false)) {
                     check.setTextColor(FilezDesign.SUCCESS);
-                    check.setText("✓ Terminal will find this path (" + Util.formatBytes(j.optLong("size", 0)) + ")");
+                    Language.setText(check, Language.msg(l10n_filez_path_found, Util.formatBytes(j.optLong("size", 0))));
                 } else {
                     check.setTextColor(FilezDesign.ERROR);
-                    StringBuilder sb = new StringBuilder("✗ Terminal will NOT find this path!");
+                    Language.TextBuilder sb = new Language.TextBuilder().append(Language.msg(l10n_filez_path_missing));
                     org.json.JSONArray kids = j.optJSONArray("parentlist");
                     if (!j.optBoolean("parentexists", false)) {
-                        sb.append("\nThat folder doesn't exist either.");
+                        sb.append(Language.msg(l10n_filez_parent_missing));
                     } else if (kids != null) {
-                        sb.append("\nThe node sees in that folder: ");
+                        sb.append(Language.msg(l10n_filez_parent_contents));
                         for (int i = 0; i < kids.length(); i++) {
                             if (i > 0) sb.append(", ");
                             sb.append('"').append(kids.optString(i)).append('"');
                         }
                     }
-                    check.setText(sb.toString());
+                    Language.setText(check, sb.build());
                 }
             }
-            @Override public void onError(String m) { check.setText(""); }
+            @Override public void onError(String m) { Language.setText(check, ""); }
         });
 
         Button copy = new Button(this);
-        copy.setText("Copy path");
+        Language.setText(copy, Language.msg(l10n_filez_copy_path));
         copy.setOnClickListener(v -> {
-            copyToClipboard("path", location);
-            copy.setText("Copied to clipboard");
-            ui.postDelayed(() -> copy.setText("Copy path"), 2500);
+            copyToClipboard(Language.text(this, l10n_filez_path_label), location);
+            Language.setText(copy, Language.msg(l10n_filez_clipboard));
+            ui.postDelayed(() -> Language.setText(copy, Language.msg(l10n_filez_copy_path)), 2500);
         });
         box.addView(copy);
 
-        new AlertDialog.Builder(this)
-                .setTitle(e.name)
+        languageDialog()
+                .setTitle(Language.join(e.name))
                 .setView(box)
-                .setPositiveButton("Export to phone…", (d, w) -> startExport(e))
-                .setNeutralButton("Close", null)
-                .setNegativeButton("Delete", (d, w) -> confirmDelete(e))
+                .setPositiveButton(Language.msg(l10n_filez_export_phone), (d, w) -> startExport(e))
+                .setNeutralButton(Language.msg(l10n_filez_close), null)
+                .setNegativeButton(Language.msg(l10n_filez_delete), (d, w) -> confirmDelete(e))
                 .show();
     }
 
-    private void detailSection(LinearLayout parent, String label, String value) {
+    private void detailSection(LinearLayout parent, CharSequence label, CharSequence value) {
         TextView l = new TextView(this);
-        l.setText(label);
+        Language.setText(l, label);
         l.setTextSize(12f);
         l.setTextColor(FilezDesign.DIM);
         l.setPadding(0, dp(8), 0, dp(2));
         parent.addView(l);
         TextView v = new TextView(this);
-        v.setText(value);
+        Language.setText(v, value);
         v.setTextSize(14f);
         v.setTextIsSelectable(true);
         parent.addView(v);
@@ -430,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void doExport(String nodePath, Uri dest) {
         pendingExportPath = null;
-        status.setText("Exporting…");
+        Language.setText(status, Language.msg(l10n_filez_exporting));
         node.file("get", nodePath, null, null, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 if (!j.optBoolean("status", false)) { onFileError(j); return; }
@@ -440,13 +483,13 @@ public class MainActivity extends AppCompatActivity {
                     try (InputStream input = getContentResolver().openInputStream(Uri.parse(srcUri));
                          OutputStream output = getContentResolver().openOutputStream(dest)) {
                         long copied = copyStream(input, output);
-                        final String doneMsg = "Exported " + Util.formatBytes(copied);
-                        ui.post(() -> { status.setText(doneMsg); toast(doneMsg); updateHeaderSoon(); });
+                        final CharSequence doneMsg = Language.msg(l10n_filez_exported, Util.formatBytes(copied));
+                        ui.post(() -> { Language.setText(status, doneMsg); toast(doneMsg); updateHeaderSoon(); });
                         if (size > 0 && copied != size) {
-                            ui.post(() -> toast("Warning: expected " + size + " bytes, wrote " + copied));
+                            ui.post(() -> toast(Language.msg(l10n_filez_size_warning, size, copied)));
                         }
                     } catch (Exception exc) {
-                        ui.post(() -> { status.setText("Export failed"); toast("Export failed: " + exc.getMessage()); });
+                        ui.post(() -> { Language.setText(status, Language.msg(l10n_filez_export_failed)); toast(Language.msg(l10n_filez_export_error, FilezMessages.error(exc))); });
                     }
                 });
             }
@@ -457,7 +500,7 @@ public class MainActivity extends AppCompatActivity {
     // ---- IMPORT: Android file system -> node base folder ----
 
     private void doImport(Uri src) {
-        status.setText("Importing…");
+        Language.setText(status, Language.msg(l10n_filez_importing));
         final String directory = currentPath;
         io.execute(() -> {
             try {
@@ -468,15 +511,15 @@ public class MainActivity extends AppCompatActivity {
                 ui.post(() -> node.file("put", dest, null, src, new NodeApi.Cb() {
                     @Override public void onResult(JSONObject j) {
                         if (!j.optBoolean("status", false)) { onFileError(j); return; }
-                        String msg = "Imported " + Util.formatBytes(j.optLong("size", 0));
-                        status.setText(msg);
+                        CharSequence msg = Language.msg(l10n_filez_imported, Util.formatBytes(j.optLong("size", 0)));
+                        Language.setText(status, msg);
                         toast(msg);
                         loadDirectory(currentPath);
                     }
                     @Override public void onError(String m) { handleFileCallError(m); }
                 }));
             } catch (Exception exc) {
-                ui.post(() -> { status.setText("Import failed"); toast("Import failed: " + exc.getMessage()); });
+                ui.post(() -> { Language.setText(status, Language.msg(l10n_filez_import_failed)); toast(Language.msg(l10n_filez_import_error, FilezMessages.error(exc))); });
             }
         });
     }
@@ -498,43 +541,44 @@ public class MainActivity extends AppCompatActivity {
     // ---- mkdir / rename / delete / backup ----
 
     private void promptNewFolder() {
-        promptText("New folder", "", name -> {
+        promptText(Language.msg(l10n_filez_new_folder), "", name -> {
             String safe = Util.safeName(name);
             if (safe.isEmpty()) return;
-            node.file("mkdir", Util.joinPath(currentPath, safe), null, null, simpleRefreshCb("Folder created"));
+            node.file("mkdir", Util.joinPath(currentPath, safe), null, null, simpleRefreshCb(Language.msg(l10n_filez_folder_created)));
         });
     }
 
     private void promptRename(FileEntry e) {
-        promptText("Rename " + e.name, e.name, name -> {
+        promptText(Language.msg(l10n_filez_rename_title, e.name), e.name, name -> {
             String safe = Util.safeName(name);
             if (safe.isEmpty() || safe.equals(e.name)) return;
             node.file("move", Util.joinPath(currentPath, e.name), Util.joinPath(currentPath, safe), null,
-                    simpleRefreshCb("Renamed"));
+                    simpleRefreshCb(Language.msg(l10n_filez_renamed)));
         });
     }
 
     private void confirmDelete(FileEntry e) {
-        String warn = e.isdir
-                ? "Delete the folder \"" + e.name + "\" and EVERYTHING in it from the node?"
-                : "Delete \"" + e.name + "\" from the node?";
-        new AlertDialog.Builder(this)
-                .setTitle("Delete")
+        CharSequence warn = e.isdir
+                ? Language.msg(l10n_filez_delete_folder, e.name)
+                : Language.msg(l10n_filez_delete_file, e.name);
+        languageDialog()
+                .setTitle(Language.msg(l10n_filez_delete))
                 .setMessage(warn)
-                .setPositiveButton("Delete", (d, w) ->
-                        node.file("delete", Util.joinPath(currentPath, e.name), null, null, simpleRefreshCb("Deleted")))
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_filez_delete), (d, w) ->
+                        node.file("delete", Util.joinPath(currentPath, e.name), null, null, simpleRefreshCb(Language.msg(l10n_filez_deleted))))
+                .setNegativeButton(Language.msg(l10n_filez_cancel), null)
                 .show();
     }
 
     /** Runs the node `backup` terminal command — the .bak lands in the base folder root. */
     private void createBackup() {
-        status.setText("Creating backup… (can take a while)");
+        Language.setText(status, Language.msg(l10n_filez_creating_backup));
         node.cmd("backup", new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 if (!j.optBoolean("status", false)) {
-                    String err = j.optString("error", j.optString("message", "Backup failed"));
-                    status.setText(err); toast(err); return;
+                    String raw = j.optString("error", j.optString("message", null));
+                    CharSequence err = raw == null ? Language.msg(l10n_filez_backup_failed) : raw;
+                    Language.setText(status, err); toast(err); return;
                 }
                 String file = "";
                 JSONObject r = j.optJSONObject("response");
@@ -542,19 +586,19 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject bk = r.optJSONObject("backup");
                     if (bk != null) file = bk.optString("file", "");
                 }
-                toast(file.isEmpty() ? "Backup created" : "Backup created: " + new File(file).getName());
+                toast(file.isEmpty() ? Language.msg(l10n_filez_backup_created) : Language.msg(l10n_filez_backup_file, new File(file).getName()));
                 loadDirectory("/");
             }
             @Override public void onError(String m) {
                 // Plain CMD — an old node answers this fine, so a timeout means unreachable
-                String msg = NodeApi.ERR_TIMEOUT.equals(m) ? MSG_NO_NODE : m;
-                status.setText(msg);
+                CharSequence msg = NodeApi.ERR_TIMEOUT.equals(m) ? MSG_NO_NODE : m;
+                Language.setText(status, msg);
                 toast(msg);
             }
         });
     }
 
-    private NodeApi.Cb simpleRefreshCb(String okMsg) {
+    private NodeApi.Cb simpleRefreshCb(CharSequence okMsg) {
         return new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 if (!j.optBoolean("status", false)) { onFileError(j); return; }
@@ -565,20 +609,20 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    private void promptText(String titleText, String prefill, TextCb cb) {
+    private void promptText(CharSequence titleText, String prefill, TextCb cb) {
         EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
-        input.setText(prefill);
+        Language.setText(input, prefill);
         input.setSelection(prefill.length());
         // Native dialog surfaces follow Android light/dark; inherit their matching input colour.
         LinearLayout wrap = new LinearLayout(this);
         wrap.setPadding(dp(20), dp(8), dp(20), 0);
         wrap.addView(input, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        new AlertDialog.Builder(this)
+        languageDialog()
                 .setTitle(titleText)
                 .setView(wrap)
-                .setPositiveButton("OK", (d, w) -> cb.text(input.getText().toString()))
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(Language.msg(l10n_filez_ok), (d, w) -> cb.text(input.getText().toString()))
+                .setNegativeButton(Language.msg(l10n_filez_cancel), null)
                 .show();
     }
 
@@ -625,7 +669,7 @@ public class MainActivity extends AppCompatActivity {
             row.addView(mid);
 
             TextView more = new TextView(MainActivity.this);
-            more.setText("⋮");
+            Language.setText(more, "⋮");
             more.setTextSize(18f);
             more.setTextColor(FilezDesign.DIM);
             more.setPadding(dp(14), dp(6), dp(14), dp(6));
@@ -636,14 +680,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Override public void onBindViewHolder(@NonNull VH h, int pos) {
             FileEntry e = data.get(pos);
-            h.glyph.setText(e.isdir ? "📁" : "📄");
-            h.name.setText(e.name);
-            h.meta.setText(e.isdir ? "Folder" : Util.formatBytes(e.size)
-                    + (e.modified > 0 ? "  ·  " + Util.formatDate(e.modified) : ""));
+            Language.setText(h.glyph, e.isdir ? "📁" : "📄");
+            Language.setText(h.name, e.name);
+            Language.setText(h.meta, e.isdir ? Language.msg(l10n_filez_folder) : Language.join(Util.formatBytes(e.size), e.modified > 0 ? Language.join("  ·  ", Language.stamp(e.modified, "yMMMdHm")) : ""));
             h.itemView.setOnClickListener(v -> {
                 if (e.isdir) loadDirectory(Util.joinPath(currentPath, e.name));
                 else showDetail(e);
             });
+            Language.description(h.more, Language.msg(l10n_filez_entry_menu, e.name));
             h.more.setOnClickListener(v -> showEntryMenu(v, e));
         }
 
@@ -674,7 +718,7 @@ public class MainActivity extends AppCompatActivity {
         if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.minimablock");
         if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
         if (launch != null) startActivity(launch);
-        else Toast.makeText(this, "Minima Core isn't installed.", Toast.LENGTH_LONG).show();
+        else Toast.makeText(this, Language.msg(l10n_filez_no_core), Toast.LENGTH_LONG).show();
     }
 
     private void openPandaApps() {
@@ -683,7 +727,7 @@ public class MainActivity extends AppCompatActivity {
         else openMinimaCore();   // no store installed — at least surface the node
     }
 
-    private void toast(String msg) { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); }
+    private void toast(CharSequence msg) { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); }
 
     private int dp(int v) { return (int) (v * getResources().getDisplayMetrics().density); }
 
@@ -692,6 +736,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        for (AlertDialog value : new java.util.ArrayList<>(languageDialogs)) value.dismiss();
+        languageDialogs.clear();
+        for (PopupMenu value : new java.util.ArrayList<>(languageMenus.keySet())) value.dismiss();
+        languageMenus.clear();
         super.onDestroy();
         if (node != null) node.onDestroy();
         io.shutdownNow();

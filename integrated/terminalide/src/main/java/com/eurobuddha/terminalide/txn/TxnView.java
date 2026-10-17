@@ -1,4 +1,7 @@
 package com.eurobuddha.terminalide.txn;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.app.Activity;
 import android.text.InputType;
@@ -49,7 +52,7 @@ public class TxnView extends BaseView {
         wire(R.id.pm_terminalide_txn_change, v -> addChange());
         wire(R.id.pm_terminalide_txn_setstate, v -> stateDialog());
         wire(R.id.pm_terminalide_txn_sign, v -> signDialog());
-        wire(R.id.pm_terminalide_txn_basics, v -> simple("txnbasics", "MMR proofs + scripts added"));
+        wire(R.id.pm_terminalide_txn_basics, v -> simple("txnbasics", Language.msg(l10n_terminal_txn_proofs_added)));
         wire(R.id.pm_terminalide_txn_check, v -> refresh());
         wire(R.id.pm_terminalide_txn_post, v -> postDialog());
         wire(R.id.pm_terminalide_txn_export, v -> exportTxn());
@@ -69,11 +72,11 @@ public class TxnView extends BaseView {
     private String txnId() {
         String id = mTxnId.getText().toString().trim();
         if (id.isEmpty()) {
-            Toast.makeText(mActivity, "Set a transaction id first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, Language.msg(l10n_terminal_txn_id_required), Toast.LENGTH_SHORT).show();
             return null;
         }
         if (hasCommandChars(id)) {
-            Toast.makeText(mActivity, "Transaction id can't contain spaces or ':'", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, Language.msg(l10n_terminal_txn_id_invalid), Toast.LENGTH_SHORT).show();
             return null;
         }
         return id;
@@ -94,17 +97,17 @@ public class TxnView extends BaseView {
         return s.contains(" ") || s.contains("\t") || s.contains("\n") || s.contains(";");
     }
 
-    private boolean rejectBadField(String label, String value, boolean allowColon) {
+    private boolean rejectBadField(CharSequence label, String value, boolean allowColon) {
         boolean bad = allowColon ? hasWhitespaceOrSemicolon(value) : hasCommandChars(value);
         if (bad) {
-            Toast.makeText(mActivity, label + " can't contain spaces"
-                    + (allowColon ? " or ';'" : ", ':' or ';'"), Toast.LENGTH_LONG).show();
+            Toast.makeText(mActivity, allowColon ? Language.msg(l10n_terminal_txn_field_invalid_colon, label) : Language.msg(l10n_terminal_txn_field_invalid, label), Toast.LENGTH_LONG).show();
         }
         return bad;
     }
 
-    private void setStatus(String text, int color) {
-        mStatus.setText(OutputFormatter.colored(text, color));
+    private void setStatus(CharSequence text, int color) {
+        Language.setText(mStatus, text);
+        mStatus.setTextColor(color);
     }
 
     // ---------------- actions ----------------
@@ -112,13 +115,13 @@ public class TxnView extends BaseView {
     private void create() {
         String id = txnId();
         if (id == null) return;
-        run("txncreate id:" + id, "created '" + id + "' — now add inputs", true);
+        run("txncreate id:" + id, Language.msg(l10n_terminal_txn_created, id), true);
     }
 
     private void pickCoin() {
         String id = txnId();
         if (id == null) return;
-        setStatus("… loading your coins", OutputFormatter.COL_DIM);
+        setStatus(Language.msg(l10n_terminal_txn_loading_coins), OutputFormatter.COL_DIM);
         // Shrink the reply at the SOURCE with simplestate:true (drops the large per-coin
         // state blobs) — an over-limit Binder reply crashes app+node uncatchably (see
         // minima-ipc-gotchas). We keep relevant+sendable (never hide coins by age) and
@@ -128,7 +131,7 @@ public class TxnView extends BaseView {
             public void onResult(JSONObject json) {
                 JSONArray coins = json.optJSONArray("response");
                 if (coins == null || coins.length() == 0) {
-                    setStatus("No sendable coins found", OutputFormatter.COL_ERROR);
+                    setStatus(Language.msg(l10n_terminal_txn_no_coins), OutputFormatter.COL_ERROR);
                     return;
                 }
                 int n = Math.min(coins.length(), 100);
@@ -137,20 +140,23 @@ public class TxnView extends BaseView {
                 String[] coinids = new String[n];
                 for (int i = 0; i < n; i++) {
                     JSONObject c = coins.optJSONObject(i);
+                    if (c == null || c.optString("coinid", "").isEmpty()) {
+                        setStatus(Language.msg(l10n_terminal_txn_incomplete), OutputFormatter.COL_ERROR);
+                        return;
+                    }
                     String amount = c.optString("tokenamount", c.optString("amount", "?"));
                     String tokenid = c.optString("tokenid", "0x00");
                     String token = tokenid.equals("0x00") ? "MINIMA" : shorten(tokenid);
                     coinids[i] = c.optString("coinid", "");
                     labels[i] = amount + " " + token + "\n" + shorten(coinids[i]);
                 }
-                String title = capped ? "Add input coin (first " + n + " of " + coins.length() + ")"
-                        : "Add input coin (" + coins.length() + " sendable)";
-                new AlertDialog.Builder(mActivity)
+                CharSequence title = capped ? Language.msg(l10n_terminal_txn_coin_title_capped, n, coins.length()) : Language.msg(l10n_terminal_txn_coin_title, coins.length());
+                ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
                         .setTitle(title)
                         .setItems(labels, (d, which) ->
                                 run("txninput id:" + id + " coinid:" + coinids[which],
-                                        "input added", true))
-                        .setNegativeButton("Cancel", null)
+                                        Language.msg(l10n_terminal_txn_input_added), true))
+                        .setNegativeButton(Language.msg(l10n_common_cancel), null)
                         .show();
             }
 
@@ -163,33 +169,33 @@ public class TxnView extends BaseView {
         String id = txnId();
         if (id == null) return;
         View v = mActivity.getLayoutInflater().inflate(R.layout.pm_terminalide_dialog_output, null);
+        Language.apply(v);
         EditText amount = v.findViewById(R.id.pm_terminalide_out_amount);
         EditText address = v.findViewById(R.id.pm_terminalide_out_address);
         EditText tokenid = v.findViewById(R.id.pm_terminalide_out_tokenid);
         CheckBox storestate = v.findViewById(R.id.pm_terminalide_out_storestate);
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Add output")
-                .setMessage("Inputs must equal outputs — any difference is BURNED. Add a change "
-                        + "output back to yourself. storestate:true only for covenant/phase coins.")
+        ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
+                .setTitle(Language.msg(l10n_terminal_txn_add_output))
+                .setMessage(Language.msg(l10n_terminal_txn_output_body))
                 .setView(v)
-                .setPositiveButton("Add", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_terminal_txn_add), (d, w) -> {
                     String amt = amount.getText().toString().trim();
                     String addr = address.getText().toString().trim();
                     if (amt.isEmpty() || addr.isEmpty()) {
-                        Toast.makeText(mActivity, "Amount and address required", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mActivity, Language.msg(l10n_terminal_txn_amount_address_required), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     String tok = tokenid.getText().toString().trim();
-                    if (rejectBadField("Amount", amt, false) || rejectBadField("Address", addr, false)
-                            || rejectBadField("Token id", tok, false)) {
+                    if (rejectBadField(Language.msg(l10n_history_amount), amt, false) || rejectBadField(Language.msg(l10n_history_address), addr, false)
+                            || rejectBadField(Language.msg(l10n_terminal_txn_token_id), tok, false)) {
                         return;
                     }
                     String cmd = "txnoutput id:" + id + " amount:" + amt + " address:" + addr
                             + (tok.isEmpty() ? "" : " tokenid:" + tok)
                             + " storestate:" + storestate.isChecked();
-                    run(cmd, "output added", true);
+                    run(cmd, Language.msg(l10n_terminal_txn_output_added), true);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
@@ -207,11 +213,11 @@ public class TxnView extends BaseView {
         String id = txnId();
         if (id == null) return;
         if (mChangeInFlight) {
-            Toast.makeText(mActivity, "Change calculation already in progress", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, Language.msg(l10n_terminal_txn_change_busy), Toast.LENGTH_SHORT).show();
             return;
         }
         mChangeInFlight = true;
-        setStatus("… calculating change", OutputFormatter.COL_DIM);
+        setStatus(Language.msg(l10n_terminal_txn_calculating), OutputFormatter.COL_DIM);
         mNode.cmd("txncheck id:" + id, new NodeApi.Cb() {
             @Override
             public void onResult(JSONObject json) {
@@ -219,37 +225,50 @@ public class TxnView extends BaseView {
                 JSONArray coins = resp != null ? resp.optJSONArray("coins") : null;
                 if (coins == null) {
                     mChangeInFlight = false;
-                    setStatus("✖ no txn '" + id + "' — Create it first", OutputFormatter.COL_ERROR);
+                    setStatus(Language.join("✖ ", Language.msg(l10n_terminal_txn_missing_txn, id)), OutputFormatter.COL_ERROR);
                     return;
                 }
                 final java.util.List<String[]> changes = new java.util.ArrayList<>();  // {tokenid, amount}
                 StringBuilder planned = new StringBuilder();
                 for (int i = 0; i < coins.length(); i++) {
                     JSONObject c = coins.optJSONObject(i);
-                    if (c == null) continue;
+                    if (c == null || c.optString("tokenid", "").isEmpty()) {
+                        mChangeInFlight = false;
+                        setStatus(Language.msg(l10n_terminal_txn_incomplete), OutputFormatter.COL_ERROR);
+                        return;
+                    }
                     String tokenid = c.optString("tokenid", "0x00");
-                    String diff = c.optString("difference", "0");
+                    String diff = c.optString("difference", "");
                     try {
-                        if (new BigDecimal(diff).compareTo(BigDecimal.ZERO) > 0) {
+                        int balance = new BigDecimal(diff).compareTo(BigDecimal.ZERO);
+                        if (balance < 0) {
+                            mChangeInFlight = false;
+                            setStatus(Language.msg(l10n_terminal_txn_negative_change), OutputFormatter.COL_ERROR);
+                            return;
+                        }
+                        if (balance > 0) {
                             changes.add(new String[]{tokenid, diff});
                             planned.append(diff).append(" ")
                                     .append(tokenid.equals("0x00") ? "MINIMA" : shorten(tokenid))
                                     .append("\n");
                         }
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException invalid) {
+                        mChangeInFlight = false;
+                        setStatus(Language.msg(l10n_terminal_txn_incomplete), OutputFormatter.COL_ERROR);
+                        return;
+                    }
                 }
                 if (changes.isEmpty()) {
                     mChangeInFlight = false;
-                    setStatus("✓ inputs already equal outputs — no change needed",
+                    setStatus(Language.msg(l10n_terminal_txn_balanced),
                             OutputFormatter.COL_STRING);
                     return;
                 }
-                new AlertDialog.Builder(mActivity)
-                        .setTitle("Add change to your wallet")
-                        .setMessage("These leftovers would BURN on post. Send them back to "
-                                + "your own address?\n\n" + planned)
-                        .setPositiveButton("Add change", (d, w) -> fetchAddressAndAdd(id, changes))
-                        .setNegativeButton("Cancel", (d, w) -> mChangeInFlight = false)
+                ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
+                        .setTitle(Language.msg(l10n_terminal_txn_change_title))
+                        .setMessage(Language.msg(l10n_terminal_txn_change_body, planned.toString()))
+                        .setPositiveButton(Language.msg(l10n_terminal_txn_add_change), (d, w) -> fetchAddressAndAdd(id, changes))
+                        .setNegativeButton(Language.msg(l10n_common_cancel), (d, w) -> mChangeInFlight = false)
                         .setOnCancelListener(d -> mChangeInFlight = false)
                         .show();
             }
@@ -271,7 +290,7 @@ public class TxnView extends BaseView {
                         resp.optString("address", "")) : "";
                 if (addr.isEmpty()) {
                     mChangeInFlight = false;
-                    setStatus("✖ couldn't fetch a wallet address", OutputFormatter.COL_ERROR);
+                    setStatus(Language.msg(l10n_terminal_txn_address_failed), OutputFormatter.COL_ERROR);
                     return;
                 }
                 addChangeOutputs(id, addr, changes, 0);
@@ -288,8 +307,7 @@ public class TxnView extends BaseView {
     private void addChangeOutputs(String id, String addr, java.util.List<String[]> changes, int idx) {
         if (idx >= changes.size()) {
             mChangeInFlight = false;
-            setStatus("✓ change added for all " + changes.size()
-                    + " token(s) — inputs now match outputs", OutputFormatter.COL_STRING);
+            setStatus(Language.msg(l10n_terminal_txn_change_added, changes.size()), OutputFormatter.COL_STRING);
             refresh();
             return;
         }
@@ -309,10 +327,7 @@ public class TxnView extends BaseView {
                                 .append(changes.get(j)[0].equals("0x00") ? "MINIMA"
                                         : shorten(changes.get(j)[0])).append("\n");
                     }
-                    setStatus("✖ change failed on token " + (idx + 1) + "/" + changes.size()
-                            + ": " + json.optString("error", "txnoutput failed")
-                            + "\n\n⚠ Still unbalanced (would BURN on post):\n" + left
-                            + "\nFix these or Delete the txn before posting.",
+                    setStatus(Language.msg(l10n_terminal_txn_change_failed, idx + 1, changes.size(), json.has("error") ? json.optString("error") : Language.msg(l10n_terminal_txn_output_failed), left.toString()),
                             OutputFormatter.COL_ERROR);
                     return;
                 }
@@ -335,30 +350,28 @@ public class TxnView extends BaseView {
         int pad = (int) (mActivity.getResources().getDisplayMetrics().density * 20);
         box.setPadding(pad, 0, pad, 0);
         EditText port = new EditText(mActivity);
-        port.setHint("port (0-255)");
+        Language.hint(port, Language.msg(l10n_terminal_txn_port_hint));
         port.setInputType(InputType.TYPE_CLASS_NUMBER);
         EditText value = new EditText(mActivity);
-        value.setHint("value");
+        Language.hint(value, Language.msg(l10n_terminal_txn_value_hint));
         box.addView(port);
         box.addView(value);
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Set state variable")
-                .setMessage("State variables ride on the transaction and are stored in outputs "
-                        + "with storestate:true. Unset ports read as empty — set every port your "
-                        + "script touches.")
+        ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
+                .setTitle(Language.msg(l10n_terminal_txn_state_title))
+                .setMessage(Language.msg(l10n_terminal_txn_state_body))
                 .setView(box)
-                .setPositiveButton("Set", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_terminal_txn_set), (d, w) -> {
                     String p = port.getText().toString().trim();
                     String val = value.getText().toString().trim();
                     if (p.isEmpty() || val.isEmpty()) {
-                        Toast.makeText(mActivity, "Port and value required", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mActivity, Language.msg(l10n_terminal_txn_port_value_required), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     // value may be hex (0x..) but must not carry spaces/';' onto the command line.
-                    if (rejectBadField("Port", p, false) || rejectBadField("Value", val, true)) return;
-                    run("txnstate id:" + id + " port:" + p + " value:" + val, "state set", true);
+                    if (rejectBadField(Language.msg(l10n_terminal_txn_port), p, false) || rejectBadField(Language.msg(l10n_terminal_txn_value), val, true)) return;
+                    run("txnstate id:" + id + " port:" + p + " value:" + val, Language.msg(l10n_terminal_txn_state_set), true);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
@@ -366,23 +379,22 @@ public class TxnView extends BaseView {
         String id = txnId();
         if (id == null) return;
         EditText key = new EditText(mActivity);
-        key.setHint("publickey (leave empty for auto)");
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Sign transaction")
-                .setMessage("Order matters: sign FIRST, then Basics, then Post. For script-coin "
-                        + "inputs sign with the specific key the script checks.")
+        Language.hint(key, Language.msg(l10n_terminal_txn_key_hint));
+        ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
+                .setTitle(Language.msg(l10n_terminal_txn_sign_title))
+                .setMessage(Language.msg(l10n_terminal_txn_sign_body))
                 .setView(key)
-                .setPositiveButton("Sign", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_terminal_txn_sign), (d, w) -> {
                     String k = key.getText().toString().trim();
-                    if (rejectBadField("Public key", k, false)) return;
+                    if (rejectBadField(Language.msg(l10n_terminal_txn_public_key), k, false)) return;
                     run("txnsign id:" + id + " publickey:" + (k.isEmpty() ? "auto" : k),
-                            "signed — now run Basics", true);
+                            Language.msg(l10n_terminal_txn_signed), true);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
-    private void simple(String cmd, String okMsg) {
+    private void simple(String cmd, CharSequence okMsg) {
         String id = txnId();
         if (id == null) return;
         run(cmd + " id:" + id, okMsg, true);
@@ -392,43 +404,41 @@ public class TxnView extends BaseView {
         String id = txnId();
         if (id == null) return;
         EditText burn = new EditText(mActivity);
-        burn.setHint("burn (optional, e.g. 0.1)");
+        Language.hint(burn, Language.msg(l10n_terminal_txn_burn_hint));
         burn.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Post transaction")
-                .setMessage("This broadcasts on-chain. Success = status:true; the PoW mines "
-                        + "asynchronously so istransaction:false at return is NORMAL — do not "
-                        + "re-post, watch the chain instead. Did you run Sign then Basics?")
+        ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
+                .setTitle(Language.msg(l10n_terminal_txn_post_title))
+                .setMessage(Language.msg(l10n_terminal_txn_post_body))
                 .setView(burn)
-                .setPositiveButton("Post", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_terminal_txn_post), (d, w) -> {
                     String b = burn.getText().toString().trim();
-                    if (rejectBadField("Burn", b, false)) return;
+                    if (rejectBadField(Language.msg(l10n_explorer_burn), b, false)) return;
                     run("txnpost id:" + id + (b.isEmpty() ? "" : " burn:" + b),
-                            "posted — status:true means accepted; it mines over the next blocks", true);
+                            Language.msg(l10n_terminal_txn_posted), true);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     private void exportTxn() {
         String id = txnId();
         if (id == null) return;
-        setStatus("… exporting", OutputFormatter.COL_DIM);
+        setStatus(Language.msg(l10n_terminal_txn_exporting), OutputFormatter.COL_DIM);
         mNode.cmd("txnexport id:" + id, new NodeApi.Cb() {
             @Override
             public void onResult(JSONObject json) {
                 JSONObject resp = json.optJSONObject("response");
                 String data = resp != null ? resp.optString("data", "") : "";
                 if (data.isEmpty()) {
-                    setStatus("✖ export failed: " + json.optString("error", "no data"),
+                    setStatus(Language.msg(l10n_terminal_txn_export_failed, json.has("error") ? json.optString("error") : Language.msg(l10n_terminal_txn_no_data)),
                             OutputFormatter.COL_ERROR);
                     return;
                 }
-                android.content.ClipboardManager cb = (android.content.ClipboardManager)
-                        mActivity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-                cb.setPrimaryClip(android.content.ClipData.newPlainText("txn", data));
-                setStatus("✓ exported to clipboard (" + data.length() + " chars) — import it on "
-                        + "another node with Import", OutputFormatter.COL_STRING);
+                if (!com.eurobuddha.terminalide.terminal.SessionExport.copy(mActivity, data, "txn")) {
+                    setStatus(Language.msg(l10n_terminal_txn_copy_failed), OutputFormatter.COL_ERROR);
+                    return;
+                }
+                setStatus(Language.msg(l10n_terminal_txn_exported, data.length()), OutputFormatter.COL_STRING);
             }
 
             @Override
@@ -440,33 +450,33 @@ public class TxnView extends BaseView {
         String id = txnId();
         if (id == null) return;
         EditText data = new EditText(mActivity);
-        data.setHint("0x... exported txn data");
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Import transaction")
+        Language.hint(data, Language.msg(l10n_terminal_txn_import_hint));
+        ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
+                .setTitle(Language.msg(l10n_terminal_txn_import_title))
                 .setView(data)
-                .setPositiveButton("Import", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_wallet_import), (d, w) -> {
                     String hex = data.getText().toString().trim();
                     if (hex.isEmpty()) return;
-                    if (rejectBadField("Import data", hex, false)) return;
-                    run("txnimport id:" + id + " data:" + hex, "imported", true);
+                    if (rejectBadField(Language.msg(l10n_terminal_txn_import_data), hex, false)) return;
+                    run("txnimport id:" + id + " data:" + hex, Language.msg(l10n_terminal_txn_imported), true);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     private void deleteDialog() {
         String id = txnId();
         if (id == null) return;
-        new AlertDialog.Builder(mActivity)
-                .setTitle("Delete '" + id + "'?")
-                .setMessage("Always delete abandoned transactions — they lock their input coins.")
-                .setPositiveButton("Delete", (d, w) -> run("txndelete id:" + id, "deleted", false))
-                .setNegativeButton("Cancel", null)
+        ((com.eurobuddha.terminalide.MainActivity)mActivity).languageDialog()
+                .setTitle(Language.msg(l10n_terminal_editor_delete_title, id))
+                .setMessage(Language.msg(l10n_terminal_txn_delete_body))
+                .setPositiveButton(Language.msg(l10n_backup_delete), (d, w) -> run("txndelete id:" + id, Language.msg(l10n_terminal_txn_deleted), false))
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
     private void listAll() {
-        setStatus("… listing transactions", OutputFormatter.COL_DIM);
+        setStatus(Language.msg(l10n_terminal_txn_listing), OutputFormatter.COL_DIM);
         mNode.cmd("txnlist", new NodeApi.Cb() {
             @Override
             public void onResult(JSONObject json) {
@@ -475,10 +485,10 @@ public class TxnView extends BaseView {
                 // Show a compact id + in/out-count summary instead.
                 JSONArray arr = json.optJSONArray("response");
                 if (arr == null || arr.length() == 0) {
-                    setStatus("No pending transactions", OutputFormatter.COL_DIM);
+                    setStatus(Language.msg(l10n_terminal_txn_no_pending), OutputFormatter.COL_DIM);
                     return;
                 }
-                StringBuilder sb = new StringBuilder(arr.length() + " pending transaction(s):\n\n");
+                Language.TextBuilder sb = new Language.TextBuilder().append(Language.msg(l10n_terminal_txn_pending, arr.length())).append("\n\n");
                 for (int i = 0; i < arr.length(); i++) {
                     JSONObject t = arr.optJSONObject(i);
                     if (t == null) continue;
@@ -489,10 +499,10 @@ public class TxnView extends BaseView {
                     int outs = txn != null && txn.optJSONArray("outputs") != null
                             ? txn.optJSONArray("outputs").length() : 0;
                     sb.append("• ").append(tid).append("  ")
-                            .append(ins).append(" in / ").append(outs).append(" out\n");
+                            .append(Language.msg(l10n_terminal_txn_in_out, ins, outs)).append("\n");
                 }
-                sb.append("\nType an id above + Check to inspect one.");
-                setStatus(sb.toString(), OutputFormatter.COL_PLAIN);
+                sb.append("\n").append(Language.msg(l10n_terminal_txn_inspect));
+                setStatus(sb.build(), OutputFormatter.COL_PLAIN);
             }
 
             @Override
@@ -502,18 +512,17 @@ public class TxnView extends BaseView {
 
     // ---------------- helpers ----------------
 
-    private void run(String cmd, String okMsg, boolean refreshAfter) {
+    private void run(String cmd, CharSequence okMsg, boolean refreshAfter) {
         setStatus("… " + cmd, OutputFormatter.COL_DIM);
         mNode.cmd(cmd, new NodeApi.Cb() {
             @Override
             public void onResult(JSONObject json) {
                 if (!json.optBoolean("status", false)) {
-                    setStatus("✖ " + cmd + "\n" + json.optString("error", "failed")
-                            + "\n\nTip: delete abandoned txns (they lock coins).",
+                    setStatus(Language.join("✖ ", cmd, "\n", json.has("error") ? json.optString("error") : Language.msg(l10n_future_error_failed), "\n\n", Language.msg(l10n_terminal_txn_delete_tip)),
                             OutputFormatter.COL_ERROR);
                     return;
                 }
-                setStatus("✓ " + okMsg, OutputFormatter.COL_STRING);
+                setStatus(Language.join("✓ ", okMsg), OutputFormatter.COL_STRING);
                 if (refreshAfter) refresh();
             }
 
@@ -524,54 +533,59 @@ public class TxnView extends BaseView {
 
     /** Re-reads txncheck for the current txn and renders the balance summary. */
     public void refresh() {
-        String id = mTxnId.getText().toString().trim();
-        if (id.isEmpty() || mNode == null) return;
+        if (mTxnId.getText().toString().trim().isEmpty() || mNode == null) return;
+        String id = txnId();
+        if (id == null) return;
         mNode.cmd("txncheck id:" + id, new NodeApi.Cb() {
             @Override
             public void onResult(JSONObject json) {
+                if (!id.equals(mTxnId.getText().toString().trim())) return;
                 if (!json.optBoolean("status", false)) {
-                    mSummary.setText(OutputFormatter.colored(
-                            "no txn '" + id + "' — Create it first", OutputFormatter.COL_DIM));
+                    Language.setText(mSummary, Language.msg(l10n_terminal_txn_missing_txn, id));
+                    mSummary.setTextColor(OutputFormatter.COL_DIM);
                     return;
                 }
                 JSONObject resp = json.optJSONObject("response");
-                StringBuilder sb = new StringBuilder();
+                Language.TextBuilder sb = new Language.TextBuilder();
                 boolean burnWarning = false;
                 if (resp != null) {
                     JSONArray coins = resp.optJSONArray("coins");
                     if (coins != null) {
                         for (int i = 0; i < coins.length(); i++) {
                             JSONObject c = coins.optJSONObject(i);
+                            if (c == null) {
+                                Language.setText(mSummary, Language.msg(l10n_terminal_txn_incomplete));
+                                mSummary.setTextColor(OutputFormatter.COL_ERROR);
+                                return;
+                            }
                             String tokenid = c.optString("tokenid", "0x00");
                             String in = c.optString("input", "?");
                             String outp = c.optString("output", "?");
                             String diff = c.optString("difference", "?");
-                            sb.append(tokenid.equals("0x00") ? "MINIMA" : shorten(tokenid))
-                                    .append("  in:").append(in)
-                                    .append("  out:").append(outp)
-                                    .append("  diff:").append(diff).append("\n");
+                            sb.append(Language.msg(l10n_terminal_txn_balance_row, tokenid.equals("0x00") ? "MINIMA" : shorten(tokenid), in, outp, diff)).append("\n");
                             try {
                                 if (new BigDecimal(diff).compareTo(BigDecimal.ZERO) > 0) burnWarning = true;
-                            } catch (NumberFormatException ignored) {}
+                            } catch (NumberFormatException invalid) {
+                                Language.setText(mSummary, Language.msg(l10n_terminal_txn_incomplete));
+                                mSummary.setTextColor(OutputFormatter.COL_ERROR);
+                                return;
+                            }
                         }
                     }
                     String burn = resp.optString("burn", "");
-                    if (!burn.isEmpty()) sb.append("burn: ").append(burn).append("\n");
+                    if (!burn.isEmpty()) sb.append(Language.msg(l10n_terminal_txn_burn_value, burn)).append("\n");
                     JSONObject valid = resp.optJSONObject("valid");
                     if (valid != null) {
-                        sb.append("valid: basic=").append(valid.optBoolean("basic"))
-                                .append(" signatures=").append(valid.optBoolean("signatures"))
-                                .append(" mmrproofs=").append(valid.optBoolean("mmrproofs"))
-                                .append(" scripts=").append(valid.optBoolean("scripts"));
+                        Object signatures = resp.opt("allsignaturesvalid");
+                        if (!(signatures instanceof Boolean)) signatures = valid.opt("signatures");
+                        sb.append(Language.msg(l10n_terminal_txn_valid, valid.optBoolean("basic"), (signatures instanceof Boolean ? signatures : "?"), valid.optBoolean("mmrproofs"), valid.optBoolean("scripts")));
                     }
                 }
                 if (burnWarning) {
-                    sb.append("\n⚠ inputs > outputs — the difference will be PERMANENTLY BURNED. "
-                            + "Add a change output unless intentional.");
+                    sb.append("\n").append(Language.msg(l10n_terminal_txn_burn_warning));
                 }
-                mSummary.setText(OutputFormatter.colored(sb.length() == 0
-                                ? "txn exists — add inputs/outputs" : sb.toString(),
-                        burnWarning ? OutputFormatter.COL_BOOL : OutputFormatter.COL_PLAIN));
+                Language.setText(mSummary, sb.build().length() == 0 ? Language.msg(l10n_terminal_txn_exists) : sb.build());
+                mSummary.setTextColor(burnWarning ? OutputFormatter.COL_BOOL : OutputFormatter.COL_PLAIN);
             }
 
             @Override
@@ -581,10 +595,10 @@ public class TxnView extends BaseView {
 
     private void nodeError(String message) {
         if (NodeApi.ERR_NOT_ENABLED.equals(message)) {
-            setStatus("The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry.",
+            setStatus(Language.msg(l10n_explorer_node_retry),
                     OutputFormatter.COL_ERROR);
         } else {
-            setStatus("✖ " + message, OutputFormatter.COL_ERROR);
+            setStatus(Language.join("✖ ", com.eurobuddha.terminalide.terminal.TerminalMessages.message(message)), OutputFormatter.COL_ERROR);
         }
     }
 

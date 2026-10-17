@@ -49,7 +49,7 @@
                 android:paddingHorizontal="14dp"
                 android:paddingVertical="10dp"
                 android:fontFamily="monospace"
-                android:hint="Enter command"
+                android:hint="Enter command" android:tag="l10n:hint=l10n_terminal_input"
                 android:textColor="@color/core_text"
                 android:textColorHint="@color/core_text_faint"
                 android:textSize="14sp"
@@ -58,9 +58,9 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/terminal_send"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Run" />
+                android:text="Run" android:tag="l10n:text=l10n_terminal_run" />
         </LinearLayout>
 
         <ScrollView
@@ -71,19 +71,39 @@
             android:scrollbars="none"
             android:background="@color/core_bg">
 
-            <TextView
-                android:id="@+id/terminal_maintext"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:scrollHorizontally="false"
-                android:gravity="bottom"
-                android:textIsSelectable="true"
-                android:focusable="true"
-                android:longClickable="true"
-                android:textColor="@color/core_text"
-                android:textSize="13sp"
-                android:lineSpacingMultiplier="1.35" />
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/terminal_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="16dp"
+                    android:fontFamily="monospace"
+                    android:scrollHorizontally="false"
+                    android:gravity="bottom"
+                    android:textIsSelectable="true"
+                    android:focusable="true"
+                    android:longClickable="true"
+                    android:textColor="@color/core_text"
+                    android:textSize="13sp"
+                    android:lineSpacingMultiplier="1.35" />
+                <TextView
+                    android:id="@+id/terminal_maintext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:scrollHorizontally="false"
+                    android:gravity="bottom"
+                    android:textIsSelectable="true"
+                    android:focusable="true"
+                    android:longClickable="true"
+                    android:textColor="@color/core_text"
+                    android:textSize="13sp"
+                    android:lineSpacingMultiplier="1.35" />
+            </LinearLayout>
         </ScrollView>
     </RelativeLayout>
 </LinearLayout>

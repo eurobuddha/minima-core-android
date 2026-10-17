@@ -1,4 +1,7 @@
 package com.eurobuddha.casino;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.view.Gravity;
 import android.view.View;
@@ -75,7 +78,7 @@ public class MyBetsView extends BaseView {
         LinearLayout card = Ui.card(act);
 
         LinearLayout header = Ui.row(act);
-        header.addView(Ui.text(act, g.icon + "  " + g.name + " · " + Currency.nameFor(b.tokenid()),
+        header.addView(Ui.text(act, Language.join(g.icon, "  ", CasinoMessages.message(g.name), " · ", Currency.nameFor(b.tokenid())),
                 Theme.gold(), 18, true), Ui.lpRow(act, 1));
         header.addView(Ui.badge(act, phaseLabel(b.phase), Theme.bg(), phaseColor(b.phase)));
         card.addView(header);
@@ -86,14 +89,13 @@ public class MyBetsView extends BaseView {
         card.addView(role);
 
         // The pick — big and clear (your own pick as player; the player's pick as house).
-        String pickStr = b.pick >= 0
-                ? (isHouse ? "Player picked  " : "Your pick  ") + g.pickLabel(b.pick)
-                : "Waiting for a player to pick…";
+        CharSequence pickStr = b.pick >= 0
+                ? Language.msg(isHouse ? l10n_casino_player_picked : l10n_casino_picked, CasinoMessages.message(g.pickLabel(b.pick)))
+                : CasinoMessages.message("Waiting for a player to pick…");
         card.addView(Ui.text(act, pickStr, Theme.text(), 15, true));
 
-        card.addView(Ui.text(act, "Stake " + Currency.show(b.betAmount, b.tokenid())
-                + "  ·  pot " + Currency.show(b.totalAmount, b.tokenid())
-                + "  ·  win " + Currency.show(Util.miniNum(Util.dec(b.betAmount).multiply(java.math.BigDecimal.valueOf(g.payout))), b.tokenid()),
+        card.addView(Ui.text(act, Language.msg(l10n_casino_stakes, Currency.show(b.betAmount, b.tokenid()), Currency.show(b.totalAmount, b.tokenid()),
+                Currency.show(Util.miniNum(Util.dec(b.betAmount).multiply(java.math.BigDecimal.valueOf(g.payout))), b.tokenid())),
                 Theme.dim(), 12, false));
 
         // Big live game visual — spins continuously while the bet is in play.
@@ -152,24 +154,27 @@ public class MyBetsView extends BaseView {
     }
 
     /** Phase line + a live timeout countdown (blocks until the bet can be reclaimed if abandoned). */
-    private String statusText(Bet b, boolean isHouse) {
+    private CharSequence statusText(Bet b, boolean isHouse) {
         String msg;
         if (b.phase == 0) msg = "Open — waiting for a player to take it.";
         else if (b.phase == 1) msg = isHouse ? "Revealing house secret…" : "Waiting for house to reveal…";
         else msg = isHouse ? "Waiting for player to resolve…" : "Resolving — paying out…";
+        CharSequence display = CasinoMessages.message(msg);
         if (b.phase >= 1 && b.coin.created >= 0) {
             long age = Math.max(0L, act.chainBlock() - b.coin.created);
             long left = b.timeout + 1L - age;  // covenant requires age > timeout, not >=
-            if (left > 0) msg += "\n⏳ Timeout in " + left + " block" + (left == 1 ? "" : "s") + " (" + age + " elapsed)";
-            else msg += b.canClaimTimeout(act.myKeys(), act.chainBlock())
-                    ? "\nTimed out — you can claim the pot."
-                    : "\nTimed out — the counterparty can claim the pot.";
+            if (left > 0) display = Language.join(display, "\n", Language.count(
+                    com.eurobuddha.minimacore.i18n.R.plurals.l10n_casino_timeout_left,
+                    (int)Math.min(Integer.MAX_VALUE, left), left, age));
+            else display = Language.join(display, "\n", CasinoMessages.message(b.canClaimTimeout(act.myKeys(), act.chainBlock())
+                    ? "Timed out — you can claim the pot."
+                    : "Timed out — the counterparty can claim the pot."));
         }
-        return msg;
+        return display;
     }
 
     private void applyStatus(TextView t, Bet b, boolean isHouse) {
-        t.setText(statusText(b, isHouse));
+        CasinoMessages.text(t, statusText(b, isHouse));
         t.setTextColor(b.timedOut(act.chainBlock()) ? Theme.amber() : Theme.dim());
     }
 
@@ -190,7 +195,7 @@ public class MyBetsView extends BaseView {
         boolean any = false;
         if (b.phase == 0 && isHouse) {
             Button cancel = Ui.button(act, "Cancel", Theme.panel2(), Theme.text());
-            cancel.setOnClickListener(v -> { cancel.setEnabled(false); status.setText("Cancelling…");
+            cancel.setOnClickListener(v -> { cancel.setEnabled(false); CasinoMessages.text(status, "Cancelling…");
                 act.txn().cancel(b, simple(status, "Bet cancelled. Funds returned.")); });
             actions.addView(cancel);
             any = true;
@@ -201,7 +206,7 @@ public class MyBetsView extends BaseView {
         ResolvedBet settled = b.phase == 2 && b.iAmPlayer(act.myKeys()) ? act.resultFor(b.coinid()) : null;
         if (settled != null) {
             status.setTextColor(settled.won ? Theme.green() : Theme.red());
-            status.setText((settled.won ? "WON +" : "LOST -") + settled.profit + " · payout confirming…");
+            CasinoMessages.text(status, Language.msg(l10n_casino_payout_confirm, Language.msg(settled.won ? l10n_casino_won_amount : l10n_casino_lost_amount, settled.profit)));
         } else if (b.phase == 2 && b.iAmPlayer(act.myKeys())) {
             boolean inFlight = act.auto() != null && act.auto().inFlight(b.coinid(), act.chainBlock());
             Button resolve = Ui.button(act, inFlight ? "Resolving…" : "Resolve", Theme.gold(), Theme.onAccent());
@@ -209,11 +214,11 @@ public class MyBetsView extends BaseView {
                 // Auto-resolve already handles this; only fire manually if nothing is in flight,
                 // and register it so the auto-resolver won't also post a competing tx.
                 if (act.auto() != null && act.auto().inFlight(b.coinid(), act.chainBlock())) {
-                    status.setText("Resolving automatically — please wait…");
+                    CasinoMessages.text(status, "Resolving automatically — please wait…");
                     return;
                 }
                 if (act.auto() != null) act.auto().markPosted(b.coinid(), act.chainBlock());
-                resolve.setEnabled(false); status.setText("Resolving…"); onResolve(b, status);
+                resolve.setEnabled(false); CasinoMessages.text(status, "Resolving…"); onResolve(b, status);
             });
             actions.addView(resolve);
             any = true;
@@ -226,7 +231,7 @@ public class MyBetsView extends BaseView {
                 lp.leftMargin = Ui.dp(act, 8);
                 claim.setLayoutParams(lp);
             }
-            claim.setOnClickListener(v -> { claim.setEnabled(false); status.setText("Claiming…");
+            claim.setOnClickListener(v -> { claim.setEnabled(false); CasinoMessages.text(status, "Claiming…");
                 act.txn().claimTimeout(b, simple(status, "Timeout claimed. Funds returned.")); });
             actions.addView(claim);
             any = true;
@@ -245,13 +250,13 @@ public class MyBetsView extends BaseView {
                 act.log((iWon ? "WON +" : "LOST -") + Currency.show(Util.miniNum(profit), b.tokenid()) + " · " + b.gameName()
                         + " (rolled " + b.game().pickLabel(result) + ")", iWon ? MainActivity.LOG_OK : MainActivity.LOG_ERR);
                 status.setTextColor(iWon ? Theme.green() : Theme.red());
-                status.setText((iWon ? "WON +" : "LOST -") + Currency.show(Util.miniNum(profit), b.tokenid()));
+                CasinoMessages.text(status, Language.msg(iWon ? l10n_casino_won_amount : l10n_casino_lost_amount, Currency.show(Util.miniNum(profit), b.tokenid())));
                 act.recordResult(b, iWon, profit, result, isHouse);   // records + celebrates (modal/anim/sound)
                 act.requestReload();
             }
             @Override public void onFailed(String message) {
                 status.setTextColor(Theme.red());
-                status.setText(message);
+                CasinoMessages.text(status, message);
             }
         });
     }
@@ -259,11 +264,11 @@ public class MyBetsView extends BaseView {
     private CasinoTxn.Result simple(TextView status, String okMsg) {
         return new CasinoTxn.Result() {
             @Override public void onPosted(String txpowid) {
-                status.setTextColor(Theme.green()); status.setText(okMsg);
+                status.setTextColor(Theme.green()); CasinoMessages.text(status, okMsg);
                 act.log(okMsg, MainActivity.LOG_OK); act.requestReload();
             }
             @Override public void onFailed(String message) {
-                status.setTextColor(Theme.red()); status.setText(message);
+                status.setTextColor(Theme.red()); CasinoMessages.text(status, message);
                 act.log(message, MainActivity.LOG_ERR);
             }
         };

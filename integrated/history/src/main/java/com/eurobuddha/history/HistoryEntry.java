@@ -1,5 +1,11 @@
 package com.eurobuddha.history;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+import static com.eurobuddha.minimacore.i18n.R.plurals.*;
+
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -178,8 +184,8 @@ public class HistoryEntry {
     public boolean isSplit() { return "self".equals(direction) && count(outputs) > count(inputs) && count(outputs) > 1; }
     public boolean isConsolidation() { return "self".equals(direction) && count(inputs) > count(outputs) && count(inputs) > 1; }
     public boolean isReshuffle() { return isSplit() || isConsolidation(); }
-    public String reshuffleLabel() {
-        return isSplit() ? ("Split · " + count(outputs) + " coins") : ("Consolidation · " + count(inputs) + " coins");
+    public CharSequence reshuffleLabel() {
+        return isSplit() ? Language.count(l10n_history_split, count(outputs)) : Language.count(l10n_history_consolidation, count(inputs));
     }
     /** For a reshuffle, the GROSS amount + token of the dominant output token (e.g. "500000  Minima") —
      *  more informative than the net "0" a self-only transaction otherwise shows. */

@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.main.views.send;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
@@ -46,7 +49,7 @@ public class SendActivity extends AppCompatActivity {
 
 
         Toolbar tb = findViewById(R.id.send_toolbar);
-        tb.setTitle("Send");
+        Language.toolbarTitle(tb, Language.msg(l10n_wallet_send));
         tb.setNavigationOnClickListener(v -> finish());
         KeyboardInsets.install(this, findViewById(R.id.send_main), tb);
 
@@ -55,11 +58,15 @@ public class SendActivity extends AppCompatActivity {
 
         mSend.setOnScanRequest(() -> mScanLauncher.launch(new ScanOptions()
                 .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-                .setPrompt("Scan a Minima address")
+                .setPrompt(Language.msg(l10n_nft_scan_address).toString())
                 .setBeepEnabled(false)
                 .setOrientationLocked(false)));
 
         FrameLayout container = findViewById(R.id.send_container);
         container.addView(mSend.getMainView());
+    }
+    @Override protected void onDestroy() {
+        if (mSend != null) mSend.onActivityDestroy();
+        super.onDestroy();
     }
 }

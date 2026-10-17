@@ -6,6 +6,7 @@
     android:padding="20dp">
 
     <TextView
+        android:tag="l10n:text=l10n_chat_to_pay_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TO THEIR PAY ADDRESS"
@@ -22,6 +23,7 @@
 
     <EditText
         android:id="@+id/pay_amount"
+        android:tag="l10n:hint=l10n_chat_amount_minima"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
@@ -30,6 +32,7 @@
         android:maxLines="1" />
 
     <TextView
+        android:tag="l10n:text=l10n_chat_real_funds"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

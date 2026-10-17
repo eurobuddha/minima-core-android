@@ -1,4 +1,7 @@
 package com.eurobuddha.entropy;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +12,9 @@ import androidx.viewpager.widget.PagerAdapter;
 public class MainPager extends PagerAdapter {
 
     private final BaseView[] views;
-    private final String[] titles;
+    private final CharSequence[] titles;
 
-    public MainPager(BaseView[] views, String[] titles) {
+    public MainPager(BaseView[] views, CharSequence[] titles) {
         this.views = views;
         this.titles = titles;
     }

@@ -19,9 +19,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import com.eurobuddha.minimacore.main.ResyncJob;
 import com.eurobuddha.minimacore.main.ResyncLauncher;
 import com.eurobuddha.minimacore.main.SeedSyncActivity;
@@ -30,8 +33,6 @@ import com.eurobuddha.minimacore.utils.MinimaCMD;
 import com.eurobuddha.minimacore.utils.Peers;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -71,7 +72,7 @@ public class RestoreFileActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.backup_restore);
         Toolbar tb = findViewById(R.id.toolbar);
-        tb.setTitle("Restore from file");
+        Language.toolbarTitle(tb, Language.msg(l10n_backup_restore));
         setSupportActionBar(tb);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         tb.setNavigationOnClickListener(v -> finish());
@@ -106,7 +107,7 @@ public class RestoreFileActivity extends AppCompatActivity {
     private void renderGate() {
         NodeKeys.Status keys = NodeKeys.read();
         gate.setVisibility(keys.ready ? View.GONE : View.VISIBLE);
-        if (!keys.ready) gate.setText(keys.message());
+        if (!keys.ready) Language.setText(gate, keys.message());
         go.setEnabled(keys.ready);
     }
 
@@ -114,7 +115,6 @@ public class RestoreFileActivity extends AppCompatActivity {
         fileRows.removeAllViews();
         List<File> files = NodeFiles.restorable(this);
         empty.setVisibility(files.isEmpty() ? View.VISIBLE : View.GONE);
-        SimpleDateFormat when = new SimpleDateFormat("d MMM yyyy, HH:mm", Locale.UK);
         for (File file : files) {
             View row = LayoutInflater.from(this).inflate(R.layout.view_backup_row, fileRows, false);
             TextView title = row.findViewById(R.id.backup_row_title);
@@ -123,22 +123,22 @@ public class RestoreFileActivity extends AppCompatActivity {
             title.setText(file.getName());
             // The folder also holds archive exports and txn files. They are listed because a
             // restore CAN name them, but they must not look like backups.
-            String kind = NodeFiles.isBackup(file) ? "" : " · not a .bak";
-            subtitle.setText(NodeFiles.formatBytes(file.length()) + " · "
-                    + when.format(new Date(file.lastModified())) + kind);
+            CharSequence kind = NodeFiles.isBackup(file) ? "" : Language.msg(l10n_backup_not_backup);
+            Language.setText(subtitle, Language.join(NodeFiles.formatBytes(file.length()), " · ",
+                    Language.stamp(file.lastModified(), "yMMMdHm"), kind));
             row.setOnClickListener(v -> {
                 selected = file.getName();
                 renderFiles();
             });
             Button action = row.findViewById(R.id.backup_row_action);
             action.setVisibility(View.VISIBLE);
-            action.setText("Delete");
+            Language.setText(action, Language.msg(l10n_backup_delete));
             action.setOnClickListener(v -> confirmDelete(file, NodeFiles.backupCount(this)));
             row.setAlpha(file.getName().equals(selected) ? 1f : 0.55f);
             fileRows.addView(row);
         }
         if (!selected.isEmpty()) {
-            setTextIfChanged(status, "Selected " + selected);
+            setTextIfChanged(status, Language.msg(l10n_backup_selected, selected));
         }
     }
 
@@ -152,28 +152,25 @@ public class RestoreFileActivity extends AppCompatActivity {
     private void confirmDelete(File file, int totalBackups) {
         // Counts .bak files only. Counting every listed file meant one backup sitting beside a
         // txn file looked like "two backups", and this warning silently did not fire.
-        String warning = NodeFiles.isBackup(file) && totalBackups <= 1
-                ? "\n\nThis is the only backup file on this node. Once it is gone there is nothing here to restore from."
+        CharSequence warning = NodeFiles.isBackup(file) && totalBackups <= 1
+                ? Language.msg(l10n_backup_last_backup)
                 : "";
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Delete this backup?")
-                .setMessage(file.getName() + "\n" + NodeFiles.formatBytes(file.length()) + "\n\n"
-                        + "This permanently removes the file from the node folder. If you have not saved a "
-                        + "copy somewhere else, the wallet inside it cannot be recovered." + warning)
-                .setPositiveButton("Delete", (d, w) -> deleteNow(file.getName()))
-                .setNegativeButton("Keep", null)
+        new LanguageDialog(this)
+                .setTitle(Language.msg(l10n_backup_delete_title))
+                .setMessage(Language.join(file.getName(), "\n", NodeFiles.formatBytes(file.length()), "\n\n", Language.msg(l10n_backup_delete_warning), warning))
+                .setPositiveButton(Language.msg(l10n_backup_delete), (d, w) -> deleteNow(file.getName()))
+                .setNegativeButton(Language.msg(l10n_backup_keep), null)
                 .show();
     }
 
     private void deleteNow(String name) {
-        String message;
+        CharSequence message;
         try {
             NodeFiles.delete(this, name);
-            message = "Deleted " + name;
+            message = Language.msg(l10n_backup_deleted, name);
             if (name.equals(selected)) selected = "";
         } catch (Exception exc) {
-            message = "Could not delete " + name + ". "
-                    + (exc.getMessage() == null ? exc.toString() : exc.getMessage());
+            message = Language.msg(l10n_backup_delete_failed, name, (exc.getMessage() == null ? exc.toString() : exc.getMessage()));
         }
         renderFiles();
         setTextIfChanged(status, message);
@@ -181,9 +178,9 @@ public class RestoreFileActivity extends AppCompatActivity {
 
     private void onFileChosen(Uri source) {
         if (source == null) return;
-        setTextIfChanged(status, "Bringing the file in…");
+        setTextIfChanged(status, Language.msg(l10n_backup_importing));
         MinimaCMD.readExecutor().execute(() -> {
-            String message;
+            CharSequence message;
             String landed = "";
             try {
                 // Never trust the provider's display name, and never silently overwrite.
@@ -191,12 +188,11 @@ public class RestoreFileActivity extends AppCompatActivity {
                         NodeFiles.displayName(getContentResolver(), source));
                 File file = NodeFiles.importFrom(this, source, name);
                 landed = file.getName();
-                message = "Added " + file.getName() + " (" + NodeFiles.formatBytes(file.length()) + ")";
+                message = Language.msg(l10n_backup_imported, file.getName(), NodeFiles.formatBytes(file.length()));
             } catch (Exception exc) {
-                message = "Could not bring the file in. "
-                        + (exc.getMessage() == null ? exc.toString() : exc.getMessage());
+                message = Language.msg(l10n_backup_import_failed, (exc.getMessage() == null ? exc.toString() : exc.getMessage()));
             }
-            final String done = message;
+            final CharSequence done = message;
             final String pick = landed;
             handler.post(() -> {
                 if (isFinishing() || isDestroyed()) return;
@@ -209,30 +205,30 @@ public class RestoreFileActivity extends AppCompatActivity {
 
     private void attemptRestore() {
         if (selected.isEmpty()) {
-            setTextIfChanged(status, "Choose which backup file to restore.");
+            setTextIfChanged(status, Language.msg(l10n_backup_choose_file));
             return;
         }
         String pass = password.getText().toString();
         if (!ResyncJob.validPassword(pass)) {
-            password.setError("Letters and numbers only");
+            Language.error(password, Language.msg(l10n_backup_invalid_password));
             return;
         }
-        password.setError(null);
+        Language.error(password, null);
 
         final ResyncJob job;
         if (modeResync.isChecked()) {
             String where = host.getText().toString().trim();
             if (!ResyncJob.validHost(where)) {
-                host.setError("Enter a hostname or IPv4 address and a port from 1 to 65535");
+                Language.error(host, Language.msg(l10n_resync_host_error));
                 return;
             }
-            host.setError(null);
+            Language.error(host, null);
             job = ResyncJob.fileResync(where, selected, pass);
         } else {
             job = ResyncJob.fileRestore(selected, pass);
         }
         if (job == null) {
-            setTextIfChanged(status, "Check the file name and password and try again.");
+            setTextIfChanged(status, Language.msg(l10n_backup_check_file));
             return;
         }
         confirm(job);
@@ -245,26 +241,22 @@ public class RestoreFileActivity extends AppCompatActivity {
      */
     private void confirm(ResyncJob job) {
         EditText typed = new EditText(this);
-        typed.setHint("type RESTORE");
+        Language.hint(typed, Language.msg(l10n_backup_restore_hint));
         int pad = Math.round(20 * getResources().getDisplayMetrics().density);
         typed.setPadding(pad, pad, pad, pad);
 
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Replace this node?")
-                .setMessage("Minima will replace its wallet and chain with " + selected + ".\n\n"
-                        + "• The keys and coins this node holds now are GONE unless they are also in that backup.\n"
-                        + "• Any transaction still waiting to be mined is dropped.\n"
-                        + "• The node stops when it finishes and you restart it.\n\n"
-                        + "Type RESTORE to confirm.")
+        new LanguageDialog(this)
+                .setTitle(Language.msg(l10n_backup_replace_title))
+                .setMessage(Language.msg(l10n_backup_replace_warning, selected))
                 .setView(typed)
-                .setPositiveButton("Restore", (d, w) -> {
+                .setPositiveButton(Language.msg(l10n_wallet_restore), (d, w) -> {
                     if (!"RESTORE".contentEquals(typed.getText().toString().trim().toUpperCase(Locale.UK))) {
-                        setTextIfChanged(status, "Not confirmed - nothing was changed.");
+                        setTextIfChanged(status, Language.msg(l10n_backup_not_confirmed));
                         return;
                     }
                     launch(job);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
@@ -273,7 +265,7 @@ public class RestoreFileActivity extends AppCompatActivity {
         // and the service binding all have to be handled there and not here.
         ResyncLauncher.Result result = ResyncLauncher.begin(this, job);
         if (!result.started) {
-            setTextIfChanged(status, result.error);
+            setTextIfChanged(status, SeedSyncActivity.launchError(result.error));
             return;
         }
         // Progress, the live node log and the restart button all live on the resync screen.
@@ -281,7 +273,7 @@ public class RestoreFileActivity extends AppCompatActivity {
         finish();
     }
 
-    private static void setTextIfChanged(TextView view, String text) {
-        if (!text.contentEquals(view.getText())) view.setText(text);
+    private static void setTextIfChanged(TextView view, CharSequence text) {
+        if (!text.toString().contentEquals(view.getText())) Language.setText(view, text);
     }
 }

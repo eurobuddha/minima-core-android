@@ -1,5 +1,9 @@
 package com.eurobuddha.futurecashnext;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -32,9 +36,9 @@ public final class Ui {
 
     /* ---------- text ---------- */
 
-    public static TextView text(Context c, String s, int color, int sizeSp, boolean bold) {
+    public static TextView text(Context c, CharSequence s, int color, int sizeSp, boolean bold) {
         final TextView t = new TextView(c);
-        t.setText(s);
+        Language.setText(t, s);
         t.setTextColor(color);
         t.setTextSize(sizeSp);
         t.setTypeface(bold ? Design.sansBold() : Design.sans());
@@ -43,9 +47,9 @@ public final class Ui {
     }
 
     /** Numbers, amounts, block heights, addresses — anything that should line up or be compared. */
-    public static TextView mono(Context c, String s, int color, int sizeSp, boolean bold) {
+    public static TextView mono(Context c, CharSequence s, int color, int sizeSp, boolean bold) {
         final TextView t = new TextView(c);
-        t.setText(s);
+        Language.setText(t, s);
         t.setTextColor(color);
         t.setTextSize(sizeSp);
         t.setTypeface(bold ? Design.monoBold() : Design.mono());
@@ -53,17 +57,17 @@ public final class Ui {
     }
 
     /** A small caps-ish section label — the quiet top line of a card. */
-    public static TextView label(Context c, String s) {
-        final TextView t = text(c, s.toUpperCase(), Design.DIM2(), 11, true);
+    public static TextView label(Context c, CharSequence s) {
+        final TextView t = text(c, Language.upper(s), Design.DIM2(), 11, true);
         t.setLetterSpacing(0.08f);
         return t;
     }
 
-    public static TextView title(Context c, String s) {
+    public static TextView title(Context c, CharSequence s) {
         return text(c, s, Design.TEXT(), 17, true);
     }
 
-    public static TextView body(Context c, String s) {
+    public static TextView body(Context c, CharSequence s) {
         return text(c, s, Design.DIM(), 13, false);
     }
 
@@ -113,7 +117,7 @@ public final class Ui {
     }
 
     /** A status chip: tinted ground, saturated ink, so it reads at a glance without shouting. */
-    public static TextView pill(Context c, String s, int colour) {
+    public static TextView pill(Context c, CharSequence s, int colour) {
         return Design.pill(c, s, tint(colour, 0x24), colour);
     }
 
@@ -124,7 +128,7 @@ public final class Ui {
     /* ---------- controls ---------- */
 
     /** The primary action: gradient ground, ripple, press-scale. One per screen, ideally. */
-    public static Button cta(Context c, String labelText, View.OnClickListener onClick) {
+    public static Button cta(Context c, CharSequence labelText, View.OnClickListener onClick) {
         final Button b = baseButton(c, labelText, Design.ON_ACCENT());
         b.setBackground(Design.ripple(Design.gradientCta(c)));
         Design.pressable(b);
@@ -133,7 +137,7 @@ public final class Ui {
     }
 
     /** A secondary action: outlined, quieter, still tappable-looking. */
-    public static Button ghost(Context c, String labelText, View.OnClickListener onClick) {
+    public static Button ghost(Context c, CharSequence labelText, View.OnClickListener onClick) {
         final Button b = baseButton(c, labelText, Design.TEXT());
         final GradientDrawable bg = new GradientDrawable();
         bg.setColor(Color.TRANSPARENT);
@@ -146,7 +150,7 @@ public final class Ui {
     }
 
     /** A destructive or state-changing action, tinted by meaning. */
-    public static Button tinted(Context c, String labelText, int colour, View.OnClickListener onClick) {
+    public static Button tinted(Context c, CharSequence labelText, int colour, View.OnClickListener onClick) {
         final Button b = baseButton(c, labelText, colour);
         final GradientDrawable bg = new GradientDrawable();
         bg.setColor(tint(colour, 0x1F));
@@ -158,9 +162,9 @@ public final class Ui {
         return b;
     }
 
-    private static Button baseButton(Context c, String labelText, int ink) {
+    private static Button baseButton(Context c, CharSequence labelText, int ink) {
         final Button b = new Button(c);
-        b.setText(labelText);
+        Language.setText(b, labelText);
         b.setAllCaps(false);
         b.setTextColor(ink);
         b.setTextSize(14);
@@ -173,28 +177,34 @@ public final class Ui {
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.topMargin = dp(c, 12);
         lp.rightMargin = dp(c, 8);
+        lp.gravity = Gravity.TOP;
         b.setLayoutParams(lp);
         return b;
     }
 
-    public static EditText field(Context c, String hint, boolean numeric) {
+    public static EditText field(Context c, CharSequence hint, boolean numeric) {
         final EditText e = new EditText(c);
-        e.setHint(hint);
-        e.setHintTextColor(Design.DIM2());
-        e.setTextColor(Design.TEXT());
+        Language.hint(e, hint);
         e.setTextSize(15);
         e.setSingleLine(true);
         // Amounts and addresses are mono for the same reason they are everywhere else: they get
         // compared, and a proportional font makes that harder than it needs to be.
         e.setTypeface(numeric ? Design.mono() : Design.sans());
         if (numeric) e.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        e.setBackground(Design.stroked(c, Design.SURFACE2(), 14));
-        e.setPadding(dp(c, 14), dp(c, 13), dp(c, 14), dp(c, 13));
+        styleField(e);
         final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.topMargin = dp(c, 10);
         e.setLayoutParams(lp);
         return e;
+    }
+
+    public static void styleField(EditText e) {
+        final Context c = e.getContext();
+        e.setHintTextColor(Design.DIM2());
+        e.setTextColor(Design.TEXT());
+        e.setBackground(Design.stroked(c, Design.SURFACE2(), 14));
+        e.setPadding(dp(c, 14), dp(c, 13), dp(c, 14), dp(c, 13));
     }
 
     /** A hairline divider, for separating rows inside one card. */
@@ -229,7 +239,7 @@ public final class Ui {
                     c.getSystemService(Context.CLIPBOARD_SERVICE);
             if (cm != null) {
                 cm.setPrimaryClip(android.content.ClipData.newPlainText("value", value));
-                android.widget.Toast.makeText(c, "Copied", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(c, Language.msg(l10n_future_copied), android.widget.Toast.LENGTH_SHORT).show();
             }
         });
         return t;
@@ -247,13 +257,12 @@ public final class Ui {
     }
 
     /** "in ~3 h (block 12345)" — blocks are ~50s. */
-    public static String maturesIn(long block, long tip) {
+    public static CharSequence maturesIn(long block, long tip) {
         final long blocks = Math.max(0, block - tip);
         final long mins = Math.round(blocks * 50 / 60.0);
-        final String when = mins < 90 ? mins + " min"
-                : mins < 1440 ? Math.round(mins / 60.0) + " h"
-                : Math.round(mins / 1440.0) + " days";
-        return "in ~" + when;
+        return mins < 90 ? Language.msg(l10n_future_in_minutes, mins)
+                : mins < 1440 ? Language.msg(l10n_future_in_hours, Math.round(mins / 60.0))
+                : Language.msg(l10n_future_in_days, Math.round(mins / 1440.0));
     }
 
     public static String timeAgo(long ms) {

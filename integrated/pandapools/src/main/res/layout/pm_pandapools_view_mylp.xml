@@ -1,106 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+<?xml version='1.0' encoding='utf-8'?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="14dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="14dp">
 
-        <!-- portfolio summary -->
-        <LinearLayout
-            android:id="@+id/pm_pandapools_lpSummaryCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="YOUR LIQUIDITY"
-                android:textSize="11sp"
-                android:letterSpacing="0.10"
-                android:id="@+id/pm_pandapools_lpSummaryLabel" />
+        <LinearLayout android:id="@+id/pm_pandapools_lpSummaryCard" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:layout_marginBottom="12dp">
 
-            <TextView
-                android:id="@+id/pm_pandapools_lpSummaryValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="—"
-                android:textSize="26sp"
-                android:paddingTop="4dp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/l10n_pools_lp_heading" android:textSize="11sp" android:letterSpacing="0.10" android:id="@+id/pm_pandapools_lpSummaryLabel" android:tag="l10n:text=l10n_pools_lp_heading" />
 
-            <TextView
-                android:id="@+id/pm_pandapools_lpSummarySub"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="—"
-                android:textSize="13sp"
-                android:paddingTop="2dp" />
+            <TextView android:id="@+id/pm_pandapools_lpSummaryValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" android:textSize="26sp" android:paddingTop="4dp" />
+
+            <TextView android:id="@+id/pm_pandapools_lpSummarySub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" android:textSize="13sp" android:paddingTop="2dp" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/pm_pandapools_lpCreateBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="+  CREATE A POOL"
-            android:gravity="center"
-            android:textSize="15sp"
-            android:letterSpacing="0.06"
-            android:padding="15dp"
-            android:layout_marginBottom="10dp" />
+        <TextView android:id="@+id/pm_pandapools_lpCreateBtn" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/l10n_pools_lp_create" android:gravity="center" android:textSize="15sp" android:letterSpacing="0.06" android:padding="15dp" android:layout_marginBottom="10dp" android:tag="l10n:text=l10n_pools_lp_create" android:minHeight="48dp" />
 
-        <TextView
-            android:id="@+id/pm_pandapools_lpRecoveryBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="BACK UP / RESTORE POOLS"
-            android:gravity="center"
-            android:textSize="12sp"
-            android:letterSpacing="0.06"
-            android:padding="12dp"
-            android:layout_marginBottom="10dp" />
+        <TextView android:id="@+id/pm_pandapools_lpRecoveryBtn" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/l10n_pools_lp_recovery" android:gravity="center" android:textSize="12sp" android:letterSpacing="0.06" android:padding="12dp" android:layout_marginBottom="10dp" android:tag="l10n:text=l10n_pools_lp_recovery" android:minHeight="48dp" />
 
-        <TextView
-            android:id="@+id/pm_pandapools_lpStatementBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="EXPORT STATEMENT"
-            android:gravity="center"
-            android:textSize="12sp"
-            android:letterSpacing="0.06"
-            android:padding="12dp"
-            android:layout_marginBottom="10dp" />
+        <TextView android:id="@+id/pm_pandapools_lpStatementBtn" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/l10n_pools_lp_statement" android:gravity="center" android:textSize="12sp" android:letterSpacing="0.06" android:padding="12dp" android:layout_marginBottom="10dp" android:tag="l10n:text=l10n_pools_lp_statement" android:minHeight="48dp" />
 
-        <TextView
-            android:id="@+id/pm_pandapools_lpCalcBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="POOL CALCULATOR"
-            android:gravity="center"
-            android:textSize="12sp"
-            android:letterSpacing="0.06"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp" />
+        <TextView android:id="@+id/pm_pandapools_lpCalcBtn" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/l10n_pools_lp_calculator" android:gravity="center" android:textSize="12sp" android:letterSpacing="0.06" android:padding="12dp" android:layout_marginBottom="16dp" android:tag="l10n:text=l10n_pools_lp_calculator" android:minHeight="48dp" />
 
-        <TextView
-            android:id="@+id/pm_pandapools_lpStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Loading your pools…"
-            android:textSize="13sp"
-            android:paddingBottom="8dp" />
+        <TextView android:id="@+id/pm_pandapools_lpStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/l10n_pools_lp_loading" android:textSize="13sp" android:paddingBottom="8dp" android:tag="l10n:text=l10n_pools_lp_loading" />
 
-        <LinearLayout
-            android:id="@+id/pm_pandapools_lpList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+        <LinearLayout android:id="@+id/pm_pandapools_lpList" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

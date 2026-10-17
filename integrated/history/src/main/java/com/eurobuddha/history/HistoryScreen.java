@@ -1,5 +1,11 @@
 package com.eurobuddha.history;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+import static com.eurobuddha.minimacore.i18n.R.plurals.*;
+
+
 import com.eurobuddha.minimaapi.direct.DirectNodeEvents;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -111,6 +117,7 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
 
     private void create() {
         screen = android.view.LayoutInflater.from(this).inflate(R.layout.pm_history_activity_main, null, false);
+        Language.apply(screen);
         header = findViewById(R.id.pm_history_header);
         status = findViewById(R.id.pm_history_status);
         syncBtn = findViewById(R.id.pm_history_syncBtn);
@@ -235,15 +242,15 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
     private void doSync() {
         if (closed) return;
         // Don't gate on `paired` — try the command; HistorySync flips the banner from the actual result.
-        if (!sync.isRunning()) { syncBtn.setText("⟳ …"); status.setText("Syncing…"); sync.start(); }
+        if (!sync.isRunning()) { Language.setText(syncBtn, "⟳ …"); Language.setText(status, Language.msg(l10n_history_syncing)); sync.start(); }
     }
 
     private final HistorySync.Listener syncListener = new HistorySync.Listener() {
         @Override public void onProgress(int totalNew) {
-            ui.post(() -> { if (closed) return; status.setText("Syncing…  " + totalNew + " captured"); reloadList(); });
+            ui.post(() -> { if (closed) return; Language.setText(status, Language.msg(l10n_history_captured, totalNew)); reloadList(); });
         }
         @Override public void onDone(int totalNew, boolean ok) {
-            ui.post(() -> { if (closed) return; lastSyncOk = ok; syncBtn.setText("⟳ Sync"); reloadList(); refreshOwnership(); });
+            ui.post(() -> { if (closed) return; lastSyncOk = ok; Language.setText(syncBtn, Language.msg(l10n_history_sync)); reloadList(); refreshOwnership(); });
         }
     };
 
@@ -273,14 +280,14 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
     private void updateStatus(int total) {
         if (closed) return;
         if (total == 0 && !lastSyncOk) {
-            status.setText("Couldn't read history — the node may be busy or a page too large. Tap ⟳ to retry.");
+            Language.setText(status, Language.msg(l10n_history_read_failed));
             return;
         }
-        String s = total + (total == 1 ? " transaction" : " transactions");
-        if (chainBlock > 0) s += " · synced to block " + chainBlock;
+        CharSequence s = Language.count(l10n_history_transactions, total);
+        if (chainBlock > 0) s = Language.join(s, " · ", Language.msg(l10n_history_synced_block, chainBlock));
         String last = db.getMeta("last_sync_ts", "");
-        if (!last.isEmpty()) { try { s += " · " + relative(Long.parseLong(last)); } catch (Exception ignored) {} }
-        status.setText(s);
+        if (!last.isEmpty()) { try { s = Language.join(s, " · ", relative(Long.parseLong(last))); } catch (Exception ignored) {} }
+        Language.setText(status, s);
     }
 
     // ---- detail dialog ----
@@ -290,38 +297,38 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(12), dp(20), dp(12));
 
-        kv(box, "Direction", e.direction);
-        kv(box, "Amount", (e.incoming ? "+" : e.direction.equals("sent") ? "−" : "") + Util.tidyAmount(e.amount) + " " + e.tokenName);
-        kv(box, "Block", String.valueOf(e.block));
-        kv(box, "Time", new SimpleDateFormat("dd MMM yyyy  HH:mm:ss", Locale.ENGLISH).format(new Date(e.timemilli)));
-        copyRow(box, "Txpow id", e.txpowid);
-        if (!Util.isMinima(e.tokenid)) copyRow(box, "Tokenid", e.tokenid);
+        kv(box, Language.msg(l10n_history_direction), directionLabel(e.direction));
+        kv(box, Language.msg(l10n_history_amount), (e.incoming ? "+" : e.direction.equals("sent") ? "−" : "") + Util.tidyAmount(e.amount) + " " + e.tokenName);
+        kv(box, Language.msg(l10n_history_block), String.valueOf(e.block));
+        kv(box, Language.msg(l10n_history_date_time), Language.stamp(e.timemilli, "yMMMdHms"));
+        copyRow(box, Language.msg(l10n_history_txpow), e.txpowid);
+        if (!Util.isMinima(e.tokenid)) copyRow(box, Language.msg(l10n_history_token), e.tokenid);
         if (!e.counterparty.isEmpty()) {
             badge(box, own.classify(e.counterparty), false, 0);
-            copyRow(box, e.incoming ? "From" : "To", e.counterparty);
+            copyRow(box, e.incoming ? Language.msg(l10n_history_from) : Language.msg(l10n_history_to), e.counterparty);
         }
         // Entry-level ownership: none of the wallet's addresses/coins in this transaction at all —
         // this is exactly what foreign contract activity adopted by a polluted node looks like.
         if (own.isLoaded() && !e.involvesWallet(own)) {
             TextView warn = new TextView(this);
-            warn.setText("No wallet address involved — contract/external activity");
+            Language.setText(warn, Language.msg(l10n_history_foreign_activity));
             warn.setTextColor(HistoryDesign.ACCENT);
             warn.setTextSize(12f);
             warn.setPadding(0, dp(6), 0, dp(2));
             box.addView(warn);
         }
         addDeltas(box, e.deltas);
-        addBreakdown(box, "Inputs", e.inputs);
-        addBreakdown(box, "Outputs", e.outputs);
+        addBreakdown(box, Language.msg(l10n_history_inputs), e.inputs);
+        addBreakdown(box, Language.msg(l10n_history_outputs), e.outputs);
 
         ScrollView sv = new ScrollView(this);
         sv.addView(box);
-        new AlertDialog.Builder(this).setTitle("Transaction").setView(sv).setPositiveButton("Close", null).show();
+        new LanguageDialog(this).setTitle(Language.msg(l10n_history_transaction)).setView(sv).setPositiveButton(Language.msg(l10n_language_close), null).show();
     }
 
-    private void kv(LinearLayout p, String k, String v) {
+    private void kv(LinearLayout p, CharSequence k, CharSequence v) {
         TextView t = new TextView(this);
-        t.setText(k + ":  " + v);
+        Language.setText(t, Language.join(k, ":  ", v));
         // Inherit the native dialog text colour in both system themes.
         t.setTextSize(13f);
         t.setPadding(0, dp(4), 0, dp(4));
@@ -329,26 +336,25 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
         p.addView(t);
     }
 
-    private void copyRow(LinearLayout p, String k, final String v) { copyRow(p, k, v, 0); }
+    private void copyRow(LinearLayout p, CharSequence k, final String v) { copyRow(p, k, v, 0); }
 
     /** Full value, never shortened; the whole row taps to copy the complete value. */
-    private void copyRow(LinearLayout p, String k, final String v, int indentDp) {
+    private void copyRow(LinearLayout p, CharSequence k, final String v, int indentDp) {
         TextView t = new TextView(this);
-        t.setText(k + ":  " + v + "   (tap to copy)");
-        t.setTextColor(HistoryDesign.DIM);
+        Language.setText(t, Language.msg(l10n_history_copy_row, k, v));
         t.setTextSize(12f);
         t.setTypeface(Typeface.MONOSPACE);
         t.setPadding(dp(indentDp), dp(4), 0, dp(4));
         t.setOnClickListener(view -> {
             ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText(k, v));
-            Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, Language.msg(l10n_history_copied), Toast.LENGTH_SHORT).show();
         });
         p.addView(t);
     }
 
-    private void sectionHeader(LinearLayout p, String title) {
+    private void sectionHeader(LinearLayout p, CharSequence title) {
         TextView h = new TextView(this);
-        h.setText(title);
+        Language.setText(h, title);
         h.setTextColor(HistoryDesign.ACCENT);
         h.setTextSize(12f);
         h.setTypeface(Typeface.DEFAULT_BOLD);
@@ -358,7 +364,7 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
 
     private void bullet(LinearLayout p, String text) {
         TextView t = new TextView(this);
-        t.setText(text);
+        Language.setText(t, text);
         // Inherit the native dialog text colour in both system themes.
         t.setTextSize(12f);
         t.setPadding(dp(6), dp(4), 0, 0);
@@ -372,7 +378,7 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
     private void badge(LinearLayout p, Ownership.Kind kind, boolean mine, int indentDp) {
         if (kind == Ownership.Kind.UNKNOWN) return;
         TextView t = new TextView(this);
-        t.setText(Ownership.label(kind) + (mine && kind == Ownership.Kind.CONTRACT ? " · YOURS" : ""));
+        Language.setText(t, Language.join(Ownership.label(kind), mine && kind == Ownership.Kind.CONTRACT ? Language.join(" · ", Language.msg(l10n_history_yours)) : ""));
         t.setTextColor(mine ? HistoryDesign.RECEIVED : Ownership.color(kind));
         t.setTextSize(11f);
         t.setTypeface(Typeface.DEFAULT_BOLD);
@@ -380,7 +386,7 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
         p.addView(t);
     }
 
-    private void addBreakdown(LinearLayout p, String title, String json) {
+    private void addBreakdown(LinearLayout p, CharSequence title, String json) {
         try {
             JSONArray a = new JSONArray(json);
             if (a.length() == 0) return;
@@ -391,8 +397,8 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
                 String tid = c.optString("tokenid", "0x00");
                 bullet(p, "• " + Util.tidyAmount(c.optString("amount", "")) + (Util.isMinima(tid) ? "  Minima" : ""));
                 badge(p, own.classify(c.optString("addr", "")), c.optBoolean("mine", false), 14);
-                if (!Util.isMinima(tid)) copyRow(p, "token", tid, 14);
-                copyRow(p, "addr", c.optString("addr", ""), 14);
+                if (!Util.isMinima(tid)) copyRow(p, Language.msg(l10n_history_token), tid, 14);
+                copyRow(p, Language.msg(l10n_history_address), c.optString("addr", ""), 14);
             }
         } catch (Exception ignored) {}
     }
@@ -401,14 +407,14 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
     private void addDeltas(LinearLayout p, String json) {
         try {
             JSONObject o = new JSONObject(json);
-            if (o.length() == 0) { kv(p, "Per-token effect", "—"); return; }
-            sectionHeader(p, "Per-token effect");
+            if (o.length() == 0) { kv(p, Language.msg(l10n_history_per_token), "—"); return; }
+            sectionHeader(p, Language.msg(l10n_history_per_token));
             for (java.util.Iterator<String> it = o.keys(); it.hasNext(); ) {
                 String tid = it.next();
                 bullet(p, "• " + Util.tidyAmount(o.optString(tid, "")) + (Util.isMinima(tid) ? "  Minima" : ""));
-                if (!Util.isMinima(tid)) copyRow(p, "token", tid, 14);
+                if (!Util.isMinima(tid)) copyRow(p, Language.msg(l10n_history_token), tid, 14);
             }
-        } catch (Exception e) { kv(p, "Per-token effect", "—"); }
+        } catch (Exception e) { kv(p, Language.msg(l10n_history_per_token), "—"); }
     }
 
     // ---- adapter ----
@@ -460,15 +466,15 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
             String g = "received".equals(e.direction) ? "↓" : "sent".equals(e.direction) ? "↑" : "⟲";
             String sign = e.incoming ? "+" : "sent".equals(e.direction) ? "−" : "";
             boolean reshuffle = e.isReshuffle();
-            h.glyph.setText(g); h.glyph.setTextColor(color);
-            h.line1.setText(reshuffle ? e.grossDisplay() : (sign + Util.tidyAmount(e.amount) + "  " + e.tokenName));
+            Language.setText(h.glyph, g); h.glyph.setTextColor(color);
+            Language.setText(h.line1, reshuffle ? e.grossDisplay() : (sign + Util.tidyAmount(e.amount) + "  " + e.tokenName));
             h.line1.setTextColor(color);
             // Counterparty ownership tag (full address is one tap away in the detail view).
             Ownership.Kind ck = own.classify(e.counterparty);
-            String tag = ck == Ownership.Kind.UNKNOWN ? "" : Ownership.label(ck) + "  ·  ";
-            String cp = e.counterparty.isEmpty() ? "" : Util.shorten(e.counterparty) + "  ·  " + tag;
-            h.line2.setText((reshuffle ? e.reshuffleLabel() + "  ·  " : cp) + relative(e.timemilli));
-            h.right.setText("#" + e.block);
+            CharSequence tag = ck == Ownership.Kind.UNKNOWN ? "" : Language.join(Ownership.label(ck), "  ·  ");
+            CharSequence cp = e.counterparty.isEmpty() ? "" : Language.join(Util.shorten(e.counterparty), "  ·  ", tag);
+            Language.setText(h.line2, Language.join(reshuffle ? Language.join(e.reshuffleLabel(), "  ·  ") : cp, relative(e.timemilli)));
+            Language.setText(h.right, "#" + e.block);
             h.itemView.setOnClickListener(v -> showDetail(e));
         }
 
@@ -487,17 +493,17 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
         if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.minimablock");
         if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
         if (launch != null) startActivity(launch);
-        else Toast.makeText(this, "Minima Core isn't installed.", Toast.LENGTH_LONG).show();
+        else Toast.makeText(this, Language.msg(l10n_history_core_missing), Toast.LENGTH_LONG).show();
     }
 
     // ---- export / import: durable backup of the collected history (survives uninstall / new phone) ----
 
     private void showMenu(View anchor) {
         PopupMenu m = new PopupMenu(this, anchor);
-        m.getMenu().add(0, 1, 0, "Export as JSON (backup)");
-        m.getMenu().add(0, 3, 1, "Export as CSV (spreadsheet)");
-        m.getMenu().add(0, 2, 2, "Import history (restore / merge)");
-        m.getMenu().add(0, 4, 3, "Hide foreign contract activity").setCheckable(true).setChecked(hideForeign);
+        m.getMenu().add(0, 1, 0, Language.msg(l10n_history_export_json));
+        m.getMenu().add(0, 3, 1, Language.msg(l10n_history_export_csv));
+        m.getMenu().add(0, 2, 2, Language.msg(l10n_history_import_history));
+        m.getMenu().add(0, 4, 3, Language.msg(l10n_history_hide_foreign)).setCheckable(true).setChecked(hideForeign);
         m.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case 1: exportLauncher.launch("minima-history.json"); return true;
@@ -528,9 +534,9 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
                 try (OutputStream os = getContentResolver().openOutputStream(uri)) {
                     os.write(root.toString().getBytes(StandardCharsets.UTF_8));
                 }
-                ui.post(() -> Toast.makeText(this, "Exported " + all.size() + " transactions", Toast.LENGTH_SHORT).show());
+                ui.post(() -> Toast.makeText(this, Language.count(l10n_history_exported, all.size()), Toast.LENGTH_SHORT).show());
             } catch (Exception e) {
-                ui.post(() -> Toast.makeText(this, "Export failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                ui.post(() -> Toast.makeText(this, Language.msg(l10n_history_export_failed, e.getMessage()), Toast.LENGTH_LONG).show());
             }
         });
     }
@@ -554,9 +560,9 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
                     if (db.insert(e)) neu++;
                 }
                 final int ft = total, fn = neu;
-                ui.post(() -> { if (closed) return; reloadList(); Toast.makeText(this, "Imported " + ft + " · " + fn + " new", Toast.LENGTH_SHORT).show(); });
+                ui.post(() -> { if (closed) return; reloadList(); Toast.makeText(this, Language.msg(l10n_history_imported, ft, fn), Toast.LENGTH_SHORT).show(); });
             } catch (Exception e) {
-                ui.post(() -> Toast.makeText(this, "Import failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                ui.post(() -> Toast.makeText(this, Language.msg(l10n_history_import_failed, e.getMessage()), Toast.LENGTH_LONG).show());
             }
         });
     }
@@ -583,9 +589,9 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
                 try (OutputStream os = getContentResolver().openOutputStream(uri)) {
                     os.write(sb.toString().getBytes(StandardCharsets.UTF_8));
                 }
-                ui.post(() -> Toast.makeText(this, "Exported " + all.size() + " rows to CSV", Toast.LENGTH_SHORT).show());
+                ui.post(() -> Toast.makeText(this, Language.count(l10n_history_csv_rows, all.size()), Toast.LENGTH_SHORT).show());
             } catch (Exception e) {
-                ui.post(() -> Toast.makeText(this, "CSV export failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                ui.post(() -> Toast.makeText(this, Language.msg(l10n_history_csv_failed, e.getMessage()), Toast.LENGTH_LONG).show());
             }
         });
     }
@@ -597,14 +603,19 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
         return s;
     }
 
-    private static String relative(long ms) {
+    private static CharSequence relative(long ms) {
         if (ms <= 0) return "";
-        long d = System.currentTimeMillis() - ms;
-        if (d < 60000) return "just now";
-        if (d < 3600000) return (d / 60000) + "m ago";
-        if (d < 86400000) return (d / 3600000) + "h ago";
-        if (d < 7 * 86400000L) return (d / 86400000) + "d ago";
-        return new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH).format(new Date(ms));
+        return System.currentTimeMillis() - ms < 7 * 86400000L
+                ? Language.since(ms) : Language.stamp(ms, "yMMMd");
+    }
+
+    private static CharSequence directionLabel(String direction) {
+        switch (direction) {
+            case "received": return Language.msg(l10n_history_received);
+            case "sent": return Language.msg(l10n_history_sent);
+            case "self": return Language.msg(l10n_history_self);
+            default: return direction;
+        }
     }
 
     private int dp(int v) { return (int) (v * getResources().getDisplayMetrics().density); }

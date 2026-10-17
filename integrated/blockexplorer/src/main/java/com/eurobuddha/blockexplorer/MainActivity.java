@@ -1,5 +1,9 @@
 package com.eurobuddha.blockexplorer;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
+
 import com.eurobuddha.minimaapi.direct.DirectNodeEvents;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -100,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(b);
         setContentView(R.layout.pm_blockexplorer_activity_main);
 
+        Language.apply(findViewById(R.id.pm_blockexplorer_main));
         tipChip = findViewById(R.id.pm_blockexplorer_tipChip);
         search = findViewById(R.id.pm_blockexplorer_search);
         goBtn = findViewById(R.id.pm_blockexplorer_goBtn);
@@ -170,7 +175,8 @@ public class MainActivity extends AppCompatActivity {
 
         // theme toggle lives in the header, after the tip chip
         TextView theme = new TextView(this);
-        theme.setText(Design.DARK ? "☀" : "☾");
+        Language.setText(theme, Design.DARK ? "☀" : "☾");
+        Language.description(theme, Design.DARK ? Language.msg(l10n_future_light_theme) : Language.msg(l10n_future_dark_theme));
         theme.setTextColor(Design.DIM);
         theme.setTextSize(17f);
         theme.setPadding(dp(10), dp(2), dp(4), dp(2));
@@ -227,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
         if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.minimablock");
         if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
         if (launch != null) startActivity(launch);
-        else Toast.makeText(this, "Minima Core isn't installed.", Toast.LENGTH_LONG).show();
+        else Toast.makeText(this, Language.msg(l10n_history_core_missing), Toast.LENGTH_LONG).show();
     }
 
     // ================================================================== home page
@@ -240,9 +246,9 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout stats = new LinearLayout(this);
         stats.setOrientation(LinearLayout.HORIZONTAL);
         stats.setPadding(dp(12), dp(12), dp(12), dp(4));
-        tileTip = statTile(stats, "TIP HEIGHT", true);
-        tileSpeed = statTile(stats, "BLOCK TIME", false);
-        tileDb = statTile(stats, "TXPOW DB", false);
+        tileTip = statTile(stats, Language.msg(l10n_explorer_tip_height), true);
+        tileSpeed = statTile(stats, Language.msg(l10n_explorer_block_time), false);
+        tileDb = statTile(stats, Language.msg(l10n_explorer_txpow_db), false);
         home.addView(stats);
 
         // --- section label + status
@@ -251,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
         secRow.setGravity(Gravity.CENTER_VERTICAL);
         secRow.setPadding(dp(18), dp(10), dp(18), dp(4));
         TextView sec = new TextView(this);
-        sec.setText("LATEST BLOCKS");
+        Language.setText(sec, Language.msg(l10n_explorer_latest));
         sec.setTextColor(Design.DIM);
         sec.setTextSize(11f);
         sec.setLetterSpacing(0.12f);
@@ -259,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
         sec.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         secRow.addView(sec);
         listStatus = new TextView(this);
-        listStatus.setText("");
+        Language.setText(listStatus, "");
         listStatus.setTextColor(Design.DIM_2);
         listStatus.setTextSize(11f);
         secRow.addView(listStatus);
@@ -279,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
-    private TextView statTile(LinearLayout parent, String label, boolean hero) {
+    private TextView statTile(LinearLayout parent, CharSequence label, boolean hero) {
         LinearLayout tile = new LinearLayout(this);
         tile.setOrientation(LinearLayout.VERTICAL);
         tile.setBackground(hero
@@ -291,14 +297,14 @@ public class MainActivity extends AppCompatActivity {
         tile.setLayoutParams(lp);
 
         TextView lab = new TextView(this);
-        lab.setText(label);
+        Language.setText(lab, label);
         lab.setTextColor(Design.DIM_2);
         lab.setTextSize(10f);
         lab.setLetterSpacing(0.1f);
         tile.addView(lab);
 
         TextView val = new TextView(this);
-        val.setText("—");
+        Language.setText(val, "—");
         val.setTextColor(hero ? Design.ACCENT : Design.TEXT);
         val.setTextSize(17f);
         val.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
@@ -329,8 +335,8 @@ public class MainActivity extends AppCompatActivity {
                 boolean first = tipHeight == 0;
                 long gap = newTip - tipHeight;
                 tipHeight = newTip;
-                tipChip.setText("● " + Util.groupNum(tipHeight));
-                tileTip.setText(Util.groupNum(tipHeight));
+                Language.setText(tipChip, "● " + Util.groupNum(tipHeight));
+                Language.setText(tileTip, Util.groupNum(tipHeight));
 
                 if (first || blocks.isEmpty()) {
                     reloadFromTip();
@@ -342,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override public void onError(String m) {
                 if (NodeApi.ERR_NOT_ENABLED.equals(m)) return;   // banner already up
-                if (blocks.isEmpty()) listStatus.setText("node unreachable");
+                if (blocks.isEmpty()) Language.setText(listStatus, Language.msg(l10n_explorer_unreachable));
             }
         });
     }
@@ -355,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
                 if (chain == null) return;
                 try {
                     double speed = Double.parseDouble(chain.optString("speed", "0"));
-                    if (speed > 0) tileSpeed.setText(String.format(java.util.Locale.ENGLISH, "%.1f s", 1.0 / speed));
+                    if (speed > 0) Language.setText(tileSpeed, Language.msg(l10n_explorer_seconds, String.format(java.util.Locale.ENGLISH, "%.1f", 1.0 / speed)));
                 } catch (Exception ignored) {}
             }
             @Override public void onError(String m) {}
@@ -365,7 +371,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject r = j.optJSONObject("response");
                 if (r == null) return;
                 JSONObject db = r.optJSONObject("txpowdb");
-                if (db != null) tileDb.setText(Util.groupNum(db.optLong("size", 0)) + " txns");
+                if (db != null) Language.setText(tileDb, Language.msg(l10n_explorer_txn_total, Util.groupNum(db.optLong("size", 0))));
             }
             @Override public void onError(String m) {}
         });
@@ -384,7 +390,7 @@ public class MainActivity extends AppCompatActivity {
     private void loadOlder() {
         if (loading || endOfChain || tipHeight == 0) return;
         loading = true;
-        listStatus.setText("loading…");
+        Language.setText(listStatus, Language.msg(l10n_explorer_loading));
         loadChain(lowestLoaded - 1, PAGE, false);
     }
 
@@ -448,7 +454,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void finishLoad() {
         loading = false;
-        listStatus.setText(endOfChain ? "end of retained chain" : "");
+        Language.setText(listStatus, endOfChain ? Language.msg(l10n_explorer_chain_end) : "");
         adapter.notifyDataSetChanged();
     }
 
@@ -472,27 +478,27 @@ public class MainActivity extends AppCompatActivity {
             if (q.startsWith("Mx")) searchAddress(q);
             else searchTxpowThenAddress(q);
         } else {
-            Toast.makeText(this, "Enter a block number, TxPoW ID or address", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, Language.msg(l10n_explorer_search_help), Toast.LENGTH_SHORT).show();
         }
     }
 
     private void fetchAndShowBlock(long height) {
         JSONObject cached = blockCache.get(height);
         if (cached != null) { showBlockDetail(cached); return; }
-        toastProgress("Looking up block " + Util.groupNum(height) + "…");
+        toastProgress(Language.msg(l10n_explorer_lookup_block, Util.groupNum(height)));
         node.cmd("txpow block:" + height, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 JSONObject txpow = j.optJSONObject("response");
-                if (txpow == null) { notFound("Block " + height); return; }
+                if (txpow == null) { notFound(Language.msg(l10n_explorer_block, height)); return; }
                 blockCache.put(height, txpow);
                 showBlockDetail(txpow);
             }
-            @Override public void onError(String m) { notFound("Block " + height); }
+            @Override public void onError(String m) { notFound(Language.msg(l10n_explorer_block, height)); }
         });
     }
 
     private void searchTxpowThenAddress(final String q) {
-        toastProgress("Searching…");
+        toastProgress(Language.msg(l10n_explorer_searching));
         JSONObject cached = txpowCache.get(q);
         if (cached != null) { showTxpowSmart(cached); return; }
         node.cmd("txpow txpowid:" + q, new NodeApi.Cb() {
@@ -529,11 +535,11 @@ public class MainActivity extends AppCompatActivity {
         else showTxnDetail(txpow);
     }
 
-    private void notFound(String what) {
-        Toast.makeText(this, what + " not found on this node", Toast.LENGTH_LONG).show();
+    private void notFound(CharSequence what) {
+        Toast.makeText(this, Language.msg(l10n_explorer_not_found, what), Toast.LENGTH_LONG).show();
     }
 
-    private void toastProgress(String msg) {
+    private void toastProgress(CharSequence msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
@@ -567,7 +573,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** Scrollable page skeleton with a back row + title. Returns the body container to fill. */
-    private LinearLayout newPage(String backLabel, String title) {
+    private LinearLayout newPage(CharSequence backLabel, CharSequence title) {
         LinearLayout page = new LinearLayout(this);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setBackgroundColor(Design.BG);
@@ -577,14 +583,14 @@ public class MainActivity extends AppCompatActivity {
         backRow.setGravity(Gravity.CENTER_VERTICAL);
         backRow.setPadding(dp(14), dp(12), dp(14), dp(6));
         TextView back = new TextView(this);
-        back.setText("‹ " + backLabel);
+        Language.setText(back, Language.join("‹ ", backLabel));
         back.setTextColor(Design.ACCENT);
         back.setTextSize(14f);
         back.setPadding(dp(4), dp(4), dp(12), dp(4));
         back.setOnClickListener(v -> popPage());
         backRow.addView(back);
         TextView t = new TextView(this);
-        t.setText(title);
+        Language.setText(t, title);
         t.setTextColor(Design.DIM);
         t.setTextSize(13f);
         backRow.addView(t);
@@ -607,38 +613,38 @@ public class MainActivity extends AppCompatActivity {
     private void showBlockDetail(JSONObject txpow) {
         JSONObject header = txpow.optJSONObject("header");
         long height = blockHeight(txpow);
-        LinearLayout body = newPage("Back", "Block detail");
+        LinearLayout body = newPage(Language.msg(l10n_explorer_back), Language.msg(l10n_explorer_block_detail));
 
         // hero card
         LinearLayout hero = sectionCard(body, true);
         TextView big = new TextView(this);
-        big.setText("#" + Util.groupNum(height));
+        Language.setText(big, "#" + Util.groupNum(height));
         big.setTextColor(Design.ACCENT);
         big.setTextSize(28f);
         big.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         hero.addView(big);
         long ms = Util.timeMilli(header);
         TextView when = new TextView(this);
-        when.setText(Util.dateTime(ms) + (ms > 0 ? "   ·   " + Util.relative(ms) : ""));
+        Language.setText(when, Language.join(Util.dateTime(ms), ms > 0 ? Language.join("   ·   ", Util.relative(ms)) : ""));
         when.setTextColor(Design.DIM);
         when.setTextSize(12f);
         hero.addView(when);
 
         // facts card
         LinearLayout facts = sectionCard(body, false);
-        copyRow(facts, "TxPoW ID", txpow.optString("txpowid", ""));
-        kv(facts, "Superblock level", txpow.optString("superblock", "—"));
-        kv(facts, "Size", txpow.optString("size", "—") + " bytes");
-        kv(facts, "Burn", Util.tidyAmount(txpow.optString("burn", "0")) + " MINIMA");
+        copyRow(facts, Language.msg(l10n_history_txpow), txpow.optString("txpowid", ""));
+        kv(facts, Language.msg(l10n_explorer_superblock), txpow.optString("superblock", "—"));
+        kv(facts, Language.msg(l10n_explorer_size), Language.msg(l10n_explorer_bytes, txpow.optString("size", "—")));
+        kv(facts, Language.msg(l10n_explorer_burn), Util.tidyAmount(txpow.optString("burn", "0")) + " MINIMA");
         if (header != null) {
-            kv(facts, "Difficulty", Util.shorten(header.optString("blkdiff", "—")));
-            kv(facts, "Cascade levels", header.optString("cascadelevels", "—"));
+            kv(facts, Language.msg(l10n_explorer_difficulty), Util.shorten(header.optString("blkdiff", "—")));
+            kv(facts, Language.msg(l10n_explorer_cascade_levels), header.optString("cascadelevels", "—"));
             JSONArray sp = header.optJSONArray("superparents");
             if (sp != null && sp.length() > 0) {
                 JSONObject p0 = sp.optJSONObject(0);
                 if (p0 != null) {
                     final String parent = p0.optString("parent", "");
-                    if (!parent.isEmpty()) linkRow(facts, "Parent block", parent,
+                    if (!parent.isEmpty()) linkRow(facts, Language.msg(l10n_explorer_parent_block), parent,
                             v -> searchTxpowThenAddress(parent));
                 }
             }
@@ -646,21 +652,21 @@ public class MainActivity extends AppCompatActivity {
 
         // transactions card
         LinearLayout txs = sectionCard(body, false);
-        sectionHeader(txs, "TRANSACTIONS");
+        sectionHeader(txs, Language.msg(l10n_explorer_transactions));
         JSONObject bodyJson = txpow.optJSONObject("body");
         JSONArray txnlist = bodyJson != null ? bodyJson.optJSONArray("txnlist") : null;
         int n = txnlist != null ? txnlist.length() : 0;
         boolean carriesOwn = txpow.optBoolean("istransaction", false);
         if (n == 0 && !carriesOwn) {
             TextView none = new TextView(this);
-            none.setText("No transactions in this block");
+            Language.setText(none, Language.msg(l10n_explorer_no_transactions));
             none.setTextColor(Design.DIM_2);
             none.setTextSize(13f);
             none.setPadding(0, dp(4), 0, dp(4));
             txs.addView(none);
         }
         if (carriesOwn) {
-            linkRow(txs, "⛏ carried in this TxPoW", txpow.optString("txpowid", ""),
+            linkRow(txs, Language.msg(l10n_explorer_carried), txpow.optString("txpowid", ""),
                     v -> showTxnDetail(txpow));
         }
         for (int i = 0; i < n; i++) {
@@ -675,7 +681,7 @@ public class MainActivity extends AppCompatActivity {
     private void fetchAndShowTxn(final String txid) {
         JSONObject cached = txpowCache.get(txid);
         if (cached != null) { showTxnDetail(cached); return; }
-        toastProgress("Loading transaction…");
+        toastProgress(Language.msg(l10n_explorer_loading_transaction));
         node.cmd("txpow txpowid:" + txid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 JSONObject txpow = j.optJSONObject("response");
@@ -691,24 +697,24 @@ public class MainActivity extends AppCompatActivity {
 
     private void showTxnDetail(JSONObject txpow) {
         JSONObject header = txpow.optJSONObject("header");
-        LinearLayout body = newPage("Back", "Transaction");
+        LinearLayout body = newPage(Language.msg(l10n_explorer_back), Language.msg(l10n_history_transaction));
 
         // hero card
         LinearLayout hero = sectionCard(body, true);
         TextView big = new TextView(this);
-        big.setText("Transaction");
+        Language.setText(big, Language.msg(l10n_history_transaction));
         big.setTextColor(Design.TEXT);
         big.setTextSize(20f);
         big.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         hero.addView(big);
         long ms = Util.timeMilli(header);
         TextView when = new TextView(this);
-        when.setText(Util.dateTime(ms) + (ms > 0 ? "   ·   " + Util.relative(ms) : ""));
+        Language.setText(when, Language.join(Util.dateTime(ms), ms > 0 ? Language.join("   ·   ", Util.relative(ms)) : ""));
         when.setTextColor(Design.DIM);
         when.setTextSize(12f);
         hero.addView(when);
         final TextView conf = new TextView(this);
-        conf.setText("confirmations: …");
+        Language.setText(conf, Language.msg(l10n_explorer_confirm_pending));
         conf.setTextColor(Design.GREEN);
         conf.setTextSize(12f);
         conf.setTypeface(Typeface.MONOSPACE);
@@ -716,26 +722,26 @@ public class MainActivity extends AppCompatActivity {
         hero.addView(conf);
 
         LinearLayout facts = sectionCard(body, false);
-        copyRow(facts, "TxPoW ID", txpow.optString("txpowid", ""));
-        kv(facts, "Size", txpow.optString("size", "—") + " bytes");
-        kv(facts, "Burn", Util.tidyAmount(txpow.optString("burn", "0")) + " MINIMA");
-        kv(facts, "Is block", txpow.optBoolean("isblock", false) ? "yes — also a block" : "no");
+        copyRow(facts, Language.msg(l10n_history_txpow), txpow.optString("txpowid", ""));
+        kv(facts, Language.msg(l10n_explorer_size), Language.msg(l10n_explorer_bytes, txpow.optString("size", "—")));
+        kv(facts, Language.msg(l10n_explorer_burn), Util.tidyAmount(txpow.optString("burn", "0")) + " MINIMA");
+        kv(facts, Language.msg(l10n_explorer_is_block), txpow.optBoolean("isblock", false) ? Language.msg(l10n_explorer_also_block) : Language.msg(l10n_explorer_no));
 
         JSONObject bodyJson = txpow.optJSONObject("body");
         JSONObject txn = bodyJson != null ? bodyJson.optJSONObject("txn") : null;
 
         if (txn != null) {
-            coinSection(body, "INPUTS", txn.optJSONArray("inputs"), Design.RED, "−");
-            coinSection(body, "OUTPUTS", txn.optJSONArray("outputs"), Design.GREEN, "+");
+            coinSection(body, Language.msg(l10n_explorer_inputs), txn.optJSONArray("inputs"), Design.RED, "−");
+            coinSection(body, Language.msg(l10n_explorer_outputs), txn.optJSONArray("outputs"), Design.GREEN, "+");
 
             JSONArray state = txn.optJSONArray("state");
             if (state != null && state.length() > 0) {
                 LinearLayout st = sectionCard(body, false);
-                sectionHeader(st, "STATE VARIABLES");
+                sectionHeader(st, Language.msg(l10n_explorer_state));
                 for (int i = 0; i < state.length(); i++) {
                     JSONObject s = state.optJSONObject(i);
                     if (s == null) continue;
-                    copyRow(st, "Port " + s.optString("port", "?"), s.optString("data", ""));
+                    copyRow(st, Language.msg(l10n_explorer_port, s.optString("port", "?")), s.optString("data", ""));
                 }
             }
         }
@@ -747,24 +753,23 @@ public class MainActivity extends AppCompatActivity {
             @Override public void onResult(JSONObject j) {
                 JSONObject r = j.optJSONObject("response");
                 if (r != null && r.optBoolean("found", false)) {
-                    conf.setText("✓ on chain · block " + r.optString("block", "?")
-                            + " · " + r.optString("confirmations", "?") + " confirmations");
+                    Language.setText(conf, Language.msg(l10n_explorer_on_chain, r.optString("block", "?"), r.optString("confirmations", "?")));
                     conf.setTextColor(Design.GREEN);
                 } else {
-                    conf.setText("not found on chain (mempool or pruned)");
+                    Language.setText(conf, Language.msg(l10n_explorer_off_chain));
                     conf.setTextColor(Design.DIM_2);
                 }
             }
-            @Override public void onError(String m) { conf.setText(""); }
+            @Override public void onError(String m) { Language.setText(conf, ""); }
         });
     }
 
-    private void coinSection(LinearLayout parent, String title, JSONArray coins, int color, String sign) {
+    private void coinSection(LinearLayout parent, CharSequence title, JSONArray coins, int color, String sign) {
         LinearLayout card = sectionCard(parent, false);
-        sectionHeader(card, title + (coins != null ? "  ·  " + coins.length() : ""));
+        sectionHeader(card, Language.join(title, coins != null ? "  ·  " + coins.length() : ""));
         if (coins == null || coins.length() == 0) {
             TextView none = new TextView(this);
-            none.setText("none");
+            Language.setText(none, Language.msg(l10n_explorer_none));
             none.setTextColor(Design.DIM_2);
             none.setTextSize(13f);
             card.addView(none);
@@ -779,7 +784,7 @@ public class MainActivity extends AppCompatActivity {
             row.setPadding(0, dp(6), 0, dp(6));
 
             TextView amt = new TextView(this);
-            amt.setText(sign + Util.coinAmount(c) + "  " + Util.tokenLabel(c));
+            Language.setText(amt, sign + Util.coinAmount(c) + "  " + Util.tokenLabel(c));
             amt.setTextColor(color);
             amt.setTextSize(15f);
             amt.setTypeface(Typeface.DEFAULT_BOLD);
@@ -787,11 +792,11 @@ public class MainActivity extends AppCompatActivity {
 
             final String addr = c.optString("miniaddress", c.optString("address", ""));
             TextView ad = new TextView(this);
-            ad.setText(Util.shorten(addr) + "   (tap to copy)");
+            Language.setText(ad, Language.msg(l10n_explorer_tap_copy, Util.shorten(addr)));
             ad.setTextColor(Design.DIM);
             ad.setTextSize(12f);
             ad.setTypeface(Typeface.MONOSPACE);
-            ad.setOnClickListener(v -> copyToClip("Address", addr));
+            ad.setOnClickListener(v -> copyToClip(Language.msg(l10n_history_address), addr));
             row.addView(ad);
 
             card.addView(row);
@@ -802,18 +807,18 @@ public class MainActivity extends AppCompatActivity {
     // ================================================================== address results page
 
     private void showAddressResults(String addr, JSONArray arr) {
-        LinearLayout body = newPage("Back", "Address");
+        LinearLayout body = newPage(Language.msg(l10n_explorer_back), Language.msg(l10n_history_address));
 
         LinearLayout hero = sectionCard(body, true);
         TextView t = new TextView(this);
-        t.setText(Util.shorten(addr));
+        Language.setText(t, Util.shorten(addr));
         t.setTextColor(Design.TEXT);
         t.setTextSize(16f);
         t.setTypeface(Typeface.MONOSPACE);
-        t.setOnClickListener(v -> copyToClip("Address", addr));
+        t.setOnClickListener(v -> copyToClip(Language.msg(l10n_history_address), addr));
         hero.addView(t);
         TextView cnt = new TextView(this);
-        cnt.setText(arr.length() + " TxPoW" + (arr.length() == 1 ? "" : "s") + " on this node  ·  tap address to copy");
+        Language.setText(cnt, Language.msg(l10n_explorer_address_count, arr.length()));
         cnt.setTextColor(Design.DIM);
         cnt.setTextSize(12f);
         hero.addView(cnt);
@@ -831,7 +836,7 @@ public class MainActivity extends AppCompatActivity {
             row.setPadding(0, dp(8), 0, dp(8));
 
             TextView kind = new TextView(this);
-            kind.setText(isBlock ? "BLK" : "TXN");
+            Language.setText(kind, isBlock ? Language.msg(l10n_explorer_block_badge) : Language.msg(l10n_explorer_txn_badge));
             kind.setTextColor(isBlock ? Design.ACCENT : Design.BLUE);
             kind.setTextSize(10f);
             kind.setTypeface(Typeface.DEFAULT_BOLD);
@@ -844,7 +849,7 @@ public class MainActivity extends AppCompatActivity {
             mid.setPadding(dp(10), 0, 0, 0);
             mid.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
             TextView id = new TextView(this);
-            id.setText(Util.shorten(txpow.optString("txpowid", "")));
+            Language.setText(id, Util.shorten(txpow.optString("txpowid", "")));
             id.setTextColor(Design.TEXT);
             id.setTextSize(13f);
             id.setTypeface(Typeface.MONOSPACE);
@@ -852,14 +857,14 @@ public class MainActivity extends AppCompatActivity {
             TextView sub = new TextView(this);
             long ms = Util.timeMilli(header);
             String blockNo = header != null ? header.optString("block", "?") : "?";
-            sub.setText("block " + blockNo + (ms > 0 ? "  ·  " + Util.relative(ms) : ""));
+            Language.setText(sub, Language.join(Language.msg(l10n_explorer_block, blockNo), ms > 0 ? Language.join("  ·  ", Util.relative(ms)) : ""));
             sub.setTextColor(Design.DIM_2);
             sub.setTextSize(11f);
             mid.addView(sub);
             row.addView(mid);
 
             TextView chev = new TextView(this);
-            chev.setText("›");
+            Language.setText(chev, "›");
             chev.setTextColor(Design.DIM_2);
             chev.setTextSize(18f);
             row.addView(chev);
@@ -887,9 +892,9 @@ public class MainActivity extends AppCompatActivity {
         return card;
     }
 
-    private void sectionHeader(LinearLayout parent, String text) {
+    private void sectionHeader(LinearLayout parent, CharSequence text) {
         TextView h = new TextView(this);
-        h.setText(text);
+        Language.setText(h, text);
         h.setTextColor(Design.DIM);
         h.setTextSize(10f);
         h.setLetterSpacing(0.12f);
@@ -898,18 +903,18 @@ public class MainActivity extends AppCompatActivity {
         parent.addView(h);
     }
 
-    private void kv(LinearLayout parent, String key, String value) {
+    private void kv(LinearLayout parent, CharSequence key, CharSequence value) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(0, dp(4), 0, dp(4));
         TextView k = new TextView(this);
-        k.setText(key);
+        Language.setText(k, key);
         k.setTextColor(Design.DIM);
         k.setTextSize(13f);
         k.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         row.addView(k);
         TextView v = new TextView(this);
-        v.setText(value);
+        Language.setText(v, value);
         v.setTextColor(Design.TEXT);
         v.setTextSize(13f);
         v.setGravity(Gravity.END);
@@ -917,17 +922,17 @@ public class MainActivity extends AppCompatActivity {
         parent.addView(row);
     }
 
-    private void copyRow(LinearLayout parent, String key, final String value) {
+    private void copyRow(LinearLayout parent, CharSequence key, final String value) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.VERTICAL);
         row.setPadding(0, dp(4), 0, dp(4));
         TextView k = new TextView(this);
-        k.setText(key + "   (tap to copy)");
+        Language.setText(k, Language.msg(l10n_explorer_tap_copy, key));
         k.setTextColor(Design.DIM);
         k.setTextSize(11f);
         row.addView(k);
         TextView v = new TextView(this);
-        v.setText(value);
+        Language.setText(v, value);
         v.setTextColor(Design.TEXT);
         v.setTextSize(12f);
         v.setTypeface(Typeface.MONOSPACE);
@@ -936,19 +941,19 @@ public class MainActivity extends AppCompatActivity {
         parent.addView(row);
     }
 
-    private void linkRow(LinearLayout parent, String label, String id, View.OnClickListener click) {
+    private void linkRow(LinearLayout parent, CharSequence label, String id, View.OnClickListener click) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.VERTICAL);
         row.setPadding(0, dp(5), 0, dp(5));
         if (label != null) {
             TextView l = new TextView(this);
-            l.setText(label);
+            Language.setText(l, label);
             l.setTextColor(Design.DIM);
             l.setTextSize(11f);
             row.addView(l);
         }
         TextView v = new TextView(this);
-        v.setText(Util.shorten(id) + "  ›");
+        Language.setText(v, Util.shorten(id) + "  ›");
         v.setTextColor(Design.ACCENT);
         v.setTextSize(13f);
         v.setTypeface(Typeface.MONOSPACE);
@@ -970,7 +975,7 @@ public class MainActivity extends AppCompatActivity {
     private void rawJsonSection(LinearLayout parent, final JSONObject json) {
         final LinearLayout card = sectionCard(parent, false);
         final TextView toggle = new TextView(this);
-        toggle.setText("{ }  View raw JSON  ▾");
+        Language.setText(toggle, Language.msg(l10n_explorer_raw_show));
         toggle.setTextColor(Design.DIM);
         toggle.setTextSize(13f);
         card.addView(toggle);
@@ -981,7 +986,7 @@ public class MainActivity extends AppCompatActivity {
                 String pretty;
                 try { pretty = json.toString(2); } catch (Exception e) { pretty = json.toString(); }
                 TextView raw = new TextView(this);
-                raw.setText(pretty);
+                Language.setText(raw, pretty);
                 raw.setTextColor(Design.DIM);
                 raw.setTextSize(10f);
                 raw.setTypeface(Typeface.MONOSPACE);
@@ -991,19 +996,19 @@ public class MainActivity extends AppCompatActivity {
                 hsv.setPadding(0, dp(8), 0, 0);
                 holder[0] = hsv;
                 card.addView(hsv);
-                toggle.setText("{ }  Hide raw JSON  ▴   (long-press to copy)");
+                Language.setText(toggle, Language.msg(l10n_explorer_raw_hide));
             } else {
                 card.removeView(holder[0]);
                 holder[0] = null;
-                toggle.setText("{ }  View raw JSON  ▾");
+                Language.setText(toggle, Language.msg(l10n_explorer_raw_show));
             }
         });
     }
 
-    private void copyToClip(String label, String value) {
+    private void copyToClip(CharSequence label, String value) {
         ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE))
                 .setPrimaryClip(ClipData.newPlainText(label, value));
-        Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, Language.msg(l10n_history_copied), Toast.LENGTH_SHORT).show();
     }
 
     // ================================================================== block list adapter
@@ -1062,7 +1067,7 @@ public class MainActivity extends AppCompatActivity {
             row.addView(pillTx);
 
             TextView chev = new TextView(MainActivity.this);
-            chev.setText("  ›");
+            Language.setText(chev, "  ›");
             chev.setTextColor(Design.DIM_2);
             chev.setTextSize(18f);
             row.addView(chev);
@@ -1076,17 +1081,17 @@ public class MainActivity extends AppCompatActivity {
             if (getItemViewType(pos) == VT_FOOTER) {
                 TextView more = (TextView) holder.itemView;
                 if (endOfChain) {
-                    more.setText("· end of retained chain ·");
+                    Language.setText(more, Language.join("· ", Language.msg(l10n_explorer_chain_end), " ·"));
                     more.setTextColor(Design.DIM_2);
                     more.setBackground(null);
                     more.setOnClickListener(null);
                 } else if (loading) {
-                    more.setText("loading…");
+                    Language.setText(more, Language.msg(l10n_explorer_loading));
                     more.setTextColor(Design.DIM);
                     more.setBackground(null);
                     more.setOnClickListener(null);
                 } else {
-                    more.setText("Load older blocks  ▾");
+                    Language.setText(more, Language.msg(l10n_explorer_older));
                     more.setTextColor(Design.ACCENT);
                     more.setBackground(Design.card(MainActivity.this, Design.CARD, 14));
                     more.setOnClickListener(v -> { v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP); loadOlder(); });
@@ -1104,14 +1109,14 @@ public class MainActivity extends AppCompatActivity {
             JSONArray txnlist = bodyJson != null ? bodyJson.optJSONArray("txnlist") : null;
             int n = (txnlist != null ? txnlist.length() : 0) + (txpow.optBoolean("istransaction", false) ? 1 : 0);
 
-            vh.num.setText("#" + Util.groupNum(height));
-            vh.sub.setText(Util.shorten(txpow.optString("txpowid", "")) + "  ·  " + Util.relative(ms));
+            Language.setText(vh.num, "#" + Util.groupNum(height));
+            Language.setText(vh.sub, Language.join(Util.shorten(txpow.optString("txpowid", "")), "  ·  ", Util.relative(ms)));
             if (n > 0) {
-                vh.pill.setText(n + (n == 1 ? " TXN" : " TXNS"));
+                Language.setText(vh.pill, Language.msg(l10n_explorer_transactions_badge, n));
                 vh.pill.setTextColor(Design.ACCENT);
                 vh.pill.setBackground(Design.pill(MainActivity.this, Design.ACCENT_SOFT));
             } else {
-                vh.pill.setText("EMPTY");
+                Language.setText(vh.pill, Language.msg(l10n_explorer_empty));
                 vh.pill.setTextColor(Design.DIM_2);
                 vh.pill.setBackground(Design.pill(MainActivity.this, Design.CARD_2));
             }

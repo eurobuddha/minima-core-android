@@ -1,4 +1,7 @@
 package com.eurobuddha.pandapools;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +15,7 @@ public abstract class BaseView {
     public BaseView(MainActivity a, int layoutRes) {
         act = a;
         root = LayoutInflater.from(a).inflate(layoutRes, null);
+        Language.apply(root);
     }
 
     public View getRoot() {

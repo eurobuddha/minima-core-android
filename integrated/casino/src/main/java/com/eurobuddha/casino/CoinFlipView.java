@@ -1,4 +1,7 @@
 package com.eurobuddha.casino;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -24,6 +27,8 @@ public class CoinFlipView extends View {
     private final Paint edge = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint glyph = new Paint(Paint.ANTI_ALIAS_FLAG);
 
+    private String headsGlyph, tailsGlyph;
+
     private float angle = 0f;            // current rotation angle (radians)
     private int result = 0;              // 0 = Heads, 1 = Tails (settled face)
     private ValueAnimator anim;
@@ -32,6 +37,7 @@ public class CoinFlipView extends View {
     public CoinFlipView(Context c, AttributeSet a) { super(c, a); init(); }
 
     private void init() {
+        updateGlyphs();
         coin.setStyle(Paint.Style.FILL);
         coin.setColor(Theme.gold());
 
@@ -42,6 +48,11 @@ public class CoinFlipView extends View {
         glyph.setColor(Theme.onAccent());
         glyph.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
         glyph.setTextAlign(Paint.Align.CENTER);
+    }
+
+    private void updateGlyphs() {
+        headsGlyph = Language.text(getContext(), l10n_casino_head_glyph);
+        tailsGlyph = Language.text(getContext(), l10n_casino_tail_glyph);
     }
 
     /**
@@ -96,6 +107,12 @@ public class CoinFlipView extends View {
         super.onDetachedFromWindow();
     }
 
+    @Override protected void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        updateGlyphs();
+        invalidate(); // redraw a settled coin without restarting or cancelling its animation
+    }
+
     @Override protected void onDraw(Canvas cv) {
         int w = getWidth(), h = getHeight();
         float cx = w / 2f, cy = h / 2f;
@@ -132,7 +149,7 @@ public class CoinFlipView extends View {
             // scale glyph horizontally with the coin so it sits on the face
             cv.save();
             cv.scale(rx / r, 1f, cx, cy);
-            cv.drawText(showHeads ? "H" : "T", cx, baseline, glyph);
+            cv.drawText(showHeads ? headsGlyph : tailsGlyph, cx, baseline, glyph);
             cv.restore();
             glyph.setAlpha(255);
         }

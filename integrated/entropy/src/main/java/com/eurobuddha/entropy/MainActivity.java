@@ -1,4 +1,7 @@
 package com.eurobuddha.entropy;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -39,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         // edge-to-edge: keep content clear of the status/navigation bars (casino pattern)
         android.view.View root = findViewById(R.id.pm_entropy_root);
+        Language.apply(root);
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
             androidx.core.graphics.Insets bars =
                     insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
@@ -49,10 +53,10 @@ public class MainActivity extends AppCompatActivity {
         Theme.load(this);
         Sfx.init(this);
         TextView btnSound = findViewById(R.id.pm_entropy_btnSound);
-        btnSound.setText(Theme.sound() ? "🔊" : "🔇");
+        Language.setText(btnSound, Theme.sound() ? "🔊" : "🔇");
         btnSound.setOnClickListener(v -> {
             Theme.setSound(this, !Theme.sound());
-            btnSound.setText(Theme.sound() ? "🔊" : "🔇");
+            Language.setText(btnSound, Theme.sound() ? "🔊" : "🔇");
             if (Theme.sound()) Sfx.click();
         });
 
@@ -73,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             }
             demoBanner.setVisibility(demoMode ? android.view.View.VISIBLE : android.view.View.GONE);
             btnDemo.setAlpha(demoMode ? 1f : 0.55f);
-            btnDemo.setText(demoMode ? "🔓" : "🎥");
+            Language.setText(btnDemo, demoMode ? "🔓" : "🎥");
         });
         try {
             Bip39.init(this);
@@ -98,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         ViewPager pager = findViewById(R.id.pm_entropy_pager);
         MainPager adapter = new MainPager(
                 new BaseView[]{diceView, lastWordView},
-                new String[]{"🎲 DICE ROLL", "✓ LAST WORD"});
+                new CharSequence[]{Language.msg(l10n_entropy_dice_tab), Language.msg(l10n_entropy_word_tab)});
         pager.setAdapter(adapter);
         pager.setOffscreenPageLimit(2);
         tabs.setupWithViewPager(pager);
@@ -112,11 +116,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (selfTestErr != null) {
             TextView banner = findViewById(R.id.pm_entropy_pairingBanner);
-            banner.setText("SELF-TEST FAILED — generation blocked: " + selfTestErr);
+            Language.setText(banner, Language.msg(l10n_entropy_self_banner, EntropyMessages.message(selfTestErr)));
             banner.setVisibility(android.view.View.VISIBLE);
-            diceView.setSourceLine("self-test FAILED — blocked", false);
+            diceView.setSourceLine(Language.msg(l10n_entropy_self_failed), false);
         } else {
-            diceView.setSourceLine("BIP39 self-test ✓ — node: connecting…", true);
+            diceView.setSourceLine(Language.msg(l10n_entropy_connecting), true);
         }
 
         // never leave rolls gated forever if the node app is absent
@@ -125,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 engineReady = true;
                 engine.setNodeOk(false);
                 if (selfTestErr == null)
-                    diceView.setSourceLine("node unavailable — device CSPRNG only (single source)", false);
+                    diceView.setSourceLine(Language.msg(l10n_entropy_unavailable), false);
             }
         }, 5000);
     }
@@ -146,8 +150,8 @@ public class MainActivity extends AppCompatActivity {
                         engineReady = true;
                         if (selfTestErr == null)
                             diceView.setSourceLine(ok
-                                    ? "BIP39 self-test ✓ — node SHA3 + device CSPRNG verified"
-                                    : "node hash malformed — device CSPRNG only (single source)", ok);
+                                    ? Language.msg(l10n_entropy_verified)
+                                    : Language.msg(l10n_entropy_malformed), ok);
                     }
                     @Override public void onError(String m) { failVerify(); }
                 });
@@ -156,11 +160,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void refreshLanguage() {
+        TabLayout tabs = findViewById(R.id.pm_entropy_tabs);
+        if (tabs == null) return;
+        CharSequence[] titles = {Language.msg(l10n_entropy_dice_tab), Language.msg(l10n_entropy_word_tab)};
+        for (int i=0;i<titles.length;i++) if (tabs.getTabAt(i) != null) tabs.getTabAt(i).setText(titles[i]);
+    }
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        refreshLanguage();
+    }
+    @Override protected void onResume() {
+        super.onResume();
+        refreshLanguage();
+    }
+
     private void failVerify() {
         engine.setNodeOk(false);
         engineReady = true;
         if (selfTestErr == null)
-            diceView.setSourceLine("node commands failed — device CSPRNG only (single source)", false);
+            diceView.setSourceLine(Language.msg(l10n_entropy_commands_failed), false);
     }
 
     @Override

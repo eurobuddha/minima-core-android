@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.main.views.balance;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
@@ -134,6 +137,8 @@ public class BalanceAdapter extends BaseAdapter {
             row = inflater.inflate(R.layout.view_balance_row, parent, false);
         }
 
+        Language.apply(row);
+
         TextView tokenname   = row.findViewById(R.id.balance_tokenname);
         TextView tokenamount = row.findViewById(R.id.balance_tokenamount);
         TextView tokenid     = row.findViewById(R.id.balance_tokenid);
@@ -150,7 +155,7 @@ public class BalanceAdapter extends BaseAdapter {
 
         //Token metadata (name / icon / webvalidate)
         TokenMeta meta = TokenMeta.parse(bal.get("token"), id);
-        tokenname.setText(meta.name);
+        Language.setText(tokenname, meta.nameProvided ? meta.name : Language.msg(l10n_wallet_token));
 
         int density = (int) mActivity.getResources().getDisplayMetrics().density;
         int iconPx  = 40 * Math.max(1, density);
@@ -196,31 +201,44 @@ public class BalanceAdapter extends BaseAdapter {
 
         String summary = Format.summaryAmount(sendable);
         tokenamount.setText(summary);
-        tokenamount.setContentDescription("Sendable " + summary + ". Tap token for exact amount and coins.");
+        Language.description(tokenamount, Language.msg(l10n_core_wallet_sendable_description, summary));
 
         //Everything the headline number leaves out, for THIS token - not just Minima
-        StringBuilder sub = new StringBuilder();
+        Language.TextBuilder sub = new Language.TextBuilder();
+        boolean hasPart = false;
         String locked = Format.subtract(confirmed, sendable);
         if(isPositive(locked)){
-            sub.append("locked ").append(Format.summaryAmount(locked));
+            sub.append(Language.msg(l10n_core_wallet_locked_amount, Format.summaryAmount(locked)));
+            hasPart = true;
         }
         if(isPositive(unconfirmed)){
-            if(sub.length() > 0){ sub.append("  ·  "); }
-            sub.append("unconfirmed ").append(Format.summaryAmount(unconfirmed));
+            if(hasPart){ sub.append("  ·  "); }
+            sub.append(Language.msg(l10n_core_wallet_unconfirmed_amount, Format.summaryAmount(unconfirmed)));
+            hasPart = true;
         }
         if(!"0".equals(coincount) && !"—".equals(coincount)){
-            if(sub.length() > 0){ sub.append("  ·  "); }
-            sub.append(coincount).append(" coins");
+            if(hasPart){ sub.append("  ·  "); }
+            sub.append(coinCount(coincount));
+            hasPart = true;
         }
 
-        if(sub.length() > 0){
-            breakdown.setText(sub.toString());
+        if(hasPart){
+            Language.setText(breakdown, sub.build());
             breakdown.setVisibility(View.VISIBLE);
         }else{
             breakdown.setVisibility(View.GONE);
         }
 
         return row;
+    }
+
+    /** Node counts stay literal; valid bounded integers select the language's plural form. */
+    public static Language.Message coinCount(String raw) {
+        try {
+            int count = Integer.parseInt(raw);
+            if (count >= 0) return Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_core_wallet_coin_count, count, raw);
+        } catch (NumberFormatException ignored) { }
+        return Language.msg(l10n_core_wallet_coin_count_raw, raw);
     }
 
     private static String val(JSONObject zBal, String zKey){

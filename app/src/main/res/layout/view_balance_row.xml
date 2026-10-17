@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Compact token row (minimaWallet-style): one line — icon · name · amount · count. The locked/
-  unconfirmed breakdown stays terse and the full token id is hidden here; tapping the row opens
-  CoinsDialog for full detail (with a "Copy token ID" button), and the drawer-style drag handles
-  reordering. balance_tokenid is kept (GONE) so BalanceAdapter needs no change.
--->
+<!-- Token identity and amount share a bounded row; translated details wrap below them.
+     Tapping opens full coin detail and dragging retains the existing token order behavior. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -28,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:contentDescription="Token icon" />
+            android:contentDescription="Token icon" android:tag="l10n:description=l10n_core_wallet_token_icon" />
 
         <ImageView
             android:id="@+id/balance_tokenbadge"
@@ -36,44 +32,50 @@
             android:layout_height="15dp"
             android:layout_gravity="bottom|end"
             android:visibility="gone"
-            android:contentDescription="Web validated" />
+            android:contentDescription="Web validated" android:tag="l10n:description=l10n_core_wallet_web_validated" />
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/balance_tokenname"
+    <!-- Bounded text column: long translated summaries cannot steal the token name's width. -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginEnd="10dp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textAppearance="@style/TextAppearance.MinimaCore.BodyStrong" />
+        android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="end">
-
-        <TextView
-            android:id="@+id/balance_tokenamount"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textAlignment="viewEnd"
-            android:fontFeatureSettings="tnum"
-            android:textAppearance="@style/TextAppearance.MinimaCore.BodyStrong" />
+            android:orientation="horizontal"
+            android:gravity="top"
+            android:baselineAligned="false">
 
-        <!-- terse: coin count, plus locked/unconfirmed only when non-zero (BalanceAdapter builds it) -->
+            <TextView
+                android:id="@+id/balance_tokenname"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="10dp"
+                android:breakStrategy="simple"
+                android:hyphenationFrequency="none"
+                android:textAppearance="@style/TextAppearance.MinimaCore.BodyStrong" />
+
+            <TextView
+                android:id="@+id/balance_tokenamount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:breakStrategy="simple"
+                android:hyphenationFrequency="none"
+                android:textAlignment="viewEnd"
+                android:fontFeatureSettings="tnum"
+                android:textAppearance="@style/TextAppearance.MinimaCore.BodyStrong" />
+        </LinearLayout>
+
         <TextView
             android:id="@+id/balance_breakdown"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textAlignment="viewEnd"
+            android:layout_marginTop="3dp"
             android:textAppearance="@style/TextAppearance.MinimaCore.Caption"
             android:textColor="@color/core_text_faint"
             android:textSize="11sp" />

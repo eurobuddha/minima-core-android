@@ -114,6 +114,10 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
         container.removeView((View)object);
     }
 
+    public void languageChanged() {
+        for (BaseView view : mAllViews) if (view != null) view.languageChanged();
+    }
+
     public void refreshAllViews(){
         for(int i=0;i<mAllViews.length;i++){
             if(mAllViews[i] != null){

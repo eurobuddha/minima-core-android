@@ -1,5 +1,6 @@
 package com.eurobuddha.minimacore.maxchat;
 
+import androidx.appcompat.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -17,6 +18,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import com.eurobuddha.minimacore.chat.ChatUi;
 import com.eurobuddha.maxima.core.MaximaNode;
 import com.eurobuddha.maxima.core.chat.ChatEngine;
@@ -38,6 +43,19 @@ import java.util.List;
  */
 public class MaxThreadActivity extends AppCompatActivity {
 
+    private final java.util.Set<AlertDialog> dialogs = new java.util.HashSet<>();
+    private LanguageDialog dialog() {
+        return new LanguageDialog(this) {
+            @Override public AlertDialog create() {
+                AlertDialog value = super.create();
+                dialogs.add(value);
+                value.setOnDismissListener(d -> dialogs.remove(value));
+                return value;
+            }
+        };
+    }
+
+
     private String mPeer;
     private MsgAdapter mAdapter;
     private final Runnable mOnChange = () -> runOnUiThread(() -> {
@@ -52,6 +70,7 @@ public class MaxThreadActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_thread);
+        Language.apply(findViewById(android.R.id.content));
 
         mPeer = getIntent().getStringExtra("peer");
         if (mPeer == null) {
@@ -70,6 +89,7 @@ public class MaxThreadActivity extends AppCompatActivity {
         // After setSupportActionBar the bar owns the title - set it THERE, or
         // the manifest label ("Minima Core") wins.
         getSupportActionBar().setTitle(title());
+        Language.toolbarTitle(tb, title());
         getSupportActionBar().setSubtitle("Parlons");
 
         ListView list = findViewById(R.id.chat_msgs);
@@ -81,8 +101,8 @@ public class MaxThreadActivity extends AppCompatActivity {
                 uri -> { if (uri != null) sendPhoto(uri); });
         EditText input = findViewById(R.id.chat_input);
         findViewById(R.id.chat_attach).setOnClickListener(v ->
-                new android.app.AlertDialog.Builder(this)
-                        .setItems(new String[]{"📷 Photo", "🎤 Voice note"}, (d, which) -> {
+                dialog()
+                        .setItems(new CharSequence[]{Language.msg(l10n_media_photo), Language.msg(l10n_media_voice)}, (d, which) -> {
                             if (which == 0) mPickImage.launch("image/*");
                             else startVoiceNote();
                         }).show());
@@ -95,7 +115,7 @@ public class MaxThreadActivity extends AppCompatActivity {
             MaximaNode node = MaxChat.node();
             Contact c = node == null ? null : node.contact(mPeer);
             if (chat == null || c == null) {
-                Toast.makeText(this, "Parlons transport not ready", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, Language.msg(l10n_chat_transport_not_ready), Toast.LENGTH_SHORT).show();
                 return;
             }
             input.setText("");
@@ -106,7 +126,7 @@ public class MaxThreadActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         input.setText(text);   // never eat a typed message
                         Toast.makeText(this,
-                                "Send failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                Language.msg(l10n_chat_send_failed, String.valueOf(e.getMessage())), Toast.LENGTH_LONG).show();
                     });
                 }
                 runOnUiThread(mAdapter::reload);
@@ -117,9 +137,24 @@ public class MaxThreadActivity extends AppCompatActivity {
         mOnChange.run();
     }
 
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        Toolbar toolbar = findViewById(R.id.chat_thread_toolbar);
+        getSupportActionBar().setTitle(title());
+        Language.toolbarTitle(toolbar, title());
+        refreshMenu(toolbar.getMenu());
+        if (mAdapter != null) mAdapter.notifyDataSetChanged();
+    }
+    private void refreshMenu(android.view.Menu menu) {
+        if (menu.findItem(R.id.maxmenu_clear) != null) menu.findItem(R.id.maxmenu_clear).setTitle(Language.text(this, l10n_chat_delete_chat));
+        if (menu.findItem(R.id.maxmenu_delete) != null) menu.findItem(R.id.maxmenu_delete).setTitle(Language.text(this, l10n_chat_delete_contact));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         getMenuInflater().inflate(R.menu.max_thread_menu, menu);
+        refreshMenu(menu);
         return true;
     }
 
@@ -127,28 +162,26 @@ public class MaxThreadActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.maxmenu_clear) {
-            new android.app.AlertDialog.Builder(this)
-                    .setTitle("Delete chat")
-                    .setMessage("Clear this conversation? The contact stays in your list — "
-                            + "you can start a new chat anytime.")
-                    .setPositiveButton("Delete chat", (d, w) -> new Thread(() -> {
+            dialog()
+                    .setTitle(Language.msg(l10n_chat_delete_chat))
+                    .setMessage(Language.msg(l10n_chat_clear_thread))
+                    .setPositiveButton(Language.msg(l10n_chat_delete_chat), (d, w) -> new Thread(() -> {
                         try { MaxChat.clearConversation(mPeer); } catch (Exception ignored) {}
                         runOnUiThread(this::finish);
                     }, "maxchat-clear").start())
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(Language.msg(l10n_common_cancel), null)
                     .show();
             return true;
         }
         if (id == R.id.maxmenu_delete) {
-            new android.app.AlertDialog.Builder(this)
-                    .setTitle("Delete contact")
-                    .setMessage("Permanently remove this Parlons contact and conversation? "
-                            + "This cannot be undone.")
-                    .setPositiveButton("Delete contact", (d, w) -> new Thread(() -> {
+            dialog()
+                    .setTitle(Language.msg(l10n_chat_delete_contact))
+                    .setMessage(Language.msg(l10n_chat_remove_parlons))
+                    .setPositiveButton(Language.msg(l10n_chat_delete_contact), (d, w) -> new Thread(() -> {
                         try { MaxChat.removeContact(mPeer); } catch (Exception ignored) {}
                         runOnUiThread(this::finish);
                     }, "maxchat-remove").start())
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(Language.msg(l10n_common_cancel), null)
                     .show();
             return true;
         }
@@ -157,6 +190,8 @@ public class MaxThreadActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        for (AlertDialog value : new java.util.ArrayList<>(dialogs)) value.dismiss();
+        dialogs.clear();
         stopAudio();
         if (mActiveRecorder != null) {
             mActiveRecorder.stopQuiet();
@@ -193,7 +228,7 @@ public class MaxThreadActivity extends AppCompatActivity {
             if (zGrants[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 startVoiceNote();
             } else {
-                Toast.makeText(this, "Microphone permission needed for voice notes",
+                Toast.makeText(this, Language.msg(l10n_chat_microphone_permission),
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -209,7 +244,7 @@ public class MaxThreadActivity extends AppCompatActivity {
                 runOnUiThread(() -> sendMediaBytes(jpeg, "image/jpeg", ""));
             } catch (Exception e) {
                 runOnUiThread(() -> Toast.makeText(this,
-                        "Photo failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                        Language.msg(l10n_chat_photo_failed, String.valueOf(e.getMessage())), Toast.LENGTH_LONG).show());
             }
         }, "maxchat-photo").start();
     }
@@ -220,16 +255,16 @@ public class MaxThreadActivity extends AppCompatActivity {
         MaximaNode node = MaxChat.node();
         Contact c = node == null ? null : node.contact(mPeer);
         if (chat == null || c == null) {
-            Toast.makeText(this, "Parlons transport not ready", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, Language.msg(l10n_chat_transport_not_ready), Toast.LENGTH_SHORT).show();
             return;
         }
-        Toast.makeText(this, "Sending…", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, Language.msg(l10n_chat_sending), Toast.LENGTH_SHORT).show();
         new Thread(() -> {
             try {
                 chat.sendMedia(c, zBytes, zMime, zCaption);
             } catch (Exception e) {
                 runOnUiThread(() -> Toast.makeText(this,
-                        "Send failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                        Language.msg(l10n_chat_send_failed, String.valueOf(e.getMessage())), Toast.LENGTH_LONG).show());
             }
             runOnUiThread(mAdapter::reload);
         }, "maxchat-media-send").start();
@@ -260,7 +295,7 @@ public class MaxThreadActivity extends AppCompatActivity {
             }
             mLoadingRef = "";
             if (f == null) {
-                Toast.makeText(this, "Voice note not available yet", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, Language.msg(l10n_chat_voice_unavailable), Toast.LENGTH_SHORT).show();
                 return;
             }
             try {
@@ -280,7 +315,7 @@ public class MaxThreadActivity extends AppCompatActivity {
                 zOnState.run();
             } catch (Exception e) {
                 stopAudio();
-                Toast.makeText(this, "Playback failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, Language.msg(l10n_chat_playback_failed), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -297,10 +332,10 @@ public class MaxThreadActivity extends AppCompatActivity {
         mPlayingRef = "";
     }
 
-    private String title() {
+    private CharSequence title() {
         MaximaNode node = MaxChat.node();
         Contact c = node == null ? null : node.contact(mPeer);
-        return c != null && !c.name.isEmpty() ? c.name : "Parlons contact";
+        return c != null && !c.name.isEmpty() ? c.name : Language.msg(l10n_chat_parlons_contact);
     }
 
     private static String ticks(ChatEngine.Entry zE) {
@@ -318,8 +353,8 @@ public class MaxThreadActivity extends AppCompatActivity {
     }
 
     private class MsgAdapter extends BaseAdapter {
-        private ArrayList<Object> mItems = new ArrayList<>();   // String day label | Entry
-        private final DateFormat mTime = DateFormat.getTimeInstance(DateFormat.SHORT);
+        private ArrayList<Object> mItems = new ArrayList<>();   // Long day timestamp | Entry
+
         // Reloads race during a message burst; only the newest snapshot may land.
         private final java.util.concurrent.atomic.AtomicInteger mGen =
                 new java.util.concurrent.atomic.AtomicInteger();
@@ -336,13 +371,13 @@ public class MaxThreadActivity extends AppCompatActivity {
                 long lastDay = 0;
                 for (ChatEngine.Entry e : conv) {
                     if (lastDay == 0 || !ChatUi.sameDay(lastDay, e.time)) {
-                        items.add(ChatUi.dayLabel(e.time));
+                        items.add(e.time);
                     }
                     lastDay = e.time;
                     items.add(e);
                 }
                 runOnUiThread(() -> {
-                    if (gen != mGen.get()) {
+                    if (gen != mGen.get() || isFinishing() || isDestroyed()) {
                         return;   // a newer snapshot is on its way
                     }
                     mItems = items;
@@ -356,22 +391,23 @@ public class MaxThreadActivity extends AppCompatActivity {
         @Override public long getItemId(int position) { return position; }
         @Override public int getViewTypeCount() { return 2; }
         @Override public int getItemViewType(int position) {
-            return mItems.get(position) instanceof String ? 0 : 1;
+            return mItems.get(position) instanceof Long ? 0 : 1;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             Object it = mItems.get(position);
-            if (it instanceof String) {
+            if (it instanceof Long) {
                 View row = convertView != null ? convertView
                         : getLayoutInflater().inflate(R.layout.chat_date_row, parent, false);
-                ((TextView) row.findViewById(R.id.date_text)).setText((String) it);
+                ((TextView) row.findViewById(R.id.date_text)).setText(ChatUi.dayLabel(MaxThreadActivity.this, (Long) it));
                 return row;
             }
 
             ChatEngine.Entry e = (ChatEngine.Entry) it;
             View row = convertView != null ? convertView
                     : getLayoutInflater().inflate(R.layout.chat_msg_row, parent, false);
+            Language.apply(row);
 
             LinearLayout rowBox = row.findViewById(R.id.msg_row);
             LinearLayout bubble = row.findViewById(R.id.msg_bubble);
@@ -423,13 +459,15 @@ public class MaxThreadActivity extends AppCompatActivity {
                 final String mref = ChatMedia.ref(e.body);
                 btn.setText(mref != null && mref.equals(mPlayingRef)
                         && mPlayer != null && mPlayer.isPlaying() ? "\u23f8" : "\u25b6");
+                Language.description(btn, Language.msg(mref.equals(mPlayingRef) && mPlayer != null && mPlayer.isPlaying()
+                        ? l10n_chat_pause_voice : l10n_chat_play_voice));
                 View.OnClickListener play = v -> toggleAudio(mbody, this::notifyDataSetChanged);
                 btn.setOnClickListener(play);
                 audio.setOnClickListener(play);
             } else if (mime != null && mime.startsWith("image")) {
                 String cap = ChatMedia.caption(e.body);
                 body.setVisibility(cap.isEmpty() ? View.GONE : View.VISIBLE);
-                body.setText(cap);
+                Language.setText(body, cap);
                 image.setVisibility(View.VISIBLE);
                 image.setImageResource(android.R.drawable.stat_sys_download);
                 final String mbody = e.body;
@@ -440,12 +478,12 @@ public class MaxThreadActivity extends AppCompatActivity {
                     }
                 });
             } else {
-                body.setText(ChatMedia.isMedia(e.body) ? ChatMedia.preview(e.body)
+                Language.setText(body, ChatMedia.isMedia(e.body) ? com.eurobuddha.minimacore.i18n.ChatPreview.message(e.body)
                         : ChatPay.isPayment(e.body)
                             ? "💸 " + ChatPay.amount(e.body) + " " + ChatPay.tokenName(e.body)
                             : e.body);
             }
-            meta.setText(mTime.format(new java.util.Date(e.time)) + ticks(e));
+            Language.setText(meta, Language.join(Language.stamp(e.time, "Hm"), ticks(e)));
             return row;
         }
     }

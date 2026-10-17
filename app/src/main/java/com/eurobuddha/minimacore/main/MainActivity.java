@@ -1,6 +1,8 @@
 package com.eurobuddha.minimacore.main;
 
 import com.eurobuddha.minimacore.BuildConfig;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -138,20 +140,20 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         tabs.setupWithViewPager(mMainPager);
 
         // Tab labels and content share the adapter positions for this build.
-        tabs.getTabAt(MainAdapter.HOME_POSITION).setText(BuildConfig.PANDAMONIUM ? "Node" : "Home");
+        tabs.getTabAt(MainAdapter.HOME_POSITION).setText(Language.text(this, BuildConfig.PANDAMONIUM ? l10n_tab_node : l10n_tab_home));
         tabs.getTabAt(MainAdapter.HOME_POSITION).setIcon(BuildConfig.PANDAMONIUM
                 ? R.drawable.ic_node : R.drawable.ic_drawer_home);
 
-        tabs.getTabAt(MainAdapter.WALLET_POSITION).setText("Wallet");
+        tabs.getTabAt(MainAdapter.WALLET_POSITION).setText(Language.text(this, l10n_tab_wallet));
         tabs.getTabAt(MainAdapter.WALLET_POSITION).setIcon(R.drawable.ic_minima);
 
-        tabs.getTabAt(MainAdapter.UTILITY_POSITION).setText(BuildConfig.PANDAMONIUM ? "History" : "Terminal");
+        tabs.getTabAt(MainAdapter.UTILITY_POSITION).setText(Language.text(this, BuildConfig.PANDAMONIUM ? l10n_tab_history : l10n_tab_terminal));
         tabs.getTabAt(MainAdapter.UTILITY_POSITION).setIcon(R.drawable.ic_edit_note);
 
-        tabs.getTabAt(MainAdapter.APPS_POSITION).setText("Apps");
+        tabs.getTabAt(MainAdapter.APPS_POSITION).setText(Language.text(this, l10n_tab_apps));
         tabs.getTabAt(MainAdapter.APPS_POSITION).setIcon(R.drawable.ic_dapps);
 
-        tabs.getTabAt(MainAdapter.CHAT_POSITION).setText("Chat");
+        tabs.getTabAt(MainAdapter.CHAT_POSITION).setText(Language.text(this, l10n_tab_chat));
         tabs.getTabAt(MainAdapter.CHAT_POSITION).setIcon(R.drawable.ic_chat);
 
         //Slightly smaller tab icons. TabLayout has no icon-size attribute, so inset each icon to
@@ -198,15 +200,34 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     public void setToolbarTitle(int zPosition){
         String title;
         switch (zPosition){
-            case MainAdapter.WALLET_POSITION:  title = "Wallet";      break;
-            case MainAdapter.UTILITY_POSITION:  title = BuildConfig.PANDAMONIUM ? "History" : "Terminal";    break;
-            case MainAdapter.APPS_POSITION:  title = "Apps";        break;
-            case MainAdapter.CHAT_POSITION:  title = "Chat";        break;
+            case MainAdapter.WALLET_POSITION:  title = Language.text(this, l10n_tab_wallet);      break;
+            case MainAdapter.UTILITY_POSITION:  title = Language.text(this, BuildConfig.PANDAMONIUM ? l10n_tab_history : l10n_tab_terminal);    break;
+            case MainAdapter.APPS_POSITION:  title = Language.text(this, l10n_tab_apps);        break;
+            case MainAdapter.CHAT_POSITION:  title = Language.text(this, l10n_tab_chat);        break;
             default: title = BuildConfig.PANDAMONIUM ? "" : "Minima Core"; break;
         }
         if(getSupportActionBar() != null){
             getSupportActionBar().setTitle(BuildConfig.PANDAMONIUM ? "" : title);
         }
+    }
+
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        if (mMainAdapter != null) mMainAdapter.languageChanged();
+        // Relabel retained tabs without selecting a page or restarting display work.
+        TabLayout tabs = findViewById(R.id.tabs);
+        if (tabs != null && tabs.getTabCount() == 5) {
+            tabs.getTabAt(MainAdapter.HOME_POSITION).setText(Language.text(this,
+                    BuildConfig.PANDAMONIUM ? l10n_tab_node : l10n_tab_home));
+            tabs.getTabAt(MainAdapter.WALLET_POSITION).setText(Language.text(this, l10n_tab_wallet));
+            tabs.getTabAt(MainAdapter.UTILITY_POSITION).setText(Language.text(this,
+                    BuildConfig.PANDAMONIUM ? l10n_tab_history : l10n_tab_terminal));
+            tabs.getTabAt(MainAdapter.APPS_POSITION).setText(Language.text(this, l10n_tab_apps));
+            tabs.getTabAt(MainAdapter.CHAT_POSITION).setText(Language.text(this, l10n_tab_chat));
+        }
+        if (mMainPager != null) setToolbarTitle(mMainPager.getCurrentItem());
+        invalidateOptionsMenu();
     }
 
     public void checkBattery() {
@@ -303,6 +324,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.mainmenu_logs).setTitle(Language.text(this, l10n_menu_logs));
+        menu.findItem(R.id.mainmenu_backup).setTitle(Language.text(this, l10n_menu_backup));
+        menu.findItem(R.id.mainmenu_params).setTitle(Language.text(this, l10n_menu_params));
+        menu.findItem(R.id.mainmenu_locknow).setTitle(Language.text(this, l10n_menu_lock_now));
+        menu.findItem(R.id.mainmenu_applock).setTitle(Language.text(this, l10n_menu_app_lock));
+        menu.findItem(R.id.mainmenu_shutdown).setTitle(Language.text(this, l10n_menu_shutdown));
+        menu.findItem(R.id.mainmenu_wipeminima).setTitle(Language.text(this, l10n_menu_reset));
+        menu.findItem(R.id.mainmenu_screenshots).setTitle(Language.text(this, l10n_menu_screenshots));
+        menu.findItem(R.id.mainmenu_language).setTitle(Language.text(this, l10n_language_title));
         //Reflect the persisted screenshot preference in the checkbox
         MenuItem ss = menu.findItem(R.id.mainmenu_screenshots);
         if(ss != null){
@@ -323,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         zItem.setChecked(allow);
 
-        Toast.makeText(this, allow ? "Screenshots allowed" : "Screenshots blocked",
+        Toast.makeText(this, Language.text(this, allow ? l10n_menu_screenshots_allowed : l10n_menu_screenshots_blocked),
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -337,6 +367,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 //                addPeerDialog();
 //
 //                return true;
+
+            case R.id.mainmenu_language :
+                Language.choose(this, false);
+                return true;
 
             case R.id.mainmenu_screenshots :
 

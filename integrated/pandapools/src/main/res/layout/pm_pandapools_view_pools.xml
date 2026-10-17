@@ -1,89 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+<?xml version='1.0' encoding='utf-8'?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="14dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="14dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="10dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="10dp">
 
-            <TextView
-                android:id="@+id/pm_pandapools_poolsSummary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="—"
-                android:textSize="13sp" />
+            <TextView android:id="@+id/pm_pandapools_poolsSummary" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="—" android:textSize="13sp" />
 
-            <TextView
-                android:id="@+id/pm_pandapools_poolsRefresh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="↻ SCAN"
-                android:textSize="12sp"
-                android:letterSpacing="0.08"
-                android:padding="6dp" />
+            <TextView android:id="@+id/pm_pandapools_poolsRefresh" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/l10n_pools_scan" android:textSize="12sp" android:letterSpacing="0.08" android:padding="6dp" android:tag="l10n:text=l10n_pools_scan" android:minHeight="48dp" android:minWidth="48dp" android:gravity="center" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/pm_pandapools_poolsStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Scanning the pool registry…"
-            android:textSize="13sp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp" />
+        <TextView android:id="@+id/pm_pandapools_poolsStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/l10n_pools_scanning" android:textSize="13sp" android:paddingTop="8dp" android:paddingBottom="8dp" android:tag="l10n:text=l10n_pools_scanning" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="8dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="2dp" android:layout_marginBottom="8dp">
 
-            <TextView
-                android:id="@+id/pm_pandapools_poolsIndivTab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="INDIVIDUAL"
-                android:textSize="12sp"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:paddingTop="7dp"
-                android:paddingBottom="7dp" />
+            <TextView android:id="@+id/pm_pandapools_poolsIndivTab" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/l10n_pools_individual" android:textSize="12sp" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="7dp" android:paddingBottom="7dp" android:tag="l10n:text=l10n_pools_individual" android:minHeight="48dp" android:minWidth="48dp" android:gravity="center" />
 
-            <View
-                android:layout_width="8dp"
-                android:layout_height="1dp" />
+            <View android:layout_width="8dp" android:layout_height="1dp" />
 
-            <TextView
-                android:id="@+id/pm_pandapools_poolsCombinedTab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="COMBINED"
-                android:textSize="12sp"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:paddingTop="7dp"
-                android:paddingBottom="7dp" />
+            <TextView android:id="@+id/pm_pandapools_poolsCombinedTab" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/l10n_pools_combined" android:textSize="12sp" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="7dp" android:paddingBottom="7dp" android:tag="l10n:text=l10n_pools_combined" android:minHeight="48dp" android:minWidth="48dp" android:gravity="center" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/pm_pandapools_poolList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+        <LinearLayout android:id="@+id/pm_pandapools_poolList" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

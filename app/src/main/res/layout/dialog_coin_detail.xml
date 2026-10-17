@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="6dp"
-            android:text="Raw JSON"
+            android:text="Raw JSON" android:tag="l10n:text=l10n_core_wallet_raw_json"
             android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
 
         <TextView

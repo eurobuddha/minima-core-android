@@ -1,6 +1,8 @@
 package com.eurobuddha.minimacore.main.backup;
 
 import org.minima.database.wallet.Wallet;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import org.minima.system.Main;
 
 /**
@@ -29,11 +31,10 @@ public final class NodeKeys {
         }
 
         /** The banner text, phrased the way the node itself phrases it. */
-        public String message() {
-            if (!nodeRunning) return "The node is not running. Start Minima before backing up or restoring.";
+        public CharSequence message() {
+            if (!nodeRunning) return Language.msg(l10n_backup_node_stopped);
             if (ready) return "";
-            return "Please wait for ALL your keys to be created. This can take 5 mins. Currently ("
-                    + created + "/" + total + ")";
+            return Language.msg(l10n_backup_keys_pending, created, total);
         }
     }
 

@@ -35,6 +35,7 @@ public class BaseView {
 
         LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService(mActivity.LAYOUT_INFLATER_SERVICE);
         mMainView = inflater.inflate(zViewResID, null);
+        com.eurobuddha.minimacore.i18n.Language.apply(mMainView);
     }
 
     public Activity getActivity(){
@@ -46,6 +47,9 @@ public class BaseView {
     }
 
     public void refreshView(){}
+
+    /** Relabel retained controls without refreshing data or changing the selected page. */
+    public void languageChanged() {}
 
     /** The Activity is going away - drop timers and dismiss any dialog this view owns. */
     public void onActivityDestroy(){}

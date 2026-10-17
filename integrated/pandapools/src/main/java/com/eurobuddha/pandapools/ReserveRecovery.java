@@ -42,7 +42,7 @@ final class ReserveRecovery {
                 } else missing.run();
             }
             public void onError(String m) {
-                PoolRefresher.fillReserves(pool, null); notes.add("Local lookup: " + m); missing.run();
+                PoolRefresher.fillReserves(pool, null); notes.add("Local lookup: " + JSONObject.quote(m)); missing.run();
             }
         });
     }
@@ -71,18 +71,18 @@ final class ReserveRecovery {
                         }
                         exportLeg(source, live, 0, () -> readLocal(() -> nextSource(isLocal)));
                     }
-                    public void onError(String m) { notes.add("Archive lookup: " + m); nextSource(isLocal); }
+                    public void onError(String m) { notes.add("Archive lookup: " + JSONObject.quote(m)); nextSource(isLocal); }
                 });
             }
-            public void onError(String m) { if (!isLocal) notes.add("Archive status: " + m); nextSource(isLocal); }
+            public void onError(String m) { if (!isLocal) notes.add("Archive status: " + JSONObject.quote(m)); nextSource(isLocal); }
         });
     }
 
     private void nextSource(boolean wasLocal) {
         if (wasLocal && archive != null) { tryArchive(archive, false); return; }
         finish(false, "Reserves are not fully visible on this node. The recipe is retained. "
-                + "Use a synced MegaMMR archive or a fresh pool backup from one; an empty local lookup does not prove the funds are gone. "
-                + String.join(" ", notes));
+                + "Use a synced MegaMMR archive or a fresh pool backup from one; an empty local lookup does not prove the funds are gone.\n"
+                + String.join("\n", notes));
     }
 
     private void exportLeg(FundingCoins.Command source, Pool live, int leg, Runnable next) {
@@ -98,7 +98,7 @@ final class ReserveRecovery {
                 }
                 checkedImport(r.optString("data", ""), token, id, () -> exportLeg(source, live, leg + 1, next));
             }
-            public void onError(String m) { notes.add("Archive export: " + m); exportLeg(source, live, leg + 1, next); }
+            public void onError(String m) { notes.add("Archive export: " + JSONObject.quote(m)); exportLeg(source, live, leg + 1, next); }
         });
     }
 
@@ -120,10 +120,10 @@ final class ReserveRecovery {
                         if (!TxPost.truthy(result, "status")) notes.add("Coin import failed for " + coin.optString("coinid") + ".");
                         next.run(); // final live read decides; 'already relevant' may legitimately reject an import
                     }
-                    public void onError(String m) { notes.add("Coin import: " + m); next.run(); }
+                    public void onError(String m) { notes.add("Coin import: " + JSONObject.quote(m)); next.run(); }
                 });
             }
-            public void onError(String m) { notes.add("Coin proof check: " + m); next.run(); }
+            public void onError(String m) { notes.add("Coin proof check: " + JSONObject.quote(m)); next.run(); }
         });
     }
 

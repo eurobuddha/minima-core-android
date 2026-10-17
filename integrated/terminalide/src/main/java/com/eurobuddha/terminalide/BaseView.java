@@ -1,4 +1,8 @@
 package com.eurobuddha.terminalide;
+import com.eurobuddha.minimacore.i18n.Language;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -15,6 +19,7 @@ public class BaseView {
 
         LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService(mActivity.LAYOUT_INFLATER_SERVICE);
         mMainView = inflater.inflate(zViewResID, null);
+        Language.apply(mMainView);
     }
 
     public Activity getActivity(){

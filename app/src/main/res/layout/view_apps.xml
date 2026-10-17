@@ -39,7 +39,7 @@
                 android:paddingHorizontal="16dp"
                 android:paddingTop="16dp"
                 android:paddingBottom="8dp"
-                android:text="Switch integrated apps on or off. Apps you turn off leave the app drawer until you turn them back on."
+                android:text="Switch integrated apps on or off. Apps you turn off leave the app drawer until you turn them back on." android:tag="l10n:text=l10n_apps_internal_help"
                 android:textAppearance="@style/TextAppearance.MinimaCore.Caption"
                 android:textColor="@color/core_text_faint" />
 

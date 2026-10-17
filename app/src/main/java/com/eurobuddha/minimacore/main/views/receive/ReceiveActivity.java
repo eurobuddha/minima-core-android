@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.main.views.receive;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
@@ -25,7 +28,7 @@ public class ReceiveActivity extends AppCompatActivity {
 
 
         Toolbar tb = findViewById(R.id.receive_toolbar);
-        tb.setTitle("Receive");
+        Language.toolbarTitle(tb, Language.msg(l10n_wallet_receive));
         tb.setNavigationOnClickListener(v -> finish());
         KeyboardInsets.install(this, findViewById(R.id.receive_main), tb);
 

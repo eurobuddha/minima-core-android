@@ -4,7 +4,7 @@
         <package android:name="com.eurobuddha.minimacore" />
     </queries>
     <application>
-        <activity android:name="com.eurobuddha.history.MainActivity" android:exported="false" android:theme="@style/pm_history_Theme.Utxo">
+        <activity android:name="com.eurobuddha.history.MainActivity" android:exported="false" android:theme="@style/pm_history_Theme.Utxo" android:configChanges="locale|layoutDirection|screenLayout">
             </activity>
     </application>
 </manifest>

@@ -1,5 +1,8 @@
 package com.eurobuddha.pandapools;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -142,7 +145,21 @@ public class PoolKeepAliveService extends Service {
         super.onTaskRemoved(rootIntent);
     }
 
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        try {
+            createChannel();
+            // Reuse AtomiX's active-service guard. A locale change does not start a maintenance pass.
+            if (started) {
+                NotificationManager manager = getSystemService(NotificationManager.class);
+                if (manager != null) manager.notify(FG_ID, fgNotification());
+            }
+        } catch (RuntimeException unavailable) { /* Keep the existing notification if the OS refuses an update. */ }
+    }
+
     @Override public void onDestroy() {
+        started = false;
         super.onDestroy();
         if (node != null) { try { node.onDestroy(); } catch (Exception ignored) {} node = null; }
     }
@@ -151,8 +168,13 @@ public class PoolKeepAliveService extends Service {
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationManager nm = getSystemService(NotificationManager.class);
-            if (nm != null) nm.createNotificationChannel(
-                    new NotificationChannel(CH_FG, "Pool keep-alive", NotificationManager.IMPORTANCE_LOW));
+            if (nm != null) {
+                NotificationChannel channel = nm.getNotificationChannel(CH_FG);
+                if (channel == null) channel = new NotificationChannel(CH_FG,
+                        Language.text(this, l10n_pools_keeper_channel), NotificationManager.IMPORTANCE_LOW);
+                channel.setName(Language.text(this, l10n_pools_keeper_channel));
+                nm.createNotificationChannel(channel);
+            }
             StrandingWatch.createChannel(this);   // separate HIGH-importance channel; see StrandingWatch
         }
     }
@@ -163,7 +185,7 @@ public class PoolKeepAliveService extends Service {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         return new NotificationCompat.Builder(this, CH_FG)
                 .setContentTitle("PandaPools")
-                .setContentText("Keeping your pools discoverable to other devices")
+                .setContentText(Language.text(this, l10n_pools_keeper_running))
                 .setSmallIcon(android.R.drawable.stat_sys_upload_done)
                 .setContentIntent(pi)
                 .setOngoing(true)

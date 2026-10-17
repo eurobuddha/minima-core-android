@@ -48,8 +48,14 @@ public final class Cfg {
     private static final int LOG_MSG_MAX = 300;
 
     private final SharedPreferences sp;
+    private final Context appContext;
+    public static final String AUDIT_WALLET_USES = "audit_wallet_uses_v1";
+    public JSONArray walletAuditKeys() {
+        return com.eurobuddha.wallet.PublicAuditKeys.snapshot(appContext);
+    }
 
     public Cfg(Context ctx) {
+        appContext = ctx.getApplicationContext();
         // Guardian and UI both touch this from different threads; SharedPreferences is thread-safe
         // and the guardian only ever writes from its single worker thread.
         this.sp = ctx.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);

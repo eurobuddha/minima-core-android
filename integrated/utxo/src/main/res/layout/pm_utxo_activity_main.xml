@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:id="@+id/pm_utxo_main" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@color/pm_utxo_ux_bg" tools:context=".MainActivity">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingTop="14dp" android:paddingBottom="10dp" android:tag="pandamonium.app.toolbar">
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+            <TextView android:id="@+id/pm_utxo_brandTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="utxoWallet" android:textColor="@color/pm_utxo_ux_accent" android:textStyle="bold" android:textSize="17sp" />
+            <TextView android:id="@+id/pm_utxo_brandSub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="PICK YOUR COINS" android:textColor="@color/pm_utxo_ux_subtext" android:textSize="9sp" android:letterSpacing="0.15" />
+        </LinearLayout>
+        <TextView android:id="@+id/pm_utxo_designToggle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="◐ STYLE" android:textColor="@color/pm_utxo_ux_accent" android:textSize="11sp" android:letterSpacing="0.08" android:padding="6dp" android:layout_marginEnd="6dp" android:minHeight="48dp" android:minWidth="48dp" android:gravity="center" />
+        <TextView android:id="@+id/pm_utxo_blockNo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="#—" android:textColor="@color/pm_utxo_ux_subtext" android:textSize="13sp" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/pm_utxo_pairingBanner" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@color/pm_utxo_ux_banner" android:padding="16dp" android:visibility="gone">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/l10n_utxo_node_not_ready" android:textColor="@color/pm_utxo_ux_accent" android:textStyle="bold" android:textSize="15sp" android:tag="l10n:text=l10n_utxo_node_not_ready" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="@string/l10n_explorer_node_retry" android:textColor="@color/pm_utxo_ux_subtext" android:textSize="13sp" android:tag="l10n:text=l10n_explorer_node_retry" />
+        <Button android:id="@+id/pm_utxo_openNodeBtn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="@string/l10n_filez_open_core" android:tag="l10n:text=l10n_filez_open_core" />
+    </LinearLayout>
+    <com.google.android.material.tabs.TabLayout android:id="@+id/pm_utxo_tabs" android:layout_width="match_parent" android:layout_height="wrap_content" app:tabMode="scrollable" app:tabGravity="fill" app:tabIndicatorColor="@color/pm_utxo_ux_accent" app:tabSelectedTextColor="@color/pm_utxo_ux_accent" app:tabTextColor="@color/pm_utxo_ux_subtext" />
+    <androidx.viewpager.widget.ViewPager android:id="@+id/pm_utxo_pager" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+</LinearLayout>

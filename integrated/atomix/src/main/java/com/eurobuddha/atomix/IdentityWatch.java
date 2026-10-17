@@ -21,7 +21,7 @@ import com.eurobuddha.atomix.integratedcomms.NodeApi;
  *
  * There is deliberately NO self-heal here (user decision, 0.1.19). Silently re-picking an identity hides the
  * fact that funds are sitting on a key the node can no longer derive. Instead we HALT and make the user
- * rescue-then-reinstall, which is the one reset that provably puts every piece back in line.
+ * review and rescue funds. Pandamonium shares node storage, so clearing app storage is not a recovery action.
  *
  * "Cannot verify" is never "mismatch": an empty key list (node busy/locked) or a failed seedrandom leaves the
  * verdict untouched, so a flaky node can never halt a healthy app.
@@ -117,9 +117,7 @@ public final class IdentityWatch {
                 + (minimaMismatch ? " Minima key not owned by node: " + orphanedPk + "." : "")
                 + (ethMismatch ? " ETH wallet in use " + staleEth + " but node derives " + nodeEth + "." : ""));
         if (notifier != null) notifier.notify("Wallet mismatch — AtomiX halted",
-                "Your node's seed no longer matches this app. Trading is stopped. Open AtomiX to rescue funds, "
-                + "then reinstall AND clear app storage — a reinstall alone can restore the old keys from a "
-                + "phone/cloud backup.");
+                "Your node's seed no longer matches AtomiX. New trades are stopped. Open AtomiX to review recovery details and rescue funds. Do not clear Pandamonium storage: it contains your shared node and wallets.");
     }
 
     /** Adopt a verdict discovered elsewhere: SwapEngine.setMyPubkeys already compares the published key

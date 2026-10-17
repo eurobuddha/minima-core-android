@@ -16,7 +16,7 @@
         <package android:name="com.eurobuddha.pandamonium" />
     </queries>
     <application>
-        <activity android:name="com.eurobuddha.pandadex.MainActivity" android:exported="false" android:windowSoftInputMode="adjustResize" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode|navigation" android:theme="@style/pm_pandadex_Theme.PandaDex">
+        <activity android:name="com.eurobuddha.pandadex.MainActivity" android:exported="false" android:windowSoftInputMode="adjustResize" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode|navigation|locale|layoutDirection" android:theme="@style/pm_pandadex_Theme.PandaDex">
             </activity>
         <service android:name="com.eurobuddha.pandadex.DexKeepAliveService" android:exported="false" android:stopWithTask="false" android:foregroundServiceType="specialUse|dataSync">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Watches the on-chain order book to detect fills and keep the user's GTC orders alive while the app is closed" />

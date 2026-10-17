@@ -117,7 +117,7 @@ final class BackupCheck {
         }
         JSONObject e = pools.optJSONObject(i);
         final String addr = e == null ? "" : e.optString("addr", "");
-        report.append("\n————————————————————\nPool: ").append(addr.isEmpty() ? "(no address in this entry)" : addr).append('\n');
+        report.append("\n————————————————————\nPool: ").append(addr.isEmpty() ? "(no address in this entry)" : FundingCoins.hex(addr) ? addr : JSONObject.quote(addr)).append('\n');
 
         if (e == null || addr.isEmpty()) {
             report.append("  ✗ unusable entry — no pool address\n");
@@ -151,7 +151,7 @@ final class BackupCheck {
                 reserves(pools, i, e, addr, report, usable, cb);
             }
             @Override public void onError(String error) {
-                report.append("  ? could not check the covenant: ").append(error).append('\n');
+                report.append("  ? could not check the covenant: ").append(JSONObject.quote(error)).append('\n');
                 one(pools, i + 1, report, usable, cb);
             }
         });
@@ -172,7 +172,7 @@ final class BackupCheck {
                 ownerKey(pools, i, e, addr, report, usable, cb);
             }
             @Override public void onError(String error) {
-                report.append("  ? could not read this pool's coins: ").append(error).append('\n');
+                report.append("  ? could not read this pool's coins: ").append(JSONObject.quote(error)).append('\n');
                 ownerKey(pools, i, e, addr, report, usable, cb);
             }
         });
@@ -216,7 +216,7 @@ final class BackupCheck {
                 proofs(pools, i, e, report, usable, cb);
             }
             @Override public void onError(String error) {
-                report.append("  ? could not read the owner key: ").append(error).append('\n');
+                report.append("  ? could not read the owner key: ").append(JSONObject.quote(error)).append('\n');
                 proofs(pools, i, e, report, usable, cb);
             }
         });
@@ -230,7 +230,7 @@ final class BackupCheck {
         else report.append("  — no coin proofs in the file. Expected, and not a problem: they expire, and "
                 + "recovery works from the recipe plus an archive lookup.\n");
         String warn = e.optString("proof_warning", "");
-        if (!warn.isEmpty()) report.append("  note from when this backup was taken: ").append(warn).append('\n');
+        if (!warn.isEmpty()) report.append("  note from when this backup was taken: ").append(JSONObject.quote(warn)).append('\n');
         int kidx = e.optInt("kidx", -1);
         if (kidx >= 0) report.append("  ✓ the owner key's derivation index is recorded (").append(kidx).append(")\n");
         else report.append("  — the owner key's derivation index is not recorded (an older backup format)\n");

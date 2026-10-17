@@ -1,0 +1,242 @@
+{
+  "fixed": {
+    "TRADE": "dex.trade",
+    "CHART": "dex.chart",
+    "TRADES": "dex.trades",
+    "ORDERS": "dex.orders",
+    "ASSETS": "dex.assets",
+    "MAKER": "dex.maker",
+    "NODE ✓": "dex.nodeReady",
+    "NODE NOT READY": "dex.nodeNotReady",
+    "CONNECTING…": "dex.connecting",
+    "Switch to light theme": "dex.themeLight",
+    "Switch to dark theme": "dex.themeDark",
+    "Finish the current transaction first — then switch": "dex.busyTheme",
+    "TRANSACTION IN PROGRESS": "dex.logTransaction",
+    "CHECKING ON-CHAIN": "dex.logChecking",
+    "ACTIVITY LOG": "dex.logTitle",
+    "A transaction is already in progress": "dex.busy",
+    "Receipt storage needs recovery. Preserve app data; do not retry trades.": "dex.receiptRecovery",
+    "Pair with your node first": "dex.pairFirst",
+    "Node connection changed. Wait for wallet verification before trading.": "dex.connectionChanged",
+    "Still reading your wallet identity — try again in a moment": "dex.identityLoading",
+    "Verifying wallet ownership — please wait": "dex.ownershipChecking",
+    "The order-book contract isn't registered on your node yet": "dex.contractNotReady",
+    "Could not read this balance. Tap to retry.": "dex.balanceRetry",
+    "Loading balance from MinimaCore…": "dex.balanceLoading",
+    "Connecting to MinimaCore…": "dex.nodeConnecting",
+    "The node has not confirmed the outcome of a previous write. It may still complete. New signing is paused. Check Orders, Tape and Assets, then use Assets → Resolve interrupted write.": "dex.writeUncertain",
+    "PAIRING…": "dex.connecting",
+    "Activity log": "dex.logTitle",
+    "Close": "language.close",
+    "The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry.": "pools.nodeUnavailable",
+    "● syncing": "dex.syncing",
+    "● live": "dex.live",
+    "24h High": "dex.high24",
+    "24h Low": "dex.low24",
+    "24h Vol (MINIMA)": "dex.volume24",
+    "ORDER BOOK": "dex.orderBook",
+    "Price (MxUSD)": "dex.priceLabel",
+    "Amount (MINIMA)": "dex.amountLabel",
+    "Total": "dex.totalLabel",
+    "FILLING…": "dex.filling",
+    "BUY": "dex.buy",
+    "SELL": "dex.sell",
+    "Price (MxUSD per MINIMA)": "dex.priceHint",
+    "Total: —": "dex.totalUnknown",
+    "∞ GTC on": "dex.gtcOn",
+    "GTC off": "dex.gtcOff",
+    "Advanced ▾": "dex.advancedDown",
+    "Advanced ▴": "dex.advancedUp",
+    "Minimum left on the book after a partial fill": "dex.minimumRemainder",
+    "A buyer must leave at least this much resting, or take the whole order. It stops someone nibbling your order down to unsellable dust.": "dex.minimumHelp",
+    "BUY MINIMA": "dex.buyMinima",
+    "SELL MINIMA": "dex.sellMinima",
+    "A quote or transaction is already in progress": "dex.quoteBusy",
+    "Enter a price and amount": "dex.enterPriceAmount",
+    "Calculating quote…": "dex.quoting",
+    "A transaction started while quoting. Please quote again.": "dex.quoteChanged",
+    "Could not calculate this quote. Refresh and check the amounts.": "dex.quoteFailed",
+    "OPEN ORDERS": "dex.openOrders",
+    "no trades observed yet": "dex.noTrades",
+    "Size-weighted price of the best displayed bid and offer, including pool and limit liquidity": "dex.weightedPriceHelp",
+    "EXPIRED": "dex.expired",
+    "Expired at last check": "dex.expiredLastCheck",
+    "No open orders": "dex.noOpenOrders",
+    "Open orders are loading from MinimaCore.": "dex.waitingOrders",
+    "Saved order list — waiting for a fresh node and wallet check.": "dex.savedOrders",
+    "Order action unresolved — see its receipt above.": "dex.unresolvedOrder",
+    "Edit order": "dex.editOrder",
+    "Cancel order": "dex.cancelOrder",
+    "Receipt storage problem": "dex.receiptProblem",
+    "Stored receipts could not be read. Trading is paused; preserve app data for recovery.": "dex.receiptUnreadable",
+    "Not submitted — this attempt stopped before posting. No transaction was sent.": "dex.receiptNotSubmitted",
+    "Older order receipt: funding details were not saved. Its creation cannot yet be verified; check live orders and trade history.": "dex.receiptLegacy",
+    "Transaction intent saved; submission is not confirmed. Keep this receipt while recovery checks the chain.": "dex.receiptPrepared",
+    "time unavailable": "dex.timeUnavailable"
+  },
+  "patterns": [
+    {
+      "template": "Total: {0} MxUSD",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.totalValue"
+    },
+    {
+      "template": "last trade · {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.lastTradeAge"
+    },
+    {
+      "template": "BOOK {0}\nPOOL {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.bookPoolAmount"
+    },
+    {
+      "template": "POOL {0}",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.poolAmount"
+    },
+    {
+      "template": "{0}s ago",
+      "kinds": [
+        "integer"
+      ],
+      "key": "pools.secondsAgo"
+    },
+    {
+      "template": "{0} minute ago",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.minutesAgo"
+    },
+    {
+      "template": "{0} minutes ago",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.minutesAgo"
+    },
+    {
+      "template": "{0} hour ago",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.hoursAgo"
+    },
+    {
+      "template": "{0} hours ago",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.hoursAgo"
+    },
+    {
+      "template": "{0} day ago",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.daysAgo"
+    },
+    {
+      "template": "{0} days ago",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.daysAgo"
+    },
+    {
+      "template": "{0}s",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.clockSeconds"
+    },
+    {
+      "template": "{0}m {1}s",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.clockMinutes"
+    },
+    {
+      "template": "Cancel order · BUY {0} MINIMA @ {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.receiptCancelBUY"
+    },
+    {
+      "template": "Cancel order · SELL {0} MINIMA @ {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.receiptCancelSELL"
+    },
+    {
+      "template": "Update order · BUY {0} MINIMA @ {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.receiptUpdateBUY"
+    },
+    {
+      "template": "Update order · SELL {0} MINIMA @ {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.receiptUpdateSELL"
+    },
+    {
+      "template": "Place order · BUY {0} MINIMA @ {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.receiptPlaceBUY"
+    },
+    {
+      "template": "Place order · SELL {0} MINIMA @ {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.receiptPlaceSELL"
+    },
+    {
+      "template": "Node accepted submission · {0}. On-chain verification pending; receipt retained.",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.receiptSubmitted"
+    },
+    {
+      "template": "Submission requested · {0}. On-chain verification pending; receipt retained.",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.receiptPosting"
+    },
+    {
+      "template": "Submission outcome unknown · {0}. On-chain verification pending; receipt retained.",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.receiptUnknown"
+    }
+  ]
+}

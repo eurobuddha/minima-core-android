@@ -1,4 +1,6 @@
 package com.eurobuddha.vestr;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import com.eurobuddha.minimaapi.direct.DirectNodeEvents;
 import android.content.Context;
@@ -32,6 +34,11 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity {
 
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+    }
+
     static final String NODE_PKG = "com.eurobuddha.pandamonium";
     public static final int TAB_CREATOR = 0, TAB_COLLECTOR = 1, TAB_ABOUT = 2;
 
@@ -56,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pm_vestr_activity_main);
+        Language.apply(findViewById(R.id.pm_vestr_main));
 
         // Edge-to-edge (targetSdk 35): push the header below the status bar and the nav below the nav
         // bar, with the dark header/nav backgrounds filling the system-bar areas.
@@ -79,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         ((Button) findViewById(R.id.pm_vestr_openNodeBtn)).setOnClickListener(v -> openMinimaCore());
 
         views = new BaseView[]{ new CreatorView(this), new CollectorView(this), new AboutView(this) };
-        pager = new MainPager(views, new String[]{"Creator", "Collector", "About"});
+        pager = new MainPager(views, new CharSequence[]{Language.msg(l10n_vestr_creator), Language.msg(l10n_vestr_collector), Language.msg(l10n_vestr_about)});
         viewPager = findViewById(R.id.pm_vestr_pager);
         viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(pager);
@@ -119,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void buildBottomBar() {
         String[] glyphs = {"✎", "❖", "ⓘ"};
-        String[] labels = {"Creator", "Collector", "About"};
+        CharSequence[] labels = {Language.msg(l10n_vestr_creator), Language.msg(l10n_vestr_collector), Language.msg(l10n_vestr_about)};
         for (int i = 0; i < 3; i++) {
             final int pos = i;
             LinearLayout tab = new LinearLayout(this);
@@ -128,9 +136,9 @@ public class MainActivity extends AppCompatActivity {
             tab.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
             tab.setPadding(0, dp(6), 0, dp(6));
             TextView glyph = new TextView(this);
-            glyph.setText(glyphs[i]); glyph.setTextSize(20f); glyph.setGravity(Gravity.CENTER);
+            Language.setText(glyph, glyphs[i]); glyph.setTextSize(20f); glyph.setGravity(Gravity.CENTER);
             TextView label = new TextView(this);
-            label.setText(labels[i]); label.setTextSize(11f); label.setGravity(Gravity.CENTER);
+            Language.setText(label, labels[i]); label.setTextSize(11f); label.setGravity(Gravity.CENTER);
             label.setLetterSpacing(0.05f); label.setPadding(0, dp(2), 0, 0);
             tab.addView(glyph); tab.addView(label);
             tab.setOnClickListener(v -> viewPager.setCurrentItem(pos));
@@ -177,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                 if (r != null) {
                     String b = r.optString("block", "");
                     try { chainBlock = Integer.parseInt(b); } catch (Exception ignored) {}
-                    blockNo.setText("#" + chainBlock);
+                    Language.setText(blockNo, "#" + chainBlock);
                 }
             }
             @Override public void onError(String message) { handleErr(message); }
@@ -201,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleErr(String message) {
         if (NodeApi.ERR_NOT_ENABLED.equals(message)) setPaired(false);
-        else Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        else Toast.makeText(this, VestrMessages.message(message), Toast.LENGTH_SHORT).show();
     }
 
     // ===== pairing UX =====
@@ -215,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
         if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.minimablock");
         if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
         if (launch != null) startActivity(launch);
-        else Toast.makeText(this, "Minima Core is not installed.", Toast.LENGTH_LONG).show();
+        else Toast.makeText(this, Language.msg(l10n_filez_no_core), Toast.LENGTH_LONG).show();
     }
 
     // ===== accessors for views =====

@@ -1,5 +1,8 @@
 package com.eurobuddha.pandapools;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -112,9 +115,11 @@ final class StrandingWatch {
         // A SEPARATE channel from the ongoing keep-alive notice, which is IMPORTANCE_LOW and so never sounds and
         // never appears as a heads-up. A warning posted there would be invisible to exactly the user this is for.
         // Two channels also let someone silence the permanent notification without silencing the alarm.
-        NotificationChannel ch = new NotificationChannel(CH_STRAND, "Pool going dark",
-                NotificationManager.IMPORTANCE_HIGH);
-        ch.setDescription("Warns you before one of your pools ages out of the chain's recent window.");
+        NotificationChannel ch = nm.getNotificationChannel(CH_STRAND);
+        if (ch == null) ch = new NotificationChannel(CH_STRAND,
+                Language.text(ctx, l10n_pools_keeper_warning_channel), NotificationManager.IMPORTANCE_HIGH);
+        ch.setName(Language.text(ctx, l10n_pools_keeper_warning_channel));
+        ch.setDescription(Language.text(ctx, l10n_pools_keeper_warning_help));
         nm.createNotificationChannel(ch);
     }
 
@@ -123,25 +128,17 @@ final class StrandingWatch {
         NotificationManager nm = ctx.getSystemService(NotificationManager.class);
         if (nm == null) return;
 
-        String title = level == Level.URGENT ? "Pool about to become unrecoverable"
-                : level == Level.WARN ? "Others can no longer find your pool"
-                : "Your pool needs PandaPools open";
-
+        String title = Language.text(ctx, level == Level.URGENT ? l10n_pools_keeper_urgent_title
+                : level == Level.WARN ? l10n_pools_keeper_warn_title : l10n_pools_keeper_notice_title);
         String body;
         if (quarantined) {
-            body = "This pool's reserves are " + age + " blocks old and PandaPools cannot refresh them: its "
-                    + "signing state has never been confirmed, so nothing will sign for it automatically. It "
-                    + "cannot recover on its own. Withdraw it, or confirm the matching wallet's signing state.";
+            body = Language.text(ctx, l10n_pools_keeper_quarantined, age);
         } else if (level == Level.URGENT) {
-            body = "Reserves are " + age + " blocks old. Past about " + CASCADE_BLOCKS + " they leave the chain's "
-                    + "recent window and can only be recovered through a MegaMMR archive. Re-publish now.";
+            body = Language.text(ctx, l10n_pools_keeper_urgent, age, CASCADE_BLOCKS);
         } else if (level == Level.WARN) {
-            body = "Reserves are " + age + " blocks old, so other wallets have stopped finding this pool and it "
-                    + "is earning nothing. Re-publish to bring it back.";
+            body = Language.text(ctx, l10n_pools_keeper_warn, age);
         } else {
-            body = "Reserves are " + age + " blocks old; they should be refreshed about every "
-                    + PoolRefresher.REFRESH_BLOCKS + " blocks. PandaPools has not been able to run. Open it, or "
-                    + "exclude it from battery optimisation.";
+            body = Language.text(ctx, l10n_pools_keeper_notice, age, PoolRefresher.REFRESH_BLOCKS);
         }
         // No estimated value anywhere in here: a figure PandaPools cannot read from chain has no business in a
         // notification about losing access to funds.
@@ -165,9 +162,9 @@ final class StrandingWatch {
                     .putExtra(PoolKeepAliveService.EXTRA_ADDRESS, p.address);
             PendingIntent pi = PendingIntent.getForegroundService(ctx, idFor(p.address) + 1, republish,
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-            b.addAction(0, "Re-publish", pi);
+            b.addAction(0, Language.text(ctx, l10n_pools_keeper_republish), pi);
         } else {
-            b.addAction(0, "Open PandaPools", open);
+            b.addAction(0, Language.text(ctx, l10n_pools_keeper_open), open);
         }
         try { nm.notify("pandamonium.pandapools", idFor(p.address), b.build()); } catch (Exception blocked) { /* permission refused */ }
     }

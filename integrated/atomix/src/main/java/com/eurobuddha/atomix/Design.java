@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import com.eurobuddha.minimacore.i18n.Language;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -71,15 +72,15 @@ public final class Design {
     public static int SURFACE2()    { return pick(0xFF1B1F28, 0xFFEDEEF2); }   // elevated / input / inactive pill
     public static int BORDER()      { return pick(0x12FFFFFF, 0xFFE6E8EE); }   // hairline stroke
     public static int TEXT()        { return pick(0xFFEEF0F4, 0xFF181B22); }   // primary ink
-    public static int DIM()         { return pick(0xFF8B909C, 0xFF8B909C); }   // secondary
-    public static int DIM2()        { return pick(0xFF6F7583, 0xFFA6ABB6); }   // tertiary / axes
+    public static int DIM()         { return pick(0xFF8B909C, 0xFF5C6370); }   // secondary
+    public static int DIM2()        { return pick(0xFF9098A6, 0xFF606775); }   // tertiary / axes
     // Accent = the ACTIVE CURRENCY's identity, so toggling MINIMA ↔ mxUSDT restyles the whole app (orange ↔
     // Tether-green): accent, active-nav pill tint, CTA gradient and on-accent ink all follow the currency,
     // each still keyed on dark/light where the currency defines two inks.
     public static int ACCENT()      { return TradingContext.active().accent; }
     public static int ACCENT_SOFT() { return pick(TradingContext.active().accentSoftDark, TradingContext.active().accentSoftLight); }
     public static int GRAD_START()  { return TradingContext.active().gradStart; }
-    public static int ON_ACCENT()   { return pick(TradingContext.active().onAccentDark, TradingContext.active().onAccentLight); }
+    public static int ON_ACCENT()   { return TradingContext.active() == TradingContext.MXUSDT ? 0xFF0B0D12 : pick(TradingContext.active().onAccentDark, TradingContext.active().onAccentLight); }
     public static int IN()          { return pick(0xFF3FD0A2, 0xFF12A97E); }   // received / bid / positive
     public static int POSITIVE()    { return IN(); }
     public static int OUT()         { return ACCENT(); }                       // sent
@@ -102,9 +103,9 @@ public final class Design {
     // ---- drawables / view helpers ----
 
     /** A rounded chip. Text uses Inter. */
-    public static TextView pill(Context c, String text, int bg, int fg) {
+    public static TextView pill(Context c, CharSequence text, int bg, int fg) {
         TextView t = new TextView(c);
-        t.setText(text);
+        Language.setText(t, text);
         t.setTextColor(fg);
         t.setTextSize(11f);
         t.setTypeface(sans());

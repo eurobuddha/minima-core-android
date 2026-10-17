@@ -1,6 +1,7 @@
 package com.eurobuddha.ethwallet;
 
 import android.content.Context;
+import com.eurobuddha.minimacore.i18n.Language;
 import android.graphics.drawable.GradientDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -16,17 +17,17 @@ public final class Design {
     public static final int ON_ACCENT = 0xFF000000;
     public static final int TEXT     = 0xFFFFFFFF;
     public static final int DIM      = 0xFF9A9AA8;
-    public static final int DIM2     = 0xFF6A6A78;
-    public static final int RED      = 0xFFE74C3C;
+    public static final int DIM2     = 0xFF9A9AA8;
+    public static final int RED      = 0xFFFF5B5B;
 
     public static int dp(Context c, int v) {
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, c.getResources().getDisplayMetrics()));
     }
 
     /** A rounded chip-style TextView. */
-    public static TextView pill(Context c, String text, int bg, int fg) {
+    public static TextView pill(Context c, CharSequence text, int bg, int fg) {
         TextView t = new TextView(c);
-        t.setText(text);
+        Language.setText(t, text);
         t.setTextColor(fg);
         t.setTextSize(11f);
         t.setGravity(Gravity.CENTER);

@@ -1,5 +1,8 @@
 package com.eurobuddha.minimacore.main.views.send;
 
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.view.View;
@@ -13,7 +16,8 @@ import org.minima.utils.json.JSONArray;
 import org.minima.utils.json.JSONObject;
 import com.eurobuddha.minimacore.R;
 import com.eurobuddha.minimacore.main.BaseView;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import androidx.appcompat.app.AlertDialog;
 
 import com.eurobuddha.minimacore.utils.Feedback;
 import com.eurobuddha.minimacore.utils.Format;
@@ -34,6 +38,8 @@ public class SendView extends BaseView {
     TokenSpinnerAdapter mTokenAdapter;
 
     int mChosenToken=0;
+    private AlertDialog confirmDialog;
+    private boolean destroyed;
 
     /** Set by SendActivity - it owns the scan launcher, which must be registered in onCreate. */
     Runnable mOnScanRequest = null;
@@ -46,7 +52,7 @@ public class SendView extends BaseView {
     public void setScannedAddress(String zRaw){
         String addr = Format.cleanAddress(zRaw);
         if(addr.isEmpty()){
-            Toast.makeText(getActivity(), "That QR held no address", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), Language.msg(l10n_send_no_qr), Toast.LENGTH_SHORT).show();
             return;
         }
         mAddress.setText(addr);
@@ -81,7 +87,7 @@ public class SendView extends BaseView {
             public void onClick(View v) {
                 String max = sendableOfChosenToken();
                 if(max == null){
-                    Toast.makeText(getActivity(), "No balance loaded yet", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), Language.msg(l10n_send_no_balance), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 mAmount.setText(max);
@@ -105,7 +111,7 @@ public class SendView extends BaseView {
                 String address      = mAddress.getText().toString().trim();
 
                 if(amount.equals("") || address.equals("")){
-                    logger.showDialog(getActivity(),"Error","Cannot have blank inputs..");
+                    logger.showDialog(getActivity(),Language.msg(l10n_seed_sync_error),Language.msg(l10n_send_blank));
                     return;
                 }
 
@@ -113,17 +119,25 @@ public class SendView extends BaseView {
                 //so a pasted "MxREAL burn:100" would otherwise inject a burn - and the confirm
                 //dialog was the only thing standing between that paste and lost funds.
                 if(!Format.isValidAddress(address)){
-                    logger.showDialog(getActivity(),"Error","That is not a Minima address. Nothing was sent.");
+                    logger.showDialog(getActivity(),Language.msg(l10n_seed_sync_error),Language.msg(l10n_send_invalid_address));
                     return;
                 }
                 if(!Format.isValidAmount(amount)){
-                    logger.showDialog(getActivity(),"Error","Amount must be a plain number greater than zero. Nothing was sent.");
+                    logger.showDialog(getActivity(),Language.msg(l10n_seed_sync_error),Language.msg(l10n_send_invalid_amount));
                     return;
                 }
 
                 JSONObject token    = mTokenAdapter.getToken(mChosenToken);
-                String tokenid      = token.get("tokenid").toString();
-                String tokenname    = TokenUtils.getTokenName(token);
+                if (token == null) {
+                    logger.showDialog(getActivity(), Language.msg(l10n_seed_sync_error), Language.msg(l10n_send_no_balance));
+                    return;
+                }
+                String tokenid = String.valueOf(token.get("tokenid"));
+                if (!Format.isValidTokenId(tokenid)) {
+                    logger.showDialog(getActivity(), Language.msg(l10n_seed_sync_error), Language.msg(l10n_send_invalid_token));
+                    return;
+                }
+                CharSequence tokenname = TokenUtils.getTokenDisplayName(token);
 
                 showConfirmDialog(amount, address, tokenname, tokenid);
             }
@@ -132,70 +146,78 @@ public class SendView extends BaseView {
         refreshView();
     }
 
-    private void showConfirmDialog(String zAmount, String zAddress, String zTokenName, String zTokenid ){
-        new MaterialAlertDialogBuilder(getActivity())
-                .setTitle("Confirm")
-                .setMessage("You are about to send "+zAmount+" "+zTokenName+" to \n"+zAddress)
+    private void showConfirmDialog(String zAmount, String zAddress, CharSequence zTokenName, String zTokenid ){
+        if (confirmDialog != null) confirmDialog.dismiss();
+        confirmDialog = new LanguageDialog(getActivity())
+                .setTitle(Language.msg(l10n_send_confirm))
+                .setMessage(Language.msg(l10n_send_confirm_body, zAmount, zTokenName, zAddress))
                 .setIcon(R.drawable.ic_minima)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
+                .setPositiveButton(Language.msg(android.R.string.yes), new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int whichButton) {
                         sendFunds(zAmount, zAddress, zTokenid);
                     }})
-                .setNegativeButton(android.R.string.no, null).show();
+                .setNegativeButton(Language.msg(android.R.string.no), null).show();
     }
 
     protected void sendFunds(String zAMount, String zAddress, String zTokenid){
 
-        Feedback.toast(getActivity(), "Building transaction…");
+        Feedback.toast(getActivity(), Language.msg(l10n_send_building).toString());
 
         String cmd = "send amount:"+zAMount+" address:"+zAddress+" tokenid:"+zTokenid;
 
-        MinimaCMD.runMinima(cmd, new MinimaCMDListener() {
-            @Override
-            public void cmdResult(JSONObject zResult) {
-                //Raw Thread - an escaping throwable would kill the app
-                try{
-                    final String err = Feedback.errorOf(zResult);
+        MinimaCMD.runMinima(cmd, this::onSendResult);
+    }
 
-                    if(err != null){
-                        //Show the node's OWN words - "Insufficient funds.. you only have X
-                        //require:Y" is exactly what the user needs, and is under "message"
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                logger.showDialog(getActivity(), "Send failed",
-                                        err + "\n\nNothing was sent. Your inputs have been kept.");
-                            }
-                        });
-                        return;
+    /** Existing node reply handling, also exercised with synthetic replies by the UI tests. */
+    protected void onSendResult(JSONObject zResult) {
+        //Raw Thread - an escaping throwable would kill the app
+        try{
+            final String err = Feedback.errorOf(zResult);
+
+            if(err != null){
+                //Show the node's OWN words - "Insufficient funds.. you only have X
+                //require:Y" is exactly what the user needs, and is under "message"
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (destroyed || getActivity().isFinishing() || getActivity().isDestroyed()) return;
+                        logger.showDialog(getActivity(), Language.msg(l10n_send_failed),
+                                Language.msg(l10n_send_failed_body, err));
                     }
-
-                    final String txpowid = Feedback.txpowIdOf(zResult);
-
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //Accepted - clear the form. Only now, never before the node answered.
-                            mAmount.setText("");
-                            mAddress.setText("");
-
-                            //NOT "sent". The node has built and posted the transaction; it still
-                            //has to be mined into a block. The wallet toasts again when the
-                            //balance actually moves (NEWBALANCE).
-                            Feedback.longToast(getActivity(), "Transaction posted — mining…");
-
-                            if(txpowid != null){
-                                logger.log("Send posted txpowid:"+txpowid);
-                            }
-                        }
-                    });
-
-                }catch(Throwable exc){
-                    logger.log("Send failed : "+exc);
-                    Feedback.toast(getActivity(), "Send failed — see the Logs tab");
-                }
+                });
+                return;
             }
-        });
+
+            final String txpowid = Feedback.txpowIdOf(zResult);
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (destroyed || getActivity().isFinishing() || getActivity().isDestroyed()) return;
+                    //Accepted - clear the form. Only now, never before the node answered.
+                    mAmount.setText("");
+                    mAddress.setText("");
+
+                    //NOT "sent". The node has built and posted the transaction; it still
+                    //has to be mined into a block. The wallet toasts again when the
+                    //balance actually moves (NEWBALANCE).
+                    Feedback.longToast(getActivity(), Language.msg(l10n_send_posted).toString());
+
+                    if(txpowid != null){
+                        logger.log("Send posted txpowid:"+txpowid);
+                    }
+                }
+            });
+
+        }catch(Throwable exc){
+            logger.log("Send failed : "+exc);
+            Feedback.toast(getActivity(), Language.msg(l10n_send_failed_logs).toString());
+        }
+    }
+
+    @Override public void onActivityDestroy() {
+        destroyed = true;
+        if (confirmDialog != null) { confirmDialog.dismiss(); confirmDialog = null; }
     }
 
     @Override
@@ -264,7 +286,7 @@ public class SendView extends BaseView {
             return;
         }
 
-        mSendable.setText("sendable "+send);
+        Language.setText(mSendable, Language.msg(l10n_core_wallet_sendable_amount, send));
         mSendable.setVisibility(View.VISIBLE);
     }
 }

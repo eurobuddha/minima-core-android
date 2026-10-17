@@ -97,6 +97,7 @@ public class SwapService extends Service {
     private boolean walletDeriving = false, minimaSettingUp = false, identityDeriving = false;
     private boolean keysLoaded = false, keysLoading = false;
     private int orderMisses = 0, otcMisses = 0;   // consecutive book-presence misses (the belt)
+    private boolean foregroundActive;
     private String fgText;                        // last foreground-notification text (update on change only)
 
     @Override public IBinder onBind(Intent intent) { return null; }
@@ -178,7 +179,17 @@ public class SwapService extends Service {
         super.onTaskRemoved(rootIntent);
     }
 
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        createChannels();
+        if (foregroundActive && fgText != null) {
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) manager.notify(FG_ID, fgNotification(fgText));
+        }
+    }
+
     @Override public void onDestroy() {
+        foregroundActive = false;
         super.onDestroy();
         h.removeCallbacksAndMessages(null);
         if (engine != null) engine.shutdown();
@@ -607,9 +618,9 @@ public class SwapService extends Service {
                 android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE);
         String body = "Minima Core isn't running — your published market will drop off the book. Tap to open it.";
         nm.notify("pandamonium.atomix.service", OFFLINE_ID, new NotificationCompat.Builder(this, CH_OFFLINE)
-                .setContentTitle("Market offline")
-                .setContentText(body)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
+                .setContentTitle(AtomixMessages.message("Market offline"))
+                .setContentText(AtomixMessages.message(body))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(AtomixMessages.message(body)))
                 .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pi)
@@ -628,7 +639,7 @@ public class SwapService extends Service {
         if (text == null || text.equals(fgText)) return;
         fgText = text;
         NotificationManager nm = getSystemService(NotificationManager.class);
-        if (nm != null) nm.notify(FG_ID, fgNotification(text));
+        if (foregroundActive && nm != null) nm.notify(FG_ID, fgNotification(text));
     }
 
     /** What the persistent notification should say right now — the user's at-a-glance market health. */
@@ -660,8 +671,8 @@ public class SwapService extends Service {
         NotificationManager nm = getSystemService(NotificationManager.class);
         if (nm == null) return;
         nm.notify("pandamonium.atomix.service", id, new NotificationCompat.Builder(this, CH_ALERT)
-                .setContentTitle(title).setContentText(body)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
+                .setContentTitle(AtomixMessages.message(title)).setContentText(AtomixMessages.message(body))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(AtomixMessages.message(body)))
                 .setSmallIcon(android.R.drawable.stat_sys_upload_done)
                 .setAutoCancel(true).build());
     }
@@ -678,16 +689,7 @@ public class SwapService extends Service {
         return Order.fromConfigJson(prefs.getString("order_config", ""));   // shared loader — keeps the ladder intact on background republish
     }
 
-    private void createChannels() {
-        if (Build.VERSION.SDK_INT >= 26) {
-            NotificationManager nm = getSystemService(NotificationManager.class);
-            if (nm == null) return;
-            // Channel names are user-visible in system settings — keep them AtomiX's, not a legacy app's.
-            nm.createNotificationChannel(new NotificationChannel(CH_FG, "AtomiX market watcher", NotificationManager.IMPORTANCE_LOW));
-            nm.createNotificationChannel(new NotificationChannel(CH_ALERT, "Swap alerts", NotificationManager.IMPORTANCE_DEFAULT));
-            nm.createNotificationChannel(new NotificationChannel(CH_OFFLINE, "Market offline", NotificationManager.IMPORTANCE_HIGH));
-        }
-    }
+    private void createChannels() { AtomixMessages.ensureChannels(this); }
 
     /** Title of the persistent notification: THIS app, and the market it is actually working. Hardcoding a
      *  legacy per-currency app name here ("usdtSwap") made the shade read as a different app publishing a
@@ -701,7 +703,7 @@ public class SwapService extends Service {
                 android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE);
         return new NotificationCompat.Builder(this, CH_FG)
                 .setContentTitle(fgTitle())
-                .setContentText(text)
+                .setContentText(AtomixMessages.message(text))
                 .setSmallIcon(android.R.drawable.stat_sys_upload_done)
                 .setContentIntent(pi)
                 .setOngoing(true)
@@ -720,6 +722,7 @@ public class SwapService extends Service {
                 // as a plain typeless FGS (dataSync's time cap is an Android-14+ concern that doesn't apply here).
                 startForeground(FG_ID, n);
             }
+            foregroundActive = true;
             return true;
         } catch (Exception e) {
             return false;   // ForegroundServiceStartNotAllowedException etc. — don't crash; relaunch retries
@@ -731,6 +734,7 @@ public class SwapService extends Service {
     @Override public void onTimeout(int startId) { stopGracefully(); }
     @Override public void onTimeout(int startId, int fgsType) { stopGracefully(); }
     private void stopGracefully() {
+        foregroundActive = false;
         try { stopForeground(STOP_FOREGROUND_REMOVE); } catch (Exception ignored) {}
         stopSelf();
     }

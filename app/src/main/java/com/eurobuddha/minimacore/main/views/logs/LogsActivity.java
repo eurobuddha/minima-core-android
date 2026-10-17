@@ -1,6 +1,10 @@
 package com.eurobuddha.minimacore.main.views.logs;
 
 import android.os.Bundle;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
+import androidx.appcompat.widget.Toolbar;
+import com.eurobuddha.minimacore.utils.KeyboardInsets;
 import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,14 +23,10 @@ public class LogsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logs);
-        setTitle("Logs");
-        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.logs_container), (v, insets) -> {
-            android.graphics.Insets bars = insets.getInsets(
-                    androidx.core.view.WindowInsetsCompat.Type.systemBars()
-                    | androidx.core.view.WindowInsetsCompat.Type.ime()).toPlatformInsets();
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            return insets;
-        });
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        Language.toolbarTitle(toolbar, Language.msg(l10n_menu_logs));
+        setSupportActionBar(toolbar);
+        KeyboardInsets.install(this, findViewById(R.id.logs_main), toolbar);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mLogsView = new LogsView(this);

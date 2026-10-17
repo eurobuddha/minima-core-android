@@ -17,6 +17,11 @@ public class Format {
 
     private Format(){}
 
+    /** Chain IDs are command arguments: never allow whitespace or parameter separators. */
+    public static boolean isValidTokenId(String id) {
+        return id != null && ("0x00".equals(id) || id.matches("^0x[0-9a-fA-F]{2,64}$"));
+    }
+
     /** Display only: at most six decimals; use tidyAmount for exact token/coin details. */
     public static String summaryAmount(String zAmount){
         if(zAmount == null || zAmount.isEmpty()) return "0";
