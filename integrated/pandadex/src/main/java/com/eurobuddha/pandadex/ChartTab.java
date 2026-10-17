@@ -1,15 +1,13 @@
 package com.eurobuddha.pandadex;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.annotation.SuppressLint;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /** CHART tab: interval pills + candles + a crosshair OHLCV readout. */
 @SuppressLint("ViewConstructor")
@@ -21,6 +19,7 @@ public final class ChartTab extends LinearLayout {
     private final MainActivity act;
     private final CandleView chart;
     private final TextView readout;
+    private final TextView empty;
     private final LinearLayout pills;
     private int sel = 1;
 
@@ -32,26 +31,29 @@ public final class ChartTab extends LinearLayout {
         setPadding(pad, pad, pad, pad);
 
         LinearLayout head = new LinearLayout(act);
+        head.setOrientation(VERTICAL);
         head.setGravity(Gravity.CENTER_VERTICAL);
         TextView title = new TextView(act);
         title.setText("MINIMA / MxUSD");
         title.setTextColor(Design.TEXT());
         title.setTypeface(Design.sansBold());
         title.setTextSize(13f);
-        head.addView(title, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
+        head.addView(title, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
         pills = new LinearLayout(act);
         for (int i = 0; i < LABELS.length; i++) {
             final int idx = i;
             TextView t = new TextView(act);
-            t.setText(LABELS[i]);
+            Language.setText(t, DexMessages.message(LABELS[i]));
+            t.setMinHeight(Design.dp(act, 48));
+            t.setGravity(Gravity.CENTER);
             t.setTextSize(10f);
             t.setTypeface(Design.mono());
             t.setPadding(Design.dp(act, 8), Design.dp(act, 4), Design.dp(act, 8), Design.dp(act, 4));
             t.setOnClickListener(v -> { sel = idx; restyle(); render(); });
-            pills.addView(t);
+            pills.addView(t, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         }
-        head.addView(pills);
+        head.addView(pills, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         addView(head);
 
         readout = new TextView(act);
@@ -63,11 +65,19 @@ public final class ChartTab extends LinearLayout {
 
         chart = new CandleView(act);
         chart.setOnSelect(this::showReadout);
-        addView(chart, new LayoutParams(LayoutParams.MATCH_PARENT, Design.dp(act, 300)));
+        android.widget.FrameLayout plot = new android.widget.FrameLayout(act);
+        plot.addView(chart, new android.widget.FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        empty = new TextView(act);
+        Language.setText(empty, Language.msg(l10n_dex_chart_empty));
+        empty.setTextColor(Design.DIM2());
+        empty.setTextSize(12f);
+        empty.setGravity(Gravity.CENTER);
+        empty.setPadding(pad, pad, pad, pad);
+        plot.addView(empty, new android.widget.FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        addView(plot, new LayoutParams(LayoutParams.MATCH_PARENT, Design.dp(act, 300)));
 
         TextView note = new TextView(act);
-        note.setText("Charts use this device's saved trade records. Recovery may add trades from history retained by your node; "
-                + "older or pruned transactions may be missing. Export records for their time basis and chain evidence.");
+        Language.setText(note, Language.msg(l10n_dex_chart_note));
         note.setTextColor(Design.DIM2());
         note.setTypeface(Design.sans());
         note.setTextSize(10f);
@@ -86,12 +96,16 @@ public final class ChartTab extends LinearLayout {
     }
 
     private void showReadout(Candles.Candle c) {
-        if (c == null) { readout.setText(""); return; }
-        SimpleDateFormat f = new SimpleDateFormat("dd MMM HH:mm", Locale.US);
-        readout.setText(f.format(new Date(c.openMs))
-                + "   O " + PriceMath.fmt(c.open) + "   H " + PriceMath.fmt(c.high)
-                + "   L " + PriceMath.fmt(c.low) + "   C " + PriceMath.fmt(c.close)
-                + "   V " + PriceMath.fmt(c.volume));
+        CharSequence value = candleReadout(c);
+        Language.setText(readout, value);
+        Language.description(chart, value);
+    }
+
+    static CharSequence candleReadout(Candles.Candle c) {
+        if (c == null) return "";
+        return Language.msg(l10n_dex_candle_readout, Language.stamp(c.openMs, "MMMdHm"),
+                PriceMath.fmt(c.open), PriceMath.fmt(c.high), PriceMath.fmt(c.low),
+                PriceMath.fmt(c.close), PriceMath.fmt(c.volume));
     }
 
     public void render() {
@@ -102,6 +116,11 @@ public final class ChartTab extends LinearLayout {
         List<Candles.Candle> cs = Candles.aggregate(fills, interval);
         if (cs.size() > 120) cs = cs.subList(cs.size() - 120, cs.size());
         chart.setData(cs, interval);
+        empty.setVisibility(cs.isEmpty() ? VISIBLE : GONE);
+        if (cs.isEmpty()) {
+            showReadout(null);
+            Language.description(chart, Language.msg(l10n_dex_chart_empty));
+        }
         if (!cs.isEmpty() && chart.selected() == null) showReadout(cs.get(cs.size() - 1));
     }
 }

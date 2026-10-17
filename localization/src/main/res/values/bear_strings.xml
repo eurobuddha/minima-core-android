@@ -6081,4 +6081,49 @@
     <string name="l10n_dex_receipt_posting">"Submission requested · %1$s. On-chain verification pending; receipt retained."</string>
     <!-- Arguments: value0 -->
     <string name="l10n_dex_receipt_unknown">"Submission outcome unknown · %1$s. On-chain verification pending; receipt retained."</string>
+    <string name="l10n_dex_interval15" formatted="false">"15m"</string>
+    <string name="l10n_dex_interval1" formatted="false">"1H"</string>
+    <string name="l10n_dex_interval4" formatted="false">"4H"</string>
+    <string name="l10n_dex_interval_day" formatted="false">"1D"</string>
+    <string name="l10n_dex_chart_note" formatted="false">"Charts use this device\'s saved trade records. Recovery may add trades from history retained by your node; older or pruned transactions may be missing. Export records for their time basis and chain evidence."</string>
+    <string name="l10n_dex_chart_empty" formatted="false">"No trades observed yet — the tape fills as the network trades"</string>
+    <!-- Arguments: time, open, high, low, close, volume -->
+    <string name="l10n_dex_candle_readout">"%1$s\nOpen %2$s · High %3$s · Low %4$s\nClose %5$s · Volume %6$s"</string>
+    <string name="l10n_dex_my_trades" formatted="false">"MY TRADES"</string>
+    <string name="l10n_dex_market_tape" formatted="false">"MARKET TAPE"</string>
+    <string name="l10n_dex_corrections" formatted="false">"CORRECTIONS"</string>
+    <string name="l10n_dex_personal_empty" formatted="false">"No personal trade records yet."</string>
+    <!-- Arguments: count, minima, mxusd -->
+    <string name="l10n_dex_trade_totals">"Rows %1$d   Net %2$s MINIMA   %3$s MxUSD"</string>
+    <string name="l10n_dex_recheck_totals" formatted="false">"Rows awaiting recheck stay visible and are excluded from net totals."</string>
+    <string name="l10n_dex_trade_times" formatted="false">"Wallet trade records; older rows may lack chain proof. Times use the inclusion block when verified; otherwise they show this device’s observation."</string>
+    <string name="l10n_dex_export_reconcile" formatted="false">"EXPORT + RECONCILE"</string>
+    <string name="l10n_dex_block_time" formatted="false">"Block time"</string>
+    <string name="l10n_dex_observed" formatted="false">"Observed"</string>
+    <string name="l10n_dex_taker_role" formatted="false">"TAKER"</string>
+    <string name="l10n_dex_source_book" formatted="false">"BOOK"</string>
+    <string name="l10n_dex_source_pool" formatted="false">"POOL"</string>
+    <string name="l10n_dex_source_both" formatted="false">"BOOK+POOL"</string>
+    <string name="l10n_dex_legacy_not_rechecked" formatted="false">"Legacy — not rechecked"</string>
+    <string name="l10n_dex_corrected_excluded" formatted="false">"Corrected earlier record — excluded from totals; see Corrections"</string>
+    <string name="l10n_dex_recheck_excluded" formatted="false">"Recheck required — excluded from totals"</string>
+    <string name="l10n_dex_chain_when_checked" formatted="false">"On-chain when checked"</string>
+    <string name="l10n_dex_market_note" formatted="false">"Device-observed order-book records. New fills require a linked on-chain spend; older rows have not all been rechecked."</string>
+    <string name="l10n_dex_market_empty" formatted="false">"No market trade records yet."</string>
+    <string name="l10n_dex_you" formatted="false">"YOU"</string>
+    <string name="l10n_dex_receipt_corrections" formatted="false">"RECEIPT CORRECTIONS"</string>
+    <string name="l10n_dex_corrections_note" formatted="false">"Earlier market and personal records are preserved here. Personal exports include the full correction evidence."</string>
+    <string name="l10n_dex_corrections_empty" formatted="false">"No receipt corrections recorded."</string>
+    <!-- Arguments: time -->
+    <string name="l10n_dex_corrected_at">"Corrected %1$s"</string>
+    <!-- Arguments: size, price, time -->
+    <string name="l10n_dex_earlier_record">"Earlier record: %1$s MINIMA @ %2$s · %3$s"</string>
+    <!-- Arguments: source, old, replacement -->
+    <string name="l10n_dex_correction_ids">"Source %1$s\nEarlier TxPoW %2$s\nVerified replacement %3$s"</string>
+    <string name="l10n_dex_timestamp_missing" formatted="false">"timestamp not recorded"</string>
+    <string name="l10n_dex_history_unknown" formatted="false">"unknown"</string>
+    <string name="l10n_dex_corrections_unreadable" formatted="false">"Correction history could not be read. Keep app data for recovery."</string>
+    <string name="l10n_dex_moved_inclusion" formatted="false">"Same TxPoW included in a different block"</string>
+    <string name="l10n_dex_changed_spender" formatted="false">"Different included spender"</string>
+    <string name="l10n_dex_legacy_corrected" formatted="false">"First linked proof corrects a legacy record"</string>
 </resources>

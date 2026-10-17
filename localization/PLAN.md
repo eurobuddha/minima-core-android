@@ -2193,3 +2193,20 @@ Findings: no blocking source/build defect identified in this increment. Device l
 Verdict: approve this increment with host validation. Full release incomplete; second local commit will preserve the added tests and checkpoint documentation.
 
 Next: PandaDEX transaction dialogs and Chart/Tape/Orders/Assets/Maker/notifications, residual diagnostics and earlier financial/accessibility findings, safe Fold validation, signed versioned deliverables, commit/push and authorized publication to GitHub fork/PandaApps/eurobuddha.com.
+
+
+## PandaDEX charts and trade history — 2026-10-18
+
+The preceding status-only turn verified the clean local commits; this turn continued implementation. Reused the existing shared Language messages/date stamps, DexMessages generator, PandaPools canvas invalidation, and the standalone PandaDEX ChartTab/CandleView/TapeTab implementations. Read the existing CandlesTest, InclusionTimeTest, ChainReview status rules, TradeExport time labels and correction archive producers. Source worktree remains feature/bear-languages-2026-10-16, based on 1.9.41; candidate 1.9.42/vc113. Ukrainian remains explicitly authorized. Fold only; no device activity this increment.
+
+Added 40 catalogue messages (4,962 total; 109 exact DEX aliases and 22 existing patterns). Translated chart intervals, OHLCV readouts, personal and market trade history, time basis, maker/taker and liquidity source labels, accounting/evidence status, correction history, reasons and missing-coordinate labels. Dates use the selected language. Literal values, IDs and stored/exported evidence remain unchanged. The chart empty state uses a wrapping TextView; interval choices have 48dp targets. A configuration change invalidates only the canvas and refreshes bound labels, preserving the crosshair and interval. Clearing an empty chart also clears its obsolete readout.
+
+Five regression tests exercise actual Candle aggregation, TapeTab metadata/correction formatting and original totals: observed versus inclusion-block time, excluded/superseded versus legacy accounting, exact amount and identifier preservation (including multilingual/unusual literal content), missing/null correction values, and immutable candle snapshots. Review caught null archived values becoming blank; corrected them to retain the unknown label and added coverage. 715 PandaDEX + 9 localization JVM tests pass (724). All three debug variants and AndroidTest compile. All 19 pinned imports reproduce; catalogue and transport checks pass. No owner Fold install or launch.
+
+### Code Review
+
+Summary: display bindings preserve raw evidence, calculations, selected candle and interval. Full changed source, generated aliases and four-language catalogue reviewed. Chart drawing gets localized dates and bounded label positions; ordinary TextViews wrap the empty message and readouts.
+Findings: no blocking source/build defect found in this increment. Device layout, large-font and live switching evidence remains pending. Dynamic application-generated evidence notes still need translation coverage; this is not complete PandaDEX localization.
+Verdict: approve this increment with host validation. CandleView setData/selected/touch logic and TapeTab label/totals are byte-identical to the donor; 183 other DEX source files, protected engines/reviewed recovery fixes, public-key audit and node JAR remain unchanged.
+
+Evidence: build/localization/dex-history-validation.json, with 435 source hashes. Next: remaining PandaDEX dialogs, Orders/OwnerHistory, Assets, Maker, notifications and diagnostics; remaining financial/accessibility findings; safe Fold runtime validation; signed versioned builds and publication to the authorized GitHub fork, PandaApps and eurobuddha.com.

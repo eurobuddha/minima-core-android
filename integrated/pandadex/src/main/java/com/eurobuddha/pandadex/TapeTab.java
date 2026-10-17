@@ -1,4 +1,6 @@
 package com.eurobuddha.pandadex;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.annotation.SuppressLint;
 import android.view.Gravity;
@@ -6,10 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.text.SimpleDateFormat;
 
 /** TRADES tab: defaults to this wallet's confirmed fills; market tape is separate. */
 @SuppressLint("ViewConstructor")
@@ -20,7 +19,6 @@ public final class TapeTab extends LinearLayout {
     private final MainActivity act;
     private final LinearLayout seg;
     private final LinearLayout rows;
-    private final SimpleDateFormat fmt = new SimpleDateFormat("dd MMM HH:mm", Locale.US);
     private int sel = 0;
 
     public TapeTab(MainActivity act) {
@@ -36,6 +34,7 @@ public final class TapeTab extends LinearLayout {
             final int idx = i;
             TextView t = tv(names[i], 11f, Design.DIM(), Design.sansBold());
             t.setGravity(Gravity.CENTER);
+            t.setMinHeight(Design.dp(act, 48));
             t.setPadding(0, Design.dp(act, 8), 0, Design.dp(act, 8));
             t.setOnClickListener(v -> { sel = idx; restyle(); render(); });
             seg.addView(t, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
@@ -58,16 +57,16 @@ public final class TapeTab extends LinearLayout {
         }
     }
 
-    private TextView tv(String s, float size, int color, android.graphics.Typeface tf) {
+    private TextView tv(CharSequence s, float size, int color, android.graphics.Typeface tf) {
         TextView t = new TextView(getContext());
-        t.setText(s);
+        Language.setText(t, DexMessages.message(s));
         t.setTextSize(size);
         t.setTextColor(color);
         t.setTypeface(tf);
         return t;
     }
 
-    private TextView mono(String s, int color, float size) {
+    private TextView mono(CharSequence s, int color, float size) {
         return tv(s, size, color, Design.mono());
     }
 
@@ -96,9 +95,7 @@ public final class TapeTab extends LinearLayout {
             summary.addView(tv("No personal trade records yet.", 11f, Design.DIM2(), Design.sans()));
         } else {
             Totals totals = totals(mine);
-            summary.addView(mono("Rows " + mine.size()
-                    + "   Net " + PriceMath.fmt(totals.netM) + " MINIMA"
-                    + "   " + PriceMath.fmt(totals.netU) + " MxUSD", Design.TEXT(), 10.5f));
+            summary.addView(mono(Language.msg(l10n_dex_trade_totals, mine.size(), PriceMath.fmt(totals.netM), PriceMath.fmt(totals.netU)), Design.TEXT(), 10.5f));
             summary.addView(tv("Rows awaiting recheck stay visible and are excluded from net totals.", 9.5f, Design.DIM2(), Design.sans()));
             summary.addView(tv("Wallet trade records; older rows may lack chain proof. Times use the inclusion block when verified; otherwise they show this device’s observation.",
                     9.5f, Design.DIM2(), Design.sans()));
@@ -106,6 +103,7 @@ public final class TapeTab extends LinearLayout {
 
         TextView export = mono("EXPORT + RECONCILE", Design.ACCENT(), 10.5f);
         export.setGravity(Gravity.CENTER);
+        export.setMinHeight(Design.dp(act, 48));
         export.setPadding(0, Design.dp(getContext(), 9), 0, Design.dp(getContext(), 9));
         export.setBackground(Design.stroked(getContext(), Design.SURFACE2(), 10));
         export.setOnClickListener(v -> act.exportTradeReconciliation());
@@ -119,19 +117,17 @@ public final class TapeTab extends LinearLayout {
             LinearLayout c = card();
             LinearLayout top = new LinearLayout(getContext());
             top.setGravity(Gravity.CENTER_VERTICAL);
-            top.addView(mono((r.buy ? "BUY " : "SELL ") + PriceMath.fmt(r.sizeMinima),
+            top.addView(mono(Language.join(DexMessages.message(r.buy ? "BUY" : "SELL"), " ", PriceMath.fmt(r.sizeMinima)),
                     r.buy ? Design.IN() : Design.RED(), 11f),
                     new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
             TextView price = mono(PriceMath.fmtPrice(r.price), Design.TEXT(), 11f);
             price.setGravity(Gravity.END);
             top.addView(price);
             c.addView(top);
-            c.addView(mono(TradeExport.timeLabel(r) + " " + fmt.format(new Date(r.timeMs)) + "   "
-                    + (r.maker ? "MAKER" : "TAKER") + "   "
-                    + label(r.sourceKind) + "   " + label(r.verificationStatus),
+            c.addView(mono(tradeMetadata(r),
                     Design.DIM(), 9.5f));
             String evidence = !r.txpowid.isEmpty() ? r.txpowid : r.spentCoin;
-            if (!evidence.isEmpty()) c.addView(mono(evidence, Design.DIM2(), 8.5f));
+            if (!evidence.isEmpty()) c.addView(mono(Language.join(evidence), Design.DIM2(), 8.5f));
             if (!r.verificationNote.isEmpty()) c.addView(tv(r.verificationNote, 9.5f, Design.DIM2(), Design.sans()));
         }
     }
@@ -156,7 +152,7 @@ public final class TapeTab extends LinearLayout {
 
             LinearLayout row = new LinearLayout(getContext());
             row.setPadding(0, Design.dp(getContext(), 4), 0, Design.dp(getContext(), 4));
-            row.addView(mono(fmt.format(new Date(t)) + (mine ? "  YOU" : ""),
+            row.addView(mono(Language.join(Language.stamp(t, "MMMdHm"), mine ? Language.join("  ", DexMessages.message("YOU")) : ""),
                     mine ? Design.ACCENT() : Design.DIM2(), 9.5f),
                     new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.15f));
             TextView p = mono(PriceMath.fmtPrice(price), buy ? Design.IN() : Design.RED(), 10.5f);
@@ -181,19 +177,35 @@ public final class TapeTab extends LinearLayout {
                 org.json.JSONObject correction=corrections.getJSONObject(i);
                 LinearLayout c=card();
                 c.addView(tv(correction.getString("reason"),11f,Design.TEXT(),Design.sansBold()));
-                c.addView(mono("Corrected "+fmt.format(new Date(correction.getLong("corrected_at"))),Design.DIM(),9.5f));
+                c.addView(mono(Language.msg(l10n_dex_corrected_at, Language.stamp(correction.getLong("corrected_at"), "MMMdHm")),Design.DIM(),9.5f));
                 org.json.JSONObject evidence=correction.getJSONObject("evidence");
                 org.json.JSONObject original=evidence.optJSONObject("personal_trade");
                 if(original==null) original=evidence.optJSONObject("public_trade");
-                if(original!=null) c.addView(tv("Earlier record: "+original.optString("size","unknown")+" MINIMA @ "+original.optString("price","unknown")
-                        +" · "+(original.optLong("timems",0)>0?fmt.format(new Date(original.optLong("timems"))):"timestamp not recorded"),10f,Design.DIM(),Design.sans()));
-                TextView ids=mono("Source "+correction.getString("coinid")+"\nEarlier TxPoW "+correction.getString("old_txpowid")
-                        +"\nVerified replacement "+correction.getString("new_txpowid"),Design.DIM2(),8.5f);
+                if(original!=null) c.addView(tv(earlierRecord(original),10f,Design.DIM(),Design.sans()));
+                TextView ids=mono(correctionIds(correction),Design.DIM2(),8.5f);
                 ids.setTextIsSelectable(true);c.addView(ids);
             }
         } catch(Exception invalid) {
             head.addView(tv("Correction history could not be read. Keep app data for recovery.",11f,Design.ACCENT(),Design.sans()));
         }
+    }
+
+    static CharSequence tradeMetadata(TradeExport.TradeRow r) {
+        return Language.join(DexMessages.message(TradeExport.timeLabel(r)), " ", Language.stamp(r.timeMs, "MMMdHm"), "   ",
+                DexMessages.message(r.maker ? "MAKER" : "TAKER"), "   ",
+                DexMessages.message(label(r.sourceKind)), "   ", DexMessages.message(label(r.verificationStatus)));
+    }
+
+    static CharSequence earlierRecord(org.json.JSONObject original) {
+        return Language.msg(l10n_dex_earlier_record,
+                !original.isNull("size") ? original.optString("size", "") : Language.msg(l10n_dex_history_unknown),
+                !original.isNull("price") ? original.optString("price", "") : Language.msg(l10n_dex_history_unknown),
+                original.optLong("timems", 0) > 0 ? Language.stamp(original.optLong("timems"), "MMMdHm") : Language.msg(l10n_dex_timestamp_missing));
+    }
+
+    static CharSequence correctionIds(org.json.JSONObject correction) throws org.json.JSONException {
+        return Language.msg(l10n_dex_correction_ids, correction.getString("coinid"),
+                correction.getString("old_txpowid"), correction.getString("new_txpowid"));
     }
 
     private static String label(String s) {

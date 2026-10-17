@@ -93,3 +93,5 @@ def adapt(root):
  # The importer copies canonical tests as part of its existing adaptation workflow.
 
  loader=importlib.util.spec_from_file_location("dex_trade_languages",project/"scripts/adapt-pandamonium-dex-trade-languages.py");m=importlib.util.module_from_spec(loader);loader.loader.exec_module(m);m.adapt(root)
+
+ loader=importlib.util.spec_from_file_location("dex_history_languages",project/"scripts/adapt-pandamonium-dex-history-languages.py");m=importlib.util.module_from_spec(loader);loader.loader.exec_module(m);m.adapt(root)

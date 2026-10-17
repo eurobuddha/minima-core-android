@@ -16,7 +16,7 @@ public class DexMessagesTest {
     }
     @Test public void declaredApplicationLabelsUseTheirOwnResources()throws Exception {
         JSONObject fixed=new JSONObject(new String(Files.readAllBytes(Path.of("../../localization/dex-messages.json")), java.nio.charset.StandardCharsets.UTF_8)).getJSONObject("fixed");
-        assertEquals(74,fixed.length());
+        assertEquals(109,fixed.length());
         for(Iterator<String> i=fixed.keys();i.hasNext();) {
             String raw=i.next(),id="l10n_"+fixed.getString(raw).replaceAll("([a-z0-9])([A-Z])","$1_$2").replace('.','_').toLowerCase(Locale.ROOT);
             assertEquals(raw,R.string.class.getField(id).getInt(null),field(DexMessages.message(raw),"resource"));

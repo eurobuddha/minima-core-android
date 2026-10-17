@@ -6143,4 +6143,49 @@
     <string name="l10n_dex_receipt_posting">"Отправка запрошена · %1$s. Ожидается проверка в цепочке; квитанция сохранена."</string>
     <!-- Arguments: value0 -->
     <string name="l10n_dex_receipt_unknown">"Результат отправки неизвестен · %1$s. Ожидается проверка в цепочке; квитанция сохранена."</string>
+    <string name="l10n_dex_interval15" formatted="false">"15м"</string>
+    <string name="l10n_dex_interval1" formatted="false">"1ч"</string>
+    <string name="l10n_dex_interval4" formatted="false">"4ч"</string>
+    <string name="l10n_dex_interval_day" formatted="false">"1д"</string>
+    <string name="l10n_dex_chart_note" formatted="false">"Графики используют сделки, сохранённые на этом устройстве. Восстановление может добавить сделки из истории узла; старые или удалённые транзакции могут отсутствовать. Экспортируйте записи, чтобы увидеть источник времени и доказательства из блокчейна."</string>
+    <string name="l10n_dex_chart_empty" formatted="false">"Сделки пока не обнаружены. Лента пополняется по мере появления сделок в сети."</string>
+    <!-- Arguments: time, open, high, low, close, volume -->
+    <string name="l10n_dex_candle_readout">"%1$s\nОткрытие %2$s · Макс. %3$s · Мин. %4$s\nЗакрытие %5$s · Объём %6$s"</string>
+    <string name="l10n_dex_my_trades" formatted="false">"МОИ СДЕЛКИ"</string>
+    <string name="l10n_dex_market_tape" formatted="false">"ЛЕНТА РЫНКА"</string>
+    <string name="l10n_dex_corrections" formatted="false">"ИСПРАВЛЕНИЯ"</string>
+    <string name="l10n_dex_personal_empty" formatted="false">"Личных сделок пока нет."</string>
+    <!-- Arguments: count, minima, mxusd -->
+    <string name="l10n_dex_trade_totals">"Записей: %1$d   Нетто: %2$s MINIMA   %3$s MxUSD"</string>
+    <string name="l10n_dex_recheck_totals" formatted="false">"Записи, ожидающие повторной проверки, остаются видимыми и исключаются из итогов."</string>
+    <string name="l10n_dex_trade_times" formatted="false">"Сделки кошелька; у старых записей может не быть доказательств из блокчейна. При проверенном включении указано время блока, иначе — время наблюдения на этом устройстве."</string>
+    <string name="l10n_dex_export_reconcile" formatted="false">"ЭКСПОРТ И СВЕРКА"</string>
+    <string name="l10n_dex_block_time" formatted="false">"Время блока"</string>
+    <string name="l10n_dex_observed" formatted="false">"Наблюдение"</string>
+    <string name="l10n_dex_taker_role" formatted="false">"ТЕЙКЕР"</string>
+    <string name="l10n_dex_source_book" formatted="false">"КНИГА ЗАЯВОК"</string>
+    <string name="l10n_dex_source_pool" formatted="false">"ПУЛ"</string>
+    <string name="l10n_dex_source_both" formatted="false">"КНИГА+ПУЛ"</string>
+    <string name="l10n_dex_legacy_not_rechecked" formatted="false">"Старая запись — повторно не проверена"</string>
+    <string name="l10n_dex_corrected_excluded" formatted="false">"Исправленная старая запись — исключена из итогов; см. «Исправления»"</string>
+    <string name="l10n_dex_recheck_excluded" formatted="false">"Нужна повторная проверка — исключено из итогов"</string>
+    <string name="l10n_dex_chain_when_checked" formatted="false">"В блокчейне на момент проверки"</string>
+    <string name="l10n_dex_market_note" formatted="false">"Записи книги заявок, обнаруженные устройством. Для новых исполнений нужна связанная трата в блокчейне; старые записи проверены повторно не все."</string>
+    <string name="l10n_dex_market_empty" formatted="false">"Рыночных сделок пока нет."</string>
+    <string name="l10n_dex_you" formatted="false">"ВЫ"</string>
+    <string name="l10n_dex_receipt_corrections" formatted="false">"ИСПРАВЛЕНИЯ КВИТАНЦИЙ"</string>
+    <string name="l10n_dex_corrections_note" formatted="false">"Здесь сохранены прежние рыночные и личные записи. Экспорт личных записей включает полные доказательства исправлений."</string>
+    <string name="l10n_dex_corrections_empty" formatted="false">"Исправлений квитанций пока нет."</string>
+    <!-- Arguments: time -->
+    <string name="l10n_dex_corrected_at">"Исправлено %1$s"</string>
+    <!-- Arguments: size, price, time -->
+    <string name="l10n_dex_earlier_record">"Прежняя запись: %1$s MINIMA @ %2$s · %3$s"</string>
+    <!-- Arguments: source, old, replacement -->
+    <string name="l10n_dex_correction_ids">"Источник %1$s\nПрежний TxPoW %2$s\nПроверенная замена %3$s"</string>
+    <string name="l10n_dex_timestamp_missing" formatted="false">"время не записано"</string>
+    <string name="l10n_dex_history_unknown" formatted="false">"неизвестно"</string>
+    <string name="l10n_dex_corrections_unreadable" formatted="false">"Не удалось прочитать историю исправлений. Сохраните данные приложения для восстановления."</string>
+    <string name="l10n_dex_moved_inclusion" formatted="false">"Тот же TxPoW включён в другой блок"</string>
+    <string name="l10n_dex_changed_spender" formatted="false">"Включена другая расходующая транзакция"</string>
+    <string name="l10n_dex_legacy_corrected" formatted="false">"Первое связанное доказательство исправляет старую запись"</string>
 </resources>

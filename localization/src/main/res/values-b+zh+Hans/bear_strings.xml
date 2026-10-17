@@ -6050,4 +6050,49 @@
     <string name="l10n_dex_receipt_posting">"已请求提交 · %1$s。正在等待链上验证，凭据已保留。"</string>
     <!-- Arguments: value0 -->
     <string name="l10n_dex_receipt_unknown">"提交结果未知 · %1$s。正在等待链上验证，凭据已保留。"</string>
+    <string name="l10n_dex_interval15" formatted="false">"15分"</string>
+    <string name="l10n_dex_interval1" formatted="false">"1时"</string>
+    <string name="l10n_dex_interval4" formatted="false">"4时"</string>
+    <string name="l10n_dex_interval_day" formatted="false">"1天"</string>
+    <string name="l10n_dex_chart_note" formatted="false">"图表使用此设备保存的交易记录。恢复操作可能会从节点保留的历史记录中补充交易；较早或已裁剪的交易可能缺失。导出记录可查看时间依据及链上证据。"</string>
+    <string name="l10n_dex_chart_empty" formatted="false">"尚未观测到交易。网络中出现交易后，记录将逐步填充。"</string>
+    <!-- Arguments: time, open, high, low, close, volume -->
+    <string name="l10n_dex_candle_readout">"%1$s\n开盘 %2$s · 最高 %3$s · 最低 %4$s\n收盘 %5$s · 成交量 %6$s"</string>
+    <string name="l10n_dex_my_trades" formatted="false">"我的交易"</string>
+    <string name="l10n_dex_market_tape" formatted="false">"市场成交记录"</string>
+    <string name="l10n_dex_corrections" formatted="false">"修正记录"</string>
+    <string name="l10n_dex_personal_empty" formatted="false">"暂无个人交易记录。"</string>
+    <!-- Arguments: count, minima, mxusd -->
+    <string name="l10n_dex_trade_totals">"记录 %1$d 条   净额 %2$s MINIMA   %3$s MxUSD"</string>
+    <string name="l10n_dex_recheck_totals" formatted="false">"等待复查的记录仍可查看，但不计入净额。"</string>
+    <string name="l10n_dex_trade_times" formatted="false">"钱包交易记录；较早的记录可能缺少链上证据。已验证时显示收录区块的时间，否则显示此设备观测到的时间。"</string>
+    <string name="l10n_dex_export_reconcile" formatted="false">"导出并核对"</string>
+    <string name="l10n_dex_block_time" formatted="false">"区块时间"</string>
+    <string name="l10n_dex_observed" formatted="false">"观测时间"</string>
+    <string name="l10n_dex_taker_role" formatted="false">"吃单方"</string>
+    <string name="l10n_dex_source_book" formatted="false">"订单簿"</string>
+    <string name="l10n_dex_source_pool" formatted="false">"流动池"</string>
+    <string name="l10n_dex_source_both" formatted="false">"订单簿+流动池"</string>
+    <string name="l10n_dex_legacy_not_rechecked" formatted="false">"旧记录 — 尚未复查"</string>
+    <string name="l10n_dex_corrected_excluded" formatted="false">"已修正的旧记录 — 不计入总额；请查看修正记录"</string>
+    <string name="l10n_dex_recheck_excluded" formatted="false">"需要复查 — 不计入总额"</string>
+    <string name="l10n_dex_chain_when_checked" formatted="false">"检查时已在链上"</string>
+    <string name="l10n_dex_market_note" formatted="false">"此设备观测到的订单簿记录。新的成交记录需要关联的链上花费证据；较早的记录尚未全部复查。"</string>
+    <string name="l10n_dex_market_empty" formatted="false">"暂无市场交易记录。"</string>
+    <string name="l10n_dex_you" formatted="false">"您"</string>
+    <string name="l10n_dex_receipt_corrections" formatted="false">"凭据修正记录"</string>
+    <string name="l10n_dex_corrections_note" formatted="false">"此处保留较早的市场及个人记录。个人记录导出中包含完整的修正证据。"</string>
+    <string name="l10n_dex_corrections_empty" formatted="false">"暂无凭据修正记录。"</string>
+    <!-- Arguments: time -->
+    <string name="l10n_dex_corrected_at">"修正时间 %1$s"</string>
+    <!-- Arguments: size, price, time -->
+    <string name="l10n_dex_earlier_record">"旧记录：%1$s MINIMA @ %2$s · %3$s"</string>
+    <!-- Arguments: source, old, replacement -->
+    <string name="l10n_dex_correction_ids">"来源 %1$s\n旧 TxPoW %2$s\n已验证的替代记录 %3$s"</string>
+    <string name="l10n_dex_timestamp_missing" formatted="false">"未记录时间"</string>
+    <string name="l10n_dex_history_unknown" formatted="false">"未知"</string>
+    <string name="l10n_dex_corrections_unreadable" formatted="false">"无法读取修正历史。请保留应用数据以便恢复。"</string>
+    <string name="l10n_dex_moved_inclusion" formatted="false">"同一 TxPoW 被收录到另一个区块"</string>
+    <string name="l10n_dex_changed_spender" formatted="false">"收录的花费交易已变更"</string>
+    <string name="l10n_dex_legacy_corrected" formatted="false">"首个关联证据修正了旧记录"</string>
 </resources>

@@ -29995,5 +29995,245 @@
     "zh-Hans": "提交结果未知 · {value0}。正在等待链上验证，凭据已保留。",
     "ru": "Результат отправки неизвестен · {value0}. Ожидается проверка в цепочке; квитанция сохранена.",
     "uk": "Результат надсилання невідомий · {value0}. Очікується перевірка в ланцюжку; квитанцію збережено."
+  },
+  "dex.interval15": {
+    "en": "15m",
+    "zh-Hans": "15分",
+    "ru": "15м",
+    "uk": "15хв"
+  },
+  "dex.interval1": {
+    "en": "1H",
+    "zh-Hans": "1时",
+    "ru": "1ч",
+    "uk": "1год"
+  },
+  "dex.interval4": {
+    "en": "4H",
+    "zh-Hans": "4时",
+    "ru": "4ч",
+    "uk": "4год"
+  },
+  "dex.intervalDay": {
+    "en": "1D",
+    "zh-Hans": "1天",
+    "ru": "1д",
+    "uk": "1д"
+  },
+  "dex.chartNote": {
+    "en": "Charts use this device's saved trade records. Recovery may add trades from history retained by your node; older or pruned transactions may be missing. Export records for their time basis and chain evidence.",
+    "zh-Hans": "图表使用此设备保存的交易记录。恢复操作可能会从节点保留的历史记录中补充交易；较早或已裁剪的交易可能缺失。导出记录可查看时间依据及链上证据。",
+    "ru": "Графики используют сделки, сохранённые на этом устройстве. Восстановление может добавить сделки из истории узла; старые или удалённые транзакции могут отсутствовать. Экспортируйте записи, чтобы увидеть источник времени и доказательства из блокчейна.",
+    "uk": "Графіки використовують угоди, збережені на цьому пристрої. Відновлення може додати угоди з історії вузла; старі або видалені транзакції можуть бути відсутні. Експортуйте записи, щоб побачити джерело часу та докази з блокчейну."
+  },
+  "dex.chartEmpty": {
+    "en": "No trades observed yet — the tape fills as the network trades",
+    "zh-Hans": "尚未观测到交易。网络中出现交易后，记录将逐步填充。",
+    "ru": "Сделки пока не обнаружены. Лента пополняется по мере появления сделок в сети.",
+    "uk": "Угод поки не виявлено. Стрічка поповнюється з появою угод у мережі."
+  },
+  "dex.candleReadout": {
+    "en": "{time}\nOpen {open} · High {high} · Low {low}\nClose {close} · Volume {volume}",
+    "zh-Hans": "{time}\n开盘 {open} · 最高 {high} · 最低 {low}\n收盘 {close} · 成交量 {volume}",
+    "ru": "{time}\nОткрытие {open} · Макс. {high} · Мин. {low}\nЗакрытие {close} · Объём {volume}",
+    "uk": "{time}\nВідкриття {open} · Макс. {high} · Мін. {low}\nЗакриття {close} · Обсяг {volume}"
+  },
+  "dex.myTrades": {
+    "en": "MY TRADES",
+    "zh-Hans": "我的交易",
+    "ru": "МОИ СДЕЛКИ",
+    "uk": "МОЇ УГОДИ"
+  },
+  "dex.marketTape": {
+    "en": "MARKET TAPE",
+    "zh-Hans": "市场成交记录",
+    "ru": "ЛЕНТА РЫНКА",
+    "uk": "СТРІЧКА РИНКУ"
+  },
+  "dex.corrections": {
+    "en": "CORRECTIONS",
+    "zh-Hans": "修正记录",
+    "ru": "ИСПРАВЛЕНИЯ",
+    "uk": "ВИПРАВЛЕННЯ"
+  },
+  "dex.personalEmpty": {
+    "en": "No personal trade records yet.",
+    "zh-Hans": "暂无个人交易记录。",
+    "ru": "Личных сделок пока нет.",
+    "uk": "Особистих угод поки немає."
+  },
+  "dex.tradeTotals": {
+    "en": "Rows {count}   Net {minima} MINIMA   {mxusd} MxUSD",
+    "zh-Hans": "记录 {count} 条   净额 {minima} MINIMA   {mxusd} MxUSD",
+    "ru": "Записей: {count}   Нетто: {minima} MINIMA   {mxusd} MxUSD",
+    "uk": "Записів: {count}   Нетто: {minima} MINIMA   {mxusd} MxUSD"
+  },
+  "dex.recheckTotals": {
+    "en": "Rows awaiting recheck stay visible and are excluded from net totals.",
+    "zh-Hans": "等待复查的记录仍可查看，但不计入净额。",
+    "ru": "Записи, ожидающие повторной проверки, остаются видимыми и исключаются из итогов.",
+    "uk": "Записи, що очікують повторної перевірки, залишаються видимими та виключаються з підсумків."
+  },
+  "dex.tradeTimes": {
+    "en": "Wallet trade records; older rows may lack chain proof. Times use the inclusion block when verified; otherwise they show this device’s observation.",
+    "zh-Hans": "钱包交易记录；较早的记录可能缺少链上证据。已验证时显示收录区块的时间，否则显示此设备观测到的时间。",
+    "ru": "Сделки кошелька; у старых записей может не быть доказательств из блокчейна. При проверенном включении указано время блока, иначе — время наблюдения на этом устройстве.",
+    "uk": "Угоди гаманця; старі записи можуть не мати доказів із блокчейну. За перевіреного включення вказано час блоку, інакше — час спостереження на цьому пристрої."
+  },
+  "dex.exportReconcile": {
+    "en": "EXPORT + RECONCILE",
+    "zh-Hans": "导出并核对",
+    "ru": "ЭКСПОРТ И СВЕРКА",
+    "uk": "ЕКСПОРТ І ЗВІРКА"
+  },
+  "dex.blockTime": {
+    "en": "Block time",
+    "zh-Hans": "区块时间",
+    "ru": "Время блока",
+    "uk": "Час блоку"
+  },
+  "dex.observed": {
+    "en": "Observed",
+    "zh-Hans": "观测时间",
+    "ru": "Наблюдение",
+    "uk": "Спостереження"
+  },
+  "dex.takerRole": {
+    "en": "TAKER",
+    "zh-Hans": "吃单方",
+    "ru": "ТЕЙКЕР",
+    "uk": "ТЕЙКЕР"
+  },
+  "dex.sourceBook": {
+    "en": "BOOK",
+    "zh-Hans": "订单簿",
+    "ru": "КНИГА ЗАЯВОК",
+    "uk": "КНИГА ОРДЕРІВ"
+  },
+  "dex.sourcePool": {
+    "en": "POOL",
+    "zh-Hans": "流动池",
+    "ru": "ПУЛ",
+    "uk": "ПУЛ"
+  },
+  "dex.sourceBoth": {
+    "en": "BOOK+POOL",
+    "zh-Hans": "订单簿+流动池",
+    "ru": "КНИГА+ПУЛ",
+    "uk": "КНИГА+ПУЛ"
+  },
+  "dex.legacyNotRechecked": {
+    "en": "Legacy — not rechecked",
+    "zh-Hans": "旧记录 — 尚未复查",
+    "ru": "Старая запись — повторно не проверена",
+    "uk": "Старий запис — повторно не перевірено"
+  },
+  "dex.correctedExcluded": {
+    "en": "Corrected earlier record — excluded from totals; see Corrections",
+    "zh-Hans": "已修正的旧记录 — 不计入总额；请查看修正记录",
+    "ru": "Исправленная старая запись — исключена из итогов; см. «Исправления»",
+    "uk": "Виправлений старий запис — виключено з підсумків; див. «Виправлення»"
+  },
+  "dex.recheckExcluded": {
+    "en": "Recheck required — excluded from totals",
+    "zh-Hans": "需要复查 — 不计入总额",
+    "ru": "Нужна повторная проверка — исключено из итогов",
+    "uk": "Потрібна повторна перевірка — виключено з підсумків"
+  },
+  "dex.chainWhenChecked": {
+    "en": "On-chain when checked",
+    "zh-Hans": "检查时已在链上",
+    "ru": "В блокчейне на момент проверки",
+    "uk": "У блокчейні на момент перевірки"
+  },
+  "dex.marketNote": {
+    "en": "Device-observed order-book records. New fills require a linked on-chain spend; older rows have not all been rechecked.",
+    "zh-Hans": "此设备观测到的订单簿记录。新的成交记录需要关联的链上花费证据；较早的记录尚未全部复查。",
+    "ru": "Записи книги заявок, обнаруженные устройством. Для новых исполнений нужна связанная трата в блокчейне; старые записи проверены повторно не все.",
+    "uk": "Записи книги ордерів, виявлені пристроєм. Для нових виконань потрібна пов’язана витрата в блокчейні; старі записи повторно перевірено не всі."
+  },
+  "dex.marketEmpty": {
+    "en": "No market trade records yet.",
+    "zh-Hans": "暂无市场交易记录。",
+    "ru": "Рыночных сделок пока нет.",
+    "uk": "Ринкових угод поки немає."
+  },
+  "dex.you": {
+    "en": "YOU",
+    "zh-Hans": "您",
+    "ru": "ВЫ",
+    "uk": "ВИ"
+  },
+  "dex.receiptCorrections": {
+    "en": "RECEIPT CORRECTIONS",
+    "zh-Hans": "凭据修正记录",
+    "ru": "ИСПРАВЛЕНИЯ КВИТАНЦИЙ",
+    "uk": "ВИПРАВЛЕННЯ КВИТАНЦІЙ"
+  },
+  "dex.correctionsNote": {
+    "en": "Earlier market and personal records are preserved here. Personal exports include the full correction evidence.",
+    "zh-Hans": "此处保留较早的市场及个人记录。个人记录导出中包含完整的修正证据。",
+    "ru": "Здесь сохранены прежние рыночные и личные записи. Экспорт личных записей включает полные доказательства исправлений.",
+    "uk": "Тут збережено попередні ринкові та особисті записи. Експорт особистих записів містить повні докази виправлень."
+  },
+  "dex.correctionsEmpty": {
+    "en": "No receipt corrections recorded.",
+    "zh-Hans": "暂无凭据修正记录。",
+    "ru": "Исправлений квитанций пока нет.",
+    "uk": "Виправлень квитанцій поки немає."
+  },
+  "dex.correctedAt": {
+    "en": "Corrected {time}",
+    "zh-Hans": "修正时间 {time}",
+    "ru": "Исправлено {time}",
+    "uk": "Виправлено {time}"
+  },
+  "dex.earlierRecord": {
+    "en": "Earlier record: {size} MINIMA @ {price} · {time}",
+    "zh-Hans": "旧记录：{size} MINIMA @ {price} · {time}",
+    "ru": "Прежняя запись: {size} MINIMA @ {price} · {time}",
+    "uk": "Попередній запис: {size} MINIMA @ {price} · {time}"
+  },
+  "dex.correctionIds": {
+    "en": "Source {source}\nEarlier TxPoW {old}\nVerified replacement {replacement}",
+    "zh-Hans": "来源 {source}\n旧 TxPoW {old}\n已验证的替代记录 {replacement}",
+    "ru": "Источник {source}\nПрежний TxPoW {old}\nПроверенная замена {replacement}",
+    "uk": "Джерело {source}\nПопередній TxPoW {old}\nПеревірена заміна {replacement}"
+  },
+  "dex.timestampMissing": {
+    "en": "timestamp not recorded",
+    "zh-Hans": "未记录时间",
+    "ru": "время не записано",
+    "uk": "час не записано"
+  },
+  "dex.historyUnknown": {
+    "en": "unknown",
+    "zh-Hans": "未知",
+    "ru": "неизвестно",
+    "uk": "невідомо"
+  },
+  "dex.correctionsUnreadable": {
+    "en": "Correction history could not be read. Keep app data for recovery.",
+    "zh-Hans": "无法读取修正历史。请保留应用数据以便恢复。",
+    "ru": "Не удалось прочитать историю исправлений. Сохраните данные приложения для восстановления.",
+    "uk": "Не вдалося прочитати історію виправлень. Збережіть дані застосунку для відновлення."
+  },
+  "dex.movedInclusion": {
+    "en": "Same TxPoW included in a different block",
+    "zh-Hans": "同一 TxPoW 被收录到另一个区块",
+    "ru": "Тот же TxPoW включён в другой блок",
+    "uk": "Той самий TxPoW включено до іншого блоку"
+  },
+  "dex.changedSpender": {
+    "en": "Different included spender",
+    "zh-Hans": "收录的花费交易已变更",
+    "ru": "Включена другая расходующая транзакция",
+    "uk": "Включено іншу транзакцію витрати"
+  },
+  "dex.legacyCorrected": {
+    "en": "First linked proof corrects a legacy record",
+    "zh-Hans": "首个关联证据修正了旧记录",
+    "ru": "Первое связанное доказательство исправляет старую запись",
+    "uk": "Перший пов’язаний доказ виправляє старий запис"
   }
 }

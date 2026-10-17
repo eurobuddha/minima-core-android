@@ -1,4 +1,6 @@
 package com.eurobuddha.pandadex;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,10 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Hand-rolled OHLC candle chart with a volume subchart and a touch crosshair. No charting
@@ -71,6 +70,12 @@ public final class CandleView extends View {
         return super.onTouchEvent(e);
     }
 
+    @Override protected void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        // Same retained candles and crosshair; do not call setData on a language change.
+        invalidate();
+    }
+
     @Override protected void onDraw(Canvas c) {
         int w = getWidth(), h = getHeight();
         float padL = Design.dp(getContext(), 4), padR = Design.dp(getContext(), 44);
@@ -78,12 +83,8 @@ public final class CandleView extends View {
         float volH = h * 0.22f;
         float priceH = h - padT - padB - volH;
 
-        if (candles.isEmpty()) {
-            text.setColor(Design.DIM2());
-            c.drawText("No trades observed yet — the tape fills as the network trades",
-                    padL + Design.dp(getContext(), 8), h / 2f, text);
-            return;
-        }
+        // ChartTab owns the wrapping, language-bound empty-state TextView.
+        if (candles.isEmpty()) return;
 
         BigDecimal hi = candles.get(0).high, lo = candles.get(0).low, volMax = BigDecimal.ZERO;
         for (Candles.Candle k : candles) {
@@ -169,13 +170,14 @@ public final class CandleView extends View {
 
         // time axis: first / mid / last bucket
         text.setColor(Design.DIM2());
-        SimpleDateFormat fmt = new SimpleDateFormat(intervalMs >= Candles.D1 ? "dd MMM" : "dd HH:mm", Locale.US);
+        String skeleton = intervalMs >= Candles.D1 ? "MMMd" : "dHm";
         int[] marks = {0, candles.size() / 2, candles.size() - 1};
         for (int m : marks) {
             if (m < 0 || m >= candles.size()) continue;
             float cx = padL + slot * m + slot / 2f;
-            c.drawText(fmt.format(new Date(candles.get(m).openMs)), Math.max(padL, cx - Design.dp(getContext(), 14)),
-                    h - Design.dp(getContext(), 4), text);
+            String label = Language.date(candles.get(m).openMs, skeleton);
+            float x = Math.max(padL, Math.min(w - padL - text.measureText(label), cx - text.measureText(label) / 2f));
+            c.drawText(label, x, h - Design.dp(getContext(), 4), text);
         }
     }
 
