@@ -1,4 +1,6 @@
 package com.eurobuddha.pandadex;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.annotation.SuppressLint;
 import android.view.Gravity;
@@ -6,8 +8,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -18,7 +18,6 @@ public final class OrdersTab extends LinearLayout {
 
     private final MainActivity act;
     private final LinearLayout seg, body;
-    private final SimpleDateFormat fmt = new SimpleDateFormat("dd MMM HH:mm", Locale.US);
     private int sel = 0;
     private OwnerHistoryView operations;
 
@@ -34,7 +33,8 @@ public final class OrdersTab extends LinearLayout {
         for (int i = 0; i < names.length; i++) {
             final int idx = i;
             TextView t = new TextView(act);
-            t.setText(names[i]);
+            Language.setText(t, DexMessages.message(names[i]));
+            t.setMinHeight(Design.dp(act, 48));
             t.setTextSize(11f);
             t.setTypeface(Design.sansBold());
             t.setGravity(Gravity.CENTER);
@@ -60,9 +60,9 @@ public final class OrdersTab extends LinearLayout {
         }
     }
 
-    private TextView line(String s, int color, float size) {
+    private TextView line(CharSequence s, int color, float size) {
         TextView t = new TextView(getContext());
-        t.setText(s);
+        Language.setText(t, DexMessages.message(s));
         t.setTextColor(color);
         t.setTypeface(Design.mono());
         t.setTextSize(size);
@@ -111,6 +111,7 @@ public final class OrdersTab extends LinearLayout {
         if (mineCount > 1) {
             TextView cancelAll = line("✕  Cancel all " + mineCount + " orders", Design.RED(), 11.5f);
             cancelAll.setGravity(Gravity.CENTER);
+            cancelAll.setMinHeight(Design.dp(act, 48));
             cancelAll.setPadding(0, Design.dp(getContext(), 10), 0, Design.dp(getContext(), 10));
             cancelAll.setBackground(Design.stroked(getContext(), Design.SURFACE2(), 10));
             cancelAll.setOnClickListener(v -> act.cancelAll(null));
@@ -132,25 +133,25 @@ public final class OrdersTab extends LinearLayout {
 
             LinearLayout top = new LinearLayout(getContext());
             top.setGravity(Gravity.CENTER_VERTICAL);
-            top.addView(line((o.sell ? "SELL " : "BUY ") + PriceMath.fmt(o.minimaAmount())
-                            + " MINIMA @ " + PriceMath.fmtPrice(o.price()), o.sell ? Design.RED() : Design.IN(), 12f),
+            top.addView(line(Language.join(DexMessages.message(o.sell ? "SELL" : "BUY"), " ", PriceMath.fmt(o.minimaAmount()), " MINIMA @ ", PriceMath.fmtPrice(o.price())), o.sell ? Design.RED() : Design.IN(), 12f),
                     new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
             if (!actionUnresolved) {
                 // Retained cancellation/edit intents already block duplicate owner writes.
                 // Definitely unsubmitted attempts leave the controls available.
                 TextView edit = line(" ✎ ", Design.DIM(), 14f);
+                edit.setMinWidth(Design.dp(act, 48)); edit.setMinHeight(Design.dp(act, 48)); edit.setGravity(Gravity.CENTER);
+                Language.description(edit, Language.msg(l10n_dex_edit_order));
                 edit.setOnClickListener(v -> act.editOrder(o));
                 top.addView(edit);
                 TextView cancel = line(" ✕ ", Design.RED(), 14f);
+                cancel.setMinWidth(Design.dp(act, 48)); cancel.setMinHeight(Design.dp(act, 48)); cancel.setGravity(Gravity.CENTER);
+                Language.description(cancel, Language.msg(l10n_dex_cancel_order));
                 cancel.setOnClickListener(v -> act.cancelOrder(o));
                 top.addView(cancel);
             }
             card.addView(top);
 
-            String meta = (o.gtc ? "GTC ∞" : "expires") + "  ·  " + o.ageLabel(block, act.makerBookReady())
-                    + "  ·  min remainder " + PriceMath.fmt(o.minRem)
-                    + "  ·  total " + PriceMath.fmt(o.usdtAmount()) + " MxUSD";
-            card.addView(line(meta, Design.DIM2(), 9.5f));
+            card.addView(line(orderMetadata(o, block, act.makerBookReady()), Design.DIM2(), 9.5f));
             // the ladder's own orders: cancelling one by hand is a different act from
             // cancelling something you placed yourself — the maker will put this one back
             if (makerIds.contains(o.orderId)) {
@@ -172,6 +173,16 @@ public final class OrdersTab extends LinearLayout {
     private void renderOperations() {
         if(operations==null)operations=new OwnerHistoryView(act,act.db().raw()::ownerReceipts,act::exportTradeReconciliation);
         operations.render();body.addView(operations);
+    }
+
+    static CharSequence orderMetadata(Order5 order, long block, boolean current) {
+        return Language.msg(l10n_dex_order_meta, DexMessages.message(order.gtc ? "GTC ∞" : "expires"),
+                DexMessages.message(order.ageLabel(block, current)), PriceMath.fmt(order.minRem), PriceMath.fmt(order.usdtAmount()));
+    }
+
+    static CharSequence tradeTime(long time, String status) {
+        return Language.join(Language.stamp(time, "MMMdHm"), ChainReview.accounted(status) ? ""
+                : Language.join("\n", DexMessages.message(status.startsWith("SUPERSEDED_") ? "Corrected — see Corrections" : "Recheck required")));
     }
 
     private void renderTrades() {
@@ -213,6 +224,7 @@ public final class OrdersTab extends LinearLayout {
         }
         TextView export = line("EXPORT RECONCILIATION ZIP", Design.ACCENT(), 10.5f);
         export.setGravity(Gravity.CENTER);
+        export.setMinHeight(Design.dp(act, 48));
         export.setPadding(0, Design.dp(getContext(), 9), 0, Design.dp(getContext(), 9));
         export.setBackground(Design.stroked(getContext(), Design.SURFACE2(), 10));
         export.setOnClickListener(v -> act.exportTradeReconciliation());
@@ -233,12 +245,12 @@ public final class OrdersTab extends LinearLayout {
             boolean maker = (Boolean) t[4];
             LinearLayout row = new LinearLayout(getContext());
             row.setPadding(0, Design.dp(getContext(), 4), 0, Design.dp(getContext(), 4));
-            row.addView(line(fmt.format(new Date(time)) + (ChainReview.accounted((String)t[6]) ? "" : (((String)t[6]).startsWith("SUPERSEDED_") ? "\nCorrected — see Corrections" : "\nRecheck required")), Design.DIM2(), 9.5f),
+            row.addView(line(tradeTime(time, (String)t[6]), Design.DIM2(), 9.5f),
                     new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.1f));
-            TextView side = line((buy ? "BUY " : "SELL ") + PriceMath.fmt(size),
+            TextView side = line(Language.join(DexMessages.message(buy ? "BUY" : "SELL"), " ", PriceMath.fmt(size)),
                     buy ? Design.IN() : Design.RED(), 10.5f);
             row.addView(side, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.2f));
-            TextView pr = line(PriceMath.fmtPrice(price) + (maker ? "  M" : "  T"), Design.TEXT(), 10.5f);
+            TextView pr = line(Language.join(PriceMath.fmtPrice(price), "\n", DexMessages.message(maker ? "MAKER" : "TAKER")), Design.TEXT(), 10.5f);
             pr.setGravity(Gravity.END);
             row.addView(pr, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.2f));
             body.addView(row);

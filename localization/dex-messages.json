@@ -108,7 +108,57 @@
     "Correction history could not be read. Keep app data for recovery.": "dex.correctionsUnreadable",
     "Same TxPoW included in a different block": "dex.movedInclusion",
     "Different included spender": "dex.changedSpender",
-    "First linked proof corrects a legacy record": "dex.legacyCorrected"
+    "First linked proof corrects a legacy record": "dex.legacyCorrected",
+    "Cancel": "common.cancel",
+    "Update": "atomixOtc.update",
+    "OPEN": "dex.openTab",
+    "OPERATIONS": "dex.operationsTab",
+    "GTC ∞": "dex.gtcLabel",
+    "expires": "dex.expiresLabel",
+    "age unavailable": "dex.ageMissing",
+    "MAKER RUNG — the published ladder owns this one": "dex.makerRung",
+    "EXPIRED — refundable to your wallet": "dex.expiredRefundable",
+    "Expired at last check — refresh before refunding": "dex.expiredRefresh",
+    "No fills yet": "dex.noFills",
+    "Rows awaiting recheck remain visible but are excluded from volume and P&L. Export for each row’s time basis and chain evidence.": "dex.tradePnlNote",
+    "EXPORT RECONCILIATION ZIP": "dex.exportZip",
+    "Export reconciliation ZIP": "dex.exportZip",
+    "Corrected — see Corrections": "dex.correctedShort",
+    "Recheck required": "dex.recheckShort",
+    "Saved order operations. Confirmations are from the last node check; these records do not add trade volume or P&L.": "dex.ownerNote",
+    "Saved operations could not be read. Preserve app data for recovery.": "dex.ownerUnreadable",
+    "Newest": "dex.newest",
+    "Newer": "dex.newer",
+    "Older": "dex.older",
+    "No completed operations saved yet. Older operations removed by previous builds are not available here.": "dex.ownerEmpty",
+    "No older operations on this page. Use Newest to refresh.": "dex.ownerPageEmpty",
+    "Order created": "dex.orderCreated",
+    "Order cancelled": "dex.orderCancelled",
+    "Price updated": "dex.priceUpdated",
+    "Order renewed": "dex.orderRenewed",
+    "Order refunded before update": "dex.refundedInstead",
+    "Order spent with payment before request": "dex.paidInstead",
+    "Saved order operation": "dex.ownerSaved",
+    "Previously verified · not found in latest node check": "dex.ownerMissing",
+    "Inclusion changed · reconciliation required": "dex.ownerMoved",
+    "Verification recorded · recheck pending": "dex.ownerPending",
+    "First observed": "dex.firstObserved",
+    "Edit order price": "dex.editPrice",
+    "New price (MxUSD per MINIMA)": "dex.newPriceHint",
+    "Connection or ownership changed. Reopen this order before editing.": "dex.editChanged",
+    "Bad price": "dex.badPrice",
+    "Reprice posted": "dex.repricePosted",
+    "Cancel sent — the order leaves the book when a block confirms it": "dex.cancelSent",
+    "No open orders in this snapshot": "dex.snapshotEmpty",
+    "Cancel all orders": "dex.cancelAllTitle",
+    "Cancel all & stop": "dex.cancelAllStop",
+    "Cancel them": "dex.cancelThem",
+    "Keep them": "dex.keepThem",
+    "Stop the maker and request withdrawal of its recorded orders? No open orders are visible in this snapshot, but a submission may still be in progress.": "dex.cancelEmptyBody",
+    "Connection changed or is not ready. Review the order list again.": "dex.cancelReview",
+    "Connection changed. Review the order list again.": "dex.cancelConnection",
+    "Maker withdrawal instructions retained. No orders were visible in this snapshot; check Orders for on-chain outcomes.": "dex.withdrawRetained",
+    "Connection changed. Remaining cancellation batches stopped; check retained receipts before retrying.": "dex.cancelBatchesStopped"
   },
   "patterns": [
     {
@@ -272,6 +322,116 @@
         "diagnostic"
       ],
       "key": "dex.receiptUnknown"
+    },
+    {
+      "template": "✕  Cancel all {0} orders",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.cancelAllCount"
+    },
+    {
+      "template": "age {0} blk",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.ageBlocks"
+    },
+    {
+      "template": "age {0} blk at last check",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.ageAtCheck"
+    },
+    {
+      "template": "Rows {0} ({1} included)   ·   Volume {2} MINIMA",
+      "kinds": [
+        "integer",
+        "integer",
+        "number"
+      ],
+      "key": "dex.orderTradeVolume"
+    },
+    {
+      "template": "Notional {0} MxUSD",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.orderNotional"
+    },
+    {
+      "template": "P&L vs book mid {0} MxUSD",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.orderPnl"
+    },
+    {
+      "template": "P&L vs book mid +{0} MxUSD",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.orderPnlPositive"
+    },
+    {
+      "template": "Page {0} · {1} operations",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.ownerPage"
+    },
+    {
+      "template": "On-chain · {0} confirmations",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.ownerDepth"
+    },
+    {
+      "template": "Reprice failed: {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.repriceFailure"
+    },
+    {
+      "template": "Cancel failed: {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.cancelFailure"
+    },
+    {
+      "template": "Cancel sent for {0} order — each leaves the book when a block confirms it, and can still be filled until then",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.cancelBatchAccepted"
+    },
+    {
+      "template": "Cancel sent for {0} orders — each leaves the book when a block confirms it, and can still be filled until then",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.cancelBatchAccepted"
+    },
+    {
+      "template": "Cancel requests accepted for {0}; {1} requests failed or have unknown outcomes. Check Orders and retained receipts.",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.cancelBatchMixed"
+    },
+    {
+      "template": "Cancelling {0} of {1}…",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.cancellingProgress"
     }
   ]
 }

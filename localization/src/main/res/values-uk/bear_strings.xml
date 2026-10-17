@@ -6188,4 +6188,91 @@
     <string name="l10n_dex_moved_inclusion" formatted="false">"Той самий TxPoW включено до іншого блоку"</string>
     <string name="l10n_dex_changed_spender" formatted="false">"Включено іншу транзакцію витрати"</string>
     <string name="l10n_dex_legacy_corrected" formatted="false">"Перший пов’язаний доказ виправляє старий запис"</string>
+    <string name="l10n_dex_open_tab" formatted="false">"ВІДКРИТІ"</string>
+    <string name="l10n_dex_operations_tab" formatted="false">"ОПЕРАЦІЇ"</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_all_count">"✕  Скасувати всі ордери: %1$s"</string>
+    <string name="l10n_dex_gtc_label" formatted="false">"До скасування ∞"</string>
+    <string name="l10n_dex_expires_label" formatted="false">"спливає"</string>
+    <string name="l10n_dex_age_missing" formatted="false">"вік невідомий"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_age_blocks">"вік: %1$s блоків"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_age_at_check">"вік на час останньої перевірки: %1$s блоків"</string>
+    <!-- Arguments: expiry, age, minimum, total -->
+    <string name="l10n_dex_order_meta">"%1$s · %2$s · мін. залишок %3$s · разом %4$s MxUSD"</string>
+    <string name="l10n_dex_maker_rung" formatted="false">"РІВЕНЬ МЕЙКЕРА — ордер належить опублікованій драбині"</string>
+    <string name="l10n_dex_expired_refundable" formatted="false">"СПЛИВ ТЕРМІН — доступне повернення до гаманця"</string>
+    <string name="l10n_dex_expired_refresh" formatted="false">"Термін сплив на час останньої перевірки — оновіть перед поверненням"</string>
+    <string name="l10n_dex_no_fills" formatted="false">"Виконань поки немає"</string>
+    <string name="l10n_dex_trade_pnl_note" formatted="false">"Записи, що очікують повторної перевірки, видимі, але не входять до обсягу та прибутку/збитку. Експорт покаже джерело часу та докази з блокчейну для кожного запису."</string>
+    <!-- Arguments: rows, included, volume -->
+    <string name="l10n_dex_order_trade_volume">"Записів: %1$s (враховано %2$s) · Обсяг %3$s MINIMA"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_notional">"Номінал %1$s MxUSD"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_pnl">"Прибуток/збиток до середини книги: %1$s MxUSD"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_pnl_positive">"Прибуток/збиток до середини книги: +%1$s MxUSD"</string>
+    <string name="l10n_dex_export_zip" formatted="false">"ЕКСПОРТ ЗВІРКИ В ZIP"</string>
+    <string name="l10n_dex_corrected_short" formatted="false">"Виправлено — див. «Виправлення»"</string>
+    <string name="l10n_dex_recheck_short" formatted="false">"Потрібна повторна перевірка"</string>
+    <string name="l10n_dex_owner_note" formatted="false">"Збережені операції з ордерами. Підтвердження — з останньої перевірки вузла; ці записи не збільшують обсяг угод і прибуток/збиток."</string>
+    <string name="l10n_dex_owner_unreadable" formatted="false">"Не вдалося прочитати збережені операції. Збережіть дані застосунку для відновлення."</string>
+    <string name="l10n_dex_newest" formatted="false">"Найновіші"</string>
+    <string name="l10n_dex_newer" formatted="false">"Новіші"</string>
+    <string name="l10n_dex_older" formatted="false">"Старіші"</string>
+    <!-- Arguments: page, operations -->
+    <string name="l10n_dex_owner_page">"Сторінка %1$s · Операцій: %2$s"</string>
+    <string name="l10n_dex_owner_empty" formatted="false">"Завершені операції ще не збережено. Старі операції, видалені попередніми збірками, тут недоступні."</string>
+    <string name="l10n_dex_owner_page_empty" formatted="false">"На цій сторінці немає старіших операцій. Натисніть «Найновіші» для оновлення."</string>
+    <string name="l10n_dex_order_created" formatted="false">"Ордер створено"</string>
+    <string name="l10n_dex_order_cancelled" formatted="false">"Ордер скасовано"</string>
+    <string name="l10n_dex_price_updated" formatted="false">"Ціну оновлено"</string>
+    <string name="l10n_dex_order_renewed" formatted="false">"Ордер продовжено"</string>
+    <string name="l10n_dex_refunded_instead" formatted="false">"Повернення за ордером виконано до оновлення"</string>
+    <string name="l10n_dex_paid_instead" formatted="false">"Ордер витрачено з оплатою до запиту"</string>
+    <string name="l10n_dex_owner_saved" formatted="false">"Збережена операція з ордером"</string>
+    <!-- Arguments: depth -->
+    <string name="l10n_dex_owner_depth">"У блокчейні · Підтверджень: %1$s"</string>
+    <string name="l10n_dex_owner_missing" formatted="false">"Раніше перевірено · Не знайдено під час останньої перевірки вузла"</string>
+    <string name="l10n_dex_owner_moved" formatted="false">"Включення змінилося · Потрібна звірка"</string>
+    <string name="l10n_dex_owner_pending" formatted="false">"Перевірку збережено · Очікується повторна перевірка"</string>
+    <string name="l10n_dex_first_observed" formatted="false">"Уперше виявлено"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_dex_owner_inclusion">"Перевірений блок включення %1$s"</string>
+    <!-- Arguments: time -->
+    <string name="l10n_dex_owner_checked">" · перевірено %1$s"</string>
+    <string name="l10n_dex_edit_price" formatted="false">"Змінити ціну ордера"</string>
+    <string name="l10n_dex_new_price_hint" formatted="false">"Нова ціна (MxUSD за MINIMA)"</string>
+    <string name="l10n_dex_edit_changed" formatted="false">"Підключення або власник змінилися. Відкрийте ордер заново перед редагуванням."</string>
+    <string name="l10n_dex_bad_price" formatted="false">"Неправильна ціна"</string>
+    <string name="l10n_dex_reprice_posted" formatted="false">"Зміну ціни надіслано"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_reprice_failure">"Не вдалося змінити ціну: %1$s"</string>
+    <string name="l10n_dex_cancel_sent" formatted="false">"Скасування надіслано — ордер залишить книгу після підтвердження блоком"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_cancel_failure">"Не вдалося скасувати: %1$s"</string>
+    <string name="l10n_dex_snapshot_empty" formatted="false">"У цьому знімку немає відкритих ордерів"</string>
+    <string name="l10n_dex_cancel_all_title" formatted="false">"Скасувати всі ордери"</string>
+    <string name="l10n_dex_cancel_all_stop" formatted="false">"Скасувати все й зупинити"</string>
+    <string name="l10n_dex_cancel_them" formatted="false">"Скасувати їх"</string>
+    <string name="l10n_dex_keep_them" formatted="false">"Залишити"</string>
+    <string name="l10n_dex_cancel_empty_body" formatted="false">"Зупинити мейкер і запитати зняття його збережених ордерів? У цьому знімку відкритих ордерів немає, але надсилання ще може тривати."</string>
+    <!-- Arguments: orders, minima, mxusd -->
+    <string name="l10n_dex_cancel_all_body">"Запитати скасування всіх видимих ордерів (%1$s)?\n\nУ них заблоковано %2$s MINIMA та %3$s MxUSD. Кошти повернуться після успішного скасування. Запити надсилаються пакетами; до підтвердження скасування ордери ще можуть виконатися."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_cancel_pause">"\n\nМейкер також буде призупинено%1$s. Ордери, що надсилаються, залишаться під наглядом для скасування після появи. Підтверджені результати дивіться в розділі ордерів."</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_rungs">" (видимих ордерів мейкера: %1$s)"</string>
+    <string name="l10n_dex_cancel_review" formatted="false">"Підключення змінилося або не готове. Перевірте список ордерів заново."</string>
+    <string name="l10n_dex_cancel_connection" formatted="false">"Підключення змінилося. Перевірте список ордерів заново."</string>
+    <string name="l10n_dex_withdraw_retained" formatted="false">"Інструкції на зняття ордерів мейкера збережено. У цьому знімку ордерів не було; результати в блокчейні дивіться в розділі ордерів."</string>
+    <string name="l10n_dex_cancel_batches_stopped" formatted="false">"Підключення змінилося. Решту пакетів скасування зупинено; перед повтором перевірте збережені квитанції."</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_batch_accepted">"Скасування надіслано для ордерів: %1$s. Кожен залишить книгу після підтвердження блоком і до цього ще може виконатися"</string>
+    <!-- Arguments: accepted, failed -->
+    <string name="l10n_dex_cancel_batch_mixed">"Запитів скасування прийнято: %1$s; невдалих або з невідомим результатом: %2$s. Перевірте ордери та збережені квитанції."</string>
+    <!-- Arguments: done, total -->
+    <string name="l10n_dex_cancelling_progress">"Скасування %1$s із %2$s…"</string>
 </resources>

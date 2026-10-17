@@ -2210,3 +2210,20 @@ Findings: no blocking source/build defect found in this increment. Device layout
 Verdict: approve this increment with host validation. CandleView setData/selected/touch logic and TapeTab label/totals are byte-identical to the donor; 183 other DEX source files, protected engines/reviewed recovery fixes, public-key audit and node JAR remain unchanged.
 
 Evidence: build/localization/dex-history-validation.json, with 435 source hashes. Next: remaining PandaDEX dialogs, Orders/OwnerHistory, Assets, Maker, notifications and diagnostics; remaining financial/accessibility findings; safe Fold runtime validation; signed versioned builds and publication to the authorized GitHub fork, PandaApps and eurobuddha.com.
+
+
+## PandaDEX orders and operation history — 2026-10-18
+
+Previous goal turn made progress and committed chart/history work as 38adfff. Revalidated all 435 tracked source hashes and the clean worktree before this increment. Reused the standalone OrdersTab, OwnerHistoryView, OwnerReceipt, Order5 and their existing receipt tests, plus the shared LanguageDialog, immutable messages/date stamps and PandaPools retained-dialog adaptation. No standalone donor edits.
+
+Added 67 messages (5,029 catalogue entries), with 159 exact DEX aliases and 37 patterns. Open orders, receipt states, owner operations and pagination, order ages/expiry, personal trade volume/P&L and export actions translate. Edit-price and cancel-all dialogs retain the existing input, callbacks and confirmation-time guards. Dates follow the selected language; exact amounts, signs, IDs, stored receipts and exports remain literal. Edit/cancel icons have translated descriptions and 48dp targets. Cancellation wording still distinguishes submitted requests from block-confirmed outcomes, and maker pause/remaining tracked orders remain explicit.
+
+Six new tests use actual owner receipt states and Order5 age labels, checking moved/missing/unconfirmed inclusion, all operation outcomes, observed versus block timestamps, absence of repeat-check times, unknown/stale order ages, exact P&L signs and amount strings, excluded trade rows, cancellation consent snapshots, and unknown diagnostic payloads. 721 PandaDEX + 9 localization JVM tests pass (730). All three debug variants and AndroidTest compile; all 19 pinned imports reproduce. Catalogue, transport and diff checks pass. No device activity; Fold R3GL805K7MB remains the only authorized device.
+
+### Code Review
+
+Summary: translated display text uses the existing state and evidence. Source comparison confirms cancellation sequencing, confirmation-time ownership checks, price-input filtering and relock arithmetic, trade volume/P&L calculations, and owner-history pagination are unchanged. No backend receipt, ownership, storage or signing changes. Protected engines, public-key audit and node JAR remain unchanged; 181 original DEX files remain untouched.
+Findings: no blocking source/build defect identified. Fold runtime verification of long labels, large fonts, retained inputs and pagination remains pending. Translation and signed release work remain incomplete.
+Verdict: approve this increment with host validation.
+
+Evidence: build/localization/dex-orders-validation.json (440 source hashes). Next: trade quote/confirmation dialogs, export flow, Assets, Maker, notifications and dynamic diagnostics; remaining financial/accessibility findings; safe Fold runtime validation; signed versioned deliverables and authorized publication to the GitHub fork, PandaApps and eurobuddha.com.

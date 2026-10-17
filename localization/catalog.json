@@ -30235,5 +30235,407 @@
     "zh-Hans": "首个关联证据修正了旧记录",
     "ru": "Первое связанное доказательство исправляет старую запись",
     "uk": "Перший пов’язаний доказ виправляє старий запис"
+  },
+  "dex.openTab": {
+    "en": "OPEN",
+    "zh-Hans": "未结订单",
+    "ru": "ОТКРЫТЫЕ",
+    "uk": "ВІДКРИТІ"
+  },
+  "dex.operationsTab": {
+    "en": "OPERATIONS",
+    "zh-Hans": "操作记录",
+    "ru": "ОПЕРАЦИИ",
+    "uk": "ОПЕРАЦІЇ"
+  },
+  "dex.cancelAllCount": {
+    "en": "✕  Cancel all {orders} orders",
+    "zh-Hans": "✕  取消全部 {orders} 个订单",
+    "ru": "✕  Отменить все заявки: {orders}",
+    "uk": "✕  Скасувати всі ордери: {orders}"
+  },
+  "dex.gtcLabel": {
+    "en": "GTC ∞",
+    "zh-Hans": "持续有效 ∞",
+    "ru": "До отмены ∞",
+    "uk": "До скасування ∞"
+  },
+  "dex.expiresLabel": {
+    "en": "expires",
+    "zh-Hans": "会到期",
+    "ru": "истекает",
+    "uk": "спливає"
+  },
+  "dex.ageMissing": {
+    "en": "age unavailable",
+    "zh-Hans": "存续区块数未知",
+    "ru": "возраст неизвестен",
+    "uk": "вік невідомий"
+  },
+  "dex.ageBlocks": {
+    "en": "age {blocks} blk",
+    "zh-Hans": "已存续 {blocks} 个区块",
+    "ru": "возраст: {blocks} блоков",
+    "uk": "вік: {blocks} блоків"
+  },
+  "dex.ageAtCheck": {
+    "en": "age {blocks} blk at last check",
+    "zh-Hans": "上次检查时已存续 {blocks} 个区块",
+    "ru": "возраст при последней проверке: {blocks} блоков",
+    "uk": "вік на час останньої перевірки: {blocks} блоків"
+  },
+  "dex.orderMeta": {
+    "en": "{expiry} · {age} · min remainder {minimum} · total {total} MxUSD",
+    "zh-Hans": "{expiry} · {age} · 最小剩余量 {minimum} · 总额 {total} MxUSD",
+    "ru": "{expiry} · {age} · мин. остаток {minimum} · всего {total} MxUSD",
+    "uk": "{expiry} · {age} · мін. залишок {minimum} · разом {total} MxUSD"
+  },
+  "dex.makerRung": {
+    "en": "MAKER RUNG — the published ladder owns this one",
+    "zh-Hans": "做市阶梯订单 — 属于已发布的阶梯",
+    "ru": "СТУПЕНЬ МЕЙКЕРА — заявка принадлежит опубликованной лестнице",
+    "uk": "РІВЕНЬ МЕЙКЕРА — ордер належить опублікованій драбині"
+  },
+  "dex.expiredRefundable": {
+    "en": "EXPIRED — refundable to your wallet",
+    "zh-Hans": "已到期 — 可退回您的钱包",
+    "ru": "ИСТЕКЛО — доступен возврат в кошелёк",
+    "uk": "СПЛИВ ТЕРМІН — доступне повернення до гаманця"
+  },
+  "dex.expiredRefresh": {
+    "en": "Expired at last check — refresh before refunding",
+    "zh-Hans": "上次检查时已到期 — 退款前请刷新",
+    "ru": "Истекло при последней проверке — обновите перед возвратом",
+    "uk": "Термін сплив на час останньої перевірки — оновіть перед поверненням"
+  },
+  "dex.noFills": {
+    "en": "No fills yet",
+    "zh-Hans": "尚无成交",
+    "ru": "Исполнений пока нет",
+    "uk": "Виконань поки немає"
+  },
+  "dex.tradePnlNote": {
+    "en": "Rows awaiting recheck remain visible but are excluded from volume and P&L. Export for each row’s time basis and chain evidence.",
+    "zh-Hans": "等待复查的记录仍可查看，但不计入成交量和盈亏。导出后可查看各条记录的时间依据及链上证据。",
+    "ru": "Записи, ожидающие повторной проверки, видны, но не входят в объём и прибыль/убыток. Экспорт покажет источник времени и доказательства из блокчейна для каждой записи.",
+    "uk": "Записи, що очікують повторної перевірки, видимі, але не входять до обсягу та прибутку/збитку. Експорт покаже джерело часу та докази з блокчейну для кожного запису."
+  },
+  "dex.orderTradeVolume": {
+    "en": "Rows {rows} ({included} included)   ·   Volume {volume} MINIMA",
+    "zh-Hans": "记录 {rows} 条（计入 {included} 条） · 成交量 {volume} MINIMA",
+    "ru": "Записей: {rows} (учтено {included}) · Объём {volume} MINIMA",
+    "uk": "Записів: {rows} (враховано {included}) · Обсяг {volume} MINIMA"
+  },
+  "dex.orderNotional": {
+    "en": "Notional {amount} MxUSD",
+    "zh-Hans": "名义金额 {amount} MxUSD",
+    "ru": "Номинал {amount} MxUSD",
+    "uk": "Номінал {amount} MxUSD"
+  },
+  "dex.orderPnl": {
+    "en": "P&L vs book mid {amount} MxUSD",
+    "zh-Hans": "相对订单簿中间价的盈亏 {amount} MxUSD",
+    "ru": "Прибыль/убыток к середине книги: {amount} MxUSD",
+    "uk": "Прибуток/збиток до середини книги: {amount} MxUSD"
+  },
+  "dex.orderPnlPositive": {
+    "en": "P&L vs book mid +{amount} MxUSD",
+    "zh-Hans": "相对订单簿中间价的盈亏 +{amount} MxUSD",
+    "ru": "Прибыль/убыток к середине книги: +{amount} MxUSD",
+    "uk": "Прибуток/збиток до середини книги: +{amount} MxUSD"
+  },
+  "dex.exportZip": {
+    "en": "EXPORT RECONCILIATION ZIP",
+    "zh-Hans": "导出核对 ZIP",
+    "ru": "ЭКСПОРТ СВЕРКИ В ZIP",
+    "uk": "ЕКСПОРТ ЗВІРКИ В ZIP"
+  },
+  "dex.correctedShort": {
+    "en": "Corrected — see Corrections",
+    "zh-Hans": "已修正 — 请查看修正记录",
+    "ru": "Исправлено — см. «Исправления»",
+    "uk": "Виправлено — див. «Виправлення»"
+  },
+  "dex.recheckShort": {
+    "en": "Recheck required",
+    "zh-Hans": "需要复查",
+    "ru": "Нужна повторная проверка",
+    "uk": "Потрібна повторна перевірка"
+  },
+  "dex.ownerNote": {
+    "en": "Saved order operations. Confirmations are from the last node check; these records do not add trade volume or P&L.",
+    "zh-Hans": "已保存的订单操作。确认数来自上次节点检查；这些记录不计入成交量或盈亏。",
+    "ru": "Сохранённые операции с заявками. Подтверждения — с последней проверки узла; эти записи не увеличивают объём сделок и прибыль/убыток.",
+    "uk": "Збережені операції з ордерами. Підтвердження — з останньої перевірки вузла; ці записи не збільшують обсяг угод і прибуток/збиток."
+  },
+  "dex.ownerUnreadable": {
+    "en": "Saved operations could not be read. Preserve app data for recovery.",
+    "zh-Hans": "无法读取已保存的操作。请保留应用数据以便恢复。",
+    "ru": "Не удалось прочитать сохранённые операции. Сохраните данные приложения для восстановления.",
+    "uk": "Не вдалося прочитати збережені операції. Збережіть дані застосунку для відновлення."
+  },
+  "dex.newest": {
+    "en": "Newest",
+    "zh-Hans": "最新",
+    "ru": "Самые новые",
+    "uk": "Найновіші"
+  },
+  "dex.newer": {
+    "en": "Newer",
+    "zh-Hans": "较新",
+    "ru": "Новее",
+    "uk": "Новіші"
+  },
+  "dex.older": {
+    "en": "Older",
+    "zh-Hans": "较早",
+    "ru": "Старее",
+    "uk": "Старіші"
+  },
+  "dex.ownerPage": {
+    "en": "Page {page} · {operations} operations",
+    "zh-Hans": "第 {page} 页 · {operations} 项操作",
+    "ru": "Страница {page} · Операций: {operations}",
+    "uk": "Сторінка {page} · Операцій: {operations}"
+  },
+  "dex.ownerEmpty": {
+    "en": "No completed operations saved yet. Older operations removed by previous builds are not available here.",
+    "zh-Hans": "尚未保存已完成的操作。旧版本删除的较早操作无法在此查看。",
+    "ru": "Завершённые операции ещё не сохранены. Старые операции, удалённые предыдущими сборками, здесь недоступны.",
+    "uk": "Завершені операції ще не збережено. Старі операції, видалені попередніми збірками, тут недоступні."
+  },
+  "dex.ownerPageEmpty": {
+    "en": "No older operations on this page. Use Newest to refresh.",
+    "zh-Hans": "此页没有更早的操作。点击“最新”可刷新。",
+    "ru": "На этой странице нет более старых операций. Нажмите «Самые новые» для обновления.",
+    "uk": "На цій сторінці немає старіших операцій. Натисніть «Найновіші» для оновлення."
+  },
+  "dex.orderCreated": {
+    "en": "Order created",
+    "zh-Hans": "订单已创建",
+    "ru": "Заявка создана",
+    "uk": "Ордер створено"
+  },
+  "dex.orderCancelled": {
+    "en": "Order cancelled",
+    "zh-Hans": "订单已取消",
+    "ru": "Заявка отменена",
+    "uk": "Ордер скасовано"
+  },
+  "dex.priceUpdated": {
+    "en": "Price updated",
+    "zh-Hans": "价格已更新",
+    "ru": "Цена обновлена",
+    "uk": "Ціну оновлено"
+  },
+  "dex.orderRenewed": {
+    "en": "Order renewed",
+    "zh-Hans": "订单已续期",
+    "ru": "Заявка продлена",
+    "uk": "Ордер продовжено"
+  },
+  "dex.refundedInstead": {
+    "en": "Order refunded before update",
+    "zh-Hans": "更新前订单已退款",
+    "ru": "Возврат по заявке выполнен до обновления",
+    "uk": "Повернення за ордером виконано до оновлення"
+  },
+  "dex.paidInstead": {
+    "en": "Order spent with payment before request",
+    "zh-Hans": "请求前订单已被花费并收到付款",
+    "ru": "Заявка потрачена с оплатой до запроса",
+    "uk": "Ордер витрачено з оплатою до запиту"
+  },
+  "dex.ownerSaved": {
+    "en": "Saved order operation",
+    "zh-Hans": "已保存的订单操作",
+    "ru": "Сохранённая операция с заявкой",
+    "uk": "Збережена операція з ордером"
+  },
+  "dex.ownerDepth": {
+    "en": "On-chain · {depth} confirmations",
+    "zh-Hans": "已上链 · {depth} 次确认",
+    "ru": "В блокчейне · Подтверждений: {depth}",
+    "uk": "У блокчейні · Підтверджень: {depth}"
+  },
+  "dex.ownerMissing": {
+    "en": "Previously verified · not found in latest node check",
+    "zh-Hans": "此前已验证 · 最近一次节点检查未找到",
+    "ru": "Ранее проверено · Не найдено при последней проверке узла",
+    "uk": "Раніше перевірено · Не знайдено під час останньої перевірки вузла"
+  },
+  "dex.ownerMoved": {
+    "en": "Inclusion changed · reconciliation required",
+    "zh-Hans": "收录情况已变更 · 需要核对",
+    "ru": "Включение изменилось · Нужна сверка",
+    "uk": "Включення змінилося · Потрібна звірка"
+  },
+  "dex.ownerPending": {
+    "en": "Verification recorded · recheck pending",
+    "zh-Hans": "已记录验证结果 · 等待复查",
+    "ru": "Проверка сохранена · Ожидается повторная проверка",
+    "uk": "Перевірку збережено · Очікується повторна перевірка"
+  },
+  "dex.firstObserved": {
+    "en": "First observed",
+    "zh-Hans": "首次观测",
+    "ru": "Впервые обнаружено",
+    "uk": "Уперше виявлено"
+  },
+  "dex.ownerInclusion": {
+    "en": "Verified inclusion block {block}",
+    "zh-Hans": "已验证的收录区块 {block}",
+    "ru": "Проверенный блок включения {block}",
+    "uk": "Перевірений блок включення {block}"
+  },
+  "dex.ownerChecked": {
+    "en": " · checked {time}",
+    "zh-Hans": " · 检查时间 {time}",
+    "ru": " · проверено {time}",
+    "uk": " · перевірено {time}"
+  },
+  "dex.editPrice": {
+    "en": "Edit order price",
+    "zh-Hans": "修改订单价格",
+    "ru": "Изменить цену заявки",
+    "uk": "Змінити ціну ордера"
+  },
+  "dex.newPriceHint": {
+    "en": "New price (MxUSD per MINIMA)",
+    "zh-Hans": "新价格（MxUSD / MINIMA）",
+    "ru": "Новая цена (MxUSD за MINIMA)",
+    "uk": "Нова ціна (MxUSD за MINIMA)"
+  },
+  "dex.editChanged": {
+    "en": "Connection or ownership changed. Reopen this order before editing.",
+    "zh-Hans": "连接或所有权已变更。请重新打开此订单后再编辑。",
+    "ru": "Подключение или владелец изменились. Откройте заявку заново перед редактированием.",
+    "uk": "Підключення або власник змінилися. Відкрийте ордер заново перед редагуванням."
+  },
+  "dex.badPrice": {
+    "en": "Bad price",
+    "zh-Hans": "价格无效",
+    "ru": "Неверная цена",
+    "uk": "Неправильна ціна"
+  },
+  "dex.repricePosted": {
+    "en": "Reprice posted",
+    "zh-Hans": "改价已提交",
+    "ru": "Изменение цены отправлено",
+    "uk": "Зміну ціни надіслано"
+  },
+  "dex.repriceFailure": {
+    "en": "Reprice failed: {error}",
+    "zh-Hans": "改价失败：{error}",
+    "ru": "Не удалось изменить цену: {error}",
+    "uk": "Не вдалося змінити ціну: {error}"
+  },
+  "dex.cancelSent": {
+    "en": "Cancel sent — the order leaves the book when a block confirms it",
+    "zh-Hans": "取消请求已发送 — 区块确认后订单才会从订单簿移除",
+    "ru": "Отмена отправлена — заявка покинет книгу после подтверждения блоком",
+    "uk": "Скасування надіслано — ордер залишить книгу після підтвердження блоком"
+  },
+  "dex.cancelFailure": {
+    "en": "Cancel failed: {error}",
+    "zh-Hans": "取消失败：{error}",
+    "ru": "Не удалось отменить: {error}",
+    "uk": "Не вдалося скасувати: {error}"
+  },
+  "dex.snapshotEmpty": {
+    "en": "No open orders in this snapshot",
+    "zh-Hans": "此快照中没有未结订单",
+    "ru": "В этом снимке нет открытых заявок",
+    "uk": "У цьому знімку немає відкритих ордерів"
+  },
+  "dex.cancelAllTitle": {
+    "en": "Cancel all orders",
+    "zh-Hans": "取消全部订单",
+    "ru": "Отменить все заявки",
+    "uk": "Скасувати всі ордери"
+  },
+  "dex.cancelAllStop": {
+    "en": "Cancel all & stop",
+    "zh-Hans": "全部取消并停止",
+    "ru": "Отменить всё и остановить",
+    "uk": "Скасувати все й зупинити"
+  },
+  "dex.cancelThem": {
+    "en": "Cancel them",
+    "zh-Hans": "取消这些订单",
+    "ru": "Отменить их",
+    "uk": "Скасувати їх"
+  },
+  "dex.keepThem": {
+    "en": "Keep them",
+    "zh-Hans": "保留订单",
+    "ru": "Оставить",
+    "uk": "Залишити"
+  },
+  "dex.cancelEmptyBody": {
+    "en": "Stop the maker and request withdrawal of its recorded orders? No open orders are visible in this snapshot, but a submission may still be in progress.",
+    "zh-Hans": "停止做市并请求撤回其已记录的订单？此快照中未显示未结订单，但可能仍有订单正在提交。",
+    "ru": "Остановить мейкер и запросить снятие его сохранённых заявок? В этом снимке открытых заявок нет, но отправка ещё может выполняться.",
+    "uk": "Зупинити мейкер і запитати зняття його збережених ордерів? У цьому знімку відкритих ордерів немає, але надсилання ще може тривати."
+  },
+  "dex.cancelAllBody": {
+    "en": "Request cancellation of all visible orders ({orders})?\n\nThese orders lock {minima} MINIMA and {mxusd} MxUSD. Funds return after successful cancellation. Cancellations are submitted in batches; orders can still fill until their cancellation confirms.",
+    "zh-Hans": "请求取消全部可见订单（{orders} 个）？\n\n这些订单锁定了 {minima} MINIMA 和 {mxusd} MxUSD。取消成功后资金才会退回。取消请求分批提交；在取消得到确认前，订单仍可能成交。",
+    "ru": "Запросить отмену всех видимых заявок ({orders})?\n\nВ них заблокировано {minima} MINIMA и {mxusd} MxUSD. Средства вернутся после успешной отмены. Запросы отправляются пакетами; до подтверждения отмены заявки ещё могут исполниться.",
+    "uk": "Запитати скасування всіх видимих ордерів ({orders})?\n\nУ них заблоковано {minima} MINIMA та {mxusd} MxUSD. Кошти повернуться після успішного скасування. Запити надсилаються пакетами; до підтвердження скасування ордери ще можуть виконатися."
+  },
+  "dex.cancelPause": {
+    "en": "\n\nThe maker will be paused too{rungs}. Orders still being submitted will remain tracked for cancellation when they appear. Check Orders for confirmed outcomes.",
+    "zh-Hans": "\n\n做市也将暂停{rungs}。仍在提交中的订单会继续受到跟踪，并在出现后请求取消。请在订单页面查看已确认的结果。",
+    "ru": "\n\nМейкер тоже будет приостановлен{rungs}. Отправляемые заявки останутся под наблюдением для отмены после появления. Подтверждённые результаты смотрите в разделе заявок.",
+    "uk": "\n\nМейкер також буде призупинено{rungs}. Ордери, що надсилаються, залишаться під наглядом для скасування після появи. Підтверджені результати дивіться в розділі ордерів."
+  },
+  "dex.cancelRungs": {
+    "en": " ({orders} visible maker orders)",
+    "zh-Hans": "（{orders} 个可见做市订单）",
+    "ru": " (видимых заявок мейкера: {orders})",
+    "uk": " (видимих ордерів мейкера: {orders})"
+  },
+  "dex.cancelReview": {
+    "en": "Connection changed or is not ready. Review the order list again.",
+    "zh-Hans": "连接已变更或尚未就绪。请重新检查订单列表。",
+    "ru": "Подключение изменилось или не готово. Проверьте список заявок заново.",
+    "uk": "Підключення змінилося або не готове. Перевірте список ордерів заново."
+  },
+  "dex.cancelConnection": {
+    "en": "Connection changed. Review the order list again.",
+    "zh-Hans": "连接已变更。请重新检查订单列表。",
+    "ru": "Подключение изменилось. Проверьте список заявок заново.",
+    "uk": "Підключення змінилося. Перевірте список ордерів заново."
+  },
+  "dex.withdrawRetained": {
+    "en": "Maker withdrawal instructions retained. No orders were visible in this snapshot; check Orders for on-chain outcomes.",
+    "zh-Hans": "做市撤单指令已保留。此快照中未显示订单；请在订单页面查看链上结果。",
+    "ru": "Инструкции на снятие заявок мейкера сохранены. В этом снимке заявок не было; результаты в блокчейне смотрите в разделе заявок.",
+    "uk": "Інструкції на зняття ордерів мейкера збережено. У цьому знімку ордерів не було; результати в блокчейні дивіться в розділі ордерів."
+  },
+  "dex.cancelBatchesStopped": {
+    "en": "Connection changed. Remaining cancellation batches stopped; check retained receipts before retrying.",
+    "zh-Hans": "连接已变更。剩余批次的取消操作已停止；重试前请检查已保留的凭据。",
+    "ru": "Подключение изменилось. Остальные пакеты отмены остановлены; перед повтором проверьте сохранённые квитанции.",
+    "uk": "Підключення змінилося. Решту пакетів скасування зупинено; перед повтором перевірте збережені квитанції."
+  },
+  "dex.cancelBatchAccepted": {
+    "en": "Cancel sent for {orders} orders — each leaves the book when a block confirms it, and can still be filled until then",
+    "zh-Hans": "已发送 {orders} 个订单的取消请求 — 各订单在区块确认后才会移除，此前仍可能成交",
+    "ru": "Отмена отправлена для заявок: {orders}. Каждая покинет книгу после подтверждения блоком и до этого ещё может исполниться",
+    "uk": "Скасування надіслано для ордерів: {orders}. Кожен залишить книгу після підтвердження блоком і до цього ще може виконатися"
+  },
+  "dex.cancelBatchMixed": {
+    "en": "Cancel requests accepted for {accepted}; {failed} requests failed or have unknown outcomes. Check Orders and retained receipts.",
+    "zh-Hans": "已接受 {accepted} 个取消请求；{failed} 个请求失败或结果未知。请检查订单页面及已保留的凭据。",
+    "ru": "Запросов отмены принято: {accepted}; неудачных или с неизвестным исходом: {failed}. Проверьте заявки и сохранённые квитанции.",
+    "uk": "Запитів скасування прийнято: {accepted}; невдалих або з невідомим результатом: {failed}. Перевірте ордери та збережені квитанції."
+  },
+  "dex.cancellingProgress": {
+    "en": "Cancelling {done} of {total}…",
+    "zh-Hans": "正在取消 {done}/{total}…",
+    "ru": "Отмена {done} из {total}…",
+    "uk": "Скасування {done} із {total}…"
   }
 }

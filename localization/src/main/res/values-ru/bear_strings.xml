@@ -6188,4 +6188,91 @@
     <string name="l10n_dex_moved_inclusion" formatted="false">"Тот же TxPoW включён в другой блок"</string>
     <string name="l10n_dex_changed_spender" formatted="false">"Включена другая расходующая транзакция"</string>
     <string name="l10n_dex_legacy_corrected" formatted="false">"Первое связанное доказательство исправляет старую запись"</string>
+    <string name="l10n_dex_open_tab" formatted="false">"ОТКРЫТЫЕ"</string>
+    <string name="l10n_dex_operations_tab" formatted="false">"ОПЕРАЦИИ"</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_all_count">"✕  Отменить все заявки: %1$s"</string>
+    <string name="l10n_dex_gtc_label" formatted="false">"До отмены ∞"</string>
+    <string name="l10n_dex_expires_label" formatted="false">"истекает"</string>
+    <string name="l10n_dex_age_missing" formatted="false">"возраст неизвестен"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_age_blocks">"возраст: %1$s блоков"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_age_at_check">"возраст при последней проверке: %1$s блоков"</string>
+    <!-- Arguments: expiry, age, minimum, total -->
+    <string name="l10n_dex_order_meta">"%1$s · %2$s · мин. остаток %3$s · всего %4$s MxUSD"</string>
+    <string name="l10n_dex_maker_rung" formatted="false">"СТУПЕНЬ МЕЙКЕРА — заявка принадлежит опубликованной лестнице"</string>
+    <string name="l10n_dex_expired_refundable" formatted="false">"ИСТЕКЛО — доступен возврат в кошелёк"</string>
+    <string name="l10n_dex_expired_refresh" formatted="false">"Истекло при последней проверке — обновите перед возвратом"</string>
+    <string name="l10n_dex_no_fills" formatted="false">"Исполнений пока нет"</string>
+    <string name="l10n_dex_trade_pnl_note" formatted="false">"Записи, ожидающие повторной проверки, видны, но не входят в объём и прибыль/убыток. Экспорт покажет источник времени и доказательства из блокчейна для каждой записи."</string>
+    <!-- Arguments: rows, included, volume -->
+    <string name="l10n_dex_order_trade_volume">"Записей: %1$s (учтено %2$s) · Объём %3$s MINIMA"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_notional">"Номинал %1$s MxUSD"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_pnl">"Прибыль/убыток к середине книги: %1$s MxUSD"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_pnl_positive">"Прибыль/убыток к середине книги: +%1$s MxUSD"</string>
+    <string name="l10n_dex_export_zip" formatted="false">"ЭКСПОРТ СВЕРКИ В ZIP"</string>
+    <string name="l10n_dex_corrected_short" formatted="false">"Исправлено — см. «Исправления»"</string>
+    <string name="l10n_dex_recheck_short" formatted="false">"Нужна повторная проверка"</string>
+    <string name="l10n_dex_owner_note" formatted="false">"Сохранённые операции с заявками. Подтверждения — с последней проверки узла; эти записи не увеличивают объём сделок и прибыль/убыток."</string>
+    <string name="l10n_dex_owner_unreadable" formatted="false">"Не удалось прочитать сохранённые операции. Сохраните данные приложения для восстановления."</string>
+    <string name="l10n_dex_newest" formatted="false">"Самые новые"</string>
+    <string name="l10n_dex_newer" formatted="false">"Новее"</string>
+    <string name="l10n_dex_older" formatted="false">"Старее"</string>
+    <!-- Arguments: page, operations -->
+    <string name="l10n_dex_owner_page">"Страница %1$s · Операций: %2$s"</string>
+    <string name="l10n_dex_owner_empty" formatted="false">"Завершённые операции ещё не сохранены. Старые операции, удалённые предыдущими сборками, здесь недоступны."</string>
+    <string name="l10n_dex_owner_page_empty" formatted="false">"На этой странице нет более старых операций. Нажмите «Самые новые» для обновления."</string>
+    <string name="l10n_dex_order_created" formatted="false">"Заявка создана"</string>
+    <string name="l10n_dex_order_cancelled" formatted="false">"Заявка отменена"</string>
+    <string name="l10n_dex_price_updated" formatted="false">"Цена обновлена"</string>
+    <string name="l10n_dex_order_renewed" formatted="false">"Заявка продлена"</string>
+    <string name="l10n_dex_refunded_instead" formatted="false">"Возврат по заявке выполнен до обновления"</string>
+    <string name="l10n_dex_paid_instead" formatted="false">"Заявка потрачена с оплатой до запроса"</string>
+    <string name="l10n_dex_owner_saved" formatted="false">"Сохранённая операция с заявкой"</string>
+    <!-- Arguments: depth -->
+    <string name="l10n_dex_owner_depth">"В блокчейне · Подтверждений: %1$s"</string>
+    <string name="l10n_dex_owner_missing" formatted="false">"Ранее проверено · Не найдено при последней проверке узла"</string>
+    <string name="l10n_dex_owner_moved" formatted="false">"Включение изменилось · Нужна сверка"</string>
+    <string name="l10n_dex_owner_pending" formatted="false">"Проверка сохранена · Ожидается повторная проверка"</string>
+    <string name="l10n_dex_first_observed" formatted="false">"Впервые обнаружено"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_dex_owner_inclusion">"Проверенный блок включения %1$s"</string>
+    <!-- Arguments: time -->
+    <string name="l10n_dex_owner_checked">" · проверено %1$s"</string>
+    <string name="l10n_dex_edit_price" formatted="false">"Изменить цену заявки"</string>
+    <string name="l10n_dex_new_price_hint" formatted="false">"Новая цена (MxUSD за MINIMA)"</string>
+    <string name="l10n_dex_edit_changed" formatted="false">"Подключение или владелец изменились. Откройте заявку заново перед редактированием."</string>
+    <string name="l10n_dex_bad_price" formatted="false">"Неверная цена"</string>
+    <string name="l10n_dex_reprice_posted" formatted="false">"Изменение цены отправлено"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_reprice_failure">"Не удалось изменить цену: %1$s"</string>
+    <string name="l10n_dex_cancel_sent" formatted="false">"Отмена отправлена — заявка покинет книгу после подтверждения блоком"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_cancel_failure">"Не удалось отменить: %1$s"</string>
+    <string name="l10n_dex_snapshot_empty" formatted="false">"В этом снимке нет открытых заявок"</string>
+    <string name="l10n_dex_cancel_all_title" formatted="false">"Отменить все заявки"</string>
+    <string name="l10n_dex_cancel_all_stop" formatted="false">"Отменить всё и остановить"</string>
+    <string name="l10n_dex_cancel_them" formatted="false">"Отменить их"</string>
+    <string name="l10n_dex_keep_them" formatted="false">"Оставить"</string>
+    <string name="l10n_dex_cancel_empty_body" formatted="false">"Остановить мейкер и запросить снятие его сохранённых заявок? В этом снимке открытых заявок нет, но отправка ещё может выполняться."</string>
+    <!-- Arguments: orders, minima, mxusd -->
+    <string name="l10n_dex_cancel_all_body">"Запросить отмену всех видимых заявок (%1$s)?\n\nВ них заблокировано %2$s MINIMA и %3$s MxUSD. Средства вернутся после успешной отмены. Запросы отправляются пакетами; до подтверждения отмены заявки ещё могут исполниться."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_cancel_pause">"\n\nМейкер тоже будет приостановлен%1$s. Отправляемые заявки останутся под наблюдением для отмены после появления. Подтверждённые результаты смотрите в разделе заявок."</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_rungs">" (видимых заявок мейкера: %1$s)"</string>
+    <string name="l10n_dex_cancel_review" formatted="false">"Подключение изменилось или не готово. Проверьте список заявок заново."</string>
+    <string name="l10n_dex_cancel_connection" formatted="false">"Подключение изменилось. Проверьте список заявок заново."</string>
+    <string name="l10n_dex_withdraw_retained" formatted="false">"Инструкции на снятие заявок мейкера сохранены. В этом снимке заявок не было; результаты в блокчейне смотрите в разделе заявок."</string>
+    <string name="l10n_dex_cancel_batches_stopped" formatted="false">"Подключение изменилось. Остальные пакеты отмены остановлены; перед повтором проверьте сохранённые квитанции."</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_batch_accepted">"Отмена отправлена для заявок: %1$s. Каждая покинет книгу после подтверждения блоком и до этого ещё может исполниться"</string>
+    <!-- Arguments: accepted, failed -->
+    <string name="l10n_dex_cancel_batch_mixed">"Запросов отмены принято: %1$s; неудачных или с неизвестным исходом: %2$s. Проверьте заявки и сохранённые квитанции."</string>
+    <!-- Arguments: done, total -->
+    <string name="l10n_dex_cancelling_progress">"Отмена %1$s из %2$s…"</string>
 </resources>

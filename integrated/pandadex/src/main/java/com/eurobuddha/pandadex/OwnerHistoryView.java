@@ -1,11 +1,12 @@
 package com.eurobuddha.pandadex;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.content.Context;
 import android.graphics.Rect;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /** Existing Operations cards, with bounded local pages and the established export action. */
@@ -16,14 +17,13 @@ final class OwnerHistoryView extends LinearLayout {
     private final Source source;private final Runnable export;
     private final List<OwnerReceipt.Cursor> previous=new ArrayList<>();
     private OwnerReceipt.Cursor after;
-    private final SimpleDateFormat fmt=new SimpleDateFormat("dd MMM HH:mm",Locale.US);
     OwnerHistoryView(Context context,Source source,Runnable export){super(context);this.source=source;this.export=export;setOrientation(VERTICAL);}
-    private TextView line(String text,int color,float size){
+    private TextView line(CharSequence text,int color,float size){
         // The existing primary ink stays readable on light surfaces; tertiary grey and
         // orange/green are too faint at these text sizes. Status wording carries the meaning.
         if(!Design.isDark())color=Design.TEXT();
         else if(color==Design.DIM2())color=Design.DIM();
-        TextView v=new TextView(getContext());v.setText(text);v.setTextColor(color);v.setTypeface(Design.mono());v.setTextSize(size);return v;
+        TextView v=new TextView(getContext());Language.setText(v, DexMessages.message(text));v.setTextColor(color);v.setTypeface(Design.mono());v.setTextSize(size);return v;
     }
     private TextView button(String text,boolean enabled,Runnable click){
         TextView v=line(text,enabled?Design.ACCENT():Design.DIM2(),11f);v.setGravity(Gravity.CENTER);
@@ -32,6 +32,14 @@ final class OwnerHistoryView extends LinearLayout {
         v.setEnabled(enabled);v.setAlpha(enabled?1f:.45f);v.setOnClickListener(view->click.run());return v;
     }
     private void move(Runnable update){update.run();render();requestRectangleOnScreen(new Rect(0,0,getWidth(),1),true);}
+    static CharSequence operationTime(OwnerReceipt.Entry r) {
+        return Language.join(DexMessages.message(r.blockTimeMs > 0 ? "Block time" : "First observed"), " ",
+                Language.stamp(r.blockTimeMs > 0 ? r.blockTimeMs : r.recordedAt, "MMMdHm"));
+    }
+    static CharSequence operationInclusion(OwnerReceipt.Entry r) {
+        return Language.join(Language.msg(l10n_dex_owner_inclusion, r.block), r.checkedAt > 0
+                ? Language.msg(l10n_dex_owner_checked, Language.stamp(r.checkedAt, "MMMdHm")) : "");
+    }
     void render(){
         removeAllViews();
         addView(line("Saved order operations. Confirmations are from the last node check; these records do not add trade volume or P&L.",Design.DIM2(),10f));
@@ -53,9 +61,9 @@ final class OwnerHistoryView extends LinearLayout {
             int p=Design.dp(getContext(),10);card.setPadding(p,p,p,p);
             card.addView(line(OwnerReceipt.title(r.outcome),Design.TEXT(),12f));
             card.addView(line(r.status(),r.current()?Design.IN():Design.ACCENT(),10f));
-            card.addView(line((r.blockTimeMs>0?"Block time ":"First observed ")+fmt.format(new Date(r.blockTimeMs>0?r.blockTimeMs:r.recordedAt)),Design.DIM2(),9.5f));
-            card.addView(line("Verified inclusion block "+r.block+(r.checkedAt>0?" · checked "+fmt.format(new Date(r.checkedAt)):""),Design.DIM2(),9.5f));
-            TextView id=line("TxPoW "+r.txpowid,Design.DIM(),9f);id.setTextIsSelectable(true);card.addView(id);
+            card.addView(line(operationTime(r),Design.DIM2(),9.5f));
+            card.addView(line(operationInclusion(r),Design.DIM2(),9.5f));
+            TextView id=line(Language.join("TxPoW ", r.txpowid),Design.DIM(),9f);id.setTextIsSelectable(true);card.addView(id);
             LayoutParams lp=new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);lp.bottomMargin=Design.dp(getContext(),8);addView(card,lp);
         }
     }

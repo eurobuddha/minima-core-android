@@ -1523,19 +1523,11 @@ public class MainActivity extends AppCompatActivity {
         final boolean stopMaker = makerWork;
         final Object connection = pairingAttempt;
 
-        String msg = mine.isEmpty()
-                ? "Stop the maker and request withdrawal of its recorded orders? No open orders are visible in this snapshot, but a submission may still be in progress."
-                : "Request cancellation of all " + mine.size() + " visible order" + (mine.size()==1?"":"s")
-                    + "?\n\nThese orders lock " + PriceMath.fmt(totalMinima) + " MINIMA and "
-                    + PriceMath.fmt(totalUsdt) + " MxUSD. Funds return after successful cancellation. "
-                    + "Cancellations are submitted in batches; orders can still fill until their cancellation confirms.";
-        if(stopMaker)msg+="\n\nThe maker will be paused too"
-                +(rungs>0?" ("+rungs+" visible maker orders)":"")
-                +". Orders still being submitted will remain tracked for cancellation when they appear. Check Orders for confirmed outcomes.";
-        new AlertDialog.Builder(this, Design.dialogTheme())
-                .setTitle("Cancel all orders")
+        CharSequence msg = cancelAllMessage(mine.size(), PriceMath.fmt(totalMinima), PriceMath.fmt(totalUsdt), stopMaker, rungs);
+        new LanguageDialog(this, Design.dialogTheme())
+                .setTitle(DexMessages.message("Cancel all orders"))
                 .setMessage(msg)
-                .setPositiveButton(stopMaker ? "Cancel all & stop" : "Cancel them", (d, w) -> {
+                .setPositiveButton(DexMessages.message(stopMaker ? "Cancel all & stop" : "Cancel them"), (d, w) -> {
                     if (!currentPairing(connection) || !ready()) { toast("Connection changed or is not ready. Review the order list again."); return; }
                     Runnable start=() -> {
                         if (!currentPairing(connection)) { toast("Connection changed. Review the order list again."); if(onDone!=null)onDone.run(); return; }
@@ -1551,8 +1543,15 @@ public class MainActivity extends AppCompatActivity {
                     if(maker!=null)maker.stopForCancelAll(chainBlock,makerListener,start);
                     else start.run();
                 })
-                .setNegativeButton("Keep them", null)
+                .setNegativeButton(DexMessages.message("Keep them"), null)
                 .show();
+    }
+
+    static CharSequence cancelAllMessage(int orders, String minima, String mxusd, boolean stopMaker, int rungs) {
+        return Language.join(orders == 0 ? Language.msg(l10n_dex_cancel_empty_body)
+                : Language.msg(l10n_dex_cancel_all_body, orders, minima, mxusd),
+                stopMaker ? Language.msg(l10n_dex_cancel_pause,
+                        rungs > 0 ? Language.msg(l10n_dex_cancel_rungs, rungs) : "") : "");
     }
 
     private void cancelSequentially(Object connection, java.util.List<Order5> list, int idx, int ok, int failed,
@@ -1902,7 +1901,7 @@ public class MainActivity extends AppCompatActivity {
         if (!ready() || !keySet.owns(o)) return;
         final Object connection = pairingAttempt;
         EditText in = new EditText(this);
-        in.setHint("New price (MxUSD per MINIMA)");
+        Language.hint(in, DexMessages.message("New price (MxUSD per MINIMA)"));
         in.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         in.setTransformationMethod(null);
         in.setFilters(new android.text.InputFilter[]{(src, start, end, dest, dstart, dend) -> {
@@ -1910,10 +1909,10 @@ public class MainActivity extends AppCompatActivity {
             return value.length() <= 44 && (value.isEmpty() || value.matches("[0-9]*\\.?[0-9]*")) ? null : "";
         }});
         in.setText(o.price().stripTrailingZeros().toPlainString());
-        new AlertDialog.Builder(this, Design.dialogTheme())
-                .setTitle("Edit order price")
+        new LanguageDialog(this, Design.dialogTheme())
+                .setTitle(DexMessages.message("Edit order price"))
                 .setView(in)
-                .setPositiveButton("Update", (d, w) -> {
+                .setPositiveButton(DexMessages.message("Update"), (d, w) -> {
                     if (!currentPairing(connection) || !ready() || !keySet.owns(o)) { toast("Connection or ownership changed. Reopen this order before editing."); return; }
                     BigDecimal np = Util.dec(in.getText().toString());
                     if (np.signum() <= 0) { toast("Bad price"); return; }
@@ -1930,7 +1929,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override public void onFailed(String message) { toast("Reprice failed: " + message); }
                     });
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(DexMessages.message("Cancel"), null)
                 .show();
     }
 

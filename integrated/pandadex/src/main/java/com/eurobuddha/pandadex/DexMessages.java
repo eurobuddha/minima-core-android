@@ -134,6 +134,56 @@ public final class DexMessages {
             case "Same TxPoW included in a different block": return Language.msg(l10n_dex_moved_inclusion);
             case "Different included spender": return Language.msg(l10n_dex_changed_spender);
             case "First linked proof corrects a legacy record": return Language.msg(l10n_dex_legacy_corrected);
+            case "Cancel": return Language.msg(l10n_common_cancel);
+            case "Update": return Language.msg(l10n_atomix_otc_update);
+            case "OPEN": return Language.msg(l10n_dex_open_tab);
+            case "OPERATIONS": return Language.msg(l10n_dex_operations_tab);
+            case "GTC ∞": return Language.msg(l10n_dex_gtc_label);
+            case "expires": return Language.msg(l10n_dex_expires_label);
+            case "age unavailable": return Language.msg(l10n_dex_age_missing);
+            case "MAKER RUNG — the published ladder owns this one": return Language.msg(l10n_dex_maker_rung);
+            case "EXPIRED — refundable to your wallet": return Language.msg(l10n_dex_expired_refundable);
+            case "Expired at last check — refresh before refunding": return Language.msg(l10n_dex_expired_refresh);
+            case "No fills yet": return Language.msg(l10n_dex_no_fills);
+            case "Rows awaiting recheck remain visible but are excluded from volume and P&L. Export for each row’s time basis and chain evidence.": return Language.msg(l10n_dex_trade_pnl_note);
+            case "EXPORT RECONCILIATION ZIP": return Language.msg(l10n_dex_export_zip);
+            case "Export reconciliation ZIP": return Language.msg(l10n_dex_export_zip);
+            case "Corrected — see Corrections": return Language.msg(l10n_dex_corrected_short);
+            case "Recheck required": return Language.msg(l10n_dex_recheck_short);
+            case "Saved order operations. Confirmations are from the last node check; these records do not add trade volume or P&L.": return Language.msg(l10n_dex_owner_note);
+            case "Saved operations could not be read. Preserve app data for recovery.": return Language.msg(l10n_dex_owner_unreadable);
+            case "Newest": return Language.msg(l10n_dex_newest);
+            case "Newer": return Language.msg(l10n_dex_newer);
+            case "Older": return Language.msg(l10n_dex_older);
+            case "No completed operations saved yet. Older operations removed by previous builds are not available here.": return Language.msg(l10n_dex_owner_empty);
+            case "No older operations on this page. Use Newest to refresh.": return Language.msg(l10n_dex_owner_page_empty);
+            case "Order created": return Language.msg(l10n_dex_order_created);
+            case "Order cancelled": return Language.msg(l10n_dex_order_cancelled);
+            case "Price updated": return Language.msg(l10n_dex_price_updated);
+            case "Order renewed": return Language.msg(l10n_dex_order_renewed);
+            case "Order refunded before update": return Language.msg(l10n_dex_refunded_instead);
+            case "Order spent with payment before request": return Language.msg(l10n_dex_paid_instead);
+            case "Saved order operation": return Language.msg(l10n_dex_owner_saved);
+            case "Previously verified · not found in latest node check": return Language.msg(l10n_dex_owner_missing);
+            case "Inclusion changed · reconciliation required": return Language.msg(l10n_dex_owner_moved);
+            case "Verification recorded · recheck pending": return Language.msg(l10n_dex_owner_pending);
+            case "First observed": return Language.msg(l10n_dex_first_observed);
+            case "Edit order price": return Language.msg(l10n_dex_edit_price);
+            case "New price (MxUSD per MINIMA)": return Language.msg(l10n_dex_new_price_hint);
+            case "Connection or ownership changed. Reopen this order before editing.": return Language.msg(l10n_dex_edit_changed);
+            case "Bad price": return Language.msg(l10n_dex_bad_price);
+            case "Reprice posted": return Language.msg(l10n_dex_reprice_posted);
+            case "Cancel sent — the order leaves the book when a block confirms it": return Language.msg(l10n_dex_cancel_sent);
+            case "No open orders in this snapshot": return Language.msg(l10n_dex_snapshot_empty);
+            case "Cancel all orders": return Language.msg(l10n_dex_cancel_all_title);
+            case "Cancel all & stop": return Language.msg(l10n_dex_cancel_all_stop);
+            case "Cancel them": return Language.msg(l10n_dex_cancel_them);
+            case "Keep them": return Language.msg(l10n_dex_keep_them);
+            case "Stop the maker and request withdrawal of its recorded orders? No open orders are visible in this snapshot, but a submission may still be in progress.": return Language.msg(l10n_dex_cancel_empty_body);
+            case "Connection changed or is not ready. Review the order list again.": return Language.msg(l10n_dex_cancel_review);
+            case "Connection changed. Review the order list again.": return Language.msg(l10n_dex_cancel_connection);
+            case "Maker withdrawal instructions retained. No orders were visible in this snapshot; check Orders for on-chain outcomes.": return Language.msg(l10n_dex_withdraw_retained);
+            case "Connection changed. Remaining cancellation batches stopped; check retained receipts before retrying.": return Language.msg(l10n_dex_cancel_batches_stopped);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {
@@ -170,8 +220,23 @@ public final class DexMessages {
         java.util.regex.Pattern.compile("Place\\ order\\ ·\\ SELL\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ @\\ (-?[0-9]+(?:\\.[0-9]+)?)"),
         java.util.regex.Pattern.compile("Node\\ accepted\\ submission\\ ·\\ ((?s:.*))\\.\\ On\\-chain\\ verification\\ pending;\\ receipt\\ retained\\."),
         java.util.regex.Pattern.compile("Submission\\ requested\\ ·\\ ((?s:.*))\\.\\ On\\-chain\\ verification\\ pending;\\ receipt\\ retained\\."),
-        java.util.regex.Pattern.compile("Submission\\ outcome\\ unknown\\ ·\\ ((?s:.*))\\.\\ On\\-chain\\ verification\\ pending;\\ receipt\\ retained\\.")
+        java.util.regex.Pattern.compile("Submission\\ outcome\\ unknown\\ ·\\ ((?s:.*))\\.\\ On\\-chain\\ verification\\ pending;\\ receipt\\ retained\\."),
+        java.util.regex.Pattern.compile("✕\\ \\ Cancel\\ all\\ (-?[0-9]+)\\ orders"),
+        java.util.regex.Pattern.compile("age\\ (-?[0-9]+)\\ blk"),
+        java.util.regex.Pattern.compile("age\\ (-?[0-9]+)\\ blk\\ at\\ last\\ check"),
+        java.util.regex.Pattern.compile("Rows\\ (-?[0-9]+)\\ \\((-?[0-9]+)\\ included\\)\\ \\ \\ ·\\ \\ \\ Volume\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA"),
+        java.util.regex.Pattern.compile("Notional\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD"),
+        java.util.regex.Pattern.compile("P\\&L\\ vs\\ book\\ mid\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD"),
+        java.util.regex.Pattern.compile("P\\&L\\ vs\\ book\\ mid\\ \\+(-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD"),
+        java.util.regex.Pattern.compile("Page\\ (-?[0-9]+)\\ ·\\ (-?[0-9]+)\\ operations"),
+        java.util.regex.Pattern.compile("On\\-chain\\ ·\\ (-?[0-9]+)\\ confirmations"),
+        java.util.regex.Pattern.compile("Reprice\\ failed:\\ ((?s:.*))"),
+        java.util.regex.Pattern.compile("Cancel\\ failed:\\ ((?s:.*))"),
+        java.util.regex.Pattern.compile("Cancel\\ sent\\ for\\ (-?[0-9]+)\\ order\\ —\\ each\\ leaves\\ the\\ book\\ when\\ a\\ block\\ confirms\\ it,\\ and\\ can\\ still\\ be\\ filled\\ until\\ then"),
+        java.util.regex.Pattern.compile("Cancel\\ sent\\ for\\ (-?[0-9]+)\\ orders\\ —\\ each\\ leaves\\ the\\ book\\ when\\ a\\ block\\ confirms\\ it,\\ and\\ can\\ still\\ be\\ filled\\ until\\ then"),
+        java.util.regex.Pattern.compile("Cancel\\ requests\\ accepted\\ for\\ (-?[0-9]+);\\ (-?[0-9]+)\\ requests\\ failed\\ or\\ have\\ unknown\\ outcomes\\.\\ Check\\ Orders\\ and\\ retained\\ receipts\\."),
+        java.util.regex.Pattern.compile("Cancelling\\ (-?[0-9]+)\\ of\\ (-?[0-9]+)…")
     };
-    private static final int[] RESOURCES={l10n_dex_total_value,l10n_dex_last_trade_age,l10n_dex_book_pool_amount,l10n_dex_pool_amount,l10n_pools_seconds_ago,l10n_dex_minutes_ago,l10n_dex_minutes_ago,l10n_dex_hours_ago,l10n_dex_hours_ago,l10n_dex_days_ago,l10n_dex_days_ago,l10n_dex_clock_seconds,l10n_dex_clock_minutes,l10n_dex_receipt_cancel_buy,l10n_dex_receipt_cancel_sell,l10n_dex_receipt_update_buy,l10n_dex_receipt_update_sell,l10n_dex_receipt_place_buy,l10n_dex_receipt_place_sell,l10n_dex_receipt_submitted,l10n_dex_receipt_posting,l10n_dex_receipt_unknown};
-    private static final boolean[][] DIAGNOSTIC={{false},{true},{false,false},{false},{false},{false},{false},{false},{false},{false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{true}};
+    private static final int[] RESOURCES={l10n_dex_total_value,l10n_dex_last_trade_age,l10n_dex_book_pool_amount,l10n_dex_pool_amount,l10n_pools_seconds_ago,l10n_dex_minutes_ago,l10n_dex_minutes_ago,l10n_dex_hours_ago,l10n_dex_hours_ago,l10n_dex_days_ago,l10n_dex_days_ago,l10n_dex_clock_seconds,l10n_dex_clock_minutes,l10n_dex_receipt_cancel_buy,l10n_dex_receipt_cancel_sell,l10n_dex_receipt_update_buy,l10n_dex_receipt_update_sell,l10n_dex_receipt_place_buy,l10n_dex_receipt_place_sell,l10n_dex_receipt_submitted,l10n_dex_receipt_posting,l10n_dex_receipt_unknown,l10n_dex_cancel_all_count,l10n_dex_age_blocks,l10n_dex_age_at_check,l10n_dex_order_trade_volume,l10n_dex_order_notional,l10n_dex_order_pnl,l10n_dex_order_pnl_positive,l10n_dex_owner_page,l10n_dex_owner_depth,l10n_dex_reprice_failure,l10n_dex_cancel_failure,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_mixed,l10n_dex_cancelling_progress};
+    private static final boolean[][] DIAGNOSTIC={{false},{true},{false,false},{false},{false},{false},{false},{false},{false},{false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{true},{false},{false},{false},{false,false,false},{false},{false},{false},{false,false},{false},{true},{true},{false},{false},{false,false},{false,false}};
 }

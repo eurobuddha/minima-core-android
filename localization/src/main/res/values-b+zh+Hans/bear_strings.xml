@@ -6095,4 +6095,91 @@
     <string name="l10n_dex_moved_inclusion" formatted="false">"同一 TxPoW 被收录到另一个区块"</string>
     <string name="l10n_dex_changed_spender" formatted="false">"收录的花费交易已变更"</string>
     <string name="l10n_dex_legacy_corrected" formatted="false">"首个关联证据修正了旧记录"</string>
+    <string name="l10n_dex_open_tab" formatted="false">"未结订单"</string>
+    <string name="l10n_dex_operations_tab" formatted="false">"操作记录"</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_all_count">"✕  取消全部 %1$s 个订单"</string>
+    <string name="l10n_dex_gtc_label" formatted="false">"持续有效 ∞"</string>
+    <string name="l10n_dex_expires_label" formatted="false">"会到期"</string>
+    <string name="l10n_dex_age_missing" formatted="false">"存续区块数未知"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_age_blocks">"已存续 %1$s 个区块"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_age_at_check">"上次检查时已存续 %1$s 个区块"</string>
+    <!-- Arguments: expiry, age, minimum, total -->
+    <string name="l10n_dex_order_meta">"%1$s · %2$s · 最小剩余量 %3$s · 总额 %4$s MxUSD"</string>
+    <string name="l10n_dex_maker_rung" formatted="false">"做市阶梯订单 — 属于已发布的阶梯"</string>
+    <string name="l10n_dex_expired_refundable" formatted="false">"已到期 — 可退回您的钱包"</string>
+    <string name="l10n_dex_expired_refresh" formatted="false">"上次检查时已到期 — 退款前请刷新"</string>
+    <string name="l10n_dex_no_fills" formatted="false">"尚无成交"</string>
+    <string name="l10n_dex_trade_pnl_note" formatted="false">"等待复查的记录仍可查看，但不计入成交量和盈亏。导出后可查看各条记录的时间依据及链上证据。"</string>
+    <!-- Arguments: rows, included, volume -->
+    <string name="l10n_dex_order_trade_volume">"记录 %1$s 条（计入 %2$s 条） · 成交量 %3$s MINIMA"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_notional">"名义金额 %1$s MxUSD"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_pnl">"相对订单簿中间价的盈亏 %1$s MxUSD"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_pnl_positive">"相对订单簿中间价的盈亏 +%1$s MxUSD"</string>
+    <string name="l10n_dex_export_zip" formatted="false">"导出核对 ZIP"</string>
+    <string name="l10n_dex_corrected_short" formatted="false">"已修正 — 请查看修正记录"</string>
+    <string name="l10n_dex_recheck_short" formatted="false">"需要复查"</string>
+    <string name="l10n_dex_owner_note" formatted="false">"已保存的订单操作。确认数来自上次节点检查；这些记录不计入成交量或盈亏。"</string>
+    <string name="l10n_dex_owner_unreadable" formatted="false">"无法读取已保存的操作。请保留应用数据以便恢复。"</string>
+    <string name="l10n_dex_newest" formatted="false">"最新"</string>
+    <string name="l10n_dex_newer" formatted="false">"较新"</string>
+    <string name="l10n_dex_older" formatted="false">"较早"</string>
+    <!-- Arguments: page, operations -->
+    <string name="l10n_dex_owner_page">"第 %1$s 页 · %2$s 项操作"</string>
+    <string name="l10n_dex_owner_empty" formatted="false">"尚未保存已完成的操作。旧版本删除的较早操作无法在此查看。"</string>
+    <string name="l10n_dex_owner_page_empty" formatted="false">"此页没有更早的操作。点击“最新”可刷新。"</string>
+    <string name="l10n_dex_order_created" formatted="false">"订单已创建"</string>
+    <string name="l10n_dex_order_cancelled" formatted="false">"订单已取消"</string>
+    <string name="l10n_dex_price_updated" formatted="false">"价格已更新"</string>
+    <string name="l10n_dex_order_renewed" formatted="false">"订单已续期"</string>
+    <string name="l10n_dex_refunded_instead" formatted="false">"更新前订单已退款"</string>
+    <string name="l10n_dex_paid_instead" formatted="false">"请求前订单已被花费并收到付款"</string>
+    <string name="l10n_dex_owner_saved" formatted="false">"已保存的订单操作"</string>
+    <!-- Arguments: depth -->
+    <string name="l10n_dex_owner_depth">"已上链 · %1$s 次确认"</string>
+    <string name="l10n_dex_owner_missing" formatted="false">"此前已验证 · 最近一次节点检查未找到"</string>
+    <string name="l10n_dex_owner_moved" formatted="false">"收录情况已变更 · 需要核对"</string>
+    <string name="l10n_dex_owner_pending" formatted="false">"已记录验证结果 · 等待复查"</string>
+    <string name="l10n_dex_first_observed" formatted="false">"首次观测"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_dex_owner_inclusion">"已验证的收录区块 %1$s"</string>
+    <!-- Arguments: time -->
+    <string name="l10n_dex_owner_checked">" · 检查时间 %1$s"</string>
+    <string name="l10n_dex_edit_price" formatted="false">"修改订单价格"</string>
+    <string name="l10n_dex_new_price_hint" formatted="false">"新价格（MxUSD / MINIMA）"</string>
+    <string name="l10n_dex_edit_changed" formatted="false">"连接或所有权已变更。请重新打开此订单后再编辑。"</string>
+    <string name="l10n_dex_bad_price" formatted="false">"价格无效"</string>
+    <string name="l10n_dex_reprice_posted" formatted="false">"改价已提交"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_reprice_failure">"改价失败：%1$s"</string>
+    <string name="l10n_dex_cancel_sent" formatted="false">"取消请求已发送 — 区块确认后订单才会从订单簿移除"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_cancel_failure">"取消失败：%1$s"</string>
+    <string name="l10n_dex_snapshot_empty" formatted="false">"此快照中没有未结订单"</string>
+    <string name="l10n_dex_cancel_all_title" formatted="false">"取消全部订单"</string>
+    <string name="l10n_dex_cancel_all_stop" formatted="false">"全部取消并停止"</string>
+    <string name="l10n_dex_cancel_them" formatted="false">"取消这些订单"</string>
+    <string name="l10n_dex_keep_them" formatted="false">"保留订单"</string>
+    <string name="l10n_dex_cancel_empty_body" formatted="false">"停止做市并请求撤回其已记录的订单？此快照中未显示未结订单，但可能仍有订单正在提交。"</string>
+    <!-- Arguments: orders, minima, mxusd -->
+    <string name="l10n_dex_cancel_all_body">"请求取消全部可见订单（%1$s 个）？\n\n这些订单锁定了 %2$s MINIMA 和 %3$s MxUSD。取消成功后资金才会退回。取消请求分批提交；在取消得到确认前，订单仍可能成交。"</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_cancel_pause">"\n\n做市也将暂停%1$s。仍在提交中的订单会继续受到跟踪，并在出现后请求取消。请在订单页面查看已确认的结果。"</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_rungs">"（%1$s 个可见做市订单）"</string>
+    <string name="l10n_dex_cancel_review" formatted="false">"连接已变更或尚未就绪。请重新检查订单列表。"</string>
+    <string name="l10n_dex_cancel_connection" formatted="false">"连接已变更。请重新检查订单列表。"</string>
+    <string name="l10n_dex_withdraw_retained" formatted="false">"做市撤单指令已保留。此快照中未显示订单；请在订单页面查看链上结果。"</string>
+    <string name="l10n_dex_cancel_batches_stopped" formatted="false">"连接已变更。剩余批次的取消操作已停止；重试前请检查已保留的凭据。"</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_batch_accepted">"已发送 %1$s 个订单的取消请求 — 各订单在区块确认后才会移除，此前仍可能成交"</string>
+    <!-- Arguments: accepted, failed -->
+    <string name="l10n_dex_cancel_batch_mixed">"已接受 %1$s 个取消请求；%2$s 个请求失败或结果未知。请检查订单页面及已保留的凭据。"</string>
+    <!-- Arguments: done, total -->
+    <string name="l10n_dex_cancelling_progress">"正在取消 %1$s/%2$s…"</string>
 </resources>

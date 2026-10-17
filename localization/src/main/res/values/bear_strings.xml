@@ -6126,4 +6126,91 @@
     <string name="l10n_dex_moved_inclusion" formatted="false">"Same TxPoW included in a different block"</string>
     <string name="l10n_dex_changed_spender" formatted="false">"Different included spender"</string>
     <string name="l10n_dex_legacy_corrected" formatted="false">"First linked proof corrects a legacy record"</string>
+    <string name="l10n_dex_open_tab" formatted="false">"OPEN"</string>
+    <string name="l10n_dex_operations_tab" formatted="false">"OPERATIONS"</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_all_count">"✕  Cancel all %1$s orders"</string>
+    <string name="l10n_dex_gtc_label" formatted="false">"GTC ∞"</string>
+    <string name="l10n_dex_expires_label" formatted="false">"expires"</string>
+    <string name="l10n_dex_age_missing" formatted="false">"age unavailable"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_age_blocks">"age %1$s blk"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_age_at_check">"age %1$s blk at last check"</string>
+    <!-- Arguments: expiry, age, minimum, total -->
+    <string name="l10n_dex_order_meta">"%1$s · %2$s · min remainder %3$s · total %4$s MxUSD"</string>
+    <string name="l10n_dex_maker_rung" formatted="false">"MAKER RUNG — the published ladder owns this one"</string>
+    <string name="l10n_dex_expired_refundable" formatted="false">"EXPIRED — refundable to your wallet"</string>
+    <string name="l10n_dex_expired_refresh" formatted="false">"Expired at last check — refresh before refunding"</string>
+    <string name="l10n_dex_no_fills" formatted="false">"No fills yet"</string>
+    <string name="l10n_dex_trade_pnl_note" formatted="false">"Rows awaiting recheck remain visible but are excluded from volume and P&amp;L. Export for each row’s time basis and chain evidence."</string>
+    <!-- Arguments: rows, included, volume -->
+    <string name="l10n_dex_order_trade_volume">"Rows %1$s (%2$s included)   ·   Volume %3$s MINIMA"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_notional">"Notional %1$s MxUSD"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_pnl">"P&amp;L vs book mid %1$s MxUSD"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_order_pnl_positive">"P&amp;L vs book mid +%1$s MxUSD"</string>
+    <string name="l10n_dex_export_zip" formatted="false">"EXPORT RECONCILIATION ZIP"</string>
+    <string name="l10n_dex_corrected_short" formatted="false">"Corrected — see Corrections"</string>
+    <string name="l10n_dex_recheck_short" formatted="false">"Recheck required"</string>
+    <string name="l10n_dex_owner_note" formatted="false">"Saved order operations. Confirmations are from the last node check; these records do not add trade volume or P&amp;L."</string>
+    <string name="l10n_dex_owner_unreadable" formatted="false">"Saved operations could not be read. Preserve app data for recovery."</string>
+    <string name="l10n_dex_newest" formatted="false">"Newest"</string>
+    <string name="l10n_dex_newer" formatted="false">"Newer"</string>
+    <string name="l10n_dex_older" formatted="false">"Older"</string>
+    <!-- Arguments: page, operations -->
+    <string name="l10n_dex_owner_page">"Page %1$s · %2$s operations"</string>
+    <string name="l10n_dex_owner_empty" formatted="false">"No completed operations saved yet. Older operations removed by previous builds are not available here."</string>
+    <string name="l10n_dex_owner_page_empty" formatted="false">"No older operations on this page. Use Newest to refresh."</string>
+    <string name="l10n_dex_order_created" formatted="false">"Order created"</string>
+    <string name="l10n_dex_order_cancelled" formatted="false">"Order cancelled"</string>
+    <string name="l10n_dex_price_updated" formatted="false">"Price updated"</string>
+    <string name="l10n_dex_order_renewed" formatted="false">"Order renewed"</string>
+    <string name="l10n_dex_refunded_instead" formatted="false">"Order refunded before update"</string>
+    <string name="l10n_dex_paid_instead" formatted="false">"Order spent with payment before request"</string>
+    <string name="l10n_dex_owner_saved" formatted="false">"Saved order operation"</string>
+    <!-- Arguments: depth -->
+    <string name="l10n_dex_owner_depth">"On-chain · %1$s confirmations"</string>
+    <string name="l10n_dex_owner_missing" formatted="false">"Previously verified · not found in latest node check"</string>
+    <string name="l10n_dex_owner_moved" formatted="false">"Inclusion changed · reconciliation required"</string>
+    <string name="l10n_dex_owner_pending" formatted="false">"Verification recorded · recheck pending"</string>
+    <string name="l10n_dex_first_observed" formatted="false">"First observed"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_dex_owner_inclusion">"Verified inclusion block %1$s"</string>
+    <!-- Arguments: time -->
+    <string name="l10n_dex_owner_checked">" · checked %1$s"</string>
+    <string name="l10n_dex_edit_price" formatted="false">"Edit order price"</string>
+    <string name="l10n_dex_new_price_hint" formatted="false">"New price (MxUSD per MINIMA)"</string>
+    <string name="l10n_dex_edit_changed" formatted="false">"Connection or ownership changed. Reopen this order before editing."</string>
+    <string name="l10n_dex_bad_price" formatted="false">"Bad price"</string>
+    <string name="l10n_dex_reprice_posted" formatted="false">"Reprice posted"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_reprice_failure">"Reprice failed: %1$s"</string>
+    <string name="l10n_dex_cancel_sent" formatted="false">"Cancel sent — the order leaves the book when a block confirms it"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_cancel_failure">"Cancel failed: %1$s"</string>
+    <string name="l10n_dex_snapshot_empty" formatted="false">"No open orders in this snapshot"</string>
+    <string name="l10n_dex_cancel_all_title" formatted="false">"Cancel all orders"</string>
+    <string name="l10n_dex_cancel_all_stop" formatted="false">"Cancel all &amp; stop"</string>
+    <string name="l10n_dex_cancel_them" formatted="false">"Cancel them"</string>
+    <string name="l10n_dex_keep_them" formatted="false">"Keep them"</string>
+    <string name="l10n_dex_cancel_empty_body" formatted="false">"Stop the maker and request withdrawal of its recorded orders? No open orders are visible in this snapshot, but a submission may still be in progress."</string>
+    <!-- Arguments: orders, minima, mxusd -->
+    <string name="l10n_dex_cancel_all_body">"Request cancellation of all visible orders (%1$s)?\n\nThese orders lock %2$s MINIMA and %3$s MxUSD. Funds return after successful cancellation. Cancellations are submitted in batches; orders can still fill until their cancellation confirms."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_cancel_pause">"\n\nThe maker will be paused too%1$s. Orders still being submitted will remain tracked for cancellation when they appear. Check Orders for confirmed outcomes."</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_rungs">" (%1$s visible maker orders)"</string>
+    <string name="l10n_dex_cancel_review" formatted="false">"Connection changed or is not ready. Review the order list again."</string>
+    <string name="l10n_dex_cancel_connection" formatted="false">"Connection changed. Review the order list again."</string>
+    <string name="l10n_dex_withdraw_retained" formatted="false">"Maker withdrawal instructions retained. No orders were visible in this snapshot; check Orders for on-chain outcomes."</string>
+    <string name="l10n_dex_cancel_batches_stopped" formatted="false">"Connection changed. Remaining cancellation batches stopped; check retained receipts before retrying."</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_cancel_batch_accepted">"Cancel sent for %1$s orders — each leaves the book when a block confirms it, and can still be filled until then"</string>
+    <!-- Arguments: accepted, failed -->
+    <string name="l10n_dex_cancel_batch_mixed">"Cancel requests accepted for %1$s; %2$s requests failed or have unknown outcomes. Check Orders and retained receipts."</string>
+    <!-- Arguments: done, total -->
+    <string name="l10n_dex_cancelling_progress">"Cancelling %1$s of %2$s…"</string>
 </resources>
