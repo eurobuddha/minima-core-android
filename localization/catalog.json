@@ -31027,5 +31027,149 @@
     "zh-Hans": "无法保存做市的停用状态。安全暂停仍然有效；请检查存储空间并重新确认。",
     "ru": "Не удалось сохранить выключенное состояние мейкера. Пауза безопасности остаётся; проверьте хранилище и повторите проверку.",
     "uk": "Не вдалося зберегти вимкнений стан мейкера. Пауза безпеки залишається; перевірте сховище та повторіть перевірку."
+  },
+  "dex.exportTitle": {
+    "en": "Trade export",
+    "zh-Hans": "交易记录导出",
+    "ru": "Экспорт сделок",
+    "uk": "Експорт угод"
+  },
+  "dex.exportNotReady": {
+    "en": "Export is not ready yet",
+    "zh-Hans": "导出尚未就绪",
+    "ru": "Экспорт пока недоступен",
+    "uk": "Експорт ще не готовий"
+  },
+  "dex.exportBusy": {
+    "en": "An export is already being prepared or saved",
+    "zh-Hans": "正在准备或保存另一个导出文件",
+    "ru": "Экспорт уже подготавливается или сохраняется",
+    "uk": "Експорт уже готується або зберігається"
+  },
+  "dex.exportSnapshotFailed": {
+    "en": "Could not read the export snapshot; please try again",
+    "zh-Hans": "无法读取导出快照；请重试",
+    "ru": "Не удалось прочитать снимок для экспорта; повторите попытку",
+    "uk": "Не вдалося прочитати знімок для експорту; спробуйте ще раз"
+  },
+  "dex.exportBuilding": {
+    "en": "Building export · optional explorer checks take up to 30 seconds…",
+    "zh-Hans": "正在生成导出文件 · 可选的区块浏览器核查最多需要 30 秒…",
+    "ru": "Подготовка экспорта · необязательная проверка через обозреватель занимает до 30 секунд…",
+    "uk": "Підготовка експорту · необов’язкова перевірка через оглядач триває до 30 секунд…"
+  },
+  "dex.exportSaving": {
+    "en": "Saving trade export…",
+    "zh-Hans": "正在保存交易记录导出文件…",
+    "ru": "Сохранение экспорта сделок…",
+    "uk": "Збереження експорту угод…"
+  },
+  "dex.exportInterrupted": {
+    "en": "The previous export was interrupted. Its destination may be empty, partial or complete. Check the file before exporting again; no save will be repeated automatically.",
+    "zh-Hans": "上次导出已中断。目标文件可能为空、仅写入部分内容或已完整写入。再次导出前请检查文件；不会自动重复保存。",
+    "ru": "Предыдущий экспорт был прерван. Файл назначения может быть пустым, частичным или полным. Проверьте его перед повторным экспортом; сохранение не будет повторено автоматически.",
+    "uk": "Попередній експорт перервано. Цільовий файл може бути порожнім, частковим або повним. Перевірте його перед повторним експортом; збереження не повторюватиметься автоматично."
+  },
+  "dex.exportJournalFailed": {
+    "en": "Could not record the export session. No export was started; free storage and try again.",
+    "zh-Hans": "无法记录导出会话。导出尚未开始；请释放存储空间后重试。",
+    "ru": "Не удалось записать состояние экспорта. Экспорт не начат; освободите место и повторите попытку.",
+    "uk": "Не вдалося записати стан експорту. Експорт не розпочато; звільніть місце та спробуйте ще раз."
+  },
+  "dex.exportScreenClosed": {
+    "en": "Export preparation was cancelled when its screen closed.",
+    "zh-Hans": "导出页面关闭时，导出准备已取消。",
+    "ru": "Подготовка экспорта отменена при закрытии его экрана.",
+    "uk": "Підготовку експорту скасовано після закриття його екрана."
+  },
+  "dex.exportWorkerBusy": {
+    "en": "Another export worker is still running. Try again when it finishes.",
+    "zh-Hans": "另一个导出任务仍在运行。请在其完成后重试。",
+    "ru": "Другой процесс экспорта ещё работает. Повторите попытку после его завершения.",
+    "uk": "Інший процес експорту ще працює. Повторіть спробу після його завершення."
+  },
+  "dex.exportStartFailed": {
+    "en": "Could not start the export. Source records are unchanged.",
+    "zh-Hans": "无法启动导出。源记录未更改。",
+    "ru": "Не удалось начать экспорт. Исходные записи не изменены.",
+    "uk": "Не вдалося почати експорт. Початкові записи не змінено."
+  },
+  "dex.exportPickerJournalFailed": {
+    "en": "Could not record the save request. No destination was written; try again after freeing storage.",
+    "zh-Hans": "无法记录保存请求。未写入任何目标文件；请释放存储空间后重试。",
+    "ru": "Не удалось записать запрос на сохранение. Файлы назначения не записывались; освободите место и повторите попытку.",
+    "uk": "Не вдалося записати запит на збереження. Цільові файли не записувалися; звільніть місце та спробуйте ще раз."
+  },
+  "dex.exportPickerFailed": {
+    "en": "Could not open the save picker. Please export again.",
+    "zh-Hans": "无法打开保存位置选择器。请重新导出。",
+    "ru": "Не удалось открыть выбор места сохранения. Повторите экспорт.",
+    "uk": "Не вдалося відкрити вибір місця збереження. Повторіть експорт."
+  },
+  "dex.exportCancelled": {
+    "en": "Export cancelled. No file was written by PandaDEX.",
+    "zh-Hans": "导出已取消。PandaDEX 未写入任何文件。",
+    "ru": "Экспорт отменён. PandaDEX не записал ни одного файла.",
+    "uk": "Експорт скасовано. PandaDEX не записав жодного файлу."
+  },
+  "dex.exportInvalidProvider": {
+    "en": "The destination is not a document provider. No file was written.",
+    "zh-Hans": "目标不是文档提供程序。未写入任何文件。",
+    "ru": "Место назначения не является поставщиком документов. Файлы не записывались.",
+    "uk": "Місце призначення не є постачальником документів. Файли не записувалися."
+  },
+  "dex.exportSaveJournalFailed": {
+    "en": "Could not record the save request. The selected document was not written; please export again.",
+    "zh-Hans": "无法记录保存请求。未写入所选文档；请重新导出。",
+    "ru": "Не удалось записать запрос на сохранение. Выбранный документ не записывался; повторите экспорт.",
+    "uk": "Не вдалося записати запит на збереження. Вибраний документ не записувався; повторіть експорт."
+  },
+  "dex.exportPartial": {
+    "en": "The export could not be completed. The destination may contain a partial file; check it and export to another destination.",
+    "zh-Hans": "导出未能完成。目标位置可能包含不完整文件；请检查并导出到其他位置。",
+    "ru": "Не удалось завершить экспорт. Файл назначения может быть неполным; проверьте его и экспортируйте в другое место.",
+    "uk": "Не вдалося завершити експорт. Цільовий файл може бути неповним; перевірте його та експортуйте в інше місце."
+  },
+  "dex.exportSaveStartFailed": {
+    "en": "Could not start saving. Check the destination and export again.",
+    "zh-Hans": "无法开始保存。请检查目标位置并重新导出。",
+    "ru": "Не удалось начать сохранение. Проверьте место назначения и повторите экспорт.",
+    "uk": "Не вдалося почати збереження. Перевірте місце призначення та повторіть експорт."
+  },
+  "dex.exportClearFailed": {
+    "en": "Export status could not be cleared. Free storage and try again; source trade records are unchanged.",
+    "zh-Hans": "无法清除导出状态。请释放存储空间后重试；源交易记录未更改。",
+    "ru": "Не удалось сбросить состояние экспорта. Освободите место и повторите попытку; исходные записи сделок не изменены.",
+    "uk": "Не вдалося скинути стан експорту. Звільніть місце та спробуйте ще раз; початкові записи угод не змінено."
+  },
+  "dex.exportPreparedOpenFailed": {
+    "en": "Could not open the prepared export",
+    "zh-Hans": "无法打开已准备的导出文件",
+    "ru": "Не удалось открыть подготовленный экспорт",
+    "uk": "Не вдалося відкрити підготовлений експорт"
+  },
+  "dex.exportStatusUnsaved": {
+    "en": "{notice} Export status could not be saved locally; check the destination after restarting.",
+    "zh-Hans": "{notice} 无法在本地保存导出状态；重启后请检查目标文件。",
+    "ru": "{notice} Не удалось сохранить состояние экспорта локально; проверьте файл назначения после перезапуска.",
+    "uk": "{notice} Не вдалося зберегти стан експорту локально; перевірте цільовий файл після перезапуску."
+  },
+  "dex.exportPrepareFailed": {
+    "en": "Could not prepare the export. Source records are unchanged. {error}",
+    "zh-Hans": "无法准备导出。源记录未更改。{error}",
+    "ru": "Не удалось подготовить экспорт. Исходные записи не изменены. {error}",
+    "uk": "Не вдалося підготувати експорт. Початкові записи не змінено. {error}"
+  },
+  "dex.exportWritten": {
+    "en": "Export written and closed · {summary}. For cloud destinations, check that the provider has finished uploading.",
+    "zh-Hans": "导出文件已写入并关闭 · {summary}。若保存到云端，请确认服务商已完成上传。",
+    "ru": "Экспорт записан и закрыт · {summary}. При сохранении в облако убедитесь, что поставщик завершил загрузку.",
+    "uk": "Експорт записано й закрито · {summary}. Якщо зберігаєте в хмару, переконайтеся, що постачальник завершив завантаження."
+  },
+  "dex.exportSummary": {
+    "en": "Personal trade records: {records} · net {minima} MINIMA · net {mxusd} MxUSD",
+    "zh-Hans": "个人交易记录：{records} · 净额 {minima} MINIMA · 净额 {mxusd} MxUSD",
+    "ru": "Личные записи сделок: {records} · нетто {minima} MINIMA · нетто {mxusd} MxUSD",
+    "uk": "Особисті записи угод: {records} · нетто {minima} MINIMA · нетто {mxusd} MxUSD"
   }
 }

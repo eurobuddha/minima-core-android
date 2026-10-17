@@ -6367,4 +6367,32 @@
     <string name="l10n_dex_write_recovery_body">"Відповідь на запис вузла втрачено, і він міг завершитися. Спершу перезапустіть MinimaCore, щоб зупинити старі команди, потім перевірте ордери, стрічку угод і баланси. Зняття паузи не скасовує й не повторює транзакцію. Мейкер залишиться вимкненим до повторної перевірки та публікації.\n\nПрервана команда:\n%1$s"</string>
     <string name="l10n_dex_write_pause_cleared" formatted="false">"Паузу безпеки знято. Перевірте ордери та баланси."</string>
     <string name="l10n_dex_maker_disarm_failed" formatted="false">"Не вдалося зберегти вимкнений стан мейкера. Пауза безпеки залишається; перевірте сховище та повторіть перевірку."</string>
+    <string name="l10n_dex_export_title" formatted="false">"Експорт угод"</string>
+    <string name="l10n_dex_export_not_ready" formatted="false">"Експорт ще не готовий"</string>
+    <string name="l10n_dex_export_busy" formatted="false">"Експорт уже готується або зберігається"</string>
+    <string name="l10n_dex_export_snapshot_failed" formatted="false">"Не вдалося прочитати знімок для експорту; спробуйте ще раз"</string>
+    <string name="l10n_dex_export_building" formatted="false">"Підготовка експорту · необов’язкова перевірка через оглядач триває до 30 секунд…"</string>
+    <string name="l10n_dex_export_saving" formatted="false">"Збереження експорту угод…"</string>
+    <string name="l10n_dex_export_interrupted" formatted="false">"Попередній експорт перервано. Цільовий файл може бути порожнім, частковим або повним. Перевірте його перед повторним експортом; збереження не повторюватиметься автоматично."</string>
+    <string name="l10n_dex_export_journal_failed" formatted="false">"Не вдалося записати стан експорту. Експорт не розпочато; звільніть місце та спробуйте ще раз."</string>
+    <string name="l10n_dex_export_screen_closed" formatted="false">"Підготовку експорту скасовано після закриття його екрана."</string>
+    <string name="l10n_dex_export_worker_busy" formatted="false">"Інший процес експорту ще працює. Повторіть спробу після його завершення."</string>
+    <string name="l10n_dex_export_start_failed" formatted="false">"Не вдалося почати експорт. Початкові записи не змінено."</string>
+    <string name="l10n_dex_export_picker_journal_failed" formatted="false">"Не вдалося записати запит на збереження. Цільові файли не записувалися; звільніть місце та спробуйте ще раз."</string>
+    <string name="l10n_dex_export_picker_failed" formatted="false">"Не вдалося відкрити вибір місця збереження. Повторіть експорт."</string>
+    <string name="l10n_dex_export_cancelled" formatted="false">"Експорт скасовано. PandaDEX не записав жодного файлу."</string>
+    <string name="l10n_dex_export_invalid_provider" formatted="false">"Місце призначення не є постачальником документів. Файли не записувалися."</string>
+    <string name="l10n_dex_export_save_journal_failed" formatted="false">"Не вдалося записати запит на збереження. Вибраний документ не записувався; повторіть експорт."</string>
+    <string name="l10n_dex_export_partial" formatted="false">"Не вдалося завершити експорт. Цільовий файл може бути неповним; перевірте його та експортуйте в інше місце."</string>
+    <string name="l10n_dex_export_save_start_failed" formatted="false">"Не вдалося почати збереження. Перевірте місце призначення та повторіть експорт."</string>
+    <string name="l10n_dex_export_clear_failed" formatted="false">"Не вдалося скинути стан експорту. Звільніть місце та спробуйте ще раз; початкові записи угод не змінено."</string>
+    <string name="l10n_dex_export_prepared_open_failed" formatted="false">"Не вдалося відкрити підготовлений експорт"</string>
+    <!-- Arguments: notice -->
+    <string name="l10n_dex_export_status_unsaved">"%1$s Не вдалося зберегти стан експорту локально; перевірте цільовий файл після перезапуску."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_export_prepare_failed">"Не вдалося підготувати експорт. Початкові записи не змінено. %1$s"</string>
+    <!-- Arguments: summary -->
+    <string name="l10n_dex_export_written">"Експорт записано й закрито · %1$s. Якщо зберігаєте в хмару, переконайтеся, що постачальник завершив завантаження."</string>
+    <!-- Arguments: records, minima, mxusd -->
+    <string name="l10n_dex_export_summary">"Особисті записи угод: %1$s · нетто %2$s MINIMA · нетто %3$s MxUSD"</string>
 </resources>

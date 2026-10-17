@@ -204,9 +204,36 @@
     "Command details unavailable for this older receipt.": "dex.olderWriteDetails",
     "Safety pause cleared. Review your orders and balances.": "dex.writePauseCleared",
     "The reviewed write changed, a write is still active, or the safety state could not be saved. Keep paused.": "pools.keepWritePaused",
-    "The maker could not be saved as disarmed. The safety pause remains; check storage and review again.": "dex.makerDisarmFailed"
+    "The maker could not be saved as disarmed. The safety pause remains; check storage and review again.": "dex.makerDisarmFailed",
+    "Trade export": "dex.exportTitle",
+    "Export is not ready yet": "dex.exportNotReady",
+    "An export is already being prepared or saved": "dex.exportBusy",
+    "Could not read the export snapshot; please try again": "dex.exportSnapshotFailed",
+    "Building export · optional explorer checks take up to 30 seconds…": "dex.exportBuilding",
+    "Saving trade export…": "dex.exportSaving",
+    "The previous export was interrupted. Its destination may be empty, partial or complete. Check the file before exporting again; no save will be repeated automatically.": "dex.exportInterrupted",
+    "Could not record the export session. No export was started; free storage and try again.": "dex.exportJournalFailed",
+    "Export preparation was cancelled when its screen closed.": "dex.exportScreenClosed",
+    "Another export worker is still running. Try again when it finishes.": "dex.exportWorkerBusy",
+    "Could not start the export. Source records are unchanged.": "dex.exportStartFailed",
+    "Could not record the save request. No destination was written; try again after freeing storage.": "dex.exportPickerJournalFailed",
+    "Could not open the save picker. Please export again.": "dex.exportPickerFailed",
+    "Export cancelled. No file was written by PandaDEX.": "dex.exportCancelled",
+    "The destination is not a document provider. No file was written.": "dex.exportInvalidProvider",
+    "Could not record the save request. The selected document was not written; please export again.": "dex.exportSaveJournalFailed",
+    "The export could not be completed. The destination may contain a partial file; check it and export to another destination.": "dex.exportPartial",
+    "Could not start saving. Check the destination and export again.": "dex.exportSaveStartFailed",
+    "Export status could not be cleared. Free storage and try again; source trade records are unchanged.": "dex.exportClearFailed",
+    "Could not open the prepared export": "dex.exportPreparedOpenFailed"
   },
   "patterns": [
+    {
+      "template": "{0} Export status could not be saved locally; check the destination after restarting.",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.exportStatusUnsaved"
+    },
     {
       "template": "Total: {0} MxUSD",
       "kinds": [
@@ -709,6 +736,38 @@
         "number"
       ],
       "key": "dex.inSavedOrders"
+    },
+    {
+      "template": "Could not prepare the export. Source records are unchanged. {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.exportPrepareFailed"
+    },
+    {
+      "template": "Export written and closed · {0}. For cloud destinations, check that the provider has finished uploading.",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.exportWritten"
+    },
+    {
+      "template": "{0} personal trade record · net {1} MINIMA · net {2} MxUSD",
+      "kinds": [
+        "integer",
+        "number",
+        "number"
+      ],
+      "key": "dex.exportSummary"
+    },
+    {
+      "template": "{0} personal trade records · net {1} MINIMA · net {2} MxUSD",
+      "kinds": [
+        "integer",
+        "number",
+        "number"
+      ],
+      "key": "dex.exportSummary"
     }
   ]
 }

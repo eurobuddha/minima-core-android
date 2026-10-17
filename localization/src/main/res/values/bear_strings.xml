@@ -6305,4 +6305,32 @@
     <string name="l10n_dex_write_recovery_body">"A node write lost its reply and may have completed. First restart MinimaCore to stop old commands, then check Orders, Tape and your balances. Clearing this pause neither undoes nor retries a transaction. The maker will stay disarmed until you review and publish it again.\n\nInterrupted command:\n%1$s"</string>
     <string name="l10n_dex_write_pause_cleared" formatted="false">"Safety pause cleared. Review your orders and balances."</string>
     <string name="l10n_dex_maker_disarm_failed" formatted="false">"The maker could not be saved as disarmed. The safety pause remains; check storage and review again."</string>
+    <string name="l10n_dex_export_title" formatted="false">"Trade export"</string>
+    <string name="l10n_dex_export_not_ready" formatted="false">"Export is not ready yet"</string>
+    <string name="l10n_dex_export_busy" formatted="false">"An export is already being prepared or saved"</string>
+    <string name="l10n_dex_export_snapshot_failed" formatted="false">"Could not read the export snapshot; please try again"</string>
+    <string name="l10n_dex_export_building" formatted="false">"Building export · optional explorer checks take up to 30 seconds…"</string>
+    <string name="l10n_dex_export_saving" formatted="false">"Saving trade export…"</string>
+    <string name="l10n_dex_export_interrupted" formatted="false">"The previous export was interrupted. Its destination may be empty, partial or complete. Check the file before exporting again; no save will be repeated automatically."</string>
+    <string name="l10n_dex_export_journal_failed" formatted="false">"Could not record the export session. No export was started; free storage and try again."</string>
+    <string name="l10n_dex_export_screen_closed" formatted="false">"Export preparation was cancelled when its screen closed."</string>
+    <string name="l10n_dex_export_worker_busy" formatted="false">"Another export worker is still running. Try again when it finishes."</string>
+    <string name="l10n_dex_export_start_failed" formatted="false">"Could not start the export. Source records are unchanged."</string>
+    <string name="l10n_dex_export_picker_journal_failed" formatted="false">"Could not record the save request. No destination was written; try again after freeing storage."</string>
+    <string name="l10n_dex_export_picker_failed" formatted="false">"Could not open the save picker. Please export again."</string>
+    <string name="l10n_dex_export_cancelled" formatted="false">"Export cancelled. No file was written by PandaDEX."</string>
+    <string name="l10n_dex_export_invalid_provider" formatted="false">"The destination is not a document provider. No file was written."</string>
+    <string name="l10n_dex_export_save_journal_failed" formatted="false">"Could not record the save request. The selected document was not written; please export again."</string>
+    <string name="l10n_dex_export_partial" formatted="false">"The export could not be completed. The destination may contain a partial file; check it and export to another destination."</string>
+    <string name="l10n_dex_export_save_start_failed" formatted="false">"Could not start saving. Check the destination and export again."</string>
+    <string name="l10n_dex_export_clear_failed" formatted="false">"Export status could not be cleared. Free storage and try again; source trade records are unchanged."</string>
+    <string name="l10n_dex_export_prepared_open_failed" formatted="false">"Could not open the prepared export"</string>
+    <!-- Arguments: notice -->
+    <string name="l10n_dex_export_status_unsaved">"%1$s Export status could not be saved locally; check the destination after restarting."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_export_prepare_failed">"Could not prepare the export. Source records are unchanged. %1$s"</string>
+    <!-- Arguments: summary -->
+    <string name="l10n_dex_export_written">"Export written and closed · %1$s. For cloud destinations, check that the provider has finished uploading."</string>
+    <!-- Arguments: records, minima, mxusd -->
+    <string name="l10n_dex_export_summary">"Personal trade records: %1$s · net %2$s MINIMA · net %3$s MxUSD"</string>
 </resources>

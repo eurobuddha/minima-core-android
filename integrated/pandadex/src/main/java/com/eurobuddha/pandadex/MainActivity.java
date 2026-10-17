@@ -2042,9 +2042,9 @@ public class MainActivity extends AppCompatActivity {
             catch(RuntimeException failure){tradeExportSession.pickerFailed();}
         }else if(phase==TradeExportSession.Phase.NOTICE&&!exportNoticeShowing) {
             exportNoticeShowing=true;
-            new AlertDialog.Builder(this,Design.dialogTheme()).setTitle("Trade export")
-                    .setMessage(tradeExportSession.notice()).setCancelable(false)
-                    .setPositiveButton("OK",(dialog,which)->{
+            new LanguageDialog(this,Design.dialogTheme()).setTitle(DexMessages.message("Trade export"))
+                    .setMessage(DexMessages.message(tradeExportSession.notice())).setCancelable(false)
+                    .setPositiveButton(DexMessages.message("OK"),(dialog,which)->{
                         exportNoticeShowing=false;
                         if(!tradeExportSession.acknowledge()) {
                             toast(tradeExportSession.notice());

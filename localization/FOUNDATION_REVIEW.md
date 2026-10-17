@@ -2310,3 +2310,18 @@ Validation: six inherited reviewed-write tests exercise stale/missing consent, a
 The reviewed NodeApi recovery section exactly matches PandaPools. Command dispatch, balance parsing, asset valuation and age calculations are byte-identical to their previous bodies. 179 original DEX files and all other protected engine/public-key audit/node-JAR hashes are unchanged. NodeApi's old hash and reviewed replacement are saved separately, preserving the original baseline. Fold runtime/visual validation remains pending.
 
 Verdict: approve this increment with host validation. Full signed release remains incomplete. Evidence: build/localization/dex-assets-validation.json (450 source hashes). Next: export, Maker, notifications and dynamic diagnostics; remaining financial/accessibility findings; safe Fold validation; signed versioned deliverables and publication to GitHub fork, PandaApps and eurobuddha.com.
+
+
+## PandaDEX export presentation — 2026-10-18
+
+Previous turn confirmed a clean local checkpoint (6f7e145) without implementation progress. Continued the existing export workflow after inspecting TradeExportSession, TradeExportWriter, TradeExportFilesTest, report totals and display callers, shared LanguageDialog, generated DexMessages and importer adapters. Session, writer and files engine match standalone PandaDEX byte-for-byte. Reused the shared retained dialog and whole-message formatter; only title/body/button bindings changed in MainActivity.
+
+Added 24 messages (5,118 total; 225 exact DEX aliases, 72 patterns) for preparation, save/cancel results, interrupted exports, partial destinations, unsaved local status and completed-write cloud-upload warnings. Displayed count and signed decimal totals come from the original writer. Unknown nested diagnostics remain whole. The local-status warning is matched before the preparation-error envelope so both warnings are retained. Export journal values, archive schemas/content, provider writes, snapshot calculations, ownership, retry/cancellation rules and callbacks are unchanged.
+
+### Code Review
+
+Summary: narrow presentation change using the existing retained language bindings. No new findings in the changed production code. Session/export engine, 179 original DEX files and all protected engine/public-key audit/node-JAR hashes remain unchanged, including the reviewed write-recovery repairs.
+
+Validation: five new tests use real report totals/writer descriptions, covering excluded rechecks, decimal signs, zero/single/multiple records, immutable displays, nested local-save/cloud warnings, unknown diagnostics and malformed totals. An initial test expected nine MxUSD decimals; inspection confirmed the existing eight-decimal ROUND_DOWN rule and the expectation was corrected without changing the exporter. 743 PandaDEX + 9 localization JVM tests pass (752). All three debug variants and AndroidTest compile. All 19 pinned imports reproduce; catalogue, transport and diff checks pass. No device use; Fold R3GL805K7MB only.
+
+Verdict: approve this increment with host validation. Device presentation/provider behaviour is still unverified. Full signed release remains incomplete. Evidence: build/localization/dex-export-validation.json (453 source hashes). Remaining work: Maker, notifications and dynamic diagnostics; outstanding financial/accessibility review; safe Fold validation; signed versioned builds and authorized publication to the GitHub fork, PandaApps and eurobuddha.com.
