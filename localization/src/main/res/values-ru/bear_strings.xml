@@ -6275,4 +6275,67 @@
     <string name="l10n_dex_cancel_batch_mixed">"Запросов отмены принято: %1$s; неудачных или с неизвестным исходом: %2$s. Проверьте заявки и сохранённые квитанции."</string>
     <!-- Arguments: done, total -->
     <string name="l10n_dex_cancelling_progress">"Отмена %1$s из %2$s…"</string>
+    <string name="l10n_dex_confirm_buy" formatted="false">"Подтвердить покупку"</string>
+    <string name="l10n_dex_confirm_sell" formatted="false">"Подтвердить продажу"</string>
+    <string name="l10n_dex_execute_trade" formatted="false">"Выполнить"</string>
+    <!-- Arguments: amount, orders -->
+    <string name="l10n_dex_sweep_buying">"Покупка %1$s MINIMA сейчас из заявок: %2$s"</string>
+    <!-- Arguments: amount, orders -->
+    <string name="l10n_dex_sweep_selling">"Продажа %1$s MINIMA сейчас по заявкам: %2$s"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_quote_buying">"Покупка %1$s MINIMA сейчас"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_quote_selling">"Продажа %1$s MINIMA сейчас"</string>
+    <!-- Arguments: price, total -->
+    <string name="l10n_dex_quote_average">"Средняя цена %1$s · %2$s MxUSD"</string>
+    <!-- Arguments: price, total -->
+    <string name="l10n_dex_quote_effective">"Эффективная цена %1$s · %2$s MxUSD"</string>
+    <!-- Arguments: minima, mxusd, orders -->
+    <string name="l10n_dex_quote_book">"КНИГА %1$s MINIMA / %2$s MxUSD · Заявок: %3$s"</string>
+    <!-- Arguments: minima, mxusd, pools -->
+    <string name="l10n_dex_quote_pool">"ПУЛЫ %1$s MINIMA / %2$s MxUSD · Пулов: %3$s"</string>
+    <!-- Arguments: percent -->
+    <string name="l10n_dex_quote_impact">"Влияние на цену %1$s%%"</string>
+    <!-- Arguments: price -->
+    <string name="l10n_dex_quote_worst">"Худшая предельная цена %1$s"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_book_leg">"  • КНИГА %1$s @ %2$s"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_book_partial">"  • КНИГА %1$s @ %2$s (частично)"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_partial">"  • %1$s @ %2$s (частично)"</string>
+    <!-- Arguments: minima, mxusd -->
+    <string name="l10n_dex_quote_pool_leg">"  • ПУЛ %1$s MINIMA / %2$s MxUSD"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_rest">"Остаток %1$s MINIMA @ %2$s будет размещён лимитной заявкой"</string>
+    <string name="l10n_dex_trade_checking_title" formatted="false">"Сделка ещё проверяется"</string>
+    <!-- Arguments: id -->
+    <string name="l10n_dex_trade_checking_body">"Ссылка на транзакцию: %1$s\n\nПриложение ещё не сопоставило эту сделку с подтверждённой транзакцией и её выплатой. Проверка продолжится; сохранённое намерение само по себе не доказывает отправку. Оставшаяся лимитная заявка не восстанавливается после перезапуска приложения."</string>
+    <string name="l10n_dex_check_now" formatted="false">"Проверить сейчас"</string>
+    <string name="l10n_dex_trade_already_checking" formatted="false">"Сделка ещё проверяется. Сначала откройте «Активы»."</string>
+    <string name="l10n_dex_order_selecting" formatted="false">"Запрос заявки принят · Выбор монет кошелька"</string>
+    <string name="l10n_dex_order_posted_checking" formatted="false">"Заявка отправлена · Проверка её создания в блокчейне"</string>
+    <!-- Arguments: status -->
+    <string name="l10n_dex_order_status">"Статус заявки: %1$s"</string>
+    <string name="l10n_dex_trade_updated_receipt_failed" formatted="false">"Узел принял сделку · Обновлённые данные квитанции не сохранены; запись восстановления сохранена"</string>
+    <string name="l10n_dex_trade_unknown" formatted="false">"Исход сделки неизвестен — квитанция сохранена. Откройте «Активы»."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_trade_failure">"Сделка не выполнена — %1$s"</string>
+    <string name="l10n_dex_trade_failure_pending" formatted="false">"Сделка не выполнена; не удалось обновить состояние ожидания, поэтому торговля остаётся приостановленной"</string>
+    <string name="l10n_dex_trade_verifying_time" formatted="false">"Сделка найдена · Проверка времени блока включения перед сохранением квитанции"</string>
+    <string name="l10n_dex_trade_cleanup_failed" formatted="false">"Квитанция сделки сохранена · Не удалось обновить состояние ожидания; торговля приостановлена"</string>
+    <string name="l10n_dex_trade_receipt_failed" formatted="false">"Не удалось безопасно сохранить квитанцию сделки · Ожидающие доказательства сохранены; торговля приостановлена"</string>
+    <string name="l10n_dex_trade_unresolved" formatted="false">"Исход сделки не выяснен — проверяется блокчейн. Перед повтором откройте «Активы»."</string>
+    <string name="l10n_dex_rest_not_placed" formatted="false">"Исход сделки не выяснен. Оставшаяся лимитная заявка не размещена; сделка ещё проверяется."</string>
+    <string name="l10n_dex_review_before_rest" formatted="false">"Оставшаяся лимитная заявка не размещена — сначала проверьте сделку"</string>
+    <string name="l10n_dex_selecting_buy" formatted="false">"Покупка: запрос принят · Выбор монет кошелька"</string>
+    <!-- Arguments: pools, orders -->
+    <string name="l10n_dex_selecting_composite_buy">"Покупка: запрос принят · Выбор монет для пулов: %1$s, лимитных заявок: %2$s"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_posted_buy">"Отправлено — ожидается подтверждение блоком: покупка %1$s MINIMA"</string>
+    <string name="l10n_dex_selecting_sell" formatted="false">"Продажа: запрос принят · Выбор монет кошелька"</string>
+    <!-- Arguments: pools, orders -->
+    <string name="l10n_dex_selecting_composite_sell">"Продажа: запрос принят · Выбор монет для пулов: %1$s, лимитных заявок: %2$s"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_posted_sell">"Отправлено — ожидается подтверждение блоком: продажа %1$s MINIMA"</string>
 </resources>

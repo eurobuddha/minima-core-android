@@ -994,10 +994,7 @@ public class MainActivity extends AppCompatActivity {
      * Taker path: show what the sweep will actually execute (best-price rows, VWAP, and the
      * balance that will rest as a limit order), then post ONE sweep txn.
      */
-    public void confirmSweep(SweepPlanner.Plan plan, boolean buy, BigDecimal amount,
-                             BigDecimal price, boolean gtc, BigDecimal minRem) {
-        if (!ready()) return;
-        BigDecimal rest = amount.subtract(plan.totalMinima).max(BigDecimal.ZERO);
+    static CharSequence sweepMessage(SweepPlanner.Plan plan, boolean buy, BigDecimal rest, BigDecimal price) {
         StringBuilder sb = new StringBuilder();
         sb.append(buy ? "Buying " : "Selling ").append(PriceMath.fmt(plan.totalMinima))
           .append(" MINIMA now from ").append(plan.takes.size())
@@ -1012,10 +1009,17 @@ public class MainActivity extends AppCompatActivity {
             sb.append("\nResting ").append(PriceMath.fmt(rest)).append(" MINIMA @ ")
               .append(PriceMath.fmtPrice(price)).append(" as a limit order");
         }
-        new AlertDialog.Builder(this, Design.dialogTheme())
-                .setTitle(buy ? "Confirm buy" : "Confirm sell")
-                .setMessage(sb.toString())
-                .setPositiveButton("Execute", (d, w) -> {
+        return DexMessages.quote(sb.toString());
+    }
+
+    public void confirmSweep(SweepPlanner.Plan plan, boolean buy, BigDecimal amount,
+                             BigDecimal price, boolean gtc, BigDecimal minRem) {
+        if (!ready()) return;
+        BigDecimal rest = amount.subtract(plan.totalMinima).max(BigDecimal.ZERO);
+        new LanguageDialog(this, Design.dialogTheme())
+                .setTitle(DexMessages.message(buy ? "Confirm buy" : "Confirm sell"))
+                .setMessage(sweepMessage(plan, buy, rest, price))
+                .setPositiveButton(DexMessages.message("Execute"), (d, w) -> {
                     if (!ready() || awaitingFill != null) {
                         if (awaitingFill != null) toast("A trade is still being checked. Review ASSETS first.");
                         return;
@@ -1089,14 +1093,11 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(DexMessages.message("Cancel"), null)
                 .show();
     }
 
-    public void confirmComposite(CompositeRouter.Plan plan, boolean buy, BigDecimal amount,
-                                 BigDecimal price, boolean gtc, BigDecimal minRem) {
-        if (!ready()) return;
-        BigDecimal rest = amount.subtract(plan.totalMinima).max(BigDecimal.ZERO);
+    static CharSequence compositeMessage(CompositeRouter.Plan plan, boolean buy, BigDecimal rest, BigDecimal price) {
         StringBuilder sb = new StringBuilder();
         sb.append(buy ? "Buying " : "Selling ").append(PriceMath.fmt(plan.totalMinima))
           .append(" MINIMA now\n");
@@ -1130,10 +1131,17 @@ public class MainActivity extends AppCompatActivity {
             sb.append("\nResting ").append(PriceMath.fmt(rest)).append(" MINIMA @ ")
               .append(PriceMath.fmtPrice(price)).append(" as a limit order");
         }
-        new AlertDialog.Builder(this, Design.dialogTheme())
-                .setTitle(buy ? "Confirm buy" : "Confirm sell")
-                .setMessage(sb.toString())
-                .setPositiveButton("Execute", (d, w) -> {
+        return DexMessages.quote(sb.toString());
+    }
+
+    public void confirmComposite(CompositeRouter.Plan plan, boolean buy, BigDecimal amount,
+                                 BigDecimal price, boolean gtc, BigDecimal minRem) {
+        if (!ready()) return;
+        BigDecimal rest = amount.subtract(plan.totalMinima).max(BigDecimal.ZERO);
+        new LanguageDialog(this, Design.dialogTheme())
+                .setTitle(DexMessages.message(buy ? "Confirm buy" : "Confirm sell"))
+                .setMessage(compositeMessage(plan, buy, rest, price))
+                .setPositiveButton(DexMessages.message("Execute"), (d, w) -> {
                     if (!ready() || awaitingFill != null) {
                         if (awaitingFill != null) toast("A trade is still being checked. Review ASSETS first.");
                         return;
@@ -1204,7 +1212,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(DexMessages.message("Cancel"), null)
                 .show();
     }
 
@@ -1331,12 +1339,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean hasUnresolvedTrade() { return awaitingFill != null; }
     public void reviewUnresolvedTrade() {
         if (awaitingFill == null) return;
-        new AlertDialog.Builder(this, Design.dialogTheme()).setTitle("Trade still being checked")
-                .setMessage("Transaction reference: " + awaitingTxpowid
-                        + "\n\nThe app has not yet matched this trade to a confirmed transaction and its payout. "
-                        + "It will keep checking; a saved intent does not by itself prove submission. Any remaining limit order is not restored after an app restart.")
-                .setPositiveButton("Check now", (d, w) -> { if (repo != null) repo.refresh(); })
-                .setNegativeButton("Close", null).show();
+        new LanguageDialog(this, Design.dialogTheme()).setTitle(DexMessages.message("Trade still being checked"))
+                .setMessage(Language.msg(l10n_dex_trade_checking_body, awaitingTxpowid))
+                .setPositiveButton(DexMessages.message("Check now"), (d, w) -> { if (repo != null) repo.refresh(); })
+                .setNegativeButton(DexMessages.message("Close"), null).show();
     }
 
     private void failAwaitingFill() {

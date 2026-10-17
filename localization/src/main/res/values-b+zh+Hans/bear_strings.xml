@@ -6182,4 +6182,67 @@
     <string name="l10n_dex_cancel_batch_mixed">"已接受 %1$s 个取消请求；%2$s 个请求失败或结果未知。请检查订单页面及已保留的凭据。"</string>
     <!-- Arguments: done, total -->
     <string name="l10n_dex_cancelling_progress">"正在取消 %1$s/%2$s…"</string>
+    <string name="l10n_dex_confirm_buy" formatted="false">"确认买入"</string>
+    <string name="l10n_dex_confirm_sell" formatted="false">"确认卖出"</string>
+    <string name="l10n_dex_execute_trade" formatted="false">"执行"</string>
+    <!-- Arguments: amount, orders -->
+    <string name="l10n_dex_sweep_buying">"现在从 %2$s 个订单买入 %1$s MINIMA"</string>
+    <!-- Arguments: amount, orders -->
+    <string name="l10n_dex_sweep_selling">"现在向 %2$s 个订单卖出 %1$s MINIMA"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_quote_buying">"现在买入 %1$s MINIMA"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_quote_selling">"现在卖出 %1$s MINIMA"</string>
+    <!-- Arguments: price, total -->
+    <string name="l10n_dex_quote_average">"平均价格 %1$s · %2$s MxUSD"</string>
+    <!-- Arguments: price, total -->
+    <string name="l10n_dex_quote_effective">"实际成交价格 %1$s · %2$s MxUSD"</string>
+    <!-- Arguments: minima, mxusd, orders -->
+    <string name="l10n_dex_quote_book">"订单簿 %1$s MINIMA / %2$s MxUSD，涉及 %3$s 个订单"</string>
+    <!-- Arguments: minima, mxusd, pools -->
+    <string name="l10n_dex_quote_pool">"流动池 %1$s MINIMA / %2$s MxUSD，涉及 %3$s 个池"</string>
+    <!-- Arguments: percent -->
+    <string name="l10n_dex_quote_impact">"价格影响 %1$s%%"</string>
+    <!-- Arguments: price -->
+    <string name="l10n_dex_quote_worst">"最差边际价格 %1$s"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_book_leg">"  • 订单簿 %1$s @ %2$s"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_book_partial">"  • 订单簿 %1$s @ %2$s（部分成交）"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_partial">"  • %1$s @ %2$s（部分成交）"</string>
+    <!-- Arguments: minima, mxusd -->
+    <string name="l10n_dex_quote_pool_leg">"  • 流动池 %1$s MINIMA / %2$s MxUSD"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_rest">"剩余 %1$s MINIMA 将以 %2$s 挂限价单"</string>
+    <string name="l10n_dex_trade_checking_title" formatted="false">"交易仍在检查中"</string>
+    <!-- Arguments: id -->
+    <string name="l10n_dex_trade_checking_body">"交易参考：%1$s\n\n应用尚未将此交易与已确认的交易及其付款匹配。应用将继续检查；仅保存交易意图并不能证明已提交。应用重启后不会恢复任何剩余限价单。"</string>
+    <string name="l10n_dex_check_now" formatted="false">"立即检查"</string>
+    <string name="l10n_dex_trade_already_checking" formatted="false">"仍有交易正在检查。请先查看资产页面。"</string>
+    <string name="l10n_dex_order_selecting" formatted="false">"已接受订单请求 · 正在选择钱包币"</string>
+    <string name="l10n_dex_order_posted_checking" formatted="false">"订单已提交 · 正在检查链上创建情况"</string>
+    <!-- Arguments: status -->
+    <string name="l10n_dex_order_status">"订单状态：%1$s"</string>
+    <string name="l10n_dex_trade_updated_receipt_failed" formatted="false">"节点已接受交易 · 无法保存更新后的凭据详情；恢复记录已保留"</string>
+    <string name="l10n_dex_trade_unknown" formatted="false">"交易结果未知 — 凭据已保留。请查看资产页面。"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_trade_failure">"交易失败 — %1$s"</string>
+    <string name="l10n_dex_trade_failure_pending" formatted="false">"交易失败；待处理状态更新失败，因此交易仍暂停"</string>
+    <string name="l10n_dex_trade_verifying_time" formatted="false">"已找到交易 · 保存凭据前正在验证其收录区块时间"</string>
+    <string name="l10n_dex_trade_cleanup_failed" formatted="false">"交易凭据已保存 · 待处理状态更新失败；交易仍暂停"</string>
+    <string name="l10n_dex_trade_receipt_failed" formatted="false">"无法安全保存交易凭据 · 待处理证据已保留；交易仍暂停"</string>
+    <string name="l10n_dex_trade_unresolved" formatted="false">"交易结果尚未确定 — 正在检查区块链。重试前请查看资产页面。"</string>
+    <string name="l10n_dex_rest_not_placed" formatted="false">"交易结果尚未确定。剩余限价单未挂出；交易仍在检查中。"</string>
+    <string name="l10n_dex_review_before_rest" formatted="false">"剩余限价单未挂出 — 请先检查此交易"</string>
+    <string name="l10n_dex_selecting_buy" formatted="false">"买入请求已接受 · 正在选择钱包币"</string>
+    <!-- Arguments: pools, orders -->
+    <string name="l10n_dex_selecting_composite_buy">"买入请求已接受 · 正在为 %1$s 个池和 %2$s 个限价单选择钱包币"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_posted_buy">"已提交 — 等待区块确认买入 %1$s MINIMA"</string>
+    <string name="l10n_dex_selecting_sell" formatted="false">"卖出请求已接受 · 正在选择钱包币"</string>
+    <!-- Arguments: pools, orders -->
+    <string name="l10n_dex_selecting_composite_sell">"卖出请求已接受 · 正在为 %1$s 个池和 %2$s 个限价单选择钱包币"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_posted_sell">"已提交 — 等待区块确认卖出 %1$s MINIMA"</string>
 </resources>

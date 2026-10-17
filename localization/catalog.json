@@ -30637,5 +30637,251 @@
     "zh-Hans": "正在取消 {done}/{total}…",
     "ru": "Отмена {done} из {total}…",
     "uk": "Скасування {done} із {total}…"
+  },
+  "dex.confirmBuy": {
+    "en": "Confirm buy",
+    "zh-Hans": "确认买入",
+    "ru": "Подтвердить покупку",
+    "uk": "Підтвердити купівлю"
+  },
+  "dex.confirmSell": {
+    "en": "Confirm sell",
+    "zh-Hans": "确认卖出",
+    "ru": "Подтвердить продажу",
+    "uk": "Підтвердити продаж"
+  },
+  "dex.executeTrade": {
+    "en": "Execute",
+    "zh-Hans": "执行",
+    "ru": "Выполнить",
+    "uk": "Виконати"
+  },
+  "dex.sweepBuying": {
+    "en": "Buying {amount} MINIMA now from {orders} orders",
+    "zh-Hans": "现在从 {orders} 个订单买入 {amount} MINIMA",
+    "ru": "Покупка {amount} MINIMA сейчас из заявок: {orders}",
+    "uk": "Купівля {amount} MINIMA зараз з ордерів: {orders}"
+  },
+  "dex.sweepSelling": {
+    "en": "Selling {amount} MINIMA now from {orders} orders",
+    "zh-Hans": "现在向 {orders} 个订单卖出 {amount} MINIMA",
+    "ru": "Продажа {amount} MINIMA сейчас по заявкам: {orders}",
+    "uk": "Продаж {amount} MINIMA зараз за ордерами: {orders}"
+  },
+  "dex.quoteBuying": {
+    "en": "Buying {amount} MINIMA now",
+    "zh-Hans": "现在买入 {amount} MINIMA",
+    "ru": "Покупка {amount} MINIMA сейчас",
+    "uk": "Купівля {amount} MINIMA зараз"
+  },
+  "dex.quoteSelling": {
+    "en": "Selling {amount} MINIMA now",
+    "zh-Hans": "现在卖出 {amount} MINIMA",
+    "ru": "Продажа {amount} MINIMA сейчас",
+    "uk": "Продаж {amount} MINIMA зараз"
+  },
+  "dex.quoteAverage": {
+    "en": "Avg price {price}  ·  {total} MxUSD",
+    "zh-Hans": "平均价格 {price} · {total} MxUSD",
+    "ru": "Средняя цена {price} · {total} MxUSD",
+    "uk": "Середня ціна {price} · {total} MxUSD"
+  },
+  "dex.quoteEffective": {
+    "en": "Effective {price}  ·  {total} MxUSD",
+    "zh-Hans": "实际成交价格 {price} · {total} MxUSD",
+    "ru": "Эффективная цена {price} · {total} MxUSD",
+    "uk": "Ефективна ціна {price} · {total} MxUSD"
+  },
+  "dex.quoteBook": {
+    "en": "BOOK {minima} MINIMA / {mxusd} MxUSD across {orders} orders",
+    "zh-Hans": "订单簿 {minima} MINIMA / {mxusd} MxUSD，涉及 {orders} 个订单",
+    "ru": "КНИГА {minima} MINIMA / {mxusd} MxUSD · Заявок: {orders}",
+    "uk": "КНИГА {minima} MINIMA / {mxusd} MxUSD · Ордерів: {orders}"
+  },
+  "dex.quotePool": {
+    "en": "POOL {minima} MINIMA / {mxusd} MxUSD across {pools} pools",
+    "zh-Hans": "流动池 {minima} MINIMA / {mxusd} MxUSD，涉及 {pools} 个池",
+    "ru": "ПУЛЫ {minima} MINIMA / {mxusd} MxUSD · Пулов: {pools}",
+    "uk": "ПУЛИ {minima} MINIMA / {mxusd} MxUSD · Пулів: {pools}"
+  },
+  "dex.quoteImpact": {
+    "en": "Price impact {percent}%",
+    "zh-Hans": "价格影响 {percent}%",
+    "ru": "Влияние на цену {percent}%",
+    "uk": "Вплив на ціну {percent}%"
+  },
+  "dex.quoteWorst": {
+    "en": "Worst marginal {price}",
+    "zh-Hans": "最差边际价格 {price}",
+    "ru": "Худшая предельная цена {price}",
+    "uk": "Найгірша гранична ціна {price}"
+  },
+  "dex.quoteBookLeg": {
+    "en": "  • BOOK {amount} @ {price}",
+    "zh-Hans": "  • 订单簿 {amount} @ {price}",
+    "ru": "  • КНИГА {amount} @ {price}",
+    "uk": "  • КНИГА {amount} @ {price}"
+  },
+  "dex.quoteBookPartial": {
+    "en": "  • BOOK {amount} @ {price}  (partial)",
+    "zh-Hans": "  • 订单簿 {amount} @ {price}（部分成交）",
+    "ru": "  • КНИГА {amount} @ {price} (частично)",
+    "uk": "  • КНИГА {amount} @ {price} (частково)"
+  },
+  "dex.quotePartial": {
+    "en": "  • {amount} @ {price}  (partial)",
+    "zh-Hans": "  • {amount} @ {price}（部分成交）",
+    "ru": "  • {amount} @ {price} (частично)",
+    "uk": "  • {amount} @ {price} (частково)"
+  },
+  "dex.quotePoolLeg": {
+    "en": "  • POOL {minima} MINIMA / {mxusd} MxUSD",
+    "zh-Hans": "  • 流动池 {minima} MINIMA / {mxusd} MxUSD",
+    "ru": "  • ПУЛ {minima} MINIMA / {mxusd} MxUSD",
+    "uk": "  • ПУЛ {minima} MINIMA / {mxusd} MxUSD"
+  },
+  "dex.quoteRest": {
+    "en": "Resting {amount} MINIMA @ {price} as a limit order",
+    "zh-Hans": "剩余 {amount} MINIMA 将以 {price} 挂限价单",
+    "ru": "Остаток {amount} MINIMA @ {price} будет размещён лимитной заявкой",
+    "uk": "Залишок {amount} MINIMA @ {price} буде розміщено лімітним ордером"
+  },
+  "dex.tradeCheckingTitle": {
+    "en": "Trade still being checked",
+    "zh-Hans": "交易仍在检查中",
+    "ru": "Сделка ещё проверяется",
+    "uk": "Угода ще перевіряється"
+  },
+  "dex.tradeCheckingBody": {
+    "en": "Transaction reference: {id}\n\nThe app has not yet matched this trade to a confirmed transaction and its payout. It will keep checking; a saved intent does not by itself prove submission. Any remaining limit order is not restored after an app restart.",
+    "zh-Hans": "交易参考：{id}\n\n应用尚未将此交易与已确认的交易及其付款匹配。应用将继续检查；仅保存交易意图并不能证明已提交。应用重启后不会恢复任何剩余限价单。",
+    "ru": "Ссылка на транзакцию: {id}\n\nПриложение ещё не сопоставило эту сделку с подтверждённой транзакцией и её выплатой. Проверка продолжится; сохранённое намерение само по себе не доказывает отправку. Оставшаяся лимитная заявка не восстанавливается после перезапуска приложения.",
+    "uk": "Посилання на транзакцію: {id}\n\nЗастосунок ще не зіставив цю угоду з підтвердженою транзакцією та її виплатою. Перевірка триватиме; збережений намір сам собою не доводить надсилання. Залишковий лімітний ордер не відновлюється після перезапуску застосунку."
+  },
+  "dex.checkNow": {
+    "en": "Check now",
+    "zh-Hans": "立即检查",
+    "ru": "Проверить сейчас",
+    "uk": "Перевірити зараз"
+  },
+  "dex.tradeAlreadyChecking": {
+    "en": "A trade is still being checked. Review ASSETS first.",
+    "zh-Hans": "仍有交易正在检查。请先查看资产页面。",
+    "ru": "Сделка ещё проверяется. Сначала откройте «Активы».",
+    "uk": "Угода ще перевіряється. Спершу відкрийте «Активи»."
+  },
+  "dex.orderSelecting": {
+    "en": "Order request accepted · selecting wallet coins",
+    "zh-Hans": "已接受订单请求 · 正在选择钱包币",
+    "ru": "Запрос заявки принят · Выбор монет кошелька",
+    "uk": "Запит ордера прийнято · Вибір монет гаманця"
+  },
+  "dex.orderPostedChecking": {
+    "en": "Order posted · checking its creation on-chain",
+    "zh-Hans": "订单已提交 · 正在检查链上创建情况",
+    "ru": "Заявка отправлена · Проверка её создания в блокчейне",
+    "uk": "Ордер надіслано · Перевірка його створення в блокчейні"
+  },
+  "dex.orderStatus": {
+    "en": "Order status: {status}",
+    "zh-Hans": "订单状态：{status}",
+    "ru": "Статус заявки: {status}",
+    "uk": "Стан ордера: {status}"
+  },
+  "dex.tradeUpdatedReceiptFailed": {
+    "en": "Node accepted the trade · updated receipt details could not be saved; recovery record retained",
+    "zh-Hans": "节点已接受交易 · 无法保存更新后的凭据详情；恢复记录已保留",
+    "ru": "Узел принял сделку · Обновлённые данные квитанции не сохранены; запись восстановления сохранена",
+    "uk": "Вузол прийняв угоду · Оновлені дані квитанції не збережено; запис відновлення збережено"
+  },
+  "dex.tradeUnknown": {
+    "en": "Trade outcome unknown — receipt retained. Review ASSETS.",
+    "zh-Hans": "交易结果未知 — 凭据已保留。请查看资产页面。",
+    "ru": "Исход сделки неизвестен — квитанция сохранена. Откройте «Активы».",
+    "uk": "Результат угоди невідомий — квитанцію збережено. Відкрийте «Активи»."
+  },
+  "dex.tradeFailure": {
+    "en": "Trade failed — {error}",
+    "zh-Hans": "交易失败 — {error}",
+    "ru": "Сделка не выполнена — {error}",
+    "uk": "Угоду не виконано — {error}"
+  },
+  "dex.tradeFailurePending": {
+    "en": "Trade failed; pending-state update failed, so trading remains paused",
+    "zh-Hans": "交易失败；待处理状态更新失败，因此交易仍暂停",
+    "ru": "Сделка не выполнена; не удалось обновить состояние ожидания, поэтому торговля остаётся приостановленной",
+    "uk": "Угоду не виконано; не вдалося оновити стан очікування, тому торгівля залишається призупиненою"
+  },
+  "dex.tradeVerifyingTime": {
+    "en": "Trade found · verifying its inclusion block time before saving the receipt",
+    "zh-Hans": "已找到交易 · 保存凭据前正在验证其收录区块时间",
+    "ru": "Сделка найдена · Проверка времени блока включения перед сохранением квитанции",
+    "uk": "Угоду знайдено · Перевірка часу блоку включення перед збереженням квитанції"
+  },
+  "dex.tradeCleanupFailed": {
+    "en": "Trade receipt saved · pending-state update failed; trading remains paused",
+    "zh-Hans": "交易凭据已保存 · 待处理状态更新失败；交易仍暂停",
+    "ru": "Квитанция сделки сохранена · Не удалось обновить состояние ожидания; торговля приостановлена",
+    "uk": "Квитанцію угоди збережено · Не вдалося оновити стан очікування; торгівлю призупинено"
+  },
+  "dex.tradeReceiptFailed": {
+    "en": "Trade receipt could not be saved safely · pending evidence retained; trading remains paused",
+    "zh-Hans": "无法安全保存交易凭据 · 待处理证据已保留；交易仍暂停",
+    "ru": "Не удалось безопасно сохранить квитанцию сделки · Ожидающие доказательства сохранены; торговля приостановлена",
+    "uk": "Не вдалося безпечно зберегти квитанцію угоди · Докази в очікуванні збережено; торгівлю призупинено"
+  },
+  "dex.tradeUnresolved": {
+    "en": "Trade outcome unresolved — checking the chain. Review ASSETS before retrying.",
+    "zh-Hans": "交易结果尚未确定 — 正在检查区块链。重试前请查看资产页面。",
+    "ru": "Исход сделки не выяснен — проверяется блокчейн. Перед повтором откройте «Активы».",
+    "uk": "Результат угоди не з’ясовано — перевіряється блокчейн. Перед повтором відкрийте «Активи»."
+  },
+  "dex.restNotPlaced": {
+    "en": "Trade outcome unresolved. The remaining limit order was not placed; the trade is still being checked.",
+    "zh-Hans": "交易结果尚未确定。剩余限价单未挂出；交易仍在检查中。",
+    "ru": "Исход сделки не выяснен. Оставшаяся лимитная заявка не размещена; сделка ещё проверяется.",
+    "uk": "Результат угоди не з’ясовано. Залишковий лімітний ордер не розміщено; угода ще перевіряється."
+  },
+  "dex.reviewBeforeRest": {
+    "en": "Remaining limit order not placed — review the trade first",
+    "zh-Hans": "剩余限价单未挂出 — 请先检查此交易",
+    "ru": "Оставшаяся лимитная заявка не размещена — сначала проверьте сделку",
+    "uk": "Залишковий лімітний ордер не розміщено — спершу перевірте угоду"
+  },
+  "dex.selectingBuy": {
+    "en": "Buy request accepted · selecting wallet coins",
+    "zh-Hans": "买入请求已接受 · 正在选择钱包币",
+    "ru": "Покупка: запрос принят · Выбор монет кошелька",
+    "uk": "Купівля: запит прийнято · Вибір монет гаманця"
+  },
+  "dex.selectingCompositeBuy": {
+    "en": "Buy request accepted · selecting wallet coins for {pools} pool(s) and {orders} limit order(s)",
+    "zh-Hans": "买入请求已接受 · 正在为 {pools} 个池和 {orders} 个限价单选择钱包币",
+    "ru": "Покупка: запрос принят · Выбор монет для пулов: {pools}, лимитных заявок: {orders}",
+    "uk": "Купівля: запит прийнято · Вибір монет для пулів: {pools}, лімітних ордерів: {orders}"
+  },
+  "dex.postedBuy": {
+    "en": "Posted — waiting for a block to confirm your buy of {amount} MINIMA",
+    "zh-Hans": "已提交 — 等待区块确认买入 {amount} MINIMA",
+    "ru": "Отправлено — ожидается подтверждение блоком: покупка {amount} MINIMA",
+    "uk": "Надіслано — очікується підтвердження блоком: купівля {amount} MINIMA"
+  },
+  "dex.selectingSell": {
+    "en": "Sell request accepted · selecting wallet coins",
+    "zh-Hans": "卖出请求已接受 · 正在选择钱包币",
+    "ru": "Продажа: запрос принят · Выбор монет кошелька",
+    "uk": "Продаж: запит прийнято · Вибір монет гаманця"
+  },
+  "dex.selectingCompositeSell": {
+    "en": "Sell request accepted · selecting wallet coins for {pools} pool(s) and {orders} limit order(s)",
+    "zh-Hans": "卖出请求已接受 · 正在为 {pools} 个池和 {orders} 个限价单选择钱包币",
+    "ru": "Продажа: запрос принят · Выбор монет для пулов: {pools}, лимитных заявок: {orders}",
+    "uk": "Продаж: запит прийнято · Вибір монет для пулів: {pools}, лімітних ордерів: {orders}"
+  },
+  "dex.postedSell": {
+    "en": "Posted — waiting for a block to confirm your sell of {amount} MINIMA",
+    "zh-Hans": "已提交 — 等待区块确认卖出 {amount} MINIMA",
+    "ru": "Отправлено — ожидается подтверждение блоком: продажа {amount} MINIMA",
+    "uk": "Надіслано — очікується підтвердження блоком: продаж {amount} MINIMA"
   }
 }

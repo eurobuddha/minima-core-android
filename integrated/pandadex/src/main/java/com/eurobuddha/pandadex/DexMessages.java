@@ -12,6 +12,20 @@ public final class DexMessages {
         if (error == null) return Language.msg(l10n_wallet_operation_failed);
         return message(error.getMessage() == null ? error.toString() : error.getMessage());
     }
+    /** Internally generated quote lines only; never split unknown diagnostics or user text. */
+    public static CharSequence quote(String value) {
+        if (value == null || value.isEmpty()) return "";
+        Language.TextBuilder result = new Language.TextBuilder();
+        boolean first = true;
+        for (String line : value.split("\n", -1)) {
+            if (!first) result.append("\n");
+            first = false;
+            boolean carriageReturn = line.endsWith("\r");
+            result.append(message(carriageReturn ? line.substring(0, line.length() - 1) : line));
+            if (carriageReturn) result.append("\r");
+        }
+        return result.build();
+    }
     public static CharSequence message(CharSequence value) {
         return value instanceof String ? message((String)value) : value == null ? "" : value;
     }
@@ -184,6 +198,25 @@ public final class DexMessages {
             case "Connection changed. Review the order list again.": return Language.msg(l10n_dex_cancel_connection);
             case "Maker withdrawal instructions retained. No orders were visible in this snapshot; check Orders for on-chain outcomes.": return Language.msg(l10n_dex_withdraw_retained);
             case "Connection changed. Remaining cancellation batches stopped; check retained receipts before retrying.": return Language.msg(l10n_dex_cancel_batches_stopped);
+            case "Confirm buy": return Language.msg(l10n_dex_confirm_buy);
+            case "Confirm sell": return Language.msg(l10n_dex_confirm_sell);
+            case "Execute": return Language.msg(l10n_dex_execute_trade);
+            case "Trade still being checked": return Language.msg(l10n_dex_trade_checking_title);
+            case "Check now": return Language.msg(l10n_dex_check_now);
+            case "A trade is still being checked. Review ASSETS first.": return Language.msg(l10n_dex_trade_already_checking);
+            case "Order request accepted · selecting wallet coins": return Language.msg(l10n_dex_order_selecting);
+            case "Order posted · checking its creation on-chain": return Language.msg(l10n_dex_order_posted_checking);
+            case "Node accepted the trade · updated receipt details could not be saved; recovery record retained": return Language.msg(l10n_dex_trade_updated_receipt_failed);
+            case "Trade outcome unknown — receipt retained. Review ASSETS.": return Language.msg(l10n_dex_trade_unknown);
+            case "Trade failed; pending-state update failed, so trading remains paused": return Language.msg(l10n_dex_trade_failure_pending);
+            case "Trade found · verifying its inclusion block time before saving the receipt": return Language.msg(l10n_dex_trade_verifying_time);
+            case "Trade receipt saved · pending-state update failed; trading remains paused": return Language.msg(l10n_dex_trade_cleanup_failed);
+            case "Trade receipt could not be saved safely · pending evidence retained; trading remains paused": return Language.msg(l10n_dex_trade_receipt_failed);
+            case "Trade outcome unresolved — checking the chain. Review ASSETS before retrying.": return Language.msg(l10n_dex_trade_unresolved);
+            case "Trade outcome unresolved. The remaining limit order was not placed; the trade is still being checked.": return Language.msg(l10n_dex_rest_not_placed);
+            case "Remaining limit order not placed — review the trade first": return Language.msg(l10n_dex_review_before_rest);
+            case "Buy request accepted · selecting wallet coins": return Language.msg(l10n_dex_selecting_buy);
+            case "Sell request accepted · selecting wallet coins": return Language.msg(l10n_dex_selecting_sell);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {
@@ -235,8 +268,33 @@ public final class DexMessages {
         java.util.regex.Pattern.compile("Cancel\\ sent\\ for\\ (-?[0-9]+)\\ order\\ —\\ each\\ leaves\\ the\\ book\\ when\\ a\\ block\\ confirms\\ it,\\ and\\ can\\ still\\ be\\ filled\\ until\\ then"),
         java.util.regex.Pattern.compile("Cancel\\ sent\\ for\\ (-?[0-9]+)\\ orders\\ —\\ each\\ leaves\\ the\\ book\\ when\\ a\\ block\\ confirms\\ it,\\ and\\ can\\ still\\ be\\ filled\\ until\\ then"),
         java.util.regex.Pattern.compile("Cancel\\ requests\\ accepted\\ for\\ (-?[0-9]+);\\ (-?[0-9]+)\\ requests\\ failed\\ or\\ have\\ unknown\\ outcomes\\.\\ Check\\ Orders\\ and\\ retained\\ receipts\\."),
-        java.util.regex.Pattern.compile("Cancelling\\ (-?[0-9]+)\\ of\\ (-?[0-9]+)…")
+        java.util.regex.Pattern.compile("Cancelling\\ (-?[0-9]+)\\ of\\ (-?[0-9]+)…"),
+        java.util.regex.Pattern.compile("Buying\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ now\\ from\\ (-?[0-9]+)\\ order"),
+        java.util.regex.Pattern.compile("Buying\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ now\\ from\\ (-?[0-9]+)\\ orders"),
+        java.util.regex.Pattern.compile("Selling\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ now\\ from\\ (-?[0-9]+)\\ order"),
+        java.util.regex.Pattern.compile("Selling\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ now\\ from\\ (-?[0-9]+)\\ orders"),
+        java.util.regex.Pattern.compile("Buying\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ now"),
+        java.util.regex.Pattern.compile("Selling\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ now"),
+        java.util.regex.Pattern.compile("Avg\\ price\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ \\ ·\\ \\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD"),
+        java.util.regex.Pattern.compile("Effective\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ \\ ·\\ \\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD"),
+        java.util.regex.Pattern.compile("BOOK\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ /\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD\\ across\\ (-?[0-9]+)\\ order"),
+        java.util.regex.Pattern.compile("BOOK\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ /\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD\\ across\\ (-?[0-9]+)\\ orders"),
+        java.util.regex.Pattern.compile("POOL\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ /\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD\\ across\\ (-?[0-9]+)\\ pool"),
+        java.util.regex.Pattern.compile("POOL\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ /\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD\\ across\\ (-?[0-9]+)\\ pools"),
+        java.util.regex.Pattern.compile("Price\\ impact\\ (-?[0-9]+(?:\\.[0-9]+)?)%"),
+        java.util.regex.Pattern.compile("Worst\\ marginal\\ (-?[0-9]+(?:\\.[0-9]+)?)"),
+        java.util.regex.Pattern.compile("\\ \\ •\\ BOOK\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ @\\ (-?[0-9]+(?:\\.[0-9]+)?)"),
+        java.util.regex.Pattern.compile("\\ \\ •\\ BOOK\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ @\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ \\ \\(partial\\)"),
+        java.util.regex.Pattern.compile("\\ \\ •\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ @\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ \\ \\(partial\\)"),
+        java.util.regex.Pattern.compile("\\ \\ •\\ POOL\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ /\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD"),
+        java.util.regex.Pattern.compile("Resting\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ @\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ as\\ a\\ limit\\ order"),
+        java.util.regex.Pattern.compile("Order\\ status:\\ ((?s:.*))"),
+        java.util.regex.Pattern.compile("Trade\\ failed\\ —\\ ((?s:.*))"),
+        java.util.regex.Pattern.compile("Buy\\ request\\ accepted\\ ·\\ selecting\\ wallet\\ coins\\ for\\ (-?[0-9]+)\\ pool\\(s\\)\\ and\\ (-?[0-9]+)\\ limit\\ order\\(s\\)"),
+        java.util.regex.Pattern.compile("Posted\\ —\\ waiting\\ for\\ a\\ block\\ to\\ confirm\\ your\\ buy\\ of\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA"),
+        java.util.regex.Pattern.compile("Sell\\ request\\ accepted\\ ·\\ selecting\\ wallet\\ coins\\ for\\ (-?[0-9]+)\\ pool\\(s\\)\\ and\\ (-?[0-9]+)\\ limit\\ order\\(s\\)"),
+        java.util.regex.Pattern.compile("Posted\\ —\\ waiting\\ for\\ a\\ block\\ to\\ confirm\\ your\\ sell\\ of\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA")
     };
-    private static final int[] RESOURCES={l10n_dex_total_value,l10n_dex_last_trade_age,l10n_dex_book_pool_amount,l10n_dex_pool_amount,l10n_pools_seconds_ago,l10n_dex_minutes_ago,l10n_dex_minutes_ago,l10n_dex_hours_ago,l10n_dex_hours_ago,l10n_dex_days_ago,l10n_dex_days_ago,l10n_dex_clock_seconds,l10n_dex_clock_minutes,l10n_dex_receipt_cancel_buy,l10n_dex_receipt_cancel_sell,l10n_dex_receipt_update_buy,l10n_dex_receipt_update_sell,l10n_dex_receipt_place_buy,l10n_dex_receipt_place_sell,l10n_dex_receipt_submitted,l10n_dex_receipt_posting,l10n_dex_receipt_unknown,l10n_dex_cancel_all_count,l10n_dex_age_blocks,l10n_dex_age_at_check,l10n_dex_order_trade_volume,l10n_dex_order_notional,l10n_dex_order_pnl,l10n_dex_order_pnl_positive,l10n_dex_owner_page,l10n_dex_owner_depth,l10n_dex_reprice_failure,l10n_dex_cancel_failure,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_mixed,l10n_dex_cancelling_progress};
-    private static final boolean[][] DIAGNOSTIC={{false},{true},{false,false},{false},{false},{false},{false},{false},{false},{false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{true},{false},{false},{false},{false,false,false},{false},{false},{false},{false,false},{false},{true},{true},{false},{false},{false,false},{false,false}};
+    private static final int[] RESOURCES={l10n_dex_total_value,l10n_dex_last_trade_age,l10n_dex_book_pool_amount,l10n_dex_pool_amount,l10n_pools_seconds_ago,l10n_dex_minutes_ago,l10n_dex_minutes_ago,l10n_dex_hours_ago,l10n_dex_hours_ago,l10n_dex_days_ago,l10n_dex_days_ago,l10n_dex_clock_seconds,l10n_dex_clock_minutes,l10n_dex_receipt_cancel_buy,l10n_dex_receipt_cancel_sell,l10n_dex_receipt_update_buy,l10n_dex_receipt_update_sell,l10n_dex_receipt_place_buy,l10n_dex_receipt_place_sell,l10n_dex_receipt_submitted,l10n_dex_receipt_posting,l10n_dex_receipt_unknown,l10n_dex_cancel_all_count,l10n_dex_age_blocks,l10n_dex_age_at_check,l10n_dex_order_trade_volume,l10n_dex_order_notional,l10n_dex_order_pnl,l10n_dex_order_pnl_positive,l10n_dex_owner_page,l10n_dex_owner_depth,l10n_dex_reprice_failure,l10n_dex_cancel_failure,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_mixed,l10n_dex_cancelling_progress,l10n_dex_sweep_buying,l10n_dex_sweep_buying,l10n_dex_sweep_selling,l10n_dex_sweep_selling,l10n_dex_quote_buying,l10n_dex_quote_selling,l10n_dex_quote_average,l10n_dex_quote_effective,l10n_dex_quote_book,l10n_dex_quote_book,l10n_dex_quote_pool,l10n_dex_quote_pool,l10n_dex_quote_impact,l10n_dex_quote_worst,l10n_dex_quote_book_leg,l10n_dex_quote_book_partial,l10n_dex_quote_partial,l10n_dex_quote_pool_leg,l10n_dex_quote_rest,l10n_dex_order_status,l10n_dex_trade_failure,l10n_dex_selecting_composite_buy,l10n_dex_posted_buy,l10n_dex_selecting_composite_sell,l10n_dex_posted_sell};
+    private static final boolean[][] DIAGNOSTIC={{false},{true},{false,false},{false},{false},{false},{false},{false},{false},{false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{true},{false},{false},{false},{false,false,false},{false},{false},{false},{false,false},{false},{true},{true},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false},{false},{false,false},{false,false},{false,false,false},{false,false,false},{false,false,false},{false,false,false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{false,false},{false},{false,false},{false}};
 }

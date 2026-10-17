@@ -2227,3 +2227,20 @@ Findings: no blocking source/build defect identified. Fold runtime verification 
 Verdict: approve this increment with host validation.
 
 Evidence: build/localization/dex-orders-validation.json (440 source hashes). Next: trade quote/confirmation dialogs, export flow, Assets, Maker, notifications and dynamic diagnostics; remaining financial/accessibility findings; safe Fold runtime validation; signed versioned deliverables and authorized publication to the GitHub fork, PandaApps and eurobuddha.com.
+
+
+## PandaDEX trade quotes and unresolved-trade review — 2026-10-18
+
+Previous goal turn made progress and committed order/history translations as 62ea9f0. Revalidated all 440 tracked hashes and clean worktree. Reused the standalone confirmSweep/confirmComposite quote assembly, the complete existing PandaPools report-line binding, shared LanguageDialog, and SweepPlannerTest/CompositeRouterTest fixtures. Quote assembly was moved unchanged into two display helpers; transaction callbacks remain in the original methods.
+
+Added 41 messages (5,070 total; 178 exact DEX aliases, 62 patterns). Sweep and mixed book/pool confirmations translate buy/sell direction, average/effective/worst prices, source counts and amounts, price impact, partial fills and remaining limit orders. Existing number formatting is retained. Unresolved-trade review keeps the exact transaction reference and warnings about unproven submission and a remaining order not restored after restart. Order/trade progress and receipt failure messages translate without changing stored strings or recovery behavior.
+
+Six regression tests use actual routing fixtures: best-price sweep with partial fill, minimum remainder and resting amount, mixed buy/sell token direction, book-only and pool-only liquidity, immutable display snapshots, line separators and unknown literal content, posted-versus-confirmed wording, and unknown multiline diagnostic preservation. 727 PandaDEX + 9 localization JVM tests pass (736). All three debug variants and AndroidTest compile; all 19 pinned imports reproduce. Catalogue/transport/diff checks pass. No device activity; Fold R3GL805K7MB only.
+
+### Code Review
+
+Summary: quote formatting and the entire positive-button execution callback are byte-identical to their prior bodies. The existing report helper is used only for internally generated quote lines; unknown diagnostics are never split through it. Display snapshots contain immutable values. Full MainActivity diff, generated lookup additions, adapter and tests reviewed.
+Findings: no blocking source/build defect introduced in this increment. Both transaction reconciliation paths, pending-state persistence/cleanup, rest queue and pool-impact calculation remain unchanged. All 181 protected DEX baseline files and other protected engines/public-key audit/node JAR are unchanged. Fold dialog layout, large-font behavior and live switching still require runtime validation.
+Verdict: approve this increment with host validation; the full release remains incomplete.
+
+Evidence: build/localization/dex-quotes-validation.json (443 source hashes). Next: export, Assets, Maker, notifications and dynamic diagnostics; remaining financial/accessibility findings; safe Fold runtime validation; signed versioned builds and publication to the authorized GitHub fork, PandaApps and eurobuddha.com.

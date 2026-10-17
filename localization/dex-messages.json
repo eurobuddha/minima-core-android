@@ -158,7 +158,26 @@
     "Connection changed or is not ready. Review the order list again.": "dex.cancelReview",
     "Connection changed. Review the order list again.": "dex.cancelConnection",
     "Maker withdrawal instructions retained. No orders were visible in this snapshot; check Orders for on-chain outcomes.": "dex.withdrawRetained",
-    "Connection changed. Remaining cancellation batches stopped; check retained receipts before retrying.": "dex.cancelBatchesStopped"
+    "Connection changed. Remaining cancellation batches stopped; check retained receipts before retrying.": "dex.cancelBatchesStopped",
+    "Confirm buy": "dex.confirmBuy",
+    "Confirm sell": "dex.confirmSell",
+    "Execute": "dex.executeTrade",
+    "Trade still being checked": "dex.tradeCheckingTitle",
+    "Check now": "dex.checkNow",
+    "A trade is still being checked. Review ASSETS first.": "dex.tradeAlreadyChecking",
+    "Order request accepted · selecting wallet coins": "dex.orderSelecting",
+    "Order posted · checking its creation on-chain": "dex.orderPostedChecking",
+    "Node accepted the trade · updated receipt details could not be saved; recovery record retained": "dex.tradeUpdatedReceiptFailed",
+    "Trade outcome unknown — receipt retained. Review ASSETS.": "dex.tradeUnknown",
+    "Trade failed; pending-state update failed, so trading remains paused": "dex.tradeFailurePending",
+    "Trade found · verifying its inclusion block time before saving the receipt": "dex.tradeVerifyingTime",
+    "Trade receipt saved · pending-state update failed; trading remains paused": "dex.tradeCleanupFailed",
+    "Trade receipt could not be saved safely · pending evidence retained; trading remains paused": "dex.tradeReceiptFailed",
+    "Trade outcome unresolved — checking the chain. Review ASSETS before retrying.": "dex.tradeUnresolved",
+    "Trade outcome unresolved. The remaining limit order was not placed; the trade is still being checked.": "dex.restNotPlaced",
+    "Remaining limit order not placed — review the trade first": "dex.reviewBeforeRest",
+    "Buy request accepted · selecting wallet coins": "dex.selectingBuy",
+    "Sell request accepted · selecting wallet coins": "dex.selectingSell"
   },
   "patterns": [
     {
@@ -432,6 +451,202 @@
         "integer"
       ],
       "key": "dex.cancellingProgress"
+    },
+    {
+      "template": "Buying {0} MINIMA now from {1} order",
+      "kinds": [
+        "number",
+        "integer"
+      ],
+      "key": "dex.sweepBuying"
+    },
+    {
+      "template": "Buying {0} MINIMA now from {1} orders",
+      "kinds": [
+        "number",
+        "integer"
+      ],
+      "key": "dex.sweepBuying"
+    },
+    {
+      "template": "Selling {0} MINIMA now from {1} order",
+      "kinds": [
+        "number",
+        "integer"
+      ],
+      "key": "dex.sweepSelling"
+    },
+    {
+      "template": "Selling {0} MINIMA now from {1} orders",
+      "kinds": [
+        "number",
+        "integer"
+      ],
+      "key": "dex.sweepSelling"
+    },
+    {
+      "template": "Buying {0} MINIMA now",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.quoteBuying"
+    },
+    {
+      "template": "Selling {0} MINIMA now",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.quoteSelling"
+    },
+    {
+      "template": "Avg price {0}  ·  {1} MxUSD",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.quoteAverage"
+    },
+    {
+      "template": "Effective {0}  ·  {1} MxUSD",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.quoteEffective"
+    },
+    {
+      "template": "BOOK {0} MINIMA / {1} MxUSD across {2} order",
+      "kinds": [
+        "number",
+        "number",
+        "integer"
+      ],
+      "key": "dex.quoteBook"
+    },
+    {
+      "template": "BOOK {0} MINIMA / {1} MxUSD across {2} orders",
+      "kinds": [
+        "number",
+        "number",
+        "integer"
+      ],
+      "key": "dex.quoteBook"
+    },
+    {
+      "template": "POOL {0} MINIMA / {1} MxUSD across {2} pool",
+      "kinds": [
+        "number",
+        "number",
+        "integer"
+      ],
+      "key": "dex.quotePool"
+    },
+    {
+      "template": "POOL {0} MINIMA / {1} MxUSD across {2} pools",
+      "kinds": [
+        "number",
+        "number",
+        "integer"
+      ],
+      "key": "dex.quotePool"
+    },
+    {
+      "template": "Price impact {0}%",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.quoteImpact"
+    },
+    {
+      "template": "Worst marginal {0}",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.quoteWorst"
+    },
+    {
+      "template": "  • BOOK {0} @ {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.quoteBookLeg"
+    },
+    {
+      "template": "  • BOOK {0} @ {1}  (partial)",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.quoteBookPartial"
+    },
+    {
+      "template": "  • {0} @ {1}  (partial)",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.quotePartial"
+    },
+    {
+      "template": "  • POOL {0} MINIMA / {1} MxUSD",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.quotePoolLeg"
+    },
+    {
+      "template": "Resting {0} MINIMA @ {1} as a limit order",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.quoteRest"
+    },
+    {
+      "template": "Order status: {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.orderStatus"
+    },
+    {
+      "template": "Trade failed — {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.tradeFailure"
+    },
+    {
+      "template": "Buy request accepted · selecting wallet coins for {0} pool(s) and {1} limit order(s)",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.selectingCompositeBuy"
+    },
+    {
+      "template": "Posted — waiting for a block to confirm your buy of {0} MINIMA",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.postedBuy"
+    },
+    {
+      "template": "Sell request accepted · selecting wallet coins for {0} pool(s) and {1} limit order(s)",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.selectingCompositeSell"
+    },
+    {
+      "template": "Posted — waiting for a block to confirm your sell of {0} MINIMA",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.postedSell"
     }
   ]
 }

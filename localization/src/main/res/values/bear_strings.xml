@@ -6213,4 +6213,67 @@
     <string name="l10n_dex_cancel_batch_mixed">"Cancel requests accepted for %1$s; %2$s requests failed or have unknown outcomes. Check Orders and retained receipts."</string>
     <!-- Arguments: done, total -->
     <string name="l10n_dex_cancelling_progress">"Cancelling %1$s of %2$s…"</string>
+    <string name="l10n_dex_confirm_buy" formatted="false">"Confirm buy"</string>
+    <string name="l10n_dex_confirm_sell" formatted="false">"Confirm sell"</string>
+    <string name="l10n_dex_execute_trade" formatted="false">"Execute"</string>
+    <!-- Arguments: amount, orders -->
+    <string name="l10n_dex_sweep_buying">"Buying %1$s MINIMA now from %2$s orders"</string>
+    <!-- Arguments: amount, orders -->
+    <string name="l10n_dex_sweep_selling">"Selling %1$s MINIMA now from %2$s orders"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_quote_buying">"Buying %1$s MINIMA now"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_quote_selling">"Selling %1$s MINIMA now"</string>
+    <!-- Arguments: price, total -->
+    <string name="l10n_dex_quote_average">"Avg price %1$s  ·  %2$s MxUSD"</string>
+    <!-- Arguments: price, total -->
+    <string name="l10n_dex_quote_effective">"Effective %1$s  ·  %2$s MxUSD"</string>
+    <!-- Arguments: minima, mxusd, orders -->
+    <string name="l10n_dex_quote_book">"BOOK %1$s MINIMA / %2$s MxUSD across %3$s orders"</string>
+    <!-- Arguments: minima, mxusd, pools -->
+    <string name="l10n_dex_quote_pool">"POOL %1$s MINIMA / %2$s MxUSD across %3$s pools"</string>
+    <!-- Arguments: percent -->
+    <string name="l10n_dex_quote_impact">"Price impact %1$s%%"</string>
+    <!-- Arguments: price -->
+    <string name="l10n_dex_quote_worst">"Worst marginal %1$s"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_book_leg">"  • BOOK %1$s @ %2$s"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_book_partial">"  • BOOK %1$s @ %2$s  (partial)"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_partial">"  • %1$s @ %2$s  (partial)"</string>
+    <!-- Arguments: minima, mxusd -->
+    <string name="l10n_dex_quote_pool_leg">"  • POOL %1$s MINIMA / %2$s MxUSD"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_quote_rest">"Resting %1$s MINIMA @ %2$s as a limit order"</string>
+    <string name="l10n_dex_trade_checking_title" formatted="false">"Trade still being checked"</string>
+    <!-- Arguments: id -->
+    <string name="l10n_dex_trade_checking_body">"Transaction reference: %1$s\n\nThe app has not yet matched this trade to a confirmed transaction and its payout. It will keep checking; a saved intent does not by itself prove submission. Any remaining limit order is not restored after an app restart."</string>
+    <string name="l10n_dex_check_now" formatted="false">"Check now"</string>
+    <string name="l10n_dex_trade_already_checking" formatted="false">"A trade is still being checked. Review ASSETS first."</string>
+    <string name="l10n_dex_order_selecting" formatted="false">"Order request accepted · selecting wallet coins"</string>
+    <string name="l10n_dex_order_posted_checking" formatted="false">"Order posted · checking its creation on-chain"</string>
+    <!-- Arguments: status -->
+    <string name="l10n_dex_order_status">"Order status: %1$s"</string>
+    <string name="l10n_dex_trade_updated_receipt_failed" formatted="false">"Node accepted the trade · updated receipt details could not be saved; recovery record retained"</string>
+    <string name="l10n_dex_trade_unknown" formatted="false">"Trade outcome unknown — receipt retained. Review ASSETS."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_trade_failure">"Trade failed — %1$s"</string>
+    <string name="l10n_dex_trade_failure_pending" formatted="false">"Trade failed; pending-state update failed, so trading remains paused"</string>
+    <string name="l10n_dex_trade_verifying_time" formatted="false">"Trade found · verifying its inclusion block time before saving the receipt"</string>
+    <string name="l10n_dex_trade_cleanup_failed" formatted="false">"Trade receipt saved · pending-state update failed; trading remains paused"</string>
+    <string name="l10n_dex_trade_receipt_failed" formatted="false">"Trade receipt could not be saved safely · pending evidence retained; trading remains paused"</string>
+    <string name="l10n_dex_trade_unresolved" formatted="false">"Trade outcome unresolved — checking the chain. Review ASSETS before retrying."</string>
+    <string name="l10n_dex_rest_not_placed" formatted="false">"Trade outcome unresolved. The remaining limit order was not placed; the trade is still being checked."</string>
+    <string name="l10n_dex_review_before_rest" formatted="false">"Remaining limit order not placed — review the trade first"</string>
+    <string name="l10n_dex_selecting_buy" formatted="false">"Buy request accepted · selecting wallet coins"</string>
+    <!-- Arguments: pools, orders -->
+    <string name="l10n_dex_selecting_composite_buy">"Buy request accepted · selecting wallet coins for %1$s pool(s) and %2$s limit order(s)"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_posted_buy">"Posted — waiting for a block to confirm your buy of %1$s MINIMA"</string>
+    <string name="l10n_dex_selecting_sell" formatted="false">"Sell request accepted · selecting wallet coins"</string>
+    <!-- Arguments: pools, orders -->
+    <string name="l10n_dex_selecting_composite_sell">"Sell request accepted · selecting wallet coins for %1$s pool(s) and %2$s limit order(s)"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_dex_posted_sell">"Posted — waiting for a block to confirm your sell of %1$s MINIMA"</string>
 </resources>
