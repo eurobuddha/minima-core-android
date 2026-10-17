@@ -1634,11 +1634,11 @@ public class MainActivity extends AppCompatActivity {
     public void publishMaker(java.util.List<MakerLadder.Slot> desired, boolean pegged) {
         if (!ready()) return;
         if (makerSplitPending) {
-            new AlertDialog.Builder(this, Design.dialogTheme())
-                    .setTitle("Funding split is confirming")
-                    .setMessage("Wait for the next block and balance refresh before publishing. "
-                            + "The split outputs are not spendable yet.")
-                    .setPositiveButton("OK", null)
+            new LanguageDialog(this, Design.dialogTheme())
+                    .setTitle(DexMessages.message("Funding split is confirming"))
+                    .setMessage(DexMessages.message("Wait for the next block and balance refresh before publishing. "
+                            + "The split outputs are not spendable yet."))
+                    .setPositiveButton(DexMessages.message("OK"), null)
                     .show();
             return;
         }
@@ -1652,39 +1652,64 @@ public class MainActivity extends AppCompatActivity {
 
         // ---- affordability FIRST: an unfunded rung fails as an invisible async reject
         // (observed live — 4 bids sent, 1 funded), so refuse to publish what can't be paid for
+        String lack = makerFundingLack(c, minimaSendable, minimaLockedNode(), minimaUnconfirmed,
+                usdtSendable, usdtLockedNode(), usdtUnconfirmed);
+        if (lack.length() > 0) {
+            new LanguageDialog(this, Design.dialogTheme())
+                    .setTitle(DexMessages.message("Not enough available funds"))
+                    .setMessage(DexMessages.quote(lack + "\nShrink the rung sizes or free up funds, then publish."))
+                    .setPositiveButton(DexMessages.message("OK"), null)
+                    .show();
+            return;
+        }
+
+        String fundingHint = makerFundingHint(nAsks, nBids);
+        AlertDialog.Builder b = new LanguageDialog(this, Design.dialogTheme())
+                .setTitle(DexMessages.message("Publish the ladder"))
+                .setMessage(makerPublishMessage(nAsks, nBids, c, pegged, fundingHint))
+                .setPositiveButton(DexMessages.message("Publish"), (d, w) -> {
+                    makerCfg.armed = true;
+                    makerCfg.lastActedMid = null;      // act on the next cycle
+                    if(!makerCfg.saveUserAction()) {
+                        makerCfg.armed=false;
+                        toast(MakerConfig.storageFailureMessage()+" Publishing was not started.");repaint();return;
+                    }
+                    setStage("Ladder publishing — posting the first rungs");
+                    repo.refresh();
+                    repaint();
+                })
+                .setNegativeButton(DexMessages.message("Not yet"), null);
+        if (!fundingHint.isEmpty()) b.setNeutralButton(DexMessages.message("Split funds first"), (d, w) -> prepareMakerFundingUtxos());
+        b.show();
+    }
+
+    static String makerFundingLack(MakerLadder.Commitments c, BigDecimal minimaSendable, BigDecimal minimaLocked,
+            BigDecimal minimaUnconfirmed, BigDecimal usdtSendable, BigDecimal usdtLocked, BigDecimal usdtUnconfirmed) {
         StringBuilder lack = new StringBuilder();
         if (c.askMinima.compareTo(minimaSendable) > 0) {
             lack.append("Asks need ").append(PriceMath.fmt(c.askMinima))
                     .append(" MINIMA — you have ").append(PriceMath.fmt(minimaSendable))
                     .append(" sendable");
-            appendUnavailable(lack, minimaLockedNode(), minimaUnconfirmed);
+            appendUnavailable(lack, minimaLocked, minimaUnconfirmed);
             lack.append(".\n");
         }
         if (c.bidUsdt.compareTo(usdtSendable) > 0) {
             lack.append("Bids need ").append(PriceMath.fmt(c.bidUsdt))
                     .append(" MxUSD — you have ").append(PriceMath.fmt(usdtSendable))
                     .append(" sendable");
-            appendUnavailable(lack, usdtLockedNode(), usdtUnconfirmed);
+            appendUnavailable(lack, usdtLocked, usdtUnconfirmed);
             lack.append(".\n");
         }
-        if (lack.length() > 0) {
-            new AlertDialog.Builder(this, Design.dialogTheme())
-                    .setTitle("Not enough available funds")
-                    .setMessage(lack + "\nShrink the rung sizes or free up funds, then publish.")
-                    .setPositiveButton("OK", null)
-                    .show();
-            return;
-        }
+        return lack.toString();
+    }
 
+    static CharSequence makerPublishMessage(int nAsks, int nBids, MakerLadder.Commitments c, boolean pegged, String fundingHint) {
         String sides = (nAsks > 0 ? nAsks + " ask" + (nAsks == 1 ? "" : "s") + " locking "
                         + PriceMath.fmt(c.askMinima) + " MINIMA" : "no asks")
                 + " and "
                 + (nBids > 0 ? nBids + " bid" + (nBids == 1 ? "" : "s") + " locking "
                         + PriceMath.fmt(c.bidUsdt) + " MxUSD" : "no bids");
-        String fundingHint = makerFundingHint(nAsks, nBids);
-        AlertDialog.Builder b = new AlertDialog.Builder(this, Design.dialogTheme())
-                .setTitle("Publish the ladder")
-                .setMessage("This puts " + (nBids + nAsks) + " orders on the book — " + sides + ".\n\n"
+        return DexMessages.quote("This puts " + (nBids + nAsks) + " orders on the book — " + sides + ".\n\n"
                         + (pegged
                         ? "PEGGED: prices track the MEXC mid and reprice when it moves past your "
                         + "threshold; your per-rung sizes are kept. If the feed goes stale the "
@@ -1699,24 +1724,14 @@ public class MainActivity extends AppCompatActivity {
                         + "Background checks are normally requested every 15 minutes. Android may delay or stop them, "
                         + "so automatic withdrawal is not a guaranteed price limit. Keep PandaDEX and MinimaCore "
                         + "running while monitoring the ladder; check Orders for confirmed cancellations."
-                        + (fundingHint.isEmpty() ? "" : "\n\n" + fundingHint))
-                .setPositiveButton("Publish", (d, w) -> {
-                    makerCfg.armed = true;
-                    makerCfg.lastActedMid = null;      // act on the next cycle
-                    if(!makerCfg.saveUserAction()) {
-                        makerCfg.armed=false;
-                        toast(MakerConfig.storageFailureMessage()+" Publishing was not started.");repaint();return;
-                    }
-                    setStage("Ladder publishing — posting the first rungs");
-                    repo.refresh();
-                    repaint();
-                })
-                .setNegativeButton("Not yet", null);
-        if (!fundingHint.isEmpty()) b.setNeutralButton("Split funds first", (d, w) -> prepareMakerFundingUtxos());
-        b.show();
+                        + (fundingHint.isEmpty() ? "" : "\n\n" + fundingHint));
     }
 
     private String makerFundingHint(int nAsks, int nBids) {
+        return makerFundingHint(nAsks, nBids, minimaCoins, usdtCoins);
+    }
+
+    static String makerFundingHint(int nAsks, int nBids, int minimaCoins, int usdtCoins) {
         StringBuilder sb = new StringBuilder();
         if (nAsks > 1 && minimaCoins > 0 && minimaCoins < nAsks) {
             sb.append("MINIMA funding looks thin: ").append(minimaCoins)
@@ -1742,23 +1757,39 @@ public class MainActivity extends AppCompatActivity {
             toast("Withdraw the live ladder before splitting maker funding coins");
             return;
         }
-        String[] items = {
-                "MINIMA - " + PriceMath.fmt(minimaSendable) + " sendable, "
-                        + minimaCoins + " coin" + (minimaCoins == 1 ? "" : "s"),
-                "MxUSD - " + PriceMath.fmt(usdtSendable) + " sendable, "
-                        + usdtCoins + " coin" + (usdtCoins == 1 ? "" : "s")
-        };
-        new AlertDialog.Builder(this, Design.dialogTheme())
-                .setTitle("Split maker funding")
-                .setMessage("This sends the selected sendable balance back to your own wallet "
-                        + "with split:" + SelfSplit.COUNT + ". The new coins are unconfirmed "
-                        + "until a block mines; publish the ladder after ASSETS shows them "
-                        + "sendable.")
+        showMakerFundingChoices(minimaSendable, usdtSendable, minimaCoins, usdtCoins);
+    }
+
+    // A message and a list cannot share AlertDialog's content panel. Keep the list visible,
+    // then review the selected immutable amount and warning before any node write.
+    void showMakerFundingChoices(BigDecimal minima, BigDecimal mxusd, int minimaCount, int mxusdCount) {
+        CharSequence[] items = {makerFundingItem("MINIMA", minima, minimaCount), makerFundingItem("MxUSD", mxusd, mxusdCount)};
+        new LanguageDialog(this, Design.dialogTheme())
+                .setTitle(DexMessages.message("Split maker funding"))
                 .setItems(items, (d, which) -> {
-                    if (which == 0) splitMakerFunding(Util.MINIMA_TOKENID, "MINIMA", minimaSendable);
-                    else splitMakerFunding(DexContract.USDT_ID, "MxUSD", usdtSendable);
+                    if (which == 0) confirmMakerFunding(Util.MINIMA_TOKENID, "MINIMA", minima, minimaCount);
+                    else if (which == 1) confirmMakerFunding(DexContract.USDT_ID, "MxUSD", mxusd, mxusdCount);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(DexMessages.message("Cancel"), null)
+                .show();
+    }
+
+    static CharSequence makerFundingItem(String label, BigDecimal amount, int coins) {
+        return DexMessages.message(label + " - " + PriceMath.fmt(amount) + " sendable, " + coins + " coin" + (coins == 1 ? "" : "s"));
+    }
+
+    private void confirmMakerFunding(String tokenid, String label, BigDecimal amount, int coins) {
+        new LanguageDialog(this, Design.dialogTheme())
+                .setTitle(DexMessages.message("Split maker funding"))
+                .setMessage(Language.join(makerFundingItem(label, amount, coins), "\n\n", Language.msg(l10n_dex_maker_split_body, SelfSplit.COUNT)))
+                .setPositiveButton(DexMessages.message("Split funds"), (d, w) -> {
+                    if (!ready()) return;
+                    if (makerCfg != null && makerCfg.armed) {
+                        toast("Withdraw the live ladder before splitting maker funding coins"); return;
+                    }
+                    splitMakerFunding(tokenid, label, amount);
+                })
+                .setNegativeButton(DexMessages.message("Cancel"), null)
                 .show();
     }
 
@@ -1836,6 +1867,22 @@ public class MainActivity extends AppCompatActivity {
             toast("No automatic edits available — review the rung statuses for positions that need attention");
             return;
         }
+        CharSequence message = makerEditMessage(relocks, reposts, creates, cancels);
+
+        new LanguageDialog(this, Design.dialogTheme())
+                .setTitle(DexMessages.message("Apply edits to the live ladder"))
+                .setMessage(message)
+                .setPositiveButton(DexMessages.message("Apply"), (d, w) -> {
+                    maker.nudge();          // don't wait out the cycle gate for a deliberate edit
+                    setStage("Applying ladder edits…");
+                    repo.refresh();
+                    repaint();
+                })
+                .setNegativeButton(DexMessages.message("Not yet"), null)
+                .show();
+    }
+
+    static CharSequence makerEditMessage(int relocks, int reposts, int creates, int cancels) {
         StringBuilder sb = new StringBuilder();
         if (relocks > 0) sb.append("• ").append(relocks).append(relocks == 1 ? " rung re-prices" : " rungs re-price")
                 .append(" in place — one transaction each, funds never leave the book.\n");
@@ -1849,17 +1896,7 @@ public class MainActivity extends AppCompatActivity {
         sb.append("\nRungs post one per side per cycle, so a large batch lands over a few "
                 + "minutes. The status panel shows each one.");
 
-        new AlertDialog.Builder(this, Design.dialogTheme())
-                .setTitle("Apply edits to the live ladder")
-                .setMessage(sb.toString())
-                .setPositiveButton("Apply", (d, w) -> {
-                    maker.nudge();          // don't wait out the cycle gate for a deliberate edit
-                    setStage("Applying ladder edits…");
-                    repo.refresh();
-                    repaint();
-                })
-                .setNegativeButton("Not yet", null)
-                .show();
+        return DexMessages.quote(sb.toString());
     }
 
     /** Withdraw the ladder: disarm, cancel everything it owns, chase what hasn't confirmed. */

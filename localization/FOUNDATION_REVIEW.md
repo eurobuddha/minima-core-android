@@ -2340,3 +2340,20 @@ Summary: presentation-only adaptation of the existing retained editor. No findin
 Validation: six tests use actual MakerStatus lines/fixtures and MarketPrice snapshots. They distinguish current/stale/absent orders, unverified reprices, reduced/unknown/different funding, retained withdrawal instructions with current/stale/missing observations, immutable displays with raw IDs/diagnostics, feed age/widening/withdrawal/quarantine and exact preview numbers. 749 PandaDEX + 9 localization JVM tests pass (758). All three debug variants and AndroidTest compile. All 19 pinned imports reproduce; catalogue, transport and diff checks pass. No device use; Fold R3GL805K7MB only.
 
 Verdict: approve this increment with host validation. Safe Fold runtime validation remains necessary for drafts/focus, long text, accessibility and switching. Full signed release remains incomplete. Evidence: build/localization/dex-maker-validation.json (457 source hashes). Next: MainActivity Maker publish/funding/apply confirmation dialogs and progress messages (already read, not changed); notification/dynamic diagnostic coverage; remaining financial/accessibility review; safe Fold validation; signed builds and authorized publication.
+
+
+## PandaDEX Maker consent and funding choices — 2026-10-18
+
+Previous turn made progress and committed the retained Maker editor as 0932f76. Revalidated all 457 checkpoint source hashes and a clean worktree. Read publishMaker, makerFundingHint, prepareMakerFundingUtxos, splitMakerFunding/postMakerSelfSplit, applyMakerEdits, withdrawLadder, appendUnavailable, MakerConfig.storageFailureMessage and existing quote/order dialog adapters. Reused shared LanguageDialog, DexMessages.quote for internally generated consent text, original commitment/shortage/hint/edit assembly and original split execution.
+
+Added 59 messages (5,241 total; 314 exact DEX aliases, 130 patterns) covering publish side/amount commitments, manual versus pegged operation, background-check limitations, available/locked/unconfirmed funds, split preparation/results, each edit type and storage/conflict warnings. Callback bodies for publish/apply and split execution/withdrawal remain unchanged. Read-only message assembly was extracted into testable helpers. No unknown node diagnostic is split into lines.
+
+### Code Review
+
+Summary: translated consent retains exact amounts and the original risks. One existing dialog defect was repaired.
+
+- MAJOR, resolved — prepareMakerFundingUtxos set both a message and list items. The actual AppCompat 1.7.1 AlertController.setupContent bytecode shows that a non-null message skips attaching mListView; the asset choices were hidden. Reused the existing list-only dialog, then a separate retained confirmation with the selected immutable amount, coin count and original split warning. The final action rechecks readiness and the active-maker guard before calling the unchanged split path. Cancel remains available in both dialogs.
+
+Validation: six cases cover actual MakerLadder commitments, one-sided publication, all unavailable-fund combinations, distinct reprice/repost/create/cancel previews, both asset choices and their separate confirmation calls, and nested storage/unknown diagnostic warnings. The dialog test mocks only Android dialog construction/Activity and exercises the real list/selection/confirmation methods, stopping before the action. 755 PandaDEX + 9 localization JVM tests pass (764). All three debug variants and AndroidTest compile. All 19 pinned imports reproduce; catalogue, transport and diff checks pass. All 178 original DEX baseline files and all protected engine/public-key audit/node-JAR hashes remain unchanged. No device use; Fold R3GL805K7MB only.
+
+Verdict: approve this increment with host validation. Full Fold rendering, switching, and the final action lifecycle remain unverified. Evidence: build/localization/dex-maker-dialog-validation.json (460 source hashes). Full signed release is incomplete. Next: notification and dynamic diagnostic coverage, remaining financial/accessibility review, safe Fold validation, signed versioned builds and authorized publication.

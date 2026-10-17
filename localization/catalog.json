@@ -31555,5 +31555,359 @@
     "zh-Hans": "买盘  {bids}\n卖盘  {asks}",
     "ru": "ПОКУПКИ  {bids}\nПРОДАЖИ  {asks}",
     "uk": "КУПІВЛІ  {bids}\nПРОДАЖІ  {asks}"
+  },
+  "dex.makerSplitConfirming": {
+    "en": "Funding split is confirming",
+    "zh-Hans": "资金拆分正在确认",
+    "ru": "Разделение средств подтверждается",
+    "uk": "Розділення коштів підтверджується"
+  },
+  "dex.makerSplitWait": {
+    "en": "Wait for the next block and balance refresh before publishing. The split outputs are not spendable yet.",
+    "zh-Hans": "请等待下个区块及余额刷新后再发布。拆分产生的输出暂不可用。",
+    "ru": "Перед публикацией дождитесь следующего блока и обновления баланса. Выходы разделения пока недоступны для расходования.",
+    "uk": "Перед публікацією дочекайтеся наступного блоку й оновлення балансу. Виходи розділення поки недоступні для витрачання."
+  },
+  "dex.makerNoRungs": {
+    "en": "No rungs to publish — set a price and size first",
+    "zh-Hans": "没有可发布的档位 — 请先设置价格和数量",
+    "ru": "Нет уровней для публикации — сначала задайте цену и объём",
+    "uk": "Немає рівнів для публікації — спочатку задайте ціну й обсяг"
+  },
+  "dex.makerInsufficientTitle": {
+    "en": "Not enough available funds",
+    "zh-Hans": "可用资金不足",
+    "ru": "Недостаточно доступных средств",
+    "uk": "Недостатньо доступних коштів"
+  },
+  "dex.makerShrink": {
+    "en": "Shrink the rung sizes or free up funds, then publish.",
+    "zh-Hans": "请减小每档数量或释放资金，然后再发布。",
+    "ru": "Уменьшите объёмы уровней или освободите средства, затем опубликуйте.",
+    "uk": "Зменште обсяги рівнів або звільніть кошти, потім опублікуйте."
+  },
+  "dex.makerNoAsks": {
+    "en": "no asks",
+    "zh-Hans": "无卖盘",
+    "ru": "нет продаж",
+    "uk": "немає продажів"
+  },
+  "dex.makerNoBids": {
+    "en": "no bids",
+    "zh-Hans": "无买盘",
+    "ru": "нет покупок",
+    "uk": "немає купівель"
+  },
+  "dex.makerPublishTitle": {
+    "en": "Publish the ladder",
+    "zh-Hans": "发布阶梯订单",
+    "ru": "Опубликовать лестницу",
+    "uk": "Опублікувати драбину"
+  },
+  "dex.makerNotYet": {
+    "en": "Not yet",
+    "zh-Hans": "暂不",
+    "ru": "Пока нет",
+    "uk": "Поки ні"
+  },
+  "dex.makerSplitFirst": {
+    "en": "Split funds first",
+    "zh-Hans": "先拆分资金",
+    "ru": "Сначала разделить средства",
+    "uk": "Спочатку розділити кошти"
+  },
+  "dex.makerPublishing": {
+    "en": "Ladder publishing — posting the first rungs",
+    "zh-Hans": "正在发布阶梯订单 — 提交首批档位",
+    "ru": "Публикация лестницы — отправка первых уровней",
+    "uk": "Публікація драбини — надсилання перших рівнів"
+  },
+  "dex.makerBusy": {
+    "en": "A transaction is already in flight",
+    "zh-Hans": "已有一笔交易正在处理中",
+    "ru": "Транзакция уже выполняется",
+    "uk": "Транзакція вже виконується"
+  },
+  "dex.makerWithdrawBeforeSplit": {
+    "en": "Withdraw the live ladder before splitting maker funding coins",
+    "zh-Hans": "拆分做市资金币前，请先撤回现有阶梯订单",
+    "ru": "Снимите активную лестницу перед разделением монет для маркетмейкера",
+    "uk": "Зніміть активну драбину перед розділенням монет для маркетмейкера"
+  },
+  "dex.makerSplitTitle": {
+    "en": "Split maker funding",
+    "zh-Hans": "拆分做市资金",
+    "ru": "Разделить средства маркетмейкера",
+    "uk": "Розділити кошти маркетмейкера"
+  },
+  "dex.makerSplitAction": {
+    "en": "Split funds",
+    "zh-Hans": "拆分资金",
+    "ru": "Разделить средства",
+    "uk": "Розділити кошти"
+  },
+  "dex.makerFetchAddress": {
+    "en": "Fetching your wallet address...",
+    "zh-Hans": "正在获取您的钱包地址…",
+    "ru": "Получение адреса кошелька…",
+    "uk": "Отримання адреси гаманця…"
+  },
+  "dex.makerSplitNoAddress": {
+    "en": "Split failed - could not get your wallet address",
+    "zh-Hans": "拆分失败 — 无法获取您的钱包地址",
+    "ru": "Разделение не удалось — не удалось получить адрес кошелька",
+    "uk": "Розділення не вдалося — не вдалося отримати адресу гаманця"
+  },
+  "dex.makerAddressFailed": {
+    "en": "Could not get your wallet address",
+    "zh-Hans": "无法获取您的钱包地址",
+    "ru": "Не удалось получить адрес кошелька",
+    "uk": "Не вдалося отримати адресу гаманця"
+  },
+  "dex.makerSplitSubmitted": {
+    "en": "Split submitted — waiting for spendable wallet coins",
+    "zh-Hans": "拆分已提交 — 等待钱包币变为可用",
+    "ru": "Разделение отправлено — ожидание доступных для расходования монет",
+    "uk": "Розділення надіслано — очікування доступних для витрачання монет"
+  },
+  "dex.makerSplitUnknown": {
+    "en": "Split outcome unknown — review Assets",
+    "zh-Hans": "拆分结果未知 — 请检查资产页",
+    "ru": "Результат разделения неизвестен — проверьте активы",
+    "uk": "Результат розділення невідомий — перевірте активи"
+  },
+  "dex.makerPublishFirst": {
+    "en": "Publish the ladder first",
+    "zh-Hans": "请先发布阶梯订单",
+    "ru": "Сначала опубликуйте лестницу",
+    "uk": "Спочатку опублікуйте драбину"
+  },
+  "dex.makerAdjusting": {
+    "en": "Mid-adjustment — try again in a moment",
+    "zh-Hans": "正在调整中 — 请稍后重试",
+    "ru": "Идёт корректировка — повторите чуть позже",
+    "uk": "Триває коригування — повторіть трохи пізніше"
+  },
+  "dex.makerNoEdits": {
+    "en": "No automatic edits available — review the rung statuses for positions that need attention",
+    "zh-Hans": "没有可自动应用的修改 — 请检查档位状态，处理需要关注的仓位",
+    "ru": "Нет автоматических изменений — проверьте статусы уровней, требующих внимания",
+    "uk": "Немає автоматичних змін — перевірте стани рівнів, що потребують уваги"
+  },
+  "dex.makerApplyTitle": {
+    "en": "Apply edits to the live ladder",
+    "zh-Hans": "将修改应用于现有阶梯订单",
+    "ru": "Применить изменения к активной лестнице",
+    "uk": "Застосувати зміни до активної драбини"
+  },
+  "dex.makerApply": {
+    "en": "Apply",
+    "zh-Hans": "应用",
+    "ru": "Применить",
+    "uk": "Застосувати"
+  },
+  "dex.makerApplying": {
+    "en": "Applying ladder edits…",
+    "zh-Hans": "正在应用阶梯订单修改…",
+    "ru": "Применение изменений лестницы…",
+    "uk": "Застосування змін драбини…"
+  },
+  "dex.makerWithdrawQueued": {
+    "en": "Finishing the current adjustment; withdrawal will then be attempted. Check Orders for confirmation.",
+    "zh-Hans": "正在完成当前调整；之后将尝试撤单。请在订单页查看确认结果。",
+    "ru": "Завершается текущая корректировка; затем будет предпринята попытка снятия. Проверьте подтверждение в разделе заявок.",
+    "uk": "Завершується поточне коригування; потім буде спроба зняття. Перевірте підтвердження в розділі заявок."
+  },
+  "dex.makerNothingWithdraw": {
+    "en": "No ladder orders to withdraw",
+    "zh-Hans": "没有可撤回的阶梯订单",
+    "ru": "Нет заявок лестницы для снятия",
+    "uk": "Немає заявок драбини для зняття"
+  },
+  "dex.makerWithdrawing": {
+    "en": "Withdrawing the ladder — cancels leave the book as blocks confirm them",
+    "zh-Hans": "正在撤回阶梯订单 — 撤单经区块确认后才会从订单簿移除",
+    "ru": "Снятие лестницы — заявки покидают стакан по мере подтверждения отмен в блоках",
+    "uk": "Зняття драбини — заявки залишають книгу в міру підтвердження скасувань у блоках"
+  },
+  "dex.makerSettingsConflict": {
+    "en": "Maker settings changed in another session. Reload and review them before saving again.",
+    "zh-Hans": "做市设置已在另一会话中更改。请重新加载并核查后再保存。",
+    "ru": "Настройки маркетмейкера изменены в другом сеансе. Перезагрузите и проверьте их перед повторным сохранением.",
+    "uk": "Налаштування маркетмейкера змінено в іншому сеансі. Перезавантажте й перевірте їх перед повторним збереженням."
+  },
+  "dex.makerSaveFailed": {
+    "en": "Maker settings could not be saved. Check available storage.",
+    "zh-Hans": "无法保存做市设置。请检查可用存储空间。",
+    "ru": "Не удалось сохранить настройки маркетмейкера. Проверьте свободное место.",
+    "uk": "Не вдалося зберегти налаштування маркетмейкера. Перевірте вільне місце."
+  },
+  "dex.makerPeggedConsent": {
+    "en": "PEGGED: prices track the MEXC mid and reprice when it moves past your threshold; your per-rung sizes are kept. If the feed goes stale the app widens its quotes, then requests withdrawal. Existing orders remain tradeable until cancellation confirms.",
+    "zh-Hans": "已锚定：价格跟随 MEXC 中间价，变动超过您设置的阈值时调价；保留各档位的数量。行情过期时，应用先扩大报价间距，再请求撤单。撤单确认前，现有订单仍可成交。",
+    "ru": "С ПРИВЯЗКОЙ: цены следуют за средней ценой MEXC и пересчитываются при превышении вашего порога; объёмы уровней сохраняются. Если поток устаревает, приложение расширяет котировки, затем запрашивает снятие. Существующие заявки доступны для сделок до подтверждения отмены.",
+    "uk": "З ПРИВ’ЯЗКОЮ: ціни слідують за середньою ціною MEXC і перераховуються після перевищення вашого порога; обсяги рівнів зберігаються. Якщо потік застаріває, застосунок розширює котирування, потім запитує зняття. Наявні заявки доступні для угод до підтвердження скасування."
+  },
+  "dex.makerManualConsent": {
+    "en": "NOT pegged: the book gets YOUR exact prices — never repriced, never withdrawn, even if the price feed dies.",
+    "zh-Hans": "未锚定：订单簿使用您设置的准确价格 — 即使行情中断，也不会自动调价或撤单。",
+    "ru": "БЕЗ привязки: в стакане будут ВАШИ точные цены — без автоматического изменения и снятия, даже если ценовой поток пропадёт.",
+    "uk": "БЕЗ прив’язки: у книзі будуть ВАШІ точні ціни — без автоматичної зміни й зняття, навіть якщо потік цін зникне."
+  },
+  "dex.makerPostingConsent": {
+    "en": "Rungs post ONE PER SIDE per cycle — each is an on-chain transaction your phone does proof-of-work for, and each one's change has to confirm before the next on that side can be funded — so a full ladder takes a few minutes to build and a rung may retry before it sticks. The Maker tab shows each rung's progress.",
+    "zh-Hans": "每个周期每侧提交一个档位 — 每个档位都是一笔链上交易，手机需执行工作量证明；同侧下一个档位要等前一笔找零确认后才能获得资金。因此完整阶梯订单需要几分钟才能建成，某些档位可能需要重试。做市页显示每档进度。",
+    "ru": "За цикл отправляется ПО ОДНОМУ уровню с каждой стороны. Каждый уровень — транзакция в блокчейне, для которой телефон выполняет proof-of-work. Сдача должна подтвердиться, прежде чем сможет финансироваться следующий уровень той же стороны. Поэтому построение полной лестницы занимает несколько минут, а отдельным уровням могут потребоваться повторные попытки. Вкладка маркетмейкера показывает ход каждого уровня.",
+    "uk": "За цикл надсилається ПО ОДНОМУ рівню з кожного боку. Кожен рівень — транзакція в блокчейні, для якої телефон виконує proof-of-work. Решта має підтвердитися, перш ніж можна буде фінансувати наступний рівень того самого боку. Тому побудова повної драбини триває кілька хвилин, а окремим рівням можуть знадобитися повторні спроби. Вкладка маркетмейкера показує перебіг кожного рівня."
+  },
+  "dex.makerBackgroundConsent": {
+    "en": "Background checks are normally requested every 15 minutes. Android may delay or stop them, so automatic withdrawal is not a guaranteed price limit. Keep PandaDEX and MinimaCore running while monitoring the ladder; check Orders for confirmed cancellations.",
+    "zh-Hans": "后台通常每 15 分钟请求检查一次。Android 可能延迟或停止检查，因此自动撤单无法保证价格上限或下限。监控阶梯订单时请保持 PandaDEX 和 MinimaCore 运行；在订单页查看已确认的撤单。",
+    "ru": "Фоновые проверки обычно запрашиваются каждые 15 минут. Android может задержать или остановить их, поэтому автоматическое снятие не гарантирует ограничения цены. Держите PandaDEX и MinimaCore запущенными при наблюдении за лестницей; проверяйте подтверждённые отмены в разделе заявок.",
+    "uk": "Фонові перевірки зазвичай запитуються кожні 15 хвилин. Android може затримати або зупинити їх, тому автоматичне зняття не гарантує обмеження ціни. Тримайте PandaDEX і MinimaCore запущеними під час спостереження за драбиною; перевіряйте підтверджені скасування в розділі заявок."
+  },
+  "dex.makerEditTiming": {
+    "en": "Rungs post one per side per cycle, so a large batch lands over a few minutes. The status panel shows each one.",
+    "zh-Hans": "每个周期每侧提交一个档位，因此较大的批次需要几分钟才能完成。状态面板显示每档进度。",
+    "ru": "За цикл отправляется по одному уровню с каждой стороны, поэтому большая партия занимает несколько минут. Панель состояния показывает каждый уровень.",
+    "uk": "За цикл надсилається по одному рівню з кожного боку, тому велика партія займає кілька хвилин. Панель стану показує кожен рівень."
+  },
+  "dex.makerAskCommitment": {
+    "en": "Asks: {orders}, locking {amount} MINIMA",
+    "zh-Hans": "卖盘：{orders}，锁定 {amount} MINIMA",
+    "ru": "Продажи: {orders}, блокируется {amount} MINIMA",
+    "uk": "Продажі: {orders}, блокується {amount} MINIMA"
+  },
+  "dex.makerBidCommitment": {
+    "en": "Bids: {orders}, locking {amount} MxUSD",
+    "zh-Hans": "买盘：{orders}，锁定 {amount} MxUSD",
+    "ru": "Покупки: {orders}, блокируется {amount} MxUSD",
+    "uk": "Купівлі: {orders}, блокується {amount} MxUSD"
+  },
+  "dex.makerPublishSummary": {
+    "en": "This puts {orders} orders on the book — {asks} and {bids}.",
+    "zh-Hans": "这将在订单簿中发布 {orders} 笔订单 — {asks}，以及{bids}。",
+    "ru": "В стакане появятся заявки: {orders} — {asks} и {bids}.",
+    "uk": "У книзі з’являться заявки: {orders} — {asks} і {bids}."
+  },
+  "dex.makerLackMinima": {
+    "en": "Asks need {needed} MINIMA — you have {available} sendable{details}.",
+    "zh-Hans": "卖盘需要 {needed} MINIMA — 您有 {available} 可用{details}。",
+    "ru": "Для продаж нужно {needed} MINIMA — доступно {available}{details}.",
+    "uk": "Для продажів потрібно {needed} MINIMA — доступно {available}{details}."
+  },
+  "dex.makerLackMxusd": {
+    "en": "Bids need {needed} MxUSD — you have {available} sendable{details}.",
+    "zh-Hans": "买盘需要 {needed} MxUSD — 您有 {available} 可用{details}。",
+    "ru": "Для покупок нужно {needed} MxUSD — доступно {available}{details}.",
+    "uk": "Для купівель потрібно {needed} MxUSD — доступно {available}{details}."
+  },
+  "dex.makerUnavailableBoth": {
+    "en": " ({locked} confirmed locked, {unconfirmed} unconfirmed)",
+    "zh-Hans": "（{locked} 已确认但锁定，{unconfirmed} 未确认）",
+    "ru": " (подтверждено и заблокировано: {locked}, не подтверждено: {unconfirmed})",
+    "uk": " (підтверджено й заблоковано: {locked}, не підтверджено: {unconfirmed})"
+  },
+  "dex.makerUnavailableLocked": {
+    "en": " ({locked} confirmed locked)",
+    "zh-Hans": "（{locked} 已确认但锁定）",
+    "ru": " (подтверждено и заблокировано: {locked})",
+    "uk": " (підтверджено й заблоковано: {locked})"
+  },
+  "dex.makerUnavailablePending": {
+    "en": " ({unconfirmed} unconfirmed)",
+    "zh-Hans": "（{unconfirmed} 未确认）",
+    "ru": " (не подтверждено: {unconfirmed})",
+    "uk": " (не підтверджено: {unconfirmed})"
+  },
+  "dex.makerThinMinima": {
+    "en": "MINIMA funding looks thin: {coins} coins for {rungs} ask rungs.",
+    "zh-Hans": "MINIMA 资金币较少：{coins} 个币用于 {rungs} 个卖盘档位。",
+    "ru": "Мало монет MINIMA для обеспечения: {coins} монет на {rungs} уровней продажи.",
+    "uk": "Мало монет MINIMA для забезпечення: {coins} монет на {rungs} рівнів продажу."
+  },
+  "dex.makerThinMxusd": {
+    "en": "MxUSD funding looks thin: {coins} coins for {rungs} bid rungs.",
+    "zh-Hans": "MxUSD 资金币较少：{coins} 个币用于 {rungs} 个买盘档位。",
+    "ru": "Мало монет MxUSD для обеспечения: {coins} монет на {rungs} уровней покупки.",
+    "uk": "Мало монет MxUSD для забезпечення: {coins} монет на {rungs} рівнів купівлі."
+  },
+  "dex.makerSplitHint": {
+    "en": "Use split:{parts} first to prepare funding coins, then wait for them to confirm before publishing.",
+    "zh-Hans": "请先使用 split:{parts} 准备资金币，等待确认后再发布。",
+    "ru": "Сначала подготовьте монеты с помощью split:{parts}, затем дождитесь подтверждения перед публикацией.",
+    "uk": "Спочатку підготуйте монети за допомогою split:{parts}, потім дочекайтеся підтвердження перед публікацією."
+  },
+  "dex.makerSplitBody": {
+    "en": "This sends the selected sendable balance back to your own wallet with split:{parts}. The new coins are unconfirmed until a block mines; publish the ladder after ASSETS shows them sendable.",
+    "zh-Hans": "这会使用 split:{parts} 将所选的可用余额发送回您自己的钱包。新区块产生前，新币处于未确认状态；请在资产页显示其可用后再发布阶梯订单。",
+    "ru": "Выбранный доступный баланс будет отправлен обратно в ваш кошелёк с split:{parts}. Новые монеты не подтверждены до появления блока; публикуйте лестницу, когда в разделе активов они станут доступны для расходования.",
+    "uk": "Вибраний доступний баланс буде надіслано назад у ваш гаманець із split:{parts}. Нові монети не підтверджені до появи блоку; публікуйте драбину, коли в розділі активів вони стануть доступними для витрачання."
+  },
+  "dex.makerFundingMinima": {
+    "en": "MINIMA — {amount} sendable, coins: {coins}",
+    "zh-Hans": "MINIMA — {amount} 可用，币数：{coins}",
+    "ru": "MINIMA — доступно {amount}, монет: {coins}",
+    "uk": "MINIMA — доступно {amount}, монет: {coins}"
+  },
+  "dex.makerFundingMxusd": {
+    "en": "MxUSD — {amount} sendable, coins: {coins}",
+    "zh-Hans": "MxUSD — {amount} 可用，币数：{coins}",
+    "ru": "MxUSD — доступно {amount}, монет: {coins}",
+    "uk": "MxUSD — доступно {amount}, монет: {coins}"
+  },
+  "dex.makerNoSplitAmount": {
+    "en": "No sendable {asset} to split",
+    "zh-Hans": "没有可用的 {asset} 可供拆分",
+    "ru": "Нет доступных {asset} для разделения",
+    "uk": "Немає доступних {asset} для розділення"
+  },
+  "dex.makerSplitting": {
+    "en": "Splitting {amount} {asset} into {parts} wallet coins…",
+    "zh-Hans": "正在将 {amount} {asset} 拆分为 {parts} 个钱包币…",
+    "ru": "Разделение {amount} {asset} на {parts} монет кошелька…",
+    "uk": "Розділення {amount} {asset} на {parts} монет гаманця…"
+  },
+  "dex.makerSplitFailed": {
+    "en": "Split failed: {error}",
+    "zh-Hans": "拆分失败：{error}",
+    "ru": "Разделение не удалось: {error}",
+    "uk": "Розділення не вдалося: {error}"
+  },
+  "dex.makerPublishNotStarted": {
+    "en": "{error} Publishing was not started.",
+    "zh-Hans": "{error} 发布未开始。",
+    "ru": "{error} Публикация не начата.",
+    "uk": "{error} Публікацію не розпочато."
+  },
+  "dex.makerCancelNotStarted": {
+    "en": "{error} No cancellation started; saved settings may still be enabled.",
+    "zh-Hans": "{error} 未开始撤单；已保存的设置可能仍处于启用状态。",
+    "ru": "{error} Отмена не начата; сохранённые настройки могут оставаться включёнными.",
+    "uk": "{error} Скасування не розпочато; збережені налаштування можуть залишатися ввімкненими."
+  },
+  "dex.makerEditRelocks": {
+    "en": "• Reprice in place: {rungs} rungs — one transaction each, funds never leave the book.",
+    "zh-Hans": "• 原位调价：{rungs} 个档位 — 每档一笔交易，资金不会离开订单簿。",
+    "ru": "• Изменение цены на месте: {rungs} уровней — по одной транзакции, средства остаются в стакане.",
+    "uk": "• Зміна ціни на місці: {rungs} рівнів — по одній транзакції, кошти залишаються в книзі."
+  },
+  "dex.makerEditReposts": {
+    "en": "• Change amount: {rungs} rungs — locked funds can't be resized, so each is cancelled and reposted and leaves the book for a block or two.",
+    "zh-Hans": "• 修改数量：{rungs} 个档位 — 无法调整已锁定资金的数量，因此每档会先撤单再重新提交，并离开订单簿一至两个区块。",
+    "ru": "• Изменение объёма: {rungs} уровней — размер заблокированных средств изменить нельзя, поэтому каждый уровень отменяется и размещается заново, покидая стакан на один-два блока.",
+    "uk": "• Зміна обсягу: {rungs} рівнів — розмір заблокованих коштів змінити не можна, тому кожен рівень скасовується й розміщується знову, залишаючи книгу на один-два блоки."
+  },
+  "dex.makerEditCreates": {
+    "en": "• New rungs posted: {rungs}.",
+    "zh-Hans": "• 提交新档位：{rungs}。",
+    "ru": "• Новых уровней к размещению: {rungs}.",
+    "uk": "• Нових рівнів до розміщення: {rungs}."
+  },
+  "dex.makerEditCancels": {
+    "en": "• Rungs removed: {rungs}.",
+    "zh-Hans": "• 移除档位：{rungs}。",
+    "ru": "• Уровней к снятию: {rungs}.",
+    "uk": "• Рівнів до зняття: {rungs}."
   }
 }

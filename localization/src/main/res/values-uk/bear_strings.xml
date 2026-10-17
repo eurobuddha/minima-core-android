@@ -6480,4 +6480,86 @@
     <string name="l10n_dex_maker_amount_description">"%1$s: кількість MINIMA"</string>
     <!-- Arguments: bids, asks -->
     <string name="l10n_dex_maker_preview">"КУПІВЛІ  %1$s\nПРОДАЖІ  %2$s"</string>
+    <string name="l10n_dex_maker_split_confirming" formatted="false">"Розділення коштів підтверджується"</string>
+    <string name="l10n_dex_maker_split_wait" formatted="false">"Перед публікацією дочекайтеся наступного блоку й оновлення балансу. Виходи розділення поки недоступні для витрачання."</string>
+    <string name="l10n_dex_maker_no_rungs" formatted="false">"Немає рівнів для публікації — спочатку задайте ціну й обсяг"</string>
+    <string name="l10n_dex_maker_insufficient_title" formatted="false">"Недостатньо доступних коштів"</string>
+    <string name="l10n_dex_maker_shrink" formatted="false">"Зменште обсяги рівнів або звільніть кошти, потім опублікуйте."</string>
+    <string name="l10n_dex_maker_no_asks" formatted="false">"немає продажів"</string>
+    <string name="l10n_dex_maker_no_bids" formatted="false">"немає купівель"</string>
+    <string name="l10n_dex_maker_publish_title" formatted="false">"Опублікувати драбину"</string>
+    <string name="l10n_dex_maker_not_yet" formatted="false">"Поки ні"</string>
+    <string name="l10n_dex_maker_split_first" formatted="false">"Спочатку розділити кошти"</string>
+    <string name="l10n_dex_maker_publishing" formatted="false">"Публікація драбини — надсилання перших рівнів"</string>
+    <string name="l10n_dex_maker_busy" formatted="false">"Транзакція вже виконується"</string>
+    <string name="l10n_dex_maker_withdraw_before_split" formatted="false">"Зніміть активну драбину перед розділенням монет для маркетмейкера"</string>
+    <string name="l10n_dex_maker_split_title" formatted="false">"Розділити кошти маркетмейкера"</string>
+    <string name="l10n_dex_maker_split_action" formatted="false">"Розділити кошти"</string>
+    <string name="l10n_dex_maker_fetch_address" formatted="false">"Отримання адреси гаманця…"</string>
+    <string name="l10n_dex_maker_split_no_address" formatted="false">"Розділення не вдалося — не вдалося отримати адресу гаманця"</string>
+    <string name="l10n_dex_maker_address_failed" formatted="false">"Не вдалося отримати адресу гаманця"</string>
+    <string name="l10n_dex_maker_split_submitted" formatted="false">"Розділення надіслано — очікування доступних для витрачання монет"</string>
+    <string name="l10n_dex_maker_split_unknown" formatted="false">"Результат розділення невідомий — перевірте активи"</string>
+    <string name="l10n_dex_maker_publish_first" formatted="false">"Спочатку опублікуйте драбину"</string>
+    <string name="l10n_dex_maker_adjusting" formatted="false">"Триває коригування — повторіть трохи пізніше"</string>
+    <string name="l10n_dex_maker_no_edits" formatted="false">"Немає автоматичних змін — перевірте стани рівнів, що потребують уваги"</string>
+    <string name="l10n_dex_maker_apply_title" formatted="false">"Застосувати зміни до активної драбини"</string>
+    <string name="l10n_dex_maker_apply" formatted="false">"Застосувати"</string>
+    <string name="l10n_dex_maker_applying" formatted="false">"Застосування змін драбини…"</string>
+    <string name="l10n_dex_maker_withdraw_queued" formatted="false">"Завершується поточне коригування; потім буде спроба зняття. Перевірте підтвердження в розділі заявок."</string>
+    <string name="l10n_dex_maker_nothing_withdraw" formatted="false">"Немає заявок драбини для зняття"</string>
+    <string name="l10n_dex_maker_withdrawing" formatted="false">"Зняття драбини — заявки залишають книгу в міру підтвердження скасувань у блоках"</string>
+    <string name="l10n_dex_maker_settings_conflict" formatted="false">"Налаштування маркетмейкера змінено в іншому сеансі. Перезавантажте й перевірте їх перед повторним збереженням."</string>
+    <string name="l10n_dex_maker_save_failed" formatted="false">"Не вдалося зберегти налаштування маркетмейкера. Перевірте вільне місце."</string>
+    <string name="l10n_dex_maker_pegged_consent" formatted="false">"З ПРИВ’ЯЗКОЮ: ціни слідують за середньою ціною MEXC і перераховуються після перевищення вашого порога; обсяги рівнів зберігаються. Якщо потік застаріває, застосунок розширює котирування, потім запитує зняття. Наявні заявки доступні для угод до підтвердження скасування."</string>
+    <string name="l10n_dex_maker_manual_consent" formatted="false">"БЕЗ прив’язки: у книзі будуть ВАШІ точні ціни — без автоматичної зміни й зняття, навіть якщо потік цін зникне."</string>
+    <string name="l10n_dex_maker_posting_consent" formatted="false">"За цикл надсилається ПО ОДНОМУ рівню з кожного боку. Кожен рівень — транзакція в блокчейні, для якої телефон виконує proof-of-work. Решта має підтвердитися, перш ніж можна буде фінансувати наступний рівень того самого боку. Тому побудова повної драбини триває кілька хвилин, а окремим рівням можуть знадобитися повторні спроби. Вкладка маркетмейкера показує перебіг кожного рівня."</string>
+    <string name="l10n_dex_maker_background_consent" formatted="false">"Фонові перевірки зазвичай запитуються кожні 15 хвилин. Android може затримати або зупинити їх, тому автоматичне зняття не гарантує обмеження ціни. Тримайте PandaDEX і MinimaCore запущеними під час спостереження за драбиною; перевіряйте підтверджені скасування в розділі заявок."</string>
+    <string name="l10n_dex_maker_edit_timing" formatted="false">"За цикл надсилається по одному рівню з кожного боку, тому велика партія займає кілька хвилин. Панель стану показує кожен рівень."</string>
+    <!-- Arguments: orders, amount -->
+    <string name="l10n_dex_maker_ask_commitment">"Продажі: %1$s, блокується %2$s MINIMA"</string>
+    <!-- Arguments: orders, amount -->
+    <string name="l10n_dex_maker_bid_commitment">"Купівлі: %1$s, блокується %2$s MxUSD"</string>
+    <!-- Arguments: orders, asks, bids -->
+    <string name="l10n_dex_maker_publish_summary">"У книзі з’являться заявки: %1$s — %2$s і %3$s."</string>
+    <!-- Arguments: needed, available, details -->
+    <string name="l10n_dex_maker_lack_minima">"Для продажів потрібно %1$s MINIMA — доступно %2$s%3$s."</string>
+    <!-- Arguments: needed, available, details -->
+    <string name="l10n_dex_maker_lack_mxusd">"Для купівель потрібно %1$s MxUSD — доступно %2$s%3$s."</string>
+    <!-- Arguments: locked, unconfirmed -->
+    <string name="l10n_dex_maker_unavailable_both">" (підтверджено й заблоковано: %1$s, не підтверджено: %2$s)"</string>
+    <!-- Arguments: locked -->
+    <string name="l10n_dex_maker_unavailable_locked">" (підтверджено й заблоковано: %1$s)"</string>
+    <!-- Arguments: unconfirmed -->
+    <string name="l10n_dex_maker_unavailable_pending">" (не підтверджено: %1$s)"</string>
+    <!-- Arguments: coins, rungs -->
+    <string name="l10n_dex_maker_thin_minima">"Мало монет MINIMA для забезпечення: %1$s монет на %2$s рівнів продажу."</string>
+    <!-- Arguments: coins, rungs -->
+    <string name="l10n_dex_maker_thin_mxusd">"Мало монет MxUSD для забезпечення: %1$s монет на %2$s рівнів купівлі."</string>
+    <!-- Arguments: parts -->
+    <string name="l10n_dex_maker_split_hint">"Спочатку підготуйте монети за допомогою split:%1$s, потім дочекайтеся підтвердження перед публікацією."</string>
+    <!-- Arguments: parts -->
+    <string name="l10n_dex_maker_split_body">"Вибраний доступний баланс буде надіслано назад у ваш гаманець із split:%1$s. Нові монети не підтверджені до появи блоку; публікуйте драбину, коли в розділі активів вони стануть доступними для витрачання."</string>
+    <!-- Arguments: amount, coins -->
+    <string name="l10n_dex_maker_funding_minima">"MINIMA — доступно %1$s, монет: %2$s"</string>
+    <!-- Arguments: amount, coins -->
+    <string name="l10n_dex_maker_funding_mxusd">"MxUSD — доступно %1$s, монет: %2$s"</string>
+    <!-- Arguments: asset -->
+    <string name="l10n_dex_maker_no_split_amount">"Немає доступних %1$s для розділення"</string>
+    <!-- Arguments: amount, asset, parts -->
+    <string name="l10n_dex_maker_splitting">"Розділення %1$s %2$s на %3$s монет гаманця…"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_split_failed">"Розділення не вдалося: %1$s"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_publish_not_started">"%1$s Публікацію не розпочато."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_cancel_not_started">"%1$s Скасування не розпочато; збережені налаштування можуть залишатися ввімкненими."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_relocks">"• Зміна ціни на місці: %1$s рівнів — по одній транзакції, кошти залишаються в книзі."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_reposts">"• Зміна обсягу: %1$s рівнів — розмір заблокованих коштів змінити не можна, тому кожен рівень скасовується й розміщується знову, залишаючи книгу на один-два блоки."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_creates">"• Нових рівнів до розміщення: %1$s."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_cancels">"• Рівнів до зняття: %1$s."</string>
 </resources>

@@ -6480,4 +6480,86 @@
     <string name="l10n_dex_maker_amount_description">"%1$s: количество MINIMA"</string>
     <!-- Arguments: bids, asks -->
     <string name="l10n_dex_maker_preview">"ПОКУПКИ  %1$s\nПРОДАЖИ  %2$s"</string>
+    <string name="l10n_dex_maker_split_confirming" formatted="false">"Разделение средств подтверждается"</string>
+    <string name="l10n_dex_maker_split_wait" formatted="false">"Перед публикацией дождитесь следующего блока и обновления баланса. Выходы разделения пока недоступны для расходования."</string>
+    <string name="l10n_dex_maker_no_rungs" formatted="false">"Нет уровней для публикации — сначала задайте цену и объём"</string>
+    <string name="l10n_dex_maker_insufficient_title" formatted="false">"Недостаточно доступных средств"</string>
+    <string name="l10n_dex_maker_shrink" formatted="false">"Уменьшите объёмы уровней или освободите средства, затем опубликуйте."</string>
+    <string name="l10n_dex_maker_no_asks" formatted="false">"нет продаж"</string>
+    <string name="l10n_dex_maker_no_bids" formatted="false">"нет покупок"</string>
+    <string name="l10n_dex_maker_publish_title" formatted="false">"Опубликовать лестницу"</string>
+    <string name="l10n_dex_maker_not_yet" formatted="false">"Пока нет"</string>
+    <string name="l10n_dex_maker_split_first" formatted="false">"Сначала разделить средства"</string>
+    <string name="l10n_dex_maker_publishing" formatted="false">"Публикация лестницы — отправка первых уровней"</string>
+    <string name="l10n_dex_maker_busy" formatted="false">"Транзакция уже выполняется"</string>
+    <string name="l10n_dex_maker_withdraw_before_split" formatted="false">"Снимите активную лестницу перед разделением монет для маркетмейкера"</string>
+    <string name="l10n_dex_maker_split_title" formatted="false">"Разделить средства маркетмейкера"</string>
+    <string name="l10n_dex_maker_split_action" formatted="false">"Разделить средства"</string>
+    <string name="l10n_dex_maker_fetch_address" formatted="false">"Получение адреса кошелька…"</string>
+    <string name="l10n_dex_maker_split_no_address" formatted="false">"Разделение не удалось — не удалось получить адрес кошелька"</string>
+    <string name="l10n_dex_maker_address_failed" formatted="false">"Не удалось получить адрес кошелька"</string>
+    <string name="l10n_dex_maker_split_submitted" formatted="false">"Разделение отправлено — ожидание доступных для расходования монет"</string>
+    <string name="l10n_dex_maker_split_unknown" formatted="false">"Результат разделения неизвестен — проверьте активы"</string>
+    <string name="l10n_dex_maker_publish_first" formatted="false">"Сначала опубликуйте лестницу"</string>
+    <string name="l10n_dex_maker_adjusting" formatted="false">"Идёт корректировка — повторите чуть позже"</string>
+    <string name="l10n_dex_maker_no_edits" formatted="false">"Нет автоматических изменений — проверьте статусы уровней, требующих внимания"</string>
+    <string name="l10n_dex_maker_apply_title" formatted="false">"Применить изменения к активной лестнице"</string>
+    <string name="l10n_dex_maker_apply" formatted="false">"Применить"</string>
+    <string name="l10n_dex_maker_applying" formatted="false">"Применение изменений лестницы…"</string>
+    <string name="l10n_dex_maker_withdraw_queued" formatted="false">"Завершается текущая корректировка; затем будет предпринята попытка снятия. Проверьте подтверждение в разделе заявок."</string>
+    <string name="l10n_dex_maker_nothing_withdraw" formatted="false">"Нет заявок лестницы для снятия"</string>
+    <string name="l10n_dex_maker_withdrawing" formatted="false">"Снятие лестницы — заявки покидают стакан по мере подтверждения отмен в блоках"</string>
+    <string name="l10n_dex_maker_settings_conflict" formatted="false">"Настройки маркетмейкера изменены в другом сеансе. Перезагрузите и проверьте их перед повторным сохранением."</string>
+    <string name="l10n_dex_maker_save_failed" formatted="false">"Не удалось сохранить настройки маркетмейкера. Проверьте свободное место."</string>
+    <string name="l10n_dex_maker_pegged_consent" formatted="false">"С ПРИВЯЗКОЙ: цены следуют за средней ценой MEXC и пересчитываются при превышении вашего порога; объёмы уровней сохраняются. Если поток устаревает, приложение расширяет котировки, затем запрашивает снятие. Существующие заявки доступны для сделок до подтверждения отмены."</string>
+    <string name="l10n_dex_maker_manual_consent" formatted="false">"БЕЗ привязки: в стакане будут ВАШИ точные цены — без автоматического изменения и снятия, даже если ценовой поток пропадёт."</string>
+    <string name="l10n_dex_maker_posting_consent" formatted="false">"За цикл отправляется ПО ОДНОМУ уровню с каждой стороны. Каждый уровень — транзакция в блокчейне, для которой телефон выполняет proof-of-work. Сдача должна подтвердиться, прежде чем сможет финансироваться следующий уровень той же стороны. Поэтому построение полной лестницы занимает несколько минут, а отдельным уровням могут потребоваться повторные попытки. Вкладка маркетмейкера показывает ход каждого уровня."</string>
+    <string name="l10n_dex_maker_background_consent" formatted="false">"Фоновые проверки обычно запрашиваются каждые 15 минут. Android может задержать или остановить их, поэтому автоматическое снятие не гарантирует ограничения цены. Держите PandaDEX и MinimaCore запущенными при наблюдении за лестницей; проверяйте подтверждённые отмены в разделе заявок."</string>
+    <string name="l10n_dex_maker_edit_timing" formatted="false">"За цикл отправляется по одному уровню с каждой стороны, поэтому большая партия занимает несколько минут. Панель состояния показывает каждый уровень."</string>
+    <!-- Arguments: orders, amount -->
+    <string name="l10n_dex_maker_ask_commitment">"Продажи: %1$s, блокируется %2$s MINIMA"</string>
+    <!-- Arguments: orders, amount -->
+    <string name="l10n_dex_maker_bid_commitment">"Покупки: %1$s, блокируется %2$s MxUSD"</string>
+    <!-- Arguments: orders, asks, bids -->
+    <string name="l10n_dex_maker_publish_summary">"В стакане появятся заявки: %1$s — %2$s и %3$s."</string>
+    <!-- Arguments: needed, available, details -->
+    <string name="l10n_dex_maker_lack_minima">"Для продаж нужно %1$s MINIMA — доступно %2$s%3$s."</string>
+    <!-- Arguments: needed, available, details -->
+    <string name="l10n_dex_maker_lack_mxusd">"Для покупок нужно %1$s MxUSD — доступно %2$s%3$s."</string>
+    <!-- Arguments: locked, unconfirmed -->
+    <string name="l10n_dex_maker_unavailable_both">" (подтверждено и заблокировано: %1$s, не подтверждено: %2$s)"</string>
+    <!-- Arguments: locked -->
+    <string name="l10n_dex_maker_unavailable_locked">" (подтверждено и заблокировано: %1$s)"</string>
+    <!-- Arguments: unconfirmed -->
+    <string name="l10n_dex_maker_unavailable_pending">" (не подтверждено: %1$s)"</string>
+    <!-- Arguments: coins, rungs -->
+    <string name="l10n_dex_maker_thin_minima">"Мало монет MINIMA для обеспечения: %1$s монет на %2$s уровней продажи."</string>
+    <!-- Arguments: coins, rungs -->
+    <string name="l10n_dex_maker_thin_mxusd">"Мало монет MxUSD для обеспечения: %1$s монет на %2$s уровней покупки."</string>
+    <!-- Arguments: parts -->
+    <string name="l10n_dex_maker_split_hint">"Сначала подготовьте монеты с помощью split:%1$s, затем дождитесь подтверждения перед публикацией."</string>
+    <!-- Arguments: parts -->
+    <string name="l10n_dex_maker_split_body">"Выбранный доступный баланс будет отправлен обратно в ваш кошелёк с split:%1$s. Новые монеты не подтверждены до появления блока; публикуйте лестницу, когда в разделе активов они станут доступны для расходования."</string>
+    <!-- Arguments: amount, coins -->
+    <string name="l10n_dex_maker_funding_minima">"MINIMA — доступно %1$s, монет: %2$s"</string>
+    <!-- Arguments: amount, coins -->
+    <string name="l10n_dex_maker_funding_mxusd">"MxUSD — доступно %1$s, монет: %2$s"</string>
+    <!-- Arguments: asset -->
+    <string name="l10n_dex_maker_no_split_amount">"Нет доступных %1$s для разделения"</string>
+    <!-- Arguments: amount, asset, parts -->
+    <string name="l10n_dex_maker_splitting">"Разделение %1$s %2$s на %3$s монет кошелька…"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_split_failed">"Разделение не удалось: %1$s"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_publish_not_started">"%1$s Публикация не начата."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_cancel_not_started">"%1$s Отмена не начата; сохранённые настройки могут оставаться включёнными."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_relocks">"• Изменение цены на месте: %1$s уровней — по одной транзакции, средства остаются в стакане."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_reposts">"• Изменение объёма: %1$s уровней — размер заблокированных средств изменить нельзя, поэтому каждый уровень отменяется и размещается заново, покидая стакан на один-два блока."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_creates">"• Новых уровней к размещению: %1$s."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_cancels">"• Уровней к снятию: %1$s."</string>
 </resources>

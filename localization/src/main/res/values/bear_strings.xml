@@ -6418,4 +6418,86 @@
     <string name="l10n_dex_maker_amount_description">"%1$s: MINIMA amount"</string>
     <!-- Arguments: bids, asks -->
     <string name="l10n_dex_maker_preview">"BIDS  %1$s\nASKS  %2$s"</string>
+    <string name="l10n_dex_maker_split_confirming" formatted="false">"Funding split is confirming"</string>
+    <string name="l10n_dex_maker_split_wait" formatted="false">"Wait for the next block and balance refresh before publishing. The split outputs are not spendable yet."</string>
+    <string name="l10n_dex_maker_no_rungs" formatted="false">"No rungs to publish — set a price and size first"</string>
+    <string name="l10n_dex_maker_insufficient_title" formatted="false">"Not enough available funds"</string>
+    <string name="l10n_dex_maker_shrink" formatted="false">"Shrink the rung sizes or free up funds, then publish."</string>
+    <string name="l10n_dex_maker_no_asks" formatted="false">"no asks"</string>
+    <string name="l10n_dex_maker_no_bids" formatted="false">"no bids"</string>
+    <string name="l10n_dex_maker_publish_title" formatted="false">"Publish the ladder"</string>
+    <string name="l10n_dex_maker_not_yet" formatted="false">"Not yet"</string>
+    <string name="l10n_dex_maker_split_first" formatted="false">"Split funds first"</string>
+    <string name="l10n_dex_maker_publishing" formatted="false">"Ladder publishing — posting the first rungs"</string>
+    <string name="l10n_dex_maker_busy" formatted="false">"A transaction is already in flight"</string>
+    <string name="l10n_dex_maker_withdraw_before_split" formatted="false">"Withdraw the live ladder before splitting maker funding coins"</string>
+    <string name="l10n_dex_maker_split_title" formatted="false">"Split maker funding"</string>
+    <string name="l10n_dex_maker_split_action" formatted="false">"Split funds"</string>
+    <string name="l10n_dex_maker_fetch_address" formatted="false">"Fetching your wallet address..."</string>
+    <string name="l10n_dex_maker_split_no_address" formatted="false">"Split failed - could not get your wallet address"</string>
+    <string name="l10n_dex_maker_address_failed" formatted="false">"Could not get your wallet address"</string>
+    <string name="l10n_dex_maker_split_submitted" formatted="false">"Split submitted — waiting for spendable wallet coins"</string>
+    <string name="l10n_dex_maker_split_unknown" formatted="false">"Split outcome unknown — review Assets"</string>
+    <string name="l10n_dex_maker_publish_first" formatted="false">"Publish the ladder first"</string>
+    <string name="l10n_dex_maker_adjusting" formatted="false">"Mid-adjustment — try again in a moment"</string>
+    <string name="l10n_dex_maker_no_edits" formatted="false">"No automatic edits available — review the rung statuses for positions that need attention"</string>
+    <string name="l10n_dex_maker_apply_title" formatted="false">"Apply edits to the live ladder"</string>
+    <string name="l10n_dex_maker_apply" formatted="false">"Apply"</string>
+    <string name="l10n_dex_maker_applying" formatted="false">"Applying ladder edits…"</string>
+    <string name="l10n_dex_maker_withdraw_queued" formatted="false">"Finishing the current adjustment; withdrawal will then be attempted. Check Orders for confirmation."</string>
+    <string name="l10n_dex_maker_nothing_withdraw" formatted="false">"No ladder orders to withdraw"</string>
+    <string name="l10n_dex_maker_withdrawing" formatted="false">"Withdrawing the ladder — cancels leave the book as blocks confirm them"</string>
+    <string name="l10n_dex_maker_settings_conflict" formatted="false">"Maker settings changed in another session. Reload and review them before saving again."</string>
+    <string name="l10n_dex_maker_save_failed" formatted="false">"Maker settings could not be saved. Check available storage."</string>
+    <string name="l10n_dex_maker_pegged_consent" formatted="false">"PEGGED: prices track the MEXC mid and reprice when it moves past your threshold; your per-rung sizes are kept. If the feed goes stale the app widens its quotes, then requests withdrawal. Existing orders remain tradeable until cancellation confirms."</string>
+    <string name="l10n_dex_maker_manual_consent" formatted="false">"NOT pegged: the book gets YOUR exact prices — never repriced, never withdrawn, even if the price feed dies."</string>
+    <string name="l10n_dex_maker_posting_consent" formatted="false">"Rungs post ONE PER SIDE per cycle — each is an on-chain transaction your phone does proof-of-work for, and each one\'s change has to confirm before the next on that side can be funded — so a full ladder takes a few minutes to build and a rung may retry before it sticks. The Maker tab shows each rung\'s progress."</string>
+    <string name="l10n_dex_maker_background_consent" formatted="false">"Background checks are normally requested every 15 minutes. Android may delay or stop them, so automatic withdrawal is not a guaranteed price limit. Keep PandaDEX and MinimaCore running while monitoring the ladder; check Orders for confirmed cancellations."</string>
+    <string name="l10n_dex_maker_edit_timing" formatted="false">"Rungs post one per side per cycle, so a large batch lands over a few minutes. The status panel shows each one."</string>
+    <!-- Arguments: orders, amount -->
+    <string name="l10n_dex_maker_ask_commitment">"Asks: %1$s, locking %2$s MINIMA"</string>
+    <!-- Arguments: orders, amount -->
+    <string name="l10n_dex_maker_bid_commitment">"Bids: %1$s, locking %2$s MxUSD"</string>
+    <!-- Arguments: orders, asks, bids -->
+    <string name="l10n_dex_maker_publish_summary">"This puts %1$s orders on the book — %2$s and %3$s."</string>
+    <!-- Arguments: needed, available, details -->
+    <string name="l10n_dex_maker_lack_minima">"Asks need %1$s MINIMA — you have %2$s sendable%3$s."</string>
+    <!-- Arguments: needed, available, details -->
+    <string name="l10n_dex_maker_lack_mxusd">"Bids need %1$s MxUSD — you have %2$s sendable%3$s."</string>
+    <!-- Arguments: locked, unconfirmed -->
+    <string name="l10n_dex_maker_unavailable_both">" (%1$s confirmed locked, %2$s unconfirmed)"</string>
+    <!-- Arguments: locked -->
+    <string name="l10n_dex_maker_unavailable_locked">" (%1$s confirmed locked)"</string>
+    <!-- Arguments: unconfirmed -->
+    <string name="l10n_dex_maker_unavailable_pending">" (%1$s unconfirmed)"</string>
+    <!-- Arguments: coins, rungs -->
+    <string name="l10n_dex_maker_thin_minima">"MINIMA funding looks thin: %1$s coins for %2$s ask rungs."</string>
+    <!-- Arguments: coins, rungs -->
+    <string name="l10n_dex_maker_thin_mxusd">"MxUSD funding looks thin: %1$s coins for %2$s bid rungs."</string>
+    <!-- Arguments: parts -->
+    <string name="l10n_dex_maker_split_hint">"Use split:%1$s first to prepare funding coins, then wait for them to confirm before publishing."</string>
+    <!-- Arguments: parts -->
+    <string name="l10n_dex_maker_split_body">"This sends the selected sendable balance back to your own wallet with split:%1$s. The new coins are unconfirmed until a block mines; publish the ladder after ASSETS shows them sendable."</string>
+    <!-- Arguments: amount, coins -->
+    <string name="l10n_dex_maker_funding_minima">"MINIMA — %1$s sendable, coins: %2$s"</string>
+    <!-- Arguments: amount, coins -->
+    <string name="l10n_dex_maker_funding_mxusd">"MxUSD — %1$s sendable, coins: %2$s"</string>
+    <!-- Arguments: asset -->
+    <string name="l10n_dex_maker_no_split_amount">"No sendable %1$s to split"</string>
+    <!-- Arguments: amount, asset, parts -->
+    <string name="l10n_dex_maker_splitting">"Splitting %1$s %2$s into %3$s wallet coins…"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_split_failed">"Split failed: %1$s"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_publish_not_started">"%1$s Publishing was not started."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_cancel_not_started">"%1$s No cancellation started; saved settings may still be enabled."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_relocks">"• Reprice in place: %1$s rungs — one transaction each, funds never leave the book."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_reposts">"• Change amount: %1$s rungs — locked funds can\'t be resized, so each is cancelled and reposted and leaves the book for a block or two."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_creates">"• New rungs posted: %1$s."</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_cancels">"• Rungs removed: %1$s."</string>
 </resources>

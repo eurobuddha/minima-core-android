@@ -6387,4 +6387,86 @@
     <string name="l10n_dex_maker_amount_description">"%1$s：MINIMA 数量"</string>
     <!-- Arguments: bids, asks -->
     <string name="l10n_dex_maker_preview">"买盘  %1$s\n卖盘  %2$s"</string>
+    <string name="l10n_dex_maker_split_confirming" formatted="false">"资金拆分正在确认"</string>
+    <string name="l10n_dex_maker_split_wait" formatted="false">"请等待下个区块及余额刷新后再发布。拆分产生的输出暂不可用。"</string>
+    <string name="l10n_dex_maker_no_rungs" formatted="false">"没有可发布的档位 — 请先设置价格和数量"</string>
+    <string name="l10n_dex_maker_insufficient_title" formatted="false">"可用资金不足"</string>
+    <string name="l10n_dex_maker_shrink" formatted="false">"请减小每档数量或释放资金，然后再发布。"</string>
+    <string name="l10n_dex_maker_no_asks" formatted="false">"无卖盘"</string>
+    <string name="l10n_dex_maker_no_bids" formatted="false">"无买盘"</string>
+    <string name="l10n_dex_maker_publish_title" formatted="false">"发布阶梯订单"</string>
+    <string name="l10n_dex_maker_not_yet" formatted="false">"暂不"</string>
+    <string name="l10n_dex_maker_split_first" formatted="false">"先拆分资金"</string>
+    <string name="l10n_dex_maker_publishing" formatted="false">"正在发布阶梯订单 — 提交首批档位"</string>
+    <string name="l10n_dex_maker_busy" formatted="false">"已有一笔交易正在处理中"</string>
+    <string name="l10n_dex_maker_withdraw_before_split" formatted="false">"拆分做市资金币前，请先撤回现有阶梯订单"</string>
+    <string name="l10n_dex_maker_split_title" formatted="false">"拆分做市资金"</string>
+    <string name="l10n_dex_maker_split_action" formatted="false">"拆分资金"</string>
+    <string name="l10n_dex_maker_fetch_address" formatted="false">"正在获取您的钱包地址…"</string>
+    <string name="l10n_dex_maker_split_no_address" formatted="false">"拆分失败 — 无法获取您的钱包地址"</string>
+    <string name="l10n_dex_maker_address_failed" formatted="false">"无法获取您的钱包地址"</string>
+    <string name="l10n_dex_maker_split_submitted" formatted="false">"拆分已提交 — 等待钱包币变为可用"</string>
+    <string name="l10n_dex_maker_split_unknown" formatted="false">"拆分结果未知 — 请检查资产页"</string>
+    <string name="l10n_dex_maker_publish_first" formatted="false">"请先发布阶梯订单"</string>
+    <string name="l10n_dex_maker_adjusting" formatted="false">"正在调整中 — 请稍后重试"</string>
+    <string name="l10n_dex_maker_no_edits" formatted="false">"没有可自动应用的修改 — 请检查档位状态，处理需要关注的仓位"</string>
+    <string name="l10n_dex_maker_apply_title" formatted="false">"将修改应用于现有阶梯订单"</string>
+    <string name="l10n_dex_maker_apply" formatted="false">"应用"</string>
+    <string name="l10n_dex_maker_applying" formatted="false">"正在应用阶梯订单修改…"</string>
+    <string name="l10n_dex_maker_withdraw_queued" formatted="false">"正在完成当前调整；之后将尝试撤单。请在订单页查看确认结果。"</string>
+    <string name="l10n_dex_maker_nothing_withdraw" formatted="false">"没有可撤回的阶梯订单"</string>
+    <string name="l10n_dex_maker_withdrawing" formatted="false">"正在撤回阶梯订单 — 撤单经区块确认后才会从订单簿移除"</string>
+    <string name="l10n_dex_maker_settings_conflict" formatted="false">"做市设置已在另一会话中更改。请重新加载并核查后再保存。"</string>
+    <string name="l10n_dex_maker_save_failed" formatted="false">"无法保存做市设置。请检查可用存储空间。"</string>
+    <string name="l10n_dex_maker_pegged_consent" formatted="false">"已锚定：价格跟随 MEXC 中间价，变动超过您设置的阈值时调价；保留各档位的数量。行情过期时，应用先扩大报价间距，再请求撤单。撤单确认前，现有订单仍可成交。"</string>
+    <string name="l10n_dex_maker_manual_consent" formatted="false">"未锚定：订单簿使用您设置的准确价格 — 即使行情中断，也不会自动调价或撤单。"</string>
+    <string name="l10n_dex_maker_posting_consent" formatted="false">"每个周期每侧提交一个档位 — 每个档位都是一笔链上交易，手机需执行工作量证明；同侧下一个档位要等前一笔找零确认后才能获得资金。因此完整阶梯订单需要几分钟才能建成，某些档位可能需要重试。做市页显示每档进度。"</string>
+    <string name="l10n_dex_maker_background_consent" formatted="false">"后台通常每 15 分钟请求检查一次。Android 可能延迟或停止检查，因此自动撤单无法保证价格上限或下限。监控阶梯订单时请保持 PandaDEX 和 MinimaCore 运行；在订单页查看已确认的撤单。"</string>
+    <string name="l10n_dex_maker_edit_timing" formatted="false">"每个周期每侧提交一个档位，因此较大的批次需要几分钟才能完成。状态面板显示每档进度。"</string>
+    <!-- Arguments: orders, amount -->
+    <string name="l10n_dex_maker_ask_commitment">"卖盘：%1$s，锁定 %2$s MINIMA"</string>
+    <!-- Arguments: orders, amount -->
+    <string name="l10n_dex_maker_bid_commitment">"买盘：%1$s，锁定 %2$s MxUSD"</string>
+    <!-- Arguments: orders, asks, bids -->
+    <string name="l10n_dex_maker_publish_summary">"这将在订单簿中发布 %1$s 笔订单 — %2$s，以及%3$s。"</string>
+    <!-- Arguments: needed, available, details -->
+    <string name="l10n_dex_maker_lack_minima">"卖盘需要 %1$s MINIMA — 您有 %2$s 可用%3$s。"</string>
+    <!-- Arguments: needed, available, details -->
+    <string name="l10n_dex_maker_lack_mxusd">"买盘需要 %1$s MxUSD — 您有 %2$s 可用%3$s。"</string>
+    <!-- Arguments: locked, unconfirmed -->
+    <string name="l10n_dex_maker_unavailable_both">"（%1$s 已确认但锁定，%2$s 未确认）"</string>
+    <!-- Arguments: locked -->
+    <string name="l10n_dex_maker_unavailable_locked">"（%1$s 已确认但锁定）"</string>
+    <!-- Arguments: unconfirmed -->
+    <string name="l10n_dex_maker_unavailable_pending">"（%1$s 未确认）"</string>
+    <!-- Arguments: coins, rungs -->
+    <string name="l10n_dex_maker_thin_minima">"MINIMA 资金币较少：%1$s 个币用于 %2$s 个卖盘档位。"</string>
+    <!-- Arguments: coins, rungs -->
+    <string name="l10n_dex_maker_thin_mxusd">"MxUSD 资金币较少：%1$s 个币用于 %2$s 个买盘档位。"</string>
+    <!-- Arguments: parts -->
+    <string name="l10n_dex_maker_split_hint">"请先使用 split:%1$s 准备资金币，等待确认后再发布。"</string>
+    <!-- Arguments: parts -->
+    <string name="l10n_dex_maker_split_body">"这会使用 split:%1$s 将所选的可用余额发送回您自己的钱包。新区块产生前，新币处于未确认状态；请在资产页显示其可用后再发布阶梯订单。"</string>
+    <!-- Arguments: amount, coins -->
+    <string name="l10n_dex_maker_funding_minima">"MINIMA — %1$s 可用，币数：%2$s"</string>
+    <!-- Arguments: amount, coins -->
+    <string name="l10n_dex_maker_funding_mxusd">"MxUSD — %1$s 可用，币数：%2$s"</string>
+    <!-- Arguments: asset -->
+    <string name="l10n_dex_maker_no_split_amount">"没有可用的 %1$s 可供拆分"</string>
+    <!-- Arguments: amount, asset, parts -->
+    <string name="l10n_dex_maker_splitting">"正在将 %1$s %2$s 拆分为 %3$s 个钱包币…"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_split_failed">"拆分失败：%1$s"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_publish_not_started">"%1$s 发布未开始。"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_maker_cancel_not_started">"%1$s 未开始撤单；已保存的设置可能仍处于启用状态。"</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_relocks">"• 原位调价：%1$s 个档位 — 每档一笔交易，资金不会离开订单簿。"</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_reposts">"• 修改数量：%1$s 个档位 — 无法调整已锁定资金的数量，因此每档会先撤单再重新提交，并离开订单簿一至两个区块。"</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_creates">"• 提交新档位：%1$s。"</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_edit_cancels">"• 移除档位：%1$s。"</string>
 </resources>

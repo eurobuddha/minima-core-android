@@ -276,7 +276,44 @@
     "reprice requested — outcome not yet verified": "dex.makerRepricePending",
     "no longer wanted — withdrawal still needed": "dex.makerWithdrawalNeeded",
     "Your depth ladder for MINIMA / MxUSD  (price = MxUSD per MINIMA):\n•  ASKS — where YOU SELL MINIMA (higher).   BIDS — where YOU BUY (lower).\n•  Each rung is a separate on-chain order. Leave rows blank to skip them.": "dex.makerIntro",
-    "While pegged, the ladder regenerates around the MEXC mid (± step %, your size per rung) and reprices when the market moves ≥ your threshold. A stale feed widens quotes, then triggers a withdrawal request. Android can delay checks; orders remain tradeable until cancellation confirms. MEXC's MINIMA market is THIN — keep step % above its typical spread and rung sizes small; you auto-trade at these prices. Every adjustment is a transaction your phone does proof-of-work for.": "dex.makerPegHelp"
+    "While pegged, the ladder regenerates around the MEXC mid (± step %, your size per rung) and reprices when the market moves ≥ your threshold. A stale feed widens quotes, then triggers a withdrawal request. Android can delay checks; orders remain tradeable until cancellation confirms. MEXC's MINIMA market is THIN — keep step % above its typical spread and rung sizes small; you auto-trade at these prices. Every adjustment is a transaction your phone does proof-of-work for.": "dex.makerPegHelp",
+    "Publish": "atomixMarket.publish",
+    "Funding split is confirming": "dex.makerSplitConfirming",
+    "Wait for the next block and balance refresh before publishing. The split outputs are not spendable yet.": "dex.makerSplitWait",
+    "No rungs to publish — set a price and size first": "dex.makerNoRungs",
+    "Not enough available funds": "dex.makerInsufficientTitle",
+    "Shrink the rung sizes or free up funds, then publish.": "dex.makerShrink",
+    "no asks": "dex.makerNoAsks",
+    "no bids": "dex.makerNoBids",
+    "Publish the ladder": "dex.makerPublishTitle",
+    "Not yet": "dex.makerNotYet",
+    "Split funds first": "dex.makerSplitFirst",
+    "Ladder publishing — posting the first rungs": "dex.makerPublishing",
+    "A transaction is already in flight": "dex.makerBusy",
+    "Withdraw the live ladder before splitting maker funding coins": "dex.makerWithdrawBeforeSplit",
+    "Split maker funding": "dex.makerSplitTitle",
+    "Split funds": "dex.makerSplitAction",
+    "Fetching your wallet address...": "dex.makerFetchAddress",
+    "Split failed - could not get your wallet address": "dex.makerSplitNoAddress",
+    "Could not get your wallet address": "dex.makerAddressFailed",
+    "Split submitted — waiting for spendable wallet coins": "dex.makerSplitSubmitted",
+    "Split outcome unknown — review Assets": "dex.makerSplitUnknown",
+    "Publish the ladder first": "dex.makerPublishFirst",
+    "Mid-adjustment — try again in a moment": "dex.makerAdjusting",
+    "No automatic edits available — review the rung statuses for positions that need attention": "dex.makerNoEdits",
+    "Apply edits to the live ladder": "dex.makerApplyTitle",
+    "Apply": "dex.makerApply",
+    "Applying ladder edits…": "dex.makerApplying",
+    "Finishing the current adjustment; withdrawal will then be attempted. Check Orders for confirmation.": "dex.makerWithdrawQueued",
+    "No ladder orders to withdraw": "dex.makerNothingWithdraw",
+    "Withdrawing the ladder — cancels leave the book as blocks confirm them": "dex.makerWithdrawing",
+    "Maker settings changed in another session. Reload and review them before saving again.": "dex.makerSettingsConflict",
+    "Maker settings could not be saved. Check available storage.": "dex.makerSaveFailed",
+    "PEGGED: prices track the MEXC mid and reprice when it moves past your threshold; your per-rung sizes are kept. If the feed goes stale the app widens its quotes, then requests withdrawal. Existing orders remain tradeable until cancellation confirms.": "dex.makerPeggedConsent",
+    "NOT pegged: the book gets YOUR exact prices — never repriced, never withdrawn, even if the price feed dies.": "dex.makerManualConsent",
+    "Rungs post ONE PER SIDE per cycle — each is an on-chain transaction your phone does proof-of-work for, and each one's change has to confirm before the next on that side can be funded — so a full ladder takes a few minutes to build and a rung may retry before it sticks. The Maker tab shows each rung's progress.": "dex.makerPostingConsent",
+    "Background checks are normally requested every 15 minutes. Android may delay or stop them, so automatic withdrawal is not a guaranteed price limit. Keep PandaDEX and MinimaCore running while monitoring the ladder; check Orders for confirmed cancellations.": "dex.makerBackgroundConsent",
+    "Rungs post one per side per cycle, so a large batch lands over a few minutes. The status panel shows each one.": "dex.makerEditTiming"
   },
   "patterns": [
     {
@@ -1003,6 +1040,265 @@
         "number"
       ],
       "key": "dex.makerSeen"
+    },
+    {
+      "template": "This puts {0} orders on the book — {1} and {2}.",
+      "kinds": [
+        "integer",
+        "diagnostic",
+        "diagnostic"
+      ],
+      "key": "dex.makerPublishSummary"
+    },
+    {
+      "template": "Asks need {0} MINIMA — you have {1} sendable{2}.",
+      "kinds": [
+        "number",
+        "number",
+        "diagnostic"
+      ],
+      "key": "dex.makerLackMinima"
+    },
+    {
+      "template": "Bids need {0} MxUSD — you have {1} sendable{2}.",
+      "kinds": [
+        "number",
+        "number",
+        "diagnostic"
+      ],
+      "key": "dex.makerLackMxusd"
+    },
+    {
+      "template": "{0} ask locking {1} MINIMA",
+      "kinds": [
+        "integer",
+        "number"
+      ],
+      "key": "dex.makerAskCommitment"
+    },
+    {
+      "template": "{0} bid locking {1} MxUSD",
+      "kinds": [
+        "integer",
+        "number"
+      ],
+      "key": "dex.makerBidCommitment"
+    },
+    {
+      "template": "MINIMA funding looks thin: {0} coin for {1} ask rungs.",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.makerThinMinima"
+    },
+    {
+      "template": "MINIMA - {0} sendable, {1} coin",
+      "kinds": [
+        "number",
+        "integer"
+      ],
+      "key": "dex.makerFundingMinima"
+    },
+    {
+      "template": "MxUSD funding looks thin: {0} coin for {1} bid rungs.",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.makerThinMxusd"
+    },
+    {
+      "template": "MxUSD - {0} sendable, {1} coin",
+      "kinds": [
+        "number",
+        "integer"
+      ],
+      "key": "dex.makerFundingMxusd"
+    },
+    {
+      "template": "{0} asks locking {1} MINIMA",
+      "kinds": [
+        "integer",
+        "number"
+      ],
+      "key": "dex.makerAskCommitment"
+    },
+    {
+      "template": "{0} bids locking {1} MxUSD",
+      "kinds": [
+        "integer",
+        "number"
+      ],
+      "key": "dex.makerBidCommitment"
+    },
+    {
+      "template": "MINIMA funding looks thin: {0} coins for {1} ask rungs.",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.makerThinMinima"
+    },
+    {
+      "template": "MINIMA - {0} sendable, {1} coins",
+      "kinds": [
+        "number",
+        "integer"
+      ],
+      "key": "dex.makerFundingMinima"
+    },
+    {
+      "template": "MxUSD funding looks thin: {0} coins for {1} bid rungs.",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.makerThinMxusd"
+    },
+    {
+      "template": "MxUSD - {0} sendable, {1} coins",
+      "kinds": [
+        "number",
+        "integer"
+      ],
+      "key": "dex.makerFundingMxusd"
+    },
+    {
+      "template": " ({0} confirmed locked, {1} unconfirmed)",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.makerUnavailableBoth"
+    },
+    {
+      "template": " ({0} confirmed locked)",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.makerUnavailableLocked"
+    },
+    {
+      "template": " ({0} unconfirmed)",
+      "kinds": [
+        "number"
+      ],
+      "key": "dex.makerUnavailablePending"
+    },
+    {
+      "template": "Use split:{0} first to prepare funding coins, then wait for them to confirm before publishing.",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerSplitHint"
+    },
+    {
+      "template": "No sendable {0} to split",
+      "kinds": [
+        "literal"
+      ],
+      "key": "dex.makerNoSplitAmount"
+    },
+    {
+      "template": "Splitting {0} {1} into {2} wallet coins…",
+      "kinds": [
+        "number",
+        "literal",
+        "integer"
+      ],
+      "key": "dex.makerSplitting"
+    },
+    {
+      "template": "Split failed - {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.makerSplitFailed"
+    },
+    {
+      "template": "Split failed — {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.makerSplitFailed"
+    },
+    {
+      "template": "Split failed: {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.makerSplitFailed"
+    },
+    {
+      "template": "{0} Publishing was not started.",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.makerPublishNotStarted"
+    },
+    {
+      "template": "{0} No cancellation started; saved settings may still be enabled.",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.makerCancelNotStarted"
+    },
+    {
+      "template": "• {0} rung re-prices in place — one transaction each, funds never leave the book.",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerEditRelocks"
+    },
+    {
+      "template": "• {0} rung changes AMOUNT — locked funds can't be resized, so each is cancelled and reposted and leaves the book for a block or two.",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerEditReposts"
+    },
+    {
+      "template": "• {0} new rung posted.",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerEditCreates"
+    },
+    {
+      "template": "• {0} rung removed.",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerEditCancels"
+    },
+    {
+      "template": "• {0} rungs re-price in place — one transaction each, funds never leave the book.",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerEditRelocks"
+    },
+    {
+      "template": "• {0} rungs change AMOUNT — locked funds can't be resized, so each is cancelled and reposted and leaves the book for a block or two.",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerEditReposts"
+    },
+    {
+      "template": "• {0} new rungs posted.",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerEditCreates"
+    },
+    {
+      "template": "• {0} rungs removed.",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerEditCancels"
     }
   ]
 }
