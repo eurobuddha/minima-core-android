@@ -31171,5 +31171,389 @@
     "zh-Hans": "个人交易记录：{records} · 净额 {minima} MINIMA · 净额 {mxusd} MxUSD",
     "ru": "Личные записи сделок: {records} · нетто {minima} MINIMA · нетто {mxusd} MxUSD",
     "uk": "Особисті записи угод: {records} · нетто {minima} MINIMA · нетто {mxusd} MxUSD"
+  },
+  "dex.makerTitle": {
+    "en": "MARKET MAKER",
+    "zh-Hans": "做市商",
+    "ru": "МАРКЕТМЕЙКЕР",
+    "uk": "МАРКЕТМЕЙКЕР"
+  },
+  "dex.makerDisarmed": {
+    "en": "DISARMED",
+    "zh-Hans": "未启用",
+    "ru": "ВЫКЛЮЧЕН",
+    "uk": "ВИМКНЕНО"
+  },
+  "dex.makerLadder": {
+    "en": "MY MARKET / LADDER",
+    "zh-Hans": "我的市场 / 阶梯订单",
+    "ru": "МОЙ РЫНОК / ЛЕСТНИЦА",
+    "uk": "МІЙ РИНОК / ДРАБИНА"
+  },
+  "dex.makerSplit": {
+    "en": "SPLIT FUNDS INTO 10 UTXOS",
+    "zh-Hans": "将资金拆分为 10 个 UTXO",
+    "ru": "РАЗДЕЛИТЬ СРЕДСТВА НА 10 UTXO",
+    "uk": "РОЗДІЛИТИ КОШТИ НА 10 UTXO"
+  },
+  "dex.makerAutoPeg": {
+    "en": "AUTO MARKET-MAKE — PEG TO MEXC",
+    "zh-Hans": "自动做市 — 锚定 MEXC",
+    "ru": "АВТОМАРКЕТМЕЙКИНГ — ПРИВЯЗКА К MEXC",
+    "uk": "АВТОМАРКЕТМЕЙКІНГ — ПРИВ’ЯЗКА ДО MEXC"
+  },
+  "dex.makerPegSwitch": {
+    "en": "Peg ladder to MEXC (auto-reprice)",
+    "zh-Hans": "将阶梯订单锚定到 MEXC（自动调价）",
+    "ru": "Привязать лестницу к MEXC (автопересчёт цен)",
+    "uk": "Прив’язати драбину до MEXC (автоперерахунок цін)"
+  },
+  "dex.makerAutoFill": {
+    "en": "AUTO-FILL (mid · step % · levels, then ask/bid size — seeds the rungs; edit any rung after)",
+    "zh-Hans": "自动填充（中间价 · 间距 % · 档位数，然后设置卖盘/买盘数量 — 生成档位后可逐档编辑）",
+    "ru": "АВТОЗАПОЛНЕНИЕ (средняя цена · шаг % · уровни, затем объёмы продажи/покупки — после заполнения можно изменить любой уровень)",
+    "uk": "АВТОЗАПОВНЕННЯ (середня ціна · крок % · рівні, потім обсяги продажу/купівлі — після заповнення можна змінити будь-який рівень)"
+  },
+  "dex.makerAsks": {
+    "en": "ASKS — you SELL MINIMA (higher price)",
+    "zh-Hans": "卖盘 — 您卖出 MINIMA（较高价格）",
+    "ru": "ПРОДАЖИ — вы ПРОДАЁТЕ MINIMA (цена выше)",
+    "uk": "ПРОДАЖІ — ви ПРОДАЄТЕ MINIMA (ціна вища)"
+  },
+  "dex.makerBids": {
+    "en": "BIDS — you BUY MINIMA (lower price)",
+    "zh-Hans": "买盘 — 您买入 MINIMA（较低价格）",
+    "ru": "ПОКУПКИ — вы ПОКУПАЕТЕ MINIMA (цена ниже)",
+    "uk": "КУПІВЛІ — ви КУПУЄТЕ MINIMA (ціна нижча)"
+  },
+  "dex.makerOnChain": {
+    "en": "ON-CHAIN STATUS",
+    "zh-Hans": "链上状态",
+    "ru": "СТАТУС В БЛОКЧЕЙНЕ",
+    "uk": "СТАН У БЛОКЧЕЙНІ"
+  },
+  "dex.makerFetchPrice": {
+    "en": "Fetching MEXC price…",
+    "zh-Hans": "正在获取 MEXC 价格…",
+    "ru": "Получение цены MEXC…",
+    "uk": "Отримання ціни MEXC…"
+  },
+  "dex.makerPublish": {
+    "en": "PUBLISH LADDER",
+    "zh-Hans": "发布阶梯订单",
+    "ru": "ОПУБЛИКОВАТЬ ЛЕСТНИЦУ",
+    "uk": "ОПУБЛІКУВАТИ ДРАБИНУ"
+  },
+  "dex.makerApplyEdits": {
+    "en": "APPLY EDITS TO THE LIVE LADDER",
+    "zh-Hans": "将修改应用于现有阶梯订单",
+    "ru": "ПРИМЕНИТЬ ИЗМЕНЕНИЯ К АКТИВНОЙ ЛЕСТНИЦЕ",
+    "uk": "ЗАСТОСУВАТИ ЗМІНИ ДО АКТИВНОЇ ДРАБИНИ"
+  },
+  "dex.makerWaitPrice": {
+    "en": "Waiting for the MEXC price — try again in a few seconds",
+    "zh-Hans": "正在等待 MEXC 价格 — 请稍后重试",
+    "ru": "Ожидание цены MEXC — повторите через несколько секунд",
+    "uk": "Очікування ціни MEXC — повторіть за кілька секунд"
+  },
+  "dex.makerPendingEdit": {
+    "en": "waiting for a MEXC price to apply that…",
+    "zh-Hans": "正在等待 MEXC 价格以应用此修改…",
+    "ru": "ожидание цены MEXC для применения изменения…",
+    "uk": "очікування ціни MEXC для застосування зміни…"
+  },
+  "dex.makerRecordsUnreadable": {
+    "en": "Saved maker records could not be read. Keep app data for recovery; review live orders before taking action.",
+    "zh-Hans": "无法读取已保存的做市记录。请保留应用数据以便恢复；操作前请检查现有订单。",
+    "ru": "Не удалось прочитать записи маркетмейкера. Сохраните данные приложения для восстановления; перед действиями проверьте активные заявки.",
+    "uk": "Не вдалося прочитати записи маркетмейкера. Збережіть дані застосунку для відновлення; перед діями перевірте активні заявки."
+  },
+  "dex.makerPegStep": {
+    "en": "Peg needs a step %",
+    "zh-Hans": "锚定需要设置间距 %",
+    "ru": "Для привязки нужен шаг %",
+    "uk": "Для прив’язки потрібен крок %"
+  },
+  "dex.makerNeedAmount": {
+    "en": "Set a MINIMA amount on at least one rung",
+    "zh-Hans": "请至少为一个档位设置 MINIMA 数量",
+    "ru": "Задайте количество MINIMA хотя бы для одного уровня",
+    "uk": "Задайте кількість MINIMA хоча б для одного рівня"
+  },
+  "dex.makerNoLevels": {
+    "en": "No levels set — add a bid or ask rung first",
+    "zh-Hans": "未设置档位 — 请先添加买盘或卖盘档位",
+    "ru": "Уровни не заданы — сначала добавьте уровень покупки или продажи",
+    "uk": "Рівні не задано — спочатку додайте рівень купівлі або продажу"
+  },
+  "dex.makerCrossedToast": {
+    "en": "⚠ Your best bid ≥ best ask (crossed market)",
+    "zh-Hans": "⚠ 您的最高买价 ≥ 最低卖价（报价交叉）",
+    "ru": "⚠ Ваша лучшая цена покупки ≥ лучшей цены продажи (пересечение цен)",
+    "uk": "⚠ Ваша найкраща ціна купівлі ≥ найкращої ціни продажу (перетин цін)"
+  },
+  "dex.makerNoRecords": {
+    "en": "no maker records stored here — check Orders for live positions",
+    "zh-Hans": "此处没有做市记录 — 请在订单页查看现有仓位",
+    "ru": "здесь нет записей маркетмейкера — проверьте активные позиции в разделе заявок",
+    "uk": "тут немає записів маркетмейкера — перевірте активні позиції в розділі заявок"
+  },
+  "dex.makerFirstCycle": {
+    "en": "waiting for the first cycle…",
+    "zh-Hans": "正在等待首个周期…",
+    "ru": "ожидание первого цикла…",
+    "uk": "очікування першого циклу…"
+  },
+  "dex.makerPausedUnreadable": {
+    "en": "MAKER PAUSED — RECORDS UNREADABLE",
+    "zh-Hans": "做市已暂停 — 无法读取记录",
+    "ru": "МАРКЕТМЕЙКЕР ПРИОСТАНОВЛЕН — ЗАПИСИ НЕ ЧИТАЮТСЯ",
+    "uk": "МАРКЕТМЕЙКЕР ПРИЗУПИНЕНИЙ — ЗАПИСИ НЕ ЧИТАЮТЬСЯ"
+  },
+  "dex.makerPausedSettings": {
+    "en": "MAKER PAUSED — SETTINGS CHANGED",
+    "zh-Hans": "做市已暂停 — 设置已更改",
+    "ru": "МАРКЕТМЕЙКЕР ПРИОСТАНОВЛЕН — НАСТРОЙКИ ИЗМЕНЕНЫ",
+    "uk": "МАРКЕТМЕЙКЕР ПРИЗУПИНЕНИЙ — НАЛАШТУВАННЯ ЗМІНЕНО"
+  },
+  "dex.makerPausedStorage": {
+    "en": "MAKER PAUSED — STORAGE ERROR",
+    "zh-Hans": "做市已暂停 — 存储错误",
+    "ru": "МАРКЕТМЕЙКЕР ПРИОСТАНОВЛЕН — ОШИБКА ХРАНИЛИЩА",
+    "uk": "МАРКЕТМЕЙКЕР ПРИЗУПИНЕНИЙ — ПОМИЛКА СХОВИЩА"
+  },
+  "dex.makerQuotingPaused": {
+    "en": "QUOTING PAUSED — CHECK ORDERS",
+    "zh-Hans": "报价已暂停 — 请检查订单",
+    "ru": "КОТИРОВАНИЕ ПРИОСТАНОВЛЕНО — ПРОВЕРЬТЕ ЗАЯВКИ",
+    "uk": "КОТИРУВАННЯ ПРИЗУПИНЕНО — ПЕРЕВІРТЕ ЗАЯВКИ"
+  },
+  "dex.makerEnabled": {
+    "en": "MAKER ENABLED",
+    "zh-Hans": "做市已启用",
+    "ru": "МАРКЕТМЕЙКЕР ВКЛЮЧЕН",
+    "uk": "МАРКЕТМЕЙКЕР УВІМКНЕНО"
+  },
+  "dex.makerEnabledPending": {
+    "en": "MAKER ENABLED — WALLET/BOOK CHECK PENDING",
+    "zh-Hans": "做市已启用 — 等待钱包/订单簿核查",
+    "ru": "МАРКЕТМЕЙКЕР ВКЛЮЧЕН — ПРОВЕРКА КОШЕЛЬКА/СТАКАНА ОЖИДАЕТСЯ",
+    "uk": "МАРКЕТМЕЙКЕР УВІМКНЕНО — ОЧІКУЄТЬСЯ ПЕРЕВІРКА ГАМАНЦЯ/КНИГИ ЗАЯВОК"
+  },
+  "dex.makerPausedRetained": {
+    "en": "MAKER PAUSED — RECORDS RETAINED",
+    "zh-Hans": "做市已暂停 — 记录已保留",
+    "ru": "МАРКЕТМЕЙКЕР ПРИОСТАНОВЛЕН — ЗАПИСИ СОХРАНЕНЫ",
+    "uk": "МАРКЕТМЕЙКЕР ПРИЗУПИНЕНИЙ — ЗАПИСИ ЗБЕРЕЖЕНО"
+  },
+  "dex.makerOff": {
+    "en": "MAKER OFF",
+    "zh-Hans": "做市已关闭",
+    "ru": "МАРКЕТМЕЙКЕР ВЫКЛЮЧЕН",
+    "uk": "МАРКЕТМЕЙКЕР ВИМКНЕНО"
+  },
+  "dex.makerWithdraw": {
+    "en": "WITHDRAW LADDER / RECORDED INTENT",
+    "zh-Hans": "撤回阶梯订单 / 已记录的请求",
+    "ru": "СНЯТЬ ЛЕСТНИЦУ / ЗАПИСАННОЕ НАМЕРЕНИЕ",
+    "uk": "ЗНЯТИ ДРАБИНУ / ЗАПИСАНИЙ НАМІР"
+  },
+  "dex.makerNoFeed": {
+    "en": "no price feed",
+    "zh-Hans": "无价格行情",
+    "ru": "нет ценового потока",
+    "uk": "немає потоку цін"
+  },
+  "dex.makerFeedQuarantined": {
+    "en": "large price move unconfirmed — quoting paused",
+    "zh-Hans": "价格大幅变动尚未确认 — 报价已暂停",
+    "ru": "резкое изменение цены не подтверждено — котирование приостановлено",
+    "uk": "різку зміну ціни не підтверджено — котирування призупинено"
+  },
+  "dex.makerFeedStale": {
+    "en": "feed stale — withdrawal needed",
+    "zh-Hans": "行情已过期 — 需要撤单",
+    "ru": "ценовой поток устарел — требуется снятие заявок",
+    "uk": "потік цін застарів — потрібно зняти заявки"
+  },
+  "dex.makerWaitingPost": {
+    "en": "waiting to post — next cycle",
+    "zh-Hans": "等待提交 — 下个周期",
+    "ru": "ожидает отправки — следующий цикл",
+    "uk": "очікує надсилання — наступний цикл"
+  },
+  "dex.makerNoOrderPending": {
+    "en": "no order recorded — wallet/book check pending",
+    "zh-Hans": "未记录订单 — 等待钱包/订单簿核查",
+    "ru": "заявка не записана — ожидается проверка кошелька/стакана",
+    "uk": "заявку не записано — очікується перевірка гаманця/книги заявок"
+  },
+  "dex.makerOrderPending": {
+    "en": "order recorded — wallet/book check pending",
+    "zh-Hans": "订单已记录 — 等待钱包/订单簿核查",
+    "ru": "заявка записана — ожидается проверка кошелька/стакана",
+    "uk": "заявку записано — очікується перевірка гаманця/книги заявок"
+  },
+  "dex.makerFundingUnknown": {
+    "en": "original funding unknown — review before automatic repricing",
+    "zh-Hans": "原始注资未知 — 自动调价前请核查",
+    "ru": "исходное обеспечение неизвестно — проверьте перед автопересчётом цен",
+    "uk": "початкове забезпечення невідоме — перевірте перед автоперерахунком цін"
+  },
+  "dex.makerFundingDiffers": {
+    "en": "funding differs from recorded intent — review this order",
+    "zh-Hans": "注资与已记录的请求不符 — 请核查此订单",
+    "ru": "обеспечение отличается от записанного намерения — проверьте заявку",
+    "uk": "забезпечення відрізняється від записаного наміру — перевірте заявку"
+  },
+  "dex.makerRepricePending": {
+    "en": "reprice requested — outcome not yet verified",
+    "zh-Hans": "已请求调价 — 结果尚未验证",
+    "ru": "изменение цены запрошено — результат ещё не проверен",
+    "uk": "зміну ціни запитано — результат ще не перевірено"
+  },
+  "dex.makerWithdrawalNeeded": {
+    "en": "no longer wanted — withdrawal still needed",
+    "zh-Hans": "不再需要此订单 — 仍需撤单",
+    "ru": "больше не требуется — заявку ещё нужно снять",
+    "uk": "більше не потрібна — заявку ще потрібно зняти"
+  },
+  "dex.makerIntro": {
+    "en": "Your depth ladder for MINIMA / MxUSD  (price = MxUSD per MINIMA):\n•  ASKS — where YOU SELL MINIMA (higher).   BIDS — where YOU BUY (lower).\n•  Each rung is a separate on-chain order. Leave rows blank to skip them.",
+    "zh-Hans": "您的 MINIMA / MxUSD 深度阶梯订单（价格 = 每个 MINIMA 对应的 MxUSD）：\n• 卖盘 — 您卖出 MINIMA（较高价格）。买盘 — 您买入 MINIMA（较低价格）。\n• 每个档位都是独立的链上订单。不需要的行请留空。",
+    "ru": "Ваша лестница заявок MINIMA / MxUSD (цена = MxUSD за MINIMA):\n• ПРОДАЖИ — вы ПРОДАЁТЕ MINIMA (выше). ПОКУПКИ — вы ПОКУПАЕТЕ (ниже).\n• Каждый уровень — отдельная заявка в блокчейне. Оставьте строку пустой, чтобы пропустить её.",
+    "uk": "Ваша драбина заявок MINIMA / MxUSD (ціна = MxUSD за MINIMA):\n• ПРОДАЖІ — ви ПРОДАЄТЕ MINIMA (вище). КУПІВЛІ — ви КУПУЄТЕ (нижче).\n• Кожен рівень — окрема заявка в блокчейні. Залиште рядок порожнім, щоб пропустити його."
+  },
+  "dex.makerPegHelp": {
+    "en": "While pegged, the ladder regenerates around the MEXC mid (± step %, your size per rung) and reprices when the market moves ≥ your threshold. A stale feed widens quotes, then triggers a withdrawal request. Android can delay checks; orders remain tradeable until cancellation confirms. MEXC's MINIMA market is THIN — keep step % above its typical spread and rung sizes small; you auto-trade at these prices. Every adjustment is a transaction your phone does proof-of-work for.",
+    "zh-Hans": "启用锚定后，阶梯订单会围绕 MEXC 中间价重新生成（± 间距 %，各档位使用您的数量），市场变动达到或超过阈值时会调价。行情过期时先扩大报价间距，再发起撤单请求。Android 可能延迟检查；撤单确认前订单仍可成交。MEXC 的 MINIMA 市场流动性较低 — 间距 % 应高于其通常价差，且每档数量应较小；这些价格会用于自动交易。每次调整都是一笔交易，需要手机执行工作量证明。",
+    "ru": "При привязке лестница пересчитывается вокруг средней цены MEXC (± шаг %, ваши объёмы по уровням), а цены меняются при движении рынка ≥ вашего порога. Устаревший поток сначала расширяет котировки, затем вызывает запрос на снятие. Android может задерживать проверки; заявки доступны для сделок до подтверждения отмены. Рынок MINIMA на MEXC малоликвиден: держите шаг % выше обычного спреда, а объёмы уровней небольшими; по этим ценам выполняются автоматические сделки. Каждая корректировка — транзакция, для которой телефон выполняет proof-of-work.",
+    "uk": "За прив’язки драбина перераховується навколо середньої ціни MEXC (± крок %, ваші обсяги за рівнями), а ціни змінюються за руху ринку ≥ вашого порога. Застарілий потік спочатку розширює котирування, потім спричиняє запит на зняття. Android може затримувати перевірки; заявки доступні для угод до підтвердження скасування. Ринок MINIMA на MEXC малоліквідний: тримайте крок % вище звичного спреду, а обсяги рівнів малими; за цими цінами виконуються автоматичні угоди. Кожне коригування — транзакція, для якої телефон виконує proof-of-work."
+  },
+  "dex.makerCrossed": {
+    "en": "⚠ Crossed — best bid {bid} ≥ best ask {ask}: you'd sell cheaper than you buy",
+    "zh-Hans": "⚠ 报价交叉 — 最高买价 {bid} ≥ 最低卖价 {ask}：您的卖价将低于买价",
+    "ru": "⚠ Пересечение цен — лучшая покупка {bid} ≥ лучшей продажи {ask}: вы продадите дешевле, чем купите",
+    "uk": "⚠ Перетин цін — найкраща купівля {bid} ≥ найкращого продажу {ask}: ви продасте дешевше, ніж купите"
+  },
+  "dex.makerPreviewSide": {
+    "en": "Levels: {levels} · best {price} · {amount} MINIMA",
+    "zh-Hans": "档位：{levels} · 最优价格 {price} · {amount} MINIMA",
+    "ru": "Уровни: {levels} · лучшая цена {price} · {amount} MINIMA",
+    "uk": "Рівні: {levels} · найкраща ціна {price} · {amount} MINIMA"
+  },
+  "dex.makerInterruptedCreate": {
+    "en": "Interrupted create — review or withdraw this intent before publishing. Order {order}",
+    "zh-Hans": "创建已中断 — 发布前请核查或撤回此请求。订单 {order}",
+    "ru": "Создание прервано — проверьте или отзовите намерение перед публикацией. Заявка {order}",
+    "uk": "Створення перервано — перевірте або відкличте намір перед публікацією. Заявка {order}"
+  },
+  "dex.makerPausedRungs": {
+    "en": "Maker paused — recorded rungs: {rungs}",
+    "zh-Hans": "做市已暂停 — 已记录的档位：{rungs}",
+    "ru": "Маркетмейкер приостановлен — записанные уровни: {rungs}",
+    "uk": "Маркетмейкер призупинений — записані рівні: {rungs}"
+  },
+  "dex.makerPausedWithdrawals": {
+    "en": "Maker paused — recorded rungs: {rungs}; retained withdrawal instructions: {withdrawals}",
+    "zh-Hans": "做市已暂停 — 已记录的档位：{rungs}；已保留的撤单指令：{withdrawals}",
+    "ru": "Маркетмейкер приостановлен — записанные уровни: {rungs}; сохранённые инструкции снятия: {withdrawals}",
+    "uk": "Маркетмейкер призупинений — записані рівні: {rungs}; збережені інструкції зняття: {withdrawals}"
+  },
+  "dex.makerFeedAge": {
+    "en": "feed {age}",
+    "zh-Hans": "行情 {age}",
+    "ru": "ценовой поток: {age}",
+    "uk": "потік цін: {age}"
+  },
+  "dex.makerFeedWider": {
+    "en": "feed {age} — quoting wider",
+    "zh-Hans": "行情 {age} — 扩大报价间距",
+    "ru": "ценовой поток: {age} — котировки расширены",
+    "uk": "потік цін: {age} — котирування розширено"
+  },
+  "dex.makerPegPrice": {
+    "en": "MEXC mid {price} · {state}",
+    "zh-Hans": "MEXC 中间价 {price} · {state}",
+    "ru": "Средняя цена MEXC {price} · {state}",
+    "uk": "Середня ціна MEXC {price} · {state}"
+  },
+  "dex.makerPegState": {
+    "en": "MEXC: {state}",
+    "zh-Hans": "MEXC：{state}",
+    "ru": "MEXC: {state}",
+    "uk": "MEXC: {state}"
+  },
+  "dex.makerLastSeen": {
+    "en": "last seen {price} × {amount} — wallet/book check pending",
+    "zh-Hans": "上次观察到 {price} × {amount} — 等待钱包/订单簿核查",
+    "ru": "последнее наблюдение: {price} × {amount} — ожидается проверка кошелька/стакана",
+    "uk": "останнє спостереження: {price} × {amount} — очікується перевірка гаманця/книги заявок"
+  },
+  "dex.makerAbsent": {
+    "en": "not seen in this book snapshot ({blocks} blk since recorded)",
+    "zh-Hans": "此订单簿快照中未出现（记录以来经过 {blocks} 个区块）",
+    "ru": "не видна в этом снимке стакана (блоков с момента записи: {blocks})",
+    "uk": "не видна в цьому знімку книги заявок (блоків із моменту запису: {blocks})"
+  },
+  "dex.makerAbsentReview": {
+    "en": "not seen in this book snapshot ({blocks} blk since recorded) — review if still absent",
+    "zh-Hans": "此订单簿快照中未出现（记录以来经过 {blocks} 个区块）— 若仍未出现，请核查",
+    "ru": "не видна в этом снимке стакана (блоков с момента записи: {blocks}) — проверьте, если всё ещё отсутствует",
+    "uk": "не видна в цьому знімку книги заявок (блоків із моменту запису: {blocks}) — перевірте, якщо досі відсутня"
+  },
+  "dex.makerLessMinima": {
+    "en": "less funding remains — {remaining} of {original} MINIMA locked",
+    "zh-Hans": "剩余注资减少 — 原 {original} MINIMA 中仍锁定 {remaining}",
+    "ru": "обеспечение уменьшилось — заблокировано {remaining} из {original} MINIMA",
+    "uk": "забезпечення зменшилося — заблоковано {remaining} із {original} MINIMA"
+  },
+  "dex.makerLessMxusd": {
+    "en": "less funding remains — {remaining} of {original} MxUSD locked",
+    "zh-Hans": "剩余注资减少 — 原 {original} MxUSD 中仍锁定 {remaining}",
+    "ru": "обеспечение уменьшилось — заблокировано {remaining} из {original} MxUSD",
+    "uk": "забезпечення зменшилося — заблоковано {remaining} із {original} MxUSD"
+  },
+  "dex.makerSeen": {
+    "en": "seen in latest book snapshot: {price} × {amount}",
+    "zh-Hans": "最新订单簿快照中可见：{price} × {amount}",
+    "ru": "видна в последнем снимке стакана: {price} × {amount}",
+    "uk": "видна в останньому знімку книги заявок: {price} × {amount}"
+  },
+  "dex.makerCancelSeen": {
+    "en": "Withdrawal instructions retained for {orders} orders — {visible} seen in latest snapshot",
+    "zh-Hans": "已保留 {orders} 笔订单的撤单指令 — 最新快照中可见 {visible} 笔",
+    "ru": "Инструкции снятия сохранены для заявок: {orders} — в последнем снимке видны: {visible}",
+    "uk": "Інструкції зняття збережено для заявок: {orders} — в останньому знімку видно: {visible}"
+  },
+  "dex.makerCancelStale": {
+    "en": "Withdrawal instructions retained for {orders} orders — {visible} last seen; wallet/book check pending",
+    "zh-Hans": "已保留 {orders} 笔订单的撤单指令 — 上次可见 {visible} 笔；等待钱包/订单簿核查",
+    "ru": "Инструкции снятия сохранены для заявок: {orders} — ранее были видны: {visible}; ожидается проверка кошелька/стакана",
+    "uk": "Інструкції зняття збережено для заявок: {orders} — раніше були видні: {visible}; очікується перевірка гаманця/книги заявок"
+  },
+  "dex.makerCancelAbsent": {
+    "en": "Withdrawal instructions retained for {orders} orders — cancellation not proven by absence",
+    "zh-Hans": "已保留 {orders} 笔订单的撤单指令 — 未出现并不能证明撤单成功",
+    "ru": "Инструкции снятия сохранены для заявок: {orders} — отсутствие не доказывает отмену",
+    "uk": "Інструкції зняття збережено для заявок: {orders} — відсутність не доводить скасування"
+  },
+  "dex.makerPriceDescription": {
+    "en": "{rung}: price in MxUSD per MINIMA",
+    "zh-Hans": "{rung}：每个 MINIMA 的价格，单位 MxUSD",
+    "ru": "{rung}: цена в MxUSD за MINIMA",
+    "uk": "{rung}: ціна в MxUSD за MINIMA"
+  },
+  "dex.makerAmountDescription": {
+    "en": "{rung}: MINIMA amount",
+    "zh-Hans": "{rung}：MINIMA 数量",
+    "ru": "{rung}: количество MINIMA",
+    "uk": "{rung}: кількість MINIMA"
+  },
+  "dex.makerPreview": {
+    "en": "BIDS  {bids}\nASKS  {asks}",
+    "zh-Hans": "买盘  {bids}\n卖盘  {asks}",
+    "ru": "ПОКУПКИ  {bids}\nПРОДАЖИ  {asks}",
+    "uk": "КУПІВЛІ  {bids}\nПРОДАЖІ  {asks}"
   }
 }

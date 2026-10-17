@@ -6302,4 +6302,89 @@
     <string name="l10n_dex_export_written">"导出文件已写入并关闭 · %1$s。若保存到云端，请确认服务商已完成上传。"</string>
     <!-- Arguments: records, minima, mxusd -->
     <string name="l10n_dex_export_summary">"个人交易记录：%1$s · 净额 %2$s MINIMA · 净额 %3$s MxUSD"</string>
+    <string name="l10n_dex_maker_title" formatted="false">"做市商"</string>
+    <string name="l10n_dex_maker_disarmed" formatted="false">"未启用"</string>
+    <string name="l10n_dex_maker_ladder" formatted="false">"我的市场 / 阶梯订单"</string>
+    <string name="l10n_dex_maker_split" formatted="false">"将资金拆分为 10 个 UTXO"</string>
+    <string name="l10n_dex_maker_auto_peg" formatted="false">"自动做市 — 锚定 MEXC"</string>
+    <string name="l10n_dex_maker_peg_switch" formatted="false">"将阶梯订单锚定到 MEXC（自动调价）"</string>
+    <string name="l10n_dex_maker_auto_fill" formatted="false">"自动填充（中间价 · 间距 % · 档位数，然后设置卖盘/买盘数量 — 生成档位后可逐档编辑）"</string>
+    <string name="l10n_dex_maker_asks" formatted="false">"卖盘 — 您卖出 MINIMA（较高价格）"</string>
+    <string name="l10n_dex_maker_bids" formatted="false">"买盘 — 您买入 MINIMA（较低价格）"</string>
+    <string name="l10n_dex_maker_on_chain" formatted="false">"链上状态"</string>
+    <string name="l10n_dex_maker_fetch_price" formatted="false">"正在获取 MEXC 价格…"</string>
+    <string name="l10n_dex_maker_publish" formatted="false">"发布阶梯订单"</string>
+    <string name="l10n_dex_maker_apply_edits" formatted="false">"将修改应用于现有阶梯订单"</string>
+    <string name="l10n_dex_maker_wait_price" formatted="false">"正在等待 MEXC 价格 — 请稍后重试"</string>
+    <string name="l10n_dex_maker_pending_edit" formatted="false">"正在等待 MEXC 价格以应用此修改…"</string>
+    <string name="l10n_dex_maker_records_unreadable" formatted="false">"无法读取已保存的做市记录。请保留应用数据以便恢复；操作前请检查现有订单。"</string>
+    <string name="l10n_dex_maker_peg_step" formatted="false">"锚定需要设置间距 %"</string>
+    <string name="l10n_dex_maker_need_amount" formatted="false">"请至少为一个档位设置 MINIMA 数量"</string>
+    <string name="l10n_dex_maker_no_levels" formatted="false">"未设置档位 — 请先添加买盘或卖盘档位"</string>
+    <string name="l10n_dex_maker_crossed_toast" formatted="false">"⚠ 您的最高买价 ≥ 最低卖价（报价交叉）"</string>
+    <string name="l10n_dex_maker_no_records" formatted="false">"此处没有做市记录 — 请在订单页查看现有仓位"</string>
+    <string name="l10n_dex_maker_first_cycle" formatted="false">"正在等待首个周期…"</string>
+    <string name="l10n_dex_maker_paused_unreadable" formatted="false">"做市已暂停 — 无法读取记录"</string>
+    <string name="l10n_dex_maker_paused_settings" formatted="false">"做市已暂停 — 设置已更改"</string>
+    <string name="l10n_dex_maker_paused_storage" formatted="false">"做市已暂停 — 存储错误"</string>
+    <string name="l10n_dex_maker_quoting_paused" formatted="false">"报价已暂停 — 请检查订单"</string>
+    <string name="l10n_dex_maker_enabled" formatted="false">"做市已启用"</string>
+    <string name="l10n_dex_maker_enabled_pending" formatted="false">"做市已启用 — 等待钱包/订单簿核查"</string>
+    <string name="l10n_dex_maker_paused_retained" formatted="false">"做市已暂停 — 记录已保留"</string>
+    <string name="l10n_dex_maker_off" formatted="false">"做市已关闭"</string>
+    <string name="l10n_dex_maker_withdraw" formatted="false">"撤回阶梯订单 / 已记录的请求"</string>
+    <string name="l10n_dex_maker_no_feed" formatted="false">"无价格行情"</string>
+    <string name="l10n_dex_maker_feed_quarantined" formatted="false">"价格大幅变动尚未确认 — 报价已暂停"</string>
+    <string name="l10n_dex_maker_feed_stale" formatted="false">"行情已过期 — 需要撤单"</string>
+    <string name="l10n_dex_maker_waiting_post" formatted="false">"等待提交 — 下个周期"</string>
+    <string name="l10n_dex_maker_no_order_pending" formatted="false">"未记录订单 — 等待钱包/订单簿核查"</string>
+    <string name="l10n_dex_maker_order_pending" formatted="false">"订单已记录 — 等待钱包/订单簿核查"</string>
+    <string name="l10n_dex_maker_funding_unknown" formatted="false">"原始注资未知 — 自动调价前请核查"</string>
+    <string name="l10n_dex_maker_funding_differs" formatted="false">"注资与已记录的请求不符 — 请核查此订单"</string>
+    <string name="l10n_dex_maker_reprice_pending" formatted="false">"已请求调价 — 结果尚未验证"</string>
+    <string name="l10n_dex_maker_withdrawal_needed" formatted="false">"不再需要此订单 — 仍需撤单"</string>
+    <string name="l10n_dex_maker_intro" formatted="false">"您的 MINIMA / MxUSD 深度阶梯订单（价格 = 每个 MINIMA 对应的 MxUSD）：\n• 卖盘 — 您卖出 MINIMA（较高价格）。买盘 — 您买入 MINIMA（较低价格）。\n• 每个档位都是独立的链上订单。不需要的行请留空。"</string>
+    <string name="l10n_dex_maker_peg_help" formatted="false">"启用锚定后，阶梯订单会围绕 MEXC 中间价重新生成（± 间距 %，各档位使用您的数量），市场变动达到或超过阈值时会调价。行情过期时先扩大报价间距，再发起撤单请求。Android 可能延迟检查；撤单确认前订单仍可成交。MEXC 的 MINIMA 市场流动性较低 — 间距 % 应高于其通常价差，且每档数量应较小；这些价格会用于自动交易。每次调整都是一笔交易，需要手机执行工作量证明。"</string>
+    <!-- Arguments: bid, ask -->
+    <string name="l10n_dex_maker_crossed">"⚠ 报价交叉 — 最高买价 %1$s ≥ 最低卖价 %2$s：您的卖价将低于买价"</string>
+    <!-- Arguments: levels, price, amount -->
+    <string name="l10n_dex_maker_preview_side">"档位：%1$s · 最优价格 %2$s · %3$s MINIMA"</string>
+    <!-- Arguments: order -->
+    <string name="l10n_dex_maker_interrupted_create">"创建已中断 — 发布前请核查或撤回此请求。订单 %1$s"</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_paused_rungs">"做市已暂停 — 已记录的档位：%1$s"</string>
+    <!-- Arguments: rungs, withdrawals -->
+    <string name="l10n_dex_maker_paused_withdrawals">"做市已暂停 — 已记录的档位：%1$s；已保留的撤单指令：%2$s"</string>
+    <!-- Arguments: age -->
+    <string name="l10n_dex_maker_feed_age">"行情 %1$s"</string>
+    <!-- Arguments: age -->
+    <string name="l10n_dex_maker_feed_wider">"行情 %1$s — 扩大报价间距"</string>
+    <!-- Arguments: price, state -->
+    <string name="l10n_dex_maker_peg_price">"MEXC 中间价 %1$s · %2$s"</string>
+    <!-- Arguments: state -->
+    <string name="l10n_dex_maker_peg_state">"MEXC：%1$s"</string>
+    <!-- Arguments: price, amount -->
+    <string name="l10n_dex_maker_last_seen">"上次观察到 %1$s × %2$s — 等待钱包/订单簿核查"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_maker_absent">"此订单簿快照中未出现（记录以来经过 %1$s 个区块）"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_maker_absent_review">"此订单簿快照中未出现（记录以来经过 %1$s 个区块）— 若仍未出现，请核查"</string>
+    <!-- Arguments: remaining, original -->
+    <string name="l10n_dex_maker_less_minima">"剩余注资减少 — 原 %2$s MINIMA 中仍锁定 %1$s"</string>
+    <!-- Arguments: remaining, original -->
+    <string name="l10n_dex_maker_less_mxusd">"剩余注资减少 — 原 %2$s MxUSD 中仍锁定 %1$s"</string>
+    <!-- Arguments: price, amount -->
+    <string name="l10n_dex_maker_seen">"最新订单簿快照中可见：%1$s × %2$s"</string>
+    <!-- Arguments: orders, visible -->
+    <string name="l10n_dex_maker_cancel_seen">"已保留 %1$s 笔订单的撤单指令 — 最新快照中可见 %2$s 笔"</string>
+    <!-- Arguments: orders, visible -->
+    <string name="l10n_dex_maker_cancel_stale">"已保留 %1$s 笔订单的撤单指令 — 上次可见 %2$s 笔；等待钱包/订单簿核查"</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_maker_cancel_absent">"已保留 %1$s 笔订单的撤单指令 — 未出现并不能证明撤单成功"</string>
+    <!-- Arguments: rung -->
+    <string name="l10n_dex_maker_price_description">"%1$s：每个 MINIMA 的价格，单位 MxUSD"</string>
+    <!-- Arguments: rung -->
+    <string name="l10n_dex_maker_amount_description">"%1$s：MINIMA 数量"</string>
+    <!-- Arguments: bids, asks -->
+    <string name="l10n_dex_maker_preview">"买盘  %1$s\n卖盘  %2$s"</string>
 </resources>

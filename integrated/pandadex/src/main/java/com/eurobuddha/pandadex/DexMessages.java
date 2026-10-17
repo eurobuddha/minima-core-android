@@ -264,6 +264,58 @@ public final class DexMessages {
             case "Could not start saving. Check the destination and export again.": return Language.msg(l10n_dex_export_save_start_failed);
             case "Export status could not be cleared. Free storage and try again; source trade records are unchanged.": return Language.msg(l10n_dex_export_clear_failed);
             case "Could not open the prepared export": return Language.msg(l10n_dex_export_prepared_open_failed);
+            case "price": return Language.msg(l10n_atomix_market_price);
+            case "mid": return Language.msg(l10n_atomix_market_mid);
+            case "step %": return Language.msg(l10n_atomix_market_step);
+            case "levels": return Language.msg(l10n_atomix_market_levels);
+            case "ask size": return Language.msg(l10n_atomix_market_ask_size);
+            case "bid size": return Language.msg(l10n_atomix_market_bid_size);
+            case "skew ±%": return Language.msg(l10n_atomix_market_skew);
+            case "reprice ≥ %": return Language.msg(l10n_atomix_market_reprice);
+            case "none": return Language.msg(l10n_atomix_market_none);
+            case "MARKET MAKER": return Language.msg(l10n_dex_maker_title);
+            case "DISARMED": return Language.msg(l10n_dex_maker_disarmed);
+            case "MY MARKET / LADDER": return Language.msg(l10n_dex_maker_ladder);
+            case "SPLIT FUNDS INTO 10 UTXOS": return Language.msg(l10n_dex_maker_split);
+            case "AUTO MARKET-MAKE — PEG TO MEXC": return Language.msg(l10n_dex_maker_auto_peg);
+            case "Peg ladder to MEXC (auto-reprice)": return Language.msg(l10n_dex_maker_peg_switch);
+            case "AUTO-FILL (mid · step % · levels, then ask/bid size — seeds the rungs; edit any rung after)": return Language.msg(l10n_dex_maker_auto_fill);
+            case "ASKS — you SELL MINIMA (higher price)": return Language.msg(l10n_dex_maker_asks);
+            case "BIDS — you BUY MINIMA (lower price)": return Language.msg(l10n_dex_maker_bids);
+            case "ON-CHAIN STATUS": return Language.msg(l10n_dex_maker_on_chain);
+            case "Fetching MEXC price…": return Language.msg(l10n_dex_maker_fetch_price);
+            case "PUBLISH LADDER": return Language.msg(l10n_dex_maker_publish);
+            case "APPLY EDITS TO THE LIVE LADDER": return Language.msg(l10n_dex_maker_apply_edits);
+            case "Waiting for the MEXC price — try again in a few seconds": return Language.msg(l10n_dex_maker_wait_price);
+            case "waiting for a MEXC price to apply that…": return Language.msg(l10n_dex_maker_pending_edit);
+            case "Saved maker records could not be read. Keep app data for recovery; review live orders before taking action.": return Language.msg(l10n_dex_maker_records_unreadable);
+            case "Peg needs a step %": return Language.msg(l10n_dex_maker_peg_step);
+            case "Set a MINIMA amount on at least one rung": return Language.msg(l10n_dex_maker_need_amount);
+            case "No levels set — add a bid or ask rung first": return Language.msg(l10n_dex_maker_no_levels);
+            case "⚠ Your best bid ≥ best ask (crossed market)": return Language.msg(l10n_dex_maker_crossed_toast);
+            case "no maker records stored here — check Orders for live positions": return Language.msg(l10n_dex_maker_no_records);
+            case "waiting for the first cycle…": return Language.msg(l10n_dex_maker_first_cycle);
+            case "MAKER PAUSED — RECORDS UNREADABLE": return Language.msg(l10n_dex_maker_paused_unreadable);
+            case "MAKER PAUSED — SETTINGS CHANGED": return Language.msg(l10n_dex_maker_paused_settings);
+            case "MAKER PAUSED — STORAGE ERROR": return Language.msg(l10n_dex_maker_paused_storage);
+            case "QUOTING PAUSED — CHECK ORDERS": return Language.msg(l10n_dex_maker_quoting_paused);
+            case "MAKER ENABLED": return Language.msg(l10n_dex_maker_enabled);
+            case "MAKER ENABLED — WALLET/BOOK CHECK PENDING": return Language.msg(l10n_dex_maker_enabled_pending);
+            case "MAKER PAUSED — RECORDS RETAINED": return Language.msg(l10n_dex_maker_paused_retained);
+            case "MAKER OFF": return Language.msg(l10n_dex_maker_off);
+            case "WITHDRAW LADDER / RECORDED INTENT": return Language.msg(l10n_dex_maker_withdraw);
+            case "no price feed": return Language.msg(l10n_dex_maker_no_feed);
+            case "large price move unconfirmed — quoting paused": return Language.msg(l10n_dex_maker_feed_quarantined);
+            case "feed stale — withdrawal needed": return Language.msg(l10n_dex_maker_feed_stale);
+            case "waiting to post — next cycle": return Language.msg(l10n_dex_maker_waiting_post);
+            case "no order recorded — wallet/book check pending": return Language.msg(l10n_dex_maker_no_order_pending);
+            case "order recorded — wallet/book check pending": return Language.msg(l10n_dex_maker_order_pending);
+            case "original funding unknown — review before automatic repricing": return Language.msg(l10n_dex_maker_funding_unknown);
+            case "funding differs from recorded intent — review this order": return Language.msg(l10n_dex_maker_funding_differs);
+            case "reprice requested — outcome not yet verified": return Language.msg(l10n_dex_maker_reprice_pending);
+            case "no longer wanted — withdrawal still needed": return Language.msg(l10n_dex_maker_withdrawal_needed);
+            case "Your depth ladder for MINIMA / MxUSD  (price = MxUSD per MINIMA):\n•  ASKS — where YOU SELL MINIMA (higher).   BIDS — where YOU BUY (lower).\n•  Each rung is a separate on-chain order. Leave rows blank to skip them.": return Language.msg(l10n_dex_maker_intro);
+            case "While pegged, the ladder regenerates around the MEXC mid (± step %, your size per rung) and reprices when the market moves ≥ your threshold. A stale feed widens quotes, then triggers a withdrawal request. Android can delay checks; orders remain tradeable until cancellation confirms. MEXC's MINIMA market is THIN — keep step % above its typical spread and rung sizes small; you auto-trade at these prices. Every adjustment is a transaction your phone does proof-of-work for.": return Language.msg(l10n_dex_maker_peg_help);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {
@@ -350,8 +402,32 @@ public final class DexMessages {
         java.util.regex.Pattern.compile("Could\\ not\\ prepare\\ the\\ export\\.\\ Source\\ records\\ are\\ unchanged\\.\\ ((?s:.*))"),
         java.util.regex.Pattern.compile("Export\\ written\\ and\\ closed\\ ·\\ ((?s:.*))\\.\\ For\\ cloud\\ destinations,\\ check\\ that\\ the\\ provider\\ has\\ finished\\ uploading\\."),
         java.util.regex.Pattern.compile("(-?[0-9]+)\\ personal\\ trade\\ record\\ ·\\ net\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ ·\\ net\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD"),
-        java.util.regex.Pattern.compile("(-?[0-9]+)\\ personal\\ trade\\ records\\ ·\\ net\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ ·\\ net\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD")
+        java.util.regex.Pattern.compile("(-?[0-9]+)\\ personal\\ trade\\ records\\ ·\\ net\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ ·\\ net\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD"),
+        java.util.regex.Pattern.compile("⚠\\ Crossed\\ —\\ best\\ bid\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ ≥\\ best\\ ask\\ (-?[0-9]+(?:\\.[0-9]+)?):\\ you'd\\ sell\\ cheaper\\ than\\ you\\ buy"),
+        java.util.regex.Pattern.compile("BIDS\\ \\ ((?s:.*))\\\nASKS\\ \\ ((?s:.*))"),
+        java.util.regex.Pattern.compile("(-?[0-9]+)\\ lvl\\ ·\\ best\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ ·\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ M"),
+        java.util.regex.Pattern.compile("Interrupted\\ create\\ —\\ review\\ or\\ withdraw\\ this\\ intent\\ before\\ publishing\\.\\ Order\\ ((?s:.*))"),
+        java.util.regex.Pattern.compile("maker\\ paused\\ —\\ (-?[0-9]+)\\ rung\\ still\\ recorded"),
+        java.util.regex.Pattern.compile("maker\\ paused\\ —\\ (-?[0-9]+)\\ rung\\ still\\ recorded,\\ (-?[0-9]+)\\ with\\ withdrawal\\ instructions\\ retained"),
+        java.util.regex.Pattern.compile("withdrawal\\ instructions\\ retained\\ for\\ (-?[0-9]+)\\ order\\ —\\ (-?[0-9]+)\\ seen\\ in\\ latest\\ snapshot"),
+        java.util.regex.Pattern.compile("withdrawal\\ instructions\\ retained\\ for\\ (-?[0-9]+)\\ order\\ —\\ (-?[0-9]+)\\ last\\ seen;\\ wallet/book\\ check\\ pending"),
+        java.util.regex.Pattern.compile("withdrawal\\ instructions\\ retained\\ for\\ (-?[0-9]+)\\ order\\ —\\ cancellation\\ not\\ proven\\ by\\ absence"),
+        java.util.regex.Pattern.compile("maker\\ paused\\ —\\ (-?[0-9]+)\\ rungs\\ still\\ recorded"),
+        java.util.regex.Pattern.compile("maker\\ paused\\ —\\ (-?[0-9]+)\\ rungs\\ still\\ recorded,\\ (-?[0-9]+)\\ with\\ withdrawal\\ instructions\\ retained"),
+        java.util.regex.Pattern.compile("withdrawal\\ instructions\\ retained\\ for\\ (-?[0-9]+)\\ orders\\ —\\ (-?[0-9]+)\\ seen\\ in\\ latest\\ snapshot"),
+        java.util.regex.Pattern.compile("withdrawal\\ instructions\\ retained\\ for\\ (-?[0-9]+)\\ orders\\ —\\ (-?[0-9]+)\\ last\\ seen;\\ wallet/book\\ check\\ pending"),
+        java.util.regex.Pattern.compile("withdrawal\\ instructions\\ retained\\ for\\ (-?[0-9]+)\\ orders\\ —\\ cancellation\\ not\\ proven\\ by\\ absence"),
+        java.util.regex.Pattern.compile("feed\\ ((?s:.*))\\ —\\ quoting\\ wider"),
+        java.util.regex.Pattern.compile("feed\\ ((?s:.*))"),
+        java.util.regex.Pattern.compile("MEXC\\ mid\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ ·\\ ((?s:.*))"),
+        java.util.regex.Pattern.compile("MEXC:\\ ((?s:.*))"),
+        java.util.regex.Pattern.compile("last\\ seen\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ ×\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ —\\ wallet/book\\ check\\ pending"),
+        java.util.regex.Pattern.compile("not\\ seen\\ in\\ this\\ book\\ snapshot\\ \\((-?[0-9]+)\\ blk\\ since\\ recorded\\)"),
+        java.util.regex.Pattern.compile("not\\ seen\\ in\\ this\\ book\\ snapshot\\ \\((-?[0-9]+)\\ blk\\ since\\ recorded\\)\\ —\\ review\\ if\\ still\\ absent"),
+        java.util.regex.Pattern.compile("less\\ funding\\ remains\\ —\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ of\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MINIMA\\ locked"),
+        java.util.regex.Pattern.compile("less\\ funding\\ remains\\ —\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ of\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ MxUSD\\ locked"),
+        java.util.regex.Pattern.compile("seen\\ in\\ latest\\ book\\ snapshot:\\ (-?[0-9]+(?:\\.[0-9]+)?)\\ ×\\ (-?[0-9]+(?:\\.[0-9]+)?)")
     };
-    private static final int[] RESOURCES={l10n_dex_export_status_unsaved,l10n_dex_total_value,l10n_dex_last_trade_age,l10n_dex_book_pool_amount,l10n_dex_pool_amount,l10n_pools_seconds_ago,l10n_dex_minutes_ago,l10n_dex_minutes_ago,l10n_dex_hours_ago,l10n_dex_hours_ago,l10n_dex_days_ago,l10n_dex_days_ago,l10n_dex_clock_seconds,l10n_dex_clock_minutes,l10n_dex_receipt_cancel_buy,l10n_dex_receipt_cancel_sell,l10n_dex_receipt_update_buy,l10n_dex_receipt_update_sell,l10n_dex_receipt_place_buy,l10n_dex_receipt_place_sell,l10n_dex_receipt_submitted,l10n_dex_receipt_posting,l10n_dex_receipt_unknown,l10n_dex_cancel_all_count,l10n_dex_age_blocks,l10n_dex_age_at_check,l10n_dex_order_trade_volume,l10n_dex_order_notional,l10n_dex_order_pnl,l10n_dex_order_pnl_positive,l10n_dex_owner_page,l10n_dex_owner_depth,l10n_dex_reprice_failure,l10n_dex_cancel_failure,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_mixed,l10n_dex_cancelling_progress,l10n_dex_sweep_buying,l10n_dex_sweep_buying,l10n_dex_sweep_selling,l10n_dex_sweep_selling,l10n_dex_quote_buying,l10n_dex_quote_selling,l10n_dex_quote_average,l10n_dex_quote_effective,l10n_dex_quote_book,l10n_dex_quote_book,l10n_dex_quote_pool,l10n_dex_quote_pool,l10n_dex_quote_impact,l10n_dex_quote_worst,l10n_dex_quote_book_leg,l10n_dex_quote_book_partial,l10n_dex_quote_partial,l10n_dex_quote_pool_leg,l10n_dex_quote_rest,l10n_dex_order_status,l10n_dex_trade_failure,l10n_dex_selecting_composite_buy,l10n_dex_posted_buy,l10n_dex_selecting_composite_sell,l10n_dex_posted_sell,l10n_dex_minutes_ago,l10n_dex_hours_ago,l10n_dex_sendable_mid,l10n_dex_in_orders,l10n_dex_in_saved_orders,l10n_dex_export_prepare_failed,l10n_dex_export_written,l10n_dex_export_summary,l10n_dex_export_summary};
-    private static final boolean[][] DIAGNOSTIC={{true},{false},{true},{false,false},{false},{false},{false},{false},{false},{false},{false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{true},{false},{false},{false},{false,false,false},{false},{false},{false},{false,false},{false},{true},{true},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false},{false},{false,false},{false,false},{false,false,false},{false,false,false},{false,false,false},{false,false,false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{false,false},{false},{false,false},{false},{false},{false},{false},{false},{false},{true},{true},{false,false,false},{false,false,false}};
+    private static final int[] RESOURCES={l10n_dex_export_status_unsaved,l10n_dex_total_value,l10n_dex_last_trade_age,l10n_dex_book_pool_amount,l10n_dex_pool_amount,l10n_pools_seconds_ago,l10n_dex_minutes_ago,l10n_dex_minutes_ago,l10n_dex_hours_ago,l10n_dex_hours_ago,l10n_dex_days_ago,l10n_dex_days_ago,l10n_dex_clock_seconds,l10n_dex_clock_minutes,l10n_dex_receipt_cancel_buy,l10n_dex_receipt_cancel_sell,l10n_dex_receipt_update_buy,l10n_dex_receipt_update_sell,l10n_dex_receipt_place_buy,l10n_dex_receipt_place_sell,l10n_dex_receipt_submitted,l10n_dex_receipt_posting,l10n_dex_receipt_unknown,l10n_dex_cancel_all_count,l10n_dex_age_blocks,l10n_dex_age_at_check,l10n_dex_order_trade_volume,l10n_dex_order_notional,l10n_dex_order_pnl,l10n_dex_order_pnl_positive,l10n_dex_owner_page,l10n_dex_owner_depth,l10n_dex_reprice_failure,l10n_dex_cancel_failure,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_accepted,l10n_dex_cancel_batch_mixed,l10n_dex_cancelling_progress,l10n_dex_sweep_buying,l10n_dex_sweep_buying,l10n_dex_sweep_selling,l10n_dex_sweep_selling,l10n_dex_quote_buying,l10n_dex_quote_selling,l10n_dex_quote_average,l10n_dex_quote_effective,l10n_dex_quote_book,l10n_dex_quote_book,l10n_dex_quote_pool,l10n_dex_quote_pool,l10n_dex_quote_impact,l10n_dex_quote_worst,l10n_dex_quote_book_leg,l10n_dex_quote_book_partial,l10n_dex_quote_partial,l10n_dex_quote_pool_leg,l10n_dex_quote_rest,l10n_dex_order_status,l10n_dex_trade_failure,l10n_dex_selecting_composite_buy,l10n_dex_posted_buy,l10n_dex_selecting_composite_sell,l10n_dex_posted_sell,l10n_dex_minutes_ago,l10n_dex_hours_ago,l10n_dex_sendable_mid,l10n_dex_in_orders,l10n_dex_in_saved_orders,l10n_dex_export_prepare_failed,l10n_dex_export_written,l10n_dex_export_summary,l10n_dex_export_summary,l10n_dex_maker_crossed,l10n_dex_maker_preview,l10n_dex_maker_preview_side,l10n_dex_maker_interrupted_create,l10n_dex_maker_paused_rungs,l10n_dex_maker_paused_withdrawals,l10n_dex_maker_cancel_seen,l10n_dex_maker_cancel_stale,l10n_dex_maker_cancel_absent,l10n_dex_maker_paused_rungs,l10n_dex_maker_paused_withdrawals,l10n_dex_maker_cancel_seen,l10n_dex_maker_cancel_stale,l10n_dex_maker_cancel_absent,l10n_dex_maker_feed_wider,l10n_dex_maker_feed_age,l10n_dex_maker_peg_price,l10n_dex_maker_peg_state,l10n_dex_maker_last_seen,l10n_dex_maker_absent,l10n_dex_maker_absent_review,l10n_dex_maker_less_minima,l10n_dex_maker_less_mxusd,l10n_dex_maker_seen};
+    private static final boolean[][] DIAGNOSTIC={{true},{false},{true},{false,false},{false},{false},{false},{false},{false},{false},{false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{true},{false},{false},{false},{false,false,false},{false},{false},{false},{false,false},{false},{true},{true},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{false,false},{false},{false},{false,false},{false,false},{false,false,false},{false,false,false},{false,false,false},{false,false,false},{false},{false},{false,false},{false,false},{false,false},{false,false},{false,false},{true},{true},{false,false},{false},{false,false},{false},{false},{false},{false},{false},{false},{true},{true},{false,false,false},{false,false,false},{false,false},{true,true},{false,false,false},{false},{false},{false,false},{false,false},{false,false},{false},{false},{false,false},{false,false},{false,false},{false},{true},{true},{false,true},{true},{false,false},{false},{false},{false,false},{false,false},{false,false}};
 }

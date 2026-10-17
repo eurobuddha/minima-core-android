@@ -6333,4 +6333,89 @@
     <string name="l10n_dex_export_written">"Export written and closed · %1$s. For cloud destinations, check that the provider has finished uploading."</string>
     <!-- Arguments: records, minima, mxusd -->
     <string name="l10n_dex_export_summary">"Personal trade records: %1$s · net %2$s MINIMA · net %3$s MxUSD"</string>
+    <string name="l10n_dex_maker_title" formatted="false">"MARKET MAKER"</string>
+    <string name="l10n_dex_maker_disarmed" formatted="false">"DISARMED"</string>
+    <string name="l10n_dex_maker_ladder" formatted="false">"MY MARKET / LADDER"</string>
+    <string name="l10n_dex_maker_split" formatted="false">"SPLIT FUNDS INTO 10 UTXOS"</string>
+    <string name="l10n_dex_maker_auto_peg" formatted="false">"AUTO MARKET-MAKE — PEG TO MEXC"</string>
+    <string name="l10n_dex_maker_peg_switch" formatted="false">"Peg ladder to MEXC (auto-reprice)"</string>
+    <string name="l10n_dex_maker_auto_fill" formatted="false">"AUTO-FILL (mid · step % · levels, then ask/bid size — seeds the rungs; edit any rung after)"</string>
+    <string name="l10n_dex_maker_asks" formatted="false">"ASKS — you SELL MINIMA (higher price)"</string>
+    <string name="l10n_dex_maker_bids" formatted="false">"BIDS — you BUY MINIMA (lower price)"</string>
+    <string name="l10n_dex_maker_on_chain" formatted="false">"ON-CHAIN STATUS"</string>
+    <string name="l10n_dex_maker_fetch_price" formatted="false">"Fetching MEXC price…"</string>
+    <string name="l10n_dex_maker_publish" formatted="false">"PUBLISH LADDER"</string>
+    <string name="l10n_dex_maker_apply_edits" formatted="false">"APPLY EDITS TO THE LIVE LADDER"</string>
+    <string name="l10n_dex_maker_wait_price" formatted="false">"Waiting for the MEXC price — try again in a few seconds"</string>
+    <string name="l10n_dex_maker_pending_edit" formatted="false">"waiting for a MEXC price to apply that…"</string>
+    <string name="l10n_dex_maker_records_unreadable" formatted="false">"Saved maker records could not be read. Keep app data for recovery; review live orders before taking action."</string>
+    <string name="l10n_dex_maker_peg_step" formatted="false">"Peg needs a step %"</string>
+    <string name="l10n_dex_maker_need_amount" formatted="false">"Set a MINIMA amount on at least one rung"</string>
+    <string name="l10n_dex_maker_no_levels" formatted="false">"No levels set — add a bid or ask rung first"</string>
+    <string name="l10n_dex_maker_crossed_toast" formatted="false">"⚠ Your best bid ≥ best ask (crossed market)"</string>
+    <string name="l10n_dex_maker_no_records" formatted="false">"no maker records stored here — check Orders for live positions"</string>
+    <string name="l10n_dex_maker_first_cycle" formatted="false">"waiting for the first cycle…"</string>
+    <string name="l10n_dex_maker_paused_unreadable" formatted="false">"MAKER PAUSED — RECORDS UNREADABLE"</string>
+    <string name="l10n_dex_maker_paused_settings" formatted="false">"MAKER PAUSED — SETTINGS CHANGED"</string>
+    <string name="l10n_dex_maker_paused_storage" formatted="false">"MAKER PAUSED — STORAGE ERROR"</string>
+    <string name="l10n_dex_maker_quoting_paused" formatted="false">"QUOTING PAUSED — CHECK ORDERS"</string>
+    <string name="l10n_dex_maker_enabled" formatted="false">"MAKER ENABLED"</string>
+    <string name="l10n_dex_maker_enabled_pending" formatted="false">"MAKER ENABLED — WALLET/BOOK CHECK PENDING"</string>
+    <string name="l10n_dex_maker_paused_retained" formatted="false">"MAKER PAUSED — RECORDS RETAINED"</string>
+    <string name="l10n_dex_maker_off" formatted="false">"MAKER OFF"</string>
+    <string name="l10n_dex_maker_withdraw" formatted="false">"WITHDRAW LADDER / RECORDED INTENT"</string>
+    <string name="l10n_dex_maker_no_feed" formatted="false">"no price feed"</string>
+    <string name="l10n_dex_maker_feed_quarantined" formatted="false">"large price move unconfirmed — quoting paused"</string>
+    <string name="l10n_dex_maker_feed_stale" formatted="false">"feed stale — withdrawal needed"</string>
+    <string name="l10n_dex_maker_waiting_post" formatted="false">"waiting to post — next cycle"</string>
+    <string name="l10n_dex_maker_no_order_pending" formatted="false">"no order recorded — wallet/book check pending"</string>
+    <string name="l10n_dex_maker_order_pending" formatted="false">"order recorded — wallet/book check pending"</string>
+    <string name="l10n_dex_maker_funding_unknown" formatted="false">"original funding unknown — review before automatic repricing"</string>
+    <string name="l10n_dex_maker_funding_differs" formatted="false">"funding differs from recorded intent — review this order"</string>
+    <string name="l10n_dex_maker_reprice_pending" formatted="false">"reprice requested — outcome not yet verified"</string>
+    <string name="l10n_dex_maker_withdrawal_needed" formatted="false">"no longer wanted — withdrawal still needed"</string>
+    <string name="l10n_dex_maker_intro" formatted="false">"Your depth ladder for MINIMA / MxUSD  (price = MxUSD per MINIMA):\n•  ASKS — where YOU SELL MINIMA (higher).   BIDS — where YOU BUY (lower).\n•  Each rung is a separate on-chain order. Leave rows blank to skip them."</string>
+    <string name="l10n_dex_maker_peg_help" formatted="false">"While pegged, the ladder regenerates around the MEXC mid (± step %, your size per rung) and reprices when the market moves ≥ your threshold. A stale feed widens quotes, then triggers a withdrawal request. Android can delay checks; orders remain tradeable until cancellation confirms. MEXC\'s MINIMA market is THIN — keep step % above its typical spread and rung sizes small; you auto-trade at these prices. Every adjustment is a transaction your phone does proof-of-work for."</string>
+    <!-- Arguments: bid, ask -->
+    <string name="l10n_dex_maker_crossed">"⚠ Crossed — best bid %1$s ≥ best ask %2$s: you\'d sell cheaper than you buy"</string>
+    <!-- Arguments: levels, price, amount -->
+    <string name="l10n_dex_maker_preview_side">"Levels: %1$s · best %2$s · %3$s MINIMA"</string>
+    <!-- Arguments: order -->
+    <string name="l10n_dex_maker_interrupted_create">"Interrupted create — review or withdraw this intent before publishing. Order %1$s"</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_paused_rungs">"Maker paused — recorded rungs: %1$s"</string>
+    <!-- Arguments: rungs, withdrawals -->
+    <string name="l10n_dex_maker_paused_withdrawals">"Maker paused — recorded rungs: %1$s; retained withdrawal instructions: %2$s"</string>
+    <!-- Arguments: age -->
+    <string name="l10n_dex_maker_feed_age">"feed %1$s"</string>
+    <!-- Arguments: age -->
+    <string name="l10n_dex_maker_feed_wider">"feed %1$s — quoting wider"</string>
+    <!-- Arguments: price, state -->
+    <string name="l10n_dex_maker_peg_price">"MEXC mid %1$s · %2$s"</string>
+    <!-- Arguments: state -->
+    <string name="l10n_dex_maker_peg_state">"MEXC: %1$s"</string>
+    <!-- Arguments: price, amount -->
+    <string name="l10n_dex_maker_last_seen">"last seen %1$s × %2$s — wallet/book check pending"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_maker_absent">"not seen in this book snapshot (%1$s blk since recorded)"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_maker_absent_review">"not seen in this book snapshot (%1$s blk since recorded) — review if still absent"</string>
+    <!-- Arguments: remaining, original -->
+    <string name="l10n_dex_maker_less_minima">"less funding remains — %1$s of %2$s MINIMA locked"</string>
+    <!-- Arguments: remaining, original -->
+    <string name="l10n_dex_maker_less_mxusd">"less funding remains — %1$s of %2$s MxUSD locked"</string>
+    <!-- Arguments: price, amount -->
+    <string name="l10n_dex_maker_seen">"seen in latest book snapshot: %1$s × %2$s"</string>
+    <!-- Arguments: orders, visible -->
+    <string name="l10n_dex_maker_cancel_seen">"Withdrawal instructions retained for %1$s orders — %2$s seen in latest snapshot"</string>
+    <!-- Arguments: orders, visible -->
+    <string name="l10n_dex_maker_cancel_stale">"Withdrawal instructions retained for %1$s orders — %2$s last seen; wallet/book check pending"</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_maker_cancel_absent">"Withdrawal instructions retained for %1$s orders — cancellation not proven by absence"</string>
+    <!-- Arguments: rung -->
+    <string name="l10n_dex_maker_price_description">"%1$s: price in MxUSD per MINIMA"</string>
+    <!-- Arguments: rung -->
+    <string name="l10n_dex_maker_amount_description">"%1$s: MINIMA amount"</string>
+    <!-- Arguments: bids, asks -->
+    <string name="l10n_dex_maker_preview">"BIDS  %1$s\nASKS  %2$s"</string>
 </resources>

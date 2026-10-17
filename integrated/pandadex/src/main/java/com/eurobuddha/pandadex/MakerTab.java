@@ -1,4 +1,6 @@
 package com.eurobuddha.pandadex;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.annotation.SuppressLint;
 import android.text.InputFilter;
@@ -65,9 +67,9 @@ public final class MakerTab extends LinearLayout {
 
     private int dp(int v) { return Design.dp(getContext(), v); }
 
-    private TextView tv(String s, float size, int colour, android.graphics.Typeface tf) {
+    private TextView tv(CharSequence s, float size, int colour, android.graphics.Typeface tf) {
         TextView t = new TextView(getContext());
-        t.setText(s);
+        Language.setText(t, DexMessages.message(s));
         t.setTextSize(size);
         t.setTextColor(colour);
         t.setTypeface(tf);
@@ -92,7 +94,9 @@ public final class MakerTab extends LinearLayout {
             return r.length() <= 44 && (r.isEmpty() || r.matches(pattern)) ? null : "";
         }});
         e.setText(value);
-        e.setHint(hint);
+        Language.hint(e, DexMessages.message(hint));
+        Language.description(e, DexMessages.message(hint));
+        e.setMinHeight(dp(48));
         e.setHintTextColor(Design.DIM2());
         e.setTextColor(Design.TEXT());
         e.setTypeface(Design.mono());
@@ -140,6 +144,10 @@ public final class MakerTab extends LinearLayout {
         row.addView(amount, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         TextView clr = tv("✕", 12f, Design.DIM2(), Design.sans());
         clr.setGravity(Gravity.CENTER);
+        clr.setMinWidth(dp(48)); clr.setMinHeight(dp(48));
+        Language.description(clr, Language.msg(l10n_atomix_market_clear, label));
+        Language.description(price, Language.msg(l10n_dex_maker_price_description, label));
+        Language.description(amount, Language.msg(l10n_dex_maker_amount_description, label));
         clr.setPadding(dp(8), dp(4), dp(2), dp(4));
         clr.setOnClickListener(v -> { price.setText(""); amount.setText(""); });
         Design.pressable(clr);
@@ -168,9 +176,10 @@ public final class MakerTab extends LinearLayout {
         // ---- status ----
         LinearLayout head = card();
         LinearLayout top = new LinearLayout(getContext());
+        top.setOrientation(VERTICAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
         top.addView(tv("MARKET MAKER", 13f, Design.TEXT(), Design.sansBold()),
-                new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
+                new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         stateTv = tv("DISARMED", 10f, Design.DIM(), Design.sansBold());
         top.addView(stateTv);
         head.addView(top);
@@ -191,6 +200,7 @@ public final class MakerTab extends LinearLayout {
         lc.addView(hint);
 
         prepBtn = tv("SPLIT FUNDS INTO 10 UTXOS", 12f, Design.ACCENT(), Design.sansBold());
+        prepBtn.setMinHeight(dp(48));
         prepBtn.setGravity(Gravity.CENTER);
         prepBtn.setPadding(0, dp(10), 0, dp(10));
         prepBtn.setBackground(Design.stroked(getContext(), Design.SURFACE2(), 10));
@@ -204,7 +214,8 @@ public final class MakerTab extends LinearLayout {
         // ---- auto-MM: peg the ladder to the live MEXC MINIMA/USDT market ----
         lc.addView(sectionLabel("AUTO MARKET-MAKE — PEG TO MEXC"));
         pegSw = new SwitchCompat(getContext());
-        pegSw.setText("Peg ladder to MEXC (auto-reprice)");
+        Language.setText(pegSw, DexMessages.message("Peg ladder to MEXC (auto-reprice)"));
+        pegSw.setMinHeight(dp(48));
         pegSw.setTextColor(Design.DIM());
         pegSw.setChecked(cfg.pegged);
         lc.addView(pegSw);
@@ -354,6 +365,7 @@ public final class MakerTab extends LinearLayout {
         // ---- publish / withdraw: ONE button, honest words (0.2.6 had "DISARM (cancels the
         // ladder)" AND "Withdraw ladder now" — the same action twice under different names) ----
         armBtn = tv("PUBLISH LADDER", 14f, Design.ON_ACCENT(), Design.sansBold());
+        armBtn.setMinHeight(dp(48));
         armBtn.setGravity(Gravity.CENTER);
         armBtn.setPadding(0, dp(13), 0, dp(13));
         armBtn.setOnClickListener(v -> togglePublish());
@@ -366,6 +378,7 @@ public final class MakerTab extends LinearLayout {
         // that never moves the funds, so tearing the whole ladder down to change a price was
         // never necessary — there was just no way to ask for it ----
         applyBtn = tv("APPLY EDITS TO THE LIVE LADDER", 12f, Design.ACCENT(), Design.sansBold());
+        applyBtn.setMinHeight(dp(48));
         applyBtn.setGravity(Gravity.CENTER);
         applyBtn.setPadding(0, dp(11), 0, dp(11));
         applyBtn.setBackground(Design.stroked(getContext(), Design.SURFACE2(), 10));
@@ -457,7 +470,7 @@ public final class MakerTab extends LinearLayout {
         pendingApply = apply;
         pendingEdit = "waiting for a MEXC price to apply that…";
         MarketPrice.refreshAsync();
-        pegPxTv.setText(pendingEdit);
+        Language.setText(pegPxTv, DexMessages.message(pendingEdit));
     }
 
     /**
@@ -623,14 +636,14 @@ public final class MakerTab extends LinearLayout {
             }
         }
         if (nA > 0 && nB > 0 && bestBid.compareTo(bestAsk) >= 0) {
-            previewTv.setText("⚠ Crossed — best bid " + PriceMath.fmtPrice(bestBid) + " ≥ best ask "
-                    + PriceMath.fmtPrice(bestAsk) + ": you'd sell cheaper than you buy");
+            Language.setText(previewTv, DexMessages.message("⚠ Crossed — best bid " + PriceMath.fmtPrice(bestBid) + " ≥ best ask "
+                    + PriceMath.fmtPrice(bestAsk) + ": you'd sell cheaper than you buy"));
             previewTv.setTextColor(Design.RED());
             return;
         }
         String bidS = nB > 0 ? (nB + " lvl · best " + PriceMath.fmtPrice(bestBid) + " · " + PriceMath.fmt(sumB) + " M") : "none";
         String askS = nA > 0 ? (nA + " lvl · best " + PriceMath.fmtPrice(bestAsk) + " · " + PriceMath.fmt(sumA) + " M") : "none";
-        previewTv.setText("BIDS  " + bidS + "\nASKS  " + askS);
+        Language.setText(previewTv, DexMessages.message("BIDS  " + bidS + "\nASKS  " + askS));
         previewTv.setTextColor(Design.DIM());
     }
 
@@ -705,7 +718,7 @@ public final class MakerTab extends LinearLayout {
         @Override public void run() {
             // Stops itself while hidden — setVisibility(VISIBLE) restarts it.
             if (!isAttachedToWindow() || getVisibility() != VISIBLE) return;
-            pegPxTv.setText(pendingEdit != null ? pendingEdit : pegLine());
+            Language.setText(pegPxTv, DexMessages.message(pendingEdit != null ? pendingEdit : pegLine()));
             updateStatus();
             if (pegSw.isChecked()) {
                 MarketPrice.refreshAsync();
@@ -726,34 +739,40 @@ public final class MakerTab extends LinearLayout {
 
     /** The per-rung on-chain story + the engine's latest message, both refreshed cheaply. */
     private void updateStatus() {
-        stageTv.setText(act.stage());
+        Language.setText(stageTv, DexMessages.message(act.stage()));
         if (!cfg.preparedCreate.isEmpty()) {
-            slotsTv.setText("Interrupted create — review or withdraw this intent before publishing. Order " + cfg.preparedOrderId());
+            Language.setText(slotsTv, DexMessages.message("Interrupted create — review or withdraw this intent before publishing. Order " + cfg.preparedOrderId()));
             return;
         }
         if (!cfg.armed) {
             // Not published: nothing is being reconciled, so don't narrate rungs as though
             // something were acting on them. Records may survive an interrupted withdraw.
             int n = cfg.slots.size(), t = cfg.cancelTombstones.size();
-            slotsTv.setText(n == 0 && t == 0 ? "no maker records stored here — check Orders for live positions"
+            Language.setText(slotsTv, DexMessages.message(n == 0 && t == 0 ? "no maker records stored here — check Orders for live positions"
                     : "maker paused — " + n + " rung" + (n == 1 ? "" : "s") + " still recorded"
-                    + (t > 0 ? ", " + t + " with withdrawal instructions retained" : ""));
+                    + (t > 0 ? ", " + t + " with withdrawal instructions retained" : "")));
             return;
         }
         java.util.List<MakerStatus.Line> lines = MakerStatus.lines(desiredNow(), cfg.slots,
                 cfg.cancelTombstones, myOrdersById(), act.chainBlock(), act.makerBookReady());
         if (lines.isEmpty()) {
-            slotsTv.setText("waiting for the first cycle…");
+            Language.setText(slotsTv, DexMessages.message("waiting for the first cycle…"));
             return;
         }
-        StringBuilder sb = new StringBuilder();
+        Language.setText(slotsTv, statusLines(lines));
+    }
+
+    static CharSequence statusLines(java.util.List<MakerStatus.Line> lines) {
+        Language.TextBuilder sb = new Language.TextBuilder();
+        boolean first = true;
         for (MakerStatus.Line l : lines) {
-            if (sb.length() > 0) sb.append('\n');
+            if (!first) sb.append('\n');
+            first = false;
             sb.append(l.tone == MakerStatus.OK ? "✓ " : l.tone == MakerStatus.FAIL ? "✗ " : "⏳ ");
             if (!l.slotId.isEmpty()) sb.append(l.slotId).append("  ");
-            sb.append(l.text);
+            sb.append(DexMessages.message(l.text));
         }
-        slotsTv.setText(sb.toString());
+        return sb.build();
     }
 
     /** Reuse the last lookup only while the book and both wallet ownership factors agree. */
@@ -798,23 +817,23 @@ public final class MakerTab extends LinearLayout {
     /** Restyle only — never rebuilds or rewrites the inputs. */
     public void render() {
         double mid = MarketPrice.mid();
-        midTv.setText(mid > 0 ? PriceMath.fmtPrice(BigDecimal.valueOf(mid)) : "—");
-        feedTv.setText(MarketPrice.stateLabel());
+        Language.setText(midTv, DexMessages.message(mid > 0 ? PriceMath.fmtPrice(BigDecimal.valueOf(mid)) : "—"));
+        Language.setText(feedTv, DexMessages.message(MarketPrice.stateLabel()));
         feedTv.setTextColor(MarketPrice.mustWithdraw() ? Design.RED()
                 : MarketPrice.fresh() ? Design.DIM2() : Design.ACCENT());
-        pegPxTv.setText(pegLine());
+        Language.setText(pegPxTv, DexMessages.message(pegLine()));
 
         boolean armed = cfg.armed;
-        stateTv.setText(!cfg.readable() ? "MAKER PAUSED — RECORDS UNREADABLE" : !MakerConfig.storageHealthy() ? (MakerConfig.settingsChangedElsewhere()?"MAKER PAUSED — SETTINGS CHANGED":"MAKER PAUSED — STORAGE ERROR") : armed ? (cfg.pegged && MarketPrice.mustWithdraw()
+        Language.setText(stateTv, DexMessages.message(!cfg.readable() ? "MAKER PAUSED — RECORDS UNREADABLE" : !MakerConfig.storageHealthy() ? (MakerConfig.settingsChangedElsewhere()?"MAKER PAUSED — SETTINGS CHANGED":"MAKER PAUSED — STORAGE ERROR") : armed ? (cfg.pegged && MarketPrice.mustWithdraw()
                         ? "QUOTING PAUSED — CHECK ORDERS" : act.makerBookReady() ? "MAKER ENABLED" : "MAKER ENABLED — WALLET/BOOK CHECK PENDING")
-                              : cfg.hasRecordedOrders() ? "MAKER PAUSED — RECORDS RETAINED" : "MAKER OFF");
+                              : cfg.hasRecordedOrders() ? "MAKER PAUSED — RECORDS RETAINED" : "MAKER OFF"));
         stateTv.setTextColor(!cfg.readable() || !MakerConfig.storageHealthy() ? Design.RED() : armed ? (cfg.pegged && MarketPrice.mustWithdraw() ? Design.RED() : act.makerBookReady() ? Design.IN() : Design.ACCENT())
                                    : Design.DIM());
         // only meaningful against a live ladder
         applyBtn.setVisibility(armed ? VISIBLE : GONE);
         prepBtn.setVisibility(armed ? GONE : VISIBLE);
         boolean recorded = !cfg.preparedCreate.isEmpty() || !cfg.slots.isEmpty();
-        armBtn.setText(armed || recorded ? "WITHDRAW LADDER / RECORDED INTENT" : "PUBLISH LADDER");
+        Language.setText(armBtn, DexMessages.message(armed || recorded ? "WITHDRAW LADDER / RECORDED INTENT" : "PUBLISH LADDER"));
         armBtn.setBackground(Design.ripple(Design.roundBg(getContext(),
                 armed ? Design.RED() : Design.IN(), 12)));
         updateStatus();

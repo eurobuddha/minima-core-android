@@ -103,3 +103,5 @@ def adapt(root):
  loader=importlib.util.spec_from_file_location("dex_assets_languages",project/"scripts/adapt-pandamonium-dex-assets-languages.py");m=importlib.util.module_from_spec(loader);loader.loader.exec_module(m);m.adapt(root)
 
  loader=importlib.util.spec_from_file_location("dex_export_languages",project/"scripts/adapt-pandamonium-dex-export-languages.py");m=importlib.util.module_from_spec(loader);loader.loader.exec_module(m);m.adapt(root)
+
+ loader=importlib.util.spec_from_file_location("dex_maker_languages",project/"scripts/adapt-pandamonium-dex-maker-languages.py");m=importlib.util.module_from_spec(loader);loader.loader.exec_module(m);m.adapt(root)

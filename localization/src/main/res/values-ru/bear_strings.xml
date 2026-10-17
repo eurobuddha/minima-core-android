@@ -6395,4 +6395,89 @@
     <string name="l10n_dex_export_written">"Экспорт записан и закрыт · %1$s. При сохранении в облако убедитесь, что поставщик завершил загрузку."</string>
     <!-- Arguments: records, minima, mxusd -->
     <string name="l10n_dex_export_summary">"Личные записи сделок: %1$s · нетто %2$s MINIMA · нетто %3$s MxUSD"</string>
+    <string name="l10n_dex_maker_title" formatted="false">"МАРКЕТМЕЙКЕР"</string>
+    <string name="l10n_dex_maker_disarmed" formatted="false">"ВЫКЛЮЧЕН"</string>
+    <string name="l10n_dex_maker_ladder" formatted="false">"МОЙ РЫНОК / ЛЕСТНИЦА"</string>
+    <string name="l10n_dex_maker_split" formatted="false">"РАЗДЕЛИТЬ СРЕДСТВА НА 10 UTXO"</string>
+    <string name="l10n_dex_maker_auto_peg" formatted="false">"АВТОМАРКЕТМЕЙКИНГ — ПРИВЯЗКА К MEXC"</string>
+    <string name="l10n_dex_maker_peg_switch" formatted="false">"Привязать лестницу к MEXC (автопересчёт цен)"</string>
+    <string name="l10n_dex_maker_auto_fill" formatted="false">"АВТОЗАПОЛНЕНИЕ (средняя цена · шаг % · уровни, затем объёмы продажи/покупки — после заполнения можно изменить любой уровень)"</string>
+    <string name="l10n_dex_maker_asks" formatted="false">"ПРОДАЖИ — вы ПРОДАЁТЕ MINIMA (цена выше)"</string>
+    <string name="l10n_dex_maker_bids" formatted="false">"ПОКУПКИ — вы ПОКУПАЕТЕ MINIMA (цена ниже)"</string>
+    <string name="l10n_dex_maker_on_chain" formatted="false">"СТАТУС В БЛОКЧЕЙНЕ"</string>
+    <string name="l10n_dex_maker_fetch_price" formatted="false">"Получение цены MEXC…"</string>
+    <string name="l10n_dex_maker_publish" formatted="false">"ОПУБЛИКОВАТЬ ЛЕСТНИЦУ"</string>
+    <string name="l10n_dex_maker_apply_edits" formatted="false">"ПРИМЕНИТЬ ИЗМЕНЕНИЯ К АКТИВНОЙ ЛЕСТНИЦЕ"</string>
+    <string name="l10n_dex_maker_wait_price" formatted="false">"Ожидание цены MEXC — повторите через несколько секунд"</string>
+    <string name="l10n_dex_maker_pending_edit" formatted="false">"ожидание цены MEXC для применения изменения…"</string>
+    <string name="l10n_dex_maker_records_unreadable" formatted="false">"Не удалось прочитать записи маркетмейкера. Сохраните данные приложения для восстановления; перед действиями проверьте активные заявки."</string>
+    <string name="l10n_dex_maker_peg_step" formatted="false">"Для привязки нужен шаг %"</string>
+    <string name="l10n_dex_maker_need_amount" formatted="false">"Задайте количество MINIMA хотя бы для одного уровня"</string>
+    <string name="l10n_dex_maker_no_levels" formatted="false">"Уровни не заданы — сначала добавьте уровень покупки или продажи"</string>
+    <string name="l10n_dex_maker_crossed_toast" formatted="false">"⚠ Ваша лучшая цена покупки ≥ лучшей цены продажи (пересечение цен)"</string>
+    <string name="l10n_dex_maker_no_records" formatted="false">"здесь нет записей маркетмейкера — проверьте активные позиции в разделе заявок"</string>
+    <string name="l10n_dex_maker_first_cycle" formatted="false">"ожидание первого цикла…"</string>
+    <string name="l10n_dex_maker_paused_unreadable" formatted="false">"МАРКЕТМЕЙКЕР ПРИОСТАНОВЛЕН — ЗАПИСИ НЕ ЧИТАЮТСЯ"</string>
+    <string name="l10n_dex_maker_paused_settings" formatted="false">"МАРКЕТМЕЙКЕР ПРИОСТАНОВЛЕН — НАСТРОЙКИ ИЗМЕНЕНЫ"</string>
+    <string name="l10n_dex_maker_paused_storage" formatted="false">"МАРКЕТМЕЙКЕР ПРИОСТАНОВЛЕН — ОШИБКА ХРАНИЛИЩА"</string>
+    <string name="l10n_dex_maker_quoting_paused" formatted="false">"КОТИРОВАНИЕ ПРИОСТАНОВЛЕНО — ПРОВЕРЬТЕ ЗАЯВКИ"</string>
+    <string name="l10n_dex_maker_enabled" formatted="false">"МАРКЕТМЕЙКЕР ВКЛЮЧЕН"</string>
+    <string name="l10n_dex_maker_enabled_pending" formatted="false">"МАРКЕТМЕЙКЕР ВКЛЮЧЕН — ПРОВЕРКА КОШЕЛЬКА/СТАКАНА ОЖИДАЕТСЯ"</string>
+    <string name="l10n_dex_maker_paused_retained" formatted="false">"МАРКЕТМЕЙКЕР ПРИОСТАНОВЛЕН — ЗАПИСИ СОХРАНЕНЫ"</string>
+    <string name="l10n_dex_maker_off" formatted="false">"МАРКЕТМЕЙКЕР ВЫКЛЮЧЕН"</string>
+    <string name="l10n_dex_maker_withdraw" formatted="false">"СНЯТЬ ЛЕСТНИЦУ / ЗАПИСАННОЕ НАМЕРЕНИЕ"</string>
+    <string name="l10n_dex_maker_no_feed" formatted="false">"нет ценового потока"</string>
+    <string name="l10n_dex_maker_feed_quarantined" formatted="false">"резкое изменение цены не подтверждено — котирование приостановлено"</string>
+    <string name="l10n_dex_maker_feed_stale" formatted="false">"ценовой поток устарел — требуется снятие заявок"</string>
+    <string name="l10n_dex_maker_waiting_post" formatted="false">"ожидает отправки — следующий цикл"</string>
+    <string name="l10n_dex_maker_no_order_pending" formatted="false">"заявка не записана — ожидается проверка кошелька/стакана"</string>
+    <string name="l10n_dex_maker_order_pending" formatted="false">"заявка записана — ожидается проверка кошелька/стакана"</string>
+    <string name="l10n_dex_maker_funding_unknown" formatted="false">"исходное обеспечение неизвестно — проверьте перед автопересчётом цен"</string>
+    <string name="l10n_dex_maker_funding_differs" formatted="false">"обеспечение отличается от записанного намерения — проверьте заявку"</string>
+    <string name="l10n_dex_maker_reprice_pending" formatted="false">"изменение цены запрошено — результат ещё не проверен"</string>
+    <string name="l10n_dex_maker_withdrawal_needed" formatted="false">"больше не требуется — заявку ещё нужно снять"</string>
+    <string name="l10n_dex_maker_intro" formatted="false">"Ваша лестница заявок MINIMA / MxUSD (цена = MxUSD за MINIMA):\n• ПРОДАЖИ — вы ПРОДАЁТЕ MINIMA (выше). ПОКУПКИ — вы ПОКУПАЕТЕ (ниже).\n• Каждый уровень — отдельная заявка в блокчейне. Оставьте строку пустой, чтобы пропустить её."</string>
+    <string name="l10n_dex_maker_peg_help" formatted="false">"При привязке лестница пересчитывается вокруг средней цены MEXC (± шаг %, ваши объёмы по уровням), а цены меняются при движении рынка ≥ вашего порога. Устаревший поток сначала расширяет котировки, затем вызывает запрос на снятие. Android может задерживать проверки; заявки доступны для сделок до подтверждения отмены. Рынок MINIMA на MEXC малоликвиден: держите шаг % выше обычного спреда, а объёмы уровней небольшими; по этим ценам выполняются автоматические сделки. Каждая корректировка — транзакция, для которой телефон выполняет proof-of-work."</string>
+    <!-- Arguments: bid, ask -->
+    <string name="l10n_dex_maker_crossed">"⚠ Пересечение цен — лучшая покупка %1$s ≥ лучшей продажи %2$s: вы продадите дешевле, чем купите"</string>
+    <!-- Arguments: levels, price, amount -->
+    <string name="l10n_dex_maker_preview_side">"Уровни: %1$s · лучшая цена %2$s · %3$s MINIMA"</string>
+    <!-- Arguments: order -->
+    <string name="l10n_dex_maker_interrupted_create">"Создание прервано — проверьте или отзовите намерение перед публикацией. Заявка %1$s"</string>
+    <!-- Arguments: rungs -->
+    <string name="l10n_dex_maker_paused_rungs">"Маркетмейкер приостановлен — записанные уровни: %1$s"</string>
+    <!-- Arguments: rungs, withdrawals -->
+    <string name="l10n_dex_maker_paused_withdrawals">"Маркетмейкер приостановлен — записанные уровни: %1$s; сохранённые инструкции снятия: %2$s"</string>
+    <!-- Arguments: age -->
+    <string name="l10n_dex_maker_feed_age">"ценовой поток: %1$s"</string>
+    <!-- Arguments: age -->
+    <string name="l10n_dex_maker_feed_wider">"ценовой поток: %1$s — котировки расширены"</string>
+    <!-- Arguments: price, state -->
+    <string name="l10n_dex_maker_peg_price">"Средняя цена MEXC %1$s · %2$s"</string>
+    <!-- Arguments: state -->
+    <string name="l10n_dex_maker_peg_state">"MEXC: %1$s"</string>
+    <!-- Arguments: price, amount -->
+    <string name="l10n_dex_maker_last_seen">"последнее наблюдение: %1$s × %2$s — ожидается проверка кошелька/стакана"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_maker_absent">"не видна в этом снимке стакана (блоков с момента записи: %1$s)"</string>
+    <!-- Arguments: blocks -->
+    <string name="l10n_dex_maker_absent_review">"не видна в этом снимке стакана (блоков с момента записи: %1$s) — проверьте, если всё ещё отсутствует"</string>
+    <!-- Arguments: remaining, original -->
+    <string name="l10n_dex_maker_less_minima">"обеспечение уменьшилось — заблокировано %1$s из %2$s MINIMA"</string>
+    <!-- Arguments: remaining, original -->
+    <string name="l10n_dex_maker_less_mxusd">"обеспечение уменьшилось — заблокировано %1$s из %2$s MxUSD"</string>
+    <!-- Arguments: price, amount -->
+    <string name="l10n_dex_maker_seen">"видна в последнем снимке стакана: %1$s × %2$s"</string>
+    <!-- Arguments: orders, visible -->
+    <string name="l10n_dex_maker_cancel_seen">"Инструкции снятия сохранены для заявок: %1$s — в последнем снимке видны: %2$s"</string>
+    <!-- Arguments: orders, visible -->
+    <string name="l10n_dex_maker_cancel_stale">"Инструкции снятия сохранены для заявок: %1$s — ранее были видны: %2$s; ожидается проверка кошелька/стакана"</string>
+    <!-- Arguments: orders -->
+    <string name="l10n_dex_maker_cancel_absent">"Инструкции снятия сохранены для заявок: %1$s — отсутствие не доказывает отмену"</string>
+    <!-- Arguments: rung -->
+    <string name="l10n_dex_maker_price_description">"%1$s: цена в MxUSD за MINIMA"</string>
+    <!-- Arguments: rung -->
+    <string name="l10n_dex_maker_amount_description">"%1$s: количество MINIMA"</string>
+    <!-- Arguments: bids, asks -->
+    <string name="l10n_dex_maker_preview">"ПОКУПКИ  %1$s\nПРОДАЖИ  %2$s"</string>
 </resources>

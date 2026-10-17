@@ -224,7 +224,59 @@
     "The export could not be completed. The destination may contain a partial file; check it and export to another destination.": "dex.exportPartial",
     "Could not start saving. Check the destination and export again.": "dex.exportSaveStartFailed",
     "Export status could not be cleared. Free storage and try again; source trade records are unchanged.": "dex.exportClearFailed",
-    "Could not open the prepared export": "dex.exportPreparedOpenFailed"
+    "Could not open the prepared export": "dex.exportPreparedOpenFailed",
+    "price": "atomixMarket.price",
+    "mid": "atomixMarket.mid",
+    "step %": "atomixMarket.step",
+    "levels": "atomixMarket.levels",
+    "ask size": "atomixMarket.askSize",
+    "bid size": "atomixMarket.bidSize",
+    "skew ±%": "atomixMarket.skew",
+    "reprice ≥ %": "atomixMarket.reprice",
+    "none": "atomixMarket.none",
+    "MARKET MAKER": "dex.makerTitle",
+    "DISARMED": "dex.makerDisarmed",
+    "MY MARKET / LADDER": "dex.makerLadder",
+    "SPLIT FUNDS INTO 10 UTXOS": "dex.makerSplit",
+    "AUTO MARKET-MAKE — PEG TO MEXC": "dex.makerAutoPeg",
+    "Peg ladder to MEXC (auto-reprice)": "dex.makerPegSwitch",
+    "AUTO-FILL (mid · step % · levels, then ask/bid size — seeds the rungs; edit any rung after)": "dex.makerAutoFill",
+    "ASKS — you SELL MINIMA (higher price)": "dex.makerAsks",
+    "BIDS — you BUY MINIMA (lower price)": "dex.makerBids",
+    "ON-CHAIN STATUS": "dex.makerOnChain",
+    "Fetching MEXC price…": "dex.makerFetchPrice",
+    "PUBLISH LADDER": "dex.makerPublish",
+    "APPLY EDITS TO THE LIVE LADDER": "dex.makerApplyEdits",
+    "Waiting for the MEXC price — try again in a few seconds": "dex.makerWaitPrice",
+    "waiting for a MEXC price to apply that…": "dex.makerPendingEdit",
+    "Saved maker records could not be read. Keep app data for recovery; review live orders before taking action.": "dex.makerRecordsUnreadable",
+    "Peg needs a step %": "dex.makerPegStep",
+    "Set a MINIMA amount on at least one rung": "dex.makerNeedAmount",
+    "No levels set — add a bid or ask rung first": "dex.makerNoLevels",
+    "⚠ Your best bid ≥ best ask (crossed market)": "dex.makerCrossedToast",
+    "no maker records stored here — check Orders for live positions": "dex.makerNoRecords",
+    "waiting for the first cycle…": "dex.makerFirstCycle",
+    "MAKER PAUSED — RECORDS UNREADABLE": "dex.makerPausedUnreadable",
+    "MAKER PAUSED — SETTINGS CHANGED": "dex.makerPausedSettings",
+    "MAKER PAUSED — STORAGE ERROR": "dex.makerPausedStorage",
+    "QUOTING PAUSED — CHECK ORDERS": "dex.makerQuotingPaused",
+    "MAKER ENABLED": "dex.makerEnabled",
+    "MAKER ENABLED — WALLET/BOOK CHECK PENDING": "dex.makerEnabledPending",
+    "MAKER PAUSED — RECORDS RETAINED": "dex.makerPausedRetained",
+    "MAKER OFF": "dex.makerOff",
+    "WITHDRAW LADDER / RECORDED INTENT": "dex.makerWithdraw",
+    "no price feed": "dex.makerNoFeed",
+    "large price move unconfirmed — quoting paused": "dex.makerFeedQuarantined",
+    "feed stale — withdrawal needed": "dex.makerFeedStale",
+    "waiting to post — next cycle": "dex.makerWaitingPost",
+    "no order recorded — wallet/book check pending": "dex.makerNoOrderPending",
+    "order recorded — wallet/book check pending": "dex.makerOrderPending",
+    "original funding unknown — review before automatic repricing": "dex.makerFundingUnknown",
+    "funding differs from recorded intent — review this order": "dex.makerFundingDiffers",
+    "reprice requested — outcome not yet verified": "dex.makerRepricePending",
+    "no longer wanted — withdrawal still needed": "dex.makerWithdrawalNeeded",
+    "Your depth ladder for MINIMA / MxUSD  (price = MxUSD per MINIMA):\n•  ASKS — where YOU SELL MINIMA (higher).   BIDS — where YOU BUY (lower).\n•  Each rung is a separate on-chain order. Leave rows blank to skip them.": "dex.makerIntro",
+    "While pegged, the ladder regenerates around the MEXC mid (± step %, your size per rung) and reprices when the market moves ≥ your threshold. A stale feed widens quotes, then triggers a withdrawal request. Android can delay checks; orders remain tradeable until cancellation confirms. MEXC's MINIMA market is THIN — keep step % above its typical spread and rung sizes small; you auto-trade at these prices. Every adjustment is a transaction your phone does proof-of-work for.": "dex.makerPegHelp"
   },
   "patterns": [
     {
@@ -768,6 +820,189 @@
         "number"
       ],
       "key": "dex.exportSummary"
+    },
+    {
+      "template": "⚠ Crossed — best bid {0} ≥ best ask {1}: you'd sell cheaper than you buy",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.makerCrossed"
+    },
+    {
+      "template": "BIDS  {0}\nASKS  {1}",
+      "kinds": [
+        "diagnostic",
+        "diagnostic"
+      ],
+      "key": "dex.makerPreview"
+    },
+    {
+      "template": "{0} lvl · best {1} · {2} M",
+      "kinds": [
+        "integer",
+        "number",
+        "number"
+      ],
+      "key": "dex.makerPreviewSide"
+    },
+    {
+      "template": "Interrupted create — review or withdraw this intent before publishing. Order {0}",
+      "kinds": [
+        "literal"
+      ],
+      "key": "dex.makerInterruptedCreate"
+    },
+    {
+      "template": "maker paused — {0} rung still recorded",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerPausedRungs"
+    },
+    {
+      "template": "maker paused — {0} rung still recorded, {1} with withdrawal instructions retained",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.makerPausedWithdrawals"
+    },
+    {
+      "template": "withdrawal instructions retained for {0} order — {1} seen in latest snapshot",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.makerCancelSeen"
+    },
+    {
+      "template": "withdrawal instructions retained for {0} order — {1} last seen; wallet/book check pending",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.makerCancelStale"
+    },
+    {
+      "template": "withdrawal instructions retained for {0} order — cancellation not proven by absence",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerCancelAbsent"
+    },
+    {
+      "template": "maker paused — {0} rungs still recorded",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerPausedRungs"
+    },
+    {
+      "template": "maker paused — {0} rungs still recorded, {1} with withdrawal instructions retained",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.makerPausedWithdrawals"
+    },
+    {
+      "template": "withdrawal instructions retained for {0} orders — {1} seen in latest snapshot",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.makerCancelSeen"
+    },
+    {
+      "template": "withdrawal instructions retained for {0} orders — {1} last seen; wallet/book check pending",
+      "kinds": [
+        "integer",
+        "integer"
+      ],
+      "key": "dex.makerCancelStale"
+    },
+    {
+      "template": "withdrawal instructions retained for {0} orders — cancellation not proven by absence",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerCancelAbsent"
+    },
+    {
+      "template": "feed {0} — quoting wider",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.makerFeedWider"
+    },
+    {
+      "template": "feed {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.makerFeedAge"
+    },
+    {
+      "template": "MEXC mid {0} · {1}",
+      "kinds": [
+        "number",
+        "diagnostic"
+      ],
+      "key": "dex.makerPegPrice"
+    },
+    {
+      "template": "MEXC: {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.makerPegState"
+    },
+    {
+      "template": "last seen {0} × {1} — wallet/book check pending",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.makerLastSeen"
+    },
+    {
+      "template": "not seen in this book snapshot ({0} blk since recorded)",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerAbsent"
+    },
+    {
+      "template": "not seen in this book snapshot ({0} blk since recorded) — review if still absent",
+      "kinds": [
+        "integer"
+      ],
+      "key": "dex.makerAbsentReview"
+    },
+    {
+      "template": "less funding remains — {0} of {1} MINIMA locked",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.makerLessMinima"
+    },
+    {
+      "template": "less funding remains — {0} of {1} MxUSD locked",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.makerLessMxusd"
+    },
+    {
+      "template": "seen in latest book snapshot: {0} × {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.makerSeen"
     }
   ]
 }
