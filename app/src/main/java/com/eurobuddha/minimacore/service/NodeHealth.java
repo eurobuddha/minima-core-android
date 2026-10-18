@@ -274,7 +274,8 @@ public final class NodeHealth {
 
     /**
      * Parse the node's own size strings - MiniFormat.formatSize emits "123 bytes",
-     * "1.5 KB", "10.1 MB", "1.2 GB". Returns 0 for anything unrecognised, so a format
+     * "1.5 KB", "10.1 MB", "1.2 GB", or a decimal comma under ru/uk.
+     * Returns 0 for anything unrecognised, so a format
      * change degrades to "looks fine" rather than to a spurious resync prompt.
      */
     static long bytes(String formatted) {
@@ -285,7 +286,11 @@ public final class NodeHealth {
         if (space <= 0) return 0;
         double value;
         try {
-            value = Double.parseDouble(s.substring(0, space));
+            String number = s.substring(0, space);
+            // MiniFormat uses %.1f with the node's locale, without grouping. Accept
+            // that exact comma form too; do not reinterpret grouped/mixed numbers.
+            if (number.matches("[0-9]+,[0-9]")) number = number.replace(',', '.');
+            value = Double.parseDouble(number);
         } catch (NumberFormatException exc) {
             return 0;
         }

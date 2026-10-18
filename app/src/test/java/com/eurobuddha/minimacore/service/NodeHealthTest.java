@@ -174,6 +174,43 @@ public class NodeHealthTest {
         assertEquals((long) (1.2 * 1024 * MB), NodeHealth.bytes("1.2 GB"));
     }
 
+    @Test public void nodeSizeFormattingKeepsHealthSignalsInEverySupportedLocale() {
+        java.util.Locale original = java.util.Locale.getDefault();
+        try {
+            for (String tag : new String[]{"en-GB", "zh-Hans-CN", "ru-RU", "uk-UA"}) {
+                java.util.Locale.setDefault(java.util.Locale.forLanguageTag(tag));
+                JSONObject reply = zfoldStatus();
+                JSONObject response = (JSONObject) reply.get("response");
+                JSONObject memory = (JSONObject) response.get("memory");
+                JSONObject files = (JSONObject) memory.get("files");
+                files.put("txpowdb", org.minima.utils.MiniFormat.formatSize(950 * MB));
+                files.put("archivedb", org.minima.utils.MiniFormat.formatSize(2 * MB));
+                memory.put("disk", org.minima.utils.MiniFormat.formatSize(1024 * MB));
+                NodeHealth.Metrics read = NodeHealth.read(reply);
+                assertNotNull(read);
+                assertEquals(tag, 950 * MB, read.txpowBytes);
+                assertEquals(tag, 2 * MB, read.archiveBytes);
+                assertEquals(tag, 1024 * MB, read.diskBytes);
+                assertEquals(tag, NodeHealth.State.DEGRADED,
+                        NodeHealth.classify(metrics(read.txpowRows, read.txpowBytes,
+                                read.diskBytes, 512 * MB, 60 * MB)).state);
+                for (long value : new long[]{512, 1536, 10 * MB, 1024 * MB}) {
+                    assertEquals(tag, value, NodeHealth.bytes(org.minima.utils.MiniFormat.formatSize(value)));
+                }
+            }
+        } finally {
+            java.util.Locale.setDefault(original);
+        }
+    }
+
+    @Test public void acceptsOnlyTheNodesSingleDecimalCommaForm() {
+        assertEquals((long) (10.1 * MB), NodeHealth.bytes("10,1 MB"));
+        assertEquals(1536, NodeHealth.bytes("1,5 KB"));
+        for (String invalid : new String[]{"1,024 MB", "1,024,0 MB", "1.024,0 MB", "1,0.0 MB", "1,5e3 MB", ",5 MB"}) {
+            assertEquals(invalid, 0, NodeHealth.bytes(invalid));
+        }
+    }
+
     /** An unreadable size must read as "fine", never as a reason to wipe the chain. */
     @Test public void unparseableSizesAreTreatedAsHarmless() {
         assertEquals(0, NodeHealth.bytes(null));
