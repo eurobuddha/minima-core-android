@@ -8258,4 +8258,6 @@
     <string name="l10n_atelier_image_resume" formatted="false">"Продовжити запис"</string>
     <string name="l10n_atelier_image_too_large" formatted="false">"Зображення перевищує ліміт завантаження 60 МБ."</string>
     <string name="l10n_atelier_image_empty_reference" formatted="false">"Сховище не повернуло посилання на зображення."</string>
+    <string name="l10n_filtr_ui_saving" formatted="false">"Збереження…"</string>
+    <string name="l10n_filtr_ui_saved" formatted="false">"Збережено у Фото"</string>
 </resources>

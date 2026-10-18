@@ -514,4 +514,7 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     spec=importlib.util.spec_from_file_location('atelier_filtr_handoff',Path(__file__).with_name('adapt-pandamonium-atelier-filtr-handoff.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
+    spec=importlib.util.spec_from_file_location('atelier_exports',Path(__file__).with_name('adapt-pandamonium-atelier-exports.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
 if __name__=='__main__': adapt(Path(sys.argv[1]))

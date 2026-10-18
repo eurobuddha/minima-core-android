@@ -978,10 +978,10 @@ function filtrStatus(msg, err) {
   el.className = "modal-status" + (err ? " err" : msg ? " ok" : "");
 }
 
-function filtrExport(jpeg, cb) {
-  if (!FILTR.src) { toast(FiltrI18n.t("filtr.ui.loadFirst")); return; }
+function filtrExport(jpeg, cb, failed) {
+  if (!FILTR.src) { toast(FiltrI18n.t("filtr.ui.loadFirst")); if (failed) failed(); return; }
   filtrRenderFull(true, function (out) {
-    if (!out) { filtrStatus("filtr.ui.exportFailed", true); return; }
+    if (!out) { filtrStatus("filtr.ui.exportFailed", true); if (failed) failed(); return; }
     if (jpeg) {
       var flat = document.createElement("canvas");
       flat.width = out.width; flat.height = out.height;
@@ -994,17 +994,30 @@ function filtrExport(jpeg, cb) {
   });
 }
 
+var FILTR_SAVE_PENDING = false;
+function filtrSaveFinished(success) {
+  FILTR_SAVE_PENDING = false;
+  $("filtr-save-png").disabled = false;
+  $("filtr-save-jpg").disabled = false;
+  filtrStatus(success ? "filtr.ui.saved" : "filtr.ui.exportFailed", !success);
+}
 function filtrDownload(jpeg) {
-  filtrExport(jpeg, function (cv) {
+  if (FILTR_SAVE_PENDING) return;
+  FILTR_SAVE_PENDING = true;
+  $("filtr-save-png").disabled = true;
+  $("filtr-save-jpg").disabled = true;
+  var requestedName = FILTR.name || "filtr";
+  try { filtrExport(jpeg, function (cv) {
     cv.toBlob(function (blob) {
-      if (!blob) { filtrStatus("filtr.ui.encodeFailed", true); return; }
-      var base = (FILTR.name || "filtr").replace(/\.[A-Za-z0-9]+$/, "")
-                   .replace(/[^A-Za-z0-9_-]+/g, "_") || "filtr";
+      if (!blob) { filtrSaveFinished(false); return; }
+      var base = requestedName.replace(/\.[A-Za-z0-9]+$/, "")
+                   .trim() || "filtr";
+      filtrStatus("filtr.ui.saving");
       downloadBlob(base + "-filtr." + (jpeg ? "jpg" : "png"), blob,
                    jpeg ? "image/jpeg" : "image/png");
-      filtrStatus("filtr.ui.downloaded");
+      // Native completion reports whether the photo was actually saved.
     }, jpeg ? "image/jpeg" : "image/png", 0.92);
-  });
+  }, function () { filtrSaveFinished(false); }); } catch (e) { filtrSaveFinished(false); }
 }
 
 /* jpeg b64 ladder for the mint handoff (raw b64, no data: prefix) */

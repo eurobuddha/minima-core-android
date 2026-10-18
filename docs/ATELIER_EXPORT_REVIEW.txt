@@ -1,0 +1,77 @@
+Atelier viewer and FILTR export review — 2026-10-18
+
+Intent and reuse
+Save/share the chosen artwork while retaining the four-language UI and literal
+metadata. Read the standalone and integrated ViewerScreen, ImageLoader, ImageTools,
+FiltrActivity, FILTR HTML/JS, FileProvider manifest/path and viewer/language tests.
+Read core ChatImageActivity (requires an actual loaded image), the shared
+minimaapi BackgroundWork executor and its bounded worker pattern, and PandaApps
+ApkExporter with its callers. No PandaApps exporter tests exist in that checkout.
+
+Reuse the existing Atelier decoder, JPEG quality/size, FileProvider authority and
+cache path. ArtworkExport adapts the proven PandaApps pending/write/publish/cleanup
+sequence to Images and preserves the API-28 branch. It does not delete earlier
+exports by filename. Both native callers use BackgroundWork.pool(2,4), with overload
+reported as failure. No dependencies or app versions change.
+
+Resolved findings
+MAJOR — Viewer fallback was saved/shared as if it were the original artwork.
+Export now requires successful decoding. Identicons remain display placeholders.
+
+MAJOR — Shared filenames were only lot-N.jpg; later exports could replace bytes
+already granted to another app. Each export now uses a unique cache file. Success
+retains the file for the receiving app; failures/cancelled results remove it.
+
+MAJOR — Compression failures and MediaStore completion were unchecked.
+Compression must succeed, a writable stream must exist, and API 29+ publication
+must update the inserted row. Partial/failed/cancelled rows are deleted. API 28
+retains legacy behavior and cleans failed rows; existing storage permission applies.
+
+MAJOR — Late share completion could open a chooser after closing or changing lots.
+Each viewer owns its export generation. Detached/closed/changed viewers reject
+completion and remove an unshared file. Old sheet controls cannot export a new
+selection. The worker uses captured name/token/index/URL and checks cancellation.
+
+MAJOR — Chooser exceptions escaped the worker's catch on the UI thread.
+Provider/chooser setup is now caught on the UI thread; failed share files are removed.
+The Intent includes ClipData and the URI read grant. Captions use completion-time
+language while keeping captured metadata literal.
+
+MINOR — Filename cleanup discarded Chinese/Cyrillic characters.
+Native filenames preserve Unicode, replace unsafe path/control characters and cap
+length by code point. FILTR captures the source filename before asynchronous encoding.
+Its MIME and extension follow the actual PNG/JPEG data, not the supplied filename.
+
+MAJOR — FILTR controls could claim completion early or remain disabled on errors.
+PNG/JPEG buttons allow one export until native completion. UI status stays Saving
+through the FileReader/native operation, follows all four languages, and changes to
+Saved only after publication. Encode/read/render/native failures release the controls
+and report failure. Language changes do not reload the editor or alter its artwork.
+
+Review boundaries
+Successful viewer exports retain the existing 1800px decode and JPEG conversion;
+FILTR exports retain its exact PNG/JPEG bytes. FILTR validates the exported MIME and
+dimensions (maximum 4096 square) and bounds input before Base64 decoding. Export
+cache files remain disposable app cache. No on-chain data or user seeds are changed.
+Remote ImageLoader fetching/cache policy is a separate outstanding review. Real
+Android MediaStore/FileProvider acceptance on the Fold is still needed before the
+integration release; Robolectric/browser checks are not physical-device acceptance.
+
+Validation
+All 263 Atelier tests pass (17 new export tests). Coverage includes pending/publish
+ordering, null streams, write/compression/publication failures, cancellation, API-28
+cleanup, unique share files, MIME/Unicode preservation, missing artwork, duplicate
+clicks, stale sheet controls, changed/detached viewers, missing share handlers,
+worker rejection, native FILTR status and four-language completion messages.
+The existing Playwright test, extended against real FILTR assets in Chrome/WebGL,
+passes: real PNG export preserves its captured Unicode filename, prevents duplicate
+native calls, recovers after renderer failure and waits for native completion.
+Its prior crop/history/annotation/cursor/DOM/language assertions still pass.
+Pandamonium release Java compilation passes; all 21 pinned imports reproduce;
+6,776 messages validate in four languages; git diff --check passes.
+Evidence: build/localization/atelier-export-tests.log, filtr-export-browser.log,
+Gradle XML reports and existing FILTR screenshots. No APK built/installed/published.
+
+Verdict
+Approve the export change; no unresolved blocking findings in this scope.
+This checkpoint does not complete the Atelier/Salon goal.

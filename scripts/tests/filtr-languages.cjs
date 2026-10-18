@@ -91,7 +91,29 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>FiltrI18n.setLanguage('ru'));await page.screenshot({path:path.join(screenshots,'filtr-desktop-ru.png')});
   assert.deepEqual(errors,[]);
   assert.deepEqual(await page.evaluate(()=>nativeCalls),[],'Language changes must not export, mint or save');
-  console.log('PASS: four languages, complete control/enum schema, unchanged crop/image/history/annotations/input selection, stable DOM, panel state, literal user text and working enum selection');
+  // Export uses real canvas/Blob/FileReader; the mocked Android bridge only records the bytes.
+  await page.evaluate(()=>{FILTR.name='作品 Русский Українська.png';filtrDownload(false);filtrDownload(false);FILTR.name='New artwork.png';});
+  await page.waitForFunction(()=>nativeCalls.some(c=>c[0]==='save'));
+  assert.equal(await page.evaluate(()=>nativeCalls.filter(c=>c[0]==='save').length),1);
+  assert.equal(await page.locator('#filtr-save-png').isDisabled(),true);
+  const exportCall=await page.evaluate(()=>nativeCalls.find(c=>c[0]==='save'));
+  assert.equal(exportCall[1],'作品 Русский Українська-filtr.png');
+  assert.ok(exportCall[2].startsWith('iVBOR'),'PNG bytes changed at native boundary');
+  for(const code of ['en','zh-Hans','ru','uk']) {
+   await page.evaluate(code=>FiltrI18n.setLanguage(code),code);
+   assert.equal(await page.locator('#filtr-status').textContent(),await page.evaluate(()=>FiltrI18n.t('filtr.ui.saving')));
+  }
+  await page.evaluate(()=>filtrSaveFinished(true));
+  assert.equal(await page.locator('#filtr-save-png').isDisabled(),false);
+  assert.equal(await page.locator('#filtr-status').textContent(),await page.evaluate(()=>FiltrI18n.t('filtr.ui.saved')));
+  await page.evaluate(()=>filtrSaveFinished(false));
+  assert.equal(await page.locator('#filtr-status').textContent(),await page.evaluate(()=>FiltrI18n.t('filtr.ui.exportFailed')));
+  await page.evaluate(()=>{const original=filtrExport;try{filtrExport=()=>{throw Error('renderer unavailable');};filtrDownload(false);}finally{filtrExport=original;}});
+  assert.equal(await page.locator('#filtr-save-png').isDisabled(),false);
+  assert.equal(await page.evaluate(()=>FILTR_SAVE_PENDING),false);
+  assert.equal(await page.evaluate(()=>nativeCalls.filter(c=>c[0]==='save').length),1);
+  assert.deepEqual(errors,[]);
+  console.log('PASS: four languages preserve editor state; real PNG export preserves captured Unicode filename, prevents duplicates, recovers after render failure and waits for native save result');
   await context.close();
  } finally {await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;server.closeAllConnections();server.close();});

@@ -47,6 +47,7 @@ public final class ViewerScreen {
         FrameLayout root = new FrameLayout(c);
         root.setBackgroundColor(0xFF0D0D0B);
         root.setClickable(true);
+        final Exports exports=new Exports(act,root);
 
         final int[] idx = { Math.max(0, Math.min(startIndex, items.size() - 1)) };
 
@@ -62,7 +63,7 @@ public final class ViewerScreen {
         TextView back = Design.text(c, "‹", 22, 0xFFF2F1EC, Design.sansBold());
         back.setGravity(Gravity.CENTER);
         back.setBackground(Design.ripple(Design.rect(0xB3111111)));
-        back.setOnClickListener(v -> host.onCloseViewer());
+        back.setOnClickListener(v -> { exports.close(); host.onCloseViewer(); });
         top.addView(back, new LinearLayout.LayoutParams(Design.dp(c, 48), Design.dp(c, 48)));
         TextView lotLabel = Design.text(c, "", 12, 0xFFF2F1EC, Design.sansBold());
         lotLabel.setLetterSpacing(0.2f);
@@ -95,13 +96,14 @@ public final class ViewerScreen {
                 sheetScroll.setVisibility(sheetScroll.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE));
 
         Runnable render = () -> {
+            final long selected=exports.select();
             StateNft.Item it = items.get(idx[0]);
             Language.setText(lotLabel, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_lot_position, String.format(java.util.Locale.US, "%03d", it.index), String.format(java.util.Locale.US, "%03d", Math.max(meta.size, items.size()))));
             img.setImageBitmap(Identicon.forToken(meta.tokenid + it.index, 900));
             img.resetZoom();
             // The loader also clears the previous request tag for an empty URL.
             ImageLoader.loadFull(act, it.imageUrl, img);
-            buildSheet(act, host, sheet, meta, it);
+            buildSheet(act, host, sheet, meta, it, exports, selected);
         };
 
         img.listener = new ZoomImage.Nav() {
@@ -119,7 +121,7 @@ public final class ViewerScreen {
     }
 
     private static void buildSheet(Activity act, Host host, LinearLayout sheet,
-                                   StateNft.Meta meta, StateNft.Item it) {
+                                   StateNft.Meta meta, StateNft.Item it, Exports exports, long selected) {
         Context c = act;
         sheet.removeAllViews();
         View bar = Design.rule(c, 3);
@@ -253,12 +255,12 @@ public final class ViewerScreen {
             actions.addView(space(c, 8), new LinearLayout.LayoutParams(Design.dp(c, 8), 1));
         }
         TextView save = Design.button(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_save), false);
-        save.setOnClickListener(v -> saveToPhotos(act, meta, it));
+        save.setOnClickListener(v -> exports.start(false,selected,meta.name,meta.tokenid,it.index,it.imageUrl));
         save.setMinHeight(Design.dp(c, 48));
         actions.addView(save, weight(c, -2));
         actions.addView(space(c, 8), new LinearLayout.LayoutParams(Design.dp(c, 8), 1));
         TextView share = Design.button(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_logs_share), false);
-        share.setOnClickListener(v -> shareImage(act, meta, it));
+        share.setOnClickListener(v -> exports.start(true,selected,meta.name,meta.tokenid,it.index,it.imageUrl));
         share.setMinHeight(Design.dp(c, 48));
         actions.addView(share, weight(c, -2));
         sheet.addView(actions, lp(c, 0, 10, 0, 0));
@@ -357,59 +359,67 @@ public final class ViewerScreen {
         return t;
     }
 
-    private static Bitmap bitmapFor(Activity act, StateNft.Meta meta, StateNft.Item it) {
-        if (it.imageUrl != null && !it.imageUrl.isEmpty()) {
-            Bitmap b = ImageLoader.decode(act, it.imageUrl, 1800);
-            if (b != null) return b;
+    /** A viewer owns its exports; only immutable selection values reach the worker. */
+    private static final class Exports {
+        final Activity activity; final View root;
+        volatile long generation; volatile boolean closed;
+        boolean busy;
+        Exports(Activity activity,View root) {
+            this.activity=activity;this.root=root;
+            root.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener(){
+                public void onViewAttachedToWindow(View v){}
+                public void onViewDetachedFromWindow(View v){close();}
+            });
         }
-        return Identicon.forToken(meta.tokenid + it.index, 900);
-    }
-
-    private static void saveToPhotos(Activity act, StateNft.Meta meta, StateNft.Item it) {
-        new Thread(() -> {
-            try {
-                Bitmap b = bitmapFor(act, meta, it);
-                String name = meta.name.replaceAll("[^A-Za-z0-9]+", "_") + "_" + it.index + ".jpg";
-                ContentValues cv = new ContentValues();
-                cv.put(MediaStore.Images.Media.DISPLAY_NAME, name);
-                cv.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-                if (Build.VERSION.SDK_INT >= 29) {
-                    cv.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Atelier");
+        void close(){closed=true;generation++;}
+        long select(){return ++generation;}
+        boolean current(long selected){return !closed&&selected==generation&&!activity.isFinishing()
+                &&!activity.isDestroyed()&&root.isAttachedToWindow();}
+        void start(boolean share,long selected,String name,String token,int index,String url){
+            if(!current(selected))return;
+            if(busy){Toast.makeText(activity,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_image_busy),Toast.LENGTH_SHORT).show();return;}
+            busy=true;
+            final Context ctx=activity.getApplicationContext();
+            final java.util.function.BooleanSupplier cancelled=()->closed||selected!=generation;
+            try{ArtworkExport.execute(()->{
+                java.io.File file=null;
+                try{
+                    ArtworkExport.check(cancelled);
+                    Bitmap bitmap=url==null||url.isEmpty()?null:ImageLoader.decode(ctx,url,1800);
+                    if(bitmap==null)throw new java.io.IOException("Artwork unavailable");
+                    try{
+                        if(share)file=ArtworkExport.shareFile(ctx,out->ArtworkExport.jpeg(bitmap,out),cancelled);
+                        else ArtworkExport.save(ctx,ArtworkExport.filename(name,"_"+index+".jpg"),"image/jpeg",
+                                out->ArtworkExport.jpeg(bitmap,out),cancelled);
+                    }finally{bitmap.recycle();}
+                    final java.io.File ready=file;
+                    activity.runOnUiThread(()->finish(selected,share,name,token,index,ready,true));
+                }catch(Exception failure){
+                    if(file!=null)file.delete();
+                    activity.runOnUiThread(()->finish(selected,share,name,token,index,null,false));
                 }
-                Uri uri = act.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
-                if (uri == null) throw new IllegalStateException("MediaStore refused");
-                try (OutputStream out = act.getContentResolver().openOutputStream(uri)) {
-                    b.compress(Bitmap.CompressFormat.JPEG, 95, out);
-                }
-                act.runOnUiThread(() -> Toast.makeText(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_saved_photos), Toast.LENGTH_SHORT).show());
-            } catch (Exception e) {
-                act.runOnUiThread(() -> Toast.makeText(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_save_image_failed), Toast.LENGTH_SHORT).show());
+            });}catch(java.util.concurrent.RejectedExecutionException full){finish(selected,share,name,token,index,null,false);}
+        }
+        void finish(long selected,boolean share,String name,String token,int index,java.io.File file,boolean success){
+            busy=false;
+            if(!current(selected)){if(file!=null)file.delete();return;}
+            if(success&&share){
+                try{
+                    Uri uri=androidx.core.content.FileProvider.getUriForFile(activity,activity.getPackageName()+".atelier.fileprovider",file);
+                    Intent send=new Intent(Intent.ACTION_SEND).setType("image/jpeg");
+                    send.putExtra(Intent.EXTRA_STREAM,uri);
+                    send.setClipData(ClipData.newRawUri("artwork",uri));
+                    send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    send.putExtra(Intent.EXTRA_TEXT,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_share_lot_caption,name,index,token).toString());
+                    activity.startActivity(Intent.createChooser(send,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_share_lot)));
+                    return;
+                }catch(RuntimeException unavailable){if(file!=null)file.delete();success=false;}
             }
-        }).start();
-    }
-
-    private static void shareImage(Activity act, StateNft.Meta meta, StateNft.Item it) {
-        new Thread(() -> {
-            try {
-                Bitmap b = bitmapFor(act, meta, it);
-                java.io.File dir = new java.io.File(act.getCacheDir(), "pandamonium_atelier_shared");
-                if (!dir.exists() && !dir.mkdirs()) throw new IllegalStateException("no cache dir");
-                java.io.File f = new java.io.File(dir, "lot-" + it.index + ".jpg");
-                try (java.io.FileOutputStream out = new java.io.FileOutputStream(f)) {
-                    b.compress(Bitmap.CompressFormat.JPEG, 95, out);
-                }
-                Uri uri = androidx.core.content.FileProvider.getUriForFile(act,
-                        act.getPackageName() + ".atelier.fileprovider", f);
-                Intent send = new Intent(Intent.ACTION_SEND);
-                send.setType("image/jpeg");
-                send.putExtra(Intent.EXTRA_STREAM, uri);
-                send.putExtra(Intent.EXTRA_TEXT, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_share_lot_caption, meta.name, it.index, meta.tokenid).toString());
-                send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                act.runOnUiThread(() -> act.startActivity(Intent.createChooser(send, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_share_lot))));
-            } catch (Exception e) {
-                act.runOnUiThread(() -> Toast.makeText(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_share_image_failed), Toast.LENGTH_SHORT).show());
-            }
-        }).start();
+            Toast.makeText(activity,Language.msg(success
+                    ?com.eurobuddha.minimacore.i18n.R.string.l10n_creative_saved_photos
+                    :share?com.eurobuddha.minimacore.i18n.R.string.l10n_creative_share_image_failed
+                    :com.eurobuddha.minimacore.i18n.R.string.l10n_creative_save_image_failed),Toast.LENGTH_SHORT).show();
+        }
     }
 
     private static View space(Context c, int h) {

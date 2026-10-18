@@ -47,7 +47,9 @@ function downloadBlob(name, data, mime) {
   r.onload = function () {
     if (window.AndroidFiltr)
       AndroidFiltr.saveImage(name, ("" + r.result).split(",")[1]);
+    else filtrSaveFinished(false);
   };
+  r.onerror = function () { filtrSaveFinished(false); };
   r.readAsDataURL(blob);
 }
 </script>

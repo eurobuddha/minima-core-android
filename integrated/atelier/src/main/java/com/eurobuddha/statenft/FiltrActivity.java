@@ -156,6 +156,35 @@ public class FiltrActivity extends Activity {
         }
     }
 
+    private final java.util.concurrent.atomic.AtomicBoolean saving = new java.util.concurrent.atomic.AtomicBoolean();
+
+    private void saveImage(String name,String b64) {
+        if(handoffClosed||!saving.compareAndSet(false,true))return;
+        final android.content.Context ctx=getApplicationContext();
+        try{ArtworkExport.execute(()->{
+            boolean saved=false;
+            try{
+                ArtworkExport.check(()->handoffClosed);
+                ArtworkExport.Encoded image=ArtworkExport.filtr(b64);
+                String base=name==null?"filtr":name.replaceFirst("\\.[^.]*$","");
+                ArtworkExport.save(ctx,ArtworkExport.filename(base,image.extension),image.mime,
+                        out->out.write(image.bytes),()->handoffClosed);
+                saved=true;
+            }catch(Exception failure){}
+            final boolean success=saved;
+            runOnUiThread(()->exportFinished(success));
+        });}catch(java.util.concurrent.RejectedExecutionException full){runOnUiThread(()->exportFinished(false));}
+    }
+    private void exportFinished(boolean success) {
+        saving.set(false);
+        if(handoffClosed||isFinishing()||isDestroyed())return;
+        Toast.makeText(this,Language.msg(success
+                ?com.eurobuddha.minimacore.i18n.R.string.l10n_creative_saved_photos
+                :com.eurobuddha.minimacore.i18n.R.string.l10n_creative_save_image_failed),Toast.LENGTH_SHORT).show();
+        if(web!=null&&"file:///android_asset/filtr/filtr.html".equals(web.getUrl()))
+            web.evaluateJavascript("filtrSaveFinished("+success+");",null);
+    }
+
     private class Bridge {
         @JavascriptInterface public String getLanguage() { return Language.code(); }
 
@@ -163,27 +192,8 @@ public class FiltrActivity extends Activity {
             runOnUiThread(() -> Toast.makeText(FiltrActivity.this, m, Toast.LENGTH_SHORT).show());
         }
 
-        @JavascriptInterface public void saveImage(String name, String b64) {
-            try {
-                byte[] bytes = Base64.decode(b64, Base64.DEFAULT);
-                boolean png = name != null && name.toLowerCase().endsWith(".png");
-                ContentValues cv = new ContentValues();
-                cv.put(MediaStore.Images.Media.DISPLAY_NAME,
-                        name == null || name.isEmpty() ? "filtr.png" : name);
-                cv.put(MediaStore.Images.Media.MIME_TYPE, png ? "image/png" : "image/jpeg");
-                if (Build.VERSION.SDK_INT >= 29) {
-                    cv.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Atelier");
-                }
-                Uri uri = getContentResolver()
-                        .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
-                if (uri == null) throw new IllegalStateException("MediaStore refused");
-                try (OutputStream out = getContentResolver().openOutputStream(uri)) {
-                    out.write(bytes);
-                }
-                toastMsg(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_saved_photos).toString());
-            } catch (Exception e) {
-                toastMsg(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_save_image_failed).toString());
-            }
+        @JavascriptInterface public void saveImage(String name,String b64) {
+            FiltrActivity.this.saveImage(name,b64);
         }
 
         @JavascriptInterface public void sendToMint(String b64) {
