@@ -1249,6 +1249,7 @@ public class MainActivity extends AppCompatActivity {
         reannHandler.removeCallbacks(reannTick);
         cancelMediaRequests();
         cancelBackup();
+        cancelPublication();
         io.shutdownNow();
         stopAudio();
         videoRequest++;
@@ -1304,7 +1305,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void go(Screen s) {
-        if (screen != s) cancelMediaRequests();
+        if (screen != s) { cancelMediaRequests(); cancelPublication(); }
         if (screen == Screen.EDIT && s != Screen.EDIT) commitEditFields();   // preserve the draft when leaving Edit
         screen = s; render();
     }
@@ -1441,35 +1442,127 @@ public class MainActivity extends AppCompatActivity {
         return p;
     }
 
-    /** Re-host profile.json (+ the public web renderer). Refreshes each holding's
-     *  published editions FIRST so viewers get the full StateNFT collection. */
-    private void hostProfile(TextView status, Runnable done) {
-        refreshEditionsThen(() -> doHostProfile(status, done));
+    private static final class ProfilePublish {
+        final String draft, typed, html;
+        final Hosting.Profile host;
+        final JSONObject profile;
+        final int epoch;
+        final TextView status;
+        final Runnable done;
+        volatile boolean cancelled;
+        boolean refreshing = true;
+        ProfilePublish(String draft, String typed, String html, Hosting.Profile host,
+                JSONObject profile, int epoch, TextView status, Runnable done) {
+            this.draft = draft; this.typed = typed; this.html = html;
+            this.host = host; this.profile = profile; this.epoch = epoch; this.status = status; this.done = done;
+        }
+    }
+    private ProfilePublish profilePublish;
+    private Object announcement;
+
+    private String profileTyped() {
+        return new JSONArray().put(edName == null ? "" : text(edName)).put(edBio == null ? "" : text(edBio))
+                .put(edAbout == null ? "" : text(edAbout)).put(edAvatar == null ? "" : text(edAvatar))
+                .put(edBanner == null ? "" : text(edBanner)).put(edWebvalidate == null ? "" : text(edWebvalidate)).toString();
     }
 
-    private void doHostProfile(TextView status, Runnable done) {
-        Hosting.Profile def = HostingStore.getDefault(this);
-        if (def == null) { if (status != null) status.setText("Set hosting first."); return; }
-        String handle = SalonStore.get(this, "handle");
-        if (status != null) status.setText("Publishing your page…");
-        JSONObject profile = buildProfileJson();
-        io.execute(() -> {
-            try (Hosting.Uploader up = Hosting.forProfile(def)) {
-                String url = up.putFile(profile.toString().getBytes("UTF-8"), handle + "/profile.json", "application/json");
-                // The encrypted relay isn't a web host, and on content-addressed Blossom
-                // the renderer's relative fetch('./profile.json') can never resolve —
-                // skip the browser renderer for both.
-                if (!Hosting.TYPE_RELAY.equals(def.type()) && !Hosting.TYPE_BLOSSOM.equals(def.type()))
-                    try { up.putFile(salonHtml().getBytes("UTF-8"), handle + "/index.html", "text/html"); } catch (Exception ignore) {}
-                Hosting.verifyUrl(url, def);
-                mProfileCache.remove(url);   // your edit is live — don't serve the stale cached copy
-                runOnUiThread(() -> {
-                    SalonStore.put(this, "profileUrl", url);
-                    if (status != null) status.setText("Live.");
-                    if (done != null) done.run();
-                });
-            } catch (Exception e) { runOnUiThread(() -> { if (status != null) status.setText("Publish failed: " + e.getMessage()); }); }
-        });
+    private boolean publicationStoredCurrent(ProfilePublish op) {
+        if (op.cancelled) return false;
+        try {
+            Hosting.Profile host = HostingStore.getDefault(this);
+            return op.draft.equals(SalonStore.publicationSnapshot(SalonStore.identityRecord(this)))
+                    && host != null && op.host.j.toString().equals(host.j.toString());
+        } catch (Exception unavailable) { return false; }
+    }
+
+    private boolean publicationCurrent(ProfilePublish op) {
+        return !isFinishing() && !isDestroyed() && op.epoch == renderEpoch
+                && op.typed.equals(profileTyped()) && publicationStoredCurrent(op);
+    }
+
+    private void publicationStatus(TextView status, CharSequence message) {
+        if (isFinishing() || isDestroyed()) return;
+        if (status != null) Language.setText(status, message); else toast(message);
+    }
+
+    private void cancelPublication() {
+        if (profilePublish != null) profilePublish.cancelled = true;
+    }
+
+    private void hostProfile(TextView status, Runnable done) {
+        if (profilePublish != null || announcement != null) { publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_busy)); return; }
+        Hosting.Profile host = HostingStore.getDefault(this);
+        if (host == null) { publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_host)); return; }
+        final ProfilePublish op;
+        try {
+            op = new ProfilePublish(SalonStore.publicationSnapshot(SalonStore.identityRecord(this)),
+                    profileTyped(), salonHtml(), host, buildProfileJson(), renderEpoch, status, done);
+        } catch (Exception unavailable) { publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return; }
+        profilePublish = op;
+        publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_preparing));
+        refreshPublicationEditions(op);
+    }
+
+    /** All edition mutation and completion runs on the UI thread; late replies cannot
+     *  mutate the uploaded JSON or overwrite a replacement account's holdings. */
+    private void refreshPublicationEditions(ProfilePublish op) {
+        JSONArray nfts = op.profile.optJSONArray("nfts");
+        if (!nodeUp || nfts == null || nfts.length() == 0) { queuePublication(op); return; }
+        final int[] pending = {nfts.length()};
+        final boolean[] received = new boolean[nfts.length()];
+        final android.os.Handler timer = new android.os.Handler(android.os.Looper.getMainLooper());
+        final Runnable finish = () -> { if (op.refreshing) queuePublication(op); };
+        timer.postDelayed(finish, 12_000);
+        for (int i = 0; i < nfts.length(); i++) {
+            final int index = i;
+            final JSONObject item = nfts.optJSONObject(i);
+            final JsonArrayCb result = editions -> runOnUiThread(() -> {
+                if (!op.refreshing || received[index]) return;
+                received[index] = true;
+                if (publicationCurrent(op) && item != null && editions.length() > 0)
+                    try { item.put("editions", editions); } catch (Exception ignored) { }
+                if (--pending[0] == 0) { timer.removeCallbacks(finish); finish.run(); }
+            });
+            if (item == null || item.optString("tokenid").isEmpty()) result.ready(new JSONArray());
+            else try { captureEditions(item.optString("tokenid"), result); }
+            catch (RuntimeException unavailable) { result.ready(new JSONArray()); }
+        }
+    }
+
+    private void queuePublication(ProfilePublish op) {
+        op.refreshing = false;
+        if (profilePublish != op) return;
+        if (!publicationCurrent(op)) { finishPublication(op, null, null); return; }
+        final String content = op.profile.toString();
+        publicationStatus(op.status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_uploading));
+        try {
+            io.execute(() -> {
+                try {
+                    if (!publicationStoredCurrent(op)) { runOnUiThread(() -> finishPublication(op, null, null)); return; }
+                    String url = ProfileHosting.upload(op.host, op.profile.optString("handle"), content, op.html);
+                    runOnUiThread(() -> finishPublication(op, url, null));
+                } catch (Exception error) { runOnUiThread(() -> finishPublication(op, null, error)); }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException unavailable) { finishPublication(op, null, unavailable); }
+    }
+
+    private void finishPublication(ProfilePublish op, String url, Exception error) {
+        if (profilePublish != op) return;
+        profilePublish = null;
+        if (!publicationCurrent(op)) {
+            if (!isFinishing() && !isDestroyed()) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_changed));
+            return;
+        }
+        if (error != null || url == null) {
+            publicationStatus(op.status, error == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_failed, mediaError(error)));
+            return;
+        }
+        if (!SalonStore.savePublication(this, op.draft, url, op.profile.optJSONArray("nfts"))) {
+            publicationStatus(op.status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return;
+        }
+        mProfileCache.remove(url);
+        publicationStatus(op.status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_uploaded));
+        if (op.done != null) op.done.run();
     }
 
     // ---- Maxima mesh budget: a Maxima-hosted profile shares a small, LRU-evicted relay
@@ -2172,44 +2265,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /** Before publishing, stamp a FRESH edition list onto every proven holding so a
-     *  remote viewer sees the whole collection, not just the icon. Enumerates each
-     *  token's editions this node holds, updates the stored nfts, then runs `done`
-     *  on the UI thread. This is why editions publish reliably regardless of what
-     *  the owner happened to open first. Node-async → callback-chained. */
-    private void refreshEditionsThen(final Runnable done) {
-        final JSONArray arr = SalonStore.arr(this, "nfts");
-        if (!nodeUp || arr.length() == 0) { done.run(); return; }
-        final java.util.concurrent.atomic.AtomicInteger pending =
-                new java.util.concurrent.atomic.AtomicInteger(arr.length());
-        final java.util.concurrent.atomic.AtomicBoolean changed =
-                new java.util.concurrent.atomic.AtomicBoolean(false);
-        // fired guards a SINGLE completion — via all-done OR the timeout below —
-        // so the publish is never stalled by a slow node, and a late edition
-        // callback can't mutate the array while finish is serialising it.
-        final java.util.concurrent.atomic.AtomicBoolean fired =
-                new java.util.concurrent.atomic.AtomicBoolean(false);
-        final Runnable finish = () -> {
-            if (fired.compareAndSet(false, true)) {
-                if (changed.get()) SalonStore.setArr(MainActivity.this, "nfts", arr);
-                runOnUiThread(done);
-            }
-        };
-        // Proceed after 12s with whatever we captured; the rest refresh next publish.
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(finish, 12_000);
-        for (int i = 0; i < arr.length(); i++) {
-            final JSONObject o = arr.optJSONObject(i);
-            final String tid = o == null ? "" : o.optString("tokenid");
-            if (tid.isEmpty()) { if (pending.decrementAndGet() == 0) finish.run(); continue; }
-            captureEditions(tid, editions -> {
-                if (!fired.get() && editions.length() > 0) {
-                    try { o.put("editions", editions); changed.set(true); } catch (Exception ignored) {}
-                }
-                if (pending.decrementAndGet() == 0) finish.run();
-            });
-        }
-    }
-
     /* ---------------- prove & showcase a holding ---------------- */
 
     private void pickNftDialog() {
@@ -2392,7 +2447,7 @@ public class MainActivity extends AppCompatActivity {
             SalonStore.put(this, "about", text(about));
             SalonStore.put(this, "avatar", text(edAvatar)); SalonStore.put(this, "banner", text(edBanner));
             SalonStore.put(this, "webvalidate", text(edWebvalidate));
-            hostProfile(profStatus, () -> { publishSalon(profStatus); toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_published)); go(Screen.HOME); });
+            hostProfile(profStatus, () -> publishSalon(profStatus));
         }), lp(0, 8, 0, 0));
     }
 
@@ -3016,14 +3071,7 @@ public class MainActivity extends AppCompatActivity {
         io.execute(() -> {
             try {
                 JSONObject profile = buildProfileJson();
-                final String profileUrl;
-                try (Hosting.Uploader up = Hosting.forProfile(def)) {
-                    profileUrl = up.putFile(profile.toString().getBytes("UTF-8"), h + "/profile.json", "application/json");
-                    // Content-addressed Blossom: relative fetch can't work — skip the renderer.
-                    if (!Hosting.TYPE_RELAY.equals(def.type()) && !Hosting.TYPE_BLOSSOM.equals(def.type()))
-                        try { up.putFile(salonHtml().getBytes("UTF-8"), h + "/index.html", "text/html"); } catch (Exception ignore) {}
-                }
-                Hosting.verifyUrl(profileUrl, def);
+                final String profileUrl = ProfileHosting.upload(def, h, profile.toString(), salonHtml());
                 runOnUiThread(() -> { SalonStore.put(this, "profileUrl", profileUrl); Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_checking)); adoptOrMint(h, n, b, profileUrl, status); });
             } catch (SftpUploader.HostKeyUnverified hk) { runOnUiThread(() -> { promptTrustHostKey(def, hk.fingerprint, status); claimFailed(); }); }
             catch (Exception e) { runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting_failed, e.getMessage())); claimFailed(); }); }
@@ -3137,9 +3185,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void publishSalon(TextView status) {
-        if (!nodeUp || !SalonStore.hasIdentity(this)) { if (status != null) status.setText("Need the node to publish."); return; }
-        SalonRegistry.announce(node, SalonStore.get(this, "tokenid"), SalonStore.get(this, "profileUrl"), SalonStore.get(this, "handle"),
-                (ok, msg) -> runOnUiThread(() -> { if (status != null) status.setText(msg); else toast(msg); }));
+        if (announcement != null) { publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_busy)); return; }
+        if (!nodeUp || !SalonStore.hasIdentity(this) || SalonStore.get(this, "profileUrl").isEmpty()) {
+            publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_need_node)); return;
+        }
+        final String owner;
+        try { owner = backupOwner(); } catch (Exception unavailable) { identityUnavailable(); return; }
+        final String url = SalonStore.get(this, "profileUrl");
+        final int epoch = renderEpoch;
+        final Object request = new Object();
+        announcement = request;
+        publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_announcing));
+        final SalonRegistry.Announced result = (ok, detail) -> runOnUiThread(() -> {
+            if (announcement != request) return;
+            announcement = null;
+            if (isFinishing() || isDestroyed()) return;
+            try { if (!owner.equals(backupOwner()) || !url.equals(SalonStore.get(this, "profileUrl"))) return; }
+            catch (Exception unavailable) { return; }
+            publicationStatus(epoch == renderEpoch ? status : null, Language.msg(ok
+                    ? com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_submitted
+                    : com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_unknown));
+        });
+        try { SalonRegistry.announce(node, SalonStore.get(this, "tokenid"), url, SalonStore.get(this, "handle"), result); }
+        catch (RuntimeException unavailable) { result.done(false, ""); }
     }
 
     /** Burn any salon identity token that ISN'T your active one (e.g. a spare from

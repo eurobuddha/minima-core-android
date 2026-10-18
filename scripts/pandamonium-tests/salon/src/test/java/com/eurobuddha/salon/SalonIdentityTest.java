@@ -164,4 +164,21 @@ public class SalonIdentityTest {
             assertEquals(original,stored.get());verify(prefs,never()).edit();
         }
     }
+    @Test public void publicationSaveIsDurableAndPreservesUnrelatedFields() throws Exception {
+        record("gcm:seed","public");String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));
+        SalonStore.put(context,"unrelated","keep");
+        assertTrue(SalonStore.savePublication(context,expected,"https://example.invalid/profile.json",new org.json.JSONArray()));
+        JSONObject actual=new JSONObject(stored.get());assertEquals("keep",actual.getString("unrelated"));assertEquals("gcm:seed",actual.getString("msgseed"));assertEquals(1,commits.get());
+    }
+    @Test public void publicationSaveRejectsChangedDraftAndIdentity() throws Exception {
+        record("gcm:seed","public");String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));
+        SalonStore.put(context,"bio","edited meanwhile");String latest=stored.get();
+        assertFalse(SalonStore.savePublication(context,expected,"old-url",new org.json.JSONArray()));assertEquals(latest,stored.get());assertEquals(0,commits.get());
+        expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));assertTrue(SalonStore.writeIdentity(context,"new-seed","new-public"));latest=stored.get();
+        assertFalse(SalonStore.savePublication(context,expected,"old-url",new org.json.JSONArray()));assertEquals(latest,stored.get());
+    }
+    @Test public void publicationCommitFailureRestoresPreviousInMemoryRecord() throws Exception {
+        record("gcm:seed","public");String previous=stored.get();String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));failCommit.set(true);
+        assertFalse(SalonStore.savePublication(context,expected,"new-url",new org.json.JSONArray()));assertEquals(previous,stored.get());assertEquals(2,commits.get());
+    }
 }

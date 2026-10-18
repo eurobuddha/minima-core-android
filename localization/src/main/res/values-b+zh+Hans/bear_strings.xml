@@ -8154,4 +8154,17 @@
     <string name="l10n_filtr_ui_saved" formatted="false">"已保存到相册"</string>
     <string name="l10n_salon_page_loading" formatted="false">"正在加载个人主页…"</string>
     <string name="l10n_salon_page_unavailable" formatted="false">"无法加载此个人主页。"</string>
+    <string name="l10n_salon_publish_busy" formatted="false">"发布正在进行中。"</string>
+    <string name="l10n_salon_publish_host" formatted="false">"请先设置托管。"</string>
+    <string name="l10n_salon_publish_storage" formatted="false">"无法在本地保存发布结果。再次发布前请检查存储空间。"</string>
+    <string name="l10n_salon_publish_preparing" formatted="false">"正在刷新展示的作品版本…"</string>
+    <string name="l10n_salon_publish_uploading" formatted="false">"正在上传并检查个人资料…"</string>
+    <string name="l10n_salon_publish_changed" formatted="false">"账号、草稿或托管已更改。上传结果未在本地保存。"</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_publish_failed">"发布未完成：%1$s。部分文件可能已上传。"</string>
+    <string name="l10n_salon_publish_uploaded" formatted="false">"个人资料已上传并保存。"</string>
+    <string name="l10n_salon_publish_need_node" formatted="false">"请连接节点并发布个人资料，然后再发布公告。"</string>
+    <string name="l10n_salon_publish_announcing" formatted="false">"正在提交 Salon 公告…"</string>
+    <string name="l10n_salon_publish_submitted" formatted="false">"公告已提交。仍在等待区块链确认。"</string>
+    <string name="l10n_salon_publish_unknown" formatted="false">"无法确认公告结果。再次提交前请检查节点。"</string>
 </resources>

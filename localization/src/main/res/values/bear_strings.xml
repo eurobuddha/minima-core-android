@@ -8190,4 +8190,17 @@
     <string name="l10n_filtr_ui_saved" formatted="false">"Saved to Photos"</string>
     <string name="l10n_salon_page_loading" formatted="false">"Loading profile…"</string>
     <string name="l10n_salon_page_unavailable" formatted="false">"This profile could not be loaded."</string>
+    <string name="l10n_salon_publish_busy" formatted="false">"A publication is already in progress."</string>
+    <string name="l10n_salon_publish_host" formatted="false">"Set up hosting first."</string>
+    <string name="l10n_salon_publish_storage" formatted="false">"Could not save the publication locally. Check storage before publishing again."</string>
+    <string name="l10n_salon_publish_preparing" formatted="false">"Refreshing your showcased editions…"</string>
+    <string name="l10n_salon_publish_uploading" formatted="false">"Uploading and checking your profile…"</string>
+    <string name="l10n_salon_publish_changed" formatted="false">"Your account, draft or hosting changed. The upload result was not saved locally."</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_publish_failed">"Publication did not finish: %1$s. Some files may already have uploaded."</string>
+    <string name="l10n_salon_publish_uploaded" formatted="false">"Profile uploaded and saved."</string>
+    <string name="l10n_salon_publish_need_node" formatted="false">"Connect the node and publish your profile before announcing it."</string>
+    <string name="l10n_salon_publish_announcing" formatted="false">"Submitting your Salon announcement…"</string>
+    <string name="l10n_salon_publish_submitted" formatted="false">"Announcement submitted. Blockchain confirmation is still pending."</string>
+    <string name="l10n_salon_publish_unknown" formatted="false">"Could not confirm the announcement result. Check the node before submitting again."</string>
 </resources>

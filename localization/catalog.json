@@ -41206,5 +41206,77 @@
     "zh-Hans": "无法加载此个人主页。",
     "ru": "Не удалось загрузить этот профиль.",
     "uk": "Не вдалося завантажити цей профіль."
+  },
+  "salonPublish.busy": {
+    "en": "A publication is already in progress.",
+    "zh-Hans": "发布正在进行中。",
+    "ru": "Публикация уже выполняется.",
+    "uk": "Публікація вже триває."
+  },
+  "salonPublish.host": {
+    "en": "Set up hosting first.",
+    "zh-Hans": "请先设置托管。",
+    "ru": "Сначала настройте хостинг.",
+    "uk": "Спочатку налаштуйте хостинг."
+  },
+  "salonPublish.storage": {
+    "en": "Could not save the publication locally. Check storage before publishing again.",
+    "zh-Hans": "无法在本地保存发布结果。再次发布前请检查存储空间。",
+    "ru": "Не удалось сохранить публикацию на устройстве. Проверьте хранилище перед повторной публикацией.",
+    "uk": "Не вдалося зберегти публікацію на пристрої. Перевірте сховище перед повторною публікацією."
+  },
+  "salonPublish.preparing": {
+    "en": "Refreshing your showcased editions…",
+    "zh-Hans": "正在刷新展示的作品版本…",
+    "ru": "Обновление выпусков в вашей витрине…",
+    "uk": "Оновлення випусків у вашій вітрині…"
+  },
+  "salonPublish.uploading": {
+    "en": "Uploading and checking your profile…",
+    "zh-Hans": "正在上传并检查个人资料…",
+    "ru": "Загрузка и проверка профиля…",
+    "uk": "Завантаження та перевірка профілю…"
+  },
+  "salonPublish.changed": {
+    "en": "Your account, draft or hosting changed. The upload result was not saved locally.",
+    "zh-Hans": "账号、草稿或托管已更改。上传结果未在本地保存。",
+    "ru": "Аккаунт, черновик или хостинг изменились. Результат загрузки не сохранён на устройстве.",
+    "uk": "Обліковий запис, чернетка або хостинг змінилися. Результат завантаження не збережено на пристрої."
+  },
+  "salonPublish.failed": {
+    "en": "Publication did not finish: {detail}. Some files may already have uploaded.",
+    "zh-Hans": "发布未完成：{detail}。部分文件可能已上传。",
+    "ru": "Публикация не завершена: {detail}. Некоторые файлы уже могли загрузиться.",
+    "uk": "Публікацію не завершено: {detail}. Деякі файли вже могли завантажитися."
+  },
+  "salonPublish.uploaded": {
+    "en": "Profile uploaded and saved.",
+    "zh-Hans": "个人资料已上传并保存。",
+    "ru": "Профиль загружен и сохранён.",
+    "uk": "Профіль завантажено та збережено."
+  },
+  "salonPublish.needNode": {
+    "en": "Connect the node and publish your profile before announcing it.",
+    "zh-Hans": "请连接节点并发布个人资料，然后再发布公告。",
+    "ru": "Подключите узел и опубликуйте профиль перед отправкой объявления.",
+    "uk": "Підключіть вузол і опублікуйте профіль перед надсиланням оголошення."
+  },
+  "salonPublish.announcing": {
+    "en": "Submitting your Salon announcement…",
+    "zh-Hans": "正在提交 Salon 公告…",
+    "ru": "Отправка объявления Salon…",
+    "uk": "Надсилання оголошення Salon…"
+  },
+  "salonPublish.submitted": {
+    "en": "Announcement submitted. Blockchain confirmation is still pending.",
+    "zh-Hans": "公告已提交。仍在等待区块链确认。",
+    "ru": "Объявление отправлено. Подтверждение в блокчейне ещё ожидается.",
+    "uk": "Оголошення надіслано. Підтвердження в блокчейні ще очікується."
+  },
+  "salonPublish.unknown": {
+    "en": "Could not confirm the announcement result. Check the node before submitting again.",
+    "zh-Hans": "无法确认公告结果。再次提交前请检查节点。",
+    "ru": "Не удалось подтвердить результат отправки. Проверьте узел перед повторной отправкой.",
+    "uk": "Не вдалося підтвердити результат надсилання. Перевірте вузол перед повторним надсиланням."
   }
 }

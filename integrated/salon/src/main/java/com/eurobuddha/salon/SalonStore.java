@@ -52,6 +52,30 @@ final class SalonStore {
         return false;
     }
 
+    /** Only fields that own or contribute to a publication, in a stable order. */
+    static String publicationSnapshot(JSONObject record) {
+        JSONArray result = new JSONArray();
+        for (String key : new String[]{"tokenid", "handle", "msgpk", "msgseed", "profileUrl",
+                "name", "bio", "about", "avatar", "banner", "webvalidate", "tipaddr",
+                "links", "gallery", "posts", "nfts"}) result.put(record.opt(key));
+        return result.toString();
+    }
+
+    /** Compare-and-save under the same lock as identity changes; preserve unrelated edits. */
+    static synchronized boolean savePublication(Context c, String expected, String url, JSONArray nfts) {
+        SharedPreferences prefs = prefs(c);
+        String previous = prefs.getString(KEY, "");
+        try {
+            JSONObject current = identityRecord(c);
+            if (!expected.equals(publicationSnapshot(current))) return false;
+            current.put("profileUrl", url);
+            if (nfts != null) current.put("nfts", nfts);
+            if (prefs.edit().putString(KEY, current.toString()).commit()) return true;
+        } catch (Exception unavailable) { /* Keep the prior durable publication. */ }
+        try { prefs.edit().putString(KEY, previous).commit(); } catch (Exception unavailable) { }
+        return false;
+    }
+
     static JSONObject me(Context c) {
         try {
             String s = prefs(c).getString(KEY, "");

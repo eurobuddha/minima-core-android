@@ -8262,4 +8262,17 @@
     <string name="l10n_filtr_ui_saved" formatted="false">"Сохранено в Фото"</string>
     <string name="l10n_salon_page_loading" formatted="false">"Загрузка профиля…"</string>
     <string name="l10n_salon_page_unavailable" formatted="false">"Не удалось загрузить этот профиль."</string>
+    <string name="l10n_salon_publish_busy" formatted="false">"Публикация уже выполняется."</string>
+    <string name="l10n_salon_publish_host" formatted="false">"Сначала настройте хостинг."</string>
+    <string name="l10n_salon_publish_storage" formatted="false">"Не удалось сохранить публикацию на устройстве. Проверьте хранилище перед повторной публикацией."</string>
+    <string name="l10n_salon_publish_preparing" formatted="false">"Обновление выпусков в вашей витрине…"</string>
+    <string name="l10n_salon_publish_uploading" formatted="false">"Загрузка и проверка профиля…"</string>
+    <string name="l10n_salon_publish_changed" formatted="false">"Аккаунт, черновик или хостинг изменились. Результат загрузки не сохранён на устройстве."</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_publish_failed">"Публикация не завершена: %1$s. Некоторые файлы уже могли загрузиться."</string>
+    <string name="l10n_salon_publish_uploaded" formatted="false">"Профиль загружен и сохранён."</string>
+    <string name="l10n_salon_publish_need_node" formatted="false">"Подключите узел и опубликуйте профиль перед отправкой объявления."</string>
+    <string name="l10n_salon_publish_announcing" formatted="false">"Отправка объявления Salon…"</string>
+    <string name="l10n_salon_publish_submitted" formatted="false">"Объявление отправлено. Подтверждение в блокчейне ещё ожидается."</string>
+    <string name="l10n_salon_publish_unknown" formatted="false">"Не удалось подтвердить результат отправки. Проверьте узел перед повторной отправкой."</string>
 </resources>

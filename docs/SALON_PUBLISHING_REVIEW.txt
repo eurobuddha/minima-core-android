@@ -1,0 +1,75 @@
+Salon publishing integration review — 2026-10-18
+
+Scope
+-----
+The integrated Salon editor publishes a captured account/draft/host, retains
+English, Simplified Chinese, Russian and Ukrainian status bindings, and leaves
+the editor open for the announcement result. User text, protocol values and
+on-chain commands are unchanged. This is a checkpoint in the full integration,
+not release approval.
+
+Reuse
+-----
+Read the standalone Salon MainActivity publishing path and integrated callers.
+Reuse sources: MediaUploads.java.inc (captured ownership and lifecycle),
+BackupOperations.java.inc (strict identity ownership), SalonStore.writeIdentity
+(durable commit and failed-commit memory restoration), Hosting.Uploader,
+Hosting.DirUploader, IpfsUploader and PinataUploader (directory CID), and the
+existing Language bindings. The adapter remains reproducible from the pinned
+sources; no standalone app or stable repair branch was modified.
+
+Resolved findings
+-----------------
+1. Upload completion previously wrote profileUrl and reported Live after an
+   account, draft or hosting change. The operation now checks stored identity,
+   public draft fields, typed editor fields, render epoch, host and lifecycle.
+   Queued work checks storage/host before opening the transport. Completion uses
+   a synchronized compare-and-save and proceeds only after durable persistence.
+2. Edition refresh previously wrote the stored NFT list independently of the
+   upload, with a race between timeout and late callbacks. Refresh now mutates
+   only the captured publication on the UI thread. Timeout and duplicate/late
+   replies cannot change uploaded bytes or overwrite another account's list.
+3. Renderer upload failures were swallowed. Mutable web hosts now upload and
+   probe the renderer before replacing profile.json; failure remains failure.
+   IPFS reuses the directory uploader so index.html and profile.json share a CID.
+   Maxima/Blossom upload only the JSON, since they cannot serve relative siblings.
+4. The editor previously toasted success and navigated away while announcement
+   submission was still pending. It now retains the editor, prevents concurrent
+   submissions, scopes callbacks to their request/account/URL, and distinguishes
+   submitted from confirmed. An uncertain result does not invite blind retry.
+5. Publishing stages and results now use retained four-language messages. The
+   published page language is captured when the operation starts. Literal profile
+   text and edition captions remain unchanged.
+
+Validation
+----------
+Full Salon suite: 218 tests, zero failures/errors/skips. New coverage: 13 operation
+and real-editor tests, six transport tests, three durable-store tests. Includes
+all four languages, literal draft/cursor preservation, stale identity/host/draft,
+queued and in-flight work, duplicate actions/callbacks, late edition replies,
+timeout, failed storage commit, rejected executor, renderer/probe failure,
+IPFS siblings, and JSON-only mesh/Blossom uploads. The hosting fixture uses real
+profile type construction; an initially overbroad static mock was corrected.
+Pandamonium release Java compilation passed. All 21 pinned imports reproduced.
+The shared catalog validates 6,790 messages in four languages. Diff whitespace
+checks passed. Evidence: build/localization/salon-publishing-{tests,import}.log.
+
+Limits and outstanding integration work
+--------------------------------------
+Transport tests fake the upload boundary; no live remote publication was made.
+Network requests already dispatched may finish after cancellation; results are
+not applied locally to changed drafts/accounts. Mutable hosts do not offer an
+atomic two-file transaction. Existing Hosting.verifyUrl checks availability,
+not full remote content identity. Failure text permits partial remote uploads.
+The initial claim path reuses the corrected transport, but its lifecycle and
+mint/adopt recovery still require the wider onboarding audit. GitHub's existing
+no-overwrite policy still prevents repeat publication; a stable-URL update path
+needs review because identity tokens retain their original URL. Serialized NFT
+metadata, restore durability and outbox ownership remain in the wider audit.
+No version bump, APK install or release publication was performed.
+
+Verdict
+-------
+Approve this editor publishing checkpoint. No unresolved blocking finding in
+these changes. Full Atelier/Salon integration remains incomplete and requires
+remaining audits, signed APKs and physical Fold acceptance before release.
