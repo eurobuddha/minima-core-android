@@ -38,7 +38,7 @@ public class AtelierAirdropLanguageTest {
         field("content").set(activity,new ScrollView(activity));field("node").set(activity,mock(NodeApi.class));
         meta=new StateNft.Meta();meta.localId=41;meta.tokenid="0x"+"d".repeat(64);meta.name="Literal artwork 中文 Русский Українська";
         AirdropEngine.clearJob(activity,meta.localId);LocalStore.save(activity,new JSONArray());
-        items=new ArrayList<>();for(int i=0;i<3;i++){StateNft.Item item=new StateNft.Item();item.index=i+1;item.owned=true;item.coin=new JSONObject().put("coinid","0xcoin"+i).put("tokenid",meta.tokenid).put("state",new JSONArray().put(new JSONObject().put("port",0).put("data","[literal identity "+i+"]")));items.add(item);}
+        items=new ArrayList<>();for(int i=0;i<3;i++){StateNft.Item item=new StateNft.Item();item.index=i+1;item.owned=true;item.coin=BurialEvidenceTest.coin(i+1).put("tokenid",meta.tokenid).put("state",new JSONArray().put(new JSONObject().put("port",0).put("data",String.valueOf(i+1))));items.add(item);}
         mint=mockStatic(MintEngine.class);service=mockStatic(MintService.class);render();
     }
     @After public void cleanup(){service.close();mint.close();AirdropEngine.clearJob(activity,meta.localId);Language.select(activity,"en");}
@@ -83,4 +83,13 @@ public class AtelierAirdropLanguageTest {
         fields().get(0).setText(A);preview(B);TextView one=button(l10n_atelier_airdrop_send_all,3),go=button(l10n_atelier_airdrop_begin);render();one.performClick();go.performClick();assertNull(AirdropEngine.job(activity,meta.localId));service.verifyNoInteractions();
     }
     @Test public void finishingActivityCannotQueueAJob(){fields().get(0).setText(A);preview(B);TextView one=button(l10n_atelier_airdrop_send_all,3),go=button(l10n_atelier_airdrop_begin);activity.finish();one.performClick();go.performClick();assertNull(AirdropEngine.job(activity,meta.localId));service.verifyNoInteractions();}
+    @Test public void failedDurableSaveKeepsDraftAndDoesNotStartTheService()throws Exception {
+        preview(A);EditText draft=fields().get(1);draft.setSelection(5);
+        try(MockedStatic<LocalStore> store=mockStatic(LocalStore.class,CALLS_REAL_METHODS)) {
+            store.when(()->LocalStore.writeAirdrop(eq(activity),eq(meta.localId),any(JSONObject.class),isNull(),eq(false))).thenReturn(false);
+            button(l10n_atelier_airdrop_begin).performClick();assertNull(AirdropEngine.job(activity,meta.localId));assertSame(draft,fields().get(1));assertEquals(A,draft.getText().toString());assertEquals(5,draft.getSelectionStart());service.verifyNoInteractions();
+            fields().get(0).setText(A);button(l10n_atelier_airdrop_send_all,items.size()).performClick();assertNull(AirdropEngine.job(activity,meta.localId));service.verifyNoInteractions();
+        }
+    }
+
 }

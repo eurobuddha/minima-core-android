@@ -1157,6 +1157,9 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         JSONObject dropJob = AirdropEngine.job(this, m.localId);
         if (dropJob != null) {
             int[] prog = AirdropEngine.progress(dropJob);
+            final long dropGeneration = screenGeneration;
+            final String dropIdentity = dropJob.optString("jobid");
+            final boolean verifiedDrop = AirdropEngine.verifiedJob(dropJob);
             LinearLayout panel = vertical();
             panel.setBackground(Design.ruled(this, Design.CARD(), Design.ACCENT(), 2f));
             panel.setPadding(dp(12), dp(10), dp(12), dp(12));
@@ -1167,14 +1170,35 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             if (es != null) for (int i = 0; i < es.length(); i++) {
                 JSONObject e = es.optJSONObject(i);
                 if (e == null) continue;
-                String st = e.optString("status");
-                String err = e.optString("error", "");
+                String st = AirdropEngine.status(verifiedDrop, e);
+                CharSequence err = AirdropEngine.errorText(e);
                 panel.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_lot, String.format(Locale.US, "%03d", e.optInt("idx"))),
-                        ("FAIL".equals(st) && !err.isEmpty()) ? Language.join(dropStatus(st), " — ", err) : Language.join(dropStatus(st), " → ", Util.shorten(e.optString("addr")))));
+                        (err.length() > 0) ? Language.join(dropStatus(st), " — ", err) : Language.join(dropStatus(st), " → ", Util.shorten(e.optString("addr")))));
+            }
+            panel.addView(Design.note(this, Language.msg(l10n_atelier_delivery_help)), lpm(0, 8, 0, 0));
+            boolean checkable = false;
+            if (verifiedDrop && es != null) for (int i=0;i<es.length();i++) {
+                JSONObject entry=es.optJSONObject(i);
+                if (entry.has("receipt") && !"DONE".equals(entry.optString("status"))) checkable=true;
+            }
+            if (checkable) {
+                TextView check = Design.button(this, Language.msg(l10n_atelier_delivery_check), false);
+                check.setMinHeight(dp(48));
+                check.setOnClickListener(v -> {
+                    if (!collectionCurrent(m, dropGeneration)) return;
+                    JSONObject current = AirdropEngine.job(this,m.localId);
+                    if (current==null || !dropIdentity.equals(current.optString("jobid"))) return;
+                    if (!AirdropEngine.checkJob(this,m.localId)) { toast(Language.msg(l10n_atelier_delivery_save_failed)); return; }
+                    engageEngine(); refreshDetail();
+                });
+                panel.addView(check, lpm(0, 8, 0, 0));
             }
             TextView clear = Design.button(this, prog[0] >= prog[1] ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_clear_record) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_abandon), false);
             clear.setOnClickListener(v -> {
-                AirdropEngine.clearJob(this, m.localId);
+                if (!collectionCurrent(m, dropGeneration)) return;
+                JSONObject current = AirdropEngine.job(this,m.localId);
+                if (current==null || !dropIdentity.equals(current.optString("jobid"))) return;
+                if (!AirdropEngine.clearJob(this, m.localId)) { toast(Language.msg(l10n_atelier_delivery_save_failed)); return; }
                 refreshDetail();
             });
             clear.setMinHeight(dp(48));
@@ -1266,6 +1290,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     private CharSequence dropStatus(String state) {
+        if ("UNKNOWN".equals(state) || "POSTING".equals(state)) return Language.msg(l10n_atelier_delivery_unverified);
         if ("PENDING".equals(state)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_pending);
         if ("POSTED".equals(state)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_posted);
         if ("DONE".equals(state)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_done);
@@ -3176,7 +3201,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         TextView sendAll = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_send_all, transferable.size()), true);
         sendAll.setOnClickListener(v -> {
             if (isFinishing() || isDestroyed() || screen != Screen.AIRDROP || generation != screenGeneration) return;
-            String a = oneAddr.getText().toString().trim().replace(" ", "");
+            String a = oneAddr.getText().toString().trim();
             if (!Util.isValidAddress(a)) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_invalid_address)); return; }
             List<String> addrs = new ArrayList<>();
             for (int i = 0; i < transferable.size(); i++) addrs.add(a);
@@ -3185,7 +3210,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             if (AirdropEngine.job(this, m.localId) != null) {
                 toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_existing)); return;
             }
-            AirdropEngine.saveJob(this, job);
+            if (!AirdropEngine.saveJob(this, job)) { toast(Language.msg(l10n_atelier_delivery_save_failed)); return; }
             engageEngine();
             toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_queued, AirdropEngine.progress(job)[1], Util.shorten(a)));
             openCollection(m);
@@ -3258,7 +3283,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             if (AirdropEngine.job(this, m.localId) != null) {
                 toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_existing)); return;
             }
-            AirdropEngine.saveJob(this, job);
+            if (!AirdropEngine.saveJob(this, job)) { toast(Language.msg(l10n_atelier_delivery_save_failed)); return; }
             engageEngine();
             toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_armed));
             openCollection(m);

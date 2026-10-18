@@ -40936,5 +40936,59 @@
     "zh-Hans": "销毁尚未确认：%1$s。请返回系列页面检查或重试。",
     "ru": "Захоронение не подтверждено: %1$s. Вернитесь к коллекции для проверки или повтора.",
     "uk": "Поховання не підтверджено: %1$s. Поверніться до колекції для перевірки або повтору."
+  },
+  "atelier.delivery.readFailed": {
+    "en": "Could not check the coin. {0}",
+    "zh-Hans": "无法检查代币。{0}",
+    "ru": "Не удалось проверить монету. {0}",
+    "uk": "Не вдалося перевірити монету. {0}"
+  },
+  "atelier.delivery.missing": {
+    "en": "The coin is no longer in this wallet. Delivery is not confirmed.",
+    "zh-Hans": "此钱包中已无该代币。尚未确认送达。",
+    "ru": "Монеты больше нет в этом кошельке. Доставка не подтверждена.",
+    "uk": "Монети більше немає в цьому гаманці. Доставку не підтверджено."
+  },
+  "atelier.delivery.tooLarge": {
+    "en": "This lot exceeds the transaction size limit.",
+    "zh-Hans": "此件作品超出交易大小限制。",
+    "ru": "Этот экземпляр превышает допустимый размер транзакции.",
+    "uk": "Цей примірник перевищує допустимий розмір транзакції."
+  },
+  "atelier.delivery.invalid": {
+    "en": "The saved delivery record cannot be verified. It has been retained.",
+    "zh-Hans": "无法验证已保存的送达记录。该记录已保留。",
+    "ru": "Не удалось проверить сохранённую запись доставки. Она сохранена.",
+    "uk": "Не вдалося перевірити збережений запис доставки. Його збережено."
+  },
+  "atelier.delivery.unknown": {
+    "en": "Delivery is unverified. This lot will not be resent automatically.",
+    "zh-Hans": "尚未验证送达。此件作品不会自动重发。",
+    "ru": "Доставка не подтверждена. Этот экземпляр не будет отправлен повторно автоматически.",
+    "uk": "Доставку не підтверджено. Цей примірник не буде надіслано повторно автоматично."
+  },
+  "atelier.delivery.saveFailed": {
+    "en": "Could not save the delivery record. Check the record before continuing.",
+    "zh-Hans": "无法保存送达记录。请检查记录后再继续。",
+    "ru": "Не удалось сохранить запись доставки. Проверьте запись перед продолжением.",
+    "uk": "Не вдалося зберегти запис доставки. Перевірте запис перед продовженням."
+  },
+  "atelier.delivery.help": {
+    "en": "Delivery requires a matching output on the chain. Checking saved receipts never resends a lot. Clearing this record cannot cancel a transaction already submitted.",
+    "zh-Hans": "送达须由链上匹配的输出确认。检查已保存的回执不会重发作品。清除此记录无法取消已提交的交易。",
+    "ru": "Для подтверждения доставки нужен соответствующий выход в блокчейне. Проверка сохранённых квитанций не отправляет экземпляры повторно. Удаление записи не отменяет уже отправленную транзакцию.",
+    "uk": "Для підтвердження доставки потрібен відповідний вихід у блокчейні. Перевірка збережених квитанцій не надсилає примірники повторно. Видалення запису не скасовує вже надіслану транзакцію."
+  },
+  "atelier.delivery.check": {
+    "en": "Check delivery status",
+    "zh-Hans": "检查送达状态",
+    "ru": "Проверить доставку",
+    "uk": "Перевірити доставку"
+  },
+  "atelier.delivery.unverified": {
+    "en": "Unverified",
+    "zh-Hans": "未验证",
+    "ru": "Не подтверждено",
+    "uk": "Не підтверджено"
   }
 }

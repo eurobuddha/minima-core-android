@@ -8135,4 +8135,14 @@
     <string name="l10n_atelier_burial_wrong_name" formatted="false">"Name does not match."</string>
     <string name="l10n_atelier_burial_airdrop_active" formatted="false">"Clear the existing airdrop from the collection screen before starting burial."</string>
     <string name="l10n_atelier_burial_failed" formatted="false">"Burial is unconfirmed: %1$s. Return to the collection to check or retry."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_delivery_read_failed">"Could not check the coin. %1$s"</string>
+    <string name="l10n_atelier_delivery_missing" formatted="false">"The coin is no longer in this wallet. Delivery is not confirmed."</string>
+    <string name="l10n_atelier_delivery_too_large" formatted="false">"This lot exceeds the transaction size limit."</string>
+    <string name="l10n_atelier_delivery_invalid" formatted="false">"The saved delivery record cannot be verified. It has been retained."</string>
+    <string name="l10n_atelier_delivery_unknown" formatted="false">"Delivery is unverified. This lot will not be resent automatically."</string>
+    <string name="l10n_atelier_delivery_save_failed" formatted="false">"Could not save the delivery record. Check the record before continuing."</string>
+    <string name="l10n_atelier_delivery_help" formatted="false">"Delivery requires a matching output on the chain. Checking saved receipts never resends a lot. Clearing this record cannot cancel a transaction already submitted."</string>
+    <string name="l10n_atelier_delivery_check" formatted="false">"Check delivery status"</string>
+    <string name="l10n_atelier_delivery_unverified" formatted="false">"Unverified"</string>
 </resources>

@@ -136,9 +136,9 @@ public class AtelierGalleryLanguageTest {
     @Test public void airdropPanelRetainsProtocolRecordsAndTranslatesTheirPresentation()throws Exception{
         StateNft.Meta m=meta(30);JSONArray entries=new JSONArray();String[] statuses={"PENDING","POSTED","DONE","FAIL","FUTURE_STATE"};
         for(int i=0;i<statuses.length;i++)entries.put(new JSONObject().put("idx",i+1).put("status",statuses[i]).put("addr","MxLiteralDestination"+i).put("error",i==3?"literal backend diagnostic 中文":""));
-        JSONObject job=new JSONObject().put("localid",m.localId).put("entries",entries);AirdropEngine.saveJob(activity,job);String stored=AirdropEngine.job(activity,m.localId).toString();
+        JSONObject job=new JSONObject().put("localid",m.localId).put("entries",entries);LocalStore.saveDraft(activity,"airdrop_"+m.localId,job);String stored=AirdropEngine.job(activity,m.localId).toString();
         open(m);render("renderDetail");View hero=body.getChildAt(0);TextView abandon=find(body,upper(l10n_atelier_gallery_abandon));assertNotNull(abandon);
-        for(String code:CODES){Language.select(activity,code);layout(body);assertSame(hero,body.getChildAt(0));assertSame(abandon,find(body,upper(l10n_atelier_gallery_abandon)));assertNotNull(find(body,Language.msg(l10n_atelier_gallery_delivered,1,5).toString()));assertNotNull(find(body,Language.text(activity,l10n_atelier_gallery_failed)+" — literal backend diagnostic 中文"));assertNotNull(find(body,"FUTURE_STATE → "+Util.shorten("MxLiteralDestination4")));assertEquals(stored,AirdropEngine.job(activity,m.localId).toString());}
+        for(String code:CODES){Language.select(activity,code);layout(body);assertSame(hero,body.getChildAt(0));assertSame(abandon,find(body,upper(l10n_atelier_gallery_abandon)));assertNotNull(find(body,Language.msg(l10n_atelier_gallery_delivered,0,5).toString()));assertNotNull(find(body,Language.text(activity,l10n_atelier_gallery_failed)+" — literal backend diagnostic 中文"));assertNotNull(find(body,Language.msg(l10n_atelier_delivery_unverified)+" → "+Util.shorten("MxLiteralDestination4")));assertEquals(stored,AirdropEngine.job(activity,m.localId).toString());}
         AirdropEngine.clearJob(activity,m.localId);
     }
     @Test public void pendingTokenSummaryRetainsNestedTranslation()throws Exception{
@@ -155,6 +155,30 @@ public class AtelierGalleryLanguageTest {
             render("galleryScan");balance.get(balance.size()-1).onResult(new JSONObject().put("status",true).put("response",new JSONArray().put(row)));
             List<?> nfts=(List<?>)field("nftRows").get(activity),tokens=(List<?>)field("tokenRows").get(activity);assertEquals(1,nfts.size());assertSame(row,nfts.get(0));assertTrue(tokens.isEmpty());assertEquals(before,row.toString());
         }
+    }
+
+    private JSONObject receiptJob()throws Exception {
+        JSONObject job=AtelierDeliveryTest.newJob(1),e=job.getJSONArray("entries").getJSONObject(0);
+        JSONObject receipt=BurialEvidence.receipt(BurialEvidenceTest.posted(BurialEvidenceTest.coin(1)),e.getJSONObject("intent"));
+        receipt.put("destination",StateNft.GRAVEYARD);e.put("receipt",receipt).put("status","UNKNOWN").put("checks",20).put("errorKey","unknown");return job;
+    }
+    @Test public void receiptRecoveryPanelRetainsBindingsAndOnlyRearmsChecks()throws Exception {
+        Shadows.shadowOf(RuntimeEnvironment.getApplication()).grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS);
+        StateNft.Meta m=meta(41);m.tokenid=BurialEvidenceTest.TOKEN;
+        AirdropEngine.clearJob(activity,41);assertTrue(AirdropEngine.saveJob(activity,receiptJob()));
+        String saved=AirdropEngine.job(activity,41).toString();open(m);render("renderDetail");TextView check=find(body,upper(l10n_atelier_delivery_check));assertNotNull(check);View hero=body.getChildAt(0);
+        for(String code:CODES){Language.select(activity,code);Language.apply(body);layout(body);assertSame(hero,body.getChildAt(0));assertSame(check,find(body,upper(l10n_atelier_delivery_check)));assertNotNull(find(body,Language.msg(l10n_atelier_delivery_help).toString()));assertEquals(saved,AirdropEngine.job(activity,41).toString());}
+        try(MockedStatic<MintService> service=mockStatic(MintService.class)){
+            check.performClick();JSONObject entry=AirdropEngine.job(activity,41).getJSONArray("entries").getJSONObject(0);assertEquals("POSTED",entry.getString("status"));assertEquals(0,entry.getInt("checks"));assertEquals(receiptJob().getJSONArray("entries").getJSONObject(0).getJSONObject("receipt").toString(),entry.getJSONObject("receipt").toString());service.verify(()->MintService.kick(activity));
+        }
+        AirdropEngine.clearJob(activity,41);
+    }
+    @Test public void staleRecoveryAndClearControlsCannotChangeAReplacementJob()throws Exception {
+        StateNft.Meta m=meta(41);m.tokenid=BurialEvidenceTest.TOKEN;AirdropEngine.clearJob(activity,41);assertTrue(AirdropEngine.saveJob(activity,receiptJob()));open(m);render("renderDetail");
+        TextView check=find(body,upper(l10n_atelier_delivery_check)),clear=find(body,upper(l10n_atelier_gallery_abandon));assertNotNull(check);assertNotNull(clear);
+        AirdropEngine.clearJob(activity,41);assertTrue(AirdropEngine.saveJob(activity,AtelierDeliveryTest.newJob(1)));String replacement=AirdropEngine.job(activity,41).toString();
+        try(MockedStatic<MintService> service=mockStatic(MintService.class)){check.performClick();clear.performClick();assertEquals(replacement,AirdropEngine.job(activity,41).toString());service.verifyNoInteractions();}
+        AirdropEngine.clearJob(activity,41);
     }
 
 }

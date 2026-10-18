@@ -1,0 +1,66 @@
+Atelier airdrop delivery review — 2026-10-18
+
+Summary
+
+Airdrops previously treated a missing input, including an incomplete node reply,
+as delivery and could retry the same input after six blocks. The integrated engine
+now saves the intended input, state, amount and recipient before signing. A matching
+transaction receipt and an exact unspent chain output are required for delivery.
+
+Reused implementations
+
+- Atelier StateNft.transferCommands and MintEngine.postTxnWithReceipt retain the
+  existing transaction construction, checks, signing and cleanup path.
+- Atelier BurialEvidence supplies strict coin replies, state fingerprints,
+  transaction receipts and exact output confirmation, originally reused from
+  NFT Wallet's tested burial/transfer implementation.
+- NFT Wallet TransactionEvidence supplies the strict stored-JSON parsing rule.
+- SalonStore supplies checked synchronous preference writes and rollback after
+  commit(false), which may already have changed Android's in-memory preferences.
+- MainActivity.verifyPhantom supplies token-ID/script validation for token lookups.
+- Existing Language bindings and collection/screen generation guards retain
+  controls and user data across English, Chinese, Russian and Ukrainian switches.
+
+Resolved findings
+
+1. Job and index were saved independently with unchecked asynchronous writes.
+   Both now commit together. Queueing failure retains the draft and does not start
+   the service or report acceptance. Compare-before-write prevents stale callbacks
+   from restoring a cleared job or overwriting a replacement.
+2. Input disappearance was incorrectly reported as delivery. Only the exact
+   intended output, recipient, amount and state can now confirm delivery.
+3. Post timeouts and restarts could automatically repeat a transfer. POSTING is
+   durable before signing; uncertain outcomes remain UNKNOWN. A saved receipt can
+   be checked again, but checking never authorizes another signature.
+4. Overlapping UI/service ticks could process the same job. A node/generation
+   owner spans the full tick. An old closed owner's callback cannot unlock a new
+   owner or mutate its job.
+5. Legacy or malformed records could be discarded or counted as delivered without
+   evidence. They remain stored and display as unverified. Finished or held jobs
+   alone no longer keep the foreground mint service running.
+6. An empty or mismatched token response could bypass the size precheck. The
+   existing strict token lookup validation now runs before the preserved size gate.
+7. Recovery/clear controls could act after navigation or job replacement. They now
+   check both the screen generation and job identity. Failed writes remain visible.
+
+Verification
+
+- Full Atelier suite: 217 tests passed after production changes; no failures or skips.
+- Pandamonium release Java compilation passed.
+- Two additional gallery tests cover retained recovery controls in all four
+  languages at 320, 480 and 900 widths, manual receipt rechecking, and stale controls.
+  All 18 gallery tests passed in the final targeted run.
+- All 21 pinned imported feature snapshots reproduce exactly through the importer.
+- The catalogue validates 6,742 messages in all four languages.
+- The delivery adapter and existing test importer reproduce the source/test mirrors.
+
+Evidence: build/localization/atelier-delivery-tests.log,
+atelier-delivery-ui-tests.log and atelier-delivery-import.log.
+
+Verdict
+
+Approve this delivery checkpoint. No unresolved
+blocking finding in these changes. This is not a completed review of the whole
+Atelier/Salon integration. Upload/viewer lifecycle, remaining Salon work, signed
+APK builds and device acceptance remain outstanding. Tests use simulated node
+responses; no live transaction was sent and no application was installed or published.

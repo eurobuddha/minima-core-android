@@ -8207,4 +8207,14 @@
     <string name="l10n_atelier_burial_wrong_name" formatted="false">"Назва не збігається."</string>
     <string name="l10n_atelier_burial_airdrop_active" formatted="false">"Видаліть поточну роздачу на екрані колекції перед похованням."</string>
     <string name="l10n_atelier_burial_failed" formatted="false">"Поховання не підтверджено: %1$s. Поверніться до колекції для перевірки або повтору."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_delivery_read_failed">"Не вдалося перевірити монету. %1$s"</string>
+    <string name="l10n_atelier_delivery_missing" formatted="false">"Монети більше немає в цьому гаманці. Доставку не підтверджено."</string>
+    <string name="l10n_atelier_delivery_too_large" formatted="false">"Цей примірник перевищує допустимий розмір транзакції."</string>
+    <string name="l10n_atelier_delivery_invalid" formatted="false">"Не вдалося перевірити збережений запис доставки. Його збережено."</string>
+    <string name="l10n_atelier_delivery_unknown" formatted="false">"Доставку не підтверджено. Цей примірник не буде надіслано повторно автоматично."</string>
+    <string name="l10n_atelier_delivery_save_failed" formatted="false">"Не вдалося зберегти запис доставки. Перевірте запис перед продовженням."</string>
+    <string name="l10n_atelier_delivery_help" formatted="false">"Для підтвердження доставки потрібен відповідний вихід у блокчейні. Перевірка збережених квитанцій не надсилає примірники повторно. Видалення запису не скасовує вже надіслану транзакцію."</string>
+    <string name="l10n_atelier_delivery_check" formatted="false">"Перевірити доставку"</string>
+    <string name="l10n_atelier_delivery_unverified" formatted="false">"Не підтверджено"</string>
 </resources>

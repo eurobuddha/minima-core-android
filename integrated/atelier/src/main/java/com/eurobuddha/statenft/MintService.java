@@ -83,8 +83,7 @@ public class MintService extends Service {
             if ("CREATE".equals(p) || "MOVE".equals(p) || "SPLIT".equals(p)
                     || "STAMP".equals(p) || "NEEDIMAGES".equals(p)) return true;
         }
-        JSONObject idx = LocalStore.loadDraft(c, "airdrop_index");
-        return idx != null && idx.length() > 0;
+        return AirdropEngine.hasWork(c);
     }
 
     @Override public void onCreate() {

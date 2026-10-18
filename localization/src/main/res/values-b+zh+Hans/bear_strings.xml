@@ -8099,4 +8099,14 @@
     <string name="l10n_atelier_burial_wrong_name" formatted="false">"名称不匹配。"</string>
     <string name="l10n_atelier_burial_airdrop_active" formatted="false">"请先在系列页面清除现有空投任务，再开始销毁。"</string>
     <string name="l10n_atelier_burial_failed" formatted="false">"销毁尚未确认：%1$s。请返回系列页面检查或重试。"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_delivery_read_failed">"无法检查代币。%1$s"</string>
+    <string name="l10n_atelier_delivery_missing" formatted="false">"此钱包中已无该代币。尚未确认送达。"</string>
+    <string name="l10n_atelier_delivery_too_large" formatted="false">"此件作品超出交易大小限制。"</string>
+    <string name="l10n_atelier_delivery_invalid" formatted="false">"无法验证已保存的送达记录。该记录已保留。"</string>
+    <string name="l10n_atelier_delivery_unknown" formatted="false">"尚未验证送达。此件作品不会自动重发。"</string>
+    <string name="l10n_atelier_delivery_save_failed" formatted="false">"无法保存送达记录。请检查记录后再继续。"</string>
+    <string name="l10n_atelier_delivery_help" formatted="false">"送达须由链上匹配的输出确认。检查已保存的回执不会重发作品。清除此记录无法取消已提交的交易。"</string>
+    <string name="l10n_atelier_delivery_check" formatted="false">"检查送达状态"</string>
+    <string name="l10n_atelier_delivery_unverified" formatted="false">"未验证"</string>
 </resources>
