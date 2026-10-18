@@ -8284,4 +8284,9 @@
     <!-- Arguments: code -->
     <string name="l10n_salon_github_write">"GitHub не підтвердив оновлення (HTTP %1$s). Перевірте репозиторій перед повторною спробою."</string>
     <string name="l10n_salon_github_unavailable" formatted="false">"Не вдалося підтвердити результат запиту до GitHub. Перевірте репозиторій перед повторною спробою."</string>
+    <string name="l10n_salon_restore_busy" formatted="false">"Відновлення сторінки вже триває."</string>
+    <string name="l10n_salon_restore_changed" formatted="false">"Сторінка або обліковий запис змінилися. Повторіть відновлення розміщеної сторінки."</string>
+    <string name="l10n_salon_restore_storage" formatted="false">"Не вдалося зберегти відновлену сторінку. Перевірте пам’ять пристрою та повторіть спробу."</string>
+    <string name="l10n_salon_restore_unavailable" formatted="false">"Відновлення сторінки недоступне. Відкрийте Salon знову та повторіть спробу."</string>
+    <string name="l10n_salon_restore_invalid" formatted="false">"Розміщена сторінка містить некоректні дані або належить іншій особі. Нічого не відновлено."</string>
 </resources>

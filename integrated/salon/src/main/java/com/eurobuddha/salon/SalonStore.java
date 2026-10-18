@@ -76,6 +76,43 @@ final class SalonStore {
         return false;
     }
 
+    enum RestoreResult { APPLIED, EMPTY, CHANGED, INVALID, FAILED }
+
+    /** Restore content only, atomically with the owner/draft check and durable save. */
+    static synchronized RestoreResult restoreHosted(Context c, String expected, JSONObject hosted) {
+        SharedPreferences prefs = prefs(c);
+        String previous = prefs.getString(KEY, "");
+        try {
+            JSONObject current = identityRecord(c);
+            if (!expected.equals(publicationSnapshot(current))) return RestoreResult.CHANGED;
+            // Initial publication can precede minting, so a missing/empty token id is valid.
+            for (String key : new String[]{"handle", "tokenid"}) {
+                Object value = hosted.opt(key);
+                if (value != null && (!(value instanceof String)
+                        || (!((String) value).isEmpty() && !value.equals(current.optString(key)))))
+                    return RestoreResult.INVALID;
+            }
+            boolean got = false;
+            for (String key : new String[]{"name", "bio", "about", "avatar", "banner", "webvalidate", "tipaddr"}) {
+                Object value = hosted.opt(key);
+                if (value == null) continue;
+                if (!(value instanceof String)) return RestoreResult.INVALID;
+                if (!((String) value).isEmpty()) { current.put(key, value); got = true; }
+            }
+            for (String key : new String[]{"links", "gallery", "posts", "nfts"}) {
+                Object value = hosted.opt(key);
+                if (value == null) continue;
+                if (!(value instanceof JSONArray)) return RestoreResult.INVALID;
+                if (((JSONArray) value).length() > 0) { current.put(key, value); got = true; }
+            }
+            if (!got) return RestoreResult.EMPTY;
+            if (prefs.edit().putString(KEY, current.toString()).commit()) return RestoreResult.APPLIED;
+        } catch (Exception unavailable) { /* Do not report an unconfirmed restore. */ }
+        // Match writeIdentity/savePublication: failed commit can still change memory.
+        try { prefs.edit().putString(KEY, previous).commit(); } catch (Exception unavailable) { }
+        return RestoreResult.FAILED;
+    }
+
     static JSONObject me(Context c) {
         try {
             String s = prefs(c).getString(KEY, "");

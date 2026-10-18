@@ -1250,6 +1250,7 @@ public class MainActivity extends AppCompatActivity {
         cancelMediaRequests();
         cancelBackup();
         cancelPublication();
+        cancelHostedRestore();
         io.shutdownNow();
         stopAudio();
         videoRequest++;
@@ -1305,7 +1306,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void go(Screen s) {
-        if (screen != s) { cancelMediaRequests(); cancelPublication(); }
+        if (screen != s) { cancelMediaRequests(); cancelPublication(); cancelHostedRestore(); }
         if (screen == Screen.EDIT && s != Screen.EDIT) commitEditFields();   // preserve the draft when leaving Edit
         screen = s; render();
     }
@@ -3162,40 +3163,74 @@ public class MainActivity extends AppCompatActivity {
             if (SalonStore.get(this, "name").isEmpty()) SalonStore.put(this, "name", meta.optString("name"));
             if (SalonStore.get(this, "bio").isEmpty()) SalonStore.put(this, "bio", meta.optString("bio"));
             SalonStore.put(this, "profileUrl", meta.optString("url")); claiming = false;
-            hydrateFromHosted(meta.optString("url"), false);   // reinstall: pull content back from the hosted page
             if (screen == Screen.HOME || screen == Screen.ONBOARD || screen == Screen.FEED) go(Screen.HOME);
+            hydrateFromHosted(meta.optString("url"), false);   // capture the final screen after adoption
         } catch (Exception ignored) {}
     }
 
-    /** A reinstall wipes the local draft, but the hosted profile.json still holds
-     *  everything — pull the CONTENT back so the page isn't blank. Never overwrites
-     *  tokenid/handle (on-chain authoritative) or the local messaging key (msgpk). */
+    private static final class HostedRestore {
+        final String snapshot, typed, url;
+        final int epoch;
+        final boolean loud;
+        HostedRestore(String snapshot, String typed, String url, int epoch, boolean loud) {
+            this.snapshot = snapshot; this.typed = typed; this.url = url; this.epoch = epoch; this.loud = loud;
+        }
+    }
+    private HostedRestore hostedRestore;
+
+    private void cancelHostedRestore() { hostedRestore = null; }
+
+    private boolean hostedRestoreCurrent(HostedRestore op) {
+        if (isFinishing() || isDestroyed() || op.epoch != renderEpoch || !op.typed.equals(profileTyped())) return false;
+        try { return op.snapshot.equals(SalonStore.publicationSnapshot(SalonStore.identityRecord(this))); }
+        catch (Exception unavailable) { return false; }
+    }
+
+    /** Hosted content never replaces identity/key fields or a newer local draft. */
     private void hydrateFromHosted(final String url, final boolean loud) {
         if (url == null || url.trim().isEmpty()) { if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_no_hosted_url)); return; }
+        if (isFinishing() || isDestroyed()) return;
+        if (hostedRestore != null) { if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_busy)); return; }
+        final HostedRestore op;
+        try {
+            JSONObject record = SalonStore.identityRecord(this);
+            if (!url.equals(record.optString("profileUrl"))) { if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_changed)); return; }
+            op = new HostedRestore(SalonStore.publicationSnapshot(record), profileTyped(), url, renderEpoch, loud);
+        } catch (Exception unavailable) { if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_storage)); return; }
+        hostedRestore = op;
         if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_restoring));
-        io.execute(() -> {
-            final JSONObject p = httpGetJson(url);
-            if (p == null) { if (loud) runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_unreachable))); return; }
-            JSONObject me = SalonStore.me(this);
-            boolean got = false;
-            try {
-                for (String k : new String[]{"name","bio","about","avatar","banner","webvalidate","tipaddr"}) {
-                    String v = p.optString(k, "");
-                    if (!v.isEmpty()) { me.put(k, v); got = true; }
-                }
-                for (String k : new String[]{"links","gallery","posts","nfts"}) {
-                    JSONArray a = p.optJSONArray(k);
-                    if (a != null && a.length() > 0) { me.put(k, a); got = true; }
-                }
-            } catch (Exception ignored) {}
-            SalonStore.save(this, me);
-            final boolean restored = got;
-            runOnUiThread(() -> {
-                if (restored) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_restored));
-                else if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_empty_hosted));
-                render();
+        try {
+            io.execute(() -> {
+                // Force a fresh read through the existing checked HTTP/mesh transport.
+                final JSONObject profile = httpGetJson(op.url, true);
+                runOnUiThread(() -> finishHostedRestore(op, profile));
             });
-        });
+        } catch (java.util.concurrent.RejectedExecutionException unavailable) {
+            hostedRestore = null;
+            if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_unavailable));
+        }
+    }
+
+    private void finishHostedRestore(HostedRestore op, JSONObject profile) {
+        if (hostedRestore != op) return;
+        hostedRestore = null;
+        if (isFinishing() || isDestroyed()) return;
+        if (!hostedRestoreCurrent(op)) { if (op.loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_changed)); return; }
+        if (profile == null) { if (op.loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_unreachable)); return; }
+        SalonStore.RestoreResult result = SalonStore.restoreHosted(this, op.snapshot, profile);
+        switch (result) {
+            case APPLIED:
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_restored));
+                // render() commits retained editor widgets even when returning from Settings.
+                // Drop the old references so opening Edit cannot undo the durable restore.
+                edName = edBio = edAbout = edAvatar = edBanner = edWebvalidate = null;
+                render();
+                break;
+            case EMPTY: if (op.loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_empty_hosted)); break;
+            case CHANGED: if (op.loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_changed)); break;
+            case INVALID: if (op.loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_invalid)); break;
+            case FAILED: if (op.loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_storage)); break;
+        }
     }
 
     private void publishSalon(TextView status) {

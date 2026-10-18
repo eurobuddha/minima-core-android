@@ -8212,4 +8212,9 @@
     <!-- Arguments: code -->
     <string name="l10n_salon_github_write">"GitHub did not confirm the update (HTTP %1$s). Check the repository before trying again."</string>
     <string name="l10n_salon_github_unavailable" formatted="false">"Could not confirm the GitHub request. Check the repository before trying again."</string>
+    <string name="l10n_salon_restore_busy" formatted="false">"A page restore is already in progress."</string>
+    <string name="l10n_salon_restore_changed" formatted="false">"Your page or account changed. Restore again to use the hosted page."</string>
+    <string name="l10n_salon_restore_storage" formatted="false">"Could not save the restored page. Check device storage and try again."</string>
+    <string name="l10n_salon_restore_unavailable" formatted="false">"Page restore is unavailable. Reopen Salon and try again."</string>
+    <string name="l10n_salon_restore_invalid" formatted="false">"The hosted page has invalid content or belongs to another identity. Nothing was restored."</string>
 </resources>

@@ -181,4 +181,45 @@ public class SalonIdentityTest {
         record("gcm:seed","public");String previous=stored.get();String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));failCommit.set(true);
         assertFalse(SalonStore.savePublication(context,expected,"new-url",new org.json.JSONArray()));assertEquals(previous,stored.get());assertEquals(2,commits.get());
     }
+    @Test public void hostedRestoreKeepsKeysIdentityAndUnrelatedEdits() throws Exception {
+        record("gcm:seed","public");SalonStore.put(context,"handle","owner");SalonStore.put(context,"tokenid","token");SalonStore.put(context,"profileUrl","url");
+        String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));SalonStore.put(context,"keepalivebg","off");
+        JSONObject hosted=new JSONObject().put("name","Literal 中文 Русский Українська").put("msgseed","attacker").put("msgpk","attacker").put("profileUrl","attacker")
+                .put("links",new org.json.JSONArray().put(new JSONObject().put("label","Literal link")));
+        assertEquals(SalonStore.RestoreResult.APPLIED,SalonStore.restoreHosted(context,expected,hosted));
+        JSONObject actual=SalonStore.identityRecord(context);
+        assertEquals("gcm:seed",actual.getString("msgseed"));assertEquals("public",actual.getString("msgpk"));assertEquals("token",actual.getString("tokenid"));
+        assertEquals("owner",actual.getString("handle"));assertEquals("url",actual.getString("profileUrl"));assertEquals("off",actual.getString("keepalivebg"));
+        assertEquals("Literal 中文 Русский Українська",actual.getString("name"));assertEquals(1,actual.getJSONArray("links").length());assertEquals(1,commits.get());
+    }
+    @Test public void hostedRestoreRejectsChangedOwnerDraftOrUrlWithoutWriting() throws Exception {
+        for(String key:new String[]{"tokenid","handle","msgpk","msgseed","profileUrl","name","nfts"}) {
+            record("gcm:seed","public");String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));
+            JSONObject changed=SalonStore.identityRecord(context);changed.put(key,"changed");stored.set(changed.toString());String latest=stored.get();
+            assertEquals(SalonStore.RestoreResult.CHANGED,SalonStore.restoreHosted(context,expected,new JSONObject().put("name","hosted")));assertEquals(latest,stored.get());
+        }
+        assertEquals(0,commits.get());
+    }
+    @Test public void hostedRestoreValidatesAllFieldsBeforeSavingAnything() throws Exception {
+        record("gcm:seed","public");SalonStore.put(context,"handle","owner");SalonStore.put(context,"tokenid","token");String previous=stored.get();
+        String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));
+        JSONObject[] bad={new JSONObject().put("name","valid").put("bio",new JSONObject()),new JSONObject().put("name",JSONObject.NULL),
+            new JSONObject().put("name","valid").put("nfts","[]"),new JSONObject().put("handle","other"),new JSONObject().put("tokenid","other")};
+        for(JSONObject hosted:bad) {assertEquals(SalonStore.RestoreResult.INVALID,SalonStore.restoreHosted(context,expected,hosted));assertEquals(previous,stored.get());}
+        assertEquals(0,commits.get());
+    }
+    @Test public void emptyHostedFieldsKeepDraftAndPermitPreMintProfile() throws Exception {
+        record("gcm:seed","public");SalonStore.put(context,"bio","keep");String previous=stored.get();String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));
+        assertEquals(SalonStore.RestoreResult.EMPTY,SalonStore.restoreHosted(context,expected,new JSONObject().put("bio","").put("nfts",new org.json.JSONArray())));
+        assertEquals(previous,stored.get());assertEquals(0,commits.get());
+        assertEquals(SalonStore.RestoreResult.APPLIED,SalonStore.restoreHosted(context,expected,new JSONObject().put("tokenid","").put("name","restored")));assertEquals("keep",SalonStore.get(context,"bio"));
+    }
+    @Test public void failedHostedCommitRestoresMemoryAndReportsFailure() throws Exception {
+        record("gcm:seed","public");String previous=stored.get();String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));failCommit.set(true);
+        assertEquals(SalonStore.RestoreResult.FAILED,SalonStore.restoreHosted(context,expected,new JSONObject().put("name","hosted")));
+        assertEquals(previous,stored.get());assertEquals(2,commits.get());
+    }
+    @Test public void corruptIdentityIsNeverReplacedByHostedContent() throws Exception {
+        stored.set("{corrupt");assertEquals(SalonStore.RestoreResult.FAILED,SalonStore.restoreHosted(context,"",new JSONObject().put("name","hosted")));assertEquals("{corrupt",stored.get());
+    }
 }

@@ -8176,4 +8176,9 @@
     <!-- Arguments: code -->
     <string name="l10n_salon_github_write">"GitHub 未确认更新（HTTP %1$s）。重试前请检查仓库。"</string>
     <string name="l10n_salon_github_unavailable" formatted="false">"无法确认 GitHub 请求。重试前请检查仓库。"</string>
+    <string name="l10n_salon_restore_busy" formatted="false">"正在恢复页面，请稍候。"</string>
+    <string name="l10n_salon_restore_changed" formatted="false">"您的页面或账户已更改。请重新恢复以使用托管页面。"</string>
+    <string name="l10n_salon_restore_storage" formatted="false">"无法保存恢复的页面。请检查设备存储空间后重试。"</string>
+    <string name="l10n_salon_restore_unavailable" formatted="false">"页面恢复暂不可用。请重新打开 Salon 后重试。"</string>
+    <string name="l10n_salon_restore_invalid" formatted="false">"托管页面内容无效或属于其他身份。未恢复任何内容。"</string>
 </resources>

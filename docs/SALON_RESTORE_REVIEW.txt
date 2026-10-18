@@ -1,0 +1,60 @@
+Salon hosted-profile restore review — 2026-10-18
+
+Summary
+The native Salon restore now applies downloaded content only to the account,
+draft, typed fields and screen that requested it. It preserves local identity
+and messaging keys, checks durable persistence, and reports failures in English,
+Simplified Chinese, Russian and Ukrainian. Authored content stays literal.
+
+Sources reused
+- Original apks/salon/app/src/main/java/com/eurobuddha/salon/MainActivity.java:
+  hydrateFromHosted content allowlist and HTTP/mesh transport.
+- scripts/pandamonium-sources/salon/SalonStore.java: publicationSnapshot and the
+  synchronized compare/save/rollback pattern used by savePublication/writeIdentity.
+- ProfilePublishing.java.inc and BackupOperations.java.inc: request ownership,
+  lifecycle guards, typed draft checks and rejected-worker handling.
+- SalonIdentityTest and SalonPublishingTest: failing preference commits and queued
+  worker fixtures. No new transport, dependency or credential store.
+
+Findings resolved
+1. A delayed response previously read the latest profile and overwrote it even
+   after account changes or edits. Restore now captures its owner/draft and checks
+   it again on the UI thread and under the store lock before saving.
+2. Navigation, re-rendering, Activity destruction and replacement requests could
+   apply stale responses. Owned callbacks now reject these outcomes. Token adoption
+   starts hydration after its existing navigation, capturing the final screen.
+3. SharedPreferences.apply could report success without confirmed persistence.
+   Restore uses commit and restores the prior in-memory record after failure.
+4. Object-valued text fields could become displayed JSON. Present content fields
+   must have the expected string/array types. An explicit nonempty handle/token id
+   must match the local identity. Pre-mint profiles may omit or leave tokenid empty.
+5. The old memo cache could satisfy an explicit restore. Restore now uses the
+   existing force-fetch option and retains the checked HTTP/mesh transport.
+6. Review caught retained editor widgets overwriting restored data on a later
+   Settings-to-Edit transition. Successful restore drops those old references;
+   the real transition is covered by a regression test.
+
+Validation
+- Full Salon suite: 254 tests passed, no failures/errors/skips, before the final
+  retained-widget correction.
+- Final targeted suite: 31 tests passed (11 hosted-restore, 20 identity), including
+  the new Settings-to-Edit regression, commit failure, malformed content, changed
+  account/draft/URL, typing and cursor retention, late/cancelled replies, finishing
+  Activity, rejected executor, cache bypass and four-language result messages.
+- Pandamonium release Java compilation passed after the final correction.
+- All 21 pinned imports reproduce the generated integration, including the final
+  restore adapter and canonical tests. All 6801 catalog messages validate in four
+  languages. Whitespace checks pass.
+- Local logs: build/localization/salon-restore-{tests,full,final,import-final}.log.
+
+Limits and next work
+Already dispatched reads may finish after navigation; their results cannot change
+local content. Restore retains the existing nonempty-field merge behavior, so an
+empty remote field does not clear a local field. No physical-device restore or
+live-host operation was performed. Initial claim/mint recovery, full backup restore,
+remaining action localization and overall integration/device acceptance remain
+separate unfinished parts of the active goal.
+
+Verdict: Approve this restore change. No unresolved blocking finding within this
+change. The full Atelier/Salon integration goal remains active and incomplete.
+No version bump, APK installation or publication was performed.
