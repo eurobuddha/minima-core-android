@@ -35440,5 +35440,173 @@
     "zh-Hans": "通过 ArDrive Turbo 永久存储。钱包即为身份，无需单独账户。上传费用和免费额度由服务提供方决定。可在 https://turbo.ar.io 查看或充值。上传的文件无法删除或覆盖，新的 URL 可能需要几分钟才能访问。",
     "ru": "Постоянное хранение через ArDrive Turbo. Кошелёк служит вашей идентичностью, отдельный аккаунт не нужен. Стоимость загрузки и бесплатные лимиты устанавливает провайдер. Проверить баланс и пополнить кошелёк можно на https://turbo.ar.io. Загруженные файлы нельзя удалить или перезаписать. Новые URL могут стать доступны через несколько минут.",
     "uk": "Постійне зберігання через ArDrive Turbo. Гаманець слугує вашою ідентичністю, окремий обліковий запис не потрібен. Вартість завантаження й безкоштовні ліміти встановлює провайдер. Перевірити баланс і поповнити гаманець можна на https://turbo.ar.io. Завантажені файли не можна видалити або перезаписати. Нові URL можуть стати доступними за кілька хвилин."
+  },
+  "atelierManage.engineLog": {
+    "en": "Engine log",
+    "zh-Hans": "引擎日志",
+    "ru": "Журнал движка",
+    "uk": "Журнал рушія"
+  },
+  "atelierManage.logIntro": {
+    "en": "The engine's own record — newest first",
+    "zh-Hans": "引擎运行记录，最新记录在前",
+    "ru": "Записи движка — сначала новые",
+    "uk": "Записи рушія — спочатку нові"
+  },
+  "atelierManage.noTick": {
+    "en": "No tick recorded yet",
+    "zh-Hans": "尚无运行记录",
+    "ru": "Запусков пока не записано",
+    "uk": "Запусків ще не записано"
+  },
+  "atelierManage.lastTick": {
+    "en": "Last tick {0}s ago",
+    "zh-Hans": "上次运行于 {0} 秒前",
+    "ru": "Последний запуск {0} с назад",
+    "uk": "Останній запуск {0} с тому"
+  },
+  "atelierManage.logSummary": {
+    "en": "{0} · Entries: {1} · refreshes every 25s",
+    "zh-Hans": "{0} · 记录数：{1} · 每 25 秒刷新",
+    "ru": "{0} · Записей: {1} · обновление каждые 25 с",
+    "uk": "{0} · Записів: {1} · оновлення кожні 25 с"
+  },
+  "atelierManage.copyLog": {
+    "en": "Copy log",
+    "zh-Hans": "复制日志",
+    "ru": "Скопировать журнал",
+    "uk": "Скопіювати журнал"
+  },
+  "atelierManage.logEmpty": {
+    "en": "Nothing yet — engage the engine and every step lands here.",
+    "zh-Hans": "暂无记录。启动引擎后，每一步都会记录在此。",
+    "ru": "Записей пока нет. Запустите движок, и каждый шаг появится здесь.",
+    "uk": "Записів ще немає. Запустіть рушій, і кожен крок з’явиться тут."
+  },
+  "atelierManage.connected": {
+    "en": "Minima Core connected",
+    "zh-Hans": "已连接 Minima Core",
+    "ru": "Minima Core подключён",
+    "uk": "Minima Core підключено"
+  },
+  "atelierManage.notReady": {
+    "en": "Embedded node not ready",
+    "zh-Hans": "内置节点尚未就绪",
+    "ru": "Встроенный узел не готов",
+    "uk": "Вбудований вузол не готовий"
+  },
+  "atelierManage.lastResponse": {
+    "en": "Last response",
+    "zh-Hans": "上次响应",
+    "ru": "Последний ответ",
+    "uk": "Остання відповідь"
+  },
+  "atelierManage.noneYet": {
+    "en": "none yet",
+    "zh-Hans": "暂无",
+    "ru": "пока нет",
+    "uk": "ще немає"
+  },
+  "atelierManage.received": {
+    "en": "received",
+    "zh-Hans": "已收到",
+    "ru": "получен",
+    "uk": "отримано"
+  },
+  "atelierManage.reconnect": {
+    "en": "Reconnect",
+    "zh-Hans": "重新连接",
+    "ru": "Переподключиться",
+    "uk": "Перепідключитися"
+  },
+  "atelierManage.reconnecting": {
+    "en": "Reconnecting…",
+    "zh-Hans": "正在重新连接…",
+    "ru": "Переподключение…",
+    "uk": "Перепідключення…"
+  },
+  "atelierManage.batteryExempt": {
+    "en": "Battery optimisation is off for Pandamonium — the engine can run unattended.",
+    "zh-Hans": "Pandamonium 的电池优化已关闭，引擎可无人值守运行。",
+    "ru": "Оптимизация батареи для Pandamonium отключена — движок может работать без вашего участия.",
+    "uk": "Оптимізацію батареї для Pandamonium вимкнено — рушій може працювати без вашої участі."
+  },
+  "atelierManage.batteryHelp": {
+    "en": "Android may pause the engine in the background. Exempt Pandamonium from battery optimisation to let long mints finish unattended.",
+    "zh-Hans": "Android 可能暂停后台引擎。请关闭 Pandamonium 的电池优化，让耗时较长的铸造可无人值守完成。",
+    "ru": "Android может приостановить движок в фоне. Отключите оптимизацию батареи для Pandamonium, чтобы длительная чеканка завершалась без вашего участия.",
+    "uk": "Android може призупинити рушій у фоні. Вимкніть оптимізацію батареї для Pandamonium, щоб тривале карбування завершувалося без вашої участі."
+  },
+  "atelierManage.allowBackground": {
+    "en": "Let the engine run unattended",
+    "zh-Hans": "允许引擎无人值守运行",
+    "ru": "Разрешить работу в фоне",
+    "uk": "Дозволити роботу у фоні"
+  },
+  "atelierManage.batterySettings": {
+    "en": "Open Settings → Apps → Pandamonium → Battery",
+    "zh-Hans": "打开设置 → 应用 → Pandamonium → 电池",
+    "ru": "Откройте Настройки → Приложения → Pandamonium → Батарея",
+    "uk": "Відкрийте Налаштування → Застосунки → Pandamonium → Батарея"
+  },
+  "atelierManage.adoptHelp": {
+    "en": "Adopt StateNFT collections already in this wallet — including mints from other devices or the CLI.",
+    "zh-Hans": "导入此钱包中已有的 StateNFT 合集，包括在其他设备或命令行中铸造的合集。",
+    "ru": "Добавьте коллекции StateNFT, уже имеющиеся в этом кошельке, включая созданные на других устройствах или через CLI.",
+    "uk": "Додайте колекції StateNFT, які вже є в цьому гаманці, зокрема створені на інших пристроях або через CLI."
+  },
+  "atelierManage.hostingHelp": {
+    "en": "Upload chosen photos to your own storage and auto-fill the mint's hosted URLs — SFTP, WebDAV, IPFS or GitHub.",
+    "zh-Hans": "将所选照片上传到您自己的存储空间，并自动填写铸造所需的托管 URL，支持 SFTP、WebDAV、IPFS 或 GitHub。",
+    "ru": "Загружайте выбранные фотографии в своё хранилище и автоматически заполняйте URL для чеканки: SFTP, WebDAV, IPFS или GitHub.",
+    "uk": "Завантажуйте вибрані фотографії у своє сховище й автоматично заповнюйте URL для карбування: SFTP, WebDAV, IPFS або GitHub."
+  },
+  "atelierManage.destinations": {
+    "en": "Manage destinations",
+    "zh-Hans": "管理存储位置",
+    "ru": "Управлять местами хранения",
+    "uk": "Керувати місцями зберігання"
+  },
+  "atelierManage.colophon": {
+    "en": "Colophon",
+    "zh-Hans": "应用信息",
+    "ru": "О приложении",
+    "uk": "Про застосунок"
+  },
+  "atelierManage.survey": {
+    "en": "Survey in progress",
+    "zh-Hans": "正在扫描",
+    "ru": "Идёт поиск",
+    "uk": "Триває пошук"
+  },
+  "atelierManage.reading": {
+    "en": "Reading tokens, matching the StateNFT contract fingerprint…",
+    "zh-Hans": "正在读取代币并匹配 StateNFT 合约指纹…",
+    "ru": "Чтение токенов и проверка отпечатка контракта StateNFT…",
+    "uk": "Читання токенів і перевірка відбитка контракту StateNFT…"
+  },
+  "atelierManage.found": {
+    "en": "Collections found",
+    "zh-Hans": "找到的合集",
+    "ru": "Найденные коллекции",
+    "uk": "Знайдені колекції"
+  },
+  "atelierManage.catalogueCount": {
+    "en": "Collections in the catalogue: {0}",
+    "zh-Hans": "目录中的合集：{0}",
+    "ru": "Коллекций в каталоге: {0}",
+    "uk": "Колекцій у каталозі: {0}"
+  },
+  "atelierManage.checking": {
+    "en": "Checking token {0} of {1}…",
+    "zh-Hans": "正在检查代币 {0}/{1}…",
+    "ru": "Проверка токена {0} из {1}…",
+    "uk": "Перевірка токена {0} з {1}…"
+  },
+  "atelierManage.scanFailed": {
+    "en": "Could not read the wallet. Try scanning again.",
+    "zh-Hans": "无法读取钱包。请重新扫描。",
+    "ru": "Не удалось прочитать кошелёк. Повторите сканирование.",
+    "uk": "Не вдалося прочитати гаманець. Повторіть сканування."
   }
 }

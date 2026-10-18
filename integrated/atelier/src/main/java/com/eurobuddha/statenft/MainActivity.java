@@ -511,8 +511,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         if (nodeDot != null) nodeDot.setTextColor(node != null && node.isEnabled() ? Design.ACCENT() : Design.SOFT());
     }
 
-    private void setInlineStatus(String s) {
-        if (inlineStatus != null) inlineStatus.setText(s);
+    private void setInlineStatus(CharSequence s) {
+        if (inlineStatus != null) Language.setText(inlineStatus, s);
     }
 
     /* ================= LAUNCH ================= */
@@ -3002,18 +3002,16 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
      *  newest first. Reached from the pane above the mint rail and Manage. */
     private void renderEngineLog(Runnable back) {
         setScreen(Screen.ENGINE_LOG, back != null ? back : this::renderManage);
-        appbar("Engine log", true, false);
+        appbar(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_engine_log), true, false);
         hideNav();
 
         JSONArray log = LocalStore.engineLog(this);
         long beat = LocalStore.lastHeartbeat(this);
-        body.addView(Design.lot(this, "The engine's own record — newest first"));
-        body.addView(Design.note(this, (beat == 0 ? "No tick recorded yet"
-                : "Last tick " + ((System.currentTimeMillis() - beat) / 1000) + "s ago")
-                + " · " + log.length() + " entries · refreshes every 25s"), lpm(0, 4, 0, 10));
+        body.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_log_intro)));
+        body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_log_summary, beat == 0 ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_no_tick) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_last_tick, (System.currentTimeMillis() - beat) / 1000), log.length())), lpm(0, 4, 0, 10));
 
         LinearLayout actions = horizontal(Gravity.CENTER_VERTICAL);
-        TextView copy = Design.button(this, "Copy log", false);
+        TextView copy = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_copy_log), false);
         copy.setOnClickListener(v -> {
             StringBuilder sb = new StringBuilder();
             java.text.SimpleDateFormat f = new java.text.SimpleDateFormat("HH:mm:ss", Locale.US);
@@ -3025,13 +3023,13 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             copyText(sb.toString());
         });
         actions.addView(copy, weight(44, 0, 4));
-        TextView clear = Design.button(this, "Clear", false);
+        TextView clear = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_logs_clear), false);
         clear.setOnClickListener(v -> { LocalStore.clearEngineLog(this); renderEngineLog(back); });
         actions.addView(clear, weight(44, 4, 0));
         body.addView(actions, lpm(0, 0, 0, 12));
 
         if (log.length() == 0) {
-            body.addView(Design.note(this, "Nothing yet — engage the engine and every step lands here."));
+            body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_log_empty)));
         }
         java.text.SimpleDateFormat fmt = new java.text.SimpleDateFormat("HH:mm:ss", Locale.US);
         for (int i = log.length() - 1; i >= 0; i--) {
@@ -3052,20 +3050,20 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     private void renderManage() {
         setScreen(Screen.MANAGE, null);
-        appbar("Manage", false, false);
+        appbar(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_manage), false, false);
         bottomNav(2);
 
         LinearLayout nodeCard = lotCard();
-        nodeCard.addView(Design.lot(this, "Node"));
+        nodeCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_tab_node)));
         boolean on = node != null && node.isEnabled();
-        nodeCard.addView(Design.text(this, on ? "Minima Core connected" : "Not paired",
+        nodeCard.addView(Design.text(this, on ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_connected) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_not_ready),
                 14, on ? Design.INK() : Design.ACCENT(), Design.sansBold()), lpm(0, 4, 0, 6));
-        nodeCard.addView(kvRow("Last response", node == null || node.lastOkMs() == 0 ? "none yet" : "received"));
-        TextView engineLogBtn = Design.button(this, "Engine log", false);
+        nodeCard.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_last_response), node == null || node.lastOkMs() == 0 ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_none_yet) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_received)));
+        TextView engineLogBtn = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_engine_log), false);
         engineLogBtn.setOnClickListener(v -> renderEngineLog(this::renderManage));
         nodeCard.addView(engineLogBtn, lph(44, 0, 8, 0, 0));
-        TextView reconnect = Design.button(this, "Reconnect", false);
-        reconnect.setOnClickListener(v -> { if (node != null) node.reRegister(); toast("Re-pairing…"); });
+        TextView reconnect = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_reconnect), false);
+        reconnect.setOnClickListener(v -> { if (node != null) node.reRegister(); toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_reconnecting)); });
         nodeCard.addView(reconnect, lph(46, 0, 10, 0, 6));
         TextView openCore = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_history_open_core), false);
         openCore.setOnClickListener(v -> openMinimaCore());
@@ -3073,48 +3071,48 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         body.addView(nodeCard, lpm(0, 0, 0, 14));
 
         LinearLayout engineCard = lotCard();
-        engineCard.addView(Design.lot(this, "Mint engine"));
+        engineCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_mint_channel)));
         android.os.PowerManager pm = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
         boolean exempt = pm != null && pm.isIgnoringBatteryOptimizations(getPackageName());
         engineCard.addView(Design.note(this, exempt
-                ? "Battery optimisation is off for Atelier — the engine seals unattended."
-                : "Samsung may freeze the engine overnight. Exempt Atelier from battery optimisation to let long mints finish unattended."), lpm(0, 4, 0, 10));
+                ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_battery_exempt)
+                : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_battery_help)), lpm(0, 4, 0, 10));
         if (!exempt) {
-            TextView allow = Design.button(this, "Let the engine run unattended", true);
+            TextView allow = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_allow_background), true);
             allow.setOnClickListener(v -> {
                 try {
                     Intent i = new Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
                             Uri.parse("package:" + getPackageName()));
                     startActivity(i);
-                } catch (Exception e) { toast("Open Settings → Apps → Atelier → Battery"); }
+                } catch (Exception e) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_battery_settings)); }
             });
             engineCard.addView(allow, lph(48, 0, 0, 0, 0));
         }
         body.addView(engineCard, lpm(0, 0, 0, 14));
 
         LinearLayout walletCard = lotCard();
-        walletCard.addView(Design.lot(this, "Wallet"));
-        walletCard.addView(Design.note(this, "Adopt StateNFT collections already in this wallet — including mints from other devices or the CLI."), lpm(0, 4, 0, 10));
+        walletCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_tab_wallet)));
+        walletCard.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_adopt_help)), lpm(0, 4, 0, 10));
         TextView scanB = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_scan_wallet), true);
         scanB.setOnClickListener(v -> renderScan());
         walletCard.addView(scanB, lph(48, 0, 0, 0, 0));
         body.addView(walletCard, lpm(0, 0, 0, 14));
 
         LinearLayout hostCard = lotCard();
-        hostCard.addView(Design.lot(this, "Hosting"));
-        hostCard.addView(Design.note(this, "Upload chosen photos to your own storage and auto-fill the mint's hosted URLs — SFTP, WebDAV, IPFS or GitHub."), lpm(0, 4, 0, 8));
+        hostCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting)));
+        hostCard.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_hosting_help)), lpm(0, 4, 0, 8));
         Hosting.Profile def = HostingStore.getDefault(this);
-        hostCard.addView(kvRow("Default", def == null ? "none yet" : def.name() + " · " + def.type()));
-        TextView hostBtn = Design.button(this, "Manage destinations", true);
+        hostCard.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_eth_wallet_default), def == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_none_yet) : def.name() + " · " + def.type()));
+        TextView hostBtn = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_destinations), true);
         hostBtn.setOnClickListener(v -> renderHosting());
         hostCard.addView(hostBtn, lph(48, 0, 8, 0, 0));
         body.addView(hostCard, lpm(0, 0, 0, 14));
 
         LinearLayout appCard = lotCard();
-        appCard.addView(Design.lot(this, "Colophon"));
-        appCard.addView(kvRow("App", "Atelier — StateNFT Studio"));
-        appCard.addView(kvRow("Version", BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")"));
-        appCard.addView(kvRow("Package", getPackageName()));
+        appCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_colophon)));
+        appCard.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_app_heading), "Atelier — StateNFT Studio"));
+        appCard.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_version), BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")"));
+        appCard.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_apps_package), getPackageName()));
         body.addView(appCard, lpm(0, 0, 0, 14));
     }
 
@@ -3520,29 +3518,33 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     private void renderScan() {
         setScreen(Screen.SCAN, this::renderManage);
-        appbar("Scan Wallet", true, false);
+        appbar(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_scan_wallet), true, false);
         hideNav();
         scanFound.clear();
 
         LinearLayout card = lotCard();
-        card.addView(Design.lot(this, "Survey in progress"));
-        inlineStatus = Design.note(this, "Reading tokens, matching the StateNFT contract fingerprint…");
+        card.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_survey)));
+        inlineStatus = Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_reading));
         card.addView(inlineStatus, lpm(0, 6, 0, 8));
         ProgressBar p = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
         p.setIndeterminate(true);
         card.addView(p, new LinearLayout.LayoutParams(-1, dp(22)));
         body.addView(card, lpm(0, 0, 0, 14));
-        body.addView(sectionHead("Collections found", ""));
+        body.addView(sectionHead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_found), ""));
         startScan();
     }
 
     private void startScan() {
         node.cmd("balance", new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) {
-                JSONArray bal = json.optJSONArray("response");
-                scanBalance(bal == null ? new JSONArray() : bal, 0);
+                if (screen != Screen.SCAN) return;
+                if (json == null || !Boolean.TRUE.equals(json.opt("status"))
+                        || !(json.opt("response") instanceof JSONArray)) {
+                    setInlineStatus(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_scan_failed)); return;
+                }
+                scanBalance(json.optJSONArray("response"), 0);
             }
-            @Override public void onError(String message) { setInlineStatus(message); }
+            @Override public void onError(String message) { if (screen == Screen.SCAN) setInlineStatus(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_scan_failed)); }
         });
     }
 
@@ -3550,13 +3552,13 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         if (screen != Screen.SCAN) return;
         if (idx >= bal.length()) {
             loadLocalCollections();
-            setInlineStatus(scanFound.size() + " collections in the catalogue");
-            TextView done = Design.button(this, "Done", true);
+            setInlineStatus(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_catalogue_count, scanFound.size()));
+            TextView done = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_chat_done), true);
             done.setOnClickListener(v -> renderGallery());
             body.addView(done, lph(50, 0, 10, 0, 0));
             return;
         }
-        setInlineStatus("Checking token " + (idx + 1) + " of " + bal.length() + "…");
+        setInlineStatus(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_manage_checking, idx + 1, bal.length()));
         JSONObject row = bal.optJSONObject(idx);
         if (row == null) { scanBalance(bal, idx + 1); return; }
         String tid = row.optString("tokenid", "");
@@ -4625,10 +4627,10 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         return card;
     }
 
-    private LinearLayout kvRow(String k, String v) {
+    private LinearLayout kvRow(CharSequence k, CharSequence v) {
         LinearLayout row = horizontal(Gravity.CENTER_VERTICAL);
         row.setPadding(0, dp(4), 0, dp(4));
-        TextView key = Design.text(this, k.toUpperCase(), 9.5f, Design.DIM(), Design.sansBold());
+        TextView key = Design.text(this, Language.upper(k), 9.5f, Design.DIM(), Design.sansBold());
         key.setLetterSpacing(0.14f);
         row.addView(key, new LinearLayout.LayoutParams(0, -2, 1));
         TextView val = Design.text(this, v == null ? "—" : v, 12, Design.INK(), Design.mono());

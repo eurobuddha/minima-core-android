@@ -7107,4 +7107,36 @@
     <string name="l10n_atelier_hosting_copy_backup" formatted="false">"复制钱包备份"</string>
     <string name="l10n_atelier_hosting_backup_help" formatted="false">"使用“复制钱包备份”复制已保存的 JWK，然后将其安全保存。钱包仅存储在此设备上，不包含在 Android 备份中。卸载应用会丢失钱包及其余额，已上传的文件仍然可用。"</string>
     <string name="l10n_atelier_hosting_arweave_help" formatted="false">"通过 ArDrive Turbo 永久存储。钱包即为身份，无需单独账户。上传费用和免费额度由服务提供方决定。可在 https://turbo.ar.io 查看或充值。上传的文件无法删除或覆盖，新的 URL 可能需要几分钟才能访问。"</string>
+    <string name="l10n_atelier_manage_engine_log" formatted="false">"引擎日志"</string>
+    <string name="l10n_atelier_manage_log_intro" formatted="false">"引擎运行记录，最新记录在前"</string>
+    <string name="l10n_atelier_manage_no_tick" formatted="false">"尚无运行记录"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_manage_last_tick">"上次运行于 %1$s 秒前"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_manage_log_summary">"%1$s · 记录数：%2$s · 每 25 秒刷新"</string>
+    <string name="l10n_atelier_manage_copy_log" formatted="false">"复制日志"</string>
+    <string name="l10n_atelier_manage_log_empty" formatted="false">"暂无记录。启动引擎后，每一步都会记录在此。"</string>
+    <string name="l10n_atelier_manage_connected" formatted="false">"已连接 Minima Core"</string>
+    <string name="l10n_atelier_manage_not_ready" formatted="false">"内置节点尚未就绪"</string>
+    <string name="l10n_atelier_manage_last_response" formatted="false">"上次响应"</string>
+    <string name="l10n_atelier_manage_none_yet" formatted="false">"暂无"</string>
+    <string name="l10n_atelier_manage_received" formatted="false">"已收到"</string>
+    <string name="l10n_atelier_manage_reconnect" formatted="false">"重新连接"</string>
+    <string name="l10n_atelier_manage_reconnecting" formatted="false">"正在重新连接…"</string>
+    <string name="l10n_atelier_manage_battery_exempt" formatted="false">"Pandamonium 的电池优化已关闭，引擎可无人值守运行。"</string>
+    <string name="l10n_atelier_manage_battery_help" formatted="false">"Android 可能暂停后台引擎。请关闭 Pandamonium 的电池优化，让耗时较长的铸造可无人值守完成。"</string>
+    <string name="l10n_atelier_manage_allow_background" formatted="false">"允许引擎无人值守运行"</string>
+    <string name="l10n_atelier_manage_battery_settings" formatted="false">"打开设置 → 应用 → Pandamonium → 电池"</string>
+    <string name="l10n_atelier_manage_adopt_help" formatted="false">"导入此钱包中已有的 StateNFT 合集，包括在其他设备或命令行中铸造的合集。"</string>
+    <string name="l10n_atelier_manage_hosting_help" formatted="false">"将所选照片上传到您自己的存储空间，并自动填写铸造所需的托管 URL，支持 SFTP、WebDAV、IPFS 或 GitHub。"</string>
+    <string name="l10n_atelier_manage_destinations" formatted="false">"管理存储位置"</string>
+    <string name="l10n_atelier_manage_colophon" formatted="false">"应用信息"</string>
+    <string name="l10n_atelier_manage_survey" formatted="false">"正在扫描"</string>
+    <string name="l10n_atelier_manage_reading" formatted="false">"正在读取代币并匹配 StateNFT 合约指纹…"</string>
+    <string name="l10n_atelier_manage_found" formatted="false">"找到的合集"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_manage_catalogue_count">"目录中的合集：%1$s"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_manage_checking">"正在检查代币 %1$s/%2$s…"</string>
+    <string name="l10n_atelier_manage_scan_failed" formatted="false">"无法读取钱包。请重新扫描。"</string>
 </resources>

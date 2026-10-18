@@ -7203,4 +7203,36 @@
     <string name="l10n_atelier_hosting_copy_backup" formatted="false">"Скопировать резервную копию кошелька"</string>
     <string name="l10n_atelier_hosting_backup_help" formatted="false">"Нажмите «Скопировать резервную копию кошелька», чтобы скопировать сохранённый JWK, и сохраните его в надёжном месте. Он есть только на этом устройстве и исключён из резервной копии Android. При удалении приложения кошелёк и его баланс будут потеряны. Загруженные файлы останутся доступны."</string>
     <string name="l10n_atelier_hosting_arweave_help" formatted="false">"Постоянное хранение через ArDrive Turbo. Кошелёк служит вашей идентичностью, отдельный аккаунт не нужен. Стоимость загрузки и бесплатные лимиты устанавливает провайдер. Проверить баланс и пополнить кошелёк можно на https://turbo.ar.io. Загруженные файлы нельзя удалить или перезаписать. Новые URL могут стать доступны через несколько минут."</string>
+    <string name="l10n_atelier_manage_engine_log" formatted="false">"Журнал движка"</string>
+    <string name="l10n_atelier_manage_log_intro" formatted="false">"Записи движка — сначала новые"</string>
+    <string name="l10n_atelier_manage_no_tick" formatted="false">"Запусков пока не записано"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_manage_last_tick">"Последний запуск %1$s с назад"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_manage_log_summary">"%1$s · Записей: %2$s · обновление каждые 25 с"</string>
+    <string name="l10n_atelier_manage_copy_log" formatted="false">"Скопировать журнал"</string>
+    <string name="l10n_atelier_manage_log_empty" formatted="false">"Записей пока нет. Запустите движок, и каждый шаг появится здесь."</string>
+    <string name="l10n_atelier_manage_connected" formatted="false">"Minima Core подключён"</string>
+    <string name="l10n_atelier_manage_not_ready" formatted="false">"Встроенный узел не готов"</string>
+    <string name="l10n_atelier_manage_last_response" formatted="false">"Последний ответ"</string>
+    <string name="l10n_atelier_manage_none_yet" formatted="false">"пока нет"</string>
+    <string name="l10n_atelier_manage_received" formatted="false">"получен"</string>
+    <string name="l10n_atelier_manage_reconnect" formatted="false">"Переподключиться"</string>
+    <string name="l10n_atelier_manage_reconnecting" formatted="false">"Переподключение…"</string>
+    <string name="l10n_atelier_manage_battery_exempt" formatted="false">"Оптимизация батареи для Pandamonium отключена — движок может работать без вашего участия."</string>
+    <string name="l10n_atelier_manage_battery_help" formatted="false">"Android может приостановить движок в фоне. Отключите оптимизацию батареи для Pandamonium, чтобы длительная чеканка завершалась без вашего участия."</string>
+    <string name="l10n_atelier_manage_allow_background" formatted="false">"Разрешить работу в фоне"</string>
+    <string name="l10n_atelier_manage_battery_settings" formatted="false">"Откройте Настройки → Приложения → Pandamonium → Батарея"</string>
+    <string name="l10n_atelier_manage_adopt_help" formatted="false">"Добавьте коллекции StateNFT, уже имеющиеся в этом кошельке, включая созданные на других устройствах или через CLI."</string>
+    <string name="l10n_atelier_manage_hosting_help" formatted="false">"Загружайте выбранные фотографии в своё хранилище и автоматически заполняйте URL для чеканки: SFTP, WebDAV, IPFS или GitHub."</string>
+    <string name="l10n_atelier_manage_destinations" formatted="false">"Управлять местами хранения"</string>
+    <string name="l10n_atelier_manage_colophon" formatted="false">"О приложении"</string>
+    <string name="l10n_atelier_manage_survey" formatted="false">"Идёт поиск"</string>
+    <string name="l10n_atelier_manage_reading" formatted="false">"Чтение токенов и проверка отпечатка контракта StateNFT…"</string>
+    <string name="l10n_atelier_manage_found" formatted="false">"Найденные коллекции"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_manage_catalogue_count">"Коллекций в каталоге: %1$s"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_manage_checking">"Проверка токена %1$s из %2$s…"</string>
+    <string name="l10n_atelier_manage_scan_failed" formatted="false">"Не удалось прочитать кошелёк. Повторите сканирование."</string>
 </resources>

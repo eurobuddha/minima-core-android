@@ -7203,4 +7203,36 @@
     <string name="l10n_atelier_hosting_copy_backup" formatted="false">"Скопіювати резервну копію гаманця"</string>
     <string name="l10n_atelier_hosting_backup_help" formatted="false">"Натисніть «Скопіювати резервну копію гаманця», щоб скопіювати збережений JWK, і збережіть його в надійному місці. Він є лише на цьому пристрої та виключений із резервної копії Android. Видалення застосунку призведе до втрати гаманця та його балансу. Завантажені файли залишаться доступними."</string>
     <string name="l10n_atelier_hosting_arweave_help" formatted="false">"Постійне зберігання через ArDrive Turbo. Гаманець слугує вашою ідентичністю, окремий обліковий запис не потрібен. Вартість завантаження й безкоштовні ліміти встановлює провайдер. Перевірити баланс і поповнити гаманець можна на https://turbo.ar.io. Завантажені файли не можна видалити або перезаписати. Нові URL можуть стати доступними за кілька хвилин."</string>
+    <string name="l10n_atelier_manage_engine_log" formatted="false">"Журнал рушія"</string>
+    <string name="l10n_atelier_manage_log_intro" formatted="false">"Записи рушія — спочатку нові"</string>
+    <string name="l10n_atelier_manage_no_tick" formatted="false">"Запусків ще не записано"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_manage_last_tick">"Останній запуск %1$s с тому"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_manage_log_summary">"%1$s · Записів: %2$s · оновлення кожні 25 с"</string>
+    <string name="l10n_atelier_manage_copy_log" formatted="false">"Скопіювати журнал"</string>
+    <string name="l10n_atelier_manage_log_empty" formatted="false">"Записів ще немає. Запустіть рушій, і кожен крок з’явиться тут."</string>
+    <string name="l10n_atelier_manage_connected" formatted="false">"Minima Core підключено"</string>
+    <string name="l10n_atelier_manage_not_ready" formatted="false">"Вбудований вузол не готовий"</string>
+    <string name="l10n_atelier_manage_last_response" formatted="false">"Остання відповідь"</string>
+    <string name="l10n_atelier_manage_none_yet" formatted="false">"ще немає"</string>
+    <string name="l10n_atelier_manage_received" formatted="false">"отримано"</string>
+    <string name="l10n_atelier_manage_reconnect" formatted="false">"Перепідключитися"</string>
+    <string name="l10n_atelier_manage_reconnecting" formatted="false">"Перепідключення…"</string>
+    <string name="l10n_atelier_manage_battery_exempt" formatted="false">"Оптимізацію батареї для Pandamonium вимкнено — рушій може працювати без вашої участі."</string>
+    <string name="l10n_atelier_manage_battery_help" formatted="false">"Android може призупинити рушій у фоні. Вимкніть оптимізацію батареї для Pandamonium, щоб тривале карбування завершувалося без вашої участі."</string>
+    <string name="l10n_atelier_manage_allow_background" formatted="false">"Дозволити роботу у фоні"</string>
+    <string name="l10n_atelier_manage_battery_settings" formatted="false">"Відкрийте Налаштування → Застосунки → Pandamonium → Батарея"</string>
+    <string name="l10n_atelier_manage_adopt_help" formatted="false">"Додайте колекції StateNFT, які вже є в цьому гаманці, зокрема створені на інших пристроях або через CLI."</string>
+    <string name="l10n_atelier_manage_hosting_help" formatted="false">"Завантажуйте вибрані фотографії у своє сховище й автоматично заповнюйте URL для карбування: SFTP, WebDAV, IPFS або GitHub."</string>
+    <string name="l10n_atelier_manage_destinations" formatted="false">"Керувати місцями зберігання"</string>
+    <string name="l10n_atelier_manage_colophon" formatted="false">"Про застосунок"</string>
+    <string name="l10n_atelier_manage_survey" formatted="false">"Триває пошук"</string>
+    <string name="l10n_atelier_manage_reading" formatted="false">"Читання токенів і перевірка відбитка контракту StateNFT…"</string>
+    <string name="l10n_atelier_manage_found" formatted="false">"Знайдені колекції"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_manage_catalogue_count">"Колекцій у каталозі: %1$s"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_manage_checking">"Перевірка токена %1$s з %2$s…"</string>
+    <string name="l10n_atelier_manage_scan_failed" formatted="false">"Не вдалося прочитати гаманець. Повторіть сканування."</string>
 </resources>

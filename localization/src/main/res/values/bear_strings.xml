@@ -7139,4 +7139,36 @@
     <string name="l10n_atelier_hosting_copy_backup" formatted="false">"Copy wallet backup"</string>
     <string name="l10n_atelier_hosting_backup_help" formatted="false">"Use Copy wallet backup to copy the stored JWK, then save it somewhere safe. It exists only on this device and is excluded from Android backup. Uninstalling loses the wallet and any balance on it. Uploaded files stay live."</string>
     <string name="l10n_atelier_hosting_arweave_help" formatted="false">"Permanent storage via ArDrive Turbo. Your wallet is your identity; no separate account is needed. Upload costs and free limits depend on the provider. Check or fund your wallet at https://turbo.ar.io. Uploaded files cannot be deleted or overwritten. New URLs may take several minutes to become available."</string>
+    <string name="l10n_atelier_manage_engine_log" formatted="false">"Engine log"</string>
+    <string name="l10n_atelier_manage_log_intro" formatted="false">"The engine\'s own record — newest first"</string>
+    <string name="l10n_atelier_manage_no_tick" formatted="false">"No tick recorded yet"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_manage_last_tick">"Last tick %1$ss ago"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_manage_log_summary">"%1$s · Entries: %2$s · refreshes every 25s"</string>
+    <string name="l10n_atelier_manage_copy_log" formatted="false">"Copy log"</string>
+    <string name="l10n_atelier_manage_log_empty" formatted="false">"Nothing yet — engage the engine and every step lands here."</string>
+    <string name="l10n_atelier_manage_connected" formatted="false">"Minima Core connected"</string>
+    <string name="l10n_atelier_manage_not_ready" formatted="false">"Embedded node not ready"</string>
+    <string name="l10n_atelier_manage_last_response" formatted="false">"Last response"</string>
+    <string name="l10n_atelier_manage_none_yet" formatted="false">"none yet"</string>
+    <string name="l10n_atelier_manage_received" formatted="false">"received"</string>
+    <string name="l10n_atelier_manage_reconnect" formatted="false">"Reconnect"</string>
+    <string name="l10n_atelier_manage_reconnecting" formatted="false">"Reconnecting…"</string>
+    <string name="l10n_atelier_manage_battery_exempt" formatted="false">"Battery optimisation is off for Pandamonium — the engine can run unattended."</string>
+    <string name="l10n_atelier_manage_battery_help" formatted="false">"Android may pause the engine in the background. Exempt Pandamonium from battery optimisation to let long mints finish unattended."</string>
+    <string name="l10n_atelier_manage_allow_background" formatted="false">"Let the engine run unattended"</string>
+    <string name="l10n_atelier_manage_battery_settings" formatted="false">"Open Settings → Apps → Pandamonium → Battery"</string>
+    <string name="l10n_atelier_manage_adopt_help" formatted="false">"Adopt StateNFT collections already in this wallet — including mints from other devices or the CLI."</string>
+    <string name="l10n_atelier_manage_hosting_help" formatted="false">"Upload chosen photos to your own storage and auto-fill the mint\'s hosted URLs — SFTP, WebDAV, IPFS or GitHub."</string>
+    <string name="l10n_atelier_manage_destinations" formatted="false">"Manage destinations"</string>
+    <string name="l10n_atelier_manage_colophon" formatted="false">"Colophon"</string>
+    <string name="l10n_atelier_manage_survey" formatted="false">"Survey in progress"</string>
+    <string name="l10n_atelier_manage_reading" formatted="false">"Reading tokens, matching the StateNFT contract fingerprint…"</string>
+    <string name="l10n_atelier_manage_found" formatted="false">"Collections found"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_manage_catalogue_count">"Collections in the catalogue: %1$s"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_manage_checking">"Checking token %1$s of %2$s…"</string>
+    <string name="l10n_atelier_manage_scan_failed" formatted="false">"Could not read the wallet. Try scanning again."</string>
 </resources>
