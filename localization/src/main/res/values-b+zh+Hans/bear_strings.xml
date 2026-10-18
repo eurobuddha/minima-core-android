@@ -6529,4 +6529,5 @@
     <string name="l10n_mall_inbox_resume_delivery" formatted="false">"继续交付"</string>
     <!-- Arguments: address -->
     <string name="l10n_mall_inbox_resume_help">"继续向 %1$s 交付。待确认或结果未知的转账只会进行验证，不会再次发送。"</string>
+    <string name="l10n_mall_inbox_reply_save_failed" formatted="false">"无法保存回复。您的草稿仍然保留。"</string>
 </resources>

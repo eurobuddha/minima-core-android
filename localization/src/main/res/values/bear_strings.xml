@@ -6560,4 +6560,5 @@
     <string name="l10n_mall_inbox_resume_delivery" formatted="false">"Resume delivery"</string>
     <!-- Arguments: address -->
     <string name="l10n_mall_inbox_resume_help">"Resume this delivery to %1$s. Pending or unknown transfers will be checked without sending them again."</string>
+    <string name="l10n_mall_inbox_reply_save_failed" formatted="false">"The reply could not be saved. Your draft is still here."</string>
 </resources>

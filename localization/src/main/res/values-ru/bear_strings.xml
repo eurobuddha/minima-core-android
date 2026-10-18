@@ -6622,4 +6622,5 @@
     <string name="l10n_mall_inbox_resume_delivery" formatted="false">"Продолжить доставку"</string>
     <!-- Arguments: address -->
     <string name="l10n_mall_inbox_resume_help">"Продолжить доставку на %1$s. Ожидающие переводы и переводы с неизвестным результатом будут проверены без повторной отправки."</string>
+    <string name="l10n_mall_inbox_reply_save_failed" formatted="false">"Не удалось сохранить ответ. Ваш черновик сохранён в поле ввода."</string>
 </resources>

@@ -6622,4 +6622,5 @@
     <string name="l10n_mall_inbox_resume_delivery" formatted="false">"Продовжити доставку"</string>
     <!-- Arguments: address -->
     <string name="l10n_mall_inbox_resume_help">"Продовжити доставку на %1$s. Перекази, що очікують підтвердження або мають невідомий результат, буде перевірено без повторного надсилання."</string>
+    <string name="l10n_mall_inbox_reply_save_failed" formatted="false">"Не вдалося зберегти відповідь. Ваша чернетка залишилася в полі введення."</string>
 </resources>
