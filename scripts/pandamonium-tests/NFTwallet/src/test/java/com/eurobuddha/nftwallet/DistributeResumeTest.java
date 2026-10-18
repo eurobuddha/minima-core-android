@@ -92,4 +92,16 @@ public class DistributeResumeTest {
     @Test public void invalidInitialAmountsAddressesAndCountsCannotStartAJob() {
         try(Flow f=new Flow()){DistributeManager m=f.manager();for(String per:new String[]{"0","-1","NaN","1;send"})m.start(Collections.singletonList(f.input()),Collections.singletonList(RECIPIENT),per,"0x00","Minima");m.start(Collections.singletonList(f.input()),Collections.nCopies(57,RECIPIENT),"1","0x00","Minima");m.start(Collections.singletonList(f.input()),Collections.singletonList(RECIPIENT+";send"),"1","0x00","Minima");assertTrue(f.commands.isEmpty());assertTrue(f.builds.isEmpty());}
     }
+    @Test public void exhaustedRetriesSurviveFailedClearAndRestartWithoutAnotherBuilder() {
+        try(Flow f=new Flow()) {
+            DistributeManager m=f.start(15);f.posted();f.phase(HistoryDb.CONFIRMED);f.supplyChange();m.onCoinsUpdated();m.onCoinsUpdated();
+            for(int retry=0;retry<3;retry++) {f.phase(HistoryDb.NOT_SUBMITTED);f.done().onFailed("not sent");m.onCoinsUpdated();}
+            assertEquals(5,f.builds.size());
+            when(f.prefs.editor.commit()).thenAnswer(c->{if(f.prefs.changes.containsValue(null)){f.prefs.changes.clear();return false;}f.prefs.flush();return true;});
+            f.phase(HistoryDb.NOT_SUBMITTED);f.done().onFailed("not sent");assertEquals(4,DistributeJob.load(f.act).retryCount);
+            m.close();DistributeManager resumed=f.manager();resumed.onCoinsUpdated();resumed.onCoinsUpdated();assertEquals(5,f.builds.size());assertTrue(resumed.isActive());
+            when(f.prefs.editor.commit()).thenAnswer(c->{f.prefs.flush();return true;});resumed.onCoinsUpdated();assertNull(DistributeJob.load(f.act));assertEquals(5,f.builds.size());
+        }
+    }
+
 }

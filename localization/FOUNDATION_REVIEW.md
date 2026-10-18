@@ -2511,3 +2511,16 @@ Summary: this closes a confirmed stale display and false-negative issue with a s
 Validation: all 245 NFT Wallet JVM tests pass. Pandamonium debug builds in 27 seconds. All 19 pinned imports reproduce; catalogue and diff checks pass. All 19 modules declare the shared localization dependency, have locale/layoutDirection/screenLayout handling on their activities, and contain Language bindings. These checks prove integration hooks, not complete inner-text or visual coverage. The catalogue remains 5289 messages in four languages. All protected financial maps, wallet audit and node hashes remain unchanged. 524 sources are recorded in build/localization/nft-ownership-validation.json. Candidate remains 1.9.43/vc114. No device operation, signing, push or publication.
 
 Verdict: approve this ownership display fix. Current release checklist now distinguishes completed source hooks and Inbox work from the remaining text, financial-flow and Fold acceptance reviews. Earlier dated limitations remain historical evidence.
+
+
+## NFT distribution confirmation and restart validation — 2026-10-18
+
+Implementation checkpoint: 5b93bcb. Distribution uses the existing HistoryDb transaction journal and TransactionEvidence receipt checks, preserving the UTXO batch/change flow. A posted batch retains its pending recipients until the exact journal attempt is confirmed. Confirmed progress is saved before the next batch. Subsequent batches require the exact confirmed change coin. One live controller owns the job; callbacks after close cannot advance it. Schema-2 saved plans validate types, bounds, frozen recipients, token and economics. Legacy or unreadable records remain preserved for review; no automatic migration invents confirmation evidence.
+
+### Code Review
+
+Summary: reviewed DistributeJob, DistributeManager, the lifecycle hook and adapter, the existing journal/builder boundaries, and controller/parser regressions. No additional blocking finding was identified in the reviewed paths. Uncertain or missing journal evidence remains held; it does not authorize retries. Exhausted retries are persisted before clearing, so failed removal and restart cannot create another batch.
+
+Validation: 258 NFT Wallet and 12 shared localization JVM cases pass (270 total, zero failures/errors/skips). The distribution cases include confirmed restart, failed saves/clears, concurrent controllers, late callbacks, malformed/altered saved plans, repeated recipients, Unicode names and exhausted retries. All three debug variants and the Pandamonium instrumentation APK build; instrumentation was compiled, not run. All 19 pinned imports reproduce, direct transport verification passes, and 5289 catalogue messages validate across four languages. Protected financial source maps, minimaWallet audit hashes and the node JAR remain unchanged. Detailed checkpoint: build/localization/nft-distribution-validation.json (529 source hashes).
+
+Verdict: approve this scoped confirmation/restart increment. Legacy-job reconciliation remains a compatibility limitation; malformed records remain held. These host tests do not establish real-chain execution or Fold acceptance. Candidate remains 1.9.43/vc114. No device changes, signing, push or publication. The remaining release checklist is still open.
