@@ -4,6 +4,13 @@
         final String[] snapshot;
         final String tokenid;
         private boolean accepted;
+        private long statusOwner = -1;
+        private void claimStatus() { if (statusOwner < 0) statusOwner = ++statusGeneration; }
+        final Status status = (message, ok) -> {
+            claimStatus();
+            if (statusOwner == statusGeneration && !act.isFinishing() && !act.isDestroyed())
+                WalletTools.this.status.show(message, ok);
+        };
         Review() {
             List<Coin> selected = act.selectedCoins();
             snapshot = TxnUtil.selectionSnapshot(selected);
@@ -22,6 +29,7 @@
         boolean accept(boolean spend) {
             if (accepted) return false;
             accepted=true;
+            claimStatus();
             return current(spend);
         }
         boolean current(boolean spend) {

@@ -18,7 +18,7 @@ public class NativeReservationGuardTest {
             try(MockedStatic<Language> language=mockStatic(Language.class,CALLS_REAL_METHODS)) {
                 language.when(()->Language.setText(eq(label),any(CharSequence.class))).thenAnswer(i->null);
                 Method quick=SendView.class.getDeclaredMethod("runQuickSend",String.class,String.class,String.class,int.class,CharSequence.class,String.class);quick.setAccessible(true);quick.invoke(send,TransactionEvidenceTest.DEST,"1",null,1,"Minima","0x00");
-                WalletTools.Status status=mock(WalletTools.Status.class);WalletTools tools=new WalletTools(act,status);Method merge=WalletTools.class.getDeclaredMethod("autoConsolidate",String.class);merge.setAccessible(true);merge.invoke(tools,"0x00");verify(status).show(any(Language.Message.class),eq(false));
+                WalletTools.Status status=mock(WalletTools.Status.class);WalletTools tools=new WalletTools(act,status);Method merge=WalletTools.class.getDeclaredMethod("autoConsolidate",String.class,WalletTools.Status.class);merge.setAccessible(true);merge.invoke(tools,"0x00",status);verify(status).show(any(Language.Message.class),eq(false));
             }
             verifyNoInteractions(node);verify(history,never()).insertPosting(any());
         }

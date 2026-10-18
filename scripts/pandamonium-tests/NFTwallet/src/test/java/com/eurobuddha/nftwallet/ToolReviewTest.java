@@ -97,7 +97,7 @@ public class ToolReviewTest {
         try(Flow f=new Flow()){
             for(Coin c:f.selected){c.confirmed=false;c.sendable=false;}
             Object review=f.review();Method accept=f.type.getDeclaredMethod("accept",boolean.class);accept.setAccessible(true);assertEquals(true,accept.invoke(review,false));
-            Field coins=f.type.getDeclaredField("coins");coins.setAccessible(true);Method next=WalletTools.class.getDeclaredMethod("untrackNext",List.class,int.class);next.setAccessible(true);next.invoke(f.tools,coins.get(review),0);
+            Field coins=f.type.getDeclaredField("coins");coins.setAccessible(true);Method next=WalletTools.class.getDeclaredMethod("untrackNext",List.class,int.class,WalletTools.Status.class);next.setAccessible(true);Field owner=f.type.getDeclaredField("status");owner.setAccessible(true);next.invoke(f.tools,coins.get(review),0,owner.get(review));
             f.selected.get(1).coinid="0x01;send";f.addresses();assertEquals(Arrays.asList("cointrack enable:false coinid:"+id('1'),"cointrack enable:false coinid:"+id('2')),f.commands);
             verify(f.act,never()).clearSelection();verify(f.act).reload();
         }

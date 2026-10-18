@@ -31,6 +31,7 @@ public class WalletTools {
 
     private final MainActivity act;
     private final Status status;
+    private long statusGeneration;
 
     public WalletTools(MainActivity act, Status status) {
         this.act = act;
@@ -43,6 +44,13 @@ public class WalletTools {
         final String[] snapshot;
         final String tokenid;
         private boolean accepted;
+        private long statusOwner = -1;
+        private void claimStatus() { if (statusOwner < 0) statusOwner = ++statusGeneration; }
+        final Status status = (message, ok) -> {
+            claimStatus();
+            if (statusOwner == statusGeneration && !act.isFinishing() && !act.isDestroyed())
+                WalletTools.this.status.show(message, ok);
+        };
         Review() {
             List<Coin> selected = act.selectedCoins();
             snapshot = TxnUtil.selectionSnapshot(selected);
@@ -61,6 +69,7 @@ public class WalletTools {
         boolean accept(boolean spend) {
             if (accepted) return false;
             accepted=true;
+            claimStatus();
             return current(spend);
         }
         boolean current(boolean spend) {
@@ -122,7 +131,7 @@ public class WalletTools {
 
     /** Post a custom transaction via {@link TxnBuilder} and reflect the outcome on the history row. */
     private void runBuilder(List<Coin> inputs, List<TxnBuilder.Out> outs, String tokenid,
-                            String internalid, CharSequence okLabel) {
+                            String internalid, CharSequence okLabel, final Status status) {
         final String[] submittedCoins=TxnUtil.selectionSnapshot(inputs);
         status.show(Language.msg(l10n_utxo_posting), true);
         new TxnBuilder(act, inputs, outs, tokenid, new TxnBuilder.Done() {
@@ -152,6 +161,7 @@ public class WalletTools {
     /** Prompt for a coin count, then split the selected coins into that many equal coins. */
     public void showSplit() {
         final Review review = new Review();
+        final Status status = review.status;
         final List<Coin> sel = review.coins;
         if (sel.isEmpty()) { status.show(Language.msg(l10n_utxo_select_split), false); return; }
         final EditText count = input(Language.msg(l10n_utxo_coin_number), "4", false);
@@ -164,6 +174,7 @@ public class WalletTools {
 
     /** Validate the count, compute equal slices, fetch one address per coin, then post the split. */
     private void doSplit(Review review, String cStr) {
+        final Status status = review.status;
         if (!review.accept(true)) return;
         final List<Coin> sel = review.coins;
         int n;
@@ -193,7 +204,7 @@ public class WalletTools {
                 }
                 String internalid = TxnUtil.recordPosting(act, "Split → " + fn + " coins",
                         Util.tidyAmount(sum(sel).toPlainString()), tokenid, tokenName, sel, outs, null, null);
-                runBuilder(sel, outs, tokenid, internalid, Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_utxo_split_done, fn));
+                runBuilder(sel, outs, tokenid, internalid, Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_utxo_split_done, fn), status);
             }
             @Override public void onError(String message) { status.show(Language.msg(l10n_utxo_failed, NftMessages.message(message)), false); }
         });
@@ -206,12 +217,13 @@ public class WalletTools {
     /** Entry point: no selection ⇒ node auto-consolidate Minima; 2+ selected ⇒ merge exactly those. */
     public void showConsolidate() {
         final Review review = new Review();
+        final Status status = review.status;
         final List<Coin> sel = review.coins;
         if (sel.isEmpty()) {
             Sheet.create(act, Language.msg(l10n_utxo_consolidate_minima))
                     .subtitle(Language.msg(l10n_utxo_consolidate_help))
                     .action(Language.msg(l10n_utxo_cancel), Sheet.Style.SECONDARY, null)
-                    .action(Language.msg(l10n_utxo_consolidate), Sheet.Style.PRIMARY, () -> { if(review.accept(false)) autoConsolidate(Util.MINIMA_TOKENID); })
+                    .action(Language.msg(l10n_utxo_consolidate), Sheet.Style.PRIMARY, () -> { if(review.accept(false)) autoConsolidate(Util.MINIMA_TOKENID, status); })
                     .show();
             return;
         }
@@ -228,7 +240,7 @@ public class WalletTools {
     }
 
     /** Run the node's native "consolidate" command (it picks its own inputs). */
-    private void autoConsolidate(String tokenid) {
+    private void autoConsolidate(String tokenid, final Status status) {
         if (!TxnUtil.canUseNativeFunds(act,tokenid,null)) { status.show(NftMessages.message(TransactionEvidence.RECORD_FAILED),false);return; }
         final String internalid = TxnUtil.recordPosting(act, "Consolidate " + tokenNameFor(tokenid),
                 "—", tokenid, tokenNameFor(tokenid));
@@ -253,6 +265,7 @@ public class WalletTools {
 
     /** Merge exactly the selected coins into a single coin at a fresh address. */
     private void mergeSelected(Review review) {
+        final Status status = review.status;
         if (!review.accept(true)) return;
         final List<Coin> sel = review.coins;
         final String tokenid = review.tokenid;
@@ -269,7 +282,7 @@ public class WalletTools {
                 outs.add(new TxnBuilder.Out(addr, total.stripTrailingZeros().toPlainString()));
                 String internalid = TxnUtil.recordPosting(act, "Consolidate → 1 coin",
                         Util.tidyAmount(total.toPlainString()), tokenid, tokenName, sel, outs, null, null);
-                runBuilder(sel, outs, tokenid, internalid, Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_utxo_merged_done, sel.size()));
+                runBuilder(sel, outs, tokenid, internalid, Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_utxo_merged_done, sel.size()), status);
             }
             @Override public void onError(String message) { status.show(Language.msg(l10n_utxo_failed, NftMessages.message(message)), false); }
         });
@@ -280,6 +293,7 @@ public class WalletTools {
     /** Prompt for address count + per-address amount, then kick off the multi-batch DistributeManager. */
     public void showDistribute() {
         final Review review = new Review();
+        final Status status = review.status;
         final List<Coin> sel = review.coins;
         if (sel.isEmpty()) { status.show(Language.msg(l10n_utxo_select_distribute), false); return; }
         if (act.distribute() != null && act.distribute().isBusy()) {
@@ -297,6 +311,7 @@ public class WalletTools {
 
     /** Validate count/amount/decimals/funds, reserve the job slot, fetch addresses, then start. */
     private void doDistribute(Review review, String cStr, String aStr) {
+        final Status status = review.status;
         if (!review.accept(true)) return;
         final List<Coin> sel = review.coins;
         int n;
@@ -344,18 +359,19 @@ public class WalletTools {
     /** Confirm, then stop tracking the selected coins (they stay on-chain, just hidden locally). */
     public void untrackSelected() {
         final Review review = new Review();
+        final Status status = review.status;
         final List<Coin> sel = review.coins;
         if (sel.isEmpty()) { status.show(Language.msg(l10n_utxo_select_untrack), false); return; }
         Sheet.create(act, Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_utxo_untrack_title, sel.size()))
                 .subtitle(Language.msg(l10n_utxo_untrack_help))
                 .action(Language.msg(l10n_utxo_cancel), Sheet.Style.SECONDARY, null)
-                .action(Language.msg(l10n_utxo_untrack), Sheet.Style.PRIMARY, () -> { if(review.accept(false)) untrackNext(sel, 0); })
+                .action(Language.msg(l10n_utxo_untrack), Sheet.Style.PRIMARY, () -> { if(review.accept(false)) untrackNext(sel, 0, status); })
                 .show();
     }
 
     // Untrack one coin at a time, recursing on success — the node has no batch cointrack call.
     /** Sequentially `cointrack enable:false` each selected coin, recursing through the list. */
-    private void untrackNext(final List<Coin> sel, final int i) {
+    private void untrackNext(final List<Coin> sel, final int i, final Status status) {
         if (i >= sel.size()) {
             status.show(Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_utxo_untracked, sel.size()), true);
             if(java.util.Arrays.equals(TxnUtil.selectionSnapshot(sel),TxnUtil.selectionSnapshot(act.selectedCoins()))) act.clearSelection();
@@ -365,9 +381,9 @@ public class WalletTools {
         status.show(Language.msg(l10n_utxo_untracking, i + 1, sel.size()), true);
         // Belt-and-braces: coins are already vetted at ingestion (Coin.isWellFormed), but this id
         // goes straight into a command, so never take that on trust.
-        if (!Util.isValidHexId(sel.get(i).coinid)) { untrackNext(sel, i + 1); return; }
+        if (!Util.isValidHexId(sel.get(i).coinid)) { untrackNext(sel, i + 1, status); return; }
         act.node().cmd("cointrack enable:false coinid:" + sel.get(i).coinid, new NodeApi.Cb() {
-            @Override public void onResult(JSONObject json) { untrackNext(sel, i + 1); }
+            @Override public void onResult(JSONObject json) { untrackNext(sel, i + 1, status); }
             @Override public void onError(String message) {
                 if (NodeApi.ERR_NOT_ENABLED.equals(message)) message = "The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry.";
                 status.show(Language.msg(l10n_utxo_untrack_failed, NftMessages.message(message)), false);

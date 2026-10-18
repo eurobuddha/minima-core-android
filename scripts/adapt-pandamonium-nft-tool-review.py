@@ -25,4 +25,24 @@ def adapt(root):
     s=change(s,'        status.show(Language.msg(l10n_utxo_posting), true);','        final String[] submittedCoins=TxnUtil.selectionSnapshot(inputs);\n        status.show(Language.msg(l10n_utxo_posting), true);')
     s=change(s,'                act.clearSelection();','                if(java.util.Arrays.equals(submittedCoins,TxnUtil.selectionSnapshot(act.selectedCoins()))) act.clearSelection();')
     s=change(s,'            act.clearSelection();','            if(java.util.Arrays.equals(TxnUtil.selectionSnapshot(sel),TxnUtil.selectionSnapshot(act.selectedCoins()))) act.clearSelection();')
-    p.write_text(s)
+    p.write_text(adapt_status(s))
+
+def adapt_status(s):
+    """Carry the accepted review's display owner through every asynchronous tool helper."""
+    def change(old,new,count=1):
+        nonlocal s
+        assert s.count(old)==count,('NFT status source drift',old,s.count(old))
+        s=s.replace(old,new)
+    change('    private final Status status;','    private final Status status;\n    private long statusGeneration;')
+    change('        final Review review = new Review();','        final Review review = new Review();\n        final Status status = review.status;',4)
+    for signature in ['private void doSplit(Review review, String cStr) {','private void mergeSelected(Review review) {','private void doDistribute(Review review, String cStr, String aStr) {']:
+        change(signature,signature+'\n        final Status status = review.status;')
+    change('String internalid, CharSequence okLabel) {','String internalid, CharSequence okLabel, final Status status) {')
+    change('l10n_utxo_split_done, fn));','l10n_utxo_split_done, fn), status);')
+    change('l10n_utxo_merged_done, sel.size()));','l10n_utxo_merged_done, sel.size()), status);')
+    change('autoConsolidate(Util.MINIMA_TOKENID);','autoConsolidate(Util.MINIMA_TOKENID, status);')
+    change('private void autoConsolidate(String tokenid) {','private void autoConsolidate(String tokenid, final Status status) {')
+    change('untrackNext(sel, 0);','untrackNext(sel, 0, status);')
+    change('private void untrackNext(final List<Coin> sel, final int i) {','private void untrackNext(final List<Coin> sel, final int i, final Status status) {')
+    change('untrackNext(sel, i + 1);','untrackNext(sel, i + 1, status);',2)
+    return s

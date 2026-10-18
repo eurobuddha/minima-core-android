@@ -16,8 +16,8 @@ public class TransactionOutcomeCallbacksTest {
         MainActivity act=mock(MainActivity.class);HistoryDb db=mock(HistoryDb.class);when(act.history()).thenReturn(db);when(db.insertPosting(any())).thenReturn(true);
         WalletTools.Status status=mock(WalletTools.Status.class);List<TxnBuilder.Done> callbacks=new ArrayList<>();
         try(MockedConstruction<TxnBuilder> builders=mockConstruction(TxnBuilder.class,(b,c)->{callbacks.add((TxnBuilder.Done)c.arguments().get(4));when(b.record(any())).thenReturn(b);})) {
-            WalletTools tools=new WalletTools(act,status);Method run=WalletTools.class.getDeclaredMethod("runBuilder",List.class,List.class,String.class,String.class,CharSequence.class);run.setAccessible(true);
-            run.invoke(tools,Collections.emptyList(),Collections.emptyList(),"0x00","public-tools","Split");callbacks.get(0).onUnknown(TransactionEvidence.UNKNOWN);
+            WalletTools tools=new WalletTools(act,status);Method run=WalletTools.class.getDeclaredMethod("runBuilder",List.class,List.class,String.class,String.class,CharSequence.class,WalletTools.Status.class);run.setAccessible(true);
+            run.invoke(tools,Collections.emptyList(),Collections.emptyList(),"0x00","public-tools","Split",status);callbacks.get(0).onUnknown(TransactionEvidence.UNKNOWN);
             verify(db).update("public-tools",HistoryDb.STATUS_UNKNOWN,null,TransactionEvidence.UNKNOWN);
             verify(db,never()).update(anyString(),eq(HistoryDb.STATUS_ERROR),any(),any());verify(act,never()).clearSelection();verify(act).reload();
             verify(status).show(any(Language.Message.class),eq(false));
