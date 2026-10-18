@@ -23,6 +23,7 @@ import com.eurobuddha.minimacore.i18n.LanguageDialog;
 import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import com.eurobuddha.minimacore.chat.ChatUi;
+import com.eurobuddha.minimacore.chat.ChatMessages;
 import com.eurobuddha.maxima.core.MaximaNode;
 import com.eurobuddha.maxima.core.chat.ChatEngine;
 import com.eurobuddha.maxima.core.chat.ChatMedia;
@@ -126,7 +127,7 @@ public class MaxThreadActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         input.setText(text);   // never eat a typed message
                         Toast.makeText(this,
-                                Language.msg(l10n_chat_send_failed, String.valueOf(e.getMessage())), Toast.LENGTH_LONG).show();
+                                Language.msg(l10n_chat_send_failed, ChatMessages.error(e)), Toast.LENGTH_LONG).show();
                     });
                 }
                 runOnUiThread(mAdapter::reload);
@@ -244,7 +245,7 @@ public class MaxThreadActivity extends AppCompatActivity {
                 runOnUiThread(() -> sendMediaBytes(jpeg, "image/jpeg", ""));
             } catch (Exception e) {
                 runOnUiThread(() -> Toast.makeText(this,
-                        Language.msg(l10n_chat_photo_failed, String.valueOf(e.getMessage())), Toast.LENGTH_LONG).show());
+                        Language.msg(l10n_chat_photo_failed, ChatMessages.error(e)), Toast.LENGTH_LONG).show());
             }
         }, "maxchat-photo").start();
     }
@@ -264,7 +265,7 @@ public class MaxThreadActivity extends AppCompatActivity {
                 chat.sendMedia(c, zBytes, zMime, zCaption);
             } catch (Exception e) {
                 runOnUiThread(() -> Toast.makeText(this,
-                        Language.msg(l10n_chat_send_failed, String.valueOf(e.getMessage())), Toast.LENGTH_LONG).show());
+                        Language.msg(l10n_chat_send_failed, ChatMessages.error(e)), Toast.LENGTH_LONG).show());
             }
             runOnUiThread(mAdapter::reload);
         }, "maxchat-media-send").start();

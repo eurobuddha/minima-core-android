@@ -302,7 +302,7 @@ public class ChatView extends BaseView {
                         });
                     } catch (Exception e) {
                         mActivity.runOnUiThread(() -> Toast.makeText(mActivity,
-                                Language.msg(l10n_chat_add_failed, String.valueOf(e.getMessage())), Toast.LENGTH_LONG).show());
+                                Language.msg(l10n_chat_add_failed, ChatMessages.error(e)), Toast.LENGTH_LONG).show());
                     }
                 }, "maxchat-add").start();
                 return;

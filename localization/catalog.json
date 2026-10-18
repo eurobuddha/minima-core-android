@@ -32269,5 +32269,125 @@
     "zh-Hans": "无法创建导出文件夹",
     "ru": "Не удалось создать папку для экспорта",
     "uk": "Не вдалося створити папку для експорту"
+  },
+  "chat.error.openImage": {
+    "en": "could not open image",
+    "zh-Hans": "无法打开图片",
+    "ru": "Не удалось открыть изображение",
+    "uk": "Не вдалося відкрити зображення"
+  },
+  "chat.error.readImage": {
+    "en": "could not read image",
+    "zh-Hans": "无法读取图片",
+    "ru": "Не удалось прочитать изображение",
+    "uk": "Не вдалося прочитати зображення"
+  },
+  "chat.error.saveImage": {
+    "en": "MediaStore refused",
+    "zh-Hans": "系统媒体库拒绝保存图片",
+    "ru": "Системная медиатека отказалась сохранить изображение",
+    "uk": "Системна медіатека відмовилася зберегти зображення"
+  },
+  "chat.error.transportStarting": {
+    "en": "Parlons transport still starting - try again in a moment",
+    "zh-Hans": "Parlons 通信服务仍在启动，请稍后重试",
+    "ru": "Транспорт Parlons ещё запускается — повторите попытку чуть позже",
+    "uk": "Транспорт Parlons ще запускається — повторіть спробу трохи згодом"
+  },
+  "chat.error.transportStopped": {
+    "en": "Parlons transport not running",
+    "zh-Hans": "Parlons 通信服务未运行",
+    "ru": "Транспорт Parlons не запущен",
+    "uk": "Транспорт Parlons не запущено"
+  },
+  "chat.error.mediaUnavailable": {
+    "en": "media service not set",
+    "zh-Hans": "媒体服务尚未就绪",
+    "ru": "Медиасервис ещё не готов",
+    "uk": "Медіасервіс ще не готовий"
+  },
+  "chat.error.emptyMedia": {
+    "en": "empty media",
+    "zh-Hans": "媒体文件为空",
+    "ru": "Медиафайл пуст",
+    "uk": "Медіафайл порожній"
+  },
+  "chat.error.notMaxAddress": {
+    "en": "not a MAX# address",
+    "zh-Hans": "这不是 MAX# 地址",
+    "ru": "Это не адрес MAX#",
+    "uk": "Це не адреса MAX#"
+  },
+  "chat.error.malformedMaxAddress": {
+    "en": "malformed MAX# address",
+    "zh-Hans": "MAX# 地址格式错误",
+    "ru": "Неверный формат адреса MAX#",
+    "uk": "Неправильний формат адреси MAX#"
+  },
+  "chat.error.sendInterrupted": {
+    "en": "send interrupted",
+    "zh-Hans": "发送已中断",
+    "ru": "Отправка прервана",
+    "uk": "Надсилання перервано"
+  },
+  "chat.error.sendInterruptedBeforeFallback": {
+    "en": "send interrupted before fallback",
+    "zh-Hans": "发送在尝试备用路径前已中断",
+    "ru": "Отправка прервана до попытки использовать запасной маршрут",
+    "uk": "Надсилання перервано до спроби використати запасний маршрут"
+  },
+  "chat.error.nodeStopped": {
+    "en": "node stopped",
+    "zh-Hans": "节点已停止",
+    "ru": "Узел остановлен",
+    "uk": "Вузол зупинено"
+  },
+  "chat.error.laneClosed": {
+    "en": "lane closed",
+    "zh-Hans": "通信通道已关闭",
+    "ru": "Канал связи закрыт",
+    "uk": "Канал зв’язку закрито"
+  },
+  "chat.error.mediaOver": {
+    "en": "media over {0} bytes",
+    "zh-Hans": "媒体文件超过 {0} 字节",
+    "ru": "Медиафайл превышает {0} байт",
+    "uk": "Медіафайл перевищує {0} байтів"
+  },
+  "chat.error.meshLimit": {
+    "en": "Maxima mesh supports files up to {0} MB. This file is {1} MB — host it on a server (SFTP/IPFS/GitHub) or compress it first.",
+    "zh-Hans": "Maxima 网状网络支持最大 {0} MB 的文件。此文件为 {1} MB，请将其托管到服务器（SFTP/IPFS/GitHub）或先压缩。",
+    "ru": "Сеть Maxima поддерживает файлы до {0} МБ. Размер этого файла — {1} МБ. Разместите его на сервере (SFTP/IPFS/GitHub) или сначала сожмите.",
+    "uk": "Мережа Maxima підтримує файли до {0} МБ. Розмір цього файлу — {1} МБ. Розмістіть його на сервері (SFTP/IPFS/GitHub) або спочатку стисніть."
+  },
+  "chat.error.noReachableAddress": {
+    "en": "no reachable address for {0} (peer not registered at that MLS, or we share no relay)",
+    "zh-Hans": "找不到 {0} 的可达地址（对方未在该 MLS 注册，或双方没有共同的中继）",
+    "ru": "Нет доступного адреса для {0} (собеседник не зарегистрирован в этом MLS или у нас нет общего ретранслятора)",
+    "uk": "Немає доступної адреси для {0} (співрозмовник не зареєстрований у цьому MLS або в нас немає спільного ретранслятора)"
+  },
+  "chat.error.unreachableRelay": {
+    "en": "couldn't reach {0} on any known relay",
+    "zh-Hans": "无法通过任何已知中继连接到 {0}",
+    "ru": "Не удалось связаться с {0} через известные ретрансляторы",
+    "uk": "Не вдалося зв’язатися з {0} через відомі ретранслятори"
+  },
+  "chat.error.anchorDirectory": {
+    "en": "anchor directory failed: {0}",
+    "zh-Hans": "主目录服务失败：{0}",
+    "ru": "Ошибка основного каталога: {0}",
+    "uk": "Помилка основного каталогу: {0}"
+  },
+  "chat.error.packageTooBig": {
+    "en": "MaximaPackage too big: {0} > {1} (peer would reply TOOBIG)",
+    "zh-Hans": "MaximaPackage 过大：{0} > {1}（对方将回复 TOOBIG）",
+    "ru": "MaximaPackage слишком велик: {0} > {1} (собеседник ответит TOOBIG)",
+    "uk": "MaximaPackage завеликий: {0} > {1} (співрозмовник відповість TOOBIG)"
+  },
+  "chat.error.operationFailed": {
+    "en": "Chat operation failed",
+    "zh-Hans": "聊天操作失败",
+    "ru": "Не удалось выполнить действие в чате",
+    "uk": "Не вдалося виконати дію в чаті"
   }
 }

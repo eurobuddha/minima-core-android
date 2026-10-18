@@ -6543,4 +6543,30 @@
     <string name="l10n_atomix_operation_market_stopped">"批量交易已停止——已完成 %1$s/%2$s 笔（第 %3$s 笔：市场已更改）。已锁定的交易继续进行；未匹配的交易将自动退款。"</string>
     <string name="l10n_mall_studio_error_shop_filename" formatted="false">"商店文件名无效"</string>
     <string name="l10n_mall_studio_error_export_folder" formatted="false">"无法创建导出文件夹"</string>
+    <string name="l10n_chat_error_open_image" formatted="false">"无法打开图片"</string>
+    <string name="l10n_chat_error_read_image" formatted="false">"无法读取图片"</string>
+    <string name="l10n_chat_error_save_image" formatted="false">"系统媒体库拒绝保存图片"</string>
+    <string name="l10n_chat_error_transport_starting" formatted="false">"Parlons 通信服务仍在启动，请稍后重试"</string>
+    <string name="l10n_chat_error_transport_stopped" formatted="false">"Parlons 通信服务未运行"</string>
+    <string name="l10n_chat_error_media_unavailable" formatted="false">"媒体服务尚未就绪"</string>
+    <string name="l10n_chat_error_empty_media" formatted="false">"媒体文件为空"</string>
+    <string name="l10n_chat_error_not_max_address" formatted="false">"这不是 MAX# 地址"</string>
+    <string name="l10n_chat_error_malformed_max_address" formatted="false">"MAX# 地址格式错误"</string>
+    <string name="l10n_chat_error_send_interrupted" formatted="false">"发送已中断"</string>
+    <string name="l10n_chat_error_send_interrupted_before_fallback" formatted="false">"发送在尝试备用路径前已中断"</string>
+    <string name="l10n_chat_error_node_stopped" formatted="false">"节点已停止"</string>
+    <string name="l10n_chat_error_lane_closed" formatted="false">"通信通道已关闭"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_chat_error_media_over">"媒体文件超过 %1$s 字节"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_chat_error_mesh_limit">"Maxima 网状网络支持最大 %1$s MB 的文件。此文件为 %2$s MB，请将其托管到服务器（SFTP/IPFS/GitHub）或先压缩。"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_chat_error_no_reachable_address">"找不到 %1$s 的可达地址（对方未在该 MLS 注册，或双方没有共同的中继）"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_chat_error_unreachable_relay">"无法通过任何已知中继连接到 %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_chat_error_anchor_directory">"主目录服务失败：%1$s"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_chat_error_package_too_big">"MaximaPackage 过大：%1$s &gt; %2$s（对方将回复 TOOBIG）"</string>
+    <string name="l10n_chat_error_operation_failed" formatted="false">"聊天操作失败"</string>
 </resources>

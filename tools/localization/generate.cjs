@@ -59,6 +59,9 @@ for (const locale of locales) {
   const folder = locale === 'en' ? 'values' : locale === 'zh-Hans' ? 'values-b+zh+Hans' : 'values-' + locale;
   outputs.set('localization/src/main/res/' + folder + '/bear_strings.xml', lines.join('\n'));
 }
+// Core chat shares the tested diagnostic generator used by the integrated apps.
+outputs.set('app/src/main/java/com/eurobuddha/minimacore/chat/ChatMessages.java',
+  require('node:child_process').execFileSync('python3', [path.join(root, 'tools/localization/chat-messages.py')], {encoding: 'utf8'}));
 for (const [name, contents] of outputs) {
   const file = path.join(root, name);
   if (process.argv.includes('--check')) {

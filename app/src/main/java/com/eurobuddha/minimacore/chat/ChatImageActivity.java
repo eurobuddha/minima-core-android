@@ -121,7 +121,7 @@ public class ChatImageActivity extends AppCompatActivity {
                 }
                 runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_saved_photo), Toast.LENGTH_SHORT).show());
             } catch (Exception exc) {
-                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_save_failed, String.valueOf(exc.getMessage())), Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_save_failed, ChatMessages.error(exc)), Toast.LENGTH_LONG).show());
             }
         }, "chat-image-save").start();
     }

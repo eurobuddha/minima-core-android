@@ -128,8 +128,8 @@ android {
         // from apks/wallet. Off by default; auto-lock delay default 1 min, configurable.
         // vc113: explicit English, Chinese, Russian and Ukrainian selection across all bears.
         // vc114: core notifications and retained main-screen controls follow the selected language.
-        versionCode 115
-        versionName "1.9.44"
+        versionCode 116
+        versionName "1.9.45"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

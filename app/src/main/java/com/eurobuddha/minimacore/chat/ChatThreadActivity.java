@@ -352,7 +352,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                 ChatDb.get(this).setVia(msgid, via);
                 runOnUiThread(() -> mAdapter.reload());
             } catch (Exception exc) {
-                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_photo_failed, String.valueOf(exc.getMessage())), Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_photo_failed, ChatMessages.error(exc)), Toast.LENGTH_LONG).show());
             }
         }, "chat-image-send").start();
     }
@@ -440,7 +440,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                 ChatDb.get(this).setVia(msgid, via);
                 runOnUiThread(() -> mAdapter.reload());
             } catch (Exception exc) {
-                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_voice_failed, String.valueOf(exc.getMessage())), Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_voice_failed, ChatMessages.error(exc)), Toast.LENGTH_LONG).show());
             }
         }, "chat-voice-send").start();
     }

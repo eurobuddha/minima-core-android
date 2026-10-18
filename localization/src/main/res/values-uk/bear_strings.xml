@@ -6636,4 +6636,30 @@
     <string name="l10n_atomix_operation_market_stopped">"Серію угод зупинено: виконано %1$s із %2$s частин (частина %3$s: ринок змінився). Заблоковані частини продовжуються; для незнайдених відповідних угод кошти повертаються автоматично."</string>
     <string name="l10n_mall_studio_error_shop_filename" formatted="false">"Недопустиме ім’я файлу магазину"</string>
     <string name="l10n_mall_studio_error_export_folder" formatted="false">"Не вдалося створити папку для експорту"</string>
+    <string name="l10n_chat_error_open_image" formatted="false">"Не вдалося відкрити зображення"</string>
+    <string name="l10n_chat_error_read_image" formatted="false">"Не вдалося прочитати зображення"</string>
+    <string name="l10n_chat_error_save_image" formatted="false">"Системна медіатека відмовилася зберегти зображення"</string>
+    <string name="l10n_chat_error_transport_starting" formatted="false">"Транспорт Parlons ще запускається — повторіть спробу трохи згодом"</string>
+    <string name="l10n_chat_error_transport_stopped" formatted="false">"Транспорт Parlons не запущено"</string>
+    <string name="l10n_chat_error_media_unavailable" formatted="false">"Медіасервіс ще не готовий"</string>
+    <string name="l10n_chat_error_empty_media" formatted="false">"Медіафайл порожній"</string>
+    <string name="l10n_chat_error_not_max_address" formatted="false">"Це не адреса MAX#"</string>
+    <string name="l10n_chat_error_malformed_max_address" formatted="false">"Неправильний формат адреси MAX#"</string>
+    <string name="l10n_chat_error_send_interrupted" formatted="false">"Надсилання перервано"</string>
+    <string name="l10n_chat_error_send_interrupted_before_fallback" formatted="false">"Надсилання перервано до спроби використати запасний маршрут"</string>
+    <string name="l10n_chat_error_node_stopped" formatted="false">"Вузол зупинено"</string>
+    <string name="l10n_chat_error_lane_closed" formatted="false">"Канал зв’язку закрито"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_chat_error_media_over">"Медіафайл перевищує %1$s байтів"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_chat_error_mesh_limit">"Мережа Maxima підтримує файли до %1$s МБ. Розмір цього файлу — %2$s МБ. Розмістіть його на сервері (SFTP/IPFS/GitHub) або спочатку стисніть."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_chat_error_no_reachable_address">"Немає доступної адреси для %1$s (співрозмовник не зареєстрований у цьому MLS або в нас немає спільного ретранслятора)"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_chat_error_unreachable_relay">"Не вдалося зв’язатися з %1$s через відомі ретранслятори"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_chat_error_anchor_directory">"Помилка основного каталогу: %1$s"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_chat_error_package_too_big">"MaximaPackage завеликий: %1$s &gt; %2$s (співрозмовник відповість TOOBIG)"</string>
+    <string name="l10n_chat_error_operation_failed" formatted="false">"Не вдалося виконати дію в чаті"</string>
 </resources>
