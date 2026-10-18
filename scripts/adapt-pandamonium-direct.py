@@ -336,6 +336,8 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
     spec=importlib.util.spec_from_file_location('atomix_send_receipt',Path(__file__).with_name('adapt-pandamonium-atomix-send-receipt.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+    spec=importlib.util.spec_from_file_location('atomix_chain_evidence',Path(__file__).with_name('adapt-pandamonium-atomix-chain-evidence.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
     spec=importlib.util.spec_from_file_location('atomix_market',Path(__file__).with_name('adapt-pandamonium-atomix-market.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
     spec=importlib.util.spec_from_file_location('atomix_market_inputs',Path(__file__).with_name('adapt-pandamonium-atomix-market-inputs.py'))
