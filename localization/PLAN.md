@@ -2484,3 +2484,11 @@ Summary: this closes a confirmed stale display and false-negative issue with a s
 Validation: all 245 NFT Wallet JVM tests pass. Pandamonium debug builds in 27 seconds. All 19 pinned imports reproduce; catalogue and diff checks pass. All 19 modules declare the shared localization dependency, have locale/layoutDirection/screenLayout handling on their activities, and contain Language bindings. These checks prove integration hooks, not complete inner-text or visual coverage. The catalogue remains 5289 messages in four languages. All protected financial maps, wallet audit and node hashes remain unchanged. 524 sources are recorded in build/localization/nft-ownership-validation.json. Candidate remains 1.9.43/vc114. No device operation, signing, push or publication.
 
 Verdict: approve this ownership display fix. Current release checklist now distinguishes completed source hooks and Inbox work from the remaining text, financial-flow and Fold acceptance reviews. Earlier dated limitations remain historical evidence.
+
+## Local work checkpoint — 2026-10-18
+
+Saved at the user's request before further implementation. NFT distribution now persists the pending batch intent, waits for the matching confirmed journal receipt before advancing recipients, validates saved schema-2 jobs, holds legacy/malformed jobs for review, and gives one live controller ownership. Canonical importer sources and generated copies match.
+
+Validation observed for this checkpoint: `:integrated-NFTwallet:testDebugUnitTest` completed successfully in 24 seconds; 252 tests across 37 suites, zero failures, errors or skips. Log: `build/localization/nft-distribution-tests.log`. This is an in-progress checkpoint, not release approval. Dedicated saved-job parser and exhausted-retry regressions, final code review, pinned-import verification and full candidate builds remain pending for this increment. The previous detailed validation remains `nft-ownership-validation.json`; it predates these distribution changes.
+
+Candidate remains 1.9.43/vc114. No device operation, signing, push or publication was performed for this checkpoint. The current release checklist above remains open.

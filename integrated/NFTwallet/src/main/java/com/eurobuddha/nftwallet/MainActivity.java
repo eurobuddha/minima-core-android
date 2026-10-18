@@ -353,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
         ui.removeCallbacks(pairingRetry);
         if (transactionRecovery != null) transactionRecovery.close();
         if (node != null) node.onDestroy();
+        if (distribute != null) distribute.close();
         if (historyDb != null && node != null) {
             try { historyDb.abandonPreparations(node); } catch (RuntimeException unavailable) { /* Keep reservations for next process recovery. */ }
         }
