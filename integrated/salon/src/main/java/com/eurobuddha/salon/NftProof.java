@@ -34,12 +34,13 @@ final class NftProof {
      *  Definitive and never stale (Axe-S3 checks live too), so it verifies the owner viewing their
      *  own page without depending on the frozen coinexport proof, which ages out as the MMR grows. */
     static void holds(final NodeApi node, final String tokenid, final Held cb) {
-        if (tokenid == null || tokenid.isEmpty()) { cb.result(false, null); return; }
-        node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
+        if (!safeId(tokenid)) { cb.result(false, null); return; }
+        node.cmd("coins relevant:true sendable:true tokenid:" + tokenid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
-                JSONArray a = j.optJSONArray("response");
-                JSONObject coin = (a != null && a.length() > 0) ? a.optJSONObject(0) : null;
-                cb.result(coin != null, coin);
+                JSONArray a = ok(j) ? j.optJSONArray("response") : null;
+                JSONObject coin = a == null || a.length() == 0 ? null : a.optJSONObject(0);
+                boolean held = matchingCoin(coin, tokenid);
+                cb.result(held, held ? coin : null);
             }
             @Override public void onError(String m) { cb.result(false, null); }
         });
@@ -47,29 +48,31 @@ final class NftProof {
 
     /** bindHex = hex of the owner's Salon tokenid (identity to bind the holding to). */
     static void generate(final NodeApi node, final String tokenid, final String bindHex, final Gen cb) {
+        if (!safeId(tokenid) || !validBinding(bindHex)) { cb.fail("incomplete proof"); return; }
         node.cmd("coins relevant:true sendable:true tokenid:" + tokenid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject r) {
-                JSONArray arr = r.optJSONArray("response");
+                JSONArray arr = ok(r) ? r.optJSONArray("response") : null;
                 if (arr == null || arr.length() == 0) { cb.fail("You don't hold a spendable coin of this asset."); return; }
                 JSONObject coin = arr.optJSONObject(0);
+                if (!matchingCoin(coin, tokenid)) { cb.fail("coin has no id/address"); return; }
                 final String coinid = coin.optString("coinid", ""), address = coin.optString("address", "");
                 if (coinid.isEmpty() || address.isEmpty()) { cb.fail("coin has no id/address"); return; }
                 node.cmd("coinexport coinid:" + coinid, new NodeApi.Cb() {
                     @Override public void onResult(JSONObject e) {
-                        JSONObject er = e.optJSONObject("response");
-                        final String proof = er == null ? "" : er.optString("data", "");
-                        if (proof.isEmpty()) { cb.fail("could not export coin proof"); return; }
+                        JSONObject er = ok(e) ? e.optJSONObject("response") : null;
+                        final String proof = text(er, "data");
+                        if (!hexBytes(proof, 1_048_576)) { cb.fail("could not export coin proof"); return; }
                         node.cmd("scripts address:" + address, new NodeApi.Cb() {
                             @Override public void onResult(JSONObject s) {
-                                JSONObject sr = firstObj(s.opt("response"));
-                                final String script = sr == null ? "" : sr.optString("script", "");
-                                final String pk = sr == null ? "" : sr.optString("publickey", "");
-                                if (script.isEmpty() || pk.isEmpty()) { cb.fail("address is not a simple wallet address (can't prove holding)"); return; }
+                                JSONObject sr = ok(s) ? firstObj(s.opt("response")) : null;
+                                final String script = text(sr, "script");
+                                final String pk = text(sr, "publickey");
+                                if (!simpleScript(script, pk) || !Boolean.TRUE.equals(sr.opt("simple")) || !address.equalsIgnoreCase(text(sr, "address"))) { cb.fail("address is not a simple wallet address (can't prove holding)"); return; }
                                 node.cmd("sign publickey:" + pk + " data:" + bindHex, new NodeApi.Cb() {
                                     @Override public void onResult(JSONObject sg) {
-                                        if (!sg.optBoolean("status", false)) { cb.fail("signing failed (is your node unlocked?)"); return; }
-                                        String sig = sg.opt("response") instanceof String ? sg.optString("response") : "";
-                                        if (sig.isEmpty()) { cb.fail("no signature returned"); return; }
+                                        if (!ok(sg)) { cb.fail("signing failed (is your node unlocked?)"); return; }
+                                        String sig = text(sg, "response");
+                                        if (!hexBytes(sig, 1_048_576)) { cb.fail("no signature returned"); return; }
                                         try {
                                             JSONObject item = new JSONObject();
                                             item.put("tokenid", tokenid); item.put("coinid", coinid);
@@ -93,32 +96,38 @@ final class NftProof {
 
     /** Verify a showcase item against {@code bindHex} (hex of the viewed profile's tokenid). */
     static void verify(final NodeApi node, final JSONObject item, final String bindHex, final Verify cb) {
-        final String tokenid = item.optString("tokenid"), proof = item.optString("coinproof"),
-                script = item.optString("script"), pk = item.optString("publickey"), sig = item.optString("sig");
-        if (proof.isEmpty() || script.isEmpty() || pk.isEmpty() || sig.isEmpty()) { cb.result(false, "incomplete proof", ""); return; }
+        final String tokenid = text(item, "tokenid"), coinid = text(item, "coinid"), proof = text(item, "coinproof"),
+                script = text(item, "script"), pk = text(item, "publickey"), sig = text(item, "sig");
+        if (!safeId(tokenid) || !safeId(coinid) || !safeId(pk) || !validBinding(bindHex)
+                || !hexBytes(proof, 1_048_576) || !hexBytes(sig, 1_048_576)) {
+            cb.result(false, "incomplete proof", ""); return;
+        }
+        if (!simpleScript(script, pk)) { cb.result(false, "key doesn't control the coin", ""); return; }
         node.cmd("coincheck data:" + proof, new NodeApi.Cb() {
             @Override public void onResult(JSONObject c) {
-                JSONObject cr = c.optJSONObject("response");
+                JSONObject cr = ok(c) ? c.optJSONObject("response") : null;
                 JSONObject coin = cr == null ? null : cr.optJSONObject("coin");
                 if (cr == null || coin == null) { cb.result(false, "coin not found on-chain", ""); return; }
                 if (!tokenid.equalsIgnoreCase(coin.optString("tokenid"))) { cb.result(false, "wrong token", ""); return; }
-                if (coin.optBoolean("spent", false)) { cb.result(false, "coin has been spent", ""); return; }
+                if (Boolean.TRUE.equals(coin.opt("spent"))) { cb.result(false, "coin has been spent", ""); return; }
+                if (!matchingCoin(coin, tokenid) || !coinid.equalsIgnoreCase(text(coin, "coinid"))) {
+                    cb.result(false, "coin not found on-chain", ""); return;
+                }
                 // valid=false with an UNSPENT coin means the exported MMR proof aged out, NOT that
                 // the coin is gone — say so honestly (the owner's live check below covers their own view).
-                if (!cr.optBoolean("valid", false)) { cb.result(false, "proof out of date — re-publish to refresh it", ""); return; }
+                if (!Boolean.TRUE.equals(cr.opt("valid"))) { cb.result(false, "proof out of date — re-publish to refresh it", ""); return; }
                 final String coinAddr = coin.optString("address", "");
                 // the sealed StateNFT edition art rides in the proof's coin state (port 1)
                 final String stateImg = stateImageUri(coin);
-                // the named pubkey must appear in the script that controls the coin
-                if (!script.toLowerCase().contains(pk.toLowerCase().replaceFirst("^0x", ""))) { cb.result(false, "key doesn't control the coin", ""); return; }
-                node.cmd("runscript script:\"" + script + "\"", new NodeApi.Cb() {
+                // Build only the node's plain-wallet script from a validated key.
+                node.cmd("runscript script:\"RETURN SIGNEDBY(" + pk + ")\"", new NodeApi.Cb() {
                     @Override public void onResult(JSONObject rs) {
-                        JSONObject rr = rs.optJSONObject("response");
+                        JSONObject rr = ok(rs) ? rs.optJSONObject("response") : null;
                         JSONObject clean = rr == null ? null : rr.optJSONObject("clean");
                         String computed = clean == null ? "" : clean.optString("address", "");
-                        if (computed.isEmpty() || !computed.equalsIgnoreCase(coinAddr)) { cb.result(false, "script/address mismatch", ""); return; }
+                        if (computed.isEmpty() || !computed.equalsIgnoreCase(coinAddr) || !Boolean.TRUE.equals(rr.opt("parseok")) || !simpleScript(text(clean, "script"), pk)) { cb.result(false, "script/address mismatch", ""); return; }
                         node.cmd("verify data:" + bindHex + " publickey:" + pk + " signature:" + sig, new NodeApi.Cb() {
-                            @Override public void onResult(JSONObject v) { boolean ok = v.optBoolean("status", false); cb.result(ok, ok ? "verified holding" : "signature not valid for this profile", ok ? stateImg : ""); }
+                            @Override public void onResult(JSONObject v) { boolean ok = ok(v) && "Signature valid".equals(text(v, "response")); cb.result(ok, ok ? "verified holding" : "signature not valid for this profile", ok ? stateImg : ""); }
                             @Override public void onError(String m) { cb.result(false, "verify call failed", ""); }
                         });
                     }
@@ -180,8 +189,50 @@ final class NftProof {
 
     private static JSONObject firstObj(Object resp) {
         if (resp instanceof JSONObject) return (JSONObject) resp;
-        if (resp instanceof JSONArray && ((JSONArray) resp).length() > 0) return ((JSONArray) resp).optJSONObject(0);
+        if (resp instanceof JSONArray && ((JSONArray) resp).length() == 1) return ((JSONArray) resp).optJSONObject(0);
         return null;
+    }
+
+    // Reuse Args' command-token policy and IdentityBalance's strict success gate.
+    private static boolean ok(JSONObject reply) {
+        return reply != null && Boolean.TRUE.equals(reply.opt("status"));
+    }
+    private static String text(JSONObject object, String key) {
+        Object value = object == null ? null : object.opt(key);
+        return value instanceof String ? (String) value : "";
+    }
+    private static boolean safeId(String value) {
+        return Args.isTokenId(value) && (value.length() & 1) == 0;
+    }
+    private static boolean hexBytes(String value, int maxChars) {
+        if (value == null || value.length() < 4 || value.length() > maxChars
+                || (value.length() & 1) != 0 || !value.startsWith("0x")) return false;
+        for (int i = 2; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (!(c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F')) return false;
+        }
+        return true;
+    }
+    private static boolean validBinding(String value) {
+        if (!hexBytes(value, 166)) return false;
+        StringBuilder identity = new StringBuilder();
+        for (int i = 2; i < value.length(); i += 2)
+            identity.append((char)Integer.parseInt(value.substring(i, i + 2), 16));
+        return safeId(identity.toString());
+    }
+    private static boolean simpleScript(String script, String key) {
+        if (!safeId(key) || script == null || script.length() > 256) return false;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile(
+                "\\ARETURN +SIGNEDBY *\\( *(0x[0-9A-Fa-f]+) *\\)\\z", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(script.trim());
+        return m.matches() && key.equalsIgnoreCase(m.group(1));
+    }
+    private static boolean matchingCoin(JSONObject coin, String tokenid) {
+        if (coin == null || !tokenid.equalsIgnoreCase(text(coin, "tokenid"))
+                || !safeId(text(coin, "coinid")) || !safeId(text(coin, "address"))
+                || !Boolean.FALSE.equals(coin.opt("spent"))) return false;
+        String amount = text(coin, "amount");
+        if (amount.length() > 100 || !amount.matches("[0-9]+(?:\\.[0-9]+)?")) return false;
+        return new java.math.BigDecimal(amount).signum() > 0;
     }
 
     private NftProof() {}

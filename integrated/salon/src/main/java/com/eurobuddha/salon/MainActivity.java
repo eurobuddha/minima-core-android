@@ -1892,7 +1892,7 @@ public class MainActivity extends AppCompatActivity {
      *  ({@code base + index + ext}) collections like "gallery bibeau". base/ext from
      *  the token metadata (balance); index from each coin's state port 0. */
     private void enumerateEditions(final String tokenid, final EditionsCb cb) {
-        if (!nodeUp || tokenid == null || tokenid.isEmpty()) { cb.ready(java.util.Collections.emptyList()); return; }
+        if (!nodeUp || !Args.isTokenId(tokenid)) { cb.ready(java.util.Collections.emptyList()); return; }
         node.cmd("balance tokenid:" + tokenid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject bal) {
                 String base = "", ext = ".png";
