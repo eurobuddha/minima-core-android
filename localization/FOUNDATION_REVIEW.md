@@ -3128,3 +3128,18 @@ Reviewed the source importer and new packaging/node/initial-label adapters, gene
 Validation: 53 Atelier, 13 Salon, 150 Pandamonium host and 12 localization JVM tests pass. Pandamonium Java compilation, direct-transport guard and 5,355-entry/four-language catalogue generation pass. The first Atelier test attempt exposed missing external fixture paths; the importer now carries the original public fixtures and relocates test reads. The initial language compile found a mistyped resource name; corrected to the existing Mail node-retry string and rebuilt successfully.
 
 This review approves saving the integration foundation, not releasing or marking the goal complete. Remaining review includes full native/WebView localization, embedded Maxima/media adaptation, owner-device state/layout checks and donor financial/identity error paths explicitly recorded in PLAN.md. No 1.9.52 APK was installed or published.
+
+
+## Code Review — creative presentation checkpoint 1.9.53
+
+### Summary
+
+Reviewed Atelier's viewer/editor display bindings, native FILTR picker/save labels, the mint service notification lifecycle, Salon notification display, shared channel naming, reproducible adapter changes, translations and new regression tests. Existing image/cryptographic/financial algorithms are preserved. Retained Language messages update labels in place.
+
+### Findings
+
+No blocking finding in this checkpoint. The real-graphics regression confirms that a modified crop remains pixel-identical through four language changes in the host test environment. Service regressions confirm language refresh does not tick either engine and destroyed services cannot revive a notification. Existing notifications contain user data and are not retranslated after delivery; new notices use the current selection. Full Fold acceptance, remaining UI translation and the integration's recorded donor error-path review are still required.
+
+### Verdict
+
+Approve this source checkpoint. This is not approval of the complete integration or a public release. See PLAN.md and build/localization/creative-presentation-validation.json for scope and evidence.

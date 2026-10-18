@@ -6704,4 +6704,75 @@
     <string name="l10n_creative_first_piece" formatted="false">"Создайте первую работу в студии или добавьте существующие коллекции StateNFT из кошелька."</string>
     <!-- Arguments: version -->
     <string name="l10n_creative_subtitle">"NFT-студия Minima · № %1$s"</string>
+    <string name="l10n_creative_mint_channel" formatted="false">"Движок выпуска"</string>
+    <string name="l10n_creative_mint_channel_help" formatted="false">"Ход закрепления коллекций в блокчейне"</string>
+    <string name="l10n_creative_mint_title" formatted="false">"Atelier — движок выпуска"</string>
+    <string name="l10n_creative_watching_chain" formatted="false">"Наблюдение за блокчейном…"</string>
+    <!-- Arguments: name, minted, size, phase -->
+    <string name="l10n_creative_sealing">"Закрепление «%1$s» — %2$s/%3$s · %4$s"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_creative_needs_images">"Для продолжения «%1$s» нужны изображения"</string>
+    <string name="l10n_creative_phase_create" formatted="false">"создание"</string>
+    <string name="l10n_creative_phase_move" formatted="false">"перемещение"</string>
+    <string name="l10n_creative_phase_split" formatted="false">"разделение"</string>
+    <string name="l10n_creative_phase_stamp" formatted="false">"маркировка"</string>
+    <string name="l10n_creative_salon_channel" formatted="false">"События Salon"</string>
+    <string name="l10n_creative_tip_received" formatted="false">"💰 Получены чаевые"</string>
+    <!-- Arguments: sender, amount, token -->
+    <string name="l10n_creative_tip_from">"%1$s отправил(а) вам чаевые: %2$s %3$s"</string>
+    <string name="l10n_creative_sender" formatted="false">"Кто-то"</string>
+    <string name="l10n_creative_media" formatted="false">"📎 Медиа"</string>
+    <string name="l10n_creative_lot_info" formatted="false">"ЛОТ ⓘ"</string>
+    <string name="l10n_creative_not_validated" formatted="false">"ещё не проверено"</string>
+    <string name="l10n_creative_links" formatted="false">"Ссылки"</string>
+    <string name="l10n_creative_web_validate" formatted="false">"Проверка через веб"</string>
+    <string name="l10n_creative_image_base" formatted="false">"Базовый URL изображений"</string>
+    <string name="l10n_creative_icon" formatted="false">"Значок"</string>
+    <string name="l10n_creative_none_set" formatted="false">"не заданы"</string>
+    <string name="l10n_creative_url_hosted" formatted="false">"По URL-адресу"</string>
+    <string name="l10n_creative_embedded" formatted="false">"Встроенное"</string>
+    <string name="l10n_creative_editions" formatted="false">"Экземпляры"</string>
+    <string name="l10n_creative_file_type" formatted="false">"Тип файла"</string>
+    <string name="l10n_creative_port_zero" formatted="false">"Порт состояния 0"</string>
+    <string name="l10n_creative_port_one" formatted="false">"Порт состояния 1"</string>
+    <string name="l10n_creative_creator_key" formatted="false">"Ключ автора"</string>
+    <string name="l10n_creative_creator_address" formatted="false">"Адрес автора"</string>
+    <string name="l10n_creative_locked_edition" formatted="false">"Заблокированный экземпляр"</string>
+    <string name="l10n_creative_locked_verified" formatted="false">"Заблокирован · веб-проверка пройдена"</string>
+    <string name="l10n_creative_locked_validation" formatted="false">"Блокировка + веб-проверка"</string>
+    <string name="l10n_creative_open_link_failed" formatted="false">"Не удалось открыть ссылку"</string>
+    <string name="l10n_creative_saved_photos" formatted="false">"Сохранено в фото"</string>
+    <string name="l10n_creative_save_image_failed" formatted="false">"Не удалось сохранить изображение"</string>
+    <string name="l10n_creative_share_image_failed" formatted="false">"Не удалось поделиться изображением"</string>
+    <!-- Arguments: index, total -->
+    <string name="l10n_creative_lot_position">"ЛОТ %1$s / %2$s"</string>
+    <!-- Arguments: index, custody -->
+    <string name="l10n_creative_lot_custody">"Лот %1$s · %2$s"</string>
+    <string name="l10n_creative_in_custody" formatted="false">"у вас на хранении"</string>
+    <string name="l10n_creative_on_chain" formatted="false">"в блокчейне"</string>
+    <string name="l10n_creative_unseen" formatted="false">"не найден"</string>
+    <!-- Arguments: id -->
+    <string name="l10n_creative_coin_hash">"монета %1$s"</string>
+    <!-- Arguments: id -->
+    <string name="l10n_creative_token_hash">"токен %1$s"</string>
+    <!-- Arguments: length -->
+    <string name="l10n_creative_embedded_length">"встроенное изображение (%1$s символов)"</string>
+    <string name="l10n_creative_verified_badge" formatted="false">"✓ ВЕБ-ПРОВЕРКА ПРОЙДЕНА"</string>
+    <string name="l10n_creative_validation_badge" formatted="false">"○ ВЕБ-ПРОВЕРКА"</string>
+    <!-- Arguments: name, index, token -->
+    <string name="l10n_creative_share_lot_caption">"%1$s — Лот %2$s · Minima StateNFT %3$s"</string>
+    <string name="l10n_creative_share_lot" formatted="false">"Поделиться лотом"</string>
+    <string name="l10n_creative_choose_image" formatted="false">"Выбрать изображение"</string>
+    <string name="l10n_creative_plate_room" formatted="false">"ФОТОМАСТЕРСКАЯ"</string>
+    <string name="l10n_creative_seal_crop" formatted="false">"ПРИМЕНИТЬ"</string>
+    <string name="l10n_creative_free_crop" formatted="false">"Свободно"</string>
+    <string name="l10n_creative_brightness" formatted="false">"Яркость"</string>
+    <string name="l10n_creative_contrast" formatted="false">"Контраст"</string>
+    <string name="l10n_creative_colour" formatted="false">"Цвет"</string>
+    <string name="l10n_creative_look_none" formatted="false">"Нет"</string>
+    <string name="l10n_creative_look_noir" formatted="false">"Ч/Б"</string>
+    <string name="l10n_creative_look_vivid" formatted="false">"Ярко"</string>
+    <string name="l10n_creative_look_warm" formatted="false">"Тепло"</string>
+    <string name="l10n_creative_look_fade" formatted="false">"Блекло"</string>
+    <string name="l10n_creative_rotate90" formatted="false">"Повернуть на 90 градусов"</string>
 </resources>

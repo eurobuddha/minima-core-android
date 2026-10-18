@@ -6640,4 +6640,75 @@
     <string name="l10n_creative_first_piece" formatted="false">"Create your first piece in the Studio, or adopt existing StateNFT collections from your wallet."</string>
     <!-- Arguments: version -->
     <string name="l10n_creative_subtitle">"The Minima NFT studio · № %1$s"</string>
+    <string name="l10n_creative_mint_channel" formatted="false">"Mint engine"</string>
+    <string name="l10n_creative_mint_channel_help" formatted="false">"Live progress while collections seal on-chain"</string>
+    <string name="l10n_creative_mint_title" formatted="false">"Atelier — mint engine"</string>
+    <string name="l10n_creative_watching_chain" formatted="false">"Watching the chain…"</string>
+    <!-- Arguments: name, minted, size, phase -->
+    <string name="l10n_creative_sealing">"Sealing “%1$s” — %2$s/%3$s · %4$s"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_creative_needs_images">"“%1$s” needs images to continue"</string>
+    <string name="l10n_creative_phase_create" formatted="false">"creating"</string>
+    <string name="l10n_creative_phase_move" formatted="false">"moving"</string>
+    <string name="l10n_creative_phase_split" formatted="false">"splitting"</string>
+    <string name="l10n_creative_phase_stamp" formatted="false">"stamping"</string>
+    <string name="l10n_creative_salon_channel" formatted="false">"Salon activity"</string>
+    <string name="l10n_creative_tip_received" formatted="false">"💰 Tip received"</string>
+    <!-- Arguments: sender, amount, token -->
+    <string name="l10n_creative_tip_from">"%1$s tipped you %2$s %3$s"</string>
+    <string name="l10n_creative_sender" formatted="false">"Someone"</string>
+    <string name="l10n_creative_media" formatted="false">"📎 Media"</string>
+    <string name="l10n_creative_lot_info" formatted="false">"LOT ⓘ"</string>
+    <string name="l10n_creative_not_validated" formatted="false">"not yet validated"</string>
+    <string name="l10n_creative_links" formatted="false">"Links"</string>
+    <string name="l10n_creative_web_validate" formatted="false">"Web validation"</string>
+    <string name="l10n_creative_image_base" formatted="false">"Image base URL"</string>
+    <string name="l10n_creative_icon" formatted="false">"Icon"</string>
+    <string name="l10n_creative_none_set" formatted="false">"none set"</string>
+    <string name="l10n_creative_url_hosted" formatted="false">"Hosted at a URL"</string>
+    <string name="l10n_creative_embedded" formatted="false">"Embedded"</string>
+    <string name="l10n_creative_editions" formatted="false">"Editions"</string>
+    <string name="l10n_creative_file_type" formatted="false">"File type"</string>
+    <string name="l10n_creative_port_zero" formatted="false">"State port 0"</string>
+    <string name="l10n_creative_port_one" formatted="false">"State port 1"</string>
+    <string name="l10n_creative_creator_key" formatted="false">"Creator key"</string>
+    <string name="l10n_creative_creator_address" formatted="false">"Creator address"</string>
+    <string name="l10n_creative_locked_edition" formatted="false">"Locked edition"</string>
+    <string name="l10n_creative_locked_verified" formatted="false">"Locked · web-verified"</string>
+    <string name="l10n_creative_locked_validation" formatted="false">"Locked + web validation"</string>
+    <string name="l10n_creative_open_link_failed" formatted="false">"Couldn\'t open link"</string>
+    <string name="l10n_creative_saved_photos" formatted="false">"Saved to Photos"</string>
+    <string name="l10n_creative_save_image_failed" formatted="false">"Could not save image"</string>
+    <string name="l10n_creative_share_image_failed" formatted="false">"Could not share image"</string>
+    <!-- Arguments: index, total -->
+    <string name="l10n_creative_lot_position">"LOT %1$s / %2$s"</string>
+    <!-- Arguments: index, custody -->
+    <string name="l10n_creative_lot_custody">"Lot %1$s · %2$s"</string>
+    <string name="l10n_creative_in_custody" formatted="false">"in your custody"</string>
+    <string name="l10n_creative_on_chain" formatted="false">"on-chain"</string>
+    <string name="l10n_creative_unseen" formatted="false">"not found"</string>
+    <!-- Arguments: id -->
+    <string name="l10n_creative_coin_hash">"coin %1$s"</string>
+    <!-- Arguments: id -->
+    <string name="l10n_creative_token_hash">"token %1$s"</string>
+    <!-- Arguments: length -->
+    <string name="l10n_creative_embedded_length">"embedded image (%1$s characters)"</string>
+    <string name="l10n_creative_verified_badge" formatted="false">"✓ WEB-VERIFIED"</string>
+    <string name="l10n_creative_validation_badge" formatted="false">"○ WEB VALIDATION"</string>
+    <!-- Arguments: name, index, token -->
+    <string name="l10n_creative_share_lot_caption">"%1$s — Lot %2$s · Minima StateNFT %3$s"</string>
+    <string name="l10n_creative_share_lot" formatted="false">"Share lot"</string>
+    <string name="l10n_creative_choose_image" formatted="false">"Choose image"</string>
+    <string name="l10n_creative_plate_room" formatted="false">"THE PLATE ROOM"</string>
+    <string name="l10n_creative_seal_crop" formatted="false">"APPLY CROP"</string>
+    <string name="l10n_creative_free_crop" formatted="false">"Free"</string>
+    <string name="l10n_creative_brightness" formatted="false">"Brightness"</string>
+    <string name="l10n_creative_contrast" formatted="false">"Contrast"</string>
+    <string name="l10n_creative_colour" formatted="false">"Colour"</string>
+    <string name="l10n_creative_look_none" formatted="false">"None"</string>
+    <string name="l10n_creative_look_noir" formatted="false">"Noir"</string>
+    <string name="l10n_creative_look_vivid" formatted="false">"Vivid"</string>
+    <string name="l10n_creative_look_warm" formatted="false">"Warm"</string>
+    <string name="l10n_creative_look_fade" formatted="false">"Fade"</string>
+    <string name="l10n_creative_rotate90" formatted="false">"Rotate 90 degrees"</string>
 </resources>

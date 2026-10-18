@@ -1,4 +1,5 @@
 package com.eurobuddha.statenft;
+import com.eurobuddha.minimacore.i18n.Language;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -54,7 +55,7 @@ public class FiltrActivity extends Activity {
                 filePick = cb;
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.setType("image/*");
-                startActivityForResult(Intent.createChooser(i, "Choose image"), 7101);
+                startActivityForResult(Intent.createChooser(i, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_choose_image)), 7101);
                 return true;
             }
         });
@@ -121,9 +122,9 @@ public class FiltrActivity extends Activity {
                 try (OutputStream out = getContentResolver().openOutputStream(uri)) {
                     out.write(bytes);
                 }
-                toastMsg("Saved to Photos");
+                toastMsg(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_saved_photos).toString());
             } catch (Exception e) {
-                toastMsg("Could not save image");
+                toastMsg(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_save_image_failed).toString());
             }
         }
 

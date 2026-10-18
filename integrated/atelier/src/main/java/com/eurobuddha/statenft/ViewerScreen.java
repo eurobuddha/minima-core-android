@@ -1,4 +1,5 @@
 package com.eurobuddha.statenft;
+import com.eurobuddha.minimacore.i18n.Language;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -67,7 +68,7 @@ public final class ViewerScreen {
         lotLabel.setLetterSpacing(0.2f);
         lotLabel.setGravity(Gravity.CENTER);
         top.addView(lotLabel, new LinearLayout.LayoutParams(0, -2, 1));
-        TextView info = Design.text(c, "LOT ⓘ", 11, 0xFFF2F1EC, Design.sansBold());
+        TextView info = Design.text(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_lot_info), 11, 0xFFF2F1EC, Design.sansBold());
         info.setLetterSpacing(0.12f);
         info.setGravity(Gravity.CENTER);
         info.setBackground(Design.ripple(Design.rect(0xB3111111)));
@@ -94,7 +95,7 @@ public final class ViewerScreen {
 
         Runnable render = () -> {
             StateNft.Item it = items.get(idx[0]);
-            lotLabel.setText(String.format(java.util.Locale.US, "LOT %03d / %03d", it.index, Math.max(meta.size, items.size())));
+            Language.setText(lotLabel, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_lot_position, String.format(java.util.Locale.US, "%03d", it.index), String.format(java.util.Locale.US, "%03d", Math.max(meta.size, items.size()))));
             img.setImageBitmap(Identicon.forToken(meta.tokenid + it.index, 900));
             img.resetZoom();
             if (it.imageUrl != null && !it.imageUrl.isEmpty()) {
@@ -124,8 +125,7 @@ public final class ViewerScreen {
         View bar = Design.rule(c, 3);
         sheet.addView(bar);
         sheet.addView(space(c, 10));
-        sheet.addView(Design.lot(c, String.format(java.util.Locale.US, "Lot %03d · %s", it.index,
-                it.owned ? "in your custody" : (it.coin != null ? "on-chain" : "unseen"))));
+        sheet.addView(Design.lot(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_lot_custody, String.format(java.util.Locale.US, "%03d", it.index), it.owned ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_in_custody) : (it.coin != null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_on_chain) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_unseen)))));
         TextView name = Design.display(c, meta.name, 17);
         sheet.addView(name, lp(c, 0, 4, 0, 6));
 
@@ -145,7 +145,7 @@ public final class ViewerScreen {
                 meta.webValid = valid;
                 shieldSlot.removeAllViews();
                 shieldSlot.addView(shieldBadge(act, valid, meta.webvalidate,
-                        valid ? null : (v == null ? "checking…" : "not yet validated")));
+                        valid ? null : (v == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_future_checking) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_not_validated))));
             };
             paintShield.run();
             sheet.addView(shieldSlot, lp(c, 0, 0, 0, 8));
@@ -159,11 +159,11 @@ public final class ViewerScreen {
 
         LinearLayout hashes = new LinearLayout(c);
         hashes.setOrientation(LinearLayout.HORIZONTAL);
-        TextView tok = Design.hash(c, "token " + Util.shorten(meta.tokenid));
+        TextView tok = Design.hash(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_token_hash, Util.shorten(meta.tokenid)));
         copyOnTap(act, tok, meta.tokenid);
         hashes.addView(tok);
         if (it.coin != null) {
-            TextView coin = Design.hash(c, "coin " + Util.shorten(it.coin.optString("coinid")));
+            TextView coin = Design.hash(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_coin_hash, Util.shorten(it.coin.optString("coinid"))));
             copyOnTap(act, coin, it.coin.optString("coinid"));
             hashes.addView(coin, lp(c, 8, 0, 0, 0));
         }
@@ -213,45 +213,45 @@ public final class ViewerScreen {
         /* ── links & metadata: every field the StateNFT carries, the URLs
          *    tappable (open in browser), hashes tap-to-copy ── */
         sheet.addView(space(c, 4));
-        sheet.addView(sectionLabel(c, "Links"));
+        sheet.addView(sectionLabel(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_links)));
         boolean anyLink = false;
-        if (!meta.externalUrl.isEmpty())  { sheet.addView(linkRow(act, "External", meta.externalUrl)); anyLink = true; }
-        if (!meta.webvalidate.isEmpty())  { sheet.addView(linkRow(act, "Web validate", meta.webvalidate)); anyLink = true; }
+        if (!meta.externalUrl.isEmpty())  { sheet.addView(linkRow(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_apps_external), meta.externalUrl)); anyLink = true; }
+        if (!meta.webvalidate.isEmpty())  { sheet.addView(linkRow(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_web_validate), meta.webvalidate)); anyLink = true; }
         if ("url".equals(meta.mode) && !meta.base.isEmpty())
-                                          { sheet.addView(linkRow(act, "Image base", meta.base)); anyLink = true; }
-        if (meta.icon.startsWith("http")) { sheet.addView(linkRow(act, "Icon", meta.icon)); anyLink = true; }
-        if (!anyLink) sheet.addView(kv(c, "Links", "none set"));
+                                          { sheet.addView(linkRow(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_image_base), meta.base)); anyLink = true; }
+        if (meta.icon.startsWith("http")) { sheet.addView(linkRow(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_icon), meta.icon)); anyLink = true; }
+        if (!anyLink) sheet.addView(kv(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_links), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_none_set)));
 
         sheet.addView(space(c, 4));
-        sheet.addView(sectionLabel(c, "Details"));
-        sheet.addView(kv(c, "Mode", "url".equals(meta.mode) ? "URL-hosted" : "Embedded"));
-        if (meta.size > 0) sheet.addView(kv(c, "Editions", String.valueOf(meta.size)));
-        if ("url".equals(meta.mode) && !meta.ext.isEmpty()) sheet.addView(kv(c, "File type", meta.ext));
+        sheet.addView(sectionLabel(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_nft_details)));
+        sheet.addView(kv(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_nft_mint_mode), "url".equals(meta.mode) ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_url_hosted) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_embedded)));
+        if (meta.size > 0) sheet.addView(kv(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_editions), String.valueOf(meta.size)));
+        if ("url".equals(meta.mode) && !meta.ext.isEmpty()) sheet.addView(kv(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_file_type), meta.ext));
         if (it.coin != null) {
-            sheet.addView(kv(c, "State port 0", StateNft.state(it.coin, 0)));
+            sheet.addView(kv(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_port_zero), StateNft.state(it.coin, 0)));
             String s1 = StateNft.state(it.coin, 1);
-            sheet.addView(kv(c, "State port 1", s1 == null ? "—" : "embedded image (" + s1.length() + " ch)"));
-            sheet.addView(copyKv(act, "Address", it.coin.optString("address")));
+            sheet.addView(kv(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_port_one), s1 == null ? "—" : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_embedded_length, s1.length())));
+            sheet.addView(copyKv(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_history_address), it.coin.optString("address")));
         }
-        if (!meta.creatorPk.isEmpty()) sheet.addView(copyKv(act, "Creator key", meta.creatorPk));
-        if (!meta.creatorAddr.isEmpty()) sheet.addView(copyKv(act, "Creator address", meta.creatorAddr));
-        sheet.addView(copyKv(act, "Token id", meta.tokenid));
-        sheet.addView(kv(c, "Contract", meta.webvalidate.isEmpty()
-                ? "Locked edition" : (meta.webValid ? "Locked · web-verified" : "Locked + web validate")));
+        if (!meta.creatorPk.isEmpty()) sheet.addView(copyKv(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_creator_key), meta.creatorPk));
+        if (!meta.creatorAddr.isEmpty()) sheet.addView(copyKv(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_creator_address), meta.creatorAddr));
+        sheet.addView(copyKv(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_terminal_txn_token_id), meta.tokenid));
+        sheet.addView(kv(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_vestr_contract), meta.webvalidate.isEmpty()
+                ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_locked_edition) : (meta.webValid ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_locked_verified) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_locked_validation))));
 
         LinearLayout actions = new LinearLayout(c);
         actions.setOrientation(LinearLayout.HORIZONTAL);
         if (it.owned && it.coin != null) {
-            TextView tr = Design.button(c, "Transfer", true);
+            TextView tr = Design.button(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_nft_wallet_transfer), true);
             tr.setOnClickListener(v -> host.onTransferItem(it));
             actions.addView(tr, weight(c, 46));
             actions.addView(space(c, 8), new LinearLayout.LayoutParams(Design.dp(c, 8), 1));
         }
-        TextView save = Design.button(c, "Save", false);
+        TextView save = Design.button(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_save), false);
         save.setOnClickListener(v -> saveToPhotos(act, meta, it));
         actions.addView(save, weight(c, 46));
         actions.addView(space(c, 8), new LinearLayout.LayoutParams(Design.dp(c, 8), 1));
-        TextView share = Design.button(c, "Share", false);
+        TextView share = Design.button(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_logs_share), false);
         share.setOnClickListener(v -> shareImage(act, meta, it));
         actions.addView(share, weight(c, 46));
         sheet.addView(actions, lp(c, 0, 10, 0, 0));
@@ -262,15 +262,15 @@ public final class ViewerScreen {
         t.setOnClickListener(v -> {
             ClipboardManager cm = (ClipboardManager) act.getSystemService(Context.CLIPBOARD_SERVICE);
             cm.setPrimaryClip(ClipData.newPlainText("statenft", full));
-            Toast.makeText(act, "Copied", Toast.LENGTH_SHORT).show();
+            Toast.makeText(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_history_copied), Toast.LENGTH_SHORT).show();
         });
     }
 
-    private static LinearLayout kv(Context c, String k, String v) {
+    private static LinearLayout kv(Context c, CharSequence k, CharSequence v) {
         LinearLayout row = new LinearLayout(c);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(0, Design.dp(c, 4), 0, Design.dp(c, 4));
-        TextView key = Design.text(c, k.toUpperCase(), 9.5f, Design.DIM(), Design.sansBold());
+        TextView key = Design.text(c, Language.upper(k), 9.5f, Design.DIM(), Design.sansBold());
         key.setLetterSpacing(0.14f);
         row.addView(key, new LinearLayout.LayoutParams(0, -2, 1));
         TextView val = Design.text(c, v == null ? "—" : v, 11.5f, Design.INK(), Design.mono());
@@ -280,8 +280,8 @@ public final class ViewerScreen {
     }
 
     /** Small uppercase section header inside the provenance sheet. */
-    private static TextView sectionLabel(Context c, String s) {
-        TextView t = Design.text(c, s.toUpperCase(), 9f, Design.DIM(), Design.sansBold());
+    private static TextView sectionLabel(Context c, CharSequence s) {
+        TextView t = Design.text(c, Language.upper(s), 9f, Design.DIM(), Design.sansBold());
         t.setLetterSpacing(0.16f);
         t.setPadding(0, Design.dp(c, 6), 0, Design.dp(c, 2));
         return t;
@@ -294,18 +294,18 @@ public final class ViewerScreen {
             if (!u.matches("(?i)^[a-z][a-z0-9+.-]*://.*")) u = "https://" + u;
             act.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(u)));
         } catch (Exception e) {
-            Toast.makeText(act, "Couldn't open link", Toast.LENGTH_SHORT).show();
+            Toast.makeText(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_open_link_failed), Toast.LENGTH_SHORT).show();
         }
     }
 
     /** kv row whose value is a tappable link (vermilion, underlined) — tap opens
      *  it in the browser, long-press copies the URL. */
-    private static LinearLayout linkRow(Activity act, String k, String url) {
+    private static LinearLayout linkRow(Activity act, CharSequence k, String url) {
         Context c = act;
         LinearLayout row = new LinearLayout(c);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(0, Design.dp(c, 5), 0, Design.dp(c, 5));
-        TextView key = Design.text(c, k.toUpperCase(), 9.5f, Design.DIM(), Design.sansBold());
+        TextView key = Design.text(c, Language.upper(k), 9.5f, Design.DIM(), Design.sansBold());
         key.setLetterSpacing(0.14f);
         row.addView(key, new LinearLayout.LayoutParams(0, -2, 1));
         TextView val = Design.text(c, url, 11f, Design.ACCENT(), Design.mono());
@@ -318,7 +318,7 @@ public final class ViewerScreen {
         val.setOnLongClickListener(v -> {
             ClipboardManager cm = (ClipboardManager) act.getSystemService(Context.CLIPBOARD_SERVICE);
             cm.setPrimaryClip(ClipData.newPlainText("statenft", url));
-            Toast.makeText(act, "Copied", Toast.LENGTH_SHORT).show();
+            Toast.makeText(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_history_copied), Toast.LENGTH_SHORT).show();
             return true;
         });
         row.addView(val, new LinearLayout.LayoutParams(0, -2, 1.8f));
@@ -326,7 +326,7 @@ public final class ViewerScreen {
     }
 
     /** kv row that shows a shortened hash and copies the full value on tap. */
-    private static LinearLayout copyKv(Activity act, String k, String full) {
+    private static LinearLayout copyKv(Activity act, CharSequence k, String full) {
         LinearLayout row = kv(act, k, Util.shorten(full));
         copyOnTap(act, (TextView) row.getChildAt(1), full);
         return row;
@@ -334,11 +334,11 @@ public final class ViewerScreen {
 
     /** Web-validation badge: gold "verified" chip (tap opens the proof) or a
      *  muted pending/unvalidated state. */
-    private static TextView shieldBadge(Activity act, boolean valid, String url, String pendingText) {
+    private static TextView shieldBadge(Activity act, boolean valid, String url, CharSequence pendingText) {
         Context c = act;
         int gold = 0xFF9A7B1F;
-        String label = valid ? "✓ WEB-VERIFIED"
-                : "○ WEB-VALIDATE" + (pendingText == null ? "" : " · " + pendingText);
+        CharSequence label = valid ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_verified_badge)
+                : Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_validation_badge), pendingText == null ? "" : Language.join(" · ", pendingText));
         TextView t = Design.text(c, label, 9.5f, valid ? gold : Design.DIM(), Design.sansBold());
         t.setLetterSpacing(0.1f);
         t.setPadding(Design.dp(c, 8), Design.dp(c, 5), Design.dp(c, 8), Design.dp(c, 6));
@@ -374,9 +374,9 @@ public final class ViewerScreen {
                 try (OutputStream out = act.getContentResolver().openOutputStream(uri)) {
                     b.compress(Bitmap.CompressFormat.JPEG, 95, out);
                 }
-                act.runOnUiThread(() -> Toast.makeText(act, "Saved to Photos", Toast.LENGTH_SHORT).show());
+                act.runOnUiThread(() -> Toast.makeText(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_saved_photos), Toast.LENGTH_SHORT).show());
             } catch (Exception e) {
-                act.runOnUiThread(() -> Toast.makeText(act, "Could not save image", Toast.LENGTH_SHORT).show());
+                act.runOnUiThread(() -> Toast.makeText(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_save_image_failed), Toast.LENGTH_SHORT).show());
             }
         }).start();
     }
@@ -396,11 +396,11 @@ public final class ViewerScreen {
                 Intent send = new Intent(Intent.ACTION_SEND);
                 send.setType("image/jpeg");
                 send.putExtra(Intent.EXTRA_STREAM, uri);
-                send.putExtra(Intent.EXTRA_TEXT, meta.name + " — Lot " + it.index + " · Minima StateNFT " + meta.tokenid);
+                send.putExtra(Intent.EXTRA_TEXT, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_share_lot_caption, meta.name, it.index, meta.tokenid).toString());
                 send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                act.runOnUiThread(() -> act.startActivity(Intent.createChooser(send, "Share lot")));
+                act.runOnUiThread(() -> act.startActivity(Intent.createChooser(send, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_share_lot))));
             } catch (Exception e) {
-                act.runOnUiThread(() -> Toast.makeText(act, "Could not share image", Toast.LENGTH_SHORT).show());
+                act.runOnUiThread(() -> Toast.makeText(act, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_share_image_failed), Toast.LENGTH_SHORT).show());
             }
         }).start();
     }

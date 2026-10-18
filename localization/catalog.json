@@ -32608,5 +32608,377 @@
     "zh-Hans": "Minima NFT 工作室 · № {version}",
     "ru": "NFT-студия Minima · № {version}",
     "uk": "NFT-студія Minima · № {version}"
+  },
+  "creative.mintChannel": {
+    "en": "Mint engine",
+    "zh-Hans": "铸造引擎",
+    "ru": "Движок выпуска",
+    "uk": "Рушій карбування"
+  },
+  "creative.mintChannelHelp": {
+    "en": "Live progress while collections seal on-chain",
+    "zh-Hans": "在链上封存藏品集时显示实时进度",
+    "ru": "Ход закрепления коллекций в блокчейне",
+    "uk": "Перебіг закріплення колекцій у блокчейні"
+  },
+  "creative.mintTitle": {
+    "en": "Atelier — mint engine",
+    "zh-Hans": "Atelier — 铸造引擎",
+    "ru": "Atelier — движок выпуска",
+    "uk": "Atelier — рушій карбування"
+  },
+  "creative.watchingChain": {
+    "en": "Watching the chain…",
+    "zh-Hans": "正在监测区块链…",
+    "ru": "Наблюдение за блокчейном…",
+    "uk": "Спостереження за блокчейном…"
+  },
+  "creative.sealing": {
+    "en": "Sealing “{name}” — {minted}/{size} · {phase}",
+    "zh-Hans": "正在封存“{name}” — {minted}/{size} · {phase}",
+    "ru": "Закрепление «{name}» — {minted}/{size} · {phase}",
+    "uk": "Закріплення «{name}» — {minted}/{size} · {phase}"
+  },
+  "creative.needsImages": {
+    "en": "“{name}” needs images to continue",
+    "zh-Hans": "“{name}”需要图片才能继续",
+    "ru": "Для продолжения «{name}» нужны изображения",
+    "uk": "Для продовження «{name}» потрібні зображення"
+  },
+  "creative.phaseCreate": {
+    "en": "creating",
+    "zh-Hans": "创建中",
+    "ru": "создание",
+    "uk": "створення"
+  },
+  "creative.phaseMove": {
+    "en": "moving",
+    "zh-Hans": "转移中",
+    "ru": "перемещение",
+    "uk": "переміщення"
+  },
+  "creative.phaseSplit": {
+    "en": "splitting",
+    "zh-Hans": "拆分中",
+    "ru": "разделение",
+    "uk": "розділення"
+  },
+  "creative.phaseStamp": {
+    "en": "stamping",
+    "zh-Hans": "写入标记中",
+    "ru": "маркировка",
+    "uk": "маркування"
+  },
+  "creative.salonChannel": {
+    "en": "Salon activity",
+    "zh-Hans": "Salon 动态",
+    "ru": "События Salon",
+    "uk": "Події Salon"
+  },
+  "creative.tipReceived": {
+    "en": "💰 Tip received",
+    "zh-Hans": "💰 已收到打赏",
+    "ru": "💰 Получены чаевые",
+    "uk": "💰 Отримано чайові"
+  },
+  "creative.tipFrom": {
+    "en": "{sender} tipped you {amount} {token}",
+    "zh-Hans": "{sender} 向您打赏了 {amount} {token}",
+    "ru": "{sender} отправил(а) вам чаевые: {amount} {token}",
+    "uk": "{sender} надіслав(-ла) вам чайові: {amount} {token}"
+  },
+  "creative.sender": {
+    "en": "Someone",
+    "zh-Hans": "有人",
+    "ru": "Кто-то",
+    "uk": "Хтось"
+  },
+  "creative.media": {
+    "en": "📎 Media",
+    "zh-Hans": "📎 媒体",
+    "ru": "📎 Медиа",
+    "uk": "📎 Медіа"
+  },
+  "creative.lotInfo": {
+    "en": "LOT ⓘ",
+    "zh-Hans": "作品 ⓘ",
+    "ru": "ЛОТ ⓘ",
+    "uk": "ЛОТ ⓘ"
+  },
+  "creative.notValidated": {
+    "en": "not yet validated",
+    "zh-Hans": "尚未验证",
+    "ru": "ещё не проверено",
+    "uk": "ще не перевірено"
+  },
+  "creative.links": {
+    "en": "Links",
+    "zh-Hans": "链接",
+    "ru": "Ссылки",
+    "uk": "Посилання"
+  },
+  "creative.webValidate": {
+    "en": "Web validation",
+    "zh-Hans": "网页验证",
+    "ru": "Проверка через веб",
+    "uk": "Перевірка через веб"
+  },
+  "creative.imageBase": {
+    "en": "Image base URL",
+    "zh-Hans": "图片基础网址",
+    "ru": "Базовый URL изображений",
+    "uk": "Базова URL-адреса зображень"
+  },
+  "creative.icon": {
+    "en": "Icon",
+    "zh-Hans": "图标",
+    "ru": "Значок",
+    "uk": "Піктограма"
+  },
+  "creative.noneSet": {
+    "en": "none set",
+    "zh-Hans": "未设置",
+    "ru": "не заданы",
+    "uk": "не задано"
+  },
+  "creative.urlHosted": {
+    "en": "Hosted at a URL",
+    "zh-Hans": "托管于网址",
+    "ru": "По URL-адресу",
+    "uk": "За URL-адресою"
+  },
+  "creative.embedded": {
+    "en": "Embedded",
+    "zh-Hans": "嵌入式",
+    "ru": "Встроенное",
+    "uk": "Вбудоване"
+  },
+  "creative.editions": {
+    "en": "Editions",
+    "zh-Hans": "版数",
+    "ru": "Экземпляры",
+    "uk": "Примірники"
+  },
+  "creative.fileType": {
+    "en": "File type",
+    "zh-Hans": "文件类型",
+    "ru": "Тип файла",
+    "uk": "Тип файлу"
+  },
+  "creative.portZero": {
+    "en": "State port 0",
+    "zh-Hans": "状态端口 0",
+    "ru": "Порт состояния 0",
+    "uk": "Порт стану 0"
+  },
+  "creative.portOne": {
+    "en": "State port 1",
+    "zh-Hans": "状态端口 1",
+    "ru": "Порт состояния 1",
+    "uk": "Порт стану 1"
+  },
+  "creative.creatorKey": {
+    "en": "Creator key",
+    "zh-Hans": "创作者密钥",
+    "ru": "Ключ автора",
+    "uk": "Ключ автора"
+  },
+  "creative.creatorAddress": {
+    "en": "Creator address",
+    "zh-Hans": "创作者地址",
+    "ru": "Адрес автора",
+    "uk": "Адреса автора"
+  },
+  "creative.lockedEdition": {
+    "en": "Locked edition",
+    "zh-Hans": "已锁定版本",
+    "ru": "Заблокированный экземпляр",
+    "uk": "Заблокований примірник"
+  },
+  "creative.lockedVerified": {
+    "en": "Locked · web-verified",
+    "zh-Hans": "已锁定 · 网页已验证",
+    "ru": "Заблокирован · веб-проверка пройдена",
+    "uk": "Заблоковано · веб-перевірку пройдено"
+  },
+  "creative.lockedValidation": {
+    "en": "Locked + web validation",
+    "zh-Hans": "已锁定 + 网页验证",
+    "ru": "Блокировка + веб-проверка",
+    "uk": "Блокування + веб-перевірка"
+  },
+  "creative.openLinkFailed": {
+    "en": "Couldn't open link",
+    "zh-Hans": "无法打开链接",
+    "ru": "Не удалось открыть ссылку",
+    "uk": "Не вдалося відкрити посилання"
+  },
+  "creative.savedPhotos": {
+    "en": "Saved to Photos",
+    "zh-Hans": "已保存到相册",
+    "ru": "Сохранено в фото",
+    "uk": "Збережено у фото"
+  },
+  "creative.saveImageFailed": {
+    "en": "Could not save image",
+    "zh-Hans": "无法保存图片",
+    "ru": "Не удалось сохранить изображение",
+    "uk": "Не вдалося зберегти зображення"
+  },
+  "creative.shareImageFailed": {
+    "en": "Could not share image",
+    "zh-Hans": "无法分享图片",
+    "ru": "Не удалось поделиться изображением",
+    "uk": "Не вдалося поділитися зображенням"
+  },
+  "creative.lotPosition": {
+    "en": "LOT {index} / {total}",
+    "zh-Hans": "作品 {index} / {total}",
+    "ru": "ЛОТ {index} / {total}",
+    "uk": "ЛОТ {index} / {total}"
+  },
+  "creative.lotCustody": {
+    "en": "Lot {index} · {custody}",
+    "zh-Hans": "作品 {index} · {custody}",
+    "ru": "Лот {index} · {custody}",
+    "uk": "Лот {index} · {custody}"
+  },
+  "creative.inCustody": {
+    "en": "in your custody",
+    "zh-Hans": "由您持有",
+    "ru": "у вас на хранении",
+    "uk": "у вас на зберіганні"
+  },
+  "creative.onChain": {
+    "en": "on-chain",
+    "zh-Hans": "链上",
+    "ru": "в блокчейне",
+    "uk": "у блокчейні"
+  },
+  "creative.unseen": {
+    "en": "not found",
+    "zh-Hans": "未找到",
+    "ru": "не найден",
+    "uk": "не знайдено"
+  },
+  "creative.coinHash": {
+    "en": "coin {id}",
+    "zh-Hans": "代币 {id}",
+    "ru": "монета {id}",
+    "uk": "монета {id}"
+  },
+  "creative.tokenHash": {
+    "en": "token {id}",
+    "zh-Hans": "通证 {id}",
+    "ru": "токен {id}",
+    "uk": "токен {id}"
+  },
+  "creative.embeddedLength": {
+    "en": "embedded image ({length} characters)",
+    "zh-Hans": "嵌入图片（{length} 个字符）",
+    "ru": "встроенное изображение ({length} символов)",
+    "uk": "вбудоване зображення ({length} символів)"
+  },
+  "creative.verifiedBadge": {
+    "en": "✓ WEB-VERIFIED",
+    "zh-Hans": "✓ 网页已验证",
+    "ru": "✓ ВЕБ-ПРОВЕРКА ПРОЙДЕНА",
+    "uk": "✓ ВЕБ-ПЕРЕВІРКУ ПРОЙДЕНО"
+  },
+  "creative.validationBadge": {
+    "en": "○ WEB VALIDATION",
+    "zh-Hans": "○ 网页验证",
+    "ru": "○ ВЕБ-ПРОВЕРКА",
+    "uk": "○ ВЕБ-ПЕРЕВІРКА"
+  },
+  "creative.shareLotCaption": {
+    "en": "{name} — Lot {index} · Minima StateNFT {token}",
+    "zh-Hans": "{name} — 作品 {index} · Minima StateNFT {token}",
+    "ru": "{name} — Лот {index} · Minima StateNFT {token}",
+    "uk": "{name} — Лот {index} · Minima StateNFT {token}"
+  },
+  "creative.shareLot": {
+    "en": "Share lot",
+    "zh-Hans": "分享作品",
+    "ru": "Поделиться лотом",
+    "uk": "Поділитися лотом"
+  },
+  "creative.chooseImage": {
+    "en": "Choose image",
+    "zh-Hans": "选择图片",
+    "ru": "Выбрать изображение",
+    "uk": "Вибрати зображення"
+  },
+  "creative.plateRoom": {
+    "en": "THE PLATE ROOM",
+    "zh-Hans": "图像编辑室",
+    "ru": "ФОТОМАСТЕРСКАЯ",
+    "uk": "ФОТОМАЙСТЕРНЯ"
+  },
+  "creative.sealCrop": {
+    "en": "APPLY CROP",
+    "zh-Hans": "应用裁剪",
+    "ru": "ПРИМЕНИТЬ",
+    "uk": "ЗАСТОСУВАТИ"
+  },
+  "creative.freeCrop": {
+    "en": "Free",
+    "zh-Hans": "自由",
+    "ru": "Свободно",
+    "uk": "Вільно"
+  },
+  "creative.brightness": {
+    "en": "Brightness",
+    "zh-Hans": "亮度",
+    "ru": "Яркость",
+    "uk": "Яскравість"
+  },
+  "creative.contrast": {
+    "en": "Contrast",
+    "zh-Hans": "对比度",
+    "ru": "Контраст",
+    "uk": "Контраст"
+  },
+  "creative.colour": {
+    "en": "Colour",
+    "zh-Hans": "色彩",
+    "ru": "Цвет",
+    "uk": "Колір"
+  },
+  "creative.lookNone": {
+    "en": "None",
+    "zh-Hans": "无",
+    "ru": "Нет",
+    "uk": "Немає"
+  },
+  "creative.lookNoir": {
+    "en": "Noir",
+    "zh-Hans": "黑白",
+    "ru": "Ч/Б",
+    "uk": "Ч/Б"
+  },
+  "creative.lookVivid": {
+    "en": "Vivid",
+    "zh-Hans": "鲜艳",
+    "ru": "Ярко",
+    "uk": "Яскраво"
+  },
+  "creative.lookWarm": {
+    "en": "Warm",
+    "zh-Hans": "暖色",
+    "ru": "Тепло",
+    "uk": "Тепло"
+  },
+  "creative.lookFade": {
+    "en": "Fade",
+    "zh-Hans": "褪色",
+    "ru": "Блекло",
+    "uk": "Блякло"
+  },
+  "creative.rotate90": {
+    "en": "Rotate 90 degrees",
+    "zh-Hans": "旋转 90 度",
+    "ru": "Повернуть на 90 градусов",
+    "uk": "Повернути на 90 градусів"
   }
 }

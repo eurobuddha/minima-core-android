@@ -1,4 +1,5 @@
 package com.eurobuddha.statenft;
+import com.eurobuddha.minimacore.i18n.Language;
 
 import android.app.Activity;
 import android.content.Context;
@@ -58,16 +59,19 @@ public final class ImageEditor {
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
         top.setPadding(Design.dp(c, 14), Design.dp(c, 40), Design.dp(c, 14), Design.dp(c, 8));
-        TextView cancel = chipBtn(c, "Cancel");
+        TextView cancel = chipBtn(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel));
         cancel.setOnClickListener(v -> onClose.run());
         top.addView(cancel, new LinearLayout.LayoutParams(-2, Design.dp(c, 40)));
-        TextView title = Design.text(c, "THE PLATE ROOM", 12, 0xFFF2F1EC, Design.sansBold());
+        TextView title = Design.text(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_plate_room), 12, 0xFFF2F1EC, Design.sansBold());
         title.setLetterSpacing(0.2f);
         title.setGravity(Gravity.CENTER);
+        title.setSingleLine(true);
+        title.setEllipsize(android.text.TextUtils.TruncateAt.END);
         top.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
-        TextView apply = Design.text(c, "SEAL CROP", 11, 0xFF0D0D0B, Design.sansBold());
+        TextView apply = Design.text(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_seal_crop), 11, 0xFF0D0D0B, Design.sansBold());
         apply.setLetterSpacing(0.12f);
         apply.setGravity(Gravity.CENTER);
+        apply.setSingleLine(true);
         apply.setBackground(Design.ripple(Design.rect(0xFFE63312)));
         apply.setPadding(Design.dp(c, 14), 0, Design.dp(c, 14), 0);
         apply.setTextColor(0xFFFFFFFF);
@@ -91,8 +95,9 @@ public final class ImageEditor {
         row1.setOrientation(LinearLayout.HORIZONTAL);
         TextView a11 = chipBtn(c, "1 : 1");
         TextView a45 = chipBtn(c, "4 : 5");
-        TextView aFree = chipBtn(c, "Free");
+        TextView aFree = chipBtn(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_free_crop));
         TextView rot = chipBtn(c, "⟳ 90°");
+        Language.description(rot, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_rotate90));
         selectChip(a11, true); selectChip(a45, false); selectChip(aFree, false);
         a11.setOnClickListener(v -> { stage.setAspect(1f); selectChip(a11, true); selectChip(a45, false); selectChip(aFree, false); });
         a45.setOnClickListener(v -> { stage.setAspect(0.8f); selectChip(a11, false); selectChip(a45, true); selectChip(aFree, false); });
@@ -122,10 +127,11 @@ public final class ImageEditor {
         LinearLayout row2 = new LinearLayout(c);
         row2.setOrientation(LinearLayout.HORIZONTAL);
         String[][] looks = {{"None", ""}, {"Noir", "noir"}, {"Vivid", "vivid"}, {"Warm", "warm"}, {"Fade", "fade"}};
+        CharSequence[] lookLabels = {Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_look_none), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_look_noir), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_look_vivid), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_look_warm), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_look_fade)};
         final TextView[] lookChips = new TextView[looks.length];
         for (int i = 0; i < looks.length; i++) {
             final int idx = i;
-            TextView lk = chipBtn(c, looks[i][0]);
+            TextView lk = chipBtn(c, lookLabels[i]);
             lookChips[i] = lk;
             selectChip(lk, i == 0);
             final String key = looks[i][1];
@@ -143,9 +149,9 @@ public final class ImageEditor {
         controls.addView(row2, row2lp);
 
         /* sliders */
-        controls.addView(slider(c, "Bright", 50, v -> { stage.brightness = (v - 50) / 50f; stage.applyFilter(); }));
-        controls.addView(slider(c, "Contrast", 50, v -> { stage.contrast = 1f + (v - 50) / 100f; stage.applyFilter(); }));
-        controls.addView(slider(c, "Colour", 50, v -> { stage.saturation = v / 50f; stage.applyFilter(); }));
+        controls.addView(slider(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_brightness), 50, v -> { stage.brightness = (v - 50) / 50f; stage.applyFilter(); }));
+        controls.addView(slider(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_contrast), 50, v -> { stage.contrast = 1f + (v - 50) / 100f; stage.applyFilter(); }));
+        controls.addView(slider(c, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_colour), 50, v -> { stage.saturation = v / 50f; stage.applyFilter(); }));
 
         apply.setOnClickListener(v -> {
             Bitmap out = stage.render(1440);
@@ -165,10 +171,13 @@ public final class ImageEditor {
         return ImageTools.recompressBase64(b64, budget);
     }
 
-    private static TextView chipBtn(Context c, String s) {
-        TextView t = Design.text(c, s.toUpperCase(), 10, 0xFFF2F1EC, Design.sansBold());
+    private static TextView chipBtn(Context c, CharSequence s) {
+        TextView t = Design.text(c, Language.upper(s), 10, 0xFFF2F1EC, Design.sansBold());
         t.setLetterSpacing(0.1f);
         t.setGravity(Gravity.CENTER);
+        t.setSingleLine(true);
+        t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        Language.description(t, s);
         t.setBackground(Design.ripple(strokeDark(c)));
         t.setClickable(true);
         return t;
@@ -193,17 +202,20 @@ public final class ImageEditor {
         }
     }
 
-    private static View slider(Context c, String label, int start, java.util.function.IntConsumer onChange) {
+    private static View slider(Context c, CharSequence label, int start, java.util.function.IntConsumer onChange) {
         LinearLayout row = new LinearLayout(c);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(-1, -2);
         rlp.topMargin = Design.dp(c, 8);
         row.setLayoutParams(rlp);
-        TextView l = Design.text(c, label.toUpperCase(), 9, 0xFF9A9A94, Design.sansBold());
+        TextView l = Design.text(c, Language.upper(label), 9, 0xFF9A9A94, Design.sansBold());
         l.setLetterSpacing(0.14f);
+        l.setSingleLine(true);
+        l.setEllipsize(android.text.TextUtils.TruncateAt.END);
         row.addView(l, new LinearLayout.LayoutParams(Design.dp(c, 70), -2));
         SeekBar sb = new SeekBar(c);
+        Language.description(sb, label);
         sb.setMax(100);
         sb.setProgress(start);
         sb.getProgressDrawable().setTint(0xFFE63312);

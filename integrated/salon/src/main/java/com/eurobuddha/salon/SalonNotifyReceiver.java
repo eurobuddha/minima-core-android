@@ -1,4 +1,5 @@
 package com.eurobuddha.salon;
+import com.eurobuddha.minimacore.i18n.Language;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -60,7 +61,7 @@ public class SalonNotifyReceiver implements DirectNodeEvents.Listener {
             if (!from.isEmpty()) {
                 String amt = coin.optString("tokenamount", coin.optString("amount", "?"));
                 String tok = TipTransport.MXUSD.equalsIgnoreCase(coin.optString("tokenid", "")) ? "mxUSD" : "MINIMA";
-                notify(ctx, "💰 Tip received", "@" + from.replaceFirst("^@", "") + " tipped you " + amt + " " + tok);
+                notify(ctx, Language.text(ctx, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_tip_received), Language.text(ctx, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_tip_from, "@" + from.replaceFirst("^@", ""), amt, tok));
             }
         } catch (Exception ignored) {}
     }
@@ -124,7 +125,8 @@ public class SalonNotifyReceiver implements DirectNodeEvents.Listener {
             if (!peerMx.isEmpty()) MailDb.get(ctx).setMxAddr(o.fromPublicId, peerMx);
             if (isNew) {
                 MailDb.get(ctx).upsertContact(o.fromPublicId, from, "", m.optString("addr", ""), preview, m.optLong("ts", 0), true);
-                notifyStatic(ctx, "💬 @" + from.replaceFirst("^@", ""), preview);
+                notifyStatic(ctx, "💬 " + (m.has("from") ? "@" + from.replaceFirst("^@", "") : Language.text(ctx, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_sender)),
+                        !body.isEmpty() ? body : (!media.isEmpty() ? Language.text(ctx, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_media) : ""));
                 // Repaint the open Messages/Thread tab. Without this a Maxima DM
                 // (or a background coin NOTIFY) only notified - it never reached
                 // the live UI, so the message sat in the DB unseen until you
@@ -144,7 +146,7 @@ public class SalonNotifyReceiver implements DirectNodeEvents.Listener {
     static void notifyStatic(Context ctx, String title, String text) {
         NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && nm != null) {
-            nm.createNotificationChannel(new NotificationChannel(CHANNEL, "Salon activity", NotificationManager.IMPORTANCE_HIGH));
+            nm.createNotificationChannel(new NotificationChannel(CHANNEL, Language.text(ctx, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_salon_channel), NotificationManager.IMPORTANCE_HIGH));
         }
         Intent open = new Intent(ctx, MainActivity.class);
         open.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);

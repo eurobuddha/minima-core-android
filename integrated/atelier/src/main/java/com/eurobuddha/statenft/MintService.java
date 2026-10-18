@@ -1,4 +1,5 @@
 package com.eurobuddha.statenft;
+import com.eurobuddha.minimacore.i18n.Language;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -28,6 +29,8 @@ public class MintService extends Service {
     private static final int NOTE_ID = 7601;
     private static final long TICK_MS = 25000;
 
+    private boolean foregroundActive;
+    private final Runnable languageChanged = this::refreshLanguageNotification;
     private NodeApi node;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private int idleTicks = 0;
@@ -89,9 +92,9 @@ public class MintService extends Service {
         Design.load(this);
         NotificationManager nm = getSystemService(NotificationManager.class);
         if (Build.VERSION.SDK_INT >= 26 && nm.getNotificationChannel(CHANNEL) == null) {
-            NotificationChannel ch = new NotificationChannel(CHANNEL, "Mint engine",
+            NotificationChannel ch = new NotificationChannel(CHANNEL, Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_mint_channel),
                     NotificationManager.IMPORTANCE_LOW);
-            ch.setDescription("Live progress while collections seal on-chain");
+            ch.setDescription(Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_mint_channel_help));
             nm.createNotificationChannel(ch);
         }
         // If the OS refuses foreground promotion, bail gracefully rather than
@@ -102,6 +105,9 @@ public class MintService extends Service {
             stopSelf();
             return;
         }
+        foregroundActive = true;
+        Language.addListener(languageChanged);
+        com.eurobuddha.minimacore.i18n.NotificationLabels.update(this);
         LocalStore.logEvent(this, "Engine service engaged — sealing continues with the app closed");
         node = new NodeApi(this, enabled -> { if (enabled) handler.post(tick); });
         handler.postDelayed(tick, 4000);
@@ -135,6 +141,8 @@ public class MintService extends Service {
     }
 
     @Override public void onDestroy() {
+        foregroundActive = false;
+        Language.removeListener(languageChanged);
         handler.removeCallbacks(tick);
         if (node != null) node.onDestroy();
         super.onDestroy();
@@ -142,27 +150,51 @@ public class MintService extends Service {
 
     @Override public IBinder onBind(Intent intent) { return null; }
 
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        refreshLanguageNotification();
+    }
+
+    private void refreshLanguageNotification() {
+        if (!foregroundActive) return;
+        com.eurobuddha.minimacore.i18n.NotificationLabels.update(this);
+        updateNotification();
+    }
+
     private void updateNotification() {
+        if (!foregroundActive) return;
         NotificationManager nm = getSystemService(NotificationManager.class);
-        if (nm != null) nm.notify(NOTE_ID, buildNotification());
+        if (nm != null) {
+            try { nm.notify(NOTE_ID, buildNotification()); }
+            catch (SecurityException denied) { /* Notification permission changed. */ }
+        }
+    }
+
+    private String phaseLabel(String phase) {
+        switch (phase) {
+            case "CREATE": return Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_phase_create);
+            case "MOVE": return Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_phase_move);
+            case "SPLIT": return Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_phase_split);
+            case "STAMP": return Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_phase_stamp);
+            default: return phase;
+        }
     }
 
     private Notification buildNotification() {
-        String title = "Atelier — mint engine";
-        String text = "Watching the chain…";
+        String title = Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_mint_title);
+        String text = Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_watching_chain);
         JSONArray rows = LocalStore.load(this);
         for (int i = 0; i < rows.length(); i++) {
             JSONObject r = rows.optJSONObject(i);
             if (r == null) continue;
             String p = r.optString("phase", "DONE");
             if ("CREATE".equals(p) || "MOVE".equals(p) || "SPLIT".equals(p) || "STAMP".equals(p)) {
-                text = "Sealing “" + r.optString("name", "collection") + "” — "
-                        + r.optInt("minted", 0) + "/" + r.optInt("size", 0)
-                        + " · " + p.toLowerCase();
+                text = Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_sealing, r.optString("name", Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_nft_collection)), r.optInt("minted", 0), r.optInt("size", 0), phaseLabel(p));
                 break;
             }
             if ("NEEDIMAGES".equals(p)) {
-                text = "“" + r.optString("name", "collection") + "” needs images to continue";
+                text = Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_creative_needs_images, r.optString("name", Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_nft_collection)));
                 break;
             }
         }

@@ -11,6 +11,8 @@ public final class NotificationLabels {
     public static void update(Context context) {
         NotificationManager manager = context.getSystemService(NotificationManager.class);
         if (manager == null) return;
+        update(context, manager, "mint_engine", R.string.l10n_creative_mint_channel, R.string.l10n_creative_mint_channel_help);
+        update(context, manager, "salon_activity", R.string.l10n_creative_salon_channel, 0);
         update(context, manager, "MinimaServiceChannel", R.string.l10n_notification_node, 0);
         update(context, manager, "MinimaHealthChannel", R.string.l10n_notification_health, R.string.l10n_notification_health_help);
         update(context, manager, "MinimaChatChannel", R.string.l10n_notification_chat, R.string.l10n_notification_chat_help);

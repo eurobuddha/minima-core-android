@@ -6608,4 +6608,75 @@
     <string name="l10n_creative_first_piece" formatted="false">"在工作室创建第一件作品，或导入钱包中已有的 StateNFT 合集。"</string>
     <!-- Arguments: version -->
     <string name="l10n_creative_subtitle">"Minima NFT 工作室 · № %1$s"</string>
+    <string name="l10n_creative_mint_channel" formatted="false">"铸造引擎"</string>
+    <string name="l10n_creative_mint_channel_help" formatted="false">"在链上封存藏品集时显示实时进度"</string>
+    <string name="l10n_creative_mint_title" formatted="false">"Atelier — 铸造引擎"</string>
+    <string name="l10n_creative_watching_chain" formatted="false">"正在监测区块链…"</string>
+    <!-- Arguments: name, minted, size, phase -->
+    <string name="l10n_creative_sealing">"正在封存“%1$s” — %2$s/%3$s · %4$s"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_creative_needs_images">"“%1$s”需要图片才能继续"</string>
+    <string name="l10n_creative_phase_create" formatted="false">"创建中"</string>
+    <string name="l10n_creative_phase_move" formatted="false">"转移中"</string>
+    <string name="l10n_creative_phase_split" formatted="false">"拆分中"</string>
+    <string name="l10n_creative_phase_stamp" formatted="false">"写入标记中"</string>
+    <string name="l10n_creative_salon_channel" formatted="false">"Salon 动态"</string>
+    <string name="l10n_creative_tip_received" formatted="false">"💰 已收到打赏"</string>
+    <!-- Arguments: sender, amount, token -->
+    <string name="l10n_creative_tip_from">"%1$s 向您打赏了 %2$s %3$s"</string>
+    <string name="l10n_creative_sender" formatted="false">"有人"</string>
+    <string name="l10n_creative_media" formatted="false">"📎 媒体"</string>
+    <string name="l10n_creative_lot_info" formatted="false">"作品 ⓘ"</string>
+    <string name="l10n_creative_not_validated" formatted="false">"尚未验证"</string>
+    <string name="l10n_creative_links" formatted="false">"链接"</string>
+    <string name="l10n_creative_web_validate" formatted="false">"网页验证"</string>
+    <string name="l10n_creative_image_base" formatted="false">"图片基础网址"</string>
+    <string name="l10n_creative_icon" formatted="false">"图标"</string>
+    <string name="l10n_creative_none_set" formatted="false">"未设置"</string>
+    <string name="l10n_creative_url_hosted" formatted="false">"托管于网址"</string>
+    <string name="l10n_creative_embedded" formatted="false">"嵌入式"</string>
+    <string name="l10n_creative_editions" formatted="false">"版数"</string>
+    <string name="l10n_creative_file_type" formatted="false">"文件类型"</string>
+    <string name="l10n_creative_port_zero" formatted="false">"状态端口 0"</string>
+    <string name="l10n_creative_port_one" formatted="false">"状态端口 1"</string>
+    <string name="l10n_creative_creator_key" formatted="false">"创作者密钥"</string>
+    <string name="l10n_creative_creator_address" formatted="false">"创作者地址"</string>
+    <string name="l10n_creative_locked_edition" formatted="false">"已锁定版本"</string>
+    <string name="l10n_creative_locked_verified" formatted="false">"已锁定 · 网页已验证"</string>
+    <string name="l10n_creative_locked_validation" formatted="false">"已锁定 + 网页验证"</string>
+    <string name="l10n_creative_open_link_failed" formatted="false">"无法打开链接"</string>
+    <string name="l10n_creative_saved_photos" formatted="false">"已保存到相册"</string>
+    <string name="l10n_creative_save_image_failed" formatted="false">"无法保存图片"</string>
+    <string name="l10n_creative_share_image_failed" formatted="false">"无法分享图片"</string>
+    <!-- Arguments: index, total -->
+    <string name="l10n_creative_lot_position">"作品 %1$s / %2$s"</string>
+    <!-- Arguments: index, custody -->
+    <string name="l10n_creative_lot_custody">"作品 %1$s · %2$s"</string>
+    <string name="l10n_creative_in_custody" formatted="false">"由您持有"</string>
+    <string name="l10n_creative_on_chain" formatted="false">"链上"</string>
+    <string name="l10n_creative_unseen" formatted="false">"未找到"</string>
+    <!-- Arguments: id -->
+    <string name="l10n_creative_coin_hash">"代币 %1$s"</string>
+    <!-- Arguments: id -->
+    <string name="l10n_creative_token_hash">"通证 %1$s"</string>
+    <!-- Arguments: length -->
+    <string name="l10n_creative_embedded_length">"嵌入图片（%1$s 个字符）"</string>
+    <string name="l10n_creative_verified_badge" formatted="false">"✓ 网页已验证"</string>
+    <string name="l10n_creative_validation_badge" formatted="false">"○ 网页验证"</string>
+    <!-- Arguments: name, index, token -->
+    <string name="l10n_creative_share_lot_caption">"%1$s — 作品 %2$s · Minima StateNFT %3$s"</string>
+    <string name="l10n_creative_share_lot" formatted="false">"分享作品"</string>
+    <string name="l10n_creative_choose_image" formatted="false">"选择图片"</string>
+    <string name="l10n_creative_plate_room" formatted="false">"图像编辑室"</string>
+    <string name="l10n_creative_seal_crop" formatted="false">"应用裁剪"</string>
+    <string name="l10n_creative_free_crop" formatted="false">"自由"</string>
+    <string name="l10n_creative_brightness" formatted="false">"亮度"</string>
+    <string name="l10n_creative_contrast" formatted="false">"对比度"</string>
+    <string name="l10n_creative_colour" formatted="false">"色彩"</string>
+    <string name="l10n_creative_look_none" formatted="false">"无"</string>
+    <string name="l10n_creative_look_noir" formatted="false">"黑白"</string>
+    <string name="l10n_creative_look_vivid" formatted="false">"鲜艳"</string>
+    <string name="l10n_creative_look_warm" formatted="false">"暖色"</string>
+    <string name="l10n_creative_look_fade" formatted="false">"褪色"</string>
+    <string name="l10n_creative_rotate90" formatted="false">"旋转 90 度"</string>
 </resources>
