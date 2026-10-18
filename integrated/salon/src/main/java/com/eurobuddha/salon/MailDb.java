@@ -16,23 +16,24 @@ import java.util.List;
  */
 final class MailDb extends SQLiteOpenHelper {
 
+    private static final String PROCESS = java.util.UUID.randomUUID().toString();
     private static MailDb INSTANCE;
     static synchronized MailDb get(Context c) {
         if (INSTANCE == null) INSTANCE = new MailDb(c.getApplicationContext());
         return INSTANCE;
     }
 
-    private MailDb(Context c) { super(c, "salon_mail", null, 4); }
+    private MailDb(Context c) { super(c, "salon_mail", null, 5); }
 
     /** Delivery status of an outgoing message. Inbound messages are always SENT. */
-    static final int SENT = 1, PENDING = 0;
+    static final int SENT = 1, PENDING = 0, UNCERTAIN = 2;
 
     @Override public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE contacts(peerpk TEXT PRIMARY KEY, handle TEXT, avatar TEXT, addr TEXT, "
                 + "mxaddr TEXT, lastbody TEXT, lastts INTEGER, unread INTEGER DEFAULT 0)");
         db.execSQL("CREATE TABLE messages(coinid TEXT PRIMARY KEY, peerpk TEXT, mine INTEGER, body TEXT, "
                 + "media TEXT, mime TEXT, ts INTEGER, valid INTEGER, status INTEGER DEFAULT 1, "
-                + "replybody TEXT, replyfrom TEXT)");
+                + "replybody TEXT, replyfrom TEXT, sender TEXT, wire TEXT, delivery TEXT, destination TEXT, attempt TEXT, phase TEXT)");
         db.execSQL("CREATE INDEX ix_msg_peer ON messages(peerpk, ts)");
     }
     @Override public void onUpgrade(SQLiteDatabase db, int o, int n) {
@@ -42,6 +43,12 @@ final class MailDb extends SQLiteOpenHelper {
         // v3: per-message delivery status. Existing rows default to SENT (1) so
         // history isn't retroactively marked pending.
         if (o < 3) db.execSQL("ALTER TABLE messages ADD COLUMN status INTEGER DEFAULT 1");
+        if (o < 5) {
+            for (String col : new String[]{"sender", "wire", "delivery", "destination", "attempt", "phase"})
+                db.execSQL("ALTER TABLE messages ADD COLUMN " + col + " TEXT");
+            // Old rows lack a verifiable sender/route and may already have reached the chain.
+            db.execSQL("UPDATE messages SET status=2 WHERE mine=1 AND status=0");
+        }
         // v4: quoted-reply snapshot (denormalised: the reply carries a copy of the
         // parent's text + author, so rendering the quote needs no cross-device lookup).
         if (o < 4) {
@@ -50,8 +57,21 @@ final class MailDb extends SQLiteOpenHelper {
         }
     }
 
+    @Override public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        // A previous process cannot retain a live Maxima callback. Stable wire IDs dedup retries.
+        // Chain attempts stay UNCERTAIN: process restart is never evidence they were rejected.
+        if(!db.isReadOnly()) db.execSQL("UPDATE messages SET phase='queued',attempt='' WHERE delivery='maxima' AND phase='sending' AND status=0 AND attempt NOT LIKE ?",new Object[]{PROCESS+":%"});
+    }
+
     static final class Contact { String peerpk, handle, avatar, addr, mxaddr, lastbody; long lastts; int unread; }
-    static final class Message { String coinid, peerpk, body, media, mime, replyBody, replyFrom; boolean mine, valid; long ts; int status = SENT; }
+    static final class Message { String coinid, peerpk, body, media, mime, replyBody, replyFrom, sender, wire, delivery, destination, attempt, phase; boolean mine, valid; long ts; int status = SENT; }
+
+    Message message(String coinid) {
+        try(Cursor cur=getReadableDatabase().rawQuery(
+                "SELECT coinid,peerpk,mine,body,media,mime,ts,valid,status,replybody,replyfrom,sender,wire,delivery,destination,attempt,phase FROM messages WHERE coinid=?",
+                new String[]{coinid})) { return cur.moveToFirst()?readMsg(cur):null; }
+    }
 
     /** Insert a message; returns true if new (dedup by coinid). */
     boolean insert(String coinid, String peerpk, boolean mine, String body, String media, String mime, long ts, boolean valid) {
@@ -71,6 +91,45 @@ final class MailDb extends SQLiteOpenHelper {
         return row != -1;   // -1 = the row already existed (conflict ignored) → not new
     }
 
+    /** Store the exact wire payload, reply and contact update in one SQLite transaction. */
+    boolean enqueue(Message m, Contact contact) {
+        if (m.sender==null || m.sender.isEmpty() || m.wire==null || m.wire.isEmpty()
+                || !("maxima".equals(m.delivery) || "chain".equals(m.delivery))) return false;
+        SQLiteDatabase db=getWritableDatabase();db.beginTransaction();
+        try {
+            if (!insert(m.coinid,m.peerpk,true,m.body,m.media,m.mime,m.ts,true,PENDING)) return false;
+            ContentValues v=new ContentValues();
+            v.put("sender",m.sender);v.put("wire",m.wire);v.put("delivery",m.delivery);v.put("destination",m.destination);
+            v.put("attempt","");v.put("phase","queued");v.put("replybody",m.replyBody);v.put("replyfrom",m.replyFrom);
+            if(db.update("messages",v,"coinid=?",new String[]{m.coinid})!=1) return false;
+            upsertContact(m.peerpk,contact.handle,contact.avatar,contact.addr,
+                    m.body.isEmpty()?"📎 media":m.body,m.ts,false);
+            db.setTransactionSuccessful();return true;
+        } finally { db.endTransaction(); }
+    }
+
+    /** One durable claim across Activity instances; chain attempts stop being retryable before send. */
+    boolean beginAttempt(Message m) {
+        String attempt=PROCESS+":"+java.util.UUID.randomUUID();
+        ContentValues v=new ContentValues();v.put("attempt",attempt);v.put("phase","sending");
+        if("chain".equals(m.delivery)) v.put("status",UNCERTAIN);
+        int changed=getWritableDatabase().update("messages",v,
+                "coinid=? AND sender=? AND wire=? AND delivery=? AND phase='queued' AND status=0",
+                new String[]{m.coinid,m.sender,m.wire,m.delivery});
+        if(changed!=1)return false;m.attempt=attempt;return true;
+    }
+
+    /** Only the callback for this durable attempt may complete it. */
+    boolean finishAttempt(Message m,String attempt,boolean accepted) {
+        ContentValues v=new ContentValues();
+        boolean chain="chain".equals(m.delivery);
+        v.put("status",accepted?SENT:chain?UNCERTAIN:PENDING);
+        v.put("phase",accepted?"done":chain?"unknown":"queued");
+        return getWritableDatabase().update("messages",v,
+                "coinid=? AND sender=? AND attempt=? AND phase='sending'",
+                new String[]{m.coinid,m.sender,attempt})==1;
+    }
+
     /** Mark an outgoing message SENT (delivery confirmed / posted). */
     void setStatus(String coinid, int status) {
         ContentValues v = new ContentValues(); v.put("status", status);
@@ -81,8 +140,8 @@ final class MailDb extends SQLiteOpenHelper {
     List<Message> pendingOutbox() {
         List<Message> out = new ArrayList<>();
         Cursor cur = getReadableDatabase().rawQuery(
-                "SELECT coinid,peerpk,mine,body,media,mime,ts,valid,status,replybody,replyfrom FROM messages "
-                + "WHERE mine=1 AND status=" + PENDING + " ORDER BY ts ASC", null);
+                "SELECT coinid,peerpk,mine,body,media,mime,ts,valid,status,replybody,replyfrom,sender,wire,delivery,destination,attempt,phase FROM messages "
+                + "WHERE mine=1 AND status=" + PENDING + " AND phase='queued' ORDER BY ts ASC", null);
         while (cur.moveToNext()) out.add(readMsg(cur));
         cur.close();
         return out;
@@ -134,7 +193,7 @@ final class MailDb extends SQLiteOpenHelper {
     List<Message> messages(String peerpk) {
         List<Message> out = new ArrayList<>();
         Cursor cur = getReadableDatabase().rawQuery(
-                "SELECT coinid,peerpk,mine,body,media,mime,ts,valid,status,replybody,replyfrom FROM messages WHERE peerpk=? ORDER BY ts ASC", new String[]{peerpk});
+                "SELECT coinid,peerpk,mine,body,media,mime,ts,valid,status,replybody,replyfrom,sender,wire,delivery,destination,attempt,phase FROM messages WHERE peerpk=? ORDER BY ts ASC", new String[]{peerpk});
         while (cur.moveToNext()) out.add(readMsg(cur));
         cur.close();
         return out;
@@ -145,7 +204,7 @@ final class MailDb extends SQLiteOpenHelper {
     List<Message> messages(String peerpk, int limit) {
         List<Message> out = new ArrayList<>();
         Cursor cur = getReadableDatabase().rawQuery(
-                "SELECT coinid,peerpk,mine,body,media,mime,ts,valid,status,replybody,replyfrom FROM messages WHERE peerpk=? ORDER BY ts DESC LIMIT ?",
+                "SELECT coinid,peerpk,mine,body,media,mime,ts,valid,status,replybody,replyfrom,sender,wire,delivery,destination,attempt,phase FROM messages WHERE peerpk=? ORDER BY ts DESC LIMIT ?",
                 new String[]{peerpk, String.valueOf(limit)});
         while (cur.moveToNext()) out.add(readMsg(cur));
         cur.close();
@@ -167,6 +226,10 @@ final class MailDb extends SQLiteOpenHelper {
         m.status = cur.getColumnCount() > 8 ? cur.getInt(8) : SENT;
         m.replyBody = cur.getColumnCount() > 9 ? cur.getString(9) : null;
         m.replyFrom = cur.getColumnCount() > 10 ? cur.getString(10) : null;
+        if (cur.getColumnCount() > 16) {
+            m.sender=cur.getString(11); m.wire=cur.getString(12); m.delivery=cur.getString(13);
+            m.destination=cur.getString(14); m.attempt=cur.getString(15); m.phase=cur.getString(16);
+        }
         return m;
     }
 

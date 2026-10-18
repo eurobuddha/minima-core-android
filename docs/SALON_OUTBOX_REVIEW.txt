@@ -1,0 +1,101 @@
+Salon outgoing-message review — 2026-10-19, source 1.9.90/161
+
+Summary
+Outgoing DMs now retain the sender, complete wire payload, selected transport and
+on-chain destination accepted at enqueue time. The existing SQLite message store
+owns each send attempt. Later account/transport changes cannot silently rewrite a
+queued message or turn a Maxima message into a paid on-chain send. Uncertain chain
+attempts remain visible and require explicit review before sending a new copy.
+
+Reuse inspected and retained
+- Standalone and integrated Salon MailDb, MinimaMail, MaximaLink, sendDm/retryOutbox/
+  coinSendDm, reply/media callers, and chat/media language tests.
+- apks/mail CommsDb and MailMessage: persistent sender identity and authored payload
+  fields; the existing wire encoder remains Salon's MinimaMail.compose.
+- Existing Salon SQLite insert/conflict handling, contact updates and reply fields;
+  these are now grouped in a transaction for outgoing enqueue.
+- Atelier AirdropEngine's durable state before non-idempotent dispatch, and its
+  unconfirmed-outcome rule. Its StateNFT transaction construction is not imported.
+- SalonComms locking/identity checks, LanguageDialog, current callback guards and
+  existing strict Boolean node-result checks. No new dependencies or transport.
+
+Findings resolved
+CRITICAL — Retrying rebuilt the message from the current account and current
+transport preference. A restored messaging key could sign old private text as a
+new sender; changing routing could also move a queued Maxima message onto chain.
+The queue now stores the original public sender identity, authored payload, stable
+message ID, mode and destination before clearing the composer. It checks both the
+stored current identity and actual crypto provider before sealing. Maxima can learn
+updated routes for the same peer; it never falls back to chain. Preference changes
+affect future messages. The on-chain address is captured at enqueue.
+
+MAJOR — Outgoing row, quoted reply and contact preview were separate writes, and
+an insert failure could still clear the draft. A SQLite transaction saves all of
+these plus the delivery record. Failure rolls back and preserves the draft/quote.
+New message IDs use UUIDs to avoid same-millisecond text/hash collisions.
+
+MAJOR — In-flight and chain retry bookkeeping lived only in an Activity. A timer
+or process restart could repost an already accepted paid send. Conditional SQLite
+updates claim each attempt once. A chain row becomes UNCERTAIN before dispatch and
+is excluded from automatic retry. Callback completion requires its captured,
+immutable attempt ID, preventing an old callback from completing a later attempt.
+SENT continues to mean transport acceptance/posting; it does not prove peer delivery
+or chain confirmation. Node acceptance requires actual Boolean status/pending.
+
+Maxima retries keep the original stable wire ID, so the recipient's existing dedup
+still applies. A process-specific attempt prefix allows startup to recover only
+Maxima sends from an earlier process; reopening the database in the same process
+does not steal a live attempt. Old callbacks cannot reset or complete newer sends.
+
+Compatibility and user recovery
+SQLite schema 5 adds delivery fields without deleting history or contacts. Existing
+pending rows lack sender/route evidence and may already have been posted; migration
+keeps their contents and marks them unconfirmed for review. Sent/inbound rows keep
+their previous status. Version-4 APKs do not have downgrade support for this schema;
+rolling code back requires retaining the version-5 database reader/migration.
+No release has been installed during this work.
+
+Unconfirmed rows and rows waiting for another sender key offer a four-language
+review dialog. It names the chosen transport and warns that an earlier copy may
+still arrive. Only the positive action queues a new copy using the current identity.
+It preserves the current composer/quote, checks account/thread/screen ownership and
+refuses stale consent after the earlier row has succeeded. Normal queued messages
+continue automatic retry over their saved Maxima route; no consent is needed for
+that already-authorized delivery. Six new messages cover state, sender and review.
+No credentials or private keys are added to the database; message bodies were
+already stored locally and the saved wire payload contains the same authored data.
+
+Validation
+- Full combined run passed in 2m 15s: Salon 333, Atelier 288, localization 12,
+  Pandamonium host 158 = 791 tests; zero failures/errors/skips. Release Java
+  compilation passed. Existing chat/media language coverage remains in place.
+- Sixteen new outbox tests use disposable SQLite plus mocked crypto/node/Maxima.
+  They cover frozen payload/sender/route, stable IDs, changed keys/preferences,
+  duplicate/late callbacks, durable single-attempt claims, failed enqueue rollback,
+  chain uncertainty and restart, process-specific Maxima recovery, four-language
+  review, retained composer/quote, stale consent, and success arriving during review.
+- After that full run, migration cases were expanded from schema 4 to every earlier
+  schema (1–4) and the translated warning body assertion was added. The same 16-test
+  outbox class passed again in 11s. Production source did not change after the full run.
+- All 21 imports reproduce the final source and tests. All 6840 messages validate
+  in English, Simplified Chinese, Russian and Ukrainian. Direct-transport and
+  whitespace checks pass. Browser assets are unchanged.
+- Evidence: build/localization/salon-outbox-{targeted,full,migration,import}.log and
+  salon-outbox-results.json. The final targeted task replaces Salon's full XML
+  report; the sidecar retains the full-run counts inspected before that task.
+- Initial failures exposed test fixtures that mocked the static SQLite row decoder
+  and expected the superseded transport-switching policy. Fixtures now exercise
+  real row decoding; route tests explicitly require the original saved transport.
+
+Limits and remaining scope
+Process recovery is exercised with persisted previous-process attempt records and
+fresh helper instances, not physical power-cut testing. An already handed-off
+message cannot be recalled. Explicit resend can deliver two copies, as stated in
+the dialog. Account ownership of inbound scans, tip callbacks and hosting trust
+confirmation remains in the next integration audit. The final label audit, signed
+APK contents and Fold acceptance also remain. No live message, token transaction,
+key operation, device installation or public release was performed.
+
+Verdict
+Approve this outbox change after the recorded verification. The full Atelier/Salon
+integration goal remains active and incomplete.

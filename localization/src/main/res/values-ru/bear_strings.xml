@@ -8333,4 +8333,11 @@
     <string name="l10n_salon_claim_retry_title" formatted="false">"Разрешить новую попытку"</string>
     <string name="l10n_salon_claim_retry_warning" formatted="false">"Предыдущий запрос ещё может выполниться. Новая попытка может создать дополнительный токен идентификатора. Сначала проверьте кошелёк узла. Это только разблокирует создание профиля; ничего не отправляется."</string>
     <string name="l10n_salon_claim_retry_ready" formatted="false">"Новая попытка разрешена. Когда будете готовы, нажмите кнопку создания профиля."</string>
+    <string name="l10n_salon_outbox_storage" formatted="false">"Не удалось сохранить состояние сообщения. Если оно не попало в очередь, черновик сохранён."</string>
+    <string name="l10n_salon_outbox_unknown" formatted="false">"Доставка не подтверждена · нажмите для проверки"</string>
+    <string name="l10n_salon_outbox_owner" formatted="false">"Ожидание исходного ключа переписки · нажмите для проверки"</string>
+    <string name="l10n_salon_outbox_review" formatted="false">"Проверить ожидающее сообщение"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_salon_outbox_warning">"Отправить новую копию с текущим ключом переписки через %1$s? Предыдущая отправка ещё может дойти, и получатель получит обе копии. Текущий черновик и цитата сохранятся."</string>
+    <string name="l10n_salon_outbox_copy" formatted="false">"Отправить новую копию"</string>
 </resources>

@@ -8225,4 +8225,11 @@
     <string name="l10n_salon_claim_retry_title" formatted="false">"允许再次尝试"</string>
     <string name="l10n_salon_claim_retry_warning" formatted="false">"先前的请求仍可能完成。再次尝试可能会创建额外的身份代币。请先检查节点钱包。此操作仅解除申请按钮的限制，不会发送任何请求。"</string>
     <string name="l10n_salon_claim_retry_ready" formatted="false">"现在可以再次尝试。准备好后，请点击申请按钮。"</string>
+    <string name="l10n_salon_outbox_storage" formatted="false">"无法保存消息状态。如果消息尚未加入队列，草稿已保留。"</string>
+    <string name="l10n_salon_outbox_unknown" formatted="false">"发送结果未确认 · 点按查看"</string>
+    <string name="l10n_salon_outbox_owner" formatted="false">"正在等待原消息身份 · 点按查看"</string>
+    <string name="l10n_salon_outbox_review" formatted="false">"查看待处理消息"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_salon_outbox_warning">"使用当前消息身份通过 %1$s 发送新副本吗？先前的发送仍可能到达，因此收件人可能收到两份。当前草稿和引用将被保留。"</string>
+    <string name="l10n_salon_outbox_copy" formatted="false">"发送新副本"</string>
 </resources>

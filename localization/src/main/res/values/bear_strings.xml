@@ -8261,4 +8261,11 @@
     <string name="l10n_salon_claim_retry_title" formatted="false">"Allow another attempt"</string>
     <string name="l10n_salon_claim_retry_warning" formatted="false">"The earlier request may still complete. Another attempt could create an extra identity token. Check the node wallet first. This only unlocks the Claim button; it sends nothing."</string>
     <string name="l10n_salon_claim_retry_ready" formatted="false">"Another attempt is now allowed. Use Claim when ready."</string>
+    <string name="l10n_salon_outbox_storage" formatted="false">"Could not save the message state. Your draft was kept if it was not queued."</string>
+    <string name="l10n_salon_outbox_unknown" formatted="false">"Delivery unconfirmed · tap to review"</string>
+    <string name="l10n_salon_outbox_owner" formatted="false">"Waiting for the original messaging identity · tap to review"</string>
+    <string name="l10n_salon_outbox_review" formatted="false">"Review pending message"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_salon_outbox_warning">"Send a new copy using your current messaging identity via %1$s? The earlier attempt may still arrive, so the recipient could receive both. Your current draft and quote will be kept."</string>
+    <string name="l10n_salon_outbox_copy" formatted="false">"Send new copy"</string>
 </resources>

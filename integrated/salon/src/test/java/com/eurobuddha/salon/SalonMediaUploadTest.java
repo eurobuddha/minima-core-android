@@ -84,9 +84,11 @@ public class SalonMediaUploadTest {
         pick(41);result(41);job();HostingStore.upsert(activity,new Hosting.Profile(new JSONObject(host.j.toString()).put("name","New destination")));job();hosts.verify(()->Hosting.forProfile(any(Hosting.Profile.class)),never());assertNull(field("activeMediaUpload").get(activity));
     }
     @Test public void photoCannotSendToChangedPeerAndUnsentTextSurvivesValidSend()throws Exception{
+        try(MockedStatic<SalonComms> identity=mockStatic(SalonComms.class)){identity.when(()->SalonComms.publicId(activity)).thenReturn("owner-public");when(db.enqueue(any(),any())).thenReturn(true);
         screen("THREAD");set("threadPeer","alice");set("threadDraft","Unsent text 中文");MailDb.Contact alice=new MailDb.Contact();alice.peerpk="alice";alice.handle="alice";alice.mxaddr="MAX#route";alice.addr="";when(db.contact("alice")).thenReturn(alice);
-        pick(46);result(46);job();set("threadPeer","bob");job();verify(db,never()).insert(anyString(),anyString(),anyBoolean(),anyString(),anyString(),anyString(),anyLong(),anyBoolean(),anyInt());verify(uploader).close();
-        set("threadPeer","alice");pick(46);result(46);job();job();verify(db).insert(anyString(),eq("alice"),eq(true),eq(""),eq("https://example.invalid/uploaded.jpg"),eq("image/jpeg"),anyLong(),eq(true),eq(MailDb.PENDING));assertEquals("Unsent text 中文",field("threadDraft").get(activity));verify(uploader,times(2)).close();
+        pick(46);result(46);job();set("threadPeer","bob");job();verify(db,never()).enqueue(any(),any());verify(uploader).close();
+        set("threadPeer","alice");pick(46);result(46);job();job();verify(db).enqueue(argThat(m->"alice".equals(m.peerpk)&&m.body.isEmpty()&&"https://example.invalid/uploaded.jpg".equals(m.media)&&"image/jpeg".equals(m.mime)),eq(alice));assertEquals("Unsent text 中文",field("threadDraft").get(activity));verify(uploader,times(2)).close();
+        }
     }
     @Test public void uploadFailuresCloseTransportAndRetainTranslatedFailureStatus()throws Exception{
         pick(42);result(42);job();when(uploader.putFile(any(byte[].class),anyString(),anyString())).thenThrow(new Hosting.HostingException("backend detail"));job();verify(uploader).close();assertNull(field("activeMediaUpload").get(activity));assertEquals("",SalonStore.get(activity,"banner"));

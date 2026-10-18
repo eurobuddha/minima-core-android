@@ -50,10 +50,10 @@ final class MinimaMail {
         String state = "{\"99\":\"0x" + sealedHex + "\"}";
         node.cmd("send amount:" + AMOUNT + " address:" + toAddress + " state:" + state, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
-                if (j.optBoolean("status", false) || j.optBoolean("pending", false)) {
+                if (j != null && (Boolean.TRUE.equals(j.opt("status")) || Boolean.TRUE.equals(j.opt("pending")))) {
                     JSONObject r = j.optJSONObject("response");
                     cb.onSent(r != null ? r.optString("txpowid", "") : "");
-                } else cb.onFailed(j.optString("error", "the node rejected the message"));
+                } else cb.onFailed(j == null ? "message outcome unconfirmed" : j.optString("error", "the node rejected the message"));
             }
             @Override public void onError(String m) { cb.onFailed(m); }
         });
