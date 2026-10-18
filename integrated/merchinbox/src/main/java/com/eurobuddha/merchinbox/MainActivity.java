@@ -780,7 +780,11 @@ public class MainActivity extends AppCompatActivity {
         txBusy = true;
         job.run();
     }
-    private void txDone() { txBusy = false; pumpTxQueue(); }
+    private void txDone() {
+        txBusy = false;
+        if (isFinishing() || isDestroyed()) { txQueue.clear(); return; }
+        pumpTxQueue();
+    }
 
     private void deliverFailed(MerchDb.Order o, String key, String msg, boolean auto) {
         nftSending.remove(key);
@@ -789,25 +793,68 @@ public class MainActivity extends AppCompatActivity {
         refreshOrderIfTopmost(o.ref);
     }
 
-    private void markSentAndMaybeAdvance(final MerchDb.Order o, final String key, final String txid, final boolean auto) {
-        io.execute(() -> {
-            db.setMeta("nftsent:" + key, txid == null || txid.isEmpty() ? "sent" : txid);
-            MerchDb.Order fresh = db.order(o.ref);
-            boolean all = fresh != null;
-            if (fresh != null) for (String[] l : nftLines(fresh)) {
-                if (db.getMeta("nftsent:" + lineKey(o.ref, l), "").isEmpty()) { all = false; break; }
-            }
-            final boolean advance = all
-                    && (MerchDb.PAID.equals(fresh.status) || MerchDb.CONFIRMED.equals(fresh.status));
-            final MerchDb.Order forStatus = fresh;
-            ui.post(() -> {
-                nftSending.remove(key);
-                if (auto) notifyDelivery(o.ref, true, txid);
-                else toast(Language.msg(l10n_mall_inbox_sent));
-                if (advance) advanceStatus(forStatus, MerchDb.SHIPPED, auto);
-                else refreshOrderIfTopmost(o.ref);
+    /** A write failure after a post has an unknown outcome: keep this line locked in this host. */
+    private void deliveryStorageFailed(MerchDb.Order o, String key, boolean auto) {
+        if (isFinishing() || isDestroyed()) return;
+        // Do not use deliverFailed: that clears nftSending and enables another transfer.
+        CharSequence message = Language.msg(l10n_mall_inbox_storage_unconfirmed);
+        if (auto) notifyDelivery(o.ref, false, message);
+        else toast(message);
+    }
+
+    /** Serialize post-record persistence with the txn queue; never start confirmation before it succeeds. */
+    private void recordPostedDelivery(MerchDb.Order o, String key, String value, boolean auto, Runnable recorded) {
+        try {
+            io.execute(() -> {
+                boolean saved;
+                try { saved = db.setMetaChecked("nftposted:" + key, value); }
+                catch (RuntimeException unavailable) { saved = false; }
+                final boolean stored = saved;
+                ui.post(() -> {
+                    txDone();
+                    if (isFinishing() || isDestroyed()) return;
+                    if (!stored) { deliveryStorageFailed(o, key, auto); return; }
+                    recorded.run();
+                });
             });
-        });
+        } catch (java.util.concurrent.RejectedExecutionException closed) {
+            txDone();
+            deliveryStorageFailed(o, key, auto);
+        }
+    }
+
+    private void markSentAndMaybeAdvance(final MerchDb.Order o, final String key, final String txid, final boolean auto) {
+        try {
+            io.execute(() -> {
+                final MerchDb.Order fresh;
+                final boolean advance;
+                try {
+                    if (!db.setMetaChecked("nftsent:" + key, txid == null || txid.isEmpty() ? "sent" : txid)) {
+                        ui.post(() -> deliveryStorageFailed(o, key, auto));
+                        return;
+                    }
+                    fresh = db.order(o.ref);
+                    boolean all = fresh != null;
+                    if (fresh != null) for (String[] l : nftLines(fresh)) {
+                        if (db.getMeta("nftsent:" + lineKey(o.ref, l), "").isEmpty()) { all = false; break; }
+                    }
+                    advance = all && (MerchDb.PAID.equals(fresh.status) || MerchDb.CONFIRMED.equals(fresh.status));
+                } catch (RuntimeException unavailable) {
+                    ui.post(() -> deliveryStorageFailed(o, key, auto));
+                    return;
+                }
+                ui.post(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    nftSending.remove(key);
+                    if (auto) notifyDelivery(o.ref, true, txid);
+                    else toast(Language.msg(l10n_mall_inbox_sent));
+                    if (advance) advanceStatus(fresh, MerchDb.SHIPPED, auto);
+                    else refreshOrderIfTopmost(o.ref);
+                });
+            });
+        } catch (java.util.concurrent.RejectedExecutionException closed) {
+            deliveryStorageFailed(o, key, auto);
+        }
     }
 
     /** Transfer the exact coin carrying edition #idx to the buyer, replaying every state port, then
@@ -872,9 +919,8 @@ public class MainActivity extends AppCompatActivity {
                     if (r != null) txid = r.optString("txpowid", "");
                 }
                 final String postedVal = txid.isEmpty() ? "posted" : txid;
-                io.execute(() -> db.setMeta("nftposted:" + key, postedVal));
-                txDone();
-                watchDeparture(o, key, tokenid, coinid, postedVal, auto, 0);
+                recordPostedDelivery(o, key, postedVal, auto,
+                        () -> watchDeparture(o, key, tokenid, coinid, postedVal, auto, 0));
             }
             @Override public void fail(String message) {
                 txDone();
@@ -932,13 +978,13 @@ public class MainActivity extends AppCompatActivity {
                                     final List<JSONObject> coins, final int i,
                                     final List<String> postedIds, final String[] firstError, final boolean auto) {
         if (i >= coins.size()) {
-            txDone();
             if (postedIds.isEmpty()) {
+                txDone();
                 deliverFailed(o, key, firstError[0] == null ? "no transfers could be posted" : firstError[0], auto);
                 return;
             }
-            io.execute(() -> db.setMeta("nftposted:" + key, "posted"));
-            watchBundleDeparture(o, key, tokenid, postedIds, firstError[0], auto, 0);
+            recordPostedDelivery(o, key, "posted", auto,
+                    () -> watchBundleDeparture(o, key, tokenid, postedIds, firstError[0], auto, 0));
             return;
         }
         JSONObject coin = coins.get(i);
@@ -1329,7 +1375,7 @@ public class MainActivity extends AppCompatActivity {
                     .setSmallIcon(android.R.drawable.ic_dialog_email)
                     .setContentTitle(ok ? Language.msg(l10n_mall_inbox_payment_received) : Language.msg(l10n_mall_inbox_delivery_failed))
                     .setContentText(ok ? Language.msg(l10n_mall_inbox_delivered_notice, ref)
-                                       : Language.msg(l10n_mall_inbox_retry_notice, ref))
+                                       : detail instanceof Language.Message ? detail : Language.msg(l10n_mall_inbox_retry_notice, ref))
                     .setAutoCancel(true);
             NotificationManagerCompat.from(this).notify("pandamonium.mall.inbox", 2, b.build());
         } catch (Exception ignored) {}

@@ -6524,4 +6524,5 @@
     <!-- Arguments: value -->
     <string name="l10n_core_key_uses">"密钥使用次数：%1$s"</string>
     <string name="l10n_mall_inbox_coin_list_unconfirmed" formatted="false">"币列表信息不完整，交付仍未确认。"</string>
+    <string name="l10n_mall_inbox_storage_unconfirmed" formatted="false">"无法验证或保存交付记录。请勿再次发送；请先检查交易。"</string>
 </resources>

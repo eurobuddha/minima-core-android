@@ -6617,4 +6617,5 @@
     <!-- Arguments: value -->
     <string name="l10n_core_key_uses">"Використань ключа: %1$s"</string>
     <string name="l10n_mall_inbox_coin_list_unconfirmed" formatted="false">"Дані списку монет неповні. Доставка залишається непідтвердженою."</string>
+    <string name="l10n_mall_inbox_storage_unconfirmed" formatted="false">"Не вдалося перевірити або зберегти доставку. Не надсилайте повторно; спочатку перевірте транзакцію."</string>
 </resources>

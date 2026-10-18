@@ -180,6 +180,12 @@ public class MerchDb extends SQLiteOpenHelper implements CommsScanner.MetaStore 
         getWritableDatabase().insertWithOnConflict(META, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
+    /** Delivery callers must check this result and handle database exceptions before proceeding. */
+    public boolean setMetaChecked(String k, String v) {
+        ContentValues cv = new ContentValues(); cv.put("k", k); cv.put("v", v);
+        return getWritableDatabase().insertWithOnConflict(META, null, cv, SQLiteDatabase.CONFLICT_REPLACE) != -1;
+    }
+
     @Override public String getMeta(String k, String def) {
         Cursor c = getReadableDatabase().rawQuery("SELECT v FROM " + META + " WHERE k=?", new String[]{k});
         try { return c.moveToFirst() ? c.getString(0) : def; } finally { c.close(); }
