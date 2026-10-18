@@ -47,9 +47,14 @@ public final class EthHtlc {
     private final EthRpc rpc;
     private final Credentials creds;
     private final EthNet net;
+    private final java.util.function.BooleanSupplier authorized;
 
     public EthHtlc(EthRpc rpc, Credentials creds, EthNet net) {
-        this.rpc = rpc; this.creds = creds; this.net = net;
+        this(rpc, creds, net, () -> true);
+    }
+    /** Authorization applies only to new approvals/locks; existing claim/refund recovery stays available. */
+    public EthHtlc(EthRpc rpc, Credentials creds, EthNet net, java.util.function.BooleanSupplier authorized) {
+        this.rpc = rpc; this.creds = creds; this.net = net; this.authorized = authorized;
     }
 
     /** ERC20 approve(htlc, amount) so the vault can pull the tokens. */
@@ -57,7 +62,7 @@ public final class EthHtlc {
         Function f = new Function("approve",
                 Arrays.asList(new Address(net.htlc), new Uint256(amount)),
                 Collections.emptyList());
-        return EthTx.send(rpc, creds, net.chainId, token, FunctionEncoder.encode(f), null, GAS_APPROVE);
+        return EthTx.send(rpc, creds, net.chainId, token, FunctionEncoder.encode(f), null, GAS_APPROVE, authorized);
     }
 
     public BigInteger allowance(String token) throws Exception {
@@ -82,7 +87,7 @@ public final class EthHtlc {
                 new Uint256(requestAmount),
                 new Bool(otc)),
                 Collections.singletonList(new TypeReference<Bytes32>() {}));
-        return EthTx.send(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_LOCK);
+        return EthTx.send(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_LOCK, authorized);
     }
 
     public String withdraw(String contractId, String preimage) throws Exception {

@@ -37,11 +37,27 @@ public final class EthTx {
         long syncAtMs = 0;   // last time "pending" was even-with / ahead-of our counter (in sync)
     }
 
+    /** Matches NodeApi's fail-closed BooleanSupplier contract. No signed transaction is sent on refusal. */
+    public static void requireAuthorized(java.util.function.BooleanSupplier authorized) {
+        boolean allowed;
+        try { allowed = authorized != null && authorized.getAsBoolean(); }
+        catch (RuntimeException failure) { allowed = false; }
+        if (!allowed) throw new IllegalStateException(com.eurobuddha.atomix.integratedcomms.NodeApi.ERR_COMMAND_CHANGED);
+    }
+
     /** Forget all cached nonce state — call on a chain/endpoint switch so we cold-start from the new node. */
     public static void resetAll() { NONCE.clear(); }
 
     public static String send(EthRpc rpc, Credentials creds, long chainId,
                               String to, String data, BigInteger value, BigInteger gasLimit) throws Exception {
+        return send(rpc, creds, chainId, to, data, value, gasLimit, () -> true);
+    }
+
+    /** The existing nonce lock and fee calculation are unchanged; only unstarted writes can be cancelled. */
+    public static String send(EthRpc rpc, Credentials creds, long chainId,
+                              String to, String data, BigInteger value, BigInteger gasLimit,
+                              java.util.function.BooleanSupplier authorized) throws Exception {
+        requireAuthorized(authorized);
         NonceState st = NONCE.computeIfAbsent(creds.getAddress(), k -> new NonceState());
         // MA-5: fetch the gas price + base fee BEFORE the per-address lock — they are nonce-INDEPENDENT, and each
         // is a full RPC round-trip (up to 9 fallbacks × ~38s). Holding them under the lock serialised every
@@ -54,6 +70,7 @@ public final class EthTx {
         if (rawGp.signum() <= 0) rawGp = FALLBACK_GAS_PRICE;
         final BigInteger gasPrice = EthSend.effectiveGasPriceWei(rawGp, rpc.baseFeePerGasOrZero());
         synchronized (st) {
+            requireAuthorized(authorized);
             long pending = rpc.getTransactionCount(creds.getAddress()).longValue();   // fresh "pending"
             long now = System.currentTimeMillis();
             long alloc, newNext, newSync;
@@ -65,10 +82,12 @@ public final class EthTx {
                 alloc = st.next; newNext = st.next + 1; newSync = st.syncAtMs;
             }
 
+            requireAuthorized(authorized);
             RawTransaction raw = RawTransaction.createTransaction(
                     BigInteger.valueOf(alloc), gasPrice, gasLimit, to,
                     value == null ? BigInteger.ZERO : value, data);
             byte[] signed = TransactionEncoder.signMessage(raw, chainId, creds);
+            requireAuthorized(authorized);
             String txHash = rpc.sendRawTransaction(Numeric.toHexString(signed));
             if (txHash == null || !txHash.startsWith("0x")) throw new Exception("send failed: " + txHash);
 

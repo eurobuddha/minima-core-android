@@ -335,7 +335,9 @@ public final class SwapEngine {
         if (hash != null && !hash.isEmpty()) { incoming.add(MinimaHtlc.normKey(hash)); SwapLog.d("RX buy handshake hash=" + hash); }
     }
     public SwapDb db() { return db; }
-    public void shutdown() { io.shutdownNow(); }
+    public void shutdown() {
+        for (Runnable task : io.shutdownNow()) if (task instanceof IoTask) ((IoTask) task).cancelQueued();
+    }
 
     private boolean ready() { return rpc != null && net != null && wallet.ready() && myMinimaPk != null && minima.ready(); }
     private String myEth() { return wallet.address(); }
@@ -886,6 +888,8 @@ public final class SwapEngine {
 
     /** Port of _checkCanSwapCoin: I am the receiver(state[4]) of a Minima HTLC coin. (package-private for tests) */
     void checkCanSwapCoin(JSONObject coin, int block) {
+        final com.eurobuddha.atomix.TradingContext market = com.eurobuddha.atomix.TradingContext.active();
+        final long generation = PublishGate.gen();
         String hash = MinimaHtlc.stateAt(coin, 5);
         if (hash.isEmpty()) return;
         int timelock = parseInt(MinimaHtlc.stateAt(coin, 3));
@@ -948,9 +952,13 @@ public final class SwapEngine {
             OtcDb.Deal d = otcLpDeal(hash);
             if (d == null || !otcVerifySell(coin, d, reqTokenAddr)) return;
         } else if (!acceptTakerSellMinima(coin, reqTokenAddr)) return;   // must match my published order
-        if (!inflight.add("cpEth:" + hash)) return;
+        final JSONObject operationCoin;
+        try { operationCoin = new JSONObject(coin.toString()); }
+        catch (org.json.JSONException invalid) { return; }
+        final java.util.function.BooleanSupplier authorized = ethCounterLegGuard(operationCoin, hash, reqTokenAddr, market, generation);
+        if (!authorized.getAsBoolean() || !inflight.add("cpEth:" + hash)) return;
         // CR-2: if the pool is shut down mid-call, release the marker we just claimed so the hash isn't wedged.
-        submitIo(() -> lockEthCounterLeg(coin, hash, reqTokenAddr), () -> inflight.remove("cpEth:" + hash));
+        submitIo(() -> lockEthCounterLeg(operationCoin, hash, reqTokenAddr, market, authorized), () -> inflight.remove("cpEth:" + hash));
     }
 
     /** TEST SEAM: the retry window is ETH_RETRY_SECS of real time, so a test proves the self-healing re-fire by
@@ -1026,13 +1034,35 @@ public final class SwapEngine {
     }
 
     /** [io] lock the ETH counter-leg for a mxUSDT→ERC20 swap I'm responding to (now+1800s). */
-    private void lockEthCounterLeg(JSONObject coin, String hash, String reqTokenAddr) {
+    // Capture the same market/generation boundary used by the Minima responder before entering the IO queue.
+    private java.util.function.BooleanSupplier ethCounterLegGuard(JSONObject coin, String hash, String reqTokenAddr,
+            com.eurobuddha.atomix.TradingContext market, long generation) {
+        final EthNet network = net;
+        final EthRpc connection = rpc;
+        final String ownerKey = myMinimaPk, ownerEth = myEth();
+        return () -> {
+            if (io.isShutdown() || halted() || network != net || connection != rpc
+                    || generation != PublishGate.gen() || market != com.eurobuddha.atomix.TradingContext.active()
+                    || !market.tokenId.equalsIgnoreCase(minima.activeToken())
+                    || !market.tokenId.equalsIgnoreCase(coin.optString("tokenid", "0x00"))
+                    || !java.util.Objects.equals(ownerKey, myMinimaPk) || !java.util.Objects.equals(ownerEth, myEth())) return false;
+            if ("TRUE".equals(MinimaHtlc.stateAt(coin, 7))) {
+                OtcDb.Deal deal = otcLpDeal(hash);
+                return deal != null && otcVerifySell(coin, deal, reqTokenAddr);
+            }
+            return myOrder != null && myOrder.market() == market && acceptTakerSellMinima(coin, reqTokenAddr);
+        };
+    }
+
+    private void lockEthCounterLeg(JSONObject coin, String hash, String reqTokenAddr,
+                                   com.eurobuddha.atomix.TradingContext market,
+                                   java.util.function.BooleanSupplier authorized) {
         try {
-            if (halted()) { inflight.remove("cpEth:" + hash); return; }   // belt: never commit ETH while mismatched
+            EthTx.requireAuthorized(authorized);
             EthNet.Token token = net.tokenByAddress(reqTokenAddr);
             if (token == null) { inflight.remove("cpEth:" + hash); return; }
             Credentials creds = wallet.creds();
-            EthHtlc eth = new EthHtlc(rpc, creds, net);
+            EthHtlc eth = new EthHtlc(rpc, creds, net, authorized);
             String tokenHuman = MinimaHtlc.stateAt(coin, 1);               // ERC20 amount the maker requested
             String reqMinimaHuman = MinimaHtlc.coinAmount(coin);        // mxUSDT they locked
             String receiverEth = MinimaHtlc.stateAt(coin, 6);             // maker's ETH address (ownereth)
@@ -1049,13 +1079,14 @@ public final class SwapEngine {
             // fails (or is grossly implausible) we THROW → the catch below aborts this lock and the responder
             // retries next cycle; we never lock the counter-leg on a guessed clock.
             final long timelock = ethChainNowStrict() + CP_SECS;
+            EthTx.requireAuthorized(authorized);
             // CR-1: record the swap row SYNCHRONOUSLY (this io thread) BEFORE the broadcast, and log EV_CPSENT
             // synchronously AFTER it — both were in ui.post()s that a destroyed main thread can DROP. Losing the
             // row leaves a mined counter-leg with nothing to refund it (no contractsAsSender scan); losing
             // EV_CPSENT leaves haveSentCounterParty false, so the responder re-locks and DOUBLE-locks the leg.
             // The cpEth marker is likewise released here on the io thread, not in a droppable post.
             SwapDb.Swap s = baseSwap(hash, "RESPONDER", "MINIMA_TO_ERC20",
-                    token.symbol, tokenHuman, com.eurobuddha.atomix.TradingContext.active().coinLabel, reqMinimaHuman, receiverEth);
+                    token.symbol, tokenHuman, market.coinLabel, reqMinimaHuman, receiverEth);
             s.myTimelock = timelock; s.myLegIsMinima = false; s.contractId = EthHtlc.contractId(hash);
             s.status = SwapDb.ST_LOCKED;
             db.upsertSwap(s);
@@ -1860,10 +1891,21 @@ public final class SwapEngine {
      *  claimed just before the call). Replaces bare io.execute(), which threw RejectedExecutionException on the
      *  calling thread — often a node callback thread — and could take down the process. */
     private void submitIo(Runnable task) { submitIo(task, null); }
+    private static final class IoTask implements Runnable {
+        final Runnable task, onReject;
+        final java.util.concurrent.atomic.AtomicInteger state = new java.util.concurrent.atomic.AtomicInteger();
+        IoTask(Runnable task, Runnable onReject) { this.task = task; this.onReject = onReject; }
+        public void run() {
+            if (!state.compareAndSet(0, 1)) return;
+            try { task.run(); } finally { state.set(2); }
+        }
+        void cancelQueued() { if (state.compareAndSet(0, 2) && onReject != null) onReject.run(); }
+    }
     private void submitIo(Runnable task, Runnable onReject) {
-        if (io.isShutdown()) { if (onReject != null) onReject.run(); return; }
-        try { io.execute(task); }
-        catch (java.util.concurrent.RejectedExecutionException e) { if (onReject != null) onReject.run(); }
+        IoTask queued = new IoTask(task, onReject);
+        if (io.isShutdown()) { queued.cancelQueued(); return; }
+        try { io.execute(queued); }
+        catch (java.util.concurrent.RejectedExecutionException e) { queued.cancelQueued(); }
     }
     private static long nowUnix() { return System.currentTimeMillis() / 1000L; }
 }
