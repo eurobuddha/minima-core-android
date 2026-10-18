@@ -7923,4 +7923,41 @@
     <string name="l10n_salon_holdings_coin_failed" formatted="false">"проверка монеты не удалась (узел занят?)"</string>
     <string name="l10n_salon_holdings_request_changed" formatted="false">"Запрос доказательства больше не актуален."</string>
     <string name="l10n_salon_holdings_request_busy" formatted="false">"Доказательство владения уже создаётся."</string>
+    <string name="l10n_salon_editor_title" formatted="false">"Редактировать страницу"</string>
+    <string name="l10n_salon_editor_back" formatted="false">"← Мой Salon"</string>
+    <string name="l10n_salon_editor_you" formatted="false">"О вас"</string>
+    <string name="l10n_salon_editor_bio" formatted="false">"О себе (одна строка)"</string>
+    <string name="l10n_salon_editor_about" formatted="false">"Подробно о себе"</string>
+    <string name="l10n_salon_editor_avatar" formatted="false">"Ссылка на аватар"</string>
+    <string name="l10n_salon_editor_upload_avatar" formatted="false">"Загрузить аватар"</string>
+    <string name="l10n_salon_editor_banner" formatted="false">"Ссылка на обложку"</string>
+    <string name="l10n_salon_editor_upload_banner" formatted="false">"Загрузить обложку"</string>
+    <string name="l10n_salon_editor_verify" formatted="false">"Подтвердите свою личность"</string>
+    <string name="l10n_salon_editor_token" formatted="false">"ID вашего токена"</string>
+    <string name="l10n_salon_editor_web_url" formatted="false">"Ссылка для веб-проверки"</string>
+    <string name="l10n_salon_editor_add_link_action" formatted="false">"+ Добавить ссылку"</string>
+    <string name="l10n_salon_editor_gallery" formatted="false">"Галерея — фото, видео, музыка"</string>
+    <string name="l10n_salon_editor_untitled" formatted="false">"(без названия)"</string>
+    <string name="l10n_salon_editor_video" formatted="false">"Видео"</string>
+    <string name="l10n_salon_editor_music" formatted="false">"Музыка"</string>
+    <string name="l10n_salon_editor_add_photo" formatted="false">"+ Фото"</string>
+    <string name="l10n_salon_editor_add_video" formatted="false">"+ Видео"</string>
+    <string name="l10n_salon_editor_add_music" formatted="false">"+ Музыка"</string>
+    <string name="l10n_salon_editor_new_post_action" formatted="false">"+ Новая запись"</string>
+    <string name="l10n_salon_editor_showcase" formatted="false">"Витрина — подтверждённые активы"</string>
+    <string name="l10n_salon_editor_add_holding" formatted="false">"+ Подтвердить и добавить актив"</string>
+    <string name="l10n_salon_editor_publish" formatted="false">"Сохранить и опубликовать"</string>
+    <string name="l10n_salon_editor_published" formatted="false">"Страница сохранена и опубликована."</string>
+    <string name="l10n_salon_editor_blog_hint" formatted="false">"Мой блог"</string>
+    <string name="l10n_salon_editor_url" formatted="false">"Ссылка"</string>
+    <string name="l10n_salon_editor_add_link" formatted="false">"Добавить ссылку"</string>
+    <string name="l10n_salon_editor_say_something" formatted="false">"Напишите что-нибудь"</string>
+    <string name="l10n_salon_editor_new_post" formatted="false">"Новая запись"</string>
+    <string name="l10n_salon_editor_post" formatted="false">"Добавить запись"</string>
+    <string name="l10n_salon_editor_posted" formatted="false">"Запись добавлена. Нажмите «Сохранить и опубликовать», чтобы она появилась на странице."</string>
+    <string name="l10n_salon_editor_caption" formatted="false">"Название / подпись"</string>
+    <string name="l10n_salon_editor_changed" formatted="false">"Черновик или личность изменились. Откройте окно редактирования заново и повторите попытку."</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_editor_verify_help">"Имена не уникальны — любой может использовать @%1$s. Чтобы связать личность со своим доменом, разместите на нём файл с ID вашего токена и вставьте сюда ссылку. После проверки появится значок."</string>
+    <string name="l10n_salon_editor_showcase_help" formatted="false">"Добавьте доказательство владения NFT или токеном. Посетители проверяют его через свои узлы. Результат может ненадолго сохраняться в кэше; старое доказательство может потребовать обновления и повторной публикации."</string>
 </resources>

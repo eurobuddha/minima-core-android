@@ -39454,5 +39454,221 @@
     "zh-Hans": "正在创建持有证明。",
     "ru": "Доказательство владения уже создаётся.",
     "uk": "Доказ володіння вже створюється."
+  },
+  "salonEditor.title": {
+    "en": "Edit page",
+    "zh-Hans": "编辑主页",
+    "ru": "Редактировать страницу",
+    "uk": "Редагувати сторінку"
+  },
+  "salonEditor.back": {
+    "en": "← My Salon",
+    "zh-Hans": "← 我的 Salon",
+    "ru": "← Мой Salon",
+    "uk": "← Мій Salon"
+  },
+  "salonEditor.you": {
+    "en": "You",
+    "zh-Hans": "个人资料",
+    "ru": "О вас",
+    "uk": "Про вас"
+  },
+  "salonEditor.bio": {
+    "en": "Bio (one line)",
+    "zh-Hans": "简介（一行）",
+    "ru": "О себе (одна строка)",
+    "uk": "Про себе (один рядок)"
+  },
+  "salonEditor.about": {
+    "en": "About (long-form)",
+    "zh-Hans": "详细介绍",
+    "ru": "Подробно о себе",
+    "uk": "Докладно про себе"
+  },
+  "salonEditor.avatar": {
+    "en": "Avatar URL",
+    "zh-Hans": "头像网址",
+    "ru": "Ссылка на аватар",
+    "uk": "Посилання на аватар"
+  },
+  "salonEditor.uploadAvatar": {
+    "en": "Upload avatar",
+    "zh-Hans": "上传头像",
+    "ru": "Загрузить аватар",
+    "uk": "Завантажити аватар"
+  },
+  "salonEditor.banner": {
+    "en": "Banner URL",
+    "zh-Hans": "封面网址",
+    "ru": "Ссылка на обложку",
+    "uk": "Посилання на обкладинку"
+  },
+  "salonEditor.uploadBanner": {
+    "en": "Upload banner",
+    "zh-Hans": "上传封面",
+    "ru": "Загрузить обложку",
+    "uk": "Завантажити обкладинку"
+  },
+  "salonEditor.verify": {
+    "en": "Verify (prove it's you)",
+    "zh-Hans": "验证身份",
+    "ru": "Подтвердите свою личность",
+    "uk": "Підтвердьте свою особу"
+  },
+  "salonEditor.token": {
+    "en": "Your token id",
+    "zh-Hans": "你的代币 ID",
+    "ru": "ID вашего токена",
+    "uk": "ID вашого токена"
+  },
+  "salonEditor.webUrl": {
+    "en": "Web-verification URL",
+    "zh-Hans": "网站验证网址",
+    "ru": "Ссылка для веб-проверки",
+    "uk": "Посилання для вебперевірки"
+  },
+  "salonEditor.addLinkAction": {
+    "en": "+ Add link",
+    "zh-Hans": "+ 添加链接",
+    "ru": "+ Добавить ссылку",
+    "uk": "+ Додати посилання"
+  },
+  "salonEditor.gallery": {
+    "en": "Gallery — photos, video, music",
+    "zh-Hans": "作品集：照片、视频、音乐",
+    "ru": "Галерея — фото, видео, музыка",
+    "uk": "Галерея — фото, відео, музика"
+  },
+  "salonEditor.untitled": {
+    "en": "(untitled)",
+    "zh-Hans": "（无标题）",
+    "ru": "(без названия)",
+    "uk": "(без назви)"
+  },
+  "salonEditor.video": {
+    "en": "Video",
+    "zh-Hans": "视频",
+    "ru": "Видео",
+    "uk": "Відео"
+  },
+  "salonEditor.music": {
+    "en": "Music",
+    "zh-Hans": "音乐",
+    "ru": "Музыка",
+    "uk": "Музика"
+  },
+  "salonEditor.addPhoto": {
+    "en": "+ Photo",
+    "zh-Hans": "+ 照片",
+    "ru": "+ Фото",
+    "uk": "+ Фото"
+  },
+  "salonEditor.addVideo": {
+    "en": "+ Video",
+    "zh-Hans": "+ 视频",
+    "ru": "+ Видео",
+    "uk": "+ Відео"
+  },
+  "salonEditor.addMusic": {
+    "en": "+ Music",
+    "zh-Hans": "+ 音乐",
+    "ru": "+ Музыка",
+    "uk": "+ Музика"
+  },
+  "salonEditor.newPostAction": {
+    "en": "+ New post",
+    "zh-Hans": "+ 新帖子",
+    "ru": "+ Новая запись",
+    "uk": "+ Новий допис"
+  },
+  "salonEditor.showcase": {
+    "en": "Showcase — proven holdings",
+    "zh-Hans": "展示：已验证的持有资产",
+    "ru": "Витрина — подтверждённые активы",
+    "uk": "Вітрина — підтверджені активи"
+  },
+  "salonEditor.addHolding": {
+    "en": "+ Prove & add a holding",
+    "zh-Hans": "+ 验证并添加资产",
+    "ru": "+ Подтвердить и добавить актив",
+    "uk": "+ Підтвердити й додати актив"
+  },
+  "salonEditor.publish": {
+    "en": "Save & publish",
+    "zh-Hans": "保存并发布",
+    "ru": "Сохранить и опубликовать",
+    "uk": "Зберегти й опублікувати"
+  },
+  "salonEditor.published": {
+    "en": "Page saved & published.",
+    "zh-Hans": "主页已保存并发布。",
+    "ru": "Страница сохранена и опубликована.",
+    "uk": "Сторінку збережено й опубліковано."
+  },
+  "salonEditor.blogHint": {
+    "en": "My blog",
+    "zh-Hans": "我的博客",
+    "ru": "Мой блог",
+    "uk": "Мій блог"
+  },
+  "salonEditor.url": {
+    "en": "URL",
+    "zh-Hans": "网址",
+    "ru": "Ссылка",
+    "uk": "Посилання"
+  },
+  "salonEditor.addLink": {
+    "en": "Add link",
+    "zh-Hans": "添加链接",
+    "ru": "Добавить ссылку",
+    "uk": "Додати посилання"
+  },
+  "salonEditor.saySomething": {
+    "en": "Say something",
+    "zh-Hans": "写点什么",
+    "ru": "Напишите что-нибудь",
+    "uk": "Напишіть щось"
+  },
+  "salonEditor.newPost": {
+    "en": "New post",
+    "zh-Hans": "新帖子",
+    "ru": "Новая запись",
+    "uk": "Новий допис"
+  },
+  "salonEditor.post": {
+    "en": "Post",
+    "zh-Hans": "添加帖子",
+    "ru": "Добавить запись",
+    "uk": "Додати допис"
+  },
+  "salonEditor.posted": {
+    "en": "Posted — hit Save & publish to push it live.",
+    "zh-Hans": "帖子已添加。点击“保存并发布”即可公开。",
+    "ru": "Запись добавлена. Нажмите «Сохранить и опубликовать», чтобы она появилась на странице.",
+    "uk": "Допис додано. Натисніть «Зберегти й опублікувати», щоб він з’явився на сторінці."
+  },
+  "salonEditor.caption": {
+    "en": "Title / caption",
+    "zh-Hans": "标题 / 说明",
+    "ru": "Название / подпись",
+    "uk": "Назва / підпис"
+  },
+  "salonEditor.changed": {
+    "en": "This draft or identity has changed. Reopen the editor dialog and try again.",
+    "zh-Hans": "草稿或身份已更改。请重新打开编辑对话框后再试。",
+    "ru": "Черновик или личность изменились. Откройте окно редактирования заново и повторите попытку.",
+    "uk": "Чернетка або особа змінилися. Відкрийте вікно редагування знову та повторіть спробу."
+  },
+  "salonEditor.verifyHelp": {
+    "en": "Handles are not unique — anyone can use @{handle}. To link your identity to your domain, host a file containing your token ID and paste its URL here. A badge appears after verification.",
+    "zh-Hans": "用户名并不唯一，任何人都可以使用 @{handle}。要将身份关联到你的域名，请在该域名下托管包含代币 ID 的文件，并在此粘贴文件网址。验证通过后会显示标记。",
+    "ru": "Имена не уникальны — любой может использовать @{handle}. Чтобы связать личность со своим доменом, разместите на нём файл с ID вашего токена и вставьте сюда ссылку. После проверки появится значок.",
+    "uk": "Імена не унікальні — будь-хто може використовувати @{handle}. Щоб пов’язати особу зі своїм доменом, розмістіть на ньому файл з ID вашого токена й вставте сюди посилання. Після перевірки з’явиться позначка."
+  },
+  "salonEditor.showcaseHelp": {
+    "en": "Add proof that you hold an NFT or token. Viewers check the proof using their own nodes. Results may be cached briefly; an old proof may need to be refreshed and published again.",
+    "zh-Hans": "添加你持有 NFT 或代币的证明。访客通过自己的节点检查证明。结果可能会短暂缓存；旧证明可能需要刷新并重新发布。",
+    "ru": "Добавьте доказательство владения NFT или токеном. Посетители проверяют его через свои узлы. Результат может ненадолго сохраняться в кэше; старое доказательство может потребовать обновления и повторной публикации.",
+    "uk": "Додайте доказ володіння NFT або токеном. Відвідувачі перевіряють його через власні вузли. Результат може ненадовго зберігатися в кеші; старий доказ може потребувати оновлення й повторної публікації."
   }
 }

@@ -2110,42 +2110,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void renderEdit() {
-        masthead("Edit page");
-        body.addView(btn("← My Salon", false, () -> go(Screen.HOME)), lph(44, 0, 0, 0, 10));
+        masthead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_title));
+        body.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_back), false, () -> go(Screen.HOME)), lp(0, 0, 0, 10));
         JSONObject me = SalonStore.me(this);
-        LinearLayout who = card(); who.addView(Design.lot(this, "You"));
-        edName = field(who, "Display name", me.optString("name"), false, "");
-        edBio = field(who, "Bio (one line)", me.optString("bio"), false, "");
-        edAbout = fieldMulti(who, "About (long-form)", me.optString("about"));
+        LinearLayout who = card(); who.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_you)));
+        edName = field(who, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_display_name), me.optString("name"), false, "");
+        edBio = field(who, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_bio), me.optString("bio"), false, "");
+        edAbout = fieldMulti(who, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_about), me.optString("about"));
         EditText name = edName, bio = edBio, about = edAbout;   // aliases for the existing Save handler below
-        edAvatar = field(who, "Avatar URL", me.optString("avatar"), false, "https://…");
-        who.addView(btn("Upload avatar", false, () -> pickMedia(PICK_AVATAR, "image/*")), lph(42, 0, 4, 0, 6));
-        edBanner = field(who, "Banner URL", me.optString("banner"), false, "https://…");
-        who.addView(btn("Upload banner", false, () -> pickMedia(PICK_BANNER, "image/*")), lph(42, 0, 4, 0, 2));
+        edAvatar = field(who, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_avatar), me.optString("avatar"), false, "https://…");
+        who.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_upload_avatar), false, () -> pickMedia(PICK_AVATAR, "image/*")), lp(0, 4, 0, 6));
+        edBanner = field(who, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_banner), me.optString("banner"), false, "https://…");
+        who.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_upload_banner), false, () -> pickMedia(PICK_BANNER, "image/*")), lp(0, 4, 0, 2));
         body.addView(who, lp(0, 0, 0, 12));
 
         // Verification — the anti-impersonation defence (handles aren't unique).
-        LinearLayout ver = card(); ver.addView(Design.lot(this, "Verify (prove it's you)"));
-        ver.addView(Design.note(this, "Handles aren't unique — anyone can call themselves @" + me.optString("handle") + ". To prove the real you, host a file on YOUR domain containing your token id, then paste its URL. A ✓ badge then shows on your card and page."), lp(0, 6, 0, 4));
-        copyRow(ver, "Your token id", me.optString("tokenid"));
-        edWebvalidate = field(ver, "Web-verification URL", me.optString("webvalidate"), false, "https://eurobuddha.com/salon.txt");
+        LinearLayout ver = card(); ver.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_verify)));
+        ver.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_verify_help, me.optString("handle"))), lp(0, 6, 0, 4));
+        copyRow(ver, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_token), me.optString("tokenid"));
+        edWebvalidate = field(ver, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_web_url), me.optString("webvalidate"), false, "https://eurobuddha.com/salon.txt");
         body.addView(ver, lp(0, 0, 0, 12));
 
         // Links
-        LinearLayout linksCard = card(); linksCard.addView(Design.lot(this, "Links"));
+        LinearLayout linksCard = card(); linksCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_links)));
         JSONArray links = SalonStore.arr(this, "links");
         for (int i = 0; i < links.length(); i++) {
-            JSONObject l = links.optJSONObject(i); final int idx = i;
+            JSONObject l = links.optJSONObject(i); if (l == null) continue; final int idx = i;
             LinearLayout r = row();
             r.addView(Design.text(this, l.optString("label"), 13, Design.INK(), Design.sansBold()), new LinearLayout.LayoutParams(0, -2, 1));
-            r.addView(btn("✕", false, () -> { JSONArray a = SalonStore.arr(this, "links"); a = removeAt(a, idx); SalonStore.setArr(this, "links", a); render(); }), new LinearLayout.LayoutParams(dp(44), dp(38)));
+            r.addView(btn("✕", false, () -> { JSONArray a = SalonStore.arr(this, "links"); a = removeAt(a, idx); SalonStore.setArr(this, "links", a); render(); }), new LinearLayout.LayoutParams(dp(44), -2));
             linksCard.addView(r, lp(0, 4, 0, 4));
         }
-        linksCard.addView(btn("+ Add link", false, this::addLinkDialog), lph(42, 0, 6, 0, 2));
+        linksCard.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_add_link_action), false, this::addLinkDialog), lp(0, 6, 0, 2));
         body.addView(linksCard, lp(0, 0, 0, 12));
 
         // Gallery
-        LinearLayout galCard = card(); galCard.addView(Design.lot(this, "Gallery — photos, video, music"));
+        LinearLayout galCard = card(); galCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_gallery)));
         JSONArray gal = SalonStore.arr(this, "gallery");
         for (int i = 0; i < gal.length(); i++) {
             JSONObject m = gal.optJSONObject(i); if (m == null) continue; final int idx = i;
@@ -2154,55 +2154,70 @@ public class MainActivity extends AppCompatActivity {
             TextView kind = Design.text(this, type.equals("audio") ? "♪" : type.equals("video") ? "▶" : "▣", 18, Design.ACCENT(), Design.sansBold());
             r.addView(kind, new LinearLayout.LayoutParams(dp(28), -2));
             LinearLayout cc = new LinearLayout(this); cc.setOrientation(LinearLayout.VERTICAL); cc.setPadding(dp(8), 0, 0, 0);
-            cc.addView(Design.text(this, cap.isEmpty() ? "(untitled)" : cap, 13.5f, Design.INK(), Design.sansBold()));
-            cc.addView(Design.text(this, type.toUpperCase(), 9f, Design.DIM(), Design.sansBold()));
+            cc.addView(Design.text(this, cap.isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_untitled) : cap, 13.5f, Design.INK(), Design.sansBold()));
+            cc.addView(Design.text(this, Language.upper(type.equals("audio") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_music) : type.equals("video") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_video) : type.equals("image") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_chat_photo) : type), 9f, Design.DIM(), Design.sansBold()));
             r.addView(cc, new LinearLayout.LayoutParams(0, -2, 1));
-            r.addView(btn("Rename", false, () -> renameGalleryItem(idx)), new LinearLayout.LayoutParams(dp(88), dp(38)));
-            r.addView(btn("✕", false, () -> { JSONArray a = removeAt(SalonStore.arr(this, "gallery"), idx); SalonStore.setArr(this, "gallery", a); render(); }), new LinearLayout.LayoutParams(dp(44), dp(38)));
+            r.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_chat_rename), false, () -> renameGalleryItem(idx)), new LinearLayout.LayoutParams(dp(88), -2));
+            r.addView(btn("✕", false, () -> { JSONArray a = removeAt(SalonStore.arr(this, "gallery"), idx); SalonStore.setArr(this, "gallery", a); render(); }), new LinearLayout.LayoutParams(dp(44), -2));
             galCard.addView(r);
             galCard.addView(Design.rule(this, 1), new LinearLayout.LayoutParams(-1, dp(1)));
         }
         LinearLayout addRow = row();
-        addRow.addView(btn("+ Photo", false, () -> pickMedia(PICK_GALLERY_IMG, "image/*")), weight(42, 0, 4));
-        addRow.addView(btn("+ Video", false, () -> pickMedia(PICK_GALLERY_VID, "video/*")), weight(42, 4, 4));
-        addRow.addView(btn("+ Music", false, () -> pickMedia(PICK_GALLERY_AUD, "audio/*")), weight(42, 4, 0));
+        addRow.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_add_photo), false, () -> pickMedia(PICK_GALLERY_IMG, "image/*")), weight(-2, 0, 4));
+        addRow.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_add_video), false, () -> pickMedia(PICK_GALLERY_VID, "video/*")), weight(-2, 4, 4));
+        addRow.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_add_music), false, () -> pickMedia(PICK_GALLERY_AUD, "audio/*")), weight(-2, 4, 0));
         galCard.addView(addRow, lp(0, 6, 0, 0));
         body.addView(galCard, lp(0, 0, 0, 12));
 
         // Posts
-        LinearLayout postCard = card(); postCard.addView(Design.lot(this, "Posts"));
-        postCard.addView(btn("+ New post", false, this::newPostDialog), lph(42, 0, 6, 0, 2));
+        LinearLayout postCard = card(); postCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_posts)));
+        postCard.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_new_post_action), false, this::newPostDialog), lp(0, 6, 0, 2));
         body.addView(postCard, lp(0, 0, 0, 12));
 
         // Showcase NFTs — proven holdings (no faking)
-        LinearLayout nftCard = card(); nftCard.addView(Design.lot(this, "Showcase — proven holdings"));
-        nftCard.addView(Design.note(this, "Prove you HOLD an NFT or token and show it on your page. Viewers' own nodes verify it live — a hosted list can't fake it, and the badge vanishes if you sell."), lp(0, 4, 0, 6));
+        LinearLayout nftCard = card(); nftCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_showcase)));
+        nftCard.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_showcase_help)), lp(0, 4, 0, 6));
         JSONArray nfts = SalonStore.arr(this, "nfts");
         for (int i = 0; i < nfts.length(); i++) {
             JSONObject n = nfts.optJSONObject(i); if (n == null) continue; final int idx = i;
             LinearLayout r = row(); r.setPadding(0, dp(6), 0, dp(6));
             r.addView(Design.text(this, n.optString("name", Util.shorten(n.optString("tokenid"))), 13.5f, Design.INK(), Design.sansBold()), new LinearLayout.LayoutParams(0, -2, 1));
-            r.addView(btn("✕", false, () -> { SalonStore.setArr(this, "nfts", removeAt(SalonStore.arr(this, "nfts"), idx)); render(); }), new LinearLayout.LayoutParams(dp(44), dp(38)));
+            r.addView(btn("✕", false, () -> { SalonStore.setArr(this, "nfts", removeAt(SalonStore.arr(this, "nfts"), idx)); render(); }), new LinearLayout.LayoutParams(dp(44), -2));
             nftCard.addView(r);
         }
-        nftCard.addView(btn("+ Prove & add a holding", false, this::pickNftDialog), lph(44, 0, 6, 0, 2));
+        nftCard.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_add_holding), false, this::pickNftDialog), lp(0, 6, 0, 2));
         body.addView(nftCard, lp(0, 0, 0, 12));
 
         profStatus = Design.note(this, ""); body.addView(profStatus, lp(0, 4, 0, 0));
-        body.addView(btn("Save & publish", true, () -> {
+        body.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_publish), true, () -> {
             SalonStore.put(this, "name", text(name)); SalonStore.put(this, "bio", text(bio));
             SalonStore.put(this, "about", text(about));
             SalonStore.put(this, "avatar", text(edAvatar)); SalonStore.put(this, "banner", text(edBanner));
             SalonStore.put(this, "webvalidate", text(edWebvalidate));
-            hostProfile(profStatus, () -> { publishSalon(profStatus); toast("Page saved & published."); go(Screen.HOME); });
-        }), lph(52, 0, 8, 0, 0));
+            hostProfile(profStatus, () -> { publishSalon(profStatus); toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_published)); go(Screen.HOME); });
+        }), lp(0, 8, 0, 0));
+    }
+
+    /** A modal edit belongs to the identity and collection draft visible when opened. */
+    private java.util.function.BooleanSupplier editorDraftCurrent(String collection) {
+        final String owner = SalonStore.get(this, "tokenid");
+        final String draft = SalonStore.arr(this, collection).toString();
+        return () -> {
+            boolean current = !isFinishing() && !isDestroyed()
+                    && owner.equals(SalonStore.get(this, "tokenid"))
+                    && draft.equals(SalonStore.arr(this, collection).toString());
+            if (!current && !isFinishing() && !isDestroyed()) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_changed));
+            return current;
+        };
     }
 
     private void addLinkDialog() {
+        final java.util.function.BooleanSupplier current = editorDraftCurrent("links");
         LinearLayout box = dialogBox();
-        EditText label = field(box, "Label", "", false, "My blog");
-        EditText url = field(box, "URL", "", false, "https://…");
-        showDialog("Add link", box, "Add", () -> {
+        EditText label = field(box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mall_studio_ui_label), "", false, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_blog_hint));
+        EditText url = field(box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_url), "", false, "https://…");
+        showDialog(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_add_link), box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_add), () -> {
+            if (!current.getAsBoolean()) return;
             if (text(url).isEmpty()) return;
             JSONArray a = SalonStore.arr(this, "links");
             try { JSONObject o = new JSONObject(); o.put("label", text(label).isEmpty() ? text(url) : text(label)); o.put("url", text(url)); a.put(o); } catch (Exception ignored) {}
@@ -2211,13 +2226,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void newPostDialog() {
+        final java.util.function.BooleanSupplier current = editorDraftCurrent("posts");
         LinearLayout box = dialogBox();
-        EditText textF = fieldMulti(box, "Say something", "");
-        showDialog("New post", box, "Post", () -> {
+        EditText textF = fieldMulti(box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_say_something), "");
+        showDialog(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_new_post), box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_post), () -> {
+            if (!current.getAsBoolean()) return;
             JSONArray a = SalonStore.arr(this, "posts");
             try { JSONObject o = new JSONObject(); o.put("ts", System.currentTimeMillis() / 1000); o.put("text", text(textF)); a.put(o); } catch (Exception ignored) {}
             SalonStore.setArr(this, "posts", a);
-            toast("Posted — hit Save & publish to push it live."); render();
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_posted)); render();
         });
     }
 
@@ -2328,11 +2345,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void renameGalleryItem(int idx) {
+        final java.util.function.BooleanSupplier current = editorDraftCurrent("gallery");
         JSONArray a = SalonStore.arr(this, "gallery");
         JSONObject m = a.optJSONObject(idx); if (m == null) return;
         LinearLayout box = dialogBox();
-        EditText t = field(box, "Title / caption", m.optString("caption", ""), false, "");
-        showDialog("Rename", box, "Save", () -> { try { m.put("caption", text(t).trim()); } catch (Exception ignored) {} SalonStore.setArr(this, "gallery", a); render(); });
+        EditText t = field(box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_caption), m.optString("caption", ""), false, "");
+        showDialog(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_chat_rename), box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_save), () -> { if (!current.getAsBoolean()) return; try { m.put("caption", text(t).trim()); } catch (Exception ignored) {} SalonStore.setArr(this, "gallery", a); render(); });
     }
 
     /** A full-width media card: a labelled header (KIND + title) over the media
@@ -3219,8 +3237,8 @@ public class MainActivity extends AppCompatActivity {
         if (secret) e.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         parent.addView(e, new LinearLayout.LayoutParams(-1, -2)); return e;
     }
-    private EditText fieldMulti(LinearLayout parent, String label, String value) {
-        parent.addView(Design.text(this, label.toUpperCase(), 9.5f, Design.DIM(), Design.sansBold()), lp(0, 8, 0, 3));
+    private EditText fieldMulti(LinearLayout parent, CharSequence label, String value) {
+        parent.addView(Design.text(this, Language.upper(label), 9.5f, Design.DIM(), Design.sansBold()), lp(0, 8, 0, 3));
         EditText e = new EditText(this); e.setText(value == null ? "" : value); e.setTextColor(Design.INK()); e.setTextSize(14);
         e.setBackground(Design.ruled(this, Design.PAPER(), Design.INK(), 1)); e.setPadding(dp(10), dp(9), dp(10), dp(9));
         e.setMinLines(3); e.setGravity(Gravity.TOP); e.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
@@ -3268,9 +3286,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView btn(CharSequence label, boolean filled, Runnable click) { TextView b = Design.button(this, label, filled); b.setMinHeight(dp(48)); b.setOnClickListener(v -> click.run()); return b; }
 
     private LinearLayout dialogBox() { LinearLayout b = new LinearLayout(this); b.setOrientation(LinearLayout.VERTICAL); b.setPadding(dp(18), dp(6), dp(18), dp(6)); return b; }
-    private void showDialog(String title, LinearLayout content, String ok, Runnable onOk) {
-        new android.app.AlertDialog.Builder(this).setTitle(title).setView(content)
-                .setPositiveButton(ok, (d, w) -> onOk.run()).setNegativeButton("Cancel", null).show();
+    private void showDialog(CharSequence title, LinearLayout content, CharSequence ok, Runnable onOk) {
+        new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(title).setView(content)
+                .setPositiveButton(ok, (d, w) -> onOk.run()).setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel), null).show();
     }
 
     private JSONArray removeAt(JSONArray a, int idx) { JSONArray out = new JSONArray(); for (int i = 0; i < a.length(); i++) if (i != idx) out.put(a.opt(i)); return out; }

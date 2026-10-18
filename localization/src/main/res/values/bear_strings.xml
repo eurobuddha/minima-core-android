@@ -7851,4 +7851,41 @@
     <string name="l10n_salon_holdings_coin_failed" formatted="false">"coin check failed (node busy?)"</string>
     <string name="l10n_salon_holdings_request_changed" formatted="false">"Proof request is no longer current."</string>
     <string name="l10n_salon_holdings_request_busy" formatted="false">"A holding proof is already being created."</string>
+    <string name="l10n_salon_editor_title" formatted="false">"Edit page"</string>
+    <string name="l10n_salon_editor_back" formatted="false">"← My Salon"</string>
+    <string name="l10n_salon_editor_you" formatted="false">"You"</string>
+    <string name="l10n_salon_editor_bio" formatted="false">"Bio (one line)"</string>
+    <string name="l10n_salon_editor_about" formatted="false">"About (long-form)"</string>
+    <string name="l10n_salon_editor_avatar" formatted="false">"Avatar URL"</string>
+    <string name="l10n_salon_editor_upload_avatar" formatted="false">"Upload avatar"</string>
+    <string name="l10n_salon_editor_banner" formatted="false">"Banner URL"</string>
+    <string name="l10n_salon_editor_upload_banner" formatted="false">"Upload banner"</string>
+    <string name="l10n_salon_editor_verify" formatted="false">"Verify (prove it\'s you)"</string>
+    <string name="l10n_salon_editor_token" formatted="false">"Your token id"</string>
+    <string name="l10n_salon_editor_web_url" formatted="false">"Web-verification URL"</string>
+    <string name="l10n_salon_editor_add_link_action" formatted="false">"+ Add link"</string>
+    <string name="l10n_salon_editor_gallery" formatted="false">"Gallery — photos, video, music"</string>
+    <string name="l10n_salon_editor_untitled" formatted="false">"(untitled)"</string>
+    <string name="l10n_salon_editor_video" formatted="false">"Video"</string>
+    <string name="l10n_salon_editor_music" formatted="false">"Music"</string>
+    <string name="l10n_salon_editor_add_photo" formatted="false">"+ Photo"</string>
+    <string name="l10n_salon_editor_add_video" formatted="false">"+ Video"</string>
+    <string name="l10n_salon_editor_add_music" formatted="false">"+ Music"</string>
+    <string name="l10n_salon_editor_new_post_action" formatted="false">"+ New post"</string>
+    <string name="l10n_salon_editor_showcase" formatted="false">"Showcase — proven holdings"</string>
+    <string name="l10n_salon_editor_add_holding" formatted="false">"+ Prove &amp; add a holding"</string>
+    <string name="l10n_salon_editor_publish" formatted="false">"Save &amp; publish"</string>
+    <string name="l10n_salon_editor_published" formatted="false">"Page saved &amp; published."</string>
+    <string name="l10n_salon_editor_blog_hint" formatted="false">"My blog"</string>
+    <string name="l10n_salon_editor_url" formatted="false">"URL"</string>
+    <string name="l10n_salon_editor_add_link" formatted="false">"Add link"</string>
+    <string name="l10n_salon_editor_say_something" formatted="false">"Say something"</string>
+    <string name="l10n_salon_editor_new_post" formatted="false">"New post"</string>
+    <string name="l10n_salon_editor_post" formatted="false">"Post"</string>
+    <string name="l10n_salon_editor_posted" formatted="false">"Posted — hit Save &amp; publish to push it live."</string>
+    <string name="l10n_salon_editor_caption" formatted="false">"Title / caption"</string>
+    <string name="l10n_salon_editor_changed" formatted="false">"This draft or identity has changed. Reopen the editor dialog and try again."</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_editor_verify_help">"Handles are not unique — anyone can use @%1$s. To link your identity to your domain, host a file containing your token ID and paste its URL here. A badge appears after verification."</string>
+    <string name="l10n_salon_editor_showcase_help" formatted="false">"Add proof that you hold an NFT or token. Viewers check the proof using their own nodes. Results may be cached briefly; an old proof may need to be refreshed and published again."</string>
 </resources>

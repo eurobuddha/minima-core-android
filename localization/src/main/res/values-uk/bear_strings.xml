@@ -7923,4 +7923,41 @@
     <string name="l10n_salon_holdings_coin_failed" formatted="false">"перевірка монети не вдалася (вузол зайнятий?)"</string>
     <string name="l10n_salon_holdings_request_changed" formatted="false">"Запит доказу більше не актуальний."</string>
     <string name="l10n_salon_holdings_request_busy" formatted="false">"Доказ володіння вже створюється."</string>
+    <string name="l10n_salon_editor_title" formatted="false">"Редагувати сторінку"</string>
+    <string name="l10n_salon_editor_back" formatted="false">"← Мій Salon"</string>
+    <string name="l10n_salon_editor_you" formatted="false">"Про вас"</string>
+    <string name="l10n_salon_editor_bio" formatted="false">"Про себе (один рядок)"</string>
+    <string name="l10n_salon_editor_about" formatted="false">"Докладно про себе"</string>
+    <string name="l10n_salon_editor_avatar" formatted="false">"Посилання на аватар"</string>
+    <string name="l10n_salon_editor_upload_avatar" formatted="false">"Завантажити аватар"</string>
+    <string name="l10n_salon_editor_banner" formatted="false">"Посилання на обкладинку"</string>
+    <string name="l10n_salon_editor_upload_banner" formatted="false">"Завантажити обкладинку"</string>
+    <string name="l10n_salon_editor_verify" formatted="false">"Підтвердьте свою особу"</string>
+    <string name="l10n_salon_editor_token" formatted="false">"ID вашого токена"</string>
+    <string name="l10n_salon_editor_web_url" formatted="false">"Посилання для вебперевірки"</string>
+    <string name="l10n_salon_editor_add_link_action" formatted="false">"+ Додати посилання"</string>
+    <string name="l10n_salon_editor_gallery" formatted="false">"Галерея — фото, відео, музика"</string>
+    <string name="l10n_salon_editor_untitled" formatted="false">"(без назви)"</string>
+    <string name="l10n_salon_editor_video" formatted="false">"Відео"</string>
+    <string name="l10n_salon_editor_music" formatted="false">"Музика"</string>
+    <string name="l10n_salon_editor_add_photo" formatted="false">"+ Фото"</string>
+    <string name="l10n_salon_editor_add_video" formatted="false">"+ Відео"</string>
+    <string name="l10n_salon_editor_add_music" formatted="false">"+ Музика"</string>
+    <string name="l10n_salon_editor_new_post_action" formatted="false">"+ Новий допис"</string>
+    <string name="l10n_salon_editor_showcase" formatted="false">"Вітрина — підтверджені активи"</string>
+    <string name="l10n_salon_editor_add_holding" formatted="false">"+ Підтвердити й додати актив"</string>
+    <string name="l10n_salon_editor_publish" formatted="false">"Зберегти й опублікувати"</string>
+    <string name="l10n_salon_editor_published" formatted="false">"Сторінку збережено й опубліковано."</string>
+    <string name="l10n_salon_editor_blog_hint" formatted="false">"Мій блог"</string>
+    <string name="l10n_salon_editor_url" formatted="false">"Посилання"</string>
+    <string name="l10n_salon_editor_add_link" formatted="false">"Додати посилання"</string>
+    <string name="l10n_salon_editor_say_something" formatted="false">"Напишіть щось"</string>
+    <string name="l10n_salon_editor_new_post" formatted="false">"Новий допис"</string>
+    <string name="l10n_salon_editor_post" formatted="false">"Додати допис"</string>
+    <string name="l10n_salon_editor_posted" formatted="false">"Допис додано. Натисніть «Зберегти й опублікувати», щоб він з’явився на сторінці."</string>
+    <string name="l10n_salon_editor_caption" formatted="false">"Назва / підпис"</string>
+    <string name="l10n_salon_editor_changed" formatted="false">"Чернетка або особа змінилися. Відкрийте вікно редагування знову та повторіть спробу."</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_editor_verify_help">"Імена не унікальні — будь-хто може використовувати @%1$s. Щоб пов’язати особу зі своїм доменом, розмістіть на ньому файл з ID вашого токена й вставте сюди посилання. Після перевірки з’явиться позначка."</string>
+    <string name="l10n_salon_editor_showcase_help" formatted="false">"Додайте доказ володіння NFT або токеном. Відвідувачі перевіряють його через власні вузли. Результат може ненадовго зберігатися в кеші; старий доказ може потребувати оновлення й повторної публікації."</string>
 </resources>

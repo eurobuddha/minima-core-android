@@ -7815,4 +7815,41 @@
     <string name="l10n_salon_holdings_coin_failed" formatted="false">"币检查失败（节点忙碌？）"</string>
     <string name="l10n_salon_holdings_request_changed" formatted="false">"证明请求已失效。"</string>
     <string name="l10n_salon_holdings_request_busy" formatted="false">"正在创建持有证明。"</string>
+    <string name="l10n_salon_editor_title" formatted="false">"编辑主页"</string>
+    <string name="l10n_salon_editor_back" formatted="false">"← 我的 Salon"</string>
+    <string name="l10n_salon_editor_you" formatted="false">"个人资料"</string>
+    <string name="l10n_salon_editor_bio" formatted="false">"简介（一行）"</string>
+    <string name="l10n_salon_editor_about" formatted="false">"详细介绍"</string>
+    <string name="l10n_salon_editor_avatar" formatted="false">"头像网址"</string>
+    <string name="l10n_salon_editor_upload_avatar" formatted="false">"上传头像"</string>
+    <string name="l10n_salon_editor_banner" formatted="false">"封面网址"</string>
+    <string name="l10n_salon_editor_upload_banner" formatted="false">"上传封面"</string>
+    <string name="l10n_salon_editor_verify" formatted="false">"验证身份"</string>
+    <string name="l10n_salon_editor_token" formatted="false">"你的代币 ID"</string>
+    <string name="l10n_salon_editor_web_url" formatted="false">"网站验证网址"</string>
+    <string name="l10n_salon_editor_add_link_action" formatted="false">"+ 添加链接"</string>
+    <string name="l10n_salon_editor_gallery" formatted="false">"作品集：照片、视频、音乐"</string>
+    <string name="l10n_salon_editor_untitled" formatted="false">"（无标题）"</string>
+    <string name="l10n_salon_editor_video" formatted="false">"视频"</string>
+    <string name="l10n_salon_editor_music" formatted="false">"音乐"</string>
+    <string name="l10n_salon_editor_add_photo" formatted="false">"+ 照片"</string>
+    <string name="l10n_salon_editor_add_video" formatted="false">"+ 视频"</string>
+    <string name="l10n_salon_editor_add_music" formatted="false">"+ 音乐"</string>
+    <string name="l10n_salon_editor_new_post_action" formatted="false">"+ 新帖子"</string>
+    <string name="l10n_salon_editor_showcase" formatted="false">"展示：已验证的持有资产"</string>
+    <string name="l10n_salon_editor_add_holding" formatted="false">"+ 验证并添加资产"</string>
+    <string name="l10n_salon_editor_publish" formatted="false">"保存并发布"</string>
+    <string name="l10n_salon_editor_published" formatted="false">"主页已保存并发布。"</string>
+    <string name="l10n_salon_editor_blog_hint" formatted="false">"我的博客"</string>
+    <string name="l10n_salon_editor_url" formatted="false">"网址"</string>
+    <string name="l10n_salon_editor_add_link" formatted="false">"添加链接"</string>
+    <string name="l10n_salon_editor_say_something" formatted="false">"写点什么"</string>
+    <string name="l10n_salon_editor_new_post" formatted="false">"新帖子"</string>
+    <string name="l10n_salon_editor_post" formatted="false">"添加帖子"</string>
+    <string name="l10n_salon_editor_posted" formatted="false">"帖子已添加。点击“保存并发布”即可公开。"</string>
+    <string name="l10n_salon_editor_caption" formatted="false">"标题 / 说明"</string>
+    <string name="l10n_salon_editor_changed" formatted="false">"草稿或身份已更改。请重新打开编辑对话框后再试。"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_editor_verify_help">"用户名并不唯一，任何人都可以使用 @%1$s。要将身份关联到你的域名，请在该域名下托管包含代币 ID 的文件，并在此粘贴文件网址。验证通过后会显示标记。"</string>
+    <string name="l10n_salon_editor_showcase_help" formatted="false">"添加你持有 NFT 或代币的证明。访客通过自己的节点检查证明。结果可能会短暂缓存；旧证明可能需要刷新并重新发布。"</string>
 </resources>
