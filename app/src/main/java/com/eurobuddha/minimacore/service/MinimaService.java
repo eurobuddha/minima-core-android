@@ -80,6 +80,8 @@ public class MinimaService extends Service {
     private IBinder mBinder = new MyBinder();
     MinimaService mService;
     private boolean serviceDestroyed;
+    private boolean foregroundActive;
+    private final Runnable languageChanged = this::refreshLanguageNotification;
 
     public MinimaServiceListener mServiceListener = null;
 
@@ -161,13 +163,11 @@ public class MinimaService extends Service {
         mHandler = new Handler(Looper.getMainLooper());
 
         // Create our notification channel here & add channel to Manager's list
-        NotificationChannel serviceChannel = new NotificationChannel(
-                CHANNEL_ID,
-                Language.text(this, l10n_notification_node),
-                NotificationManager.IMPORTANCE_LOW
-        );
-
         mNotificationManager = getSystemService(NotificationManager.class);
+        NotificationChannel serviceChannel = mNotificationManager.getNotificationChannel(CHANNEL_ID);
+        if (serviceChannel == null) serviceChannel = new NotificationChannel(CHANNEL_ID,
+                Language.text(this, l10n_notification_node), NotificationManager.IMPORTANCE_LOW);
+        serviceChannel.setName(Language.text(this, l10n_notification_node));
         mNotificationManager.createNotificationChannel(serviceChannel);
 
         //Set the Alarm..
@@ -237,7 +237,7 @@ public class MinimaService extends Service {
                     }else if(event.equals("NEWBALANCE")){
 
                         //Notify the User
-                        createNotification("Your balance has changed");
+                        createNotification(Language.text(MinimaService.this, l10n_core_balance_changed));
 
                         //..and tell the UI, so the wallet can refresh and confirm in-app.
                         //This is the real "it landed" signal - a send command reply only
@@ -544,7 +544,7 @@ public class MinimaService extends Service {
     public Notification createNotification(String zText){
         mNotification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(zText)
-                .setContentText("Minima Status Channel")
+                .setContentText(Language.text(this, l10n_core_notice_status))
                 .setSilent(true)
                 .setSmallIcon(R.drawable.ic_minima)
                 .setContentIntent(createDefaultPending())
@@ -557,25 +557,35 @@ public class MinimaService extends Service {
         mNotificationManager.cancel(zMiniDAPPUID,2);
     }
 
+    /** Render cached block evidence; a language change must not query or restart the node. */
+    private String nodeStatusText() {
+        if (mTxPowJSON == null) return Language.text(this, l10n_startup_starting);
+        JSONObject header = (JSONObject) mTxPowJSON.get("header");
+        String block = header.getString("block");
+        long timestamp = Long.parseLong(header.getString("timemilli"));
+        return block + " @ " + Language.date(timestamp, "yMdHms");
+    }
+
     private void setMinimaNotification(){
+        if (serviceDestroyed) return;
+        startForeground(1, createNotification(nodeStatusText()));
+        foregroundActive = true;
+        Language.addListener(languageChanged);
+    }
 
-        //Set the default message
-        if(mTxPowJSON == null){
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        refreshLanguageNotification();
+    }
 
-            //Basic message
-            startForeground(1, createNotification("Starting up.. please wait.."));
-
-        }else{
-            JSONObject header = (JSONObject)mTxPowJSON.get("header");
-
-            String block    = header.getString("block");
-            long timemilli  = Long.valueOf(header.getString("timemilli"));
-            String date     = DATEFORMAT.format(new Date(timemilli));
-
-            //String date     = (String) header.get("date");
-
-            //Set block time message
-            startForeground(1, createNotification(block + " @ " + date));
+    private void refreshLanguageNotification() {
+        if (!foregroundActive || serviceDestroyed || mNotificationManager == null) return;
+        try {
+            com.eurobuddha.minimacore.i18n.NotificationLabels.update(this);
+            mNotificationManager.notify(1, createNotification(nodeStatusText()));
+        } catch (RuntimeException unavailable) {
+            // Keep the existing foreground notification if Android refuses the update.
         }
     }
 
@@ -594,6 +604,8 @@ public class MinimaService extends Service {
     @Override
     public void onDestroy() {
         serviceDestroyed = true;
+        foregroundActive = false;
+        Language.removeListener(languageChanged);
         super.onDestroy();
 
         //Have started shutdown
@@ -633,11 +645,11 @@ public class MinimaService extends Service {
         //Not listening anymore..
         Main.setMinimaListener(null);
 
-        //Shut the channel..
-        mNotificationManager.deleteNotificationChannel(CHANNEL_ID);
+        // Remove this notification while retaining the user's channel settings.
+        if (mNotificationManager != null) mNotificationManager.cancel(1);
 
         //Mention..
-        Toast.makeText(this, "Minima Service Stopped", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, Language.text(this, l10n_core_stopped), Toast.LENGTH_SHORT).show();
 
         //Release the wakelocks..
         if(mWakeLock != null && mWakeLock.isHeld()) mWakeLock.release();

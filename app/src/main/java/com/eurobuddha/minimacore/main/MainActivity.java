@@ -5,7 +5,9 @@ import com.eurobuddha.minimacore.i18n.Language;
 import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.Manifest;
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
+import com.eurobuddha.minimacore.i18n.LanguageDialog;
+import android.view.View;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -65,6 +67,21 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     ViewPager mMainPager;
 
     MainAdapter mMainAdapter;
+
+    private final java.util.Set<AlertDialog> languageDialogs = new java.util.HashSet<>();
+    private LanguageDialog languageDialog() {
+        return new LanguageDialog(this) {
+            @Override public AlertDialog create() {
+                AlertDialog dialog = super.create();
+                languageDialogs.add(dialog);
+                dialog.getWindow().getDecorView().addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                    @Override public void onViewAttachedToWindow(View v) { languageDialogs.add(dialog); }
+                    @Override public void onViewDetachedFromWindow(View v) { languageDialogs.remove(dialog); }
+                });
+                return dialog;
+            }
+        };
+    }
 
     ProgressDialog mShutdownDialog = null;
 
@@ -129,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         ((com.eurobuddha.minimacore.chat.ChatView) mMainAdapter.getChatView()).setOnScanRequest(() ->
                 chatScan.launch(new com.journeyapps.barcodescanner.ScanOptions()
                         .setDesiredBarcodeFormats(com.journeyapps.barcodescanner.ScanOptions.QR_CODE)
-                        .setPrompt("Scan a keets address QR")
+                        .setPrompt(Language.text(this, l10n_core_scan_keets))
                         .setBeepEnabled(false)
                         .setOrientationLocked(false)));
 
@@ -214,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override public void onConfigurationChanged(android.content.res.Configuration config) {
         super.onConfigurationChanged(config);
         Language.configurationChanged(this);
+        refreshShutdownLabels();
         if (mMainAdapter != null) mMainAdapter.languageChanged();
         // Relabel retained tabs without selecting a page or restarting display work.
         TabLayout tabs = findViewById(R.id.tabs);
@@ -290,6 +308,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     @Override
     protected void onDestroy() {
+        for (AlertDialog dialog : new java.util.ArrayList<>(languageDialogs)) dialog.dismiss();
+        languageDialogs.clear();
+        if (mShutdownDialog != null) { mShutdownDialog.dismiss(); mShutdownDialog = null; }
         footerRefresh.close();
         displayHandler.removeCallbacksAndMessages(null);
         super.onDestroy();
@@ -436,24 +457,24 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     public void addPeerDialog(){
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Minima Peer");
+        LanguageDialog builder = languageDialog();
+        builder.setTitle(Language.msg(l10n_core_peer_title));
 
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
-        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(Language.msg(l10n_core_add_peer), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String peer = input.getText().toString();
 
                 MinimaCMD.runMinima("peers action:addpeers peerslist:"+peer);
 
-                Toast.makeText(MainActivity.this, "Peer added..", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, Language.msg(l10n_core_peer_added), Toast.LENGTH_SHORT).show();
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(Language.msg(l10n_common_cancel), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -469,6 +490,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         shutdownMinima();
     }
 
+    private void refreshShutdownLabels() {
+        if (mShutdownDialog == null) return;
+        mShutdownDialog.setTitle(Language.text(this, l10n_core_shutting_down));
+        mShutdownDialog.setMessage(Language.text(this, l10n_core_wait));
+    }
+
     public void shutdownMinima(){
 
         //Has the service shutdown
@@ -478,11 +505,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             if(RESTART_ON_SHUTDOWN){
                 RESTART_ON_SHUTDOWN = false;
                 startMinimaService();
-                Toast.makeText(this, "Minima restarting..", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, Language.msg(l10n_core_restarting), Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Toast.makeText(this, "Minima Service Stopped", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, Language.msg(l10n_core_stopped), Toast.LENGTH_SHORT).show();
 
             //Are we WIPING..
             if(WIPE_ON_SHUTDOWN){
@@ -503,8 +530,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void run() {
                 mShutdownDialog = new ProgressDialog(MainActivity.this); // this = YourActivity
                 mShutdownDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                mShutdownDialog.setTitle("Minima Shutting down..");
-                mShutdownDialog.setMessage("Please wait...");
+                refreshShutdownLabels();
                 mShutdownDialog.setIndeterminate(true);
 
                 mShutdownDialog.setCanceledOnTouchOutside(true);
@@ -529,14 +555,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     public void wipeMinima(){
 
-        new AlertDialog.Builder(this)
-                .setTitle("Confirm")
-                .setMessage("You are about to RESET Minima!\n\n" +
-                        "This will wipe ALL DATA..\n\n" +
-                        "Make sure you have backed up your seed and key uses!\n\n" +
-                        "Are you sure ?")
+        languageDialog()
+                .setTitle(Language.msg(l10n_core_reset_title))
+                .setMessage(Language.msg(l10n_core_reset_warning))
                 .setIcon(R.drawable.ic_minima)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
+                .setPositiveButton(Language.msg(android.R.string.yes), new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int whichButton) {
                         //Now in shutdopwn mode..
                         logger.log("Minima WIPE STARTED");
@@ -545,7 +568,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
                         shutdownMinima();
                     }})
-                .setNegativeButton(android.R.string.no, null).show();
+                .setNegativeButton(Language.msg(android.R.string.no), null).show();
     }
 
     public void wipeData(){
@@ -604,7 +627,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         public void run() {
                             startMinimaService();
                             Toast.makeText(MainActivity.this,
-                                    "Minima restarting with new params..", Toast.LENGTH_LONG).show();
+                                    Language.msg(l10n_core_restart_params), Toast.LENGTH_LONG).show();
                         }
                     }, 2000);
                 }
@@ -640,7 +663,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 try{
                     // Refresh the wallet by its build-specific position.
                     mMainAdapter.refreshPagerView(MainAdapter.WALLET_POSITION);
-                    Toast.makeText(MainActivity.this, "Balance updated on chain", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, Language.msg(l10n_core_balance_updated), Toast.LENGTH_SHORT).show();
 
                 }catch(Throwable exc){
                     logger.log("NEWBALANCE refresh failed : "+exc);
@@ -669,10 +692,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 int block = txp.getBlockNumber().getAsInt();
 
                 long timemilli  = txp.getTimeMilli().getAsLong();
-                Date dd         = new Date(timemilli);
-                String datestr  = MinimaService.DATEFORMAT_TIME.format(new Date(timemilli));
-
-                mFooterRight.setText(block+" @ "+datestr);
+                Language.setText(mFooterRight, Language.join(block, " @ ", Language.stamp(timemilli, "Hms")));
             }
         });
 
@@ -685,8 +705,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         try {
             JSONObject resp = (JSONObject) result.get("response");
             Object maxuses = resp.get("maxuses");
-            if (maxuses != null) mFooterLeft.setText(
-                    (GeneralParams.USE_BLOCK_AS_KEYUSES ? "Last Key Block:" : "Key Uses:") + maxuses);
+            if (maxuses != null) Language.setText(mFooterLeft, Language.msg(
+                    GeneralParams.USE_BLOCK_AS_KEYUSES ? l10n_core_last_key_block : l10n_core_key_uses,
+                    String.valueOf(maxuses)));
         } catch (Exception ignored) {}
     }
 

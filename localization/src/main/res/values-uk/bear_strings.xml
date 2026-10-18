@@ -6598,4 +6598,22 @@
     <string name="l10n_dex_notice_covenant_failure">"Перевірка ковенанту не вдалася: %1$s"</string>
     <!-- Arguments: price, error -->
     <string name="l10n_dex_notice_order_error">"Заявка за %1$s — %2$s"</string>
+    <string name="l10n_core_notice_status" formatted="false">"Стан вузла Minima"</string>
+    <string name="l10n_core_balance_changed" formatted="false">"Ваш баланс змінився"</string>
+    <string name="l10n_core_stopped" formatted="false">"Службу Minima зупинено"</string>
+    <string name="l10n_core_restarting" formatted="false">"Minima перезапускається…"</string>
+    <string name="l10n_core_shutting_down" formatted="false">"Minima завершує роботу…"</string>
+    <string name="l10n_core_wait" formatted="false">"Зачекайте…"</string>
+    <string name="l10n_core_reset_title" formatted="false">"Скинути Minima?"</string>
+    <string name="l10n_core_reset_warning" formatted="false">"Ви збираєтеся СКИНУТИ Minima!\n\nЦе видалить УСІ ДАНІ.\n\nПереконайтеся, що ви зберегли резервну копію сід-фрази та лічильників використання ключів!\n\nВи впевнені?"</string>
+    <string name="l10n_core_restart_params" formatted="false">"Minima перезапускається з новими налаштуваннями…"</string>
+    <string name="l10n_core_balance_updated" formatted="false">"Баланс оновлено в блокчейні"</string>
+    <string name="l10n_core_scan_keets" formatted="false">"Відскануйте QR-код адреси keets"</string>
+    <string name="l10n_core_peer_title" formatted="false">"Додати вузол Minima"</string>
+    <string name="l10n_core_add_peer" formatted="false">"Додати"</string>
+    <string name="l10n_core_peer_added" formatted="false">"Вузол додано"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_core_last_key_block">"Останній блок ключа: %1$s"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_core_key_uses">"Використань ключа: %1$s"</string>
 </resources>

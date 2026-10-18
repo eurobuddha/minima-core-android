@@ -127,8 +127,9 @@ android {
         // (PBKDF2->AES-GCM sentinel), biometric via BiometricUnlock (AndroidKeyStore), both lifted
         // from apks/wallet. Off by default; auto-lock delay default 1 min, configurable.
         // vc113: explicit English, Chinese, Russian and Ukrainian selection across all bears.
-        versionCode 113
-        versionName "1.9.42"
+        // vc114: core notifications and retained main-screen controls follow the selected language.
+        versionCode 114
+        versionName "1.9.43"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -232,6 +233,7 @@ dependencies {
     // The fork's node has NO Maxima - the app carries the clean-room core itself, like mininotes.
     implementation project(':maxima-core')
     testImplementation libs.junit
+    testImplementation 'org.mockito:mockito-core:5.12.0'
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
 }

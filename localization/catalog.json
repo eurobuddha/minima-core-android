@@ -32065,5 +32065,101 @@
     "zh-Hans": "订单价格 {price} — {error}",
     "ru": "Заявка по {price} — {error}",
     "uk": "Заявка за {price} — {error}"
+  },
+  "core.noticeStatus": {
+    "en": "Minima node status",
+    "zh-Hans": "Minima 节点状态",
+    "ru": "Состояние узла Minima",
+    "uk": "Стан вузла Minima"
+  },
+  "core.balanceChanged": {
+    "en": "Your balance has changed",
+    "zh-Hans": "您的余额已变更",
+    "ru": "Ваш баланс изменился",
+    "uk": "Ваш баланс змінився"
+  },
+  "core.stopped": {
+    "en": "Minima service stopped",
+    "zh-Hans": "Minima 服务已停止",
+    "ru": "Служба Minima остановлена",
+    "uk": "Службу Minima зупинено"
+  },
+  "core.restarting": {
+    "en": "Minima restarting…",
+    "zh-Hans": "Minima 正在重启…",
+    "ru": "Minima перезапускается…",
+    "uk": "Minima перезапускається…"
+  },
+  "core.shuttingDown": {
+    "en": "Minima shutting down…",
+    "zh-Hans": "Minima 正在关闭…",
+    "ru": "Minima завершает работу…",
+    "uk": "Minima завершує роботу…"
+  },
+  "core.wait": {
+    "en": "Please wait…",
+    "zh-Hans": "请稍候…",
+    "ru": "Подождите…",
+    "uk": "Зачекайте…"
+  },
+  "core.resetTitle": {
+    "en": "Reset Minima?",
+    "zh-Hans": "重置 Minima？",
+    "ru": "Сбросить Minima?",
+    "uk": "Скинути Minima?"
+  },
+  "core.resetWarning": {
+    "en": "You are about to RESET Minima!\n\nThis will erase ALL DATA.\n\nMake sure you have backed up your seed and key uses!\n\nAre you sure?",
+    "zh-Hans": "您即将重置 Minima！\n\n这将删除所有数据。\n\n请确保您已备份助记词和密钥使用次数！\n\n确定要继续吗？",
+    "ru": "Вы собираетесь СБРОСИТЬ Minima!\n\nЭто удалит ВСЕ ДАННЫЕ.\n\nУбедитесь, что вы сохранили резервную копию сид-фразы и счётчиков использования ключей!\n\nВы уверены?",
+    "uk": "Ви збираєтеся СКИНУТИ Minima!\n\nЦе видалить УСІ ДАНІ.\n\nПереконайтеся, що ви зберегли резервну копію сід-фрази та лічильників використання ключів!\n\nВи впевнені?"
+  },
+  "core.restartParams": {
+    "en": "Minima restarting with new settings…",
+    "zh-Hans": "Minima 正在使用新设置重启…",
+    "ru": "Minima перезапускается с новыми настройками…",
+    "uk": "Minima перезапускається з новими налаштуваннями…"
+  },
+  "core.balanceUpdated": {
+    "en": "Balance updated on chain",
+    "zh-Hans": "链上余额已更新",
+    "ru": "Баланс обновлён в блокчейне",
+    "uk": "Баланс оновлено в блокчейні"
+  },
+  "core.scanKeets": {
+    "en": "Scan a keets address QR code",
+    "zh-Hans": "扫描 keets 地址二维码",
+    "ru": "Отсканируйте QR-код адреса keets",
+    "uk": "Відскануйте QR-код адреси keets"
+  },
+  "core.peerTitle": {
+    "en": "Add Minima peer",
+    "zh-Hans": "添加 Minima 对等节点",
+    "ru": "Добавить узел Minima",
+    "uk": "Додати вузол Minima"
+  },
+  "core.addPeer": {
+    "en": "Add",
+    "zh-Hans": "添加",
+    "ru": "Добавить",
+    "uk": "Додати"
+  },
+  "core.peerAdded": {
+    "en": "Peer added",
+    "zh-Hans": "已添加对等节点",
+    "ru": "Узел добавлен",
+    "uk": "Вузол додано"
+  },
+  "core.lastKeyBlock": {
+    "en": "Last key block: {value}",
+    "zh-Hans": "上次密钥区块：{value}",
+    "ru": "Последний блок ключа: {value}",
+    "uk": "Останній блок ключа: {value}"
+  },
+  "core.keyUses": {
+    "en": "Key uses: {value}",
+    "zh-Hans": "密钥使用次数：{value}",
+    "ru": "Использований ключа: {value}",
+    "uk": "Використань ключа: {value}"
   }
 }

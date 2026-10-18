@@ -6536,4 +6536,22 @@
     <string name="l10n_dex_notice_covenant_failure">"Covenant check failed: %1$s"</string>
     <!-- Arguments: price, error -->
     <string name="l10n_dex_notice_order_error">"Order @ %1$s — %2$s"</string>
+    <string name="l10n_core_notice_status" formatted="false">"Minima node status"</string>
+    <string name="l10n_core_balance_changed" formatted="false">"Your balance has changed"</string>
+    <string name="l10n_core_stopped" formatted="false">"Minima service stopped"</string>
+    <string name="l10n_core_restarting" formatted="false">"Minima restarting…"</string>
+    <string name="l10n_core_shutting_down" formatted="false">"Minima shutting down…"</string>
+    <string name="l10n_core_wait" formatted="false">"Please wait…"</string>
+    <string name="l10n_core_reset_title" formatted="false">"Reset Minima?"</string>
+    <string name="l10n_core_reset_warning" formatted="false">"You are about to RESET Minima!\n\nThis will erase ALL DATA.\n\nMake sure you have backed up your seed and key uses!\n\nAre you sure?"</string>
+    <string name="l10n_core_restart_params" formatted="false">"Minima restarting with new settings…"</string>
+    <string name="l10n_core_balance_updated" formatted="false">"Balance updated on chain"</string>
+    <string name="l10n_core_scan_keets" formatted="false">"Scan a keets address QR code"</string>
+    <string name="l10n_core_peer_title" formatted="false">"Add Minima peer"</string>
+    <string name="l10n_core_add_peer" formatted="false">"Add"</string>
+    <string name="l10n_core_peer_added" formatted="false">"Peer added"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_core_last_key_block">"Last key block: %1$s"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_core_key_uses">"Key uses: %1$s"</string>
 </resources>

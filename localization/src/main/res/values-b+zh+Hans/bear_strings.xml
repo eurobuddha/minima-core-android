@@ -6505,4 +6505,22 @@
     <string name="l10n_dex_notice_covenant_failure">"合约核查失败：%1$s"</string>
     <!-- Arguments: price, error -->
     <string name="l10n_dex_notice_order_error">"订单价格 %1$s — %2$s"</string>
+    <string name="l10n_core_notice_status" formatted="false">"Minima 节点状态"</string>
+    <string name="l10n_core_balance_changed" formatted="false">"您的余额已变更"</string>
+    <string name="l10n_core_stopped" formatted="false">"Minima 服务已停止"</string>
+    <string name="l10n_core_restarting" formatted="false">"Minima 正在重启…"</string>
+    <string name="l10n_core_shutting_down" formatted="false">"Minima 正在关闭…"</string>
+    <string name="l10n_core_wait" formatted="false">"请稍候…"</string>
+    <string name="l10n_core_reset_title" formatted="false">"重置 Minima？"</string>
+    <string name="l10n_core_reset_warning" formatted="false">"您即将重置 Minima！\n\n这将删除所有数据。\n\n请确保您已备份助记词和密钥使用次数！\n\n确定要继续吗？"</string>
+    <string name="l10n_core_restart_params" formatted="false">"Minima 正在使用新设置重启…"</string>
+    <string name="l10n_core_balance_updated" formatted="false">"链上余额已更新"</string>
+    <string name="l10n_core_scan_keets" formatted="false">"扫描 keets 地址二维码"</string>
+    <string name="l10n_core_peer_title" formatted="false">"添加 Minima 对等节点"</string>
+    <string name="l10n_core_add_peer" formatted="false">"添加"</string>
+    <string name="l10n_core_peer_added" formatted="false">"已添加对等节点"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_core_last_key_block">"上次密钥区块：%1$s"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_core_key_uses">"密钥使用次数：%1$s"</string>
 </resources>
