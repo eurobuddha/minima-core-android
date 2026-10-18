@@ -1,0 +1,83 @@
+Salon hosting test and trust review — 2026-10-19, source 1.9.91/162
+
+Summary
+Hosting tests use a frozen destination and retain the account and screen that
+requested them. SFTP trust consent can pin only that unchanged saved destination.
+The retry starts only after a checked pin commit, and stale results cannot open a
+trust dialog or repaint a different account/editor. No live upload was performed.
+
+Sources reused
+- Standalone apks/salon MainActivity testProfile/promptTrustHostKey/saveHost and the
+  integrated equivalents, callers in hosting list/editor and identity setup.
+- Salon Hosting.Profile, Hosting.forProfile, Uploader, SftpUploader/PinRepo,
+  HostingStore and HostingSecrets. SFTP fingerprint checking and upload transport
+  are unchanged. UUID names keep simultaneous probe uploads distinct.
+- Existing ProfilePublishing, ClaimIdentity, backupOwner and render/destroy guards.
+  Account/hosting lock order remains SalonStore then HostingStore.
+- SalonStore's checked preference commit and rollback, and HostingStore's strict
+  listForBackup parser. The pin updates only the saved matching row; it preserves
+  other destinations and any newer default selection.
+- Shared LanguageDialog's retained bindings. It uses view attachment, so the new
+  dismissal listener does not replace a localization cleanup listener.
+- Existing SalonHostingLanguageTest and SalonBackupPersistenceTest memory/disk
+  fixture. Atelier's corresponding test/confirm methods were read too; their
+  separate lifecycle remains in the remaining integration review.
+- Graph expansion [salon, hosting, profile, sftp, trust] located the standalone
+  Hosting/Profile/MainActivity/SftpUploader flow. Current source controls the change.
+
+Resolved findings
+MAJOR — The old trust callback unconditionally upserted a captured mutable profile.
+An account restore, saved profile edit or deletion could be overwritten by old
+consent. Both the original account and complete destination snapshot are checked
+before opening/accepting trust. Default selection is excluded from the endpoint
+comparison, and the latest default is preserved by the pin-only update. Unsaved
+editor changes invalidate consent. The original fingerprint remains literal.
+
+MAJOR — Background tests read the live mutable editor and returned unowned UI
+updates. They now use a deep copy of the accepted profile. Stored ownership is
+checked before uploader creation, upload and fetch-back; UI results also check
+screen generation, Activity lifetime and the current editor. An already-started
+upload cannot be recalled; cancellation prevents subsequent steps and stale UI.
+Repeated test requests cancel earlier ownership, and workers close uploaders.
+
+MAJOR — Trust was treated as saved after an unchecked apply(). A checked commit
+now precedes the retry. Storage failure restores the prior preference snapshot,
+keeps the editor unpinned and shows the existing localized storage failure. The
+same code works with legacy hosting preferences and the combined restored account
+store. Corrupt profile lists are preserved, not replaced with a partial list.
+
+The dialog is consumed before saving/retrying. Duplicate taps, dismissal, changed
+accounts and render/destroy cancellation cannot retry or repin it. The setup-to-
+trust handoff and pin-to-retry handoff hold the account lock throughout. Existing
+pins cannot be silently replaced by the first-contact trust flow.
+
+Verification
+- Combined checks passed in 57 seconds: Salon 348, Atelier 288, localization 12,
+  Pandamonium host 158 = 806 tests, zero failures/errors/skips. Release Java
+  compilation passed. Unchanged module tasks may use their valid Gradle cache.
+- Fifteen new tests cover real consent dialogs, changed account/editor/store,
+  deletion, navigation/lifetime, repeated clicks, defaults, frozen upload config,
+  late SFTP errors, dismissal, uploader cleanup, worker rejection, pin commit
+  failure/exception/restart in both preference locations, and corrupt storage.
+- Existing five hosting language tests retain all editor inputs/cursors and prove
+  English, Simplified Chinese, Russian and Ukrainian dialog/status updates.
+- The first targeted run exposed an invalid fixture that used SalonStore.put to
+  replace msgpk; that API deliberately refuses key writes. The fixture now asserts
+  writeIdentity succeeds. The corrected initial 18-test group passed; the final
+  two additional boundary tests are included in the full 348-test Salon run.
+- First full run exhausted Gradle's default test heap. Salon's existing unitTests
+  block now sets maxHeapSize='2g'. The standard full command then passed; no tests
+  were excluded. This setting affects the test JVM only, not APK runtime limits.
+- All 21 pinned imports reproduce, including the test heap setting. All 6840
+  catalogue messages validate in four languages. Direct-transport and whitespace
+  checks pass; canonical sources/tests match imported copies.
+- Evidence: build/localization/salon-hosting-checks-{targeted,full,full-2g,import}.log
+  and salon-hosting-checks-results.json. The 'full' log records the failed heap run;
+  'full-2g' is the successful complete run.
+
+Verdict
+Approve this hosting change. No unresolved blocking finding within this patch.
+No APK build/install/publication, real upload, transaction, key operation or device
+change was performed. Remaining integration work includes inbound/tip callbacks,
+Atelier hosting consent/navigation, final label audit, signed APK verification and
+Fold acceptance. The overall integration goal remains active and incomplete.

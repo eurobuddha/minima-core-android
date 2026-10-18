@@ -1,6 +1,6 @@
 # Four-language bear release
 
-## Current Atelier/Salon integration checkpoint — 1.9.90/161, 2026-10-19
+## Current Atelier/Salon integration checkpoint — 1.9.91/162, 2026-10-19
 
 This section supersedes the older source-version and completion-count snapshots
 below. The active goal remains incomplete. No final integration release has been
@@ -11,7 +11,7 @@ checkpoint performs no device changes.
   the common manual English, Simplified Chinese, Russian and Ukrainian selector.
   Menu identities 17/18, Pandamonium-only dependencies, non-exported activities and
   separate providers remain present. Salon uses the host MaxChat node/media.
-- Current host verification: 791 passing tests across Atelier (288), Salon (333),
+- Current host verification: 806 passing tests across Atelier (288), Salon (348),
   shared localization (12) and Pandamonium host (158). The prior real Chrome FILTR
   and Salon page four-language checks still apply to the unchanged browser assets.
   Host/browser checks do not prove Fold acceptance.
@@ -34,12 +34,16 @@ checkpoint performs no device changes.
   an explicit four-language review path. See `docs/SALON_OUTBOX_REVIEW.txt` for
   migration compatibility, verification and limits.
 
+- Salon hosting tests and SFTP trust now retain the original account/destination,
+  reject stale consent and commit pins before retrying. The 2 GB Salon test heap
+  supports the complete suite. Review: `docs/SALON_HOSTING_CHECKS_REVIEW.txt`.
+
 Remaining before accepting the full goal:
 
-1. Finish account ownership checks for inbound scans, tip callbacks and hosting
-   trust confirmation. Outgoing-message ownership and durable retries are reviewed.
+1. Finish account ownership checks for inbound scans and tip callbacks. Salon
+   hosting trust and outgoing-message ownership/durable retries are reviewed.
 2. Finish the hardcoded-label audit, including Atelier's `openMinimaCore()` fallback
-   toast, and review the integrated apps' remaining asynchronous completion paths.
+   toast, and finish Atelier's testProfile/confirmHostKey lifecycle guards.
 3. Build final signed versioned APKs after review; verify actual packages, certificate,
    embedded Keets components, language resources, assets and version metadata.
 4. Run the authorized Fold navigation, four-language visual/retained-input, WebView,

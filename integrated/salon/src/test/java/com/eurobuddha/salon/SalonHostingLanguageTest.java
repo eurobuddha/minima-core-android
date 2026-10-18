@@ -116,6 +116,7 @@ public class SalonHostingLanguageTest {
     @Test public void trustDialogRetainsHostAndFingerprintAndCancelNeverPins() throws Exception {
         Hosting.Profile p=Hosting.Profile.fresh("sftp");Hosting.put(p.cfg(),"host","my-host.example");
         TextView status=new TextView(activity);String fp="SHA256:abc123+/=";
+        HostingStore.upsert(activity,p);
         invoke("promptTrustHostKey",new Class<?>[]{Hosting.Profile.class,String.class,TextView.class},p,fp,status);
         Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
         AlertDialog dialog=(AlertDialog)ShadowDialog.getLatestDialog();assertNotNull(dialog);
@@ -131,6 +132,7 @@ public class SalonHostingLanguageTest {
     }
     @Test public void trustingPinsExactFingerprintThenSchedulesExistingTestPath() throws Exception {
         Hosting.Profile p=Hosting.Profile.fresh("sftp");Hosting.put(p.cfg(),"host","my-host.example");TextView status=new TextView(activity);
+        HostingStore.upsert(activity,p);
         invoke("promptTrustHostKey",new Class<?>[]{Hosting.Profile.class,String.class,TextView.class},p,"SHA256:literal+/=",status);
         Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
         AlertDialog dialog=(AlertDialog)ShadowDialog.getLatestDialog();Language.select(activity,"uk");
@@ -143,16 +145,18 @@ public class SalonHostingLanguageTest {
     @Test public void uploadSuccessAndFailureMessagesRetainLiteralDetailsAcrossLanguages() throws Exception {
         Hosting.Profile p=Hosting.Profile.fresh("webdav");TextView status=new TextView(activity);
         String url="https://files.example/中文/test.txt", error="provider error 403: literal";
+        HostingStore.upsert(activity,p);
         doAnswer(call->{((Runnable)call.getArgument(0)).run();return null;}).when(worker).execute(any(Runnable.class));
-        try(MockedStatic<Hosting> hosting=mockStatic(Hosting.class)) {
+        try(MockedStatic<Hosting> hosting=mockStatic(Hosting.class,CALLS_REAL_METHODS)) {
             Hosting.Uploader uploader=mock(Hosting.Uploader.class);
-            hosting.when(()->Hosting.forProfile(p)).thenReturn(uploader);
+            hosting.when(()->Hosting.verifyUrl(anyString(),any(Hosting.Profile.class))).thenAnswer(call->null);
+            hosting.when(()->Hosting.forProfile(any(Hosting.Profile.class))).thenReturn(uploader);
             when(uploader.putFile(any(byte[].class),anyString(),eq("text/plain"))).thenReturn(url);
             invoke("testProfile",new Class<?>[]{Hosting.Profile.class,TextView.class},p,status);
             Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
             for(String code:CODES){Language.select(activity,code);assertEquals(Language.msg(l10n_creative_hosting_tested,url).toString(),status.getText().toString());}
-            verify(uploader).close();hosting.verify(()->Hosting.verifyUrl(url,p));
-            hosting.when(()->Hosting.forProfile(p)).thenThrow(new Hosting.HostingException(error));
+            verify(uploader).close();hosting.verify(()->Hosting.verifyUrl(eq(url),argThat(copy->copy.j.toString().equals(p.j.toString()))));
+            hosting.when(()->Hosting.forProfile(any(Hosting.Profile.class))).thenThrow(new Hosting.HostingException(error));
             invoke("testProfile",new Class<?>[]{Hosting.Profile.class,TextView.class},p,status);
             Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
             for(String code:CODES){Language.select(activity,code);assertEquals(Language.msg(l10n_creative_hosting_failed,error).toString(),status.getText().toString());}

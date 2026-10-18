@@ -92,6 +92,48 @@ final class HostingStore {
         save(c, all);
     }
 
+    /** Default selection is unrelated to the endpoint the user is verifying. */
+    static String profileSnapshot(Hosting.Profile profile) {
+        try {
+            JSONObject copy = new JSONObject(profile.j.toString());
+            copy.remove("def");
+            return copy.toString();
+        } catch (Exception invalid) { throw new SalonStore.BackupStorageUnavailable(); }
+    }
+
+    static synchronized boolean matches(Context c, Hosting.Profile expected) {
+        for (Hosting.Profile current : listForBackup(c))
+            if (current.id().equals(expected.id()))
+                return profileSnapshot(current).equals(profileSnapshot(expected));
+        return false;
+    }
+
+    /** Compare and commit only the pin, retaining the latest default and other profiles.
+     * The caller holds SalonStore's account lock before this hosting lock. */
+    static synchronized boolean pinHostKey(Context c, Hosting.Profile expected, String fingerprint) {
+        if (!Hosting.TYPE_SFTP.equals(expected.type()) || fingerprint == null || fingerprint.isEmpty()
+                || !expected.cfgStr("hostKeyFp").isEmpty()) return false;
+        final SharedPreferences p = prefs(c);
+        final String previous = p.getString(KEY, null);
+        final List<Hosting.Profile> all = listForBackup(c);
+        boolean found = false;
+        for (Hosting.Profile current : all) {
+            if (!current.id().equals(expected.id())) continue;
+            if (!profileSnapshot(current).equals(profileSnapshot(expected))) return false;
+            Hosting.put(current.cfg(), "hostKeyFp", fingerprint);
+            found = true;
+        }
+        if (!found) return false;
+        JSONArray result = new JSONArray();
+        for (Hosting.Profile current : all) result.put(current.j);
+        try {
+            if (p.edit().putString(KEY, result.toString()).commit()) return true;
+        } catch (RuntimeException unavailable) { /* Restore the in-memory copy too. */ }
+        try { p.edit().putString(KEY, previous).commit(); }
+        catch (RuntimeException unavailable) { /* The caller must not retry the connection. */ }
+        return false;
+    }
+
     static synchronized void remove(Context c, String id) {
         List<Hosting.Profile> all = list(c);
         List<Hosting.Profile> next = new ArrayList<>();

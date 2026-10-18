@@ -108,7 +108,7 @@
                         op.url=url;publicationStatus(op.status,MSG_CHECKING);adoptOrMint(op);
                     });
                 } catch(SftpUploader.HostKeyUnverified untrusted) {
-                    runOnUiThread(()->{if(requireClaim(op)){endClaim(op,MSG_STORAGE);promptTrustHostKey(op.host,untrusted.fingerprint,op.status);}});
+                    runOnUiThread(()->{synchronized(SalonStore.class){if(requireClaim(op)){endClaim(op,MSG_STORAGE);promptTrustHostKey(op.host,untrusted.fingerprint,op.status);}}});
                 } catch(Exception unavailable) { runOnUiThread(()->endClaim(op,MSG_HOST_FAILED)); }
             });
         } catch(java.util.concurrent.RejectedExecutionException unavailable) { endClaim(op,MSG_STORAGE); }
