@@ -198,6 +198,7 @@ public final class OtcController {
     /** Instigator opens a deal against an LP offer. */
     public void propose(OtcOffer lp, String dealSide, String amount, String price, SendResult res) {
         if (lp == null || !validSide(dealSide) || lp.capFor(dealSide) <= 0) { res.err("enter amount + price"); return; }
+        if (lp == null || lp.market != market || !currentMarket()) { res.err(MARKET_ERROR); return; }
         if (!ready()) { res.err("still connecting"); return; }
         if (!validTerms(amount, price)) { res.err("enter amount + price"); return; }
         OtcDb.Deal d = new OtcDb.Deal();

@@ -53,24 +53,29 @@ public final class OtcBook {
 
     /** Bounded one-shot scan of the board; verifies signatures and returns freshest-per-signer. */
     public static void scan(NodeApi node, LazySodium ls, Consumer<Map<String, OtcOffer>> ok, Consumer<String> err) {
-        node.cmd("coinnotify action:add address:" + address(), new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) { doScan(node, ls, ok, err); }
-            @Override public void onError(String m) { doScan(node, ls, ok, err); }   // proceed regardless
+        final TradingContext market = TradingContext.active();
+        node.cmd("coinnotify action:add address:" + market.otcBoardAddr, new NodeApi.Cb() {
+            @Override public void onResult(JSONObject j) { doScan(node, ls, market, ok, err); }
+            @Override public void onError(String m) { doScan(node, ls, market, ok, err); }   // proceed regardless
         });
     }
 
-    private static void doScan(NodeApi node, LazySodium ls, Consumer<Map<String, OtcOffer>> ok, Consumer<String> err) {
-        node.cmd("coins simplestate:true order:desc depth:" + SCAN_DEPTH + " address:" + address(), new NodeApi.Cb() {
+    private static void doScan(NodeApi node, LazySodium ls, TradingContext market, Consumer<Map<String, OtcOffer>> ok, Consumer<String> err) {
+        if (market != TradingContext.active()) { err.accept(OtcController.MARKET_ERROR); return; }
+        node.cmd("coins simplestate:true order:desc depth:" + SCAN_DEPTH + " address:" + market.otcBoardAddr, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
+                if (market != TradingContext.active()) { err.accept(OtcController.MARKET_ERROR); return; }
                 Object resp = j.opt("response");
                 JSONArray coins = resp instanceof JSONArray ? (JSONArray) resp : new JSONArray();
                 Map<String, OtcOffer> book = new LinkedHashMap<>();
                 for (int i = 0; i < coins.length(); i++) {
                     OtcOffer o = verifyCoin(ls, coins.optJSONObject(i));
                     if (o == null) continue;
+                    o.market = market;
                     OtcOffer prev = book.get(o.signerPk);
                     if (prev == null || o.ts > prev.ts) book.put(o.signerPk, o);
                 }
+                if (market != TradingContext.active()) { err.accept(OtcController.MARKET_ERROR); return; }
                 ok.accept(book);
             }
             @Override public void onError(String m) { err.accept(m); }

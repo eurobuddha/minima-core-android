@@ -24,6 +24,9 @@ public final class OtcOffer {
     public String commsPublicId = "";     // 0x + boxPk + signPk — seals negotiation messages to the LP
     public long ts = 0;                   // freshest-per-signer wins
 
+    // Local scan provenance; never serialized or accepted from peer JSON.
+    com.eurobuddha.atomix.TradingContext market;
+
     // set on receive (NOT signed)
     public String signerPk = "";
     public String coinid = "";

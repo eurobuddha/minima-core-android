@@ -145,3 +145,32 @@ def adapt(root):
             if (d.inActiveMarket() && otc != null && OtcDb.TURN_ME.equals(d.whoseTurn)'''),(
  '    private void otcCounterDialog(final OtcDb.Deal d) {',
  '    private void otcCounterDialog(final OtcDb.Deal d) {\n        if (!d.inActiveMarket()) { toast(Language.msg(l10n_atomix_otc_market_unavailable)); return; }')])
+
+ adapt_board(root)
+
+
+def adapt_board(root):
+ """Keep a scan and its locally verified offers in the market captured at entry."""
+ folder=root/'atomix/src/main/java/com/eurobuddha/atomix/swap'
+ def patch(name,changes):
+  p=folder/name;s=p.read_text()
+  for old,new in changes:
+   assert s.count(old)==1,('AtomiX board drift',name,old);s=s.replace(old,new)
+  p.write_text(s)
+ patch('OtcOffer.java',[(
+ '    // set on receive (NOT signed)',
+ '    // Local scan provenance; never serialized or accepted from peer JSON.\n    com.eurobuddha.atomix.TradingContext market;\n\n    // set on receive (NOT signed)')])
+ patch('OtcController.java',[(
+ '    public void propose(OtcOffer lp, String dealSide, String amount, String price, SendResult res) {',
+ '    public void propose(OtcOffer lp, String dealSide, String amount, String price, SendResult res) {\n        if (lp == null || lp.market != market || !currentMarket()) { res.err(MARKET_ERROR); return; }')])
+ patch('OtcBook.java',[(
+ '        node.cmd("coinnotify action:add address:" + address(), new NodeApi.Cb() {',
+ '        final TradingContext market = TradingContext.active();\n        node.cmd("coinnotify action:add address:" + market.otcBoardAddr, new NodeApi.Cb() {'),(
+ 'doScan(node, ls, ok, err); }\n            @Override public void onError(String m) { doScan(node, ls, ok, err);',
+ 'doScan(node, ls, market, ok, err); }\n            @Override public void onError(String m) { doScan(node, ls, market, ok, err);'),(
+ '    private static void doScan(NodeApi node, LazySodium ls, Consumer<Map<String, OtcOffer>> ok, Consumer<String> err) {\n        node.cmd("coins simplestate:true order:desc depth:" + SCAN_DEPTH + " address:" + address(), new NodeApi.Cb() {\n            @Override public void onResult(JSONObject j) {',
+ '    private static void doScan(NodeApi node, LazySodium ls, TradingContext market, Consumer<Map<String, OtcOffer>> ok, Consumer<String> err) {\n        if (market != TradingContext.active()) { err.accept(OtcController.MARKET_ERROR); return; }\n        node.cmd("coins simplestate:true order:desc depth:" + SCAN_DEPTH + " address:" + market.otcBoardAddr, new NodeApi.Cb() {\n            @Override public void onResult(JSONObject j) {\n                if (market != TradingContext.active()) { err.accept(OtcController.MARKET_ERROR); return; }'),(
+ '                    if (o == null) continue;',
+ '                    if (o == null) continue;\n                    o.market = market;'),(
+ '                ok.accept(book);',
+ '                if (market != TradingContext.active()) { err.accept(OtcController.MARKET_ERROR); return; }\n                ok.accept(book);')])
