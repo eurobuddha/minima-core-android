@@ -7139,4 +7139,79 @@
     <!-- Arguments: 0, 1 -->
     <string name="l10n_atelier_manage_checking">"正在检查代币 %1$s/%2$s…"</string>
     <string name="l10n_atelier_manage_scan_failed" formatted="false">"无法读取钱包。请重新扫描。"</string>
+    <string name="l10n_atelier_create_new_nft" formatted="false">"新建 NFT"</string>
+    <string name="l10n_atelier_create_new_token" formatted="false">"新建代币"</string>
+    <string name="l10n_atelier_create_artwork" formatted="false">"作品"</string>
+    <string name="l10n_atelier_create_embed" formatted="false">"嵌入图片"</string>
+    <string name="l10n_atelier_create_hosted" formatted="false">"托管 URL"</string>
+    <string name="l10n_atelier_create_choose_image" formatted="false">"点按画面选择图片。"</string>
+    <string name="l10n_atelier_create_replace_image" formatted="false">"点按替换。此图片将被永久写入链上。"</string>
+    <string name="l10n_atelier_create_svg_help" formatted="false">"矢量作品，以 SVG 格式存储，放大仍清晰。"</string>
+    <string name="l10n_atelier_create_edit_image" formatted="false">"打开图片编辑器：裁剪 · 旋转 · 色调"</string>
+    <string name="l10n_atelier_create_image_url" formatted="false">"图片 URL"</string>
+    <string name="l10n_atelier_create_image_url_hint" formatted="false">"https://… 或 ipfs://…"</string>
+    <string name="l10n_atelier_create_upload_artwork" formatted="false">"上传作品到存储空间"</string>
+    <string name="l10n_atelier_create_title" formatted="false">"标题"</string>
+    <string name="l10n_atelier_create_title_hint" formatted="false">"夜曲 04"</string>
+    <string name="l10n_atelier_create_optional" formatted="false">"可选"</string>
+    <string name="l10n_atelier_create_owner" formatted="false">"艺术家／所有者"</string>
+    <string name="l10n_atelier_create_owner_hint" formatted="false">"记录中的姓名"</string>
+    <string name="l10n_atelier_create_external_url" formatted="false">"外部 URL（可选）"</string>
+    <string name="l10n_atelier_create_upload_full" formatted="false">"上传原始分辨率照片"</string>
+    <string name="l10n_atelier_create_webvalidate" formatted="false">"网页验证 URL（可选）"</string>
+    <string name="l10n_atelier_create_signed" formatted="false">"始终以创建者身份签名 ✓"</string>
+    <string name="l10n_atelier_create_traits" formatted="false">"属性"</string>
+    <string name="l10n_atelier_create_trait_hint" formatted="false">"属性，例如：地区"</string>
+    <string name="l10n_atelier_create_trait_value_hint" formatted="false">"值，例如：左岸"</string>
+    <string name="l10n_atelier_create_trait_required" formatted="false">"请填写属性和值"</string>
+    <string name="l10n_atelier_create_trait_limit" formatted="false">"最多 12 个属性"</string>
+    <string name="l10n_atelier_create_before_seal" formatted="false">"铸造前预览"</string>
+    <string name="l10n_atelier_create_untitled" formatted="false">"未命名"</string>
+    <string name="l10n_atelier_create_minting" formatted="false">"正在铸造…"</string>
+    <string name="l10n_atelier_create_seal_nft" formatted="false">"铸造此 NFT"</string>
+    <string name="l10n_atelier_create_metadata_help" formatted="false">"采用钱包标准元数据铸造，可在 NFT Wallet、MiniDapp 等应用中显示。"</string>
+    <string name="l10n_atelier_create_title_required" formatted="false">"标题须为 1–60 个字符"</string>
+    <string name="l10n_atelier_create_editions_range" formatted="false">"发行份数须为 1–1000"</string>
+    <string name="l10n_atelier_create_image_required" formatted="false">"请先选择作品图片"</string>
+    <string name="l10n_atelier_create_image_url_required" formatted="false">"请填写图片 URL，不得含空格、引号或分号"</string>
+    <string name="l10n_atelier_create_safe_urls" formatted="false">"URL 不得含空格、引号或分号"</string>
+    <string name="l10n_atelier_create_nft_minted" formatted="false">"NFT 已铸造，确认后将显示在图库中"</string>
+    <string name="l10n_atelier_create_art_shrunk" formatted="false">"作品已自动压缩，以便 NFT 签名和转移"</string>
+    <string name="l10n_atelier_create_key_failed" formatted="false">"无法获取签名密钥"</string>
+    <string name="l10n_atelier_create_decimals" formatted="false">"小数位数（0–16）"</string>
+    <string name="l10n_atelier_create_description_optional" formatted="false">"描述（可选）"</string>
+    <string name="l10n_atelier_create_icon_url_optional" formatted="false">"图标 URL（可选）"</string>
+    <string name="l10n_atelier_create_upload_icon_host" formatted="false">"上传图标图片到存储空间"</string>
+    <string name="l10n_atelier_create_icon_help" formatted="false">"钱包图标：优先使用上方托管 URL"</string>
+    <string name="l10n_atelier_create_custom_fields" formatted="false">"自定义记录字段"</string>
+    <string name="l10n_atelier_create_field_hint" formatted="false">"字段，例如：website"</string>
+    <string name="l10n_atelier_create_field_required" formatted="false">"请填写字段和值"</string>
+    <string name="l10n_atelier_create_field_limit" formatted="false">"最多 10 个自定义字段"</string>
+    <string name="l10n_atelier_create_record" formatted="false">"记录预览"</string>
+    <string name="l10n_atelier_create_permanent_supply" formatted="false">"供应量不可更改"</string>
+    <string name="l10n_atelier_create_supply_help" formatted="false">"铸造后无法更改总供应量和小数位数。"</string>
+    <string name="l10n_atelier_create_name_required" formatted="false">"名称须为 1–40 个字符"</string>
+    <string name="l10n_atelier_create_supply_required" formatted="false">"供应量须为正整数"</string>
+    <string name="l10n_atelier_create_decimals_range" formatted="false">"小数位数须为 0–16"</string>
+    <string name="l10n_atelier_create_safe_icon_url" formatted="false">"图标 URL 不得含空格、引号或分号"</string>
+    <string name="l10n_atelier_create_icon_shrunk" formatted="false">"图标已自动压缩，以保留代币签名"</string>
+    <string name="l10n_atelier_create_icon_too_large" formatted="false">"图标和字段超出已签名记录的大小限制，请使用托管图标 URL 或缩短字段"</string>
+    <string name="l10n_atelier_create_record_too_large" formatted="false">"记录超出签名大小限制，请缩短描述或自定义字段"</string>
+    <string name="l10n_atelier_create_token_minted" formatted="false">"代币已铸造，确认后将显示"</string>
+    <string name="l10n_atelier_create_upload_icon" formatted="false">"上传图标图片"</string>
+    <string name="l10n_atelier_create_replace_icon" formatted="false">"替换图标图片"</string>
+    <string name="l10n_atelier_create_setup_hosting" formatted="false">"在“管理 → 托管”中设置存储位置"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_editions_preview">"发行份数：%1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_traits_preview">"属性数：%1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_reserved">"“%1$s”是保留字段"</string>
+    <string name="l10n_atelier_create_node_refused" formatted="false">"节点拒绝"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_create_svg_too_large">"此 SVG（%1$s 字节）超出已签名记录的 %2$s 字节限制。"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_svg_editions">"发行份数为 %1$s。"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_art_too_large">"作品无法压缩到已签名记录的 %1$s 字节限制，请缩短文本或减少发行份数。"</string>
 </resources>

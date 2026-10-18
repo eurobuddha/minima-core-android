@@ -7235,4 +7235,79 @@
     <!-- Arguments: 0, 1 -->
     <string name="l10n_atelier_manage_checking">"Проверка токена %1$s из %2$s…"</string>
     <string name="l10n_atelier_manage_scan_failed" formatted="false">"Не удалось прочитать кошелёк. Повторите сканирование."</string>
+    <string name="l10n_atelier_create_new_nft" formatted="false">"Новый NFT"</string>
+    <string name="l10n_atelier_create_new_token" formatted="false">"Новый токен"</string>
+    <string name="l10n_atelier_create_artwork" formatted="false">"Работа"</string>
+    <string name="l10n_atelier_create_embed" formatted="false">"Встроить изображение"</string>
+    <string name="l10n_atelier_create_hosted" formatted="false">"URL хостинга"</string>
+    <string name="l10n_atelier_create_choose_image" formatted="false">"Нажмите на изображение, чтобы выбрать файл."</string>
+    <string name="l10n_atelier_create_replace_image" formatted="false">"Нажмите для замены. Именно это изображение будет записано в блокчейн."</string>
+    <string name="l10n_atelier_create_svg_help" formatted="false">"Векторная работа — сохраняется как SVG и остаётся чёткой при любом размере."</string>
+    <string name="l10n_atelier_create_edit_image" formatted="false">"Редактор: кадрирование · поворот · тон"</string>
+    <string name="l10n_atelier_create_image_url" formatted="false">"URL изображения"</string>
+    <string name="l10n_atelier_create_image_url_hint" formatted="false">"https://… или ipfs://…"</string>
+    <string name="l10n_atelier_create_upload_artwork" formatted="false">"Загрузить работу на хостинг"</string>
+    <string name="l10n_atelier_create_title" formatted="false">"Название"</string>
+    <string name="l10n_atelier_create_title_hint" formatted="false">"Ноктюрн 04"</string>
+    <string name="l10n_atelier_create_optional" formatted="false">"Необязательно"</string>
+    <string name="l10n_atelier_create_owner" formatted="false">"Автор / владелец"</string>
+    <string name="l10n_atelier_create_owner_hint" formatted="false">"Ваше имя в записи"</string>
+    <string name="l10n_atelier_create_external_url" formatted="false">"Внешний URL (необязательно)"</string>
+    <string name="l10n_atelier_create_upload_full" formatted="false">"Загрузить фото в полном разрешении"</string>
+    <string name="l10n_atelier_create_webvalidate" formatted="false">"URL веб-проверки (необязательно)"</string>
+    <string name="l10n_atelier_create_signed" formatted="false">"Всегда с подписью автора ✓"</string>
+    <string name="l10n_atelier_create_traits" formatted="false">"Свойства"</string>
+    <string name="l10n_atelier_create_trait_hint" formatted="false">"Свойство, например район"</string>
+    <string name="l10n_atelier_create_trait_value_hint" formatted="false">"Значение, например Левый берег"</string>
+    <string name="l10n_atelier_create_trait_required" formatted="false">"Укажите свойство и значение"</string>
+    <string name="l10n_atelier_create_trait_limit" formatted="false">"Не более 12 свойств"</string>
+    <string name="l10n_atelier_create_before_seal" formatted="false">"Перед созданием"</string>
+    <string name="l10n_atelier_create_untitled" formatted="false">"Без названия"</string>
+    <string name="l10n_atelier_create_minting" formatted="false">"Чеканка…"</string>
+    <string name="l10n_atelier_create_seal_nft" formatted="false">"Создать этот NFT"</string>
+    <string name="l10n_atelier_create_metadata_help" formatted="false">"Используются стандартные метаданные кошелька: NFT будет отображаться в NFT Wallet, MiniDapp и других приложениях."</string>
+    <string name="l10n_atelier_create_title_required" formatted="false">"Название должно содержать 1–60 символов"</string>
+    <string name="l10n_atelier_create_editions_range" formatted="false">"Количество экземпляров: от 1 до 1000"</string>
+    <string name="l10n_atelier_create_image_required" formatted="false">"Сначала выберите изображение работы"</string>
+    <string name="l10n_atelier_create_image_url_required" formatted="false">"Укажите URL изображения без пробелов, кавычек и точек с запятой"</string>
+    <string name="l10n_atelier_create_safe_urls" formatted="false">"URL не должны содержать пробелы, кавычки или точки с запятой"</string>
+    <string name="l10n_atelier_create_nft_minted" formatted="false">"NFT создан и появится в галерее после подтверждения"</string>
+    <string name="l10n_atelier_create_art_shrunk" formatted="false">"Изображение уменьшено для подписи и передачи NFT"</string>
+    <string name="l10n_atelier_create_key_failed" formatted="false">"Не удалось получить ключ подписи"</string>
+    <string name="l10n_atelier_create_decimals" formatted="false">"Знаков после запятой (0–16)"</string>
+    <string name="l10n_atelier_create_description_optional" formatted="false">"Описание (необязательно)"</string>
+    <string name="l10n_atelier_create_icon_url_optional" formatted="false">"URL значка (необязательно)"</string>
+    <string name="l10n_atelier_create_upload_icon_host" formatted="false">"Загрузить значок на хостинг"</string>
+    <string name="l10n_atelier_create_icon_help" formatted="false">"Значок кошелька: URL выше имеет приоритет над загруженным изображением"</string>
+    <string name="l10n_atelier_create_custom_fields" formatted="false">"Дополнительные поля записи"</string>
+    <string name="l10n_atelier_create_field_hint" formatted="false">"Поле, например website"</string>
+    <string name="l10n_atelier_create_field_required" formatted="false">"Укажите поле и значение"</string>
+    <string name="l10n_atelier_create_field_limit" formatted="false">"Не более 10 дополнительных полей"</string>
+    <string name="l10n_atelier_create_record" formatted="false">"Запись"</string>
+    <string name="l10n_atelier_create_permanent_supply" formatted="false">"ОБЪЁМ ВЫПУСКА НЕИЗМЕНЕН"</string>
+    <string name="l10n_atelier_create_supply_help" formatted="false">"Объём выпуска и число знаков после запятой нельзя изменить после чеканки."</string>
+    <string name="l10n_atelier_create_name_required" formatted="false">"Название должно содержать 1–40 символов"</string>
+    <string name="l10n_atelier_create_supply_required" formatted="false">"Объём выпуска должен быть положительным целым числом"</string>
+    <string name="l10n_atelier_create_decimals_range" formatted="false">"Число знаков после запятой: от 0 до 16"</string>
+    <string name="l10n_atelier_create_safe_icon_url" formatted="false">"URL значка не должен содержать пробелы, кавычки или точки с запятой"</string>
+    <string name="l10n_atelier_create_icon_shrunk" formatted="false">"Значок уменьшен, чтобы сохранить подпись токена"</string>
+    <string name="l10n_atelier_create_icon_too_large" formatted="false">"Значок и поля превышают лимит подписанной записи. Используйте URL значка или сократите поля"</string>
+    <string name="l10n_atelier_create_record_too_large" formatted="false">"Запись превышает лимит для подписи. Сократите описание или дополнительные поля"</string>
+    <string name="l10n_atelier_create_token_minted" formatted="false">"Токен создан и появится после подтверждения"</string>
+    <string name="l10n_atelier_create_upload_icon" formatted="false">"Загрузить значок"</string>
+    <string name="l10n_atelier_create_replace_icon" formatted="false">"Заменить значок"</string>
+    <string name="l10n_atelier_create_setup_hosting" formatted="false">"Настройте хостинг: Управление → Хостинг"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_editions_preview">"Экземпляров: %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_traits_preview">"Свойств: %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_reserved">"«%1$s» — зарезервированное поле"</string>
+    <string name="l10n_atelier_create_node_refused" formatted="false">"узел отклонил запрос"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_create_svg_too_large">"Этот SVG (%1$s Б) не помещается в лимит подписанной записи (%2$s Б)."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_svg_editions">"При количестве экземпляров: %1$s."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_art_too_large">"Изображение не помещается в лимит подписанной записи (%1$s Б). Сократите текст или число экземпляров."</string>
 </resources>

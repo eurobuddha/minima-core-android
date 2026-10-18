@@ -7171,4 +7171,79 @@
     <!-- Arguments: 0, 1 -->
     <string name="l10n_atelier_manage_checking">"Checking token %1$s of %2$s…"</string>
     <string name="l10n_atelier_manage_scan_failed" formatted="false">"Could not read the wallet. Try scanning again."</string>
+    <string name="l10n_atelier_create_new_nft" formatted="false">"New NFT"</string>
+    <string name="l10n_atelier_create_new_token" formatted="false">"New Token"</string>
+    <string name="l10n_atelier_create_artwork" formatted="false">"Artwork"</string>
+    <string name="l10n_atelier_create_embed" formatted="false">"Embed image"</string>
+    <string name="l10n_atelier_create_hosted" formatted="false">"Hosted URL"</string>
+    <string name="l10n_atelier_create_choose_image" formatted="false">"Tap the plate to choose an image."</string>
+    <string name="l10n_atelier_create_replace_image" formatted="false">"Tap to replace. This exact image is sealed on-chain."</string>
+    <string name="l10n_atelier_create_svg_help" formatted="false">"Vector plate — sealed as SVG, razor-sharp at every size."</string>
+    <string name="l10n_atelier_create_edit_image" formatted="false">"Open the plate room — crop · rotate · tone"</string>
+    <string name="l10n_atelier_create_image_url" formatted="false">"Image URL"</string>
+    <string name="l10n_atelier_create_image_url_hint" formatted="false">"https://… or ipfs://…"</string>
+    <string name="l10n_atelier_create_upload_artwork" formatted="false">"Upload artwork to hosting"</string>
+    <string name="l10n_atelier_create_title" formatted="false">"Title"</string>
+    <string name="l10n_atelier_create_title_hint" formatted="false">"Nocturne 04"</string>
+    <string name="l10n_atelier_create_optional" formatted="false">"Optional"</string>
+    <string name="l10n_atelier_create_owner" formatted="false">"Artist / owner"</string>
+    <string name="l10n_atelier_create_owner_hint" formatted="false">"Your name in the record"</string>
+    <string name="l10n_atelier_create_external_url" formatted="false">"External URL (optional)"</string>
+    <string name="l10n_atelier_create_upload_full" formatted="false">"Upload full-res photo to hosting"</string>
+    <string name="l10n_atelier_create_webvalidate" formatted="false">"Web validate URL (optional)"</string>
+    <string name="l10n_atelier_create_signed" formatted="false">"Signed as creator ✓ — always"</string>
+    <string name="l10n_atelier_create_traits" formatted="false">"Traits"</string>
+    <string name="l10n_atelier_create_trait_hint" formatted="false">"Trait — e.g. District"</string>
+    <string name="l10n_atelier_create_trait_value_hint" formatted="false">"Value — e.g. Rive Gauche"</string>
+    <string name="l10n_atelier_create_trait_required" formatted="false">"Both trait and value needed"</string>
+    <string name="l10n_atelier_create_trait_limit" formatted="false">"12 traits maximum"</string>
+    <string name="l10n_atelier_create_before_seal" formatted="false">"Before the seal"</string>
+    <string name="l10n_atelier_create_untitled" formatted="false">"Untitled"</string>
+    <string name="l10n_atelier_create_minting" formatted="false">"Minting…"</string>
+    <string name="l10n_atelier_create_seal_nft" formatted="false">"Seal this NFT"</string>
+    <string name="l10n_atelier_create_metadata_help" formatted="false">"Minted with the wallet-standard metadata — it will render in the NFT Wallet, the MiniDapp and beyond."</string>
+    <string name="l10n_atelier_create_title_required" formatted="false">"Title must be 1–60 characters"</string>
+    <string name="l10n_atelier_create_editions_range" formatted="false">"Editions must be 1–1000"</string>
+    <string name="l10n_atelier_create_image_required" formatted="false">"Choose an artwork image first"</string>
+    <string name="l10n_atelier_create_image_url_required" formatted="false">"Image URL required — no spaces, quotes or semicolons"</string>
+    <string name="l10n_atelier_create_safe_urls" formatted="false">"URLs must not contain spaces, quotes or semicolons"</string>
+    <string name="l10n_atelier_create_nft_minted" formatted="false">"NFT minted — it appears in the gallery once confirmed"</string>
+    <string name="l10n_atelier_create_art_shrunk" formatted="false">"artwork auto-shrunk so the NFT signs and travels"</string>
+    <string name="l10n_atelier_create_key_failed" formatted="false">"could not fetch the signing key"</string>
+    <string name="l10n_atelier_create_decimals" formatted="false">"Decimals (0–16)"</string>
+    <string name="l10n_atelier_create_description_optional" formatted="false">"Description (optional)"</string>
+    <string name="l10n_atelier_create_icon_url_optional" formatted="false">"Icon URL (optional)"</string>
+    <string name="l10n_atelier_create_upload_icon_host" formatted="false">"Upload an icon photo to hosting"</string>
+    <string name="l10n_atelier_create_icon_help" formatted="false">"Wallet icon — hosted URL above beats an upload"</string>
+    <string name="l10n_atelier_create_custom_fields" formatted="false">"Custom record fields"</string>
+    <string name="l10n_atelier_create_field_hint" formatted="false">"Field — e.g. website"</string>
+    <string name="l10n_atelier_create_field_required" formatted="false">"Both field and value needed"</string>
+    <string name="l10n_atelier_create_field_limit" formatted="false">"10 custom fields maximum"</string>
+    <string name="l10n_atelier_create_record" formatted="false">"The record"</string>
+    <string name="l10n_atelier_create_permanent_supply" formatted="false">"SUPPLY IS PERMANENT"</string>
+    <string name="l10n_atelier_create_supply_help" formatted="false">"Total supply and decimals cannot be changed after minting."</string>
+    <string name="l10n_atelier_create_name_required" formatted="false">"Name must be 1–40 characters"</string>
+    <string name="l10n_atelier_create_supply_required" formatted="false">"Supply must be a positive whole number"</string>
+    <string name="l10n_atelier_create_decimals_range" formatted="false">"Decimals must be 0–16"</string>
+    <string name="l10n_atelier_create_safe_icon_url" formatted="false">"Icon URL must not contain spaces, quotes or semicolons"</string>
+    <string name="l10n_atelier_create_icon_shrunk" formatted="false">"icon auto-slimmed to keep the token signed"</string>
+    <string name="l10n_atelier_create_icon_too_large" formatted="false">"icon + fields exceed the signed record budget - hosted icon URL or shorter fields"</string>
+    <string name="l10n_atelier_create_record_too_large" formatted="false">"record exceeds the signed budget - shorten the description or custom fields"</string>
+    <string name="l10n_atelier_create_token_minted" formatted="false">"Token minted — appears once confirmed"</string>
+    <string name="l10n_atelier_create_upload_icon" formatted="false">"Upload icon image"</string>
+    <string name="l10n_atelier_create_replace_icon" formatted="false">"Replace icon image"</string>
+    <string name="l10n_atelier_create_setup_hosting" formatted="false">"Set up hosting in Manage → Hosting"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_editions_preview">"Editions: %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_traits_preview">"Traits: %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_reserved">"\'%1$s\' is a reserved field"</string>
+    <string name="l10n_atelier_create_node_refused" formatted="false">"node refused"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_create_svg_too_large">"This SVG (%1$s B) cannot fit the signed record limit of %2$s B."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_svg_editions">"With %1$s editions."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_create_art_too_large">"Artwork cannot fit the signed record limit of %1$s B. Shorten the text or reduce editions."</string>
 </resources>

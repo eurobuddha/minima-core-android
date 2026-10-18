@@ -35608,5 +35608,419 @@
     "zh-Hans": "无法读取钱包。请重新扫描。",
     "ru": "Не удалось прочитать кошелёк. Повторите сканирование.",
     "uk": "Не вдалося прочитати гаманець. Повторіть сканування."
+  },
+  "atelierCreate.newNft": {
+    "en": "New NFT",
+    "zh-Hans": "新建 NFT",
+    "ru": "Новый NFT",
+    "uk": "Новий NFT"
+  },
+  "atelierCreate.newToken": {
+    "en": "New Token",
+    "zh-Hans": "新建代币",
+    "ru": "Новый токен",
+    "uk": "Новий токен"
+  },
+  "atelierCreate.artwork": {
+    "en": "Artwork",
+    "zh-Hans": "作品",
+    "ru": "Работа",
+    "uk": "Робота"
+  },
+  "atelierCreate.embed": {
+    "en": "Embed image",
+    "zh-Hans": "嵌入图片",
+    "ru": "Встроить изображение",
+    "uk": "Вбудувати зображення"
+  },
+  "atelierCreate.hosted": {
+    "en": "Hosted URL",
+    "zh-Hans": "托管 URL",
+    "ru": "URL хостинга",
+    "uk": "URL хостингу"
+  },
+  "atelierCreate.chooseImage": {
+    "en": "Tap the plate to choose an image.",
+    "zh-Hans": "点按画面选择图片。",
+    "ru": "Нажмите на изображение, чтобы выбрать файл.",
+    "uk": "Натисніть на зображення, щоб вибрати файл."
+  },
+  "atelierCreate.replaceImage": {
+    "en": "Tap to replace. This exact image is sealed on-chain.",
+    "zh-Hans": "点按替换。此图片将被永久写入链上。",
+    "ru": "Нажмите для замены. Именно это изображение будет записано в блокчейн.",
+    "uk": "Натисніть для заміни. Саме це зображення буде записано в блокчейн."
+  },
+  "atelierCreate.svgHelp": {
+    "en": "Vector plate — sealed as SVG, razor-sharp at every size.",
+    "zh-Hans": "矢量作品，以 SVG 格式存储，放大仍清晰。",
+    "ru": "Векторная работа — сохраняется как SVG и остаётся чёткой при любом размере.",
+    "uk": "Векторна робота — зберігається як SVG і залишається чіткою за будь-якого розміру."
+  },
+  "atelierCreate.editImage": {
+    "en": "Open the plate room — crop · rotate · tone",
+    "zh-Hans": "打开图片编辑器：裁剪 · 旋转 · 色调",
+    "ru": "Редактор: кадрирование · поворот · тон",
+    "uk": "Редактор: кадрування · поворот · тон"
+  },
+  "atelierCreate.imageUrl": {
+    "en": "Image URL",
+    "zh-Hans": "图片 URL",
+    "ru": "URL изображения",
+    "uk": "URL зображення"
+  },
+  "atelierCreate.imageUrlHint": {
+    "en": "https://… or ipfs://…",
+    "zh-Hans": "https://… 或 ipfs://…",
+    "ru": "https://… или ipfs://…",
+    "uk": "https://… або ipfs://…"
+  },
+  "atelierCreate.uploadArtwork": {
+    "en": "Upload artwork to hosting",
+    "zh-Hans": "上传作品到存储空间",
+    "ru": "Загрузить работу на хостинг",
+    "uk": "Завантажити роботу на хостинг"
+  },
+  "atelierCreate.title": {
+    "en": "Title",
+    "zh-Hans": "标题",
+    "ru": "Название",
+    "uk": "Назва"
+  },
+  "atelierCreate.titleHint": {
+    "en": "Nocturne 04",
+    "zh-Hans": "夜曲 04",
+    "ru": "Ноктюрн 04",
+    "uk": "Ноктюрн 04"
+  },
+  "atelierCreate.optional": {
+    "en": "Optional",
+    "zh-Hans": "可选",
+    "ru": "Необязательно",
+    "uk": "Необов’язково"
+  },
+  "atelierCreate.owner": {
+    "en": "Artist / owner",
+    "zh-Hans": "艺术家／所有者",
+    "ru": "Автор / владелец",
+    "uk": "Автор / власник"
+  },
+  "atelierCreate.ownerHint": {
+    "en": "Your name in the record",
+    "zh-Hans": "记录中的姓名",
+    "ru": "Ваше имя в записи",
+    "uk": "Ваше ім’я в записі"
+  },
+  "atelierCreate.externalUrl": {
+    "en": "External URL (optional)",
+    "zh-Hans": "外部 URL（可选）",
+    "ru": "Внешний URL (необязательно)",
+    "uk": "Зовнішній URL (необов’язково)"
+  },
+  "atelierCreate.uploadFull": {
+    "en": "Upload full-res photo to hosting",
+    "zh-Hans": "上传原始分辨率照片",
+    "ru": "Загрузить фото в полном разрешении",
+    "uk": "Завантажити фото в повній роздільності"
+  },
+  "atelierCreate.webvalidate": {
+    "en": "Web validate URL (optional)",
+    "zh-Hans": "网页验证 URL（可选）",
+    "ru": "URL веб-проверки (необязательно)",
+    "uk": "URL веб-перевірки (необов’язково)"
+  },
+  "atelierCreate.signed": {
+    "en": "Signed as creator ✓ — always",
+    "zh-Hans": "始终以创建者身份签名 ✓",
+    "ru": "Всегда с подписью автора ✓",
+    "uk": "Завжди з підписом автора ✓"
+  },
+  "atelierCreate.traits": {
+    "en": "Traits",
+    "zh-Hans": "属性",
+    "ru": "Свойства",
+    "uk": "Властивості"
+  },
+  "atelierCreate.traitHint": {
+    "en": "Trait — e.g. District",
+    "zh-Hans": "属性，例如：地区",
+    "ru": "Свойство, например район",
+    "uk": "Властивість, наприклад район"
+  },
+  "atelierCreate.traitValueHint": {
+    "en": "Value — e.g. Rive Gauche",
+    "zh-Hans": "值，例如：左岸",
+    "ru": "Значение, например Левый берег",
+    "uk": "Значення, наприклад Лівий берег"
+  },
+  "atelierCreate.traitRequired": {
+    "en": "Both trait and value needed",
+    "zh-Hans": "请填写属性和值",
+    "ru": "Укажите свойство и значение",
+    "uk": "Вкажіть властивість і значення"
+  },
+  "atelierCreate.traitLimit": {
+    "en": "12 traits maximum",
+    "zh-Hans": "最多 12 个属性",
+    "ru": "Не более 12 свойств",
+    "uk": "Не більше 12 властивостей"
+  },
+  "atelierCreate.beforeSeal": {
+    "en": "Before the seal",
+    "zh-Hans": "铸造前预览",
+    "ru": "Перед созданием",
+    "uk": "Перед створенням"
+  },
+  "atelierCreate.untitled": {
+    "en": "Untitled",
+    "zh-Hans": "未命名",
+    "ru": "Без названия",
+    "uk": "Без назви"
+  },
+  "atelierCreate.minting": {
+    "en": "Minting…",
+    "zh-Hans": "正在铸造…",
+    "ru": "Чеканка…",
+    "uk": "Карбування…"
+  },
+  "atelierCreate.sealNft": {
+    "en": "Seal this NFT",
+    "zh-Hans": "铸造此 NFT",
+    "ru": "Создать этот NFT",
+    "uk": "Створити цей NFT"
+  },
+  "atelierCreate.metadataHelp": {
+    "en": "Minted with the wallet-standard metadata — it will render in the NFT Wallet, the MiniDapp and beyond.",
+    "zh-Hans": "采用钱包标准元数据铸造，可在 NFT Wallet、MiniDapp 等应用中显示。",
+    "ru": "Используются стандартные метаданные кошелька: NFT будет отображаться в NFT Wallet, MiniDapp и других приложениях.",
+    "uk": "Використовуються стандартні метадані гаманця: NFT відображатиметься в NFT Wallet, MiniDapp та інших застосунках."
+  },
+  "atelierCreate.titleRequired": {
+    "en": "Title must be 1–60 characters",
+    "zh-Hans": "标题须为 1–60 个字符",
+    "ru": "Название должно содержать 1–60 символов",
+    "uk": "Назва має містити 1–60 символів"
+  },
+  "atelierCreate.editionsRange": {
+    "en": "Editions must be 1–1000",
+    "zh-Hans": "发行份数须为 1–1000",
+    "ru": "Количество экземпляров: от 1 до 1000",
+    "uk": "Кількість примірників: від 1 до 1000"
+  },
+  "atelierCreate.imageRequired": {
+    "en": "Choose an artwork image first",
+    "zh-Hans": "请先选择作品图片",
+    "ru": "Сначала выберите изображение работы",
+    "uk": "Спочатку виберіть зображення роботи"
+  },
+  "atelierCreate.imageUrlRequired": {
+    "en": "Image URL required — no spaces, quotes or semicolons",
+    "zh-Hans": "请填写图片 URL，不得含空格、引号或分号",
+    "ru": "Укажите URL изображения без пробелов, кавычек и точек с запятой",
+    "uk": "Вкажіть URL зображення без пробілів, лапок і крапок з комою"
+  },
+  "atelierCreate.safeUrls": {
+    "en": "URLs must not contain spaces, quotes or semicolons",
+    "zh-Hans": "URL 不得含空格、引号或分号",
+    "ru": "URL не должны содержать пробелы, кавычки или точки с запятой",
+    "uk": "URL не мають містити пробіли, лапки чи крапки з комою"
+  },
+  "atelierCreate.nftMinted": {
+    "en": "NFT minted — it appears in the gallery once confirmed",
+    "zh-Hans": "NFT 已铸造，确认后将显示在图库中",
+    "ru": "NFT создан и появится в галерее после подтверждения",
+    "uk": "NFT створено, він з’явиться в галереї після підтвердження"
+  },
+  "atelierCreate.artShrunk": {
+    "en": "artwork auto-shrunk so the NFT signs and travels",
+    "zh-Hans": "作品已自动压缩，以便 NFT 签名和转移",
+    "ru": "Изображение уменьшено для подписи и передачи NFT",
+    "uk": "Зображення зменшено для підпису й передачі NFT"
+  },
+  "atelierCreate.keyFailed": {
+    "en": "could not fetch the signing key",
+    "zh-Hans": "无法获取签名密钥",
+    "ru": "Не удалось получить ключ подписи",
+    "uk": "Не вдалося отримати ключ підпису"
+  },
+  "atelierCreate.decimals": {
+    "en": "Decimals (0–16)",
+    "zh-Hans": "小数位数（0–16）",
+    "ru": "Знаков после запятой (0–16)",
+    "uk": "Знаків після коми (0–16)"
+  },
+  "atelierCreate.descriptionOptional": {
+    "en": "Description (optional)",
+    "zh-Hans": "描述（可选）",
+    "ru": "Описание (необязательно)",
+    "uk": "Опис (необов’язково)"
+  },
+  "atelierCreate.iconUrlOptional": {
+    "en": "Icon URL (optional)",
+    "zh-Hans": "图标 URL（可选）",
+    "ru": "URL значка (необязательно)",
+    "uk": "URL значка (необов’язково)"
+  },
+  "atelierCreate.uploadIconHost": {
+    "en": "Upload an icon photo to hosting",
+    "zh-Hans": "上传图标图片到存储空间",
+    "ru": "Загрузить значок на хостинг",
+    "uk": "Завантажити значок на хостинг"
+  },
+  "atelierCreate.iconHelp": {
+    "en": "Wallet icon — hosted URL above beats an upload",
+    "zh-Hans": "钱包图标：优先使用上方托管 URL",
+    "ru": "Значок кошелька: URL выше имеет приоритет над загруженным изображением",
+    "uk": "Значок гаманця: URL вище має пріоритет над завантаженим зображенням"
+  },
+  "atelierCreate.customFields": {
+    "en": "Custom record fields",
+    "zh-Hans": "自定义记录字段",
+    "ru": "Дополнительные поля записи",
+    "uk": "Додаткові поля запису"
+  },
+  "atelierCreate.fieldHint": {
+    "en": "Field — e.g. website",
+    "zh-Hans": "字段，例如：website",
+    "ru": "Поле, например website",
+    "uk": "Поле, наприклад website"
+  },
+  "atelierCreate.fieldRequired": {
+    "en": "Both field and value needed",
+    "zh-Hans": "请填写字段和值",
+    "ru": "Укажите поле и значение",
+    "uk": "Вкажіть поле й значення"
+  },
+  "atelierCreate.fieldLimit": {
+    "en": "10 custom fields maximum",
+    "zh-Hans": "最多 10 个自定义字段",
+    "ru": "Не более 10 дополнительных полей",
+    "uk": "Не більше 10 додаткових полів"
+  },
+  "atelierCreate.record": {
+    "en": "The record",
+    "zh-Hans": "记录预览",
+    "ru": "Запись",
+    "uk": "Запис"
+  },
+  "atelierCreate.permanentSupply": {
+    "en": "SUPPLY IS PERMANENT",
+    "zh-Hans": "供应量不可更改",
+    "ru": "ОБЪЁМ ВЫПУСКА НЕИЗМЕНЕН",
+    "uk": "ОБСЯГ ВИПУСКУ НЕЗМІННИЙ"
+  },
+  "atelierCreate.supplyHelp": {
+    "en": "Total supply and decimals cannot be changed after minting.",
+    "zh-Hans": "铸造后无法更改总供应量和小数位数。",
+    "ru": "Объём выпуска и число знаков после запятой нельзя изменить после чеканки.",
+    "uk": "Обсяг випуску й кількість знаків після коми не можна змінити після карбування."
+  },
+  "atelierCreate.nameRequired": {
+    "en": "Name must be 1–40 characters",
+    "zh-Hans": "名称须为 1–40 个字符",
+    "ru": "Название должно содержать 1–40 символов",
+    "uk": "Назва має містити 1–40 символів"
+  },
+  "atelierCreate.supplyRequired": {
+    "en": "Supply must be a positive whole number",
+    "zh-Hans": "供应量须为正整数",
+    "ru": "Объём выпуска должен быть положительным целым числом",
+    "uk": "Обсяг випуску має бути додатним цілим числом"
+  },
+  "atelierCreate.decimalsRange": {
+    "en": "Decimals must be 0–16",
+    "zh-Hans": "小数位数须为 0–16",
+    "ru": "Число знаков после запятой: от 0 до 16",
+    "uk": "Кількість знаків після коми: від 0 до 16"
+  },
+  "atelierCreate.safeIconUrl": {
+    "en": "Icon URL must not contain spaces, quotes or semicolons",
+    "zh-Hans": "图标 URL 不得含空格、引号或分号",
+    "ru": "URL значка не должен содержать пробелы, кавычки или точки с запятой",
+    "uk": "URL значка не має містити пробіли, лапки чи крапки з комою"
+  },
+  "atelierCreate.iconShrunk": {
+    "en": "icon auto-slimmed to keep the token signed",
+    "zh-Hans": "图标已自动压缩，以保留代币签名",
+    "ru": "Значок уменьшен, чтобы сохранить подпись токена",
+    "uk": "Значок зменшено, щоб зберегти підпис токена"
+  },
+  "atelierCreate.iconTooLarge": {
+    "en": "icon + fields exceed the signed record budget - hosted icon URL or shorter fields",
+    "zh-Hans": "图标和字段超出已签名记录的大小限制，请使用托管图标 URL 或缩短字段",
+    "ru": "Значок и поля превышают лимит подписанной записи. Используйте URL значка или сократите поля",
+    "uk": "Значок і поля перевищують ліміт підписаного запису. Використайте URL значка або скоротіть поля"
+  },
+  "atelierCreate.recordTooLarge": {
+    "en": "record exceeds the signed budget - shorten the description or custom fields",
+    "zh-Hans": "记录超出签名大小限制，请缩短描述或自定义字段",
+    "ru": "Запись превышает лимит для подписи. Сократите описание или дополнительные поля",
+    "uk": "Запис перевищує ліміт для підпису. Скоротіть опис або додаткові поля"
+  },
+  "atelierCreate.tokenMinted": {
+    "en": "Token minted — appears once confirmed",
+    "zh-Hans": "代币已铸造，确认后将显示",
+    "ru": "Токен создан и появится после подтверждения",
+    "uk": "Токен створено, він з’явиться після підтвердження"
+  },
+  "atelierCreate.uploadIcon": {
+    "en": "Upload icon image",
+    "zh-Hans": "上传图标图片",
+    "ru": "Загрузить значок",
+    "uk": "Завантажити значок"
+  },
+  "atelierCreate.replaceIcon": {
+    "en": "Replace icon image",
+    "zh-Hans": "替换图标图片",
+    "ru": "Заменить значок",
+    "uk": "Замінити значок"
+  },
+  "atelierCreate.setupHosting": {
+    "en": "Set up hosting in Manage → Hosting",
+    "zh-Hans": "在“管理 → 托管”中设置存储位置",
+    "ru": "Настройте хостинг: Управление → Хостинг",
+    "uk": "Налаштуйте хостинг: Керування → Хостинг"
+  },
+  "atelierCreate.editionsPreview": {
+    "en": "Editions: {0}",
+    "zh-Hans": "发行份数：{0}",
+    "ru": "Экземпляров: {0}",
+    "uk": "Примірників: {0}"
+  },
+  "atelierCreate.traitsPreview": {
+    "en": "Traits: {0}",
+    "zh-Hans": "属性数：{0}",
+    "ru": "Свойств: {0}",
+    "uk": "Властивостей: {0}"
+  },
+  "atelierCreate.reserved": {
+    "en": "'{0}' is a reserved field",
+    "zh-Hans": "“{0}”是保留字段",
+    "ru": "«{0}» — зарезервированное поле",
+    "uk": "«{0}» — зарезервоване поле"
+  },
+  "atelierCreate.nodeRefused": {
+    "en": "node refused",
+    "zh-Hans": "节点拒绝",
+    "ru": "узел отклонил запрос",
+    "uk": "вузол відхилив запит"
+  },
+  "atelierCreate.svgTooLarge": {
+    "en": "This SVG ({0} B) cannot fit the signed record limit of {1} B.",
+    "zh-Hans": "此 SVG（{0} 字节）超出已签名记录的 {1} 字节限制。",
+    "ru": "Этот SVG ({0} Б) не помещается в лимит подписанной записи ({1} Б).",
+    "uk": "Цей SVG ({0} Б) не вміщується в ліміт підписаного запису ({1} Б)."
+  },
+  "atelierCreate.svgEditions": {
+    "en": "With {0} editions.",
+    "zh-Hans": "发行份数为 {0}。",
+    "ru": "При количестве экземпляров: {0}.",
+    "uk": "За кількості примірників: {0}."
+  },
+  "atelierCreate.artTooLarge": {
+    "en": "Artwork cannot fit the signed record limit of {0} B. Shorten the text or reduce editions.",
+    "zh-Hans": "作品无法压缩到已签名记录的 {0} 字节限制，请缩短文本或减少发行份数。",
+    "ru": "Изображение не помещается в лимит подписанной записи ({0} Б). Сократите текст или число экземпляров.",
+    "uk": "Зображення не вміщується в ліміт підписаного запису ({0} Б). Скоротіть текст або кількість примірників."
   }
 }

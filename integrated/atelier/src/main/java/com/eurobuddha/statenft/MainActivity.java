@@ -1863,17 +1863,20 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     private void renderCreateNft() {
         setScreen(Screen.CREATE_NFT, this::renderStudio);
-        appbar("New NFT", true, false);
+        appbar(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_new_nft), true, false);
         hideNav();
 
-        body.addView(Design.kicker(this, "Artwork"), lpm(0, 0, 0, 6));
+        body.addView(Design.kicker(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_artwork)), lpm(0, 0, 0, 6));
         LinearLayout modeRow = horizontal(Gravity.CENTER);
-        TextView mEmb = Design.chip(this, "Embed image", nftEmbed);
-        TextView mUrl = Design.chip(this, "Hosted URL", !nftEmbed);
+        TextView mEmb = Design.chip(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_embed), nftEmbed);
+        TextView mUrl = Design.chip(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_hosted), !nftEmbed);
         mEmb.setOnClickListener(v -> { nftEmbed = true; renderCreateNft(); });
         mUrl.setOnClickListener(v -> { nftEmbed = false; renderCreateNft(); });
-        modeRow.addView(mEmb, weight(44, 0, 4));
-        modeRow.addView(mUrl, weight(44, 4, 0));
+        mEmb.setMinHeight(dp(48)); mUrl.setMinHeight(dp(48));
+        LinearLayout.LayoutParams embedLp = weight(48, 0, 4); embedLp.height = -2;
+        LinearLayout.LayoutParams urlLp = weight(48, 4, 0); urlLp.height = -2;
+        modeRow.addView(mEmb, embedLp);
+        modeRow.addView(mUrl, urlLp);
         body.addView(modeRow, lpm(0, 0, 0, 10));
 
         if (nftEmbed) {
@@ -1889,12 +1892,12 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             frame.setClickable(true);
             frame.setOnClickListener(v -> pickNftImage());
             body.addView(frame, lpm(0, 0, 0, 6));
-            body.addView(Design.note(this, nftImage.isEmpty() ? "Tap the plate to choose an image." : "Tap to replace. This exact image is sealed on-chain."), lpm(0, 0, 0, 8));
+            body.addView(Design.note(this, nftImage.isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_choose_image) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_replace_image)), lpm(0, 0, 0, 8));
             if (!nftImage.isEmpty()) {
                 if ("image/svg+xml".equals(ImageTools.mimeOf(nftImage))) {
-                    body.addView(Design.note(this, "Vector plate — sealed as SVG, razor-sharp at every size."), lpm(0, 0, 0, 10));
+                    body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_svg_help)), lpm(0, 0, 0, 10));
                 } else {
-                    TextView edit = Design.button(this, "Open the plate room — crop · rotate · tone", false);
+                    TextView edit = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_edit_image), false);
                     edit.setOnClickListener(v -> showEditor(nftImage, ImageTools.ARTIMAGE_BUDGET, edited -> {
                         nftImage = edited;
                         renderCreateNft();
@@ -1903,34 +1906,34 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 }
             }
         } else {
-            EditText urlF = fieldInto(body, "Image URL", "https://… or ipfs://…", nftUrl);
+            EditText urlF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_image_url), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_image_url_hint), nftUrl);
             urlF.addTextChangedListener(watch(sv -> nftUrl = sv));
-            body.addView(hostingUploadRow("nfturl", "Upload artwork to hosting",
+            body.addView(hostingUploadRow("nfturl", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_upload_artwork),
                     () -> pickHostSingle(PICK_HOST_EXTERNAL, "nfturl")), lpm(0, 4, 0, 0));
         }
 
-        EditText nameF = fieldInto(body, "Title", "Nocturne 04", nftName);
+        EditText nameF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_title), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_title_hint), nftName);
         nameF.addTextChangedListener(watch(sv -> nftName = sv));
-        EditText descF = fieldInto(body, "Description", "Optional", nftDesc);
+        EditText descF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_description), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_optional), nftDesc);
         descF.addTextChangedListener(watch(sv -> nftDesc = sv));
-        EditText ownerF = fieldInto(body, "Artist / owner", "Your name in the record", nftOwner);
+        EditText ownerF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_owner), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_owner_hint), nftOwner);
         ownerF.addTextChangedListener(watch(sv -> nftOwner = sv));
-        EditText edF = fieldInto(body, "Editions", "1", nftEditions);
+        EditText edF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_editions), "1", nftEditions);
         edF.addTextChangedListener(watch(sv -> nftEditions = sv));
-        EditText extF = fieldInto(body, "External URL (optional)", "https://…", nftExternal);
+        EditText extF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_external_url), "https://…", nftExternal);
         extF.addTextChangedListener(watch(sv -> nftExternal = sv));
-        body.addView(hostingUploadRow("nftext", "Upload full-res photo to hosting",
+        body.addView(hostingUploadRow("nftext", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_upload_full),
                 () -> pickHostSingle(PICK_HOST_EXTERNAL, "nftext")), lpm(0, 4, 0, 0));
-        EditText webF = fieldInto(body, "Web validate URL (optional)", "https://…/validate", nftWeb);
+        EditText webF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_webvalidate), "https://…/validate", nftWeb);
         webF.addTextChangedListener(watch(sv -> nftWeb = sv));
 
         LinearLayout signRow = horizontal(Gravity.CENTER_VERTICAL);
-        TextView signChip = Design.chip(this, "Signed as creator ✓ — always", true);
+        TextView signChip = Design.chip(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_signed), true);
         signRow.addView(signChip, new LinearLayout.LayoutParams(-2, -2));
         body.addView(signRow, lpm(0, 4, 0, 12));
 
         /* traits — OpenSea-style attributes */
-        body.addView(sectionHead("Traits", nftTraits.size() + ""));
+        body.addView(sectionHead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_traits), nftTraits.size() + ""));
         for (int i = 0; i < nftTraits.size(); i++) {
             final int idx = i;
             String[] t = nftTraits.get(i);
@@ -1949,18 +1952,18 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             body.addView(row, lpm(0, 0, 0, 6));
         }
         LinearLayout addRow = horizontal(Gravity.CENTER_VERTICAL);
-        EditText tType = input("Trait — e.g. District");
+        EditText tType = input(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_trait_hint));
         tType.setText(traitTypeDraft);
         tType.addTextChangedListener(watch(sv -> traitTypeDraft = sv));
-        EditText tVal = input("Value — e.g. Rive Gauche");
+        EditText tVal = input(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_trait_value_hint));
         tVal.setText(traitValueDraft);
         tVal.addTextChangedListener(watch(sv -> traitValueDraft = sv));
         addRow.addView(tType, weight(46, 0, 3));
         addRow.addView(tVal, weight(46, 3, 3));
         TextView addBtn = Design.button(this, "+", false);
         addBtn.setOnClickListener(v -> {
-            if (traitTypeDraft.trim().isEmpty() || traitValueDraft.trim().isEmpty()) { toast("Both trait and value needed"); return; }
-            if (nftTraits.size() >= 12) { toast("12 traits maximum"); return; }
+            if (traitTypeDraft.trim().isEmpty() || traitValueDraft.trim().isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_trait_required)); return; }
+            if (nftTraits.size() >= 12) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_trait_limit)); return; }
             nftTraits.add(new String[]{ traitTypeDraft.trim(), traitValueDraft.trim() });
             traitTypeDraft = ""; traitValueDraft = "";
             renderCreateNft();
@@ -1969,7 +1972,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         body.addView(addRow, lpm(0, 2, 0, 12));
 
         /* seal preview: wallet card + metadata record */
-        body.addView(sectionHead("Before the seal", ""));
+        body.addView(sectionHead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_before_seal), ""));
         LinearLayout prev = horizontal(Gravity.CENTER_VERTICAL);
         prev.setBackground(Design.blockShadow(this, Design.CARD()));
         prev.setPadding(dp(10), dp(10), dp(12), dp(12));
@@ -1982,10 +1985,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         prev.addView(pIcon, new LinearLayout.LayoutParams(dp(52), dp(52)));
         LinearLayout pCopy = vertical();
         pCopy.setPadding(dp(10), 0, 0, 0);
-        pCopy.addView(Design.text(this, nftName.trim().isEmpty() ? "Untitled" : nftName.trim(), 13, Design.INK(), Design.sansBold()));
-        pCopy.addView(Design.note(this, "ed. " + (nftEditions.trim().isEmpty() ? "1" : nftEditions.trim())
-                + (nftOwner.trim().isEmpty() ? "" : " · " + nftOwner.trim())
-                + (nftTraits.isEmpty() ? "" : " · " + nftTraits.size() + " traits")));
+        pCopy.addView(Design.text(this, nftName.trim().isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_untitled) : nftName.trim(), 13, Design.INK(), Design.sansBold()));
+        pCopy.addView(Design.note(this, Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_editions_preview, nftEditions.trim().isEmpty() ? "1" : nftEditions.trim()), (nftOwner.trim().isEmpty() ? "" : " · " + nftOwner.trim()), nftTraits.isEmpty() ? "" : Language.join(" · ", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_traits_preview, nftTraits.size())))));
         prev.addView(pCopy, new LinearLayout.LayoutParams(0, -2, 1));
         prev.addView(Design.pill(this, "NFT", Design.PILL_DONE));
         body.addView(prev, lpm(0, 0, 0, 8));
@@ -1994,11 +1995,11 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         metaDump.setPadding(dp(10), dp(8), dp(10), dp(8));
         body.addView(metaDump, lpm(0, 0, 0, 12));
 
-        TextView go = Design.button(this, nftBusy ? "Minting…" : "Seal this NFT", true);
+        TextView go = Design.button(this, nftBusy ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_minting) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_seal_nft), true);
         go.setEnabled(!nftBusy);
         go.setOnClickListener(v -> mintNft(go));
         body.addView(go, lph(54, 0, 0, 0, 8));
-        body.addView(Design.note(this, "Minted with the wallet-standard metadata — it will render in the NFT Wallet, the MiniDapp and beyond."));
+        body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_metadata_help)));
     }
 
     private String previewNftJson() {
@@ -2013,18 +2014,18 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     private void mintNft(TextView go) {
         if (nftBusy) return;
         String n = nftName.trim();
-        if (n.isEmpty() || n.length() > 60) { toast("Title must be 1–60 characters"); return; }
+        if (n.isEmpty() || n.length() > 60) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_title_required)); return; }
         int editions = parseIntSafe(nftEditions.trim().isEmpty() ? "1" : nftEditions.trim());
-        if (editions < 1 || editions > 1000) { toast("Editions must be 1–1000"); return; }
+        if (editions < 1 || editions > 1000) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_editions_range)); return; }
         String url;
         if (nftEmbed) {
-            if (nftImage.isEmpty()) { toast("Choose an artwork image first"); return; }
+            if (nftImage.isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_image_required)); return; }
             url = "<artimage>" + nftImage + "</artimage>";
         } else {
             url = nftUrl.trim();
-            if (url.isEmpty() || !validCmdUrl(url)) { toast("Image URL required — no spaces, quotes or semicolons"); return; }
+            if (url.isEmpty() || !validCmdUrl(url)) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_image_url_required)); return; }
         }
-        if (!validCmdUrl(nftExternal.trim()) || !validCmdUrl(nftWeb.trim())) { toast("URLs must not contain spaces, quotes or semicolons"); return; }
+        if (!validCmdUrl(nftExternal.trim()) || !validCmdUrl(nftWeb.trim())) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_safe_urls)); return; }
         if (!hostGatePassed) {
             java.util.List<String> urls = new java.util.ArrayList<>();
             if (!nftEmbed && nftUrl.trim().startsWith("http")) urls.add(nftUrl.trim());
@@ -2034,16 +2035,16 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         }
         hostGatePassed = false;
         nftBusy = true;
-        go.setText("MINTING…");
+        Language.setText(go, Language.upper(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_minting)));
         NodeApi.Cb fin = new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) {
                 nftBusy = false;
                 if (!json.optBoolean("status", false)) {
-                    toast("Mint failed: " + json.optString("error", "node refused"));
+                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_mint_failed, json.isNull("error") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_node_refused) : json.optString("error")));
                     renderCreateNft();
                     return;
                 }
-                toast("NFT minted — it appears in the gallery once confirmed");
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_nft_minted));
                 nftName = ""; nftDesc = ""; nftImage = ""; nftUrl = ""; nftExternal = ""; nftWeb = ""; nftEditions = "1";
                 nftTraits.clear();
                 traitTypeDraft = ""; traitValueDraft = "";
@@ -2067,23 +2068,20 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             if (nftImage.length() > artBudget) {
                 if ("image/svg+xml".equals(ImageTools.mimeOf(nftImage))) {
                     nftBusy = false;
-                    toast("this SVG (" + nftImage.length() + "B) cannot be shrunk to the "
-                            + artBudget + "B the signed record allows"
-                            + (editions > 1 ? " with " + editions + " editions" : ""));
+                    toast(Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_svg_too_large, nftImage.length(), artBudget), editions > 1 ? Language.join(" ", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_svg_editions, editions)) : ""));
                     renderCreateNft();
                     return;
                 }
                 String out = ImageTools.recompressBase64(nftImage, Math.max(1500, artBudget));
                 if (out.isEmpty() || out.length() > artBudget) {
                     nftBusy = false;
-                    toast("artwork cannot be shrunk to the " + artBudget
-                            + "B the signed record allows - shorten the text or reduce editions");
+                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_art_too_large, artBudget));
                     renderCreateNft();
                     return;
                 }
                 nftImage = out;
                 urlFit = "<artimage>" + out + "</artimage>";
-                toast("artwork auto-shrunk so the NFT signs and travels");
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_art_shrunk));
             }
         }
         final String urlF = urlFit;
@@ -2091,7 +2089,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             @Override public void onResult(JSONObject json) {
                 JSONObject r = json.optJSONObject("response");
                 String pk = r == null ? "" : r.optString("publickey", "");
-                if (pk.isEmpty()) { nftBusy = false; toast("could not fetch the signing key"); renderCreateNft(); return; }
+                if (pk.isEmpty()) { nftBusy = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_key_failed)); renderCreateNft(); return; }
                 node.cmd(StateNft.nftCreateCommand(n, nftDesc.trim(), urlF, nftOwner.trim(),
                         nftExternal.trim(), nftWeb.trim(), attrs, editions, pk), fin);
             }
@@ -2103,29 +2101,29 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     private void renderCreateToken() {
         setScreen(Screen.CREATE_TOKEN, this::renderStudio);
-        appbar("New Token", true, false);
+        appbar(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_new_token), true, false);
         hideNav();
 
-        EditText nameF = fieldInto(body, "Name", "EuroBuddha Coin", tokName);
+        EditText nameF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_name), "EuroBuddha Coin", tokName);
         nameF.addTextChangedListener(watch(sv -> tokName = sv));
-        EditText tickF = fieldInto(body, "Ticker", "EUROB", tokTicker);
+        EditText tickF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_ticker), "EUROB", tokTicker);
         tickF.addTextChangedListener(watch(sv -> tokTicker = sv));
-        EditText supF = fieldInto(body, "Total supply", "1000000", tokSupply);
+        EditText supF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_nft_mint_supply), "1000000", tokSupply);
         supF.addTextChangedListener(watch(sv -> tokSupply = sv));
-        EditText decF = fieldInto(body, "Decimals (0–16)", "0", tokDecimals);
+        EditText decF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_decimals), "0", tokDecimals);
         decF.addTextChangedListener(watch(sv -> tokDecimals = sv));
-        EditText descF = fieldInto(body, "Description (optional)", "", tokDesc);
+        EditText descF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_description_optional), "", tokDesc);
         descF.addTextChangedListener(watch(sv -> tokDesc = sv));
-        EditText urlF = fieldInto(body, "Icon URL (optional)", "https://…/icon.png", tokUrl);
+        EditText urlF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_icon_url_optional), "https://…/icon.png", tokUrl);
         urlF.addTextChangedListener(watch(sv -> tokUrl = sv));
-        body.addView(hostingUploadRow("tokicon", "Upload an icon photo to hosting",
+        body.addView(hostingUploadRow("tokicon", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_upload_icon_host),
                 () -> pickHostSingle(PICK_HOST_ICON, "tokicon")), lpm(0, 4, 0, 0));
-        body.addView(iconUploadRow(tokIcon, "Wallet icon — hosted URL above beats an upload",
+        body.addView(iconUploadRow(tokIcon, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_icon_help),
                 v -> { pendingPickContext = PICK_TOKICON; pendingBatchImages = false; launchPicker(false); },
                 v -> { tokIcon = ""; renderCreateToken(); }), lpm(0, 4, 0, 8));
 
         /* custom metadata pairs */
-        body.addView(sectionHead("Custom record fields", tokPairs.size() + ""));
+        body.addView(sectionHead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_custom_fields), tokPairs.size() + ""));
         for (int i = 0; i < tokPairs.size(); i++) {
             final int idx = i;
             String[] p = tokPairs.get(i);
@@ -2144,10 +2142,10 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             body.addView(row, lpm(0, 0, 0, 6));
         }
         LinearLayout addRow = horizontal(Gravity.CENTER_VERTICAL);
-        EditText pKey = input("Field — e.g. website");
+        EditText pKey = input(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_field_hint));
         pKey.setText(pairKeyDraft);
         pKey.addTextChangedListener(watch(sv -> pairKeyDraft = sv));
-        EditText pVal = input("Value");
+        EditText pVal = input(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_terminal_txn_value));
         pVal.setText(pairValueDraft);
         pVal.addTextChangedListener(watch(sv -> pairValueDraft = sv));
         addRow.addView(pKey, weight(46, 0, 3));
@@ -2155,9 +2153,9 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         TextView addBtn = Design.button(this, "+", false);
         addBtn.setOnClickListener(v -> {
             String k = pairKeyDraft.trim();
-            if (k.isEmpty() || pairValueDraft.trim().isEmpty()) { toast("Both field and value needed"); return; }
-            if (StateNft.RESERVED_KEYS.contains(k.toLowerCase())) { toast("'" + k + "' is a reserved field"); return; }
-            if (tokPairs.size() >= 10) { toast("10 custom fields maximum"); return; }
+            if (k.isEmpty() || pairValueDraft.trim().isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_field_required)); return; }
+            if (StateNft.RESERVED_KEYS.contains(k.toLowerCase())) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_reserved, k)); return; }
+            if (tokPairs.size() >= 10) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_field_limit)); return; }
             tokPairs.add(new String[]{ k, pairValueDraft.trim() });
             pairKeyDraft = ""; pairValueDraft = "";
             renderCreateToken();
@@ -2166,7 +2164,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         body.addView(addRow, lpm(0, 2, 0, 12));
 
         /* record preview */
-        body.addView(sectionHead("The record", ""));
+        body.addView(sectionHead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_record), ""));
         TextView metaDump = Design.text(this, previewTokenJson(), 9.5f, Design.DIM(), Design.mono());
         metaDump.setBackground(Design.ruled(this, Design.CARD(), Design.INK(), 1));
         metaDump.setPadding(dp(10), dp(8), dp(10), dp(8));
@@ -2175,11 +2173,11 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         LinearLayout warn = vertical();
         warn.setBackground(Design.ruled(this, Design.CARD(), Design.ACCENT(), 2f));
         warn.setPadding(dp(12), dp(10), dp(12), dp(12));
-        warn.addView(Design.text(this, "SUPPLY IS PERMANENT", 12, Design.ACCENT(), Design.sansBold()));
-        warn.addView(Design.note(this, "Total supply and decimals cannot be changed after minting."), lpm(0, 3, 0, 0));
+        warn.addView(Design.text(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_permanent_supply), 12, Design.ACCENT(), Design.sansBold()));
+        warn.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_supply_help)), lpm(0, 3, 0, 0));
         body.addView(warn, lpm(0, 6, 0, 14));
 
-        TextView go = Design.button(this, tokBusy ? "Minting…" : "Mint token", true);
+        TextView go = Design.button(this, tokBusy ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_minting) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_nft_mint_mint_token), true);
         go.setEnabled(!tokBusy);
         go.setOnClickListener(v -> mintToken(go));
         body.addView(go, lph(54, 0, 0, 0, 0));
@@ -2188,13 +2186,13 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     private void mintToken(TextView go) {
         if (tokBusy) return;
         String n = tokName.trim();
-        if (n.isEmpty() || n.length() > 40) { toast("Name must be 1–40 characters"); return; }
+        if (n.isEmpty() || n.length() > 40) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_name_required)); return; }
         long supply = 0;
         try { supply = Long.parseLong(tokSupply.trim()); } catch (Exception ignored) {}
-        if (supply < 1) { toast("Supply must be a positive whole number"); return; }
+        if (supply < 1) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_supply_required)); return; }
         int dec = parseIntSafe(tokDecimals.trim());
-        if (dec < 0 || dec > 16) { toast("Decimals must be 0–16"); return; }
-        if (!validCmdUrl(tokUrl.trim())) { toast("Icon URL must not contain spaces, quotes or semicolons"); return; }
+        if (dec < 0 || dec > 16) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_decimals_range)); return; }
+        if (!validCmdUrl(tokUrl.trim())) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_safe_icon_url)); return; }
         if (!hostGatePassed && tokUrl.trim().startsWith("http")) {
             java.util.List<String> urls = new java.util.ArrayList<>();
             urls.add(tokUrl.trim());
@@ -2203,7 +2201,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         }
         hostGatePassed = false;
         tokBusy = true;
-        go.setText("MINTING…");
+        Language.setText(go, Language.upper(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_minting)));
         String iconValue = !tokUrl.trim().isEmpty() ? tokUrl.trim()
                 : (!tokIcon.isEmpty() ? "<artimage>" + tokIcon : "");
         /* ALWAYS SIGNED: gate the record (icon + pairs + signature) against the
@@ -2218,16 +2216,16 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 String out = ImageTools.recompressBase64(tokIcon, Math.max(1200, room));
                 if (!out.isEmpty() && out.length() <= room) {
                     iconFit = "<artimage>" + out + "</artimage>";
-                    toast("icon auto-slimmed to keep the token signed");
+                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_icon_shrunk));
                 } else {
                     tokBusy = false;
-                    toast("icon + fields exceed the signed record budget - hosted icon URL or shorter fields");
+                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_icon_too_large));
                     renderCreateToken();
                     return;
                 }
             } else if (probe.length() + MintEngine.DEF_SIGN_WEIGHT > MintEngine.DEF_SPLIT_MAX) {
                 tokBusy = false;
-                toast("record exceeds the signed budget - shorten the description or custom fields");
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_record_too_large));
                 renderCreateToken();
                 return;
             }
@@ -2240,18 +2238,18 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             @Override public void onResult(JSONObject ga) {
                 JSONObject gr = ga.optJSONObject("response");
                 String pk = gr == null ? "" : gr.optString("publickey", "");
-                if (pk.isEmpty()) { tokBusy = false; toast("could not fetch the signing key"); renderCreateToken(); return; }
+                if (pk.isEmpty()) { tokBusy = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_key_failed)); renderCreateToken(); return; }
         node.cmd(StateNft.tokenCreateCommand(nF, tokDesc.trim(), tokTicker.trim(), iconFitF, supplyF, decF, tokPairs)
                         + " signtoken:" + pk,
                 new NodeApi.Cb() {
                     @Override public void onResult(JSONObject json) {
                         tokBusy = false;
                         if (!json.optBoolean("status", false)) {
-                            toast("Mint failed: " + json.optString("error", "node refused"));
+                            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_mint_failed, json.isNull("error") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_node_refused) : json.optString("error")));
                             renderCreateToken();
                             return;
                         }
-                        toast("Token minted — appears once confirmed");
+                        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_token_minted));
                         tokName = ""; tokTicker = ""; tokDesc = ""; tokUrl = ""; tokIcon = "";
                         tokPairs.clear();
                         pairKeyDraft = ""; pairValueDraft = "";
@@ -4034,9 +4032,9 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     /** A "Upload to hosting…" button; disabled with guidance when there is no
      *  default destination. */
-    private View hostingUploadRow(String lane, String label, Runnable onTap) {
+    private View hostingUploadRow(String lane, CharSequence label, Runnable onTap) {
         boolean ready = HostingStore.getDefault(this) != null;
-        TextView b = Design.button(this, ready ? label : "Set up hosting in Manage → Hosting", false);
+        TextView b = Design.button(this, ready ? label : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_setup_hosting), false);
         if (ready) {
             b.setOnClickListener(v -> onTap.run());
         } else {
@@ -4571,7 +4569,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     /** Icon upload affordance: thumb preview + pick/clear controls. */
-    private LinearLayout iconUploadRow(String iconB64, String caption,
+    private LinearLayout iconUploadRow(String iconB64, CharSequence caption,
                                        View.OnClickListener pick, View.OnClickListener clear) {
         LinearLayout row = horizontal(Gravity.CENTER_VERTICAL);
         boolean has = iconB64 != null && !iconB64.isEmpty();
@@ -4582,9 +4580,10 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             ImageLoader.loadOver(this, ImageTools.dataUri(iconB64), thumb);
             row.addView(thumb, new LinearLayout.LayoutParams(dp(40), dp(40)){{ rightMargin = dp(8); }});
         }
-        TextView btn = Design.button(this, has ? "Replace icon image" : "Upload icon image", false);
+        TextView btn = Design.button(this, has ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_replace_icon) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_upload_icon), false);
         btn.setOnClickListener(pick);
-        row.addView(btn, new LinearLayout.LayoutParams(0, dp(40), 1));
+        btn.setMinHeight(dp(48));
+        row.addView(btn, new LinearLayout.LayoutParams(0, -2, 1));
         if (has) {
             TextView del = Design.text(this, "×", 18, Design.ACCENT(), Design.sansBold());
             del.setPadding(dp(12), 0, dp(6), 0);
