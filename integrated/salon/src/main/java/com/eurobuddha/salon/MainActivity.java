@@ -242,13 +242,6 @@ public class MainActivity extends AppCompatActivity {
         if (nodeChip != null) Language.setText(nodeChip, nodeUp ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_connected) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_node_not_ready));
         if (!nodeUp) startPairingRetry();   // keep re-registering after a disconnect
         if (nodeUp && pubkey.isEmpty()) fetchPubkey();
-        if (nodeUp && !adoptChecked && !claiming && !SalonStore.hasIdentity(this)) {
-            adoptChecked = true;
-            node.cmd("balance", new NodeApi.Cb() {
-                @Override public void onResult(JSONObject j) { JSONObject t = findAnySalonToken(j); if (t != null) runOnUiThread(() -> adoptFromToken(t)); }
-                @Override public void onError(String m) {}
-            });
-        }
         // One-time-per-session setup (relay TTL, mail key, first inbox scan).
         if (nodeUp && !reannouncedThisSession && SalonStore.hasIdentity(this)) {
             reannouncedThisSession = true;
@@ -265,6 +258,7 @@ public class MainActivity extends AppCompatActivity {
         // content (the holdings showcase, the tip/message bar) was drawn in its
         // "no node" state. Re-render once, on the false->true transition, so it refreshes.
         if (nodeUp && !wasNodeUp && (screen == Screen.HOME || screen == Screen.VIEW || screen == Screen.DISCOVER || screen == Screen.MESSAGES)) render();
+        if (nodeUp && !adoptChecked && !claiming && !SalonStore.hasIdentity(this)) { adoptChecked=true; checkIdentityAdoption(); }
         wasNodeUp = nodeUp;
     }
 
@@ -1272,6 +1266,7 @@ public class MainActivity extends AppCompatActivity {
         cancelBackup();
         cancelPublication();
         cancelHostedRestore();
+        cancelIdentityClaim();
         cancelSpareBurn();
         io.shutdownNow();
         stopAudio();
@@ -1336,6 +1331,7 @@ public class MainActivity extends AppCompatActivity {
     private int renderEpoch = 0;   // bumped every render(); async painters bail if it moved (stale screen)
     private void render() {
         if (screen == Screen.EDIT) commitEditFields();   // an in-Edit action rebuilding the screen must not lose typed text
+        cancelIdentityClaim();
         renderEpoch++;
         if (swipe != null) swipe.setEnabled(screen == Screen.FEED || screen == Screen.DISCOVER);   // pull-to-refresh where it makes sense
         buildNav(); body.removeAllViews();
@@ -3088,106 +3084,276 @@ public class MainActivity extends AppCompatActivity {
         EditText bio = field(form, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_bio), SalonStore.get(this, "bio"), false, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_bio_hint));
         final TextView status = Design.note(this, ""); form.addView(status, lp(0, 8, 0, 0));
         claimBtn = btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_claim), true, () -> claimIdentity(text(handle), text(name), text(bio), status));
-        claimBtn.setEnabled(!claiming); if (claiming) claimBtn.setAlpha(0.4f);
+        claimHandleField=handle; claimNameField=name; claimBioField=bio; setClaimEnabled(!claiming);
         form.addView(claimBtn, lph(52, 0, 10, 0, 0));
+        if (SalonStore.me(this).has("claimPending")) {
+            claimRetryButton=btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_claim_retry_title),false,this::confirmClaimRetry);
+            form.addView(claimRetryButton,lph(48,0,8,0,0));
+        }
         body.addView(form, lp(0, 0, 0, 12));
     }
 
-    private void claimIdentity(String handle, String name, String bio, TextView status) {
-        if (claiming) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_claiming)); return; }
-        handle = Hosting.slug(handle);
-        if (handle.isEmpty() || name.trim().isEmpty()) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_required)); return; }
-        Hosting.Profile def = HostingStore.getDefault(this);
-        if (def == null) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting_first)); return; }
-        if (!nodeUp) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_waiting_node)); return; }
-        if (pubkey.isEmpty()) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_fetching_key)); fetchPubkey(); return; }
-        claiming = true; setClaimEnabled(false);
-        final String h = handle, n = name.trim(), b = bio.trim();
-        SalonStore.put(this, "handle", h); SalonStore.put(this, "name", n); SalonStore.put(this, "bio", b);
-        Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_publishing));
-        io.execute(() -> {
-            try {
-                JSONObject profile = buildProfileJson();
-                final String profileUrl = ProfileHosting.upload(def, h, profile.toString(), salonHtml());
-                runOnUiThread(() -> { SalonStore.put(this, "profileUrl", profileUrl); Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_checking)); adoptOrMint(h, n, b, profileUrl, status); });
-            } catch (SftpUploader.HostKeyUnverified hk) { runOnUiThread(() -> { promptTrustHostKey(def, hk.fingerprint, status); claimFailed(); }); }
-            catch (Exception e) { runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting_failed, mediaError(e))); claimFailed(); }); }
-        });
+    /** Setup follows the same captured-owner lifetime as profile publishing. */
+    private static final class IdentityClaim {
+        String snapshot, url;
+        final String handle, name, bio, signer, html;
+        final Hosting.Profile host;
+        final JSONObject profile;
+        final int epoch;
+        final NodeApi node;
+        final TextView status;
+        volatile boolean cancelled;
+        int request;
+        Runnable poll;
+        IdentityClaim(String snapshot, String handle, String name, String bio, String signer,
+                Hosting.Profile host, JSONObject profile, String html, int epoch, NodeApi node, TextView status) {
+            this.snapshot=snapshot; this.handle=handle; this.name=name; this.bio=bio; this.signer=signer;
+            this.host=host; this.profile=profile; this.html=html; this.epoch=epoch; this.node=node; this.status=status;
+        }
     }
+    private EditText claimHandleField, claimNameField, claimBioField;
+    private TextView claimRetryButton;
+    private androidx.appcompat.app.AlertDialog claimRetryDialog;
+    private IdentityClaim identityClaim;
+    private Object identityAdoption;
+    private final android.os.Handler claimTimer = new android.os.Handler(android.os.Looper.getMainLooper());
 
-    private void adoptOrMint(String h, String n, String b, String url, TextView status) {
-        node.cmd("balance", new NodeApi.Cb() {
-            @Override public void onResult(JSONObject reply) {
-                final JSONObject existing;
-                try { existing = IdentityBalance.find(reply, h); }
-                catch (IllegalArgumentException unavailable) { onError(""); return; }
-                runOnUiThread(() -> {
-                    if (existing != null) finishClaim(existing.optString("tokenid"));
-                    else {
-                        Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_identity_minting));
-                        mintIdentity(h, n, b, url, status);
-                    }
-                });
+    private void cancelIdentityClaim() {
+        if(claimRetryDialog!=null){androidx.appcompat.app.AlertDialog dialog=claimRetryDialog;claimRetryDialog=null;dialog.dismiss();}
+        IdentityClaim op=identityClaim;
+        identityClaim=null; identityAdoption=null; claiming=false;
+        if(op!=null) { op.cancelled=true; if(op.poll!=null) claimTimer.removeCallbacks(op.poll); }
+        setClaimEnabled(true);
+    }
+    private boolean claimStoredCurrent(IdentityClaim op) {
+        if(op.cancelled) return false;
+        try {
+            Hosting.Profile host=HostingStore.getDefault(this);
+            return op.snapshot.equals(SalonStore.publicationSnapshot(SalonStore.identityRecord(this)))
+                    && host!=null && op.host.j.toString().equals(host.j.toString());
+        } catch(Exception unavailable) { return false; }
+    }
+    private boolean claimCurrent(IdentityClaim op) {
+        return identityClaim==op && !isFinishing() && !isDestroyed() && op.epoch==renderEpoch
+                && nodeUp && node==op.node && pubkey.equals(op.signer) && claimStoredCurrent(op);
+    }
+    private boolean requireClaim(IdentityClaim op) {
+        if(claimCurrent(op)) return true;
+        if(identityClaim==op) endClaim(op, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_changed));
+        return false;
+    }
+    private void endClaim(IdentityClaim op, CharSequence message) {
+        if(identityClaim!=op) return;
+        cancelIdentityClaim();
+        if(!isFinishing() && !isDestroyed() && op.epoch==renderEpoch) publicationStatus(op.status,message);
+    }
+    private boolean saveClaim(IdentityClaim op, JSONObject changes) {
+        synchronized(SalonStore.class) {
+            if(!requireClaim(op)) return false;
+            if(!SalonStore.saveClaim(this,op.snapshot,changes)) { endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return false; }
+            op.snapshot=SalonStore.publicationSnapshot(SalonStore.identityRecord(this));
+            return true;
+        }
+    }
+    private void claimIdentity(String handle,String name,String bio,TextView status) {
+        if(claiming) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_claiming)); return; }
+        handle=Hosting.slug(handle);
+        if(handle.isEmpty() || name.trim().isEmpty()) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_required)); return; }
+        if(!Args.isSafeMeta(name) || !Args.isSafeMeta(bio)) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_safe_metadata)); return; }
+        Hosting.Profile host=HostingStore.getDefault(this);
+        if(host==null) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting_first)); return; }
+        if(!nodeUp || node==null) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_waiting_node)); return; }
+        if(!Args.isTokenId(pubkey)) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_fetching_key)); fetchPubkey(); return; }
+        final IdentityClaim op;
+        final JSONObject pending;
+        try {
+            JSONObject current=SalonStore.identityRecord(this);
+            if(!current.optString("tokenid").isEmpty()) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_changed)); return; }
+            if(current.has("claimPending") && !(current.opt("claimPending") instanceof JSONObject)) {
+                publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return;
             }
-            @Override public void onError(String ignored) {
-                runOnUiThread(() -> {
-                    Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_identity_lookup_failed));
-                    claimFailed();
-                });
+            pending=current.optJSONObject("claimPending");
+            // A prior submission can still confirm after a timeout/restart. Resume reads only.
+            if(pending!=null && (!handle.equals(pending.optString("handle"))
+                    || !pubkey.equals(pending.optString("signer")) || pending.optString("url").isEmpty())) {
+                publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_claim_pending)); return;
             }
-        });
+            JSONObject profile=pending==null?buildProfileJson():new JSONObject();
+            profile.put("handle",handle).put("name",name.trim()).put("bio",bio.trim());
+            op=new IdentityClaim(SalonStore.publicationSnapshot(current),handle,name.trim(),bio.trim(),pubkey,
+                    new Hosting.Profile(new JSONObject(host.j.toString())),profile,pending==null?salonHtml():"",renderEpoch,node,status);
+        } catch(Exception unavailable) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return; }
+        identityAdoption=null; identityClaim=op; claiming=true; setClaimEnabled(false);
+        if(pending!=null) {
+            op.url=pending.optString("url"); publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_confirming)); pollForIdentity(op,0); return;
+        }
+        JSONObject draft=new JSONObject();putJson(draft,"handle",op.handle);putJson(draft,"name",op.name);putJson(draft,"bio",op.bio);
+        if(!saveClaim(op,draft)) return;
+        publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_publishing));
+        try {
+            io.execute(()->{
+                if(!claimStoredCurrent(op)) { runOnUiThread(()->endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_changed))); return; }
+                try {
+                    String url=ProfileHosting.upload(op.host,op.handle,op.profile.toString(),op.html);
+                    runOnUiThread(()->{
+                        if(!requireClaim(op)) return;
+                        if(url==null || url.isEmpty() || !Args.isSafeMeta(url)) { endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return; }
+                        JSONObject change=new JSONObject();putJson(change,"profileUrl",url);
+                        if(!saveClaim(op,change)) return;
+                        op.url=url;publicationStatus(op.status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_checking));adoptOrMint(op);
+                    });
+                } catch(SftpUploader.HostKeyUnverified untrusted) {
+                    runOnUiThread(()->{if(requireClaim(op)){endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage));promptTrustHostKey(op.host,untrusted.fingerprint,op.status);}});
+                } catch(Exception unavailable) { runOnUiThread(()->endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_failed, mediaError(unavailable)))); }
+            });
+        } catch(java.util.concurrent.RejectedExecutionException unavailable) { endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); }
     }
-
-    private void mintIdentity(String handle, String name, String bio, String profileUrl, TextView status) {
-        // Defense-in-depth: keep command/JSON-structure breakers out of the free-text metadata
-        // that gets interpolated into the tokencreate command (quotes are JSON-escaped upstream).
-        if (!Args.isSafeMeta(name) || !Args.isSafeMeta(bio)) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_safe_metadata)); claimFailed(); return; }
-        JSONObject meta = new JSONObject();
-        putJson(meta, "salon", "1"); putJson(meta, "handle", handle); putJson(meta, "name", name); putJson(meta, "url", profileUrl); putJson(meta, "bio", bio);
-        node.cmd("tokencreate name:" + meta + " amount:1 decimals:0 signtoken:" + pubkey, new NodeApi.Cb() {
-            @Override public void onResult(JSONObject json) {
-                if (!json.optBoolean("status", false)) { runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_mint_failed, json.has("error") ? json.optString("error") : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_rejected))); claimFailed(); }); return; }
-                runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_confirming)); pollForIdentity(handle, 0, status); });
+    private void adoptOrMint(IdentityClaim op) {
+        if(!requireClaim(op)) return;
+        final int request=++op.request;
+        NodeApi.Cb result=new NodeApi.Cb() {
+            public void onResult(JSONObject reply) { runOnUiThread(()->{
+                if(op.request!=request || !requireClaim(op)) return; op.request++;
+                try {
+                    JSONObject existing=IdentityBalance.find(reply,op.handle);
+                    if(existing!=null) finishClaim(op,existing.optString("tokenid"));
+                    else mintIdentity(op);
+                } catch(IllegalArgumentException unavailable) { endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_identity_lookup_failed)); }
+            }); }
+            public void onError(String ignored) { runOnUiThread(()->{
+                if(op.request!=request || !requireClaim(op)) return;op.request++;endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_identity_lookup_failed));
+            }); }
+        };
+        try { op.node.cmd("balance",result); } catch(RuntimeException unavailable) { result.onError(""); }
+    }
+    private void mintIdentity(IdentityClaim op) {
+        if(!requireClaim(op)) return;
+        JSONObject pending=new JSONObject(),changes=new JSONObject(),meta=new JSONObject();
+        try {
+            pending.put("handle",op.handle).put("url",op.url).put("signer",op.signer);
+            changes.put("claimPending",pending);
+            meta.put("salon","1").put("handle",op.handle).put("name",op.name).put("url",op.url).put("bio",op.bio);
+        } catch(Exception unavailable) { endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return; }
+        // Reuse Atelier's save-before-post rule. An unconfirmed attempt is never auto-reposted.
+        if(!saveClaim(op,changes)) return;
+        publicationStatus(op.status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_identity_minting));
+        final int request=++op.request;
+        NodeApi.Cb result=new NodeApi.Cb() {
+            public void onResult(JSONObject reply) { runOnUiThread(()->{
+                if(op.request!=request || !requireClaim(op)) return;op.request++;
+                if(reply!=null && Boolean.FALSE.equals(reply.opt("status"))) {
+                    JSONObject clear=new JSONObject();try{clear.put("claimPending",JSONObject.NULL);}catch(Exception ignored){}
+                    if(saveClaim(op,clear)) endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_claim_rejected));
+                } else if(reply!=null && Boolean.TRUE.equals(reply.opt("status"))) {
+                    publicationStatus(op.status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_confirming));pollForIdentity(op,0);
+                } else endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_claim_pending));
+            }); }
+            public void onError(String ignored) { runOnUiThread(()->{
+                if(op.request!=request || !requireClaim(op)) return;op.request++;endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_claim_pending));
+            }); }
+        };
+        try {
+            synchronized(SalonStore.class) {
+                if(!requireClaim(op)) return;
+                op.node.cmd("tokencreate name:"+meta+" amount:1 decimals:0 signtoken:"+op.signer,result);
             }
-            @Override public void onError(String m) { runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_mint_failed, m)); claimFailed(); }); }
-        });
+        }
+        catch(RuntimeException unavailable) { result.onError(""); }
+    }
+    private void pollForIdentity(IdentityClaim op,int tries) {
+        if(!requireClaim(op)) return;
+        final int request=++op.request;
+        NodeApi.Cb result=new NodeApi.Cb() {
+            public void onResult(JSONObject reply) { runOnUiThread(()->{
+                if(op.request!=request || !requireClaim(op)) return;op.request++;
+                try {
+                    JSONObject row=IdentityBalance.find(reply,op.handle);
+                    if(row!=null) { finishClaim(op,row.optString("tokenid")); return; }
+                } catch(IllegalArgumentException unavailable) { /* Unknown balance is never permission to mint. */ }
+                nextClaimPoll(op,tries);
+            }); }
+            public void onError(String ignored) { runOnUiThread(()->{
+                if(op.request!=request || !requireClaim(op)) return;op.request++;nextClaimPoll(op,tries);
+            }); }
+        };
+        try { op.node.cmd("balance",result); } catch(RuntimeException unavailable) { result.onError(""); }
+    }
+    private void nextClaimPoll(IdentityClaim op,int tries) {
+        if(tries>=30) { endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_claim_pending)); return; }
+        op.poll=()->pollForIdentity(op,tries+1);claimTimer.postDelayed(op.poll,4000);
+    }
+    private void finishClaim(IdentityClaim op,String tokenid) {
+        if(!Args.isTokenId(tokenid) || new java.math.BigInteger(tokenid.substring(2),16).signum()==0) { endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_identity_lookup_failed)); return; }
+        JSONObject change=new JSONObject();putJson(change,"tokenid",tokenid);
+        try{change.put("claimPending",JSONObject.NULL);}catch(Exception ignored){}
+        if(!saveClaim(op,change)) return;
+        cancelIdentityClaim();publishSalon(null);toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_opened));go(Screen.HOME);
+    }
+    private void setClaimEnabled(boolean on) {
+        if(claimBtn!=null){claimBtn.setEnabled(on);claimBtn.setAlpha(on?1f:0.4f);}
+        for(EditText field:new EditText[]{claimHandleField,claimNameField,claimBioField}) if(field!=null) field.setEnabled(on);
     }
 
-    private void pollForIdentity(String handle, int tries, TextView status) {
-        node.cmd("balance", new NodeApi.Cb() {
-            @Override public void onResult(JSONObject json) {
-                String tid = findSalonToken(json, handle);
-                if (!tid.isEmpty()) runOnUiThread(() -> finishClaim(tid));
-                else if (tries < 30) body.postDelayed(() -> pollForIdentity(handle, tries + 1, status), 4000);
-                else runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_pending)); claiming = false; });
-            }
-            @Override public void onError(String m) { if (tries < 30) body.postDelayed(() -> pollForIdentity(handle, tries + 1, status), 4000); else runOnUiThread(() -> claiming = false); }
-        });
+    /** Explicit permission for another attempt; this dialog never sends a command. */
+    private void confirmClaimRetry() {
+        if(claiming || claimRetryDialog!=null || !nodeUp || isFinishing() || isDestroyed()) return;
+        final String snapshot;
+        try {
+            JSONObject current=SalonStore.identityRecord(this);
+            if(!(current.opt("claimPending") instanceof JSONObject)) return;
+            snapshot=SalonStore.publicationSnapshot(current);
+        } catch(Exception unavailable) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return; }
+        final int epoch=renderEpoch;final NodeApi requestedNode=node;
+        claimRetryDialog=new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_claim_retry_title)).setMessage(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_claim_retry_warning))
+                .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel),null)
+                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_claim_retry_title),(dialog,which)->{
+                    if(claimRetryDialog!=dialog) return;claimRetryDialog=null;
+                    if(claiming || isFinishing() || isDestroyed() || epoch!=renderEpoch || node!=requestedNode || !nodeUp) return;
+                    try {
+                        if(!snapshot.equals(SalonStore.publicationSnapshot(SalonStore.identityRecord(this)))) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_changed)); return; }
+                        JSONObject clear=new JSONObject().put("claimPending",JSONObject.NULL);
+                        if(!SalonStore.saveClaim(this,snapshot,clear)) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return; }
+                        if(claimRetryButton!=null) claimRetryButton.setVisibility(View.GONE);
+                        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_claim_retry_ready));
+                    } catch(Exception unavailable) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); }
+                }).create();
+        claimRetryDialog.setOnDismissListener(dialog->{if(claimRetryDialog==dialog)claimRetryDialog=null;});
+        claimRetryDialog.show();
     }
 
-    private void finishClaim(String tokenid) {
-        SalonStore.put(this, "tokenid", tokenid); claiming = false;
-        publishSalon(null);   // put myself on the square
-        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_opened)); go(Screen.HOME);
-    }
-    private void claimFailed() { claiming = false; setClaimEnabled(true); }
-    private void setClaimEnabled(boolean on) { if (claimBtn != null) { claimBtn.setEnabled(on); claimBtn.setAlpha(on ? 1f : 0.4f); } }
-
-    private JSONObject findAnySalonToken(JSONObject j) { return findSalonEntry(j, null); }
-    private String findSalonToken(JSONObject j, String handle) { JSONObject t = findSalonEntry(j, handle); return t == null ? "" : t.optString("tokenid"); }
-    private JSONObject findSalonEntry(JSONObject balanceJson, String handle) {
-        try { return IdentityBalance.find(balanceJson, handle); }
-        catch (IllegalArgumentException unavailable) { return null; }
-    }
-    private void adoptFromToken(JSONObject tokenRow) {
-        try { JSONObject meta = tokenRow.optJSONObject("token");
-            SalonStore.put(this, "tokenid", tokenRow.optString("tokenid")); SalonStore.put(this, "handle", meta.optString("handle"));
-            if (SalonStore.get(this, "name").isEmpty()) SalonStore.put(this, "name", meta.optString("name"));
-            if (SalonStore.get(this, "bio").isEmpty()) SalonStore.put(this, "bio", meta.optString("bio"));
-            SalonStore.put(this, "profileUrl", meta.optString("url")); claiming = false;
-            if (screen == Screen.HOME || screen == Screen.ONBOARD || screen == Screen.FEED) go(Screen.HOME);
-            hydrateFromHosted(meta.optString("url"), false);   // capture the final screen after adoption
-        } catch (Exception ignored) {}
+    /** Automatic adoption may finish only for the empty account that requested the balance. */
+    private void checkIdentityAdoption() {
+        if(identityAdoption!=null || claiming || SalonStore.hasIdentity(this)) return;
+        final String snapshot;
+        try { snapshot=SalonStore.publicationSnapshot(SalonStore.identityRecord(this)); }
+        catch(Exception unavailable) { return; }
+        final Object request=new Object();identityAdoption=request;
+        final NodeApi requestedNode=node;final int epoch=renderEpoch;
+        NodeApi.Cb result=new NodeApi.Cb() {
+            public void onResult(JSONObject reply) { runOnUiThread(()->{
+                if(identityAdoption!=request) return; identityAdoption=null;
+                if(isFinishing() || isDestroyed() || epoch!=renderEpoch || node!=requestedNode || !nodeUp || claiming) return;
+                try {
+                    JSONObject current=SalonStore.identityRecord(MainActivity.this);
+                    if(!snapshot.equals(SalonStore.publicationSnapshot(current))) return;
+                    JSONObject pending=current.optJSONObject("claimPending");
+                    JSONObject row=IdentityBalance.find(reply,pending==null?null:pending.optString("handle"));
+                    if(row==null) return;
+                    String tokenid=row.optString("tokenid");
+                    if(new java.math.BigInteger(tokenid.substring(2),16).signum()==0) return;
+                    JSONObject meta=row.getJSONObject("token"),change=new JSONObject();
+                    change.put("tokenid",tokenid).put("handle",meta.getString("handle")).put("profileUrl",meta.optString("url"));
+                    for(String key:new String[]{"name","bio"}) if(current.optString(key).isEmpty()) change.put(key,meta.optString(key));
+                    change.put("claimPending",JSONObject.NULL);
+                    if(!SalonStore.saveClaim(MainActivity.this,snapshot,change)) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return; }
+                    if(screen==Screen.HOME || screen==Screen.ONBOARD || screen==Screen.FEED) go(Screen.HOME);
+                    hydrateFromHosted(meta.optString("url"),false);
+                } catch(Exception unavailable) { /* A failed lookup cannot adopt or mint. */ }
+            }); }
+            public void onError(String ignored) { runOnUiThread(()->{if(identityAdoption==request) identityAdoption=null;}); }
+        };
+        try { requestedNode.cmd("balance",result); } catch(RuntimeException unavailable) { result.onError(""); }
     }
 
     private static final class HostedRestore {

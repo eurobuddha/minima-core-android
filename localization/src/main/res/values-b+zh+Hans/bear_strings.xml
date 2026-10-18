@@ -8220,4 +8220,9 @@
     <string name="l10n_salon_tips_bad_address" formatted="false">"该资料的打赏地址无效。未发送任何内容。"</string>
     <string name="l10n_salon_tips_bad_token" formatted="false">"代币 ID 无效。"</string>
     <string name="l10n_salon_backup_storage_failed" formatted="false">"无法读取或保存账户备份。请检查设备存储空间后重试。"</string>
+    <string name="l10n_salon_claim_pending" formatted="false">"身份请求尚未确认。请检查节点钱包，然后重新打开此用户名再次检查。系统不会自动重新提交。"</string>
+    <string name="l10n_salon_claim_rejected" formatted="false">"节点拒绝了身份请求。请检查节点后重试。"</string>
+    <string name="l10n_salon_claim_retry_title" formatted="false">"允许再次尝试"</string>
+    <string name="l10n_salon_claim_retry_warning" formatted="false">"先前的请求仍可能完成。再次尝试可能会创建额外的身份代币。请先检查节点钱包。此操作仅解除申请按钮的限制，不会发送任何请求。"</string>
+    <string name="l10n_salon_claim_retry_ready" formatted="false">"现在可以再次尝试。准备好后，请点击申请按钮。"</string>
 </resources>

@@ -40,39 +40,6 @@ public class IdentityBalanceTest {
             assertThrows(IllegalArgumentException.class,()->IdentityBalance.find(input,"artist"));
         }
     }
-    @Test public void actualClaimContinuationNeverMintsOnRejectedMalformedOrTimedOutLookup() throws Exception {
-        for(JSONObject input:new JSONObject[]{null,new JSONObject().put("status",false),reply("bad"),
-                reply(new JSONArray().put(JSONObject.NULL))}) checkClaim(input,false);
-    }
-    @Test public void actualClaimContinuationMintsOnlyAfterSuccessfulAbsence() throws Exception {
-        checkClaim(reply(new JSONArray().put(row("Minima"))),true);
-    }
-    private void checkClaim(JSONObject reply,boolean mayMint) throws Exception {
-        MainActivity activity=mock(MainActivity.class,CALLS_REAL_METHODS);
-        doAnswer(call->{((Runnable)call.getArgument(0)).run();return null;}).when(activity).runOnUiThread(any());
-        NodeApi node=mock(NodeApi.class);set(activity,"node",node);set(activity,"pubkey","0x1234");set(activity,"claiming",true);
-        List<String> commands=new ArrayList<>();
-        doAnswer(call->{
-            String command=call.getArgument(0);commands.add(command);
-            if("balance".equals(command)) {
-                NodeApi.Cb cb=call.getArgument(1);
-                if(reply==null)cb.onError("timeout");else cb.onResult(reply);
-            }
-            return null;
-        }).when(node).cmd(anyString(),any(NodeApi.Cb.class));
-        try(MockedStatic<Language> language=mockStatic(Language.class)) {
-            Method method=MainActivity.class.getDeclaredMethod("adoptOrMint",String.class,String.class,String.class,String.class,TextView.class);
-            method.setAccessible(true);method.invoke(activity,"artist","Artist","Bio","https://example.invalid/profile.json",mock(TextView.class));
-            assertEquals(mayMint,commands.stream().anyMatch(c->c.startsWith("tokencreate ")));
-            if(!mayMint)assertEquals(false,get(activity,"claiming"));
-        }
-    }
-    private static void set(MainActivity activity,String name,Object value) throws Exception {
-        Field f=MainActivity.class.getDeclaredField(name);f.setAccessible(true);f.set(activity,value);
-    }
-    private static Object get(MainActivity activity,String name) throws Exception {
-        Field f=MainActivity.class.getDeclaredField(name);f.setAccessible(true);return f.get(activity);
-    }
     @Test public void sparesReuseCompleteParserAndDeduplicateCaseInsensitively() throws Exception {
         String spare="0x"+"cd".repeat(32),upper="0x"+"CD".repeat(32);
         JSONObject input=reply(new JSONArray().put(row(meta())).put(row(meta().toString()).put("tokenid",spare))

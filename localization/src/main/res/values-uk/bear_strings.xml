@@ -8328,4 +8328,9 @@
     <string name="l10n_salon_tips_bad_address" formatted="false">"У профілі вказано некоректну адресу для чайових. Нічого не надіслано."</string>
     <string name="l10n_salon_tips_bad_token" formatted="false">"Некоректний ID токена."</string>
     <string name="l10n_salon_backup_storage_failed" formatted="false">"Не вдалося прочитати або зберегти резервну копію облікового запису. Перевірте пам’ять пристрою та повторіть спробу."</string>
+    <string name="l10n_salon_claim_pending" formatted="false">"Запит на створення ідентифікатора не підтверджено. Перевірте гаманець вузла, потім знову відкрийте це ім’я для перевірки. Автоматичного повторного надсилання не буде."</string>
+    <string name="l10n_salon_claim_rejected" formatted="false">"Вузол відхилив запит на створення ідентифікатора. Перевірте вузол перед повторною спробою."</string>
+    <string name="l10n_salon_claim_retry_title" formatted="false">"Дозволити нову спробу"</string>
+    <string name="l10n_salon_claim_retry_warning" formatted="false">"Попередній запит ще може виконатися. Нова спроба може створити додатковий токен ідентифікатора. Спочатку перевірте гаманець вузла. Це лише розблокує створення профілю; нічого не надсилається."</string>
+    <string name="l10n_salon_claim_retry_ready" formatted="false">"Нову спробу дозволено. Коли будете готові, натисніть кнопку створення профілю."</string>
 </resources>

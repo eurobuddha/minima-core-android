@@ -76,12 +76,32 @@ final class SalonStore {
         return false;
     }
 
+    /** Reuse publication compare-and-save for setup; preserve unrelated profile/key fields. */
+    static synchronized boolean saveClaim(Context c, String expected, JSONObject changes) {
+        final SharedPreferences p;
+        final String previous;
+        try { p = prefs(c); previous = p.getString(KEY, ""); }
+        catch (RuntimeException unavailable) { return false; }
+        try {
+            JSONObject current = identityRecord(c);
+            if (!expected.equals(publicationSnapshot(current))) return false;
+            for (String key : new String[]{"handle", "name", "bio", "tokenid", "profileUrl", "claimPending"}) {
+                if (changes.has(key)) {
+                    if (changes.isNull(key)) current.remove(key); else current.put(key, changes.get(key));
+                }
+            }
+            if (p.edit().putString(KEY, current.toString()).commit()) return true;
+        } catch (Exception unavailable) { /* Keep the previous complete setup. */ }
+        try { p.edit().putString(KEY, previous).commit(); } catch (Exception unavailable) { }
+        return false;
+    }
+
     /** Only fields that own or contribute to a publication, in a stable order. */
     static String publicationSnapshot(JSONObject record) {
         JSONArray result = new JSONArray();
         for (String key : new String[]{"tokenid", "handle", "msgpk", "msgseed", "profileUrl",
                 "name", "bio", "about", "avatar", "banner", "webvalidate", "tipaddr",
-                "links", "gallery", "posts", "nfts"}) result.put(record.opt(key));
+                "links", "gallery", "posts", "nfts", "claimPending"}) result.put(record.opt(key));
         return result.toString();
     }
 

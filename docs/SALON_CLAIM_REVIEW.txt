@@ -1,0 +1,96 @@
+Salon identity setup review — 2026-10-19, source 1.9.89/160
+
+Summary
+Account setup now captures its draft, hosting destination, signing key, node and
+screen lifetime. Late upload, balance and mint callbacks cannot save into another
+account or start work from an obsolete screen. A pending mint is saved before
+submission, and reopening that attempt performs balance checks only.
+
+Sources reused
+- Standalone apks/salon MainActivity claimIdentity/adoptOrMint/mintIdentity/
+  pollForIdentity/adoptFromToken, including its existing tokencreate command,
+  amount 1, decimals 0, metadata and signing key parameter.
+- Canonical Salon ProfilePublishing.java.inc and HostedRestore.java.inc: captured
+  snapshots, cancellation, main-thread completion and checked store updates.
+- SalonStore.savePublication/writeIdentity: compare-and-save, checked commit and
+  restoration of Android's memory after a failed write.
+- IdentityBalance's complete response validation and serialized metadata parser.
+- ProfileHosting's checked upload and hosting verification, unchanged.
+- Atelier AirdropEngine save-before-post and unknown-outcome behavior, and its
+  transfer-flow lifecycle checks. Salon keeps its existing high-level mint command.
+- LanguageDialog, SalonPublishingTest and SalonHostedRestoreTest fixtures, plus
+  SalonBackupPersistenceTest's separate memory/disk preference simulation.
+- Also inspected mds/salon/salon.js mint/poll and Openly Identity.ensure. Their
+  unowned callbacks do not provide the needed account lifetime or checked save.
+
+Findings resolved
+MAJOR — An upload read the live profile on a worker, then wrote its URL to whichever
+account existed when it completed. Setup now captures immutable publication data,
+checks the stored snapshot and hosting destination before upload, and checks again
+before applying its result. Name/handle/bio inputs are retained and disabled during
+setup; manual language changes keep their widgets, values and cursor.
+
+MAJOR — Late or duplicate balance/mint callbacks could create another token, clear
+a later operation, or adopt into a replaced account. Each node request is consumed
+once on the main thread. Account, messaging key, node, signer and screen ownership
+are checked before continuation. The final mint dispatch rechecks under the same
+SalonStore lock used by backup restore. Navigation/render/destruction cancel the
+operation and remove its scheduled poll. Automatic adoption uses a captured account
+snapshot and one checked save for all identity fields.
+
+MAJOR — A timeout was reported as a failed mint and allowed blind resubmission.
+The claimPending record (handle, URL, signer) is durably saved before the command.
+True Boolean status starts bounded balance polling; malformed responses/timeouts
+retain an unconfirmed outcome. A definite Boolean rejection clears the marker only
+after a checked save. A matching balance entry completes setup and clears it.
+Reopening a pending attempt only polls, even after Activity replacement.
+
+A separate, translated confirmation lets the owner allow another attempt after
+checking the wallet. It warns that the previous request may still complete and a
+new attempt may create an extra identity. This confirmation only clears the pending
+marker; it never sends a command. Claim must be pressed separately. Changed owner,
+node, screen, dismissed dialogs and duplicate clicks cannot use stale confirmation.
+Five new messages cover pending/rejected outcomes and explicit retry in all four
+languages. Existing hosting diagnostics still use the media-error formatter.
+
+Storage and compatibility
+The new pending record is inside the existing salon_identity/me JSON. The profile
+renderer/export allowlist does not publish it. It is included in account backup as
+local state and in operation snapshots so other profile operations cannot erase a
+pending attempt unnoticed. No secret, library, keystore alias, node protocol or
+external command format changes. Old versions do not enforce this pending guard;
+rollback to older code does not carry the new retry protection.
+
+Validation
+- Combined integration run: 773 tests passed in 2m 7s. Following the final
+  dispatch recheck and two added cases, the full Salon suite passed again with
+  317 tests in 37s; Atelier 288, localization 12 and host 158 remain passing.
+  Total current evidence: 775 tests, zero failures/errors/skips.
+- Twenty new Activity/storage tests replace two old reflective continuation tests.
+  Parser coverage is retained; lookup failure and successful-absence coverage now
+  enters through the real claim workflow with mocked node and hosting services.
+- Cases cover stale account/key/node/screen, captured content, duplicate replies,
+  unknown/rejected mint outcomes, failed pending save, Activity replacement,
+  cancelled polling, confirmed balance, complete automatic adoption, failed CAS
+  and memory rollback, final dispatch race, retained form inputs and four-language
+  confirmation with no command before or after its positive action.
+- Release Java compilation passed. All 21 pinned imports reproduce the final
+  adapter/sources/tests. 6834 messages validate in four languages. Direct transport
+  and whitespace checks pass. Browser assets remain unchanged.
+- Evidence: build/localization/salon-claim-{tests,full,final,import}.log and
+  salon-claim-results.json. The first targeted run found an unnecessary publication
+  dependency in pending recovery; removed. The first full run exposed a missing
+  view-attachment wait in the new dialog test; corrected before the passing run.
+
+Limits
+An already submitted command or upload cannot be recalled by leaving the screen.
+Balance polling uses the existing matching-handle adoption rule and does not claim
+transaction-proof verification. Explicitly allowing another attempt can create a
+spare identity if the earlier request later confirms; the dialog states this.
+Tests use mocked node/hosting/registry calls and synthetic local preferences. No
+real account, seed, wallet, token transaction, device install or release was used.
+
+Verdict
+Approve this setup change after the recorded checks. The full Atelier/Salon goal
+remains incomplete: outgoing-message/account callback review, final label audit,
+signed APK verification and Fold acceptance remain. This is a source checkpoint.

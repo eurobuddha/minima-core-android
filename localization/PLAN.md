@@ -1,6 +1,6 @@
 # Four-language bear release
 
-## Current Atelier/Salon integration checkpoint — 1.9.88/159, 2026-10-18
+## Current Atelier/Salon integration checkpoint — 1.9.89/160, 2026-10-19
 
 This section supersedes the older source-version and completion-count snapshots
 below. The active goal remains incomplete. No final integration release has been
@@ -11,20 +11,27 @@ checkpoint performs no device changes.
   the common manual English, Simplified Chinese, Russian and Ukrainian selector.
   Menu identities 17/18, Pandamonium-only dependencies, non-exported activities and
   separate providers remain present. Salon uses the host MaxChat node/media.
-- Current host verification: 757 passing tests across Atelier (288), Salon (299),
+- Current host verification: 775 passing tests across Atelier (288), Salon (317),
   shared localization (12) and Pandamonium host (158). The prior real Chrome FILTR
   and Salon page four-language checks still apply to the unchanged browser assets.
   Host/browser checks do not prove Fold acceptance.
-- 6829 catalogue messages validate in all four languages. All 21 pinned imports
+- 6834 catalogue messages validate in all four languages. All 21 pinned imports
   reproduce. The direct-transport guard and release Java compilation pass.
 - Salon full backup now validates before writes and saves the key, draft and hosting
   list together, activating the new key only after checked persistence. Corrupt
   saved data cannot silently produce an incomplete backup. Restored content survives
   returning to Edit. Review: `docs/SALON_BACKUP_PERSISTENCE_REVIEW.txt`.
 
+- Salon setup now captures its account/draft/node/hosting lifetime, checks every
+  continuation and saves pending mints before dispatch. Unconfirmed attempts resume
+  balance reads only; an explicit four-language confirmation can allow another
+  attempt without sending anything. Inputs remain intact across language changes.
+  Review: `docs/SALON_CLAIM_REVIEW.txt`.
+
 Remaining before accepting the full goal:
 
-1. Review account ownership through claim/mint/poll and outgoing-message callbacks.
+1. Review account ownership through outgoing-message and remaining asynchronous
+   callbacks, including hosting confirmation and tip/inbox completion paths.
 2. Finish the hardcoded-label audit, including Atelier's `openMinimaCore()` fallback
    toast, and review the integrated apps' remaining asynchronous completion paths.
 3. Build final signed versioned APKs after review; verify actual packages, certificate,

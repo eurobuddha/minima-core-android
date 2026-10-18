@@ -8328,4 +8328,9 @@
     <string name="l10n_salon_tips_bad_address" formatted="false">"В профиле указан неверный адрес для чаевых. Ничего не отправлено."</string>
     <string name="l10n_salon_tips_bad_token" formatted="false">"Неверный ID токена."</string>
     <string name="l10n_salon_backup_storage_failed" formatted="false">"Не удалось прочитать или сохранить резервную копию учётной записи. Проверьте память устройства и повторите попытку."</string>
+    <string name="l10n_salon_claim_pending" formatted="false">"Запрос на создание идентификатора не подтверждён. Проверьте кошелёк узла, затем снова откройте это имя для проверки. Автоматической повторной отправки не будет."</string>
+    <string name="l10n_salon_claim_rejected" formatted="false">"Узел отклонил запрос на создание идентификатора. Проверьте узел перед повторной попыткой."</string>
+    <string name="l10n_salon_claim_retry_title" formatted="false">"Разрешить новую попытку"</string>
+    <string name="l10n_salon_claim_retry_warning" formatted="false">"Предыдущий запрос ещё может выполниться. Новая попытка может создать дополнительный токен идентификатора. Сначала проверьте кошелёк узла. Это только разблокирует создание профиля; ничего не отправляется."</string>
+    <string name="l10n_salon_claim_retry_ready" formatted="false">"Новая попытка разрешена. Когда будете готовы, нажмите кнопку создания профиля."</string>
 </resources>

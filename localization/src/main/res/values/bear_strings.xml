@@ -8256,4 +8256,9 @@
     <string name="l10n_salon_tips_bad_address" formatted="false">"The profile has an invalid tip address. Nothing was sent."</string>
     <string name="l10n_salon_tips_bad_token" formatted="false">"Invalid token ID."</string>
     <string name="l10n_salon_backup_storage_failed" formatted="false">"Could not read or save the account backup. Check device storage and try again."</string>
+    <string name="l10n_salon_claim_pending" formatted="false">"The identity request is unconfirmed. Check the node wallet, then reopen this handle to check again. It will not be submitted again automatically."</string>
+    <string name="l10n_salon_claim_rejected" formatted="false">"The node rejected the identity request. Check the node before trying again."</string>
+    <string name="l10n_salon_claim_retry_title" formatted="false">"Allow another attempt"</string>
+    <string name="l10n_salon_claim_retry_warning" formatted="false">"The earlier request may still complete. Another attempt could create an extra identity token. Check the node wallet first. This only unlocks the Claim button; it sends nothing."</string>
+    <string name="l10n_salon_claim_retry_ready" formatted="false">"Another attempt is now allowed. Use Claim when ready."</string>
 </resources>
