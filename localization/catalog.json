@@ -36094,5 +36094,371 @@
     "zh-Hans": "链接验证成功 ✓ — 开始铸造…",
     "ru": "Ссылки проверены ✓ — начинаем выпуск…",
     "uk": "Посилання перевірено ✓ — починаємо створення…"
+  },
+  "atelierCollection.collectionTitle": {
+    "en": "StateNFT Collection",
+    "zh-Hans": "StateNFT 系列",
+    "ru": "Коллекция StateNFT",
+    "uk": "Колекція StateNFT"
+  },
+  "atelierCollection.collectionHelp": {
+    "en": "2–20 editions sharing one tokenid. Sealed per-coin identities, resumable mint engine, locked contract.",
+    "zh-Hans": "2–20 个版本共用一个 tokenid。每枚代币的身份记录均已封存，铸造可中断后继续，合约已锁定。",
+    "ru": "От 2 до 20 экземпляров с одним tokenid. У каждого — закреплённые данные; выпуск можно продолжить после перерыва. Контракт заблокирован.",
+    "uk": "Від 2 до 20 примірників з одним tokenid. Кожен має закріплені дані; створення можна продовжити після перерви. Контракт заблоковано."
+  },
+  "atelierCollection.engine": {
+    "en": "Engine",
+    "zh-Hans": "铸造引擎",
+    "ru": "Механизм выпуска",
+    "uk": "Механізм створення"
+  },
+  "atelierCollection.singleNft": {
+    "en": "Single NFT",
+    "zh-Hans": "单个 NFT",
+    "ru": "Отдельный NFT",
+    "uk": "Окремий NFT"
+  },
+  "atelierCollection.singleHelp": {
+    "en": "A classic Minima NFT — 1/1 or small edition. Renders in every wallet.",
+    "zh-Hans": "经典 Minima NFT，可单份发行或少量发行，支持各钱包显示。",
+    "ru": "Классический NFT Minima: единственный экземпляр или небольшой тираж. Отображается в кошельках.",
+    "uk": "Класичний NFT Minima: єдиний примірник або невеликий тираж. Відображається в гаманцях."
+  },
+  "atelierCollection.customToken": {
+    "en": "Custom Token",
+    "zh-Hans": "自定义代币",
+    "ru": "Свой токен",
+    "uk": "Власний токен"
+  },
+  "atelierCollection.customHelp": {
+    "en": "A fungible token — name, ticker, supply, decimals, icon.",
+    "zh-Hans": "可互换代币，可设置名称、代码、供应量、小数位数和图标。",
+    "ru": "Взаимозаменяемый токен: название, тикер, объём выпуска, знаки после запятой и значок.",
+    "uk": "Взаємозамінний токен: назва, тикер, обсяг випуску, десяткові знаки та значок."
+  },
+  "atelierCollection.generative": {
+    "en": "Generative Collection",
+    "zh-Hans": "生成艺术系列",
+    "ru": "Генеративная коллекция",
+    "uk": "Генеративна колекція"
+  },
+  "atelierCollection.generativeHelp": {
+    "en": "18 on-chain SVG style packs — Mandala to Panda Punks. Deterministic from a seed, rarity sliders, traits auto-filled.",
+    "zh-Hans": "18 种链上 SVG 风格，从 Mandala 到 Panda Punks。由种子确定生成结果，可调整稀有度，自动填写特征。",
+    "ru": "18 стилей SVG для хранения в блокчейне — от Mandala до Panda Punks. Генерация по зерну, настройка редкости и автоматические атрибуты.",
+    "uk": "18 стилів SVG для зберігання в блокчейні — від Mandala до Panda Punks. Генерація за зерном, налаштування рідкісності й автоматичні атрибути."
+  },
+  "atelierCollection.filtr": {
+    "en": "FILTR — image editor",
+    "zh-Hans": "FILTR — 图像编辑器",
+    "ru": "FILTR — редактор изображений",
+    "uk": "FILTR — редактор зображень"
+  },
+  "atelierCollection.filtrHelp": {
+    "en": "Crop, rotate, erase; 15 filter effects, presets, comic bubbles and text. Save, or send straight into a mint.",
+    "zh-Hans": "裁剪、旋转、擦除；15 种滤镜效果、预设、漫画气泡和文字。可保存或直接用于铸造。",
+    "ru": "Обрезка, поворот, ластик, 15 фильтров, пресеты, реплики и текст. Сохраните результат или сразу создайте NFT.",
+    "uk": "Обрізання, поворот, гумка, 15 фільтрів, пресети, репліки й текст. Збережіть результат або одразу створіть NFT."
+  },
+  "atelierCollection.drafts": {
+    "en": "Drafts on the bench",
+    "zh-Hans": "工作台草稿",
+    "ru": "Черновики в мастерской",
+    "uk": "Чернетки в майстерні"
+  },
+  "atelierCollection.newCollection": {
+    "en": "New Collection",
+    "zh-Hans": "新建系列",
+    "ru": "Новая коллекция",
+    "uk": "Нова колекція"
+  },
+  "atelierCollection.nameHint": {
+    "en": "Trois Jours à Paris",
+    "zh-Hans": "巴黎三日",
+    "ru": "Три дня в Париже",
+    "uk": "Три дні в Парижі"
+  },
+  "atelierCollection.descriptionHint": {
+    "en": "Optional, 0–200 characters",
+    "zh-Hans": "选填，0–200 个字符",
+    "ru": "Необязательно, до 200 символов",
+    "uk": "Необов’язково, до 200 символів"
+  },
+  "atelierCollection.editions": {
+    "en": "Editions (2–20)",
+    "zh-Hans": "版本数（2–20）",
+    "ru": "Экземпляры (2–20)",
+    "uk": "Примірники (2–20)"
+  },
+  "atelierCollection.imageSource": {
+    "en": "Image source",
+    "zh-Hans": "图像来源",
+    "ru": "Источник изображений",
+    "uk": "Джерело зображень"
+  },
+  "atelierCollection.hosted": {
+    "en": "Hosted URLs",
+    "zh-Hans": "托管链接",
+    "ru": "Ссылки на файлы",
+    "uk": "Посилання на файли"
+  },
+  "atelierCollection.embed": {
+    "en": "Embed on-chain",
+    "zh-Hans": "嵌入链上",
+    "ru": "Хранить в блокчейне",
+    "uk": "Зберігати в блокчейні"
+  },
+  "atelierCollection.base": {
+    "en": "Base URL",
+    "zh-Hans": "基础链接",
+    "ru": "Базовый URL",
+    "uk": "Базовий URL"
+  },
+  "atelierCollection.extension": {
+    "en": "Extension",
+    "zh-Hans": "扩展名",
+    "ru": "Расширение",
+    "uk": "Розширення"
+  },
+  "atelierCollection.restoreBase": {
+    "en": "Restore uploaded base URL",
+    "zh-Hans": "恢复已上传文件的基础链接",
+    "ru": "Вернуть URL загруженных файлов",
+    "uk": "Повернути URL завантажених файлів"
+  },
+  "atelierCollection.uploadPlates": {
+    "en": "Upload plates to hosting → auto-fill base URL",
+    "zh-Hans": "上传图像至托管服务 → 自动填写基础链接",
+    "ru": "Загрузить изображения → заполнить базовый URL",
+    "uk": "Завантажити зображення → заповнити базовий URL"
+  },
+  "atelierCollection.updateSlots": {
+    "en": "Update image slots",
+    "zh-Hans": "更新图像栏位",
+    "ru": "Обновить ячейки изображений",
+    "uk": "Оновити комірки зображень"
+  },
+  "atelierCollection.chooseImages": {
+    "en": "Choose images",
+    "zh-Hans": "选择图像",
+    "ru": "Выбрать изображения",
+    "uk": "Вибрати зображення"
+  },
+  "atelierCollection.resetPlates": {
+    "en": "Reset all plates",
+    "zh-Hans": "重置全部图像",
+    "ru": "Сбросить все изображения",
+    "uk": "Скинути всі зображення"
+  },
+  "atelierCollection.resetBody": {
+    "en": "Clear every chosen image? The collection details stay — you just pick fresh images.",
+    "zh-Hans": "清除全部已选图像？系列详情将保留，您可以重新选择图像。",
+    "ru": "Удалить все выбранные изображения? Данные коллекции сохранятся, и вы сможете выбрать новые изображения.",
+    "uk": "Видалити всі вибрані зображення? Дані колекції збережуться, і ви зможете вибрати нові зображення."
+  },
+  "atelierCollection.proofSheet": {
+    "en": "Proof sheet — what gets sealed · tap a plate to edit, replace or clear",
+    "zh-Hans": "预览表 — 将封存的图像 · 点击图像可编辑、替换或清除",
+    "ru": "Лист просмотра — изображения для записи · нажмите, чтобы изменить, заменить или удалить",
+    "uk": "Аркуш перегляду — зображення для запису · натисніть, щоб змінити, замінити або видалити"
+  },
+  "atelierCollection.iconHint": {
+    "en": "https://…/icon.png — wallets show this",
+    "zh-Hans": "https://…/icon.png — 钱包将显示此图标",
+    "ru": "https://…/icon.png — значок в кошельках",
+    "uk": "https://…/icon.png — значок у гаманцях"
+  },
+  "atelierCollection.iconHelp": {
+    "en": "Or embed a wallet icon (first plate is used if neither is set)",
+    "zh-Hans": "也可嵌入钱包图标（均未设置时使用第一张图像）",
+    "ru": "Или встроить значок кошелька (иначе используется первое изображение)",
+    "uk": "Або вбудувати значок гаманця (інакше використовується перше зображення)"
+  },
+  "atelierCollection.validationHelp": {
+    "en": "The validation doc must contain the tokenid, which only exists after minting — so a missing doc never blocks the mint; it just isn't validated until the doc is live.",
+    "zh-Hans": "验证文档必须包含铸造后才生成的 tokenid。因此，缺少文档不会阻止铸造；文档上线后才能完成验证。",
+    "ru": "Документ проверки должен содержать tokenid, который появится после выпуска. Отсутствие документа не блокирует выпуск; проверка станет доступна после публикации документа.",
+    "uk": "Документ перевірки має містити tokenid, який з’явиться після створення. Відсутність документа не блокує створення; перевірка стане доступною після публікації документа."
+  },
+  "atelierCollection.autoValidation": {
+    "en": "Auto-create the validation doc on my hosting after mint (writes the tokenid for you — overrides the URL above)",
+    "zh-Hans": "铸造后在我的托管服务上自动创建验证文档（自动写入 tokenid，并覆盖上方链接）",
+    "ru": "Создать документ проверки на моём хостинге после выпуска (запишет tokenid; заменит URL выше)",
+    "uk": "Створити документ перевірки на моєму хостингу після випуску (запише tokenid; замінить URL вище)"
+  },
+  "atelierCollection.mint": {
+    "en": "Mint collection",
+    "zh-Hans": "铸造系列",
+    "ru": "Выпустить коллекцию",
+    "uk": "Створити колекцію"
+  },
+  "atelierCollection.engineHelp": {
+    "en": "The engine runs create → gather → split → stamp while the app is open, and resumes if interrupted.",
+    "zh-Hans": "应用打开时，引擎依次执行创建 → 汇集 → 拆分 → 标记；中断后可继续。",
+    "ru": "При открытом приложении выполняются создание → сбор → разделение → маркировка. После перерыва работа возобновляется.",
+    "uk": "Коли застосунок відкрито, виконуються створення → збирання → поділ → маркування. Після перерви робота відновлюється."
+  },
+  "atelierCollection.descriptionRange": {
+    "en": "Description must be 0–200 characters",
+    "zh-Hans": "描述须为 0–200 个字符",
+    "ru": "Описание — не более 200 символов",
+    "uk": "Опис — не більше 200 символів"
+  },
+  "atelierCollection.editionsRange": {
+    "en": "Editions must be 2–20",
+    "zh-Hans": "版本数须为 2–20",
+    "ru": "Число экземпляров — от 2 до 20",
+    "uk": "Кількість примірників — від 2 до 20"
+  },
+  "atelierCollection.baseHttps": {
+    "en": "Base URL must start https://",
+    "zh-Hans": "基础链接须以 https:// 开头",
+    "ru": "Базовый URL должен начинаться с https://",
+    "uk": "Базовий URL має починатися з https://"
+  },
+  "atelierCollection.baseConfirm": {
+    "en": "Use this Base URL?",
+    "zh-Hans": "使用此基础链接？",
+    "ru": "Использовать этот базовый URL?",
+    "uk": "Використати цей базовий URL?"
+  },
+  "atelierCollection.mintAnyway": {
+    "en": "Mint anyway",
+    "zh-Hans": "仍然铸造",
+    "ru": "Всё равно выпустить",
+    "uk": "Усе одно створити"
+  },
+  "atelierCollection.addressFailed": {
+    "en": "getaddress failed",
+    "zh-Hans": "无法获取地址",
+    "ru": "Не удалось получить адрес",
+    "uk": "Не вдалося отримати адресу"
+  },
+  "atelierCollection.iconSlimmed": {
+    "en": "icon slimmed so the plates keep their room",
+    "zh-Hans": "已缩小图标，为图像保留空间",
+    "ru": "Значок уменьшен, чтобы оставить место для изображений",
+    "uk": "Значок зменшено, щоб залишити місце для зображень"
+  },
+  "atelierCollection.iconDropped": {
+    "en": "icon dropped so the plates keep their room — wallet shows the identicon",
+    "zh-Hans": "已移除图标，为图像保留空间；钱包将显示识别图案",
+    "ru": "Значок убран, чтобы оставить место для изображений. Кошелёк покажет идентикон.",
+    "uk": "Значок прибрано, щоб залишити місце для зображень. Гаманець покаже ідентикон."
+  },
+  "atelierCollection.mintStarted": {
+    "en": "Minting started",
+    "zh-Hans": "已开始铸造",
+    "ru": "Выпуск начат",
+    "uk": "Створення розпочато"
+  },
+  "atelierCollection.vectorReplace": {
+    "en": "Vector plate — choose a replacement",
+    "zh-Hans": "矢量图像 — 请选择替换图像",
+    "ru": "Векторное изображение — выберите замену",
+    "uk": "Векторне зображення — виберіть заміну"
+  },
+  "atelierCollection.editPlate": {
+    "en": "Edit — crop & tone",
+    "zh-Hans": "编辑 — 裁剪与色调",
+    "ru": "Изменить — обрезка и тон",
+    "uk": "Змінити — обрізання й тон"
+  },
+  "atelierCollection.replacePlate": {
+    "en": "Replace — choose a different image",
+    "zh-Hans": "替换 — 选择其他图像",
+    "ru": "Заменить — выбрать другое изображение",
+    "uk": "Замінити — вибрати інше зображення"
+  },
+  "atelierCollection.clearPlate": {
+    "en": "Clear this plate",
+    "zh-Hans": "清除此图像",
+    "ru": "Удалить это изображение",
+    "uk": "Видалити це зображення"
+  },
+  "atelierCollection.checkingUploaded": {
+    "en": "Checking your uploaded plates…",
+    "zh-Hans": "正在检查已上传图像…",
+    "ru": "Проверяем загруженные изображения…",
+    "uk": "Перевіряємо завантажені зображення…"
+  },
+  "atelierCollection.wrongBase": {
+    "en": "Images not at that Base URL",
+    "zh-Hans": "此基础链接下没有图像",
+    "ru": "По этому базовому URL нет изображений",
+    "uk": "За цим базовим URL немає зображень"
+  },
+  "atelierCollection.useUploaded": {
+    "en": "Use uploaded",
+    "zh-Hans": "使用已上传文件",
+    "ru": "Использовать загруженные",
+    "uk": "Використати завантажені"
+  },
+  "atelierCollection.keepTyped": {
+    "en": "Keep typed",
+    "zh-Hans": "保留输入内容",
+    "ru": "Оставить введённый URL",
+    "uk": "Залишити введений URL"
+  },
+  "atelierCollection.baseRestored": {
+    "en": "Base URL restored — tap Mint again.",
+    "zh-Hans": "基础链接已恢复，请再次点击铸造。",
+    "ru": "Базовый URL восстановлен. Нажмите «Выпустить» ещё раз.",
+    "uk": "Базовий URL відновлено. Натисніть «Створити» ще раз."
+  },
+  "atelierCollection.draft": {
+    "en": "{0} draft",
+    "zh-Hans": "{0}草稿",
+    "ru": "Черновик: {0}",
+    "uk": "Чернетка: {0}"
+  },
+  "atelierCollection.uploadedAt": {
+    "en": "Uploaded plates live at: {0}",
+    "zh-Hans": "已上传图像位于：{0}",
+    "ru": "Загруженные изображения доступны по адресу: {0}",
+    "uk": "Завантажені зображення доступні за адресою: {0}"
+  },
+  "atelierCollection.missingImage": {
+    "en": "Image missing for lot {0}",
+    "zh-Hans": "第 {0} 项缺少图像",
+    "ru": "Нет изображения для экземпляра {0}",
+    "uk": "Немає зображення для примірника {0}"
+  },
+  "atelierCollection.confirmBody": {
+    "en": "These images were not uploaded here for this collection. The base URL may point to a different set:\n\n{0}\n\nTo use your own pictures, upload them first. Mint with this URL anyway?",
+    "zh-Hans": "这些图像并非在此为本系列上传。此基础链接可能指向其他图像：\n\n{0}\n\n如需使用自己的图像，请先上传。仍使用此链接铸造？",
+    "ru": "Эти изображения не были загружены здесь для этой коллекции. Базовый URL может вести к другому набору:\n\n{0}\n\nЧтобы использовать свои изображения, сначала загрузите их. Всё равно выпустить с этим URL?",
+    "uk": "Ці зображення не було завантажено тут для цієї колекції. Базовий URL може вести до іншого набору:\n\n{0}\n\nЩоб використати власні зображення, спочатку завантажте їх. Усе одно створити з цим URL?"
+  },
+  "atelierCollection.metadataTooLarge": {
+    "en": "Metadata exceeds the signed record limit ({0} / {1}), even without an icon. Shorten the description or reduce traits.",
+    "zh-Hans": "即使没有图标，元数据仍超出已签名记录限制（{0} / {1}）。请缩短描述或减少特征。",
+    "ru": "Метаданные превышают лимит подписанной записи ({0} / {1}) даже без значка. Сократите описание или число атрибутов.",
+    "uk": "Метадані перевищують ліміт підписаного запису ({0} / {1}) навіть без значка. Скоротіть опис або кількість атрибутів."
+  },
+  "atelierCollection.svgTooLarge": {
+    "en": "Image {0} ({1} B SVG) cannot fit the {2} B left by the signed record. Shorten the record or tap the image to replace it.",
+    "zh-Hans": "第 {0} 张图像（{1} 字节 SVG）无法放入已签名记录剩余的 {2} 字节空间。请缩短记录或点击图像进行替换。",
+    "ru": "Изображение {0} (SVG, {1} Б) не помещается в оставшиеся {2} Б подписанной записи. Сократите запись или нажмите изображение для замены.",
+    "uk": "Зображення {0} (SVG, {1} Б) не вміщується в решту {2} Б підписаного запису. Скоротіть запис або натисніть зображення для заміни."
+  },
+  "atelierCollection.imageTooLarge": {
+    "en": "Image {0} cannot be reduced to {1} B. Shorten the record or tap the image to replace it.",
+    "zh-Hans": "第 {0} 张图像无法缩小至 {1} 字节。请缩短记录或点击图像进行替换。",
+    "ru": "Изображение {0} не удаётся уменьшить до {1} Б. Сократите запись или нажмите изображение для замены.",
+    "uk": "Зображення {0} не вдається зменшити до {1} Б. Скоротіть запис або натисніть зображення для заміни."
+  },
+  "atelierCollection.plate": {
+    "en": "Image {0}",
+    "zh-Hans": "图像 {0}",
+    "ru": "Изображение {0}",
+    "uk": "Зображення {0}"
+  },
+  "atelierCollection.recoveryBody": {
+    "en": "Nothing is hosted at:\n{0}\n\nYour uploaded images are available at:\n{1}\n\nUse the uploaded base URL for this mint?",
+    "zh-Hans": "此地址未托管文件：\n{0}\n\n您已上传的图像位于：\n{1}\n\n本次铸造使用已上传文件的基础链接？",
+    "ru": "По этому адресу нет файлов:\n{0}\n\nВаши загруженные изображения доступны здесь:\n{1}\n\nИспользовать их базовый URL для выпуска?",
+    "uk": "За цією адресою немає файлів:\n{0}\n\nВаші завантажені зображення доступні тут:\n{1}\n\nВикористати їхній базовий URL для створення?"
   }
 }

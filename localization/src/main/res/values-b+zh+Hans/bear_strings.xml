@@ -7228,4 +7228,74 @@
     <!-- Arguments: 0 -->
     <string name="l10n_atelier_mint_unreachable">"无法访问链接：%1$s"</string>
     <string name="l10n_atelier_mint_verified" formatted="false">"链接验证成功 ✓ — 开始铸造…"</string>
+    <string name="l10n_atelier_collection_collection_title" formatted="false">"StateNFT 系列"</string>
+    <string name="l10n_atelier_collection_collection_help" formatted="false">"2–20 个版本共用一个 tokenid。每枚代币的身份记录均已封存，铸造可中断后继续，合约已锁定。"</string>
+    <string name="l10n_atelier_collection_engine" formatted="false">"铸造引擎"</string>
+    <string name="l10n_atelier_collection_single_nft" formatted="false">"单个 NFT"</string>
+    <string name="l10n_atelier_collection_single_help" formatted="false">"经典 Minima NFT，可单份发行或少量发行，支持各钱包显示。"</string>
+    <string name="l10n_atelier_collection_custom_token" formatted="false">"自定义代币"</string>
+    <string name="l10n_atelier_collection_custom_help" formatted="false">"可互换代币，可设置名称、代码、供应量、小数位数和图标。"</string>
+    <string name="l10n_atelier_collection_generative" formatted="false">"生成艺术系列"</string>
+    <string name="l10n_atelier_collection_generative_help" formatted="false">"18 种链上 SVG 风格，从 Mandala 到 Panda Punks。由种子确定生成结果，可调整稀有度，自动填写特征。"</string>
+    <string name="l10n_atelier_collection_filtr" formatted="false">"FILTR — 图像编辑器"</string>
+    <string name="l10n_atelier_collection_filtr_help" formatted="false">"裁剪、旋转、擦除；15 种滤镜效果、预设、漫画气泡和文字。可保存或直接用于铸造。"</string>
+    <string name="l10n_atelier_collection_drafts" formatted="false">"工作台草稿"</string>
+    <string name="l10n_atelier_collection_new_collection" formatted="false">"新建系列"</string>
+    <string name="l10n_atelier_collection_name_hint" formatted="false">"巴黎三日"</string>
+    <string name="l10n_atelier_collection_description_hint" formatted="false">"选填，0–200 个字符"</string>
+    <string name="l10n_atelier_collection_editions" formatted="false">"版本数（2–20）"</string>
+    <string name="l10n_atelier_collection_image_source" formatted="false">"图像来源"</string>
+    <string name="l10n_atelier_collection_hosted" formatted="false">"托管链接"</string>
+    <string name="l10n_atelier_collection_embed" formatted="false">"嵌入链上"</string>
+    <string name="l10n_atelier_collection_base" formatted="false">"基础链接"</string>
+    <string name="l10n_atelier_collection_extension" formatted="false">"扩展名"</string>
+    <string name="l10n_atelier_collection_restore_base" formatted="false">"恢复已上传文件的基础链接"</string>
+    <string name="l10n_atelier_collection_upload_plates" formatted="false">"上传图像至托管服务 → 自动填写基础链接"</string>
+    <string name="l10n_atelier_collection_update_slots" formatted="false">"更新图像栏位"</string>
+    <string name="l10n_atelier_collection_choose_images" formatted="false">"选择图像"</string>
+    <string name="l10n_atelier_collection_reset_plates" formatted="false">"重置全部图像"</string>
+    <string name="l10n_atelier_collection_reset_body" formatted="false">"清除全部已选图像？系列详情将保留，您可以重新选择图像。"</string>
+    <string name="l10n_atelier_collection_proof_sheet" formatted="false">"预览表 — 将封存的图像 · 点击图像可编辑、替换或清除"</string>
+    <string name="l10n_atelier_collection_icon_hint" formatted="false">"https://…/icon.png — 钱包将显示此图标"</string>
+    <string name="l10n_atelier_collection_icon_help" formatted="false">"也可嵌入钱包图标（均未设置时使用第一张图像）"</string>
+    <string name="l10n_atelier_collection_validation_help" formatted="false">"验证文档必须包含铸造后才生成的 tokenid。因此，缺少文档不会阻止铸造；文档上线后才能完成验证。"</string>
+    <string name="l10n_atelier_collection_auto_validation" formatted="false">"铸造后在我的托管服务上自动创建验证文档（自动写入 tokenid，并覆盖上方链接）"</string>
+    <string name="l10n_atelier_collection_mint" formatted="false">"铸造系列"</string>
+    <string name="l10n_atelier_collection_engine_help" formatted="false">"应用打开时，引擎依次执行创建 → 汇集 → 拆分 → 标记；中断后可继续。"</string>
+    <string name="l10n_atelier_collection_description_range" formatted="false">"描述须为 0–200 个字符"</string>
+    <string name="l10n_atelier_collection_editions_range" formatted="false">"版本数须为 2–20"</string>
+    <string name="l10n_atelier_collection_base_https" formatted="false">"基础链接须以 https:// 开头"</string>
+    <string name="l10n_atelier_collection_base_confirm" formatted="false">"使用此基础链接？"</string>
+    <string name="l10n_atelier_collection_mint_anyway" formatted="false">"仍然铸造"</string>
+    <string name="l10n_atelier_collection_address_failed" formatted="false">"无法获取地址"</string>
+    <string name="l10n_atelier_collection_icon_slimmed" formatted="false">"已缩小图标，为图像保留空间"</string>
+    <string name="l10n_atelier_collection_icon_dropped" formatted="false">"已移除图标，为图像保留空间；钱包将显示识别图案"</string>
+    <string name="l10n_atelier_collection_mint_started" formatted="false">"已开始铸造"</string>
+    <string name="l10n_atelier_collection_vector_replace" formatted="false">"矢量图像 — 请选择替换图像"</string>
+    <string name="l10n_atelier_collection_edit_plate" formatted="false">"编辑 — 裁剪与色调"</string>
+    <string name="l10n_atelier_collection_replace_plate" formatted="false">"替换 — 选择其他图像"</string>
+    <string name="l10n_atelier_collection_clear_plate" formatted="false">"清除此图像"</string>
+    <string name="l10n_atelier_collection_checking_uploaded" formatted="false">"正在检查已上传图像…"</string>
+    <string name="l10n_atelier_collection_wrong_base" formatted="false">"此基础链接下没有图像"</string>
+    <string name="l10n_atelier_collection_use_uploaded" formatted="false">"使用已上传文件"</string>
+    <string name="l10n_atelier_collection_keep_typed" formatted="false">"保留输入内容"</string>
+    <string name="l10n_atelier_collection_base_restored" formatted="false">"基础链接已恢复，请再次点击铸造。"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_draft">"%1$s草稿"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_uploaded_at">"已上传图像位于：%1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_missing_image">"第 %1$s 项缺少图像"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_confirm_body">"这些图像并非在此为本系列上传。此基础链接可能指向其他图像：\n\n%1$s\n\n如需使用自己的图像，请先上传。仍使用此链接铸造？"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_collection_metadata_too_large">"即使没有图标，元数据仍超出已签名记录限制（%1$s / %2$s）。请缩短描述或减少特征。"</string>
+    <!-- Arguments: 0, 1, 2 -->
+    <string name="l10n_atelier_collection_svg_too_large">"第 %1$s 张图像（%2$s 字节 SVG）无法放入已签名记录剩余的 %3$s 字节空间。请缩短记录或点击图像进行替换。"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_collection_image_too_large">"第 %1$s 张图像无法缩小至 %2$s 字节。请缩短记录或点击图像进行替换。"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_plate">"图像 %1$s"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_collection_recovery_body">"此地址未托管文件：\n%1$s\n\n您已上传的图像位于：\n%2$s\n\n本次铸造使用已上传文件的基础链接？"</string>
 </resources>

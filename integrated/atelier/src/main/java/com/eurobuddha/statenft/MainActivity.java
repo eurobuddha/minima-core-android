@@ -1439,23 +1439,23 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     private void renderStudio() {
         setScreen(Screen.STUDIO, null);
-        appbar("Studio", false, false);
+        appbar(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_studio), false, false);
         bottomNav(1);
 
-        body.addView(studioCard("№ 1", "StateNFT Collection",
-                "2–20 editions sharing one tokenid. Sealed per-coin identities, resumable mint engine, locked contract.",
-                "Engine", v -> renderCreateCollection()), lpm(0, 0, 0, 14));
-        body.addView(studioCard("№ 2", "Single NFT",
-                "A classic Minima NFT — 1/1 or small edition. Renders in every wallet.",
+        body.addView(studioCard("№ 1", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_collection_title),
+                Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_collection_help),
+                Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_engine), v -> renderCreateCollection()), lpm(0, 0, 0, 14));
+        body.addView(studioCard("№ 2", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_single_nft),
+                Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_single_help),
                 null, v -> renderCreateNft()), lpm(0, 0, 0, 14));
-        body.addView(studioCard("№ 3", "Custom Token",
-                "A fungible token — name, ticker, supply, decimals, icon.",
+        body.addView(studioCard("№ 3", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_custom_token),
+                Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_custom_help),
                 null, v -> renderCreateToken()), lpm(0, 0, 0, 14));
-        body.addView(studioCard("№ 4", "Generative Collection",
-                "18 on-chain SVG style packs — Mandala to Panda Punks. Deterministic from a seed, rarity sliders, traits auto-filled.",
+        body.addView(studioCard("№ 4", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_generative),
+                Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_generative_help),
                 "artBox", v -> renderGenerative()), lpm(0, 0, 0, 14));
-        body.addView(studioCard("№ 5", "FILTR — image editor",
-                "Crop, rotate, erase; 15 filter effects, presets, comic bubbles and text. Save, or send straight into a mint.",
+        body.addView(studioCard("№ 5", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_filtr),
+                Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_filtr_help),
                 "filtr", v -> startActivity(new android.content.Intent(this, FiltrActivity.class))), lpm(0, 0, 0, 14));
 
         /* drafts shelf */
@@ -1463,8 +1463,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         boolean hasTokDraft = !tokName.trim().isEmpty() || !tokPairs.isEmpty() || !tokIcon.isEmpty();
         boolean hasCollDraft = !createName.trim().isEmpty() || anyCreateImage();
         if (hasNftDraft || hasTokDraft || hasCollDraft) {
-            body.addView(sectionHead("Drafts on the bench", ""));
-            if (hasCollDraft) body.addView(draftRow("Collection", createName, v -> renderCreateCollection(), v -> {
+            body.addView(sectionHead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_drafts), ""));
+            if (hasCollDraft) body.addView(draftRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_nft_collection), createName, v -> renderCreateCollection(), v -> {
                 resetCollectionDraft();
                 LocalStore.clearDraft(this, "collection");
                 renderStudio();
@@ -1476,7 +1476,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 LocalStore.clearDraft(this, "nft");
                 renderStudio();
             }), lpm(0, 0, 0, 8));
-            if (hasTokDraft) body.addView(draftRow("Token", tokName, v -> renderCreateToken(), v -> {
+            if (hasTokDraft) body.addView(draftRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_token), tokName, v -> renderCreateToken(), v -> {
                 tokName = ""; tokTicker = ""; tokSupply = "1000000"; tokDecimals = "0"; tokDesc = ""; tokUrl = ""; tokIcon = "";
                 tokPairs.clear();
                 pairKeyDraft = ""; pairValueDraft = "";
@@ -1491,18 +1491,19 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         return false;
     }
 
-    private View draftRow(String kind, String name, View.OnClickListener resume, View.OnClickListener discard) {
+    private View draftRow(CharSequence kind, String name, View.OnClickListener resume, View.OnClickListener discard) {
         LinearLayout row = horizontal(Gravity.CENTER_VERTICAL);
         row.setBackground(Design.dashed(this, Design.CARD(), Design.INK()));
         row.setPadding(dp(10), dp(8), dp(6), dp(8));
         LinearLayout copy = vertical();
-        copy.addView(Design.lot(this, kind + " draft"));
-        copy.addView(Design.text(this, name == null || name.trim().isEmpty() ? "Untitled" : name.trim(),
+        copy.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_draft, kind)));
+        copy.addView(Design.text(this, name == null || name.trim().isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_untitled) : name.trim(),
                 12, Design.INK(), Design.sansBold()));
         row.addView(copy, new LinearLayout.LayoutParams(0, -2, 1));
-        TextView res = Design.button(this, "Resume", true);
+        TextView res = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_logs_resume), true);
         res.setOnClickListener(resume);
-        row.addView(res, new LinearLayout.LayoutParams(dp(88), dp(38)));
+        res.setMinHeight(dp(48));
+        row.addView(res, new LinearLayout.LayoutParams(dp(88), -2));
         TextView disc = Design.text(this, "×", 18, Design.ACCENT(), Design.sansBold());
         disc.setPadding(dp(12), 0, dp(12), 0);
         disc.setClickable(true);
@@ -1511,7 +1512,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         return row;
     }
 
-    private View studioCard(String no, String title, String descText, String pillText, View.OnClickListener click) {
+    private View studioCard(String no, CharSequence title, CharSequence descText, CharSequence pillText, View.OnClickListener click) {
         LinearLayout card = vertical();
         card.setBackground(Design.blockShadow(this, Design.CARD()));
         card.setPadding(dp(14), dp(12), dp(16), dp(15));
@@ -1531,97 +1532,104 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     private void renderCreateCollection() {
         setScreen(Screen.CREATE_COLLECTION, this::renderStudio);
-        appbar("New Collection", true, false);
+        appbar(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_new_collection), true, false);
         hideNav();
 
-        EditText name = fieldInto(body, "Name", "Trois Jours à Paris", createName);
+        EditText name = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_name), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_name_hint), createName);
         name.addTextChangedListener(watch(sv -> createName = sv));
-        EditText desc = fieldInto(body, "Description", "Optional, 0–200 characters", createDesc);
+        EditText desc = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_description), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_description_hint), createDesc);
         desc.addTextChangedListener(watch(sv -> createDesc = sv));
-        EditText size = fieldInto(body, "Editions (2–20)", "12", createSize);
+        EditText size = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_editions), "12", createSize);
         size.addTextChangedListener(watch(sv -> createSize = sv));
 
-        body.addView(Design.kicker(this, "Image source"), lpm(0, 8, 0, 6));
+        body.addView(Design.kicker(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_image_source)), lpm(0, 8, 0, 6));
         LinearLayout mode = horizontal(Gravity.CENTER);
-        TextView mUrl = Design.chip(this, "Hosted URLs", "url".equals(createMode));
-        TextView mEmb = Design.chip(this, "Embed on-chain", "embed".equals(createMode));
+        TextView mUrl = Design.chip(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_hosted), "url".equals(createMode));
+        TextView mEmb = Design.chip(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_embed), "embed".equals(createMode));
         final EditText[] baseF = new EditText[1], extF = new EditText[1], iconF = new EditText[1], extUrlF = new EditText[1], webF = new EditText[1];
         mUrl.setOnClickListener(v -> { saveCollectionDraft(name, desc, size, baseF[0], extF[0], iconF[0], extUrlF[0], webF[0]); createMode = "url"; renderCreateCollection(); });
         mEmb.setOnClickListener(v -> { saveCollectionDraft(name, desc, size, baseF[0], extF[0], iconF[0], extUrlF[0], webF[0]); createMode = "embed"; renderCreateCollection(); });
-        mode.addView(mUrl, weight(44, 0, 4));
-        mode.addView(mEmb, weight(44, 4, 0));
+        mUrl.setMinHeight(dp(48)); mEmb.setMinHeight(dp(48));
+        LinearLayout.LayoutParams urlLp = weight(48, 0, 4); urlLp.height = -2;
+        LinearLayout.LayoutParams embedLp = weight(48, 4, 0); embedLp.height = -2;
+        mode.addView(mUrl, urlLp);
+        mode.addView(mEmb, embedLp);
         body.addView(mode, lpm(0, 0, 0, 10));
 
         if ("url".equals(createMode)) {
-            baseF[0] = fieldInto(body, "Base URL", "https://…/collection/", createBase);
+            baseF[0] = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_base), "https://…/collection/", createBase);
             baseF[0].addTextChangedListener(watch(sv -> createBase = sv));
-            extF[0] = fieldInto(body, "Extension", ".jpg", createExt);
+            extF[0] = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_extension), ".jpg", createExt);
             extF[0].addTextChangedListener(watch(sv -> createExt = sv));
             // Safety net: a recorded good upload but a drifted Base URL → one-tap restore.
             if (!createUploadedBase.isEmpty() && !createUploadedBase.equals(createBase)) {
-                TextView restore = Design.button(this, "Restore uploaded base URL", false);
+                TextView restore = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_restore_base), false);
                 restore.setOnClickListener(v -> { createBase = createUploadedBase; createExt = createUploadedExt; renderCreateCollection(); });
-                body.addView(restore, lph(44, 0, 6, 0, 2));
-                body.addView(Design.note(this, "Uploaded plates live at: " + createUploadedBase + "1" + createUploadedExt), lpm(0, 0, 0, 6));
+                restore.setMinHeight(dp(48));
+                body.addView(restore, lpm(0, 6, 0, 2));
+                body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_uploaded_at, createUploadedBase + "1" + createUploadedExt)), lpm(0, 0, 0, 6));
             }
             final EditText sizeField = size;
             body.addView(hostingUploadRow("collplates",
-                    "Upload plates to hosting → auto-fill base URL",
+                    Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_upload_plates),
                     () -> { saveCollectionDraft(name, desc, size, baseF[0], extF[0], iconF[0], extUrlF[0], webF[0]);
                             pickHostPlates(clampSize(parseIntSafe(sizeField.getText().toString()))); }),
                     lpm(0, 6, 0, 0));
         } else {
             int n = clampSize(parseIntSafe(size.getText().toString()));
             ensureCreateImages(n);
-            TextView refresh = Design.button(this, "Update image slots", false);
+            TextView refresh = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_update_slots), false);
             refresh.setOnClickListener(v -> {
                 saveCollectionDraft(name, desc, size, baseF[0], extF[0], iconF[0], extUrlF[0], webF[0]);
                 ensureCreateImages(clampSize(parseIntSafe(size.getText().toString())));
                 renderCreateCollection();
             });
-            body.addView(refresh, lph(44, 0, 0, 0, 8));
-            TextView pick = Design.button(this, "Choose images", true);
+            refresh.setMinHeight(dp(48));
+            body.addView(refresh, lpm(0, 0, 0, 8));
+            TextView pick = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_choose_images), true);
             pick.setOnClickListener(v -> {
                 saveCollectionDraft(name, desc, size, baseF[0], extF[0], iconF[0], extUrlF[0], webF[0]);
                 pickImages();
             });
-            body.addView(pick, lph(48, 0, 0, 0, 10));
+            pick.setMinHeight(dp(48));
+            body.addView(pick, lpm(0, 0, 0, 10));
             boolean anyPlate = false;
             for (String s : createImages) if (s != null && !s.isEmpty()) { anyPlate = true; break; }
             if (anyPlate) {
-                TextView resetAll = Design.button(this, "Reset all plates", false);
-                resetAll.setOnClickListener(v -> new android.app.AlertDialog.Builder(this)
-                        .setTitle("Reset all plates")
-                        .setMessage("Clear every chosen image? The collection details stay — you just pick fresh images.")
-                        .setPositiveButton("Reset", (d, w) -> {
+                TextView resetAll = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_reset_plates), false);
+                resetAll.setOnClickListener(v -> new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                        .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_reset_plates))
+                        .setMessage(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_reset_body))
+                        .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_future_reset), (d, w) -> {
                             saveCollectionDraft(name, desc, size, baseF[0], extF[0], iconF[0], extUrlF[0], webF[0]);
                             createImages = new String[createImages.length];
                             renderCreateCollection();
                         })
-                        .setNegativeButton("Keep", null)
+                        .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_backup_keep), null)
                         .show());
-                body.addView(resetAll, lph(44, 0, 0, 0, 8));
+                resetAll.setMinHeight(dp(48));
+                body.addView(resetAll, lpm(0, 0, 0, 8));
             }
-            body.addView(Design.lot(this, "Proof sheet — what gets sealed · tap a plate to edit, replace or clear"), lpm(0, 0, 0, 6));
+            body.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_proof_sheet)), lpm(0, 0, 0, 6));
             body.addView(imageSlotGrid(), lpm(0, 0, 0, 8));
         }
 
-        iconF[0] = fieldInto(body, "Icon URL (optional)", "https://…/icon.png — wallets show this", createIcon);
+        iconF[0] = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_icon_url_optional), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_icon_hint), createIcon);
         iconF[0].addTextChangedListener(watch(sv -> createIcon = sv));
-        body.addView(hostingUploadRow("collicon", "Upload an icon photo to hosting",
+        body.addView(hostingUploadRow("collicon", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_upload_icon_host),
                 () -> { saveCollectionDraft(name, desc, size, baseF[0], extF[0], iconF[0], extUrlF[0], webF[0]);
                         pickHostSingle(PICK_HOST_ICON, "collicon"); }), lpm(0, 4, 0, 0));
-        body.addView(iconUploadRow(createIconB64, "Or embed a wallet icon (first plate is used if neither is set)",
+        body.addView(iconUploadRow(createIconB64, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_icon_help),
                 v -> { pendingPickContext = PICK_COLLICON; pendingBatchImages = false; launchPicker(false); },
                 v -> { createIconB64 = ""; renderCreateCollection(); }), lpm(0, 4, 0, 8));
-        extUrlF[0] = fieldInto(body, "External URL (optional)", "https://…", createExternal);
+        extUrlF[0] = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_external_url), "https://…", createExternal);
         extUrlF[0].addTextChangedListener(watch(sv -> createExternal = sv));
-        body.addView(hostingUploadRow("collext", "Upload full-res photo to hosting",
+        body.addView(hostingUploadRow("collext", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_upload_full),
                 () -> { saveCollectionDraft(name, desc, size, baseF[0], extF[0], iconF[0], extUrlF[0], webF[0]);
                         pickHostSingle(PICK_HOST_EXTERNAL, "collext"); }), lpm(0, 4, 0, 0));
-        webF[0] = fieldInto(body, "Web validate URL (optional)", "https://…/validate", createWeb);
+        webF[0] = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_webvalidate), "https://…/validate", createWeb);
         webF[0].addTextChangedListener(watch(sv -> createWeb = sv));
-        body.addView(Design.note(this, "The validation doc must contain the tokenid, which only exists after minting — so a missing doc never blocks the mint; it just isn't validated until the doc is live."), lpm(0, 4, 0, 0));
+        body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_validation_help)), lpm(0, 4, 0, 0));
         // wv-auto seals the doc's URL on-chain BEFORE the doc exists — impossible on
         // content-addressed Arweave (the URL is unknowable pre-upload), so hide it there.
         Hosting.Profile wvHp = HostingStore.getDefault(this);
@@ -1631,15 +1639,16 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             wvChk.setChecked(createWvAuto);
             wvChk.setOnCheckedChangeListener((b, on) -> { createWvAuto = on; if (on) createWeb = ""; renderCreateCollection(); });
             wvRow.addView(wvChk, new LinearLayout.LayoutParams(-2, -2));
-            wvRow.addView(Design.note(this, "Auto-create the validation doc on my hosting after mint (writes the tokenid for you — overrides the URL above)"),
+            wvRow.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_auto_validation)),
                     new LinearLayout.LayoutParams(0, -2, 1){{ leftMargin = dp(6); }});
             body.addView(wvRow, lpm(0, 6, 0, 0));
         }
 
-        TextView go = Design.button(this, "Mint collection", true);
+        TextView go = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_mint), true);
         go.setOnClickListener(v -> createCollection(name, desc, size, baseF[0], extF[0], iconF[0], extUrlF[0], webF[0]));
-        body.addView(go, lph(54, 0, 10, 0, 8));
-        body.addView(Design.note(this, "The engine runs create → gather → split → stamp while the app is open, and resumes if interrupted."));
+        go.setMinHeight(dp(54));
+        body.addView(go, lpm(0, 10, 0, 8));
+        body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_engine_help)));
     }
 
     private int clampSize(int n) { return Math.max(2, Math.min(20, n == 0 ? 12 : n)); }
@@ -1656,14 +1665,14 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         String ic = icon.getText().toString().trim();
         String ex = external.getText().toString().trim();
         String w = web.getText().toString().trim();
-        if (n.isEmpty() || n.length() > 40) { toast("Name must be 1–40 characters"); return; }
-        if (d.length() > 200) { toast("Description must be 0–200 characters"); return; }
+        if (n.isEmpty() || n.length() > 40) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_name_required)); return; }
+        if (d.length() > 200) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_description_range)); return; }
         int count = parseIntSafe(s);
-        if (count < 2 || count > 20) { toast("Editions must be 2–20"); return; }
-        if ("url".equals(createMode) && !bs.startsWith("https://")) { toast("Base URL must start https://"); return; }
+        if (count < 2 || count > 20) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_editions_range)); return; }
+        if ("url".equals(createMode) && !bs.startsWith("https://")) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_base_https)); return; }
         if (x.isEmpty()) x = ".jpg";
         if (!validCmdUrl(ic) || !validCmdUrl(ex) || !validCmdUrl(w) || !validCmdUrl(bs)) {
-            toast("URLs must not contain spaces, quotes or semicolons");
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_safe_urls));
             return;
         }
         final String extValue = x;
@@ -1671,7 +1680,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             ensureCreateImages(count);
             for (int i = 0; i < count; i++) {
                 if (createImages[i] == null || createImages[i].isEmpty()) {
-                    toast("Image missing for lot " + (i + 1));
+                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_missing_image, i + 1));
                     return;
                 }
             }
@@ -1684,16 +1693,14 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 && (createUploadedBase.isEmpty() || !bs.equals(createUploadedBase))) {
             final String confirmationDraft = mintDraftSnapshot(2);
             final long confirmationScreen = screenGeneration;
-            new android.app.AlertDialog.Builder(this)
-                    .setTitle("Use this Base URL?")
-                    .setMessage("These images weren't uploaded for this collection here — the Base URL may point at a different set:\n\n"
-                            + bs + "1" + x
-                            + "\n\nTo use your own pictures, tap “Upload plates” first. Mint with this URL anyway?")
-                    .setPositiveButton("Mint anyway", (dg, wch) -> {
+            new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                    .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_base_confirm))
+                    .setMessage(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_confirm_body, bs + "1" + x))
+                    .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_mint_anyway), (dg, wch) -> {
                             if (confirmationScreen != screenGeneration || !confirmationDraft.equals(mintDraftSnapshot(2))) { mintDraftChanged(); return; }
                             confirmedCollectionDraft = confirmationDraft;
                             createCollection(name, desc, size, base, ext, icon, external, web); })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel), null)
                     .show();
             return;
         }
@@ -1739,7 +1746,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 collectionBusy = false;
                 if (collectionScreen != screenGeneration || !collectionDraft.equals(mintDraftSnapshot(2))) { mintDraftChanged(); return; }
                 JSONObject r = json == null || !Boolean.TRUE.equals(json.opt("status")) ? null : json.optJSONObject("response");
-                if (r == null || r.optString("publickey").isEmpty() || r.optString("address").isEmpty()) { toast("getaddress failed"); return; }
+                if (r == null || r.optString("publickey").isEmpty() || r.optString("address").isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_address_failed)); return; }
                 StateNft.Meta m = new StateNft.Meta();
                 m.localId = LocalStore.nextId(MainActivity.this);
                 m.name = nF;
@@ -1820,7 +1827,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                             if (collectionItemTraits != null && collectionItemTraits.length() > 0)
                                 put(metaJ, "traits", collectionItemTraits);
                             room = MintEngine.imageBudget(metaJ.toString().length());
-                            if (room >= need) toast("icon slimmed so the plates keep their room");
+                            if (room >= need) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_icon_slimmed));
                         }
                         if (room < need) {
                             m.icon = "";
@@ -1828,29 +1835,23 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                             if (collectionItemTraits != null && collectionItemTraits.length() > 0)
                                 put(metaJ, "traits", collectionItemTraits);
                             room = MintEngine.imageBudget(metaJ.toString().length());
-                            if (room >= 0) toast("icon dropped so the plates keep their room — wallet shows the identicon");
+                            if (room >= 0) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_icon_dropped));
                         }
                     }
                     if (room < 0) {
-                        toast(MintEngine.jointGate(metaJ.toString().length(), 0)
-                                + " — even without an icon; trim the description or trait slots");
+                        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_metadata_too_large, metaJ.toString().length(), MintEngine.META_MAX));
                         return;
                     }
                     for (int ii = 0; ii < createImages.length; ii++) {
                         String im = createImages[ii];
                         if (im == null || im.length() <= room) continue;
                         if ("image/svg+xml".equals(ImageTools.mimeOf(im))) {
-                            toast("plate " + (ii + 1) + " (" + im.length() + "B SVG) cannot be "
-                                    + "shrunk to the " + room + "B image room the signed record "
-                                    + "leaves - lighten the record, or tap plate " + (ii + 1)
-                                    + " on the proof sheet to replace it");
+                            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_svg_too_large, ii + 1, im.length(), room));
                             return;
                         }
                         String out = ImageTools.recompressBase64(im, room);
                         if (out.isEmpty()) {
-                            toast("plate " + (ii + 1) + " cannot be shrunk to the " + room
-                                    + "B image room - lighten the record, or tap plate "
-                                    + (ii + 1) + " on the proof sheet to replace it");
+                            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_image_too_large, ii + 1, room));
                             return;
                         }
                         createImages[ii] = out;
@@ -1865,7 +1866,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 }
                 LocalStore.upsert(MainActivity.this, row);
                 resetCollectionDraft();
-                toast("Minting started");
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_mint_started));
                 engageEngine();
                 loadLocalCollections();
                 openCollection(findCollectionByLocalId(m.localId, m));
@@ -3818,17 +3819,17 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         cell.setOnClickListener(v -> {
             if (ready) {
                 if ("image/svg+xml".equals(ImageTools.mimeOf(createImages[idx]))) {
-                    toast("Vector plate — choose a replacement");
+                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_vector_replace));
                     pickImage(idx);
                 } else {
                     // a filled plate offers all three exits — crop-only trapped
                     // an oversized pick with no way to swap it (2026-08-10)
-                    new android.app.AlertDialog.Builder(this)
-                            .setTitle("Plate " + String.format(Locale.US, "%02d", idx + 1))
-                            .setItems(new String[]{
-                                    "Edit — crop & tone",
-                                    "Replace — choose a different image",
-                                    "Clear this plate" }, (d, which) -> {
+                    new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                            .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_plate, String.format(Locale.US, "%02d", idx + 1)))
+                            .setItems(new CharSequence[]{
+                                    Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_edit_plate),
+                                    Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_replace_plate),
+                                    Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_clear_plate) }, (d, which) -> {
                                 if (which == 0) {
                                     showEditor(createImages[idx], ImageTools.STATE_IMG_BUDGET, edited -> {
                                         createImages[idx] = edited;
@@ -4191,26 +4192,30 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
      *  can chain a second slow check — rare double-failure path, accepted deliberately. */
     private void offerUploadedBaseRecovery(String typedBase, String typedExt, String badMsg) {
         if (createUploadedBase.isEmpty() || createUploadedBase.equals(typedBase)) { toast(badMsg); return; }
-        final String probe = createUploadedBase + "1" + createUploadedExt;
+        final String uploadedBase = createUploadedBase, uploadedExt = createUploadedExt;
+        final String recoveryDraft = mintDraftSnapshot(2);
+        final long recoveryScreen = screenGeneration;
+        final String probe = uploadedBase + "1" + uploadedExt;
         final Hosting.Profile p = HostingStore.getDefault(this);
-        toast("Checking your uploaded plates…");
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_checking_uploaded));
         new Thread(() -> {
             boolean ok;
             try { Hosting.verifyUrl(probe, p); ok = true; } catch (Throwable t) { ok = false; }
             final boolean good = ok;
             main.post(() -> {
+                if (isFinishing() || isDestroyed() || recoveryScreen != screenGeneration
+                        || !recoveryDraft.equals(mintDraftSnapshot(2))) return;
                 if (!good) { toast(badMsg); return; }
-                new android.app.AlertDialog.Builder(this)
-                        .setTitle("Images not at that Base URL")
-                        .setMessage("Nothing is hosted at:\n" + typedBase + "1" + typedExt
-                                + "\n\nYour uploaded plates ARE live at:\n" + probe
-                                + "\n\nUse the uploaded base URL for this mint?")
-                        .setPositiveButton("Use uploaded", (dg, wch) -> {
-                            createBase = createUploadedBase; createExt = createUploadedExt;
+                new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                        .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_wrong_base))
+                        .setMessage(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_recovery_body, typedBase + "1" + typedExt, probe))
+                        .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_use_uploaded), (dg, wch) -> {
+                            if (recoveryScreen != screenGeneration || !recoveryDraft.equals(mintDraftSnapshot(2))) { mintDraftChanged(); return; }
+                            createBase = uploadedBase; createExt = uploadedExt;
                             renderCreateCollection();
-                            toast("Base URL restored — tap Mint again.");
+                            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_base_restored));
                         })
-                        .setNegativeButton("Keep typed", null)
+                        .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_keep_typed), null)
                         .show();
             });
         }).start();

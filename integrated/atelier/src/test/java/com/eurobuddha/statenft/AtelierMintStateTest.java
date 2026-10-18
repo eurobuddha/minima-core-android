@@ -139,7 +139,7 @@ public class AtelierMintStateTest {
     @Test public void collectionConfirmationDoesNotAuthorizeAnEditedBaseUrl()throws Exception {
         try(MockedStatic<ImageLoader> images=mockStatic(ImageLoader.class)){
             set("createName","Collection");set("createSize","2");set("createBase","https://example.invalid/original/");render("renderCreateCollection");
-            find(body,"MINT COLLECTION").performClick();idle();android.app.AlertDialog confirmation=ShadowAlertDialog.getLatestAlertDialog();
+            find(body,"MINT COLLECTION").performClick();idle();AlertDialog confirmation=(AlertDialog)ShadowDialog.getLatestDialog();
             ((EditText)find(body,"https://example.invalid/original/")).setText("https://example.invalid/different/");
             confirmation.getButton(android.app.AlertDialog.BUTTON_POSITIVE).performClick();idle();
             assertTrue(commands.isEmpty());assertEquals(false,field("verifyGateRunning").get(activity));assertNull(field("confirmedCollectionDraft").get(activity));assertEquals("https://example.invalid/different/",field("createBase").get(activity));

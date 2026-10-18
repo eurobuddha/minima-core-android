@@ -7324,4 +7324,74 @@
     <!-- Arguments: 0 -->
     <string name="l10n_atelier_mint_unreachable">"Ссылка недоступна: %1$s"</string>
     <string name="l10n_atelier_mint_verified" formatted="false">"Ссылки проверены ✓ — начинаем выпуск…"</string>
+    <string name="l10n_atelier_collection_collection_title" formatted="false">"Коллекция StateNFT"</string>
+    <string name="l10n_atelier_collection_collection_help" formatted="false">"От 2 до 20 экземпляров с одним tokenid. У каждого — закреплённые данные; выпуск можно продолжить после перерыва. Контракт заблокирован."</string>
+    <string name="l10n_atelier_collection_engine" formatted="false">"Механизм выпуска"</string>
+    <string name="l10n_atelier_collection_single_nft" formatted="false">"Отдельный NFT"</string>
+    <string name="l10n_atelier_collection_single_help" formatted="false">"Классический NFT Minima: единственный экземпляр или небольшой тираж. Отображается в кошельках."</string>
+    <string name="l10n_atelier_collection_custom_token" formatted="false">"Свой токен"</string>
+    <string name="l10n_atelier_collection_custom_help" formatted="false">"Взаимозаменяемый токен: название, тикер, объём выпуска, знаки после запятой и значок."</string>
+    <string name="l10n_atelier_collection_generative" formatted="false">"Генеративная коллекция"</string>
+    <string name="l10n_atelier_collection_generative_help" formatted="false">"18 стилей SVG для хранения в блокчейне — от Mandala до Panda Punks. Генерация по зерну, настройка редкости и автоматические атрибуты."</string>
+    <string name="l10n_atelier_collection_filtr" formatted="false">"FILTR — редактор изображений"</string>
+    <string name="l10n_atelier_collection_filtr_help" formatted="false">"Обрезка, поворот, ластик, 15 фильтров, пресеты, реплики и текст. Сохраните результат или сразу создайте NFT."</string>
+    <string name="l10n_atelier_collection_drafts" formatted="false">"Черновики в мастерской"</string>
+    <string name="l10n_atelier_collection_new_collection" formatted="false">"Новая коллекция"</string>
+    <string name="l10n_atelier_collection_name_hint" formatted="false">"Три дня в Париже"</string>
+    <string name="l10n_atelier_collection_description_hint" formatted="false">"Необязательно, до 200 символов"</string>
+    <string name="l10n_atelier_collection_editions" formatted="false">"Экземпляры (2–20)"</string>
+    <string name="l10n_atelier_collection_image_source" formatted="false">"Источник изображений"</string>
+    <string name="l10n_atelier_collection_hosted" formatted="false">"Ссылки на файлы"</string>
+    <string name="l10n_atelier_collection_embed" formatted="false">"Хранить в блокчейне"</string>
+    <string name="l10n_atelier_collection_base" formatted="false">"Базовый URL"</string>
+    <string name="l10n_atelier_collection_extension" formatted="false">"Расширение"</string>
+    <string name="l10n_atelier_collection_restore_base" formatted="false">"Вернуть URL загруженных файлов"</string>
+    <string name="l10n_atelier_collection_upload_plates" formatted="false">"Загрузить изображения → заполнить базовый URL"</string>
+    <string name="l10n_atelier_collection_update_slots" formatted="false">"Обновить ячейки изображений"</string>
+    <string name="l10n_atelier_collection_choose_images" formatted="false">"Выбрать изображения"</string>
+    <string name="l10n_atelier_collection_reset_plates" formatted="false">"Сбросить все изображения"</string>
+    <string name="l10n_atelier_collection_reset_body" formatted="false">"Удалить все выбранные изображения? Данные коллекции сохранятся, и вы сможете выбрать новые изображения."</string>
+    <string name="l10n_atelier_collection_proof_sheet" formatted="false">"Лист просмотра — изображения для записи · нажмите, чтобы изменить, заменить или удалить"</string>
+    <string name="l10n_atelier_collection_icon_hint" formatted="false">"https://…/icon.png — значок в кошельках"</string>
+    <string name="l10n_atelier_collection_icon_help" formatted="false">"Или встроить значок кошелька (иначе используется первое изображение)"</string>
+    <string name="l10n_atelier_collection_validation_help" formatted="false">"Документ проверки должен содержать tokenid, который появится после выпуска. Отсутствие документа не блокирует выпуск; проверка станет доступна после публикации документа."</string>
+    <string name="l10n_atelier_collection_auto_validation" formatted="false">"Создать документ проверки на моём хостинге после выпуска (запишет tokenid; заменит URL выше)"</string>
+    <string name="l10n_atelier_collection_mint" formatted="false">"Выпустить коллекцию"</string>
+    <string name="l10n_atelier_collection_engine_help" formatted="false">"При открытом приложении выполняются создание → сбор → разделение → маркировка. После перерыва работа возобновляется."</string>
+    <string name="l10n_atelier_collection_description_range" formatted="false">"Описание — не более 200 символов"</string>
+    <string name="l10n_atelier_collection_editions_range" formatted="false">"Число экземпляров — от 2 до 20"</string>
+    <string name="l10n_atelier_collection_base_https" formatted="false">"Базовый URL должен начинаться с https://"</string>
+    <string name="l10n_atelier_collection_base_confirm" formatted="false">"Использовать этот базовый URL?"</string>
+    <string name="l10n_atelier_collection_mint_anyway" formatted="false">"Всё равно выпустить"</string>
+    <string name="l10n_atelier_collection_address_failed" formatted="false">"Не удалось получить адрес"</string>
+    <string name="l10n_atelier_collection_icon_slimmed" formatted="false">"Значок уменьшен, чтобы оставить место для изображений"</string>
+    <string name="l10n_atelier_collection_icon_dropped" formatted="false">"Значок убран, чтобы оставить место для изображений. Кошелёк покажет идентикон."</string>
+    <string name="l10n_atelier_collection_mint_started" formatted="false">"Выпуск начат"</string>
+    <string name="l10n_atelier_collection_vector_replace" formatted="false">"Векторное изображение — выберите замену"</string>
+    <string name="l10n_atelier_collection_edit_plate" formatted="false">"Изменить — обрезка и тон"</string>
+    <string name="l10n_atelier_collection_replace_plate" formatted="false">"Заменить — выбрать другое изображение"</string>
+    <string name="l10n_atelier_collection_clear_plate" formatted="false">"Удалить это изображение"</string>
+    <string name="l10n_atelier_collection_checking_uploaded" formatted="false">"Проверяем загруженные изображения…"</string>
+    <string name="l10n_atelier_collection_wrong_base" formatted="false">"По этому базовому URL нет изображений"</string>
+    <string name="l10n_atelier_collection_use_uploaded" formatted="false">"Использовать загруженные"</string>
+    <string name="l10n_atelier_collection_keep_typed" formatted="false">"Оставить введённый URL"</string>
+    <string name="l10n_atelier_collection_base_restored" formatted="false">"Базовый URL восстановлен. Нажмите «Выпустить» ещё раз."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_draft">"Черновик: %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_uploaded_at">"Загруженные изображения доступны по адресу: %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_missing_image">"Нет изображения для экземпляра %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_confirm_body">"Эти изображения не были загружены здесь для этой коллекции. Базовый URL может вести к другому набору:\n\n%1$s\n\nЧтобы использовать свои изображения, сначала загрузите их. Всё равно выпустить с этим URL?"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_collection_metadata_too_large">"Метаданные превышают лимит подписанной записи (%1$s / %2$s) даже без значка. Сократите описание или число атрибутов."</string>
+    <!-- Arguments: 0, 1, 2 -->
+    <string name="l10n_atelier_collection_svg_too_large">"Изображение %1$s (SVG, %2$s Б) не помещается в оставшиеся %3$s Б подписанной записи. Сократите запись или нажмите изображение для замены."</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_collection_image_too_large">"Изображение %1$s не удаётся уменьшить до %2$s Б. Сократите запись или нажмите изображение для замены."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_plate">"Изображение %1$s"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_collection_recovery_body">"По этому адресу нет файлов:\n%1$s\n\nВаши загруженные изображения доступны здесь:\n%2$s\n\nИспользовать их базовый URL для выпуска?"</string>
 </resources>

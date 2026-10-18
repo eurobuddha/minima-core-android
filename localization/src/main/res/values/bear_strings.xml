@@ -7260,4 +7260,74 @@
     <!-- Arguments: 0 -->
     <string name="l10n_atelier_mint_unreachable">"URL unreachable: %1$s"</string>
     <string name="l10n_atelier_mint_verified" formatted="false">"URLs verified ✓ — starting mint…"</string>
+    <string name="l10n_atelier_collection_collection_title" formatted="false">"StateNFT Collection"</string>
+    <string name="l10n_atelier_collection_collection_help" formatted="false">"2–20 editions sharing one tokenid. Sealed per-coin identities, resumable mint engine, locked contract."</string>
+    <string name="l10n_atelier_collection_engine" formatted="false">"Engine"</string>
+    <string name="l10n_atelier_collection_single_nft" formatted="false">"Single NFT"</string>
+    <string name="l10n_atelier_collection_single_help" formatted="false">"A classic Minima NFT — 1/1 or small edition. Renders in every wallet."</string>
+    <string name="l10n_atelier_collection_custom_token" formatted="false">"Custom Token"</string>
+    <string name="l10n_atelier_collection_custom_help" formatted="false">"A fungible token — name, ticker, supply, decimals, icon."</string>
+    <string name="l10n_atelier_collection_generative" formatted="false">"Generative Collection"</string>
+    <string name="l10n_atelier_collection_generative_help" formatted="false">"18 on-chain SVG style packs — Mandala to Panda Punks. Deterministic from a seed, rarity sliders, traits auto-filled."</string>
+    <string name="l10n_atelier_collection_filtr" formatted="false">"FILTR — image editor"</string>
+    <string name="l10n_atelier_collection_filtr_help" formatted="false">"Crop, rotate, erase; 15 filter effects, presets, comic bubbles and text. Save, or send straight into a mint."</string>
+    <string name="l10n_atelier_collection_drafts" formatted="false">"Drafts on the bench"</string>
+    <string name="l10n_atelier_collection_new_collection" formatted="false">"New Collection"</string>
+    <string name="l10n_atelier_collection_name_hint" formatted="false">"Trois Jours à Paris"</string>
+    <string name="l10n_atelier_collection_description_hint" formatted="false">"Optional, 0–200 characters"</string>
+    <string name="l10n_atelier_collection_editions" formatted="false">"Editions (2–20)"</string>
+    <string name="l10n_atelier_collection_image_source" formatted="false">"Image source"</string>
+    <string name="l10n_atelier_collection_hosted" formatted="false">"Hosted URLs"</string>
+    <string name="l10n_atelier_collection_embed" formatted="false">"Embed on-chain"</string>
+    <string name="l10n_atelier_collection_base" formatted="false">"Base URL"</string>
+    <string name="l10n_atelier_collection_extension" formatted="false">"Extension"</string>
+    <string name="l10n_atelier_collection_restore_base" formatted="false">"Restore uploaded base URL"</string>
+    <string name="l10n_atelier_collection_upload_plates" formatted="false">"Upload plates to hosting → auto-fill base URL"</string>
+    <string name="l10n_atelier_collection_update_slots" formatted="false">"Update image slots"</string>
+    <string name="l10n_atelier_collection_choose_images" formatted="false">"Choose images"</string>
+    <string name="l10n_atelier_collection_reset_plates" formatted="false">"Reset all plates"</string>
+    <string name="l10n_atelier_collection_reset_body" formatted="false">"Clear every chosen image? The collection details stay — you just pick fresh images."</string>
+    <string name="l10n_atelier_collection_proof_sheet" formatted="false">"Proof sheet — what gets sealed · tap a plate to edit, replace or clear"</string>
+    <string name="l10n_atelier_collection_icon_hint" formatted="false">"https://…/icon.png — wallets show this"</string>
+    <string name="l10n_atelier_collection_icon_help" formatted="false">"Or embed a wallet icon (first plate is used if neither is set)"</string>
+    <string name="l10n_atelier_collection_validation_help" formatted="false">"The validation doc must contain the tokenid, which only exists after minting — so a missing doc never blocks the mint; it just isn\'t validated until the doc is live."</string>
+    <string name="l10n_atelier_collection_auto_validation" formatted="false">"Auto-create the validation doc on my hosting after mint (writes the tokenid for you — overrides the URL above)"</string>
+    <string name="l10n_atelier_collection_mint" formatted="false">"Mint collection"</string>
+    <string name="l10n_atelier_collection_engine_help" formatted="false">"The engine runs create → gather → split → stamp while the app is open, and resumes if interrupted."</string>
+    <string name="l10n_atelier_collection_description_range" formatted="false">"Description must be 0–200 characters"</string>
+    <string name="l10n_atelier_collection_editions_range" formatted="false">"Editions must be 2–20"</string>
+    <string name="l10n_atelier_collection_base_https" formatted="false">"Base URL must start https://"</string>
+    <string name="l10n_atelier_collection_base_confirm" formatted="false">"Use this Base URL?"</string>
+    <string name="l10n_atelier_collection_mint_anyway" formatted="false">"Mint anyway"</string>
+    <string name="l10n_atelier_collection_address_failed" formatted="false">"getaddress failed"</string>
+    <string name="l10n_atelier_collection_icon_slimmed" formatted="false">"icon slimmed so the plates keep their room"</string>
+    <string name="l10n_atelier_collection_icon_dropped" formatted="false">"icon dropped so the plates keep their room — wallet shows the identicon"</string>
+    <string name="l10n_atelier_collection_mint_started" formatted="false">"Minting started"</string>
+    <string name="l10n_atelier_collection_vector_replace" formatted="false">"Vector plate — choose a replacement"</string>
+    <string name="l10n_atelier_collection_edit_plate" formatted="false">"Edit — crop &amp; tone"</string>
+    <string name="l10n_atelier_collection_replace_plate" formatted="false">"Replace — choose a different image"</string>
+    <string name="l10n_atelier_collection_clear_plate" formatted="false">"Clear this plate"</string>
+    <string name="l10n_atelier_collection_checking_uploaded" formatted="false">"Checking your uploaded plates…"</string>
+    <string name="l10n_atelier_collection_wrong_base" formatted="false">"Images not at that Base URL"</string>
+    <string name="l10n_atelier_collection_use_uploaded" formatted="false">"Use uploaded"</string>
+    <string name="l10n_atelier_collection_keep_typed" formatted="false">"Keep typed"</string>
+    <string name="l10n_atelier_collection_base_restored" formatted="false">"Base URL restored — tap Mint again."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_draft">"%1$s draft"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_uploaded_at">"Uploaded plates live at: %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_missing_image">"Image missing for lot %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_confirm_body">"These images were not uploaded here for this collection. The base URL may point to a different set:\n\n%1$s\n\nTo use your own pictures, upload them first. Mint with this URL anyway?"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_collection_metadata_too_large">"Metadata exceeds the signed record limit (%1$s / %2$s), even without an icon. Shorten the description or reduce traits."</string>
+    <!-- Arguments: 0, 1, 2 -->
+    <string name="l10n_atelier_collection_svg_too_large">"Image %1$s (%2$s B SVG) cannot fit the %3$s B left by the signed record. Shorten the record or tap the image to replace it."</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_collection_image_too_large">"Image %1$s cannot be reduced to %2$s B. Shorten the record or tap the image to replace it."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_collection_plate">"Image %1$s"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_atelier_collection_recovery_body">"Nothing is hosted at:\n%1$s\n\nYour uploaded images are available at:\n%2$s\n\nUse the uploaded base URL for this mint?"</string>
 </resources>
