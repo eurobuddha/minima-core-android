@@ -1,0 +1,2819 @@
+{
+  "styles": [
+    {
+      "key": "mandala",
+      "label": "Mandala",
+      "cfg": {
+        "style": "mandala",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Dusk Neon",
+                "weight": 16
+              },
+              {
+                "name": "Ocean",
+                "weight": 16
+              },
+              {
+                "name": "Mint Frost",
+                "weight": 14
+              },
+              {
+                "name": "Solar",
+                "weight": 14
+              },
+              {
+                "name": "Sakura",
+                "weight": 12
+              },
+              {
+                "name": "Acid",
+                "weight": 10
+              },
+              {
+                "name": "Ember",
+                "weight": 8
+              },
+              {
+                "name": "Mono",
+                "weight": 5
+              },
+              {
+                "name": "Gold",
+                "weight": 3
+              },
+              {
+                "name": "Hologram",
+                "weight": 2
+              }
+            ]
+          },
+          {
+            "key": "symmetry",
+            "label": "Symmetry",
+            "variants": [
+              {
+                "name": "6-fold",
+                "weight": 22
+              },
+              {
+                "name": "8-fold",
+                "weight": 26
+              },
+              {
+                "name": "12-fold",
+                "weight": 22
+              },
+              {
+                "name": "16-fold",
+                "weight": 18
+              },
+              {
+                "name": "24-fold",
+                "weight": 12
+              }
+            ]
+          },
+          {
+            "key": "reflect",
+            "label": "Rotation",
+            "variants": [
+              {
+                "name": "Mirrored",
+                "weight": 55
+              },
+              {
+                "name": "Pinwheel",
+                "weight": 45
+              }
+            ]
+          },
+          {
+            "key": "rings",
+            "label": "Rings",
+            "variants": [
+              {
+                "name": "Sparse",
+                "weight": 26
+              },
+              {
+                "name": "Balanced",
+                "weight": 36
+              },
+              {
+                "name": "Rich",
+                "weight": 26
+              },
+              {
+                "name": "Dense",
+                "weight": 12
+              }
+            ]
+          },
+          {
+            "key": "motif",
+            "label": "Motif",
+            "variants": [
+              {
+                "name": "Petal",
+                "weight": 26
+              },
+              {
+                "name": "Lens",
+                "weight": 20
+              },
+              {
+                "name": "Geometric",
+                "weight": 20
+              },
+              {
+                "name": "Dot Chain",
+                "weight": 18
+              },
+              {
+                "name": "Thorn",
+                "weight": 16
+              }
+            ]
+          },
+          {
+            "key": "core",
+            "label": "Core",
+            "variants": [
+              {
+                "name": "Disc",
+                "weight": 30
+              },
+              {
+                "name": "Ring",
+                "weight": 26
+              },
+              {
+                "name": "Star",
+                "weight": 24
+              },
+              {
+                "name": "Eye",
+                "weight": 20
+              }
+            ]
+          },
+          {
+            "key": "background",
+            "label": "Background",
+            "variants": [
+              {
+                "name": "Wash",
+                "weight": 40
+              },
+              {
+                "name": "Rings",
+                "weight": 32
+              },
+              {
+                "name": "Dots",
+                "weight": 28
+              }
+            ]
+          },
+          {
+            "key": "rim",
+            "label": "Rim",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 50
+              },
+              {
+                "name": "Halo",
+                "weight": 30
+              },
+              {
+                "name": "Double",
+                "weight": 20
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "geo",
+      "label": "Geometry",
+      "cfg": {
+        "style": "geo",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Dusk Neon",
+                "weight": 16
+              },
+              {
+                "name": "Ocean",
+                "weight": 16
+              },
+              {
+                "name": "Mint Frost",
+                "weight": 14
+              },
+              {
+                "name": "Solar",
+                "weight": 14
+              },
+              {
+                "name": "Sakura",
+                "weight": 12
+              },
+              {
+                "name": "Acid",
+                "weight": 10
+              },
+              {
+                "name": "Ember",
+                "weight": 8
+              },
+              {
+                "name": "Mono",
+                "weight": 5
+              },
+              {
+                "name": "Gold",
+                "weight": 3
+              },
+              {
+                "name": "Hologram",
+                "weight": 2
+              }
+            ]
+          },
+          {
+            "key": "layout",
+            "label": "Layout",
+            "variants": [
+              {
+                "name": "Grid-3",
+                "weight": 26
+              },
+              {
+                "name": "Grid-2",
+                "weight": 20
+              },
+              {
+                "name": "Band",
+                "weight": 18
+              },
+              {
+                "name": "Orbit",
+                "weight": 18
+              },
+              {
+                "name": "Scatter",
+                "weight": 18
+              }
+            ]
+          },
+          {
+            "key": "forms",
+            "label": "Forms",
+            "variants": [
+              {
+                "name": "Circles",
+                "weight": 24
+              },
+              {
+                "name": "Triangles",
+                "weight": 20
+              },
+              {
+                "name": "Bars",
+                "weight": 20
+              },
+              {
+                "name": "Arcs",
+                "weight": 18
+              },
+              {
+                "name": "Mixed",
+                "weight": 18
+              }
+            ]
+          },
+          {
+            "key": "density",
+            "label": "Density",
+            "variants": [
+              {
+                "name": "Minimal",
+                "weight": 30
+              },
+              {
+                "name": "Balanced",
+                "weight": 45
+              },
+              {
+                "name": "Busy",
+                "weight": 25
+              }
+            ]
+          },
+          {
+            "key": "focal",
+            "label": "Focal",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 30
+              },
+              {
+                "name": "Disc",
+                "weight": 28
+              },
+              {
+                "name": "Wedge",
+                "weight": 22
+              },
+              {
+                "name": "Ring",
+                "weight": 20
+              }
+            ]
+          },
+          {
+            "key": "texture",
+            "label": "Texture",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 45
+              },
+              {
+                "name": "Stripes",
+                "weight": 30
+              },
+              {
+                "name": "Dots",
+                "weight": 25
+              }
+            ]
+          },
+          {
+            "key": "background",
+            "label": "Background",
+            "variants": [
+              {
+                "name": "Paper",
+                "weight": 38
+              },
+              {
+                "name": "Split",
+                "weight": 32
+              },
+              {
+                "name": "Wash",
+                "weight": 30
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "pixel",
+      "label": "Pixel",
+      "cfg": {
+        "style": "pixel",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Dusk Neon",
+                "weight": 16
+              },
+              {
+                "name": "Ocean",
+                "weight": 16
+              },
+              {
+                "name": "Mint Frost",
+                "weight": 14
+              },
+              {
+                "name": "Solar",
+                "weight": 14
+              },
+              {
+                "name": "Sakura",
+                "weight": 12
+              },
+              {
+                "name": "Acid",
+                "weight": 10
+              },
+              {
+                "name": "Ember",
+                "weight": 8
+              },
+              {
+                "name": "Mono",
+                "weight": 5
+              },
+              {
+                "name": "Gold",
+                "weight": 3
+              },
+              {
+                "name": "Hologram",
+                "weight": 2
+              }
+            ]
+          },
+          {
+            "key": "res",
+            "label": "Resolution",
+            "variants": [
+              {
+                "name": "16",
+                "weight": 35
+              },
+              {
+                "name": "24",
+                "weight": 40
+              },
+              {
+                "name": "32",
+                "weight": 25
+              }
+            ]
+          },
+          {
+            "key": "symmetry",
+            "label": "Symmetry",
+            "variants": [
+              {
+                "name": "Mirror",
+                "weight": 40
+              },
+              {
+                "name": "Quad",
+                "weight": 25
+              },
+              {
+                "name": "Totem",
+                "weight": 20
+              },
+              {
+                "name": "Chaos",
+                "weight": 15
+              }
+            ]
+          },
+          {
+            "key": "mask",
+            "label": "Mask",
+            "variants": [
+              {
+                "name": "Core",
+                "weight": 32
+              },
+              {
+                "name": "Column",
+                "weight": 24
+              },
+              {
+                "name": "Diamond",
+                "weight": 22
+              },
+              {
+                "name": "Field",
+                "weight": 22
+              }
+            ]
+          },
+          {
+            "key": "density",
+            "label": "Density",
+            "variants": [
+              {
+                "name": "Sparse",
+                "weight": 30
+              },
+              {
+                "name": "Medium",
+                "weight": 45
+              },
+              {
+                "name": "Dense",
+                "weight": 25
+              }
+            ]
+          },
+          {
+            "key": "coloring",
+            "label": "Coloring",
+            "variants": [
+              {
+                "name": "Duo",
+                "weight": 30
+              },
+              {
+                "name": "Trio",
+                "weight": 40
+              },
+              {
+                "name": "Spark",
+                "weight": 30
+              }
+            ]
+          },
+          {
+            "key": "outline",
+            "label": "Outline",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 50
+              },
+              {
+                "name": "Ink",
+                "weight": 50
+              }
+            ]
+          },
+          {
+            "key": "background",
+            "label": "Background",
+            "variants": [
+              {
+                "name": "Plain",
+                "weight": 36
+              },
+              {
+                "name": "Wash",
+                "weight": 34
+              },
+              {
+                "name": "Grid",
+                "weight": 30
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "phyllo",
+      "label": "Phyllotaxis",
+      "cfg": {
+        "style": "phyllo",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Dusk Neon",
+                "weight": 16
+              },
+              {
+                "name": "Ocean",
+                "weight": 16
+              },
+              {
+                "name": "Mint Frost",
+                "weight": 14
+              },
+              {
+                "name": "Solar",
+                "weight": 14
+              },
+              {
+                "name": "Sakura",
+                "weight": 12
+              },
+              {
+                "name": "Acid",
+                "weight": 10
+              },
+              {
+                "name": "Ember",
+                "weight": 8
+              },
+              {
+                "name": "Mono",
+                "weight": 5
+              },
+              {
+                "name": "Gold",
+                "weight": 3
+              },
+              {
+                "name": "Hologram",
+                "weight": 2
+              }
+            ]
+          },
+          {
+            "key": "count",
+            "label": "Seeds",
+            "variants": [
+              {
+                "name": "120",
+                "weight": 30
+              },
+              {
+                "name": "150",
+                "weight": 40
+              },
+              {
+                "name": "180",
+                "weight": 30
+              }
+            ]
+          },
+          {
+            "key": "element",
+            "label": "Element",
+            "variants": [
+              {
+                "name": "Dot",
+                "weight": 36
+              },
+              {
+                "name": "Ray",
+                "weight": 26
+              },
+              {
+                "name": "Seed",
+                "weight": 18
+              },
+              {
+                "name": "Duotone",
+                "weight": 20
+              }
+            ]
+          },
+          {
+            "key": "ramp",
+            "label": "Size ramp",
+            "variants": [
+              {
+                "name": "Bloom",
+                "weight": 34
+              },
+              {
+                "name": "Core",
+                "weight": 28
+              },
+              {
+                "name": "Pulse",
+                "weight": 22
+              },
+              {
+                "name": "Even",
+                "weight": 16
+              }
+            ]
+          },
+          {
+            "key": "connector",
+            "label": "Connector",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 40
+              },
+              {
+                "name": "Fermat",
+                "weight": 22
+              },
+              {
+                "name": "Arms-8",
+                "weight": 20
+              },
+              {
+                "name": "Arms-13",
+                "weight": 18
+              }
+            ]
+          },
+          {
+            "key": "background",
+            "label": "Background",
+            "variants": [
+              {
+                "name": "Wash",
+                "weight": 45
+              },
+              {
+                "name": "Plain",
+                "weight": 30
+              },
+              {
+                "name": "Rings",
+                "weight": 25
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "curves",
+      "label": "Math Curves",
+      "cfg": {
+        "style": "curves",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Dusk Neon",
+                "weight": 16
+              },
+              {
+                "name": "Ocean",
+                "weight": 16
+              },
+              {
+                "name": "Mint Frost",
+                "weight": 14
+              },
+              {
+                "name": "Solar",
+                "weight": 14
+              },
+              {
+                "name": "Sakura",
+                "weight": 12
+              },
+              {
+                "name": "Acid",
+                "weight": 10
+              },
+              {
+                "name": "Ember",
+                "weight": 8
+              },
+              {
+                "name": "Mono",
+                "weight": 5
+              },
+              {
+                "name": "Gold",
+                "weight": 3
+              },
+              {
+                "name": "Hologram",
+                "weight": 2
+              }
+            ]
+          },
+          {
+            "key": "family",
+            "label": "Family",
+            "variants": [
+              {
+                "name": "Spirograph",
+                "weight": 26
+              },
+              {
+                "name": "Rose",
+                "weight": 22
+              },
+              {
+                "name": "Lissajous",
+                "weight": 20
+              },
+              {
+                "name": "Harmonograph",
+                "weight": 18
+              },
+              {
+                "name": "Superformula",
+                "weight": 14
+              }
+            ]
+          },
+          {
+            "key": "layers",
+            "label": "Layers",
+            "variants": [
+              {
+                "name": "Solo",
+                "weight": 34
+              },
+              {
+                "name": "Echo",
+                "weight": 36
+              },
+              {
+                "name": "Duet",
+                "weight": 30
+              }
+            ]
+          },
+          {
+            "key": "ink",
+            "label": "Ink",
+            "variants": [
+              {
+                "name": "Fine",
+                "weight": 32
+              },
+              {
+                "name": "Bold",
+                "weight": 34
+              },
+              {
+                "name": "Neon",
+                "weight": 34
+              }
+            ]
+          },
+          {
+            "key": "background",
+            "label": "Background",
+            "variants": [
+              {
+                "name": "Wash",
+                "weight": 44
+              },
+              {
+                "name": "Grid",
+                "weight": 28
+              },
+              {
+                "name": "Dots",
+                "weight": 28
+              }
+            ]
+          },
+          {
+            "key": "trim",
+            "label": "Trim",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 58
+              },
+              {
+                "name": "Frame",
+                "weight": 42
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "truchet",
+      "label": "Truchet",
+      "cfg": {
+        "style": "truchet",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Dusk Neon",
+                "weight": 16
+              },
+              {
+                "name": "Ocean",
+                "weight": 16
+              },
+              {
+                "name": "Mint Frost",
+                "weight": 14
+              },
+              {
+                "name": "Solar",
+                "weight": 14
+              },
+              {
+                "name": "Sakura",
+                "weight": 12
+              },
+              {
+                "name": "Acid",
+                "weight": 10
+              },
+              {
+                "name": "Ember",
+                "weight": 8
+              },
+              {
+                "name": "Mono",
+                "weight": 5
+              },
+              {
+                "name": "Gold",
+                "weight": 3
+              },
+              {
+                "name": "Hologram",
+                "weight": 2
+              }
+            ]
+          },
+          {
+            "key": "grid",
+            "label": "Grid",
+            "variants": [
+              {
+                "name": "8",
+                "weight": 28
+              },
+              {
+                "name": "10",
+                "weight": 28
+              },
+              {
+                "name": "12",
+                "weight": 26
+              },
+              {
+                "name": "14",
+                "weight": 18
+              }
+            ]
+          },
+          {
+            "key": "tiles",
+            "label": "Tiles",
+            "variants": [
+              {
+                "name": "Arcs",
+                "weight": 40
+              },
+              {
+                "name": "Diagonals",
+                "weight": 22
+              },
+              {
+                "name": "Quarter Fans",
+                "weight": 20
+              },
+              {
+                "name": "Arcs+Dots",
+                "weight": 18
+              }
+            ]
+          },
+          {
+            "key": "symmetry",
+            "label": "Symmetry",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 30
+              },
+              {
+                "name": "Mirror",
+                "weight": 26
+              },
+              {
+                "name": "Rot2",
+                "weight": 24
+              },
+              {
+                "name": "Quad",
+                "weight": 20
+              }
+            ]
+          },
+          {
+            "key": "stroke",
+            "label": "Stroke",
+            "variants": [
+              {
+                "name": "Fine",
+                "weight": 28
+              },
+              {
+                "name": "Bold",
+                "weight": 46
+              },
+              {
+                "name": "Heavy",
+                "weight": 26
+              }
+            ]
+          },
+          {
+            "key": "color",
+            "label": "Color",
+            "variants": [
+              {
+                "name": "Mono",
+                "weight": 32
+              },
+              {
+                "name": "Duo",
+                "weight": 42
+              },
+              {
+                "name": "Glow",
+                "weight": 26
+              }
+            ]
+          },
+          {
+            "key": "background",
+            "label": "Background",
+            "variants": [
+              {
+                "name": "Plain",
+                "weight": 45
+              },
+              {
+                "name": "Wash",
+                "weight": 30
+              },
+              {
+                "name": "Dots",
+                "weight": 25
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "mondrian",
+      "label": "Mondrian",
+      "cfg": {
+        "style": "mondrian",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Classic",
+                "weight": 50
+              },
+              {
+                "name": "Warm",
+                "weight": 22
+              },
+              {
+                "name": "Cool",
+                "weight": 20
+              },
+              {
+                "name": "Inverted",
+                "weight": 8
+              }
+            ]
+          },
+          {
+            "key": "depth",
+            "label": "Subdivision",
+            "variants": [
+              {
+                "name": "Calm",
+                "weight": 32
+              },
+              {
+                "name": "Lively",
+                "weight": 44
+              },
+              {
+                "name": "Boogie",
+                "weight": 24
+              }
+            ]
+          },
+          {
+            "key": "line",
+            "label": "Line weight",
+            "variants": [
+              {
+                "name": "Fine",
+                "weight": 28
+              },
+              {
+                "name": "Bold",
+                "weight": 46
+              },
+              {
+                "name": "Heavy",
+                "weight": 26
+              }
+            ]
+          },
+          {
+            "key": "balance",
+            "label": "Color balance",
+            "variants": [
+              {
+                "name": "Paper-led",
+                "weight": 46
+              },
+              {
+                "name": "Primary-led",
+                "weight": 40
+              },
+              {
+                "name": "Saturated",
+                "weight": 14
+              }
+            ]
+          },
+          {
+            "key": "form",
+            "label": "Form",
+            "variants": [
+              {
+                "name": "Rectilinear",
+                "weight": 85
+              },
+              {
+                "name": "Diamond",
+                "weight": 15
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "miro",
+      "label": "Miro",
+      "cfg": {
+        "style": "miro",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Cream",
+                "weight": 38
+              },
+              {
+                "name": "Sand",
+                "weight": 26
+              },
+              {
+                "name": "Sky",
+                "weight": 22
+              },
+              {
+                "name": "Night",
+                "weight": 14
+              }
+            ]
+          },
+          {
+            "key": "density",
+            "label": "Density",
+            "variants": [
+              {
+                "name": "Airy",
+                "weight": 34
+              },
+              {
+                "name": "Lively",
+                "weight": 44
+              },
+              {
+                "name": "Crowded",
+                "weight": 22
+              }
+            ]
+          },
+          {
+            "key": "motifs",
+            "label": "Motifs",
+            "variants": [
+              {
+                "name": "Blobs",
+                "weight": 24
+              },
+              {
+                "name": "Stars",
+                "weight": 20
+              },
+              {
+                "name": "Eyes",
+                "weight": 18
+              },
+              {
+                "name": "Crescents",
+                "weight": 16
+              },
+              {
+                "name": "Mixed",
+                "weight": 22
+              }
+            ]
+          },
+          {
+            "key": "connector",
+            "label": "Connectors",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 34
+              },
+              {
+                "name": "Meander",
+                "weight": 38
+              },
+              {
+                "name": "Web",
+                "weight": 28
+              }
+            ]
+          },
+          {
+            "key": "lead",
+            "label": "Accent lead",
+            "variants": [
+              {
+                "name": "Red-led",
+                "weight": 38
+              },
+              {
+                "name": "Blue-led",
+                "weight": 32
+              },
+              {
+                "name": "Balanced",
+                "weight": 30
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "kandinsky",
+      "label": "Kandinsky",
+      "cfg": {
+        "style": "kandinsky",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Bauhaus",
+                "weight": 45
+              },
+              {
+                "name": "Primary",
+                "weight": 25
+              },
+              {
+                "name": "Dusk",
+                "weight": 18
+              },
+              {
+                "name": "Pastel",
+                "weight": 12
+              },
+              {
+                "name": "Ivory",
+                "weight": 10
+              },
+              {
+                "name": "Terra",
+                "weight": 8
+              }
+            ]
+          },
+          {
+            "key": "mode",
+            "label": "Mode",
+            "variants": [
+              {
+                "name": "Circle Grid",
+                "weight": 55
+              },
+              {
+                "name": "Free",
+                "weight": 45
+              }
+            ]
+          },
+          {
+            "key": "grid",
+            "label": "Grid",
+            "variants": [
+              {
+                "name": "3x3",
+                "weight": 40
+              },
+              {
+                "name": "4x3",
+                "weight": 35
+              },
+              {
+                "name": "5x4",
+                "weight": 25
+              }
+            ]
+          },
+          {
+            "key": "rings",
+            "label": "Rings",
+            "variants": [
+              {
+                "name": "Few",
+                "weight": 34
+              },
+              {
+                "name": "Many",
+                "weight": 42
+              },
+              {
+                "name": "Nested",
+                "weight": 24
+              }
+            ]
+          },
+          {
+            "key": "overlay",
+            "label": "Overlay",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 44
+              },
+              {
+                "name": "Lines",
+                "weight": 30
+              },
+              {
+                "name": "Arcs",
+                "weight": 26
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "matisse",
+      "label": "Matisse",
+      "cfg": {
+        "style": "matisse",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Jazz",
+                "weight": 30
+              },
+              {
+                "name": "Lagoon",
+                "weight": 26
+              },
+              {
+                "name": "Snail",
+                "weight": 24
+              },
+              {
+                "name": "Blue Nude",
+                "weight": 20
+              }
+            ]
+          },
+          {
+            "key": "composition",
+            "label": "Composition",
+            "variants": [
+              {
+                "name": "Scatter",
+                "weight": 40
+              },
+              {
+                "name": "Column",
+                "weight": 30
+              },
+              {
+                "name": "Burst",
+                "weight": 30
+              }
+            ]
+          },
+          {
+            "key": "family",
+            "label": "Shapes",
+            "variants": [
+              {
+                "name": "Algae",
+                "weight": 30
+              },
+              {
+                "name": "Leaves",
+                "weight": 26
+              },
+              {
+                "name": "Stars",
+                "weight": 22
+              },
+              {
+                "name": "Mixed",
+                "weight": 22
+              }
+            ]
+          },
+          {
+            "key": "count",
+            "label": "Count",
+            "variants": [
+              {
+                "name": "Few",
+                "weight": 32
+              },
+              {
+                "name": "Several",
+                "weight": 42
+              },
+              {
+                "name": "Many",
+                "weight": 26
+              }
+            ]
+          },
+          {
+            "key": "field",
+            "label": "Field",
+            "variants": [
+              {
+                "name": "Whole",
+                "weight": 40
+              },
+              {
+                "name": "Half",
+                "weight": 34
+              },
+              {
+                "name": "Corner",
+                "weight": 26
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "escher",
+      "label": "Escher",
+      "cfg": {
+        "style": "escher",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Dusk Neon",
+                "weight": 16
+              },
+              {
+                "name": "Ocean",
+                "weight": 16
+              },
+              {
+                "name": "Mint Frost",
+                "weight": 14
+              },
+              {
+                "name": "Solar",
+                "weight": 14
+              },
+              {
+                "name": "Sakura",
+                "weight": 12
+              },
+              {
+                "name": "Acid",
+                "weight": 10
+              },
+              {
+                "name": "Ember",
+                "weight": 8
+              },
+              {
+                "name": "Mono",
+                "weight": 5
+              },
+              {
+                "name": "Gold",
+                "weight": 3
+              },
+              {
+                "name": "Hologram",
+                "weight": 2
+              }
+            ]
+          },
+          {
+            "key": "lattice",
+            "label": "Lattice",
+            "variants": [
+              {
+                "name": "Square",
+                "weight": 60
+              },
+              {
+                "name": "Diagonal",
+                "weight": 40
+              }
+            ]
+          },
+          {
+            "key": "cells",
+            "label": "Cells",
+            "variants": [
+              {
+                "name": "5",
+                "weight": 34
+              },
+              {
+                "name": "6",
+                "weight": 40
+              },
+              {
+                "name": "8",
+                "weight": 26
+              }
+            ]
+          },
+          {
+            "key": "morph",
+            "label": "Morph",
+            "variants": [
+              {
+                "name": "Subtle",
+                "weight": 45
+              },
+              {
+                "name": "Bold",
+                "weight": 55
+              }
+            ]
+          },
+          {
+            "key": "scheme",
+            "label": "Scheme",
+            "variants": [
+              {
+                "name": "Two-tone",
+                "weight": 40
+              },
+              {
+                "name": "Tri-tone",
+                "weight": 34
+              },
+              {
+                "name": "Outline",
+                "weight": 18
+              },
+              {
+                "name": "Impossible",
+                "weight": 8
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "opart",
+      "label": "Op-Art",
+      "cfg": {
+        "style": "opart",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Blackwhite",
+                "weight": 48
+              },
+              {
+                "name": "Inverse",
+                "weight": 24
+              },
+              {
+                "name": "Crimson",
+                "weight": 12
+              },
+              {
+                "name": "Cobalt",
+                "weight": 10
+              },
+              {
+                "name": "Duotone",
+                "weight": 6
+              }
+            ]
+          },
+          {
+            "key": "field",
+            "label": "Field",
+            "variants": [
+              {
+                "name": "Waves",
+                "weight": 34
+              },
+              {
+                "name": "Checker",
+                "weight": 24
+              },
+              {
+                "name": "Moire",
+                "weight": 22
+              },
+              {
+                "name": "Zigzag",
+                "weight": 20
+              }
+            ]
+          },
+          {
+            "key": "frequency",
+            "label": "Frequency",
+            "variants": [
+              {
+                "name": "Low",
+                "weight": 45
+              },
+              {
+                "name": "High",
+                "weight": 55
+              }
+            ]
+          },
+          {
+            "key": "warp",
+            "label": "Warp",
+            "variants": [
+              {
+                "name": "Gentle",
+                "weight": 50
+              },
+              {
+                "name": "Strong",
+                "weight": 50
+              }
+            ]
+          },
+          {
+            "key": "tilt",
+            "label": "Tilt",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 46
+              },
+              {
+                "name": "Quarter",
+                "weight": 30
+              },
+              {
+                "name": "Diagonal",
+                "weight": 24
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "picasso",
+      "label": "Picasso",
+      "cfg": {
+        "style": "picasso",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Earth",
+                "weight": 40
+              },
+              {
+                "name": "Blue Period",
+                "weight": 26
+              },
+              {
+                "name": "Rose Period",
+                "weight": 20
+              },
+              {
+                "name": "Grisaille",
+                "weight": 14
+              }
+            ]
+          },
+          {
+            "key": "fragmentation",
+            "label": "Fragmentation",
+            "variants": [
+              {
+                "name": "Low",
+                "weight": 45
+              },
+              {
+                "name": "High",
+                "weight": 55
+              }
+            ]
+          },
+          {
+            "key": "eyes",
+            "label": "Eyes",
+            "variants": [
+              {
+                "name": "Mismatched",
+                "weight": 44
+              },
+              {
+                "name": "Both-profile",
+                "weight": 30
+              },
+              {
+                "name": "Stacked",
+                "weight": 26
+              }
+            ]
+          },
+          {
+            "key": "hair",
+            "label": "Hair",
+            "variants": [
+              {
+                "name": "Block",
+                "weight": 42
+              },
+              {
+                "name": "Swept",
+                "weight": 34
+              },
+              {
+                "name": "Bald",
+                "weight": 24
+              }
+            ]
+          },
+          {
+            "key": "outline",
+            "label": "Outline",
+            "variants": [
+              {
+                "name": "Fine",
+                "weight": 40
+              },
+              {
+                "name": "Bold",
+                "weight": 60
+              }
+            ]
+          },
+          {
+            "key": "backdrop",
+            "label": "Backdrop",
+            "variants": [
+              {
+                "name": "Flat",
+                "weight": 45
+              },
+              {
+                "name": "Planes",
+                "weight": 55
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "magritte",
+      "label": "Magritte",
+      "cfg": {
+        "style": "magritte",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Day",
+                "weight": 44
+              },
+              {
+                "name": "Dusk",
+                "weight": 30
+              },
+              {
+                "name": "Night",
+                "weight": 26
+              }
+            ]
+          },
+          {
+            "key": "sky",
+            "label": "Sky",
+            "variants": [
+              {
+                "name": "Clouds",
+                "weight": 50
+              },
+              {
+                "name": "Gradient",
+                "weight": 26
+              },
+              {
+                "name": "Stars",
+                "weight": 24
+              }
+            ]
+          },
+          {
+            "key": "object",
+            "label": "Object",
+            "variants": [
+              {
+                "name": "Bowler",
+                "weight": 26
+              },
+              {
+                "name": "Apple",
+                "weight": 22
+              },
+              {
+                "name": "Moon",
+                "weight": 18
+              },
+              {
+                "name": "Eye",
+                "weight": 18
+              },
+              {
+                "name": "Umbrella",
+                "weight": 16
+              }
+            ]
+          },
+          {
+            "key": "multiplicity",
+            "label": "Multiplicity",
+            "variants": [
+              {
+                "name": "Single",
+                "weight": 58
+              },
+              {
+                "name": "Rain",
+                "weight": 42
+              }
+            ]
+          },
+          {
+            "key": "horizon",
+            "label": "Horizon",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 40
+              },
+              {
+                "name": "Sea",
+                "weight": 32
+              },
+              {
+                "name": "Field",
+                "weight": 28
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "seurat",
+      "label": "Seurat",
+      "cfg": {
+        "style": "seurat",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Grande Jatte",
+                "weight": 38
+              },
+              {
+                "name": "Port",
+                "weight": 26
+              },
+              {
+                "name": "Violet Hour",
+                "weight": 22
+              },
+              {
+                "name": "Ember Field",
+                "weight": 14
+              }
+            ]
+          },
+          {
+            "key": "scene",
+            "label": "Scene",
+            "variants": [
+              {
+                "name": "Seascape",
+                "weight": 40
+              },
+              {
+                "name": "Hills",
+                "weight": 34
+              },
+              {
+                "name": "Meadow",
+                "weight": 26
+              }
+            ]
+          },
+          {
+            "key": "dots",
+            "label": "Dot scale",
+            "variants": [
+              {
+                "name": "Fine",
+                "weight": 55
+              },
+              {
+                "name": "Medium",
+                "weight": 45
+              }
+            ]
+          },
+          {
+            "key": "horizon",
+            "label": "Horizon",
+            "variants": [
+              {
+                "name": "High",
+                "weight": 30
+              },
+              {
+                "name": "Middle",
+                "weight": 44
+              },
+              {
+                "name": "Low",
+                "weight": 26
+              }
+            ]
+          },
+          {
+            "key": "accent",
+            "label": "Accent",
+            "variants": [
+              {
+                "name": "Sun",
+                "weight": 32
+              },
+              {
+                "name": "Sail",
+                "weight": 26
+              },
+              {
+                "name": "Tree",
+                "weight": 22
+              },
+              {
+                "name": "None",
+                "weight": 20
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "punks",
+      "label": "Punks",
+      "cfg": {
+        "style": "punks",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Pale",
+                "weight": 24
+              },
+              {
+                "name": "Tan",
+                "weight": 24
+              },
+              {
+                "name": "Brown",
+                "weight": 22
+              },
+              {
+                "name": "Deep",
+                "weight": 20
+              },
+              {
+                "name": "Zombie",
+                "weight": 5
+              },
+              {
+                "name": "Alien",
+                "weight": 3
+              },
+              {
+                "name": "Robot",
+                "weight": 2
+              }
+            ]
+          },
+          {
+            "key": "hair",
+            "label": "Hair / headgear",
+            "variants": [
+              {
+                "name": "Mohawk",
+                "weight": 13
+              },
+              {
+                "name": "Wild",
+                "weight": 11
+              },
+              {
+                "name": "Cap",
+                "weight": 11
+              },
+              {
+                "name": "Beanie",
+                "weight": 10
+              },
+              {
+                "name": "Hoodie",
+                "weight": 11
+              },
+              {
+                "name": "Long",
+                "weight": 10
+              },
+              {
+                "name": "Buzz",
+                "weight": 10
+              },
+              {
+                "name": "Top Knot",
+                "weight": 9
+              },
+              {
+                "name": "Headband",
+                "weight": 8
+              },
+              {
+                "name": "Bald",
+                "weight": 5
+              },
+              {
+                "name": "Crown",
+                "weight": 2
+              }
+            ]
+          },
+          {
+            "key": "eyes",
+            "label": "Eyes / eyewear",
+            "variants": [
+              {
+                "name": "Regular",
+                "weight": 30
+              },
+              {
+                "name": "Shades",
+                "weight": 22
+              },
+              {
+                "name": "Patch",
+                "weight": 14
+              },
+              {
+                "name": "3D",
+                "weight": 13
+              },
+              {
+                "name": "VR",
+                "weight": 11
+              },
+              {
+                "name": "Monocle",
+                "weight": 10
+              }
+            ]
+          },
+          {
+            "key": "beard",
+            "label": "Facial hair",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 42
+              },
+              {
+                "name": "Mustache",
+                "weight": 22
+              },
+              {
+                "name": "Goatee",
+                "weight": 20
+              },
+              {
+                "name": "Beard",
+                "weight": 16
+              }
+            ]
+          },
+          {
+            "key": "mouth",
+            "label": "Mouth",
+            "variants": [
+              {
+                "name": "Neutral",
+                "weight": 26
+              },
+              {
+                "name": "Smile",
+                "weight": 18
+              },
+              {
+                "name": "Frown",
+                "weight": 11
+              },
+              {
+                "name": "Grin",
+                "weight": 14
+              },
+              {
+                "name": "Cigarette",
+                "weight": 16
+              },
+              {
+                "name": "Pipe",
+                "weight": 10
+              },
+              {
+                "name": "Gold Grin",
+                "weight": 5
+              }
+            ]
+          },
+          {
+            "key": "shirt",
+            "label": "Shirt",
+            "variants": [
+              {
+                "name": "Bare",
+                "weight": 32
+              },
+              {
+                "name": "Tee",
+                "weight": 42
+              },
+              {
+                "name": "Tank",
+                "weight": 26
+              }
+            ]
+          },
+          {
+            "key": "extra",
+            "label": "Extra",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 52
+              },
+              {
+                "name": "Chain",
+                "weight": 16
+              },
+              {
+                "name": "Teardrop",
+                "weight": 12
+              },
+              {
+                "name": "Scar",
+                "weight": 12
+              },
+              {
+                "name": "Earring",
+                "weight": 8
+              }
+            ]
+          },
+          {
+            "key": "background",
+            "label": "Background",
+            "variants": [
+              {
+                "name": "Plain",
+                "weight": 44
+              },
+              {
+                "name": "Wash",
+                "weight": 32
+              },
+              {
+                "name": "Grid",
+                "weight": 24
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "minipunks",
+      "label": "Minima Punks",
+      "cfg": {
+        "style": "minipunks",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Icon",
+                "weight": 28
+              },
+              {
+                "name": "Node",
+                "weight": 20
+              },
+              {
+                "name": "Azure",
+                "weight": 16
+              },
+              {
+                "name": "Maxima",
+                "weight": 14
+              },
+              {
+                "name": "Ember",
+                "weight": 12
+              },
+              {
+                "name": "Tri-Sig",
+                "weight": 6
+              }
+            ]
+          },
+          {
+            "key": "crest",
+            "label": "Headgear",
+            "variants": [
+              {
+                "name": "M Crest",
+                "weight": 20
+              },
+              {
+                "name": "Mohawk",
+                "weight": 15
+              },
+              {
+                "name": "Cap",
+                "weight": 14
+              },
+              {
+                "name": "Hoodie",
+                "weight": 12
+              },
+              {
+                "name": "Headset",
+                "weight": 12
+              },
+              {
+                "name": "Antenna",
+                "weight": 10
+              },
+              {
+                "name": "Spikes",
+                "weight": 9
+              },
+              {
+                "name": "Bald",
+                "weight": 8
+              }
+            ]
+          },
+          {
+            "key": "eyes",
+            "label": "Eyes",
+            "variants": [
+              {
+                "name": "Regular",
+                "weight": 30
+              },
+              {
+                "name": "Laser",
+                "weight": 20
+              },
+              {
+                "name": "Shades",
+                "weight": 20
+              },
+              {
+                "name": "Visor",
+                "weight": 16
+              },
+              {
+                "name": "Patch",
+                "weight": 14
+              }
+            ]
+          },
+          {
+            "key": "mouth",
+            "label": "Mouth",
+            "variants": [
+              {
+                "name": "Neutral",
+                "weight": 28
+              },
+              {
+                "name": "Smile",
+                "weight": 24
+              },
+              {
+                "name": "Grin",
+                "weight": 18
+              },
+              {
+                "name": "Cigarette",
+                "weight": 18
+              },
+              {
+                "name": "Whistle",
+                "weight": 12
+              }
+            ]
+          },
+          {
+            "key": "print",
+            "label": "Chest print",
+            "variants": [
+              {
+                "name": "Orange M",
+                "weight": 35
+              },
+              {
+                "name": "Blue M",
+                "weight": 25
+              },
+              {
+                "name": "White M",
+                "weight": 22
+              },
+              {
+                "name": "Tri M",
+                "weight": 18
+              }
+            ]
+          },
+          {
+            "key": "companion",
+            "label": "Companion",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 40
+              },
+              {
+                "name": "Block",
+                "weight": 22
+              },
+              {
+                "name": "Coin",
+                "weight": 22
+              },
+              {
+                "name": "Rain",
+                "weight": 16
+              }
+            ]
+          },
+          {
+            "key": "background",
+            "label": "Background",
+            "variants": [
+              {
+                "name": "Charcoal",
+                "weight": 30
+              },
+              {
+                "name": "Deep Blue",
+                "weight": 28
+              },
+              {
+                "name": "Deep Teal",
+                "weight": 22
+              },
+              {
+                "name": "Grid",
+                "weight": 20
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "pandas",
+      "label": "Panda Punks",
+      "cfg": {
+        "style": "pandas",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Classic",
+                "weight": 30
+              },
+              {
+                "name": "Vintage",
+                "weight": 20
+              },
+              {
+                "name": "Snow",
+                "weight": 16
+              },
+              {
+                "name": "Shadow",
+                "weight": 14
+              },
+              {
+                "name": "Rusty",
+                "weight": 12
+              },
+              {
+                "name": "Moon",
+                "weight": 8
+              }
+            ]
+          },
+          {
+            "key": "ears",
+            "label": "Ears",
+            "variants": [
+              {
+                "name": "Perky",
+                "weight": 32
+              },
+              {
+                "name": "Floppy",
+                "weight": 30
+              },
+              {
+                "name": "Bear",
+                "weight": 22
+              },
+              {
+                "name": "Torn",
+                "weight": 16
+              }
+            ]
+          },
+          {
+            "key": "eyes",
+            "label": "Eyes",
+            "variants": [
+              {
+                "name": "Laser Red",
+                "weight": 30
+              },
+              {
+                "name": "Button",
+                "weight": 20
+              },
+              {
+                "name": "Laser Blue",
+                "weight": 16
+              },
+              {
+                "name": "Amber Glow",
+                "weight": 14
+              },
+              {
+                "name": "Sleepy",
+                "weight": 10
+              },
+              {
+                "name": "X-Stitch",
+                "weight": 10
+              }
+            ]
+          },
+          {
+            "key": "mouth",
+            "label": "Muzzle",
+            "variants": [
+              {
+                "name": "Calm",
+                "weight": 30
+              },
+              {
+                "name": "Smile",
+                "weight": 24
+              },
+              {
+                "name": "Tongue",
+                "weight": 16
+              },
+              {
+                "name": "Stitch",
+                "weight": 16
+              },
+              {
+                "name": "Grr",
+                "weight": 14
+              }
+            ]
+          },
+          {
+            "key": "chest",
+            "label": "Chest",
+            "variants": [
+              {
+                "name": "Tri-M",
+                "weight": 28
+              },
+              {
+                "name": "None",
+                "weight": 22
+              },
+              {
+                "name": "Patch",
+                "weight": 20
+              },
+              {
+                "name": "Bamboo",
+                "weight": 16
+              },
+              {
+                "name": "Heart",
+                "weight": 14
+              }
+            ]
+          },
+          {
+            "key": "extra",
+            "label": "Extra",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 40
+              },
+              {
+                "name": "Stitches",
+                "weight": 24
+              },
+              {
+                "name": "Bandage",
+                "weight": 18
+              },
+              {
+                "name": "Blush",
+                "weight": 18
+              }
+            ]
+          },
+          {
+            "key": "background",
+            "label": "Background",
+            "variants": [
+              {
+                "name": "Puzzle",
+                "weight": 34
+              },
+              {
+                "name": "Royal",
+                "weight": 24
+              },
+              {
+                "name": "Dusk",
+                "weight": 22
+              },
+              {
+                "name": "Grid",
+                "weight": 20
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "photo",
+      "label": "Photo Cartoon",
+      "cfg": {
+        "style": "photo",
+        "slots": [
+          {
+            "key": "palette",
+            "label": "Palette",
+            "variants": [
+              {
+                "name": "Dusk Neon",
+                "weight": 16
+              },
+              {
+                "name": "Ocean",
+                "weight": 16
+              },
+              {
+                "name": "Mint Frost",
+                "weight": 14
+              },
+              {
+                "name": "Solar",
+                "weight": 14
+              },
+              {
+                "name": "Sakura",
+                "weight": 12
+              },
+              {
+                "name": "Acid",
+                "weight": 10
+              },
+              {
+                "name": "Ember",
+                "weight": 8
+              },
+              {
+                "name": "Mono",
+                "weight": 5
+              },
+              {
+                "name": "Gold",
+                "weight": 3
+              },
+              {
+                "name": "Hologram",
+                "weight": 2
+              }
+            ]
+          },
+          {
+            "key": "finish",
+            "label": "Finish",
+            "variants": [
+              {
+                "name": "Painted",
+                "weight": 58
+              },
+              {
+                "name": "Vector",
+                "weight": 42
+              }
+            ]
+          },
+          {
+            "key": "render",
+            "label": "Render",
+            "variants": [
+              {
+                "name": "Smooth",
+                "weight": 62
+              },
+              {
+                "name": "Pixel",
+                "weight": 38
+              }
+            ]
+          },
+          {
+            "key": "grid",
+            "label": "Detail",
+            "variants": [
+              {
+                "name": "48",
+                "weight": 46
+              },
+              {
+                "name": "40",
+                "weight": 30
+              },
+              {
+                "name": "32",
+                "weight": 24
+              }
+            ]
+          },
+          {
+            "key": "mode",
+            "label": "Mode",
+            "variants": [
+              {
+                "name": "Natural",
+                "weight": 34
+              },
+              {
+                "name": "Poster",
+                "weight": 22
+              },
+              {
+                "name": "Duotone",
+                "weight": 18
+              },
+              {
+                "name": "Mono",
+                "weight": 16
+              },
+              {
+                "name": "Invert",
+                "weight": 10
+              }
+            ]
+          },
+          {
+            "key": "background",
+            "label": "Background",
+            "variants": [
+              {
+                "name": "Plain",
+                "weight": 45
+              },
+              {
+                "name": "Wash",
+                "weight": 30
+              },
+              {
+                "name": "Grid",
+                "weight": 25
+              }
+            ]
+          },
+          {
+            "key": "outline",
+            "label": "Outline",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 55
+              },
+              {
+                "name": "Ink",
+                "weight": 45
+              }
+            ]
+          },
+          {
+            "key": "overlay",
+            "label": "Overlay",
+            "variants": [
+              {
+                "name": "None",
+                "weight": 60
+              },
+              {
+                "name": "Scanlines",
+                "weight": 22
+              },
+              {
+                "name": "Dots",
+                "weight": 18
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

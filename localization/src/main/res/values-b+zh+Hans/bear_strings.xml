@@ -7298,4 +7298,422 @@
     <string name="l10n_atelier_collection_plate">"图像 %1$s"</string>
     <!-- Arguments: 0, 1 -->
     <string name="l10n_atelier_collection_recovery_body">"此地址未托管文件：\n%1$s\n\n您已上传的图像位于：\n%2$s\n\n本次铸造使用已上传文件的基础链接？"</string>
+    <string name="l10n_atelier_art_label12_fold" formatted="false">"12 重对称"</string>
+    <string name="l10n_atelier_art_label16_fold" formatted="false">"16 重对称"</string>
+    <string name="l10n_atelier_art_label24_fold" formatted="false">"24 重对称"</string>
+    <string name="l10n_atelier_art_label6_fold" formatted="false">"6 重对称"</string>
+    <string name="l10n_atelier_art_label8_fold" formatted="false">"8 重对称"</string>
+    <string name="l10n_atelier_art_label_accent" formatted="false">"强调色"</string>
+    <string name="l10n_atelier_art_label_accent_lead" formatted="false">"以强调色为主"</string>
+    <string name="l10n_atelier_art_label_acid" formatted="false">"酸性色"</string>
+    <string name="l10n_atelier_art_label_airy" formatted="false">"轻盈"</string>
+    <string name="l10n_atelier_art_label_algae" formatted="false">"藻类"</string>
+    <string name="l10n_atelier_art_label_alien" formatted="false">"外星人"</string>
+    <string name="l10n_atelier_art_label_amber_glow" formatted="false">"琥珀光"</string>
+    <string name="l10n_atelier_art_label_antenna" formatted="false">"天线"</string>
+    <string name="l10n_atelier_art_label_apple" formatted="false">"苹果"</string>
+    <string name="l10n_atelier_art_label_arcs" formatted="false">"弧线"</string>
+    <string name="l10n_atelier_art_label_arcs_dots" formatted="false">"弧线与圆点"</string>
+    <string name="l10n_atelier_art_label_arms13" formatted="false">"13 条臂"</string>
+    <string name="l10n_atelier_art_label_arms8" formatted="false">"8 条臂"</string>
+    <string name="l10n_atelier_art_label_azure" formatted="false">"蔚蓝"</string>
+    <string name="l10n_atelier_art_label_backdrop" formatted="false">"背景幕"</string>
+    <string name="l10n_atelier_art_label_background" formatted="false">"背景"</string>
+    <string name="l10n_atelier_art_label_balanced" formatted="false">"均衡"</string>
+    <string name="l10n_atelier_art_label_bald" formatted="false">"光头"</string>
+    <string name="l10n_atelier_art_label_bamboo" formatted="false">"竹子"</string>
+    <string name="l10n_atelier_art_label_band" formatted="false">"条带"</string>
+    <string name="l10n_atelier_art_label_bandage" formatted="false">"绷带"</string>
+    <string name="l10n_atelier_art_label_bare" formatted="false">"简素"</string>
+    <string name="l10n_atelier_art_label_bars" formatted="false">"条形"</string>
+    <string name="l10n_atelier_art_label_bauhaus" formatted="false">"包豪斯"</string>
+    <string name="l10n_atelier_art_label_beanie" formatted="false">"针织帽"</string>
+    <string name="l10n_atelier_art_label_bear" formatted="false">"熊"</string>
+    <string name="l10n_atelier_art_label_beard" formatted="false">"胡须"</string>
+    <string name="l10n_atelier_art_label_blackwhite" formatted="false">"黑白"</string>
+    <string name="l10n_atelier_art_label_blobs" formatted="false">"色块"</string>
+    <string name="l10n_atelier_art_label_block" formatted="false">"块状"</string>
+    <string name="l10n_atelier_art_label_bloom" formatted="false">"花朵"</string>
+    <string name="l10n_atelier_art_label_blue_m" formatted="false">"蓝色 M"</string>
+    <string name="l10n_atelier_art_label_blue_nude" formatted="false">"蓝色裸像"</string>
+    <string name="l10n_atelier_art_label_blue_period" formatted="false">"蓝色时期"</string>
+    <string name="l10n_atelier_art_label_blue_led" formatted="false">"以蓝色为主"</string>
+    <string name="l10n_atelier_art_label_blush" formatted="false">"腮红"</string>
+    <string name="l10n_atelier_art_label_bold" formatted="false">"鲜明"</string>
+    <string name="l10n_atelier_art_label_boogie" formatted="false">"布吉"</string>
+    <string name="l10n_atelier_art_label_both_profile" formatted="false">"双侧面"</string>
+    <string name="l10n_atelier_art_label_bowler" formatted="false">"圆顶礼帽"</string>
+    <string name="l10n_atelier_art_label_brown" formatted="false">"棕色"</string>
+    <string name="l10n_atelier_art_label_burst" formatted="false">"迸发"</string>
+    <string name="l10n_atelier_art_label_busy" formatted="false">"繁密"</string>
+    <string name="l10n_atelier_art_label_button" formatted="false">"纽扣"</string>
+    <string name="l10n_atelier_art_label_buzz" formatted="false">"寸头"</string>
+    <string name="l10n_atelier_art_label_calm" formatted="false">"平静"</string>
+    <string name="l10n_atelier_art_label_cap" formatted="false">"鸭舌帽"</string>
+    <string name="l10n_atelier_art_label_cells" formatted="false">"单元格"</string>
+    <string name="l10n_atelier_art_label_chain" formatted="false">"链条"</string>
+    <string name="l10n_atelier_art_label_chaos" formatted="false">"混沌"</string>
+    <string name="l10n_atelier_art_label_charcoal" formatted="false">"炭黑"</string>
+    <string name="l10n_atelier_art_label_checker" formatted="false">"棋盘格"</string>
+    <string name="l10n_atelier_art_label_chest" formatted="false">"胸部"</string>
+    <string name="l10n_atelier_art_label_chest_print" formatted="false">"胸前图案"</string>
+    <string name="l10n_atelier_art_label_cigarette" formatted="false">"香烟"</string>
+    <string name="l10n_atelier_art_label_circle_grid" formatted="false">"圆形网格"</string>
+    <string name="l10n_atelier_art_label_circles" formatted="false">"圆形"</string>
+    <string name="l10n_atelier_art_label_classic" formatted="false">"经典"</string>
+    <string name="l10n_atelier_art_label_clouds" formatted="false">"云朵"</string>
+    <string name="l10n_atelier_art_label_cobalt" formatted="false">"钴蓝"</string>
+    <string name="l10n_atelier_art_label_coin" formatted="false">"硬币"</string>
+    <string name="l10n_atelier_art_label_color" formatted="false">"颜色"</string>
+    <string name="l10n_atelier_art_label_color_balance" formatted="false">"色彩平衡"</string>
+    <string name="l10n_atelier_art_label_coloring" formatted="false">"着色"</string>
+    <string name="l10n_atelier_art_label_column" formatted="false">"柱形"</string>
+    <string name="l10n_atelier_art_label_companion" formatted="false">"伙伴"</string>
+    <string name="l10n_atelier_art_label_composition" formatted="false">"构图"</string>
+    <string name="l10n_atelier_art_label_connector" formatted="false">"连接线"</string>
+    <string name="l10n_atelier_art_label_connectors" formatted="false">"连接线组"</string>
+    <string name="l10n_atelier_art_label_cool" formatted="false">"冷色"</string>
+    <string name="l10n_atelier_art_label_core" formatted="false">"核心"</string>
+    <string name="l10n_atelier_art_label_corner" formatted="false">"角落"</string>
+    <string name="l10n_atelier_art_label_count" formatted="false">"数量"</string>
+    <string name="l10n_atelier_art_label_cream" formatted="false">"奶油色"</string>
+    <string name="l10n_atelier_art_label_crescents" formatted="false">"月牙"</string>
+    <string name="l10n_atelier_art_label_crimson" formatted="false">"绯红"</string>
+    <string name="l10n_atelier_art_label_crowded" formatted="false">"拥挤"</string>
+    <string name="l10n_atelier_art_label_crown" formatted="false">"王冠"</string>
+    <string name="l10n_atelier_art_label_day" formatted="false">"白天"</string>
+    <string name="l10n_atelier_art_label_deep" formatted="false">"深色"</string>
+    <string name="l10n_atelier_art_label_deep_blue" formatted="false">"深蓝"</string>
+    <string name="l10n_atelier_art_label_deep_teal" formatted="false">"深青绿"</string>
+    <string name="l10n_atelier_art_label_dense" formatted="false">"密集"</string>
+    <string name="l10n_atelier_art_label_density" formatted="false">"密度"</string>
+    <string name="l10n_atelier_art_label_detail" formatted="false">"细节"</string>
+    <string name="l10n_atelier_art_label_diagonal" formatted="false">"对角线"</string>
+    <string name="l10n_atelier_art_label_diagonals" formatted="false">"对角线组"</string>
+    <string name="l10n_atelier_art_label_diamond" formatted="false">"菱形"</string>
+    <string name="l10n_atelier_art_label_disc" formatted="false">"圆盘"</string>
+    <string name="l10n_atelier_art_label_dot" formatted="false">"圆点"</string>
+    <string name="l10n_atelier_art_label_dot_chain" formatted="false">"点链"</string>
+    <string name="l10n_atelier_art_label_dot_scale" formatted="false">"圆点大小"</string>
+    <string name="l10n_atelier_art_label_dots" formatted="false">"圆点组"</string>
+    <string name="l10n_atelier_art_label_double" formatted="false">"双重"</string>
+    <string name="l10n_atelier_art_label_duet" formatted="false">"二重奏"</string>
+    <string name="l10n_atelier_art_label_duo" formatted="false">"双人组"</string>
+    <string name="l10n_atelier_art_label_duotone" formatted="false">"双色调"</string>
+    <string name="l10n_atelier_art_label_dusk" formatted="false">"黄昏"</string>
+    <string name="l10n_atelier_art_label_dusk_neon" formatted="false">"暮色霓虹"</string>
+    <string name="l10n_atelier_art_label_earring" formatted="false">"耳环"</string>
+    <string name="l10n_atelier_art_label_ears" formatted="false">"耳朵"</string>
+    <string name="l10n_atelier_art_label_earth" formatted="false">"大地"</string>
+    <string name="l10n_atelier_art_label_echo" formatted="false">"回声"</string>
+    <string name="l10n_atelier_art_label_element" formatted="false">"元素"</string>
+    <string name="l10n_atelier_art_label_ember" formatted="false">"余烬"</string>
+    <string name="l10n_atelier_art_label_ember_field" formatted="false">"余烬原野"</string>
+    <string name="l10n_atelier_art_label_escher" formatted="false">"埃舍尔"</string>
+    <string name="l10n_atelier_art_label_even" formatted="false">"均匀"</string>
+    <string name="l10n_atelier_art_label_extra" formatted="false">"额外"</string>
+    <string name="l10n_atelier_art_label_eye" formatted="false">"眼睛"</string>
+    <string name="l10n_atelier_art_label_eyes" formatted="false">"双眼"</string>
+    <string name="l10n_atelier_art_label_eyes_eyewear" formatted="false">"眼睛／眼镜"</string>
+    <string name="l10n_atelier_art_label_facial_hair" formatted="false">"面部毛发"</string>
+    <string name="l10n_atelier_art_label_family" formatted="false">"家族"</string>
+    <string name="l10n_atelier_art_label_fermat" formatted="false">"费马"</string>
+    <string name="l10n_atelier_art_label_few" formatted="false">"少量"</string>
+    <string name="l10n_atelier_art_label_field" formatted="false">"场域"</string>
+    <string name="l10n_atelier_art_label_fine" formatted="false">"精细"</string>
+    <string name="l10n_atelier_art_label_finish" formatted="false">"表面效果"</string>
+    <string name="l10n_atelier_art_label_flat" formatted="false">"平面"</string>
+    <string name="l10n_atelier_art_label_floppy" formatted="false">"垂耳"</string>
+    <string name="l10n_atelier_art_label_focal" formatted="false">"焦点"</string>
+    <string name="l10n_atelier_art_label_form" formatted="false">"形状"</string>
+    <string name="l10n_atelier_art_label_forms" formatted="false">"形状组"</string>
+    <string name="l10n_atelier_art_label_fragmentation" formatted="false">"碎片化"</string>
+    <string name="l10n_atelier_art_label_frame" formatted="false">"边框"</string>
+    <string name="l10n_atelier_art_label_free" formatted="false">"自由"</string>
+    <string name="l10n_atelier_art_label_frequency" formatted="false">"频率"</string>
+    <string name="l10n_atelier_art_label_frown" formatted="false">"皱眉"</string>
+    <string name="l10n_atelier_art_label_gentle" formatted="false">"柔和"</string>
+    <string name="l10n_atelier_art_label_geometric" formatted="false">"几何式"</string>
+    <string name="l10n_atelier_art_label_geometry" formatted="false">"几何"</string>
+    <string name="l10n_atelier_art_label_glow" formatted="false">"辉光"</string>
+    <string name="l10n_atelier_art_label_goatee" formatted="false">"山羊胡"</string>
+    <string name="l10n_atelier_art_label_gold" formatted="false">"金色"</string>
+    <string name="l10n_atelier_art_label_gold_grin" formatted="false">"金色笑容"</string>
+    <string name="l10n_atelier_art_label_gradient" formatted="false">"渐变"</string>
+    <string name="l10n_atelier_art_label_grande_jatte" formatted="false">"大碗岛"</string>
+    <string name="l10n_atelier_art_label_grid" formatted="false">"网格"</string>
+    <string name="l10n_atelier_art_label_grid2" formatted="false">"2 格网格"</string>
+    <string name="l10n_atelier_art_label_grid3" formatted="false">"3 格网格"</string>
+    <string name="l10n_atelier_art_label_grin" formatted="false">"咧嘴笑"</string>
+    <string name="l10n_atelier_art_label_grisaille" formatted="false">"灰阶画"</string>
+    <string name="l10n_atelier_art_label_grr" formatted="false">"咆哮"</string>
+    <string name="l10n_atelier_art_label_hair" formatted="false">"发型"</string>
+    <string name="l10n_atelier_art_label_hair_headgear" formatted="false">"发型／头饰"</string>
+    <string name="l10n_atelier_art_label_half" formatted="false">"一半"</string>
+    <string name="l10n_atelier_art_label_halo" formatted="false">"光环"</string>
+    <string name="l10n_atelier_art_label_harmonograph" formatted="false">"谐波图"</string>
+    <string name="l10n_atelier_art_label_headband" formatted="false">"头带"</string>
+    <string name="l10n_atelier_art_label_headgear" formatted="false">"头饰"</string>
+    <string name="l10n_atelier_art_label_headset" formatted="false">"耳麦"</string>
+    <string name="l10n_atelier_art_label_heart" formatted="false">"心形"</string>
+    <string name="l10n_atelier_art_label_heavy" formatted="false">"厚重"</string>
+    <string name="l10n_atelier_art_label_high" formatted="false">"高"</string>
+    <string name="l10n_atelier_art_label_hills" formatted="false">"山丘"</string>
+    <string name="l10n_atelier_art_label_hologram" formatted="false">"全息"</string>
+    <string name="l10n_atelier_art_label_hoodie" formatted="false">"连帽衫"</string>
+    <string name="l10n_atelier_art_label_horizon" formatted="false">"地平线"</string>
+    <string name="l10n_atelier_art_label_icon" formatted="false">"图标"</string>
+    <string name="l10n_atelier_art_label_impossible" formatted="false">"不可能图形"</string>
+    <string name="l10n_atelier_art_label_ink" formatted="false">"墨色"</string>
+    <string name="l10n_atelier_art_label_inverse" formatted="false">"反向"</string>
+    <string name="l10n_atelier_art_label_invert" formatted="false">"反转"</string>
+    <string name="l10n_atelier_art_label_inverted" formatted="false">"倒置"</string>
+    <string name="l10n_atelier_art_label_ivory" formatted="false">"象牙白"</string>
+    <string name="l10n_atelier_art_label_jazz" formatted="false">"爵士"</string>
+    <string name="l10n_atelier_art_label_kandinsky" formatted="false">"康定斯基"</string>
+    <string name="l10n_atelier_art_label_lagoon" formatted="false">"泻湖"</string>
+    <string name="l10n_atelier_art_label_laser" formatted="false">"激光"</string>
+    <string name="l10n_atelier_art_label_laser_blue" formatted="false">"蓝色激光"</string>
+    <string name="l10n_atelier_art_label_laser_red" formatted="false">"红色激光"</string>
+    <string name="l10n_atelier_art_label_lattice" formatted="false">"格栅"</string>
+    <string name="l10n_atelier_art_label_layers" formatted="false">"层数"</string>
+    <string name="l10n_atelier_art_label_layout" formatted="false">"布局"</string>
+    <string name="l10n_atelier_art_label_leaves" formatted="false">"叶片"</string>
+    <string name="l10n_atelier_art_label_lens" formatted="false">"透镜"</string>
+    <string name="l10n_atelier_art_label_line_weight" formatted="false">"线条粗细"</string>
+    <string name="l10n_atelier_art_label_lines" formatted="false">"线条"</string>
+    <string name="l10n_atelier_art_label_lissajous" formatted="false">"利萨如曲线"</string>
+    <string name="l10n_atelier_art_label_lively" formatted="false">"活泼"</string>
+    <string name="l10n_atelier_art_label_long" formatted="false">"长"</string>
+    <string name="l10n_atelier_art_label_low" formatted="false">"低"</string>
+    <string name="l10n_atelier_art_label_mcrest" formatted="false">"M 徽章"</string>
+    <string name="l10n_atelier_art_label_magritte" formatted="false">"马格利特"</string>
+    <string name="l10n_atelier_art_label_mandala" formatted="false">"曼陀罗"</string>
+    <string name="l10n_atelier_art_label_many" formatted="false">"大量"</string>
+    <string name="l10n_atelier_art_label_mask" formatted="false">"面罩"</string>
+    <string name="l10n_atelier_art_label_math_curves" formatted="false">"数学曲线"</string>
+    <string name="l10n_atelier_art_label_matisse" formatted="false">"马蒂斯"</string>
+    <string name="l10n_atelier_art_label_maxima" formatted="false">"Maxima"</string>
+    <string name="l10n_atelier_art_label_meadow" formatted="false">"草地"</string>
+    <string name="l10n_atelier_art_label_meander" formatted="false">"曲流"</string>
+    <string name="l10n_atelier_art_label_medium" formatted="false">"中等"</string>
+    <string name="l10n_atelier_art_label_middle" formatted="false">"中部"</string>
+    <string name="l10n_atelier_art_label_minima_punks" formatted="false">"Minima 朋克"</string>
+    <string name="l10n_atelier_art_label_minimal" formatted="false">"极简"</string>
+    <string name="l10n_atelier_art_label_mint_frost" formatted="false">"薄荷霜"</string>
+    <string name="l10n_atelier_art_label_miro" formatted="false">"米罗"</string>
+    <string name="l10n_atelier_art_label_mirror" formatted="false">"镜面"</string>
+    <string name="l10n_atelier_art_label_mirrored" formatted="false">"镜像"</string>
+    <string name="l10n_atelier_art_label_mismatched" formatted="false">"不对称"</string>
+    <string name="l10n_atelier_art_label_mixed" formatted="false">"混合"</string>
+    <string name="l10n_atelier_art_label_mode" formatted="false">"模式"</string>
+    <string name="l10n_atelier_art_label_mohawk" formatted="false">"莫霍克发型"</string>
+    <string name="l10n_atelier_art_label_moire" formatted="false">"摩尔纹"</string>
+    <string name="l10n_atelier_art_label_mondrian" formatted="false">"蒙德里安"</string>
+    <string name="l10n_atelier_art_label_mono" formatted="false">"单色"</string>
+    <string name="l10n_atelier_art_label_monocle" formatted="false">"单片眼镜"</string>
+    <string name="l10n_atelier_art_label_moon" formatted="false">"月亮"</string>
+    <string name="l10n_atelier_art_label_morph" formatted="false">"形变"</string>
+    <string name="l10n_atelier_art_label_motif" formatted="false">"图案"</string>
+    <string name="l10n_atelier_art_label_motifs" formatted="false">"图案组"</string>
+    <string name="l10n_atelier_art_label_mouth" formatted="false">"嘴"</string>
+    <string name="l10n_atelier_art_label_multiplicity" formatted="false">"多重性"</string>
+    <string name="l10n_atelier_art_label_mustache" formatted="false">"小胡子"</string>
+    <string name="l10n_atelier_art_label_muzzle" formatted="false">"口鼻部"</string>
+    <string name="l10n_atelier_art_label_natural" formatted="false">"自然"</string>
+    <string name="l10n_atelier_art_label_neon" formatted="false">"霓虹"</string>
+    <string name="l10n_atelier_art_label_nested" formatted="false">"嵌套"</string>
+    <string name="l10n_atelier_art_label_neutral" formatted="false">"中性"</string>
+    <string name="l10n_atelier_art_label_night" formatted="false">"夜晚"</string>
+    <string name="l10n_atelier_art_label_node" formatted="false">"节点"</string>
+    <string name="l10n_atelier_art_label_none" formatted="false">"无"</string>
+    <string name="l10n_atelier_art_label_object" formatted="false">"物体"</string>
+    <string name="l10n_atelier_art_label_ocean" formatted="false">"海洋"</string>
+    <string name="l10n_atelier_art_label_op_art" formatted="false">"欧普艺术"</string>
+    <string name="l10n_atelier_art_label_orange_m" formatted="false">"橙色 M"</string>
+    <string name="l10n_atelier_art_label_orbit" formatted="false">"轨道"</string>
+    <string name="l10n_atelier_art_label_outline" formatted="false">"轮廓"</string>
+    <string name="l10n_atelier_art_label_overlay" formatted="false">"叠加"</string>
+    <string name="l10n_atelier_art_label_painted" formatted="false">"绘画"</string>
+    <string name="l10n_atelier_art_label_pale" formatted="false">"淡色"</string>
+    <string name="l10n_atelier_art_label_palette" formatted="false">"调色板"</string>
+    <string name="l10n_atelier_art_label_panda_punks" formatted="false">"熊猫朋克"</string>
+    <string name="l10n_atelier_art_label_paper" formatted="false">"纸张"</string>
+    <string name="l10n_atelier_art_label_paper_led" formatted="false">"以纸色为主"</string>
+    <string name="l10n_atelier_art_label_pastel" formatted="false">"粉彩"</string>
+    <string name="l10n_atelier_art_label_patch" formatted="false">"眼罩"</string>
+    <string name="l10n_atelier_art_label_perky" formatted="false">"竖耳"</string>
+    <string name="l10n_atelier_art_label_petal" formatted="false">"花瓣"</string>
+    <string name="l10n_atelier_art_label_photo_cartoon" formatted="false">"照片卡通化"</string>
+    <string name="l10n_atelier_art_label_phyllotaxis" formatted="false">"叶序"</string>
+    <string name="l10n_atelier_art_label_picasso" formatted="false">"毕加索"</string>
+    <string name="l10n_atelier_art_label_pinwheel" formatted="false">"风车"</string>
+    <string name="l10n_atelier_art_label_pipe" formatted="false">"烟斗"</string>
+    <string name="l10n_atelier_art_label_pixel" formatted="false">"像素"</string>
+    <string name="l10n_atelier_art_label_plain" formatted="false">"素色"</string>
+    <string name="l10n_atelier_art_label_planes" formatted="false">"平面组"</string>
+    <string name="l10n_atelier_art_label_port" formatted="false">"港口"</string>
+    <string name="l10n_atelier_art_label_poster" formatted="false">"海报"</string>
+    <string name="l10n_atelier_art_label_primary" formatted="false">"原色"</string>
+    <string name="l10n_atelier_art_label_primary_led" formatted="false">"以原色为主"</string>
+    <string name="l10n_atelier_art_label_pulse" formatted="false">"脉冲"</string>
+    <string name="l10n_atelier_art_label_punks" formatted="false">"朋克"</string>
+    <string name="l10n_atelier_art_label_puzzle" formatted="false">"拼图"</string>
+    <string name="l10n_atelier_art_label_quad" formatted="false">"四重"</string>
+    <string name="l10n_atelier_art_label_quarter" formatted="false">"四分之一"</string>
+    <string name="l10n_atelier_art_label_quarter_fans" formatted="false">"四分之一扇形"</string>
+    <string name="l10n_atelier_art_label_rain" formatted="false">"雨"</string>
+    <string name="l10n_atelier_art_label_ray" formatted="false">"射线"</string>
+    <string name="l10n_atelier_art_label_rectilinear" formatted="false">"直线式"</string>
+    <string name="l10n_atelier_art_label_red_led" formatted="false">"以红色为主"</string>
+    <string name="l10n_atelier_art_label_regular" formatted="false">"规则"</string>
+    <string name="l10n_atelier_art_label_render" formatted="false">"渲染"</string>
+    <string name="l10n_atelier_art_label_resolution" formatted="false">"分辨率"</string>
+    <string name="l10n_atelier_art_label_rich" formatted="false">"丰富"</string>
+    <string name="l10n_atelier_art_label_rim" formatted="false">"边缘"</string>
+    <string name="l10n_atelier_art_label_ring" formatted="false">"环"</string>
+    <string name="l10n_atelier_art_label_rings" formatted="false">"环组"</string>
+    <string name="l10n_atelier_art_label_robot" formatted="false">"机器人"</string>
+    <string name="l10n_atelier_art_label_rose" formatted="false">"玫瑰"</string>
+    <string name="l10n_atelier_art_label_rose_period" formatted="false">"玫瑰时期"</string>
+    <string name="l10n_atelier_art_label_rot2" formatted="false">"旋转 2"</string>
+    <string name="l10n_atelier_art_label_rotation" formatted="false">"旋转"</string>
+    <string name="l10n_atelier_art_label_royal" formatted="false">"皇家"</string>
+    <string name="l10n_atelier_art_label_rusty" formatted="false">"锈色"</string>
+    <string name="l10n_atelier_art_label_sail" formatted="false">"帆"</string>
+    <string name="l10n_atelier_art_label_sakura" formatted="false">"樱花"</string>
+    <string name="l10n_atelier_art_label_sand" formatted="false">"沙色"</string>
+    <string name="l10n_atelier_art_label_saturated" formatted="false">"饱和"</string>
+    <string name="l10n_atelier_art_label_scanlines" formatted="false">"扫描线"</string>
+    <string name="l10n_atelier_art_label_scar" formatted="false">"伤疤"</string>
+    <string name="l10n_atelier_art_label_scatter" formatted="false">"散布"</string>
+    <string name="l10n_atelier_art_label_scene" formatted="false">"场景"</string>
+    <string name="l10n_atelier_art_label_scheme" formatted="false">"方案"</string>
+    <string name="l10n_atelier_art_label_sea" formatted="false">"大海"</string>
+    <string name="l10n_atelier_art_label_seascape" formatted="false">"海景"</string>
+    <string name="l10n_atelier_art_label_seed" formatted="false">"种子"</string>
+    <string name="l10n_atelier_art_label_seeds" formatted="false">"种子组"</string>
+    <string name="l10n_atelier_art_label_seurat" formatted="false">"修拉"</string>
+    <string name="l10n_atelier_art_label_several" formatted="false">"若干"</string>
+    <string name="l10n_atelier_art_label_shades" formatted="false">"墨镜"</string>
+    <string name="l10n_atelier_art_label_shadow" formatted="false">"阴影"</string>
+    <string name="l10n_atelier_art_label_shapes" formatted="false">"形状"</string>
+    <string name="l10n_atelier_art_label_shirt" formatted="false">"衬衫"</string>
+    <string name="l10n_atelier_art_label_single" formatted="false">"单个"</string>
+    <string name="l10n_atelier_art_label_size_ramp" formatted="false">"尺寸递变"</string>
+    <string name="l10n_atelier_art_label_sky" formatted="false">"天空"</string>
+    <string name="l10n_atelier_art_label_sleepy" formatted="false">"困倦"</string>
+    <string name="l10n_atelier_art_label_smile" formatted="false">"微笑"</string>
+    <string name="l10n_atelier_art_label_smooth" formatted="false">"平滑"</string>
+    <string name="l10n_atelier_art_label_snail" formatted="false">"蜗牛"</string>
+    <string name="l10n_atelier_art_label_snow" formatted="false">"雪"</string>
+    <string name="l10n_atelier_art_label_solar" formatted="false">"太阳色"</string>
+    <string name="l10n_atelier_art_label_solo" formatted="false">"独奏"</string>
+    <string name="l10n_atelier_art_label_spark" formatted="false">"火花"</string>
+    <string name="l10n_atelier_art_label_sparse" formatted="false">"稀疏"</string>
+    <string name="l10n_atelier_art_label_spikes" formatted="false">"尖刺"</string>
+    <string name="l10n_atelier_art_label_spirograph" formatted="false">"螺旋绘图"</string>
+    <string name="l10n_atelier_art_label_split" formatted="false">"分割"</string>
+    <string name="l10n_atelier_art_label_square" formatted="false">"方形"</string>
+    <string name="l10n_atelier_art_label_stacked" formatted="false">"堆叠"</string>
+    <string name="l10n_atelier_art_label_star" formatted="false">"星形"</string>
+    <string name="l10n_atelier_art_label_stars" formatted="false">"星群"</string>
+    <string name="l10n_atelier_art_label_stitch" formatted="false">"针脚"</string>
+    <string name="l10n_atelier_art_label_stitches" formatted="false">"缝线"</string>
+    <string name="l10n_atelier_art_label_stripes" formatted="false">"条纹"</string>
+    <string name="l10n_atelier_art_label_stroke" formatted="false">"笔画"</string>
+    <string name="l10n_atelier_art_label_strong" formatted="false">"强烈"</string>
+    <string name="l10n_atelier_art_label_subdivision" formatted="false">"细分"</string>
+    <string name="l10n_atelier_art_label_subtle" formatted="false">"微妙"</string>
+    <string name="l10n_atelier_art_label_sun" formatted="false">"太阳"</string>
+    <string name="l10n_atelier_art_label_superformula" formatted="false">"超级公式"</string>
+    <string name="l10n_atelier_art_label_swept" formatted="false">"侧梳"</string>
+    <string name="l10n_atelier_art_label_symmetry" formatted="false">"对称"</string>
+    <string name="l10n_atelier_art_label_tan" formatted="false">"棕褐"</string>
+    <string name="l10n_atelier_art_label_tank" formatted="false">"背心"</string>
+    <string name="l10n_atelier_art_label_teardrop" formatted="false">"泪滴"</string>
+    <string name="l10n_atelier_art_label_tee" formatted="false">"T 恤"</string>
+    <string name="l10n_atelier_art_label_terra" formatted="false">"大地色"</string>
+    <string name="l10n_atelier_art_label_texture" formatted="false">"纹理"</string>
+    <string name="l10n_atelier_art_label_thorn" formatted="false">"荆棘"</string>
+    <string name="l10n_atelier_art_label_tiles" formatted="false">"瓷砖"</string>
+    <string name="l10n_atelier_art_label_tilt" formatted="false">"倾斜"</string>
+    <string name="l10n_atelier_art_label_tongue" formatted="false">"舌头"</string>
+    <string name="l10n_atelier_art_label_top_knot" formatted="false">"顶髻"</string>
+    <string name="l10n_atelier_art_label_torn" formatted="false">"撕裂"</string>
+    <string name="l10n_atelier_art_label_totem" formatted="false">"图腾"</string>
+    <string name="l10n_atelier_art_label_tree" formatted="false">"树"</string>
+    <string name="l10n_atelier_art_label_tri_m" formatted="false">"三重 M"</string>
+    <string name="l10n_atelier_art_label_tri_m09cfd7" formatted="false">"三重 M"</string>
+    <string name="l10n_atelier_art_label_tri_sig" formatted="false">"三重签名"</string>
+    <string name="l10n_atelier_art_label_tri_tone" formatted="false">"三色调"</string>
+    <string name="l10n_atelier_art_label_triangles" formatted="false">"三角形"</string>
+    <string name="l10n_atelier_art_label_trim" formatted="false">"修边"</string>
+    <string name="l10n_atelier_art_label_trio" formatted="false">"三重奏"</string>
+    <string name="l10n_atelier_art_label_truchet" formatted="false">"特鲁谢"</string>
+    <string name="l10n_atelier_art_label_two_tone" formatted="false">"双色"</string>
+    <string name="l10n_atelier_art_label_umbrella" formatted="false">"雨伞"</string>
+    <string name="l10n_atelier_art_label_vector" formatted="false">"矢量"</string>
+    <string name="l10n_atelier_art_label_vintage" formatted="false">"复古"</string>
+    <string name="l10n_atelier_art_label_violet_hour" formatted="false">"紫罗兰时刻"</string>
+    <string name="l10n_atelier_art_label_visor" formatted="false">"遮阳镜"</string>
+    <string name="l10n_atelier_art_label_warm" formatted="false">"暖色"</string>
+    <string name="l10n_atelier_art_label_warp" formatted="false">"扭曲"</string>
+    <string name="l10n_atelier_art_label_wash" formatted="false">"淡彩"</string>
+    <string name="l10n_atelier_art_label_waves" formatted="false">"波浪"</string>
+    <string name="l10n_atelier_art_label_web" formatted="false">"蛛网"</string>
+    <string name="l10n_atelier_art_label_wedge" formatted="false">"楔形"</string>
+    <string name="l10n_atelier_art_label_whistle" formatted="false">"吹口哨"</string>
+    <string name="l10n_atelier_art_label_white_m" formatted="false">"白色 M"</string>
+    <string name="l10n_atelier_art_label_whole" formatted="false">"整体"</string>
+    <string name="l10n_atelier_art_label_wild" formatted="false">"狂野"</string>
+    <string name="l10n_atelier_art_label_xstitch" formatted="false">"十字缝线"</string>
+    <string name="l10n_atelier_art_label_zigzag" formatted="false">"锯齿形"</string>
+    <string name="l10n_atelier_art_label_zombie" formatted="false">"僵尸"</string>
+    <string name="l10n_atelier_art_title" formatted="false">"生成艺术"</string>
+    <string name="l10n_atelier_art_intro" formatted="false">"生成器 — 19 种链上 SVG 风格"</string>
+    <string name="l10n_atelier_art_deterministic" formatted="false">"种子和风格可逐字节重现每幅作品。在 MiniDapp 中铸造时，相同设计会得到相同结果。"</string>
+    <string name="l10n_atelier_art_warming" formatted="false">"正在启动艺术引擎…"</string>
+    <string name="l10n_atelier_art_photo_loaded" formatted="false">"照片已加载 — 每幅作品都基于其卡通图像生成。原图保留在手机上。"</string>
+    <string name="l10n_atelier_art_photo_help" formatted="false">"选择照片，在此设备上创建系列。原图保留在手机上。占位图无法铸造。"</string>
+    <string name="l10n_atelier_art_change_photo" formatted="false">"更换照片"</string>
+    <string name="l10n_atelier_art_choose_photo" formatted="false">"选择照片"</string>
+    <string name="l10n_atelier_art_seed" formatted="false">"系列种子 — 相同种子，始终生成相同艺术"</string>
+    <string name="l10n_atelier_art_random_seed" formatted="false">"生成新的系列种子"</string>
+    <string name="l10n_atelier_art_traits" formatted="false">"特征池与稀有度"</string>
+    <!-- Arguments: value, total -->
+    <string name="l10n_atelier_art_enabled">"已启用 %1$s/%2$s"</string>
+    <string name="l10n_atelier_art_shuffle_rarity" formatted="false">"🎲 稀有度"</string>
+    <string name="l10n_atelier_art_shuffle_traits" formatted="false">"🎲 特征"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_capacity">"特征空间：%1$s 种不同组合"</string>
+    <string name="l10n_atelier_art_proof" formatted="false">"作品预览"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_plates">"作品：%1$s"</string>
+    <string name="l10n_atelier_art_drawing" formatted="false">"正在绘制…"</string>
+    <string name="l10n_atelier_art_generate" formatted="false">"生成"</string>
+    <string name="l10n_atelier_art_plate_hint" formatted="false">"点按作品，查看其特征和稀有度。"</string>
+    <string name="l10n_atelier_art_composing" formatted="false">"正在合成…"</string>
+    <string name="l10n_atelier_art_send" formatted="false">"发送到系列向导"</string>
+    <string name="l10n_atelier_art_traits_shuffled" formatted="false">"特征池已打乱"</string>
+    <string name="l10n_atelier_art_rarity_shuffled" formatted="false">"稀有度已打乱"</string>
+    <!-- Arguments: value, total -->
+    <string name="l10n_atelier_art_rarity_bytes">"稀有度分数 r%1$s · 原始大小 %2$s 字节"</string>
+    <string name="l10n_atelier_art_load_photo" formatted="false">"请先加载照片 — 占位图无法铸造。"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_plate_budget">"作品 %1$s 超出链上大小限制。"</string>
+    <string name="l10n_atelier_art_signed_budget" formatted="false">"系列超出已签名记录的大小限制。请减少特征或缩小图像。"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_editions_ready">"已绘制版本：%1$s — 请完善系列详情。"</string>
+    <string name="l10n_atelier_art_filtr_loaded" formatted="false">"FILTR 图像已加载到 NFT 向导"</string>
+    <string name="l10n_atelier_art_cartoonizing" formatted="false">"正在设备上生成卡通图像…"</string>
+    <string name="l10n_atelier_art_filtr_failed" formatted="false">"无法读取 FILTR 图像"</string>
+    <string name="l10n_atelier_art_photo_read_failed" formatted="false">"无法读取该照片"</string>
+    <string name="l10n_atelier_art_photo_process_failed" formatted="false">"无法处理该照片"</string>
+    <string name="l10n_atelier_art_photo_ready" formatted="false">"已在此设备上使用 AI 生成照片的卡通图像"</string>
+    <string name="l10n_atelier_art_photo_fallback" formatted="false">"AI 引擎不可用 — 已直接描摹照片"</string>
+    <string name="l10n_atelier_art_no_variants" formatted="false">"请在每个特征组中至少启用一个选项。"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_unique_failed">"无法为作品 %1$s 找到唯一组合。请启用更多选项或减少系列数量。"</string>
+    <string name="l10n_atelier_art_generate_failed" formatted="false">"无法生成此系列。请调整特征后重试。"</string>
 </resources>

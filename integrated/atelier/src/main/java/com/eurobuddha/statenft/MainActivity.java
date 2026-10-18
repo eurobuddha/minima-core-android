@@ -636,7 +636,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         if (withScan) galleryScan();
     }
 
-    private LinearLayout sectionHead(CharSequence title, String count) {
+    private LinearLayout sectionHead(CharSequence title, CharSequence count) {
         LinearLayout h = horizontal(Gravity.CENTER_VERTICAL);
         h.addView(Design.kicker(this, title), new LinearLayout.LayoutParams(0, -2, 1));
         h.addView(Design.text(this, count, 11, Design.DIM(), Design.mono()));
@@ -2297,44 +2297,63 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     /* ================= GENERATIVE ================= */
 
+    private String artDraftSnapshot() {
+        JSONObject snapshot = new JSONObject();
+        put(snapshot, "style", artStyle); put(snapshot, "seed", artSeed);
+        put(snapshot, "count", genCount); put(snapshot, "photo", artPhotoLoaded);
+        put(snapshot, "config", artCfgs.get(artStyle));
+        return snapshot.toString();
+    }
+
+    private boolean artRequestCurrent(long generation, String draft) {
+        if (isFinishing() || isDestroyed()) return false;
+        if (generation == screenGeneration && draft.equals(artDraftSnapshot())) return true;
+        if (screen == Screen.CREATE_GENERATIVE) renderGenerative();
+        return false;
+    }
+
     private void renderGenerative() {
         setScreen(Screen.CREATE_GENERATIVE, this::renderStudio);
-        appbar("Generative", true, false);
+        appbar(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_title), true, false);
         hideNav();
         if (!artDraftLoaded) { artDraftLoaded = true; artLoadDraft(); }
 
-        body.addView(Design.lot(this, "The Generator — 19 on-chain SVG style packs"));
-        body.addView(Design.note(this, "Deterministic: the seed and style reproduce every "
-                + "plate byte-for-byte — the same design mints identically in the MiniDapp."), lpm(0, 4, 0, 12));
+        body.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_intro)));
+        body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_deterministic)), lpm(0, 4, 0, 12));
 
-        final TextView warm = Design.note(this, "Warming up the art engine…");
+        final TextView warm = Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_warming));
         body.addView(warm, lpm(0, 0, 0, 12));
 
+        final long requestedScreen = screenGeneration;
+        final String requestedStyle = artStyle;
         ArtStudio.with(this, studio -> {
-            if (screen != Screen.CREATE_GENERATIVE) return;
+            if (isFinishing() || isDestroyed() || requestedScreen != screenGeneration) return;
             if (ART_STYLE_LIST == null) {
                 studio.styles(list -> {
+                    if (isFinishing() || isDestroyed() || requestedScreen != screenGeneration) return;
                     ART_STYLE_LIST = list;
-                    if (screen == Screen.CREATE_GENERATIVE) renderGenerative();
+                    renderGenerative();
                 });
                 return;
             }
             JSONObject cfg = artCfgs.get(artStyle);
             if (cfg == null) {
-                studio.defaultConfig(artStyle, c2 -> {
-                    artCfgs.put(artStyle, c2);
-                    artMigrated.add(artStyle);
-                    if (screen == Screen.CREATE_GENERATIVE) renderGenerative();
+                studio.defaultConfig(requestedStyle, c2 -> {
+                    if (isFinishing() || isDestroyed() || requestedScreen != screenGeneration) return;
+                    artCfgs.put(requestedStyle, c2);
+                    artMigrated.add(requestedStyle);
+                    renderGenerative();
                 });
                 return;
             }
             /* saved drafts age across releases — rebuild on the current slot
              * set once per process so new slots (e.g. Render) actually show */
             if (!artMigrated.contains(artStyle)) {
-                artMigrated.add(artStyle);
                 studio.migrate(cfg, m -> {
-                    if (m != null && m.length() > 0) { artCfgs.put(artStyle, m); artSaveDraft(); }
-                    if (screen == Screen.CREATE_GENERATIVE) renderGenerative();
+                    if (isFinishing() || isDestroyed() || requestedScreen != screenGeneration) return;
+                    artMigrated.add(requestedStyle);
+                    if (m != null && m.length() > 0) { artCfgs.put(requestedStyle, m); artSaveDraft(); }
+                    renderGenerative();
                 });
                 return;
             }
@@ -2378,9 +2397,9 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 renderGenerative();
             });
             cell.addView(iv, new LinearLayout.LayoutParams(dp(72), dp(72)));
-            TextView nm = Design.text(this, st.optString("label"), 8.5f,
+            TextView nm = Design.text(this, ArtLabels.display(st.optString("label")), 8.5f,
                     active ? Design.ACCENT() : Design.INK(), Design.sansBold());
-            nm.setSingleLine(true);
+            nm.setSingleLine(false);
             nm.setGravity(Gravity.CENTER);
             cell.addView(nm, new LinearLayout.LayoutParams(dp(76), -2));
             strip.addView(cell);
@@ -2392,24 +2411,23 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         /* ---- photo intake (Photo Cartoon pack only) ---- */
         if ("photo".equals(artStyle)) {
             LinearLayout card = lotCard();
-            card.addView(Design.display(this, "Photo Cartoon", 13));
+            card.addView(Design.display(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_label_photo_cartoon), 13));
             card.addView(Design.note(this, artPhotoLoaded
-                    ? "Photo loaded — every plate derives from its cartoon. "
-                      + "The original never leaves the phone."
-                    : "Pick a photo: it is cartoonized on-device (48px, 8 flat "
-                      + "colors) and becomes the base for every plate. Without "
-                      + "one the pack draws a placeholder bust that never mints."));
+                    ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_photo_loaded)
+                    : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_photo_help)));
             LinearLayout row = horizontal(Gravity.CENTER_VERTICAL);
             TextView pick = Design.button(this,
-                    artPhotoLoaded ? "Change photo" : "Choose photo", true);
+                    artPhotoLoaded ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_change_photo) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_choose_photo), true);
             pick.setOnClickListener(v -> {
                 pendingPickContext = PICK_ARTPHOTO;
                 pendingBatchImages = false;
                 launchPicker(false);
             });
-            row.addView(pick, weight(46, 0, artPhotoLoaded ? 4 : 0));
+            pick.setMinHeight(dp(48));
+            LinearLayout.LayoutParams pickLp = weight(48, 0, artPhotoLoaded ? 4 : 0); pickLp.height = -2;
+            row.addView(pick, pickLp);
             if (artPhotoLoaded) {
-                TextView clear = Design.button(this, "Clear", false);
+                TextView clear = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_logs_clear), false);
                 clear.setOnClickListener(v -> ArtStudio.with(this, s ->
                         s.clearPhoto(() -> {
                             artPhotoLoaded = false;
@@ -2418,14 +2436,16 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                             artPreviews.clear();
                             if (screen == Screen.CREATE_GENERATIVE) renderGenerative();
                         })));
-                row.addView(clear, weight(46, 4, 0));
+                clear.setMinHeight(dp(48));
+                LinearLayout.LayoutParams clearLp = weight(48, 4, 0); clearLp.height = -2;
+                row.addView(clear, clearLp);
             }
             card.addView(row, lpm(0, 8, 0, 0));
             body.addView(card, lpm(0, 0, 0, 14));
         }
 
         /* ---- seed ---- */
-        body.addView(Design.lot(this, "Collection seed — same seed, same art, forever"));
+        body.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_seed)));
         LinearLayout seedRow = horizontal(Gravity.CENTER_VERTICAL);
         EditText seed = input("atelier-genesis");
         seed.setText(artSeed);
@@ -2442,6 +2462,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         }));
         seedRow.addView(seed, weight(46, 0, 4));
         TextView dice = Design.button(this, "🎲", false);
+        Language.description(dice, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_random_seed));
         dice.setOnClickListener(v -> {
             String chars = "abcdefghjkmnpqrstuvwxyz23456789";
             StringBuilder sb = new StringBuilder("atelier-");
@@ -2457,7 +2478,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         body.addView(seedRow, lpm(0, 6, 0, 14));
 
         /* ---- trait pool & rarity ---- */
-        body.addView(sectionHead("Trait pool & rarity", ""));
+        body.addView(sectionHead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_traits), ""));
         JSONArray slots = cfg.optJSONArray("slots");
         if (slots != null) for (int i = 0; i < slots.length(); i++) {
             final JSONObject slot = slots.optJSONObject(i);
@@ -2466,14 +2487,14 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             LinearLayout card = lotCard();
             LinearLayout head = horizontal(Gravity.CENTER_VERTICAL);
             LinearLayout copy = vertical();
-            copy.addView(Design.display(this, slot.optString("label", slotKey), 13));
+            copy.addView(Design.display(this, ArtLabels.display(slot.optString("label", slotKey)), 13));
             JSONArray vs = slot.optJSONArray("variants");
             int on = 0, total = vs == null ? 0 : vs.length();
             if (vs != null) for (int k = 0; k < total; k++) {
                 JSONObject v2 = vs.optJSONObject(k);
                 if (v2 != null && v2.optBoolean("on", true) && v2.optInt("weight", 0) > 0) on++;
             }
-            copy.addView(Design.note(this, on + "/" + total + " on"));
+            copy.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_enabled, on, total)));
             head.addView(copy, new LinearLayout.LayoutParams(0, -2, 1));
             boolean open = artOpenSlots.contains(slotKey);
             TextView arrow = Design.text(this, open ? "▴" : "▾", 14, Design.ACCENT(), Design.sansBold());
@@ -2505,8 +2526,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                         renderGenerative();
                     });
                     row.addView(cb);
-                    TextView nm = Design.text(this, variant.optString("name"), 11.5f, Design.INK(), Design.sans());
-                    nm.setSingleLine(true);
+                    TextView nm = Design.text(this, ArtLabels.display(variant.optString("name")), 11.5f, Design.INK(), Design.sans());
+                    nm.setSingleLine(false);
                     row.addView(nm, new LinearLayout.LayoutParams(dp(96), -2));
                     android.widget.SeekBar sb = new android.widget.SeekBar(this);
                     sb.setMax(100);
@@ -2536,13 +2557,17 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         }
 
         LinearLayout shuffleRow = horizontal(Gravity.CENTER_VERTICAL);
-        TextView shufR = Design.button(this, "🎲 Rarity", false);
+        TextView shufR = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_shuffle_rarity), false);
         shufR.setOnClickListener(v -> { artShuffle(cfg, false); });
-        shuffleRow.addView(shufR, weight(44, 0, 4));
-        TextView shufP = Design.button(this, "🎲 Traits", false);
+        shufR.setMinHeight(dp(48));
+        LinearLayout.LayoutParams shufRLp = weight(48, 0, 4); shufRLp.height = -2;
+        shuffleRow.addView(shufR, shufRLp);
+        TextView shufP = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_shuffle_traits), false);
         shufP.setOnClickListener(v -> { artShuffle(cfg, true); });
-        shuffleRow.addView(shufP, weight(44, 4, 4));
-        TextView reset = Design.button(this, "Reset", false);
+        shufP.setMinHeight(dp(48));
+        LinearLayout.LayoutParams shufPLp = weight(48, 4, 4); shufPLp.height = -2;
+        shuffleRow.addView(shufP, shufPLp);
+        TextView reset = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_future_reset), false);
         reset.setOnClickListener(v -> {
             artCfgs.remove(artStyle);
             artItems = new JSONArray();
@@ -2550,31 +2575,34 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             artSaveDraft();
             renderGenerative();
         });
-        shuffleRow.addView(reset, weight(44, 4, 0));
+        reset.setMinHeight(dp(48));
+        LinearLayout.LayoutParams resetLp = weight(48, 4, 0); resetLp.height = -2;
+        shuffleRow.addView(reset, resetLp);
         body.addView(shuffleRow, lpm(0, 4, 0, 6));
 
         final TextView capNote = Design.note(this, "");
         body.addView(capNote, lpm(0, 0, 0, 14));
-        studio.capacity(cfg, n -> capNote.setText("trait space: "
-                + String.format(Locale.US, "%,d", n) + " distinct combinations"));
+        studio.capacity(cfg, n -> Language.setText(capNote, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_capacity, String.format(Locale.US, "%,d", n))));
 
         /* ---- proof sheet ---- */
-        body.addView(sectionHead("Proof sheet", artItems.length() == 0 ? "" : artItems.length() + " plates"));
+        body.addView(sectionHead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_proof), artItems.length() == 0 ? "" : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_plates, artItems.length())));
         LinearLayout genRow = horizontal(Gravity.CENTER_VERTICAL);
         EditText count = input("12");
         count.setText(genCount);
         count.addTextChangedListener(watch(sv -> genCount = sv));
         genRow.addView(count, new LinearLayout.LayoutParams(dp(70), dp(46)));
-        TextView gen = Design.button(this, genBusy ? "Drawing…" : "Generate", true);
+        TextView gen = Design.button(this, genBusy ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_drawing) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_generate), true);
         gen.setEnabled(!genBusy);
         gen.setOnClickListener(v -> artGenerate(studio, cfg));
-        genRow.addView(gen, weight(46, 8, 0));
+        gen.setMinHeight(dp(48));
+        LinearLayout.LayoutParams genLp = weight(48, 8, 0); genLp.height = -2;
+        genRow.addView(gen, genLp);
         body.addView(genRow, lpm(0, 0, 0, 10));
 
         artSheetBox = vertical();
         body.addView(artSheetBox);
         if (artItems.length() > 0) {
-            artSheetBox.addView(Design.note(this, "Tap a plate for its traits and rarity."), lpm(0, 0, 0, 8));
+            artSheetBox.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_plate_hint)), lpm(0, 0, 0, 8));
             int cols = 3;
             LinearLayout row = null;
             for (int i = 0; i < artItems.length(); i++) {
@@ -2609,10 +2637,11 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                     row.addView(new Space(this), new LinearLayout.LayoutParams(0, 1, 1){{ leftMargin = dp(8); }});
                 }
             }
-            TextView use = Design.button(this, genBusy ? "Composing…" : "Send to collection wizard", true);
+            TextView use = Design.button(this, genBusy ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_composing) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_send), true);
             use.setEnabled(!genBusy);
             use.setOnClickListener(v -> sendArtToCollection());
-            artSheetBox.addView(use, lph(52, 0, 12, 0, 8));
+            use.setMinHeight(dp(52));
+            artSheetBox.addView(use, lpm(0, 12, 0, 8));
         }
     }
 
@@ -2644,23 +2673,26 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         artPreviews.clear();
         artSaveDraft();
         renderGenerative();
-        toast(pool ? "Trait pool shuffled" : "Rarity shuffled");
+        toast(pool ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_traits_shuffled) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_rarity_shuffled));
     }
 
     private void artGenerate(ArtStudio studio, JSONObject cfg) {
+        if (genBusy) return;
         int n = Math.max(2, Math.min(20, parseIntSafe(genCount)));
         genCount = String.valueOf(n);
         genBusy = true;
         renderGenerative();
+        final long requestedScreen = screenGeneration;
+        final String requestedDraft = artDraftSnapshot();
         String s = artSeed.isEmpty() ? "atelier" : artSeed;
         studio.generate(s, n, cfg, result -> {
             genBusy = false;
-            if (screen != Screen.CREATE_GENERATIVE) return;
+            if (!artRequestCurrent(requestedScreen, requestedDraft)) return;
             String err = result.optString("error", "");
             JSONArray items = result.optJSONArray("items");
             if (items == null) items = new JSONArray();
-            if (!err.isEmpty() && items.length() < n) {
-                toast(err);
+            if (err.length() != 0 && items.length() < n) {
+                toast(ArtLabels.error(err));
             }
             artItems = items;
             artPreviews.clear();
@@ -2686,39 +2718,41 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     private void showArtItem(JSONObject item, int idx) {
         if (item == null) return;
-        StringBuilder sb = new StringBuilder();
+        Language.TextBuilder sb = new Language.TextBuilder();
         JSONArray ts = item.optJSONArray("traits");
         if (ts != null) for (int i = 0; i < ts.length(); i++) {
             JSONObject t = ts.optJSONObject(i);
             if (t == null) continue;
-            sb.append(t.optString("label")).append(":  ").append(t.optString("value"))
+            sb.append(ArtLabels.display(t.optString("label"))).append(":  ").append(ArtLabels.display(t.optString("value")))
               .append("   (").append(t.optString("pct")).append("%)\n");
         }
-        sb.append("\nrarity score r").append(item.opt("score"))
-          .append(" · ").append(item.optInt("bytes")).append("B raw");
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("Plate " + String.format(Locale.US, "%02d", idx + 1))
-                .setMessage(sb.toString())
-                .setPositiveButton("Close", null)
+        sb.append("\n").append(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_rarity_bytes, item.optString("score"), item.optInt("bytes")));
+        new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_plate, String.format(Locale.US, "%02d", idx + 1)))
+                .setMessage(sb.build())
+                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_language_close), null)
                 .show();
     }
 
     private void sendArtToCollection() {
         if (artItems.length() == 0 || genBusy) return;
         if ("photo".equals(artStyle) && !artPhotoLoaded) {
-            toast("Load a photo first — the placeholder never mints");
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_load_photo));
             return;
         }
         genBusy = true;
         renderGenerative();
         final JSONArray itemsF = artItems;
+        final String requestedStyle = artStyle, requestedDraft = artDraftSnapshot();
+        final String collectionDraft = mintDraftSnapshot(2);
+        final long requestedScreen = screenGeneration;
         new Thread(() -> {
             String[] images = new String[itemsF.length()];
             JSONObject traitsMap = new JSONObject();
-            String err = "";
+            CharSequence err = "";
             // the photo pack seals only its rarity axes — freed record bytes
             // pay for full-quality Painted plates under the joint budget
-            java.util.HashSet<String> sealed = "photo".equals(artStyle)
+            java.util.HashSet<String> sealed = "photo".equals(requestedStyle)
                     ? new java.util.HashSet<>(java.util.Arrays.asList(
                         "palette", "finish", "render", "mode"))
                     : null;
@@ -2728,7 +2762,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 String b64 = svg.isEmpty() ? "" : java.util.Base64.getEncoder()
                         .encodeToString(svg.getBytes(java.nio.charset.StandardCharsets.UTF_8));
                 if (b64.isEmpty() || b64.length() > ART_EMBED_BUDGET) {
-                    err = "Plate " + (i + 1) + " will not fit the on-chain budget";
+                    err = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_plate_budget, i + 1);
                     break;
                 }
                 images[i] = b64;
@@ -2750,7 +2784,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
              * fallback), but an oversized one must be rasterized here or the
              * wallet tile falls back to the placeholder. */
             String iconB64 = "";
-            if (err.isEmpty() && images.length > 0 && images[0].length() > ImageTools.ICON_BUDGET) {
+            if (err.length() == 0 && images.length > 0 && images[0].length() > ImageTools.ICON_BUDGET) {
                 JSONObject lead = itemsF.optJSONObject(0);
                 android.graphics.Bitmap b = lead == null ? null
                         : ArtStudio.svgBitmap(lead.optString("svg"), 512);
@@ -2758,7 +2792,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             }
             /* ALWAYS SIGNED envelope at the handoff: fit the icon into the
              * room; the binding exact gate runs again at the mint click. */
-            if (err.isEmpty()) {
+            if (err.length() == 0) {
                 int maxImg = 0;
                 for (String im : images) if (im != null && im.length() > maxImg) maxImg = im.length();
                 StateNft.Meta probe = new StateNft.Meta();
@@ -2794,21 +2828,24 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                             LocalStore.logEvent(MainActivity.this,
                                     "Icon dropped so every lot signs and travels - wallet shows the identicon");
                         } else {
-                            err = gate3;
+                            err = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_signed_budget);
                         }
                     }
                 }
             }
-            final String errF = err, iconF = iconB64;
+            final CharSequence errF = err;
+            final String iconF = iconB64;
             runOnUiThread(() -> {
                 genBusy = false;
-                if (!errF.isEmpty()) { toast(errF); renderGenerative(); return; }
+                if (!artRequestCurrent(requestedScreen, requestedDraft)) return;
+                if (artItems != itemsF || !collectionDraft.equals(mintDraftSnapshot(2))) { renderGenerative(); return; }
+                if (errF.length() != 0) { toast(errF); renderGenerative(); return; }
                 createMode = "embed";
                 createSize = String.valueOf(images.length);
                 createImages = images;
                 collectionItemTraits = traitsMap;
                 if (!iconF.isEmpty()) createIconB64 = iconF;
-                toast(images.length + " editions drawn — finish the collection details");
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_editions_ready, images.length));
                 renderCreateCollection();
             });
         }).start();
@@ -2823,13 +2860,13 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         if (mint != null && !mint.isEmpty()) {
             FiltrActivity.pendingMint = null;
             nftImage = mint;
-            toast("FILTR image loaded into the NFT wizard");
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_filtr_loaded));
             renderCreateNft();
         }
         String photo = FiltrActivity.pendingPhoto;
         if (photo != null && !photo.isEmpty()) {
             FiltrActivity.pendingPhoto = null;
-            toast("Cartoonizing on-device…");
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_cartoonizing));
             new Thread(() -> {
                 try {
                     byte[] raw = android.util.Base64.decode(photo, android.util.Base64.DEFAULT);
@@ -2838,7 +2875,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                     artPhotoFromBitmap(b == null ? null
                             : android.graphics.Bitmap.createScaledBitmap(b, 512, 512, true));
                 } catch (Throwable t) {
-                    runOnUiThread(() -> toast("Could not read the FILTR image"));
+                    runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_filtr_failed)));
                 }
             }).start();
             runOnUiThread(this::renderGenerative);
@@ -2854,15 +2891,15 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
          * painting itself rides along for the Painted finish */
         final String paint = ai ? ImageTools.paintB64(toon, 8600) : "";  // fits the PROVEN 19500 pair budget
         runOnUiThread(() -> {
-            if (rgba == null) { toast("Could not read that photo"); return; }
+            if (rgba == null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_photo_read_failed)); return; }
             ArtStudio.with(this, s -> s.setPhoto(rgba, ai ? 10 : 8, paint, k -> {
                 artPhotoLoaded = k > 0;
                 ART_THUMBS.remove("photo");
                 artItems = new JSONArray();
                 artPreviews.clear();
-                toast(!artPhotoLoaded ? "Could not process that photo"
-                        : ai ? "Photo AI-cartoonized on-device"
-                             : "AI engine unavailable — photo traced directly");
+                toast(!artPhotoLoaded ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_photo_process_failed)
+                        : ai ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_photo_ready)
+                             : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_photo_fallback));
                 if (screen == Screen.CREATE_GENERATIVE) renderGenerative();
             }));
         });

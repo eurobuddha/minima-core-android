@@ -7394,4 +7394,422 @@
     <string name="l10n_atelier_collection_plate">"Зображення %1$s"</string>
     <!-- Arguments: 0, 1 -->
     <string name="l10n_atelier_collection_recovery_body">"За цією адресою немає файлів:\n%1$s\n\nВаші завантажені зображення доступні тут:\n%2$s\n\nВикористати їхній базовий URL для створення?"</string>
+    <string name="l10n_atelier_art_label12_fold" formatted="false">"12-кратна"</string>
+    <string name="l10n_atelier_art_label16_fold" formatted="false">"16-кратна"</string>
+    <string name="l10n_atelier_art_label24_fold" formatted="false">"24-кратна"</string>
+    <string name="l10n_atelier_art_label6_fold" formatted="false">"6-кратна"</string>
+    <string name="l10n_atelier_art_label8_fold" formatted="false">"8-кратна"</string>
+    <string name="l10n_atelier_art_label_accent" formatted="false">"Акцент"</string>
+    <string name="l10n_atelier_art_label_accent_lead" formatted="false">"Акцентний колір"</string>
+    <string name="l10n_atelier_art_label_acid" formatted="false">"Кислотний"</string>
+    <string name="l10n_atelier_art_label_airy" formatted="false">"Повітряний"</string>
+    <string name="l10n_atelier_art_label_algae" formatted="false">"Водорості"</string>
+    <string name="l10n_atelier_art_label_alien" formatted="false">"Прибулець"</string>
+    <string name="l10n_atelier_art_label_amber_glow" formatted="false">"Бурштинове сяйво"</string>
+    <string name="l10n_atelier_art_label_antenna" formatted="false">"Антена"</string>
+    <string name="l10n_atelier_art_label_apple" formatted="false">"Яблуко"</string>
+    <string name="l10n_atelier_art_label_arcs" formatted="false">"Дуги"</string>
+    <string name="l10n_atelier_art_label_arcs_dots" formatted="false">"Дуги й точки"</string>
+    <string name="l10n_atelier_art_label_arms13" formatted="false">"13 променів"</string>
+    <string name="l10n_atelier_art_label_arms8" formatted="false">"8 променів"</string>
+    <string name="l10n_atelier_art_label_azure" formatted="false">"Лазуровий"</string>
+    <string name="l10n_atelier_art_label_backdrop" formatted="false">"Задній план"</string>
+    <string name="l10n_atelier_art_label_background" formatted="false">"Тло"</string>
+    <string name="l10n_atelier_art_label_balanced" formatted="false">"Збалансований"</string>
+    <string name="l10n_atelier_art_label_bald" formatted="false">"Лисий"</string>
+    <string name="l10n_atelier_art_label_bamboo" formatted="false">"Бамбук"</string>
+    <string name="l10n_atelier_art_label_band" formatted="false">"Смуга"</string>
+    <string name="l10n_atelier_art_label_bandage" formatted="false">"Пов’язка"</string>
+    <string name="l10n_atelier_art_label_bare" formatted="false">"Без прикрас"</string>
+    <string name="l10n_atelier_art_label_bars" formatted="false">"Смужки"</string>
+    <string name="l10n_atelier_art_label_bauhaus" formatted="false">"Баугауз"</string>
+    <string name="l10n_atelier_art_label_beanie" formatted="false">"В’язана шапка"</string>
+    <string name="l10n_atelier_art_label_bear" formatted="false">"Ведмідь"</string>
+    <string name="l10n_atelier_art_label_beard" formatted="false">"Борода"</string>
+    <string name="l10n_atelier_art_label_blackwhite" formatted="false">"Чорно-білий"</string>
+    <string name="l10n_atelier_art_label_blobs" formatted="false">"Плями"</string>
+    <string name="l10n_atelier_art_label_block" formatted="false">"Блок"</string>
+    <string name="l10n_atelier_art_label_bloom" formatted="false">"Цвітіння"</string>
+    <string name="l10n_atelier_art_label_blue_m" formatted="false">"Синя M"</string>
+    <string name="l10n_atelier_art_label_blue_nude" formatted="false">"Блакитна оголена"</string>
+    <string name="l10n_atelier_art_label_blue_period" formatted="false">"Блакитний період"</string>
+    <string name="l10n_atelier_art_label_blue_led" formatted="false">"Переважає синій"</string>
+    <string name="l10n_atelier_art_label_blush" formatted="false">"Рум’янець"</string>
+    <string name="l10n_atelier_art_label_bold" formatted="false">"Виразний"</string>
+    <string name="l10n_atelier_art_label_boogie" formatted="false">"Бугі"</string>
+    <string name="l10n_atelier_art_label_both_profile" formatted="false">"Два профілі"</string>
+    <string name="l10n_atelier_art_label_bowler" formatted="false">"Капелюх-котелок"</string>
+    <string name="l10n_atelier_art_label_brown" formatted="false">"Коричневий"</string>
+    <string name="l10n_atelier_art_label_burst" formatted="false">"Сплеск"</string>
+    <string name="l10n_atelier_art_label_busy" formatted="false">"Насичений"</string>
+    <string name="l10n_atelier_art_label_button" formatted="false">"Ґудзик"</string>
+    <string name="l10n_atelier_art_label_buzz" formatted="false">"Їжачок"</string>
+    <string name="l10n_atelier_art_label_calm" formatted="false">"Спокійний"</string>
+    <string name="l10n_atelier_art_label_cap" formatted="false">"Кепка"</string>
+    <string name="l10n_atelier_art_label_cells" formatted="false">"Комірки"</string>
+    <string name="l10n_atelier_art_label_chain" formatted="false">"Ланцюг"</string>
+    <string name="l10n_atelier_art_label_chaos" formatted="false">"Хаос"</string>
+    <string name="l10n_atelier_art_label_charcoal" formatted="false">"Вугільний"</string>
+    <string name="l10n_atelier_art_label_checker" formatted="false">"Шаховий"</string>
+    <string name="l10n_atelier_art_label_chest" formatted="false">"Груди"</string>
+    <string name="l10n_atelier_art_label_chest_print" formatted="false">"Малюнок на грудях"</string>
+    <string name="l10n_atelier_art_label_cigarette" formatted="false">"Сигарета"</string>
+    <string name="l10n_atelier_art_label_circle_grid" formatted="false">"Сітка кіл"</string>
+    <string name="l10n_atelier_art_label_circles" formatted="false">"Кола"</string>
+    <string name="l10n_atelier_art_label_classic" formatted="false">"Класичний"</string>
+    <string name="l10n_atelier_art_label_clouds" formatted="false">"Хмари"</string>
+    <string name="l10n_atelier_art_label_cobalt" formatted="false">"Кобальтовий"</string>
+    <string name="l10n_atelier_art_label_coin" formatted="false">"Монета"</string>
+    <string name="l10n_atelier_art_label_color" formatted="false">"Колір"</string>
+    <string name="l10n_atelier_art_label_color_balance" formatted="false">"Баланс кольору"</string>
+    <string name="l10n_atelier_art_label_coloring" formatted="false">"Забарвлення"</string>
+    <string name="l10n_atelier_art_label_column" formatted="false">"Колона"</string>
+    <string name="l10n_atelier_art_label_companion" formatted="false">"Супутник"</string>
+    <string name="l10n_atelier_art_label_composition" formatted="false">"Композиція"</string>
+    <string name="l10n_atelier_art_label_connector" formatted="false">"З’єднувач"</string>
+    <string name="l10n_atelier_art_label_connectors" formatted="false">"З’єднувачі"</string>
+    <string name="l10n_atelier_art_label_cool" formatted="false">"Холодний"</string>
+    <string name="l10n_atelier_art_label_core" formatted="false">"Ядро"</string>
+    <string name="l10n_atelier_art_label_corner" formatted="false">"Кут"</string>
+    <string name="l10n_atelier_art_label_count" formatted="false">"Кількість"</string>
+    <string name="l10n_atelier_art_label_cream" formatted="false">"Кремовий"</string>
+    <string name="l10n_atelier_art_label_crescents" formatted="false">"Півмісяці"</string>
+    <string name="l10n_atelier_art_label_crimson" formatted="false">"Багряний"</string>
+    <string name="l10n_atelier_art_label_crowded" formatted="false">"Щільний"</string>
+    <string name="l10n_atelier_art_label_crown" formatted="false">"Корона"</string>
+    <string name="l10n_atelier_art_label_day" formatted="false">"День"</string>
+    <string name="l10n_atelier_art_label_deep" formatted="false">"Глибокий"</string>
+    <string name="l10n_atelier_art_label_deep_blue" formatted="false">"Глибокий синій"</string>
+    <string name="l10n_atelier_art_label_deep_teal" formatted="false">"Темна бірюза"</string>
+    <string name="l10n_atelier_art_label_dense" formatted="false">"Густий"</string>
+    <string name="l10n_atelier_art_label_density" formatted="false">"Щільність"</string>
+    <string name="l10n_atelier_art_label_detail" formatted="false">"Деталізація"</string>
+    <string name="l10n_atelier_art_label_diagonal" formatted="false">"Діагональ"</string>
+    <string name="l10n_atelier_art_label_diagonals" formatted="false">"Діагоналі"</string>
+    <string name="l10n_atelier_art_label_diamond" formatted="false">"Ромб"</string>
+    <string name="l10n_atelier_art_label_disc" formatted="false">"Диск"</string>
+    <string name="l10n_atelier_art_label_dot" formatted="false">"Крапка"</string>
+    <string name="l10n_atelier_art_label_dot_chain" formatted="false">"Ланцюжок крапок"</string>
+    <string name="l10n_atelier_art_label_dot_scale" formatted="false">"Розмір крапок"</string>
+    <string name="l10n_atelier_art_label_dots" formatted="false">"Крапки"</string>
+    <string name="l10n_atelier_art_label_double" formatted="false">"Подвійний"</string>
+    <string name="l10n_atelier_art_label_duet" formatted="false">"Дует"</string>
+    <string name="l10n_atelier_art_label_duo" formatted="false">"Пара"</string>
+    <string name="l10n_atelier_art_label_duotone" formatted="false">"Двоколірний"</string>
+    <string name="l10n_atelier_art_label_dusk" formatted="false">"Сутінки"</string>
+    <string name="l10n_atelier_art_label_dusk_neon" formatted="false">"Сутінковий неон"</string>
+    <string name="l10n_atelier_art_label_earring" formatted="false">"Сережка"</string>
+    <string name="l10n_atelier_art_label_ears" formatted="false">"Вуха"</string>
+    <string name="l10n_atelier_art_label_earth" formatted="false">"Земля"</string>
+    <string name="l10n_atelier_art_label_echo" formatted="false">"Відлуння"</string>
+    <string name="l10n_atelier_art_label_element" formatted="false">"Елемент"</string>
+    <string name="l10n_atelier_art_label_ember" formatted="false">"Жаринка"</string>
+    <string name="l10n_atelier_art_label_ember_field" formatted="false">"Поле жарин"</string>
+    <string name="l10n_atelier_art_label_escher" formatted="false">"Ешер"</string>
+    <string name="l10n_atelier_art_label_even" formatted="false">"Рівномірний"</string>
+    <string name="l10n_atelier_art_label_extra" formatted="false">"Додатково"</string>
+    <string name="l10n_atelier_art_label_eye" formatted="false">"Око"</string>
+    <string name="l10n_atelier_art_label_eyes" formatted="false">"Очі"</string>
+    <string name="l10n_atelier_art_label_eyes_eyewear" formatted="false">"Очі / окуляри"</string>
+    <string name="l10n_atelier_art_label_facial_hair" formatted="false">"Волосся на обличчі"</string>
+    <string name="l10n_atelier_art_label_family" formatted="false">"Сімейство"</string>
+    <string name="l10n_atelier_art_label_fermat" formatted="false">"Ферма"</string>
+    <string name="l10n_atelier_art_label_few" formatted="false">"Мало"</string>
+    <string name="l10n_atelier_art_label_field" formatted="false">"Поле"</string>
+    <string name="l10n_atelier_art_label_fine" formatted="false">"Тонкий"</string>
+    <string name="l10n_atelier_art_label_finish" formatted="false">"Оздоблення"</string>
+    <string name="l10n_atelier_art_label_flat" formatted="false">"Плоский"</string>
+    <string name="l10n_atelier_art_label_floppy" formatted="false">"Висячі"</string>
+    <string name="l10n_atelier_art_label_focal" formatted="false">"Фокус"</string>
+    <string name="l10n_atelier_art_label_form" formatted="false">"Форма"</string>
+    <string name="l10n_atelier_art_label_forms" formatted="false">"Форми"</string>
+    <string name="l10n_atelier_art_label_fragmentation" formatted="false">"Фрагментація"</string>
+    <string name="l10n_atelier_art_label_frame" formatted="false">"Рамка"</string>
+    <string name="l10n_atelier_art_label_free" formatted="false">"Вільний"</string>
+    <string name="l10n_atelier_art_label_frequency" formatted="false">"Частота"</string>
+    <string name="l10n_atelier_art_label_frown" formatted="false">"Похмурий"</string>
+    <string name="l10n_atelier_art_label_gentle" formatted="false">"М’який"</string>
+    <string name="l10n_atelier_art_label_geometric" formatted="false">"Геометричний"</string>
+    <string name="l10n_atelier_art_label_geometry" formatted="false">"Геометрія"</string>
+    <string name="l10n_atelier_art_label_glow" formatted="false">"Сяйво"</string>
+    <string name="l10n_atelier_art_label_goatee" formatted="false">"Еспаньйолка"</string>
+    <string name="l10n_atelier_art_label_gold" formatted="false">"Золотий"</string>
+    <string name="l10n_atelier_art_label_gold_grin" formatted="false">"Золота усмішка"</string>
+    <string name="l10n_atelier_art_label_gradient" formatted="false">"Градієнт"</string>
+    <string name="l10n_atelier_art_label_grande_jatte" formatted="false">"Гранд-Жатт"</string>
+    <string name="l10n_atelier_art_label_grid" formatted="false">"Сітка"</string>
+    <string name="l10n_atelier_art_label_grid2" formatted="false">"Сітка-2"</string>
+    <string name="l10n_atelier_art_label_grid3" formatted="false">"Сітка-3"</string>
+    <string name="l10n_atelier_art_label_grin" formatted="false">"Широка усмішка"</string>
+    <string name="l10n_atelier_art_label_grisaille" formatted="false">"Гризайль"</string>
+    <string name="l10n_atelier_art_label_grr" formatted="false">"Р-р-р"</string>
+    <string name="l10n_atelier_art_label_hair" formatted="false">"Волосся"</string>
+    <string name="l10n_atelier_art_label_hair_headgear" formatted="false">"Волосся / головний убір"</string>
+    <string name="l10n_atelier_art_label_half" formatted="false">"Половина"</string>
+    <string name="l10n_atelier_art_label_halo" formatted="false">"Ореол"</string>
+    <string name="l10n_atelier_art_label_harmonograph" formatted="false">"Гармонограф"</string>
+    <string name="l10n_atelier_art_label_headband" formatted="false">"Пов’язка на голову"</string>
+    <string name="l10n_atelier_art_label_headgear" formatted="false">"Головний убір"</string>
+    <string name="l10n_atelier_art_label_headset" formatted="false">"Гарнітура"</string>
+    <string name="l10n_atelier_art_label_heart" formatted="false">"Серце"</string>
+    <string name="l10n_atelier_art_label_heavy" formatted="false">"Важкий"</string>
+    <string name="l10n_atelier_art_label_high" formatted="false">"Високий"</string>
+    <string name="l10n_atelier_art_label_hills" formatted="false">"Пагорби"</string>
+    <string name="l10n_atelier_art_label_hologram" formatted="false">"Голограма"</string>
+    <string name="l10n_atelier_art_label_hoodie" formatted="false">"Худі"</string>
+    <string name="l10n_atelier_art_label_horizon" formatted="false">"Горизонт"</string>
+    <string name="l10n_atelier_art_label_icon" formatted="false">"Значок"</string>
+    <string name="l10n_atelier_art_label_impossible" formatted="false">"Неможливий"</string>
+    <string name="l10n_atelier_art_label_ink" formatted="false">"Чорнило"</string>
+    <string name="l10n_atelier_art_label_inverse" formatted="false">"Зворотний"</string>
+    <string name="l10n_atelier_art_label_invert" formatted="false">"Інверсія"</string>
+    <string name="l10n_atelier_art_label_inverted" formatted="false">"Перевернутий"</string>
+    <string name="l10n_atelier_art_label_ivory" formatted="false">"Слонова кістка"</string>
+    <string name="l10n_atelier_art_label_jazz" formatted="false">"Джаз"</string>
+    <string name="l10n_atelier_art_label_kandinsky" formatted="false">"Кандинський"</string>
+    <string name="l10n_atelier_art_label_lagoon" formatted="false">"Лагуна"</string>
+    <string name="l10n_atelier_art_label_laser" formatted="false">"Лазер"</string>
+    <string name="l10n_atelier_art_label_laser_blue" formatted="false">"Синій лазер"</string>
+    <string name="l10n_atelier_art_label_laser_red" formatted="false">"Червоний лазер"</string>
+    <string name="l10n_atelier_art_label_lattice" formatted="false">"Ґратка"</string>
+    <string name="l10n_atelier_art_label_layers" formatted="false">"Шари"</string>
+    <string name="l10n_atelier_art_label_layout" formatted="false">"Розташування"</string>
+    <string name="l10n_atelier_art_label_leaves" formatted="false">"Листя"</string>
+    <string name="l10n_atelier_art_label_lens" formatted="false">"Лінза"</string>
+    <string name="l10n_atelier_art_label_line_weight" formatted="false">"Товщина ліній"</string>
+    <string name="l10n_atelier_art_label_lines" formatted="false">"Лінії"</string>
+    <string name="l10n_atelier_art_label_lissajous" formatted="false">"Ліссажу"</string>
+    <string name="l10n_atelier_art_label_lively" formatted="false">"Жвавий"</string>
+    <string name="l10n_atelier_art_label_long" formatted="false">"Довгий"</string>
+    <string name="l10n_atelier_art_label_low" formatted="false">"Низький"</string>
+    <string name="l10n_atelier_art_label_mcrest" formatted="false">"Емблема M"</string>
+    <string name="l10n_atelier_art_label_magritte" formatted="false">"Магрітт"</string>
+    <string name="l10n_atelier_art_label_mandala" formatted="false">"Мандала"</string>
+    <string name="l10n_atelier_art_label_many" formatted="false">"Багато"</string>
+    <string name="l10n_atelier_art_label_mask" formatted="false">"Маска"</string>
+    <string name="l10n_atelier_art_label_math_curves" formatted="false">"Математичні криві"</string>
+    <string name="l10n_atelier_art_label_matisse" formatted="false">"Матісс"</string>
+    <string name="l10n_atelier_art_label_maxima" formatted="false">"Maxima"</string>
+    <string name="l10n_atelier_art_label_meadow" formatted="false">"Луг"</string>
+    <string name="l10n_atelier_art_label_meander" formatted="false">"Меандр"</string>
+    <string name="l10n_atelier_art_label_medium" formatted="false">"Середній"</string>
+    <string name="l10n_atelier_art_label_middle" formatted="false">"Середина"</string>
+    <string name="l10n_atelier_art_label_minima_punks" formatted="false">"Minima-панки"</string>
+    <string name="l10n_atelier_art_label_minimal" formatted="false">"Мінімальний"</string>
+    <string name="l10n_atelier_art_label_mint_frost" formatted="false">"М’ятний іній"</string>
+    <string name="l10n_atelier_art_label_miro" formatted="false">"Міро"</string>
+    <string name="l10n_atelier_art_label_mirror" formatted="false">"Дзеркало"</string>
+    <string name="l10n_atelier_art_label_mirrored" formatted="false">"Дзеркальний"</string>
+    <string name="l10n_atelier_art_label_mismatched" formatted="false">"Непарні"</string>
+    <string name="l10n_atelier_art_label_mixed" formatted="false">"Змішаний"</string>
+    <string name="l10n_atelier_art_label_mode" formatted="false">"Режим"</string>
+    <string name="l10n_atelier_art_label_mohawk" formatted="false">"Ірокез"</string>
+    <string name="l10n_atelier_art_label_moire" formatted="false">"Муар"</string>
+    <string name="l10n_atelier_art_label_mondrian" formatted="false">"Мондріан"</string>
+    <string name="l10n_atelier_art_label_mono" formatted="false">"Монохромний"</string>
+    <string name="l10n_atelier_art_label_monocle" formatted="false">"Монокль"</string>
+    <string name="l10n_atelier_art_label_moon" formatted="false">"Місяць"</string>
+    <string name="l10n_atelier_art_label_morph" formatted="false">"Морфінг"</string>
+    <string name="l10n_atelier_art_label_motif" formatted="false">"Мотив"</string>
+    <string name="l10n_atelier_art_label_motifs" formatted="false">"Мотиви"</string>
+    <string name="l10n_atelier_art_label_mouth" formatted="false">"Рот"</string>
+    <string name="l10n_atelier_art_label_multiplicity" formatted="false">"Множинність"</string>
+    <string name="l10n_atelier_art_label_mustache" formatted="false">"Вуса"</string>
+    <string name="l10n_atelier_art_label_muzzle" formatted="false">"Мордочка"</string>
+    <string name="l10n_atelier_art_label_natural" formatted="false">"Природний"</string>
+    <string name="l10n_atelier_art_label_neon" formatted="false">"Неон"</string>
+    <string name="l10n_atelier_art_label_nested" formatted="false">"Вкладений"</string>
+    <string name="l10n_atelier_art_label_neutral" formatted="false">"Нейтральний"</string>
+    <string name="l10n_atelier_art_label_night" formatted="false">"Ніч"</string>
+    <string name="l10n_atelier_art_label_node" formatted="false">"Вузол"</string>
+    <string name="l10n_atelier_art_label_none" formatted="false">"Немає"</string>
+    <string name="l10n_atelier_art_label_object" formatted="false">"Об’єкт"</string>
+    <string name="l10n_atelier_art_label_ocean" formatted="false">"Океан"</string>
+    <string name="l10n_atelier_art_label_op_art" formatted="false">"Оп-арт"</string>
+    <string name="l10n_atelier_art_label_orange_m" formatted="false">"Помаранчева M"</string>
+    <string name="l10n_atelier_art_label_orbit" formatted="false">"Орбіта"</string>
+    <string name="l10n_atelier_art_label_outline" formatted="false">"Контур"</string>
+    <string name="l10n_atelier_art_label_overlay" formatted="false">"Накладання"</string>
+    <string name="l10n_atelier_art_label_painted" formatted="false">"Живопис"</string>
+    <string name="l10n_atelier_art_label_pale" formatted="false">"Блідий"</string>
+    <string name="l10n_atelier_art_label_palette" formatted="false">"Палітра"</string>
+    <string name="l10n_atelier_art_label_panda_punks" formatted="false">"Панда-панки"</string>
+    <string name="l10n_atelier_art_label_paper" formatted="false">"Папір"</string>
+    <string name="l10n_atelier_art_label_paper_led" formatted="false">"Переважає колір паперу"</string>
+    <string name="l10n_atelier_art_label_pastel" formatted="false">"Пастельний"</string>
+    <string name="l10n_atelier_art_label_patch" formatted="false">"Пов’язка на око"</string>
+    <string name="l10n_atelier_art_label_perky" formatted="false">"Сторчма"</string>
+    <string name="l10n_atelier_art_label_petal" formatted="false">"Пелюстка"</string>
+    <string name="l10n_atelier_art_label_photo_cartoon" formatted="false">"Мультфільм із фото"</string>
+    <string name="l10n_atelier_art_label_phyllotaxis" formatted="false">"Філотаксис"</string>
+    <string name="l10n_atelier_art_label_picasso" formatted="false">"Пікассо"</string>
+    <string name="l10n_atelier_art_label_pinwheel" formatted="false">"Вітрячок"</string>
+    <string name="l10n_atelier_art_label_pipe" formatted="false">"Люлька"</string>
+    <string name="l10n_atelier_art_label_pixel" formatted="false">"Піксель"</string>
+    <string name="l10n_atelier_art_label_plain" formatted="false">"Простий"</string>
+    <string name="l10n_atelier_art_label_planes" formatted="false">"Площини"</string>
+    <string name="l10n_atelier_art_label_port" formatted="false">"Порт"</string>
+    <string name="l10n_atelier_art_label_poster" formatted="false">"Плакат"</string>
+    <string name="l10n_atelier_art_label_primary" formatted="false">"Основні кольори"</string>
+    <string name="l10n_atelier_art_label_primary_led" formatted="false">"Переважають основні кольори"</string>
+    <string name="l10n_atelier_art_label_pulse" formatted="false">"Пульс"</string>
+    <string name="l10n_atelier_art_label_punks" formatted="false">"Панки"</string>
+    <string name="l10n_atelier_art_label_puzzle" formatted="false">"Головоломка"</string>
+    <string name="l10n_atelier_art_label_quad" formatted="false">"Четверний"</string>
+    <string name="l10n_atelier_art_label_quarter" formatted="false">"Чверть"</string>
+    <string name="l10n_atelier_art_label_quarter_fans" formatted="false">"Чверті віяла"</string>
+    <string name="l10n_atelier_art_label_rain" formatted="false">"Дощ"</string>
+    <string name="l10n_atelier_art_label_ray" formatted="false">"Промінь"</string>
+    <string name="l10n_atelier_art_label_rectilinear" formatted="false">"Прямолінійний"</string>
+    <string name="l10n_atelier_art_label_red_led" formatted="false">"Переважає червоний"</string>
+    <string name="l10n_atelier_art_label_regular" formatted="false">"Регулярний"</string>
+    <string name="l10n_atelier_art_label_render" formatted="false">"Відтворення"</string>
+    <string name="l10n_atelier_art_label_resolution" formatted="false">"Роздільність"</string>
+    <string name="l10n_atelier_art_label_rich" formatted="false">"Багатий"</string>
+    <string name="l10n_atelier_art_label_rim" formatted="false">"Обідок"</string>
+    <string name="l10n_atelier_art_label_ring" formatted="false">"Кільце"</string>
+    <string name="l10n_atelier_art_label_rings" formatted="false">"Кільця"</string>
+    <string name="l10n_atelier_art_label_robot" formatted="false">"Робот"</string>
+    <string name="l10n_atelier_art_label_rose" formatted="false">"Троянда"</string>
+    <string name="l10n_atelier_art_label_rose_period" formatted="false">"Рожевий період"</string>
+    <string name="l10n_atelier_art_label_rot2" formatted="false">"Поворот 2"</string>
+    <string name="l10n_atelier_art_label_rotation" formatted="false">"Обертання"</string>
+    <string name="l10n_atelier_art_label_royal" formatted="false">"Королівський"</string>
+    <string name="l10n_atelier_art_label_rusty" formatted="false">"Іржавий"</string>
+    <string name="l10n_atelier_art_label_sail" formatted="false">"Вітрило"</string>
+    <string name="l10n_atelier_art_label_sakura" formatted="false">"Сакура"</string>
+    <string name="l10n_atelier_art_label_sand" formatted="false">"Пісок"</string>
+    <string name="l10n_atelier_art_label_saturated" formatted="false">"Насичений колір"</string>
+    <string name="l10n_atelier_art_label_scanlines" formatted="false">"Рядки розгортки"</string>
+    <string name="l10n_atelier_art_label_scar" formatted="false">"Шрам"</string>
+    <string name="l10n_atelier_art_label_scatter" formatted="false">"Розсип"</string>
+    <string name="l10n_atelier_art_label_scene" formatted="false">"Сцена"</string>
+    <string name="l10n_atelier_art_label_scheme" formatted="false">"Схема"</string>
+    <string name="l10n_atelier_art_label_sea" formatted="false">"Море"</string>
+    <string name="l10n_atelier_art_label_seascape" formatted="false">"Морський пейзаж"</string>
+    <string name="l10n_atelier_art_label_seed" formatted="false">"Зерно"</string>
+    <string name="l10n_atelier_art_label_seeds" formatted="false">"Зерна"</string>
+    <string name="l10n_atelier_art_label_seurat" formatted="false">"Сера"</string>
+    <string name="l10n_atelier_art_label_several" formatted="false">"Кілька"</string>
+    <string name="l10n_atelier_art_label_shades" formatted="false">"Темні окуляри"</string>
+    <string name="l10n_atelier_art_label_shadow" formatted="false">"Тінь"</string>
+    <string name="l10n_atelier_art_label_shapes" formatted="false">"Фігури"</string>
+    <string name="l10n_atelier_art_label_shirt" formatted="false">"Сорочка"</string>
+    <string name="l10n_atelier_art_label_single" formatted="false">"Одиночний"</string>
+    <string name="l10n_atelier_art_label_size_ramp" formatted="false">"Зміна розміру"</string>
+    <string name="l10n_atelier_art_label_sky" formatted="false">"Небо"</string>
+    <string name="l10n_atelier_art_label_sleepy" formatted="false">"Сонний"</string>
+    <string name="l10n_atelier_art_label_smile" formatted="false">"Усмішка"</string>
+    <string name="l10n_atelier_art_label_smooth" formatted="false">"Гладкий"</string>
+    <string name="l10n_atelier_art_label_snail" formatted="false">"Равлик"</string>
+    <string name="l10n_atelier_art_label_snow" formatted="false">"Сніг"</string>
+    <string name="l10n_atelier_art_label_solar" formatted="false">"Сонячний"</string>
+    <string name="l10n_atelier_art_label_solo" formatted="false">"Соло"</string>
+    <string name="l10n_atelier_art_label_spark" formatted="false">"Іскра"</string>
+    <string name="l10n_atelier_art_label_sparse" formatted="false">"Рідкий"</string>
+    <string name="l10n_atelier_art_label_spikes" formatted="false">"Шипи"</string>
+    <string name="l10n_atelier_art_label_spirograph" formatted="false">"Спірограф"</string>
+    <string name="l10n_atelier_art_label_split" formatted="false">"Поділений"</string>
+    <string name="l10n_atelier_art_label_square" formatted="false">"Квадрат"</string>
+    <string name="l10n_atelier_art_label_stacked" formatted="false">"Стос"</string>
+    <string name="l10n_atelier_art_label_star" formatted="false">"Зірка"</string>
+    <string name="l10n_atelier_art_label_stars" formatted="false">"Зірки"</string>
+    <string name="l10n_atelier_art_label_stitch" formatted="false">"Стежок"</string>
+    <string name="l10n_atelier_art_label_stitches" formatted="false">"Стежки"</string>
+    <string name="l10n_atelier_art_label_stripes" formatted="false">"Смуги"</string>
+    <string name="l10n_atelier_art_label_stroke" formatted="false">"Штрих"</string>
+    <string name="l10n_atelier_art_label_strong" formatted="false">"Сильний"</string>
+    <string name="l10n_atelier_art_label_subdivision" formatted="false">"Поділ"</string>
+    <string name="l10n_atelier_art_label_subtle" formatted="false">"Тонкий ефект"</string>
+    <string name="l10n_atelier_art_label_sun" formatted="false">"Сонце"</string>
+    <string name="l10n_atelier_art_label_superformula" formatted="false">"Суперформула"</string>
+    <string name="l10n_atelier_art_label_swept" formatted="false">"Зачіс"</string>
+    <string name="l10n_atelier_art_label_symmetry" formatted="false">"Симетрія"</string>
+    <string name="l10n_atelier_art_label_tan" formatted="false">"Смаглявий"</string>
+    <string name="l10n_atelier_art_label_tank" formatted="false">"Майка"</string>
+    <string name="l10n_atelier_art_label_teardrop" formatted="false">"Крапля"</string>
+    <string name="l10n_atelier_art_label_tee" formatted="false">"Футболка"</string>
+    <string name="l10n_atelier_art_label_terra" formatted="false">"Терра"</string>
+    <string name="l10n_atelier_art_label_texture" formatted="false">"Текстура"</string>
+    <string name="l10n_atelier_art_label_thorn" formatted="false">"Шип"</string>
+    <string name="l10n_atelier_art_label_tiles" formatted="false">"Плитки"</string>
+    <string name="l10n_atelier_art_label_tilt" formatted="false">"Нахил"</string>
+    <string name="l10n_atelier_art_label_tongue" formatted="false">"Язик"</string>
+    <string name="l10n_atelier_art_label_top_knot" formatted="false">"Пучок"</string>
+    <string name="l10n_atelier_art_label_torn" formatted="false">"Рваний"</string>
+    <string name="l10n_atelier_art_label_totem" formatted="false">"Тотем"</string>
+    <string name="l10n_atelier_art_label_tree" formatted="false">"Дерево"</string>
+    <string name="l10n_atelier_art_label_tri_m" formatted="false">"Потрійна M"</string>
+    <string name="l10n_atelier_art_label_tri_m09cfd7" formatted="false">"Потрійна M"</string>
+    <string name="l10n_atelier_art_label_tri_sig" formatted="false">"Потрійний підпис"</string>
+    <string name="l10n_atelier_art_label_tri_tone" formatted="false">"Триколірний"</string>
+    <string name="l10n_atelier_art_label_triangles" formatted="false">"Трикутники"</string>
+    <string name="l10n_atelier_art_label_trim" formatted="false">"Облямівка"</string>
+    <string name="l10n_atelier_art_label_trio" formatted="false">"Тріо"</string>
+    <string name="l10n_atelier_art_label_truchet" formatted="false">"Трюше"</string>
+    <string name="l10n_atelier_art_label_two_tone" formatted="false">"Два тони"</string>
+    <string name="l10n_atelier_art_label_umbrella" formatted="false">"Парасоля"</string>
+    <string name="l10n_atelier_art_label_vector" formatted="false">"Вектор"</string>
+    <string name="l10n_atelier_art_label_vintage" formatted="false">"Вінтаж"</string>
+    <string name="l10n_atelier_art_label_violet_hour" formatted="false">"Фіолетова година"</string>
+    <string name="l10n_atelier_art_label_visor" formatted="false">"Козирок"</string>
+    <string name="l10n_atelier_art_label_warm" formatted="false">"Теплий"</string>
+    <string name="l10n_atelier_art_label_warp" formatted="false">"Викривлення"</string>
+    <string name="l10n_atelier_art_label_wash" formatted="false">"Розмивка"</string>
+    <string name="l10n_atelier_art_label_waves" formatted="false">"Хвилі"</string>
+    <string name="l10n_atelier_art_label_web" formatted="false">"Павутиння"</string>
+    <string name="l10n_atelier_art_label_wedge" formatted="false">"Клин"</string>
+    <string name="l10n_atelier_art_label_whistle" formatted="false">"Свист"</string>
+    <string name="l10n_atelier_art_label_white_m" formatted="false">"Біла M"</string>
+    <string name="l10n_atelier_art_label_whole" formatted="false">"Цілий"</string>
+    <string name="l10n_atelier_art_label_wild" formatted="false">"Дикий"</string>
+    <string name="l10n_atelier_art_label_xstitch" formatted="false">"Хрестик"</string>
+    <string name="l10n_atelier_art_label_zigzag" formatted="false">"Зиґзаґ"</string>
+    <string name="l10n_atelier_art_label_zombie" formatted="false">"Зомбі"</string>
+    <string name="l10n_atelier_art_title" formatted="false">"Генеративне мистецтво"</string>
+    <string name="l10n_atelier_art_intro" formatted="false">"Генератор — 19 наборів стилів SVG у блокчейні"</string>
+    <string name="l10n_atelier_art_deterministic" formatted="false">"Сід і стиль відтворюють кожну роботу байт у байт. Той самий дизайн створюється в MiniDapp без змін."</string>
+    <string name="l10n_atelier_art_warming" formatted="false">"Запуск рушія генерації…"</string>
+    <string name="l10n_atelier_art_photo_loaded" formatted="false">"Фото завантажено — кожна робота ґрунтується на його мальованій версії. Оригінал залишається на телефоні."</string>
+    <string name="l10n_atelier_art_photo_help" formatted="false">"Виберіть фото для створення колекції на цьому пристрої. Оригінал залишається на телефоні. Заповнювач не можна випустити як NFT."</string>
+    <string name="l10n_atelier_art_change_photo" formatted="false">"Змінити фото"</string>
+    <string name="l10n_atelier_art_choose_photo" formatted="false">"Вибрати фото"</string>
+    <string name="l10n_atelier_art_seed" formatted="false">"Сід колекції — той самий сід, те саме мистецтво, назавжди"</string>
+    <string name="l10n_atelier_art_random_seed" formatted="false">"Створити новий сід колекції"</string>
+    <string name="l10n_atelier_art_traits" formatted="false">"Набір ознак і рідкісність"</string>
+    <!-- Arguments: value, total -->
+    <string name="l10n_atelier_art_enabled">"Увімкнено: %1$s/%2$s"</string>
+    <string name="l10n_atelier_art_shuffle_rarity" formatted="false">"🎲 Рідкісність"</string>
+    <string name="l10n_atelier_art_shuffle_traits" formatted="false">"🎲 Ознаки"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_capacity">"Можливі поєднання ознак: %1$s"</string>
+    <string name="l10n_atelier_art_proof" formatted="false">"Попередній перегляд робіт"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_plates">"Робіт: %1$s"</string>
+    <string name="l10n_atelier_art_drawing" formatted="false">"Малювання…"</string>
+    <string name="l10n_atelier_art_generate" formatted="false">"Створити"</string>
+    <string name="l10n_atelier_art_plate_hint" formatted="false">"Натисніть на роботу, щоб побачити її ознаки та рідкісність."</string>
+    <string name="l10n_atelier_art_composing" formatted="false">"Підготовка…"</string>
+    <string name="l10n_atelier_art_send" formatted="false">"Відкрити в майстрі колекції"</string>
+    <string name="l10n_atelier_art_traits_shuffled" formatted="false">"Набір ознак перемішано"</string>
+    <string name="l10n_atelier_art_rarity_shuffled" formatted="false">"Рідкісність перемішано"</string>
+    <!-- Arguments: value, total -->
+    <string name="l10n_atelier_art_rarity_bytes">"Оцінка рідкісності r%1$s · %2$s Б вихідних даних"</string>
+    <string name="l10n_atelier_art_load_photo" formatted="false">"Спочатку завантажте фото — заповнювач не можна випустити як NFT."</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_plate_budget">"Робота %1$s перевищує допустимий розмір для блокчейну."</string>
+    <string name="l10n_atelier_art_signed_budget" formatted="false">"Колекція перевищує ліміт підписаного запису. Зменште кількість ознак або розмір зображень."</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_editions_ready">"Створено примірників: %1$s — заповніть відомості про колекцію."</string>
+    <string name="l10n_atelier_art_filtr_loaded" formatted="false">"Зображення FILTR завантажено в майстер NFT"</string>
+    <string name="l10n_atelier_art_cartoonizing" formatted="false">"Створення мальованої версії на пристрої…"</string>
+    <string name="l10n_atelier_art_filtr_failed" formatted="false">"Не вдалося прочитати зображення FILTR"</string>
+    <string name="l10n_atelier_art_photo_read_failed" formatted="false">"Не вдалося прочитати фото"</string>
+    <string name="l10n_atelier_art_photo_process_failed" formatted="false">"Не вдалося обробити фото"</string>
+    <string name="l10n_atelier_art_photo_ready" formatted="false">"Мальовану версію фото створено за допомогою ШІ на пристрої"</string>
+    <string name="l10n_atelier_art_photo_fallback" formatted="false">"Рушій ШІ недоступний — фото перетворено безпосередньо"</string>
+    <string name="l10n_atelier_art_no_variants" formatted="false">"Увімкніть хоча б один варіант у кожній групі ознак."</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_unique_failed">"Не вдалося знайти унікальне поєднання для роботи %1$s. Увімкніть більше варіантів або зменште колекцію."</string>
+    <string name="l10n_atelier_art_generate_failed" formatted="false">"Не вдалося створити колекцію. Змініть ознаки та спробуйте ще раз."</string>
 </resources>

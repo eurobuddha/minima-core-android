@@ -36460,5 +36460,2471 @@
     "zh-Hans": "此地址未托管文件：\n{0}\n\n您已上传的图像位于：\n{1}\n\n本次铸造使用已上传文件的基础链接？",
     "ru": "По этому адресу нет файлов:\n{0}\n\nВаши загруженные изображения доступны здесь:\n{1}\n\nИспользовать их базовый URL для выпуска?",
     "uk": "За цією адресою немає файлів:\n{0}\n\nВаші завантажені зображення доступні тут:\n{1}\n\nВикористати їхній базовий URL для створення?"
+  },
+  "atelierArt.label12Fold": {
+    "en": "12-fold",
+    "zh-Hans": "12 重对称",
+    "ru": "12-кратная",
+    "uk": "12-кратна"
+  },
+  "atelierArt.label16Fold": {
+    "en": "16-fold",
+    "zh-Hans": "16 重对称",
+    "ru": "16-кратная",
+    "uk": "16-кратна"
+  },
+  "atelierArt.label24Fold": {
+    "en": "24-fold",
+    "zh-Hans": "24 重对称",
+    "ru": "24-кратная",
+    "uk": "24-кратна"
+  },
+  "atelierArt.label6Fold": {
+    "en": "6-fold",
+    "zh-Hans": "6 重对称",
+    "ru": "6-кратная",
+    "uk": "6-кратна"
+  },
+  "atelierArt.label8Fold": {
+    "en": "8-fold",
+    "zh-Hans": "8 重对称",
+    "ru": "8-кратная",
+    "uk": "8-кратна"
+  },
+  "atelierArt.labelAccent": {
+    "en": "Accent",
+    "zh-Hans": "强调色",
+    "ru": "Акцент",
+    "uk": "Акцент"
+  },
+  "atelierArt.labelAccentLead": {
+    "en": "Accent lead",
+    "zh-Hans": "以强调色为主",
+    "ru": "Акцентный цвет",
+    "uk": "Акцентний колір"
+  },
+  "atelierArt.labelAcid": {
+    "en": "Acid",
+    "zh-Hans": "酸性色",
+    "ru": "Кислотный",
+    "uk": "Кислотний"
+  },
+  "atelierArt.labelAiry": {
+    "en": "Airy",
+    "zh-Hans": "轻盈",
+    "ru": "Воздушный",
+    "uk": "Повітряний"
+  },
+  "atelierArt.labelAlgae": {
+    "en": "Algae",
+    "zh-Hans": "藻类",
+    "ru": "Водоросли",
+    "uk": "Водорості"
+  },
+  "atelierArt.labelAlien": {
+    "en": "Alien",
+    "zh-Hans": "外星人",
+    "ru": "Пришелец",
+    "uk": "Прибулець"
+  },
+  "atelierArt.labelAmberGlow": {
+    "en": "Amber Glow",
+    "zh-Hans": "琥珀光",
+    "ru": "Янтарное сияние",
+    "uk": "Бурштинове сяйво"
+  },
+  "atelierArt.labelAntenna": {
+    "en": "Antenna",
+    "zh-Hans": "天线",
+    "ru": "Антенна",
+    "uk": "Антена"
+  },
+  "atelierArt.labelApple": {
+    "en": "Apple",
+    "zh-Hans": "苹果",
+    "ru": "Яблоко",
+    "uk": "Яблуко"
+  },
+  "atelierArt.labelArcs": {
+    "en": "Arcs",
+    "zh-Hans": "弧线",
+    "ru": "Дуги",
+    "uk": "Дуги"
+  },
+  "atelierArt.labelArcsDots": {
+    "en": "Arcs+Dots",
+    "zh-Hans": "弧线与圆点",
+    "ru": "Дуги и точки",
+    "uk": "Дуги й точки"
+  },
+  "atelierArt.labelArms13": {
+    "en": "Arms-13",
+    "zh-Hans": "13 条臂",
+    "ru": "13 лучей",
+    "uk": "13 променів"
+  },
+  "atelierArt.labelArms8": {
+    "en": "Arms-8",
+    "zh-Hans": "8 条臂",
+    "ru": "8 лучей",
+    "uk": "8 променів"
+  },
+  "atelierArt.labelAzure": {
+    "en": "Azure",
+    "zh-Hans": "蔚蓝",
+    "ru": "Лазурный",
+    "uk": "Лазуровий"
+  },
+  "atelierArt.labelBackdrop": {
+    "en": "Backdrop",
+    "zh-Hans": "背景幕",
+    "ru": "Задний план",
+    "uk": "Задній план"
+  },
+  "atelierArt.labelBackground": {
+    "en": "Background",
+    "zh-Hans": "背景",
+    "ru": "Фон",
+    "uk": "Тло"
+  },
+  "atelierArt.labelBalanced": {
+    "en": "Balanced",
+    "zh-Hans": "均衡",
+    "ru": "Сбалансированный",
+    "uk": "Збалансований"
+  },
+  "atelierArt.labelBald": {
+    "en": "Bald",
+    "zh-Hans": "光头",
+    "ru": "Лысый",
+    "uk": "Лисий"
+  },
+  "atelierArt.labelBamboo": {
+    "en": "Bamboo",
+    "zh-Hans": "竹子",
+    "ru": "Бамбук",
+    "uk": "Бамбук"
+  },
+  "atelierArt.labelBand": {
+    "en": "Band",
+    "zh-Hans": "条带",
+    "ru": "Полоса",
+    "uk": "Смуга"
+  },
+  "atelierArt.labelBandage": {
+    "en": "Bandage",
+    "zh-Hans": "绷带",
+    "ru": "Повязка",
+    "uk": "Пов’язка"
+  },
+  "atelierArt.labelBare": {
+    "en": "Bare",
+    "zh-Hans": "简素",
+    "ru": "Без украшений",
+    "uk": "Без прикрас"
+  },
+  "atelierArt.labelBars": {
+    "en": "Bars",
+    "zh-Hans": "条形",
+    "ru": "Полоски",
+    "uk": "Смужки"
+  },
+  "atelierArt.labelBauhaus": {
+    "en": "Bauhaus",
+    "zh-Hans": "包豪斯",
+    "ru": "Баухаус",
+    "uk": "Баугауз"
+  },
+  "atelierArt.labelBeanie": {
+    "en": "Beanie",
+    "zh-Hans": "针织帽",
+    "ru": "Вязаная шапка",
+    "uk": "В’язана шапка"
+  },
+  "atelierArt.labelBear": {
+    "en": "Bear",
+    "zh-Hans": "熊",
+    "ru": "Медведь",
+    "uk": "Ведмідь"
+  },
+  "atelierArt.labelBeard": {
+    "en": "Beard",
+    "zh-Hans": "胡须",
+    "ru": "Борода",
+    "uk": "Борода"
+  },
+  "atelierArt.labelBlackwhite": {
+    "en": "Blackwhite",
+    "zh-Hans": "黑白",
+    "ru": "Чёрно-белый",
+    "uk": "Чорно-білий"
+  },
+  "atelierArt.labelBlobs": {
+    "en": "Blobs",
+    "zh-Hans": "色块",
+    "ru": "Пятна",
+    "uk": "Плями"
+  },
+  "atelierArt.labelBlock": {
+    "en": "Block",
+    "zh-Hans": "块状",
+    "ru": "Блок",
+    "uk": "Блок"
+  },
+  "atelierArt.labelBloom": {
+    "en": "Bloom",
+    "zh-Hans": "花朵",
+    "ru": "Цветение",
+    "uk": "Цвітіння"
+  },
+  "atelierArt.labelBlueM": {
+    "en": "Blue M",
+    "zh-Hans": "蓝色 M",
+    "ru": "Синяя M",
+    "uk": "Синя M"
+  },
+  "atelierArt.labelBlueNude": {
+    "en": "Blue Nude",
+    "zh-Hans": "蓝色裸像",
+    "ru": "Голубая обнажённая",
+    "uk": "Блакитна оголена"
+  },
+  "atelierArt.labelBluePeriod": {
+    "en": "Blue Period",
+    "zh-Hans": "蓝色时期",
+    "ru": "Голубой период",
+    "uk": "Блакитний період"
+  },
+  "atelierArt.labelBlueLed": {
+    "en": "Blue-led",
+    "zh-Hans": "以蓝色为主",
+    "ru": "Преобладает синий",
+    "uk": "Переважає синій"
+  },
+  "atelierArt.labelBlush": {
+    "en": "Blush",
+    "zh-Hans": "腮红",
+    "ru": "Румянец",
+    "uk": "Рум’янець"
+  },
+  "atelierArt.labelBold": {
+    "en": "Bold",
+    "zh-Hans": "鲜明",
+    "ru": "Выразительный",
+    "uk": "Виразний"
+  },
+  "atelierArt.labelBoogie": {
+    "en": "Boogie",
+    "zh-Hans": "布吉",
+    "ru": "Буги",
+    "uk": "Бугі"
+  },
+  "atelierArt.labelBothProfile": {
+    "en": "Both-profile",
+    "zh-Hans": "双侧面",
+    "ru": "Два профиля",
+    "uk": "Два профілі"
+  },
+  "atelierArt.labelBowler": {
+    "en": "Bowler",
+    "zh-Hans": "圆顶礼帽",
+    "ru": "Котелок",
+    "uk": "Капелюх-котелок"
+  },
+  "atelierArt.labelBrown": {
+    "en": "Brown",
+    "zh-Hans": "棕色",
+    "ru": "Коричневый",
+    "uk": "Коричневий"
+  },
+  "atelierArt.labelBurst": {
+    "en": "Burst",
+    "zh-Hans": "迸发",
+    "ru": "Всплеск",
+    "uk": "Сплеск"
+  },
+  "atelierArt.labelBusy": {
+    "en": "Busy",
+    "zh-Hans": "繁密",
+    "ru": "Насыщенный",
+    "uk": "Насичений"
+  },
+  "atelierArt.labelButton": {
+    "en": "Button",
+    "zh-Hans": "纽扣",
+    "ru": "Пуговица",
+    "uk": "Ґудзик"
+  },
+  "atelierArt.labelBuzz": {
+    "en": "Buzz",
+    "zh-Hans": "寸头",
+    "ru": "Ёжик",
+    "uk": "Їжачок"
+  },
+  "atelierArt.labelCalm": {
+    "en": "Calm",
+    "zh-Hans": "平静",
+    "ru": "Спокойный",
+    "uk": "Спокійний"
+  },
+  "atelierArt.labelCap": {
+    "en": "Cap",
+    "zh-Hans": "鸭舌帽",
+    "ru": "Кепка",
+    "uk": "Кепка"
+  },
+  "atelierArt.labelCells": {
+    "en": "Cells",
+    "zh-Hans": "单元格",
+    "ru": "Ячейки",
+    "uk": "Комірки"
+  },
+  "atelierArt.labelChain": {
+    "en": "Chain",
+    "zh-Hans": "链条",
+    "ru": "Цепь",
+    "uk": "Ланцюг"
+  },
+  "atelierArt.labelChaos": {
+    "en": "Chaos",
+    "zh-Hans": "混沌",
+    "ru": "Хаос",
+    "uk": "Хаос"
+  },
+  "atelierArt.labelCharcoal": {
+    "en": "Charcoal",
+    "zh-Hans": "炭黑",
+    "ru": "Угольный",
+    "uk": "Вугільний"
+  },
+  "atelierArt.labelChecker": {
+    "en": "Checker",
+    "zh-Hans": "棋盘格",
+    "ru": "Шахматный",
+    "uk": "Шаховий"
+  },
+  "atelierArt.labelChest": {
+    "en": "Chest",
+    "zh-Hans": "胸部",
+    "ru": "Грудь",
+    "uk": "Груди"
+  },
+  "atelierArt.labelChestPrint": {
+    "en": "Chest print",
+    "zh-Hans": "胸前图案",
+    "ru": "Рисунок на груди",
+    "uk": "Малюнок на грудях"
+  },
+  "atelierArt.labelCigarette": {
+    "en": "Cigarette",
+    "zh-Hans": "香烟",
+    "ru": "Сигарета",
+    "uk": "Сигарета"
+  },
+  "atelierArt.labelCircleGrid": {
+    "en": "Circle Grid",
+    "zh-Hans": "圆形网格",
+    "ru": "Сетка кругов",
+    "uk": "Сітка кіл"
+  },
+  "atelierArt.labelCircles": {
+    "en": "Circles",
+    "zh-Hans": "圆形",
+    "ru": "Круги",
+    "uk": "Кола"
+  },
+  "atelierArt.labelClassic": {
+    "en": "Classic",
+    "zh-Hans": "经典",
+    "ru": "Классический",
+    "uk": "Класичний"
+  },
+  "atelierArt.labelClouds": {
+    "en": "Clouds",
+    "zh-Hans": "云朵",
+    "ru": "Облака",
+    "uk": "Хмари"
+  },
+  "atelierArt.labelCobalt": {
+    "en": "Cobalt",
+    "zh-Hans": "钴蓝",
+    "ru": "Кобальтовый",
+    "uk": "Кобальтовий"
+  },
+  "atelierArt.labelCoin": {
+    "en": "Coin",
+    "zh-Hans": "硬币",
+    "ru": "Монета",
+    "uk": "Монета"
+  },
+  "atelierArt.labelColor": {
+    "en": "Color",
+    "zh-Hans": "颜色",
+    "ru": "Цвет",
+    "uk": "Колір"
+  },
+  "atelierArt.labelColorBalance": {
+    "en": "Color balance",
+    "zh-Hans": "色彩平衡",
+    "ru": "Баланс цвета",
+    "uk": "Баланс кольору"
+  },
+  "atelierArt.labelColoring": {
+    "en": "Coloring",
+    "zh-Hans": "着色",
+    "ru": "Окраска",
+    "uk": "Забарвлення"
+  },
+  "atelierArt.labelColumn": {
+    "en": "Column",
+    "zh-Hans": "柱形",
+    "ru": "Колонна",
+    "uk": "Колона"
+  },
+  "atelierArt.labelCompanion": {
+    "en": "Companion",
+    "zh-Hans": "伙伴",
+    "ru": "Спутник",
+    "uk": "Супутник"
+  },
+  "atelierArt.labelComposition": {
+    "en": "Composition",
+    "zh-Hans": "构图",
+    "ru": "Композиция",
+    "uk": "Композиція"
+  },
+  "atelierArt.labelConnector": {
+    "en": "Connector",
+    "zh-Hans": "连接线",
+    "ru": "Соединитель",
+    "uk": "З’єднувач"
+  },
+  "atelierArt.labelConnectors": {
+    "en": "Connectors",
+    "zh-Hans": "连接线组",
+    "ru": "Соединители",
+    "uk": "З’єднувачі"
+  },
+  "atelierArt.labelCool": {
+    "en": "Cool",
+    "zh-Hans": "冷色",
+    "ru": "Холодный",
+    "uk": "Холодний"
+  },
+  "atelierArt.labelCore": {
+    "en": "Core",
+    "zh-Hans": "核心",
+    "ru": "Ядро",
+    "uk": "Ядро"
+  },
+  "atelierArt.labelCorner": {
+    "en": "Corner",
+    "zh-Hans": "角落",
+    "ru": "Угол",
+    "uk": "Кут"
+  },
+  "atelierArt.labelCount": {
+    "en": "Count",
+    "zh-Hans": "数量",
+    "ru": "Количество",
+    "uk": "Кількість"
+  },
+  "atelierArt.labelCream": {
+    "en": "Cream",
+    "zh-Hans": "奶油色",
+    "ru": "Кремовый",
+    "uk": "Кремовий"
+  },
+  "atelierArt.labelCrescents": {
+    "en": "Crescents",
+    "zh-Hans": "月牙",
+    "ru": "Полумесяцы",
+    "uk": "Півмісяці"
+  },
+  "atelierArt.labelCrimson": {
+    "en": "Crimson",
+    "zh-Hans": "绯红",
+    "ru": "Багряный",
+    "uk": "Багряний"
+  },
+  "atelierArt.labelCrowded": {
+    "en": "Crowded",
+    "zh-Hans": "拥挤",
+    "ru": "Плотный",
+    "uk": "Щільний"
+  },
+  "atelierArt.labelCrown": {
+    "en": "Crown",
+    "zh-Hans": "王冠",
+    "ru": "Корона",
+    "uk": "Корона"
+  },
+  "atelierArt.labelDay": {
+    "en": "Day",
+    "zh-Hans": "白天",
+    "ru": "День",
+    "uk": "День"
+  },
+  "atelierArt.labelDeep": {
+    "en": "Deep",
+    "zh-Hans": "深色",
+    "ru": "Глубокий",
+    "uk": "Глибокий"
+  },
+  "atelierArt.labelDeepBlue": {
+    "en": "Deep Blue",
+    "zh-Hans": "深蓝",
+    "ru": "Глубокий синий",
+    "uk": "Глибокий синій"
+  },
+  "atelierArt.labelDeepTeal": {
+    "en": "Deep Teal",
+    "zh-Hans": "深青绿",
+    "ru": "Тёмная бирюза",
+    "uk": "Темна бірюза"
+  },
+  "atelierArt.labelDense": {
+    "en": "Dense",
+    "zh-Hans": "密集",
+    "ru": "Густой",
+    "uk": "Густий"
+  },
+  "atelierArt.labelDensity": {
+    "en": "Density",
+    "zh-Hans": "密度",
+    "ru": "Плотность",
+    "uk": "Щільність"
+  },
+  "atelierArt.labelDetail": {
+    "en": "Detail",
+    "zh-Hans": "细节",
+    "ru": "Детализация",
+    "uk": "Деталізація"
+  },
+  "atelierArt.labelDiagonal": {
+    "en": "Diagonal",
+    "zh-Hans": "对角线",
+    "ru": "Диагональ",
+    "uk": "Діагональ"
+  },
+  "atelierArt.labelDiagonals": {
+    "en": "Diagonals",
+    "zh-Hans": "对角线组",
+    "ru": "Диагонали",
+    "uk": "Діагоналі"
+  },
+  "atelierArt.labelDiamond": {
+    "en": "Diamond",
+    "zh-Hans": "菱形",
+    "ru": "Ромб",
+    "uk": "Ромб"
+  },
+  "atelierArt.labelDisc": {
+    "en": "Disc",
+    "zh-Hans": "圆盘",
+    "ru": "Диск",
+    "uk": "Диск"
+  },
+  "atelierArt.labelDot": {
+    "en": "Dot",
+    "zh-Hans": "圆点",
+    "ru": "Точка",
+    "uk": "Крапка"
+  },
+  "atelierArt.labelDotChain": {
+    "en": "Dot Chain",
+    "zh-Hans": "点链",
+    "ru": "Цепочка точек",
+    "uk": "Ланцюжок крапок"
+  },
+  "atelierArt.labelDotScale": {
+    "en": "Dot scale",
+    "zh-Hans": "圆点大小",
+    "ru": "Размер точек",
+    "uk": "Розмір крапок"
+  },
+  "atelierArt.labelDots": {
+    "en": "Dots",
+    "zh-Hans": "圆点组",
+    "ru": "Точки",
+    "uk": "Крапки"
+  },
+  "atelierArt.labelDouble": {
+    "en": "Double",
+    "zh-Hans": "双重",
+    "ru": "Двойной",
+    "uk": "Подвійний"
+  },
+  "atelierArt.labelDuet": {
+    "en": "Duet",
+    "zh-Hans": "二重奏",
+    "ru": "Дуэт",
+    "uk": "Дует"
+  },
+  "atelierArt.labelDuo": {
+    "en": "Duo",
+    "zh-Hans": "双人组",
+    "ru": "Пара",
+    "uk": "Пара"
+  },
+  "atelierArt.labelDuotone": {
+    "en": "Duotone",
+    "zh-Hans": "双色调",
+    "ru": "Двухцветный",
+    "uk": "Двоколірний"
+  },
+  "atelierArt.labelDusk": {
+    "en": "Dusk",
+    "zh-Hans": "黄昏",
+    "ru": "Сумерки",
+    "uk": "Сутінки"
+  },
+  "atelierArt.labelDuskNeon": {
+    "en": "Dusk Neon",
+    "zh-Hans": "暮色霓虹",
+    "ru": "Сумеречный неон",
+    "uk": "Сутінковий неон"
+  },
+  "atelierArt.labelEarring": {
+    "en": "Earring",
+    "zh-Hans": "耳环",
+    "ru": "Серьга",
+    "uk": "Сережка"
+  },
+  "atelierArt.labelEars": {
+    "en": "Ears",
+    "zh-Hans": "耳朵",
+    "ru": "Уши",
+    "uk": "Вуха"
+  },
+  "atelierArt.labelEarth": {
+    "en": "Earth",
+    "zh-Hans": "大地",
+    "ru": "Земля",
+    "uk": "Земля"
+  },
+  "atelierArt.labelEcho": {
+    "en": "Echo",
+    "zh-Hans": "回声",
+    "ru": "Эхо",
+    "uk": "Відлуння"
+  },
+  "atelierArt.labelElement": {
+    "en": "Element",
+    "zh-Hans": "元素",
+    "ru": "Элемент",
+    "uk": "Елемент"
+  },
+  "atelierArt.labelEmber": {
+    "en": "Ember",
+    "zh-Hans": "余烬",
+    "ru": "Уголёк",
+    "uk": "Жаринка"
+  },
+  "atelierArt.labelEmberField": {
+    "en": "Ember Field",
+    "zh-Hans": "余烬原野",
+    "ru": "Поле углей",
+    "uk": "Поле жарин"
+  },
+  "atelierArt.labelEscher": {
+    "en": "Escher",
+    "zh-Hans": "埃舍尔",
+    "ru": "Эшер",
+    "uk": "Ешер"
+  },
+  "atelierArt.labelEven": {
+    "en": "Even",
+    "zh-Hans": "均匀",
+    "ru": "Равномерный",
+    "uk": "Рівномірний"
+  },
+  "atelierArt.labelExtra": {
+    "en": "Extra",
+    "zh-Hans": "额外",
+    "ru": "Дополнительно",
+    "uk": "Додатково"
+  },
+  "atelierArt.labelEye": {
+    "en": "Eye",
+    "zh-Hans": "眼睛",
+    "ru": "Глаз",
+    "uk": "Око"
+  },
+  "atelierArt.labelEyes": {
+    "en": "Eyes",
+    "zh-Hans": "双眼",
+    "ru": "Глаза",
+    "uk": "Очі"
+  },
+  "atelierArt.labelEyesEyewear": {
+    "en": "Eyes / eyewear",
+    "zh-Hans": "眼睛／眼镜",
+    "ru": "Глаза / очки",
+    "uk": "Очі / окуляри"
+  },
+  "atelierArt.labelFacialHair": {
+    "en": "Facial hair",
+    "zh-Hans": "面部毛发",
+    "ru": "Растительность на лице",
+    "uk": "Волосся на обличчі"
+  },
+  "atelierArt.labelFamily": {
+    "en": "Family",
+    "zh-Hans": "家族",
+    "ru": "Семейство",
+    "uk": "Сімейство"
+  },
+  "atelierArt.labelFermat": {
+    "en": "Fermat",
+    "zh-Hans": "费马",
+    "ru": "Ферма",
+    "uk": "Ферма"
+  },
+  "atelierArt.labelFew": {
+    "en": "Few",
+    "zh-Hans": "少量",
+    "ru": "Мало",
+    "uk": "Мало"
+  },
+  "atelierArt.labelField": {
+    "en": "Field",
+    "zh-Hans": "场域",
+    "ru": "Поле",
+    "uk": "Поле"
+  },
+  "atelierArt.labelFine": {
+    "en": "Fine",
+    "zh-Hans": "精细",
+    "ru": "Тонкий",
+    "uk": "Тонкий"
+  },
+  "atelierArt.labelFinish": {
+    "en": "Finish",
+    "zh-Hans": "表面效果",
+    "ru": "Отделка",
+    "uk": "Оздоблення"
+  },
+  "atelierArt.labelFlat": {
+    "en": "Flat",
+    "zh-Hans": "平面",
+    "ru": "Плоский",
+    "uk": "Плоский"
+  },
+  "atelierArt.labelFloppy": {
+    "en": "Floppy",
+    "zh-Hans": "垂耳",
+    "ru": "Висячие",
+    "uk": "Висячі"
+  },
+  "atelierArt.labelFocal": {
+    "en": "Focal",
+    "zh-Hans": "焦点",
+    "ru": "Фокус",
+    "uk": "Фокус"
+  },
+  "atelierArt.labelForm": {
+    "en": "Form",
+    "zh-Hans": "形状",
+    "ru": "Форма",
+    "uk": "Форма"
+  },
+  "atelierArt.labelForms": {
+    "en": "Forms",
+    "zh-Hans": "形状组",
+    "ru": "Формы",
+    "uk": "Форми"
+  },
+  "atelierArt.labelFragmentation": {
+    "en": "Fragmentation",
+    "zh-Hans": "碎片化",
+    "ru": "Фрагментация",
+    "uk": "Фрагментація"
+  },
+  "atelierArt.labelFrame": {
+    "en": "Frame",
+    "zh-Hans": "边框",
+    "ru": "Рамка",
+    "uk": "Рамка"
+  },
+  "atelierArt.labelFree": {
+    "en": "Free",
+    "zh-Hans": "自由",
+    "ru": "Свободный",
+    "uk": "Вільний"
+  },
+  "atelierArt.labelFrequency": {
+    "en": "Frequency",
+    "zh-Hans": "频率",
+    "ru": "Частота",
+    "uk": "Частота"
+  },
+  "atelierArt.labelFrown": {
+    "en": "Frown",
+    "zh-Hans": "皱眉",
+    "ru": "Хмурый",
+    "uk": "Похмурий"
+  },
+  "atelierArt.labelGentle": {
+    "en": "Gentle",
+    "zh-Hans": "柔和",
+    "ru": "Мягкий",
+    "uk": "М’який"
+  },
+  "atelierArt.labelGeometric": {
+    "en": "Geometric",
+    "zh-Hans": "几何式",
+    "ru": "Геометрический",
+    "uk": "Геометричний"
+  },
+  "atelierArt.labelGeometry": {
+    "en": "Geometry",
+    "zh-Hans": "几何",
+    "ru": "Геометрия",
+    "uk": "Геометрія"
+  },
+  "atelierArt.labelGlow": {
+    "en": "Glow",
+    "zh-Hans": "辉光",
+    "ru": "Сияние",
+    "uk": "Сяйво"
+  },
+  "atelierArt.labelGoatee": {
+    "en": "Goatee",
+    "zh-Hans": "山羊胡",
+    "ru": "Эспаньолка",
+    "uk": "Еспаньйолка"
+  },
+  "atelierArt.labelGold": {
+    "en": "Gold",
+    "zh-Hans": "金色",
+    "ru": "Золотой",
+    "uk": "Золотий"
+  },
+  "atelierArt.labelGoldGrin": {
+    "en": "Gold Grin",
+    "zh-Hans": "金色笑容",
+    "ru": "Золотая ухмылка",
+    "uk": "Золота усмішка"
+  },
+  "atelierArt.labelGradient": {
+    "en": "Gradient",
+    "zh-Hans": "渐变",
+    "ru": "Градиент",
+    "uk": "Градієнт"
+  },
+  "atelierArt.labelGrandeJatte": {
+    "en": "Grande Jatte",
+    "zh-Hans": "大碗岛",
+    "ru": "Гранд-Жатт",
+    "uk": "Гранд-Жатт"
+  },
+  "atelierArt.labelGrid": {
+    "en": "Grid",
+    "zh-Hans": "网格",
+    "ru": "Сетка",
+    "uk": "Сітка"
+  },
+  "atelierArt.labelGrid2": {
+    "en": "Grid-2",
+    "zh-Hans": "2 格网格",
+    "ru": "Сетка-2",
+    "uk": "Сітка-2"
+  },
+  "atelierArt.labelGrid3": {
+    "en": "Grid-3",
+    "zh-Hans": "3 格网格",
+    "ru": "Сетка-3",
+    "uk": "Сітка-3"
+  },
+  "atelierArt.labelGrin": {
+    "en": "Grin",
+    "zh-Hans": "咧嘴笑",
+    "ru": "Ухмылка",
+    "uk": "Широка усмішка"
+  },
+  "atelierArt.labelGrisaille": {
+    "en": "Grisaille",
+    "zh-Hans": "灰阶画",
+    "ru": "Гризайль",
+    "uk": "Гризайль"
+  },
+  "atelierArt.labelGrr": {
+    "en": "Grr",
+    "zh-Hans": "咆哮",
+    "ru": "Р-р-р",
+    "uk": "Р-р-р"
+  },
+  "atelierArt.labelHair": {
+    "en": "Hair",
+    "zh-Hans": "发型",
+    "ru": "Волосы",
+    "uk": "Волосся"
+  },
+  "atelierArt.labelHairHeadgear": {
+    "en": "Hair / headgear",
+    "zh-Hans": "发型／头饰",
+    "ru": "Волосы / головной убор",
+    "uk": "Волосся / головний убір"
+  },
+  "atelierArt.labelHalf": {
+    "en": "Half",
+    "zh-Hans": "一半",
+    "ru": "Половина",
+    "uk": "Половина"
+  },
+  "atelierArt.labelHalo": {
+    "en": "Halo",
+    "zh-Hans": "光环",
+    "ru": "Ореол",
+    "uk": "Ореол"
+  },
+  "atelierArt.labelHarmonograph": {
+    "en": "Harmonograph",
+    "zh-Hans": "谐波图",
+    "ru": "Гармонограф",
+    "uk": "Гармонограф"
+  },
+  "atelierArt.labelHeadband": {
+    "en": "Headband",
+    "zh-Hans": "头带",
+    "ru": "Повязка на голову",
+    "uk": "Пов’язка на голову"
+  },
+  "atelierArt.labelHeadgear": {
+    "en": "Headgear",
+    "zh-Hans": "头饰",
+    "ru": "Головной убор",
+    "uk": "Головний убір"
+  },
+  "atelierArt.labelHeadset": {
+    "en": "Headset",
+    "zh-Hans": "耳麦",
+    "ru": "Гарнитура",
+    "uk": "Гарнітура"
+  },
+  "atelierArt.labelHeart": {
+    "en": "Heart",
+    "zh-Hans": "心形",
+    "ru": "Сердце",
+    "uk": "Серце"
+  },
+  "atelierArt.labelHeavy": {
+    "en": "Heavy",
+    "zh-Hans": "厚重",
+    "ru": "Тяжёлый",
+    "uk": "Важкий"
+  },
+  "atelierArt.labelHigh": {
+    "en": "High",
+    "zh-Hans": "高",
+    "ru": "Высокий",
+    "uk": "Високий"
+  },
+  "atelierArt.labelHills": {
+    "en": "Hills",
+    "zh-Hans": "山丘",
+    "ru": "Холмы",
+    "uk": "Пагорби"
+  },
+  "atelierArt.labelHologram": {
+    "en": "Hologram",
+    "zh-Hans": "全息",
+    "ru": "Голограмма",
+    "uk": "Голограма"
+  },
+  "atelierArt.labelHoodie": {
+    "en": "Hoodie",
+    "zh-Hans": "连帽衫",
+    "ru": "Худи",
+    "uk": "Худі"
+  },
+  "atelierArt.labelHorizon": {
+    "en": "Horizon",
+    "zh-Hans": "地平线",
+    "ru": "Горизонт",
+    "uk": "Горизонт"
+  },
+  "atelierArt.labelIcon": {
+    "en": "Icon",
+    "zh-Hans": "图标",
+    "ru": "Значок",
+    "uk": "Значок"
+  },
+  "atelierArt.labelImpossible": {
+    "en": "Impossible",
+    "zh-Hans": "不可能图形",
+    "ru": "Невозможный",
+    "uk": "Неможливий"
+  },
+  "atelierArt.labelInk": {
+    "en": "Ink",
+    "zh-Hans": "墨色",
+    "ru": "Чернила",
+    "uk": "Чорнило"
+  },
+  "atelierArt.labelInverse": {
+    "en": "Inverse",
+    "zh-Hans": "反向",
+    "ru": "Обратный",
+    "uk": "Зворотний"
+  },
+  "atelierArt.labelInvert": {
+    "en": "Invert",
+    "zh-Hans": "反转",
+    "ru": "Инверсия",
+    "uk": "Інверсія"
+  },
+  "atelierArt.labelInverted": {
+    "en": "Inverted",
+    "zh-Hans": "倒置",
+    "ru": "Перевёрнутый",
+    "uk": "Перевернутий"
+  },
+  "atelierArt.labelIvory": {
+    "en": "Ivory",
+    "zh-Hans": "象牙白",
+    "ru": "Слоновая кость",
+    "uk": "Слонова кістка"
+  },
+  "atelierArt.labelJazz": {
+    "en": "Jazz",
+    "zh-Hans": "爵士",
+    "ru": "Джаз",
+    "uk": "Джаз"
+  },
+  "atelierArt.labelKandinsky": {
+    "en": "Kandinsky",
+    "zh-Hans": "康定斯基",
+    "ru": "Кандинский",
+    "uk": "Кандинський"
+  },
+  "atelierArt.labelLagoon": {
+    "en": "Lagoon",
+    "zh-Hans": "泻湖",
+    "ru": "Лагуна",
+    "uk": "Лагуна"
+  },
+  "atelierArt.labelLaser": {
+    "en": "Laser",
+    "zh-Hans": "激光",
+    "ru": "Лазер",
+    "uk": "Лазер"
+  },
+  "atelierArt.labelLaserBlue": {
+    "en": "Laser Blue",
+    "zh-Hans": "蓝色激光",
+    "ru": "Синий лазер",
+    "uk": "Синій лазер"
+  },
+  "atelierArt.labelLaserRed": {
+    "en": "Laser Red",
+    "zh-Hans": "红色激光",
+    "ru": "Красный лазер",
+    "uk": "Червоний лазер"
+  },
+  "atelierArt.labelLattice": {
+    "en": "Lattice",
+    "zh-Hans": "格栅",
+    "ru": "Решётка",
+    "uk": "Ґратка"
+  },
+  "atelierArt.labelLayers": {
+    "en": "Layers",
+    "zh-Hans": "层数",
+    "ru": "Слои",
+    "uk": "Шари"
+  },
+  "atelierArt.labelLayout": {
+    "en": "Layout",
+    "zh-Hans": "布局",
+    "ru": "Расположение",
+    "uk": "Розташування"
+  },
+  "atelierArt.labelLeaves": {
+    "en": "Leaves",
+    "zh-Hans": "叶片",
+    "ru": "Листья",
+    "uk": "Листя"
+  },
+  "atelierArt.labelLens": {
+    "en": "Lens",
+    "zh-Hans": "透镜",
+    "ru": "Линза",
+    "uk": "Лінза"
+  },
+  "atelierArt.labelLineWeight": {
+    "en": "Line weight",
+    "zh-Hans": "线条粗细",
+    "ru": "Толщина линий",
+    "uk": "Товщина ліній"
+  },
+  "atelierArt.labelLines": {
+    "en": "Lines",
+    "zh-Hans": "线条",
+    "ru": "Линии",
+    "uk": "Лінії"
+  },
+  "atelierArt.labelLissajous": {
+    "en": "Lissajous",
+    "zh-Hans": "利萨如曲线",
+    "ru": "Лиссажу",
+    "uk": "Ліссажу"
+  },
+  "atelierArt.labelLively": {
+    "en": "Lively",
+    "zh-Hans": "活泼",
+    "ru": "Живой",
+    "uk": "Жвавий"
+  },
+  "atelierArt.labelLong": {
+    "en": "Long",
+    "zh-Hans": "长",
+    "ru": "Длинный",
+    "uk": "Довгий"
+  },
+  "atelierArt.labelLow": {
+    "en": "Low",
+    "zh-Hans": "低",
+    "ru": "Низкий",
+    "uk": "Низький"
+  },
+  "atelierArt.labelMCrest": {
+    "en": "M Crest",
+    "zh-Hans": "M 徽章",
+    "ru": "Эмблема M",
+    "uk": "Емблема M"
+  },
+  "atelierArt.labelMagritte": {
+    "en": "Magritte",
+    "zh-Hans": "马格利特",
+    "ru": "Магритт",
+    "uk": "Магрітт"
+  },
+  "atelierArt.labelMandala": {
+    "en": "Mandala",
+    "zh-Hans": "曼陀罗",
+    "ru": "Мандала",
+    "uk": "Мандала"
+  },
+  "atelierArt.labelMany": {
+    "en": "Many",
+    "zh-Hans": "大量",
+    "ru": "Много",
+    "uk": "Багато"
+  },
+  "atelierArt.labelMask": {
+    "en": "Mask",
+    "zh-Hans": "面罩",
+    "ru": "Маска",
+    "uk": "Маска"
+  },
+  "atelierArt.labelMathCurves": {
+    "en": "Math Curves",
+    "zh-Hans": "数学曲线",
+    "ru": "Математические кривые",
+    "uk": "Математичні криві"
+  },
+  "atelierArt.labelMatisse": {
+    "en": "Matisse",
+    "zh-Hans": "马蒂斯",
+    "ru": "Матисс",
+    "uk": "Матісс"
+  },
+  "atelierArt.labelMaxima": {
+    "en": "Maxima",
+    "zh-Hans": "Maxima",
+    "ru": "Maxima",
+    "uk": "Maxima"
+  },
+  "atelierArt.labelMeadow": {
+    "en": "Meadow",
+    "zh-Hans": "草地",
+    "ru": "Луг",
+    "uk": "Луг"
+  },
+  "atelierArt.labelMeander": {
+    "en": "Meander",
+    "zh-Hans": "曲流",
+    "ru": "Меандр",
+    "uk": "Меандр"
+  },
+  "atelierArt.labelMedium": {
+    "en": "Medium",
+    "zh-Hans": "中等",
+    "ru": "Средний",
+    "uk": "Середній"
+  },
+  "atelierArt.labelMiddle": {
+    "en": "Middle",
+    "zh-Hans": "中部",
+    "ru": "Середина",
+    "uk": "Середина"
+  },
+  "atelierArt.labelMinimaPunks": {
+    "en": "Minima Punks",
+    "zh-Hans": "Minima 朋克",
+    "ru": "Minima-панки",
+    "uk": "Minima-панки"
+  },
+  "atelierArt.labelMinimal": {
+    "en": "Minimal",
+    "zh-Hans": "极简",
+    "ru": "Минимальный",
+    "uk": "Мінімальний"
+  },
+  "atelierArt.labelMintFrost": {
+    "en": "Mint Frost",
+    "zh-Hans": "薄荷霜",
+    "ru": "Мятный иней",
+    "uk": "М’ятний іній"
+  },
+  "atelierArt.labelMiro": {
+    "en": "Miro",
+    "zh-Hans": "米罗",
+    "ru": "Миро",
+    "uk": "Міро"
+  },
+  "atelierArt.labelMirror": {
+    "en": "Mirror",
+    "zh-Hans": "镜面",
+    "ru": "Зеркало",
+    "uk": "Дзеркало"
+  },
+  "atelierArt.labelMirrored": {
+    "en": "Mirrored",
+    "zh-Hans": "镜像",
+    "ru": "Зеркальный",
+    "uk": "Дзеркальний"
+  },
+  "atelierArt.labelMismatched": {
+    "en": "Mismatched",
+    "zh-Hans": "不对称",
+    "ru": "Непарные",
+    "uk": "Непарні"
+  },
+  "atelierArt.labelMixed": {
+    "en": "Mixed",
+    "zh-Hans": "混合",
+    "ru": "Смешанный",
+    "uk": "Змішаний"
+  },
+  "atelierArt.labelMode": {
+    "en": "Mode",
+    "zh-Hans": "模式",
+    "ru": "Режим",
+    "uk": "Режим"
+  },
+  "atelierArt.labelMohawk": {
+    "en": "Mohawk",
+    "zh-Hans": "莫霍克发型",
+    "ru": "Ирокез",
+    "uk": "Ірокез"
+  },
+  "atelierArt.labelMoire": {
+    "en": "Moire",
+    "zh-Hans": "摩尔纹",
+    "ru": "Муар",
+    "uk": "Муар"
+  },
+  "atelierArt.labelMondrian": {
+    "en": "Mondrian",
+    "zh-Hans": "蒙德里安",
+    "ru": "Мондриан",
+    "uk": "Мондріан"
+  },
+  "atelierArt.labelMono": {
+    "en": "Mono",
+    "zh-Hans": "单色",
+    "ru": "Монохромный",
+    "uk": "Монохромний"
+  },
+  "atelierArt.labelMonocle": {
+    "en": "Monocle",
+    "zh-Hans": "单片眼镜",
+    "ru": "Монокль",
+    "uk": "Монокль"
+  },
+  "atelierArt.labelMoon": {
+    "en": "Moon",
+    "zh-Hans": "月亮",
+    "ru": "Луна",
+    "uk": "Місяць"
+  },
+  "atelierArt.labelMorph": {
+    "en": "Morph",
+    "zh-Hans": "形变",
+    "ru": "Морфинг",
+    "uk": "Морфінг"
+  },
+  "atelierArt.labelMotif": {
+    "en": "Motif",
+    "zh-Hans": "图案",
+    "ru": "Мотив",
+    "uk": "Мотив"
+  },
+  "atelierArt.labelMotifs": {
+    "en": "Motifs",
+    "zh-Hans": "图案组",
+    "ru": "Мотивы",
+    "uk": "Мотиви"
+  },
+  "atelierArt.labelMouth": {
+    "en": "Mouth",
+    "zh-Hans": "嘴",
+    "ru": "Рот",
+    "uk": "Рот"
+  },
+  "atelierArt.labelMultiplicity": {
+    "en": "Multiplicity",
+    "zh-Hans": "多重性",
+    "ru": "Множественность",
+    "uk": "Множинність"
+  },
+  "atelierArt.labelMustache": {
+    "en": "Mustache",
+    "zh-Hans": "小胡子",
+    "ru": "Усы",
+    "uk": "Вуса"
+  },
+  "atelierArt.labelMuzzle": {
+    "en": "Muzzle",
+    "zh-Hans": "口鼻部",
+    "ru": "Мордочка",
+    "uk": "Мордочка"
+  },
+  "atelierArt.labelNatural": {
+    "en": "Natural",
+    "zh-Hans": "自然",
+    "ru": "Естественный",
+    "uk": "Природний"
+  },
+  "atelierArt.labelNeon": {
+    "en": "Neon",
+    "zh-Hans": "霓虹",
+    "ru": "Неон",
+    "uk": "Неон"
+  },
+  "atelierArt.labelNested": {
+    "en": "Nested",
+    "zh-Hans": "嵌套",
+    "ru": "Вложенный",
+    "uk": "Вкладений"
+  },
+  "atelierArt.labelNeutral": {
+    "en": "Neutral",
+    "zh-Hans": "中性",
+    "ru": "Нейтральный",
+    "uk": "Нейтральний"
+  },
+  "atelierArt.labelNight": {
+    "en": "Night",
+    "zh-Hans": "夜晚",
+    "ru": "Ночь",
+    "uk": "Ніч"
+  },
+  "atelierArt.labelNode": {
+    "en": "Node",
+    "zh-Hans": "节点",
+    "ru": "Узел",
+    "uk": "Вузол"
+  },
+  "atelierArt.labelNone": {
+    "en": "None",
+    "zh-Hans": "无",
+    "ru": "Нет",
+    "uk": "Немає"
+  },
+  "atelierArt.labelObject": {
+    "en": "Object",
+    "zh-Hans": "物体",
+    "ru": "Объект",
+    "uk": "Об’єкт"
+  },
+  "atelierArt.labelOcean": {
+    "en": "Ocean",
+    "zh-Hans": "海洋",
+    "ru": "Океан",
+    "uk": "Океан"
+  },
+  "atelierArt.labelOpArt": {
+    "en": "Op-Art",
+    "zh-Hans": "欧普艺术",
+    "ru": "Оп-арт",
+    "uk": "Оп-арт"
+  },
+  "atelierArt.labelOrangeM": {
+    "en": "Orange M",
+    "zh-Hans": "橙色 M",
+    "ru": "Оранжевая M",
+    "uk": "Помаранчева M"
+  },
+  "atelierArt.labelOrbit": {
+    "en": "Orbit",
+    "zh-Hans": "轨道",
+    "ru": "Орбита",
+    "uk": "Орбіта"
+  },
+  "atelierArt.labelOutline": {
+    "en": "Outline",
+    "zh-Hans": "轮廓",
+    "ru": "Контур",
+    "uk": "Контур"
+  },
+  "atelierArt.labelOverlay": {
+    "en": "Overlay",
+    "zh-Hans": "叠加",
+    "ru": "Наложение",
+    "uk": "Накладання"
+  },
+  "atelierArt.labelPainted": {
+    "en": "Painted",
+    "zh-Hans": "绘画",
+    "ru": "Живопись",
+    "uk": "Живопис"
+  },
+  "atelierArt.labelPale": {
+    "en": "Pale",
+    "zh-Hans": "淡色",
+    "ru": "Бледный",
+    "uk": "Блідий"
+  },
+  "atelierArt.labelPalette": {
+    "en": "Palette",
+    "zh-Hans": "调色板",
+    "ru": "Палитра",
+    "uk": "Палітра"
+  },
+  "atelierArt.labelPandaPunks": {
+    "en": "Panda Punks",
+    "zh-Hans": "熊猫朋克",
+    "ru": "Панда-панки",
+    "uk": "Панда-панки"
+  },
+  "atelierArt.labelPaper": {
+    "en": "Paper",
+    "zh-Hans": "纸张",
+    "ru": "Бумага",
+    "uk": "Папір"
+  },
+  "atelierArt.labelPaperLed": {
+    "en": "Paper-led",
+    "zh-Hans": "以纸色为主",
+    "ru": "Преобладает цвет бумаги",
+    "uk": "Переважає колір паперу"
+  },
+  "atelierArt.labelPastel": {
+    "en": "Pastel",
+    "zh-Hans": "粉彩",
+    "ru": "Пастельный",
+    "uk": "Пастельний"
+  },
+  "atelierArt.labelPatch": {
+    "en": "Patch",
+    "zh-Hans": "眼罩",
+    "ru": "Повязка на глаз",
+    "uk": "Пов’язка на око"
+  },
+  "atelierArt.labelPerky": {
+    "en": "Perky",
+    "zh-Hans": "竖耳",
+    "ru": "Торчащие",
+    "uk": "Сторчма"
+  },
+  "atelierArt.labelPetal": {
+    "en": "Petal",
+    "zh-Hans": "花瓣",
+    "ru": "Лепесток",
+    "uk": "Пелюстка"
+  },
+  "atelierArt.labelPhotoCartoon": {
+    "en": "Photo Cartoon",
+    "zh-Hans": "照片卡通化",
+    "ru": "Мультфильм из фото",
+    "uk": "Мультфільм із фото"
+  },
+  "atelierArt.labelPhyllotaxis": {
+    "en": "Phyllotaxis",
+    "zh-Hans": "叶序",
+    "ru": "Филлотаксис",
+    "uk": "Філотаксис"
+  },
+  "atelierArt.labelPicasso": {
+    "en": "Picasso",
+    "zh-Hans": "毕加索",
+    "ru": "Пикассо",
+    "uk": "Пікассо"
+  },
+  "atelierArt.labelPinwheel": {
+    "en": "Pinwheel",
+    "zh-Hans": "风车",
+    "ru": "Вертушка",
+    "uk": "Вітрячок"
+  },
+  "atelierArt.labelPipe": {
+    "en": "Pipe",
+    "zh-Hans": "烟斗",
+    "ru": "Трубка",
+    "uk": "Люлька"
+  },
+  "atelierArt.labelPixel": {
+    "en": "Pixel",
+    "zh-Hans": "像素",
+    "ru": "Пиксель",
+    "uk": "Піксель"
+  },
+  "atelierArt.labelPlain": {
+    "en": "Plain",
+    "zh-Hans": "素色",
+    "ru": "Простой",
+    "uk": "Простий"
+  },
+  "atelierArt.labelPlanes": {
+    "en": "Planes",
+    "zh-Hans": "平面组",
+    "ru": "Плоскости",
+    "uk": "Площини"
+  },
+  "atelierArt.labelPort": {
+    "en": "Port",
+    "zh-Hans": "港口",
+    "ru": "Порт",
+    "uk": "Порт"
+  },
+  "atelierArt.labelPoster": {
+    "en": "Poster",
+    "zh-Hans": "海报",
+    "ru": "Плакат",
+    "uk": "Плакат"
+  },
+  "atelierArt.labelPrimary": {
+    "en": "Primary",
+    "zh-Hans": "原色",
+    "ru": "Основные цвета",
+    "uk": "Основні кольори"
+  },
+  "atelierArt.labelPrimaryLed": {
+    "en": "Primary-led",
+    "zh-Hans": "以原色为主",
+    "ru": "Преобладают основные цвета",
+    "uk": "Переважають основні кольори"
+  },
+  "atelierArt.labelPulse": {
+    "en": "Pulse",
+    "zh-Hans": "脉冲",
+    "ru": "Пульс",
+    "uk": "Пульс"
+  },
+  "atelierArt.labelPunks": {
+    "en": "Punks",
+    "zh-Hans": "朋克",
+    "ru": "Панки",
+    "uk": "Панки"
+  },
+  "atelierArt.labelPuzzle": {
+    "en": "Puzzle",
+    "zh-Hans": "拼图",
+    "ru": "Головоломка",
+    "uk": "Головоломка"
+  },
+  "atelierArt.labelQuad": {
+    "en": "Quad",
+    "zh-Hans": "四重",
+    "ru": "Четверной",
+    "uk": "Четверний"
+  },
+  "atelierArt.labelQuarter": {
+    "en": "Quarter",
+    "zh-Hans": "四分之一",
+    "ru": "Четверть",
+    "uk": "Чверть"
+  },
+  "atelierArt.labelQuarterFans": {
+    "en": "Quarter Fans",
+    "zh-Hans": "四分之一扇形",
+    "ru": "Четверти веера",
+    "uk": "Чверті віяла"
+  },
+  "atelierArt.labelRain": {
+    "en": "Rain",
+    "zh-Hans": "雨",
+    "ru": "Дождь",
+    "uk": "Дощ"
+  },
+  "atelierArt.labelRay": {
+    "en": "Ray",
+    "zh-Hans": "射线",
+    "ru": "Луч",
+    "uk": "Промінь"
+  },
+  "atelierArt.labelRectilinear": {
+    "en": "Rectilinear",
+    "zh-Hans": "直线式",
+    "ru": "Прямолинейный",
+    "uk": "Прямолінійний"
+  },
+  "atelierArt.labelRedLed": {
+    "en": "Red-led",
+    "zh-Hans": "以红色为主",
+    "ru": "Преобладает красный",
+    "uk": "Переважає червоний"
+  },
+  "atelierArt.labelRegular": {
+    "en": "Regular",
+    "zh-Hans": "规则",
+    "ru": "Регулярный",
+    "uk": "Регулярний"
+  },
+  "atelierArt.labelRender": {
+    "en": "Render",
+    "zh-Hans": "渲染",
+    "ru": "Отрисовка",
+    "uk": "Відтворення"
+  },
+  "atelierArt.labelResolution": {
+    "en": "Resolution",
+    "zh-Hans": "分辨率",
+    "ru": "Разрешение",
+    "uk": "Роздільність"
+  },
+  "atelierArt.labelRich": {
+    "en": "Rich",
+    "zh-Hans": "丰富",
+    "ru": "Богатый",
+    "uk": "Багатий"
+  },
+  "atelierArt.labelRim": {
+    "en": "Rim",
+    "zh-Hans": "边缘",
+    "ru": "Ободок",
+    "uk": "Обідок"
+  },
+  "atelierArt.labelRing": {
+    "en": "Ring",
+    "zh-Hans": "环",
+    "ru": "Кольцо",
+    "uk": "Кільце"
+  },
+  "atelierArt.labelRings": {
+    "en": "Rings",
+    "zh-Hans": "环组",
+    "ru": "Кольца",
+    "uk": "Кільця"
+  },
+  "atelierArt.labelRobot": {
+    "en": "Robot",
+    "zh-Hans": "机器人",
+    "ru": "Робот",
+    "uk": "Робот"
+  },
+  "atelierArt.labelRose": {
+    "en": "Rose",
+    "zh-Hans": "玫瑰",
+    "ru": "Роза",
+    "uk": "Троянда"
+  },
+  "atelierArt.labelRosePeriod": {
+    "en": "Rose Period",
+    "zh-Hans": "玫瑰时期",
+    "ru": "Розовый период",
+    "uk": "Рожевий період"
+  },
+  "atelierArt.labelRot2": {
+    "en": "Rot2",
+    "zh-Hans": "旋转 2",
+    "ru": "Поворот 2",
+    "uk": "Поворот 2"
+  },
+  "atelierArt.labelRotation": {
+    "en": "Rotation",
+    "zh-Hans": "旋转",
+    "ru": "Вращение",
+    "uk": "Обертання"
+  },
+  "atelierArt.labelRoyal": {
+    "en": "Royal",
+    "zh-Hans": "皇家",
+    "ru": "Королевский",
+    "uk": "Королівський"
+  },
+  "atelierArt.labelRusty": {
+    "en": "Rusty",
+    "zh-Hans": "锈色",
+    "ru": "Ржавый",
+    "uk": "Іржавий"
+  },
+  "atelierArt.labelSail": {
+    "en": "Sail",
+    "zh-Hans": "帆",
+    "ru": "Парус",
+    "uk": "Вітрило"
+  },
+  "atelierArt.labelSakura": {
+    "en": "Sakura",
+    "zh-Hans": "樱花",
+    "ru": "Сакура",
+    "uk": "Сакура"
+  },
+  "atelierArt.labelSand": {
+    "en": "Sand",
+    "zh-Hans": "沙色",
+    "ru": "Песок",
+    "uk": "Пісок"
+  },
+  "atelierArt.labelSaturated": {
+    "en": "Saturated",
+    "zh-Hans": "饱和",
+    "ru": "Насыщенный цвет",
+    "uk": "Насичений колір"
+  },
+  "atelierArt.labelScanlines": {
+    "en": "Scanlines",
+    "zh-Hans": "扫描线",
+    "ru": "Строки развёртки",
+    "uk": "Рядки розгортки"
+  },
+  "atelierArt.labelScar": {
+    "en": "Scar",
+    "zh-Hans": "伤疤",
+    "ru": "Шрам",
+    "uk": "Шрам"
+  },
+  "atelierArt.labelScatter": {
+    "en": "Scatter",
+    "zh-Hans": "散布",
+    "ru": "Россыпь",
+    "uk": "Розсип"
+  },
+  "atelierArt.labelScene": {
+    "en": "Scene",
+    "zh-Hans": "场景",
+    "ru": "Сцена",
+    "uk": "Сцена"
+  },
+  "atelierArt.labelScheme": {
+    "en": "Scheme",
+    "zh-Hans": "方案",
+    "ru": "Схема",
+    "uk": "Схема"
+  },
+  "atelierArt.labelSea": {
+    "en": "Sea",
+    "zh-Hans": "大海",
+    "ru": "Море",
+    "uk": "Море"
+  },
+  "atelierArt.labelSeascape": {
+    "en": "Seascape",
+    "zh-Hans": "海景",
+    "ru": "Морской пейзаж",
+    "uk": "Морський пейзаж"
+  },
+  "atelierArt.labelSeed": {
+    "en": "Seed",
+    "zh-Hans": "种子",
+    "ru": "Зерно",
+    "uk": "Зерно"
+  },
+  "atelierArt.labelSeeds": {
+    "en": "Seeds",
+    "zh-Hans": "种子组",
+    "ru": "Зёрна",
+    "uk": "Зерна"
+  },
+  "atelierArt.labelSeurat": {
+    "en": "Seurat",
+    "zh-Hans": "修拉",
+    "ru": "Сёра",
+    "uk": "Сера"
+  },
+  "atelierArt.labelSeveral": {
+    "en": "Several",
+    "zh-Hans": "若干",
+    "ru": "Несколько",
+    "uk": "Кілька"
+  },
+  "atelierArt.labelShades": {
+    "en": "Shades",
+    "zh-Hans": "墨镜",
+    "ru": "Тёмные очки",
+    "uk": "Темні окуляри"
+  },
+  "atelierArt.labelShadow": {
+    "en": "Shadow",
+    "zh-Hans": "阴影",
+    "ru": "Тень",
+    "uk": "Тінь"
+  },
+  "atelierArt.labelShapes": {
+    "en": "Shapes",
+    "zh-Hans": "形状",
+    "ru": "Фигуры",
+    "uk": "Фігури"
+  },
+  "atelierArt.labelShirt": {
+    "en": "Shirt",
+    "zh-Hans": "衬衫",
+    "ru": "Рубашка",
+    "uk": "Сорочка"
+  },
+  "atelierArt.labelSingle": {
+    "en": "Single",
+    "zh-Hans": "单个",
+    "ru": "Одиночный",
+    "uk": "Одиночний"
+  },
+  "atelierArt.labelSizeRamp": {
+    "en": "Size ramp",
+    "zh-Hans": "尺寸递变",
+    "ru": "Изменение размера",
+    "uk": "Зміна розміру"
+  },
+  "atelierArt.labelSky": {
+    "en": "Sky",
+    "zh-Hans": "天空",
+    "ru": "Небо",
+    "uk": "Небо"
+  },
+  "atelierArt.labelSleepy": {
+    "en": "Sleepy",
+    "zh-Hans": "困倦",
+    "ru": "Сонный",
+    "uk": "Сонний"
+  },
+  "atelierArt.labelSmile": {
+    "en": "Smile",
+    "zh-Hans": "微笑",
+    "ru": "Улыбка",
+    "uk": "Усмішка"
+  },
+  "atelierArt.labelSmooth": {
+    "en": "Smooth",
+    "zh-Hans": "平滑",
+    "ru": "Гладкий",
+    "uk": "Гладкий"
+  },
+  "atelierArt.labelSnail": {
+    "en": "Snail",
+    "zh-Hans": "蜗牛",
+    "ru": "Улитка",
+    "uk": "Равлик"
+  },
+  "atelierArt.labelSnow": {
+    "en": "Snow",
+    "zh-Hans": "雪",
+    "ru": "Снег",
+    "uk": "Сніг"
+  },
+  "atelierArt.labelSolar": {
+    "en": "Solar",
+    "zh-Hans": "太阳色",
+    "ru": "Солнечный",
+    "uk": "Сонячний"
+  },
+  "atelierArt.labelSolo": {
+    "en": "Solo",
+    "zh-Hans": "独奏",
+    "ru": "Соло",
+    "uk": "Соло"
+  },
+  "atelierArt.labelSpark": {
+    "en": "Spark",
+    "zh-Hans": "火花",
+    "ru": "Искра",
+    "uk": "Іскра"
+  },
+  "atelierArt.labelSparse": {
+    "en": "Sparse",
+    "zh-Hans": "稀疏",
+    "ru": "Редкий",
+    "uk": "Рідкий"
+  },
+  "atelierArt.labelSpikes": {
+    "en": "Spikes",
+    "zh-Hans": "尖刺",
+    "ru": "Шипы",
+    "uk": "Шипи"
+  },
+  "atelierArt.labelSpirograph": {
+    "en": "Spirograph",
+    "zh-Hans": "螺旋绘图",
+    "ru": "Спирограф",
+    "uk": "Спірограф"
+  },
+  "atelierArt.labelSplit": {
+    "en": "Split",
+    "zh-Hans": "分割",
+    "ru": "Разделённый",
+    "uk": "Поділений"
+  },
+  "atelierArt.labelSquare": {
+    "en": "Square",
+    "zh-Hans": "方形",
+    "ru": "Квадрат",
+    "uk": "Квадрат"
+  },
+  "atelierArt.labelStacked": {
+    "en": "Stacked",
+    "zh-Hans": "堆叠",
+    "ru": "Стопка",
+    "uk": "Стос"
+  },
+  "atelierArt.labelStar": {
+    "en": "Star",
+    "zh-Hans": "星形",
+    "ru": "Звезда",
+    "uk": "Зірка"
+  },
+  "atelierArt.labelStars": {
+    "en": "Stars",
+    "zh-Hans": "星群",
+    "ru": "Звёзды",
+    "uk": "Зірки"
+  },
+  "atelierArt.labelStitch": {
+    "en": "Stitch",
+    "zh-Hans": "针脚",
+    "ru": "Стежок",
+    "uk": "Стежок"
+  },
+  "atelierArt.labelStitches": {
+    "en": "Stitches",
+    "zh-Hans": "缝线",
+    "ru": "Стежки",
+    "uk": "Стежки"
+  },
+  "atelierArt.labelStripes": {
+    "en": "Stripes",
+    "zh-Hans": "条纹",
+    "ru": "Полосы",
+    "uk": "Смуги"
+  },
+  "atelierArt.labelStroke": {
+    "en": "Stroke",
+    "zh-Hans": "笔画",
+    "ru": "Штрих",
+    "uk": "Штрих"
+  },
+  "atelierArt.labelStrong": {
+    "en": "Strong",
+    "zh-Hans": "强烈",
+    "ru": "Сильный",
+    "uk": "Сильний"
+  },
+  "atelierArt.labelSubdivision": {
+    "en": "Subdivision",
+    "zh-Hans": "细分",
+    "ru": "Подразделение",
+    "uk": "Поділ"
+  },
+  "atelierArt.labelSubtle": {
+    "en": "Subtle",
+    "zh-Hans": "微妙",
+    "ru": "Тонкий эффект",
+    "uk": "Тонкий ефект"
+  },
+  "atelierArt.labelSun": {
+    "en": "Sun",
+    "zh-Hans": "太阳",
+    "ru": "Солнце",
+    "uk": "Сонце"
+  },
+  "atelierArt.labelSuperformula": {
+    "en": "Superformula",
+    "zh-Hans": "超级公式",
+    "ru": "Суперформула",
+    "uk": "Суперформула"
+  },
+  "atelierArt.labelSwept": {
+    "en": "Swept",
+    "zh-Hans": "侧梳",
+    "ru": "Зачёс",
+    "uk": "Зачіс"
+  },
+  "atelierArt.labelSymmetry": {
+    "en": "Symmetry",
+    "zh-Hans": "对称",
+    "ru": "Симметрия",
+    "uk": "Симетрія"
+  },
+  "atelierArt.labelTan": {
+    "en": "Tan",
+    "zh-Hans": "棕褐",
+    "ru": "Смуглый",
+    "uk": "Смаглявий"
+  },
+  "atelierArt.labelTank": {
+    "en": "Tank",
+    "zh-Hans": "背心",
+    "ru": "Майка",
+    "uk": "Майка"
+  },
+  "atelierArt.labelTeardrop": {
+    "en": "Teardrop",
+    "zh-Hans": "泪滴",
+    "ru": "Капля",
+    "uk": "Крапля"
+  },
+  "atelierArt.labelTee": {
+    "en": "Tee",
+    "zh-Hans": "T 恤",
+    "ru": "Футболка",
+    "uk": "Футболка"
+  },
+  "atelierArt.labelTerra": {
+    "en": "Terra",
+    "zh-Hans": "大地色",
+    "ru": "Терра",
+    "uk": "Терра"
+  },
+  "atelierArt.labelTexture": {
+    "en": "Texture",
+    "zh-Hans": "纹理",
+    "ru": "Текстура",
+    "uk": "Текстура"
+  },
+  "atelierArt.labelThorn": {
+    "en": "Thorn",
+    "zh-Hans": "荆棘",
+    "ru": "Шип",
+    "uk": "Шип"
+  },
+  "atelierArt.labelTiles": {
+    "en": "Tiles",
+    "zh-Hans": "瓷砖",
+    "ru": "Плитки",
+    "uk": "Плитки"
+  },
+  "atelierArt.labelTilt": {
+    "en": "Tilt",
+    "zh-Hans": "倾斜",
+    "ru": "Наклон",
+    "uk": "Нахил"
+  },
+  "atelierArt.labelTongue": {
+    "en": "Tongue",
+    "zh-Hans": "舌头",
+    "ru": "Язык",
+    "uk": "Язик"
+  },
+  "atelierArt.labelTopKnot": {
+    "en": "Top Knot",
+    "zh-Hans": "顶髻",
+    "ru": "Пучок",
+    "uk": "Пучок"
+  },
+  "atelierArt.labelTorn": {
+    "en": "Torn",
+    "zh-Hans": "撕裂",
+    "ru": "Рваный",
+    "uk": "Рваний"
+  },
+  "atelierArt.labelTotem": {
+    "en": "Totem",
+    "zh-Hans": "图腾",
+    "ru": "Тотем",
+    "uk": "Тотем"
+  },
+  "atelierArt.labelTree": {
+    "en": "Tree",
+    "zh-Hans": "树",
+    "ru": "Дерево",
+    "uk": "Дерево"
+  },
+  "atelierArt.labelTriM": {
+    "en": "Tri M",
+    "zh-Hans": "三重 M",
+    "ru": "Тройная M",
+    "uk": "Потрійна M"
+  },
+  "atelierArt.labelTriM09cfd7": {
+    "en": "Tri-M",
+    "zh-Hans": "三重 M",
+    "ru": "Тройная M",
+    "uk": "Потрійна M"
+  },
+  "atelierArt.labelTriSig": {
+    "en": "Tri-Sig",
+    "zh-Hans": "三重签名",
+    "ru": "Тройная подпись",
+    "uk": "Потрійний підпис"
+  },
+  "atelierArt.labelTriTone": {
+    "en": "Tri-tone",
+    "zh-Hans": "三色调",
+    "ru": "Трёхцветный",
+    "uk": "Триколірний"
+  },
+  "atelierArt.labelTriangles": {
+    "en": "Triangles",
+    "zh-Hans": "三角形",
+    "ru": "Треугольники",
+    "uk": "Трикутники"
+  },
+  "atelierArt.labelTrim": {
+    "en": "Trim",
+    "zh-Hans": "修边",
+    "ru": "Окантовка",
+    "uk": "Облямівка"
+  },
+  "atelierArt.labelTrio": {
+    "en": "Trio",
+    "zh-Hans": "三重奏",
+    "ru": "Трио",
+    "uk": "Тріо"
+  },
+  "atelierArt.labelTruchet": {
+    "en": "Truchet",
+    "zh-Hans": "特鲁谢",
+    "ru": "Трюше",
+    "uk": "Трюше"
+  },
+  "atelierArt.labelTwoTone": {
+    "en": "Two-tone",
+    "zh-Hans": "双色",
+    "ru": "Два тона",
+    "uk": "Два тони"
+  },
+  "atelierArt.labelUmbrella": {
+    "en": "Umbrella",
+    "zh-Hans": "雨伞",
+    "ru": "Зонт",
+    "uk": "Парасоля"
+  },
+  "atelierArt.labelVector": {
+    "en": "Vector",
+    "zh-Hans": "矢量",
+    "ru": "Вектор",
+    "uk": "Вектор"
+  },
+  "atelierArt.labelVintage": {
+    "en": "Vintage",
+    "zh-Hans": "复古",
+    "ru": "Винтаж",
+    "uk": "Вінтаж"
+  },
+  "atelierArt.labelVioletHour": {
+    "en": "Violet Hour",
+    "zh-Hans": "紫罗兰时刻",
+    "ru": "Фиолетовый час",
+    "uk": "Фіолетова година"
+  },
+  "atelierArt.labelVisor": {
+    "en": "Visor",
+    "zh-Hans": "遮阳镜",
+    "ru": "Козырёк",
+    "uk": "Козирок"
+  },
+  "atelierArt.labelWarm": {
+    "en": "Warm",
+    "zh-Hans": "暖色",
+    "ru": "Тёплый",
+    "uk": "Теплий"
+  },
+  "atelierArt.labelWarp": {
+    "en": "Warp",
+    "zh-Hans": "扭曲",
+    "ru": "Искажение",
+    "uk": "Викривлення"
+  },
+  "atelierArt.labelWash": {
+    "en": "Wash",
+    "zh-Hans": "淡彩",
+    "ru": "Размывка",
+    "uk": "Розмивка"
+  },
+  "atelierArt.labelWaves": {
+    "en": "Waves",
+    "zh-Hans": "波浪",
+    "ru": "Волны",
+    "uk": "Хвилі"
+  },
+  "atelierArt.labelWeb": {
+    "en": "Web",
+    "zh-Hans": "蛛网",
+    "ru": "Паутина",
+    "uk": "Павутиння"
+  },
+  "atelierArt.labelWedge": {
+    "en": "Wedge",
+    "zh-Hans": "楔形",
+    "ru": "Клин",
+    "uk": "Клин"
+  },
+  "atelierArt.labelWhistle": {
+    "en": "Whistle",
+    "zh-Hans": "吹口哨",
+    "ru": "Свист",
+    "uk": "Свист"
+  },
+  "atelierArt.labelWhiteM": {
+    "en": "White M",
+    "zh-Hans": "白色 M",
+    "ru": "Белая M",
+    "uk": "Біла M"
+  },
+  "atelierArt.labelWhole": {
+    "en": "Whole",
+    "zh-Hans": "整体",
+    "ru": "Целый",
+    "uk": "Цілий"
+  },
+  "atelierArt.labelWild": {
+    "en": "Wild",
+    "zh-Hans": "狂野",
+    "ru": "Дикий",
+    "uk": "Дикий"
+  },
+  "atelierArt.labelXStitch": {
+    "en": "X-Stitch",
+    "zh-Hans": "十字缝线",
+    "ru": "Крестик",
+    "uk": "Хрестик"
+  },
+  "atelierArt.labelZigzag": {
+    "en": "Zigzag",
+    "zh-Hans": "锯齿形",
+    "ru": "Зигзаг",
+    "uk": "Зиґзаґ"
+  },
+  "atelierArt.labelZombie": {
+    "en": "Zombie",
+    "zh-Hans": "僵尸",
+    "ru": "Зомби",
+    "uk": "Зомбі"
+  },
+  "atelierArt.title": {
+    "en": "Generative",
+    "zh-Hans": "生成艺术",
+    "ru": "Генеративное искусство",
+    "uk": "Генеративне мистецтво"
+  },
+  "atelierArt.intro": {
+    "en": "The Generator — 19 on-chain SVG style packs",
+    "zh-Hans": "生成器 — 19 种链上 SVG 风格",
+    "ru": "Генератор — 19 наборов стилей SVG в блокчейне",
+    "uk": "Генератор — 19 наборів стилів SVG у блокчейні"
+  },
+  "atelierArt.deterministic": {
+    "en": "The seed and style reproduce every plate byte-for-byte. The same design mints identically in the MiniDapp.",
+    "zh-Hans": "种子和风格可逐字节重现每幅作品。在 MiniDapp 中铸造时，相同设计会得到相同结果。",
+    "ru": "Сид и стиль воспроизводят каждую работу байт в байт. Тот же дизайн создаётся в MiniDapp без изменений.",
+    "uk": "Сід і стиль відтворюють кожну роботу байт у байт. Той самий дизайн створюється в MiniDapp без змін."
+  },
+  "atelierArt.warming": {
+    "en": "Warming up the art engine…",
+    "zh-Hans": "正在启动艺术引擎…",
+    "ru": "Запуск движка генерации…",
+    "uk": "Запуск рушія генерації…"
+  },
+  "atelierArt.photoLoaded": {
+    "en": "Photo loaded — every plate derives from its cartoon. The original stays on the phone.",
+    "zh-Hans": "照片已加载 — 每幅作品都基于其卡通图像生成。原图保留在手机上。",
+    "ru": "Фото загружено — каждая работа основана на его рисованной версии. Оригинал остаётся на телефоне.",
+    "uk": "Фото завантажено — кожна робота ґрунтується на його мальованій версії. Оригінал залишається на телефоні."
+  },
+  "atelierArt.photoHelp": {
+    "en": "Choose a photo to create the collection on this device. The original stays on the phone. A placeholder cannot be minted.",
+    "zh-Hans": "选择照片，在此设备上创建系列。原图保留在手机上。占位图无法铸造。",
+    "ru": "Выберите фото для создания коллекции на этом устройстве. Оригинал остаётся на телефоне. Заглушку нельзя выпустить как NFT.",
+    "uk": "Виберіть фото для створення колекції на цьому пристрої. Оригінал залишається на телефоні. Заповнювач не можна випустити як NFT."
+  },
+  "atelierArt.changePhoto": {
+    "en": "Change photo",
+    "zh-Hans": "更换照片",
+    "ru": "Сменить фото",
+    "uk": "Змінити фото"
+  },
+  "atelierArt.choosePhoto": {
+    "en": "Choose photo",
+    "zh-Hans": "选择照片",
+    "ru": "Выбрать фото",
+    "uk": "Вибрати фото"
+  },
+  "atelierArt.seed": {
+    "en": "Collection seed — same seed, same art, forever",
+    "zh-Hans": "系列种子 — 相同种子，始终生成相同艺术",
+    "ru": "Сид коллекции — тот же сид, то же искусство, навсегда",
+    "uk": "Сід колекції — той самий сід, те саме мистецтво, назавжди"
+  },
+  "atelierArt.randomSeed": {
+    "en": "Generate a new collection seed",
+    "zh-Hans": "生成新的系列种子",
+    "ru": "Создать новый сид коллекции",
+    "uk": "Створити новий сід колекції"
+  },
+  "atelierArt.traits": {
+    "en": "Trait pool & rarity",
+    "zh-Hans": "特征池与稀有度",
+    "ru": "Набор признаков и редкость",
+    "uk": "Набір ознак і рідкісність"
+  },
+  "atelierArt.enabled": {
+    "en": "{value}/{total} enabled",
+    "zh-Hans": "已启用 {value}/{total}",
+    "ru": "Включено: {value}/{total}",
+    "uk": "Увімкнено: {value}/{total}"
+  },
+  "atelierArt.shuffleRarity": {
+    "en": "🎲 Rarity",
+    "zh-Hans": "🎲 稀有度",
+    "ru": "🎲 Редкость",
+    "uk": "🎲 Рідкісність"
+  },
+  "atelierArt.shuffleTraits": {
+    "en": "🎲 Traits",
+    "zh-Hans": "🎲 特征",
+    "ru": "🎲 Признаки",
+    "uk": "🎲 Ознаки"
+  },
+  "atelierArt.capacity": {
+    "en": "Trait space: {value} distinct combinations",
+    "zh-Hans": "特征空间：{value} 种不同组合",
+    "ru": "Возможные сочетания признаков: {value}",
+    "uk": "Можливі поєднання ознак: {value}"
+  },
+  "atelierArt.proof": {
+    "en": "Proof sheet",
+    "zh-Hans": "作品预览",
+    "ru": "Предпросмотр работ",
+    "uk": "Попередній перегляд робіт"
+  },
+  "atelierArt.plates": {
+    "en": "Plates: {value}",
+    "zh-Hans": "作品：{value}",
+    "ru": "Работ: {value}",
+    "uk": "Робіт: {value}"
+  },
+  "atelierArt.drawing": {
+    "en": "Drawing…",
+    "zh-Hans": "正在绘制…",
+    "ru": "Рисование…",
+    "uk": "Малювання…"
+  },
+  "atelierArt.generate": {
+    "en": "Generate",
+    "zh-Hans": "生成",
+    "ru": "Создать",
+    "uk": "Створити"
+  },
+  "atelierArt.plateHint": {
+    "en": "Tap a plate for its traits and rarity.",
+    "zh-Hans": "点按作品，查看其特征和稀有度。",
+    "ru": "Нажмите на работу, чтобы увидеть её признаки и редкость.",
+    "uk": "Натисніть на роботу, щоб побачити її ознаки та рідкісність."
+  },
+  "atelierArt.composing": {
+    "en": "Composing…",
+    "zh-Hans": "正在合成…",
+    "ru": "Подготовка…",
+    "uk": "Підготовка…"
+  },
+  "atelierArt.send": {
+    "en": "Send to collection wizard",
+    "zh-Hans": "发送到系列向导",
+    "ru": "Открыть в мастере коллекции",
+    "uk": "Відкрити в майстрі колекції"
+  },
+  "atelierArt.traitsShuffled": {
+    "en": "Trait pool shuffled",
+    "zh-Hans": "特征池已打乱",
+    "ru": "Набор признаков перемешан",
+    "uk": "Набір ознак перемішано"
+  },
+  "atelierArt.rarityShuffled": {
+    "en": "Rarity shuffled",
+    "zh-Hans": "稀有度已打乱",
+    "ru": "Редкость перемешана",
+    "uk": "Рідкісність перемішано"
+  },
+  "atelierArt.rarityBytes": {
+    "en": "Rarity score r{value} · {total} B raw",
+    "zh-Hans": "稀有度分数 r{value} · 原始大小 {total} 字节",
+    "ru": "Оценка редкости r{value} · {total} Б исходных данных",
+    "uk": "Оцінка рідкісності r{value} · {total} Б вихідних даних"
+  },
+  "atelierArt.loadPhoto": {
+    "en": "Load a photo first — a placeholder cannot be minted.",
+    "zh-Hans": "请先加载照片 — 占位图无法铸造。",
+    "ru": "Сначала загрузите фото — заглушку нельзя выпустить как NFT.",
+    "uk": "Спочатку завантажте фото — заповнювач не можна випустити як NFT."
+  },
+  "atelierArt.plateBudget": {
+    "en": "Plate {value} will not fit the on-chain budget.",
+    "zh-Hans": "作品 {value} 超出链上大小限制。",
+    "ru": "Работа {value} превышает допустимый размер для блокчейна.",
+    "uk": "Робота {value} перевищує допустимий розмір для блокчейну."
+  },
+  "atelierArt.signedBudget": {
+    "en": "The collection exceeds the signed record budget. Reduce its traits or image size.",
+    "zh-Hans": "系列超出已签名记录的大小限制。请减少特征或缩小图像。",
+    "ru": "Коллекция превышает лимит подписанной записи. Уменьшите число признаков или размер изображений.",
+    "uk": "Колекція перевищує ліміт підписаного запису. Зменште кількість ознак або розмір зображень."
+  },
+  "atelierArt.editionsReady": {
+    "en": "Editions drawn: {value} — finish the collection details.",
+    "zh-Hans": "已绘制版本：{value} — 请完善系列详情。",
+    "ru": "Создано экземпляров: {value} — заполните сведения о коллекции.",
+    "uk": "Створено примірників: {value} — заповніть відомості про колекцію."
+  },
+  "atelierArt.filtrLoaded": {
+    "en": "FILTR image loaded into the NFT wizard",
+    "zh-Hans": "FILTR 图像已加载到 NFT 向导",
+    "ru": "Изображение FILTR загружено в мастер NFT",
+    "uk": "Зображення FILTR завантажено в майстер NFT"
+  },
+  "atelierArt.cartoonizing": {
+    "en": "Cartoonizing on-device…",
+    "zh-Hans": "正在设备上生成卡通图像…",
+    "ru": "Создание рисованной версии на устройстве…",
+    "uk": "Створення мальованої версії на пристрої…"
+  },
+  "atelierArt.filtrFailed": {
+    "en": "Could not read the FILTR image",
+    "zh-Hans": "无法读取 FILTR 图像",
+    "ru": "Не удалось прочитать изображение FILTR",
+    "uk": "Не вдалося прочитати зображення FILTR"
+  },
+  "atelierArt.photoReadFailed": {
+    "en": "Could not read that photo",
+    "zh-Hans": "无法读取该照片",
+    "ru": "Не удалось прочитать фото",
+    "uk": "Не вдалося прочитати фото"
+  },
+  "atelierArt.photoProcessFailed": {
+    "en": "Could not process that photo",
+    "zh-Hans": "无法处理该照片",
+    "ru": "Не удалось обработать фото",
+    "uk": "Не вдалося обробити фото"
+  },
+  "atelierArt.photoReady": {
+    "en": "Photo cartoonized with AI on this device",
+    "zh-Hans": "已在此设备上使用 AI 生成照片的卡通图像",
+    "ru": "Рисованная версия фото создана с помощью ИИ на устройстве",
+    "uk": "Мальовану версію фото створено за допомогою ШІ на пристрої"
+  },
+  "atelierArt.photoFallback": {
+    "en": "AI engine unavailable — photo traced directly",
+    "zh-Hans": "AI 引擎不可用 — 已直接描摹照片",
+    "ru": "Движок ИИ недоступен — фото преобразовано напрямую",
+    "uk": "Рушій ШІ недоступний — фото перетворено безпосередньо"
+  },
+  "atelierArt.noVariants": {
+    "en": "Enable at least one variant in every trait group.",
+    "zh-Hans": "请在每个特征组中至少启用一个选项。",
+    "ru": "Включите хотя бы один вариант в каждой группе признаков.",
+    "uk": "Увімкніть хоча б один варіант у кожній групі ознак."
+  },
+  "atelierArt.uniqueFailed": {
+    "en": "Could not find a unique combination for plate {value}. Enable more variants or reduce the collection size.",
+    "zh-Hans": "无法为作品 {value} 找到唯一组合。请启用更多选项或减少系列数量。",
+    "ru": "Не удалось найти уникальное сочетание для работы {value}. Включите больше вариантов или уменьшите коллекцию.",
+    "uk": "Не вдалося знайти унікальне поєднання для роботи {value}. Увімкніть більше варіантів або зменште колекцію."
+  },
+  "atelierArt.generateFailed": {
+    "en": "Could not generate this collection. Adjust the traits and try again.",
+    "zh-Hans": "无法生成此系列。请调整特征后重试。",
+    "ru": "Не удалось создать коллекцию. Измените признаки и повторите попытку.",
+    "uk": "Не вдалося створити колекцію. Змініть ознаки та спробуйте ще раз."
   }
 }

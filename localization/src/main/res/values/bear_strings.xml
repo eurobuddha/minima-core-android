@@ -7330,4 +7330,422 @@
     <string name="l10n_atelier_collection_plate">"Image %1$s"</string>
     <!-- Arguments: 0, 1 -->
     <string name="l10n_atelier_collection_recovery_body">"Nothing is hosted at:\n%1$s\n\nYour uploaded images are available at:\n%2$s\n\nUse the uploaded base URL for this mint?"</string>
+    <string name="l10n_atelier_art_label12_fold" formatted="false">"12-fold"</string>
+    <string name="l10n_atelier_art_label16_fold" formatted="false">"16-fold"</string>
+    <string name="l10n_atelier_art_label24_fold" formatted="false">"24-fold"</string>
+    <string name="l10n_atelier_art_label6_fold" formatted="false">"6-fold"</string>
+    <string name="l10n_atelier_art_label8_fold" formatted="false">"8-fold"</string>
+    <string name="l10n_atelier_art_label_accent" formatted="false">"Accent"</string>
+    <string name="l10n_atelier_art_label_accent_lead" formatted="false">"Accent lead"</string>
+    <string name="l10n_atelier_art_label_acid" formatted="false">"Acid"</string>
+    <string name="l10n_atelier_art_label_airy" formatted="false">"Airy"</string>
+    <string name="l10n_atelier_art_label_algae" formatted="false">"Algae"</string>
+    <string name="l10n_atelier_art_label_alien" formatted="false">"Alien"</string>
+    <string name="l10n_atelier_art_label_amber_glow" formatted="false">"Amber Glow"</string>
+    <string name="l10n_atelier_art_label_antenna" formatted="false">"Antenna"</string>
+    <string name="l10n_atelier_art_label_apple" formatted="false">"Apple"</string>
+    <string name="l10n_atelier_art_label_arcs" formatted="false">"Arcs"</string>
+    <string name="l10n_atelier_art_label_arcs_dots" formatted="false">"Arcs+Dots"</string>
+    <string name="l10n_atelier_art_label_arms13" formatted="false">"Arms-13"</string>
+    <string name="l10n_atelier_art_label_arms8" formatted="false">"Arms-8"</string>
+    <string name="l10n_atelier_art_label_azure" formatted="false">"Azure"</string>
+    <string name="l10n_atelier_art_label_backdrop" formatted="false">"Backdrop"</string>
+    <string name="l10n_atelier_art_label_background" formatted="false">"Background"</string>
+    <string name="l10n_atelier_art_label_balanced" formatted="false">"Balanced"</string>
+    <string name="l10n_atelier_art_label_bald" formatted="false">"Bald"</string>
+    <string name="l10n_atelier_art_label_bamboo" formatted="false">"Bamboo"</string>
+    <string name="l10n_atelier_art_label_band" formatted="false">"Band"</string>
+    <string name="l10n_atelier_art_label_bandage" formatted="false">"Bandage"</string>
+    <string name="l10n_atelier_art_label_bare" formatted="false">"Bare"</string>
+    <string name="l10n_atelier_art_label_bars" formatted="false">"Bars"</string>
+    <string name="l10n_atelier_art_label_bauhaus" formatted="false">"Bauhaus"</string>
+    <string name="l10n_atelier_art_label_beanie" formatted="false">"Beanie"</string>
+    <string name="l10n_atelier_art_label_bear" formatted="false">"Bear"</string>
+    <string name="l10n_atelier_art_label_beard" formatted="false">"Beard"</string>
+    <string name="l10n_atelier_art_label_blackwhite" formatted="false">"Blackwhite"</string>
+    <string name="l10n_atelier_art_label_blobs" formatted="false">"Blobs"</string>
+    <string name="l10n_atelier_art_label_block" formatted="false">"Block"</string>
+    <string name="l10n_atelier_art_label_bloom" formatted="false">"Bloom"</string>
+    <string name="l10n_atelier_art_label_blue_m" formatted="false">"Blue M"</string>
+    <string name="l10n_atelier_art_label_blue_nude" formatted="false">"Blue Nude"</string>
+    <string name="l10n_atelier_art_label_blue_period" formatted="false">"Blue Period"</string>
+    <string name="l10n_atelier_art_label_blue_led" formatted="false">"Blue-led"</string>
+    <string name="l10n_atelier_art_label_blush" formatted="false">"Blush"</string>
+    <string name="l10n_atelier_art_label_bold" formatted="false">"Bold"</string>
+    <string name="l10n_atelier_art_label_boogie" formatted="false">"Boogie"</string>
+    <string name="l10n_atelier_art_label_both_profile" formatted="false">"Both-profile"</string>
+    <string name="l10n_atelier_art_label_bowler" formatted="false">"Bowler"</string>
+    <string name="l10n_atelier_art_label_brown" formatted="false">"Brown"</string>
+    <string name="l10n_atelier_art_label_burst" formatted="false">"Burst"</string>
+    <string name="l10n_atelier_art_label_busy" formatted="false">"Busy"</string>
+    <string name="l10n_atelier_art_label_button" formatted="false">"Button"</string>
+    <string name="l10n_atelier_art_label_buzz" formatted="false">"Buzz"</string>
+    <string name="l10n_atelier_art_label_calm" formatted="false">"Calm"</string>
+    <string name="l10n_atelier_art_label_cap" formatted="false">"Cap"</string>
+    <string name="l10n_atelier_art_label_cells" formatted="false">"Cells"</string>
+    <string name="l10n_atelier_art_label_chain" formatted="false">"Chain"</string>
+    <string name="l10n_atelier_art_label_chaos" formatted="false">"Chaos"</string>
+    <string name="l10n_atelier_art_label_charcoal" formatted="false">"Charcoal"</string>
+    <string name="l10n_atelier_art_label_checker" formatted="false">"Checker"</string>
+    <string name="l10n_atelier_art_label_chest" formatted="false">"Chest"</string>
+    <string name="l10n_atelier_art_label_chest_print" formatted="false">"Chest print"</string>
+    <string name="l10n_atelier_art_label_cigarette" formatted="false">"Cigarette"</string>
+    <string name="l10n_atelier_art_label_circle_grid" formatted="false">"Circle Grid"</string>
+    <string name="l10n_atelier_art_label_circles" formatted="false">"Circles"</string>
+    <string name="l10n_atelier_art_label_classic" formatted="false">"Classic"</string>
+    <string name="l10n_atelier_art_label_clouds" formatted="false">"Clouds"</string>
+    <string name="l10n_atelier_art_label_cobalt" formatted="false">"Cobalt"</string>
+    <string name="l10n_atelier_art_label_coin" formatted="false">"Coin"</string>
+    <string name="l10n_atelier_art_label_color" formatted="false">"Color"</string>
+    <string name="l10n_atelier_art_label_color_balance" formatted="false">"Color balance"</string>
+    <string name="l10n_atelier_art_label_coloring" formatted="false">"Coloring"</string>
+    <string name="l10n_atelier_art_label_column" formatted="false">"Column"</string>
+    <string name="l10n_atelier_art_label_companion" formatted="false">"Companion"</string>
+    <string name="l10n_atelier_art_label_composition" formatted="false">"Composition"</string>
+    <string name="l10n_atelier_art_label_connector" formatted="false">"Connector"</string>
+    <string name="l10n_atelier_art_label_connectors" formatted="false">"Connectors"</string>
+    <string name="l10n_atelier_art_label_cool" formatted="false">"Cool"</string>
+    <string name="l10n_atelier_art_label_core" formatted="false">"Core"</string>
+    <string name="l10n_atelier_art_label_corner" formatted="false">"Corner"</string>
+    <string name="l10n_atelier_art_label_count" formatted="false">"Count"</string>
+    <string name="l10n_atelier_art_label_cream" formatted="false">"Cream"</string>
+    <string name="l10n_atelier_art_label_crescents" formatted="false">"Crescents"</string>
+    <string name="l10n_atelier_art_label_crimson" formatted="false">"Crimson"</string>
+    <string name="l10n_atelier_art_label_crowded" formatted="false">"Crowded"</string>
+    <string name="l10n_atelier_art_label_crown" formatted="false">"Crown"</string>
+    <string name="l10n_atelier_art_label_day" formatted="false">"Day"</string>
+    <string name="l10n_atelier_art_label_deep" formatted="false">"Deep"</string>
+    <string name="l10n_atelier_art_label_deep_blue" formatted="false">"Deep Blue"</string>
+    <string name="l10n_atelier_art_label_deep_teal" formatted="false">"Deep Teal"</string>
+    <string name="l10n_atelier_art_label_dense" formatted="false">"Dense"</string>
+    <string name="l10n_atelier_art_label_density" formatted="false">"Density"</string>
+    <string name="l10n_atelier_art_label_detail" formatted="false">"Detail"</string>
+    <string name="l10n_atelier_art_label_diagonal" formatted="false">"Diagonal"</string>
+    <string name="l10n_atelier_art_label_diagonals" formatted="false">"Diagonals"</string>
+    <string name="l10n_atelier_art_label_diamond" formatted="false">"Diamond"</string>
+    <string name="l10n_atelier_art_label_disc" formatted="false">"Disc"</string>
+    <string name="l10n_atelier_art_label_dot" formatted="false">"Dot"</string>
+    <string name="l10n_atelier_art_label_dot_chain" formatted="false">"Dot Chain"</string>
+    <string name="l10n_atelier_art_label_dot_scale" formatted="false">"Dot scale"</string>
+    <string name="l10n_atelier_art_label_dots" formatted="false">"Dots"</string>
+    <string name="l10n_atelier_art_label_double" formatted="false">"Double"</string>
+    <string name="l10n_atelier_art_label_duet" formatted="false">"Duet"</string>
+    <string name="l10n_atelier_art_label_duo" formatted="false">"Duo"</string>
+    <string name="l10n_atelier_art_label_duotone" formatted="false">"Duotone"</string>
+    <string name="l10n_atelier_art_label_dusk" formatted="false">"Dusk"</string>
+    <string name="l10n_atelier_art_label_dusk_neon" formatted="false">"Dusk Neon"</string>
+    <string name="l10n_atelier_art_label_earring" formatted="false">"Earring"</string>
+    <string name="l10n_atelier_art_label_ears" formatted="false">"Ears"</string>
+    <string name="l10n_atelier_art_label_earth" formatted="false">"Earth"</string>
+    <string name="l10n_atelier_art_label_echo" formatted="false">"Echo"</string>
+    <string name="l10n_atelier_art_label_element" formatted="false">"Element"</string>
+    <string name="l10n_atelier_art_label_ember" formatted="false">"Ember"</string>
+    <string name="l10n_atelier_art_label_ember_field" formatted="false">"Ember Field"</string>
+    <string name="l10n_atelier_art_label_escher" formatted="false">"Escher"</string>
+    <string name="l10n_atelier_art_label_even" formatted="false">"Even"</string>
+    <string name="l10n_atelier_art_label_extra" formatted="false">"Extra"</string>
+    <string name="l10n_atelier_art_label_eye" formatted="false">"Eye"</string>
+    <string name="l10n_atelier_art_label_eyes" formatted="false">"Eyes"</string>
+    <string name="l10n_atelier_art_label_eyes_eyewear" formatted="false">"Eyes / eyewear"</string>
+    <string name="l10n_atelier_art_label_facial_hair" formatted="false">"Facial hair"</string>
+    <string name="l10n_atelier_art_label_family" formatted="false">"Family"</string>
+    <string name="l10n_atelier_art_label_fermat" formatted="false">"Fermat"</string>
+    <string name="l10n_atelier_art_label_few" formatted="false">"Few"</string>
+    <string name="l10n_atelier_art_label_field" formatted="false">"Field"</string>
+    <string name="l10n_atelier_art_label_fine" formatted="false">"Fine"</string>
+    <string name="l10n_atelier_art_label_finish" formatted="false">"Finish"</string>
+    <string name="l10n_atelier_art_label_flat" formatted="false">"Flat"</string>
+    <string name="l10n_atelier_art_label_floppy" formatted="false">"Floppy"</string>
+    <string name="l10n_atelier_art_label_focal" formatted="false">"Focal"</string>
+    <string name="l10n_atelier_art_label_form" formatted="false">"Form"</string>
+    <string name="l10n_atelier_art_label_forms" formatted="false">"Forms"</string>
+    <string name="l10n_atelier_art_label_fragmentation" formatted="false">"Fragmentation"</string>
+    <string name="l10n_atelier_art_label_frame" formatted="false">"Frame"</string>
+    <string name="l10n_atelier_art_label_free" formatted="false">"Free"</string>
+    <string name="l10n_atelier_art_label_frequency" formatted="false">"Frequency"</string>
+    <string name="l10n_atelier_art_label_frown" formatted="false">"Frown"</string>
+    <string name="l10n_atelier_art_label_gentle" formatted="false">"Gentle"</string>
+    <string name="l10n_atelier_art_label_geometric" formatted="false">"Geometric"</string>
+    <string name="l10n_atelier_art_label_geometry" formatted="false">"Geometry"</string>
+    <string name="l10n_atelier_art_label_glow" formatted="false">"Glow"</string>
+    <string name="l10n_atelier_art_label_goatee" formatted="false">"Goatee"</string>
+    <string name="l10n_atelier_art_label_gold" formatted="false">"Gold"</string>
+    <string name="l10n_atelier_art_label_gold_grin" formatted="false">"Gold Grin"</string>
+    <string name="l10n_atelier_art_label_gradient" formatted="false">"Gradient"</string>
+    <string name="l10n_atelier_art_label_grande_jatte" formatted="false">"Grande Jatte"</string>
+    <string name="l10n_atelier_art_label_grid" formatted="false">"Grid"</string>
+    <string name="l10n_atelier_art_label_grid2" formatted="false">"Grid-2"</string>
+    <string name="l10n_atelier_art_label_grid3" formatted="false">"Grid-3"</string>
+    <string name="l10n_atelier_art_label_grin" formatted="false">"Grin"</string>
+    <string name="l10n_atelier_art_label_grisaille" formatted="false">"Grisaille"</string>
+    <string name="l10n_atelier_art_label_grr" formatted="false">"Grr"</string>
+    <string name="l10n_atelier_art_label_hair" formatted="false">"Hair"</string>
+    <string name="l10n_atelier_art_label_hair_headgear" formatted="false">"Hair / headgear"</string>
+    <string name="l10n_atelier_art_label_half" formatted="false">"Half"</string>
+    <string name="l10n_atelier_art_label_halo" formatted="false">"Halo"</string>
+    <string name="l10n_atelier_art_label_harmonograph" formatted="false">"Harmonograph"</string>
+    <string name="l10n_atelier_art_label_headband" formatted="false">"Headband"</string>
+    <string name="l10n_atelier_art_label_headgear" formatted="false">"Headgear"</string>
+    <string name="l10n_atelier_art_label_headset" formatted="false">"Headset"</string>
+    <string name="l10n_atelier_art_label_heart" formatted="false">"Heart"</string>
+    <string name="l10n_atelier_art_label_heavy" formatted="false">"Heavy"</string>
+    <string name="l10n_atelier_art_label_high" formatted="false">"High"</string>
+    <string name="l10n_atelier_art_label_hills" formatted="false">"Hills"</string>
+    <string name="l10n_atelier_art_label_hologram" formatted="false">"Hologram"</string>
+    <string name="l10n_atelier_art_label_hoodie" formatted="false">"Hoodie"</string>
+    <string name="l10n_atelier_art_label_horizon" formatted="false">"Horizon"</string>
+    <string name="l10n_atelier_art_label_icon" formatted="false">"Icon"</string>
+    <string name="l10n_atelier_art_label_impossible" formatted="false">"Impossible"</string>
+    <string name="l10n_atelier_art_label_ink" formatted="false">"Ink"</string>
+    <string name="l10n_atelier_art_label_inverse" formatted="false">"Inverse"</string>
+    <string name="l10n_atelier_art_label_invert" formatted="false">"Invert"</string>
+    <string name="l10n_atelier_art_label_inverted" formatted="false">"Inverted"</string>
+    <string name="l10n_atelier_art_label_ivory" formatted="false">"Ivory"</string>
+    <string name="l10n_atelier_art_label_jazz" formatted="false">"Jazz"</string>
+    <string name="l10n_atelier_art_label_kandinsky" formatted="false">"Kandinsky"</string>
+    <string name="l10n_atelier_art_label_lagoon" formatted="false">"Lagoon"</string>
+    <string name="l10n_atelier_art_label_laser" formatted="false">"Laser"</string>
+    <string name="l10n_atelier_art_label_laser_blue" formatted="false">"Laser Blue"</string>
+    <string name="l10n_atelier_art_label_laser_red" formatted="false">"Laser Red"</string>
+    <string name="l10n_atelier_art_label_lattice" formatted="false">"Lattice"</string>
+    <string name="l10n_atelier_art_label_layers" formatted="false">"Layers"</string>
+    <string name="l10n_atelier_art_label_layout" formatted="false">"Layout"</string>
+    <string name="l10n_atelier_art_label_leaves" formatted="false">"Leaves"</string>
+    <string name="l10n_atelier_art_label_lens" formatted="false">"Lens"</string>
+    <string name="l10n_atelier_art_label_line_weight" formatted="false">"Line weight"</string>
+    <string name="l10n_atelier_art_label_lines" formatted="false">"Lines"</string>
+    <string name="l10n_atelier_art_label_lissajous" formatted="false">"Lissajous"</string>
+    <string name="l10n_atelier_art_label_lively" formatted="false">"Lively"</string>
+    <string name="l10n_atelier_art_label_long" formatted="false">"Long"</string>
+    <string name="l10n_atelier_art_label_low" formatted="false">"Low"</string>
+    <string name="l10n_atelier_art_label_mcrest" formatted="false">"M Crest"</string>
+    <string name="l10n_atelier_art_label_magritte" formatted="false">"Magritte"</string>
+    <string name="l10n_atelier_art_label_mandala" formatted="false">"Mandala"</string>
+    <string name="l10n_atelier_art_label_many" formatted="false">"Many"</string>
+    <string name="l10n_atelier_art_label_mask" formatted="false">"Mask"</string>
+    <string name="l10n_atelier_art_label_math_curves" formatted="false">"Math Curves"</string>
+    <string name="l10n_atelier_art_label_matisse" formatted="false">"Matisse"</string>
+    <string name="l10n_atelier_art_label_maxima" formatted="false">"Maxima"</string>
+    <string name="l10n_atelier_art_label_meadow" formatted="false">"Meadow"</string>
+    <string name="l10n_atelier_art_label_meander" formatted="false">"Meander"</string>
+    <string name="l10n_atelier_art_label_medium" formatted="false">"Medium"</string>
+    <string name="l10n_atelier_art_label_middle" formatted="false">"Middle"</string>
+    <string name="l10n_atelier_art_label_minima_punks" formatted="false">"Minima Punks"</string>
+    <string name="l10n_atelier_art_label_minimal" formatted="false">"Minimal"</string>
+    <string name="l10n_atelier_art_label_mint_frost" formatted="false">"Mint Frost"</string>
+    <string name="l10n_atelier_art_label_miro" formatted="false">"Miro"</string>
+    <string name="l10n_atelier_art_label_mirror" formatted="false">"Mirror"</string>
+    <string name="l10n_atelier_art_label_mirrored" formatted="false">"Mirrored"</string>
+    <string name="l10n_atelier_art_label_mismatched" formatted="false">"Mismatched"</string>
+    <string name="l10n_atelier_art_label_mixed" formatted="false">"Mixed"</string>
+    <string name="l10n_atelier_art_label_mode" formatted="false">"Mode"</string>
+    <string name="l10n_atelier_art_label_mohawk" formatted="false">"Mohawk"</string>
+    <string name="l10n_atelier_art_label_moire" formatted="false">"Moire"</string>
+    <string name="l10n_atelier_art_label_mondrian" formatted="false">"Mondrian"</string>
+    <string name="l10n_atelier_art_label_mono" formatted="false">"Mono"</string>
+    <string name="l10n_atelier_art_label_monocle" formatted="false">"Monocle"</string>
+    <string name="l10n_atelier_art_label_moon" formatted="false">"Moon"</string>
+    <string name="l10n_atelier_art_label_morph" formatted="false">"Morph"</string>
+    <string name="l10n_atelier_art_label_motif" formatted="false">"Motif"</string>
+    <string name="l10n_atelier_art_label_motifs" formatted="false">"Motifs"</string>
+    <string name="l10n_atelier_art_label_mouth" formatted="false">"Mouth"</string>
+    <string name="l10n_atelier_art_label_multiplicity" formatted="false">"Multiplicity"</string>
+    <string name="l10n_atelier_art_label_mustache" formatted="false">"Mustache"</string>
+    <string name="l10n_atelier_art_label_muzzle" formatted="false">"Muzzle"</string>
+    <string name="l10n_atelier_art_label_natural" formatted="false">"Natural"</string>
+    <string name="l10n_atelier_art_label_neon" formatted="false">"Neon"</string>
+    <string name="l10n_atelier_art_label_nested" formatted="false">"Nested"</string>
+    <string name="l10n_atelier_art_label_neutral" formatted="false">"Neutral"</string>
+    <string name="l10n_atelier_art_label_night" formatted="false">"Night"</string>
+    <string name="l10n_atelier_art_label_node" formatted="false">"Node"</string>
+    <string name="l10n_atelier_art_label_none" formatted="false">"None"</string>
+    <string name="l10n_atelier_art_label_object" formatted="false">"Object"</string>
+    <string name="l10n_atelier_art_label_ocean" formatted="false">"Ocean"</string>
+    <string name="l10n_atelier_art_label_op_art" formatted="false">"Op-Art"</string>
+    <string name="l10n_atelier_art_label_orange_m" formatted="false">"Orange M"</string>
+    <string name="l10n_atelier_art_label_orbit" formatted="false">"Orbit"</string>
+    <string name="l10n_atelier_art_label_outline" formatted="false">"Outline"</string>
+    <string name="l10n_atelier_art_label_overlay" formatted="false">"Overlay"</string>
+    <string name="l10n_atelier_art_label_painted" formatted="false">"Painted"</string>
+    <string name="l10n_atelier_art_label_pale" formatted="false">"Pale"</string>
+    <string name="l10n_atelier_art_label_palette" formatted="false">"Palette"</string>
+    <string name="l10n_atelier_art_label_panda_punks" formatted="false">"Panda Punks"</string>
+    <string name="l10n_atelier_art_label_paper" formatted="false">"Paper"</string>
+    <string name="l10n_atelier_art_label_paper_led" formatted="false">"Paper-led"</string>
+    <string name="l10n_atelier_art_label_pastel" formatted="false">"Pastel"</string>
+    <string name="l10n_atelier_art_label_patch" formatted="false">"Patch"</string>
+    <string name="l10n_atelier_art_label_perky" formatted="false">"Perky"</string>
+    <string name="l10n_atelier_art_label_petal" formatted="false">"Petal"</string>
+    <string name="l10n_atelier_art_label_photo_cartoon" formatted="false">"Photo Cartoon"</string>
+    <string name="l10n_atelier_art_label_phyllotaxis" formatted="false">"Phyllotaxis"</string>
+    <string name="l10n_atelier_art_label_picasso" formatted="false">"Picasso"</string>
+    <string name="l10n_atelier_art_label_pinwheel" formatted="false">"Pinwheel"</string>
+    <string name="l10n_atelier_art_label_pipe" formatted="false">"Pipe"</string>
+    <string name="l10n_atelier_art_label_pixel" formatted="false">"Pixel"</string>
+    <string name="l10n_atelier_art_label_plain" formatted="false">"Plain"</string>
+    <string name="l10n_atelier_art_label_planes" formatted="false">"Planes"</string>
+    <string name="l10n_atelier_art_label_port" formatted="false">"Port"</string>
+    <string name="l10n_atelier_art_label_poster" formatted="false">"Poster"</string>
+    <string name="l10n_atelier_art_label_primary" formatted="false">"Primary"</string>
+    <string name="l10n_atelier_art_label_primary_led" formatted="false">"Primary-led"</string>
+    <string name="l10n_atelier_art_label_pulse" formatted="false">"Pulse"</string>
+    <string name="l10n_atelier_art_label_punks" formatted="false">"Punks"</string>
+    <string name="l10n_atelier_art_label_puzzle" formatted="false">"Puzzle"</string>
+    <string name="l10n_atelier_art_label_quad" formatted="false">"Quad"</string>
+    <string name="l10n_atelier_art_label_quarter" formatted="false">"Quarter"</string>
+    <string name="l10n_atelier_art_label_quarter_fans" formatted="false">"Quarter Fans"</string>
+    <string name="l10n_atelier_art_label_rain" formatted="false">"Rain"</string>
+    <string name="l10n_atelier_art_label_ray" formatted="false">"Ray"</string>
+    <string name="l10n_atelier_art_label_rectilinear" formatted="false">"Rectilinear"</string>
+    <string name="l10n_atelier_art_label_red_led" formatted="false">"Red-led"</string>
+    <string name="l10n_atelier_art_label_regular" formatted="false">"Regular"</string>
+    <string name="l10n_atelier_art_label_render" formatted="false">"Render"</string>
+    <string name="l10n_atelier_art_label_resolution" formatted="false">"Resolution"</string>
+    <string name="l10n_atelier_art_label_rich" formatted="false">"Rich"</string>
+    <string name="l10n_atelier_art_label_rim" formatted="false">"Rim"</string>
+    <string name="l10n_atelier_art_label_ring" formatted="false">"Ring"</string>
+    <string name="l10n_atelier_art_label_rings" formatted="false">"Rings"</string>
+    <string name="l10n_atelier_art_label_robot" formatted="false">"Robot"</string>
+    <string name="l10n_atelier_art_label_rose" formatted="false">"Rose"</string>
+    <string name="l10n_atelier_art_label_rose_period" formatted="false">"Rose Period"</string>
+    <string name="l10n_atelier_art_label_rot2" formatted="false">"Rot2"</string>
+    <string name="l10n_atelier_art_label_rotation" formatted="false">"Rotation"</string>
+    <string name="l10n_atelier_art_label_royal" formatted="false">"Royal"</string>
+    <string name="l10n_atelier_art_label_rusty" formatted="false">"Rusty"</string>
+    <string name="l10n_atelier_art_label_sail" formatted="false">"Sail"</string>
+    <string name="l10n_atelier_art_label_sakura" formatted="false">"Sakura"</string>
+    <string name="l10n_atelier_art_label_sand" formatted="false">"Sand"</string>
+    <string name="l10n_atelier_art_label_saturated" formatted="false">"Saturated"</string>
+    <string name="l10n_atelier_art_label_scanlines" formatted="false">"Scanlines"</string>
+    <string name="l10n_atelier_art_label_scar" formatted="false">"Scar"</string>
+    <string name="l10n_atelier_art_label_scatter" formatted="false">"Scatter"</string>
+    <string name="l10n_atelier_art_label_scene" formatted="false">"Scene"</string>
+    <string name="l10n_atelier_art_label_scheme" formatted="false">"Scheme"</string>
+    <string name="l10n_atelier_art_label_sea" formatted="false">"Sea"</string>
+    <string name="l10n_atelier_art_label_seascape" formatted="false">"Seascape"</string>
+    <string name="l10n_atelier_art_label_seed" formatted="false">"Seed"</string>
+    <string name="l10n_atelier_art_label_seeds" formatted="false">"Seeds"</string>
+    <string name="l10n_atelier_art_label_seurat" formatted="false">"Seurat"</string>
+    <string name="l10n_atelier_art_label_several" formatted="false">"Several"</string>
+    <string name="l10n_atelier_art_label_shades" formatted="false">"Shades"</string>
+    <string name="l10n_atelier_art_label_shadow" formatted="false">"Shadow"</string>
+    <string name="l10n_atelier_art_label_shapes" formatted="false">"Shapes"</string>
+    <string name="l10n_atelier_art_label_shirt" formatted="false">"Shirt"</string>
+    <string name="l10n_atelier_art_label_single" formatted="false">"Single"</string>
+    <string name="l10n_atelier_art_label_size_ramp" formatted="false">"Size ramp"</string>
+    <string name="l10n_atelier_art_label_sky" formatted="false">"Sky"</string>
+    <string name="l10n_atelier_art_label_sleepy" formatted="false">"Sleepy"</string>
+    <string name="l10n_atelier_art_label_smile" formatted="false">"Smile"</string>
+    <string name="l10n_atelier_art_label_smooth" formatted="false">"Smooth"</string>
+    <string name="l10n_atelier_art_label_snail" formatted="false">"Snail"</string>
+    <string name="l10n_atelier_art_label_snow" formatted="false">"Snow"</string>
+    <string name="l10n_atelier_art_label_solar" formatted="false">"Solar"</string>
+    <string name="l10n_atelier_art_label_solo" formatted="false">"Solo"</string>
+    <string name="l10n_atelier_art_label_spark" formatted="false">"Spark"</string>
+    <string name="l10n_atelier_art_label_sparse" formatted="false">"Sparse"</string>
+    <string name="l10n_atelier_art_label_spikes" formatted="false">"Spikes"</string>
+    <string name="l10n_atelier_art_label_spirograph" formatted="false">"Spirograph"</string>
+    <string name="l10n_atelier_art_label_split" formatted="false">"Split"</string>
+    <string name="l10n_atelier_art_label_square" formatted="false">"Square"</string>
+    <string name="l10n_atelier_art_label_stacked" formatted="false">"Stacked"</string>
+    <string name="l10n_atelier_art_label_star" formatted="false">"Star"</string>
+    <string name="l10n_atelier_art_label_stars" formatted="false">"Stars"</string>
+    <string name="l10n_atelier_art_label_stitch" formatted="false">"Stitch"</string>
+    <string name="l10n_atelier_art_label_stitches" formatted="false">"Stitches"</string>
+    <string name="l10n_atelier_art_label_stripes" formatted="false">"Stripes"</string>
+    <string name="l10n_atelier_art_label_stroke" formatted="false">"Stroke"</string>
+    <string name="l10n_atelier_art_label_strong" formatted="false">"Strong"</string>
+    <string name="l10n_atelier_art_label_subdivision" formatted="false">"Subdivision"</string>
+    <string name="l10n_atelier_art_label_subtle" formatted="false">"Subtle"</string>
+    <string name="l10n_atelier_art_label_sun" formatted="false">"Sun"</string>
+    <string name="l10n_atelier_art_label_superformula" formatted="false">"Superformula"</string>
+    <string name="l10n_atelier_art_label_swept" formatted="false">"Swept"</string>
+    <string name="l10n_atelier_art_label_symmetry" formatted="false">"Symmetry"</string>
+    <string name="l10n_atelier_art_label_tan" formatted="false">"Tan"</string>
+    <string name="l10n_atelier_art_label_tank" formatted="false">"Tank"</string>
+    <string name="l10n_atelier_art_label_teardrop" formatted="false">"Teardrop"</string>
+    <string name="l10n_atelier_art_label_tee" formatted="false">"Tee"</string>
+    <string name="l10n_atelier_art_label_terra" formatted="false">"Terra"</string>
+    <string name="l10n_atelier_art_label_texture" formatted="false">"Texture"</string>
+    <string name="l10n_atelier_art_label_thorn" formatted="false">"Thorn"</string>
+    <string name="l10n_atelier_art_label_tiles" formatted="false">"Tiles"</string>
+    <string name="l10n_atelier_art_label_tilt" formatted="false">"Tilt"</string>
+    <string name="l10n_atelier_art_label_tongue" formatted="false">"Tongue"</string>
+    <string name="l10n_atelier_art_label_top_knot" formatted="false">"Top Knot"</string>
+    <string name="l10n_atelier_art_label_torn" formatted="false">"Torn"</string>
+    <string name="l10n_atelier_art_label_totem" formatted="false">"Totem"</string>
+    <string name="l10n_atelier_art_label_tree" formatted="false">"Tree"</string>
+    <string name="l10n_atelier_art_label_tri_m" formatted="false">"Tri M"</string>
+    <string name="l10n_atelier_art_label_tri_m09cfd7" formatted="false">"Tri-M"</string>
+    <string name="l10n_atelier_art_label_tri_sig" formatted="false">"Tri-Sig"</string>
+    <string name="l10n_atelier_art_label_tri_tone" formatted="false">"Tri-tone"</string>
+    <string name="l10n_atelier_art_label_triangles" formatted="false">"Triangles"</string>
+    <string name="l10n_atelier_art_label_trim" formatted="false">"Trim"</string>
+    <string name="l10n_atelier_art_label_trio" formatted="false">"Trio"</string>
+    <string name="l10n_atelier_art_label_truchet" formatted="false">"Truchet"</string>
+    <string name="l10n_atelier_art_label_two_tone" formatted="false">"Two-tone"</string>
+    <string name="l10n_atelier_art_label_umbrella" formatted="false">"Umbrella"</string>
+    <string name="l10n_atelier_art_label_vector" formatted="false">"Vector"</string>
+    <string name="l10n_atelier_art_label_vintage" formatted="false">"Vintage"</string>
+    <string name="l10n_atelier_art_label_violet_hour" formatted="false">"Violet Hour"</string>
+    <string name="l10n_atelier_art_label_visor" formatted="false">"Visor"</string>
+    <string name="l10n_atelier_art_label_warm" formatted="false">"Warm"</string>
+    <string name="l10n_atelier_art_label_warp" formatted="false">"Warp"</string>
+    <string name="l10n_atelier_art_label_wash" formatted="false">"Wash"</string>
+    <string name="l10n_atelier_art_label_waves" formatted="false">"Waves"</string>
+    <string name="l10n_atelier_art_label_web" formatted="false">"Web"</string>
+    <string name="l10n_atelier_art_label_wedge" formatted="false">"Wedge"</string>
+    <string name="l10n_atelier_art_label_whistle" formatted="false">"Whistle"</string>
+    <string name="l10n_atelier_art_label_white_m" formatted="false">"White M"</string>
+    <string name="l10n_atelier_art_label_whole" formatted="false">"Whole"</string>
+    <string name="l10n_atelier_art_label_wild" formatted="false">"Wild"</string>
+    <string name="l10n_atelier_art_label_xstitch" formatted="false">"X-Stitch"</string>
+    <string name="l10n_atelier_art_label_zigzag" formatted="false">"Zigzag"</string>
+    <string name="l10n_atelier_art_label_zombie" formatted="false">"Zombie"</string>
+    <string name="l10n_atelier_art_title" formatted="false">"Generative"</string>
+    <string name="l10n_atelier_art_intro" formatted="false">"The Generator — 19 on-chain SVG style packs"</string>
+    <string name="l10n_atelier_art_deterministic" formatted="false">"The seed and style reproduce every plate byte-for-byte. The same design mints identically in the MiniDapp."</string>
+    <string name="l10n_atelier_art_warming" formatted="false">"Warming up the art engine…"</string>
+    <string name="l10n_atelier_art_photo_loaded" formatted="false">"Photo loaded — every plate derives from its cartoon. The original stays on the phone."</string>
+    <string name="l10n_atelier_art_photo_help" formatted="false">"Choose a photo to create the collection on this device. The original stays on the phone. A placeholder cannot be minted."</string>
+    <string name="l10n_atelier_art_change_photo" formatted="false">"Change photo"</string>
+    <string name="l10n_atelier_art_choose_photo" formatted="false">"Choose photo"</string>
+    <string name="l10n_atelier_art_seed" formatted="false">"Collection seed — same seed, same art, forever"</string>
+    <string name="l10n_atelier_art_random_seed" formatted="false">"Generate a new collection seed"</string>
+    <string name="l10n_atelier_art_traits" formatted="false">"Trait pool &amp; rarity"</string>
+    <!-- Arguments: value, total -->
+    <string name="l10n_atelier_art_enabled">"%1$s/%2$s enabled"</string>
+    <string name="l10n_atelier_art_shuffle_rarity" formatted="false">"🎲 Rarity"</string>
+    <string name="l10n_atelier_art_shuffle_traits" formatted="false">"🎲 Traits"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_capacity">"Trait space: %1$s distinct combinations"</string>
+    <string name="l10n_atelier_art_proof" formatted="false">"Proof sheet"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_plates">"Plates: %1$s"</string>
+    <string name="l10n_atelier_art_drawing" formatted="false">"Drawing…"</string>
+    <string name="l10n_atelier_art_generate" formatted="false">"Generate"</string>
+    <string name="l10n_atelier_art_plate_hint" formatted="false">"Tap a plate for its traits and rarity."</string>
+    <string name="l10n_atelier_art_composing" formatted="false">"Composing…"</string>
+    <string name="l10n_atelier_art_send" formatted="false">"Send to collection wizard"</string>
+    <string name="l10n_atelier_art_traits_shuffled" formatted="false">"Trait pool shuffled"</string>
+    <string name="l10n_atelier_art_rarity_shuffled" formatted="false">"Rarity shuffled"</string>
+    <!-- Arguments: value, total -->
+    <string name="l10n_atelier_art_rarity_bytes">"Rarity score r%1$s · %2$s B raw"</string>
+    <string name="l10n_atelier_art_load_photo" formatted="false">"Load a photo first — a placeholder cannot be minted."</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_plate_budget">"Plate %1$s will not fit the on-chain budget."</string>
+    <string name="l10n_atelier_art_signed_budget" formatted="false">"The collection exceeds the signed record budget. Reduce its traits or image size."</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_editions_ready">"Editions drawn: %1$s — finish the collection details."</string>
+    <string name="l10n_atelier_art_filtr_loaded" formatted="false">"FILTR image loaded into the NFT wizard"</string>
+    <string name="l10n_atelier_art_cartoonizing" formatted="false">"Cartoonizing on-device…"</string>
+    <string name="l10n_atelier_art_filtr_failed" formatted="false">"Could not read the FILTR image"</string>
+    <string name="l10n_atelier_art_photo_read_failed" formatted="false">"Could not read that photo"</string>
+    <string name="l10n_atelier_art_photo_process_failed" formatted="false">"Could not process that photo"</string>
+    <string name="l10n_atelier_art_photo_ready" formatted="false">"Photo cartoonized with AI on this device"</string>
+    <string name="l10n_atelier_art_photo_fallback" formatted="false">"AI engine unavailable — photo traced directly"</string>
+    <string name="l10n_atelier_art_no_variants" formatted="false">"Enable at least one variant in every trait group."</string>
+    <!-- Arguments: value -->
+    <string name="l10n_atelier_art_unique_failed">"Could not find a unique combination for plate %1$s. Enable more variants or reduce the collection size."</string>
+    <string name="l10n_atelier_art_generate_failed" formatted="false">"Could not generate this collection. Adjust the traits and try again."</string>
 </resources>
