@@ -141,9 +141,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(b);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
-        // Maxima transport handshake: register (wakes it), subscribe our DM
-        // channel, cache our addresses. Idempotent, fire-and-forget - the app
-        // works fully without Maxima (on-chain DMs), this just upgrades it.
+        // Refresh the embedded host transport; its service owns start and stop.
         MaximaLink.connect(this);
 
         NostrKeys.init(getApplicationContext());   // Blossom uploads sign off the io executor, no Context there
@@ -2972,9 +2970,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case Hosting.TYPE_MAXIMA:
-                card.addView(Design.note(this, "You are the server. Media is encrypted on your phone, kept HERE, and mirrored across the Maxima relay mesh so it stays reachable while your phone sleeps — no single relay to trust, pay or lose. Needs the Maxima app installed (approve Salon once in Maxima → Connected apps).\n\nViewable in Maxima-capable apps only. This is the decentralised path: 100% of the network is hosted by its users.\n\nSize limit: up to 16 MB per file — great for photos and short clips. Large video/audio won't fit the mesh (it's user-hosted redundancy, not a storage locker); host those on a server type (SFTP/IPFS/GitHub), which has no size limit and stays online without you."
-                        + "\n\nProfile budget: " + mibOf(meshUsageBytes()) + " / " + (MAX_PROFILE_MESH_BYTES >> 20) + " MB used (total across all your mesh media). Big libraries belong on a server host."
-                        + (MaximaLink.isReady(this) ? "\n\n✓ Maxima connected." : "\n\n⚠ Maxima not connected yet — install/approve it, then reopen this.")), lp(0, 6, 0, 2));
+                TextView meshNote=Design.note(this, "");
+                Language.setText(meshNote, Language.join(
+                        Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_transport_mesh_help), "\n\n",
+                        Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_transport_mesh_usage, mibOf(meshUsageBytes()), MAX_PROFILE_MESH_BYTES >> 20), "\n\n",
+                        Language.msg(MaximaLink.isReady(this) ? com.eurobuddha.minimacore.i18n.R.string.l10n_salon_transport_connected
+                                : com.eurobuddha.minimacore.i18n.R.string.l10n_salon_transport_connecting)));
+                card.addView(meshNote, lp(0, 6, 0, 2));
                 break;
         }
         final TextView status = Design.note(this, ""); card.addView(status, lp(0, 8, 0, 0));

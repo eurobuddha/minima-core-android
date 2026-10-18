@@ -2,21 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <queries>
         <package android:name="com.eurobuddha.minimacore" />
-        <package android:name="com.eurobuddha.maxima.app" />
     </queries>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="com.eurobuddha.maxima.app.permission.USE_MAXIMA" />
     <application>
         <activity android:name="com.eurobuddha.salon.MainActivity" android:exported="false" android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density|keyboardHidden|locale|layoutDirection" android:windowSoftInputMode="adjustNothing" android:theme="@style/pm_salon_Theme.StateNFT">
             </activity>
-        <receiver android:name="com.eurobuddha.salon.MaximaLinkReceiver" android:exported="true" android:permission="com.eurobuddha.maxima.app.permission.USE_MAXIMA">
-            <intent-filter>
-                <action android:name="com.eurobuddha.maxima.app.RESPONSE" />
-                <action android:name="com.eurobuddha.maxima.app.DELIVER" />
-                <action android:name="com.eurobuddha.maxima.app.EVENT" />
-            </intent-filter>
-        </receiver>
         <provider android:name="com.eurobuddha.salon.IntegratedFileProvider" android:authorities="${applicationId}.salon.fileprovider" android:exported="false" android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/pm_salon_file_paths" />
         </provider>

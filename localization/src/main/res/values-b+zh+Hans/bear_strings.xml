@@ -6962,4 +6962,16 @@
     <string name="l10n_terminal_ide_logs_failed" formatted="false">"无法加载日志。请重新打开此标签页重试。"</string>
     <string name="l10n_salon_identity_unavailable" formatted="false">"你的消息身份暂时不可用。已保留存储的密钥。请重新打开 Salon 重试；如有需要，可从备份恢复消息密钥。"</string>
     <string name="l10n_salon_identity_restore_failed" formatted="false">"无法恢复消息密钥。请检查密钥，并在安全存储可用时重试。已保留你原来的身份。"</string>
+    <string name="l10n_salon_transport_not_ready" formatted="false">"Pandamonium 的消息服务正在连接。请稍后重试。"</string>
+    <string name="l10n_salon_transport_invalid_message" formatted="false">"加密消息无效，尚未发送。"</string>
+    <string name="l10n_salon_transport_send_failed" formatted="false">"消息仍在队列中。收件人的连接路径不可用。"</string>
+    <string name="l10n_salon_transport_busy" formatted="false">"消息服务繁忙。消息仍在队列中。"</string>
+    <string name="l10n_salon_transport_background_only" formatted="false">"媒体传输必须在后台运行。"</string>
+    <string name="l10n_salon_transport_media_size" formatted="false">"网状网络托管支持最大 16 MB 的非空文件。更大的文件请使用服务器托管。"</string>
+    <string name="l10n_salon_transport_invalid_media" formatted="false">"此媒体引用无效。"</string>
+    <string name="l10n_salon_transport_mesh_help" formatted="false">"媒体会加密并存储在此设备上，并在 Maxima 中继可用时保存副本。传输由 Pandamonium 的内置消息服务处理。\n\n网状网络媒体可在支持 Maxima 的应用中打开。可用性取决于此设备及其中继副本。文件最大为 16 MB；更大的文件请使用 SFTP、IPFS 或 GitHub 托管。"</string>
+    <!-- Arguments: used, limit -->
+    <string name="l10n_salon_transport_mesh_usage">"个人资料媒体：%1$s / %2$s MB。"</string>
+    <string name="l10n_salon_transport_connected" formatted="false">"✓ 内置 Maxima 已连接。"</string>
+    <string name="l10n_salon_transport_connecting" formatted="false">"Maxima 正通过 Pandamonium 连接。"</string>
 </resources>

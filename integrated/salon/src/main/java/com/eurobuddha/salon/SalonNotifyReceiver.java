@@ -87,7 +87,7 @@ public class SalonNotifyReceiver implements DirectNodeEvents.Listener {
     /**
      * The ONE inbound-DM path, shared by both transports: on-chain coins
      * (state[99] via the core's NOTIFY broadcast or a scan) and Maxima
-     * deliveries ({@link MaximaLinkReceiver}). The payload is the identical
+     * deliveries ({@link MaximaLink}). The payload is the identical
      * libsodium-sealed blob either way, so sender authenticity (the msgpk the
      * thread is keyed on) is verified by the same signature check regardless of
      * which pipe carried it.

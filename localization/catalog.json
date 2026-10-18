@@ -34648,5 +34648,71 @@
     "zh-Hans": "无法恢复消息密钥。请检查密钥，并在安全存储可用时重试。已保留你原来的身份。",
     "ru": "Не удалось восстановить ключ сообщений. Проверьте ключ и повторите, когда защищённое хранилище станет доступно. Прежняя идентичность сохранена.",
     "uk": "Не вдалося відновити ключ повідомлень. Перевірте ключ і повторіть, коли захищене сховище стане доступним. Попередню ідентичність збережено."
+  },
+  "salonTransport.notReady": {
+    "en": "Pandamonium’s messaging service is connecting. Try again shortly.",
+    "zh-Hans": "Pandamonium 的消息服务正在连接。请稍后重试。",
+    "ru": "Служба сообщений Pandamonium подключается. Повторите чуть позже.",
+    "uk": "Служба повідомлень Pandamonium підключається. Повторіть трохи пізніше."
+  },
+  "salonTransport.invalidMessage": {
+    "en": "The sealed message is invalid. It has not been sent.",
+    "zh-Hans": "加密消息无效，尚未发送。",
+    "ru": "Зашифрованное сообщение некорректно. Оно не отправлено.",
+    "uk": "Зашифроване повідомлення некоректне. Його не надіслано."
+  },
+  "salonTransport.sendFailed": {
+    "en": "Message remains queued. The recipient’s route is unavailable.",
+    "zh-Hans": "消息仍在队列中。收件人的连接路径不可用。",
+    "ru": "Сообщение остаётся в очереди. Маршрут к получателю недоступен.",
+    "uk": "Повідомлення залишається в черзі. Маршрут до одержувача недоступний."
+  },
+  "salonTransport.busy": {
+    "en": "The messaging service is busy. The message remains queued.",
+    "zh-Hans": "消息服务繁忙。消息仍在队列中。",
+    "ru": "Служба сообщений занята. Сообщение остаётся в очереди.",
+    "uk": "Служба повідомлень зайнята. Повідомлення залишається в черзі."
+  },
+  "salonTransport.backgroundOnly": {
+    "en": "Media transfer must run in the background.",
+    "zh-Hans": "媒体传输必须在后台运行。",
+    "ru": "Передача медиа должна выполняться в фоновом режиме.",
+    "uk": "Передавання медіа має виконуватися у фоновому режимі."
+  },
+  "salonTransport.mediaSize": {
+    "en": "Choose a non-empty file up to 16 MB for mesh hosting. Use a server destination for larger files.",
+    "zh-Hans": "网状网络托管支持最大 16 MB 的非空文件。更大的文件请使用服务器托管。",
+    "ru": "Выберите непустой файл размером до 16 МБ для сети Maxima. Большие файлы размещайте на сервере.",
+    "uk": "Виберіть непорожній файл розміром до 16 МБ для мережі Maxima. Великі файли розміщуйте на сервері."
+  },
+  "salonTransport.invalidMedia": {
+    "en": "This media reference is invalid.",
+    "zh-Hans": "此媒体引用无效。",
+    "ru": "Некорректная ссылка на медиа.",
+    "uk": "Некоректне посилання на медіа."
+  },
+  "salonTransport.meshHelp": {
+    "en": "Media is encrypted and stored on this device, with replicas on Maxima relays when available. Pandamonium’s built-in messaging service handles the transfer.\n\nMesh media opens in Maxima-capable apps. Availability depends on this device and its relay copies. Files can be up to 16 MB; use SFTP, IPFS or GitHub hosting for larger files.",
+    "zh-Hans": "媒体会加密并存储在此设备上，并在 Maxima 中继可用时保存副本。传输由 Pandamonium 的内置消息服务处理。\n\n网状网络媒体可在支持 Maxima 的应用中打开。可用性取决于此设备及其中继副本。文件最大为 16 MB；更大的文件请使用 SFTP、IPFS 或 GitHub 托管。",
+    "ru": "Медиа шифруются и сохраняются на этом устройстве, а при доступности ретрансляторов Maxima на них создаются копии. Передачей управляет встроенная служба сообщений Pandamonium.\n\nТакие медиа открываются в приложениях с поддержкой Maxima. Доступность зависит от устройства и копий на ретрансляторах. Максимальный размер файла — 16 МБ; для больших файлов используйте SFTP, IPFS или GitHub.",
+    "uk": "Медіа шифруються та зберігаються на цьому пристрої, а за доступності ретрансляторів Maxima на них створюються копії. Передаванням керує вбудована служба повідомлень Pandamonium.\n\nТакі медіа відкриваються в застосунках із підтримкою Maxima. Доступність залежить від пристрою та копій на ретрансляторах. Максимальний розмір файлу — 16 МБ; для великих файлів використовуйте SFTP, IPFS або GitHub."
+  },
+  "salonTransport.meshUsage": {
+    "en": "Profile media: {used} / {limit} MB.",
+    "zh-Hans": "个人资料媒体：{used} / {limit} MB。",
+    "ru": "Медиа профиля: {used} / {limit} МБ.",
+    "uk": "Медіа профілю: {used} / {limit} МБ."
+  },
+  "salonTransport.connected": {
+    "en": "✓ Embedded Maxima connected.",
+    "zh-Hans": "✓ 内置 Maxima 已连接。",
+    "ru": "✓ Встроенная Maxima подключена.",
+    "uk": "✓ Вбудована Maxima підключена."
+  },
+  "salonTransport.connecting": {
+    "en": "Maxima is connecting through Pandamonium.",
+    "zh-Hans": "Maxima 正通过 Pandamonium 连接。",
+    "ru": "Maxima подключается через Pandamonium.",
+    "uk": "Maxima підключається через Pandamonium."
   }
 }

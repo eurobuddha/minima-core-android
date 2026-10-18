@@ -107,6 +107,12 @@ public final class PandamoniumHooks {
                     || com.eurobuddha.minimacore.lock.AppLock.get().isUnlocked()));
         android.os.Handler main = new android.os.Handler(android.os.Looper.getMainLooper());
         com.eurobuddha.minimaapi.direct.DirectNodeEvents.install(action -> main.post(action));
+        com.eurobuddha.salon.MaximaLink.install(context,
+                com.eurobuddha.minimacore.maxchat.MaxChat::node,
+                com.eurobuddha.minimacore.maxchat.MaxChat::media,
+                com.eurobuddha.minimacore.utils.BackgroundWork.pool(2, 16), action -> main.post(action));
+        com.eurobuddha.minimacore.maxchat.MaxChat.APPLICATION_LISTENERS.add(com.eurobuddha.salon.MaximaLink::onMessage);
+        com.eurobuddha.minimacore.maxchat.MaxChat.UI_LISTENERS.add(com.eurobuddha.salon.MaximaLink::refresh);
         com.eurobuddha.minimaapi.direct.DirectNodeEvents.subscribe(
                 new com.eurobuddha.terminalide.receiver.MinimaNotifyReceiver(context),
                 com.eurobuddha.minimacore.utils.BackgroundWork.pool(1, 8), "MINIMALOG");

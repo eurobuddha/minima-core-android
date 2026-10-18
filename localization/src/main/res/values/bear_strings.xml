@@ -6994,4 +6994,16 @@
     <string name="l10n_terminal_ide_logs_failed" formatted="false">"Could not load logs. Reopen this tab to retry."</string>
     <string name="l10n_salon_identity_unavailable" formatted="false">"Your messaging identity is temporarily unavailable. Stored keys are preserved. Reopen Salon to retry; restore your messaging key from backup if needed."</string>
     <string name="l10n_salon_identity_restore_failed" formatted="false">"Could not restore the messaging key. Check the key and try again when secure storage is available. Your previous identity is preserved."</string>
+    <string name="l10n_salon_transport_not_ready" formatted="false">"Pandamonium’s messaging service is connecting. Try again shortly."</string>
+    <string name="l10n_salon_transport_invalid_message" formatted="false">"The sealed message is invalid. It has not been sent."</string>
+    <string name="l10n_salon_transport_send_failed" formatted="false">"Message remains queued. The recipient’s route is unavailable."</string>
+    <string name="l10n_salon_transport_busy" formatted="false">"The messaging service is busy. The message remains queued."</string>
+    <string name="l10n_salon_transport_background_only" formatted="false">"Media transfer must run in the background."</string>
+    <string name="l10n_salon_transport_media_size" formatted="false">"Choose a non-empty file up to 16 MB for mesh hosting. Use a server destination for larger files."</string>
+    <string name="l10n_salon_transport_invalid_media" formatted="false">"This media reference is invalid."</string>
+    <string name="l10n_salon_transport_mesh_help" formatted="false">"Media is encrypted and stored on this device, with replicas on Maxima relays when available. Pandamonium’s built-in messaging service handles the transfer.\n\nMesh media opens in Maxima-capable apps. Availability depends on this device and its relay copies. Files can be up to 16 MB; use SFTP, IPFS or GitHub hosting for larger files."</string>
+    <!-- Arguments: used, limit -->
+    <string name="l10n_salon_transport_mesh_usage">"Profile media: %1$s / %2$s MB."</string>
+    <string name="l10n_salon_transport_connected" formatted="false">"✓ Embedded Maxima connected."</string>
+    <string name="l10n_salon_transport_connecting" formatted="false">"Maxima is connecting through Pandamonium."</string>
 </resources>

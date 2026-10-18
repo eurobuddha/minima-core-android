@@ -7058,4 +7058,16 @@
     <string name="l10n_terminal_ide_logs_failed" formatted="false">"Не вдалося завантажити журнал. Відкрийте вкладку знову, щоб повторити."</string>
     <string name="l10n_salon_identity_unavailable" formatted="false">"Ключі повідомлень тимчасово недоступні. Збережені ключі не змінено. Відкрийте Salon знову; за потреби відновіть ключ повідомлень із резервної копії."</string>
     <string name="l10n_salon_identity_restore_failed" formatted="false">"Не вдалося відновити ключ повідомлень. Перевірте ключ і повторіть, коли захищене сховище стане доступним. Попередню ідентичність збережено."</string>
+    <string name="l10n_salon_transport_not_ready" formatted="false">"Служба повідомлень Pandamonium підключається. Повторіть трохи пізніше."</string>
+    <string name="l10n_salon_transport_invalid_message" formatted="false">"Зашифроване повідомлення некоректне. Його не надіслано."</string>
+    <string name="l10n_salon_transport_send_failed" formatted="false">"Повідомлення залишається в черзі. Маршрут до одержувача недоступний."</string>
+    <string name="l10n_salon_transport_busy" formatted="false">"Служба повідомлень зайнята. Повідомлення залишається в черзі."</string>
+    <string name="l10n_salon_transport_background_only" formatted="false">"Передавання медіа має виконуватися у фоновому режимі."</string>
+    <string name="l10n_salon_transport_media_size" formatted="false">"Виберіть непорожній файл розміром до 16 МБ для мережі Maxima. Великі файли розміщуйте на сервері."</string>
+    <string name="l10n_salon_transport_invalid_media" formatted="false">"Некоректне посилання на медіа."</string>
+    <string name="l10n_salon_transport_mesh_help" formatted="false">"Медіа шифруються та зберігаються на цьому пристрої, а за доступності ретрансляторів Maxima на них створюються копії. Передаванням керує вбудована служба повідомлень Pandamonium.\n\nТакі медіа відкриваються в застосунках із підтримкою Maxima. Доступність залежить від пристрою та копій на ретрансляторах. Максимальний розмір файлу — 16 МБ; для великих файлів використовуйте SFTP, IPFS або GitHub."</string>
+    <!-- Arguments: used, limit -->
+    <string name="l10n_salon_transport_mesh_usage">"Медіа профілю: %1$s / %2$s МБ."</string>
+    <string name="l10n_salon_transport_connected" formatted="false">"✓ Вбудована Maxima підключена."</string>
+    <string name="l10n_salon_transport_connecting" formatted="false">"Maxima підключається через Pandamonium."</string>
 </resources>

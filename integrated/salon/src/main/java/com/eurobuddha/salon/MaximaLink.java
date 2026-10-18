@@ -1,379 +1,164 @@
 package com.eurobuddha.salon;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.os.Looper;
+import com.eurobuddha.maxima.core.MaximaNode;
+import com.eurobuddha.maxima.core.MaximaSender;
+import com.eurobuddha.maxima.core.codec.MiniData;
+import com.eurobuddha.maxima.core.msg.MaximaMessage;
+import com.eurobuddha.maxima.core.media.MediaManifest;
+import com.eurobuddha.maxima.core.media.MediaService;
+import com.eurobuddha.minimacore.i18n.Language;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.function.Supplier;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-/**
- * The Salon's line to the Maxima transport — the first companion APK to ride it.
- *
- * Maxima (com.eurobuddha.maxima.app) is the always-on decentralised comms layer:
- * identity, sealing, NAT traversal, retries and the offline mailbox live THERE;
- * the Salon brings only its own message format over broadcast IPC, exactly as
- * the Minima node IPC works. This class wraps the whole conversation:
- *
- *   REGISTER   ask to connect (also wakes the transport); the user approves
- *              once, in the Maxima app's Settings -> Connected apps
- *   SUBSCRIBE  claim our application string, {@link #APPLICATION} - first claim
- *              wins permanently, so no other app can read Salon DMs
- *   IDENTITY   cache our Mx addresses (published in profile.json as "mxaddr",
- *              which is how peers learn to reach us - zero new protocol)
- *   SEND       a DM leaves here; UNKNOWN means "relay is HOLDING it for the
- *              offline peer" and is success-pending, never failure
- *   DELIVER    inbound arrives at {@link MaximaLinkReceiver} and funnels into
- *              the same intake as on-chain DMs
- *
- * The DM payload over Maxima is the SAME libsodium-sealed blob the coin path
- * puts in state[99]. Maxima's own E2E already seals the wire; keeping our seal
- * inside it means the sender's msgpk - the key DM threads are keyed on - stays
- * signature-verified by the code that already does it, on both paths.
- */
-final class MaximaLink {
-
-    /** Our application-string namespace on the transport. */
+/** Salon's sealed DM and mx1 media formats over the host's existing Maxima transport. */
+public final class MaximaLink {
     static final String APPLICATION = "salon_dm_v1";
+    static final String MEDIA_PREFIX = "mx1:";
+    static final long MESH_MAX_BYTES = MediaService.MAX_MESH_FILE_BYTES;
+    private static volatile Backend backend;
 
-    static final String MAXIMA_PKG = "com.eurobuddha.maxima.app";
-    private static final String RECEIVER = MaximaLinkReceiver.class.getName();
-    private static final String PREFS = "salon_maxima";
+    private static final class Backend {
+        final Context context;
+        final Supplier<MaximaNode> node;
+        final Supplier<MediaService> media;
+        final Executor worker, callbacks;
+        boolean ready;
+        Backend(Context context, Supplier<MaximaNode> node, Supplier<MediaService> media,
+                Executor worker, Executor callbacks) {
+            this.context=context.getApplicationContext();this.node=node;this.media=media;
+            this.worker=worker;this.callbacks=callbacks;
+        }
+    }
 
-    // Maxima IPC vocabulary (mirrors maxima's MaximaApiMessages).
-    static final String ACTION_REGISTER = MAXIMA_PKG + ".REGISTER";
-    static final String ACTION_SEND = MAXIMA_PKG + ".SEND";
-    static final String ACTION_SUBSCRIBE = MAXIMA_PKG + ".SUBSCRIBE";
-    static final String ACTION_IDENTITY = MAXIMA_PKG + ".IDENTITY";
-    static final String ACTION_RESPONSE = MAXIMA_PKG + ".RESPONSE";
-    static final String ACTION_DELIVER = MAXIMA_PKG + ".DELIVER";
-    static final String ACTION_EVENT = MAXIMA_PKG + ".EVENT";
+    /** Installed once by Pandamonium; MinimaService retains ownership of start/stop. */
+    public static void install(Context context, Supplier<MaximaNode> node,
+            Supplier<MediaService> media, Executor worker, Executor callbacks) {
+        backend = new Backend(context,node,media,worker,callbacks);
+        refresh();
+    }
 
-    static final String X_PACKAGE = "package";
-    static final String X_CLASS = "class";
-    static final String X_REQID = "requestid";
-    static final String X_APPLICATION = "application";
-    static final String X_TO = "to";
-    static final String X_DATA = "data";
-    static final String X_DATA_URI = "datauri";
-    static final String X_RESULT = "result";
-    static final String X_ERROR = "error";
-    static final String X_ENABLED = "enabled";
-    static final String X_ADDRESSES = "addresses";
-    static final String X_PUBLICKEY = "publickey";
-    static final String X_MSGID = "msgid";
+    private MaximaLink() {}
+    static void connect(Context ignored) { refresh(); }
 
-    /** A send outcome, marshalled back from the RESPONSE broadcast. */
+    /** Host lifecycle/relay events trigger the existing durable Salon outbox retry. */
+    public static void refresh() {
+        Backend b=backend;
+        if (b==null) return;
+        boolean notify;
+        synchronized(b) {
+            boolean ready=ready(b);
+            notify=ready && !b.ready;
+            b.ready=ready;
+        }
+        if (notify) b.callbacks.execute(MainActivity::onMaximaReady);
+    }
+
+    private static boolean ready(Backend b) {
+        MaximaNode node=b.node.get();
+        return node!=null && !node.myAddresses().isEmpty();
+    }
+    static boolean isReady(Context ignored) { Backend b=backend;return b!=null && ready(b); }
+    static String myAddresses(Context ignored) {
+        Backend b=backend;MaximaNode node=b==null?null:b.node.get();
+        // Never advertise the old standalone Parlons address cached by the donor APK.
+        return node==null?"":String.join(",",node.myAddresses());
+    }
+
     interface SendCb {
-        /** OK, or UNKNOWN (= mailboxed for an offline peer: sent-pending). */
         void onSent(String status, boolean pending);
-
         void onFailed(String error);
     }
 
-    /** In-flight request callbacks, keyed by requestid. */
-    static final Map<String, SendCb> PENDING_SENDS = new ConcurrentHashMap<>();
-
-    /** In-flight blocking media calls, keyed by requestid. */
-    static final Map<String, MediaWaiter> PENDING_MEDIA = new ConcurrentHashMap<>();
-
-    /** Monotonic request-id counter — makes every reqId unique even for calls in
-     *  the same millisecond (feed/profile rendering resolves media concurrently). */
-    private static final java.util.concurrent.atomic.AtomicLong SEQ =
-            new java.util.concurrent.atomic.AtomicLong();
-
-    static final class MediaWaiter {
-        final java.util.concurrent.CountDownLatch latch =
-                new java.util.concurrent.CountDownLatch(1);
-        volatile String resultText;   // put: the manifest JSON
-        volatile android.net.Uri uri; // get: bytes handed back as content://
-        volatile String error;
-    }
-
-    /** Application context, cached on connect() so the static media helpers -
-     *  called from background threads without a Context - can broadcast. */
-    private static volatile Context sApp;
-
-    private MaximaLink() {
-    }
-
-    // ---------------------------------------------------------------
-    // lifecycle: register + subscribe + identity, driven on app open
-    // ---------------------------------------------------------------
-
-    /**
-     * Kick the whole handshake. Safe to call every launch: REGISTER is
-     * idempotent (and wakes the transport), SUBSCRIBE re-claims our string,
-     * IDENTITY refreshes the cached addresses. Each step advances when the
-     * previous one's RESPONSE lands in {@link MaximaLinkReceiver}.
-     */
-    static void connect(Context ctx) {
-        sApp = ctx.getApplicationContext();
-        if (!isInstalled(ctx)) {
-            return;
+    static void sendDm(Context context, String addresses, String sealedHex, SendCb cb) {
+        Backend b=backend;
+        if(b==null) {cb.onFailed(Language.text(context,l10n_salon_transport_not_ready));return;}
+        final byte[] payload;
+        try {
+            String hex=sealedHex==null?"":sealedHex.replaceFirst("^(0x|0X)","");
+            if(hex.isEmpty() || hex.length()>512*1024 || (hex.length()&1)!=0 || !hex.matches("[0-9a-fA-F]+"))
+                throw new IllegalArgumentException();
+            payload=Hex.from(hex);
+        } catch (RuntimeException invalid) {
+            b.callbacks.execute(()->cb.onFailed(Language.text(b.context,l10n_salon_transport_invalid_message)));return;
         }
-        send(ctx, ACTION_REGISTER, i -> {
-        });
-    }
-
-    /** Called by the receiver as RESPONSEs arrive; advances the handshake. */
-    static void onRegisterResult(Context ctx, boolean approved) {
-        boolean was = prefs(ctx).getBoolean("approved", false);
-        prefs(ctx).edit().putBoolean("approved", approved).apply();
-        if (approved) {
-            send(ctx, ACTION_SUBSCRIBE, i -> i.putExtra(X_APPLICATION, APPLICATION));
-            send(ctx, ACTION_IDENTITY, i -> {
+        try {
+            b.worker.execute(()->{
+                String accepted=null;
+                try {
+                    MaximaNode node=b.node.get();
+                    if(node!=null && addresses!=null) {
+                        int tried=0;
+                        for(String address:addresses.split(",")) {
+                            address=address.trim();if(address.isEmpty())continue;
+                            if(++tried>8)break;
+                            try {
+                                if(address.regionMatches(true,0,"MAX#",0,4)) address=node.resolvePermanent(address);
+                                MaximaSender.Result result=node.sendRaw(address,APPLICATION,payload);
+                                if(result!=null && ("OK".equals(result.statusName)||"UNKNOWN".equals(result.statusName))) {
+                                    accepted=result.statusName;break;
+                                }
+                            } catch (Exception routeUnavailable) { /* Try another advertised relay route. */ }
+                        }
+                    }
+                } catch (RuntimeException unavailable) { /* Leave the caller's persisted outbox pending. */ }
+                final String status=accepted;
+                // The transport owns its timeout. Do not create a second, earlier timeout/retry race.
+                b.callbacks.execute(()->{
+                    if(status!=null) cb.onSent(status,"UNKNOWN".equals(status));
+                    else cb.onFailed(Language.text(b.context,l10n_salon_transport_send_failed));
+                });
             });
-            if (!was) MainActivity.onMaximaReady();   // transport just came up — flush the outbox
+        } catch (RejectedExecutionException busy) {
+            b.callbacks.execute(()->cb.onFailed(Language.text(b.context,l10n_salon_transport_busy)));
         }
     }
 
-    static void onIdentity(Context ctx, String addressesCsv, String publicKeyHex) {
-        SharedPreferences.Editor e = prefs(ctx).edit();
-        boolean changed = !addressesCsv.equals(prefs(ctx).getString("mxaddr", ""));
-        e.putString("mxaddr", addressesCsv == null ? "" : addressesCsv);
-        e.putString("mxid", publicKeyHex == null ? "" : publicKeyHex);
-        e.apply();
-        if (changed) {
-            // Our reachable addresses moved (relay churn). The profile carries
-            // them, so it needs a re-publish; MainActivity picks this flag up.
-            prefs(ctx).edit().putBoolean("addr_dirty", true).apply();
-        }
+    /** Already on Maxima's ordered background receive lane; reuse signature-checked intake. */
+    public static void onMessage(MaximaMessage message, MiniData msgid) {
+        Backend b=backend;
+        if(b==null || message==null || message.mApplication==null
+                || !APPLICATION.equals(message.mApplication.toString()) || message.mData==null) return;
+        // Receiving traffic must not create a Salon identity in an unused integrated app.
+        if(SalonStore.get(b.context,"msgseed").isEmpty())return;
+        byte[] data=message.mData.getBytes();
+        if(data.length==0 || data.length>256*1024)return;
+        SalonNotifyReceiver.intakeDm(b.context,Hex.to(data),
+                "mx-"+(msgid==null?message.msgid().to0xString():msgid.to0xString()));
     }
 
-    /** Our current Maxima addresses (CSV), for profile.json "mxaddr". */
-    static String myAddresses(Context ctx) {
-        return prefs(ctx).getString("mxaddr", "");
+    static boolean isMediaRef(String value) { return value!=null && value.startsWith(MEDIA_PREFIX); }
+    private static Backend mediaBackend() throws Exception {
+        Backend b=backend;
+        if(b==null)throw new IllegalStateException("Embedded Maxima transport unavailable");
+        if(Looper.getMainLooper()!=null && Looper.myLooper()==Looper.getMainLooper())
+            throw new IllegalStateException(Language.text(b.context,l10n_salon_transport_background_only));
+        return b;
     }
-
-    static boolean isApproved(Context ctx) {
-        return prefs(ctx).getBoolean("approved", false);
+    static String putMedia(byte[] bytes,String mime) throws Exception {
+        Backend b=mediaBackend();
+        if(bytes==null || bytes.length==0 || bytes.length>MESH_MAX_BYTES)
+            throw new IllegalArgumentException(Language.text(b.context,l10n_salon_transport_media_size));
+        MediaService service=b.media.get();
+        if(service==null || !ready(b))throw new IllegalStateException(Language.text(b.context,l10n_salon_transport_not_ready));
+        MediaManifest manifest=service.publish(bytes,mime==null?"application/octet-stream":mime);
+        return MEDIA_PREFIX+Base64.getUrlEncoder().encodeToString(manifest.encode().getBytes(StandardCharsets.UTF_8));
     }
-
-    /** Addresses changed since the profile was last published? */
-    static boolean addressesDirty(Context ctx) {
-        return prefs(ctx).getBoolean("addr_dirty", false);
-    }
-
-    static void clearAddressesDirty(Context ctx) {
-        prefs(ctx).edit().putBoolean("addr_dirty", false).apply();
-    }
-
-    static boolean isInstalled(Context ctx) {
-        try {
-            ctx.getPackageManager().getPackageInfo(MAXIMA_PKG, 0);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /** Can we send over Maxima right now (installed + user-approved)? */
-    static boolean isReady(Context ctx) {
-        return isInstalled(ctx) && isApproved(ctx);
-    }
-
-    // ---------------------------------------------------------------
-    // sending
-    // ---------------------------------------------------------------
-
-    /**
-     * Send a sealed DM blob (hex, as {@code crypto.seal()} returns it) to one of
-     * the peer's Maxima addresses (CSV from their profile). Tries the first
-     * address; on hard failure the caller's onFailed fires and the coin path
-     * takes over. UNKNOWN is success-pending.
-     */
-    static void sendDm(Context ctx, String peerMxAddrCsv, String sealedHex, SendCb cb) {
-        String first = peerMxAddrCsv == null ? "" : peerMxAddrCsv.split(",")[0].trim();
-        if (first.isEmpty()) {
-            cb.onFailed("no maxima address");
-            return;
-        }
-        String reqId = "dm-" + System.currentTimeMillis() + "-" + SEQ.incrementAndGet();
-        PENDING_SENDS.put(reqId, cb);
-        // Sends time out client-side; if no RESPONSE lands, fail over to chain.
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            SendCb late = PENDING_SENDS.remove(reqId);
-            if (late != null) {
-                late.onFailed("maxima timeout");
-            }
-        }, 25_000);
-        send(ctx, ACTION_SEND, i -> {
-            i.putExtra(X_REQID, reqId);
-            i.putExtra(X_TO, first);
-            i.putExtra(X_APPLICATION, APPLICATION);
-            // Sealed blobs are small for text DMs; inline as 0x hex. (Media refs
-            // ride inside the sealed JSON, so the blob stays small either way.)
-            i.putExtra(X_DATA, sealedHex.startsWith("0x") ? sealedHex : "0x" + sealedHex);
-        });
-    }
-
-    // ---------------------------------------------------------------
-    // self-hosted media (blocking; call from a background thread)
-    // ---------------------------------------------------------------
-
-    static final String MEDIA_PREFIX = "mx1:";
-    static final String ACTION_MEDIA = MAXIMA_PKG + ".MEDIA";
-    static final String X_OP = "op";
-    static final String X_DATA_LEN = "datalen";
-
-    /**
-     * Per-file ceiling for the mesh, mirroring Maxima's own
-     * {@code MediaService.MAX_MESH_FILE_BYTES}. The mesh is user-hosted and
-     * best-effort: a bigger file can't get a durable off-phone replica (relay
-     * put-rate + small shared, LRU-evicted blob shelves), so we reject it HERE,
-     * before staging or any IPC, with a clear "use a server host" message —
-     * never a 90s round-trip that ends in a timeout. Server hosting types
-     * (SFTP/IPFS/GitHub/…) carry the large files. Keep in lockstep with core. */
-    static final long MESH_MAX_BYTES = 16L * 1024 * 1024;
-
-    static boolean isMediaRef(String s) {
-        return s != null && s.startsWith(MEDIA_PREFIX);
-    }
-
-    /** Human "12.3 MB" for the size-limit message. */
-    private static String mib(long zBytes) {
-        double m = zBytes / (1024.0 * 1024.0);
-        return (m >= 10 ? Math.round(m) + "" : (Math.round(m * 10) / 10.0) + "") + " MB";
-    }
-
-    /**
-     * Publish bytes through Maxima's self-hosted media layer; returns an
-     * {@code mx1:<base64url manifest>} ref. Blocks on the IPC round trip.
-     */
-    static String putMedia(byte[] zBytes, String zMime) throws Exception {
-        Context ctx = requireApp();
-        // Reject oversize up front — no staging, no IPC, no 90s wait. The mesh
-        // can't durably host it; the caller must use a server host instead.
-        if (zBytes.length > MESH_MAX_BYTES) {
-            throw new Exception("Maxima mesh supports files up to "
-                    + (MESH_MAX_BYTES >> 20) + " MB. This file is " + mib(zBytes.length)
-                    + " — host it on a server (SFTP/IPFS/GitHub) or compress it first.");
-        }
-        // Hand the bytes to Maxima as a content:// grant (they can exceed the
-        // broadcast parcel limit). The staged file is deleted after the round trip.
-        java.io.File staged = stageFileForMaxima(ctx, zBytes);
-        android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(
-                ctx, ctx.getPackageName() + ".salon.fileprovider", staged);
-        String reqId = "mput-" + System.currentTimeMillis() + "-" + SEQ.incrementAndGet();
-        MediaWaiter w = new MediaWaiter();
-        PENDING_MEDIA.put(reqId, w);
-        try {
-            Intent i = new Intent(ACTION_MEDIA);
-            i.setPackage(MAXIMA_PKG);
-            i.putExtra(X_PACKAGE, ctx.getPackageName());
-            i.putExtra(X_CLASS, RECEIVER);
-            i.putExtra(X_REQID, reqId);
-            i.putExtra(X_OP, "put");
-            i.setDataAndType(uri, zMime == null ? "application/octet-stream" : zMime);
-            i.putExtra(X_DATA_URI, uri);
-            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            ctx.grantUriPermission(MAXIMA_PKG, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            ctx.sendBroadcast(i);
-
-            if (!w.latch.await(90, java.util.concurrent.TimeUnit.SECONDS)) {
-                throw new Exception("maxima media put timeout");
-            }
-            if (w.error != null || w.resultText == null) {
-                throw new Exception("maxima media put: " + w.error);
-            }
-            return MEDIA_PREFIX + android.util.Base64.encodeToString(
-                    w.resultText.getBytes(java.nio.charset.StandardCharsets.UTF_8),
-                    android.util.Base64.NO_WRAP | android.util.Base64.URL_SAFE);
-        } finally {
-            PENDING_MEDIA.remove(reqId);
-            //noinspection ResultOfMethodCallIgnored
-            staged.delete();   // Maxima has finished reading by the time the round trip returns
-        }
-    }
-
-    /** Fetch + reassemble an {@code mx1:} ref to bytes. Blocks on the IPC round trip. */
-    static byte[] getMedia(String zRef) throws Exception {
-        Context ctx = requireApp();
-        String manifestJson = new String(android.util.Base64.decode(
-                zRef.substring(MEDIA_PREFIX.length()),
-                android.util.Base64.NO_WRAP | android.util.Base64.URL_SAFE),
-                java.nio.charset.StandardCharsets.UTF_8);
-        String reqId = "mget-" + System.currentTimeMillis() + "-" + SEQ.incrementAndGet();
-        MediaWaiter w = new MediaWaiter();
-        PENDING_MEDIA.put(reqId, w);
-        Intent i = new Intent(ACTION_MEDIA);
-        i.setPackage(MAXIMA_PKG);
-        i.putExtra(X_PACKAGE, ctx.getPackageName());
-        i.putExtra(X_CLASS, RECEIVER);
-        i.putExtra(X_REQID, reqId);
-        i.putExtra(X_OP, "get");
-        i.putExtra(X_DATA, manifestJson);
-        ctx.sendBroadcast(i);
-
-        if (!w.latch.await(90, java.util.concurrent.TimeUnit.SECONDS)) {
-            PENDING_MEDIA.remove(reqId);
-            throw new Exception("maxima media get timeout");
-        }
-        PENDING_MEDIA.remove(reqId);
-        if (w.error != null || w.uri == null) {
-            throw new Exception("maxima media get: " + w.error);
-        }
-        try (java.io.InputStream in = ctx.getContentResolver().openInputStream(w.uri)) {
-            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
-            byte[] buf = new byte[8192];
-            int n;
-            while ((n = in.read(buf)) > 0) {
-                bos.write(buf, 0, n);
-            }
-            return bos.toByteArray();
-        }
-    }
-
-    private static java.io.File stageFileForMaxima(Context ctx, byte[] bytes) throws Exception {
-        java.io.File dir = new java.io.File(ctx.getCacheDir(), "pandamonium_salon_shared");
-        //noinspection ResultOfMethodCallIgnored
-        dir.mkdirs();
-        // Best-effort sweep of anything a crash/timeout left behind (>10 min old).
-        java.io.File[] old = dir.listFiles();
-        if (old != null) {
-            long cutoff = System.currentTimeMillis() - 10 * 60 * 1000L;
-            for (java.io.File o : old) {
-                if (o.lastModified() < cutoff) {
-                    //noinspection ResultOfMethodCallIgnored
-                    o.delete();
-                }
-            }
-        }
-        java.io.File f = new java.io.File(dir, "mxmedia-" + System.nanoTime() + ".bin");
-        try (java.io.FileOutputStream out = new java.io.FileOutputStream(f)) {
-            out.write(bytes);
-        }
-        return f;
-    }
-
-    private static Context requireApp() throws Exception {
-        Context c = sApp;
-        if (c == null) {
-            throw new Exception("Maxima link not initialised");
-        }
-        if (!isReady(c)) {
-            throw new Exception("Maxima not ready");
-        }
-        return c;
-    }
-
-    // ---------------------------------------------------------------
-
-    private interface Filler {
-        void fill(Intent i);
-    }
-
-    private static void send(Context ctx, String action, Filler filler) {
-        Intent i = new Intent(action);
-        i.setPackage(MAXIMA_PKG);
-        i.putExtra(X_PACKAGE, ctx.getPackageName());
-        i.putExtra(X_CLASS, RECEIVER);
-        filler.fill(i);
-        ctx.sendBroadcast(i);
-    }
-
-    private static SharedPreferences prefs(Context ctx) {
-        return ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    static byte[] getMedia(String ref) throws Exception {
+        Backend b=mediaBackend();
+        if(!isMediaRef(ref) || ref.length()>128*1024)
+            throw new IllegalArgumentException(Language.text(b.context,l10n_salon_transport_invalid_media));
+        MediaManifest manifest=MediaManifest.decode(new String(Base64.getUrlDecoder().decode(ref.substring(4)),StandardCharsets.UTF_8));
+        if(manifest==null)throw new IllegalArgumentException(Language.text(b.context,l10n_salon_transport_invalid_media));
+        MediaService service=b.media.get();
+        if(service==null)throw new IllegalStateException(Language.text(b.context,l10n_salon_transport_not_ready));
+        // The service verifies chunk hashes, size, AES-GCM authentication and the full-file hash.
+        // A cached file can still be opened while the node has no live relay address.
+        return service.fetch(manifest);
     }
 }

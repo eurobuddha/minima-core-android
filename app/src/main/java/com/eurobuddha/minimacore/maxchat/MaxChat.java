@@ -55,6 +55,8 @@ public final class MaxChat {
     /** UI refresh hooks, called on arbitrary threads after chat activity. */
     public static final List<Runnable> UI_LISTENERS = new CopyOnWriteArrayList<>();
 
+    public static final List<MaximaNode.MessageListener> APPLICATION_LISTENERS = new CopyOnWriteArrayList<>();
+
     private MaxChat() {
     }
 
@@ -128,10 +130,13 @@ public final class MaxChat {
                         fire();
                     }
                 });
-                node.setMessageListener((msg, msgid) -> {
-                    ChatEngine ce = sChat;
-                    if (ce != null) {
-                        ce.onInbound(msg, msgid == null ? "" : msgid.to0xString());
+                node.setMessageListener((msg, msgid) -> dispatch(node, epoch, chat, msg, msgid));
+                node.setEventListener(new MaximaNode.EventListener() {
+                    @Override public void onContactsChanged(Contact contact, boolean removed) {
+                        if (epoch == sEpoch && sNode == node) fire();
+                    }
+                    @Override public void onHostsChanged(String hostPort, boolean connected) {
+                        if (epoch == sEpoch && sNode == node) fire();
                     }
                 });
                 // The core's own diagnostics (attach failures, MLS lookups, resends):
@@ -182,6 +187,19 @@ public final class MaxChat {
         }, "maxchat-start").start();
     }
 
+    /** Deliver on the core's ordered background lane without replacing normal chat. */
+    static void dispatch(MaximaNode node, int epoch, ChatEngine chat,
+            com.eurobuddha.maxima.core.msg.MaximaMessage msg, MiniData msgid) {
+        if (epoch != sEpoch || sNode != node) return;
+        try { chat.onInbound(msg, msgid == null ? "" : msgid.to0xString()); }
+        finally {
+            for (MaximaNode.MessageListener listener : APPLICATION_LISTENERS) {
+                try { listener.onMessage(msg, msgid); }
+                catch (Exception failure) { android.util.Log.w("MaxChat", "Application message intake failed"); }
+            }
+        }
+    }
+
     /** One upkeep round: keep-alives, relay health, address refresh. */
     private static void beat() {
         MaximaNode node = sNode;
@@ -190,6 +208,7 @@ public final class MaxChat {
         }
         try {
             node.maintain(START_TIMEOUT_MS);
+            if (sNode == node) fire();
         } catch (Throwable t) {
             android.util.Log.w("MaxChat", "upkeep: " + t.getClass().getSimpleName());
         }
@@ -205,6 +224,7 @@ public final class MaxChat {
         sNode = null;
         sChat = null;
         sMedia = null;
+        fire();
         if (node != null) {
             new Thread(node::stop, "maxchat-stop").start();
         }
