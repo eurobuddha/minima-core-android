@@ -347,6 +347,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.findItem(R.id.mainmenu_logs).setTitle(Language.text(this, l10n_menu_logs));
+        menu.findItem(R.id.mainmenu_terminal).setTitle(Language.text(this, l10n_tab_terminal));
         menu.findItem(R.id.mainmenu_backup).setTitle(Language.text(this, l10n_menu_backup));
         menu.findItem(R.id.mainmenu_params).setTitle(Language.text(this, l10n_menu_params));
         menu.findItem(R.id.mainmenu_locknow).setTitle(Language.text(this, l10n_menu_lock_now));
@@ -404,6 +405,13 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
                 MainActivity.this.startActivity(new Intent(MainActivity.this,
                         com.eurobuddha.minimacore.main.views.logs.LogsActivity.class));
+
+                return true;
+
+            case R.id.mainmenu_terminal :
+
+                MainActivity.this.startActivity(new Intent(MainActivity.this,
+                        com.eurobuddha.minimacore.main.views.terminal.TerminalActivity.class));
 
                 return true;
 
