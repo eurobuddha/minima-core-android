@@ -8188,4 +8188,6 @@
     <string name="l10n_atelier_image_empty_reference" formatted="false">"The host did not return an image URL."</string>
     <string name="l10n_filtr_ui_saving" formatted="false">"Saving…"</string>
     <string name="l10n_filtr_ui_saved" formatted="false">"Saved to Photos"</string>
+    <string name="l10n_salon_page_loading" formatted="false">"Loading profile…"</string>
+    <string name="l10n_salon_page_unavailable" formatted="false">"This profile could not be loaded."</string>
 </resources>

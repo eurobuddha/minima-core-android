@@ -8152,4 +8152,6 @@
     <string name="l10n_atelier_image_empty_reference" formatted="false">"托管服务未返回图片网址。"</string>
     <string name="l10n_filtr_ui_saving" formatted="false">"正在保存…"</string>
     <string name="l10n_filtr_ui_saved" formatted="false">"已保存到相册"</string>
+    <string name="l10n_salon_page_loading" formatted="false">"正在加载个人主页…"</string>
+    <string name="l10n_salon_page_unavailable" formatted="false">"无法加载此个人主页。"</string>
 </resources>

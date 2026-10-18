@@ -8260,4 +8260,6 @@
     <string name="l10n_atelier_image_empty_reference" formatted="false">"Хранилище не вернуло ссылку на изображение."</string>
     <string name="l10n_filtr_ui_saving" formatted="false">"Сохранение…"</string>
     <string name="l10n_filtr_ui_saved" formatted="false">"Сохранено в Фото"</string>
+    <string name="l10n_salon_page_loading" formatted="false">"Загрузка профиля…"</string>
+    <string name="l10n_salon_page_unavailable" formatted="false">"Не удалось загрузить этот профиль."</string>
 </resources>

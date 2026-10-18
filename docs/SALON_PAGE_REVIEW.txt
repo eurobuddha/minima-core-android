@@ -1,0 +1,64 @@
+Salon published page — four-language review, 2026-10-18
+
+Sources and reuse
+Read Salon's complete SALON_HTML renderer and both publication call sites; the
+retained FILTR i18n functions and adapter; the Parlons panel's explicit saved
+language choice and parsed-URL check; native Language.code() and its four options;
+the existing shared catalogue and real-browser FILTR test harness.
+
+The existing Salon page layout and renderer remain the base. The new canonical
+salon-page.html and salon-page-i18n.js are reproduced by
+scripts/adapt-pandamonium-salon-page.py into the existing Java HTML constant.
+The page embeds seven catalogue entries in all four languages. Five reuse existing
+messages; loading and unavailable add two messages. No new runtime dependency.
+
+Behavior
+Both publication call sites use salonHtml(), which inserts the current explicitly
+selected Pandamonium language. A visible labelled native select offers English,
+Simplified Chinese, Russian and Ukrainian. The visitor's saved explicit choice
+wins over the publisher default; browser locale never chooses the language.
+Unavailable browser storage leaves switching functional.
+
+Language changes update only marked application labels. Profile text, names,
+handles, link labels and targets, gallery and post order remain literal. Existing
+media/link elements are retained, so switching does not reset playback or refetch
+the profile. Long user text wraps inside the original layout. The brand name
+The Salon and language option names remain proper names.
+
+The original field escaping is preserved. URL parsing applies the existing
+javascript/data/vbscript refusal after browser-normalized protocol parsing, closing
+the newline-obfuscated javascript variant without rewriting allowed literal URLs.
+Relative media/link paths keep their existing behavior. The renderer now checks
+HTTP success and rejects a null/non-object profile before rendering; loading and
+failure messages follow the current manual selection, including a late response.
+
+Review
+Reviewed the adapter, canonical HTML/JS, generated constant and its two call sites,
+new catalogue/generated resources, native test and browser test. The i18n script
+reuses only marked label binding; it never translates profile.json content.
+The initial native language is restricted by Language's existing supported codes.
+Dictionary embedding escapes '<', and HTML text/attributes retain donor escaping.
+No unresolved blocking findings within this patch. The separate native publishing
+lifecycle and truthful-completion work remains open.
+
+Validation
+- All 196 Salon tests pass with zero failures/errors/skips, including the generated
+  native HTML test through every explicit language. Release Java compilation passes.
+- Actual installed Chrome executes the generated Java HTML with isolated loopback
+  fixtures. All four labels/options, publisher default, saved/invalid choice,
+  unavailable storage, loading and error states pass. HTTP 404 carrying valid JSON
+  and malformed top-level JSON both fail visibly.
+- Native browser audio uses a seekable synthetic WAV with proper HTTP Range support.
+  Playback position, volume/rate, pause state and exact media/link DOM identities
+  survive switches. Profile fetch count and literal user content remain unchanged.
+- Escaped markup and a newline-obfuscated script URL do not execute. English,
+  Chinese, Russian and Ukrainian fit the 390px viewport without horizontal overflow.
+  Ukrainian mobile and Russian desktop screenshots were visually inspected.
+- All 21 pinned imports reproduce; all 6,778 messages validate in four languages;
+  git diff --check passes.
+
+Evidence: build/localization/salon-page-{tests.log,browser.log,import.log} and
+salon-page-screenshots/. Test fixtures contain no owner data and make no external
+requests. No APK built, installed, or publicly published. Goal remains active.
+
+Verdict: Approve this public-page language checkpoint.
