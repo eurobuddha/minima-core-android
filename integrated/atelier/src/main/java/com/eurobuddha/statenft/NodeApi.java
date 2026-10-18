@@ -99,6 +99,8 @@ public class NodeApi {
         if (mPairing != null) mPairing.onEnabled(enabled);
     }
 
+    public boolean isClosed() { return mReleased || dead(); }
+
     public boolean isEnabled() { return mEnabled != null && mEnabled; }
 
     public long lastOkMs() { return mLastOkMs; }
@@ -148,7 +150,7 @@ public class NodeApi {
     }
 
     private void cmdOnMain(String command, long timeoutMs, Cb cb) {
-        if (mReleased) {
+        if (isClosed()) {
             // ALWAYS dispatch: a caller that never hears back can wedge forever — BookRepository
             // sets `scanning = true` before calling and only clears it in the callback, so a
             // silent return makes every later refresh() a no-op.
@@ -186,7 +188,7 @@ public class NodeApi {
             @Override
             public void response(JSONObject zResponse) {
                 mMain.post(() -> {
-                    if (done[0]) return;
+                    if (done[0] || isClosed()) return;
                     done[0] = true;
                     mMain.removeCallbacks(timeout);
                     mPending.remove(timeout);

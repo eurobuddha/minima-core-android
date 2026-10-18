@@ -40852,5 +40852,89 @@
     "zh-Hans": "无法验证转让：%1$s。请先检查藏品系列，再重试。",
     "ru": "Не удалось проверить передачу: %1$s. Проверьте коллекцию перед повторной попыткой.",
     "uk": "Не вдалося перевірити передачу: %1$s. Перевірте колекцію перед повторною спробою."
+  },
+  "atelierBurial.title": {
+    "en": "The Graveyard",
+    "zh-Hans": "墓地",
+    "ru": "Кладбище",
+    "uk": "Цвинтар"
+  },
+  "atelierBurial.final": {
+    "en": "Final lot — irreversible",
+    "zh-Hans": "最后的拍品 — 不可逆转",
+    "ru": "Последний лот — необратимо",
+    "uk": "Останній лот — незворотно"
+  },
+  "atelierBurial.owned": {
+    "en": "Owned coins",
+    "zh-Hans": "持有的币",
+    "ru": "Монеты в собственности",
+    "uk": "Монети у власності"
+  },
+  "atelierBurial.destination": {
+    "en": "Destination",
+    "zh-Hans": "目标地址",
+    "ru": "Адрес назначения",
+    "uk": "Адреса призначення"
+  },
+  "atelierBurial.contract": {
+    "en": "Contract",
+    "zh-Hans": "合约",
+    "ru": "Контракт",
+    "uk": "Контракт"
+  },
+  "atelierBurial.noExit": {
+    "en": "RETURN FALSE — nothing leaves",
+    "zh-Hans": "RETURN FALSE — 无法取出",
+    "ru": "RETURN FALSE — вывести невозможно",
+    "uk": "RETURN FALSE — виведення неможливе"
+  },
+  "atelierBurial.permanent": {
+    "en": "BURIAL IS PERMANENT",
+    "zh-Hans": "销毁不可撤销",
+    "ru": "ЗАХОРОНЕНИЕ НЕОБРАТИМО",
+    "uk": "ПОХОВАННЯ НЕЗВОРОТНЕ"
+  },
+  "atelierBurial.custody": {
+    "en": "Only coins in your custody are buried. Collectors’ holdings are untouched.",
+    "zh-Hans": "仅销毁您持有的币。收藏者持有的币不受影响。",
+    "ru": "Будут захоронены только ваши монеты. Монеты коллекционеров останутся нетронутыми.",
+    "uk": "Буде поховано лише ваші монети. Монети колекціонерів залишаться недоторканими."
+  },
+  "atelierBurial.typeName": {
+    "en": "Type the collection name to arm",
+    "zh-Hans": "输入系列名称以启用",
+    "ru": "Введите название коллекции для подтверждения",
+    "uk": "Введіть назву колекції для підтвердження"
+  },
+  "atelierBurial.arm": {
+    "en": "The exact name arms the shovel.",
+    "zh-Hans": "输入完全一致的名称以启用销毁。",
+    "ru": "Точное название разрешает захоронение.",
+    "uk": "Точна назва дозволяє поховання."
+  },
+  "atelierBurial.submit": {
+    "en": "Bury owned coins",
+    "zh-Hans": "销毁持有的币",
+    "ru": "Захоронить свои монеты",
+    "uk": "Поховати свої монети"
+  },
+  "atelierBurial.wrongName": {
+    "en": "Name does not match.",
+    "zh-Hans": "名称不匹配。",
+    "ru": "Название не совпадает.",
+    "uk": "Назва не збігається."
+  },
+  "atelierBurial.airdropActive": {
+    "en": "Clear the existing airdrop from the collection screen before starting burial.",
+    "zh-Hans": "请先在系列页面清除现有空投任务，再开始销毁。",
+    "ru": "Удалите текущую раздачу на экране коллекции перед захоронением.",
+    "uk": "Видаліть поточну роздачу на екрані колекції перед похованням."
+  },
+  "atelierBurial.failed": {
+    "en": "Burial is unconfirmed: %1$s. Return to the collection to check or retry.",
+    "zh-Hans": "销毁尚未确认：%1$s。请返回系列页面检查或重试。",
+    "ru": "Захоронение не подтверждено: %1$s. Вернитесь к коллекции для проверки или повтора.",
+    "uk": "Поховання не підтверджено: %1$s. Поверніться до колекції для перевірки або повтору."
   }
 }

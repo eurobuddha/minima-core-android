@@ -18,22 +18,50 @@ public final class MintEngine {
 
     private MintEngine() {}
 
-    public static void tick(Context ctx, NodeApi node, Done done) {
+    private static NodeApi mintNode;
+    private static long mintGeneration;
+    private static final java.util.Map<NodeApi, Integer> posting = new java.util.IdentityHashMap<>();
+
+    private static synchronized boolean mintInFlight() {
+        if (mintNode != null && mintNode.isClosed()) { mintNode = null; mintGeneration++; }
+        return mintNode != null;
+    }
+    private static synchronized void beginPost(NodeApi node) { posting.put(node, posting.getOrDefault(node, 0) + 1); }
+    private static synchronized void endPost(NodeApi node) {
+        int count = posting.getOrDefault(node, 0);
+        if (count <= 1) posting.remove(node); else posting.put(node, count - 1);
+    }
+    static synchronized boolean pauseForBurial(Context ctx, String tokenid) {
+        posting.entrySet().removeIf(entry -> entry.getKey().isClosed());
+        return !mintInFlight() && posting.isEmpty() && LocalStore.pauseForBurial(ctx, tokenid);
+    }
+
+
+    public static synchronized void tick(Context ctx, NodeApi node, Done done) {
+        if (node == null || node.isClosed() || mintInFlight()) return;
+        mintNode = node;
+        final long generation = ++mintGeneration;
+        final Runnable finished = () -> {
+            synchronized (MintEngine.class) {
+                if (generation == mintGeneration) mintNode = null;
+            }
+        };
         cmd(node, "block", new Cb() {
             @Override public void ok(JSONObject block) {
                 int tip = block.optJSONObject("response") == null ? 0 : block.optJSONObject("response").optInt("block", 0);
                 LocalStore.prunePending(ctx, tip);
                 JSONArray rows = LocalStore.load(ctx);
-                tickRow(ctx, node, rows, 0, tip, false, done);
+                tickRow(ctx, node, rows, 0, tip, false, done, finished);
             }
-            @Override public void fail(String e) { done.done("Mint tick failed: " + e); }
+            @Override public void fail(String e) { finished.run(); done.done("Mint tick failed: " + e); }
         });
     }
 
     // Every active row advances one step per tick; an errored or waiting row
     // must never starve the ones after it (matches engine.js engineTick).
-    private static void tickRow(Context ctx, NodeApi node, JSONArray rows, int i, int tip, boolean acted, Done done) {
+    private static void tickRow(Context ctx, NodeApi node, JSONArray rows, int i, int tip, boolean acted, Done done, Runnable finished) {
         if (i >= rows.length()) {
+            finished.run();
             if (!acted) done.done("Mint engine idle");
             return;
         }
@@ -45,7 +73,7 @@ public final class MintEngine {
         String phase = row == null ? "DONE" : row.optString("phase", "DONE");
         if (row == null || "DONE".equals(phase) || "DAMAGED".equals(phase)
                 || "BURIED".equals(phase) || "BURY".equals(phase)) {
-            tickRow(ctx, node, rows, i + 1, tip, acted, done);
+            tickRow(ctx, node, rows, i + 1, tip, acted, done, finished);
             return;
         }
         final String rowName = row.optString("name", "?");
@@ -53,7 +81,7 @@ public final class MintEngine {
             String line = rowName + " · " + phase + ": " + msg;
             LocalStore.logEvent(ctx, line);
             done.done(line);
-            tickRow(ctx, node, rows, i + 1, tip, true, done);
+            tickRow(ctx, node, rows, i + 1, tip, true, done, finished);
         };
         if (watchStall(ctx, node, row, tip, next)) return;
         if ("CREATE".equals(phase)) phaseCreate(ctx, node, row, tip, next);
@@ -61,7 +89,7 @@ public final class MintEngine {
         else if ("SPLIT".equals(phase)) phaseSplit(ctx, node, row, tip, next);
         else if ("STAMP".equals(phase)) phaseStamp(ctx, node, row, tip, next);
         else if ("NEEDIMAGES".equals(phase)) phaseNeedImages(ctx, node, row, next);
-        else tickRow(ctx, node, rows, i + 1, tip, acted, done);
+        else tickRow(ctx, node, rows, i + 1, tip, acted, done, finished);
     }
 
     public static void resumeNow(Context ctx, NodeApi node, Done done) {
@@ -396,6 +424,10 @@ public final class MintEngine {
      *  at reality. Driven by the Recover button AND the stall watchdog. */
     public static void recover(Context ctx, NodeApi node, JSONObject row, int tip, Done done) {
         String tid = row.optString("tokenid");
+        JSONObject current = LocalStore.findById(ctx, row.optLong("id"));
+        if (current != null && ("BURY".equals(current.optString("phase")) || "BURIED".equals(current.optString("phase")))) {
+            done.done(com.eurobuddha.minimacore.i18n.Language.text(ctx, "BURIED".equals(current.optString("phase")) ? com.eurobuddha.minimacore.i18n.R.string.l10n_nft_burial_confirmed : com.eurobuddha.minimacore.i18n.R.string.l10n_nft_burial_paused)); return;
+        }
         LocalStore.clearPending(ctx);
         put(row, "splitretries", 0);
         put(row, "splitunits", -1);
@@ -624,6 +656,11 @@ public final class MintEngine {
     }
 
     static void postTxnWithReceipt(NodeApi node, String id, List<String> steps, java.util.function.Consumer<JSONObject> ok, java.util.function.Consumer<String> fail) {
+        beginPost(node);
+        postTxnTracked(node, id, steps, reply -> { endPost(node); ok.accept(reply); }, error -> { endPost(node); fail.accept(error); });
+    }
+
+    private static void postTxnTracked(NodeApi node, String id, List<String> steps, java.util.function.Consumer<JSONObject> ok, java.util.function.Consumer<String> fail) {
         cmd(node, "txndelete id:" + id, new Cb() {
             @Override public void ok(JSONObject ignored) { build(); }
             @Override public void fail(String e) { build(); }

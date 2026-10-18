@@ -13,6 +13,63 @@ public final class LocalStore {
 
     private LocalStore() {}
 
+    /** Public input/output identifiers and state hashes; no seed, key, signature or artwork is stored. */
+    static synchronized JSONArray burialJournal(Context ctx, String tokenid) {
+        if (!Util.isValidHexId(tokenid)) throw BurialEvidence.invalid();
+        String raw = prefs(ctx).getString("burial:" + tokenid.toLowerCase(java.util.Locale.ROOT), "[]");
+        try {
+            JSONArray entries = new JSONArray(raw);
+            BurialEvidence.journal(entries, tokenid);
+            return entries;
+        } catch (Exception e) { throw BurialEvidence.invalid(); }
+    }
+
+    static synchronized boolean saveBurialJournal(Context ctx, String tokenid, JSONArray entries) {
+        if (!Util.isValidHexId(tokenid)) throw BurialEvidence.invalid();
+        BurialEvidence.journal(entries, tokenid);
+        return prefs(ctx).edit().putString("burial:" + tokenid.toLowerCase(java.util.Locale.ROOT), entries.toString()).commit();
+    }
+
+    static synchronized boolean pauseForBurial(Context ctx, String tokenid) {
+        if (!Util.isValidHexId(tokenid)) throw BurialEvidence.invalid();
+        JSONArray rows = burialCollections(ctx);
+        try {
+            for (int i = 0; i < rows.length(); i++) {
+                JSONObject row = rows.optJSONObject(i);
+                if (row != null && BurialEvidence.same(tokenid, row.optString("tokenid")) && !"BURIED".equals(row.optString("phase"))) {
+                    row.put("phase", "BURY");
+                }
+            }
+            boolean saved = prefs(ctx).edit().putString(KEY_COLLECTIONS, rows.toString()).commit();
+            if (saved) sCollections = rows;
+            return saved;
+        } catch (Exception e) { return false; }
+    }
+
+    static synchronized boolean completeBurial(Context ctx, String tokenid, JSONArray expected, int tip) {
+        if (tip <= 0) return false;
+        if (expected == null || expected.length() == 0 || !BurialEvidence.sameJournal(expected, burialJournal(ctx, tokenid), tokenid)) return false;
+        for (int i = 0; i < expected.length(); i++) {
+            try { BurialEvidence.id(expected.optJSONObject(i), "output"); }
+            catch (RuntimeException e) { return false; }
+        }
+        JSONArray rows = burialCollections(ctx);
+        try {
+            for (int i = 0; i < rows.length(); i++) {
+                JSONObject row = rows.optJSONObject(i);
+                if (row != null && BurialEvidence.same(tokenid, row.optString("tokenid")) && "BURY".equals(row.optString("phase"))) {
+                    row.put("phase", "BURIED"); row.put("error", ""); row.put("buriedat", tip);
+                }
+            }
+            boolean saved = prefs(ctx).edit().putString(KEY_COLLECTIONS, rows.toString())
+                    .remove("burial:" + tokenid.toLowerCase(java.util.Locale.ROOT)).commit();
+            if (saved) sCollections = rows;
+            return saved;
+        } catch (Exception e) { return false; }
+    }
+
+
+
     private static JSONArray burialCollections(Context ctx) {
         try {
             JSONArray rows = new JSONArray(prefs(ctx).getString(KEY_COLLECTIONS, "[]"));
@@ -24,6 +81,7 @@ public final class LocalStore {
     static synchronized boolean canDepart(Context ctx, String tokenid) {
         if (!Util.isValidHexId(tokenid)) return false;
         try {
+            if (burialJournal(ctx, tokenid).length() > 0) return false;
             JSONArray rows = burialCollections(ctx);
             for (int i = 0; i < rows.length(); i++) {
                 JSONObject row = rows.getJSONObject(i);
@@ -61,8 +119,9 @@ public final class LocalStore {
         return id;
     }
 
-    public static void upsert(Context c, JSONObject row) {
-        JSONArray arr = load(c);
+    public static synchronized void upsert(Context c, JSONObject row) {
+        // Cached rows are mutable. Read the persisted phase before accepting a late callback.
+        JSONArray arr = burialCollections(c);
         long id = row.optLong("id", 0);
         String tokenid = row.optString("tokenid", "");
         boolean done = false;
@@ -70,6 +129,9 @@ public final class LocalStore {
             JSONObject cur = arr.optJSONObject(i);
             if (cur != null && (cur.optLong("id", -1) == id
                     || (!tokenid.isEmpty() && tokenid.equals(cur.optString("tokenid", ""))))) {
+                String phase = cur.optString("phase");
+                if (("BURY".equals(phase) || "BURIED".equals(phase))
+                        && !phase.equals(row.optString("phase"))) { sCollections = arr; return; }
                 try { arr.put(i, row); } catch (Exception ignored) {}
                 done = true;
                 break;

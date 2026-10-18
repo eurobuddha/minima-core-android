@@ -202,6 +202,7 @@ public final class AirdropEngine {
                     advance.run();
                     return;
                 }
+                if (!LocalStore.canDepart(ctx, j.optString("tokenid"))) { advance.run(); return; }
                 postedThisTick[0] = true;
                 String txn = "drop" + localId + "x" + e.optInt("idx");
                 MintEngine.postTxn(node, txn,

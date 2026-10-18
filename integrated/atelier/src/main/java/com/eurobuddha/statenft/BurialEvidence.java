@@ -40,7 +40,8 @@ final class BurialEvidence {
         return coins;
     }
     /** Same supported state values as StateNft, with strict shape/duplicate-port checks before hashing. */
-    static String stateHash(JSONObject coin) {
+    static String stateHash(JSONObject coin) { return stateHash(coin, true); }
+    private static String stateHash(JSONObject coin, boolean identityRequired) {
         Object state = coin == null ? null : coin.opt("state");
         TreeMap<Integer,String> ports = new TreeMap<>();
         if (state instanceof JSONArray) {
@@ -55,7 +56,7 @@ final class BurialEvidence {
             java.util.Iterator<String> keys = object.keys();
             while (keys.hasNext()) { String port = keys.next(); add(ports, port, object.opt(port)); }
         } else throw invalid();
-        if (!ports.containsKey(0)) throw invalid();
+        if (identityRequired && !ports.containsKey(0)) throw invalid();
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             for (Map.Entry<Integer,String> entry : ports.entrySet()) {
@@ -74,6 +75,30 @@ final class BurialEvidence {
         if (!p.matches("[0-9]{1,3}") || !StateNft.safeStateValue(value)) throw invalid();
         int port = Integer.parseInt(p);
         if (port > 255 || ports.put(port, value) != null) throw invalid();
+    }
+    // Atelier can deliberately strip state when the creator buries an oversized coin.
+    static boolean preserves(JSONObject intent) {
+        Object value = intent.opt("preserve");
+        if (value == null) return true; // Existing transfer receipts preserve state.
+        if (!(value instanceof Boolean)) throw invalid();
+        return Boolean.TRUE.equals(value);
+    }
+    static String outputStateHash(JSONObject coin, boolean preserve) {
+        if (!preserve) {
+            Object state = coin == null ? null : coin.opt("state");
+            if (!(state instanceof JSONArray && ((JSONArray)state).length() == 0)
+                    && !(state instanceof JSONObject && ((JSONObject)state).length() == 0)) throw invalid();
+        }
+        return stateHash(coin, preserve);
+    }
+    static JSONObject burialIntent(JSONObject coin, String tokenid, boolean preserve) {
+        if (preserve) return intent(coin, tokenid);
+        if (!same(tokenid, id(coin, "tokenid"))) throw invalid();
+        try {
+            return new JSONObject().put("input", id(coin, "coinid")).put("output", "")
+                    .put("tokenid", tokenid).put("tokenamount", amount(coin)).put("preserve", false)
+                    .put("statehash", outputStateHash(new JSONObject().put("state", new JSONArray()), false));
+        } catch (org.json.JSONException e) { throw invalid(); }
     }
     static JSONObject intent(JSONObject coin, String tokenid) {
         if (!same(tokenid, id(coin,"tokenid"))) throw invalid();
@@ -108,8 +133,8 @@ final class BurialEvidence {
                 || !addressIs(output,destination)
                 || !intent.optString("tokenamount").equals(amount(input))
                 || !intent.optString("tokenamount").equals(amount(output))
-                || !Boolean.TRUE.equals(output.opt("storestate"))
-                || !intent.optString("statehash").equals(stateHash(txn)))throw invalid();
+                || !Boolean.valueOf(preserves(intent)).equals(output.opt("storestate"))
+                || !intent.optString("statehash").equals(outputStateHash(txn, preserves(intent))))throw invalid();
         String outputid=id(output,"coinid");
         if(same(outputid,intent.optString("input"))||new java.math.BigInteger(outputid.substring(2),16).signum()==0)throw invalid();
         try{return new JSONObject(intent.toString()).put("output",outputid).put("address",id(output,"address"));}catch(org.json.JSONException e){throw invalid();}
@@ -121,7 +146,7 @@ final class BurialEvidence {
             JSONObject e=entries.optJSONObject(i);
             if(!inputs.add(id(e,"input").toLowerCase(java.util.Locale.ROOT))
                     || !same(tokenid,id(e,"tokenid")))throw invalid();
-            amount(e);
+            amount(e); preserves(e);
             Object hash=e.opt("statehash"), out=e.opt("output");
             if(!(hash instanceof String)||!((String)hash).matches("[0-9a-f]{64}")||!(out instanceof String))throw invalid();
             if(!((String)out).isEmpty()&&!outputs.add(id(e,"output").toLowerCase(java.util.Locale.ROOT)))throw invalid();
@@ -137,7 +162,7 @@ final class BurialEvidence {
         for (int i = 0; i < entries.length(); i++) {
             JSONObject e = entries.optJSONObject(i);
             values.put(e.optString("input").toLowerCase(java.util.Locale.ROOT),
-                    e.optString("output").toLowerCase(java.util.Locale.ROOT) + "\n" + amount(e) + "\n" + e.optString("statehash"));
+                    e.optString("output").toLowerCase(java.util.Locale.ROOT) + "\n" + amount(e) + "\n" + e.optString("statehash") + "\n" + preserves(e));
         }
         return values;
     }
@@ -152,8 +177,8 @@ final class BurialEvidence {
                     && addressIs(coin,destination)
                     && amount(receipt).equals(amount(coin))
                     && Boolean.FALSE.equals(coin.opt("spent"))
-                    && Boolean.TRUE.equals(coin.opt("storestate"))
-                    && receipt.optString("statehash").equals(stateHash(coin));
+                    && Boolean.valueOf(preserves(receipt)).equals(coin.opt("storestate"))
+                    && receipt.optString("statehash").equals(outputStateHash(coin, preserves(receipt)));
         } catch(IllegalArgumentException e){return false;}
     }
 }

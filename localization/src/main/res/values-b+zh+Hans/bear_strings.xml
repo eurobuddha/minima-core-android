@@ -8085,4 +8085,18 @@
     <string name="l10n_atelier_transfer_confirmed" formatted="false">"拍品 %1$d 已转让"</string>
     <string name="l10n_atelier_transfer_unconfirmed" formatted="false">"转让尚未确认。请刷新藏品系列，核实当前所有者后再重试。"</string>
     <string name="l10n_atelier_transfer_failed" formatted="false">"无法验证转让：%1$s。请先检查藏品系列，再重试。"</string>
+    <string name="l10n_atelier_burial_title" formatted="false">"墓地"</string>
+    <string name="l10n_atelier_burial_final" formatted="false">"最后的拍品 — 不可逆转"</string>
+    <string name="l10n_atelier_burial_owned" formatted="false">"持有的币"</string>
+    <string name="l10n_atelier_burial_destination" formatted="false">"目标地址"</string>
+    <string name="l10n_atelier_burial_contract" formatted="false">"合约"</string>
+    <string name="l10n_atelier_burial_no_exit" formatted="false">"RETURN FALSE — 无法取出"</string>
+    <string name="l10n_atelier_burial_permanent" formatted="false">"销毁不可撤销"</string>
+    <string name="l10n_atelier_burial_custody" formatted="false">"仅销毁您持有的币。收藏者持有的币不受影响。"</string>
+    <string name="l10n_atelier_burial_type_name" formatted="false">"输入系列名称以启用"</string>
+    <string name="l10n_atelier_burial_arm" formatted="false">"输入完全一致的名称以启用销毁。"</string>
+    <string name="l10n_atelier_burial_submit" formatted="false">"销毁持有的币"</string>
+    <string name="l10n_atelier_burial_wrong_name" formatted="false">"名称不匹配。"</string>
+    <string name="l10n_atelier_burial_airdrop_active" formatted="false">"请先在系列页面清除现有空投任务，再开始销毁。"</string>
+    <string name="l10n_atelier_burial_failed" formatted="false">"销毁尚未确认：%1$s。请返回系列页面检查或重试。"</string>
 </resources>

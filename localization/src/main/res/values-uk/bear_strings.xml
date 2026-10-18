@@ -8193,4 +8193,18 @@
     <string name="l10n_atelier_transfer_confirmed" formatted="false">"Лот %1$d передано"</string>
     <string name="l10n_atelier_transfer_unconfirmed" formatted="false">"Передачу не підтверджено. Оновіть колекцію та перевірте поточного власника перед повторною спробою."</string>
     <string name="l10n_atelier_transfer_failed" formatted="false">"Не вдалося перевірити передачу: %1$s. Перевірте колекцію перед повторною спробою."</string>
+    <string name="l10n_atelier_burial_title" formatted="false">"Цвинтар"</string>
+    <string name="l10n_atelier_burial_final" formatted="false">"Останній лот — незворотно"</string>
+    <string name="l10n_atelier_burial_owned" formatted="false">"Монети у власності"</string>
+    <string name="l10n_atelier_burial_destination" formatted="false">"Адреса призначення"</string>
+    <string name="l10n_atelier_burial_contract" formatted="false">"Контракт"</string>
+    <string name="l10n_atelier_burial_no_exit" formatted="false">"RETURN FALSE — виведення неможливе"</string>
+    <string name="l10n_atelier_burial_permanent" formatted="false">"ПОХОВАННЯ НЕЗВОРОТНЕ"</string>
+    <string name="l10n_atelier_burial_custody" formatted="false">"Буде поховано лише ваші монети. Монети колекціонерів залишаться недоторканими."</string>
+    <string name="l10n_atelier_burial_type_name" formatted="false">"Введіть назву колекції для підтвердження"</string>
+    <string name="l10n_atelier_burial_arm" formatted="false">"Точна назва дозволяє поховання."</string>
+    <string name="l10n_atelier_burial_submit" formatted="false">"Поховати свої монети"</string>
+    <string name="l10n_atelier_burial_wrong_name" formatted="false">"Назва не збігається."</string>
+    <string name="l10n_atelier_burial_airdrop_active" formatted="false">"Видаліть поточну роздачу на екрані колекції перед похованням."</string>
+    <string name="l10n_atelier_burial_failed" formatted="false">"Поховання не підтверджено: %1$s. Поверніться до колекції для перевірки або повтору."</string>
 </resources>

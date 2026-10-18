@@ -1,5 +1,6 @@
 package com.eurobuddha.statenft;
 import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -714,6 +715,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             if ("NEEDIMAGES".equals(p)) return Design.pill(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_images), Design.PILL_ERR);
             return Design.pill(this, statusWord(p), Design.PILL_LIVE);
         }
+        if ("BURY".equals(p)) return Design.pill(this, Language.msg(l10n_nft_burial_paused_title), Design.PILL_ERR);
         if ("BURIED".equals(p)) return Design.pill(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_buried), Design.PILL_DIM);
         if (m.size > 0 && m.minted >= m.size) return Design.pill(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_sealed), Design.PILL_DONE);
         return Design.pill(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_open), Design.PILL_DIM);
@@ -1144,7 +1146,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             LinearLayout.LayoutParams doctorLp = weight(48, 4, 4); doctorLp.height = -2;
             actions.addView(doctor, doctorLp);
         }
-        TextView bury = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_bury), false);
+        TextView bury = Design.button(this, Language.msg("BURY".equals(m.phase) ? l10n_nft_burial_check_retry : l10n_atelier_gallery_bury), false);
         bury.setOnClickListener(v -> renderBury());
         bury.setMinHeight(dp(48));
         LinearLayout.LayoutParams buryLp = weight(48, 4, 0); buryLp.height = -2;
@@ -1404,116 +1406,237 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         StateNft.Meta m = openMeta;
         if (m == null) return;
         setScreen(Screen.BURY, () -> openCollection(m));
-        appbar("The Graveyard", true, false);
+        final long generation = screenGeneration;
+        appbar(Language.msg(l10n_atelier_burial_title), true, false);
         hideNav();
-
-        body.addView(Design.lot(this, "Final lot — irreversible"));
+        body.addView(Design.lot(this, Language.msg(l10n_atelier_burial_final)));
         body.addView(Design.display(this, m.name, 22), lpm(0, 4, 0, 14));
-
         LinearLayout facts = lotCard();
-        facts.addView(kvRow("Owned coins", String.valueOf(m.owned)));
-        facts.addView(kvRow("Destination", Util.shorten(StateNft.GRAVEYARD)));
-        facts.addView(kvRow("Contract", "RETURN FALSE — nothing leaves"));
+        facts.addView(kvRow(Language.msg(l10n_atelier_burial_owned), String.valueOf(m.owned)));
+        facts.addView(kvRow(Language.msg(l10n_atelier_burial_destination), Util.shorten(StateNft.GRAVEYARD)));
+        facts.addView(kvRow(Language.msg(l10n_atelier_burial_contract), Language.msg(l10n_atelier_burial_no_exit)));
         body.addView(facts, lpm(0, 0, 0, 12));
-
         LinearLayout warn = vertical();
         warn.setBackground(Design.ruled(this, Design.CARD(), Design.ACCENT(), 2f));
         warn.setPadding(dp(12), dp(10), dp(12), dp(12));
-        warn.addView(Design.text(this, "BURIAL IS PERMANENT", 13, Design.ACCENT(), Design.sansBold()));
-        warn.addView(Design.note(this, "Only coins in your custody are buried. Collectors' holdings are untouched."), lpm(0, 4, 0, 0));
+        warn.addView(Design.text(this, Language.msg(l10n_atelier_burial_permanent), 13, Design.ACCENT(), Design.sansBold()));
+        warn.addView(Design.note(this, Language.msg(l10n_atelier_burial_custody)), lpm(0, 4, 0, 0));
         body.addView(warn, lpm(0, 0, 0, 14));
-
-        body.addView(Design.kicker(this, "Type the collection name to arm"));
+        body.addView(Design.kicker(this, Language.msg(l10n_atelier_burial_type_name)));
         EditText confirm = input(m.name);
-        body.addView(confirm, lph(50, 0, 6, 0, 8));
-        TextView msg = Design.note(this, "The exact name arms the shovel.");
+        confirm.setMinHeight(dp(50));
+        body.addView(confirm, lpm(0, 6, 0, 8));
+        TextView msg = Design.note(this, Language.msg("BURY".equals(m.phase) ? l10n_nft_burial_paused : l10n_atelier_burial_arm));
         body.addView(msg, lpm(0, 0, 0, 10));
-        TextView go = Design.button(this, "Bury owned coins", true);
+        TextView go = Design.button(this, Language.msg("BURY".equals(m.phase) ? l10n_nft_burial_check_retry : l10n_atelier_burial_submit), true);
         go.setOnClickListener(v -> {
+            if (!burialScreenActive(generation) || !go.isEnabled()) return;
             if (!m.name.equals(confirm.getText().toString().trim())) {
-                msg.setText("Name does not match.");
-                return;
+                Language.setText(msg, Language.msg(l10n_atelier_burial_wrong_name)); return;
             }
-            msg.setText("Reading wallet coins…");
-            buryOwnedCoins(m, msg);
+            go.setEnabled(false); confirm.setEnabled(false);
+            buryOwnedCoins(m, msg, generation);
         });
-        body.addView(go, lph(54, 0, 0, 0, 0));
+        go.setMinHeight(dp(54));
+        body.addView(go, lpm(0, 0, 0, 0));
     }
 
-    private void buryOwnedCoins(StateNft.Meta m, TextView msg) {
-        MintEngine.tokenCoinsBounded(node, m.tokenid, true, (coins, partial) -> {
-            if (coins.length() == 0) {
-                msg.setText(partial
-                        ? "No coins visible in the newest window — try again in a few minutes."
-                        : "No owned coins to bury.");
+    private boolean burialScreenActive(long generation) {
+        return !isFinishing() && !isDestroyed() && screen == Screen.BURY && generation == screenGeneration;
+    }
+
+    /** NFT Wallet's persistent intent/receipt flow, hosted in Atelier's retained screen. */
+    private void buryOwnedCoins(StateNft.Meta m, TextView msg, long generation) {
+        try {
+            LocalStore.burialJournal(this, m.tokenid);
+            if (AirdropEngine.job(this, m.localId) != null) {
+                Language.setText(msg, Language.msg(l10n_atelier_burial_airdrop_active)); return;
+            }
+            if (!MintEngine.pauseForBurial(this, m.tokenid)) {
+                Language.setText(msg, Language.msg(l10n_nft_burial_pause_failed)); return;
+            }
+            m.phase = "BURY";
+        } catch (RuntimeException e) {
+            Language.setText(msg, Language.msg(l10n_nft_burial_evidence_missing)); return;
+        }
+        Language.setText(msg, Language.msg(l10n_nft_actions_finding_coins));
+        node.cmd("coins relevant:true own:true tokenid:" + m.tokenid, new NodeApi.Cb() {
+            @Override public void onResult(JSONObject json) {
+                if (!burialScreenActive(generation)) return;
+                final List<JSONObject> coins = new ArrayList<>();
+                try {
+                    JSONArray arr = BurialEvidence.coins(json, m.tokenid);
+                    JSONArray journal = LocalStore.burialJournal(MainActivity.this, m.tokenid);
+                    for (int i = 0; i < arr.length(); i++) {
+                        JSONObject coin = arr.getJSONObject(i);
+                        if (BurialEvidence.same(StateNft.GRAVEYARD, coin.optString("address"))) throw BurialEvidence.invalid();
+                        boolean preserve = StateNft.replayableState(coin);
+                        if ((!preserve || StateNft.stamped(coin) == null) && !Util.isValidHexId(m.creatorPk)) throw BurialEvidence.invalid();
+                        JSONObject old = burialEntry(journal, coin.optString("coinid"));
+                        // Preserve a previously chosen stripped-state fallback on an explicit retry.
+                        if (old != null) preserve = BurialEvidence.preserves(old);
+                        JSONObject intent = BurialEvidence.burialIntent(coin, m.tokenid, preserve);
+                        if (old == null) journal.put(intent);
+                        else if (!old.optString("statehash").equals(intent.optString("statehash"))
+                                || !old.optString("tokenamount").equals(intent.optString("tokenamount"))) throw BurialEvidence.invalid();
+                        coins.add(coin);
+                    }
+                    if (!LocalStore.saveBurialJournal(MainActivity.this, m.tokenid, journal)) throw BurialEvidence.invalid();
+                    if (coins.isEmpty()) {
+                        if (journal.length() == 0) Language.setText(msg, Language.msg(l10n_nft_actions_no_coins));
+                        else watchBurialCompletion(m, msg, generation);
+                        return;
+                    }
+                } catch (Exception e) {
+                    Language.setText(msg, Language.msg(l10n_nft_burial_evidence_missing)); return;
+                }
+                buryNext(m, coins, 0, msg, generation);
+            }
+            @Override public void onError(String message) {
+                if (burialScreenActive(generation)) Language.setText(msg, Language.msg(l10n_atelier_burial_failed, message));
+            }
+        });
+    }
+
+    private static JSONObject burialEntry(JSONArray journal, String input) {
+        for (int i = 0; i < journal.length(); i++) {
+            JSONObject entry = journal.optJSONObject(i);
+            if (entry != null && BurialEvidence.same(input, entry.optString("input"))) return entry;
+        }
+        return null;
+    }
+
+    private void saveBurialEntry(String tokenid, JSONObject entry) {
+        try {
+            JSONArray journal = LocalStore.burialJournal(this, tokenid);
+            boolean replaced = false;
+            for (int j = 0; j < journal.length(); j++) {
+                if (BurialEvidence.same(entry.optString("input"), journal.getJSONObject(j).optString("input"))) {
+                    journal.put(j, entry); replaced = true; break;
+                }
+            }
+            if (!replaced || !LocalStore.saveBurialJournal(this, tokenid, journal)) throw BurialEvidence.invalid();
+        } catch (Exception e) { throw BurialEvidence.invalid(); }
+    }
+
+    private void buryNext(StateNft.Meta m, List<JSONObject> coins, int i, TextView msg, long generation) {
+        if (!burialScreenActive(generation)) return;
+        if (i >= coins.size()) { watchBurialCompletion(m, msg, generation); return; }
+        JSONObject coin = coins.get(i);
+        final JSONObject intent;
+        try {
+            intent = burialEntry(LocalStore.burialJournal(this, m.tokenid), coin.optString("coinid"));
+            if (intent == null) throw BurialEvidence.invalid();
+            if (!intent.optString("output").isEmpty()) { buryNext(m, coins, i + 1, msg, generation); return; }
+            if ((!BurialEvidence.preserves(intent) || StateNft.stamped(coin) == null) && !Util.isValidHexId(m.creatorPk)) throw BurialEvidence.invalid();
+        } catch (RuntimeException e) {
+            Language.setText(msg, Language.msg(l10n_nft_burial_evidence_missing)); return;
+        }
+        Language.setText(msg, Language.msg(l10n_nft_actions_burying_item, i + 1, coins.size()));
+        runBury(m, coins, i, intent, msg, generation);
+    }
+
+    private void runBury(StateNft.Meta m, List<JSONObject> coins, int i, JSONObject intent, TextView msg, long generation) {
+        if (!burialScreenActive(generation)) return;
+        JSONObject coin = coins.get(i);
+        boolean preserve = BurialEvidence.preserves(intent);
+        String creator = !preserve || StateNft.stamped(coin) == null ? m.creatorPk : "";
+        String txn = "bury" + java.util.UUID.randomUUID().toString().replace("-", "");
+        MintEngine.postTxnWithReceipt(node, txn, StateNft.buryCommands(txn, m.tokenid, creator, coin, preserve), posted -> {
+            try {
+                // Persist an accepted receipt even if the user left the screen while posting.
+                saveBurialEntry(m.tokenid, BurialEvidence.receipt(posted, intent));
+            } catch (RuntimeException e) {
+                if (burialScreenActive(generation)) Language.setText(msg, Language.msg(l10n_nft_burial_evidence_missing));
                 return;
             }
-            if (partial) msg.setText("Large collection — burying the newest batch of " + coins.length() + "…");
-            buryOne(m, coins, 0, partial, msg);
-        }, e -> msg.setText(e));
+            buryNext(m, coins, i + 1, msg, generation);
+        }, error -> {
+            if (!burialScreenActive(generation)) return;
+            if (preserve && error != null && error.toLowerCase(Locale.ROOT).contains("size too large") && Util.isValidHexId(m.creatorPk)) {
+                try {
+                    JSONObject stripped = BurialEvidence.burialIntent(coin, m.tokenid, false);
+                    saveBurialEntry(m.tokenid, stripped); // Durable before the fallback signature.
+                    runBury(m, coins, i, stripped, msg, generation);
+                } catch (RuntimeException e) { Language.setText(msg, Language.msg(l10n_nft_burial_evidence_missing)); }
+            } else Language.setText(msg, Language.msg(l10n_atelier_burial_failed, error == null ? "" : error));
+        });
     }
 
-    private void buryOne(StateNft.Meta m, JSONArray coins, int i, boolean partial, TextView msg) {
-        if (i >= coins.length()) {
-            if (partial) {
-                msg.setText("Batch posted. Older coins were beyond the node link — run Bury again once these confirm; each pass reaches deeper.");
-                toast("Burial batch posted — repeat to finish");
-            } else {
-                msg.setText("Burial transactions posted.");
-                toast("Burial posted");
-                markBuriedWhenEmpty(m);
-            }
-            openCollection(m);
-            return;
+    private void watchBurialCompletion(StateNft.Meta m, TextView msg, long generation) {
+        final JSONArray journal;
+        try {
+            journal = LocalStore.burialJournal(this, m.tokenid);
+            if (journal.length() == 0) throw BurialEvidence.invalid();
+            for (int i = 0; i < journal.length(); i++) BurialEvidence.id(journal.getJSONObject(i), "output");
+        } catch (Exception e) {
+            Language.setText(msg, Language.msg(l10n_nft_burial_evidence_missing)); return;
         }
-        JSONObject c = coins.optJSONObject(i);
-        if (c == null) { buryOne(m, coins, i + 1, partial, msg); return; }
-        msg.setText("Burying " + (i + 1) + " / " + coins.length() + "…");
-        String txn = "bury" + (System.currentTimeMillis() % 100000);
-        runBury(m, coins, i, c, txn, StateNft.replayableState(c), partial, msg);
-    }
-
-    /** Once every posted burial confirms and no coins remain, mark the row
-     *  BURIED with the burial block — the gallery shows a fresh grave for
-     *  50 blocks, then the collection leaves the catalogue for good. */
-    private void markBuriedWhenEmpty(StateNft.Meta m) {
-        final Runnable[] check = new Runnable[1];
+        Language.setText(msg, Language.msg(l10n_nft_burial_waiting));
         final int[] tries = {0};
-        check[0] = () -> MintEngine.tokenCoinsBounded(node, m.tokenid, true, (coins, partial) -> {
-            if (coins.length() == 0 && !partial) {
-                node.cmd("block", new NodeApi.Cb() {
+        final Runnable[] poll = new Runnable[1];
+        final Runnable retry = () -> {
+            if (!burialScreenActive(generation) || !departureWatchers.contains(poll[0])) return;
+            if (++tries[0] >= 20) {
+                departureWatchers.remove(poll[0]);
+                Language.setText(msg, Language.msg(l10n_nft_burial_unconfirmed));
+            } else main.postDelayed(poll[0], 20000);
+        };
+        poll[0] = () -> {
+            if (!burialScreenActive(generation) || !departureWatchers.contains(poll[0])) return;
+            verifyBurialOutputs(m, journal, 0, generation, () -> {
+                node.cmd("coins relevant:true own:true tokenid:" + m.tokenid, new NodeApi.Cb() {
                     @Override public void onResult(JSONObject json) {
-                        JSONObject r = json.optJSONObject("response");
-                        int tip = r == null ? 0 : r.optInt("block", 0);
-                        JSONObject row = LocalStore.findById(MainActivity.this, m.localId);
-                        if (row == null) row = LocalStore.findByTokenid(MainActivity.this, m.tokenid);
-                        if (row == null) return;
-                        put(row, "phase", "BURIED");
-                        put(row, "buriedat", tip);
-                        LocalStore.upsert(MainActivity.this, row);
-                        loadLocalCollections();
-                        if (screen == Screen.COLLECTION) refreshDetail();
+                        if (!burialScreenActive(generation)) return;
+                        try {
+                            if (BurialEvidence.coins(json, m.tokenid).length() != 0) { retry.run(); return; }
+                            if (!BurialEvidence.sameJournal(journal, LocalStore.burialJournal(MainActivity.this, m.tokenid), m.tokenid)) {
+                                departureWatchers.remove(poll[0]);
+                                Language.setText(msg, Language.msg(l10n_nft_burial_evidence_missing)); return;
+                            }
+                        } catch (RuntimeException e) { retry.run(); return; }
+                        node.cmd("block", new NodeApi.Cb() {
+                            @Override public void onResult(JSONObject block) {
+                                if (!burialScreenActive(generation)) return;
+                                JSONObject response = block.optJSONObject("response");
+                                Object raw = response == null ? null : response.opt("block");
+                                int tip = response == null ? 0 : response.optInt("block", 0);
+                                if (!Boolean.TRUE.equals(block.opt("status")) || raw == null || !raw.toString().matches("[0-9]+") || tip <= 0) { retry.run(); return; }
+                                try {
+                                    if (!LocalStore.completeBurial(MainActivity.this, m.tokenid, journal, tip)) { retry.run(); return; }
+                                } catch (RuntimeException e) { retry.run(); return; }
+                                departureWatchers.remove(poll[0]);
+                                m.phase = "BURIED";
+                                MintEngine.clearWalletCoinCache();
+                                loadLocalCollections(); lastDetailSig = "";
+                                Language.setText(msg, Language.msg(l10n_nft_burial_confirmed));
+                            }
+                            @Override public void onError(String error) { retry.run(); }
+                        });
                     }
-                    @Override public void onError(String message) {}
+                    @Override public void onError(String error) { retry.run(); }
                 });
-            } else if (++tries[0] < 20) {
-                main.postDelayed(check[0], 20000);
-            }
-        }, e -> { if (++tries[0] < 20) main.postDelayed(check[0], 20000); });
-        main.postDelayed(check[0], 20000);
+            }, retry);
+        };
+        departureWatchers.add(poll[0]);
+        main.postDelayed(poll[0], 20000);
     }
 
-    private void runBury(StateNft.Meta m, JSONArray coins, int i, JSONObject c, String txn,
-                         boolean preserve, boolean partial, TextView msg) {
-        MintEngine.postTxn(node, txn, StateNft.buryCommands(txn, m.tokenid, m.creatorPk, c, preserve),
-                () -> buryOne(m, coins, i + 1, partial, msg),
-                e -> {
-                    if (preserve && e.toLowerCase().contains("size too large") && !m.creatorPk.isEmpty()) {
-                        runBury(m, coins, i, c, txn + "s", false, partial, msg);
-                    } else {
-                        msg.setText("Failed: " + e);
-                    }
-                });
+    private void verifyBurialOutputs(StateNft.Meta m, JSONArray journal, int i, long generation, Runnable confirmed, Runnable retry) {
+        if (!burialScreenActive(generation)) return;
+        if (i >= journal.length()) { confirmed.run(); return; }
+        JSONObject receipt = journal.optJSONObject(i);
+        node.cmd("coins coinid:" + receipt.optString("output"), new NodeApi.Cb() {
+            @Override public void onResult(JSONObject json) {
+                if (!burialScreenActive(generation)) return;
+                try {
+                    JSONArray coins = BurialEvidence.coins(json, m.tokenid);
+                    if (coins.length() != 1 || !BurialEvidence.confirmed(receipt, coins.optJSONObject(0))) { retry.run(); return; }
+                } catch (RuntimeException e) { retry.run(); return; }
+                verifyBurialOutputs(m, journal, i + 1, generation, confirmed, retry);
+            }
+            @Override public void onError(String error) { retry.run(); }
+        });
     }
 
     /* ================= STUDIO ================= */

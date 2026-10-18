@@ -8121,4 +8121,18 @@
     <string name="l10n_atelier_transfer_confirmed" formatted="false">"Lot %1$d transferred"</string>
     <string name="l10n_atelier_transfer_unconfirmed" formatted="false">"Transfer not confirmed. Refresh the collection to check its current owner before trying again."</string>
     <string name="l10n_atelier_transfer_failed" formatted="false">"Transfer could not be verified: %1$s. Check the collection before trying again."</string>
+    <string name="l10n_atelier_burial_title" formatted="false">"The Graveyard"</string>
+    <string name="l10n_atelier_burial_final" formatted="false">"Final lot — irreversible"</string>
+    <string name="l10n_atelier_burial_owned" formatted="false">"Owned coins"</string>
+    <string name="l10n_atelier_burial_destination" formatted="false">"Destination"</string>
+    <string name="l10n_atelier_burial_contract" formatted="false">"Contract"</string>
+    <string name="l10n_atelier_burial_no_exit" formatted="false">"RETURN FALSE — nothing leaves"</string>
+    <string name="l10n_atelier_burial_permanent" formatted="false">"BURIAL IS PERMANENT"</string>
+    <string name="l10n_atelier_burial_custody" formatted="false">"Only coins in your custody are buried. Collectors’ holdings are untouched."</string>
+    <string name="l10n_atelier_burial_type_name" formatted="false">"Type the collection name to arm"</string>
+    <string name="l10n_atelier_burial_arm" formatted="false">"The exact name arms the shovel."</string>
+    <string name="l10n_atelier_burial_submit" formatted="false">"Bury owned coins"</string>
+    <string name="l10n_atelier_burial_wrong_name" formatted="false">"Name does not match."</string>
+    <string name="l10n_atelier_burial_airdrop_active" formatted="false">"Clear the existing airdrop from the collection screen before starting burial."</string>
+    <string name="l10n_atelier_burial_failed" formatted="false">"Burial is unconfirmed: %1$s. Return to the collection to check or retry."</string>
 </resources>
