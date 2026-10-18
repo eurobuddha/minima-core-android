@@ -45,6 +45,11 @@ public final class CommsTransport {
     /** Post a (sealed) blob into state[99] at an address with an amount + tokenid (+ optional extra state). */
     public static void postBlob(NodeApi node, String address, String amount, String tokenid,
                                 String blobHex, JSONObject extraState, SendCb cb) {
+        postBlob(node, address, amount, tokenid, blobHex, extraState, () -> true, cb);
+    }
+    /** Publication guard is retained through the signing queue and the shared node worker. */
+    public static void postBlob(NodeApi node, String address, String amount, String tokenid,
+                                String blobHex, JSONObject extraState, java.util.function.BooleanSupplier authorized, SendCb cb) {
         try {
             // MA-9: every value below is interpolated into the `send` command — reject anything that isn't a
             // clean hex address/token/blob or a plain decimal amount, so no value can inject a command parameter.
@@ -61,7 +66,7 @@ public final class CommsTransport {
                 if (!(v instanceof String) || !isCleanHex((String) v)) { cb.onFailed("bad extra state value"); return; }
             }
             state.put("99", "0x" + blobHex);   // hex-typed state value, read back the same way
-            post(node, "send amount:" + amount + " address:" + address + " tokenid:" + tokenid + " state:" + state, cb);
+            post(node, "send amount:" + amount + " address:" + address + " tokenid:" + tokenid + " state:" + state, authorized, cb);
         } catch (Exception e) {
             cb.onFailed(e.getMessage());
         }
@@ -78,12 +83,17 @@ public final class CommsTransport {
      * txnsign sequence does. These publishes are the app's highest-frequency signer — one per order
      * publish, OTC publish and tombstone — so leaving them ungated would have defeated the gate.
      */
-    private static void post(NodeApi node, String cmd, SendCb cb) {
-        SignGate.submit(gate -> node.cmd(cmd, new NodeApi.Cb() {
+    private static void post(NodeApi node, String cmd, java.util.function.BooleanSupplier authorized, SendCb cb) {
+        SignGate.submit(gate -> {
+            if (!NodeApi.authorized(authorized)) {
+                gate.free(); cb.onFailed(NodeApi.ERR_COMMAND_CHANGED); return;
+            }
+            node.cmd(cmd, authorized, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 gate.free();
-                // status:true = accepted; pending:true = queued via the pending app (node locked)
-                if (j.optBoolean("status", false) || j.optBoolean("pending", false)) {
+                // NodeApi already holds pending/incomplete writes for review; never report them sent.
+                if (j == null || !WriteSafety.completeReply(j)) { cb.onFailed(NodeApi.ERR_WRITE_UNCERTAIN); return; }
+                if (Boolean.TRUE.equals(j.opt("status"))) {
                     JSONObject r = j.optJSONObject("response");
                     cb.onSent(r != null ? r.optString("txpowid", "") : "");
                 } else {
@@ -91,7 +101,8 @@ public final class CommsTransport {
                 }
             }
             @Override public void onError(String message) { gate.free(); cb.onFailed(message); }
-        }));
+            });
+        });
     }
 
     private CommsTransport() {}

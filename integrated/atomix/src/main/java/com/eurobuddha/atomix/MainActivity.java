@@ -4015,6 +4015,7 @@ public class MainActivity extends AppCompatActivity {
             double sell = otcNumber(sellE.length() == 0 ? "0" : sellE.getText().toString(), Double.NaN), buy = otcNumber(buyE.length() == 0 ? "0" : buyE.getText().toString(), Double.NaN);
             if (!Double.isFinite(sell) || !Double.isFinite(buy) || sell < 0 || buy < 0 || (sell <= 0 && buy <= 0)) { toast(Language.msg(l10n_atomix_otc_enter_size)); return; }
             finishOtcEditing(box);
+            PublishGate.bumpGen(); // new OTC terms invalidate queued publications
             prefs.edit().putString("otc_sell_size", sell > 0 ? trim(sell) : "").putString("otc_buy_size", buy > 0 ? trim(buy) : "")
                     .putBoolean("otc_enable", true).putBoolean("otc_auto", true).apply();
             publishOtcOffer(sell, buy);
@@ -4229,12 +4230,13 @@ public class MainActivity extends AppCompatActivity {
             @Override public void onFailed(String message) {
                 PublishGate.release(PublishGate.OTC);
                 SwapLog.w("fg OTC publish FAIL: " + message);
-                ui.post(() -> toast(Language.msg(l10n_atomix_otc_publish_failed, message)));
+                ui.post(() -> toast(Language.msg(l10n_atomix_otc_publish_failed, OperationMessages.message(message))));
             }
         });
     }
 
     private void withdrawOtcOffer() {
+        PublishGate.bumpGen(); // a queued live offer must not overtake this withdrawal
         prefs.edit().putBoolean("otc_enable", false).putBoolean("otc_auto", false).apply();
         if (identity == null || myMinimaPk == null) { render(); return; }
         OtcOffer o = new OtcOffer();

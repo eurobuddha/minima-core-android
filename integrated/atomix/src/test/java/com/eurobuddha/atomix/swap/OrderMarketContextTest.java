@@ -125,8 +125,8 @@ public class OrderMarketContextTest {
         for (TradingContext market : TradingContext.values()) for (boolean reply : new boolean[]{true, false}) {
             TradingContext.setActive(market, null); Pub p = new Pub(); p.fresh(PublishGate.gen());
             try (MockedStatic<CommsTransport> transport = mockStatic(CommsTransport.class)) {
-                transport.when(() -> CommsTransport.postBlob(any(), anyString(), anyString(), anyString(), anyString(), any(), any()))
-                    .thenAnswer(i -> { assertEquals(market.orderBookAddr, i.getArgument(1)); ((CommsTransport.SendCb)i.getArgument(6)).onSent("fixture-tx"); return null; });
+                transport.when(() -> CommsTransport.postBlob(any(), anyString(), anyString(), anyString(), anyString(), any(), any(), any()))
+                    .thenAnswer(i -> { assertEquals(market.orderBookAddr, i.getArgument(1)); ((CommsTransport.SendCb)i.getArgument(7)).onSent("fixture-tx"); return null; });
                 p.balance(reply); assertEquals(reply ? 12.5 : 5, p.order.minimaAvail, 0); verify(p.result).onSent("fixture-tx"); verify(p.result, never()).onFailed(anyString());
             }
         }
@@ -135,8 +135,8 @@ public class OrderMarketContextTest {
         for (TradingContext market : TradingContext.values()) for (boolean currency : new boolean[]{true, false}) {
             TradingContext.setActive(market, null); Pub p = new Pub(); List<CommsTransport.SendCb> pending = new ArrayList<>();
             try (MockedStatic<CommsTransport> transport = mockStatic(CommsTransport.class)) {
-                transport.when(() -> CommsTransport.postBlob(any(), anyString(), anyString(), anyString(), anyString(), any(), any()))
-                    .thenAnswer(i -> { pending.add(i.getArgument(6)); return null; });
+                transport.when(() -> CommsTransport.postBlob(any(), anyString(), anyString(), anyString(), anyString(), any(), any(), any()))
+                    .thenAnswer(i -> { pending.add(i.getArgument(7)); return null; });
                 SwapOrderBook.publish(p.node, p.sodium, p.identity, p.order, p.result); assertEquals(1, pending.size());
                 if (currency) TradingContext.setActive(market.other(), null); else PublishGate.bumpGen();
                 pending.get(0).onSent("fixture-tx"); p.reject();

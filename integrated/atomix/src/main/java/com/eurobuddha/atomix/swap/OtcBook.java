@@ -35,6 +35,9 @@ public final class OtcBook {
 
     /** Sign {@code offer} with my comms key and broadcast it to the board. */
     public static void publish(NodeApi node, LazySodium ls, CommsIdentity id, OtcOffer offer, CommsTransport.SendCb cb) {
+        final TradingContext market = TradingContext.active();
+        final long generation = PublishGate.gen();
+        final java.util.function.BooleanSupplier current = () -> market == TradingContext.active() && generation == PublishGate.gen();
         try {
             offer.ts = System.currentTimeMillis();
             offer.commsPublicId = id.publicId();
@@ -44,8 +47,14 @@ public final class OtcBook {
             JSONObject extra = new JSONObject();
             extra.put("1", "0x" + Hex.to(id.signPk));
             extra.put("2", "0x" + Hex.to(sig));
-            CommsTransport.postBlob(node, address(), CommsTransport.MESSAGE_AMOUNT, CommsTransport.NATIVE,
-                    Hex.to(msg), extra, cb);
+            CommsTransport.postBlob(node, market.otcBoardAddr, CommsTransport.MESSAGE_AMOUNT, CommsTransport.NATIVE,
+                    Hex.to(msg), extra, current, new CommsTransport.SendCb() {
+                        @Override public void onSent(String txpowid) {
+                            if (!current.getAsBoolean()) { cb.onFailed(NodeApi.ERR_COMMAND_CHANGED); return; }
+                            cb.onSent(txpowid);
+                        }
+                        @Override public void onFailed(String message) { cb.onFailed(message); }
+                    });
         } catch (Exception e) {
             cb.onFailed("otc publish: " + e.getMessage());
         }

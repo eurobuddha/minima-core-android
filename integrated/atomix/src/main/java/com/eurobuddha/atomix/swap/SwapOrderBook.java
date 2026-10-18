@@ -81,7 +81,7 @@ public final class SwapOrderBook {
             extra.put("2", "0x" + Hex.to(sig));
             if (!current(order, generation)) { cb.onFailed(MARKET_ERROR); return; }
             CommsTransport.postBlob(node, destination, CommsTransport.MESSAGE_AMOUNT, CommsTransport.NATIVE,
-                    Hex.to(msg), extra, new CommsTransport.SendCb() {
+                    Hex.to(msg), extra, () -> current(order, generation), new CommsTransport.SendCb() {
                         @Override public void onSent(String txpowid) {
                             if (!current(order, generation)) { cb.onFailed(MARKET_ERROR); return; }
                             cb.onSent(txpowid);
