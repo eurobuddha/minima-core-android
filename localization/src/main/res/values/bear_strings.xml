@@ -8203,4 +8203,13 @@
     <string name="l10n_salon_publish_announcing" formatted="false">"Submitting your Salon announcement…"</string>
     <string name="l10n_salon_publish_submitted" formatted="false">"Announcement submitted. Blockchain confirmation is still pending."</string>
     <string name="l10n_salon_publish_unknown" formatted="false">"Could not confirm the announcement result. Check the node before submitting again."</string>
+    <string name="l10n_salon_github_configuration" formatted="false">"Check the GitHub repository settings for this profile."</string>
+    <!-- Arguments: code -->
+    <string name="l10n_salon_github_read">"GitHub could not read this file’s current version (HTTP %1$s). No update was sent for this file."</string>
+    <string name="l10n_salon_github_invalid" formatted="false">"GitHub returned an invalid response. This file was not updated."</string>
+    <!-- Arguments: code -->
+    <string name="l10n_salon_github_conflict">"GitHub refused the update (HTTP %1$s). Check the repository before trying again."</string>
+    <!-- Arguments: code -->
+    <string name="l10n_salon_github_write">"GitHub did not confirm the update (HTTP %1$s). Check the repository before trying again."</string>
+    <string name="l10n_salon_github_unavailable" formatted="false">"Could not confirm the GitHub request. Check the repository before trying again."</string>
 </resources>

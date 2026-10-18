@@ -2654,6 +2654,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private CharSequence mediaError(Exception error) {
+        if (error instanceof GithubUploader.ProfileFailure) {
+            GithubUploader.ProfileFailure failure = (GithubUploader.ProfileFailure) error;
+            switch (failure.reason) {
+                case CONFIGURATION: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_github_configuration);
+                case READ: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_github_read, failure.status);
+                case INVALID: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_github_invalid);
+                case CONFLICT: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_github_conflict, failure.status);
+                case WRITE: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_github_write, failure.status);
+                case UNAVAILABLE: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_github_unavailable);
+            }
+        }
         String detail = error.getMessage();
         if ("cannot read file".equals(detail) || "could not read image".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_read_failed);
         if ("file too large (max 60 MB)".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_size, 60);
@@ -3077,7 +3088,7 @@ public class MainActivity extends AppCompatActivity {
                 final String profileUrl = ProfileHosting.upload(def, h, profile.toString(), salonHtml());
                 runOnUiThread(() -> { SalonStore.put(this, "profileUrl", profileUrl); Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_checking)); adoptOrMint(h, n, b, profileUrl, status); });
             } catch (SftpUploader.HostKeyUnverified hk) { runOnUiThread(() -> { promptTrustHostKey(def, hk.fingerprint, status); claimFailed(); }); }
-            catch (Exception e) { runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting_failed, e.getMessage())); claimFailed(); }); }
+            catch (Exception e) { runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting_failed, mediaError(e))); claimFailed(); }); }
         });
     }
 

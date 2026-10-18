@@ -8275,4 +8275,13 @@
     <string name="l10n_salon_publish_announcing" formatted="false">"Надсилання оголошення Salon…"</string>
     <string name="l10n_salon_publish_submitted" formatted="false">"Оголошення надіслано. Підтвердження в блокчейні ще очікується."</string>
     <string name="l10n_salon_publish_unknown" formatted="false">"Не вдалося підтвердити результат надсилання. Перевірте вузол перед повторним надсиланням."</string>
+    <string name="l10n_salon_github_configuration" formatted="false">"Перевірте налаштування репозиторію GitHub для цього профілю."</string>
+    <!-- Arguments: code -->
+    <string name="l10n_salon_github_read">"Не вдалося прочитати поточну версію файлу в GitHub (HTTP %1$s). Оновлення цього файлу не надіслано."</string>
+    <string name="l10n_salon_github_invalid" formatted="false">"GitHub повернув некоректну відповідь. Цей файл не оновлено."</string>
+    <!-- Arguments: code -->
+    <string name="l10n_salon_github_conflict">"GitHub відхилив оновлення (HTTP %1$s). Перевірте репозиторій перед повторною спробою."</string>
+    <!-- Arguments: code -->
+    <string name="l10n_salon_github_write">"GitHub не підтвердив оновлення (HTTP %1$s). Перевірте репозиторій перед повторною спробою."</string>
+    <string name="l10n_salon_github_unavailable" formatted="false">"Не вдалося підтвердити результат запиту до GitHub. Перевірте репозиторій перед повторною спробою."</string>
 </resources>

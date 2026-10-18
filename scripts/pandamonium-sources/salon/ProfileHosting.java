@@ -25,10 +25,10 @@ final class ProfileHosting {
             } else {
                 // Keep the stable URL sealed into existing identity tokens. If the renderer
                 // fails, do not replace the profile or report a completed publication.
-                pageUrl = up.putFile(page, path + "/index.html", "text/html");
+                pageUrl = putProfile(up, page, path + "/index.html", "text/html");
                 requireRef(pageUrl);
                 Hosting.verifyUrl(pageUrl, host);
-                url = up.putFile(json, path + "/profile.json", "application/json");
+                url = putProfile(up, json, path + "/profile.json", "application/json");
                 pageUrl = null; // already checked before replacing profile.json
             }
             requireRef(url);
@@ -36,6 +36,12 @@ final class ProfileHosting {
             if (pageUrl != null) Hosting.verifyUrl(pageUrl, host);
         }
         return url;
+    }
+
+    private static String putProfile(Hosting.Uploader up, byte[] bytes, String path, String mime) throws Exception {
+        return up instanceof Hosting.ProfileUploader
+                ? ((Hosting.ProfileUploader)up).putProfileFile(bytes, path, mime)
+                : up.putFile(bytes, path, mime);
     }
 
     private static void requireRef(String ref) throws Hosting.HostingException {

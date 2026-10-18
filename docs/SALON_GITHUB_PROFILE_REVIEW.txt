@@ -1,0 +1,61 @@
+Salon GitHub profile update review — 2026-10-18
+
+Summary
+Repeat publication previously called the no-overwrite media uploader, so GitHub
+rejected an existing profile. The native Salon now ports the existing MiniDapp's
+putGithubFixed flow: GET the current file SHA, then PUT with that SHA at the same
+path. This resolves the GitHub follow-up in SALON_PUBLISHING_REVIEW.txt and
+SALON_METADATA_REVIEW.txt. Identity-token profile URLs remain stable.
+
+Reuse and adaptations
+Read mds/salon/hosting.js uploadFixed/putGithubFixed and its b64/publicUrl helpers,
+salon.js salonSaveManifest, and app.js saveMyManifest. Read the native Salon and
+Atelier GithubUploader/Hosting classes and HostingTest's no-SHA invariant.
+The existing Java body encoder, authentication, public URL builder and upload
+orchestrator are retained. A ProfileUploader interface opts in only for profile
+publication; ordinary media/NFT uploads continue using putFile without a SHA.
+Only <slug>/profile.json and <slug>/index.html are allowed by the update path.
+
+Compared with the MiniDapp donor, the port treats only lookup 404 as permission to
+attempt creation; auth, redirect, rate-limit and server errors stop before PUT.
+Successful lookups require a file response with the requested path and a valid
+SHA. The branch query is encoded and the same branch is used in the update body.
+The metadata read reuses the core NetFetch byte cap and Salon's interruption and
+zero-read handling. Its 2 MiB limit accommodates inline content for small files;
+GitHub's object media type omits content for files larger than 1 MiB.
+Authenticated requests do not follow redirects. Streams and connections close
+on success and failure. Conflicts are surfaced without automatic retry. Error
+messages contain typed reason/status fields, not credentials or response bodies.
+Six retained messages cover English, Simplified Chinese, Russian and Ukrainian,
+including the initial-hosting and editor-publication error paths.
+
+Protocol reference
+GitHub Contents API documentation, checked during implementation:
+https://docs.github.com/en/rest/repos/contents#create-or-update-file-contents
+It requires the existing blob SHA when updating; create/update success statuses
+are 201/200. The existing project's API version header is preserved.
+
+Validation
+Full Salon suite: 238 tests, zero failures/errors/skips. Eleven new transport tests
+cover first and repeat saves, unchanged URLs, current SHA on every save, query
+encoding, lookup failures, malformed/oversized/wrong-path metadata, conflicts,
+write failures, redirects, cleanup, interruption, path validation, media overwrite
+refusal, and the real ProfileHosting orchestration of both files twice. One new
+language test checks all typed failures and nested retained publication messages
+across all four languages. Final focused 18 tests passed after wording refinement.
+Pandamonium release Java compilation passed. All 21 pinned imports reproduced;
+6,796 catalog messages validate in four languages. Staged whitespace checks pass.
+Evidence: build/localization/salon-github-{tests,final,import}.log.
+
+Limits
+Tests simulate HTTP connections; no live user repository/profile was published.
+Public URL checks retain the existing availability policy; CDN/Pages content can
+lag the API update. The two files are separate commits, not an atomic transaction.
+If a later file fails, an earlier file may already have changed; the publishing UI
+reports this possibility. This checkpoint does not complete the wider integration.
+Onboarding/recovery, restore durability, outbox ownership, remaining language
+acceptance, signed artifacts and physical Fold validation still remain.
+
+Verdict
+Approve. No unresolved blocking finding in these changes. No version bump,
+APK installation or release publication was performed.

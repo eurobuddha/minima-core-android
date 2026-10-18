@@ -41278,5 +41278,41 @@
     "zh-Hans": "无法确认公告结果。再次提交前请检查节点。",
     "ru": "Не удалось подтвердить результат отправки. Проверьте узел перед повторной отправкой.",
     "uk": "Не вдалося підтвердити результат надсилання. Перевірте вузол перед повторним надсиланням."
+  },
+  "salonGithub.configuration": {
+    "en": "Check the GitHub repository settings for this profile.",
+    "zh-Hans": "请检查此个人资料的 GitHub 仓库设置。",
+    "ru": "Проверьте настройки репозитория GitHub для этого профиля.",
+    "uk": "Перевірте налаштування репозиторію GitHub для цього профілю."
+  },
+  "salonGithub.read": {
+    "en": "GitHub could not read this file’s current version (HTTP {code}). No update was sent for this file.",
+    "zh-Hans": "GitHub 无法读取此文件的当前版本（HTTP {code}）。未发送此文件的更新。",
+    "ru": "Не удалось прочитать текущую версию файла в GitHub (HTTP {code}). Обновление этого файла не отправлено.",
+    "uk": "Не вдалося прочитати поточну версію файлу в GitHub (HTTP {code}). Оновлення цього файлу не надіслано."
+  },
+  "salonGithub.invalid": {
+    "en": "GitHub returned an invalid response. This file was not updated.",
+    "zh-Hans": "GitHub 返回了无效响应。此文件未更新。",
+    "ru": "GitHub вернул некорректный ответ. Этот файл не обновлён.",
+    "uk": "GitHub повернув некоректну відповідь. Цей файл не оновлено."
+  },
+  "salonGithub.conflict": {
+    "en": "GitHub refused the update (HTTP {code}). Check the repository before trying again.",
+    "zh-Hans": "GitHub 拒绝了更新（HTTP {code}）。重试前请检查仓库。",
+    "ru": "GitHub отклонил обновление (HTTP {code}). Проверьте репозиторий перед повторной попыткой.",
+    "uk": "GitHub відхилив оновлення (HTTP {code}). Перевірте репозиторій перед повторною спробою."
+  },
+  "salonGithub.write": {
+    "en": "GitHub did not confirm the update (HTTP {code}). Check the repository before trying again.",
+    "zh-Hans": "GitHub 未确认更新（HTTP {code}）。重试前请检查仓库。",
+    "ru": "GitHub не подтвердил обновление (HTTP {code}). Проверьте репозиторий перед повторной попыткой.",
+    "uk": "GitHub не підтвердив оновлення (HTTP {code}). Перевірте репозиторій перед повторною спробою."
+  },
+  "salonGithub.unavailable": {
+    "en": "Could not confirm the GitHub request. Check the repository before trying again.",
+    "zh-Hans": "无法确认 GitHub 请求。重试前请检查仓库。",
+    "ru": "Не удалось подтвердить результат запроса к GitHub. Проверьте репозиторий перед повторной попыткой.",
+    "uk": "Не вдалося підтвердити результат запиту до GitHub. Перевірте репозиторій перед повторною спробою."
   }
 }

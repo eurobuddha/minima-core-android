@@ -8167,4 +8167,13 @@
     <string name="l10n_salon_publish_announcing" formatted="false">"正在提交 Salon 公告…"</string>
     <string name="l10n_salon_publish_submitted" formatted="false">"公告已提交。仍在等待区块链确认。"</string>
     <string name="l10n_salon_publish_unknown" formatted="false">"无法确认公告结果。再次提交前请检查节点。"</string>
+    <string name="l10n_salon_github_configuration" formatted="false">"请检查此个人资料的 GitHub 仓库设置。"</string>
+    <!-- Arguments: code -->
+    <string name="l10n_salon_github_read">"GitHub 无法读取此文件的当前版本（HTTP %1$s）。未发送此文件的更新。"</string>
+    <string name="l10n_salon_github_invalid" formatted="false">"GitHub 返回了无效响应。此文件未更新。"</string>
+    <!-- Arguments: code -->
+    <string name="l10n_salon_github_conflict">"GitHub 拒绝了更新（HTTP %1$s）。重试前请检查仓库。"</string>
+    <!-- Arguments: code -->
+    <string name="l10n_salon_github_write">"GitHub 未确认更新（HTTP %1$s）。重试前请检查仓库。"</string>
+    <string name="l10n_salon_github_unavailable" formatted="false">"无法确认 GitHub 请求。重试前请检查仓库。"</string>
 </resources>

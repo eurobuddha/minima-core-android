@@ -201,6 +201,11 @@ final class Hosting {
         @Override default void close() {}
     }
 
+    /** Explicit opt-in to replacing only mutable profile files at their stable URLs. */
+    interface ProfileUploader {
+        String putProfileFile(byte[] bytes, String relPath, String mime) throws HostingException;
+    }
+
     /** Directory transport (IPFS backends): one call, one CID, base URL back. */
     interface DirUploader {
         String putDirectory(List<Entry> files, ProgressCb cb) throws HostingException;
