@@ -469,7 +469,7 @@ public class MainActivity extends AppCompatActivity {
         if (peerpk == null || peerpk.isEmpty()) { toast("This account can't receive messages yet."); return; }
         // Switching to a different peer: drop any in-progress reply and draft so
         // one conversation's private text can never carry into another's.
-        if (!peerpk.equals(threadPeer)) { replyBody = ""; replyFrom = ""; replyPeer = ""; threadDraft = ""; threadRenderedCount = -1; threadWindow = THREAD_WINDOW_STEP; }
+        if (!peerpk.equals(threadPeer)) { cancelMediaRequests(); replyBody = ""; replyFrom = ""; replyPeer = ""; threadDraft = ""; threadRenderedCount = -1; threadWindow = THREAD_WINDOW_STEP; }
         MailDb db = MailDb.get(this);
         MailDb.Contact ex = db.contact(peerpk);
         db.upsertContact(peerpk, handle, avatar, addr, ex != null ? ex.lastbody : "", ex != null ? ex.lastts : 0, false);
@@ -667,7 +667,8 @@ public class MainActivity extends AppCompatActivity {
         db.insert(msgId, threadPeer, true, body, mediaRef, mediaMime, ts, true, MailDb.PENDING);
         if (!outReplyBody.isEmpty()) db.setReply(msgId, replyBody, replyFrom);   // my local copy keeps MY-side labels
         db.upsertContact(threadPeer, ct.handle, ct.avatar, ct.addr, body.isEmpty() ? "📎 media" : body, ts, false);
-        replyBody = ""; replyFrom = ""; replyPeer = ""; threadDraft = "";   // consumed — clear before the re-render
+        replyBody = ""; replyFrom = ""; replyPeer = "";
+        if (mediaRef == null || mediaRef.isEmpty()) threadDraft = ""; // A photo does not consume unsent text.
         render();
 
         if (viaChain) { coinSendDm(ct, msg, msgId); return; }
@@ -809,9 +810,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void attachDmMedia() {
-        if (threadPeer.isEmpty()) return;
-        Intent i = new Intent(Intent.ACTION_GET_CONTENT); i.setType("image/*");
-        startActivityForResult(Intent.createChooser(i, "Choose photo"), PICK_DM_IMG);
+        pickMedia(PICK_DM_IMG, "image/*");
     }
 
     /* ---------------- messaging key backup / restore ---------------- */
@@ -1054,6 +1053,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         pairHandler.removeCallbacks(pairTick);
         reannHandler.removeCallbacks(reannTick);
+        cancelMediaRequests();
         io.shutdownNow();
         stopAudio();
         videoRequest++;
@@ -1109,6 +1109,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void go(Screen s) {
+        if (screen != s) cancelMediaRequests();
         if (screen == Screen.EDIT && s != Screen.EDIT) commitEditFields();   // preserve the draft when leaving Edit
         screen = s; render();
     }
@@ -2245,14 +2246,173 @@ public class MainActivity extends AppCompatActivity {
     private static final int PICK_AVATAR = 41, PICK_BANNER = 42, PICK_GALLERY_IMG = 43, PICK_GALLERY_VID = 44, PICK_GALLERY_AUD = 45, PICK_DM_IMG = 46, SAVE_TEXT = 51, OPEN_BACKUP = 52;
     private String pendingSaveText;   // content queued for a SAF "Save file" (ACTION_CREATE_DOCUMENT)
 
+    /** One selection/upload at a time; snapshots contain data, never live editor views. */
+    private static final class MediaPick {
+        final int code;
+        final String identity, handle, target, hostJson;
+        final Hosting.Profile host;
+        final boolean meshDm;
+        volatile boolean cancelled;
+        MediaPick(int code, String identity, String handle, String target, Hosting.Profile host, boolean meshDm) {
+            this.code = code; this.identity = identity; this.handle = handle; this.target = target;
+            this.host = host; this.hostJson = host.j.toString(); this.meshDm = meshDm;
+        }
+    }
+    private MediaPick pendingMediaPick, activeMediaUpload;
+
+    private String mediaIdentity() {
+        return new JSONArray().put(SalonStore.get(this, "tokenid")).put(SalonStore.get(this, "handle"))
+                .put(SalonStore.get(this, "msgpk")).toString();
+    }
+
+    /** Read on the UI thread, so typed values and quoted replies belong to this selection. */
+    private String mediaTarget(int code) {
+        if (code == PICK_DM_IMG) return new JSONArray().put(threadPeer).put(threadDraft)
+                .put(replyPeer).put(replyBody).put(replyFrom).put(SalonStore.get(this, XPORT_PREF + threadPeer)).toString();
+        if (code == PICK_AVATAR) return edAvatar == null ? SalonStore.get(this, "avatar") : text(edAvatar);
+        if (code == PICK_BANNER) return edBanner == null ? SalonStore.get(this, "banner") : text(edBanner);
+        return SalonStore.arr(this, "gallery").toString();
+    }
+
+    private boolean mediaHostCurrent(MediaPick pick) {
+        if (pick.meshDm) return true; // The chosen mesh transport never falls back to a different host.
+        Hosting.Profile host = HostingStore.getDefault(this);
+        return host != null && pick.hostJson.equals(host.j.toString());
+    }
+
+    private boolean mediaCurrent(MediaPick pick) {
+        boolean current = !pick.cancelled && !isFinishing() && !isDestroyed()
+                && pick.identity.equals(mediaIdentity()) && mediaHostCurrent(pick)
+                && screen == (pick.code == PICK_DM_IMG ? Screen.THREAD : Screen.EDIT)
+                && pick.target.equals(mediaTarget(pick.code));
+        if (!current) pick.cancelled = true;
+        return current;
+    }
+
+    private void cancelMediaRequests() {
+        if (pendingMediaPick != null) pendingMediaPick.cancelled = true;
+        if (activeMediaUpload != null) activeMediaUpload.cancelled = true;
+    }
+
+    private void mediaStatus(CharSequence message) {
+        if (isFinishing() || isDestroyed()) return;
+        if (screen == Screen.EDIT && profStatus != null) Language.setText(profStatus, message);
+        toast(message);
+    }
+
     private void pickMedia(int code, String mime) {
-        if (HostingStore.getDefault(this) == null) { toast("Set hosting first."); return; }
-        Intent i = new Intent(Intent.ACTION_GET_CONTENT); i.setType(mime);
-        startActivityForResult(Intent.createChooser(i, "Choose"), code);
+        if (code < PICK_AVATAR || code > PICK_DM_IMG) return;
+        if (pendingMediaPick != null || activeMediaUpload != null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_busy)); return; }
+        if (screen != (code == PICK_DM_IMG ? Screen.THREAD : Screen.EDIT)) return;
+        if (code == PICK_DM_IMG && threadPeer.isEmpty()) return;
+        boolean meshDm = code == PICK_DM_IMG && MaximaLink.isReady(this);
+        Hosting.Profile host = meshDm ? Hosting.Profile.fresh(Hosting.TYPE_MAXIMA) : HostingStore.getDefault(this);
+        if (host == null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_host)); return; }
+        final MediaPick pick = new MediaPick(code, mediaIdentity(), SalonStore.get(this, "handle"), mediaTarget(code), host, meshDm);
+        pendingMediaPick = pick;
+        try {
+            Intent i = new Intent(Intent.ACTION_GET_CONTENT); i.setType(mime);
+            startActivityForResult(Intent.createChooser(i, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_choose)), code);
+        } catch (RuntimeException unavailable) {
+            pendingMediaPick = null; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_picker_failed));
+        }
+    }
+
+    /** Ignore unowned callbacks after recreation rather than attaching to the current account. */
+    private void receiveMedia(int code, int result, Intent data) {
+        MediaPick pick = pendingMediaPick;
+        if (pick == null || pick.code != code) {
+            if (result == RESULT_OK) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_reselect));
+            return;
+        }
+        pendingMediaPick = null;
+        if (result != RESULT_OK || data == null || data.getData() == null) return;
+        if (!mediaCurrent(pick)) { mediaStatus(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_changed)); return; }
+        activeMediaUpload = pick;
+        mediaStatus(pick.code == PICK_DM_IMG ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_sending) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_uploading));
+        final Uri uri = data.getData();
+        try {
+            io.execute(() -> {
+                try {
+                    if (pick.cancelled || !pick.identity.equals(mediaIdentity()) || !mediaHostCurrent(pick)) {
+                        runOnUiThread(() -> finishMedia(pick, null, null)); return;
+                    }
+                    final byte[] bytes;
+                    final String kind, mime, extension;
+                    if (pick.code == PICK_GALLERY_VID) { bytes = readCapped(uri, 60); kind = "video"; mime = "video/mp4"; extension = ".mp4"; }
+                    else if (pick.code == PICK_GALLERY_AUD) { bytes = readCapped(uri, 25); kind = "audio"; mime = "audio/mpeg"; extension = ".mp3"; }
+                    else { bytes = readScaledJpeg(uri, pick.code == PICK_AVATAR ? 640 : 1400); kind = "image"; mime = "image/jpeg"; extension = ".jpg"; }
+                    // Recheck typed fields and recipient on the UI before dispatch.
+                    runOnUiThread(() -> dispatchMedia(pick, bytes, kind, mime, extension));
+                } catch (Exception error) { runOnUiThread(() -> finishMedia(pick, null, error)); }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException unavailable) { finishMedia(pick, null, unavailable); }
+    }
+
+    private void dispatchMedia(MediaPick pick, byte[] bytes, String kind, String mime, String extension) {
+        if (activeMediaUpload != pick) return;
+        if (!mediaCurrent(pick)) { finishMedia(pick, null, null); return; }
+        if (bytes.length == 0) { finishMedia(pick, null, new Exception("cannot read file")); return; }
+        // Random suffix prevents two successful selections in the same millisecond colliding.
+        final String path = Hosting.slug(pick.handle) + "/media/" + kind + "-" + java.util.UUID.randomUUID() + extension;
+        try {
+            io.execute(() -> {
+                try {
+                    if (pick.cancelled || !pick.identity.equals(mediaIdentity()) || !mediaHostCurrent(pick)) {
+                        runOnUiThread(() -> finishMedia(pick, null, null)); return;
+                    }
+                    if (pick.code != PICK_DM_IMG && Hosting.TYPE_MAXIMA.equals(pick.host.type())) {
+                        final long usage = meshUsageBytes();
+                        if (usage > MAX_PROFILE_MESH_BYTES - bytes.length) {
+                            runOnUiThread(() -> {
+                                if (activeMediaUpload != pick) return;
+                                if (!mediaCurrent(pick)) { finishMedia(pick, null, null); return; }
+                                activeMediaUpload = null; mediaStatus(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_mesh_full, mibOf(usage), MAX_PROFILE_MESH_BYTES >> 20));
+                            });
+                            return;
+                        }
+                    }
+                    final String ref;
+                    try (Hosting.Uploader uploader = Hosting.forProfile(pick.host)) { ref = uploader.putFile(bytes, path, mime); }
+                    if (ref == null || ref.isEmpty()) throw new Exception("empty upload reference");
+                    runOnUiThread(() -> finishMedia(pick, new String[]{kind, ref, mime}, null));
+                } catch (Exception error) { runOnUiThread(() -> finishMedia(pick, null, error)); }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException unavailable) { finishMedia(pick, null, unavailable); }
+    }
+
+    private void finishMedia(MediaPick pick, String[] uploaded, Exception error) {
+        if (activeMediaUpload != pick) return;
+        activeMediaUpload = null;
+        if (isFinishing() || isDestroyed()) return;
+        if (!mediaCurrent(pick)) {
+            if (pick.identity.equals(mediaIdentity())) mediaStatus(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_changed)); else toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_changed));
+            return;
+        }
+        if (error != null) { mediaStatus(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_failed, mediaError(error))); return; }
+        if (uploaded == null) { mediaStatus(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_changed)); return; }
+        if (pick.code == PICK_DM_IMG) { sendDm("", uploaded[1], uploaded[2]); return; }
+        if (pick.code == PICK_AVATAR || pick.code == PICK_BANNER) {
+            String key = pick.code == PICK_AVATAR ? "avatar" : "banner";
+            EditText field = pick.code == PICK_AVATAR ? edAvatar : edBanner;
+            if (field != null) field.setText(uploaded[1]);
+            SalonStore.put(this, key, uploaded[1]); render();
+        } else promptMediaTitle(uploaded[0], uploaded[1]);
+        mediaStatus(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_uploaded));
+    }
+
+    private CharSequence mediaError(Exception error) {
+        String detail = error.getMessage();
+        if ("cannot read file".equals(detail) || "could not read image".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_read_failed);
+        if ("file too large (max 60 MB)".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_size, 60);
+        if ("file too large (max 25 MB)".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_size, 25);
+        if ("empty upload reference".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_no_reference);
+        return detail == null || detail.isEmpty() ? error.getClass().getSimpleName() : HoldingMessages.message(detail);
     }
 
     @Override protected void onActivityResult(int req, int res, Intent data) {
         super.onActivityResult(req, res, data);
+        if (req >= PICK_AVATAR && req <= PICK_DM_IMG) { receiveMedia(req, res, data); return; }
         if (res != RESULT_OK || data == null || data.getData() == null) return;
         final Uri uri = data.getData();
         final int r = req;
@@ -2278,57 +2438,6 @@ public class MainActivity extends AppCompatActivity {
             });
             return;
         }
-        if (r == PICK_DM_IMG) {   // DM photo: self-host via Maxima when ready, else the encrypted relay
-            toast("Sending photo…");
-            io.execute(() -> {
-                try {
-                    byte[] jpeg = readScaledJpeg(uri, 1400);
-                    // Prefer the Maxima mesh (you host it, no central relay). The encrypted-relay
-                    // fallback is RETIRED (MaxLite sunset) — fall back to the user's configured
-                    // default host instead, and if there's none, ask them to set one up.
-                    Hosting.Profile host = MaximaLink.isReady(this)
-                            ? Hosting.Profile.fresh(Hosting.TYPE_MAXIMA)
-                            : HostingStore.getDefault(this);
-                    if (host == null) { runOnUiThread(() -> toast("Set up hosting (or install Maxima) to send photos")); return; }
-                    String ref = Hosting.forProfile(host).putFile(jpeg, "dm.jpg", "image/jpeg");
-                    runOnUiThread(() -> sendDm("", ref, "image/jpeg"));
-                } catch (Exception e) { runOnUiThread(() -> toast("Photo failed: " + e.getMessage())); }
-            });
-            return;
-        }
-        toast("Uploading…");   // profStatus is at the bottom of a long scroll — give visible feedback here too
-        if (profStatus != null) profStatus.setText("Uploading…");
-        io.execute(() -> {
-            try {
-                String handle = SalonStore.get(this, "handle");
-                Hosting.Profile def = HostingStore.getDefault(this);
-                byte[] bytes; String ext, mime, kind;
-                if (r == PICK_GALLERY_VID) { bytes = readCapped(uri, 60); ext = ".mp4"; mime = "video/mp4"; kind = "video"; }
-                else if (r == PICK_GALLERY_AUD) { bytes = readCapped(uri, 25); ext = ".mp3"; mime = "audio/mpeg"; kind = "audio"; }
-                else { bytes = readScaledJpeg(uri, r == PICK_AVATAR ? 640 : 1400); ext = ".jpg"; mime = "image/jpeg"; kind = "image"; }
-                String rel = handle + "/media/" + kind + "-" + Long.toString(System.currentTimeMillis(), 36) + ext;
-                // Maxima mesh only: enforce the per-profile total BEFORE any IPC/publish, so a
-                // full profile fails instantly with clear guidance instead of a 90 s round trip.
-                if (Hosting.TYPE_MAXIMA.equals(def.type())) {
-                    long usage = meshUsageBytes();
-                    if (usage + bytes.length > MAX_PROFILE_MESH_BYTES) {
-                        final String msg = "Your Maxima profile is at " + mibOf(usage) + " / "
-                                + (MAX_PROFILE_MESH_BYTES >> 20) + " MB. Remove some media, or switch this "
-                                + "profile to a server host (SFTP/IPFS/GitHub) for unlimited size.";
-                        runOnUiThread(() -> { if (profStatus != null) profStatus.setText(msg); toast("Mesh profile full"); });
-                        return;
-                    }
-                }
-                final String url;
-                try (Hosting.Uploader up = Hosting.forProfile(def)) { url = up.putFile(bytes, rel, mime); }
-                runOnUiThread(() -> {
-                    if (r == PICK_AVATAR && edAvatar != null) { edAvatar.setText(url); SalonStore.put(this, "avatar", url); render(); }
-                    else if (r == PICK_BANNER && edBanner != null) { edBanner.setText(url); SalonStore.put(this, "banner", url); render(); }
-                    else promptMediaTitle(kind, url);
-                    if (profStatus != null) profStatus.setText("Uploaded.");
-                });
-            } catch (Exception e) { runOnUiThread(() -> { if (profStatus != null) profStatus.setText("Upload failed: " + e.getMessage()); }); }
-        });
     }
 
     private void promptMediaTitle(String kind, String url) {

@@ -39820,5 +39820,89 @@
     "zh-Hans": "播放",
     "ru": "Воспроизвести",
     "uk": "Відтворити"
+  },
+  "salonUpload.busy": {
+    "en": "A file selection or upload is already in progress.",
+    "zh-Hans": "文件选择或上传正在进行中。",
+    "ru": "Выбор или загрузка файла уже выполняется.",
+    "uk": "Вибір або завантаження файлу вже триває."
+  },
+  "salonUpload.host": {
+    "en": "Set up hosting before uploading a file.",
+    "zh-Hans": "请先设置存储服务，再上传文件。",
+    "ru": "Настройте хранилище перед загрузкой файла.",
+    "uk": "Налаштуйте сховище перед завантаженням файлу."
+  },
+  "salonUpload.choose": {
+    "en": "Choose a file",
+    "zh-Hans": "选择文件",
+    "ru": "Выберите файл",
+    "uk": "Виберіть файл"
+  },
+  "salonUpload.pickerFailed": {
+    "en": "Could not open the file picker. Try again.",
+    "zh-Hans": "无法打开文件选择器，请重试。",
+    "ru": "Не удалось открыть выбор файла. Повторите попытку.",
+    "uk": "Не вдалося відкрити вибір файлу. Спробуйте ще раз."
+  },
+  "salonUpload.reselect": {
+    "en": "The file selection expired. Please select the file again.",
+    "zh-Hans": "文件选择已失效，请重新选择。",
+    "ru": "Выбор файла устарел. Выберите файл заново.",
+    "uk": "Вибір файлу застарів. Виберіть файл знову."
+  },
+  "salonUpload.changed": {
+    "en": "The profile, chat, draft or destination changed. The upload result was not applied. Select the file again.",
+    "zh-Hans": "个人资料、聊天、草稿或目标存储已更改，上传结果未应用。请重新选择文件。",
+    "ru": "Профиль, чат, черновик или хранилище изменились. Результат загрузки не применён. Выберите файл заново.",
+    "uk": "Профіль, чат, чернетка або сховище змінилися. Результат завантаження не застосовано. Виберіть файл знову."
+  },
+  "salonUpload.sending": {
+    "en": "Uploading photo for this chat…",
+    "zh-Hans": "正在为此聊天上传照片…",
+    "ru": "Загрузка фото для этого чата…",
+    "uk": "Завантаження фото для цього чату…"
+  },
+  "salonUpload.uploading": {
+    "en": "Uploading…",
+    "zh-Hans": "正在上传…",
+    "ru": "Загрузка…",
+    "uk": "Завантаження…"
+  },
+  "salonUpload.meshFull": {
+    "en": "This profile uses {used} of the {limit} MB mesh allowance. Remove media or choose another hosting destination.",
+    "zh-Hans": "此个人资料已使用网状网络 {limit} MB 配额中的 {used}。请移除媒体或选择其他存储服务。",
+    "ru": "Профиль использует {used} из доступных в сети {limit} МБ. Удалите медиафайлы или выберите другое хранилище.",
+    "uk": "Профіль використовує {used} із доступних у мережі {limit} МБ. Видаліть медіафайли або виберіть інше сховище."
+  },
+  "salonUpload.failed": {
+    "en": "Upload failed: {error}",
+    "zh-Hans": "上传失败：{error}",
+    "ru": "Ошибка загрузки: {error}",
+    "uk": "Помилка завантаження: {error}"
+  },
+  "salonUpload.uploaded": {
+    "en": "Uploaded.",
+    "zh-Hans": "已上传。",
+    "ru": "Загружено.",
+    "uk": "Завантажено."
+  },
+  "salonUpload.readFailed": {
+    "en": "Could not read the selected file.",
+    "zh-Hans": "无法读取所选文件。",
+    "ru": "Не удалось прочитать выбранный файл.",
+    "uk": "Не вдалося прочитати вибраний файл."
+  },
+  "salonUpload.size": {
+    "en": "The selected file exceeds the {size} MB limit.",
+    "zh-Hans": "所选文件超过 {size} MB 限制。",
+    "ru": "Выбранный файл превышает лимит {size} МБ.",
+    "uk": "Вибраний файл перевищує обмеження {size} МБ."
+  },
+  "salonUpload.noReference": {
+    "en": "The host did not return a file reference.",
+    "zh-Hans": "存储服务未返回文件引用。",
+    "ru": "Хранилище не вернуло ссылку на файл.",
+    "uk": "Сховище не повернуло посилання на файл."
   }
 }

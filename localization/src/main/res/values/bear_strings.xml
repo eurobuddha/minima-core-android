@@ -7920,4 +7920,21 @@
     <string name="l10n_salon_media_forward_ten" formatted="false">"Forward 10 seconds"</string>
     <string name="l10n_salon_media_stop" formatted="false">"Stop playback"</string>
     <string name="l10n_salon_media_play" formatted="false">"Play"</string>
+    <string name="l10n_salon_upload_busy" formatted="false">"A file selection or upload is already in progress."</string>
+    <string name="l10n_salon_upload_host" formatted="false">"Set up hosting before uploading a file."</string>
+    <string name="l10n_salon_upload_choose" formatted="false">"Choose a file"</string>
+    <string name="l10n_salon_upload_picker_failed" formatted="false">"Could not open the file picker. Try again."</string>
+    <string name="l10n_salon_upload_reselect" formatted="false">"The file selection expired. Please select the file again."</string>
+    <string name="l10n_salon_upload_changed" formatted="false">"The profile, chat, draft or destination changed. The upload result was not applied. Select the file again."</string>
+    <string name="l10n_salon_upload_sending" formatted="false">"Uploading photo for this chat…"</string>
+    <string name="l10n_salon_upload_uploading" formatted="false">"Uploading…"</string>
+    <!-- Arguments: used, limit -->
+    <string name="l10n_salon_upload_mesh_full">"This profile uses %1$s of the %2$s MB mesh allowance. Remove media or choose another hosting destination."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_upload_failed">"Upload failed: %1$s"</string>
+    <string name="l10n_salon_upload_uploaded" formatted="false">"Uploaded."</string>
+    <string name="l10n_salon_upload_read_failed" formatted="false">"Could not read the selected file."</string>
+    <!-- Arguments: size -->
+    <string name="l10n_salon_upload_size">"The selected file exceeds the %1$s MB limit."</string>
+    <string name="l10n_salon_upload_no_reference" formatted="false">"The host did not return a file reference."</string>
 </resources>

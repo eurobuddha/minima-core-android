@@ -7992,4 +7992,21 @@
     <string name="l10n_salon_media_forward_ten" formatted="false">"Уперед на 10 секунд"</string>
     <string name="l10n_salon_media_stop" formatted="false">"Зупинити відтворення"</string>
     <string name="l10n_salon_media_play" formatted="false">"Відтворити"</string>
+    <string name="l10n_salon_upload_busy" formatted="false">"Вибір або завантаження файлу вже триває."</string>
+    <string name="l10n_salon_upload_host" formatted="false">"Налаштуйте сховище перед завантаженням файлу."</string>
+    <string name="l10n_salon_upload_choose" formatted="false">"Виберіть файл"</string>
+    <string name="l10n_salon_upload_picker_failed" formatted="false">"Не вдалося відкрити вибір файлу. Спробуйте ще раз."</string>
+    <string name="l10n_salon_upload_reselect" formatted="false">"Вибір файлу застарів. Виберіть файл знову."</string>
+    <string name="l10n_salon_upload_changed" formatted="false">"Профіль, чат, чернетка або сховище змінилися. Результат завантаження не застосовано. Виберіть файл знову."</string>
+    <string name="l10n_salon_upload_sending" formatted="false">"Завантаження фото для цього чату…"</string>
+    <string name="l10n_salon_upload_uploading" formatted="false">"Завантаження…"</string>
+    <!-- Arguments: used, limit -->
+    <string name="l10n_salon_upload_mesh_full">"Профіль використовує %1$s із доступних у мережі %2$s МБ. Видаліть медіафайли або виберіть інше сховище."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_upload_failed">"Помилка завантаження: %1$s"</string>
+    <string name="l10n_salon_upload_uploaded" formatted="false">"Завантажено."</string>
+    <string name="l10n_salon_upload_read_failed" formatted="false">"Не вдалося прочитати вибраний файл."</string>
+    <!-- Arguments: size -->
+    <string name="l10n_salon_upload_size">"Вибраний файл перевищує обмеження %1$s МБ."</string>
+    <string name="l10n_salon_upload_no_reference" formatted="false">"Сховище не повернуло посилання на файл."</string>
 </resources>

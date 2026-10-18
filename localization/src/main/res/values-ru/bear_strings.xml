@@ -7992,4 +7992,21 @@
     <string name="l10n_salon_media_forward_ten" formatted="false">"Вперёд на 10 секунд"</string>
     <string name="l10n_salon_media_stop" formatted="false">"Остановить воспроизведение"</string>
     <string name="l10n_salon_media_play" formatted="false">"Воспроизвести"</string>
+    <string name="l10n_salon_upload_busy" formatted="false">"Выбор или загрузка файла уже выполняется."</string>
+    <string name="l10n_salon_upload_host" formatted="false">"Настройте хранилище перед загрузкой файла."</string>
+    <string name="l10n_salon_upload_choose" formatted="false">"Выберите файл"</string>
+    <string name="l10n_salon_upload_picker_failed" formatted="false">"Не удалось открыть выбор файла. Повторите попытку."</string>
+    <string name="l10n_salon_upload_reselect" formatted="false">"Выбор файла устарел. Выберите файл заново."</string>
+    <string name="l10n_salon_upload_changed" formatted="false">"Профиль, чат, черновик или хранилище изменились. Результат загрузки не применён. Выберите файл заново."</string>
+    <string name="l10n_salon_upload_sending" formatted="false">"Загрузка фото для этого чата…"</string>
+    <string name="l10n_salon_upload_uploading" formatted="false">"Загрузка…"</string>
+    <!-- Arguments: used, limit -->
+    <string name="l10n_salon_upload_mesh_full">"Профиль использует %1$s из доступных в сети %2$s МБ. Удалите медиафайлы или выберите другое хранилище."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_upload_failed">"Ошибка загрузки: %1$s"</string>
+    <string name="l10n_salon_upload_uploaded" formatted="false">"Загружено."</string>
+    <string name="l10n_salon_upload_read_failed" formatted="false">"Не удалось прочитать выбранный файл."</string>
+    <!-- Arguments: size -->
+    <string name="l10n_salon_upload_size">"Выбранный файл превышает лимит %1$s МБ."</string>
+    <string name="l10n_salon_upload_no_reference" formatted="false">"Хранилище не вернуло ссылку на файл."</string>
 </resources>

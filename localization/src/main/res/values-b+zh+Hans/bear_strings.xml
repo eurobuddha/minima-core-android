@@ -7884,4 +7884,21 @@
     <string name="l10n_salon_media_forward_ten" formatted="false">"前进 10 秒"</string>
     <string name="l10n_salon_media_stop" formatted="false">"停止播放"</string>
     <string name="l10n_salon_media_play" formatted="false">"播放"</string>
+    <string name="l10n_salon_upload_busy" formatted="false">"文件选择或上传正在进行中。"</string>
+    <string name="l10n_salon_upload_host" formatted="false">"请先设置存储服务，再上传文件。"</string>
+    <string name="l10n_salon_upload_choose" formatted="false">"选择文件"</string>
+    <string name="l10n_salon_upload_picker_failed" formatted="false">"无法打开文件选择器，请重试。"</string>
+    <string name="l10n_salon_upload_reselect" formatted="false">"文件选择已失效，请重新选择。"</string>
+    <string name="l10n_salon_upload_changed" formatted="false">"个人资料、聊天、草稿或目标存储已更改，上传结果未应用。请重新选择文件。"</string>
+    <string name="l10n_salon_upload_sending" formatted="false">"正在为此聊天上传照片…"</string>
+    <string name="l10n_salon_upload_uploading" formatted="false">"正在上传…"</string>
+    <!-- Arguments: used, limit -->
+    <string name="l10n_salon_upload_mesh_full">"此个人资料已使用网状网络 %2$s MB 配额中的 %1$s。请移除媒体或选择其他存储服务。"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_upload_failed">"上传失败：%1$s"</string>
+    <string name="l10n_salon_upload_uploaded" formatted="false">"已上传。"</string>
+    <string name="l10n_salon_upload_read_failed" formatted="false">"无法读取所选文件。"</string>
+    <!-- Arguments: size -->
+    <string name="l10n_salon_upload_size">"所选文件超过 %1$s MB 限制。"</string>
+    <string name="l10n_salon_upload_no_reference" formatted="false">"存储服务未返回文件引用。"</string>
 </resources>
