@@ -1056,6 +1056,8 @@ public class MainActivity extends AppCompatActivity {
         reannHandler.removeCallbacks(reannTick);
         io.shutdownNow();
         stopAudio();
+        videoRequest++;
+        dismissVideo();
         proofRequests.close();
         if (node != null) node.onDestroy();   // release the DirectNodeApi receiver + cancel pending IPC timeouts
     }
@@ -2330,12 +2332,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void promptMediaTitle(String kind, String url) {
+        final java.util.function.BooleanSupplier current = editorDraftCurrent("gallery");
         LinearLayout box = dialogBox();
-        String label = kind.equals("audio") ? "Track title" : kind.equals("video") ? "Video title" : "Photo caption";
-        EditText t = field(box, label, "", false, kind.equals("audio") ? "Song name — artist" : "");
-        new android.app.AlertDialog.Builder(this).setTitle("Add to gallery").setView(box).setCancelable(false)
-                .setPositiveButton("Add", (d, w) -> addGalleryItem(kind, url, text(t)))
-                .setNegativeButton("Skip title", (d, w) -> addGalleryItem(kind, url, "")).show();
+        CharSequence label = kind.equals("audio") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_track_title) : kind.equals("video") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_video_title) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_photo_caption);
+        EditText t = field(box, label, "", false, kind.equals("audio") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_song_hint) : "");
+        new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_add_gallery)).setView(box).setCancelable(false)
+                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_add), (d, w) -> { if (current.getAsBoolean()) addGalleryItem(kind, url, text(t)); })
+                .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_skip_title), (d, w) -> { if (current.getAsBoolean()) addGalleryItem(kind, url, ""); }).show();
     }
 
     private void addGalleryItem(String kind, String url, String caption) {
@@ -2362,7 +2365,7 @@ public class MainActivity extends AppCompatActivity {
         col.setBackground(Design.ruled(this, Design.CARD(), Design.INK(), 1));
 
         LinearLayout head = new LinearLayout(this); head.setOrientation(LinearLayout.VERTICAL); head.setPadding(dp(11), dp(9), dp(11), dp(8));
-        String kindLabel = type.equals("audio") ? "MUSIC" : type.equals("video") ? "VIDEO" : "PHOTO";
+        CharSequence kindLabel = type.equals("audio") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_music) : type.equals("video") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_video) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_chat_photo);
         TextView kt = Design.text(this, kindLabel, 8.5f, Design.ACCENT(), Design.sansBold()); kt.setLetterSpacing(0.14f);
         head.addView(kt);
         if (!cap.isEmpty()) head.addView(Design.text(this, cap, 15, Design.INK(), Design.sansBold()));
@@ -2376,7 +2379,7 @@ public class MainActivity extends AppCompatActivity {
             col.addView(iv, new LinearLayout.LayoutParams(-1, -2));
         } else if ("video".equals(type)) {
             FrameLayout f = new FrameLayout(this); f.setBackgroundColor(0xFF141310);
-            TextView play = Design.text(this, "▶  TAP TO PLAY", 13, 0xFFF2F1EC, Design.sansBold()); play.setGravity(Gravity.CENTER);
+            TextView play = Design.text(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_tap_play), 13, 0xFFF2F1EC, Design.sansBold()); play.setGravity(Gravity.CENTER);
             f.addView(play, new FrameLayout.LayoutParams(-1, -1));
             f.setClickable(true); f.setOnClickListener(v -> openVideo(url));
             col.addView(f, new LinearLayout.LayoutParams(-1, dp(190)));
@@ -2384,7 +2387,7 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout ar = row(); ar.setPadding(dp(11), dp(2), dp(11), dp(12));
             TextView note = Design.text(this, "♪", 26, Design.INK(), Design.sansBold());
             ar.addView(note, new LinearLayout.LayoutParams(dp(38), -2));
-            ar.addView(btn("▶ Play", true, () -> playTrack(url, cap.isEmpty() ? "Untitled track" : cap)), new LinearLayout.LayoutParams(0, dp(46), 1));
+            ar.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_play_action), true, () -> playTrack(url, cap.isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_untitled) : cap)), new LinearLayout.LayoutParams(0, -2, 1));
             col.addView(ar);
         }
         return col;
@@ -2398,28 +2401,41 @@ public class MainActivity extends AppCompatActivity {
         d.setContentView(iv); d.show();
     }
 
+    private long videoRequest;
+    private Dialog videoDialog;
+
     private void openVideo(String url) {
-        if (url == null || url.isEmpty()) return;
+        if (url == null || url.isEmpty() || isFinishing() || isDestroyed()) return;
+        dismissVideo();
+        final long request = ++videoRequest;
         if (RelayResolver.isMediaRef(url)) {                 // decrypt to a cache file first
-            toast("Decrypting video…");
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_decrypt_video));
             io.execute(() -> { try { java.io.File f = RelayResolver.resolveToTempFile(this, url);
-                runOnUiThread(() -> playVideoUri(Uri.fromFile(f))); }
-                catch (Exception e) { runOnUiThread(() -> toast("Couldn't load video: " + e.getMessage())); } });
+                runOnUiThread(() -> { if (request == videoRequest && !isFinishing() && !isDestroyed()) playVideoUri(Uri.fromFile(f)); }); }
+                catch (Exception e) { runOnUiThread(() -> { if (request == videoRequest && !isFinishing() && !isDestroyed()) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_video_failed, e.getMessage())); }); } });
             return;
         }
         playVideoUri(Uri.parse(url));
     }
 
+    private void dismissVideo() {
+        // onDismiss is queued: detach the old owner before choosing the next request.
+        Dialog previous = videoDialog; videoDialog = null;
+        if (previous != null) previous.dismiss();
+    }
+
     private void playVideoUri(Uri uri) {
+        if (isFinishing() || isDestroyed()) return;
+        dismissVideo();
         Dialog d = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         VideoView vv = new VideoView(this);
         MediaController mc = new MediaController(this); mc.setAnchorView(vv);
         vv.setMediaController(mc); vv.setVideoURI(uri);
         FrameLayout fl = new FrameLayout(this); fl.setBackgroundColor(0xFF000000);
         fl.addView(vv, new FrameLayout.LayoutParams(-1, -1, Gravity.CENTER));
-        d.setContentView(fl); d.show();
-        vv.setOnPreparedListener(mp -> { mp.setLooping(false); vv.start(); mc.show(0); });
-        d.setOnDismissListener(x -> vv.stopPlayback());   // release the player so audio doesn't keep running after Back
+        videoDialog = d; d.setContentView(fl); d.show();
+        vv.setOnPreparedListener(mp -> { if (videoDialog != d || !d.isShowing() || isFinishing() || isDestroyed()) return; mp.setLooping(false); vv.start(); mc.show(0); });
+        d.setOnDismissListener(x -> { vv.stopPlayback(); if (videoDialog == d) { videoDialog = null; videoRequest++; } });   // release the player so audio doesn't keep running after Back
     }
 
     /* ---------- gallery as a collection: photo grid, video carousel, playlist ---------- */
@@ -2434,12 +2450,12 @@ public class MainActivity extends AppCompatActivity {
             String t = m.optString("type", "image");
             if ("audio".equals(t)) tracks.add(m); else if ("video".equals(t)) videos.add(m); else photos.add(m);
         }
-        if (!photos.isEmpty()) { c.addView(subLabel("Photos · " + photos.size()), lp(0, 10, 0, 6)); c.addView(photoGrid(photos)); }
-        if (!videos.isEmpty()) { c.addView(subLabel("Video · " + videos.size()), lp(0, 16, 0, 6)); c.addView(videoCarousel(videos)); }
-        if (!tracks.isEmpty()) { c.addView(subLabel("Music · " + tracks.size()), lp(0, 16, 0, 6)); c.addView(trackList(tracks)); }
+        if (!photos.isEmpty()) { c.addView(subLabel(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_photos, photos.size())), lp(0, 10, 0, 6)); c.addView(photoGrid(photos)); }
+        if (!videos.isEmpty()) { c.addView(subLabel(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_videos, videos.size())), lp(0, 16, 0, 6)); c.addView(videoCarousel(videos)); }
+        if (!tracks.isEmpty()) { c.addView(subLabel(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_tracks, tracks.size())), lp(0, 16, 0, 6)); c.addView(trackList(tracks)); }
     }
 
-    private TextView subLabel(String s) { TextView t = Design.text(this, s.toUpperCase(), 9f, Design.DIM(), Design.sansBold()); t.setLetterSpacing(0.14f); return t; }
+    private TextView subLabel(CharSequence s) { TextView t = Design.text(this, Language.upper(s), 9f, Design.DIM(), Design.sansBold()); t.setLetterSpacing(0.14f); return t; }
 
     private LinearLayout.LayoutParams cellLp(int col) { LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, -2, 1); if (col == 0) p.rightMargin = dp(4); else p.leftMargin = dp(4); return p; }
 
@@ -2485,7 +2501,7 @@ public class MainActivity extends AppCompatActivity {
         col.setBackground(Design.ruled(this, Design.CARD(), Design.INK(), 1));
         for (int i = 0; i < tracks.size(); i++) {
             JSONObject m = tracks.get(i); final String url = m.optString("url");
-            final String title = m.optString("caption", "").isEmpty() ? "Untitled track" : m.optString("caption");
+            final CharSequence title = m.optString("caption", "").isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_untitled) : m.optString("caption");
             LinearLayout r = row(); r.setPadding(dp(11), dp(11), dp(10), dp(11)); r.setClickable(true); Design.pressable(r);
             r.setOnClickListener(v -> playTrack(url, title));
             r.addView(Design.text(this, String.valueOf(i + 1), 12, Design.DIM(), Design.mono()), new LinearLayout.LayoutParams(dp(24), -2));
@@ -2510,18 +2526,21 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout top = new LinearLayout(this); top.setOrientation(LinearLayout.HORIZONTAL); top.setGravity(Gravity.CENTER_VERTICAL); top.setPadding(dp(16), dp(26), dp(16), dp(10));
         final TextView counter = Design.text(this, "", 13, 0xFFFFFFFF, Design.mono()); top.addView(counter, new LinearLayout.LayoutParams(0, -2, 1));
         TextView close = Design.text(this, "✕", 20, 0xFFFFFFFF, Design.sansBold()); close.setPadding(dp(10), dp(4), dp(10), dp(4)); close.setOnClickListener(v -> d.dismiss()); top.addView(close);
+        Language.description(close, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_language_close));
         root.addView(top, new FrameLayout.LayoutParams(-1, -2, Gravity.TOP));
 
         final TextView caption = Design.text(this, "", 14, 0xFFFFFFFF, Design.sans()); caption.setPadding(dp(16), dp(12), dp(16), dp(30)); caption.setBackgroundColor(0x99000000);
         root.addView(caption, new FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM));
 
         final TextView prev = navArrow("‹"), next = navArrow("›");
+        Language.description(prev, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_previous));
+        Language.description(next, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_next));
         FrameLayout.LayoutParams plp = new FrameLayout.LayoutParams(-2, -2, Gravity.START | Gravity.CENTER_VERTICAL); plp.leftMargin = dp(4); root.addView(prev, plp);
         FrameLayout.LayoutParams nlp = new FrameLayout.LayoutParams(-2, -2, Gravity.END | Gravity.CENTER_VERTICAL); nlp.rightMargin = dp(4); root.addView(next, nlp);
 
         final Runnable[] bind = new Runnable[1];
         bind[0] = () -> {
-            JSONObject m = items.get(idx[0]); counter.setText((idx[0] + 1) + " / " + items.size());
+            JSONObject m = items.get(idx[0]); Language.setText(counter, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_position, idx[0] + 1, items.size()));
             String cap = m.optString("caption", ""); caption.setText(cap); caption.setVisibility(cap.isEmpty() ? View.GONE : View.VISIBLE);
             ImageLoader.loadFull(this, m.optString("url"), img);
             prev.setVisibility(idx[0] > 0 ? View.VISIBLE : View.INVISIBLE); next.setVisibility(idx[0] < items.size() - 1 ? View.VISIBLE : View.INVISIBLE);
@@ -2561,6 +2580,7 @@ public class MainActivity extends AppCompatActivity {
             public void onStartTrackingTouch(SeekBar s) { miniSeeking = true; }
             public void onStopTrackingTouch(SeekBar s) { miniSeeking = false; }
         });
+        Language.description(miniBar, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_seek));
         miniPlayer.addView(miniBar, new LinearLayout.LayoutParams(-1, -2));
 
         LinearLayout r = new LinearLayout(this); r.setOrientation(LinearLayout.HORIZONTAL); r.setGravity(Gravity.CENTER_VERTICAL); r.setPadding(dp(12), dp(2), dp(6), dp(6));
@@ -2570,51 +2590,58 @@ public class MainActivity extends AppCompatActivity {
         miniTime = Design.text(this, "0:00", 10, Design.DIM(), Design.mono());
         col.addView(miniTitle); col.addView(miniTime);
         r.addView(col, new LinearLayout.LayoutParams(0, -2, 1));
-        r.addView(miniIcon("⏪", () -> seekRel(-10000)));
-        miniPlay = miniIcon("❚❚", this::togglePlay); r.addView(miniPlay);
-        r.addView(miniIcon("⏩", () -> seekRel(10000)));
-        r.addView(miniIcon("✕", this::stopAudio));
+        r.addView(miniIcon("⏪", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_back_ten), () -> seekRel(-10000)));
+        miniPlay = miniIcon("❚❚", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_logs_pause), this::togglePlay); r.addView(miniPlay);
+        r.addView(miniIcon("⏩", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_forward_ten), () -> seekRel(10000)));
+        r.addView(miniIcon("✕", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_stop), this::stopAudio));
         miniPlayer.addView(r, new LinearLayout.LayoutParams(-1, -2));
     }
 
-    private TextView miniIcon(String s, Runnable click) {
+    private TextView miniIcon(String s, CharSequence description, Runnable click) {
         TextView t = Design.text(this, s, 16, Design.INK(), Design.sansBold()); t.setGravity(Gravity.CENTER);
         t.setPadding(dp(10), dp(6), dp(10), dp(6)); t.setClickable(true); Design.pressable(t);
+        Language.description(t, description); t.setMinWidth(dp(48)); t.setMinHeight(dp(48));
         t.setOnClickListener(v -> click.run()); return t;
     }
 
     private int audioDur() { try { return audio == null ? 0 : audio.getDuration(); } catch (Exception e) { return 0; } }
     private void seekRel(int ms) { if (audio == null) return; try { int d = audioDur(); int np = audio.getCurrentPosition() + ms; if (np < 0) np = 0; if (d > 0 && np > d) np = d; audio.seekTo(np); } catch (Exception ignored) {} }
     private void togglePlay() { if (audio == null) return; try { if (audio.isPlaying()) audio.pause(); else audio.start(); updateMiniPlay(); } catch (Exception ignored) {} }
-    private void updateMiniPlay() { if (miniPlay == null) return; boolean playing = false; try { playing = audio != null && audio.isPlaying(); } catch (Exception ignored) {} miniPlay.setText(playing ? "❚❚" : "▶"); }
+    private void updateMiniPlay() { if (miniPlay == null) return; boolean playing = false; try { playing = audio != null && audio.isPlaying(); } catch (Exception ignored) {} miniPlay.setText(playing ? "❚❚" : "▶"); Language.description(miniPlay, playing ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_logs_pause) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_play)); }
 
     /** Start (or switch to) a track; it plays on regardless of screen changes,
      *  controlled from the docked mini-player until you hit ✕. */
-    private void playTrack(String url, String title) {
+    private long audioRequest;
+
+    private void playTrack(String url, CharSequence title) {
         if (url == null || url.isEmpty()) return;
+        if (isFinishing() || isDestroyed()) return;
+        stopAudio();
+        final long request = audioRequest;
         if (RelayResolver.isMediaRef(url)) {                 // decrypt to a cache file first
-            stopAudio(); miniTitle.setText(title); miniTime.setText("decrypting…"); miniBar.setProgress(0);
+            Language.setText(miniTitle, title); Language.setText(miniTime, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_decrypting)); miniBar.setProgress(0);
             miniPlayer.setVisibility(View.VISIBLE);
             io.execute(() -> { try { java.io.File f = RelayResolver.resolveToTempFile(this, url);
-                runOnUiThread(() -> playTrackSource(f.getAbsolutePath(), title)); }
-                catch (Exception e) { runOnUiThread(() -> { toast("Couldn't load track: " + e.getMessage()); stopAudio(); }); } });
+                runOnUiThread(() -> { if (request == audioRequest && !isFinishing() && !isDestroyed()) playTrackSource(f.getAbsolutePath(), title); }); }
+                catch (Exception e) { runOnUiThread(() -> { if (request != audioRequest || isFinishing() || isDestroyed()) return; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_track_failed, e.getMessage())); stopAudio(); }); } });
             return;
         }
         playTrackSource(url, title);
     }
 
-    private void playTrackSource(String source, String title) {
+    private void playTrackSource(String source, CharSequence title) {
+        if (isFinishing() || isDestroyed()) return;
         stopAudio();
         final MediaPlayer mp = new MediaPlayer(); audio = mp;
-        miniTitle.setText(title); miniTime.setText("0:00"); miniBar.setProgress(0);
+        Language.setText(miniTitle, title); miniTime.setText("0:00"); miniBar.setProgress(0);
         miniPlayer.setVisibility(View.VISIBLE); updateMiniPlay();
         try {
             mp.setDataSource(source);
-            mp.setOnPreparedListener(x -> { mp.start(); updateMiniPlay(); startTicker(); });
-            mp.setOnCompletionListener(x -> { miniBar.setProgress(1000); updateMiniPlay(); });
-            mp.setOnErrorListener((m, w, e) -> { toast("Playback error"); stopAudio(); return true; });
+            mp.setOnPreparedListener(x -> { if (audio != mp || isFinishing() || isDestroyed()) return; mp.start(); updateMiniPlay(); startTicker(); });
+            mp.setOnCompletionListener(x -> { if (audio != mp || isFinishing() || isDestroyed()) return; miniBar.setProgress(1000); updateMiniPlay(); });
+            mp.setOnErrorListener((m, w, e) -> { if (audio != mp || isFinishing() || isDestroyed()) return true; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_playback_error)); stopAudio(); return true; });
             mp.prepareAsync();
-        } catch (Exception e) { toast("Couldn't play: " + e.getMessage()); stopAudio(); }
+        } catch (Exception e) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_media_play_failed, e.getMessage())); stopAudio(); }
     }
 
     private void startTicker() {
@@ -2630,6 +2657,8 @@ public class MainActivity extends AppCompatActivity {
     private String fmtTime(int ms) { int s = ms / 1000; return s / 60 + ":" + String.format("%02d", s % 60); }
 
     private void stopAudio() {
+        audioRequest++;
+        miniSeeking = false;
         playback.removeCallbacksAndMessages(null);
         if (audio != null) { try { audio.release(); } catch (Exception ignored) {} audio = null; }
         if (miniPlayer != null) miniPlayer.setVisibility(View.GONE);

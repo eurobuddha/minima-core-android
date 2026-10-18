@@ -39670,5 +39670,155 @@
     "zh-Hans": "添加你持有 NFT 或代币的证明。访客通过自己的节点检查证明。结果可能会短暂缓存；旧证明可能需要刷新并重新发布。",
     "ru": "Добавьте доказательство владения NFT или токеном. Посетители проверяют его через свои узлы. Результат может ненадолго сохраняться в кэше; старое доказательство может потребовать обновления и повторной публикации.",
     "uk": "Додайте доказ володіння NFT або токеном. Відвідувачі перевіряють його через власні вузли. Результат може ненадовго зберігатися в кеші; старий доказ може потребувати оновлення й повторної публікації."
+  },
+  "salonMedia.trackTitle": {
+    "en": "Track title",
+    "zh-Hans": "曲目标题",
+    "ru": "Название композиции",
+    "uk": "Назва композиції"
+  },
+  "salonMedia.videoTitle": {
+    "en": "Video title",
+    "zh-Hans": "视频标题",
+    "ru": "Название видео",
+    "uk": "Назва відео"
+  },
+  "salonMedia.photoCaption": {
+    "en": "Photo caption",
+    "zh-Hans": "照片说明",
+    "ru": "Подпись к фото",
+    "uk": "Підпис до фото"
+  },
+  "salonMedia.songHint": {
+    "en": "Song name — artist",
+    "zh-Hans": "歌名 — 艺术家",
+    "ru": "Название — исполнитель",
+    "uk": "Назва — виконавець"
+  },
+  "salonMedia.addGallery": {
+    "en": "Add to gallery",
+    "zh-Hans": "添加到作品集",
+    "ru": "Добавить в галерею",
+    "uk": "Додати до галереї"
+  },
+  "salonMedia.skipTitle": {
+    "en": "Skip title",
+    "zh-Hans": "跳过标题",
+    "ru": "Без названия",
+    "uk": "Без назви"
+  },
+  "salonMedia.tapPlay": {
+    "en": "▶  TAP TO PLAY",
+    "zh-Hans": "▶  点击播放",
+    "ru": "▶  НАЖМИТЕ ДЛЯ ВОСПРОИЗВЕДЕНИЯ",
+    "uk": "▶  НАТИСНІТЬ ДЛЯ ВІДТВОРЕННЯ"
+  },
+  "salonMedia.playAction": {
+    "en": "▶ Play",
+    "zh-Hans": "▶ 播放",
+    "ru": "▶ Слушать",
+    "uk": "▶ Слухати"
+  },
+  "salonMedia.untitled": {
+    "en": "Untitled track",
+    "zh-Hans": "无标题曲目",
+    "ru": "Композиция без названия",
+    "uk": "Композиція без назви"
+  },
+  "salonMedia.decryptVideo": {
+    "en": "Decrypting video…",
+    "zh-Hans": "正在解密视频…",
+    "ru": "Расшифровка видео…",
+    "uk": "Розшифрування відео…"
+  },
+  "salonMedia.decrypting": {
+    "en": "decrypting…",
+    "zh-Hans": "正在解密…",
+    "ru": "расшифровка…",
+    "uk": "розшифрування…"
+  },
+  "salonMedia.playbackError": {
+    "en": "Playback error",
+    "zh-Hans": "播放错误",
+    "ru": "Ошибка воспроизведения",
+    "uk": "Помилка відтворення"
+  },
+  "salonMedia.videoFailed": {
+    "en": "Could not load video: {error}",
+    "zh-Hans": "无法加载视频：{error}",
+    "ru": "Не удалось загрузить видео: {error}",
+    "uk": "Не вдалося завантажити відео: {error}"
+  },
+  "salonMedia.trackFailed": {
+    "en": "Could not load track: {error}",
+    "zh-Hans": "无法加载曲目：{error}",
+    "ru": "Не удалось загрузить композицию: {error}",
+    "uk": "Не вдалося завантажити композицію: {error}"
+  },
+  "salonMedia.playFailed": {
+    "en": "Could not play: {error}",
+    "zh-Hans": "无法播放：{error}",
+    "ru": "Не удалось воспроизвести: {error}",
+    "uk": "Не вдалося відтворити: {error}"
+  },
+  "salonMedia.photos": {
+    "en": "Photos · {count}",
+    "zh-Hans": "照片 · {count}",
+    "ru": "Фото · {count}",
+    "uk": "Фото · {count}"
+  },
+  "salonMedia.videos": {
+    "en": "Video · {count}",
+    "zh-Hans": "视频 · {count}",
+    "ru": "Видео · {count}",
+    "uk": "Відео · {count}"
+  },
+  "salonMedia.tracks": {
+    "en": "Music · {count}",
+    "zh-Hans": "音乐 · {count}",
+    "ru": "Музыка · {count}",
+    "uk": "Музика · {count}"
+  },
+  "salonMedia.previous": {
+    "en": "Previous image",
+    "zh-Hans": "上一张图片",
+    "ru": "Предыдущее изображение",
+    "uk": "Попереднє зображення"
+  },
+  "salonMedia.position": {
+    "en": "{current} / {total}",
+    "zh-Hans": "{current} / {total}",
+    "ru": "{current} / {total}",
+    "uk": "{current} / {total}"
+  },
+  "salonMedia.seek": {
+    "en": "Playback position",
+    "zh-Hans": "播放位置",
+    "ru": "Позиция воспроизведения",
+    "uk": "Позиція відтворення"
+  },
+  "salonMedia.backTen": {
+    "en": "Back 10 seconds",
+    "zh-Hans": "后退 10 秒",
+    "ru": "Назад на 10 секунд",
+    "uk": "Назад на 10 секунд"
+  },
+  "salonMedia.forwardTen": {
+    "en": "Forward 10 seconds",
+    "zh-Hans": "前进 10 秒",
+    "ru": "Вперёд на 10 секунд",
+    "uk": "Уперед на 10 секунд"
+  },
+  "salonMedia.stop": {
+    "en": "Stop playback",
+    "zh-Hans": "停止播放",
+    "ru": "Остановить воспроизведение",
+    "uk": "Зупинити відтворення"
+  },
+  "salonMedia.play": {
+    "en": "Play",
+    "zh-Hans": "播放",
+    "ru": "Воспроизвести",
+    "uk": "Відтворити"
   }
 }

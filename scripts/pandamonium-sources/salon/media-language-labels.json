@@ -1,0 +1,18 @@
+{
+  "Track title": "salonMedia.trackTitle",
+  "Video title": "salonMedia.videoTitle",
+  "Photo caption": "salonMedia.photoCaption",
+  "Song name — artist": "salonMedia.songHint",
+  "Add to gallery": "salonMedia.addGallery",
+  "Skip title": "salonMedia.skipTitle",
+  "▶  TAP TO PLAY": "salonMedia.tapPlay",
+  "▶ Play": "salonMedia.playAction",
+  "Untitled track": "salonMedia.untitled",
+  "Decrypting video…": "salonMedia.decryptVideo",
+  "decrypting…": "salonMedia.decrypting",
+  "Playback error": "salonMedia.playbackError",
+  "Add": "mail.add",
+  "MUSIC": "salonEditor.music",
+  "VIDEO": "salonEditor.video",
+  "PHOTO": "chat.photo"
+}

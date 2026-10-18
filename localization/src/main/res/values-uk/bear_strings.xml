@@ -7960,4 +7960,36 @@
     <!-- Arguments: handle -->
     <string name="l10n_salon_editor_verify_help">"Імена не унікальні — будь-хто може використовувати @%1$s. Щоб пов’язати особу зі своїм доменом, розмістіть на ньому файл з ID вашого токена й вставте сюди посилання. Після перевірки з’явиться позначка."</string>
     <string name="l10n_salon_editor_showcase_help" formatted="false">"Додайте доказ володіння NFT або токеном. Відвідувачі перевіряють його через власні вузли. Результат може ненадовго зберігатися в кеші; старий доказ може потребувати оновлення й повторної публікації."</string>
+    <string name="l10n_salon_media_track_title" formatted="false">"Назва композиції"</string>
+    <string name="l10n_salon_media_video_title" formatted="false">"Назва відео"</string>
+    <string name="l10n_salon_media_photo_caption" formatted="false">"Підпис до фото"</string>
+    <string name="l10n_salon_media_song_hint" formatted="false">"Назва — виконавець"</string>
+    <string name="l10n_salon_media_add_gallery" formatted="false">"Додати до галереї"</string>
+    <string name="l10n_salon_media_skip_title" formatted="false">"Без назви"</string>
+    <string name="l10n_salon_media_tap_play" formatted="false">"▶  НАТИСНІТЬ ДЛЯ ВІДТВОРЕННЯ"</string>
+    <string name="l10n_salon_media_play_action" formatted="false">"▶ Слухати"</string>
+    <string name="l10n_salon_media_untitled" formatted="false">"Композиція без назви"</string>
+    <string name="l10n_salon_media_decrypt_video" formatted="false">"Розшифрування відео…"</string>
+    <string name="l10n_salon_media_decrypting" formatted="false">"розшифрування…"</string>
+    <string name="l10n_salon_media_playback_error" formatted="false">"Помилка відтворення"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_media_video_failed">"Не вдалося завантажити відео: %1$s"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_media_track_failed">"Не вдалося завантажити композицію: %1$s"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_media_play_failed">"Не вдалося відтворити: %1$s"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_media_photos">"Фото · %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_media_videos">"Відео · %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_media_tracks">"Музика · %1$d"</string>
+    <string name="l10n_salon_media_previous" formatted="false">"Попереднє зображення"</string>
+    <!-- Arguments: current, total -->
+    <string name="l10n_salon_media_position">"%1$s / %2$s"</string>
+    <string name="l10n_salon_media_seek" formatted="false">"Позиція відтворення"</string>
+    <string name="l10n_salon_media_back_ten" formatted="false">"Назад на 10 секунд"</string>
+    <string name="l10n_salon_media_forward_ten" formatted="false">"Уперед на 10 секунд"</string>
+    <string name="l10n_salon_media_stop" formatted="false">"Зупинити відтворення"</string>
+    <string name="l10n_salon_media_play" formatted="false">"Відтворити"</string>
 </resources>

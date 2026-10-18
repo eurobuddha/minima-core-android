@@ -7888,4 +7888,36 @@
     <!-- Arguments: handle -->
     <string name="l10n_salon_editor_verify_help">"Handles are not unique — anyone can use @%1$s. To link your identity to your domain, host a file containing your token ID and paste its URL here. A badge appears after verification."</string>
     <string name="l10n_salon_editor_showcase_help" formatted="false">"Add proof that you hold an NFT or token. Viewers check the proof using their own nodes. Results may be cached briefly; an old proof may need to be refreshed and published again."</string>
+    <string name="l10n_salon_media_track_title" formatted="false">"Track title"</string>
+    <string name="l10n_salon_media_video_title" formatted="false">"Video title"</string>
+    <string name="l10n_salon_media_photo_caption" formatted="false">"Photo caption"</string>
+    <string name="l10n_salon_media_song_hint" formatted="false">"Song name — artist"</string>
+    <string name="l10n_salon_media_add_gallery" formatted="false">"Add to gallery"</string>
+    <string name="l10n_salon_media_skip_title" formatted="false">"Skip title"</string>
+    <string name="l10n_salon_media_tap_play" formatted="false">"▶  TAP TO PLAY"</string>
+    <string name="l10n_salon_media_play_action" formatted="false">"▶ Play"</string>
+    <string name="l10n_salon_media_untitled" formatted="false">"Untitled track"</string>
+    <string name="l10n_salon_media_decrypt_video" formatted="false">"Decrypting video…"</string>
+    <string name="l10n_salon_media_decrypting" formatted="false">"decrypting…"</string>
+    <string name="l10n_salon_media_playback_error" formatted="false">"Playback error"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_media_video_failed">"Could not load video: %1$s"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_media_track_failed">"Could not load track: %1$s"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_media_play_failed">"Could not play: %1$s"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_media_photos">"Photos · %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_media_videos">"Video · %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_media_tracks">"Music · %1$d"</string>
+    <string name="l10n_salon_media_previous" formatted="false">"Previous image"</string>
+    <!-- Arguments: current, total -->
+    <string name="l10n_salon_media_position">"%1$s / %2$s"</string>
+    <string name="l10n_salon_media_seek" formatted="false">"Playback position"</string>
+    <string name="l10n_salon_media_back_ten" formatted="false">"Back 10 seconds"</string>
+    <string name="l10n_salon_media_forward_ten" formatted="false">"Forward 10 seconds"</string>
+    <string name="l10n_salon_media_stop" formatted="false">"Stop playback"</string>
+    <string name="l10n_salon_media_play" formatted="false">"Play"</string>
 </resources>
