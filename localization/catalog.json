@@ -18720,10 +18720,10 @@
     "uk": "Розділити на монети (1–20, необов’язково)"
   },
   "nft.send.equalCoins": {
-    "en": "{quantity} equal coins",
-    "zh-Hans": "{quantity} 个等额币",
-    "ru": "Равных монет: {quantity}",
-    "uk": "Рівних монет: {quantity}"
+    "en": "{quantity} coins; any rounding remainder goes in the last coin",
+    "zh-Hans": "{quantity} 个币；舍入余数计入最后一个币",
+    "ru": "Монет: {quantity}; остаток от округления — в последней монете",
+    "uk": "Монет: {quantity}; залишок від округлення — в останній монеті"
   },
   "nft.send.nodeChosen": {
     "en": "chosen by the node",

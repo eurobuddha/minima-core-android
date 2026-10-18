@@ -3587,7 +3587,7 @@
     <string name="l10n_nft_send_split_range" formatted="false">"拆分数量必须在 1 到 20 之间。"</string>
     <string name="l10n_nft_send_split_label" formatted="false">"拆分成币（1–20，可选）"</string>
     <!-- Arguments: quantity -->
-    <string name="l10n_nft_send_equal_coins">"%1$s 个等额币"</string>
+    <string name="l10n_nft_send_equal_coins">"%1$s 个币；舍入余数计入最后一个币"</string>
     <string name="l10n_nft_send_node_chosen" formatted="false">"由节点选择"</string>
     <string name="l10n_nft_send_warning_quick" formatted="false">"提交后无法撤销。继续前请核对收款地址。"</string>
     <string name="l10n_nft_send_bad_token_id" formatted="false">"代币 ID 格式错误，无法构建命令。"</string>

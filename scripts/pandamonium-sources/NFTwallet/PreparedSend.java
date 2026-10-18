@@ -1,6 +1,7 @@
 package com.eurobuddha.nftwallet;
 
 import org.json.JSONObject;
+import org.json.JSONArray;
 import java.util.*;
 
 /** Node-native coin selection, with an acknowledged exact intent before signing or posting. */
@@ -12,6 +13,7 @@ final class PreparedSend {
     private final String handle="nft_send_"+UUID.randomUUID().toString().replace("-","");
     private String historyId, signedFile;
     private JSONObject draft, intent;
+    private int decimals;
     private boolean started, prepared, finished;
 
     PreparedSend(MainActivity act,String recipient,String amount,String burn,int split,String token,String tokenName,TxnBuilder.Done done) {
@@ -19,11 +21,22 @@ final class PreparedSend {
     }
     void run() {
         if(started)return;started=true;
-        try { PreparedSendEvidence.request(recipient,amount,token,burn,split); }
+        final String destinations;
+        try {
+            PreparedSendEvidence.request(recipient,amount,token,burn,split);
+            if(split==1)destinations="address:"+recipient+" amount:"+amount;
+            else {
+                decimals=Util.isMinima(token)?44:act.tokenDecimals(token);
+                JSONArray multi=new JSONArray();
+                for(String value:PreparedSendEvidence.splitAmounts(amount,split,decimals))multi.put(recipient+":"+value);
+                destinations="multi:"+multi;
+            }
+        }
         catch(RuntimeException invalid){finished=true;done.onFailed(TransactionEvidence.INVALID);return;}
         historyId=TxnUtil.recordPosting(act,recipient,amount,token,tokenName,null,null,null,burn);
         if(historyId==null){finished=true;done.onFailed(TransactionEvidence.SAVE_FAILED);return;}
-        String command="sendnosign address:"+recipient+" amount:"+amount+" tokenid:"+token+" split:"+split
+        // Explicit outputs avoid sendnosign's split rounding loss; the node still chooses inputs/change/burn.
+        String command="sendnosign "+destinations+" tokenid:"+token+" split:1"
                 +" burn:"+PreparedSendEvidence.fee(burn)+" file:"+handle+".txn";
         act.node().cmd(command,new NodeApi.Cb() {
             @Override public void onResult(JSONObject reply){if(!finished)viewUnsigned();}
@@ -43,7 +56,8 @@ final class PreparedSend {
     private void checkOwned(List<String> addresses,int index,Set<String> verified) {
         if(finished)return;
         if(index>=addresses.size()) {
-            try { intent=PreparedSendEvidence.quick(draft,recipient,amount,token,burn,split,verified); }
+            try { intent=split==1?PreparedSendEvidence.quick(draft,recipient,amount,token,burn,split,verified)
+                    :PreparedSendEvidence.quickSplit(draft,recipient,amount,token,burn,split,verified,decimals); }
             catch(RuntimeException invalid){fail(TransactionEvidence.INVALID);return;}
             try {
                 if(!act.history().prepareAttempt(historyId,handle,intent)){fail(TransactionEvidence.RECORD_FAILED);return;}

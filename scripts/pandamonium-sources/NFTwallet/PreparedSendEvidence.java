@@ -2,6 +2,7 @@ package com.eurobuddha.nftwallet;
 
 import org.json.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /** Freeze the node's unsigned selection, preserving its split, change and separate burn transaction. */
@@ -10,6 +11,21 @@ final class PreparedSendEvidence {
     static void request(String recipient,String amount,String token,String burn,int split) {
         if(!Util.isValidAddress(recipient)||!Util.isValidAmount(amount)||new BigDecimal(amount).signum()<=0
                 ||!Util.isValidHexId(token)||!Util.isValidAmount(fee(burn))||split<1||split>20)throw TransactionEvidence.invalid();
+    }
+    /** WalletTools.doSplit arithmetic: round down, then retain the remainder in the last coin. */
+    static List<String> splitAmounts(String amount,int split,int decimals) {
+        if(!Util.isValidAmount(amount)||split<1||split>20||decimals<0||decimals>44)throw TransactionEvidence.invalid();
+        BigDecimal total=new BigDecimal(amount);
+        if(total.signum()<=0||Util.decimalPlaces(total)>decimals)throw TransactionEvidence.invalid();
+        BigDecimal each=total.divide(new BigDecimal(split),decimals,RoundingMode.DOWN);
+        if(each.signum()<=0)throw TransactionEvidence.invalid();
+        BigDecimal last=total.subtract(each.multiply(new BigDecimal(split-1)));
+        List<String> values=new ArrayList<>();
+        for(int i=0;i<split;i++)values.add((i==split-1?last:each).stripTrailingZeros().toPlainString());
+        return Collections.unmodifiableList(values);
+    }
+    static JSONObject quickSplit(JSONObject reply,String recipient,String amount,String token,String burn,int split,Set<String> owned,int decimals) {
+        return quick(reply,recipient,amount,token,burn,split,owned,splitAmounts(amount,split,decimals));
     }
     static String fee(String burn){return burn==null||burn.isEmpty()?"0":burn;}
     private static JSONObject body(JSONObject reply){JSONObject b=TransactionEvidence.txpow(reply).optJSONObject("body");if(b==null)throw TransactionEvidence.invalid();return b;}
@@ -33,6 +49,9 @@ final class PreparedSendEvidence {
                 &&TransactionEvidence.nonzeroId(script,"publickey")!=null;}catch(RuntimeException invalid){return false;}
     }
     static JSONObject quick(JSONObject reply,String recipient,String amount,String token,String burn,int split,Set<String> owned) {
+        return quick(reply,recipient,amount,token,burn,split,owned,null);
+    }
+    private static JSONObject quick(JSONObject reply,String recipient,String amount,String token,String burn,int split,Set<String> owned,List<String> plannedAmounts) {
         request(recipient,amount,token,burn,split);
         JSONObject b=body(reply),main=b.optJSONObject("txn");JSONArray outs=outputs(main);
         Set<String> needed=ownedOutputs(reply,split,false);
@@ -40,7 +59,8 @@ final class PreparedSendEvidence {
         BigDecimal total=BigDecimal.ZERO;String each=null;
         for(int i=0;i<split;i++) {
             JSONObject out=outs.optJSONObject(i);String value=TransactionEvidence.amount(out,token);
-            if(!BurialEvidence.addressIs(out,recipient)||(each!=null&&!each.equals(value)))throw TransactionEvidence.invalid();
+            if(!BurialEvidence.addressIs(out,recipient))throw TransactionEvidence.invalid();
+            if(plannedAmounts==null ? each!=null&&!each.equals(value) : !plannedAmounts.get(i).equals(value))throw TransactionEvidence.invalid();
             each=value;total=total.add(new BigDecimal(value));
         }
         if(total.compareTo(new BigDecimal(amount))!=0)throw TransactionEvidence.invalid();

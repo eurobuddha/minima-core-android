@@ -3659,7 +3659,7 @@
     <string name="l10n_nft_send_split_range" formatted="false">"Количество частей должно быть от 1 до 20."</string>
     <string name="l10n_nft_send_split_label" formatted="false">"Разделить на монеты (1–20, необязательно)"</string>
     <!-- Arguments: quantity -->
-    <string name="l10n_nft_send_equal_coins">"Равных монет: %1$s"</string>
+    <string name="l10n_nft_send_equal_coins">"Монет: %1$s; остаток от округления — в последней монете"</string>
     <string name="l10n_nft_send_node_chosen" formatted="false">"выбирает узел"</string>
     <string name="l10n_nft_send_warning_quick" formatted="false">"После отправки отмена невозможна. Прежде чем продолжить, проверьте адрес получателя."</string>
     <string name="l10n_nft_send_bad_token_id" formatted="false">"Некорректный ID токена — команда не будет создана."</string>

@@ -3611,7 +3611,7 @@
     <string name="l10n_nft_send_split_range" formatted="false">"Split must be between 1 and 20."</string>
     <string name="l10n_nft_send_split_label" formatted="false">"Split into coins (1–20, optional)"</string>
     <!-- Arguments: quantity -->
-    <string name="l10n_nft_send_equal_coins">"%1$s equal coins"</string>
+    <string name="l10n_nft_send_equal_coins">"%1$s coins; any rounding remainder goes in the last coin"</string>
     <string name="l10n_nft_send_node_chosen" formatted="false">"chosen by the node"</string>
     <string name="l10n_nft_send_warning_quick" formatted="false">"Once posted, this cannot be undone. Verify the recipient address before continuing."</string>
     <string name="l10n_nft_send_bad_token_id" formatted="false">"That token\'s id is malformed — refusing to build the command."</string>

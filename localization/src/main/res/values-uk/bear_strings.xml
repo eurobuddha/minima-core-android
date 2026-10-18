@@ -3659,7 +3659,7 @@
     <string name="l10n_nft_send_split_range" formatted="false">"Кількість частин має бути від 1 до 20."</string>
     <string name="l10n_nft_send_split_label" formatted="false">"Розділити на монети (1–20, необов’язково)"</string>
     <!-- Arguments: quantity -->
-    <string name="l10n_nft_send_equal_coins">"Рівних монет: %1$s"</string>
+    <string name="l10n_nft_send_equal_coins">"Монет: %1$s; залишок від округлення — в останній монеті"</string>
     <string name="l10n_nft_send_node_chosen" formatted="false">"вибирає вузол"</string>
     <string name="l10n_nft_send_warning_quick" formatted="false">"Після надсилання скасування неможливе. Перш ніж продовжити, перевірте адресу одержувача."</string>
     <string name="l10n_nft_send_bad_token_id" formatted="false">"Некоректний ID токена — команду не буде створено."</string>
