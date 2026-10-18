@@ -8011,4 +8011,12 @@
     <!-- Arguments: error -->
     <string name="l10n_salon_settings_read_failed">"Could not read file: %1$s"</string>
     <string name="l10n_salon_settings_qr_failed" formatted="false">"Could not render QR code."</string>
+    <string name="l10n_salon_backup_busy" formatted="false">"A backup or restore is already in progress."</string>
+    <string name="l10n_salon_backup_changed" formatted="false">"Your Salon identity changed. Start the backup or restore again."</string>
+    <string name="l10n_salon_backup_unavailable" formatted="false">"Could not start the backup operation. Reopen Salon and try again."</string>
+    <string name="l10n_salon_backup_reselect" formatted="false">"This file request is no longer active. Start the backup or restore again."</string>
+    <string name="l10n_salon_backup_document" formatted="false">"Choose a document using the system file picker."</string>
+    <string name="l10n_salon_backup_save_incomplete" formatted="false">"Could not finish saving. The destination may contain a partial file; check it before using this backup."</string>
+    <string name="l10n_salon_backup_too_large" formatted="false">"This backup exceeds the 20 MB limit."</string>
+    <string name="l10n_salon_backup_read_failed" formatted="false">"Could not read the backup file. Select it again or use another copy."</string>
 </resources>

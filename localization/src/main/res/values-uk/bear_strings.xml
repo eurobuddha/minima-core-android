@@ -8083,4 +8083,12 @@
     <!-- Arguments: error -->
     <string name="l10n_salon_settings_read_failed">"Не вдалося прочитати файл: %1$s"</string>
     <string name="l10n_salon_settings_qr_failed" formatted="false">"Не вдалося створити QR-код."</string>
+    <string name="l10n_salon_backup_busy" formatted="false">"Резервне копіювання або відновлення вже виконується."</string>
+    <string name="l10n_salon_backup_changed" formatted="false">"Ваша особа Salon змінилася. Почніть резервне копіювання або відновлення знову."</string>
+    <string name="l10n_salon_backup_unavailable" formatted="false">"Не вдалося почати операцію з резервною копією. Відкрийте Salon знову та повторіть."</string>
+    <string name="l10n_salon_backup_reselect" formatted="false">"Цей запит файлу більше не активний. Почніть резервне копіювання або відновлення знову."</string>
+    <string name="l10n_salon_backup_document" formatted="false">"Виберіть документ через системний вибір файлів."</string>
+    <string name="l10n_salon_backup_save_incomplete" formatted="false">"Не вдалося завершити збереження. Файл може бути записано частково; перевірте його перед використанням резервної копії."</string>
+    <string name="l10n_salon_backup_too_large" formatted="false">"Ця резервна копія перевищує ліміт 20 МБ."</string>
+    <string name="l10n_salon_backup_read_failed" formatted="false">"Не вдалося прочитати резервну копію. Виберіть файл знову або скористайтеся іншою копією."</string>
 </resources>

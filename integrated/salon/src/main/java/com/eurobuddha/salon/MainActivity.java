@@ -834,34 +834,211 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /** One owned backup operation; no plaintext secret is put in saved-instance state. */
+    private static final java.util.concurrent.atomic.AtomicInteger NEXT_BACKUP_REQUEST = new java.util.concurrent.atomic.AtomicInteger(1000);
+    private static final class BackupOperation {
+        final int code, requestCode;
+        final String owner;
+        volatile boolean cancelled;
+        boolean picker;
+        String content;
+        BackupOperation(int code, String owner) {
+            this.code = code; this.owner = owner;
+            requestCode = code == 0 ? 0 : NEXT_BACKUP_REQUEST.getAndIncrement();
+        }
+    }
+    private BackupOperation backupOperation;
+    private volatile boolean backupClosed;
+
+    private String backupOwner() {
+        JSONObject record = SalonStore.identityRecord(this);
+        return new JSONArray().put(record.optString("tokenid")).put(record.optString("handle"))
+                .put(record.optString("msgpk")).put(record.optString("msgseed")).toString();
+    }
+
+    private BackupOperation beginBackup(int code) {
+        if (backupClosed || isFinishing() || isDestroyed()) return null;
+        if (backupOperation != null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_busy)); return null; }
+        try {
+            BackupOperation operation = new BackupOperation(code, backupOwner());
+            if (operation.requestCode > 65535) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_unavailable)); return null; }
+            return backupOperation = operation;
+        } catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); return null; }
+    }
+
+    private boolean backupCurrent(BackupOperation operation) {
+        if (backupClosed || operation.cancelled) return false;
+        try { return operation.owner.equals(backupOwner()); }
+        catch (SalonComms.IdentityUnavailable unavailable) { return false; }
+    }
+
+    private void backupNotice(CharSequence message) {
+        if (!backupClosed && !isFinishing() && !isDestroyed()) toast(message);
+    }
+
+    private void finishBackup(BackupOperation operation, CharSequence notice) {
+        if (backupOperation != operation) return;
+        backupOperation = null; operation.content = null;
+        if (!backupClosed && !isFinishing() && !isDestroyed() && notice != null) toast(notice);
+    }
+
+    private void cancelBackup() {
+        backupClosed = true;
+        if (backupOperation != null) {
+            backupOperation.cancelled = true; backupOperation.content = null; backupOperation = null;
+        }
+    }
+
     private void backupAccount() {
-        io.execute(() -> {
-            try {
-                String backup = buildBackupJson();
-                runOnUiThread(() -> {
-                    if (!isFinishing() && !isDestroyed()) saveTextFile("salon-backup.json", backup);
-                });
-            } catch (Crypt.Unavailable unavailable) { runOnUiThread(this::hostingSecretUnavailable); }
-            catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); }
-        });
+        final BackupOperation operation = beginBackup(SAVE_TEXT);
+        if (operation == null) return;
+        try {
+            io.execute(() -> {
+                try {
+                    final String content;
+                    // Serialize key changes; recheck the captured owner before launching the picker.
+                    // Hosting decryption must not hold the profile-edit lock.
+                    synchronized (SalonComms.class) {
+                        if (!backupCurrent(operation)) { runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_changed))); return; }
+                        content = buildBackupJson();
+                    }
+                    if (content.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 20 * 1024 * 1024) {
+                        runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_too_large))); return;
+                    }
+                    runOnUiThread(() -> launchBackupSave(operation, "salon-backup.json", content));
+                } catch (Crypt.Unavailable unavailable) { runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_unavailable))); }
+                catch (SalonComms.IdentityUnavailable unavailable) { runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_unavailable))); }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException unavailable) { finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_unavailable)); }
     }
 
     private void backupMsgKey() {
-        io.execute(() -> {
-            final String seed;
-            try { seed = SalonComms.exportSeed(this); }
-            catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); return; }
-            runOnUiThread(() -> {
-                if (isFinishing() || isDestroyed()) return;
-                if (seed.isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_no_key)); return; }
-                LinearLayout box = dialogBox();
-                box.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_help)), lp(0, 2, 0, 8));
-                TextView t = Design.text(this, seed, 12, Design.INK(), Design.mono()); t.setOnClickListener(v -> copyMessagingKey(seed)); box.addView(t);
-                new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_backup_key)).setView(box)
-                        .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_save_file), (d, w) -> saveTextFile("salon-messaging-key.txt", seed))
-                        .setNeutralButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_copy), (d, w) -> copyMessagingKey(seed))
-                        .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_language_close), null).show();
+        final BackupOperation operation = beginBackup(0);
+        if (operation == null) return;
+        try {
+            io.execute(() -> {
+                try {
+                    final String seed;
+                    synchronized (SalonComms.class) {
+                        if (!backupCurrent(operation)) { runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_changed))); return; }
+                        seed = SalonComms.exportSeed(this);
+                    }
+                    runOnUiThread(() -> {
+                        if (backupOperation != operation) return;
+                        if (!backupCurrent(operation) || isFinishing() || isDestroyed()) { finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_changed)); return; }
+                        finishBackup(operation, null);
+                        if (seed.isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_no_key)); return; }
+                        LinearLayout box = dialogBox();
+                        box.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_help)), lp(0, 2, 0, 8));
+                        TextView t = Design.text(this, seed, 12, Design.INK(), Design.mono());
+                        t.setOnClickListener(v -> { if (backupDialogCurrent(operation)) copyMessagingKey(seed); }); box.addView(t);
+                        new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_backup_key)).setView(box)
+                                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_save_file), (d, w) -> { if (backupDialogCurrent(operation)) saveTextFile("salon-messaging-key.txt", seed); })
+                                .setNeutralButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_copy), (d, w) -> { if (backupDialogCurrent(operation)) copyMessagingKey(seed); })
+                                .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_language_close), null).show();
+                    });
+                } catch (SalonComms.IdentityUnavailable unavailable) { runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_unavailable))); }
             });
+        } catch (java.util.concurrent.RejectedExecutionException unavailable) { finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_unavailable)); }
+    }
+
+    private boolean backupDialogCurrent(BackupOperation operation) {
+        if (isFinishing() || isDestroyed() || backupClosed) return false;
+        if (!backupCurrent(operation)) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_changed)); return false; }
+        return true;
+    }
+
+    private void saveTextFile(String suggestedName, String content) {
+        final BackupOperation operation = beginBackup(SAVE_TEXT);
+        if (operation != null) launchBackupSave(operation, suggestedName, content);
+    }
+
+    private void launchBackupSave(BackupOperation operation, String suggestedName, String content) {
+        if (backupOperation != operation) return;
+        if (!backupDialogCurrent(operation)) { finishBackup(operation, null); return; }
+        operation.content = content; operation.picker = true;
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
+                .setType("text/plain").putExtra(Intent.EXTRA_TITLE, suggestedName);
+        try { startActivityForResult(intent, operation.requestCode); }
+        catch (RuntimeException unavailable) { finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_no_save_app)); }
+    }
+
+    private void restoreFromFile() {
+        final BackupOperation operation = beginBackup(OPEN_BACKUP);
+        if (operation == null) return;
+        operation.picker = true;
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");
+        try { startActivityForResult(intent, operation.requestCode); }
+        catch (RuntimeException unavailable) { finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_no_open_app)); }
+    }
+
+    private void receiveBackupFile(int requestCode, int result, Intent data) {
+        final BackupOperation operation = backupOperation;
+        if (operation == null || operation.requestCode != requestCode || !operation.picker) {
+            if (result == RESULT_OK && !backupClosed && !isFinishing() && !isDestroyed()) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_reselect));
+            return;
+        }
+        final int code = operation.code;
+        operation.picker = false; // Consume once, including cancellation and malformed results.
+        if (result != RESULT_OK || data == null || data.getData() == null) { finishBackup(operation, null); return; }
+        if (!backupCurrent(operation)) { finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_changed)); return; }
+        final Uri uri = data.getData();
+        if (!"content".equals(uri.getScheme())) { finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_document)); return; }
+        final String content = operation.content; operation.content = null;
+        try {
+            io.execute(() -> {
+                try {
+                    if (!backupCurrent(operation)) { runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_changed))); return; }
+                    if (code == SAVE_TEXT) {
+                        // Match TradeExportWriter.writeTo: truncate, close, then report success.
+                        if (content == null) throw new java.io.IOException("missing backup");
+                        try (java.io.OutputStream out = getContentResolver().openOutputStream(uri, "wt")) {
+                            if (out == null) throw new java.io.IOException("cannot open document");
+                            if (!backupCurrent(operation)) throw new java.io.InterruptedIOException();
+                            out.write(content.getBytes(java.nio.charset.StandardCharsets.UTF_8)); out.flush();
+                        }
+                        runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_saved)));
+                    } else {
+                        final String json = java.nio.charset.StandardCharsets.UTF_8.newDecoder()
+                                .onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+                                .onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT)
+                                .decode(java.nio.ByteBuffer.wrap(readCapped(uri, 20))).toString();
+                        restoreFromBackup(json, operation);
+                        runOnUiThread(() -> finishBackup(operation, null));
+                    }
+                } catch (Exception error) {
+                    runOnUiThread(() -> finishBackup(operation, code == SAVE_TEXT ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_save_incomplete)
+                            : "file too large (max 20 MB)".equals(error.getMessage()) ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_too_large) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_read_failed)));
+                }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException unavailable) { finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_unavailable)); }
+    }
+
+    private void restoreMsgKey() {
+        final BackupOperation dialog;
+        try { dialog = new BackupOperation(0, backupOwner()); }
+        catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); return; }
+        LinearLayout box = dialogBox();
+        final EditText input = field(box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_paste_key), "", false, "");
+        showDialog(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restore_key), box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_restore), () -> {
+            if (!backupDialogCurrent(dialog)) return;
+            final BackupOperation operation = beginBackup(0);
+            if (operation == null) return;
+            final String seed = text(input);
+            try {
+                io.execute(() -> {
+                    final boolean ok;
+                    synchronized (SalonComms.class) { synchronized (SalonStore.class) {
+                        if (!backupCurrent(operation)) { runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_changed))); return; }
+                        ok = SalonComms.importSeed(this, seed);
+                    } }
+                    runOnUiThread(() -> {
+                        if (backupOperation != operation) return;
+                        finishBackup(operation, ok ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restored_key_help) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_restore_failed));
+                        if (ok && !backupClosed && !isFinishing() && !isDestroyed()) render();
+                    });
+                });
+            } catch (java.util.concurrent.RejectedExecutionException unavailable) { finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_unavailable)); }
         });
     }
 
@@ -876,15 +1053,6 @@ public class MainActivity extends AppCompatActivity {
         }
         cm.setPrimaryClip(clip);
         toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_copied));
-    }
-
-    /** Save text to a file the user picks (system Save-As, no storage permission). */
-    private void saveTextFile(String suggestedName, String content) {
-        pendingSaveText = content;
-        Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
-                .setType("text/plain").putExtra(Intent.EXTRA_TITLE, suggestedName);
-        try { startActivityForResult(i, SAVE_TEXT); }
-        catch (Exception e) { pendingSaveText = null; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_no_save_app)); }
     }
 
     /** A full account backup file: messaging key + hosting logins (+ identity/content
@@ -911,19 +1079,38 @@ public class MainActivity extends AppCompatActivity {
         return b.toString();
     }
 
-    private void restoreFromFile() {
-        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");
-        try { startActivityForResult(i, OPEN_BACKUP); }
-        catch (Exception e) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_no_open_app)); }
-    }
-
     /** Restore an account backup: re-wrap hosting secrets with this device's Crypt key,
      *  import the messaging seed, and (only if empty) seed the identity/content draft. */
-    private void restoreFromBackup(String json) {
+    private void restoreFromBackup(String json) { restoreFromBackup(json, null); }
+
+    private void restoreFromBackup(String json, BackupOperation operation) {
         try {
             JSONObject b = new JSONObject(json);
-            if (b.optInt("salonBackup", 0) != 1) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_invalid_backup))); return; }
+            if (b.optInt("salonBackup", 0) != 1) { runOnUiThread(() -> backupNotice(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_invalid_backup))); return; }
+            if ((b.has("hosting") && !(b.opt("hosting") instanceof JSONArray))
+                    || (b.has("me") && !(b.opt("me") instanceof JSONObject))
+                    || (b.has("msgseed") && !(b.opt("msgseed") instanceof String))) throw new IllegalArgumentException("Invalid backup fields");
             JSONArray preparedHosts = HostingSecrets.prepareRestore(b.optJSONArray("hosting"));
+            // Stage credential encryption before taking the profile-edit lock.
+            synchronized (SalonComms.class) { synchronized (SalonStore.class) {
+                if (operation != null && !backupCurrent(operation)) {
+                    runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_changed))); return;
+                }
+            boolean msgOk = false, seedKept = false;
+            String rawSeed = b.optString("msgseed", "");
+            String seed = rawSeed.isEmpty() ? "" : Hex.to(SalonComms.checkedSeed(rawSeed));
+            if (!seed.isEmpty()) {
+                boolean activeInbox = !MailDb.get(this).contacts().isEmpty();
+                if (activeInbox && !seed.equalsIgnoreCase(SalonComms.exportSeed(this))) {
+                    seedKept = true;   // never silently replace a key that has a live inbox
+                } else {
+                    if (!SalonComms.importSeed(this, seed)) {
+                        runOnUiThread(() -> { if (!isFinishing() && !isDestroyed()) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_restore_failed)); });
+                        return;
+                    }
+                    msgOk = true;
+                }
+            }
             JSONObject me = b.optJSONObject("me");
             if (me != null && !SalonStore.hasIdentity(this)) {   // don't clobber a live identity
                 JSONObject keepMsg = SalonStore.me(this);
@@ -935,31 +1122,10 @@ public class MainActivity extends AppCompatActivity {
                 HostingStore.upsert(this, new Hosting.Profile(preparedHosts.getJSONObject(i)));
                 hostN++;
             }
-            boolean msgOk = false, seedKept = false;
-            String seed = b.optString("msgseed", "");
-            if (!seed.isEmpty()) {
-                boolean activeInbox = !MailDb.get(this).contacts().isEmpty();
-                if (activeInbox && !seed.equalsIgnoreCase(SalonComms.exportSeed(this))) {
-                    seedKept = true;   // never silently replace a key that has a live inbox
-                } else if (SalonComms.importSeed(this, seed)) {
-                    SalonStore.put(this, "msgpk", SalonComms.publicId(this)); msgOk = true;
-                }
-            }
             final int hn = hostN; final boolean mo = msgOk, sk = seedKept;
-            runOnUiThread(() -> { toast(Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restored_destinations, hn), mo ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_restored_suffix) : "", sk ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_kept_suffix) : "")); render(); });
-        } catch (Exception e) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_restore_failed))); }
-    }
-
-    private void restoreMsgKey() {
-        LinearLayout box = dialogBox();
-        final EditText f = field(box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_paste_key), "", false, "");
-        showDialog(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restore_key), box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_restore), () -> {
-            final String seed = text(f);
-            io.execute(() -> {
-            final boolean ok = SalonComms.importSeed(this, seed);
-            runOnUiThread(() -> { if (ok) { SalonStore.put(this, "msgpk", SalonComms.publicId(this)); toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restored_key_help)); render(); } else toast(Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_restore_failed)); });
-            });
-        });
+            runOnUiThread(() -> { if (backupClosed || isFinishing() || isDestroyed()) return; toast(Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restored_destinations, hn), mo ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_restored_suffix) : "", sk ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_kept_suffix) : "")); render(); });
+            } }
+        } catch (Exception e) { runOnUiThread(() -> backupNotice(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_restore_failed))); }
     }
 
     /** GET-touch the owner's own relay blobs so their 7-day TTL resets each session. */
@@ -1082,6 +1248,7 @@ public class MainActivity extends AppCompatActivity {
         pairHandler.removeCallbacks(pairTick);
         reannHandler.removeCallbacks(reannTick);
         cancelMediaRequests();
+        cancelBackup();
         io.shutdownNow();
         stopAudio();
         videoRequest++;
@@ -2272,7 +2439,6 @@ public class MainActivity extends AppCompatActivity {
     /* ================= media: pick / upload / play ================= */
 
     private static final int PICK_AVATAR = 41, PICK_BANNER = 42, PICK_GALLERY_IMG = 43, PICK_GALLERY_VID = 44, PICK_GALLERY_AUD = 45, PICK_DM_IMG = 46, SAVE_TEXT = 51, OPEN_BACKUP = 52;
-    private String pendingSaveText;   // content queued for a SAF "Save file" (ACTION_CREATE_DOCUMENT)
 
     /** One selection/upload at a time; snapshots contain data, never live editor views. */
     private static final class MediaPick {
@@ -2441,31 +2607,7 @@ public class MainActivity extends AppCompatActivity {
     @Override protected void onActivityResult(int req, int res, Intent data) {
         super.onActivityResult(req, res, data);
         if (req >= PICK_AVATAR && req <= PICK_DM_IMG) { receiveMedia(req, res, data); return; }
-        if (res != RESULT_OK || data == null || data.getData() == null) return;
-        final Uri uri = data.getData();
-        final int r = req;
-        if (r == SAVE_TEXT) {   // write the queued text to the user-chosen file
-            final String content = pendingSaveText; pendingSaveText = null;
-            if (content == null) return;
-            io.execute(() -> {
-                try (java.io.OutputStream os = getContentResolver().openOutputStream(uri)) {
-                    os.write(content.getBytes(java.nio.charset.StandardCharsets.UTF_8)); os.flush();
-                    runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_saved)));
-                } catch (Exception e) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_save_failed, HoldingMessages.message(e.getMessage())))); }
-            });
-            return;
-        }
-        if (r == OPEN_BACKUP) {   // read + restore an account backup file
-            io.execute(() -> {
-                try (java.io.InputStream is = getContentResolver().openInputStream(uri)) {
-                    java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
-                    byte[] buf = new byte[8192]; int n;
-                    while ((n = is.read(buf)) > 0) bos.write(buf, 0, n);
-                    restoreFromBackup(new String(bos.toByteArray(), java.nio.charset.StandardCharsets.UTF_8));
-                } catch (Exception e) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_read_failed, HoldingMessages.message(e.getMessage())))); }
-            });
-            return;
-        }
+        if (req == SAVE_TEXT || req == OPEN_BACKUP || (req >= 1000 && req <= 65535)) receiveBackupFile(req, res, data);
     }
 
     private void promptMediaTitle(String kind, String url) {
@@ -3300,11 +3442,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private byte[] readCapped(Uri uri, int maxMB) throws Exception {
-        InputStream in = getContentResolver().openInputStream(uri);
-        if (in == null) throw new Exception("cannot read file");
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); byte[] buf = new byte[16384]; int n; long tot = 0, cap = (long) maxMB * 1024 * 1024;
-        while ((n = in.read(buf)) > 0) { tot += n; if (tot > cap) { in.close(); throw new Exception("file too large (max " + maxMB + " MB)"); } bos.write(buf, 0, n); }
-        in.close(); return bos.toByteArray();
+        try (InputStream in = getContentResolver().openInputStream(uri)) {
+            if (in == null) throw new Exception("cannot read file");
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(); byte[] buf = new byte[16384];
+            int n; long total = 0, cap = (long) maxMB * 1024 * 1024;
+            while ((n = in.read(buf)) != -1) {
+                if (Thread.currentThread().isInterrupted()) throw new java.io.InterruptedIOException();
+                if (n == 0) { int one = in.read(); if (one == -1) break; buf[0] = (byte) one; n = 1; }
+                total += n;
+                if (total > cap) throw new Exception("file too large (max " + maxMB + " MB)");
+                bos.write(buf, 0, n);
+            }
+            return bos.toByteArray();
+        }
     }
 
     private byte[] readScaledJpeg(Uri uri, int maxDim) throws Exception {

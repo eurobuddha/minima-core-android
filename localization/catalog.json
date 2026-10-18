@@ -40306,5 +40306,53 @@
     "zh-Hans": "无法生成二维码。",
     "ru": "Не удалось создать QR-код.",
     "uk": "Не вдалося створити QR-код."
+  },
+  "salonBackup.busy": {
+    "en": "A backup or restore is already in progress.",
+    "zh-Hans": "备份或恢复正在进行中。",
+    "ru": "Резервное копирование или восстановление уже выполняется.",
+    "uk": "Резервне копіювання або відновлення вже виконується."
+  },
+  "salonBackup.changed": {
+    "en": "Your Salon identity changed. Start the backup or restore again.",
+    "zh-Hans": "你的 Salon 身份已更改，请重新开始备份或恢复。",
+    "ru": "Ваша личность Salon изменилась. Начните резервное копирование или восстановление заново.",
+    "uk": "Ваша особа Salon змінилася. Почніть резервне копіювання або відновлення знову."
+  },
+  "salonBackup.unavailable": {
+    "en": "Could not start the backup operation. Reopen Salon and try again.",
+    "zh-Hans": "无法启动备份操作。请重新打开 Salon 后重试。",
+    "ru": "Не удалось начать операцию с резервной копией. Откройте Salon заново и повторите.",
+    "uk": "Не вдалося почати операцію з резервною копією. Відкрийте Salon знову та повторіть."
+  },
+  "salonBackup.reselect": {
+    "en": "This file request is no longer active. Start the backup or restore again.",
+    "zh-Hans": "此文件请求已失效，请重新开始备份或恢复。",
+    "ru": "Этот запрос файла больше не активен. Начните резервное копирование или восстановление заново.",
+    "uk": "Цей запит файлу більше не активний. Почніть резервне копіювання або відновлення знову."
+  },
+  "salonBackup.document": {
+    "en": "Choose a document using the system file picker.",
+    "zh-Hans": "请使用系统文件选择器选择文档。",
+    "ru": "Выберите документ через системный выбор файлов.",
+    "uk": "Виберіть документ через системний вибір файлів."
+  },
+  "salonBackup.saveIncomplete": {
+    "en": "Could not finish saving. The destination may contain a partial file; check it before using this backup.",
+    "zh-Hans": "未能完成保存。目标位置可能含有不完整的文件，使用此备份前请检查。",
+    "ru": "Не удалось завершить сохранение. Файл может быть записан частично; проверьте его перед использованием резервной копии.",
+    "uk": "Не вдалося завершити збереження. Файл може бути записано частково; перевірте його перед використанням резервної копії."
+  },
+  "salonBackup.tooLarge": {
+    "en": "This backup exceeds the 20 MB limit.",
+    "zh-Hans": "此备份超过 20 MB 限制。",
+    "ru": "Эта резервная копия превышает лимит 20 МБ.",
+    "uk": "Ця резервна копія перевищує ліміт 20 МБ."
+  },
+  "salonBackup.readFailed": {
+    "en": "Could not read the backup file. Select it again or use another copy.",
+    "zh-Hans": "无法读取备份文件。请重新选择或使用其他副本。",
+    "ru": "Не удалось прочитать резервную копию. Выберите файл заново или используйте другую копию.",
+    "uk": "Не вдалося прочитати резервну копію. Виберіть файл знову або скористайтеся іншою копією."
   }
 }

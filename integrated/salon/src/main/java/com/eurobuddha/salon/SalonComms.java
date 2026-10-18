@@ -43,7 +43,7 @@ final class SalonComms {
         IdentityUnavailable() { super("Salon messaging identity unavailable; stored identity preserved"); }
     }
 
-    private static byte[] checkedSeed(String hex) {
+    static byte[] checkedSeed(String hex) {
         if (hex == null) throw new IdentityUnavailable();
         String value = hex.trim();
         if (value.startsWith("0x") || value.startsWith("0X")) value = value.substring(2);

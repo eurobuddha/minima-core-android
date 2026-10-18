@@ -7975,4 +7975,12 @@
     <!-- Arguments: error -->
     <string name="l10n_salon_settings_read_failed">"无法读取文件：%1$s"</string>
     <string name="l10n_salon_settings_qr_failed" formatted="false">"无法生成二维码。"</string>
+    <string name="l10n_salon_backup_busy" formatted="false">"备份或恢复正在进行中。"</string>
+    <string name="l10n_salon_backup_changed" formatted="false">"你的 Salon 身份已更改，请重新开始备份或恢复。"</string>
+    <string name="l10n_salon_backup_unavailable" formatted="false">"无法启动备份操作。请重新打开 Salon 后重试。"</string>
+    <string name="l10n_salon_backup_reselect" formatted="false">"此文件请求已失效，请重新开始备份或恢复。"</string>
+    <string name="l10n_salon_backup_document" formatted="false">"请使用系统文件选择器选择文档。"</string>
+    <string name="l10n_salon_backup_save_incomplete" formatted="false">"未能完成保存。目标位置可能含有不完整的文件，使用此备份前请检查。"</string>
+    <string name="l10n_salon_backup_too_large" formatted="false">"此备份超过 20 MB 限制。"</string>
+    <string name="l10n_salon_backup_read_failed" formatted="false">"无法读取备份文件。请重新选择或使用其他副本。"</string>
 </resources>
