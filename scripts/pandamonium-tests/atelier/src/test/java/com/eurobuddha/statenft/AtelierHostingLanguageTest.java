@@ -24,6 +24,8 @@ import static com.eurobuddha.minimacore.i18n.R.string.*;
 public class AtelierHostingLanguageTest {
     private MainActivity activity;
     private LinearLayout body,appbar;
+    private java.util.concurrent.ExecutorService worker;
+    private final List<Runnable> hostingJobs=new ArrayList<>();
     private static final String[] CODES={"zh-Hans","ru","uk","en"};
     private Field field(String name) throws Exception { Field f=MainActivity.class.getDeclaredField(name);f.setAccessible(true);return f; }
     private void invoke(String name,Class<?>[] types,Object... args) throws Exception { Method m=MainActivity.class.getDeclaredMethod(name,types);m.setAccessible(true);m.invoke(activity,args); }
@@ -31,12 +33,15 @@ public class AtelierHostingLanguageTest {
     @Before public void setup() throws Exception {
         Language.initialize(RuntimeEnvironment.getApplication(),()->false);Language.select(RuntimeEnvironment.getApplication(),"en");
         activity=Robolectric.buildActivity(MainActivity.class).get();activity.setTheme(R.style.pm_atelier_Theme_StateNFT);
+        ((java.util.concurrent.ExecutorService)field("imageIo").get(activity)).shutdownNow();
+        worker=mock(java.util.concurrent.ExecutorService.class);field("imageIo").set(activity,worker);
+        doAnswer(c->{hostingJobs.add(c.getArgument(0));return null;}).when(worker).execute(any());
         body=new LinearLayout(activity);body.setOrientation(LinearLayout.VERTICAL);
         appbar=new LinearLayout(activity);appbar.setOrientation(LinearLayout.VERTICAL);
         field("body").set(activity,body);field("appbarBox").set(activity,appbar);field("content").set(activity,new ScrollView(activity));
         for(Hosting.Profile p:HostingStore.list(activity))HostingStore.remove(activity,p.id());
     }
-    @After public void cleanup() { android.app.Dialog d=ShadowDialog.getLatestDialog();if(d!=null)d.dismiss();Language.select(activity,"en"); }
+    @After public void cleanup() throws Exception { invoke("cancelHostingCheck",new Class<?>[]{});worker.shutdownNow(); android.app.Dialog d=ShadowDialog.getLatestDialog();if(d!=null)d.dismiss();Language.select(activity,"en"); }
     private static List<EditText> edits(View root){List<EditText> out=new ArrayList<>();if(root instanceof EditText)out.add((EditText)root);if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++)out.addAll(edits(((ViewGroup)root).getChildAt(i)));return out;}
     private static TextView find(View root,String value){if(root instanceof TextView && value.equals(((TextView)root).getText().toString()))return(TextView)root;if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++){TextView t=find(((ViewGroup)root).getChildAt(i),value);if(t!=null)return t;}return null;}
     private static void fits(View root) {
@@ -78,28 +83,25 @@ public class AtelierHostingLanguageTest {
         find(body,Language.upper(Language.msg(l10n_filez_delete)).toString()).performClick();idle();dialog=(AlertDialog)ShadowDialog.getLatestDialog();dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();idle();assertTrue(HostingStore.list(activity).isEmpty());
     }
     @Test public void hostKeyDialogKeepsFingerprintAndCancelDoesNotTrustIt() throws Exception {
-        Hosting.Profile p=Hosting.Profile.fresh("sftp");String fp="SHA256:literal+/=";
+        Hosting.Profile p=Hosting.Profile.fresh("sftp");HostingStore.upsert(activity,p);String fp="SHA256:literal+/=";
         invoke("confirmHostKey",new Class<?>[]{Hosting.Profile.class,String.class},p,fp);idle();AlertDialog dialog=(AlertDialog)ShadowDialog.getLatestDialog();
         for(String code:CODES){Language.select(activity,code);assertEquals(Language.msg(l10n_atelier_hosting_verify_body,fp).toString(),((TextView)dialog.findViewById(android.R.id.message)).getText().toString());assertEquals("",p.cfgStr("hostKeyFp"));}
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).performClick();idle();assertEquals("",p.cfgStr("hostKeyFp"));
-        AtomicReference<Runnable> job=new AtomicReference<>();
-        try(MockedConstruction<Thread> threads=mockConstruction(Thread.class,(mock,ctx)->job.set((Runnable)ctx.arguments().get(0)))) {
-            invoke("confirmHostKey",new Class<?>[]{Hosting.Profile.class,String.class},p,fp);idle();dialog=(AlertDialog)ShadowDialog.getLatestDialog();dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();idle();
-            assertEquals(fp,p.cfgStr("hostKeyFp"));assertEquals(fp,HostingStore.list(activity).get(0).cfgStr("hostKeyFp"));assertNotNull(job.get());verify(threads.constructed().get(0)).start();
-        }
+        invoke("confirmHostKey",new Class<?>[]{Hosting.Profile.class,String.class},p,fp);idle();dialog=(AlertDialog)ShadowDialog.getLatestDialog();dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();idle();
+        assertEquals(fp,p.cfgStr("hostKeyFp"));assertEquals(fp,HostingStore.list(activity).get(0).cfgStr("hostKeyFp"));assertEquals(1,hostingJobs.size());
     }
     @Test public void testResultsTranslateAndFailedUploadClosesConnection() throws Exception {
-        Hosting.Profile p=Hosting.Profile.fresh("sftp");Hosting.put(p.j,"name","Server literal");String url="https://assets.example/中文/file";
-        AtomicReference<Runnable> job=new AtomicReference<>();
-        try(MockedConstruction<Thread> threads=mockConstruction(Thread.class,(mock,ctx)->job.set((Runnable)ctx.arguments().get(0)));MockedStatic<Hosting> hosting=mockStatic(Hosting.class)) {
-            Hosting.Uploader up=mock(Hosting.Uploader.class,withSettings().extraInterfaces(AutoCloseable.class));hosting.when(()->Hosting.forProfile(p)).thenReturn(up);hosting.when(()->Hosting.fillTemplate(anyString(),anyMap())).thenReturn("atelier/probe/test.txt");
+        Hosting.Profile p=Hosting.Profile.fresh("sftp");Hosting.put(p.j,"name","Server literal");HostingStore.upsert(activity,p);String url="https://assets.example/中文/file";
+        try(MockedStatic<Hosting> hosting=mockStatic(Hosting.class,CALLS_REAL_METHODS)) {
+            Hosting.Uploader up=mock(Hosting.Uploader.class,withSettings().extraInterfaces(AutoCloseable.class));hosting.when(()->Hosting.forProfile(any())).thenReturn(up);
+            hosting.when(()->Hosting.verifyUrl(eq(url),any())).thenAnswer(c->null);
             when(up.putFile(any(byte[].class),anyString(),eq("text/plain"))).thenReturn(url);
-            invoke("testProfile",new Class<?>[]{Hosting.Profile.class},p);job.get().run();idle();
+            invoke("testProfile",new Class<?>[]{Hosting.Profile.class},p);hostingJobs.remove(0).run();idle();
             AlertDialog dialog=(AlertDialog)ShadowDialog.getLatestDialog();
             for(String code:CODES){Language.select(activity,code);assertEquals(Language.msg(l10n_atelier_hosting_tested,url).toString(),((TextView)dialog.findViewById(android.R.id.message)).getText().toString());}
-            verify((AutoCloseable)up).close();hosting.verify(()->Hosting.verifyUrl(url,p));dialog.dismiss();
+            verify((AutoCloseable)up).close();hosting.verify(()->Hosting.verifyUrl(eq(url),any()));dialog.dismiss();
             when(up.putFile(any(byte[].class),anyString(),eq("text/plain"))).thenThrow(new Hosting.HostingException("provider 403"));
-            invoke("testProfile",new Class<?>[]{Hosting.Profile.class},p);job.get().run();idle();dialog=(AlertDialog)ShadowDialog.getLatestDialog();
+            invoke("testProfile",new Class<?>[]{Hosting.Profile.class},p);hostingJobs.remove(0).run();idle();dialog=(AlertDialog)ShadowDialog.getLatestDialog();
             for(String code:CODES){Language.select(activity,code);assertEquals(Language.msg(l10n_creative_hosting_failed,"provider 403").toString(),((TextView)dialog.findViewById(android.R.id.message)).getText().toString());}
             verify((AutoCloseable)up,times(2)).close();
         }

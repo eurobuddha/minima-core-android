@@ -8340,4 +8340,13 @@
     <!-- Arguments: 0 -->
     <string name="l10n_salon_outbox_warning">"Надіслати нову копію з поточним ключем листування через %1$s? Попереднє надсилання ще може дійти, й одержувач отримає обидві копії. Поточну чернетку та цитату буде збережено."</string>
     <string name="l10n_salon_outbox_copy" formatted="false">"Надіслати нову копію"</string>
+    <string name="l10n_atelier_hosting_changed" formatted="false">"Налаштування хостингу змінилися. Збережіть їх і повторіть перевірку."</string>
+    <string name="l10n_atelier_hosting_storage" formatted="false">"Не вдалося прочитати або зберегти налаштування хостингу. Перевірте сховище та повторіть спробу."</string>
+    <!-- Arguments: count -->
+    <plurals name="l10n_atelier_gallery_unfiled">
+        <item quantity="one">"%1$d звичайний NFT вилучено з колекцій. Відкрийте вкладку NFT."</item>
+        <item quantity="few">"%1$d звичайні NFT вилучено з колекцій. Відкрийте вкладку NFT."</item>
+        <item quantity="many">"%1$d звичайних NFT вилучено з колекцій. Відкрийте вкладку NFT."</item>
+        <item quantity="other">"%1$d звичайного NFT вилучено з колекцій. Відкрийте вкладку NFT."</item>
+    </plurals>
 </resources>

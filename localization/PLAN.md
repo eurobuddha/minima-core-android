@@ -1,6 +1,6 @@
 # Four-language bear release
 
-## Current Atelier/Salon integration checkpoint — 1.9.92/163, 2026-10-19
+## Current Atelier/Salon integration checkpoint — 1.9.93/164, 2026-10-19
 
 This section supersedes the older source-version and completion-count snapshots
 below. The active goal remains incomplete. No final integration release has been
@@ -11,11 +11,11 @@ checkpoint performs no device changes.
   the common manual English, Simplified Chinese, Russian and Ukrainian selector.
   Menu identities 17/18, Pandamonium-only dependencies, non-exported activities and
   separate providers remain present. Salon uses the host MaxChat node/media.
-- Current host verification: 831 passing tests across Atelier (288), Salon (373),
+- Current host verification: 848 passing tests across Atelier (305), Salon (373),
   shared localization (12) and Pandamonium host (158). The prior real Chrome FILTR
   and Salon page four-language checks still apply to the unchanged browser assets.
   Host/browser checks do not prove Fold acceptance.
-- 6840 catalogue messages validate in all four languages. All 21 pinned imports
+- 6843 catalogue messages validate in all four languages. All 21 pinned imports
   reproduce. The direct-transport guard and release Java compilation pass.
 - Salon full backup now validates before writes and saves the key, draft and hosting
   list together, activating the new key only after checked persistence. Corrupt
@@ -42,17 +42,19 @@ checkpoint performs no device changes.
   validate complete reads and consume replies once. Startup/reconnect/restore
   begin reads after key readiness. Review: `docs/SALON_NODE_CALLBACKS_REVIEW.txt`.
 
+- Atelier hosting tests now retain saved destinations, reject stale trust consent and
+  check fingerprint persistence before retry. Host navigation stays inside Pandamonium.
+  The native active-label audit completed, including the remaining NFT reclassification
+  toast in all four languages. Review: `docs/ATELIER_HOSTING_CHECKS_REVIEW.txt`.
+
 Remaining before accepting the full goal:
 
-1. Finish Atelier's testProfile/confirmHostKey lifecycle guards and reuse embedded
-   host navigation in openMinimaCore(). The recorded Salon callback work is reviewed.
-2. Finish the active-label audit while preserving authored content and protocol values.
-3. Build final signed versioned APKs after review; verify actual packages, certificate,
+1. Build final signed versioned APKs after review; verify actual packages, certificate,
    embedded Keets components, language resources, assets and version metadata.
-4. Run the authorized Fold navigation, four-language visual/retained-input, WebView,
+2. Run the authorized Fold navigation, four-language visual/retained-input, WebView,
    notification and lock acceptance checks while preserving owner data. Never run
    disposable test fixtures on the owner device or operate on the S10+.
-5. Commit/push only to the fork. Any final publication remains subject to the
+3. Commit/push only to the fork. Any final publication remains subject to the
    established acceptance gate and uses GitHub, PandaApps and eurobuddha.com only.
 
 

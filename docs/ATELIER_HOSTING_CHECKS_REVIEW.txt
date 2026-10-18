@@ -1,0 +1,71 @@
+Atelier hosting checks and embedded navigation — source 1.9.93/code164
+
+Summary
+Hosting tests now retain a frozen saved destination and the screen that requested
+it. SFTP consent cannot restore a deleted profile, overwrite an edited destination,
+or retry before its fingerprint is durably saved. Open Minima Core returns to the
+existing Pandamonium host task. No unresolved blocking finding in this patch.
+
+Reuse and scope
+Reused Salon HostingChecks.java.inc and HostingStore's strict read, snapshot,
+comparison and checked pin commit; its ownership tests and memory/disk preference
+fixture; Atelier's existing imageIo worker and screen generation; and the explicit
+intent plus REORDER_TO_FRONT used by PandamoniumHooks and PandamoniumDestinations.
+Inspected the standalone Atelier MainActivity, the complete SftpUploader, uploader
+factory, hosting editor/list callers, image-upload trust handoffs, LocalStore parser,
+LanguageDialog and existing hosting/language tests before adapting them.
+
+The importer uses scripts/adapt-pandamonium-atelier-hosting-checks.py and canonical
+sources/tests. Atelier keeps its own hosting preference file and JWK secret field.
+It does not inherit Salon's account store or identity coupling. Existing encryption,
+transport implementations, Arweave receipt policy and image-upload behavior remain.
+
+Review findings resolved
+- A mutable editor previously supplied credentials to a background test. The worker
+  now uses a deep copy, validates the saved profile before transport creation/upload
+  and fetch-back, and closes AutoCloseable uploaders on success and failure.
+- Old trust dialogs could overwrite newer saved profiles through upsert. Consent
+  is consumed once, compares the saved snapshot, changes only the current pin,
+  preserves default selection and other profiles, and checks commit before retry.
+  A failed commit restores the prior memory snapshot; the editor stays unpinned.
+- Navigation, destruction, stopped Activities and late image-upload callbacks could
+  show stale dialogs. Screen/lifetime checks now cancel ownership and dismiss
+  result/trust dialogs. Tests also exercise a late request after onStop.
+- Open Minima Core used external-package fallbacks and a store URI. It now targets
+  the host's known MainActivity in the same package with the existing drawer flags.
+- The active-label scan found the regular-NFT reclassification toast in English.
+  It now uses four-language plurals and the visible NFTs tab name. No reclassification
+  logic, token command, destination, amount, account key or stored metadata changed.
+
+Validation
+25 focused tests pass: 15 new ownership/navigation checks, two new pin persistence
+checks and eight existing hosting-language tests. Fixtures use mocked uploaders,
+executors, Android preference state and disposable Activities. The initial onStop
+fixture lacked a fragment controller because it deliberately skips onCreate; after
+mocking that framework dependency, the actual onStop path and late-request guard pass.
+All 21 pinned imports reproduce. The direct-node transport guard passes. The catalogue
+validates 6843 messages in English, Simplified Chinese, Russian and Ukrainian.
+The complete run passes 848 tests: Salon 373, Atelier 305, localization 12 and
+Pandamonium host 158, with no failures, errors or skipped tests. Release Java
+compilation passes. Evidence: build/localization/atelier-hosting-checks-full.log,
+-targeted-pass.log, -import.log and -results.json. git diff --check passes.
+
+Active-label audit
+Inspected native text, toast, title/message/button/hint, notification and XML label
+call sites across Atelier and Salon. Remaining literals at those sites are product
+names, transport identifiers, symbols, versions, authored names/messages/metadata,
+URLs/IDs, raw backend diagnostics, commented-out code, or arguments to existing
+Language/ArtLabels/HoldingMessages bindings. Multiline candidate calls were checked
+in context. Existing art/FILTR and Salon page language assets are unchanged; their
+prior browser checks remain applicable. This source audit does not prove physical
+layout, keyboard, clipboard, notification or lock behavior on the Fold.
+
+Limits
+A transport operation already handed to an uploader cannot be recalled by navigation;
+later steps and UI results are suppressed. Tests do not establish real hosting service
+availability or user verification of a fingerprint. No real upload, message, token
+transfer, seed operation, install or publication was performed for this change.
+
+Verdict
+Approve this source patch. Signed package verification and authorized Fold acceptance
+remain separate requirements before completing the Atelier/Salon integration goal.

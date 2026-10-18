@@ -8232,4 +8232,10 @@
     <!-- Arguments: 0 -->
     <string name="l10n_salon_outbox_warning">"使用当前消息身份通过 %1$s 发送新副本吗？先前的发送仍可能到达，因此收件人可能收到两份。当前草稿和引用将被保留。"</string>
     <string name="l10n_salon_outbox_copy" formatted="false">"发送新副本"</string>
+    <string name="l10n_atelier_hosting_changed" formatted="false">"此托管目标已更改。请保存后重新测试。"</string>
+    <string name="l10n_atelier_hosting_storage" formatted="false">"无法读取或保存此托管目标。请检查存储空间后重试。"</string>
+    <!-- Arguments: count -->
+    <plurals name="l10n_atelier_gallery_unfiled">
+        <item quantity="other">"已将 %1$d 个普通 NFT 移出合集。请查看“NFT”标签页。"</item>
+    </plurals>
 </resources>

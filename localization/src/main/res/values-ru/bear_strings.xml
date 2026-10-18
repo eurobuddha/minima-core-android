@@ -8340,4 +8340,13 @@
     <!-- Arguments: 0 -->
     <string name="l10n_salon_outbox_warning">"Отправить новую копию с текущим ключом переписки через %1$s? Предыдущая отправка ещё может дойти, и получатель получит обе копии. Текущий черновик и цитата сохранятся."</string>
     <string name="l10n_salon_outbox_copy" formatted="false">"Отправить новую копию"</string>
+    <string name="l10n_atelier_hosting_changed" formatted="false">"Настройки хостинга изменились. Сохраните их и повторите проверку."</string>
+    <string name="l10n_atelier_hosting_storage" formatted="false">"Не удалось прочитать или сохранить настройки хостинга. Проверьте хранилище и повторите попытку."</string>
+    <!-- Arguments: count -->
+    <plurals name="l10n_atelier_gallery_unfiled">
+        <item quantity="one">"%1$d обычный NFT убран из коллекций. Откройте вкладку NFT."</item>
+        <item quantity="few">"%1$d обычных NFT убраны из коллекций. Откройте вкладку NFT."</item>
+        <item quantity="many">"%1$d обычных NFT убраны из коллекций. Откройте вкладку NFT."</item>
+        <item quantity="other">"%1$d обычных NFT убраны из коллекций. Откройте вкладку NFT."</item>
+    </plurals>
 </resources>

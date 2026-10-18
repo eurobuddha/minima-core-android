@@ -269,8 +269,20 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         super.onPause();
     }
 
+    @Override protected void onStart() {
+        super.onStart();
+        hostingStopped=false;
+    }
+
+    @Override protected void onStop() {
+        hostingStopped=true;
+        cancelHostingCheck();
+        super.onStop();
+    }
+
     @Override protected void onDestroy() {
         cancelImageRequests();
+        cancelHostingCheck();
         imageIo.shutdownNow();
         verifyGateCancel = true;
         for (Runnable r : departureWatchers) main.removeCallbacks(r);
@@ -376,6 +388,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     private void setScreen(Screen s, Runnable back) {
         cancelImageRequests();
+        cancelHostingCheck();
         screenGeneration++;
         screen = s;
         backAction = back;
@@ -481,8 +494,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 loadLocalCollections();
                 lastGallerySig = "";
                 if (screen == Screen.GALLERY) renderGallery();
-                toast(removed[0] + " regular NFT" + (removed[0] == 1 ? "" : "s")
-                        + " unfiled from collections — see Singles");
+                toast(Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_atelier_gallery_unfiled, removed[0]));
             }
             return;
         }
@@ -3796,56 +3808,124 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         body.addView(e, lpm(0, 0, 0, 4));
     }
 
-    private void testProfile(Hosting.Profile p) {
-        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_testing_name, p.name()));
-        new Thread(() -> {
-            CharSequence result;
-            try {
-                String nonce = "atelier-" + System.currentTimeMillis();
-                String rel = Hosting.fillTemplate("atelier/probe/{ts}-{rand}.txt",
-                        mapOf("ts", Hosting.ts36(), "rand", Hosting.rand4()));
-                Hosting.Uploader u = Hosting.forProfile(p);
-                String url;
-                try {
-                    url = u.putFile(nonce.getBytes(java.nio.charset.StandardCharsets.UTF_8), rel, "text/plain");
-                } finally {
-                    if (u instanceof AutoCloseable) { try { ((AutoCloseable) u).close(); } catch (Exception ignored) { } }
-                }
-                if (Hosting.TYPE_ARWEAVE.equals(p.type())) {
-                    // Turbo's 200 + txid IS the storage receipt; the URL itself
-                    // only starts serving after gateway indexing (~5-10 min).
-                    result = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_turbo_tested, url);
-                } else {
-                    // fetch-back leg
-                    Hosting.verifyUrl(url, p);
-                    result = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_tested, url);
-                }
-            } catch (SftpUploader.HostKeyUnverified hk) {
-                main.post(() -> confirmHostKey(p, hk.fingerprint));
-                return;
-            } catch (Hosting.HostingException e) {
-                result = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_failed, e.getMessage());
-            } catch (Throwable t) {
-                result = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_failed, t.getClass().getSimpleName());
-            }
-            final CharSequence r = result;
-            main.post(() -> new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
-                    .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_test_title, p.name()))
-                    .setMessage(r)
-                    .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_ok), null).show());
-        }).start();
+    /** Salon's frozen saved-destination checks, scoped to Atelier's screen lifetime. */
+    private static final class HostingCheck {
+        final Hosting.Profile profile, editor;
+        final long generation;
+        volatile boolean cancelled;
+        HostingCheck(Hosting.Profile profile, Hosting.Profile editor, long generation) {
+            this.profile=profile; this.editor=editor; this.generation=generation;
+        }
     }
+    private volatile HostingCheck hostingCheck;
+    private boolean hostingStopped;
+    private androidx.appcompat.app.AlertDialog hostingTrustDialog, hostingResultDialog;
 
-    private void confirmHostKey(Hosting.Profile p, String fp) {
-        new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
-                .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_verify_key))
-                .setMessage(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_verify_body, fp))
-                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_trust_pin), (d, w) -> {
-                    Hosting.put(p.cfg(), "hostKeyFp", fp);
-                    HostingStore.upsert(this, p);
-                    testProfile(p);
+    private void cancelHostingCheck() {
+        HostingCheck op=hostingCheck; hostingCheck=null;
+        if(op!=null) op.cancelled=true;
+        if(hostingTrustDialog!=null) {
+            androidx.appcompat.app.AlertDialog dialog=hostingTrustDialog;hostingTrustDialog=null;dialog.dismiss();
+        }
+        if(hostingResultDialog!=null) {
+            androidx.appcompat.app.AlertDialog dialog=hostingResultDialog;hostingResultDialog=null;dialog.dismiss();
+        }
+    }
+    private boolean hostingStoredCurrent(HostingCheck op) {
+        if(op.cancelled || hostingCheck!=op) return false;
+        try { return HostingStore.matches(this,op.profile); }
+        catch(Exception unavailable) { return false; }
+    }
+    private boolean hostingCurrent(HostingCheck op) {
+        if(hostingStopped || isFinishing() || isDestroyed() || op.generation!=screenGeneration) return false;
+        try {
+            return HostingStore.profileSnapshot(op.editor).equals(HostingStore.profileSnapshot(op.profile))
+                    && hostingStoredCurrent(op);
+        } catch(Exception unavailable) { return false; }
+    }
+    private HostingCheck beginHostingCheck(Hosting.Profile p) {
+        cancelHostingCheck();
+        if(hostingStopped || isFinishing() || isDestroyed()) return null;
+        try {
+            HostingCheck op=new HostingCheck(new Hosting.Profile(new JSONObject(p.j.toString())),p,screenGeneration);
+            if(!HostingStore.matches(this,op.profile)) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_changed));return null; }
+            hostingCheck=op;return op;
+        } catch(Exception unavailable) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_storage));return null; }
+    }
+    private void finishHostingCheck(HostingCheck op,CharSequence message) {
+        if(hostingCheck!=op) return;
+        boolean current=hostingCurrent(op);cancelHostingCheck();
+        if(current) {
+            hostingResultDialog=new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                    .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_test_title, op.profile.name())).setMessage(message).setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_ok),null).show();
+            androidx.appcompat.app.AlertDialog dialog=hostingResultDialog;
+            dialog.setOnDismissListener(d->{if(hostingResultDialog==dialog)hostingResultDialog=null;});
+        }
+    }
+    private void testProfile(Hosting.Profile p) {
+        HostingCheck op=beginHostingCheck(p);
+        if(op==null) return;
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_testing_name, op.profile.name()));
+        try {
+            imageIo.execute(()->{
+                if(!hostingStoredCurrent(op)) return;
+                CharSequence result;
+                try {
+                    String nonce="atelier-"+System.currentTimeMillis();
+                    String rel="atelier/probe/"+java.util.UUID.randomUUID()+".txt";
+                    Hosting.Uploader uploader=Hosting.forProfile(op.profile);
+                    String url;
+                    try {
+                        if(!hostingStoredCurrent(op)) return;
+                        url=uploader.putFile(nonce.getBytes(java.nio.charset.StandardCharsets.UTF_8),rel,"text/plain");
+                    } finally {
+                        if(uploader instanceof AutoCloseable) {
+                            try { ((AutoCloseable)uploader).close(); } catch(Exception ignored) { }
+                        }
+                    }
+                    if(!hostingStoredCurrent(op)) return;
+                    if(Hosting.TYPE_ARWEAVE.equals(op.profile.type())) {
+                        // Turbo's receipt precedes gateway indexing; retain Atelier's existing policy.
+                        result=Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_turbo_tested, url);
+                    } else {
+                        Hosting.verifyUrl(url,op.profile);
+                        result=Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_tested, url);
+                    }
+                } catch(SftpUploader.HostKeyUnverified untrusted) {
+                    main.post(()->showHostingTrust(op,untrusted.fingerprint));return;
+                } catch(Exception error) {
+                    result=Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_failed, error.getMessage()==null?error.getClass().getSimpleName():error.getMessage());
+                }
+                final CharSequence message=result;
+                main.post(()->finishHostingCheck(op,message));
+            });
+        } catch(java.util.concurrent.RejectedExecutionException unavailable) { finishHostingCheck(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_storage)); }
+    }
+    /** Image uploads already validate their draft before handing their frozen host here. */
+    private void confirmHostKey(Hosting.Profile p,String fp) {
+        HostingCheck op=beginHostingCheck(p);
+        if(op!=null) showHostingTrust(op,fp);
+    }
+    private void showHostingTrust(HostingCheck op,String fp) {
+        if(!hostingCurrent(op) || !Hosting.TYPE_SFTP.equals(op.profile.type()) || fp==null || fp.isEmpty()
+                || !op.profile.cfgStr("hostKeyFp").isEmpty() || hostingTrustDialog!=null) return;
+        hostingTrustDialog=new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_verify_key)).setMessage(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_verify_body, fp))
+                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_trust_pin),(d,w)->{
+                    synchronized(HostingStore.class) {
+                        if(!hostingCurrent(op)) { if(hostingCheck==op)cancelHostingCheck();return; }
+                        // Consume consent before persistence or retry. Never overwrite a changed destination.
+                        cancelHostingCheck();
+                        boolean saved;
+                        try { saved=HostingStore.pinHostKey(this,op.profile,fp); }
+                        catch(Exception unavailable) { saved=false; }
+                        if(!saved) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_storage));return; }
+                        Hosting.put(op.editor.cfg(),"hostKeyFp",fp);
+                        testProfile(op.editor);
+                    }
                 })
-                .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel), null).show();
+                .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel),(d,w)->{if(hostingCheck==op)cancelHostingCheck();}).show();
+        hostingTrustDialog.setOnDismissListener(d->{if(hostingCheck==op)cancelHostingCheck();});
     }
 
     /** Explicit wallet backup; same sensitive-clipboard handling as minimaCore utils/Clip. */
@@ -5218,14 +5298,12 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     private void openMinimaCore() {
-        Intent launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
-        if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.minimablock");
-        if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
-        if (launch != null) startActivity(launch);
-        else {
-            try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.eurobuddha.minimacore"))); }
-            catch (Exception e) { toast("Minima Core app not found"); }
-        }
+        cancelHostingCheck();
+        // Same explicit destination and task behavior as Pandamonium's drawer.
+        Intent intent=new Intent();
+        intent.setClassName(getPackageName(),"com.eurobuddha.minimacore.main.MainActivity");
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivity(intent);
     }
 
     private void toast(CharSequence s) {

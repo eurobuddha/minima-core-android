@@ -8268,4 +8268,11 @@
     <!-- Arguments: 0 -->
     <string name="l10n_salon_outbox_warning">"Send a new copy using your current messaging identity via %1$s? The earlier attempt may still arrive, so the recipient could receive both. Your current draft and quote will be kept."</string>
     <string name="l10n_salon_outbox_copy" formatted="false">"Send new copy"</string>
+    <string name="l10n_atelier_hosting_changed" formatted="false">"This hosting destination changed. Save it and test again."</string>
+    <string name="l10n_atelier_hosting_storage" formatted="false">"Could not read or save this hosting destination. Check storage and try again."</string>
+    <!-- Arguments: count -->
+    <plurals name="l10n_atelier_gallery_unfiled">
+        <item quantity="one">"%1$d regular NFT moved out of collections. See the NFTs tab."</item>
+        <item quantity="other">"%1$d regular NFTs moved out of collections. See the NFTs tab."</item>
+    </plurals>
 </resources>

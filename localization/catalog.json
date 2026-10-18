@@ -41578,5 +41578,38 @@
     "zh-Hans": "发送新副本",
     "ru": "Отправить новую копию",
     "uk": "Надіслати нову копію"
+  },
+  "atelier.hosting.changed": {
+    "en": "This hosting destination changed. Save it and test again.",
+    "zh-Hans": "此托管目标已更改。请保存后重新测试。",
+    "ru": "Настройки хостинга изменились. Сохраните их и повторите проверку.",
+    "uk": "Налаштування хостингу змінилися. Збережіть їх і повторіть перевірку."
+  },
+  "atelier.hosting.storage": {
+    "en": "Could not read or save this hosting destination. Check storage and try again.",
+    "zh-Hans": "无法读取或保存此托管目标。请检查存储空间后重试。",
+    "ru": "Не удалось прочитать или сохранить настройки хостинга. Проверьте хранилище и повторите попытку.",
+    "uk": "Не вдалося прочитати або зберегти налаштування хостингу. Перевірте сховище та повторіть спробу."
+  },
+  "atelier.gallery.unfiled": {
+    "en": {
+      "one": "{count} regular NFT moved out of collections. See the NFTs tab.",
+      "other": "{count} regular NFTs moved out of collections. See the NFTs tab."
+    },
+    "zh-Hans": {
+      "other": "已将 {count} 个普通 NFT 移出合集。请查看“NFT”标签页。"
+    },
+    "ru": {
+      "one": "{count} обычный NFT убран из коллекций. Откройте вкладку NFT.",
+      "few": "{count} обычных NFT убраны из коллекций. Откройте вкладку NFT.",
+      "many": "{count} обычных NFT убраны из коллекций. Откройте вкладку NFT.",
+      "other": "{count} обычных NFT убраны из коллекций. Откройте вкладку NFT."
+    },
+    "uk": {
+      "one": "{count} звичайний NFT вилучено з колекцій. Відкрийте вкладку NFT.",
+      "few": "{count} звичайні NFT вилучено з колекцій. Відкрийте вкладку NFT.",
+      "many": "{count} звичайних NFT вилучено з колекцій. Відкрийте вкладку NFT.",
+      "other": "{count} звичайного NFT вилучено з колекцій. Відкрийте вкладку NFT."
+    }
   }
 }
