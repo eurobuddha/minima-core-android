@@ -163,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (notifyReceiver != null) try { DirectNodeEvents.unsubscribe(notifyReceiver); } catch (Exception ignored) {}
         if (node != null) node.onDestroy();
+        if (paymentJournal != null) paymentJournal.close();
         io.shutdownNow();
     }
 
@@ -1016,6 +1017,71 @@ public class MainActivity extends AppCompatActivity {
         parent.removeViewAt(index); parent.addView(updated, index);
     }
 
+    private PaymentJournal paymentJournal;
+    private final java.util.Set<String> activePayments = new java.util.HashSet<>();
+    private synchronized PaymentJournal paymentJournal() {
+        if (paymentJournal == null) paymentJournal = new PaymentJournal(db);
+        return paymentJournal;
+    }
+    private boolean paymentUiLive() { return !isFinishing() && !isDestroyed(); }
+    private void refreshPaymentOrder(String ref) {
+        if (!paymentUiLive()) return;
+        View top = stack.peek();
+        if (top == null || !("order:" + ref).equals(top.getTag())) return;
+        View panel = top.findViewWithTag("payment:" + ref);
+        if (!(panel instanceof LinearLayout)) return;
+        MerchDb.Order order = db.order(ref);
+        if (order != null) { ((LinearLayout) panel).removeAllViews(); fillPaymentStatus((LinearLayout) panel, order); }
+    }
+    private void startPayment(String ref, AlertDialog progress, View checkout, Catalog shop) {
+        if (!activePayments.add(ref)) { dismiss(progress); return; }
+        io.execute(() -> {
+            final MerchDb.Order payment;
+            try { payment = paymentJournal().paymentOrder(ref); }
+            catch (RuntimeException failed) {
+                ui.post(() -> { activePayments.remove(ref); dismiss(progress); if (paymentUiLive()) toast(Language.msg(l10n_mall_shop_payment_unavailable)); });
+                return;
+            }
+            ui.post(() -> {
+                if (!paymentUiLive()) { activePayments.remove(ref); return; }
+                new PaymentFlow(node, paymentJournal(), io, ui, this::paymentUiLive, new PaymentFlow.Listener() {
+                    public void posted() {
+                        if (!paymentUiLive()) return;
+                        dismiss(progress);
+                        if (checkout != null && stack.peek() == checkout && catalog == shop) {
+                            cart.clear(); pop(); push(buildOrderDetail(ref));
+                        } else refreshPaymentOrder(ref);
+                    }
+                    public void confirmed() { activePayments.remove(ref); refreshPaymentOrder(ref); }
+                    public void unconfirmed() { activePayments.remove(ref); refreshPaymentOrder(ref); }
+                }).start(payment);
+            });
+        });
+    }
+    private void addPaymentStatus(LinearLayout body, MerchDb.Order original) {
+        LinearLayout panel = new LinearLayout(this); panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setTag("payment:" + original.ref); body.addView(panel); fillPaymentStatus(panel, original);
+    }
+    private void fillPaymentStatus(LinearLayout body, MerchDb.Order original) {
+        try {
+            MerchDb.Order payment = paymentJournal().paymentOrder(original.ref);
+            JSONObject record = paymentJournal().load(payment.ref, payment);
+            boolean available = paymentJournal().available(payment);
+            boolean retry = PaymentJournal.retryable(record);
+            boolean maySubmit = !payment.paid && MerchDb.PENDING.equals(payment.status);
+            int label = !available || (retry && !maySubmit) ? l10n_mall_shop_payment_unavailable
+                    : PaymentJournal.complete(record) ? l10n_mall_shop_payment_confirmed
+                    : activePayments.contains(payment.ref) ? l10n_mall_shop_payment_checking
+                    : PaymentJournal.retryable(record) ? l10n_mall_shop_payment_not_sent : l10n_mall_shop_payment_unknown;
+            body.addView(card(Language.msg(label)));
+            if (available && (!retry || maySubmit) && !PaymentJournal.complete(record) && !activePayments.contains(payment.ref)) {
+                TextView action = button(Language.msg(PaymentJournal.retryable(record)
+                        ? l10n_mall_shop_retry_payment : l10n_mall_shop_payment_check), true);
+                action.setOnClickListener(v -> retryPayment(original)); body.addView(action);
+            }
+        } catch (RuntimeException unavailable) { body.addView(card(Language.msg(l10n_mall_shop_payment_unavailable))); }
+    }
+
     private void confirmAndPlace(final String shipId, final String delivery, final String note) {
         final String total = grandTotal(shipId).toPlainString();
         languageDialog()
@@ -1066,41 +1132,42 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle(Language.msg(l10n_mall_shop_placing)).setMessage(Language.msg(l10n_mall_shop_sending_order)).setCancelable(false).create();
         progress.show();
 
+        final View checkout = stack.peek();
+        final Catalog shop = catalog;
         io.execute(() -> {
-            db.upsertOrder(m, "buyer", "");
-            db.setMeta("vendoraddr:" + ref, vendorAddress);   // so Retry payment works without the live catalog
+            try {
+                if (!paymentJournal().saveOrder(m, vendorAddress)) throw PaymentJournal.invalid();
+            } catch (RuntimeException failed) {
+                ui.post(() -> { dismiss(progress); if (paymentUiLive()) toast(Language.msg(l10n_mall_shop_payment_save_failed)); });
+                return;
+            }
             CommsTransport.sendMessage(node, crypto, m.to, m.toWire(), new CommsTransport.SendCb() {
                 @Override public void onSent(String txid) {
-                    CommsTransport.sendPayment(node, vendorAddress, m.amount, m.tokenid, ref, new CommsTransport.SendCb() {
-                        @Override public void onSent(String ptx) {
-                            ui.post(() -> { dismiss(progress); cart.clear(); pop(); toast(Language.msg(l10n_mall_shop_placed)); showMyOrders(); });
+                    io.execute(() -> {
+                        try { paymentJournal().orderSent(ref); }
+                        catch (RuntimeException failed) {
+                            ui.post(() -> { dismiss(progress); if (paymentUiLive()) toast(Language.msg(l10n_mall_shop_payment_unavailable)); }); return;
                         }
-                        @Override public void onFailed(String e) {
-                            db.setMeta("unpaid:" + ref, "1");   // flag so the order screen offers Retry payment
-                            ui.post(() -> { dismiss(progress); cart.clear(); pop(); toast(Language.msg(l10n_mall_shop_unpaid)); showMyOrders(); });
-                        }
+                        ui.post(() -> { if (paymentUiLive()) startPayment(ref, progress, checkout, shop); });
                     });
                 }
-                @Override public void onFailed(String e) { ui.post(() -> { dismiss(progress); toast(Language.msg(l10n_mall_shop_order_error, ShopMessages.message(e))); }); }
+                @Override public void onFailed(String e) {
+                    ui.post(() -> { dismiss(progress); if (paymentUiLive()) toast(Language.msg(l10n_mall_shop_order_unknown)); });
+                }
             });
         });
     }
 
     private void retryPayment(final MerchDb.Order o) {
-        // The original order owns the destination. Imported shops may have changed since purchase.
-        final String ref = o.ref, amount = o.amount, tokenid = o.tokenid, currency = o.currency;
-        final String vaddr = db.getMeta("vendoraddr:" + ref, "");
-        if (vaddr == null || vaddr.isEmpty()) { toast(Language.msg(l10n_mall_shop_retry_unavailable)); return; }
-        final AlertDialog progress = languageDialog()
-                .setTitle(Language.msg(l10n_mall_shop_retrying)).setMessage(Language.msg(l10n_mall_shop_sending_payment, amount, currency)).setCancelable(false).create();
-        progress.show();
-        CommsTransport.sendPayment(node, vaddr, amount, tokenid, ref, new CommsTransport.SendCb() {
-            @Override public void onSent(String txid) {
-                io.execute(() -> db.setMeta("unpaid:" + ref, ""));
-                ui.post(() -> { dismiss(progress); toast(Language.msg(l10n_mall_shop_payment_sent)); refreshTop(buildOrderDetail(ref)); });
-            }
-            @Override public void onFailed(String e) { ui.post(() -> { dismiss(progress); toast(Language.msg(l10n_chat_payment_failed, ShopMessages.message(e))); }); }
-        });
+        try {
+            MerchDb.Order current = paymentJournal().paymentOrder(o.ref);
+            if (!java.util.Objects.equals(o.amount, current.amount) || !java.util.Objects.equals(o.tokenid, current.tokenid)
+                    || !java.util.Objects.equals(o.counterparty, current.counterparty) || !java.util.Objects.equals(o.items, current.items)
+                    || !paymentJournal().available(current)) throw PaymentJournal.invalid();
+        } catch (RuntimeException unavailable) { toast(Language.msg(l10n_mall_shop_payment_unavailable)); return; }
+        final AlertDialog progress = languageDialog().setTitle(Language.msg(l10n_mall_shop_order))
+                .setMessage(Language.msg(l10n_mall_shop_payment_checking)).setCancelable(false).create();
+        progress.show(); startPayment(o.ref, progress, null, null);
     }
 
     // ---- my orders ----
@@ -1188,13 +1255,7 @@ public class MainActivity extends AppCompatActivity {
                     body.addView(copyRow(Language.msg(l10n_mall_shop_delivered_to), shortId(o.payaddr), o.payaddr));
                 if (!o.delivery.isEmpty()) body.addView(kv(Language.msg(l10n_mail_to), o.delivery));   // mixed order: physical address
             }
-            if ("1".equals(db.getMeta("unpaid:" + o.ref, ""))) {
-                TextView retry = button(Language.msg(l10n_mall_shop_retry_payment), true);
-                LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                rlp.topMargin = dp(14); retry.setLayoutParams(rlp); retry.setPadding(dp(16), dp(12), dp(16), dp(12));
-                retry.setOnClickListener(v -> retryPayment(o));
-                body.addView(retry);
-            }
+            addPaymentStatus(body, o);
         }
 
         body.addView(sectionLabel(inquiry ? Language.msg(l10n_mall_shop_conversation) : Language.msg(l10n_mall_shop_vendor_messages)));

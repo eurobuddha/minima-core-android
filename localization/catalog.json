@@ -32395,5 +32395,53 @@
     "zh-Hans": "交易已更改。请查看最新条款。",
     "ru": "Условия сделки изменились. Проверьте актуальные условия.",
     "uk": "Умови угоди змінилися. Перевірте актуальні умови."
+  },
+  "mallShop.paymentUnavailable": {
+    "en": "No verified payment record is available. Review this order with the seller before paying again.",
+    "zh-Hans": "没有可验证的付款记录。再次付款前，请与卖家核实此订单。",
+    "ru": "Нет подтверждённой записи об оплате. Прежде чем платить снова, уточните заказ у продавца.",
+    "uk": "Немає підтвердженого запису про оплату. Перш ніж платити знову, уточніть замовлення у продавця."
+  },
+  "mallShop.paymentChecking": {
+    "en": "Checking payment…",
+    "zh-Hans": "正在检查付款…",
+    "ru": "Проверка оплаты…",
+    "uk": "Перевірка оплати…"
+  },
+  "mallShop.paymentConfirmed": {
+    "en": "Payment confirmed on the blockchain.",
+    "zh-Hans": "付款已在区块链上确认。",
+    "ru": "Оплата подтверждена в блокчейне.",
+    "uk": "Оплату підтверджено в блокчейні."
+  },
+  "mallShop.paymentNotSent": {
+    "en": "Payment has not been submitted. You can retry.",
+    "zh-Hans": "付款尚未提交，可以重试。",
+    "ru": "Платёж не отправлен. Можно повторить попытку.",
+    "uk": "Платіж не надіслано. Можна повторити спробу."
+  },
+  "mallShop.paymentUnknown": {
+    "en": "Payment is not yet confirmed. Check its status before paying again.",
+    "zh-Hans": "付款尚未确认。再次付款前，请检查其状态。",
+    "ru": "Оплата пока не подтверждена. Проверьте её статус, прежде чем платить снова.",
+    "uk": "Оплату ще не підтверджено. Перевірте її стан, перш ніж платити знову."
+  },
+  "mallShop.paymentCheck": {
+    "en": "Check payment",
+    "zh-Hans": "检查付款",
+    "ru": "Проверить оплату",
+    "uk": "Перевірити оплату"
+  },
+  "mallShop.paymentSaveFailed": {
+    "en": "Could not save the order. Nothing was sent.",
+    "zh-Hans": "无法保存订单，未发送任何内容。",
+    "ru": "Не удалось сохранить заказ. Ничего не отправлено.",
+    "uk": "Не вдалося зберегти замовлення. Нічого не надіслано."
+  },
+  "mallShop.orderUnknown": {
+    "en": "Order delivery is not verified. No payment was started. Review the order before trying again.",
+    "zh-Hans": "订单送达情况尚未验证，付款尚未开始。请先核实订单，再重试。",
+    "ru": "Доставка заказа не подтверждена. Оплата не начата. Проверьте заказ перед повторной попыткой.",
+    "uk": "Доставку замовлення не підтверджено. Оплату не розпочато. Перевірте замовлення перед повторною спробою."
   }
 }

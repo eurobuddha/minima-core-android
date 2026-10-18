@@ -77,12 +77,11 @@ public final class CommsTransport {
     private static void post(NodeApi node, String cmd, SendCb cb) {
         node.cmd(cmd, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
-                // status:true = accepted; pending:true = queued via the pending app (node locked)
-                if (j.optBoolean("status", false) || j.optBoolean("pending", false)) {
-                    JSONObject r = j.optJSONObject("response");
-                    cb.onSent(r != null ? r.optString("txpowid", "") : "");
+                String receipt = SendReceipt.sendReceipt(j);
+                if (receipt != null) {
+                    cb.onSent(receipt);
                 } else {
-                    cb.onFailed(j.optString("error", "the node rejected the send"));
+                    cb.onFailed(j == null ? "Node result unavailable. Outcome unknown." : j.optString("error", "Node result unavailable. Outcome unknown."));
                 }
             }
             @Override public void onError(String message) { cb.onFailed(message); }

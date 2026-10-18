@@ -31,14 +31,15 @@ public class OrderContextTest {
         activity=Robolectric.buildActivity(MainActivity.class).get();activity.setTheme(androidx.appcompat.R.style.Theme_AppCompat);Language.select(activity,"en");
         ((ExecutorService)get("io")).shutdownNow();ExecutorService io=mock(ExecutorService.class);set("io",io);
         doAnswer(i->{work.add(i.getArgument(0));return null;}).when(io).execute(any());
-        node=mock(NodeApi.class);db=mock(MerchDb.class);store=mock(ShopStore.class);crypto=mock(CryptoProvider.class);
+        org.robolectric.RuntimeEnvironment.getApplication().deleteDatabase("pandamonium_merchshop.db");
+        node=mock(NodeApi.class);db=spy(new MerchDb(org.robolectric.RuntimeEnvironment.getApplication()));store=mock(ShopStore.class);crypto=mock(CryptoProvider.class);
         set("node",node);set("db",db);set("store",store);set("crypto",crypto);set("myId","public-buyer");
         when(crypto.seal(anyString(),any())).thenReturn("abcd");
         doAnswer(i->{commands.add(i.getArgument(0));replies.add(i.getArgument(1));return null;}).when(node).cmd(anyString(),any());
     }
     @After @SuppressWarnings("unchecked") public void close()throws Exception {
         for(AlertDialog dialog:new ArrayList<>((Set<AlertDialog>)get("languageDialogs")))dialog.dismiss();
-        ((Handler)get("ui")).removeCallbacksAndMessages(null);Language.select(activity,"en");activity.finish();
+        ((Handler)get("ui")).removeCallbacksAndMessages(null);if(get("paymentJournal")!=null)((PaymentJournal)get("paymentJournal")).close();db.close();org.robolectric.RuntimeEnvironment.getApplication().deleteDatabase("pandamonium_merchshop.db");Language.select(activity,"en");activity.finish();
     }
     Object get(String name)throws Exception{Field f=MainActivity.class.getDeclaredField(name);f.setAccessible(true);return f.get(activity);}
     void set(String name,Object value)throws Exception{Field f=MainActivity.class.getDeclaredField(name);f.setAccessible(true);f.set(activity,value);}
@@ -57,25 +58,41 @@ public class OrderContextTest {
         org.mockito.ArgumentCaptor<byte[]> wire=org.mockito.ArgumentCaptor.forClass(byte[].class);
         verify(crypto).seal(eq("original-seller"),wire.capture());MerchMessage message=MerchMessage.fromWire(wire.getValue());
         assertEquals("24.790000",message.amount);assertEquals("0x00",message.tokenid);assertEquals("  delivery 中文  ",message.delivery);assertEquals("note Українська",message.message);
-        verify(db).setMeta("vendoraddr:"+message.ref,ADDRESS);
+        assertEquals(ADDRESS,db.getMeta("vendoraddr:"+message.ref,""));
         Catalog replacement=new Catalog();replacement.vendorAddress=OTHER;replacement.tokenid="0xaa";set("catalog",replacement);
-        Language.select(activity,"uk");replies.remove(0).onResult(accepted());assertEquals(2,commands.size());
-        assertEquals("send amount:24.790000 address:"+ADDRESS+" tokenid:0x00 state:{\"1\":\"0x"+Hex.to(message.ref.getBytes(java.nio.charset.StandardCharsets.UTF_8))+"\"}",commands.get(1));
+        Language.select(activity,"uk");replies.remove(0).onResult(accepted());pump();assertEquals(2,commands.size());
+        assertEquals("sendnosign address:"+ADDRESS+" amount:24.790000 tokenid:0x00 split:1 burn:0 state:{\"1\":\"0x"+Hex.to(message.ref.getBytes(java.nio.charset.StandardCharsets.UTF_8))+"\"} file:"+commands.get(1).split(" file:")[1],commands.get(1));
     }
     MerchDb.Order order(){MerchDb.Order o=new MerchDb.Order();o.ref="ORD-original";o.amount="0012.340000";o.tokenid="0x00";o.currency="Minima";o.shopId="original";return o;}
     void retry(MerchDb.Order o)throws Exception{call("retryPayment",new Class<?>[]{MerchDb.Order.class},o);}
-    @Test public void retryUsesSavedAddressAndCallbackKeepsOriginalReference()throws Exception {
-        Catalog c=prepare();c.vendorAddress=OTHER;MerchDb.Order o=order();when(db.getMeta("vendoraddr:"+o.ref,"")).thenReturn(ADDRESS);
-        retry(o);assertTrue(commands.get(0).startsWith("send amount:0012.340000 address:"+ADDRESS+" tokenid:0x00 "));
-        o.ref="ORD-mutated";o.amount="999";o.tokenid="0xff";replies.get(0).onResult(accepted());work.remove(0).run();
-        verify(db).setMeta("unpaid:ORD-original","");verify(db,never()).setMeta(eq("unpaid:ORD-mutated"),any());verifyNoInteractions(store);
+    void pump(){for(int i=0;i<8;i++){while(!work.isEmpty())work.remove(0).run();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();}}
+    @Test public void retryUsesSavedAddressAndOriginalReferenceAcrossDelayedWork()throws Exception {
+        Catalog c=prepare();c.vendorAddress=OTHER;MerchMessage m=new MerchMessage();m.ref="ORD-original";m.amount="0012.340000";m.tokenid="0x00";
+        PaymentJournal journal=new PaymentJournal(db);set("paymentJournal",journal);assertTrue(journal.saveOrder(m,ADDRESS));journal.orderSent(m.ref);
+        MerchDb.Order o=db.order(m.ref);retry(o);o.ref="ORD-mutated";o.amount="999";o.tokenid="0xff";pump();
+        assertEquals(1,commands.size());assertTrue(commands.get(0).startsWith("sendnosign address:"+ADDRESS+" amount:0012.340000 tokenid:0x00 "));
+        assertTrue(commands.get(0).contains(Hex.to("ORD-original".getBytes(java.nio.charset.StandardCharsets.UTF_8))));verifyNoInteractions(store);
     }
     @Test public void missingAddressNeverFallsBackToAnOpenOrReimportedShopInAnyLanguage()throws Exception {
-        Catalog c=prepare();c.vendorAddress=OTHER;MerchDb.Order o=order();when(store.get(o.shopId)).thenReturn(c);when(db.getMeta("vendoraddr:"+o.ref,"")).thenReturn("");
-        for(String language:new String[]{"en","zh-Hans","ru","uk"}){Language.select(activity,language);retry(o);assertEquals(Language.text(activity,com.eurobuddha.minimacore.i18n.R.string.l10n_mall_shop_retry_unavailable),org.robolectric.shadows.ShadowToast.getTextOfLatestToast());}
+        Catalog c=prepare();c.vendorAddress=OTHER;MerchDb.Order o=order();when(store.get(o.shopId)).thenReturn(c);
+        for(String language:new String[]{"en","zh-Hans","ru","uk"}){Language.select(activity,language);retry(o);assertEquals(Language.text(activity,com.eurobuddha.minimacore.i18n.R.string.l10n_mall_shop_payment_unavailable),org.robolectric.shadows.ShadowToast.getTextOfLatestToast());}
         verifyNoInteractions(node);verify(store,never()).get(anyString());assertTrue(work.isEmpty());
     }
     @Test public void nullAddressAlsoCannotDispatchAPayment()throws Exception {
         prepare();retry(order());verifyNoInteractions(node,store);assertTrue(work.isEmpty());
+    }
+
+    @Test @SuppressWarnings("unchecked") public void paymentRefreshPreservesReplyEditableThroughAllLanguages()throws Exception {
+        MerchMessage m=new MerchMessage();m.ref="ORD-draft";m.amount="1";m.tokenid="0x00";
+        PaymentJournal journal=new PaymentJournal(db);set("paymentJournal",journal);assertTrue(journal.saveOrder(m,ADDRESS));journal.orderSent(m.ref);
+        android.view.View page=(android.view.View)call("buildOrderDetail",new Class<?>[]{String.class},m.ref);
+        java.util.ArrayDeque<android.view.View> stack=(java.util.ArrayDeque<android.view.View>)get("stack");stack.push(page);
+        android.widget.FrameLayout container=new android.widget.FrameLayout(activity);set("container",container);activity.getWindow().setContentView(container);container.addView(page);
+        android.widget.EditText box=CheckoutRefreshTest.fields(page).get(0);String raw="  中文 Русский Українська  ";box.setText(raw);box.setSelection(2,6);box.requestFocus();android.text.Editable text=box.getText();Object composing=new Object();text.setSpan(composing,2,4,android.text.Spanned.SPAN_COMPOSING);
+        for(String language:new String[]{"en","zh-Hans","ru","uk"}) {
+            Language.select(activity,language);call("refreshPaymentOrder",new Class<?>[]{String.class},m.ref);
+            assertSame(page,stack.peek());assertSame(box,CheckoutRefreshTest.fields(page).get(0));assertSame(text,box.getText());assertEquals(raw,box.getText().toString());assertEquals(2,box.getSelectionStart());assertEquals(6,box.getSelectionEnd());assertEquals(2,text.getSpanStart(composing));assertTrue(box.hasFocus());
+        }
+        android.view.View other=new android.view.View(activity);stack.push(other);call("refreshPaymentOrder",new Class<?>[]{String.class},m.ref);assertSame(other,stack.peek());assertEquals(raw,box.getText().toString());verifyNoInteractions(node);
     }
 }

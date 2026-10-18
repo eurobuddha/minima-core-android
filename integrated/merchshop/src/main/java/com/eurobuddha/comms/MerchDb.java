@@ -17,7 +17,7 @@ import java.util.List;
 public class MerchDb extends SQLiteOpenHelper implements CommsScanner.MetaStore {
 
     private static final String DB = "pandamonium_merchshop.db";
-    private static final int VERSION = 2;   // v2: + shopid/shopname on orders
+    private static final int VERSION = 3;   // v3: durable buyer payment journal
     private static final String ORD = "orders", CHAT = "order_chat", META = "meta";
 
     // statuses
@@ -37,6 +37,7 @@ public class MerchDb extends SQLiteOpenHelper implements CommsScanner.MetaStore 
     }
 
     @Override public void onCreate(SQLiteDatabase db) {
+        com.eurobuddha.merchshop.PaymentJournal.create(db);
         db.execSQL("CREATE TABLE IF NOT EXISTS " + ORD + " (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, ref TEXT UNIQUE, role TEXT, counterparty TEXT," +
                 "counterpartyname TEXT, payaddr TEXT, shopid TEXT, shopname TEXT, items TEXT, product TEXT, amount TEXT, currency TEXT," +
@@ -49,6 +50,7 @@ public class MerchDb extends SQLiteOpenHelper implements CommsScanner.MetaStore 
     }
 
     @Override public void onUpgrade(SQLiteDatabase db, int o, int n) {
+        com.eurobuddha.merchshop.PaymentJournal.create(db);
         for (String col : new String[]{"shopid TEXT", "shopname TEXT"}) {
             try { db.execSQL("ALTER TABLE " + ORD + " ADD COLUMN " + col); } catch (Exception ignored) {}
         }

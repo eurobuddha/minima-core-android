@@ -6663,4 +6663,12 @@
     <string name="l10n_chat_error_package_too_big">"MaximaPackage слишком велик: %1$s &gt; %2$s (собеседник ответит TOOBIG)"</string>
     <string name="l10n_chat_error_operation_failed" formatted="false">"Не удалось выполнить действие в чате"</string>
     <string name="l10n_atomix_otc_deal_changed" formatted="false">"Условия сделки изменились. Проверьте актуальные условия."</string>
+    <string name="l10n_mall_shop_payment_unavailable" formatted="false">"Нет подтверждённой записи об оплате. Прежде чем платить снова, уточните заказ у продавца."</string>
+    <string name="l10n_mall_shop_payment_checking" formatted="false">"Проверка оплаты…"</string>
+    <string name="l10n_mall_shop_payment_confirmed" formatted="false">"Оплата подтверждена в блокчейне."</string>
+    <string name="l10n_mall_shop_payment_not_sent" formatted="false">"Платёж не отправлен. Можно повторить попытку."</string>
+    <string name="l10n_mall_shop_payment_unknown" formatted="false">"Оплата пока не подтверждена. Проверьте её статус, прежде чем платить снова."</string>
+    <string name="l10n_mall_shop_payment_check" formatted="false">"Проверить оплату"</string>
+    <string name="l10n_mall_shop_payment_save_failed" formatted="false">"Не удалось сохранить заказ. Ничего не отправлено."</string>
+    <string name="l10n_mall_shop_order_unknown" formatted="false">"Доставка заказа не подтверждена. Оплата не начата. Проверьте заказ перед повторной попыткой."</string>
 </resources>

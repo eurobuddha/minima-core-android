@@ -33,4 +33,14 @@ public class PaymentArgumentsTest {
         assertEquals("send amount:12.340000 address:0x1234 tokenid:0x00 state:{\"1\":\"0x7265663b6f74686572\"}", command.getValue());
         verifyNoInteractions(cb);
     }
+
+    @Test public void incompleteOrPendingAcknowledgementsNeverReportSent()throws Exception {
+        String txid="0x"+"ab".repeat(32);
+        for(org.json.JSONObject reply:new org.json.JSONObject[]{null,new org.json.JSONObject(),new org.json.JSONObject().put("status",true),new org.json.JSONObject().put("status","true").put("response",new org.json.JSONObject().put("txpowid",txid)),new org.json.JSONObject().put("status",true).put("pending",true).put("response",new org.json.JSONObject().put("txpowid",txid)),new org.json.JSONObject().put("status",true).put("response",new org.json.JSONObject().put("txpowid","0x"+"00".repeat(32)))}) {
+            NodeApi node=mock(NodeApi.class);CommsTransport.SendCb cb=mock(CommsTransport.SendCb.class);
+            CommsTransport.sendPayment(node,"0x1234","1","0x00","ref",cb);ArgumentCaptor<NodeApi.Cb> result=ArgumentCaptor.forClass(NodeApi.Cb.class);verify(node).cmd(anyString(),result.capture());result.getValue().onResult(reply);
+            verify(cb).onFailed(anyString());verify(cb,never()).onSent(anyString());
+        }
+        NodeApi node=mock(NodeApi.class);CommsTransport.SendCb cb=mock(CommsTransport.SendCb.class);CommsTransport.sendPayment(node,"0x1234","1","0x00","ref",cb);ArgumentCaptor<NodeApi.Cb> result=ArgumentCaptor.forClass(NodeApi.Cb.class);verify(node).cmd(anyString(),result.capture());result.getValue().onResult(new org.json.JSONObject().put("status",true).put("response",new org.json.JSONObject().put("txpowid",txid)));verify(cb).onSent(txid);verify(cb,never()).onFailed(anyString());
+    }
 }

@@ -6570,4 +6570,12 @@
     <string name="l10n_chat_error_package_too_big">"MaximaPackage 过大：%1$s &gt; %2$s（对方将回复 TOOBIG）"</string>
     <string name="l10n_chat_error_operation_failed" formatted="false">"聊天操作失败"</string>
     <string name="l10n_atomix_otc_deal_changed" formatted="false">"交易已更改。请查看最新条款。"</string>
+    <string name="l10n_mall_shop_payment_unavailable" formatted="false">"没有可验证的付款记录。再次付款前，请与卖家核实此订单。"</string>
+    <string name="l10n_mall_shop_payment_checking" formatted="false">"正在检查付款…"</string>
+    <string name="l10n_mall_shop_payment_confirmed" formatted="false">"付款已在区块链上确认。"</string>
+    <string name="l10n_mall_shop_payment_not_sent" formatted="false">"付款尚未提交，可以重试。"</string>
+    <string name="l10n_mall_shop_payment_unknown" formatted="false">"付款尚未确认。再次付款前，请检查其状态。"</string>
+    <string name="l10n_mall_shop_payment_check" formatted="false">"检查付款"</string>
+    <string name="l10n_mall_shop_payment_save_failed" formatted="false">"无法保存订单，未发送任何内容。"</string>
+    <string name="l10n_mall_shop_order_unknown" formatted="false">"订单送达情况尚未验证，付款尚未开始。请先核实订单，再重试。"</string>
 </resources>
