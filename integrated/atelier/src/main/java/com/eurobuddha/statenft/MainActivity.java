@@ -1697,7 +1697,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 "artBox", v -> renderGenerative()), lpm(0, 0, 0, 14));
         body.addView(studioCard("№ 5", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_filtr),
                 Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_filtr_help),
-                "filtr", v -> startActivity(new android.content.Intent(this, FiltrActivity.class))), lpm(0, 0, 0, 14));
+                "filtr", v -> launchFiltr()), lpm(0, 0, 0, 14));
 
         /* drafts shelf */
         boolean hasNftDraft = !nftName.trim().isEmpty() || !nftImage.isEmpty() || !nftTraits.isEmpty();
@@ -3092,38 +3092,70 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         }).start();
     }
 
-    /** The AI-photo pipeline from a 512 square bitmap (worker thread):
-     *  cartoonize -> quantize -> bridge setPhoto. Fed by the picker AND by
-     *  the FILTR handoff. */
-    @Override protected void onResume() {
-        super.onResume();
-        String mint = FiltrActivity.pendingMint;
-        if (mint != null && !mint.isEmpty()) {
-            FiltrActivity.pendingMint = null;
-            nftImage = mint;
-            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_filtr_loaded));
-            renderCreateNft();
-        }
-        String photo = FiltrActivity.pendingPhoto;
-        if (photo != null && !photo.isEmpty()) {
-            FiltrActivity.pendingPhoto = null;
-            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_cartoonizing));
-            new Thread(() -> {
-                try {
-                    byte[] raw = android.util.Base64.decode(photo, android.util.Base64.DEFAULT);
-                    android.graphics.Bitmap b =
-                            android.graphics.BitmapFactory.decodeByteArray(raw, 0, raw.length);
-                    artPhotoFromBitmap(b == null ? null
-                            : android.graphics.Bitmap.createScaledBitmap(b, 512, 512, true));
-                } catch (Throwable t) {
-                    runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_filtr_failed)));
-                }
-            }).start();
-            runOnUiThread(this::renderGenerative);
+    private void launchFiltr() {
+        if (screen != Screen.STUDIO || isFinishing() || isDestroyed()) return;
+        if (pendingImagePick != null || activeImagePick != null) { toast(Language.msg(l10n_atelier_image_busy)); return; }
+        if (!artDraftLoaded) { artDraftLoaded = true; artLoadDraft(); }
+        ImagePick pick = new ImagePick();
+        pick.context = -1; pick.screen = screen; pick.generation = screenGeneration;
+        pick.sequence = ++imageSequence; pick.target = imageTarget(-1, 0);
+        pick.filtrId = java.util.UUID.randomUUID().toString();
+        pendingImagePick = pick;
+        try {
+            startActivityForResult(new Intent(this, FiltrActivity.class).putExtra(FiltrHandoff.ID, pick.filtrId), FiltrHandoff.REQUEST);
+        } catch (RuntimeException unavailable) {
+            pendingImagePick = null; toast(Language.msg(l10n_atelier_image_picker_failed));
         }
     }
 
-    private void artPhotoFromBitmap(android.graphics.Bitmap big) { artPhotoFromBitmap(big, null); }
+    private void receiveFiltr(int resultCode, Intent data) {
+        ImagePick pick = pendingImagePick;
+        if (pick == null || pick.filtrId == null) {
+            if (resultCode == RESULT_OK) {
+                if (data != null) {
+                    String id = data.getStringExtra(FiltrHandoff.ID);
+                    if (activeImagePick != null && id != null && id.equals(activeImagePick.filtrId)) return;
+                    FiltrHandoff.discard(this,id);
+                }
+                toast(Language.msg(l10n_atelier_image_reselect));
+            }
+            return;
+        }
+        pendingImagePick = null;
+        if (resultCode != RESULT_OK || data == null) { FiltrHandoff.discard(this,pick.filtrId); return; }
+        String id = data.getStringExtra(FiltrHandoff.ID), mode = data.getStringExtra(FiltrHandoff.MODE);
+        if (!pick.filtrId.equals(id) || !imageCurrent(pick)) {
+            FiltrHandoff.discard(this,pick.filtrId); toast(Language.msg(l10n_atelier_image_changed)); return;
+        }
+        activeImagePick = pick;
+        executeImageWork(pick, () -> {
+            final String image;
+            try { image = FiltrHandoff.take(this,pick.filtrId,mode); }
+            catch (java.io.IOException failure) {
+                runOnUiThread(() -> { if (acceptImageResult(pick)) toast(Language.msg(l10n_atelier_art_filtr_failed)); }); return;
+            }
+            runOnUiThread(() -> {
+                if (!acceptImageResult(pick)) return;
+                if (FiltrHandoff.MINT.equals(mode)) {
+                    nftImage = image; saveDrafts(); renderCreateNft();
+                    toast(Language.msg(l10n_atelier_art_filtr_loaded));
+                } else {
+                    renderGenerative();
+                    ImagePick photo = new ImagePick();
+                    photo.context = PICK_ARTPHOTO; photo.screen = screen; photo.generation = screenGeneration;
+                    photo.sequence = ++imageSequence; photo.target = imageTarget(PICK_ARTPHOTO,0);
+                    activeImagePick = photo;
+                    toast(Language.msg(l10n_atelier_art_cartoonizing));
+                    executeImageWork(photo, () -> {
+                        byte[] bytes = android.util.Base64.decode(image, android.util.Base64.DEFAULT);
+                        android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                        artPhotoFromBitmap(bitmap,photo);
+                    });
+                }
+            });
+        });
+    }
+
     private void artPhotoFromBitmap(android.graphics.Bitmap big, ImagePick pick) {
         android.graphics.Bitmap toon = big == null ? null : AiCartoon.cartoonize(this, big);
         final boolean ai = toon != null;
@@ -3133,12 +3165,12 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
          * painting itself rides along for the Painted finish */
         final String paint = ai ? ImageTools.paintB64(toon, 8600) : "";  // fits the PROVEN 19500 pair budget
         runOnUiThread(() -> {
-            if (pick != null && !acceptImageResult(pick)) return;
+            if (!acceptImageResult(pick)) return;
             if (rgba == null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_photo_read_failed)); return; }
             ArtStudio.with(this, s -> {
-                if (pick != null && !imageCurrent(pick)) return;
+                if (!imageCurrent(pick)) return;
                 s.setPhoto(rgba, ai ? 10 : 8, paint, k -> {
-                if (pick != null && !imageCurrent(pick)) return;
+                if (!imageCurrent(pick)) return;
                 artPhotoLoaded = k > 0;
                 ART_THUMBS.remove("photo");
                 artItems = new JSONArray();
@@ -4403,7 +4435,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     /** Salon media-request pattern, scoped to Atelier's draft and screen generation. */
     private static final class ImagePick {
         int context, start, count; boolean batch; long recovery, generation, sequence;
-        Screen screen; String lane, target, slug, hostJson;
+        Screen screen; String lane, target, slug, hostJson, filtrId;
         Hosting.Profile host; volatile boolean cancelled;
         Runnable cancelConfirmation;
     }
@@ -4412,6 +4444,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     private final java.util.concurrent.ExecutorService imageIo = java.util.concurrent.Executors.newSingleThreadExecutor();
 
     private String imageTarget(int context, long recovery) {
+        if (context == -1) return new JSONArray().put(mintDraftSnapshot(0)).put(artDraftSnapshot()).toString();
         if (context == PICK_RECOVERY) {
             JSONObject row = LocalStore.findById(this, recovery);
             return row == null ? "" : row.toString();
@@ -4437,6 +4470,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     private void cancelImageRequests() {
         for (ImagePick pick : new ImagePick[]{pendingImagePick,activeImagePick}) if (pick != null) {
             pick.cancelled = true;
+            if (pick.filtrId != null) FiltrHandoff.discard(this,pick.filtrId);
             if (pick.cancelConfirmation != null) pick.cancelConfirmation.run();
         }
     }
@@ -4450,13 +4484,14 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     private void executeImageWork(ImagePick pick, Runnable work) {
         try {
             imageIo.execute(() -> {
-                if (pick.cancelled) { main.post(() -> acceptImageResult(pick)); return; }
+                if (pick.cancelled) { FiltrHandoff.discard(this,pick.filtrId); main.post(() -> acceptImageResult(pick)); return; }
                 try { work.run(); }
                 catch (Exception failure) { main.post(() -> {
                     if (acceptImageResult(pick)) toast(Language.msg(l10n_atelier_image_failed, failure.getClass().getSimpleName()));
                 }); }
             });
         } catch (java.util.concurrent.RejectedExecutionException stopped) {
+            FiltrHandoff.discard(this,pick.filtrId);
             if (acceptImageResult(pick)) toast(Language.msg(l10n_atelier_image_failed, stopped.getClass().getSimpleName()));
         }
     }
@@ -4938,7 +4973,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != 7001) return;
+        if (requestCode == FiltrHandoff.REQUEST) { receiveFiltr(resultCode,data); return; }
+        if (requestCode != 7001 || (pendingImagePick != null && pendingImagePick.filtrId != null)) return;
         final ImagePick pick = pendingImagePick;
         pendingImagePick = null;
         if (resultCode != RESULT_OK || data == null) return;

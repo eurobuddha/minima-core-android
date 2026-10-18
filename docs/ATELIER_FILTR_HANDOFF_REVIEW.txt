@@ -1,0 +1,67 @@
+Atelier FILTR handoff review — 2026-10-18
+
+Scope
+FILTR's Send to NFT mint and Send to Photo Cartoon in the Pandamonium
+integration branch. Preserve the existing editor, export budgets, artwork bytes,
+AI/quantization pipeline and four-language selector.
+
+Reuse
+Read the integrated and standalone StateNFT FiltrActivity, MainActivity handoff,
+ImageTools and ArtStudio callers; reuse the existing image-pick-session.inc draft,
+screen and sequence checks and executeImageWork worker. Salon MediaUploads.java.inc
+provided the established request-ownership model. FiltrLanguageBridgeTest,
+AtelierImagePickTest and AtelierGenerativeLanguageTest provided the regression
+fixtures. NodeFiles.replaceFrom supplied the temporary sibling / fsync / atomic
+move pattern; its node-folder policy cannot be used for private artwork cache.
+No existing bounded, request-owned FILTR result implementation was found.
+
+Changes
+- Remove process-wide pendingMint/pendingPhoto and onResume consumption.
+- Launch FILTR for a result with a unique request ID. Keep the selected drafts and
+  screen generation with the parent Activity. Check them before accepting results.
+- Store the exact image string in private cache; only ID and destination cross
+  Binder. The 512-square lossless photo can exceed the Binder transaction limit.
+- Enforce the existing 9,000-character NFT budget and a 2 MiB base64 photo limit;
+  require a decodable raster and 512-square Photo Cartoon dimensions. Bound mint
+  raster dimensions and sample validation decoding. Reject invalid destination/ID.
+- Sync and atomically publish the cache file; read with a hard cap; delete consumed,
+  rejected and cancelled files. Cache files are not public exports or backups.
+- Duplicate callbacks cannot consume an active result or delete its pending file.
+  A normal image-picker callback cannot steal a pending FILTR request.
+- Retain literal NFT metadata; save accepted NFT image in the existing draft store.
+  Photo Cartoon uses the same guarded pipeline as the normal picker, including
+  checks at the ArtStudio-ready and completion callbacks.
+- Existing translated errors render in the current selected language. Language
+  refresh retains the same WebView and request and does not reload artwork.
+
+Review findings resolved
+MAJOR: global handoff variables could update the wrong activity/draft; removed.
+MAJOR: Photo Cartoon had no request ownership; uses the existing guards now.
+MAJOR: large photo payload cannot safely be an Intent extra; only identifiers cross.
+MAJOR: duplicate result could remove the cache before its first worker read it;
+  active matching duplicates return without deleting or scheduling anything.
+MINOR: callbacks from the two picker types could consume each other's request;
+  their handlers now preserve the other request.
+
+Limitations / remaining integration work
+Activity/process recreation without the original owner rejects the handoff with
+translated guidance; it never chooses a new draft silently. Photo Cartoon's master
+remains process-local in the existing ArtStudio engine. Cache remnants after abrupt
+process termination remain disposable app cache. Physical WebView/Fold acceptance
+is still required. Viewer export, FILTR Save to Photos, image fetching and the
+remaining Salon lifecycle/persistence paths remain separate review work.
+
+Validation
+All 246 Atelier tests pass, including 12 new handoff/request cases. Tests cover
+real bitmap validation and exact private-file consumption, a lossless 512-square
+PNG whose base64 exceeds 1 MiB, corrupt/oversized files, invalid IDs/destinations,
+duplicate/cancelled/unowned results, callback separation, stale drafts/navigation,
+late Photo Cartoon callbacks, four-language selection and editor lifecycle.
+Pandamonium release Java compilation passes. All 21 imports reproduce from pinned
+sources; all 6,774 catalogue messages validate in four languages. git diff --check
+passes. Evidence: build/localization/atelier-filtr-handoff-tests.log and Gradle XML.
+No APK was built, installed or published for this checkpoint.
+
+Verdict
+Approve this handoff change. No unresolved blocking findings within this scope.
+This checkpoint does not complete the Atelier/Salon goal.

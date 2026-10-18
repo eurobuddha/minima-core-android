@@ -25,7 +25,7 @@ public class FiltrLanguageBridgeTest {
     @Test public void languageSelectionUpdatesExistingPageWithoutReloadOrHandoff() throws Exception {
         FiltrActivity activity=mock(FiltrActivity.class,CALLS_REAL_METHODS);WebView web=mock(WebView.class);set(activity,"web",web);
         when(web.getUrl()).thenReturn("file:///android_asset/filtr/filtr.html");
-        String mint=FiltrActivity.pendingMint,photo=FiltrActivity.pendingPhoto;
+        String request="test-owned-request";set(activity,"requestId",request);
         try(MockedStatic<Language> language=mockStatic(Language.class)) {
             for(String code:new String[]{"en","zh-Hans","ru","uk"}) {
                 language.when(Language::code).thenReturn(code);refresh(activity);
@@ -33,7 +33,7 @@ public class FiltrLanguageBridgeTest {
             }
         }
         verify(web,never()).loadUrl(anyString());verify(web,never()).reload();verify(web,never()).destroy();
-        assertSame(mint,FiltrActivity.pendingMint);assertSame(photo,FiltrActivity.pendingPhoto);
+        assertSame(request,get(activity,"requestId"));verify(activity,never()).finish();
     }
     @Test public void staleOrForeignPagesNeverReceiveBridgeUpdates() throws Exception {
         FiltrActivity activity=mock(FiltrActivity.class,CALLS_REAL_METHODS);WebView web=mock(WebView.class);set(activity,"web",web);

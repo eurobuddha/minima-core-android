@@ -133,4 +133,56 @@ public class AtelierImagePickTest {
         row.put("phase","BURY");LocalStore.save(activity,new JSONArray().put(row));choose.performClick();assertNull(field("pendingImagePick").get(activity));assertEquals("BURY",LocalStore.findById(activity,41).getString("phase"));service.verifyNoInteractions();
     }
 
+    String startFiltr()throws Exception {
+        screen("STUDIO");set("artDraftLoaded",true);call("launchFiltr",new Class<?>[]{});
+        Object request=field("pendingImagePick").get(activity);assertNotNull(request);Field id=request.getClass().getDeclaredField("filtrId");id.setAccessible(true);return(String)id.get(request);
+    }
+    void filtrResult(String id,String mode){activity.onActivityResult(FiltrHandoff.REQUEST,Activity.RESULT_OK,new Intent().putExtra(FiltrHandoff.ID,id).putExtra(FiltrHandoff.MODE,mode));idle();}
+    @Test public void filtrMintRetainsExactImageAndMetadataAcrossLanguageSelection()throws Exception {
+        String id=startFiltr();set("nftName","Literal artwork 中文 Русский Українська");
+        // The draft is captured at launch; restart this fixture's request after the edit.
+        activity.onActivityResult(FiltrHandoff.REQUEST,Activity.RESULT_CANCELED,null);id=startFiltr();
+        String expected="exact validated artwork";
+        try(MockedStatic<FiltrHandoff> files=mockStatic(FiltrHandoff.class)){
+            final String request=id;files.when(()->FiltrHandoff.take(activity,request,FiltrHandoff.MINT)).thenReturn(expected);
+            for(String code:new String[]{"en","zh-Hans","ru","uk"})Language.select(activity,code);
+            filtrResult(id,FiltrHandoff.MINT);filtrResult(id,FiltrHandoff.MINT);assertEquals(1,jobs.size());files.verify(()->FiltrHandoff.discard(activity,request),never());job();assertEquals(expected,field("nftImage").get(activity));assertEquals("Literal artwork 中文 Русский Українська",field("nftName").get(activity));assertEquals("CREATE_NFT",field("screen").get(activity).toString());
+            filtrResult(id,FiltrHandoff.MINT);assertTrue(jobs.isEmpty());files.verify(()->FiltrHandoff.take(activity,request,FiltrHandoff.MINT),times(1));
+        }
+    }
+    @Test public void filtrCannotApplyAfterNavigationDraftChangeOrWrongRequest()throws Exception {
+        try(MockedStatic<FiltrHandoff> files=mockStatic(FiltrHandoff.class)){
+            String id=startFiltr();filtrResult(java.util.UUID.randomUUID().toString(),FiltrHandoff.MINT);assertTrue(jobs.isEmpty());
+            id=startFiltr();set("nftName","new draft");filtrResult(id,FiltrHandoff.MINT);assertTrue(jobs.isEmpty());
+            id=startFiltr();final String request=id;files.when(()->FiltrHandoff.take(activity,request,FiltrHandoff.MINT)).thenReturn("old image");filtrResult(id,FiltrHandoff.MINT);screen("GALLERY");job();assertEquals("",field("nftImage").get(activity));assertEquals("GALLERY",field("screen").get(activity).toString());
+        }
+    }
+    @Test public void filtrFailureCancellationAndRecreationLeaveDraftUntouched()throws Exception {
+        String id=startFiltr();activity.onActivityResult(FiltrHandoff.REQUEST,Activity.RESULT_CANCELED,null);assertNull(field("pendingImagePick").get(activity));filtrResult(id,FiltrHandoff.MINT);assertTrue(jobs.isEmpty());
+        id=startFiltr();filtrResult(id,FiltrHandoff.MINT);job();assertEquals("",field("nftImage").get(activity));assertEquals(Language.msg(l10n_atelier_art_filtr_failed).toString(),ShadowToast.getTextOfLatestToast());
+    }
+
+    @Test public void filtrPhotoUsesGuardedPipelineAndRetainsLanguageDuringItsCallback()throws Exception {
+        ArtStudio studio=mock(ArtStudio.class);List<java.util.function.Consumer<Integer>> results=new ArrayList<>();
+        doAnswer(i->{results.add(i.getArgument(3));return null;}).when(studio).setPhoto(anyString(),anyInt(),anyString(),any());
+        try(MockedStatic<FiltrHandoff> files=mockStatic(FiltrHandoff.class);MockedStatic<ArtStudio> bridge=mockStatic(ArtStudio.class);MockedStatic<AiCartoon> ai=mockStatic(AiCartoon.class);MockedStatic<android.graphics.BitmapFactory> decoder=mockStatic(android.graphics.BitmapFactory.class)){
+            bridge.when(()->ArtStudio.with(eq(activity),any(ArtStudio.Ready.class))).thenAnswer(i->{((ArtStudio.Ready)i.getArgument(1)).run(studio);return null;});
+            decoder.when(()->android.graphics.BitmapFactory.decodeByteArray(any(byte[].class),eq(0),anyInt())).thenReturn(Bitmap.createBitmap(512,512,Bitmap.Config.ARGB_8888));
+            images.when(()->ImageTools.gridPixels(any(Bitmap.class),eq(96))).thenReturn(new int[]{0xff123456});
+            String id=startFiltr();files.when(()->FiltrHandoff.take(activity,id,FiltrHandoff.PHOTO)).thenReturn("QUJDRA==");filtrResult(id,FiltrHandoff.PHOTO);job();assertEquals("CREATE_GENERATIVE",field("screen").get(activity).toString());assertEquals(1,jobs.size());job();assertEquals(1,results.size());
+            for(String code:new String[]{"en","zh-Hans","ru","uk"})Language.select(activity,code);
+            results.get(0).accept(8);assertEquals(true,field("artPhotoLoaded").get(activity));assertEquals(Language.msg(l10n_atelier_art_photo_fallback).toString(),ShadowToast.getTextOfLatestToast());verify(studio).setPhoto("[18,52,86,255]",8,"",results.get(0));
+            String second=startFiltr();files.when(()->FiltrHandoff.take(activity,second,FiltrHandoff.PHOTO)).thenReturn("QUJDRA==");filtrResult(second,FiltrHandoff.PHOTO);job();job();assertEquals(2,results.size());JSONArray newer=new JSONArray().put("new artwork");set("artItems",newer);set("artSeed","changed");results.get(1).accept(0);assertSame(newer,field("artItems").get(activity));assertEquals(true,field("artPhotoLoaded").get(activity));
+        }
+    }
+    @Test public void filtrPhotoCancelledBeforeWorkerCannotReachTheArtBridge()throws Exception {
+        try(MockedStatic<FiltrHandoff> files=mockStatic(FiltrHandoff.class);MockedStatic<ArtStudio> bridge=mockStatic(ArtStudio.class)){
+            String id=startFiltr();files.when(()->FiltrHandoff.take(activity,id,FiltrHandoff.PHOTO)).thenReturn("QUJDRA==");filtrResult(id,FiltrHandoff.PHOTO);job();bridge.clearInvocations();call("cancelImageRequests",new Class<?>[]{});screen("GALLERY");job();bridge.verifyNoInteractions();assertEquals(false,field("artPhotoLoaded").get(activity));
+        }
+    }
+
+    @Test public void normalPickerResultCannotConsumePendingFiltrRequest()throws Exception {
+        String id=startFiltr();Object request=field("pendingImagePick").get(activity);result();assertSame(request,field("pendingImagePick").get(activity));assertTrue(jobs.isEmpty());activity.onActivityResult(FiltrHandoff.REQUEST,Activity.RESULT_CANCELED,null);assertNull(field("pendingImagePick").get(activity));
+    }
+
 }

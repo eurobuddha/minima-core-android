@@ -31,13 +31,14 @@ import java.io.OutputStream;
  * engine bundle is unchanged; display labels follow the shared selector),
  * hosted in a WebView with three native bridges: save to Photos, send the
  * flattened image to the Single-NFT wizard, send it to the Photo Cartoon
- * pack. MainActivity consumes the pending handoffs in onResume.
+ * pack. The result belongs only to the Activity request that opened this editor.
  */
 public class FiltrActivity extends Activity {
 
-    /** Handoffs for MainActivity (b64, no data: prefix). */
-    static volatile String pendingMint = null;
-    static volatile String pendingPhoto = null;
+    private String requestId;
+    private volatile boolean handoffClosed;
+    private boolean handoffSent;
+    private final java.util.concurrent.atomic.AtomicBoolean sending = new java.util.concurrent.atomic.AtomicBoolean();
 
     private ValueCallback<Uri[]> filePick;
     private WebView web;
@@ -46,6 +47,8 @@ public class FiltrActivity extends Activity {
     @SuppressLint("SetJavaScriptEnabled")
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestId = getIntent().getStringExtra(FiltrHandoff.ID);
+        if (!FiltrHandoff.validId(requestId)) { finish(); return; }
         web = new WebView(this);
         web.getSettings().setJavaScriptEnabled(true);
         web.getSettings().setDomStorageEnabled(true);
@@ -125,10 +128,32 @@ public class FiltrActivity extends Activity {
     @Override protected void onResume() { super.onResume(); refreshLanguage(); }
 
     @Override protected void onDestroy() {
+        handoffClosed = true;
+        if (!handoffSent && requestId != null) FiltrHandoff.discard(this,requestId);
         Language.removeListener(languageChanged);
         if (filePick != null) { filePick.onReceiveValue(null); filePick = null; }
         if (web != null) { web.removeJavascriptInterface("AndroidFiltr"); web.destroy(); web = null; }
         super.onDestroy();
+    }
+
+    /** Called by WebView's bridge thread; only a tiny result crosses Binder. */
+    private void sendResult(String mode, String b64) {
+        if (handoffClosed || !sending.compareAndSet(false,true)) return;
+        try {
+            FiltrHandoff.write(this,requestId,mode,b64);
+            runOnUiThread(() -> {
+                if (handoffClosed || isFinishing() || isDestroyed()) { FiltrHandoff.discard(this,requestId); return; }
+                handoffSent = true;
+                setResult(RESULT_OK,new Intent().putExtra(FiltrHandoff.ID,requestId).putExtra(FiltrHandoff.MODE,mode));
+                finish();
+            });
+        } catch (Exception failure) {
+            FiltrHandoff.discard(this,requestId); sending.set(false);
+            runOnUiThread(() -> {
+                if (!handoffClosed && !isFinishing() && !isDestroyed())
+                    Toast.makeText(this,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_filtr_failed),Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 
     private class Bridge {
@@ -162,13 +187,11 @@ public class FiltrActivity extends Activity {
         }
 
         @JavascriptInterface public void sendToMint(String b64) {
-            pendingMint = b64;
-            runOnUiThread(FiltrActivity.this::finish);
+            sendResult(FiltrHandoff.MINT,b64);
         }
 
         @JavascriptInterface public void sendToPhoto(String b64) {
-            pendingPhoto = b64;
-            runOnUiThread(FiltrActivity.this::finish);
+            sendResult(FiltrHandoff.PHOTO,b64);
         }
     }
 }
