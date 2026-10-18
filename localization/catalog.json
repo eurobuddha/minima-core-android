@@ -32500,5 +32500,113 @@
     "zh-Hans": "💸 付款",
     "ru": "💸 Платёж",
     "uk": "💸 Платіж"
+  },
+  "creative.studio": {
+    "en": "Studio",
+    "zh-Hans": "工作室",
+    "ru": "Студия",
+    "uk": "Студія"
+  },
+  "creative.manage": {
+    "en": "Manage",
+    "zh-Hans": "管理",
+    "ru": "Управление",
+    "uk": "Керування"
+  },
+  "creative.feed": {
+    "en": "Feed",
+    "zh-Hans": "动态",
+    "ru": "Лента",
+    "uk": "Стрічка"
+  },
+  "creative.discover": {
+    "en": "Discover",
+    "zh-Hans": "发现",
+    "ru": "Обзор",
+    "uk": "Огляд"
+  },
+  "creative.salon": {
+    "en": "Salon",
+    "zh-Hans": "沙龙",
+    "ru": "Салон",
+    "uk": "Салон"
+  },
+  "creative.messages": {
+    "en": "Messages",
+    "zh-Hans": "消息",
+    "ru": "Сообщения",
+    "uk": "Повідомлення"
+  },
+  "creative.collections": {
+    "en": "Collections",
+    "zh-Hans": "合集",
+    "ru": "Коллекции",
+    "uk": "Колекції"
+  },
+  "creative.nfts": {
+    "en": "NFTs",
+    "zh-Hans": "NFT",
+    "ru": "NFT",
+    "uk": "NFT"
+  },
+  "creative.mine": {
+    "en": "Mine",
+    "zh-Hans": "我的",
+    "ru": "Мои",
+    "uk": "Мої"
+  },
+  "creative.singleNfts": {
+    "en": "Single NFTs",
+    "zh-Hans": "单个 NFT",
+    "ru": "Отдельные NFT",
+    "uk": "Окремі NFT"
+  },
+  "creative.emptyCatalogue": {
+    "en": "Empty catalogue",
+    "zh-Hans": "目录为空",
+    "ru": "Каталог пуст",
+    "uk": "Каталог порожній"
+  },
+  "creative.noLots": {
+    "en": "No lots yet",
+    "zh-Hans": "暂无作品",
+    "ru": "Пока нет лотов",
+    "uk": "Лотів поки немає"
+  },
+  "creative.openStudio": {
+    "en": "Open the studio",
+    "zh-Hans": "打开工作室",
+    "ru": "Открыть студию",
+    "uk": "Відкрити студію"
+  },
+  "creative.enterStudio": {
+    "en": "Enter the studio",
+    "zh-Hans": "进入工作室",
+    "ru": "Войти в студию",
+    "uk": "Увійти до студії"
+  },
+  "creative.scanWallet": {
+    "en": "Scan wallet",
+    "zh-Hans": "扫描钱包",
+    "ru": "Сканировать кошелёк",
+    "uk": "Сканувати гаманець"
+  },
+  "creative.welcome": {
+    "en": "Collections with sealed on-chain identities. Single NFTs. Custom tokens. Every mint a numbered lot.",
+    "zh-Hans": "身份封存于链上的合集、单个 NFT 和自定义代币。每次铸造均有独立编号。",
+    "ru": "Коллекции с закреплёнными в блокчейне идентификаторами. Отдельные NFT. Собственные токены. Каждый выпуск — пронумерованный лот.",
+    "uk": "Колекції з ідентифікаторами, закріпленими в блокчейні. Окремі NFT. Власні токени. Кожен випуск — пронумерований лот."
+  },
+  "creative.firstPiece": {
+    "en": "Create your first piece in the Studio, or adopt existing StateNFT collections from your wallet.",
+    "zh-Hans": "在工作室创建第一件作品，或导入钱包中已有的 StateNFT 合集。",
+    "ru": "Создайте первую работу в студии или добавьте существующие коллекции StateNFT из кошелька.",
+    "uk": "Створіть першу роботу в студії або додайте наявні колекції StateNFT з гаманця."
+  },
+  "creative.subtitle": {
+    "en": "The Minima NFT studio · № {version}",
+    "zh-Hans": "Minima NFT 工作室 · № {version}",
+    "ru": "NFT-студия Minima · № {version}",
+    "uk": "NFT-студія Minima · № {version}"
   }
 }

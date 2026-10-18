@@ -1,0 +1,1170 @@
+package com.eurobuddha.statenft;
+
+import android.content.Context;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
+public final class MintEngine {
+    public interface Done {
+        void done(String message);
+    }
+
+    private static final int CREATE_TIMEOUT = 20;
+
+    private MintEngine() {}
+
+    public static void tick(Context ctx, NodeApi node, Done done) {
+        cmd(node, "block", new Cb() {
+            @Override public void ok(JSONObject block) {
+                int tip = block.optJSONObject("response") == null ? 0 : block.optJSONObject("response").optInt("block", 0);
+                LocalStore.prunePending(ctx, tip);
+                JSONArray rows = LocalStore.load(ctx);
+                tickRow(ctx, node, rows, 0, tip, false, done);
+            }
+            @Override public void fail(String e) { done.done("Mint tick failed: " + e); }
+        });
+    }
+
+    // Every active row advances one step per tick; an errored or waiting row
+    // must never starve the ones after it (matches engine.js engineTick).
+    private static void tickRow(Context ctx, NodeApi node, JSONArray rows, int i, int tip, boolean acted, Done done) {
+        if (i >= rows.length()) {
+            if (!acted) done.done("Mint engine idle");
+            return;
+        }
+        JSONObject row = rows.optJSONObject(i);
+        // Auto-create the web-validation doc as soon as the tokenid is known —
+        // runs for DONE rows too, so it fires whether the mint is mid-flight
+        // or already finished (once; guarded by wvdone).
+        if (row != null) maybeCreateValidationDoc(ctx, row);
+        String phase = row == null ? "DONE" : row.optString("phase", "DONE");
+        if (row == null || "DONE".equals(phase) || "DAMAGED".equals(phase)
+                || "BURIED".equals(phase) || "BURY".equals(phase)) {
+            tickRow(ctx, node, rows, i + 1, tip, acted, done);
+            return;
+        }
+        final String rowName = row.optString("name", "?");
+        Done next = msg -> {
+            String line = rowName + " · " + phase + ": " + msg;
+            LocalStore.logEvent(ctx, line);
+            done.done(line);
+            tickRow(ctx, node, rows, i + 1, tip, true, done);
+        };
+        if (watchStall(ctx, node, row, tip, next)) return;
+        if ("CREATE".equals(phase)) phaseCreate(ctx, node, row, tip, next);
+        else if ("MOVE".equals(phase)) phaseMove(ctx, node, row, tip, next);
+        else if ("SPLIT".equals(phase)) phaseSplit(ctx, node, row, tip, next);
+        else if ("STAMP".equals(phase)) phaseStamp(ctx, node, row, tip, next);
+        else if ("NEEDIMAGES".equals(phase)) phaseNeedImages(ctx, node, row, next);
+        else tickRow(ctx, node, rows, i + 1, tip, acted, done);
+    }
+
+    public static void resumeNow(Context ctx, NodeApi node, Done done) {
+        tick(ctx, node, done);
+    }
+
+    private static void phaseCreate(Context ctx, NodeApi node, JSONObject row, int tip, Done done) {
+        cmd(node, "balance", new Cb() {
+            @Override public void ok(JSONObject res) {
+                JSONArray bal = res.optJSONArray("response");
+                // tokenids already claimed by another row must not be re-bound
+                HashSet<String> bound = new HashSet<>();
+                JSONArray all = LocalStore.load(ctx);
+                for (int i = 0; i < all.length(); i++) {
+                    JSONObject r = all.optJSONObject(i);
+                    String tid = r == null ? "" : r.optString("tokenid", "");
+                    if (!tid.isEmpty()) bound.add(tid);
+                }
+                List<String> candidates = new ArrayList<>();
+                if (bal != null) {
+                    for (int i = 0; i < bal.length(); i++) {
+                        JSONObject b = bal.optJSONObject(i);
+                        if (b == null) continue;
+                        JSONObject t = b.optJSONObject("token");
+                        if (t == null) continue;
+                        if (row.optString("name").equals(t.optString("name"))
+                                && row.optInt("size") == t.optInt("size")
+                                && row.optString("mode").equals(t.optString("mode"))
+                                && !bound.contains(b.optString("tokenid"))) {
+                            candidates.add(b.optString("tokenid"));
+                        }
+                    }
+                }
+                findMatchingToken(ctx, node, row, candidates, 0, new ArrayList<>(), tip, done);
+            }
+            @Override public void fail(String e) { setError(ctx, row, e, done); }
+        });
+    }
+
+    private static void findMatchingToken(Context ctx, NodeApi node, JSONObject row, List<String> cands,
+                                          int i, List<String> matches, int tip, Done done) {
+        if (i >= cands.size()) {
+            if (matches.size() > 1) {
+                setError(ctx, row, "ambiguous mint: " + matches.size() + " tokens match", done);
+                return;
+            }
+            if (matches.size() == 1) {
+                put(row, "tokenid", matches.get(0));
+                setPhase(ctx, row, "MOVE", done);
+                return;
+            }
+            postTokenCreate(ctx, node, row, tip, done);
+            return;
+        }
+        String tid = cands.get(i);
+        cmd(node, "tokens tokenid:" + tid, new Cb() {
+            @Override public void ok(JSONObject res) {
+                JSONObject t = res.optJSONObject("response");
+                String script = t == null ? "" : t.optString("script", "");
+                if (StateNft.script(row.optString("creatorpk"), row.optString("mode")).equals(script)) matches.add(tid);
+                findMatchingToken(ctx, node, row, cands, i + 1, matches, tip, done);
+            }
+            @Override public void fail(String e) {
+                findMatchingToken(ctx, node, row, cands, i + 1, matches, tip, done);
+            }
+        });
+    }
+
+    private static void postTokenCreate(Context ctx, NodeApi node, JSONObject row, int tip, Done done) {
+        if (row.optInt("posted", 0) == 1) {
+            int waited = tip - row.optInt("postedat", 0);
+            if (row.optInt("postedat", 0) == 0 || waited < CREATE_TIMEOUT) {
+                done.done("Waiting for tokencreate confirmation");
+                return;
+            }
+            put(row, "posted", 0);
+            setError(ctx, row, "tokencreate did not confirm within " + CREATE_TIMEOUT + " blocks - retrying", done);
+            return;
+        }
+        StateNft.Meta m = metaFromRow(row);
+        JSONObject tokenMeta = StateNft.tokenMetadata(m);
+        JSONObject itemTraits = row.optJSONObject("itemtraits");
+        if (itemTraits != null && itemTraits.length() > 0) put(tokenMeta, "traits", itemTraits);
+        int maxImg = maxImageLen(row);
+        String gate = jointGate(tokenMeta.toString().length(), maxImg);
+        if (!"sign".equals(gate)) {
+            setError(ctx, row, gate, done);
+            return;
+        }
+        String cmd = "tokencreate name:" + tokenMeta
+                + " amount:" + row.optInt("size")
+                + " decimals:0"
+                + " script:\"" + StateNft.script(row.optString("creatorpk"), row.optString("mode")) + "\""
+                + " state:{\"0\":\"0\"}";
+        // ALWAYS signed — the gate above guarantees the signed record fits
+        cmd += " signtoken:" + row.optString("creatorpk");
+        if (!row.optString("webvalidate").isEmpty()) cmd += " webvalidate:" + row.optString("webvalidate");
+        cmd(node, cmd, new Cb() {
+            @Override public void ok(JSONObject res) {
+                put(row, "posted", 1);
+                put(row, "postedat", tip);
+                put(row, "error", "");
+                LocalStore.upsert(ctx, row);
+                done.done("Tokencreate posted");
+            }
+            @Override public void fail(String e) { setError(ctx, row, e, done); }
+        });
+    }
+
+    private static void phaseMove(Context ctx, NodeApi node, JSONObject row, int tip, Done done) {
+        tokenCoins(node, row.optString("tokenid"), mine -> {
+            if (mine.length() == 0) { done.done("Waiting for mint coin"); return; }
+            List<JSONObject> strays = new ArrayList<>();
+            for (int i = 0; i < mine.length(); i++) {
+                JSONObject c = mine.optJSONObject(i);
+                if (c != null && !row.optString("creatoraddr").equals(c.optString("address"))
+                        && LocalStore.pendingOk(ctx, c.optString("coinid"), tip)) {
+                    strays.add(c);
+                }
+            }
+            boolean anyStray = false;
+            for (int i = 0; i < mine.length(); i++) {
+                JSONObject c = mine.optJSONObject(i);
+                if (c != null && !row.optString("creatoraddr").equals(c.optString("address"))) anyStray = true;
+            }
+            if (!anyStray) { setPhase(ctx, row, "SPLIT", done); return; }
+            if (strays.isEmpty()) { done.done("Move confirming…"); return; }
+            moveNext(ctx, node, row, tip, strays, 0, done);
+        }, e -> setError(ctx, row, e, done));
+    }
+
+    private static void moveNext(Context ctx, NodeApi node, JSONObject row, int tip,
+                                 List<JSONObject> strays, int i, Done done) {
+        if (i >= strays.size()) { done.done("Posted " + strays.size() + " move(s)"); return; }
+        JSONObject c = strays.get(i);
+        LocalStore.setPending(ctx, c.optString("coinid"), tip);
+        String id = "mv" + row.optLong("id") + "x" + i;
+        List<String> steps = new ArrayList<>();
+        steps.add("txninput id:" + id + " coinid:" + c.optString("coinid"));
+        steps.add("txnoutput id:" + id + " amount:" + c.optString("tokenamount")
+                + " address:" + row.optString("creatoraddr")
+                + " tokenid:" + row.optString("tokenid") + " storestate:true");
+        steps.add("txnstate id:" + id + " port:0 value:0");
+        steps.add("txnsign id:" + id + " publickey:auto");
+        steps.add("txnsign id:" + id + " publickey:" + row.optString("creatorpk"));
+        postTxn(node, id, steps,
+                () -> moveNext(ctx, node, row, tip, strays, i + 1, done),
+                e -> setError(ctx, row, e, done));
+    }
+
+    private static void phaseSplit(Context ctx, NodeApi node, JSONObject row, int tip, Done done) {
+        tokenCoins(node, row.optString("tokenid"), coins -> {
+            int units = 0;
+            List<JSONObject> bigs = new ArrayList<>();
+            for (int i = 0; i < coins.length(); i++) {
+                JSONObject c = coins.optJSONObject(i);
+                if (c == null) continue;
+                double amt = amountOf(c);
+                if (amt >= 0.9999 && amt <= 1.0001) units++;
+                else if (amt > 1.0001) bigs.add(c);
+            }
+            if (units >= row.optInt("size") && bigs.isEmpty()) { setPhase(ctx, row, "STAMP", done); return; }
+            if (bigs.isEmpty()) { done.done("Waiting for split coins"); return; }
+            List<JSONObject> ready = new ArrayList<>();
+            for (JSONObject c : bigs) {
+                if (LocalStore.pendingOk(ctx, c.optString("coinid"), tip)) ready.add(c);
+            }
+            if (ready.isEmpty()) { done.done("Splits confirming…"); return; }
+            /* A stalled split is NOT proof of oversize. Every collection that
+             * minted passed the signed-record guard (jointGate: def within the
+             * split budget), so a minted token can ALWAYS split one edition at a
+             * time — 'Maths' at a ~18.4K signed def split fine while 'Gallery
+             * Bibeau' at ~9.2K stalled, disproving any size story. A stall here
+             * means the phone node hasn't MINED the (fittable) batch-1 split yet,
+             * not that it can't fit. So we NEVER conclude "too heavy, bury it"
+             * from unit-count alone (that falsely told users to destroy perfectly
+             * splittable collections, 2026-08-12). Keep retrying; the only real
+             * size verdict is the node's own "size too large" at k=1, surfaced
+             * raw by splitCoin's postTxn handler. Track the counter only so a
+             * slow split doesn't spam, capped so it can never trip a hard stop. */
+            int lastUnits = row.optInt("splitunits", -1);
+            int retries = row.optInt("splitretries", 0);
+            retries = (lastUnits >= 0 && units <= lastUnits) ? Math.min(retries + 1, 3) : 0;
+            put(row, "splitretries", retries);
+            put(row, "splitunits", units);
+            LocalStore.upsert(ctx, row);
+            /* Every token-carrying output (and the input) embeds the FULL token
+             * definition — icon + per-item traits included. A generative
+             * collection's definition runs ~11KB, so the old fixed 3-unit batch
+             * built ~55KB+ txns that the node accepted and the chain silently
+             * rejected: the split retried forever with no error. Measure the
+             * definition once and size the batch to fit the 64KB TxPoW. */
+            node.cmd("tokens tokenid:" + row.optString("tokenid"), new NodeApi.Cb() {
+                @Override public void onResult(JSONObject json) {
+                    Object r = json.opt("response");
+                    int defLen = r == null ? 4000 : r.toString().length();
+                    splitNext(ctx, node, row, tip, ready, 0, defLen, done);
+                }
+                @Override public void onError(String message) {
+                    splitNext(ctx, node, row, tip, ready, 0, 12000, done);  // unknown: be conservative
+                }
+            });
+        }, e -> setError(ctx, row, e, done));
+    }
+
+    /* ---- the JOINT transfer budget (the "Random" lesson, 2026-08-09) ----
+     * A sealed transfer carries the token definition TWICE (input proof +
+     * output) and the embedded image TWICE (input state + replayed output
+     * state), plus a multi-KB signature — all under the 64KB TxPoW cap:
+     *
+     *     defActual + maxImageB64  <=  23000    (proven on-chain: 7K def +
+     *                                            16000 image, spike 2026-08-05)
+     *
+     * "Random" (def 14,587 + images 12-15K) computes to 65-71KB transfers —
+     * sealed forever, transferable never. The definition is computed EXACTLY:
+     * the metadata JSON the engine seals plus the measured 533-byte record
+     * wrapper (constant across every minted collection on this chain). */
+    static final int TRANSFER_PAIR_BUDGET = 19500;  // 20000 combined CONFIRMED on-chain 2026-08-10 (21000 failed) − 500 margin
+    static final int DEF_WRAPPER = 533;
+    static final int DEF_SPLIT_MAX = 17300;   // 3 defs + ~12K sig under 64KB
+    /** signtype+signedby+signature JSON weight — lands in the record AFTER
+     *  tokencreate, invisible to every client-side estimate. 'Math' passed
+     *  the guards at ~10K visible definition; signing pushed the real record
+     *  to 18.4K — past the split bound. Counted here forever after. */
+    static final int DEF_SIGN_WEIGHT = 8400;
+
+    /** metaLen ceiling with the signature ALWAYS aboard. */
+    static final int META_MAX = DEF_SPLIT_MAX - DEF_WRAPPER - DEF_SIGN_WEIGHT;  // 8367
+
+    /** ALWAYS SIGNED: the image budget the signed record leaves, or -1 when
+     *  the record alone cannot split. The one size authority — UIs compute
+     *  this FIRST and shrink content into it. */
+    static int imageBudget(int metaLen) {
+        if (metaLen > META_MAX) return -1;
+        return TRANSFER_PAIR_BUDGET - DEF_WRAPPER - DEF_SIGN_WEIGHT - metaLen;
+    }
+
+    /** Sign-or-error. The nosign branch is DELETED project-wide — never
+     *  reintroduce it: an unsigned mint silently trades the creator's
+     *  provenance away, which is never the engine's call to make. */
+    static String jointGate(int metaLen, int maxImg) {
+        int room = imageBudget(metaLen);
+        if (room < 0) {
+            return "record " + (metaLen + DEF_WRAPPER + DEF_SIGN_WEIGHT)
+                 + "B signed cannot split under the 64KB cap (metadata " + metaLen
+                 + "B > " + META_MAX + "B) - fewer items, lighter traits or hosted icon";
+        }
+        if (maxImg > room) {
+            return "largest image " + maxImg + "B exceeds the " + room
+                 + "B image budget left by the signed record (metadata " + metaLen
+                 + "B) - smaller images, lighter traits or hosted icon";
+        }
+        return "sign";
+    }
+
+    /** Exact definition length the engine would seal for this Meta + traits. */
+    static int defActualLen(StateNft.Meta m, JSONObject itemTraits) {
+        JSONObject meta = StateNft.tokenMetadata(m);
+        if (itemTraits != null && itemTraits.length() > 0) put(meta, "traits", itemTraits);
+        return meta.toString().length() + DEF_WRAPPER + DEF_SIGN_WEIGHT;   // ALWAYS signed
+    }
+
+
+    /** Unit outputs per split txn such that (k units + change + input) token
+     *  definitions stay within ~40KB, leaving 24KB headroom for the signature
+     *  and proofs under the 64KB TxPoW cap. Legacy ~7KB definitions still get
+     *  the proven 3-unit batches; ~11KB generative definitions drop to 1. */
+    static int splitBatch(int defLen) {
+        // Every coin (input + each output) embeds the FULL token definition,
+        // and the spend adds a ~9KB WOTS signature the def-count model ignored.
+        // A signed url/embed def of ~9KB at batch 2 (4 def copies + sig) lands
+        // just over the mineable TxPoW size: the node accepts it to the mempool
+        // but the chain silently drops it, so the split loops forever (Gallery
+        // Bibeau, 2026-08-12). 28000 (was 40000) leaves headroom for the sig,
+        // so a heavy signed def splits one unit at a time and actually confirms.
+        int defs = Math.max(1, 28000 / Math.max(1, defLen));   // total defs that fit
+        return Math.max(1, Math.min(3, defs - 2));             // minus input + change
+    }
+
+    private static void splitNext(Context ctx, NodeApi node, JSONObject row, int tip,
+                                  List<JSONObject> bigs, int i, int defLen, Done done) {
+        if (i >= bigs.size()) { done.done("Posted " + bigs.size() + " split(s)"); return; }
+        JSONObject c = bigs.get(i);
+        LocalStore.setPending(ctx, c.optString("coinid"), tip);
+        int k = Math.min(splitBatch(defLen), parseInt(c.optString("tokenamount", "1")));
+        LocalStore.logEvent(ctx, "split " + row.optString("name") + ": defLen=" + defLen
+                + " batch=" + k + " coin=" + c.optString("tokenamount"));
+        splitCoin(node, row, c, k,
+                () -> splitNext(ctx, node, row, tip, bigs, i + 1, defLen, done),
+                e -> setError(ctx, row, e, done));
+    }
+
+    private static void splitCoin(NodeApi node, JSONObject row, JSONObject coin, int k, Runnable ok, java.util.function.Consumer<String> fail) {
+        int n = parseInt(coin.optString("tokenamount", "0"));
+        if (k > n) k = n;
+        String id = "sp" + row.optLong("id");
+        List<String> steps = new ArrayList<>();
+        steps.add("txninput id:" + id + " coinid:" + coin.optString("coinid"));
+        for (int i = 0; i < k; i++) {
+            steps.add("txnoutput id:" + id + " amount:1 address:" + row.optString("creatoraddr")
+                    + " tokenid:" + row.optString("tokenid") + " storestate:true");
+        }
+        if (n - k > 0) {
+            steps.add("txnoutput id:" + id + " amount:" + (n - k) + " address:" + row.optString("creatoraddr")
+                    + " tokenid:" + row.optString("tokenid") + " storestate:true");
+        }
+        steps.add("txnstate id:" + id + " port:0 value:0");
+        steps.add("txnsign id:" + id + " publickey:auto");
+        // The fat coin is unstamped (state[0]==0), so its StateNFT script only
+        // authorises a SPLIT via the creator-bypass branch: IF s EQ 0 AND
+        // SIGNEDBY(<creatorpk>). publickey:auto does NOT reliably produce that
+        // signature for a custom script (it worked for some collections by luck
+        // of key ordering, not for Gallery Bibeau) — the node accepts the post,
+        // consensus finds the bypass unsigned, the fallback forbids splitting
+        // (VERIFYOUT demands the whole @AMOUNT) and silently drops the txn. Sign
+        // explicitly with the creator key, exactly as phaseMove already does.
+        if (!row.optString("creatorpk").isEmpty())
+            steps.add("txnsign id:" + id + " publickey:" + row.optString("creatorpk"));
+        int finalK = k;
+        postTxn(node, id, steps, ok, e -> {
+            if (e.contains("size too large") && finalK > 1) splitCoin(node, row, coin, finalK / 2, ok, fail);
+            else fail.accept(e);
+        });
+    }
+
+    /* STAMP processes EVERY ready blank per tick — engine.js behavior. The
+     * old one-per-tick port made a 17-item mint take the best part of an
+     * hour of screen-on time. */
+    /** Recovery for a stalled mint: forget every local lock/counter, drop the
+     *  coin cache, then re-derive the phase from what the chain actually
+     *  holds. Never posts a transaction — it only re-points the state machine
+     *  at reality. Driven by the Recover button AND the stall watchdog. */
+    public static void recover(Context ctx, NodeApi node, JSONObject row, int tip, Done done) {
+        String tid = row.optString("tokenid");
+        LocalStore.clearPending(ctx);
+        put(row, "splitretries", 0);
+        put(row, "splitunits", -1);
+        put(row, "stallticks", 0);
+        put(row, "error", "");
+        clearWalletCoinCache();
+        if (tid == null || tid.isEmpty()) {
+            put(row, "posted", 0);
+            setPhase(ctx, row, "CREATE", done);
+            return;
+        }
+        tokenCoins(node, tid, coins -> {
+            int stampedN = 0, blankN = 0, bigN = 0;
+            HashSet<String> used = new HashSet<>();
+            for (int i = 0; i < coins.length(); i++) {
+                JSONObject c = coins.optJSONObject(i);
+                if (c == null) continue;
+                String idx = StateNft.stamped(c);
+                if (idx != null && idx.matches("^[0-9]+$")) { used.add(idx); stampedN++; continue; }
+                double amt = amountOf(c);
+                if (amt >= 0.9999 && amt <= 1.0001) blankN++;
+                else if (amt > 1.0001) bigN++;
+            }
+            // one-line forensic dump so a stalled mint can be diagnosed from
+            // the Engine Log alone (amount|port-0 value per coin)
+            StringBuilder dump = new StringBuilder();
+            for (int i = 0; i < coins.length() && i < 24; i++) {
+                JSONObject c = coins.optJSONObject(i);
+                if (c == null) continue;
+                dump.append(i == 0 ? "" : " ")
+                    .append(c.optString("tokenamount", "?")).append("|")
+                    .append(String.valueOf(StateNft.state(c, 0)));
+            }
+            LocalStore.logEvent(ctx, row.optString("name") + ": COINS " + dump);
+            // Chain-confirmed distinct seals ONLY — reservations must never
+            // count toward DONE (the Maths 14/20 false-DONE, 2026-08-10)
+            String phase = classifyStamp(used.size(), row.optInt("size"), blankN, bigN, coins.length());
+            LocalStore.logEvent(ctx, row.optString("name") + ": RECOVER — chain shows "
+                    + coins.length() + " coins (" + used.size() + " distinct of " + stampedN
+                    + " sealed, " + blankN + " blank, " + bigN + " unsplit) -> " + phase);
+            if ("DAMAGED".equals(phase)) { setDamaged(ctx, row, used.size(), coins.length(), done); return; }
+            setPhase(ctx, row, phase, done);
+        }, e -> {
+            LocalStore.logEvent(ctx, row.optString("name") + ": RECOVER could not read coins: " + e);
+            LocalStore.upsert(ctx, row);
+            done.done("Recover: could not read the chain — " + e);
+        });
+    }
+
+    public static synchronized void clearWalletCoinCache() {
+        sWalletCoins = null;
+        sWalletCoinsAt = 0;
+    }
+
+    /** Coin amount as a NUMBER. tokenamount arrives as a decimal string whose
+     *  exact form varies by node build ("1", "1.0", "1.000000…"); string
+     *  equality against "1" silently lost coins from the mint machine. */
+    static double amountOf(JSONObject coin) {
+        if (coin == null) return 0;
+        try { return Double.parseDouble(coin.optString("tokenamount", "0").trim()); }
+        catch (Exception e) { return 0; }
+    }
+
+    private static void phaseStamp(Context ctx, NodeApi node, JSONObject row, int tip, Done done) {
+        tokenCoins(node, row.optString("tokenid"), coins -> {
+            HashSet<String> used = new HashSet<>();
+            List<JSONObject> blanks = new ArrayList<>();
+            List<JSONObject> bigs = new ArrayList<>();
+            for (int i = 0; i < coins.length(); i++) {
+                JSONObject c = coins.optJSONObject(i);
+                if (c == null) continue;
+                String idx = StateNft.stamped(c);
+                // Only a DIGIT index is a real seal: anything else (a legacy
+                // or malformed port-0 value) must not silently consume a coin
+                if (idx != null && idx.matches("^[0-9]+$")) { used.add(idx); continue; }
+                // Classify by VALUE, not string equality: node builds have
+                // reported "1", "1.0" and "1.000..." for the same unit coin,
+                // and a coin matching none of the branches vanished from the
+                // machine entirely — the 2026-08-10 stamping deadlock.
+                double amt = amountOf(c);
+                if (amt >= 0.9999 && amt <= 1.0001) blanks.add(c);
+                else if (amt > 1.0001) bigs.add(c);
+            }
+            updateCoinIds(row, coins);
+            // DONE takes CHAIN-CONFIRMED seals only. Reservations are hopes,
+            // not facts: counting them here marked Maths DONE at 14/20 real
+            // seals when 6 reserved stamp txns died in a rewind (2026-08-10),
+            // hiding every recovery control while 6 blanks sat waiting.
+            String verdict = classifyStamp(used.size(), row.optInt("size"),
+                    blanks.size(), bigs.size(), coins.length());
+            if ("DONE".equals(verdict)) { setPhase(ctx, row, "DONE", done); return; }
+            if ("DAMAGED".equals(verdict)) { setDamaged(ctx, row, used.size(), coins.length(), done); return; }
+            // The 'Waiting for blank unit coins' deadlock (2026-08-10): dropped
+            // split txns can rewind the chain AFTER the phase advanced on their
+            // unconfirmed outputs, leaving the unsealed units inside a fat
+            // change coin that STAMP never looks at. Chain truth wins: unsplit
+            // coins present and no blanks -> go back and finish splitting.
+            if ("SPLIT".equals(verdict)) {
+                put(row, "splitretries", 0);
+                put(row, "splitunits", -1);
+                LocalStore.logEvent(ctx, row.optString("name")
+                        + ": unsplit units found in STAMP — returning to SPLIT");
+                setPhase(ctx, row, "SPLIT", done);
+                return;
+            }
+            // Dead reservations get re-posted onto their own coins (duplicate-
+            // proof by double-spend); vanished ones release after a deep TTL.
+            // Then merge the surviving reservations so the planner never
+            // re-issues a live index. (A depth-limited window can hide old
+            // stamps: the merge also keeps those off the free list.)
+            List<String[]> replans = replanDeadReservations(ctx, row, used, blanks, coins, tip);
+            mergeLocalStamps(row, used);
+            HashSet<String> replanCids = new HashSet<>();
+            for (String[] r : replans) replanCids.add(r[0]);
+            List<String> ready = new ArrayList<>();
+            for (JSONObject c : blanks) {
+                String cid = c.optString("coinid");
+                if (!replanCids.contains(cid) && LocalStore.pendingOk(ctx, cid, tip)) ready.add(cid);
+            }
+            List<String[]> plan = new ArrayList<>(replans);
+            plan.addAll(planAssignments(ready, used, row.optInt("size")));
+            // one cap for ALL stamps per tick (re-posts prioritized): the
+            // burst-starves-itself observation applies to fresh posts too
+            if (plan.size() > STAMP_BATCH) plan = new ArrayList<>(plan.subList(0, STAMP_BATCH));
+            if (plan.isEmpty()) {
+                LocalStore.upsert(ctx, row);
+                // Say what the engine SEES — a bare "waiting" hid a coin-query
+                // blind spot for hours (2026-08-10)
+                done.done(blanks.isEmpty()
+                        ? "No blank units in view (coins " + coins.length()
+                          + ", sealed " + used.size() + "/" + row.optInt("size")
+                          + ", unsplit " + bigs.size() + ") — tap Recover mint"
+                        : (ready.isEmpty() ? "Stamps confirming…"
+                                           : "All indices assigned — waiting for confirmations"));
+                return;
+            }
+            stampNext(ctx, node, row, tip, plan, 0, done);
+        }, e -> setError(ctx, row, e, done));
+    }
+
+    /** Pure planner: assign the lowest free index to each ready blank coin.
+     *  Never re-issues an index in `used`; at most one index per coin. */
+    static List<String[]> planAssignments(List<String> readyCoinIds, HashSet<String> used, int size) {
+        List<String[]> out = new ArrayList<>();
+        HashSet<String> taken = new HashSet<>(used);
+        for (String cid : readyCoinIds) {
+            int free = -1;
+            for (int i = 1; i <= size; i++) {
+                if (!taken.contains(String.valueOf(i))) { free = i; break; }
+            }
+            if (free < 0) break;
+            taken.add(String.valueOf(free));
+            out.add(new String[]{ cid, String.valueOf(free) });
+        }
+        return out;
+    }
+
+    private static void stampNext(Context ctx, NodeApi node, JSONObject row, int tip,
+                                  List<String[]> plan, int i, Done done) {
+        if (i >= plan.size()) {
+            done.done("Posted " + plan.size() + " stamp" + (plan.size() == 1 ? "" : "s") + " this tick");
+            return;
+        }
+        String coinid = plan.get(i)[0];
+        int idx = parseInt(plan.get(i)[1]);
+        String img = itemImage(row, idx);
+        if ("embed".equals(row.optString("mode")) && img.isEmpty()) {
+            // stamping is irreversible under the locked contract — park until
+            // the plate is re-supplied, exactly like engine.js
+            put(row, "phase", "NEEDIMAGES");
+            put(row, "error", "missing image for item #" + idx);
+            LocalStore.upsert(ctx, row);
+            done.done(row.optString("error"));
+            return;
+        }
+        LocalStore.setPending(ctx, coinid, tip);
+        /* Reserve the index BEFORE posting. The old code only recorded an
+         * index once the chain showed the stamp confirmed, so any round that
+         * started with a stale/empty chain view handed the SAME index to a
+         * fresh coin — the duplicate seals found on 2026-08-10 (index 1 on
+         * four coins). mergeLocalStamps() reads these reservations, so an
+         * index can never be issued twice, confirmed or not. Under the locked
+         * contract a duplicate seal is permanent, so this must hold. */
+        reserveIndex(ctx, row, idx, coinid, tip);
+        String id = "st" + row.optLong("id") + "x" + idx;
+        List<String> steps = new ArrayList<>();
+        steps.add("txninput id:" + id + " coinid:" + coinid);
+        steps.add("txnoutput id:" + id + " amount:1 address:" + row.optString("creatoraddr")
+                + " tokenid:" + row.optString("tokenid") + " storestate:true");
+        steps.add("txnstate id:" + id + " port:0 value:" + idx);
+        if ("embed".equals(row.optString("mode"))) steps.add("txnstate id:" + id + " port:1 value:[" + img + "]");
+        steps.add("txnsign id:" + id + " publickey:auto");
+        // The blank unit is still unstamped (state[0]==0) when spent, so stamping
+        // it also runs the creator-bypass branch and needs the creator signature
+        // (auto is unreliable for the custom script — see splitCoin). Mirror MOVE.
+        if (!row.optString("creatorpk").isEmpty())
+            steps.add("txnsign id:" + id + " publickey:" + row.optString("creatorpk"));
+        postTxn(node, id, steps,
+                () -> stampNext(ctx, node, row, tip, plan, i + 1, done),
+                e -> setError(ctx, row, e, done));
+    }
+
+    private static void phaseNeedImages(Context ctx, NodeApi node, JSONObject row, Done done) {
+        tokenCoins(node, row.optString("tokenid"), coins -> {
+            HashSet<String> used = new HashSet<>();
+            for (int i = 0; i < coins.length(); i++) {
+                JSONObject c = coins.optJSONObject(i);
+                if (c == null) continue;
+                String idx = StateNft.stamped(c);
+                if (idx != null && idx.matches("^[0-9]+$")) used.add(idx);
+            }
+            mergeLocalStamps(row, used);
+            if (used.size() >= row.optInt("size")) {
+                setPhase(ctx, row, "DONE", done);
+            } else if (missingLocalImages(row) == 0) {
+                setPhase(ctx, row, "MOVE", done);
+            } else {
+                LocalStore.upsert(ctx, row);
+                done.done(missingLocalImages(row) + " embedded images still missing");
+            }
+        }, e -> done.done("Waiting for missing embedded images"));
+    }
+
+    static void postTxn(NodeApi node, String id, List<String> steps, Runnable ok, java.util.function.Consumer<String> fail) {
+        cmd(node, "txndelete id:" + id, new Cb() {
+            @Override public void ok(JSONObject ignored) { build(); }
+            @Override public void fail(String e) { build(); }
+            private void build() {
+                List<String> build = new ArrayList<>();
+                List<String> signs = new ArrayList<>();
+                for (String s : steps) {
+                    if (s.startsWith("txnsign")) signs.add(s);
+                    else build.add(s);
+                }
+                List<String> cmds = new ArrayList<>();
+                cmds.add("txncreate id:" + id);
+                cmds.addAll(build);
+                runCommands(node, cmds, () -> checkAndSign(node, id, signs, ok, fail), e -> cleanup(node, id, fail, e));
+            }
+        });
+    }
+
+    private static void checkAndSign(NodeApi node, String id, List<String> signs, Runnable ok, java.util.function.Consumer<String> fail) {
+        cmd(node, "txncheck id:" + id, new Cb() {
+            @Override public void ok(JSONObject res) {
+                JSONArray coins = res.optJSONObject("response") == null ? null : res.optJSONObject("response").optJSONArray("coins");
+                boolean bad = coins == null || coins.length() == 0;
+                if (coins != null) {
+                    for (int i = 0; i < coins.length(); i++) {
+                        JSONObject c = coins.optJSONObject(i);
+                        if (c != null && !"0".equals(c.optString("difference"))) bad = true;
+                    }
+                }
+                if (bad) { cleanup(node, id, fail, "unbalanced txn " + id); return; }
+                List<String> cmds = new ArrayList<>(signs);
+                cmds.add("txnbasics id:" + id);
+                cmds.add("txnpost id:" + id);
+                runCommands(node, cmds, () -> {
+                    cmd(node, "txndelete id:" + id, new Cb() {
+                        @Override public void ok(JSONObject ignored) { ok.run(); }
+                        @Override public void fail(String e) { ok.run(); }
+                    });
+                }, e -> cleanup(node, id, fail, e));
+            }
+            @Override public void fail(String e) { cleanup(node, id, fail, e); }
+        });
+    }
+
+    private static void runCommands(NodeApi node, List<String> cmds, Runnable ok, java.util.function.Consumer<String> fail) {
+        runCommandAt(node, cmds, 0, ok, fail);
+    }
+
+    private static void runCommandAt(NodeApi node, List<String> cmds, int i, Runnable ok, java.util.function.Consumer<String> fail) {
+        if (i >= cmds.size()) { ok.run(); return; }
+        cmd(node, cmds.get(i), new Cb() {
+            @Override public void ok(JSONObject res) { runCommandAt(node, cmds, i + 1, ok, fail); }
+            @Override public void fail(String e) { fail.accept(e); }
+        });
+    }
+
+    private static void cleanup(NodeApi node, String id, java.util.function.Consumer<String> fail, String e) {
+        cmd(node, "txndelete id:" + id, new Cb() {
+            @Override public void ok(JSONObject ignored) { fail.accept(e); }
+            @Override public void fail(String ignored) { fail.accept(e); }
+        });
+    }
+
+    private static void tokenCoins(NodeApi node, String tid, CoinsCb ok, java.util.function.Consumer<String> fail) {
+        tokenCoinsBounded(node, tid, true, (coins, partial) -> ok.ok(coins), fail);
+    }
+
+    public interface CoinsBounded { void ok(JSONArray coins, boolean partial); }
+
+    /** Coin query that survives the 256KB IPC cap. Fast path: one plain
+     *  query. When the reply blows the cap (each coin drags the FULL token
+     *  metadata — a 20-item embed collection is ~380KB), fall back to a
+     *  complete PAGED SWEEP over [coinage, depth] age windows: adaptive
+     *  spans halve on overflow down to single blocks and double on success,
+     *  accumulating every coin de-duplicated by coinid. partial=true only
+     *  when a single-block window itself exceeded the cap (skipped) or the
+     *  sweep was cut short — callers must not treat absence as proof then.
+     *  (Family rule: bounded paging, adaptive halving.) */
+    /* ---- whole-wallet coin cache ----
+     * Per-token `coins relevant:true tokenid:X` replies can land in the Binder
+     * DEATH WINDOW (~250–256KB): just under the node's 256,000 hand-off cutoff
+     * yet over the broadcast parcel limit — the delivery kills the app process
+     * before any callback (TransactionTooLargeException, no stub, no error).
+     * The whole-wallet list is safe by construction: big wallets always exceed
+     * the cutoff and ride the fork node's content:// file hand-off; small ones
+     * are nowhere near the window. So: fetch the WHOLE list once, filter by
+     * tokenid locally, cache briefly so N collections cost one query. */
+    private static final long WALLET_COINS_TTL_MS = 20000;
+    private static JSONArray sWalletCoins = null;
+    private static long sWalletCoinsAt = 0;
+
+    private static synchronized JSONArray cachedWalletCoins() {
+        if (sWalletCoins != null && System.currentTimeMillis() - sWalletCoinsAt < WALLET_COINS_TTL_MS) {
+            return sWalletCoins;
+        }
+        return null;
+    }
+
+    private static synchronized void cacheWalletCoins(JSONArray coins) {
+        sWalletCoins = coins;
+        sWalletCoinsAt = System.currentTimeMillis();
+    }
+
+    private static JSONArray filterByToken(JSONArray all, String tid) {
+        JSONArray out = new JSONArray();
+        for (int i = 0; i < all.length(); i++) {
+            JSONObject c = all.optJSONObject(i);
+            if (c != null && tid.equals(c.optString("tokenid"))) out.put(c);
+        }
+        return out;
+    }
+
+    public static void tokenCoinsBounded(NodeApi node, String tid, boolean relevant,
+                                         CoinsBounded ok, java.util.function.Consumer<String> fail) {
+        if (relevant) {
+            JSONArray cached = cachedWalletCoins();
+            if (cached != null) { ok.ok(filterByToken(cached, tid), false); return; }
+            node.cmd("coins relevant:true", new NodeApi.Cb() {
+                @Override public void onResult(JSONObject json) {
+                    if (!json.optBoolean("status", false)) {
+                        fail.accept(json.optString("error", "coins query failed"));
+                        return;
+                    }
+                    JSONArray arr = json.optJSONArray("response");
+                    if (arr == null) arr = new JSONArray();
+                    cacheWalletCoins(arr);
+                    ok.ok(filterByToken(arr, tid), false);
+                }
+                @Override public void onError(String message) {
+                    // legacy node without the file hand-off: the whole list can
+                    // overflow — fall back to the bounded per-token sweep
+                    if (NodeApi.ERR_TOO_LONG.equals(message)) { pagedSweep(node, tid, true, ok, fail); return; }
+                    fail.accept(message);
+                }
+            });
+            return;
+        }
+        /* all-coins pass (holdings beyond this wallet): the global per-token
+         * reply is the one that stalled Panda at 383KB — the sweep's bounded
+         * windows keep every reply small, so lead with it directly */
+        pagedSweep(node, tid, false, ok, fail);
+    }
+
+    private static void pagedSweep(NodeApi node, String tid, boolean relevant,
+                                   CoinsBounded ok, java.util.function.Consumer<String> fail) {
+        node.cmd("block", new NodeApi.Cb() {
+            @Override public void onResult(JSONObject json) {
+                JSONObject r = json.optJSONObject("response");
+                int tip = r == null ? 0 : r.optInt("block", 0);
+                if (tip <= 0) { fail.accept("block height unavailable for paged coin sweep"); return; }
+                // start small: window replies must stay far below the Binder
+                // death window (~250KB), not merely below the 256KB stub cutoff
+                sweepWindow(node, tid, relevant, tip, 0, 64,
+                        new java.util.LinkedHashMap<>(), new int[]{0}, new boolean[]{false}, ok);
+            }
+            @Override public void onError(String message) { fail.accept(message); }
+        });
+    }
+
+    private static void sweepWindow(NodeApi node, String tid, boolean relevant, int tip,
+                                    int from, int span,
+                                    java.util.LinkedHashMap<String, JSONObject> acc,
+                                    int[] requests, boolean[] partial, CoinsBounded ok) {
+        if (from > tip || requests[0] >= 80) {
+            if (from <= tip) partial[0] = true;   // request budget cut the sweep short
+            JSONArray out = new JSONArray();
+            for (JSONObject c : acc.values()) out.put(c);
+            ok.ok(out, partial[0]);
+            return;
+        }
+        int to = Math.min(from + span, tip + 10);
+        requests[0]++;
+        String command = "coins " + (relevant ? "relevant:true " : "") + "tokenid:" + tid
+                + " coinage:" + from + " depth:" + to;
+        node.cmd(command, new NodeApi.Cb() {
+            @Override public void onResult(JSONObject json) {
+                JSONArray arr = json.optBoolean("status", false) ? json.optJSONArray("response") : null;
+                if (arr != null) {
+                    for (int i = 0; i < arr.length(); i++) {
+                        JSONObject c = arr.optJSONObject(i);
+                        if (c != null) acc.put(c.optString("coinid"), c);
+                    }
+                }
+                sweepWindow(node, tid, relevant, tip, to, Math.min(span * 2, 262144),
+                        acc, requests, partial, ok);
+            }
+            @Override public void onError(String message) {
+                if (NodeApi.ERR_TOO_LONG.equals(message)) {
+                    if (span <= 1) {
+                        // one single block alone exceeds the cap — skip it honestly
+                        partial[0] = true;
+                        sweepWindow(node, tid, relevant, tip, from + 1, 64, acc, requests, partial, ok);
+                    } else {
+                        sweepWindow(node, tid, relevant, tip, from, Math.max(1, span / 2),
+                                acc, requests, partial, ok);
+                    }
+                    return;
+                }
+                // non-cap error mid-sweep: deliver what we have, flagged partial
+                partial[0] = true;
+                JSONArray out = new JSONArray();
+                for (JSONObject c : acc.values()) out.put(c);
+                ok.ok(out, true);
+            }
+        });
+    }
+
+    private static void cmd(NodeApi node, String command, Cb cb) {
+        node.cmd(command, new NodeApi.Cb() {
+            @Override public void onResult(JSONObject json) {
+                if (json.optBoolean("status", false)) cb.ok(json);
+                else cb.fail(json.optString("error", json.optString("response", command + " failed")));
+            }
+            @Override public void onError(String message) { cb.fail(message); }
+        });
+    }
+
+    /** Rows whose validation doc is currently uploading — prevents a second
+     *  tick from double-posting while the first is in flight. */
+    private static final java.util.Set<Long> WV_INFLIGHT =
+            java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+
+    /** If this collection opted into auto-creating its web-validation doc and
+     *  its tokenid is now known, upload a text file containing the tokenid to
+     *  the chosen hosting path — the exact bytes `tokenvalidate` needs. Once. */
+    static void maybeCreateValidationDoc(Context ctx, JSONObject row) {
+        if (row.optInt("wvauto", 0) != 1 || row.optInt("wvdone", 0) == 1) return;
+        final String tid = row.optString("tokenid", "");
+        final String rel = row.optString("wvrel", "");
+        if (tid.isEmpty() || rel.isEmpty()) return;
+        final long id = row.optLong("id");
+        if (!WV_INFLIGHT.add(id)) return;
+        new Thread(() -> {
+            Hosting.Uploader u = null;
+            try {
+                Hosting.Profile p = HostingStore.getDefault(ctx);
+                if (p == null) { LocalStore.logEvent(ctx, row.optString("name")
+                        + ": validation doc skipped — no hosting destination"); return; }
+                u = Hosting.forProfile(p);
+                u.putFile(tid.getBytes(java.nio.charset.StandardCharsets.UTF_8), rel, "text/plain");
+                put(row, "wvdone", 1);
+                LocalStore.upsert(ctx, row);
+                LocalStore.logEvent(ctx, row.optString("name")
+                        + ": validation doc written with tokenid → " + rel);
+            } catch (Throwable t) {
+                LocalStore.logEvent(ctx, row.optString("name")
+                        + ": validation doc upload failed (will retry next block): "
+                        + (t.getMessage() == null ? t.getClass().getSimpleName() : t.getMessage()));
+            } finally {
+                if (u instanceof AutoCloseable) { try { ((AutoCloseable) u).close(); } catch (Exception ignored) { } }
+                WV_INFLIGHT.remove(id);
+            }
+        }).start();
+    }
+
+    private static void setPhase(Context ctx, JSONObject row, String phase, Done done) {
+        put(row, "phase", phase);
+        put(row, "error", "");
+        LocalStore.upsert(ctx, row);
+        done.done("Collection " + row.optString("name") + " -> " + phase);
+    }
+
+    /** Stall watchdog: a row whose sealed count has not moved for STALL_TICKS
+     *  consecutive engine ticks recovers itself (chain re-derive, no txn).
+     *  Progress resets the counter, so healthy slow mints never trip it. */
+    private static final int STALL_TICKS = 8;
+
+    private static boolean watchStall(Context ctx, NodeApi node, JSONObject row, int tip, Done done) {
+        // SPLIT owns its own escalation (phaseSplit: 3 no-progress cycles -> honest
+        // error). The watchdog's recover() RESETS splitretries, so it used to mask
+        // a genuinely-unmineable split as an eternal loop (Gallery Bibeau). Leave
+        // SPLIT alone so its escalation can actually fire.
+        if ("SPLIT".equals(row.optString("phase"))) return false;
+        int seen = row.optInt("minted", 0);
+        int last = row.optInt("stallseen", -1);
+        int ticks = row.optInt("stallticks", 0);
+        if (seen != last) {
+            put(row, "stallseen", seen);
+            put(row, "stallticks", 0);
+            LocalStore.upsert(ctx, row);
+            return false;
+        }
+        ticks++;
+        put(row, "stallticks", ticks);
+        LocalStore.upsert(ctx, row);
+        if (ticks < STALL_TICKS) return false;
+        LocalStore.logEvent(ctx, row.optString("name")
+                + ": no progress for " + ticks + " ticks — self-recovering");
+        recover(ctx, node, row, tip, done);
+        return true;
+    }
+
+    private static void setError(Context ctx, JSONObject row, String error, Done done) {
+        LocalStore.logEvent(ctx, "ERROR [" + row.optString("name") + " · "
+                + row.optString("phase") + "]: " + error);
+        put(row, "error", error);
+        LocalStore.upsert(ctx, row);
+        done.done(error);
+    }
+
+    static StateNft.Meta metaFromRow(JSONObject row) {
+        StateNft.Meta m = new StateNft.Meta();
+        m.localId = row.optLong("id");
+        m.name = row.optString("name", "Collection");
+        m.description = row.optString("description", "");
+        m.mode = row.optString("mode", "url");
+        m.size = row.optInt("size", 0);
+        m.base = row.optString("base", "");
+        m.ext = row.optString("ext", ".png");
+        m.icon = row.optString("icon", "");
+        m.externalUrl = row.optString("externalurl", "");
+        m.webvalidate = row.optString("webvalidate", "");
+        m.creatorPk = row.optString("creatorpk", "");
+        m.creatorAddr = row.optString("creatoraddr", "");
+        m.tokenid = row.optString("tokenid", "");
+        m.phase = row.optString("phase", "DONE");
+        m.error = row.optString("error", "");
+        m.posted = row.optInt("posted", 0);
+        m.postedAt = row.optInt("postedat", 0);
+        m.owned = row.optInt("owned", 0);
+        m.minted = row.optInt("minted", 0);
+        m.buriedAt = row.optInt("buriedat", 0);
+        m.created = row.optInt("created", 1) == 1;
+        m.creator = m.created;
+        return m;
+    }
+
+    static JSONObject rowFromMeta(StateNft.Meta m, JSONArray items) {
+        JSONObject row = new JSONObject();
+        put(row, "id", m.localId);
+        put(row, "name", m.name);
+        put(row, "description", m.description);
+        put(row, "mode", m.mode);
+        put(row, "size", m.size);
+        put(row, "base", m.base);
+        put(row, "ext", m.ext);
+        put(row, "icon", m.icon);
+        put(row, "webvalidate", m.webvalidate);
+        put(row, "externalurl", m.externalUrl);
+        put(row, "creatoraddr", m.creatorAddr);
+        put(row, "creatorpk", m.creatorPk);
+        put(row, "tokenid", m.tokenid);
+        put(row, "phase", m.phase);
+        put(row, "posted", m.posted);
+        put(row, "postedat", m.postedAt);
+        put(row, "created", m.created ? 1 : 0);
+        put(row, "owned", m.owned);
+        put(row, "minted", m.minted);
+        put(row, "buriedat", m.buriedAt);
+        put(row, "error", m.error);
+        put(row, "items", items == null ? new JSONArray() : items);
+        return row;
+    }
+
+    static JSONArray localItems(JSONObject row) {
+        JSONArray items = row.optJSONArray("items");
+        return items == null ? new JSONArray() : items;
+    }
+
+    /** Durably claim item #idx for this coin (pre-post reservation). */
+    private static void reserveIndex(Context ctx, JSONObject row, int idx, String coinid, int tip) {
+        JSONArray items = localItems(row);
+        for (int j = 0; j < items.length(); j++) {
+            JSONObject it = items.optJSONObject(j);
+            if (it != null && it.optInt("idx") == idx) {
+                if (it.optString("coinid", "").isEmpty()) put(it, "coinid", coinid);
+                // refresh the TTL clock on a re-post of the same pair so the
+                // next re-post waits a full TTL again
+                if (coinid.equals(it.optString("coinid", ""))) put(it, "reservedat", tip);
+                LocalStore.upsert(ctx, row);
+                return;
+            }
+        }
+        JSONObject it = new JSONObject();
+        put(it, "idx", idx);
+        put(it, "coinid", coinid);
+        put(it, "reservedat", tip);
+        items.put(it);
+        put(row, "items", items);
+        LocalStore.upsert(ctx, row);
+    }
+
+    /** Chain-truth verdict for the stamp machinery. `distinct` counts indices
+     *  CONFIRMED on-chain only — never reservations. */
+    static String classifyStamp(int distinct, int size, int blanks, int bigs, int coins) {
+        if (distinct >= size) return "DONE";
+        if (coins == 0) return "MOVE";
+        if (blanks == 0 && bigs == 0 && coins >= size) return "DAMAGED";
+        if (blanks == 0 && bigs > 0) return "SPLIT";
+        return "STAMP";
+    }
+
+    /** Terminal honest state for pre-reservation duplicate seals: every coin
+     *  is stamped but distinct designs fall short — under the locked contract
+     *  a duplicate seal is permanent, so the collection can never complete.
+     *  The lots stay valid, sendable and buriable; the engine stops churning. */
+    private static void setDamaged(Context ctx, JSONObject row, int distinct, int coins, Done done) {
+        int size = row.optInt("size");
+        String msg = "DAMAGED: all " + coins + " coins are sealed but only " + distinct + " of "
+                + size + " designs are distinct — " + (coins - distinct)
+                + " coins carry duplicate seals (minted before the duplicate-seal fix), which the "
+                + "locked contract makes permanent. The sealed lots remain valid, sendable and "
+                + "buriable; the collection can never reach " + size + " distinct lots.";
+        LocalStore.logEvent(ctx, row.optString("name") + ": " + msg);
+        put(row, "phase", "DAMAGED");
+        put(row, "error", msg);
+        put(row, "stallticks", 0);
+        LocalStore.upsert(ctx, row);
+        done.done(msg);
+    }
+
+    /** A reservation is DEAD when its index never confirmed and its reserved
+     *  coin still sits unspent among the blanks. The ONLY duplicate-proof
+     *  cure is re-posting the SAME index onto the SAME coin: if the original
+     *  txn ever resurfaces, both spend one coin and the chain keeps exactly
+     *  one seal — which also means same-pair re-posts are safe at the
+     *  ordinary 6-block per-coin spend-lock cadence (pendingOk); the old
+     *  12-block wait throttled Maths to ~one seal per window. Capped at
+     *  REPLAN_BATCH per tick: a burst of competing TxPoWs starves itself
+     *  down to about one confirmation per round. */
+    private static final int REPLAN_BATCH = 2;
+    /** All stamp posts per tick — replans + fresh combined. */
+    private static final int STAMP_BATCH = 4;
+    /** A reservation whose coin has vanished from the coin set entirely with
+     *  its index still unconfirmed can only be freed after a much deeper wait
+     *  — the txn that consumed the coin may still surface its stamp. */
+    private static final int VANISHED_TTL = 60;
+
+    static List<String[]> replanDeadReservations(Context ctx, JSONObject row, HashSet<String> chainUsed,
+                                                 List<JSONObject> blanks, JSONArray coins, int tip) {
+        JSONArray items = localItems(row);
+        HashSet<String> blankIds = new HashSet<>();
+        for (JSONObject b : blanks) blankIds.add(b.optString("coinid"));
+        HashSet<String> allIds = new HashSet<>();
+        for (int i = 0; i < coins.length(); i++) {
+            JSONObject c = coins.optJSONObject(i);
+            if (c != null) allIds.add(c.optString("coinid"));
+        }
+        List<String[]> replans = new ArrayList<>();
+        boolean changed = false;
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject it = items.optJSONObject(i);
+            if (it == null) continue;
+            String cid = it.optString("coinid", "");
+            if (cid.isEmpty()) continue;
+            if (chainUsed.contains(String.valueOf(it.optInt("idx")))) continue;
+            int at = it.optInt("reservedat", -1);
+            if (at < 0) { put(it, "reservedat", tip); changed = true; }
+            if (blankIds.contains(cid)) {
+                if (!LocalStore.pendingOk(ctx, cid, tip)) continue;
+                if (replans.size() >= REPLAN_BATCH) continue;
+                LocalStore.logEvent(ctx, row.optString("name") + ": re-posting idx "
+                        + it.optInt("idx") + " onto its reserved coin — still blank");
+                replans.add(new String[]{ cid, String.valueOf(it.optInt("idx")) });
+            } else if (!allIds.contains(cid)) {
+                // deliberately the PRE-stamp local `at`: a reservation whose
+                // clock started this tick must wait a full TTL from now
+                if (at < 0) continue;
+                if (tip - at < VANISHED_TTL) continue;
+                LocalStore.logEvent(ctx, row.optString("name") + ": released idx "
+                        + it.optInt("idx") + " — reserved coin gone " + (tip - at)
+                        + " blocks with no seal in sight");
+                it.remove("coinid");
+                it.remove("reservedat");
+                changed = true;
+            }
+            // coin visible but neither blank nor stamped-with-our-idx: leave it
+        }
+        if (changed) { put(row, "items", items); LocalStore.upsert(ctx, row); }
+        return replans;
+    }
+
+    private static void updateCoinIds(JSONObject row, JSONArray coins) {
+        JSONArray items = localItems(row);
+        for (int i = 0; i < coins.length(); i++) {
+            JSONObject c = coins.optJSONObject(i);
+            if (c == null) continue;
+            String idx = StateNft.stamped(c);
+            if (idx == null || !idx.matches("^[0-9]+$")) continue;
+            for (int j = 0; j < items.length(); j++) {
+                JSONObject it = items.optJSONObject(j);
+                if (it != null && it.optInt("idx") == parseInt(idx)) put(it, "coinid", c.optString("coinid"));
+            }
+        }
+        put(row, "items", items);
+    }
+
+    private static String itemImage(JSONObject row, int idx) {
+        JSONArray items = localItems(row);
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject it = items.optJSONObject(i);
+            if (it != null && it.optInt("idx") == idx) return it.optString("image", "");
+        }
+        return "";
+    }
+
+    private static void mergeLocalStamps(JSONObject row, HashSet<String> used) {
+        JSONArray items = localItems(row);
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject it = items.optJSONObject(i);
+            if (it != null && !it.optString("coinid", "").isEmpty()) {
+                used.add(String.valueOf(it.optInt("idx")));
+            }
+        }
+    }
+
+    private static int firstFree(int size, HashSet<String> used) {
+        for (int i = 1; i <= size; i++) if (!used.contains(String.valueOf(i))) return i;
+        return size;
+    }
+
+    /** Largest embedded image (b64 chars) across the row's items. */
+    private static int maxImageLen(JSONObject row) {
+        int size = row.optInt("size", 0);
+        int max = 0;
+        for (int idx = 1; idx <= size; idx++) {
+            max = Math.max(max, itemImage(row, idx).length());
+        }
+        return max;
+    }
+
+    private static int missingLocalImages(JSONObject row) {
+        if (!"embed".equals(row.optString("mode"))) return 0;
+        int size = row.optInt("size", 0);
+        int missing = 0;
+        for (int idx = 1; idx <= size; idx++) {
+            if (itemImage(row, idx).isEmpty()) missing++;
+        }
+        return missing;
+    }
+
+    private static int parseInt(String s) {
+        try { return Integer.parseInt(s); } catch (Exception e) { return 0; }
+    }
+
+    private static void put(JSONObject o, String k, Object v) {
+        try { o.put(k, v); } catch (Exception ignored) {}
+    }
+
+    private interface Cb {
+        void ok(JSONObject res);
+        void fail(String e);
+    }
+
+    private interface CoinsCb {
+        void ok(JSONArray coins);
+    }
+}

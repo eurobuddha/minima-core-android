@@ -6621,4 +6621,23 @@
     </plurals>
     <string name="l10n_chat_tap_open" formatted="false">"Tap to open"</string>
     <string name="l10n_chat_payment_preview" formatted="false">"💸 Payment"</string>
+    <string name="l10n_creative_studio" formatted="false">"Studio"</string>
+    <string name="l10n_creative_manage" formatted="false">"Manage"</string>
+    <string name="l10n_creative_feed" formatted="false">"Feed"</string>
+    <string name="l10n_creative_discover" formatted="false">"Discover"</string>
+    <string name="l10n_creative_salon" formatted="false">"Salon"</string>
+    <string name="l10n_creative_messages" formatted="false">"Messages"</string>
+    <string name="l10n_creative_collections" formatted="false">"Collections"</string>
+    <string name="l10n_creative_nfts" formatted="false">"NFTs"</string>
+    <string name="l10n_creative_mine" formatted="false">"Mine"</string>
+    <string name="l10n_creative_single_nfts" formatted="false">"Single NFTs"</string>
+    <string name="l10n_creative_empty_catalogue" formatted="false">"Empty catalogue"</string>
+    <string name="l10n_creative_no_lots" formatted="false">"No lots yet"</string>
+    <string name="l10n_creative_open_studio" formatted="false">"Open the studio"</string>
+    <string name="l10n_creative_enter_studio" formatted="false">"Enter the studio"</string>
+    <string name="l10n_creative_scan_wallet" formatted="false">"Scan wallet"</string>
+    <string name="l10n_creative_welcome" formatted="false">"Collections with sealed on-chain identities. Single NFTs. Custom tokens. Every mint a numbered lot."</string>
+    <string name="l10n_creative_first_piece" formatted="false">"Create your first piece in the Studio, or adopt existing StateNFT collections from your wallet."</string>
+    <!-- Arguments: version -->
+    <string name="l10n_creative_subtitle">"The Minima NFT studio · № %1$s"</string>
 </resources>

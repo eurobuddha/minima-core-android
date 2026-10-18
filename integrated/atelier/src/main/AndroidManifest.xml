@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <package android:name="com.eurobuddha.minimacore" />
+    </queries>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <application>
+        <activity android:name="com.eurobuddha.statenft.FiltrActivity" android:exported="false" android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|locale|layoutDirection" android:theme="@style/pm_atelier_Theme.StateNFT" />
+        <activity android:name="com.eurobuddha.statenft.MainActivity" android:exported="false" android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density|keyboardHidden|locale|layoutDirection" android:windowSoftInputMode="adjustResize" android:theme="@style/pm_atelier_Theme.StateNFT">
+            </activity>
+        <service android:name="com.eurobuddha.statenft.MintService" android:exported="false" android:stopWithTask="false" android:foregroundServiceType="specialUse|dataSync">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Finishes an in-flight StateNFT mint — one transaction per block until every item is stamped — while the app is closed" />
+        </service>
+        <provider android:name="com.eurobuddha.statenft.IntegratedFileProvider" android:authorities="${applicationId}.atelier.fileprovider" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/pm_atelier_file_paths" />
+        </provider>
+    </application>
+</manifest>

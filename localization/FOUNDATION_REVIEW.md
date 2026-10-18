@@ -3119,3 +3119,12 @@ No unresolved correctness finding in this patch. The actual owner-specific Studi
 Approve this source patch for signed candidate builds. Fold visual confirmation, the exact owner Studio error and broader multilingual runtime acceptance remain pending. Evidence: `build/localization/bear-1.9.51-validation.json`.
 
 Signed build follow-up: all three 1.9.51/vc122 release candidates built successfully from 80ef5fc. Signature continuity, SHA256 checksums, package/version metadata, non-debuggable arm64 packaging, 16 KiB alignment and all four packaged language catalogues verified. Artifacts are in apks/base/dist with versioned filenames and checksum sidecars. Fold R3GL805K7MB disconnected before installation; no other device was updated. This build verification does not establish runtime acceptance.
+
+
+## Atelier/Salon integration foundation — 2026-10-18 (in progress)
+
+Reviewed the source importer and new packaging/node/initial-label adapters, generated manifests, storage and file-provider ownership, host destination order and event subscriptions. Reused existing libraries and retained-binding helpers; donor art/crypto/transaction code remains imported. The event listener now checks for an established Salon identity or messaging seed before processing wallet events. Verified that all 21 imports reproduce and the original 19 generated snapshots are unchanged. Initial translation resources cover navigation and Atelier launch/gallery labels only.
+
+Validation: 53 Atelier, 13 Salon, 150 Pandamonium host and 12 localization JVM tests pass. Pandamonium Java compilation, direct-transport guard and 5,355-entry/four-language catalogue generation pass. The first Atelier test attempt exposed missing external fixture paths; the importer now carries the original public fixtures and relocates test reads. The initial language compile found a mistyped resource name; corrected to the existing Mail node-retry string and rebuilt successfully.
+
+This review approves saving the integration foundation, not releasing or marking the goal complete. Remaining review includes full native/WebView localization, embedded Maxima/media adaptation, owner-device state/layout checks and donor financial/identity error paths explicitly recorded in PLAN.md. No 1.9.52 APK was installed or published.

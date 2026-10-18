@@ -6589,4 +6589,23 @@
     </plurals>
     <string name="l10n_chat_tap_open" formatted="false">"点按打开"</string>
     <string name="l10n_chat_payment_preview" formatted="false">"💸 付款"</string>
+    <string name="l10n_creative_studio" formatted="false">"工作室"</string>
+    <string name="l10n_creative_manage" formatted="false">"管理"</string>
+    <string name="l10n_creative_feed" formatted="false">"动态"</string>
+    <string name="l10n_creative_discover" formatted="false">"发现"</string>
+    <string name="l10n_creative_salon" formatted="false">"沙龙"</string>
+    <string name="l10n_creative_messages" formatted="false">"消息"</string>
+    <string name="l10n_creative_collections" formatted="false">"合集"</string>
+    <string name="l10n_creative_nfts" formatted="false">"NFT"</string>
+    <string name="l10n_creative_mine" formatted="false">"我的"</string>
+    <string name="l10n_creative_single_nfts" formatted="false">"单个 NFT"</string>
+    <string name="l10n_creative_empty_catalogue" formatted="false">"目录为空"</string>
+    <string name="l10n_creative_no_lots" formatted="false">"暂无作品"</string>
+    <string name="l10n_creative_open_studio" formatted="false">"打开工作室"</string>
+    <string name="l10n_creative_enter_studio" formatted="false">"进入工作室"</string>
+    <string name="l10n_creative_scan_wallet" formatted="false">"扫描钱包"</string>
+    <string name="l10n_creative_welcome" formatted="false">"身份封存于链上的合集、单个 NFT 和自定义代币。每次铸造均有独立编号。"</string>
+    <string name="l10n_creative_first_piece" formatted="false">"在工作室创建第一件作品，或导入钱包中已有的 StateNFT 合集。"</string>
+    <!-- Arguments: version -->
+    <string name="l10n_creative_subtitle">"Minima NFT 工作室 · № %1$s"</string>
 </resources>

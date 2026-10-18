@@ -6685,4 +6685,23 @@
     </plurals>
     <string name="l10n_chat_tap_open" formatted="false">"Нажмите, чтобы открыть"</string>
     <string name="l10n_chat_payment_preview" formatted="false">"💸 Платёж"</string>
+    <string name="l10n_creative_studio" formatted="false">"Студия"</string>
+    <string name="l10n_creative_manage" formatted="false">"Управление"</string>
+    <string name="l10n_creative_feed" formatted="false">"Лента"</string>
+    <string name="l10n_creative_discover" formatted="false">"Обзор"</string>
+    <string name="l10n_creative_salon" formatted="false">"Салон"</string>
+    <string name="l10n_creative_messages" formatted="false">"Сообщения"</string>
+    <string name="l10n_creative_collections" formatted="false">"Коллекции"</string>
+    <string name="l10n_creative_nfts" formatted="false">"NFT"</string>
+    <string name="l10n_creative_mine" formatted="false">"Мои"</string>
+    <string name="l10n_creative_single_nfts" formatted="false">"Отдельные NFT"</string>
+    <string name="l10n_creative_empty_catalogue" formatted="false">"Каталог пуст"</string>
+    <string name="l10n_creative_no_lots" formatted="false">"Пока нет лотов"</string>
+    <string name="l10n_creative_open_studio" formatted="false">"Открыть студию"</string>
+    <string name="l10n_creative_enter_studio" formatted="false">"Войти в студию"</string>
+    <string name="l10n_creative_scan_wallet" formatted="false">"Сканировать кошелёк"</string>
+    <string name="l10n_creative_welcome" formatted="false">"Коллекции с закреплёнными в блокчейне идентификаторами. Отдельные NFT. Собственные токены. Каждый выпуск — пронумерованный лот."</string>
+    <string name="l10n_creative_first_piece" formatted="false">"Создайте первую работу в студии или добавьте существующие коллекции StateNFT из кошелька."</string>
+    <!-- Arguments: version -->
+    <string name="l10n_creative_subtitle">"NFT-студия Minima · № %1$s"</string>
 </resources>

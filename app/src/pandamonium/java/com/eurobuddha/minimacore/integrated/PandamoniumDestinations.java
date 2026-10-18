@@ -5,7 +5,7 @@ public final class PandamoniumDestinations {
     private PandamoniumDestinations() {}
     public static final String[] NAMES = {
         "Minima Core", "ETH Wallet", "AtomiX", "PandaPools", "Future Cash Next", "PandaDEX",
-        "Zero Edge Casino", "Minima Explorer", "Filez", "Minima Vestr", "Entropy", "Terminal IDE", "MinimaMail", "UTXO Wallet", "miniMall", "NFT Wallet", "minimaWallet"
+        "Zero Edge Casino", "Minima Explorer", "Filez", "Minima Vestr", "Entropy", "Terminal IDE", "MinimaMail", "UTXO Wallet", "miniMall", "NFT Wallet", "minimaWallet", "Atelier", "The Salon"
     };
     // Existing launcher artwork, indexed by destination identity rather than display order.
     public static final int[] ICONS = {
@@ -25,7 +25,9 @@ public final class PandamoniumDestinations {
         com.eurobuddha.utxo.R.mipmap.pm_utxo_ic_launcher,
         com.eurobuddha.merchshop.R.mipmap.pm_merchshop_ic_launcher,
         com.eurobuddha.nftwallet.R.mipmap.pm_nftwallet_ic_launcher,
-        com.eurobuddha.wallet.R.mipmap.pm_wallet_ic_launcher
+        com.eurobuddha.wallet.R.mipmap.pm_wallet_ic_launcher,
+        com.eurobuddha.statenft.R.mipmap.pm_atelier_ic_launcher,
+        com.eurobuddha.salon.R.mipmap.pm_salon_ic_launcher
     };
     public static final String[] CLASSES = {
         "com.eurobuddha.minimacore.main.MainActivity", "com.eurobuddha.ethwallet.MainActivity",
@@ -38,7 +40,9 @@ public final class PandamoniumDestinations {
         "com.eurobuddha.utxo.MainActivity",
         "com.eurobuddha.minimacore.integrated.MallActivity",
         "com.eurobuddha.nftwallet.MainActivity",
-        "com.eurobuddha.wallet.MainActivity"
+        "com.eurobuddha.wallet.MainActivity",
+        "com.eurobuddha.statenft.MainActivity",
+        "com.eurobuddha.salon.MainActivity"
     };
     public static int indexFor(String activityClass) {
         for (int i = 0; i < CLASSES.length; i++) {
@@ -49,6 +53,8 @@ public final class PandamoniumDestinations {
                 || activityClass.equals("com.eurobuddha.merchstudio.MainActivity")
                 || activityClass.equals("com.eurobuddha.merchinbox.MainActivity"))
             return indexFor("com.eurobuddha.minimacore.integrated.MallActivity");
+        if (activityClass.equals("com.eurobuddha.statenft.FiltrActivity"))
+            return indexFor("com.eurobuddha.statenft.MainActivity");
         return -1;
     }
 }

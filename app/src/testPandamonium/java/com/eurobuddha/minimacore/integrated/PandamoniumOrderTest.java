@@ -38,4 +38,16 @@ public class PandamoniumOrderTest {
         assertEquals(order, PandamoniumOrder.decode(PandamoniumOrder.encode(order)));
     }
 
+    @Test public void creativeAppsAppendAndPreserveSavedOrder() {
+        assertEquals(17, PandamoniumDestinations.indexFor("com.eurobuddha.statenft.MainActivity"));
+        assertEquals(18, PandamoniumDestinations.indexFor("com.eurobuddha.salon.MainActivity"));
+        assertEquals(17, PandamoniumDestinations.indexFor("com.eurobuddha.statenft.FiltrActivity"));
+        String prior = String.join(",", java.util.Arrays.copyOfRange(PandamoniumDestinations.CLASSES, 1, 17));
+        List<Integer> order = PandamoniumOrder.decode(prior);
+        for (int i = 0; i < 19; i++) assertEquals(Integer.valueOf(i), order.get(i));
+        assertEquals(order, PandamoniumOrder.decode(PandamoniumOrder.encode(order)));
+        assertEquals(19, PandamoniumDestinations.NAMES.length);
+        assertEquals(19, PandamoniumDestinations.ICONS.length);
+    }
+
 }

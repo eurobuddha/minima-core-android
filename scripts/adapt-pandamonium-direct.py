@@ -6,6 +6,12 @@ ANDROID='{http://schemas.android.com/apk/res/android}'
 ET.register_namespace('android',ANDROID[1:-1])
 
 def adapt(root):
+    # Adapt Salon's closed-screen notification intake before generic SDK rewriting.
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('creative_apps', Path(__file__).with_name('adapt-pandamonium-creative.py'))
+    creative_apps = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(creative_apps)
+    creative_apps.prepare(root)
     # Reproduce 1.9.32's shared codec dependency; importing old copies would
     # reintroduce duplicate classes. Refuse to discard a copy that has diverged.
     shared = Path(__file__).resolve().parents[1] / 'maxima-core/src/main/java/com/eurobuddha/maxima/core'
@@ -404,6 +410,9 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
     spec=importlib.util.spec_from_file_location('token_metadata',Path(__file__).with_name('adapt-pandamonium-token-metadata.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('creative_languages',Path(__file__).with_name('adapt-pandamonium-creative-languages.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
 if __name__=='__main__': adapt(Path(sys.argv[1]))

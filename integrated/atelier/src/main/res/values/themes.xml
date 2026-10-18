@@ -1,0 +1,12 @@
+<resources>
+    <style name="pm_atelier_Base.Theme.StateNFT" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:fontFamily">@font/pm_atelier_inter</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:colorAccent">#111111</item>
+    </style>
+
+    <style name="pm_atelier_Theme.StateNFT" parent="pm_atelier_Base.Theme.StateNFT" />
+
+    <style name="pm_atelier_StateNftDialogLight" parent="Theme.Material3.Light.Dialog.Alert" />
+</resources>

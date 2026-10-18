@@ -11,7 +11,7 @@ direct_adapt = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(direct_adapt)
 
 ROOT = Path(__file__).resolve().parents[1]
-APPS = ['ethwallet','atomix','pandapools','futurecash-next','pandadex','casino','blockexplorer','filez','history','vestr','entropy','terminalide','mail','utxo','merchshop','merchstudio','merchinbox','NFTwallet','wallet']
+APPS = ['ethwallet','atomix','pandapools','futurecash-next','pandadex','casino','blockexplorer','filez','history','vestr','entropy','terminalide','mail','utxo','merchshop','merchstudio','merchinbox','NFTwallet','wallet','atelier','salon']
 HOST = 'com.eurobuddha.pandamonium'
 ANDROID = '{http://schemas.android.com/apk/res/android}'
 ET.register_namespace('android', ANDROID[1:-1])
@@ -19,7 +19,11 @@ ET.register_namespace('tools', 'http://schemas.android.com/tools')
 
 def import_app(name, target_root=None):
     # An isolated worktree can reuse the established sibling source checkout.
-    source = Path(os.environ.get('PANDAMONIUM_SOURCE_ROOT', ROOT.parent)) / name
+    source_root = Path(os.environ.get('PANDAMONIUM_SOURCE_ROOT', ROOT.parent))
+    source = source_root / name
+    # Atelier's proven Android source lives with its StateNFT MiniDapp suite.
+    if name == 'atelier' and not source.exists():
+        source = source_root.parent / 'mds/statenft-suite/android'
     target = (target_root or ROOT / 'integrated') / name
     if target.exists():
         raise SystemExit(f'{target} exists: review/remove the snapshot explicitly before reimporting')
@@ -118,6 +122,19 @@ def import_app(name, target_root=None):
             dest.parent.mkdir(parents=True,exist_ok=True)
             shutil.copy2(path,dest)
             hashes[str(path.relative_to(source))]=hashlib.sha256(path.read_bytes()).hexdigest()
+    if name == 'atelier':
+        canonical = source.resolve().parent / 'minidapp/art.js'
+        dest = target / 'src/test/resources/canonical-art.js'
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(canonical, dest)
+        hashes['../minidapp/art.js'] = hashlib.sha256(canonical.read_bytes()).hexdigest()
+        for relative in ('hosting/parity.json', 'arweave/ans104.json'):
+            fixture = source.resolve().parent / 'test/fixtures' / relative
+            dest = target / 'src/test/resources/fixtures' / relative
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(fixture, dest)
+            hashes['../test/fixtures/'+relative] = hashlib.sha256(fixture.read_bytes()).hexdigest()
+
     manifest=target/'src/main/AndroidManifest.xml'
     tree=ET.parse(manifest);app=tree.getroot().find('application');theme=app.get(ANDROID+'theme')
     app.attrib.clear()  # base owns backup policy, application class, icon and label
@@ -172,7 +189,7 @@ dependencies {
     for f in ['LICENSE','NOTICE']:
         if (source/f).exists():shutil.copy2(source/f,target/f)
     revision=subprocess.check_output(['git','-C',str(source),'rev-parse','HEAD'],text=True).strip()
-    return {'source':'../'+name,'revision':revision,'version':version,'namespace':namespace,'files':hashes,'resource_prefix':prefix}
+    return {'source':('../../mds/statenft-suite/android' if name == 'atelier' else '../'+name),'revision':revision,'version':version,'namespace':namespace,'files':hashes,'resource_prefix':prefix}
 
 if __name__=='__main__':
     if sys.argv[1:] == ['--verify']:

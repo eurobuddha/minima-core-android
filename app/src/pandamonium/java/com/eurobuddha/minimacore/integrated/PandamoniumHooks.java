@@ -110,6 +110,10 @@ public final class PandamoniumHooks {
         com.eurobuddha.minimaapi.direct.DirectNodeEvents.subscribe(
                 new com.eurobuddha.terminalide.receiver.MinimaNotifyReceiver(context),
                 com.eurobuddha.minimacore.utils.BackgroundWork.pool(1, 8), "MINIMALOG");
+        com.eurobuddha.minimaapi.direct.DirectNodeEvents.subscribe(
+                new com.eurobuddha.salon.SalonNotifyReceiver(context),
+                com.eurobuddha.minimacore.utils.BackgroundWork.pool(1, 8),
+                "NEWBLOCK", "NEWCOIN", "NOTIFYCOIN");
     }
 
     public static void install(Activity raw) {

@@ -4,7 +4,7 @@
 
 PandaBear, BlackBear and Pandamonium: English (`en`), Simplified Chinese (`zh-Hans`), Russian (`ru`) and Ukrainian (`uk`, Українська). Ukrainian explicitly authorized on 2026-10-16. Users choose the language; retain their choice. Language changes must preserve wallet state, edited input, active operations and app lock behavior.
 
-Baseline: `9def96e6801a9bef261611e45349f28a1eb6ae1c` (all three 1.9.41 tags and fork/ui/full-redesign verified). Candidate source: 1.9.51, versionCode 122. Isolated branch: feature/bear-languages-2026-10-16.
+Baseline: `9def96e6801a9bef261611e45349f28a1eb6ae1c` (all three 1.9.41 tags and fork/ui/full-redesign verified). Installed candidate: 1.9.51/vc122. New Atelier/Salon integration source: 1.9.52/vc123 (in progress). Isolated branch: feature/bear-languages-2026-10-16.
 
 ## Current release status — 2026-10-18
 
@@ -13,7 +13,7 @@ Use this section for current status. The dated entries below record earlier chec
 - **Source:** 1.9.51/vc122 adds NFT tab-strip scrolling and Studio unstamped collection read fixes to the reviewed 1.9.50 metadata fixes. Baseline 1.9.41 and bundled node remain unchanged.
 - **Languages:** explicit, remembered English, Simplified Chinese, Russian and Ukrainian; 5,337 catalogue messages per language across all 19 integrations. Full visual/state acceptance remains pending.
 - **Review and tests:** no blocking finding in the 1.9.51 patch. All 25 host tasks pass (2,687 tests; four modules have no tests). Import reproduction, direct transport and catalogue checks pass. The new guarded NFT/Studio UI tests compile with the Atomix fixture group excluded; the full instrumentation compile is blocked by pre-existing obsolete OtcDb calls. No device instrumentation was run on the owner Fold.
-- **Builds:** all three signed 1.9.50/vc121 candidates were installed on Fold R3GL805K7MB, user 0, with data preserved. Signed 1.9.51/vc122 candidates are now verified and staged in `apks/base/dist`, built from `80ef5fc`. Original signing certificates, package/version metadata, 16 KiB alignment, non-debuggable arm64 packaging and all four language resources are verified. The Fold disconnected before 1.9.51 installation; only the unrelated S10+ was visible and was left untouched. Evidence: `build/localization/bear-1.9.51-validation.json` and `signed-candidates-1.9.51-validation.json`.
+- **Builds:** all three signed 1.9.50/vc121 candidates were installed on Fold R3GL805K7MB, user 0, with data preserved. Signed 1.9.51/vc122 candidates are now verified and staged in `apks/base/dist`, built from `80ef5fc`. Original signing certificates, package/version metadata, 16 KiB alignment, non-debuggable arm64 packaging and all four language resources are verified. The owner reconnected Fold R3GL805K7MB; all three 1.9.51/vc122 updates are now installed and PackageManager-verified for user 0. App data was preserved and S10+ untouched. Evidence: `build/localization/fold-1.9.51-install-validation.json`. Evidence: `build/localization/bear-1.9.51-validation.json` and `signed-candidates-1.9.51-validation.json`.
 - **Device acceptance:** only Fold R3GL805K7MB is authorized. Its reported tab snap-back has a confirmed layout feedback loop. Studio reproduces the reported error text on valid unstamped/unsupported collection state; the owner's precise failing response has not been captured. Confirm both on the Fold after updating. Remaining language, app lock, accessibility and populated minimaWallet acceptance are still pending. Disposable emulator fixtures must never run on the owner device.
 - **Delivery:** signed versioned APKs and SHA256 sidecars belong in `/Users/eurobuddha/Projects/minima/apks/base/dist`. Publication destinations remain GitHub fork `eurobuddha/minima-core-android`, PandaApps and eurobuddha.com only. No public release of these multilingual candidates has occurred.
 
@@ -3081,3 +3081,39 @@ The full NFT display fix review and 25-task regression finished before building 
 - `minima-core-Pandamonium-1.9.50-candidate.apk`: `ed4a2e30dfe491fce0d82b89f3a7e9f6d3c9a7471fb268958dbbb5bab3b92b53`
 
 Evidence: `build/localization/signed-candidates-1.9.50-validation.json` and `dist/bear-languages-1.9.50-candidate.json`. These builds include the integrated UTXO Wallet, NFT Wallet and MiniMall Studio fixes. No 1.9.50 installation or public publication occurred. The owner disconnected the Fold while AFK; resume data-preserving installation and visual/runtime acceptance when it is reconnected.
+
+
+## Active goal: Atelier and The Salon in Pandamonium — 2026-10-18
+
+The complete objective is to integrate both native apps with English, Simplified Chinese, Russian and Ukrainian, using the existing explicit selector. This section is an implementation checkpoint, not completion or release approval. The preceding turn installed 1.9.51 and made verified progress; this goal turn adds and tests the first integration slice.
+
+### Sources and reused boundaries
+
+- Atelier Android: `/Users/eurobuddha/Projects/minima/mds/statenft-suite/android`, version 0.7.18, parent suite commit `2a9a6ae`. Salon: `/Users/eurobuddha/Projects/minima/apks/salon`, version 0.11.34, commit `f216ab1`. Both working trees were clean at source inspection; precise revisions and hashes are in `integrated/sources.lock.json`.
+- Existing `scripts/import-pandamonium.py`, `adapt-pandamonium-direct.py`, Mall/Vestr main-handler and Boolean-result gates, `DirectNodeEvents`, `PandamoniumDestinations`/`PandamoniumOrder`, and retained `Language` bindings.
+- New adapters: `scripts/adapt-pandamonium-creative.py` and `scripts/adapt-pandamonium-creative-languages.py`. Always update adapters and generated modules together, then verify all 21 imports using `PANDAMONIUM_SOURCE_ROOT="$PWD/build/localization/pinned-sources" python3 scripts/import-pandamonium.py --verify`.
+
+### Completed checkpoint
+
+- [x] Import the full native sources, resources, FILTR and art engines, AI model and inherited tests; preserve the canonical art and hosting/Arweave public parity fixtures.
+- [x] Append Atelier and The Salon to the existing destination identities (17 and 18), preserving saved order and existing apps.
+- [x] Link both modules only into Pandamonium; use the embedded Minima node client and background event dispatcher.
+- [x] Separate hosting preferences, keystore aliases, provider authorities, shared-file directories and notification identifiers in one UID.
+- [x] Prevent unrelated wallet events from creating Salon identity keys before Salon has been used. Configured inboxes retain their donor signature-checked intake.
+- [x] Bind initial navigation, Atelier launch/gallery labels and node status to the shared four-language library without screen recreation. Catalogue now has 5,355 entries (18 added); this is partial language coverage.
+- [x] Verify existing 19 snapshots were unchanged when adding the two apps; all 21 import snapshots now reproduce.
+- [x] Compile Pandamonium and pass 53 Atelier tests, 13 Salon tests, 150 host tests and 12 localization tests (228 total across the current reports). New tests cover direct reply completeness, saved destination order, and unused/configured Salon event intake.
+
+### Remaining requirements — full goal, not optional polish
+
+- [ ] Atelier: every native editor, collection/detail/gallery action, Single NFT and Token wizard, generative art style/slot controls, hosting settings and trust dialogs, scan/adopt/recover paths, image actions and validation/errors.
+- [ ] Atelier: FILTR HTML/JS controls, tools, sheets, chooser/bridge messages, in-place language changes preserving edits. Keep `artstudio/art.js`, FILTR engine math and model bytes unchanged; translate display labels only.
+- [ ] Atelier: mint/airdrop notifications, progress, phase labels and historical diagnostic display; retain transaction strings and metadata supplied by users.
+- [ ] Salon: Feed, Discover, profile/content/media editors, hosting and trust dialogs, onboarding/claim, tips, messages/replies, backup/restore, notification text, diagnostics and dynamic counts/dates. Keep content, handles, keys, protocol strings and command amounts literal.
+- [ ] Salon transport: current donor MaximaLink still uses the optional external Parlons IPC path. Inspect and reuse the host `MaxChat.node()`/`media()` interfaces for embedded Salon messaging/media while preserving sealed payloads, callback outcomes, subscriptions and lifetime. Do not remove features to avoid this work.
+- [ ] Review donor paths exposed by integration: `MainActivity.adoptOrMint()` currently mints even after a failed balance read; verify complete snapshot evidence before permitting mint. `SalonComms.loadOrCreateSeed()` currently creates a replacement after decrypt failure; review against the existing preserve-key behavior before accepting the integration. Review Atelier's phantom-removal path on failed token reads. These are not fixed by shell localization.
+- [ ] Full code review of all integrations and translations, catalogue/placeholder and untranslated-label audit, regression tests, importer reproduction and package/resource checks. Current review only covers the packaging/direct-node/initial-label boundary, not the donor apps end to end.
+- [ ] Test language switching, retained drafts and active operations, lock behavior, notifications, WebView state, navigation and layouts on the authorized Fold only. Never run disposable-device fixtures on owner hardware. Existing full instrumentation compile also has unrelated obsolete AtomiX OtcDb fixtures to resolve before claiming a full device-test build.
+- [ ] Build and verify signed versioned release APKs after full review, then install on Fold as authorized; keep public publication behind the existing final acceptance gate. Current 1.9.52 source has no signed candidate or device installation.
+
+Evidence: `build/localization/creative-integration-foundation.json`, `creative-shell-tests.log`, `creative-events-tests.log`, `creative-import-verification.log`. Goal remains active.

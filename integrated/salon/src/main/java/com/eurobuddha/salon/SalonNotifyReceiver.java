@@ -1,0 +1,170 @@
+package com.eurobuddha.salon;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import com.eurobuddha.minimaapi.direct.DirectNodeEvents;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+
+/**
+ * Closed-app alerts. The Minima core pushes a targeted {@code com.eurobuddha.minimacore.NOTIFY}
+ * broadcast to our package whenever a coin lands in our wallet (NEWCOIN) or at a coinnotify
+ * address (NOTIFYCOIN) — even when Salon is dead/backgrounded. We classify the coin: a DM
+ * (state[99], decrypted in-app) or a tip (state[1]=handle), store the DM, and post a heads-up
+ * notification. No foreground service, no persistent notification. Mirrors
+ * apks/terminal/.../MinimaNotifyReceiver.
+ */
+public class SalonNotifyReceiver implements DirectNodeEvents.Listener {
+
+    static final String CHANNEL = "salon_activity";
+
+    private final Context context;
+    public SalonNotifyReceiver(Context context) { this.context = context.getApplicationContext(); }
+    // Host subscribes this listener on its bounded background executor, like Terminal IDE.
+    @Override public void onEvent(JSONObject event) {
+        // The host exists before Salon is used. Do not create messaging keys from
+        // unrelated wallet events; keep the donor identity/seed ownership boundary.
+        if (!SalonStore.hasIdentity(context) && SalonStore.get(context, "msgseed").isEmpty()) return;
+        process(context, event.toString());
+    }
+
+    private void process(Context ctx, String message) {
+        try {
+            JSONObject j = new JSONObject(message);
+            String event = j.optString("event", "");
+            // Free background tick: the node broadcasts every block (~50s) even while our
+            // process is dead. Ride it to keep the Discovery beacon alive with the app closed.
+            if (event.equals("NEWBLOCK")) { maybeEnqueueKeepAlive(ctx); return; }
+            if (!event.equals("NEWCOIN") && !event.equals("NOTIFYCOIN")) return;
+            JSONObject data = j.optJSONObject("data"); if (data == null) return;
+            JSONObject coin = data.optJSONObject("coin"); if (coin == null) coin = data;
+            String myAddr = SalonStore.get(ctx, "tipaddr");
+            String addr = coin.optString("address", data.optString("address", ""));
+            if (event.equals("NOTIFYCOIN") && !myAddr.isEmpty() && !addr.equalsIgnoreCase(myAddr)) return;
+
+            String s99 = statePort(coin, 99);
+            if (!s99.isEmpty()) { handleDm(ctx, coin, s99); return; }
+
+            String from = SalonRegistry.unhex(statePort(coin, 1));
+            if (!from.isEmpty()) {
+                String amt = coin.optString("tokenamount", coin.optString("amount", "?"));
+                String tok = TipTransport.MXUSD.equalsIgnoreCase(coin.optString("tokenid", "")) ? "mxUSD" : "MINIMA";
+                notify(ctx, "💰 Tip received", "@" + from.replaceFirst("^@", "") + " tipped you " + amt + " " + tok);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    /** Enqueue one bounded keep-alive pass when due (>=4h since the last pass, foreground or
+     *  background). Two prefs reads per block when idle — trivial. KEEP dedups re-enqueues;
+     *  the Worker re-checks every gate itself, so races here are harmless. */
+    private static void maybeEnqueueKeepAlive(Context ctx) {
+        try {
+            if (MainActivity.FOREGROUND) return;   // the Activity's own tick is driving
+            if (!SalonKeepAliveWorker.bgEnabled(ctx) || !SalonStore.hasIdentity(ctx)) return;
+            if (!SalonKeepAliveWorker.due(ctx)) return;
+            androidx.work.WorkManager.getInstance(ctx).enqueueUniqueWork(
+                    SalonKeepAliveWorker.WORK_ONESHOT, androidx.work.ExistingWorkPolicy.KEEP,
+                    new androidx.work.OneTimeWorkRequest.Builder(SalonKeepAliveWorker.class).build());
+        } catch (Throwable ignored) {}
+    }
+
+    private void handleDm(Context ctx, JSONObject coin, String s99) {
+        intakeDm(ctx, s99, coin.optString("coinid", ""));
+    }
+
+    /**
+     * The ONE inbound-DM path, shared by both transports: on-chain coins
+     * (state[99] via the core's NOTIFY broadcast or a scan) and Maxima
+     * deliveries ({@link MaximaLinkReceiver}). The payload is the identical
+     * libsodium-sealed blob either way, so sender authenticity (the msgpk the
+     * thread is keyed on) is verified by the same signature check regardless of
+     * which pipe carried it.
+     *
+     * @param sealedHex the sealed blob, hex with or without 0x
+     * @param msgId     dedup id — a coinid on-chain, "mx-&lt;msgid&gt;" over Maxima
+     * @return true if this was a valid, NEW message
+     */
+    static boolean intakeDm(Context ctx, String sealedHex, String msgId) {
+        try {
+            String hex = (sealedHex.startsWith("0x") || sealedHex.startsWith("0X"))
+                    ? sealedHex.substring(2) : sealedHex;
+            Opened o = SalonComms.crypto(ctx).open(hex);
+            if (o == null || !o.valid) return false;   // not for us, or signature fails (anti-impersonation)
+            JSONObject m = new JSONObject(new String(o.plaintext, StandardCharsets.UTF_8));
+            String from = m.optString("from", "someone"), body = m.optString("body", ""), media = m.optString("media", "");
+            String preview = !body.isEmpty() ? body : (!media.isEmpty() ? "📎 media" : "");
+            // Dedup on the sender's STABLE app-level id when present, so ONE logical
+            // message is one row no matter which transport carried it (a retry over
+            // Maxima, or a lost-ack chain post re-sent over Maxima, etc.). scanMail
+            // now keys the same way, so the two coin-intake paths agree. Sender-
+            // scoped so two senders' ids can't collide; falls back to the transport
+            // id for older senders that stamp none.
+            String stableId = m.optString("id", "");
+            String dedupId = !stableId.isEmpty() ? "id-" + o.fromPublicId + "-" + stableId : msgId;
+            boolean isNew = MailDb.get(ctx).insert(dedupId, o.fromPublicId, false, body, media, m.optString("mime", ""), m.optLong("ts", 0), o.valid);
+            // Quoted-reply snapshot travels with the message (v4). Idempotent — safe on a re-delivery.
+            String rBody = m.optString("replybody", "");
+            if (!rBody.isEmpty()) MailDb.get(ctx).setReply(dedupId, rBody, m.optString("replyfrom", ""));
+            // Learn the sender's Maxima address from the message itself, so our
+            // reply goes back over Maxima — the transport becomes two-way after a
+            // single message, no profile-view required. (Runs even on a duplicate,
+            // in case we learned the peer before they published an mxaddr.)
+            String peerMx = m.optString("mxaddr", "");
+            if (!peerMx.isEmpty()) MailDb.get(ctx).setMxAddr(o.fromPublicId, peerMx);
+            if (isNew) {
+                MailDb.get(ctx).upsertContact(o.fromPublicId, from, "", m.optString("addr", ""), preview, m.optLong("ts", 0), true);
+                notifyStatic(ctx, "💬 @" + from.replaceFirst("^@", ""), preview);
+                // Repaint the open Messages/Thread tab. Without this a Maxima DM
+                // (or a background coin NOTIFY) only notified - it never reached
+                // the live UI, so the message sat in the DB unseen until you
+                // navigated away and back.
+                MainActivity.onInboxChanged();
+            }
+            return isNew;
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    private void notify(Context ctx, String title, String text) {
+        notifyStatic(ctx, title, text);
+    }
+
+    static void notifyStatic(Context ctx, String title, String text) {
+        NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && nm != null) {
+            nm.createNotificationChannel(new NotificationChannel(CHANNEL, "Salon activity", NotificationManager.IMPORTANCE_HIGH));
+        }
+        Intent open = new Intent(ctx, MainActivity.class);
+        open.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
+        PendingIntent pi = PendingIntent.getActivity(ctx, 0, open, flags);
+        NotificationCompat.Builder b = new NotificationCompat.Builder(ctx, CHANNEL)
+                .setSmallIcon(ctx.getApplicationInfo().icon)
+                .setContentTitle(title).setContentText(text)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true).setContentIntent(pi);
+        try { NotificationManagerCompat.from(ctx).notify("pandamonium.salon", (int) (System.currentTimeMillis() % 100000), b.build()); }
+        catch (SecurityException ignored) {}   // POST_NOTIFICATIONS not granted
+    }
+
+    private static String statePort(JSONObject coin, int port) {
+        JSONArray st = coin.optJSONArray("state");
+        if (st != null) for (int k = 0; k < st.length(); k++) {
+            JSONObject s = st.optJSONObject(k);
+            if (s != null && s.optInt("port", -1) == port) return s.optString("data", "");
+        }
+        return "";
+    }
+}
