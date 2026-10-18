@@ -4,17 +4,17 @@
 
 PandaBear, BlackBear and Pandamonium: English (`en`), Simplified Chinese (`zh-Hans`), Russian (`ru`) and Ukrainian (`uk`, Українська). Ukrainian explicitly authorized on 2026-10-16. Users choose the language; retain their choice. Language changes must preserve wallet state, edited input, active operations and app lock behavior.
 
-Baseline: `9def96e6801a9bef261611e45349f28a1eb6ae1c` (all three 1.9.41 tags and fork/ui/full-redesign verified). Candidate source: 1.9.49, versionCode 120. Isolated branch: feature/bear-languages-2026-10-16.
+Baseline: `9def96e6801a9bef261611e45349f28a1eb6ae1c` (all three 1.9.41 tags and fork/ui/full-redesign verified). Candidate source: 1.9.50, versionCode 121. Isolated branch: feature/bear-languages-2026-10-16.
 
 ## Current release status — 2026-10-18
 
 Use this section for current status. The dated entries below record earlier checkpoints.
 
-- **Source:** the final 1.9.41 baseline (`9def96e`) is preserved. Candidate source is now 1.9.49/vc120 on `feature/bear-languages-2026-10-16`. AtomiX now guards both responder paths through signing, verifies txnpost receipts and releases stopped queued work; miniMall retains durable original-order payment tracking and read-only recovery.
+- **Source:** the 1.9.41 baseline (`9def96e`) is preserved. Candidate source is 1.9.50/vc121 on `feature/bear-languages-2026-10-16`; final build source `9144188` includes the UTXO Wallet, NFT Wallet and MiniMall Studio metadata display fixes.
 - **Languages:** explicit, remembered English, Simplified Chinese, Russian and Ukrainian selection; 5,337 catalogue entries per language. All 19 integrated modules use the shared library. Structural/resource checks do not establish complete inner-text, state or visual acceptance.
-- **Recent completed source fixes:** chat diagnostic translation and delayed-failure draft protection; AtomiX send acknowledgements, consistent chain evidence, exact persisted OTC consent and one execution admission across foreground/background controllers. Earlier Inbox, NFT Wallet, wallet/key-use and integration work remains preserved. Chat notification previews/counts now follow the selected language. Latest evidence: `build/localization/chat-notifications-validation.json` and `bear-1.9.49-validation.json` (632 source hashes).
-- **Builds:** signed 1.9.49/vc120 candidates match pushed source `8eab9ba` in `apks/base/dist`. Certificates, checksums, package/version metadata, APK ZIP alignment and 5,337 resources in each of four languages are verified. Full host regression: 2,677 passing executions across 25 tasks (four NO-SOURCE; five valid UP-TO-DATE). Evidence: `build/localization/bear-1.9.49-validation.json` and `signed-candidates-1.9.49-validation.json`. Fold acceptance and publication remain pending.
-- **Device acceptance:** only Fold `R3GL805K7MB` is authorized. All three signed 1.9.49/vc120 candidates are installed and Package Manager verified; Pandamonium was updated in place from 1.9.41. Normal UI was reached, but a populated owner Send form is now active. Testing is waiting for owner readiness. Four-language persistence/state, app lock, visual/accessibility and populated minimaWallet acceptance remain incomplete. Disposable emulator fixtures must never run on the owner device.
+- **Recent completed source fixes:** decoded JSON token/collection names and icons in UTXO Wallet, NFT Wallet and MiniMall Studio; bounded coin labels; reproducible importer adaptation. Earlier chat, AtomiX, miniMall, wallet/key-use and integration fixes remain preserved. Full patch review has no blocking findings. Evidence: `build/localization/bear-1.9.50-validation.json` (636 source hashes).
+- **Builds:** all three signed 1.9.50/vc121 candidates are ready in `apks/base/dist`, built after the complete NFT-fix review from `9144188`. Original certificates, SHA256 checksums, package/version metadata, 16 KiB ZIP alignment, non-debuggable arm64 packaging, four declared locales and 5,337 resources per locale are verified. Full host regression: 2,686 passing tests across 25 tasks (six executed, 15 valid UP-TO-DATE, four NO-SOURCE). Evidence: `build/localization/bear-1.9.50-validation.json` and `signed-candidates-1.9.50-validation.json`.
+- **Device acceptance:** only Fold `R3GL805K7MB` is authorized. Version 1.9.49 is installed; 1.9.50 has not been installed. The owner disconnected the Fold while AFK for about one hour and requested prepared builds. Await reconnection. NFT visual checks, four-language persistence/state, app lock, visual/accessibility and populated minimaWallet acceptance remain incomplete. Disposable emulator fixtures must never run on the owner device.
 - **Remaining review:** the current static text/format sweep and optional inherited MySQL disposition are recorded below. No known app-owned text gap remains from that sweep. Complete language/state/visual acceptance across all 19 modules still requires the Fold.
 - **Delivery:** final accepted, signed, versioned APKs and SHA256 sidecars belong in `/Users/eurobuddha/Projects/minima/apks/base/dist`. Authorized publication is GitHub fork `eurobuddha/minima-core-android`, PandaApps and eurobuddha.com only. No public release of these multilingual candidates has occurred.
 
@@ -3071,3 +3071,14 @@ No blocking findings in the final patch. Confirmed ordinary and multilingual nam
 Approve the source patch. Full host regression: 25 tasks, 2,686 passing tests, zero failures/errors/skips; valid UP-TO-DATE tasks are recorded separately from executed tasks. Transport, 5,337-message/four-language catalogue and whitespace checks pass; the node JAR still matches the baseline SHA256. Evidence: `build/localization/bear-1.9.50-validation.json`, `nft-studio-full-regression.log`, and `nft-studio-metadata-import.log`. The full review and checks completed before the final signed build.
 
 The owner is AFK and disconnected the Fold for about one hour, requesting completed fixes, full review and prepared APKs. Do not attempt installation or device interaction. Rebuild the three signed 1.9.50/vc121 candidates with the Studio fix before staging any artifact in dist. The earlier wallet-only 1.9.50 build was not staged, installed or published. Device visual/runtime acceptance and publication remain pending.
+
+
+## Signed 1.9.50 candidates ready — 2026-10-18
+
+The full NFT display fix review and 25-task regression finished before building from `9144188971cf5fae859ab784f785a39010af02a6`. All three APKs in `/Users/eurobuddha/Projects/minima/apks/base/dist` pass original-certificate, package/version (1.9.50/vc121), non-debuggable arm64, 16 KiB ZIP alignment and four-language resource verification. Old candidates are preserved. SHA256 sidecars and the candidate manifest are saved.
+
+- `minima-core-PandaBear-1.9.50-candidate.apk`: `a73d0c31a41ed37b6ec3e6034b0f09f9647bc43c1d9d603dbf57ee3344cb7307`
+- `minima-core-BlackBear-1.9.50-candidate.apk`: `c185098cd44b366290c5b68f0ad74ee87cde6a2337de4ac17b72e68f29438f22`
+- `minima-core-Pandamonium-1.9.50-candidate.apk`: `ed4a2e30dfe491fce0d82b89f3a7e9f6d3c9a7471fb268958dbbb5bab3b92b53`
+
+Evidence: `build/localization/signed-candidates-1.9.50-validation.json` and `dist/bear-languages-1.9.50-candidate.json`. These builds include the integrated UTXO Wallet, NFT Wallet and MiniMall Studio fixes. No 1.9.50 installation or public publication occurred. The owner disconnected the Fold while AFK; resume data-preserving installation and visual/runtime acceptance when it is reconnected.

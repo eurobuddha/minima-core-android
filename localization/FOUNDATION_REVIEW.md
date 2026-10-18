@@ -3089,3 +3089,14 @@ No blocking findings in the final patch. Confirmed ordinary and multilingual nam
 Approve the source patch. Full host regression: 25 tasks, 2,686 passing tests, zero failures/errors/skips; valid UP-TO-DATE tasks are recorded separately from executed tasks. Transport, 5,337-message/four-language catalogue and whitespace checks pass; the node JAR still matches the baseline SHA256. Evidence: `build/localization/bear-1.9.50-validation.json`, `nft-studio-full-regression.log`, and `nft-studio-metadata-import.log`. The full review and checks completed before the final signed build.
 
 The owner is AFK and disconnected the Fold for about one hour, requesting completed fixes, full review and prepared APKs. Do not attempt installation or device interaction. Rebuild the three signed 1.9.50/vc121 candidates with the Studio fix before staging any artifact in dist. The earlier wallet-only 1.9.50 build was not staged, installed or published. Device visual/runtime acceptance and publication remain pending.
+
+
+## Signed 1.9.50 candidates ready — 2026-10-18
+
+The full NFT display fix review and 25-task regression finished before building from `9144188971cf5fae859ab784f785a39010af02a6`. All three APKs in `/Users/eurobuddha/Projects/minima/apks/base/dist` pass original-certificate, package/version (1.9.50/vc121), non-debuggable arm64, 16 KiB ZIP alignment and four-language resource verification. Old candidates are preserved. SHA256 sidecars and the candidate manifest are saved.
+
+- `minima-core-PandaBear-1.9.50-candidate.apk`: `a73d0c31a41ed37b6ec3e6034b0f09f9647bc43c1d9d603dbf57ee3344cb7307`
+- `minima-core-BlackBear-1.9.50-candidate.apk`: `c185098cd44b366290c5b68f0ad74ee87cde6a2337de4ac17b72e68f29438f22`
+- `minima-core-Pandamonium-1.9.50-candidate.apk`: `ed4a2e30dfe491fce0d82b89f3a7e9f6d3c9a7471fb268958dbbb5bab3b92b53`
+
+Evidence: `build/localization/signed-candidates-1.9.50-validation.json` and `dist/bear-languages-1.9.50-candidate.json`. These builds include the integrated UTXO Wallet, NFT Wallet and MiniMall Studio fixes. No 1.9.50 installation or public publication occurred. The owner disconnected the Fold while AFK; resume data-preserving installation and visual/runtime acceptance when it is reconnected.
