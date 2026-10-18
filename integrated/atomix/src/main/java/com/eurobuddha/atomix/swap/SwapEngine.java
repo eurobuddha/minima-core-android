@@ -224,8 +224,47 @@ public final class SwapEngine {
     int cpInFlightSizeForTest() { synchronized (CP_LOCKING) { return cpInFlight.size(); } }
     static synchronized void resetFragmentationNoteForTest() { lastFragmentationNoteMs = 0; }
 
+    // The existing CP maps reserve coins; this identity additionally owns delayed callbacks.
+    // All accesses use their existing CP_LOCKING monitor, shared by Activity and Service engines.
+    private static final Map<String, CounterLeg> cpAttempts = new HashMap<>();
+    private final class CounterLeg {
+        final EthHtlc.Contract contract;
+        final String hash;
+        final com.eurobuddha.atomix.TradingContext market;
+        final long generation;
+        final EthNet network = net;
+        final EthRpc connection = rpc;
+        CounterLeg(EthHtlc.Contract contract, com.eurobuddha.atomix.TradingContext market, long generation) {
+            this.contract = contract; hash = contract.hashlock; this.market = market; this.generation = generation;
+        }
+        boolean owned() { synchronized (CP_LOCKING) { return cpAttempts.get(hash) == this; } }
+        boolean current() {
+            synchronized (CP_LOCKING) {
+                return owned() && CP_LOCKING.containsKey(hash) && cpInFlight.containsKey(hash)
+                        && !io.isShutdown() && !halted() && network == net && connection == rpc
+                        && generation == PublishGate.gen() && market == com.eurobuddha.atomix.TradingContext.active()
+                        && market.tokenId.equalsIgnoreCase(minima.activeToken());
+            }
+        }
+        boolean authorized() { return current() && terms(); }
+        // Reuse the original acceptance boundaries immediately before creating a new liability.
+        boolean terms() {
+            if (contract.otc) {
+                OtcDb.Deal deal = otcLpDeal(hash);
+                return deal != null && otcVerifyBuy(contract, deal);
+            }
+            return myOrder != null && myOrder.market() == market && acceptTakerBuyMinima(contract);
+        }
+        void release() {
+            synchronized (CP_LOCKING) {
+                if (!owned()) return;
+                releaseCpLeg(hash); inflight.remove("cpMin:" + hash);
+            }
+        }
+    }
+
     private void releaseCpLeg(String hash) {
-        synchronized (CP_LOCKING) { cpInFlight.remove(hash); cpLockSince.remove(hash); CP_LOCKING.remove(hash); }
+        synchronized (CP_LOCKING) { cpInFlight.remove(hash); cpLockSince.remove(hash); CP_LOCKING.remove(hash); cpAttempts.remove(hash); }
     }
 
     /** At publish: trim the ask ladder to the tranches I can actually lock right now, run {@code afterPublish},
@@ -899,7 +938,7 @@ public final class SwapEngine {
         // against my active-currency order/price would misprice the counter-leg. Claiming a coin I'm OWED (secret
         // known, above) and refunding my own expired coins (checkExpiredMinima) stay token-agnostic; only this
         // new-liability path is gated.
-        if (halted()) return;   // node/app key mismatch — take on no new counter-leg liability
+        if (io.isShutdown() || halted()) return;   // stopped host/key mismatch: no new liability
         if (!minima.activeToken().equalsIgnoreCase(coin.optString("tokenid", "0x00"))) return;
         if (db.haveSentCounterParty(hash)) return;
         if (timelock - block < CP_BLOCKS_CHECK) return;                    // first leg too close to expiry
@@ -1046,6 +1085,7 @@ public final class SwapEngine {
             // Prune stale CP_LOCKING markers (owning engine died mid-flight so its confirm-release never ran;
             // the DB row + haveSentCounterParty already dedup). Bounds the static map in a long-running process.
             CP_LOCKING.entrySet().removeIf(e -> nowUnix() - e.getValue() > CP_LOCK_TIMEOUT_SECS);
+            cpAttempts.keySet().retainAll(CP_LOCKING.keySet());
         }
         for (String h : pendLegs) {
             Long since = cpLockSince.get(h);
@@ -1053,7 +1093,13 @@ public final class SwapEngine {
             // so a leg whose lock callback was lost (dropped on a finishing Activity) doesn't leak the marker and
             // wedge that hash forever.
             if (since != null && nowUnix() - since > CP_LOCK_TIMEOUT_SECS) { releaseCpLeg(h); inflight.remove("cpMin:" + h); continue; }
-            confirmMyLock(h, true, onChain -> { if (onChain) { releaseCpLeg(h); inflight.remove("cpMin:" + h); } });
+            final CounterLeg attempt;
+            synchronized (CP_LOCKING) { attempt = cpAttempts.get(h); }
+            confirmMyLock(h, true, onChain -> {
+                synchronized (CP_LOCKING) {
+                    if (onChain && cpAttempts.get(h) == attempt) { releaseCpLeg(h); inflight.remove("cpMin:" + h); }
+                }
+            });
         }
 
         // PRIMARY (works on free/keyless RPCs): for every known swap, read its ETH leg by deterministic
@@ -1337,6 +1383,8 @@ public final class SwapEngine {
 
     /** Port of _checkCanCollectETHCoin: I am the receiver of an ETH HTLC contract. */
     private void checkCanCollectEth(EthHtlc eth, EthHtlc.Contract c, int minimaBlock) throws Exception {
+        final com.eurobuddha.atomix.TradingContext market = com.eurobuddha.atomix.TradingContext.active();
+        final long generation = PublishGate.gen();
         String hash = c.hashlock;
         String secret = db.getSecret(hash);
 
@@ -1357,7 +1405,7 @@ public final class SwapEngine {
         }
 
         // I don't know the secret → I'm an ERC20→mxUSDT responder; lock the mxUSDT counter-leg.
-        if (halted()) return;   // node/app key mismatch — take on no new counter-leg liability
+        if (io.isShutdown() || halted()) return;   // stopped host/key mismatch: no new liability
         if (db.haveSentCounterParty(hash)) return;
         // Persistent dedup (survives a restart / a lost txnpost response that the in-memory CP_LOCKING can't):
         // lockMinimaCounterLeg records the swap row BEFORE broadcast, so a row here means this hash is already
@@ -1391,7 +1439,7 @@ public final class SwapEngine {
             cpLockSince.put(hash, nowUnix());   // MA-18: inside the CP_LOCKING monitor with cpInFlight (lines 202-203)
         }
         if (!inflight.add("cpMin:" + hash)) { releaseCpLeg(hash); return; }
-        lockMinimaCounterLeg(c, minimaBlock);
+        lockMinimaCounterLeg(c, minimaBlock, market, generation);
     }
 
     /** Tell the maker (once) why a handshake-announced buy was declined, so a reject isn't silent. */
@@ -1401,87 +1449,112 @@ public final class SwapEngine {
     }
 
     /** Lock the mxUSDT counter-leg for an ERC20→mxUSDT swap I'm responding to (block+36). */
-    private void lockMinimaCounterLeg(EthHtlc.Contract c, int minimaBlock) {
+    private void lockMinimaCounterLeg(EthHtlc.Contract c, int minimaBlock,
+                                      com.eurobuddha.atomix.TradingContext market, long generation) {
         final String hash = c.hashlock;
+        final CounterLeg attempt;
+        synchronized (CP_LOCKING) {
+            if (!CP_LOCKING.containsKey(hash) || !cpInFlight.containsKey(hash) || cpAttempts.containsKey(hash)) return;
+            attempt = new CounterLeg(c, market, generation);
+            cpAttempts.put(hash, attempt);
+        }
+        if (!attempt.current()) { attempt.release(); return; }
         if (isConsolidating()) {
-            releaseCpLeg(hash); inflight.remove("cpMin:" + hash);
+            attempt.release();
             declineCpNote(hash, "Consolidation in progress. Retry after confirmation. Deal: " + hash);
             return;
         }
         final int timelock = minimaBlock + CP_BLOCKS;
         final String reqMinimaHuman = EthWallet.format(c.requestAmount, 18, 18);   // mxUSDT they want from me
         final String receiverPubkey = c.minimaPublicKey;                           // initiator's Minima pubkey
-        ui.post(() -> minima.myFreeCoins(coins -> {
-            // Gather DISTINCT confirmed coins totalling ≥ the lock amount (largest-first → fewest inputs), skipping
-            // any coin reserved by another in-flight burst lock. This fills a deal larger than any SINGLE coin (like
-            // a wallet send auto-selecting UTXOs) while burst siblings still never double-select. Pick + reserve atomically.
-            final java.math.BigDecimal need = new java.math.BigDecimal(reqMinimaHuman);
-            final java.util.List<String> pickIds = new java.util.ArrayList<>();
-            java.math.BigDecimal pickSumTmp = java.math.BigDecimal.ZERO, freeTotal = java.math.BigDecimal.ZERO;
-            synchronized (CP_LOCKING) {                       // single monitor for all cpInFlight mutations
-                java.util.Set<String> used = new java.util.HashSet<>();   // coinids reserved by other in-flight locks (values are comma-joined lists)
-                for (String v : cpInFlight.values()) if (v != null && !v.isEmpty()) for (String u : v.split(",")) if (!u.isEmpty()) used.add(u);
-                java.util.List<String> ids = new java.util.ArrayList<>();
-                java.util.List<java.math.BigDecimal> amts = new java.util.ArrayList<>();
-                for (int i = 0; i < coins.length(); i++) {
-                    JSONObject cc = coins.optJSONObject(i); if (cc == null) continue;
-                    String cid = cc.optString("coinid", ""), amt = MinimaHtlc.coinAmount(cc);
-                    if (cid.isEmpty() || used.contains(cid)) continue;
-                    try { java.math.BigDecimal a = new java.math.BigDecimal(amt); ids.add(cid); amts.add(a); freeTotal = freeTotal.add(a); } catch (Exception ignore) {}
+        if (!ui.post(() -> {
+            if (!attempt.current() || !attempt.terms()) { attempt.release(); return; }
+            minima.myFreeCoins(coins -> {
+                if (!attempt.current() || !attempt.terms()) { attempt.release(); return; }
+                // Gather DISTINCT confirmed coins totalling ≥ the lock amount (largest-first → fewest inputs), skipping
+                // any coin reserved by another in-flight burst lock. This fills a deal larger than any SINGLE coin (like
+                // a wallet send auto-selecting UTXOs) while burst siblings still never double-select. Pick + reserve atomically.
+                final java.math.BigDecimal need = new java.math.BigDecimal(reqMinimaHuman);
+                final java.util.List<String> pickIds = new java.util.ArrayList<>();
+                java.math.BigDecimal pickSumTmp = java.math.BigDecimal.ZERO, freeTotal = java.math.BigDecimal.ZERO;
+                synchronized (CP_LOCKING) {                       // single monitor for all cpInFlight mutations
+                    if (!attempt.current()) { attempt.release(); return; }
+                    java.util.Set<String> used = new java.util.HashSet<>();   // coinids reserved by other in-flight locks (values are comma-joined lists)
+                    for (String v : cpInFlight.values()) if (v != null && !v.isEmpty()) for (String u : v.split(",")) if (!u.isEmpty()) used.add(u);
+                    java.util.List<String> ids = new java.util.ArrayList<>();
+                    java.util.List<java.math.BigDecimal> amts = new java.util.ArrayList<>();
+                    for (int i = 0; i < coins.length(); i++) {
+                        JSONObject cc = coins.optJSONObject(i); if (cc == null) continue;
+                        String cid = cc.optString("coinid", ""), amt = MinimaHtlc.coinAmount(cc);
+                        if (cid.isEmpty() || used.contains(cid)) continue;
+                        try { java.math.BigDecimal a = new java.math.BigDecimal(amt); ids.add(cid); amts.add(a); freeTotal = freeTotal.add(a); } catch (Exception ignore) {}
+                    }
+                    Integer[] ord = new Integer[ids.size()];
+                    for (int i = 0; i < ord.length; i++) ord[i] = i;
+                    java.util.Arrays.sort(ord, (x, y) -> amts.get(y).compareTo(amts.get(x)));   // largest-first
+                    for (int oi = 0; oi < ord.length && pickSumTmp.compareTo(need) < 0 && pickIds.size() < MAX_LOCK_COINS; oi++) {
+                        pickIds.add(ids.get(ord[oi])); pickSumTmp = pickSumTmp.add(amts.get(ord[oi]));
+                    }
+                    if (pickSumTmp.compareTo(need) >= 0) cpInFlight.put(hash, android.text.TextUtils.join(",", pickIds));
+                    else pickIds.clear();
                 }
-                Integer[] ord = new Integer[ids.size()];
-                for (int i = 0; i < ord.length; i++) ord[i] = i;
-                java.util.Arrays.sort(ord, (x, y) -> amts.get(y).compareTo(amts.get(x)));   // largest-first
-                for (int oi = 0; oi < ord.length && pickSumTmp.compareTo(need) < 0 && pickIds.size() < MAX_LOCK_COINS; oi++) {
-                    pickIds.add(ids.get(ord[oi])); pickSumTmp = pickSumTmp.add(amts.get(ord[oi]));
+                if (pickIds.isEmpty()) {   // can't cover `need` right now — DON'T hang silently; tell the LP why
+                    attempt.release();
+                    declineCpNote(hash, freeTotal.compareTo(need) < 0
+                            ? "Can't fill deal — need " + reqMinimaHuman + " mxUSDT, only " + freeTotal.toPlainString() + " free"
+                            : "mxUSDT too fragmented to lock " + reqMinimaHuman + " in one tx — consolidate your coins");
+                    return;
                 }
-                if (pickSumTmp.compareTo(need) >= 0) cpInFlight.put(hash, android.text.TextUtils.join(",", pickIds));
-                else pickIds.clear();
-            }
-            if (pickIds.isEmpty()) {   // can't cover `need` right now — DON'T hang silently; tell the LP why
-                releaseCpLeg(hash); inflight.remove("cpMin:" + hash);
-                declineCpNote(hash, freeTotal.compareTo(need) < 0
-                        ? "Can't fill deal — need " + reqMinimaHuman + " mxUSDT, only " + freeTotal.toPlainString() + " free"
-                        : "mxUSDT too fragmented to lock " + reqMinimaHuman + " in one tx — consolidate your coins");
-                return;
-            }
-            final String totalSel = pickSumTmp.toPlainString();
-            // RECORD-BEFORE-BROADCAST (mirrors lockEthCounterLeg's Fix D): persist the swap row NOW, so a process
-            // kill or a lost txnpost response between broadcast and ok() can't re-lock this hash on restart. The
-            // row (gated in checkCanCollectEth via getSwap!=null) is the only restart-proof dedup the mxUSDT leg
-            // has (no on-chain hash-uniqueness). EV_CPSENT stays AFTER (→ haveSentCounterParty).
-            EthNet.Token tk = net.tokenByAddress(c.tokenContract);
-            String sym = tk == null ? "token" : tk.symbol;
-            SwapDb.Swap s = baseSwap(hash, "RESPONDER", "ERC20_TO_MINIMA",
-                    com.eurobuddha.atomix.TradingContext.active().coinLabel, reqMinimaHuman, sym, EthWallet.format(c.amount, decimalsOf(c.tokenContract), 18),
-                    receiverPubkey);
-            s.myTimelock = timelock; s.myLegIsMinima = true; s.contractId = c.contractId;
-            s.status = SwapDb.ST_LOCKED;
-            db.upsertSwap(s);
-            notifier.onSwapsChanged();
-            minima.lockFromCoins(pickIds, totalSel, reqMinimaHuman, reqMinimaHuman, "minima", receiverPubkey,
-                    myEth(), hash, timelock, "FALSE", new MinimaHtlc.PostCb() {
-                @Override public void ok(String txpowid) {
-                    db.logEvent(hash, SwapDb.EV_CPSENT, "minima", reqMinimaHuman, txpowid);
-                    notifier.notify("Locked your " + com.eurobuddha.atomix.TradingContext.active().coinLabel, "Waiting for the counterparty to reveal the secret");
-                    notifier.onSwapsChanged();
-                    inflight.remove("cpMin:" + hash);
-                    // keep cpInFlight[hash] reserved until the lock CONFIRMS (freed in runEthChecks) — holds the coin
+                final String totalSel = pickSumTmp.toPlainString();
+                // RECORD-BEFORE-BROADCAST (mirrors lockEthCounterLeg's Fix D): persist the swap row NOW, so a process
+                // kill or a lost txnpost response between broadcast and ok() can't re-lock this hash on restart. The
+                // row (gated in checkCanCollectEth via getSwap!=null) is the only restart-proof dedup the mxUSDT leg
+                // has (no on-chain hash-uniqueness). EV_CPSENT stays AFTER (→ haveSentCounterParty).
+                EthNet.Token tk = net.tokenByAddress(c.tokenContract);
+                String sym = tk == null ? "token" : tk.symbol;
+                SwapDb.Swap s = baseSwap(hash, "RESPONDER", "ERC20_TO_MINIMA",
+                        attempt.market.coinLabel, reqMinimaHuman, sym, EthWallet.format(c.amount, decimalsOf(c.tokenContract), 18),
+                        receiverPubkey);
+                s.myTimelock = timelock; s.myLegIsMinima = true; s.contractId = c.contractId;
+                s.status = SwapDb.ST_LOCKED;
+                synchronized (CP_LOCKING) {
+                    if (!attempt.current() || !attempt.terms()) { attempt.release(); return; }
+                    try { db.upsertSwap(s); }
+                    catch (RuntimeException storageFailure) {
+                        attempt.release(); SwapLog.w("Counter-leg could not be saved before signing"); return;
+                    }
                 }
-                @Override public void err(String m) {
-                    inflight.remove("cpMin:" + hash);
-                    // Retry ONLY if the failure provably didn't broadcast (build phase, no "POSTED:" tag); a
-                    // txnpost failure may have landed with a lost response → keep the row so we never re-lock.
-                    if (m == null || !m.startsWith("POSTED:")) db.deleteSwap(hash);
-                    releaseCpLeg(hash);
-                }
+                notifier.onSwapsChanged();
+                minima.lockFromCoins(pickIds, totalSel, reqMinimaHuman, reqMinimaHuman, "minima", receiverPubkey,
+                        myEth(), hash, timelock, "FALSE", attempt::authorized, new MinimaHtlc.PostCb() {
+                    @Override public void ok(String txpowid) {
+                        db.logEvent(hash, SwapDb.EV_CPSENT, "minima", reqMinimaHuman, txpowid);
+                        notifier.notify("Locked your " + attempt.market.coinLabel, "Waiting for the counterparty to reveal the secret");
+                        notifier.onSwapsChanged();
+                        synchronized (CP_LOCKING) {
+                            if (attempt.owned()) inflight.remove("cpMin:" + hash);
+                        }
+                        // keep cpInFlight[hash] reserved until the lock CONFIRMS (freed in runEthChecks) — holds the coin
+                    }
+                    @Override public void err(String m) {
+                        synchronized (CP_LOCKING) {
+                        if (!attempt.owned()) return;
+                        // Retry ONLY if the failure provably didn't broadcast (build phase, no "POSTED:" tag); a
+                        // txnpost failure may have landed with a lost response → keep the row so we never re-lock.
+                        if (m == null || !m.startsWith("POSTED:")) db.deleteSwap(hash);
+                        attempt.release();
+                        }
+                    }
+                });
+            }, e -> {
+                boolean report = attempt.current();
+                attempt.release();
+                if (!report) return;
+                SwapLog.w("Buy " + hash + " counter-leg declined: " + e);
+                if (e != null && e.startsWith(MinimaHtlc.ERR_TOO_MANY_COINS) && shouldNoteFragmentation())
+                    declineCpNote(hash, e + ". Open Wallet → Consolidate before accepting buys. Deal: " + hash);
             });
-        }, e -> {
-            releaseCpLeg(hash); inflight.remove("cpMin:" + hash);
-            SwapLog.w("Buy " + hash + " counter-leg declined: " + e);
-            if (e != null && e.startsWith(MinimaHtlc.ERR_TOO_MANY_COINS) && shouldNoteFragmentation())
-                declineCpNote(hash, e + ". Open Wallet → Consolidate before accepting buys. Deal: " + hash);
-        }));
+        })) attempt.release();
     }
 
     // ============================================================ order-match guards (fund safety)

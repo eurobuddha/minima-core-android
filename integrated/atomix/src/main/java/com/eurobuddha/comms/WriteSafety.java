@@ -29,9 +29,9 @@ final class WriteSafety {
     static boolean completeReply(String command, JSONObject reply) {
         if (!completeReply(reply)) return false;
         String verb = command == null ? "" : command.trim().split("\\s+", 2)[0];
-        // Other commands retain their existing result contracts. A definite send rejection
+        // Other commands retain their existing result contracts. A definite send/post rejection
         // also needs no transaction ID; a positive reply without one remains uncertain.
-        return !verb.equals("send") || command.matches(".*(?:^|\\s)dryrun:true(?:\\s|$).*")
+        return !(verb.equals("send") || verb.equals("txnpost")) || verb.equals("send") && command.matches(".*(?:^|\\s)dryrun:true(?:\\s|$).*")
                 || !Boolean.TRUE.equals(reply.opt("status"))
                 || sendReceipt(reply) != null;
     }

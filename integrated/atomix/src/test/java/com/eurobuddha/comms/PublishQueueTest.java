@@ -26,7 +26,7 @@ public class PublishQueueTest {
     @Before public void before() { saved = TradingContext.active(); SignGate.resetForTest(); WriteSafety.resetForTest(); }
     @After public void after() { TradingContext.setActive(saved, null); SignGate.resetForTest(); WriteSafety.resetForTest(); }
     private static JSONObject sent() throws Exception { return new JSONObject().put("status", true).put("response", new JSONObject().put("txpowid", "0x" + "12".repeat(32))); }
-    private static final class Host implements AutoCloseable {
+    static final class Host implements AutoCloseable {
         final List<DirectNodeApi.Request> requests = new ArrayList<>();
         final List<String> commands = new ArrayList<>();
         final Map<String,Object> persisted = new HashMap<>();

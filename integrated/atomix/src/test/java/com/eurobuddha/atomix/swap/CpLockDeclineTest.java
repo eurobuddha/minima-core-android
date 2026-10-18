@@ -19,12 +19,16 @@ public class CpLockDeclineTest {
         Handler ui = mock(Handler.class);
         when(ui.post(any())).thenAnswer(inv -> { ((Runnable) inv.getArgument(0)).run(); return true; });
         MinimaHtlc minima = mock(MinimaHtlc.class);
+        when(minima.activeToken()).thenReturn(com.eurobuddha.atomix.TradingContext.active().tokenId);
         doAnswer(inv -> { ((Consumer<String>) inv.getArgument(1)).accept("TOO_MANY_COINS: 120 coins, safe limit 53"); return null; })
                 .when(minima).myFreeCoins(any(), any());
         SwapDb db = mock(SwapDb.class);
         SwapEngine.Notifier notifier = mock(SwapEngine.Notifier.class);
         SwapEngine engine = new SwapEngine(mock(NodeApi.class), minima, db, mock(EthWallet.class), ui, notifier);
-        Method lock = SwapEngine.class.getDeclaredMethod("lockMinimaCounterLeg", EthHtlc.Contract.class, int.class);
+        engine.setNetwork(mock(EthRpc.class), EthNet.MAINNET);
+        Order order = new Order(); Order.Pair pair = new Order.Pair(); pair.enable = true; pair.buy = 1;
+        order.pairs.put("USDT", pair); engine.setMyOrder(order);
+        Method lock = SwapEngine.class.getDeclaredMethod("lockMinimaCounterLeg", EthHtlc.Contract.class, int.class, com.eurobuddha.atomix.TradingContext.class, long.class);
         lock.setAccessible(true);
         Field slots = SwapEngine.class.getDeclaredField("cpInFlight"); slots.setAccessible(true);
         Field global = SwapEngine.class.getDeclaredField("CP_LOCKING"); global.setAccessible(true);
@@ -35,7 +39,8 @@ public class CpLockDeclineTest {
                 ((Map<String,Long>) global.get(null)).put(hash, System.currentTimeMillis()/1000);
                 EthHtlc.Contract c = new EthHtlc.Contract();
                 c.hashlock = hash; c.requestAmount = BigInteger.TEN.pow(18); c.minimaPublicKey = "0xAABB";
-                lock.invoke(engine, c, 100);
+                c.amount = BigInteger.TEN.pow(6); c.tokenContract = EthNet.MAINNET.token("USDT").address;
+                lock.invoke(engine, c, 100, com.eurobuddha.atomix.TradingContext.active(), PublishGate.gen());
                 assertEquals(0, engine.cpInFlightSizeForTest());
                 assertFalse(((Map<?,?>) global.get(null)).containsKey(hash));
             }

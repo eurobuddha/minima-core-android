@@ -237,7 +237,8 @@ public final class SwapDb {
         if (s.created == 0) s.created = System.currentTimeMillis();
         v.put("created", s.created);
         v.put("updated", System.currentTimeMillis());
-        helper.getWritableDatabase().insertWithOnConflict("swaps", null, v, SQLiteDatabase.CONFLICT_REPLACE);
+        if (helper.getWritableDatabase().insertWithOnConflict("swaps", null, v, SQLiteDatabase.CONFLICT_REPLACE) < 0)
+            throw new android.database.sqlite.SQLiteException("Swap could not be saved");
     }
 
     public synchronized void setSwapStatus(String hash, String status) {
