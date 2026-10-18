@@ -207,6 +207,7 @@ final class Hosting {
     }
 
     static Uploader forProfile(Profile p) throws HostingException {
+        HostingSecrets.requireReadable(p);
         switch (p.type()) {
             case TYPE_SFTP:   return new SftpUploader(p);
             case TYPE_WEBDAV: return new WebDavUploader(p);

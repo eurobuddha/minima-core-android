@@ -834,7 +834,8 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (!isFinishing() && !isDestroyed()) saveTextFile("salon-backup.json", backup);
                 });
-            } catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); }
+            } catch (Crypt.Unavailable unavailable) { runOnUiThread(this::hostingSecretUnavailable); }
+            catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); }
         });
     }
 
@@ -880,16 +881,12 @@ public class MainActivity extends AppCompatActivity {
             if (!seed.isEmpty()) b.put("msgseed", seed);
             JSONArray hosts = new JSONArray();
             for (Hosting.Profile p : HostingStore.list(this)) {
-                JSONObject copy = new JSONObject(p.j.toString());
-                JSONObject cfg = copy.optJSONObject(copy.optString("type"));
-                if (cfg != null) for (String sf : HostingStore.SECRET_FIELDS) {
-                    String enc = cfg.optString(sf, "");
-                    if (!enc.isEmpty()) cfg.put(sf, Crypt.decryptSecure(enc));
-                }
+                JSONObject copy = HostingSecrets.copySecrets(p.j, false);
                 hosts.put(copy);
             }
             b.put("hosting", hosts);
-        } catch (Exception unavailable) { throw new SalonComms.IdentityUnavailable(); }
+        } catch (Crypt.Unavailable unavailable) { throw unavailable; }
+        catch (Exception unavailable) { throw new SalonComms.IdentityUnavailable(); }
         return b.toString();
     }
 
@@ -905,6 +902,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONObject b = new JSONObject(json);
             if (b.optInt("salonBackup", 0) != 1) { runOnUiThread(() -> toast("Not a Salon backup file.")); return; }
+            JSONArray preparedHosts = HostingSecrets.prepareRestore(b.optJSONArray("hosting"));
             JSONObject me = b.optJSONObject("me");
             if (me != null && !SalonStore.hasIdentity(this)) {   // don't clobber a live identity
                 JSONObject keepMsg = SalonStore.me(this);
@@ -912,15 +910,8 @@ public class MainActivity extends AppCompatActivity {
                 SalonStore.save(this, me);
             }
             int hostN = 0;
-            JSONArray hosts = b.optJSONArray("hosting");
-            if (hosts != null) for (int i = 0; i < hosts.length(); i++) {
-                JSONObject o = hosts.optJSONObject(i); if (o == null) continue;
-                JSONObject cfg = o.optJSONObject(o.optString("type"));
-                if (cfg != null) for (String sf : HostingStore.SECRET_FIELDS) {
-                    String plain = cfg.optString(sf, "");
-                    if (!plain.isEmpty()) cfg.put(sf, Crypt.encrypt(plain));
-                }
-                HostingStore.upsert(this, new Hosting.Profile(o));
+            for (int i = 0; i < preparedHosts.length(); i++) {
+                HostingStore.upsert(this, new Hosting.Profile(preparedHosts.getJSONObject(i)));
                 hostN++;
             }
             boolean msgOk = false, seedKept = false;
@@ -936,7 +927,7 @@ public class MainActivity extends AppCompatActivity {
             final int hn = hostN; final boolean mo = msgOk, sk = seedKept;
             runOnUiThread(() -> { toast("Restored " + hn + " destination" + (hn == 1 ? "" : "s") + (mo ? " + messaging key." : ".")
                     + (sk ? " Kept your current messaging key (use Settings → Restore messaging key to change it)." : "")); render(); });
-        } catch (Exception e) { runOnUiThread(() -> toast("Restore failed: " + e.getMessage())); }
+        } catch (Exception e) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_restore_failed))); }
     }
 
     private void restoreMsgKey() {
@@ -2993,17 +2984,19 @@ public class MainActivity extends AppCompatActivity {
         }
         final TextView status = Design.note(this, ""); card.addView(status, lp(0, 8, 0, 0));
         LinearLayout btns = row();
-        btns.addView(btn("Save", true, () -> { saveHost(p); go(Screen.HOSTING); }), weight(48, 0, 4));
-        btns.addView(btn("Save & test", false, () -> { saveHost(p); testProfile(p, status); }), weight(48, 4, 0));
+        btns.addView(btn("Save", true, () -> { if (saveHost(p)) go(Screen.HOSTING); }), weight(48, 0, 4));
+        btns.addView(btn("Save & test", false, () -> { if (saveHost(p)) testProfile(p, status); }), weight(48, 4, 0));
         card.addView(btns, lp(0, 8, 0, 0));
         body.addView(card, lp(0, 0, 0, 12));
     }
 
-    private void saveHost(Hosting.Profile p) {
+    private boolean saveHost(Hosting.Profile p) {
+        if (!hostingSecretsReady(p)) return false;
         if (p.name().isEmpty()) Hosting.put(p.j, "name", p.type());
         Hosting.put(p.j, "pathTemplate", "salon/{collection}/{name}-{ts}{ext}"); Hosting.put(p.j, "dirTemplate", "salon/{collection}-{ts}");
         HostingStore.upsert(this, p);
         if (HostingStore.getDefault(this) == null || HostingStore.list(this).size() == 1) HostingStore.setDefault(this, p.id());
+        return true;
     }
 
     private void testProfile(Hosting.Profile p) { testProfile(p, null); }
@@ -3211,12 +3204,41 @@ public class MainActivity extends AppCompatActivity {
         parent.addView(e, new LinearLayout.LayoutParams(-1, -2)); return e;
     }
     private void cfgField(LinearLayout parent, JSONObject cfg, String key, String label, String hint, boolean secret) { EditText e = field(parent, label, cfg.optString(key, ""), secret, hint); e.addTextChangedListener(watch(s -> Hosting.put(cfg, key, s))); }
-    private void cfgSecret(LinearLayout parent, JSONObject cfg, String key, String label) { EditText e = field(parent, label, Crypt.decrypt(cfg.optString(key, "")), true, "••••••"); e.addTextChangedListener(watch(s -> Hosting.put(cfg, key, Crypt.encrypt(s)))); }
+    private final HostingSecrets hostSecrets = new HostingSecrets();
+
+    private void hostingSecretUnavailable() {
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_unavailable).toString());
+    }
+    private boolean hostingSecretsReady(Hosting.Profile profile) {
+        if (hostSecrets.retry(profile)) return true;
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_not_saved).toString());
+        return false;
+    }
+    private void bindHostingSecret(EditText input, JSONObject cfg, String key,
+            boolean revealStored, boolean trim, boolean keepBlank) {
+        hostSecrets.bind(input, cfg, key);
+        try { input.setText(hostSecrets.value(cfg, key, revealStored)); }
+        catch (Crypt.Unavailable unavailable) {
+            Language.error(input, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_unavailable));
+        }
+        if (hostSecrets.pending(cfg, key))
+            Language.error(input, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_not_saved));
+        input.addTextChangedListener(watch(value -> {
+            String next = trim ? value.trim() : value;
+            if (keepBlank && next.isEmpty()) {
+                hostSecrets.discard(cfg, key); Language.error(input, null); return;
+            }
+            boolean saved = hostSecrets.write(cfg, key, next);
+            Language.error(input, saved ? null : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_not_saved));
+        }));
+    }
+
+    private void cfgSecret(LinearLayout parent, JSONObject cfg, String key, String label) { EditText e = field(parent, label, "", true, "••••••"); bindHostingSecret(e, cfg, key, true, false, false); }
     private void cfgSecretMulti(LinearLayout parent, JSONObject cfg, String key, String label) {
         parent.addView(Design.text(this, label.toUpperCase(), 9.5f, Design.DIM(), Design.sansBold()), lp(0, 8, 0, 3));
-        EditText e = new EditText(this); e.setText(Crypt.decrypt(cfg.optString(key, ""))); e.setTextColor(Design.INK()); e.setTextSize(11); e.setTypeface(Design.mono());
+        EditText e = new EditText(this); e.setTextColor(Design.INK()); e.setTextSize(11); e.setTypeface(Design.mono());
         e.setBackground(Design.ruled(this, Design.PAPER(), Design.INK(), 1)); e.setPadding(dp(10), dp(9), dp(10), dp(9)); e.setMinLines(4); e.setGravity(Gravity.TOP);
-        e.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE); e.addTextChangedListener(watch(s -> Hosting.put(cfg, key, Crypt.encrypt(s))));
+        e.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE); bindHostingSecret(e, cfg, key, true, false, false);
         parent.addView(e, new LinearLayout.LayoutParams(-1, -2));
     }
 

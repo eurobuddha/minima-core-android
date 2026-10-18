@@ -7012,4 +7012,7 @@
     <!-- Arguments: detail -->
     <string name="l10n_salon_setup_mint_failed">"铸造失败：%1$s"</string>
     <string name="l10n_salon_setup_rejected" formatted="false">"节点已拒绝。"</string>
+    <string name="l10n_creative_secret_unavailable" formatted="false">"安全存储不可用，已保留保存的凭据。请解锁设备后重试，或使用备份中的凭据进行替换。"</string>
+    <string name="l10n_creative_secret_not_saved" formatted="false">"无法加密此更改，尚未保存。原凭据未更改。请在安全存储可用时再次保存。"</string>
+    <string name="l10n_creative_secret_restore_failed" formatted="false">"无法恢复备份。请检查文件，并在安全存储可用时重试。"</string>
 </resources>

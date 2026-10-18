@@ -7108,4 +7108,7 @@
     <!-- Arguments: detail -->
     <string name="l10n_salon_setup_mint_failed">"Не удалось создать токен: %1$s"</string>
     <string name="l10n_salon_setup_rejected" formatted="false">"Узел отклонил запрос."</string>
+    <string name="l10n_creative_secret_unavailable" formatted="false">"Защищённое хранилище недоступно. Сохранённые данные доступа не изменены. Разблокируйте устройство и повторите или замените данные из резервной копии."</string>
+    <string name="l10n_creative_secret_not_saved" formatted="false">"Не удалось зашифровать изменение. Оно не сохранено; прежние данные доступа не изменены. Повторите сохранение, когда защищённое хранилище станет доступно."</string>
+    <string name="l10n_creative_secret_restore_failed" formatted="false">"Не удалось восстановить резервную копию. Проверьте файл и повторите, когда защищённое хранилище станет доступно."</string>
 </resources>

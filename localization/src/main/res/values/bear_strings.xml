@@ -7044,4 +7044,7 @@
     <!-- Arguments: detail -->
     <string name="l10n_salon_setup_mint_failed">"Mint failed: %1$s"</string>
     <string name="l10n_salon_setup_rejected" formatted="false">"Rejected by the node."</string>
+    <string name="l10n_creative_secret_unavailable" formatted="false">"Secure storage is unavailable. Saved credentials have been kept. Unlock the device and try again, or replace the credential from your backup."</string>
+    <string name="l10n_creative_secret_not_saved" formatted="false">"Could not encrypt this change. It is not saved. Your previous credential is unchanged. Try Save again when secure storage is available."</string>
+    <string name="l10n_creative_secret_restore_failed" formatted="false">"Could not restore the backup. Check the file and try again when secure storage is available."</string>
 </resources>

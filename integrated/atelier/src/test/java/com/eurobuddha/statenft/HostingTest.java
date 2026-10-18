@@ -101,15 +101,14 @@ public class HostingTest {
                 !o.has("sha"));
     }
 
-    @Test public void profileRoundTripAndSecretWrap() {
+    @Test public void profileRoundTripWithLegacySecret() {
         Hosting.Profile p = Hosting.Profile.fresh(Hosting.TYPE_SFTP);
         Hosting.put(p.j, "name", "eurobuddha.com");
         Hosting.put(p.cfg(), "host", "eurobuddha.com");
-        Hosting.put(p.cfg(), "password", Crypt.encrypt("s3cret"));
+        Hosting.put(p.cfg(), "password", "plain:s3cret");
         Hosting.Profile back = new Hosting.Profile(p.j);
         assertEquals("eurobuddha.com", back.cfgStr("host"));
-        // JVM has no AndroidKeyStore -> Crypt falls back to the visible
-        // "plain:" form, and decrypt round-trips it
+        // Existing legacy profiles remain readable; HostingCryptTest covers secure new writes.
         assertTrue(back.cfgStr("password").startsWith("plain:"));
         assertEquals("s3cret", back.secret("password"));
         assertTrue("toString must redact", !back.toString().contains("s3cret"));

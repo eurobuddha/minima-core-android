@@ -11,22 +11,24 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
-/** At-rest wrapping for hosting credentials (SFTP passwords, API tokens) —
- *  the first REUSABLE off-device secrets this app has ever stored, so plain
- *  SharedPreferences (extractable via device backup) is not acceptable.
- *  AndroidKeyStore AES/GCM; values are "gcm:" + b64(iv|ciphertext). When the
- *  Keystore is unavailable (Robolectric, exotic devices) values fall back to
- *  "plain:" + value — honest, visible in the stored form, and covered by the
- *  backup-exclusion rule either way. */
+/** Existing AndroidKeyStore AES/GCM envelope. New secrets require secure storage;
+ * legacy plain values remain readable so owners can migrate their saved profiles. */
 final class Crypt {
 
     private static final String ALIAS = "pandamonium_salon_hosting_key";
 
     private Crypt() {}
 
+    static final class Unavailable extends IllegalStateException {
+        @Override public String getMessage() {
+            return com.eurobuddha.minimacore.i18n.Language.msg(
+                    com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_unavailable).toString();
+        }
+    }
+
     static String encrypt(String value) {
         try { return encryptSecure(value); }
-        catch (Exception unavailable) { return "plain:" + (value == null ? "" : value); }
+        catch (SalonComms.IdentityUnavailable unavailable) { throw new Unavailable(); }
     }
 
     /** Identity storage must never fall back to plaintext. */
@@ -49,7 +51,7 @@ final class Crypt {
 
     static String decrypt(String stored) {
         try { return decryptSecure(stored); }
-        catch (Exception unavailable) { return ""; }
+        catch (SalonComms.IdentityUnavailable unavailable) { throw new Unavailable(); }
     }
 
     /** Distinguish an unavailable encrypted value from an absent one. */

@@ -11,23 +11,31 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
-/** At-rest wrapping for hosting credentials (SFTP passwords, API tokens) —
- *  the first REUSABLE off-device secrets this app has ever stored, so plain
- *  SharedPreferences (extractable via device backup) is not acceptable.
- *  AndroidKeyStore AES/GCM; values are "gcm:" + b64(iv|ciphertext). When the
- *  Keystore is unavailable (Robolectric, exotic devices) values fall back to
- *  "plain:" + value — honest, visible in the stored form, and covered by the
- *  backup-exclusion rule either way. */
+/** Existing AndroidKeyStore AES/GCM envelope. New secrets require secure storage;
+ * legacy plain values remain readable so owners can migrate their saved profiles. */
 final class Crypt {
 
     private static final String ALIAS = "pandamonium_atelier_hosting_key";
 
     private Crypt() {}
 
+    static final class Unavailable extends IllegalStateException {
+        @Override public String getMessage() {
+            return com.eurobuddha.minimacore.i18n.Language.msg(
+                    com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_unavailable).toString();
+        }
+    }
+
     static String encrypt(String value) {
+        try { return encryptSecure(value); }
+        catch (Unavailable unavailable) { throw new Unavailable(); }
+    }
+
+    /** Identity storage must never fall back to plaintext. */
+    static String encryptSecure(String value) {
         if (value == null || value.isEmpty()) return "";
         try {
-            SecretKey key = key();
+            SecretKey key = key(true);
             Cipher c = Cipher.getInstance("AES/GCM/NoPadding");
             c.init(Cipher.ENCRYPT_MODE, key);
             byte[] iv = c.getIV();
@@ -36,12 +44,18 @@ final class Crypt {
             System.arraycopy(iv, 0, out, 0, iv.length);
             System.arraycopy(ct, 0, out, iv.length, ct.length);
             return "gcm:" + Base64.encodeToString(out, Base64.NO_WRAP);
-        } catch (Throwable t) {
-            return "plain:" + value;
+        } catch (Exception t) {
+            throw new Unavailable();
         }
     }
 
     static String decrypt(String stored) {
+        try { return decryptSecure(stored); }
+        catch (Unavailable unavailable) { throw new Unavailable(); }
+    }
+
+    /** Distinguish an unavailable encrypted value from an absent one. */
+    static String decryptSecure(String stored) {
         if (stored == null || stored.isEmpty()) return "";
         if (stored.startsWith("plain:")) return stored.substring(6);
         if (!stored.startsWith("gcm:")) return stored;   // legacy/unknown: as-is
@@ -52,20 +66,21 @@ final class Crypt {
             System.arraycopy(all, 0, iv, 0, 12);
             System.arraycopy(all, 12, ct, 0, ct.length);
             Cipher c = Cipher.getInstance("AES/GCM/NoPadding");
-            c.init(Cipher.DECRYPT_MODE, key(), new GCMParameterSpec(128, iv));
+            c.init(Cipher.DECRYPT_MODE, key(false), new GCMParameterSpec(128, iv));
             return new String(c.doFinal(ct), java.nio.charset.StandardCharsets.UTF_8);
-        } catch (Throwable t) {
-            return "";
+        } catch (Exception t) {
+            throw new Unavailable();
         }
     }
 
-    private static SecretKey key() throws Exception {
+    private static synchronized SecretKey key(boolean create) throws Exception {
         KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
         ks.load(null);
         KeyStore.Entry e = ks.getEntry(ALIAS, null);
         if (e instanceof KeyStore.SecretKeyEntry) {
             return ((KeyStore.SecretKeyEntry) e).getSecretKey();
         }
+        if (!create || e != null) throw new Unavailable();
         KeyGenerator kg = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
         kg.init(new KeyGenParameterSpec.Builder(ALIAS,
                 KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)

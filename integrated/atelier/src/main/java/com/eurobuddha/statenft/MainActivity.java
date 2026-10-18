@@ -3262,24 +3262,28 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 if (cfg.optString("jwk", "").isEmpty()) {
                     final TextView gen = Design.button(this, "Generate wallet", true);
                     final org.json.JSONObject arCfg = cfg;
+                    final Hosting.Profile generatedProfile = hostEditProfile;
                     gen.setOnClickListener(v -> {
                         gen.setText("GENERATING…"); gen.setEnabled(false); gen.setAlpha(0.5f);
                         new Thread(() -> {   // RSA-4096 keygen takes seconds on-device
                             try {
                                 String jwk = Ans104.generateJwkJson();
+                                String wrapped = Crypt.encrypt(jwk);
                                 main.post(() -> {
-                                    Hosting.put(arCfg, "jwk", Crypt.encrypt(jwk));
+                                    Hosting.put(arCfg, "jwk", wrapped);
                                     // persist immediately — a generated key must never exist unsaved;
                                     // default the name so the upsert can't create a blank list entry
-                                    if (hostEditProfile.name().isEmpty()) Hosting.put(hostEditProfile.j, "name", "Arweave");
-                                    HostingStore.upsert(this, hostEditProfile);
+                                    if (generatedProfile.name().isEmpty()) Hosting.put(generatedProfile.j, "name", "Arweave");
+                                    HostingStore.upsert(this, generatedProfile);
                                     toast("Wallet created");
-                                    if (screen == Screen.HOSTING_EDIT) renderHostingEdit(hostEditProfile);
+                                    if (screen == Screen.HOSTING_EDIT && hostEditProfile == generatedProfile) renderHostingEdit(generatedProfile);
                                     else toast("Reopen the destination to see your wallet address");
                                 });
+                            } catch (Crypt.Unavailable unavailable) {
+                                main.post(() -> { hostingSecretUnavailable(); gen.setEnabled(true); gen.setAlpha(1f); gen.setText("Generate wallet"); });
                             } catch (Exception e) {
                                 main.post(() -> { toast("Wallet generation failed: " + e.getClass().getSimpleName());
-                                        if (screen == Screen.HOSTING_EDIT) renderHostingEdit(hostEditProfile); });
+                                        if (screen == Screen.HOSTING_EDIT && hostEditProfile == generatedProfile) renderHostingEdit(generatedProfile); });
                             }
                         }).start();
                     });
@@ -3287,6 +3291,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 } else {
                     String addr;
                     try { addr = Ans104.addressFromJwk(Crypt.decrypt(cfg.optString("jwk", ""))); }
+                    catch (Crypt.Unavailable unavailable) { addr = unavailable.getMessage(); }
                     catch (Exception e) { addr = "(wallet unreadable — paste a valid JWK below)"; }
                     final String addrF = addr;
                     body.addView(Design.kicker(this, "Wallet address (tap to copy — fund it here)"), lpm(0, 8, 0, 5));
@@ -3294,7 +3299,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                     addrV.setBackground(Design.ruled(this, Design.CARD(), Design.INK(), 1.5f));
                     addrV.setPadding(dp(12), dp(10), dp(12), dp(10));
                     addrV.setClickable(true);
-                    addrV.setOnClickListener(v -> copyText(addrF));
+                    addrV.setOnClickListener(v -> { if (addrF.matches("[A-Za-z0-9_-]{43}")) copyText(addrF); });
                     body.addView(addrV, lpm(0, 0, 0, 4));
                     body.addView(Design.note(this, "Back up this wallet: reveal the field below and copy the JWK somewhere safe. It exists only on this device (excluded from Android backup) — uninstalling loses the wallet and any balance on it. Your uploaded files stay live regardless."), lpm(0, 4, 0, 4));
                 }
@@ -3307,6 +3312,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         LinearLayout actions = horizontal(Gravity.CENTER_VERTICAL);
         TextView save = Design.button(this, "Save", true);
         save.setOnClickListener(v -> {
+            if (!hostingSecretsReady(hostEditProfile)) return;
             if (hostEditProfile.name().isEmpty()) { toast("Give the destination a name"); return; }
             HostingStore.upsert(this, hostEditProfile);
             if (HostingStore.getDefault(this) == null || HostingStore.list(this).size() == 1) {
@@ -3318,6 +3324,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         actions.addView(save, weight(48, 0, 4));
         TextView testB = Design.button(this, "Save & test", false);
         testB.setOnClickListener(v -> {
+            if (!hostingSecretsReady(hostEditProfile)) return;
             if (hostEditProfile.name().isEmpty()) { toast("Give the destination a name"); return; }
             HostingStore.upsert(this, hostEditProfile);
             testProfile(hostEditProfile);
@@ -3328,6 +3335,35 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     /** A hosting-config field; SECRET fields are wrapped via Crypt on change
      *  and shown as a password input. */
+    private final HostingSecrets hostSecrets = new HostingSecrets();
+
+    private void hostingSecretUnavailable() {
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_unavailable).toString());
+    }
+    private boolean hostingSecretsReady(Hosting.Profile profile) {
+        if (hostSecrets.retry(profile)) return true;
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_not_saved).toString());
+        return false;
+    }
+    private void bindHostingSecret(EditText input, JSONObject cfg, String key,
+            boolean revealStored, boolean trim, boolean keepBlank) {
+        hostSecrets.bind(input, cfg, key);
+        try { input.setText(hostSecrets.value(cfg, key, revealStored)); }
+        catch (Crypt.Unavailable unavailable) {
+            Language.error(input, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_unavailable));
+        }
+        if (hostSecrets.pending(cfg, key))
+            Language.error(input, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_not_saved));
+        input.addTextChangedListener(watch(value -> {
+            String next = trim ? value.trim() : value;
+            if (keepBlank && next.isEmpty()) {
+                hostSecrets.discard(cfg, key); Language.error(input, null); return;
+            }
+            boolean saved = hostSecrets.write(cfg, key, next);
+            Language.error(input, saved ? null : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_not_saved));
+        }));
+    }
+
     private void hostField(org.json.JSONObject cfg, String key, String label, String hint, boolean secret) {
         final boolean isSecret = secret;
         String cur = cfg.optString(key, "");
@@ -3349,7 +3385,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
         e.setInputType(MASKED);
         e.setImeOptions(android.view.inputmethod.EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
-        e.addTextChangedListener(watch(sv -> { if (!sv.isEmpty()) Hosting.put(cfg, key, Crypt.encrypt(sv)); }));
+        bindHostingSecret(e, cfg, key, false, false, true);
         row.addView(e, new LinearLayout.LayoutParams(0, dp(48), 1));
         final TextView eye = Design.text(this, "👁", 18, Design.INK(), Design.sans());
         eye.setGravity(Gravity.CENTER);
@@ -3393,7 +3429,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         e.setPadding(dp(12), dp(10), dp(12), dp(10));
         e.setBackground(Design.ruled(this, Design.CARD(), Design.INK(), 1.5f));
-        e.addTextChangedListener(watch(sv -> { if (!sv.trim().isEmpty()) Hosting.put(cfg, key, Crypt.encrypt(sv.trim())); }));
+        bindHostingSecret(e, cfg, key, false, true, true);
         body.addView(e, lpm(0, 0, 0, 4));
     }
 

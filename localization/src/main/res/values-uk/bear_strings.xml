@@ -7108,4 +7108,7 @@
     <!-- Arguments: detail -->
     <string name="l10n_salon_setup_mint_failed">"Не вдалося створити токен: %1$s"</string>
     <string name="l10n_salon_setup_rejected" formatted="false">"Вузол відхилив запит."</string>
+    <string name="l10n_creative_secret_unavailable" formatted="false">"Захищене сховище недоступне. Збережені дані доступу не змінено. Розблокуйте пристрій і повторіть або замініть дані з резервної копії."</string>
+    <string name="l10n_creative_secret_not_saved" formatted="false">"Не вдалося зашифрувати зміну. Її не збережено; попередні дані доступу не змінено. Повторіть збереження, коли захищене сховище стане доступним."</string>
+    <string name="l10n_creative_secret_restore_failed" formatted="false">"Не вдалося відновити резервну копію. Перевірте файл і повторіть, коли захищене сховище стане доступним."</string>
 </resources>
