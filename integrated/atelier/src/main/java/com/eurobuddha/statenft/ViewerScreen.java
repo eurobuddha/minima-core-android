@@ -140,7 +140,7 @@ public final class ViewerScreen {
             /* client-side check (NFTwallet's WebValidate): does the proof doc name
              *  this tokenid? gold verified badge when it does, muted otherwise. */
             final Runnable paintShield = () -> {
-                Boolean v = WebValidate.status(meta.tokenid);
+                Boolean v = WebValidate.status(meta.tokenid, meta.webvalidate);
                 boolean valid = Boolean.TRUE.equals(v);
                 meta.webValid = valid;
                 shieldSlot.removeAllViews();
@@ -149,7 +149,7 @@ public final class ViewerScreen {
             };
             paintShield.run();
             sheet.addView(shieldSlot, lp(c, 0, 0, 0, 8));
-            WebValidate.ensure(act, meta.tokenid, meta.webvalidate, paintShield);
+            WebValidate.ensure(act, shieldSlot, meta.tokenid, meta.webvalidate, paintShield);
         }
 
         if (!meta.description.isEmpty()) {

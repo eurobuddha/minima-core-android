@@ -690,7 +690,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         final int bs = dp(badgeDp);
         final Runnable paint = () -> {
             if (f.getChildCount() > 1) f.removeViewAt(1);
-            if (Boolean.TRUE.equals(WebValidate.status(tokenid))) {
+            if (Boolean.TRUE.equals(WebValidate.status(tokenid, webvalidate))) {
                 ImageView badge = new ImageView(this);
                 FrameLayout.LayoutParams blp =
                         new FrameLayout.LayoutParams(bs, bs, Gravity.BOTTOM | Gravity.END);
@@ -702,7 +702,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         };
         paint.run();
         if (tokenid != null && !tokenid.isEmpty() && webvalidate != null && !webvalidate.isEmpty())
-            WebValidate.ensure(this, tokenid, webvalidate, paint);
+            WebValidate.ensure(this, f, tokenid, webvalidate, paint);
         return f;
     }
 
@@ -1014,7 +1014,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             final int bs = dp(30);
             final FrameLayout hb = heroBox;
             final Runnable paint = () -> {
-                if (Boolean.TRUE.equals(WebValidate.status(m.tokenid)) && hb.findViewWithTag("vbadge") == null) {
+                if (Boolean.TRUE.equals(WebValidate.status(m.tokenid, m.webvalidate)) && hb.findViewWithTag("vbadge") == null) {
                     ImageView badge = new ImageView(this);
                     badge.setTag("vbadge");
                     FrameLayout.LayoutParams blp =
@@ -1027,7 +1027,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             };
             paint.run();
             if (!m.tokenid.isEmpty() && !m.webvalidate.isEmpty())
-                WebValidate.ensure(this, m.tokenid, m.webvalidate, paint);
+                WebValidate.ensure(this, hb, m.tokenid, m.webvalidate, paint);
         }
         heroBox.setClickable(true);
         heroBox.setOnClickListener(v -> { if (!shown.isEmpty()) showViewer(m, shown, 0); });

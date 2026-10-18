@@ -90,10 +90,10 @@ public class SalonSocialLanguageTest {
     @Test public void remoteProfileCannotBorrowAnotherTokensWebVerification()throws Exception{
         JSONObject p=profile("remote").put("tokenid","0xborrowed").put("webvalidate","https://example.invalid/proof");
         set("viewEntry",new SalonRegistry.Entry("0xdiscovered","https://example.invalid/remote","remote"));
-        verification.when(()->WebValidate.status("0xborrowed")).thenReturn(true);
+        verification.when(()->WebValidate.status("0xborrowed", "https://example.invalid/proof")).thenReturn(true);
         call("renderProfilePage",new Class<?>[]{JSONObject.class,boolean.class},p,false);
-        verification.verify(()->WebValidate.status("0xborrowed"),never());
-        verification.verify(()->WebValidate.ensure(eq(activity),eq("0xdiscovered"),eq("https://example.invalid/proof"),any(Runnable.class)),times(2));
+        verification.verify(()->WebValidate.status("0xborrowed", "https://example.invalid/proof"),never());
+        verification.verify(()->WebValidate.ensure(eq(activity),any(View.class),eq("0xdiscovered"),eq("https://example.invalid/proof"),any(Runnable.class)),times(2));
         assertNull(find(body,Language.msg(l10n_salon_social_verified_host,"example.invalid").toString()));
         assertEquals("0xborrowed",p.getString("tokenid"));
     }

@@ -1568,9 +1568,9 @@ public class MainActivity extends AppCompatActivity {
         String wv = p.optString("webvalidate", "");
         if (!wv.isEmpty()) {
             final String host = urlHost(wv);
-            Boolean st = WebValidate.status(boundIdentity);
+            Boolean st = WebValidate.status(boundIdentity, wv);
             if (Boolean.TRUE.equals(st)) shieldSlot.addView(verifiedBadge(host));
-            WebValidate.ensure(this, boundIdentity, wv, () -> { shieldSlot.removeAllViews(); if (Boolean.TRUE.equals(WebValidate.status(boundIdentity))) shieldSlot.addView(verifiedBadge(host)); });
+            WebValidate.ensure(this, shieldSlot, boundIdentity, wv, () -> { shieldSlot.removeAllViews(); if (Boolean.TRUE.equals(WebValidate.status(boundIdentity, wv))) shieldSlot.addView(verifiedBadge(host)); });
         }
         body.addView(headCard, lp(0, 0, 0, 12));
 
@@ -3193,7 +3193,7 @@ public class MainActivity extends AppCompatActivity {
         final int bs = dp(Math.max(15, sizeDp / 3));
         final Runnable paint = () -> {
             if (f.getChildCount() > 1) f.removeViewAt(1);
-            if (Boolean.TRUE.equals(WebValidate.status(tokenid))) {
+            if (Boolean.TRUE.equals(WebValidate.status(tokenid, webvalidate))) {
                 ImageView badge = new ImageView(this);
                 FrameLayout.LayoutParams blp = new FrameLayout.LayoutParams(bs, bs, Gravity.BOTTOM | Gravity.END);
                 blp.setMargins(0, 0, dp(2), dp(2));
@@ -3203,7 +3203,7 @@ public class MainActivity extends AppCompatActivity {
         };
         paint.run();
         if (tokenid != null && !tokenid.isEmpty() && webvalidate != null && !webvalidate.isEmpty())
-            WebValidate.ensure(this, tokenid, webvalidate, paint);
+            WebValidate.ensure(this, f, tokenid, webvalidate, paint);
         return f;
     }
 
