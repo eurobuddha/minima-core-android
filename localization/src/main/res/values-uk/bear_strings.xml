@@ -8044,4 +8044,43 @@
     <string name="l10n_salon_chat_mining" formatted="false">"Надіслано ⛏ (майнінг)"</string>
     <!-- Arguments: error -->
     <string name="l10n_salon_chat_send_failed">"Помилка надсилання — у черзі: %1$s"</string>
+    <string name="l10n_salon_settings_hosting_help" formatted="false">"Ваша сторінка та медіафайли завантажуються до вибраного сховища."</string>
+    <string name="l10n_salon_settings_none" formatted="false">"Поки немає"</string>
+    <string name="l10n_salon_settings_manage" formatted="false">"Керування сховищами"</string>
+    <string name="l10n_salon_settings_backup" formatted="false">"Резервне копіювання та відновлення"</string>
+    <string name="l10n_salon_settings_backup_help" formatted="false">"Збережіть ключ повідомлень, дані доступу до сховищ і чернетку сторінки в один файл. Зберігайте його безпечно: дані доступу в ньому не зашифровані."</string>
+    <string name="l10n_salon_settings_backup_file" formatted="false">"Зберегти резервну копію"</string>
+    <string name="l10n_salon_settings_restore_file" formatted="false">"Відновити з файлу"</string>
+    <string name="l10n_salon_settings_tip_address" formatted="false">"Адреса для чайових"</string>
+    <string name="l10n_salon_settings_tip_qr" formatted="false">"QR-код адреси для чайових"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_settings_tip_for">"Чайові для @%1$s"</string>
+    <string name="l10n_salon_settings_republish" formatted="false">"Опублікувати в Salon повторно"</string>
+    <string name="l10n_salon_settings_background_help" formatted="false">"Періодично публікувати маяк профілю через вузол цього телефона, поки Salon закрито, щоб профіль залишався в розділі «Огляд»."</string>
+    <string name="l10n_salon_settings_background_on" formatted="false">"Фонова публікація: увімкнена"</string>
+    <string name="l10n_salon_settings_background_off" formatted="false">"Фонова публікація: вимкнена"</string>
+    <string name="l10n_salon_settings_restore_page" formatted="false">"Відновити сторінку зі сховища"</string>
+    <string name="l10n_salon_settings_backup_key" formatted="false">"Резервна копія ключа повідомлень"</string>
+    <string name="l10n_salon_settings_restore_key" formatted="false">"Відновити ключ повідомлень"</string>
+    <string name="l10n_salon_settings_burn" formatted="false">"Спалити зайвий токен особи"</string>
+    <string name="l10n_salon_settings_about" formatted="false">"Про застосунок"</string>
+    <string name="l10n_salon_settings_no_key" formatted="false">"Ключа повідомлень поки немає."</string>
+    <string name="l10n_salon_settings_key_help" formatted="false">"Це ваш ключ повідомлень. Кожен, хто має його, може читати ваші приватні повідомлення та видавати себе за вас. Зберігайте його безпечно, наприклад у менеджері паролів. Відновіть його після перевстановлення, щоб зберегти ту саму особу для листування."</string>
+    <string name="l10n_salon_settings_save_file" formatted="false">"Зберегти файл"</string>
+    <string name="l10n_salon_settings_copied" formatted="false">"Скопійовано — зберігайте безпечно."</string>
+    <string name="l10n_salon_settings_no_save_app" formatted="false">"Немає застосунку для збереження файлу."</string>
+    <string name="l10n_salon_settings_no_open_app" formatted="false">"Немає застосунку для відкриття файлу."</string>
+    <string name="l10n_salon_settings_invalid_backup" formatted="false">"Це не файл резервної копії Salon."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_settings_restored_destinations">"Відновлено сховищ: %1$d."</string>
+    <string name="l10n_salon_settings_key_restored_suffix" formatted="false">" Ключ повідомлень відновлено."</string>
+    <string name="l10n_salon_settings_key_kept_suffix" formatted="false">" Ваш поточний ключ повідомлень збережено. Для його заміни виберіть «Налаштування → Відновити ключ повідомлень»."</string>
+    <string name="l10n_salon_settings_paste_key" formatted="false">"Вставте ключ повідомлень (hex)"</string>
+    <string name="l10n_salon_settings_restored_key_help" formatted="false">"Відновлено. Опублікуйте профіль повторно, щоб інші використовували новий ключ."</string>
+    <string name="l10n_salon_settings_saved" formatted="false">"Збережено. Зберігайте файл безпечно — він містить ваші дані доступу."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_settings_save_failed">"Не вдалося зберегти: %1$s"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_settings_read_failed">"Не вдалося прочитати файл: %1$s"</string>
+    <string name="l10n_salon_settings_qr_failed" formatted="false">"Не вдалося створити QR-код."</string>
 </resources>

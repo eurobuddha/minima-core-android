@@ -40096,5 +40096,215 @@
     "zh-Hans": "发送失败，已排队：{error}",
     "ru": "Ошибка отправки — в очереди: {error}",
     "uk": "Помилка надсилання — у черзі: {error}"
+  },
+  "salonSettings.hostingHelp": {
+    "en": "Your page and media upload to your selected storage destination.",
+    "zh-Hans": "你的页面和媒体文件会上传到所选存储目标。",
+    "ru": "Ваша страница и медиафайлы загружаются в выбранное хранилище.",
+    "uk": "Ваша сторінка та медіафайли завантажуються до вибраного сховища."
+  },
+  "salonSettings.none": {
+    "en": "None yet",
+    "zh-Hans": "尚未设置",
+    "ru": "Пока нет",
+    "uk": "Поки немає"
+  },
+  "salonSettings.manage": {
+    "en": "Manage destinations",
+    "zh-Hans": "管理存储目标",
+    "ru": "Управление хранилищами",
+    "uk": "Керування сховищами"
+  },
+  "salonSettings.backup": {
+    "en": "Backup & restore",
+    "zh-Hans": "备份与恢复",
+    "ru": "Резервное копирование и восстановление",
+    "uk": "Резервне копіювання та відновлення"
+  },
+  "salonSettings.backupHelp": {
+    "en": "Save your messaging key, hosting credentials and page draft to one file. Keep it safe: the file contains unencrypted credentials.",
+    "zh-Hans": "将消息密钥、存储凭据和页面草稿保存到一个文件中。请妥善保管：文件含有未加密的凭据。",
+    "ru": "Сохраните ключ сообщений, данные доступа к хранилищам и черновик страницы в один файл. Храните его безопасно: данные доступа в нём не зашифрованы.",
+    "uk": "Збережіть ключ повідомлень, дані доступу до сховищ і чернетку сторінки в один файл. Зберігайте його безпечно: дані доступу в ньому не зашифровані."
+  },
+  "salonSettings.backupFile": {
+    "en": "Back up to file",
+    "zh-Hans": "备份到文件",
+    "ru": "Сохранить резервную копию",
+    "uk": "Зберегти резервну копію"
+  },
+  "salonSettings.restoreFile": {
+    "en": "Restore from file",
+    "zh-Hans": "从文件恢复",
+    "ru": "Восстановить из файла",
+    "uk": "Відновити з файлу"
+  },
+  "salonSettings.tipAddress": {
+    "en": "Tip address",
+    "zh-Hans": "打赏地址",
+    "ru": "Адрес для чаевых",
+    "uk": "Адреса для чайових"
+  },
+  "salonSettings.tipQr": {
+    "en": "Show tip-address QR",
+    "zh-Hans": "显示打赏地址二维码",
+    "ru": "QR-код адреса для чаевых",
+    "uk": "QR-код адреси для чайових"
+  },
+  "salonSettings.tipFor": {
+    "en": "Tip @{handle}",
+    "zh-Hans": "打赏 @{handle}",
+    "ru": "Чаевые для @{handle}",
+    "uk": "Чайові для @{handle}"
+  },
+  "salonSettings.republish": {
+    "en": "Re-publish to the Salon",
+    "zh-Hans": "重新发布到 Salon",
+    "ru": "Опубликовать в Salon повторно",
+    "uk": "Опублікувати в Salon повторно"
+  },
+  "salonSettings.backgroundHelp": {
+    "en": "Keep your profile visible in Discover by periodically publishing its beacon through this phone’s node while Salon is closed.",
+    "zh-Hans": "Salon 关闭后，通过本手机的节点定期发布资料信标，让你的资料保持在“发现”中可见。",
+    "ru": "Периодически публиковать маяк профиля через узел этого телефона, пока Salon закрыт, чтобы профиль оставался в разделе «Обзор».",
+    "uk": "Періодично публікувати маяк профілю через вузол цього телефона, поки Salon закрито, щоб профіль залишався в розділі «Огляд»."
+  },
+  "salonSettings.backgroundOn": {
+    "en": "Background publishing: on",
+    "zh-Hans": "后台发布：开启",
+    "ru": "Фоновая публикация: включена",
+    "uk": "Фонова публікація: увімкнена"
+  },
+  "salonSettings.backgroundOff": {
+    "en": "Background publishing: off",
+    "zh-Hans": "后台发布：关闭",
+    "ru": "Фоновая публикация: выключена",
+    "uk": "Фонова публікація: вимкнена"
+  },
+  "salonSettings.restorePage": {
+    "en": "Restore page from hosting",
+    "zh-Hans": "从存储服务恢复页面",
+    "ru": "Восстановить страницу из хранилища",
+    "uk": "Відновити сторінку зі сховища"
+  },
+  "salonSettings.backupKey": {
+    "en": "Back up messaging key",
+    "zh-Hans": "备份消息密钥",
+    "ru": "Резервная копия ключа сообщений",
+    "uk": "Резервна копія ключа повідомлень"
+  },
+  "salonSettings.restoreKey": {
+    "en": "Restore messaging key",
+    "zh-Hans": "恢复消息密钥",
+    "ru": "Восстановить ключ сообщений",
+    "uk": "Відновити ключ повідомлень"
+  },
+  "salonSettings.burn": {
+    "en": "Burn spare identity token",
+    "zh-Hans": "销毁多余的身份代币",
+    "ru": "Сжечь лишний токен личности",
+    "uk": "Спалити зайвий токен особи"
+  },
+  "salonSettings.about": {
+    "en": "About",
+    "zh-Hans": "关于",
+    "ru": "О приложении",
+    "uk": "Про застосунок"
+  },
+  "salonSettings.noKey": {
+    "en": "No messaging key yet.",
+    "zh-Hans": "尚无消息密钥。",
+    "ru": "Ключа сообщений пока нет.",
+    "uk": "Ключа повідомлень поки немає."
+  },
+  "salonSettings.keyHelp": {
+    "en": "This is your messaging key. Anyone with it can read your DMs and impersonate you. Store it safely, for example in a password manager. Restore it after reinstalling to keep the same messaging identity.",
+    "zh-Hans": "这是你的消息密钥。持有者可读取你的私信并冒充你。请妥善保管，例如存入密码管理器。重新安装后恢复此密钥，可保留相同的消息身份。",
+    "ru": "Это ваш ключ сообщений. Любой, у кого он есть, может читать ваши личные сообщения и выдавать себя за вас. Храните его безопасно, например в менеджере паролей. Восстановите его после переустановки, чтобы сохранить ту же личность для переписки.",
+    "uk": "Це ваш ключ повідомлень. Кожен, хто має його, може читати ваші приватні повідомлення та видавати себе за вас. Зберігайте його безпечно, наприклад у менеджері паролів. Відновіть його після перевстановлення, щоб зберегти ту саму особу для листування."
+  },
+  "salonSettings.saveFile": {
+    "en": "Save file",
+    "zh-Hans": "保存文件",
+    "ru": "Сохранить файл",
+    "uk": "Зберегти файл"
+  },
+  "salonSettings.copied": {
+    "en": "Copied — store it safely.",
+    "zh-Hans": "已复制，请妥善保管。",
+    "ru": "Скопировано — храните безопасно.",
+    "uk": "Скопійовано — зберігайте безпечно."
+  },
+  "salonSettings.noSaveApp": {
+    "en": "No file app to save with.",
+    "zh-Hans": "没有可用于保存文件的应用。",
+    "ru": "Нет приложения для сохранения файла.",
+    "uk": "Немає застосунку для збереження файлу."
+  },
+  "salonSettings.noOpenApp": {
+    "en": "No file app to open with.",
+    "zh-Hans": "没有可用于打开文件的应用。",
+    "ru": "Нет приложения для открытия файла.",
+    "uk": "Немає застосунку для відкриття файлу."
+  },
+  "salonSettings.invalidBackup": {
+    "en": "Not a Salon backup file.",
+    "zh-Hans": "这不是 Salon 备份文件。",
+    "ru": "Это не файл резервной копии Salon.",
+    "uk": "Це не файл резервної копії Salon."
+  },
+  "salonSettings.restoredDestinations": {
+    "en": "Storage destinations restored: {count}.",
+    "zh-Hans": "已恢复的存储目标：{count}。",
+    "ru": "Восстановлено хранилищ: {count}.",
+    "uk": "Відновлено сховищ: {count}."
+  },
+  "salonSettings.keyRestoredSuffix": {
+    "en": " Messaging key restored.",
+    "zh-Hans": " 消息密钥已恢复。",
+    "ru": " Ключ сообщений восстановлен.",
+    "uk": " Ключ повідомлень відновлено."
+  },
+  "salonSettings.keyKeptSuffix": {
+    "en": " Your current messaging key was kept. To change it, use Settings → Restore messaging key.",
+    "zh-Hans": " 已保留当前消息密钥。如需更改，请使用“设置 → 恢复消息密钥”。",
+    "ru": " Ваш текущий ключ сообщений сохранён. Для его замены выберите «Настройки → Восстановить ключ сообщений».",
+    "uk": " Ваш поточний ключ повідомлень збережено. Для його заміни виберіть «Налаштування → Відновити ключ повідомлень»."
+  },
+  "salonSettings.pasteKey": {
+    "en": "Paste messaging key (hex)",
+    "zh-Hans": "粘贴消息密钥（十六进制）",
+    "ru": "Вставьте ключ сообщений (hex)",
+    "uk": "Вставте ключ повідомлень (hex)"
+  },
+  "salonSettings.restoredKeyHelp": {
+    "en": "Restored. Re-publish your profile so others use the new key.",
+    "zh-Hans": "已恢复。请重新发布个人资料，让他人使用新密钥。",
+    "ru": "Восстановлено. Опубликуйте профиль повторно, чтобы другие использовали новый ключ.",
+    "uk": "Відновлено. Опублікуйте профіль повторно, щоб інші використовували новий ключ."
+  },
+  "salonSettings.saved": {
+    "en": "Saved. Keep this file safe — it holds your credentials.",
+    "zh-Hans": "已保存。请妥善保管此文件，其中包含你的凭据。",
+    "ru": "Сохранено. Храните файл безопасно — он содержит ваши данные доступа.",
+    "uk": "Збережено. Зберігайте файл безпечно — він містить ваші дані доступу."
+  },
+  "salonSettings.saveFailed": {
+    "en": "Save failed: {error}",
+    "zh-Hans": "保存失败：{error}",
+    "ru": "Не удалось сохранить: {error}",
+    "uk": "Не вдалося зберегти: {error}"
+  },
+  "salonSettings.readFailed": {
+    "en": "Could not read file: {error}",
+    "zh-Hans": "无法读取文件：{error}",
+    "ru": "Не удалось прочитать файл: {error}",
+    "uk": "Не вдалося прочитати файл: {error}"
+  },
+  "salonSettings.qrFailed": {
+    "en": "Could not render QR code.",
+    "zh-Hans": "无法生成二维码。",
+    "ru": "Не удалось создать QR-код.",
+    "uk": "Не вдалося створити QR-код."
   }
 }

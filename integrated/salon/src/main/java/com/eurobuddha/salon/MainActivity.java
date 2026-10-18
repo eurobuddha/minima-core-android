@@ -852,16 +852,30 @@ public class MainActivity extends AppCompatActivity {
             try { seed = SalonComms.exportSeed(this); }
             catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); return; }
             runOnUiThread(() -> {
-                if (seed.isEmpty()) { toast("No messaging key yet."); return; }
+                if (isFinishing() || isDestroyed()) return;
+                if (seed.isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_no_key)); return; }
                 LinearLayout box = dialogBox();
-                box.addView(Design.note(this, "This is your MESSAGING KEY. Anyone with it can read your DMs and impersonate you — store it safely (a password manager). Paste it on a new device or after a reinstall to keep the same inbox."), lp(0, 2, 0, 8));
-                TextView t = Design.text(this, seed, 12, Design.INK(), Design.mono()); copyOnTap(t, seed); box.addView(t);
-                new android.app.AlertDialog.Builder(this).setTitle("Back up messaging key").setView(box)
-                        .setPositiveButton("Save file", (d, w) -> saveTextFile("salon-messaging-key.txt", seed))
-                        .setNeutralButton("Copy", (d, w) -> { ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("salon-msgkey", seed)); toast("Copied — store it safely."); })
-                        .setNegativeButton("Close", null).show();
+                box.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_help)), lp(0, 2, 0, 8));
+                TextView t = Design.text(this, seed, 12, Design.INK(), Design.mono()); t.setOnClickListener(v -> copyMessagingKey(seed)); box.addView(t);
+                new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_backup_key)).setView(box)
+                        .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_save_file), (d, w) -> saveTextFile("salon-messaging-key.txt", seed))
+                        .setNeutralButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_copy), (d, w) -> copyMessagingKey(seed))
+                        .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_language_close), null).show();
             });
         });
+    }
+
+    private void copyMessagingKey(String seed) {
+        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        if (cm == null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_core_wallet_clipboard)); return; }
+        ClipData clip = ClipData.newPlainText("salon-msgkey", seed);
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            android.os.PersistableBundle extras = new android.os.PersistableBundle();
+            extras.putBoolean(android.content.ClipDescription.EXTRA_IS_SENSITIVE, true);
+            clip.getDescription().setExtras(extras);
+        }
+        cm.setPrimaryClip(clip);
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_copied));
     }
 
     /** Save text to a file the user picks (system Save-As, no storage permission). */
@@ -870,7 +884,7 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
                 .setType("text/plain").putExtra(Intent.EXTRA_TITLE, suggestedName);
         try { startActivityForResult(i, SAVE_TEXT); }
-        catch (Exception e) { pendingSaveText = null; toast("No file app to save with."); }
+        catch (Exception e) { pendingSaveText = null; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_no_save_app)); }
     }
 
     /** A full account backup file: messaging key + hosting logins (+ identity/content
@@ -900,7 +914,7 @@ public class MainActivity extends AppCompatActivity {
     private void restoreFromFile() {
         Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");
         try { startActivityForResult(i, OPEN_BACKUP); }
-        catch (Exception e) { toast("No file app to open with."); }
+        catch (Exception e) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_no_open_app)); }
     }
 
     /** Restore an account backup: re-wrap hosting secrets with this device's Crypt key,
@@ -908,7 +922,7 @@ public class MainActivity extends AppCompatActivity {
     private void restoreFromBackup(String json) {
         try {
             JSONObject b = new JSONObject(json);
-            if (b.optInt("salonBackup", 0) != 1) { runOnUiThread(() -> toast("Not a Salon backup file.")); return; }
+            if (b.optInt("salonBackup", 0) != 1) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_invalid_backup))); return; }
             JSONArray preparedHosts = HostingSecrets.prepareRestore(b.optJSONArray("hosting"));
             JSONObject me = b.optJSONObject("me");
             if (me != null && !SalonStore.hasIdentity(this)) {   // don't clobber a live identity
@@ -932,18 +946,20 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             final int hn = hostN; final boolean mo = msgOk, sk = seedKept;
-            runOnUiThread(() -> { toast("Restored " + hn + " destination" + (hn == 1 ? "" : "s") + (mo ? " + messaging key." : ".")
-                    + (sk ? " Kept your current messaging key (use Settings → Restore messaging key to change it)." : "")); render(); });
+            runOnUiThread(() -> { toast(Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restored_destinations, hn), mo ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_restored_suffix) : "", sk ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_kept_suffix) : "")); render(); });
         } catch (Exception e) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_restore_failed))); }
     }
 
     private void restoreMsgKey() {
         LinearLayout box = dialogBox();
-        final EditText f = field(box, "Paste messaging key (hex)", "", false, "");
-        showDialog("Restore messaging key", box, "Restore", () -> io.execute(() -> {
-            final boolean ok = SalonComms.importSeed(this, text(f));
-            runOnUiThread(() -> { if (ok) { SalonStore.put(this, "msgpk", SalonComms.publicId(this)); toast("Restored. Re-publish your profile so others use the new key."); render(); } else toast(Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_restore_failed)); });
-        }));
+        final EditText f = field(box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_paste_key), "", false, "");
+        showDialog(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restore_key), box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_restore), () -> {
+            final String seed = text(f);
+            io.execute(() -> {
+            final boolean ok = SalonComms.importSeed(this, seed);
+            runOnUiThread(() -> { if (ok) { SalonStore.put(this, "msgpk", SalonComms.publicId(this)); toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restored_key_help)); render(); } else toast(Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_restore_failed)); });
+            });
+        });
     }
 
     /** GET-touch the owner's own relay blobs so their 7-day TTL resets each session. */
@@ -2434,8 +2450,8 @@ public class MainActivity extends AppCompatActivity {
             io.execute(() -> {
                 try (java.io.OutputStream os = getContentResolver().openOutputStream(uri)) {
                     os.write(content.getBytes(java.nio.charset.StandardCharsets.UTF_8)); os.flush();
-                    runOnUiThread(() -> toast("Saved. Keep this file safe — it holds your credentials."));
-                } catch (Exception e) { runOnUiThread(() -> toast("Save failed: " + e.getMessage())); }
+                    runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_saved)));
+                } catch (Exception e) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_save_failed, HoldingMessages.message(e.getMessage())))); }
             });
             return;
         }
@@ -2446,7 +2462,7 @@ public class MainActivity extends AppCompatActivity {
                     byte[] buf = new byte[8192]; int n;
                     while ((n = is.read(buf)) > 0) bos.write(buf, 0, n);
                     restoreFromBackup(new String(bos.toByteArray(), java.nio.charset.StandardCharsets.UTF_8));
-                } catch (Exception e) { runOnUiThread(() -> toast("Couldn't read file: " + e.getMessage())); }
+                } catch (Exception e) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_read_failed, HoldingMessages.message(e.getMessage())))); }
             });
             return;
         }
@@ -3025,33 +3041,33 @@ public class MainActivity extends AppCompatActivity {
     /* ================= SETTINGS + HOSTING (unchanged) ================= */
 
     private void renderSettings() {
-        masthead("Settings");
+        masthead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_settings));
         LinearLayout nodeCard = card(); nodeCard.addView(Design.lot(this, "Minima Core"));
-        addKvPlain(nodeCard, "Node", nodeUp ? "connected" : "not connected — enable The Salon in Minima → Apps");
+        addKvPlain(nodeCard, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_tab_node), nodeUp ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_connected) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_not_connected));
         body.addView(nodeCard, lp(0, 0, 0, 12));
         Hosting.Profile def = HostingStore.getDefault(this);
-        LinearLayout hostCard = card(); hostCard.addView(Design.lot(this, "Hosting"));
-        hostCard.addView(Design.note(this, "Your page + all media upload to your OWN storage — SFTP straight to your server, or WebDAV / IPFS / GitHub."), lp(0, 4, 0, 6));
-        addKvPlain(hostCard, "Default", def == null ? "none yet" : def.name() + " · " + def.type());
-        hostCard.addView(btn("Manage destinations", true, () -> go(Screen.HOSTING)), lph(48, 0, 8, 0, 0));
+        LinearLayout hostCard = card(); hostCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting)));
+        hostCard.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_hosting_help)), lp(0, 4, 0, 6));
+        addKvPlain(hostCard, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_eth_wallet_default), def == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_none) : def.name() + " · " + def.type());
+        hostCard.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_manage), true, () -> go(Screen.HOSTING)), lp(0, 8, 0, 0));
         body.addView(hostCard, lp(0, 0, 0, 12));
 
-        LinearLayout bkp = card(); bkp.addView(Design.lot(this, "Backup & restore"));
-        bkp.addView(Design.note(this, "Save your messaging key + hosting logins to one file. After a reinstall, Restore brings them back — then your page content restores from hosting. Keep the file safe: it holds your credentials in the clear."), lp(0, 4, 0, 6));
-        bkp.addView(btn("Back up to file", true, this::backupAccount), lph(48, 0, 6, 0, 0));
-        bkp.addView(btn("Restore from file", false, this::restoreFromFile), lph(44, 0, 8, 0, 0));
+        LinearLayout bkp = card(); bkp.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_backup)));
+        bkp.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_backup_help)), lp(0, 4, 0, 6));
+        bkp.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_backup_file), true, this::backupAccount), lp(0, 6, 0, 0));
+        bkp.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restore_file), false, this::restoreFromFile), lp(0, 8, 0, 0));
         body.addView(bkp, lp(0, 0, 0, 12));
         if (SalonStore.hasIdentity(this)) {
-            LinearLayout idc = card(); idc.addView(Design.lot(this, "Identity"));
-            copyRow(idc, "Handle", "@" + SalonStore.get(this, "handle"));
-            copyRow(idc, "Token", SalonStore.get(this, "tokenid"));
+            LinearLayout idc = card(); idc.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_home_identity)));
+            copyRow(idc, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_handle), "@" + SalonStore.get(this, "handle"));
+            copyRow(idc, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_token), SalonStore.get(this, "tokenid"));
             String tipaddr = SalonStore.get(this, "tipaddr");
-            if (!tipaddr.isEmpty()) { copyRow(idc, "Tip address", tipaddr);
-                idc.addView(btn("Show tip-address QR", false, () -> showQr("Tip @" + SalonStore.get(this, "handle"), tipaddr)), lph(44, 0, 4, 0, 0)); }
-            idc.addView(btn("Re-publish to the Salon", false, () -> publishSalon(null)), lph(44, 0, 8, 0, 0));
+            if (!tipaddr.isEmpty()) { copyRow(idc, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_tip_address), tipaddr);
+                idc.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_tip_qr), false, () -> showQr(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_tip_for, SalonStore.get(this, "handle")), tipaddr)), lp(0, 4, 0, 0)); }
+            idc.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_republish), false, () -> publishSalon(null)), lp(0, 8, 0, 0));
             boolean bg = SalonKeepAliveWorker.bgEnabled(this);
-            idc.addView(Design.note(this, "Keep on the square while closed: re-posts your beacon every few hours in the background via the Minima node on this phone, so you never drop off Discovery."), lp(0, 8, 0, 4));
-            idc.addView(btn("Background publish: " + (bg ? "ON" : "OFF"), false, () -> {
+            idc.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_background_help)), lp(0, 8, 0, 4));
+            idc.addView(btn(bg ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_background_on) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_background_off), false, () -> {
                 if (SalonKeepAliveWorker.bgEnabled(this)) {
                     SalonStore.put(this, "keepalivebg", "off");
                     try {
@@ -3063,15 +3079,15 @@ public class MainActivity extends AppCompatActivity {
                     scheduleKeepAliveFallback();
                 }
                 render();
-            }), lph(44, 0, 8, 0, 0));
-            idc.addView(btn("Restore page from hosting", false, () -> hydrateFromHosted(SalonStore.get(this, "profileUrl"), true)), lph(44, 0, 8, 0, 0));
-            idc.addView(btn("Back up messaging key", false, this::backupMsgKey), lph(44, 0, 8, 0, 0));
-            idc.addView(btn("Restore messaging key", false, this::restoreMsgKey), lph(44, 0, 8, 0, 0));
-            idc.addView(btn("Burn spare identity token", false, this::burnSpares), lph(44, 0, 8, 0, 0));
+            }), lp(0, 8, 0, 0));
+            idc.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restore_page), false, () -> hydrateFromHosted(SalonStore.get(this, "profileUrl"), true)), lp(0, 8, 0, 0));
+            idc.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_backup_key), false, this::backupMsgKey), lp(0, 8, 0, 0));
+            idc.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restore_key), false, this::restoreMsgKey), lp(0, 8, 0, 0));
+            idc.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_burn), false, this::burnSpares), lp(0, 8, 0, 0));
             body.addView(idc, lp(0, 0, 0, 12));
         }
-        LinearLayout about = card(); about.addView(Design.lot(this, "Colophon"));
-        addKvPlain(about, "App", "The Salon"); addKvPlain(about, "Version", BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
+        LinearLayout about = card(); about.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_about)));
+        addKvPlain(about, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_app_heading), "The Salon"); addKvPlain(about, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_version), BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
         body.addView(about, lp(0, 0, 0, 12));
     }
 
@@ -3486,9 +3502,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_share_failed)); }
     }
 
-    private void showQr(String title, String data) {
+    private void showQr(CharSequence title, String data) {
         Bitmap bmp = Qr.bitmap(data, 640);
-        if (bmp == null) { toast("Couldn't render QR"); return; }
+        if (bmp == null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_qr_failed)); return; }
         Dialog d = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         LinearLayout col = new LinearLayout(this); col.setOrientation(LinearLayout.VERTICAL); col.setGravity(Gravity.CENTER);
         col.setBackgroundColor(0xFFFFFFFF); col.setPadding(dp(24), dp(24), dp(24), dp(24));

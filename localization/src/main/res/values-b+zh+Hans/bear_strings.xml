@@ -7936,4 +7936,43 @@
     <string name="l10n_salon_chat_mining" formatted="false">"已发送 ⛏（正在挖矿）"</string>
     <!-- Arguments: error -->
     <string name="l10n_salon_chat_send_failed">"发送失败，已排队：%1$s"</string>
+    <string name="l10n_salon_settings_hosting_help" formatted="false">"你的页面和媒体文件会上传到所选存储目标。"</string>
+    <string name="l10n_salon_settings_none" formatted="false">"尚未设置"</string>
+    <string name="l10n_salon_settings_manage" formatted="false">"管理存储目标"</string>
+    <string name="l10n_salon_settings_backup" formatted="false">"备份与恢复"</string>
+    <string name="l10n_salon_settings_backup_help" formatted="false">"将消息密钥、存储凭据和页面草稿保存到一个文件中。请妥善保管：文件含有未加密的凭据。"</string>
+    <string name="l10n_salon_settings_backup_file" formatted="false">"备份到文件"</string>
+    <string name="l10n_salon_settings_restore_file" formatted="false">"从文件恢复"</string>
+    <string name="l10n_salon_settings_tip_address" formatted="false">"打赏地址"</string>
+    <string name="l10n_salon_settings_tip_qr" formatted="false">"显示打赏地址二维码"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_settings_tip_for">"打赏 @%1$s"</string>
+    <string name="l10n_salon_settings_republish" formatted="false">"重新发布到 Salon"</string>
+    <string name="l10n_salon_settings_background_help" formatted="false">"Salon 关闭后，通过本手机的节点定期发布资料信标，让你的资料保持在“发现”中可见。"</string>
+    <string name="l10n_salon_settings_background_on" formatted="false">"后台发布：开启"</string>
+    <string name="l10n_salon_settings_background_off" formatted="false">"后台发布：关闭"</string>
+    <string name="l10n_salon_settings_restore_page" formatted="false">"从存储服务恢复页面"</string>
+    <string name="l10n_salon_settings_backup_key" formatted="false">"备份消息密钥"</string>
+    <string name="l10n_salon_settings_restore_key" formatted="false">"恢复消息密钥"</string>
+    <string name="l10n_salon_settings_burn" formatted="false">"销毁多余的身份代币"</string>
+    <string name="l10n_salon_settings_about" formatted="false">"关于"</string>
+    <string name="l10n_salon_settings_no_key" formatted="false">"尚无消息密钥。"</string>
+    <string name="l10n_salon_settings_key_help" formatted="false">"这是你的消息密钥。持有者可读取你的私信并冒充你。请妥善保管，例如存入密码管理器。重新安装后恢复此密钥，可保留相同的消息身份。"</string>
+    <string name="l10n_salon_settings_save_file" formatted="false">"保存文件"</string>
+    <string name="l10n_salon_settings_copied" formatted="false">"已复制，请妥善保管。"</string>
+    <string name="l10n_salon_settings_no_save_app" formatted="false">"没有可用于保存文件的应用。"</string>
+    <string name="l10n_salon_settings_no_open_app" formatted="false">"没有可用于打开文件的应用。"</string>
+    <string name="l10n_salon_settings_invalid_backup" formatted="false">"这不是 Salon 备份文件。"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_settings_restored_destinations">"已恢复的存储目标：%1$d。"</string>
+    <string name="l10n_salon_settings_key_restored_suffix" formatted="false">" 消息密钥已恢复。"</string>
+    <string name="l10n_salon_settings_key_kept_suffix" formatted="false">" 已保留当前消息密钥。如需更改，请使用“设置 → 恢复消息密钥”。"</string>
+    <string name="l10n_salon_settings_paste_key" formatted="false">"粘贴消息密钥（十六进制）"</string>
+    <string name="l10n_salon_settings_restored_key_help" formatted="false">"已恢复。请重新发布个人资料，让他人使用新密钥。"</string>
+    <string name="l10n_salon_settings_saved" formatted="false">"已保存。请妥善保管此文件，其中包含你的凭据。"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_settings_save_failed">"保存失败：%1$s"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_settings_read_failed">"无法读取文件：%1$s"</string>
+    <string name="l10n_salon_settings_qr_failed" formatted="false">"无法生成二维码。"</string>
 </resources>

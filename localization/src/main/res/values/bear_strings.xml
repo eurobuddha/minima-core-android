@@ -7972,4 +7972,43 @@
     <string name="l10n_salon_chat_mining" formatted="false">"Sent ⛏ (mining)"</string>
     <!-- Arguments: error -->
     <string name="l10n_salon_chat_send_failed">"Send failed — queued: %1$s"</string>
+    <string name="l10n_salon_settings_hosting_help" formatted="false">"Your page and media upload to your selected storage destination."</string>
+    <string name="l10n_salon_settings_none" formatted="false">"None yet"</string>
+    <string name="l10n_salon_settings_manage" formatted="false">"Manage destinations"</string>
+    <string name="l10n_salon_settings_backup" formatted="false">"Backup &amp; restore"</string>
+    <string name="l10n_salon_settings_backup_help" formatted="false">"Save your messaging key, hosting credentials and page draft to one file. Keep it safe: the file contains unencrypted credentials."</string>
+    <string name="l10n_salon_settings_backup_file" formatted="false">"Back up to file"</string>
+    <string name="l10n_salon_settings_restore_file" formatted="false">"Restore from file"</string>
+    <string name="l10n_salon_settings_tip_address" formatted="false">"Tip address"</string>
+    <string name="l10n_salon_settings_tip_qr" formatted="false">"Show tip-address QR"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_settings_tip_for">"Tip @%1$s"</string>
+    <string name="l10n_salon_settings_republish" formatted="false">"Re-publish to the Salon"</string>
+    <string name="l10n_salon_settings_background_help" formatted="false">"Keep your profile visible in Discover by periodically publishing its beacon through this phone’s node while Salon is closed."</string>
+    <string name="l10n_salon_settings_background_on" formatted="false">"Background publishing: on"</string>
+    <string name="l10n_salon_settings_background_off" formatted="false">"Background publishing: off"</string>
+    <string name="l10n_salon_settings_restore_page" formatted="false">"Restore page from hosting"</string>
+    <string name="l10n_salon_settings_backup_key" formatted="false">"Back up messaging key"</string>
+    <string name="l10n_salon_settings_restore_key" formatted="false">"Restore messaging key"</string>
+    <string name="l10n_salon_settings_burn" formatted="false">"Burn spare identity token"</string>
+    <string name="l10n_salon_settings_about" formatted="false">"About"</string>
+    <string name="l10n_salon_settings_no_key" formatted="false">"No messaging key yet."</string>
+    <string name="l10n_salon_settings_key_help" formatted="false">"This is your messaging key. Anyone with it can read your DMs and impersonate you. Store it safely, for example in a password manager. Restore it after reinstalling to keep the same messaging identity."</string>
+    <string name="l10n_salon_settings_save_file" formatted="false">"Save file"</string>
+    <string name="l10n_salon_settings_copied" formatted="false">"Copied — store it safely."</string>
+    <string name="l10n_salon_settings_no_save_app" formatted="false">"No file app to save with."</string>
+    <string name="l10n_salon_settings_no_open_app" formatted="false">"No file app to open with."</string>
+    <string name="l10n_salon_settings_invalid_backup" formatted="false">"Not a Salon backup file."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_settings_restored_destinations">"Storage destinations restored: %1$d."</string>
+    <string name="l10n_salon_settings_key_restored_suffix" formatted="false">" Messaging key restored."</string>
+    <string name="l10n_salon_settings_key_kept_suffix" formatted="false">" Your current messaging key was kept. To change it, use Settings → Restore messaging key."</string>
+    <string name="l10n_salon_settings_paste_key" formatted="false">"Paste messaging key (hex)"</string>
+    <string name="l10n_salon_settings_restored_key_help" formatted="false">"Restored. Re-publish your profile so others use the new key."</string>
+    <string name="l10n_salon_settings_saved" formatted="false">"Saved. Keep this file safe — it holds your credentials."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_settings_save_failed">"Save failed: %1$s"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_settings_read_failed">"Could not read file: %1$s"</string>
+    <string name="l10n_salon_settings_qr_failed" formatted="false">"Could not render QR code."</string>
 </resources>
