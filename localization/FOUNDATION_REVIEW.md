@@ -3039,3 +3039,18 @@ Inherited optional node issue disposition: MySQLConnect.searchCoins formats Doub
 ### Code Review
 
 Summary: the minimal notification display changes reuse existing parsing and localization; no operation or persistence code changed. All changed Java, version/catalogue and generated resource changes were inspected, including plural categories and literal user data handling. Findings: no blocking issue in this diff. Verdict: approve this source checkpoint. Existing regression suites pass 453 executions (146 PandaBear, 146 BlackBear, 149 Pandamonium, 12 localization), with zero failures/errors/skips. All 19 pinned imports, transport, catalogue and whitespace checks pass. Evidence: build/localization/chat-notifications-validation.json, chat-notifications-tests.log and chat-notifications-import.log. Fold R3GL805K7MB is still absent; no device data was accessed. Signed 1.9.48 candidates remain preserved and must be superseded by rebuilt candidates for this source.
+
+
+## Signed 1.9.49 candidates — 2026-10-18
+
+Source `8eab9ba0eb5fb4bddafe2762f269b40d49912120` is committed and exact-hash verified on fork branch `feature/bear-languages-2026-10-16`. All three release builds and 25 host test tasks completed successfully: 2,677 passing executions, zero failures/errors/skips, four NO-SOURCE tasks and five valid UP-TO-DATE tasks. All 632 source hashes and the baseline node/wallet protected hashes match.
+
+The three candidates in `/Users/eurobuddha/Projects/minima/apks/base/dist` have the original family signing certificate, correct package IDs, 1.9.49/vc120 metadata, non-debuggable arm64 packaging, verified 16 KiB ZIP alignment, all four declared locales and all 5,337 catalogue resources per locale. SHA256 sidecars are saved. Prior APKs remain preserved.
+
+- `minima-core-PandaBear-1.9.49-candidate.apk`: `cfaa64ea66d4f7920edd5383e2e69fe866cbb3a1e954106e5daa95254fc59632`
+- `minima-core-BlackBear-1.9.49-candidate.apk`: `05bfc53e13a6c2095d28e290931356c46a30f745c7a09ba963570aa45b14b27b`
+- `minima-core-Pandamonium-1.9.49-candidate.apk`: `d342979872f45a7788533443bd5fae6e1ed3cf60a4baf8841d1ed238b9ae48ec`
+
+Evidence: `build/localization/bear-1.9.49-validation.json`, `signed-candidates-1.9.49-validation.json` and `dist/bear-languages-1.9.49-candidate.json`. No public release or installation has occurred. The final serial-specific ADB check still reports Fold R3GL805K7MB not found. Reconnection has been requested.
+
+Remaining acceptance: data-preserving signed upgrade on the Fold; explicit four-language selection and persistence; unchanged activity/input/operation state while switching; lock and biometric behavior; long labels and accessibility; populated minimaWallet behavior; all 19 integrated apps. Existing disposable instrumentation disables AppLock and requires ranchu hardware, so it must not run on the owner Fold. Use the signed candidate and normal UI paths, preserve owner data and signing state, and do not initiate financial actions merely to exercise labels. After acceptance, publish the accepted versioned artifacts and checksums to the authorized GitHub fork, PandaApps and eurobuddha.com. No other device or app store is authorized.
