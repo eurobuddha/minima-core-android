@@ -6,6 +6,10 @@ def adapt(root):
     project=Path(__file__).resolve().parents[1]
     folder=root/'NFTwallet/src/main/java/com/eurobuddha/nftwallet'
     shutil.copy2(project/'scripts/pandamonium-sources/NFTwallet/PreparedSend.java',folder/'PreparedSend.java')
+    p=folder/'NodeApi.java';s=p.read_text();anchor='    public void onDestroy() {'
+    assert s.count(anchor)==1,'NFT prepared-file cleanup drift'
+    s=s.replace(anchor,(project/'scripts/pandamonium-sources/NFTwallet/prepared-file-cleanup.inc').read_text()+anchor)
+    p.write_text(s)
     p=folder/'SendView.java';s=p.read_text()
     start=s.index('        StringBuilder cmd = new StringBuilder("send address:")')
     end=s.index('\n    // ----- expert confirm breakdown -----',start)

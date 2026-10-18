@@ -15,6 +15,7 @@ final class PreparedSend {
     private JSONObject draft, intent;
     private int decimals;
     private boolean started, prepared, finished;
+    private boolean unsignedReady, signedVerified, retainFiles;
 
     PreparedSend(MainActivity act,String recipient,String amount,String burn,int split,String token,String tokenName,TxnBuilder.Done done) {
         this.act=act;this.recipient=recipient;this.amount=amount;this.burn=burn;this.split=split;this.token=token;this.tokenName=tokenName;this.done=done;
@@ -39,8 +40,9 @@ final class PreparedSend {
         String command="sendnosign "+destinations+" tokenid:"+token+" split:1"
                 +" burn:"+PreparedSendEvidence.fee(burn)+" file:"+handle+".txn";
         act.node().cmd(command,new NodeApi.Cb() {
-            @Override public void onResult(JSONObject reply){if(!finished)viewUnsigned();}
+            @Override public void onResult(JSONObject reply){if(!finished){unsignedReady=true;viewUnsigned();}}
             @Override public void onError(String message){fail(message);}
+            @Override public void onUnknown(String message){retainFiles=true;fail(message);}
         });
     }
     private void viewUnsigned() {
@@ -51,6 +53,7 @@ final class PreparedSend {
                 catch(RuntimeException invalid){fail(TransactionEvidence.INVALID);}
             }
             @Override public void onError(String message){fail(message);}
+            @Override public void onUnknown(String message){retainFiles=true;fail(message);}
         });
     }
     private void checkOwned(List<String> addresses,int index,Set<String> verified) {
@@ -73,6 +76,7 @@ final class PreparedSend {
                 verified.add(address);checkOwned(addresses,index+1,verified);
             }
             @Override public void onError(String message){fail(message);}
+            @Override public void onUnknown(String message){retainFiles=true;fail(message);}
         });
     }
     private void sign() {
@@ -88,7 +92,7 @@ final class PreparedSend {
                 verifySigned();
             }
             @Override public void onError(String message){fail(message);}
-            @Override public void onUnknown(String message){fail(TransactionEvidence.NOT_SENT);}
+            @Override public void onUnknown(String message){retainFiles=true;fail(TransactionEvidence.NOT_SENT);}
         });
     }
     private void verifySigned() {
@@ -97,10 +101,10 @@ final class PreparedSend {
                 if(finished)return;
                 try { TransactionEvidence.receipt(reply,intent); }
                 catch(RuntimeException mismatch){fail(TransactionEvidence.NOT_SENT);return;}
-                post();
+                signedVerified=true;post();
             }
             @Override public void onError(String message){fail(TransactionEvidence.NOT_SENT);}
-            @Override public void onUnknown(String message){fail(TransactionEvidence.NOT_SENT);}
+            @Override public void onUnknown(String message){retainFiles=true;fail(TransactionEvidence.NOT_SENT);}
         });
     }
     private void post() {
@@ -114,6 +118,7 @@ final class PreparedSend {
                 catch(RuntimeException incomplete){unknown();return;}
                 if(!mark(HistoryDb.POSTED,reply)){unknown();return;}
                 finished=true;act.history().update(historyId,HistoryDb.STATUS_POSTED,null,"");
+                discardFinishedFiles();
                 done.onPosted(TransactionEvidence.txpow(reply).optString("txpowid"),outputs);
             }
             @Override public void onError(String message){fail(message);}
@@ -126,7 +131,13 @@ final class PreparedSend {
     private void fail(String message) {
         if(finished)return;
         if(prepared&&!mark(HistoryDb.NOT_SUBMITTED,null)){unknown();return;}
-        finished=true;act.history().update(historyId,HistoryDb.STATUS_ERROR,null,message);done.onFailed(message);
+        finished=true;act.history().update(historyId,HistoryDb.STATUS_ERROR,null,message);discardFinishedFiles();done.onFailed(message);
+    }
+    /** Only an acknowledged outcome may release scratch files; recovery never replays them. */
+    private void discardFinishedFiles() {
+        if(retainFiles)return;
+        if(unsignedReady)act.node().discardPreparedFile(handle+".txn");
+        if(signedVerified)act.node().discardPreparedFile(signedFile);
     }
     private void unknown() {
         if(finished)return;finished=true;mark(HistoryDb.UNKNOWN,null);
