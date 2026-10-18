@@ -1,0 +1,58 @@
+Atelier and Salon hosted URL verification — 2026-10-18
+
+Scope and reuse
+Inspected both integrated Hosting.java files and their standalone donors, existing
+HostingTest, upload/profile/mint callers and the core wallet NetFetch implementation.
+The existing profile schema and ownHosts() allowance are retained. The integration
+adapter reuses NetFetch's bounded manual redirect pattern and calls its host policy.
+Direct reuse of NetFetch.get() would reject explicitly configured LAN hosts and
+require a full 200 response body, whereas this probe needs a small Range read and
+accepts a valid 206 response. No new dependency or public API was added.
+
+Findings resolved
+- Atelier automatically followed unchecked redirect destinations after validating
+  only the original host. Each hop now checks its HTTP(S) scheme and host.
+- Salon accepted a 3xx response as successful verification without opening the
+  destination. Supported redirects now resolve relative Locations and continue
+  through the same bounded check; loops and missing Locations fail.
+- Both accepted response headers without checking body readability, including empty
+  success responses. A final 200 or 206 must yield a byte; only a prefix is read,
+  even if the server ignores the Range header. This is availability verification,
+  not full-file integrity/content validation.
+- Connections and streams close on success, refusal and I/O failure.
+- Thread interruption no longer gets swallowed by retry sleep. The flag is retained
+  and subsequent HTTP probes do not open connections or restart a retry window.
+
+Preserved behavior
+Configured own-host allowances still permit private gateways. Matching is exact and
+case-insensitive. Other private/multicast/CGNAT destinations use the existing block
+policy. Retry counts, normal timeouts, Arweave deadlines, cancellation callbacks,
+Salon relay resolution, uploader credentials and data paths remain unchanged.
+The existing translated caller messages continue to wrap technical diagnostics.
+No version changes, signed APK builds, installations or publication in this patch.
+
+Review limits
+The shared host policy retains its documented DNS check/connection resolution race.
+Configured hosts are intentionally trusted; this patch does not redesign that policy.
+The probe establishes that the final URL currently serves readable bytes; it does
+not prove their format, future availability, or equality to the uploaded file.
+Salon publish lifecycle and public-page language coverage remain integration work.
+
+Validation
+Full Atelier suite: 288 tests. Full Salon suite: 195 tests. All 483 passed,
+zero failures/errors/skips; release Pandamonium Java compilation passed.
+The 24 new probe tests cover relative redirects, each private-address class,
+configured private gateways, case-insensitive exact host matching, foreign schemes,
+redirects to errors, missing Location, redirect loops, response status/body checks,
+stream/connection cleanup and preserved interruption during retry sleep.
+No live node or network was used by these regression fixtures.
+
+All 21 pinned imports reproduce; all 6,776 messages validate in four languages;
+git diff --check passes. Evidence: build/localization/hosting-verification-
+{tests.log,validation.json,import.log}. Final review changed only indentation after
+the full test run; importer verification was repeated for that formatting change.
+
+Verdict: Approve this hosting-verification patch. No unresolved blocking findings
+within its scope. Full Atelier/Salon integration remains active; publication UI,
+metadata, restore/outbox ownership, public-page language coverage and final device
+acceptance remain outstanding.

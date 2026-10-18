@@ -280,34 +280,64 @@ final class Hosting {
                 return;
             } catch (HostingException e) {
                 last = e;
+                if (Thread.currentThread().isInterrupted()) throw e;
                 boolean more = slow ? System.currentTimeMillis() + sleepMs < deadlineAt : a < attempts - 1;
                 if (!more) break;
-                try { Thread.sleep(sleepMs); } catch (InterruptedException ignored) { }
+                try { Thread.sleep(sleepMs); } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    throw new HostingException("Verification stopped by user: " + url);
+                }
             }
         }
         throw last;
     }
 
     private static void verifyOnce(String url, Profile p) throws HostingException {
+        verifyOnce(url, p, u -> (HttpURLConnection) u.openConnection());
+    }
+
+    interface ProbeConnection { HttpURLConnection open(URL url) throws Exception; }
+
+    // NetFetch's bounded manual redirect loop, retaining the explicit hosting-profile allowance.
+    // The injected transport is test-only; the same host/scheme policy always runs.
+    static void verifyOnce(String url, Profile p, ProbeConnection connections) throws HostingException {
+        java.util.Set<String> ownHosts = new java.util.HashSet<>();
+        if (p != null) for (String host : p.ownHosts()) ownHosts.add(host.toLowerCase(Locale.ROOT));
+        String current = url;
         try {
-            URL u = new URL(url);
-            boolean own = p != null && p.ownHosts().contains(u.getHost());
-            if (!own && ImageLoader.isBlockedHost(u.getHost())) {
-                throw new HostingException("URL host is not publicly reachable: " + u.getHost());
+            for (int hop = 0; hop <= 3; hop++) {
+                if (Thread.currentThread().isInterrupted()) throw new java.io.InterruptedIOException();
+                URL u = new URL(current);
+                if (!"http".equals(u.getProtocol()) && !"https".equals(u.getProtocol()))
+                    throw new HostingException("URL must use HTTP or HTTPS");
+                if (!ownHosts.contains(u.getHost().toLowerCase(Locale.ROOT))
+                        && com.eurobuddha.minimacore.main.views.balance.tokens.NetFetch.isBlockedHost(u.getHost()))
+                    throw new HostingException("URL host is not publicly reachable: " + u.getHost());
+                HttpURLConnection con = connections.open(u);
+                try {
+                    con.setConnectTimeout(8000);
+                    con.setReadTimeout(15000);
+                    con.setInstanceFollowRedirects(false);
+                    con.setRequestProperty("Range", "bytes=0-1");
+                    int code = con.getResponseCode();
+                    if (code == 301 || code == 302 || code == 303 || code == 307 || code == 308) {
+                        String location = con.getHeaderField("Location");
+                        if (location == null || location.isEmpty())
+                            throw new HostingException("URL redirect has no destination");
+                        current = new URL(u, location).toString();
+                        continue; // scheme and host are checked again before opening the next connection
+                    }
+                    if (code != 200 && code != 206)
+                        throw new HostingException("URL does not serve (HTTP " + code + "): " + url);
+                    try (java.io.InputStream in = con.getInputStream()) {
+                        if (in == null || in.read() == -1) throw new HostingException("URL serves an empty response: " + url);
+                    }
+                    return;
+                } finally { con.disconnect(); }
             }
-            HttpURLConnection con = (HttpURLConnection) u.openConnection();
-            con.setConnectTimeout(8000);
-            con.setReadTimeout(15000);
-            con.setInstanceFollowRedirects(true);
-            con.setRequestProperty("Range", "bytes=0-1");
-            int code = con.getResponseCode();
-            con.disconnect();
-            if (code < 200 || code >= 400) {
-                throw new HostingException("URL does not serve (HTTP " + code + "): " + url);
-            }
-        } catch (HostingException he) {
-            throw he;
-        } catch (Exception e) {
+            throw new HostingException("URL has too many redirects: " + url);
+        } catch (HostingException he) { throw he; }
+        catch (Exception e) {
             throw new HostingException("URL not reachable: " + url + " — " + e.getClass().getSimpleName());
         }
     }
