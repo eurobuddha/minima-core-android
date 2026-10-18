@@ -1,0 +1,47 @@
+Salon NFT metadata review — 2026-10-18
+
+Summary
+Salon's asset picker and held-edition scan assumed token metadata and token.name
+were already JSON objects. Serialized metadata became a JSON label or lost its
+cover/base/ext. The adapter reuses NFT Wallet's exact asObject/tokenObject methods,
+derived from the MinimaCore wallet balance parser and already reused in Atelier.
+Only the two display/enumeration callers are adapted. The original IconResolver,
+NftProof edition URL/state-image logic, proof generation and node commands remain.
+
+Sources inspected
+app/.../main/views/balance/BalanceAdapter.java and tokens/TokenMeta.java;
+integrated/NFTwallet/.../TokenMeta.java and Util.java;
+scripts/adapt-pandamonium-token-metadata.py and -atelier-viewer.py;
+standalone apks/salon/.../Util.java; integrated Salon MainActivity, Util,
+IconResolver, NftProof, IdentityBalance; wallet and Atelier metadata tests and
+SalonHoldingsLanguageTest. Core uses Minima JSON; Salon uses org.json, so the
+existing NFT Wallet adaptation is copied by the importer rather than adding a
+circular dependency from the integrated library to the host application.
+
+Review
+No blocking finding in the final change. The parser handles object/string roots,
+object/string names and existing token envelopes without mutating node replies.
+Outer token IDs remain authoritative; nested metadata does not replace them.
+Authored names, image bytes, proof bytes and edition captions remain literal.
+Missing names retain Salon's shortened-token-ID fallback. Existing URL aliases,
+IPFS resolution, duplicate edition handling and embedded-image precedence remain.
+The publication cap still excludes embedded data URIs; local display supports them.
+No raw metadata migration or rewriting of existing saved user captions is added.
+
+Verification
+Full Salon suite: 226 tests, zero failures/errors/skips, including eight new tests
+through the real picker/proof-storage boundary and edition URL assembly. Fixtures
+cover serialized roots/names/envelopes, 128 KiB icon data, missing names, literal
+and malformed-JSON names, image aliases, base/ext fallbacks, multilingual selection,
+source immutability and embedded artwork precedence. Seven donor NFT Wallet parser
+tests also passed. Pandamonium release Java compilation passed in the same run.
+All 21 integrated snapshots reproduce; catalog remains 6,790 messages/four languages.
+Evidence: build/localization/salon-metadata-tests.log and salon-metadata-import.log.
+The first embedded-art test incorrectly exercised the publication filter; it was
+corrected to use local enumeration, retaining the existing publishing size policy.
+No live node/hosting action, APK install, version bump or release publication.
+
+Verdict
+Approve this metadata checkpoint. The full Atelier/Salon goal remains active:
+GitHub repeat publishing, onboarding/recovery, restore/outbox audit, final language
+acceptance and signed/device-tested artifacts still remain.
