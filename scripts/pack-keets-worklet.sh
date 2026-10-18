@@ -8,28 +8,31 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-SIDECAR="${KEETS_SIDECAR_DIR:-../../keets/sidecar}"
-[ -f "$SIDECAR/index.js" ] || { echo "keets sidecar not found at $SIDECAR"; exit 1; }
-( cd "$SIDECAR" && [ -d node_modules ] || npm ci )
-
-command -v bare >/dev/null || npm install -g bare
-PACK="$(npm root -g)/bare-pack/bin.js"
-[ -f "$PACK" ] || { npm install -g bare-pack; PACK="$(npm root -g)/bare-pack/bin.js"; }
+if [ "${1:-}" != "--prepared" ]; then
+  exec python3 scripts/prepare-keets.py --component worklet "$@"
+fi
+: "${KEETS_OUTPUT_ROOT:?prepared output directory required}"
+: "${KEETS_SIDECAR_DIR:?pinned sidecar required}"
+: "${KEETS_BARE:?pinned Bare executable required}"
+: "${KEETS_PACK:?pinned bare-pack required}"
+SIDECAR="$KEETS_SIDECAR_DIR"
+PACK="$KEETS_PACK"
 
 # node builtins → bare equivalents, applied at pack time only (the sidecar picks them at
 # runtime itself; node's loader can't express this map, bare-pack's --imports can).
-IMPORTS="$(mktemp).json"
-trap 'rm -f "$IMPORTS"' EXIT
+WORK="$(mktemp -d)"
+IMPORTS="$WORK/imports.json"
+trap 'rm -rf "$WORK"' EXIT
 cat > "$IMPORTS" <<'EOF'
 { "net": "bare-tcp", "fs": "bare-fs", "path": "bare-path", "process": "bare-process", "http": "bare-http1" }
 EOF
 
-mkdir -p app/src/main/assets
-( cd "$SIDECAR" && bare "$PACK" \
-    --host android-arm64 --host android-arm \
+mkdir -p "$KEETS_OUTPUT_ROOT/app/src/main/assets"
+( cd "$SIDECAR" && "$KEETS_BARE" "$PACK" \
+    --host android-arm64 --host android-arm --host android-x64 \
     --linked --imports "$IMPORTS" \
-    --out "$OLDPWD/app/src/main/assets/keets.bundle" index.js )
-echo "packed app/src/main/assets/keets.bundle ($(du -h app/src/main/assets/keets.bundle | cut -f1))"
+    --out "$KEETS_OUTPUT_ROOT/app/src/main/assets/keets.bundle" index.js )
+echo "packed app/src/main/assets/keets.bundle ($(du -h "$KEETS_OUTPUT_ROOT/app/src/main/assets/keets.bundle" | cut -f1))"
 
 # addon prebuilds → jniLibs, named lib<module>.<version>.so (bare's linked: convention).
 # Walk node_modules RECURSIVELY: npm nests a second copy when versions conflict
@@ -45,8 +48,8 @@ while IFS= read -r predir; do
     pre="$predir/$host/$mod.bare"
     if [ -f "$pre" ]; then
       ver="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$moddir/package.json" | head -1)"
-      mkdir -p "app/src/main/jniLibs/$abi"
-      cp "$pre" "app/src/main/jniLibs/$abi/lib$mod.$ver.so"
+      mkdir -p "$KEETS_OUTPUT_ROOT/app/src/main/jniLibs/$abi"
+      cp "$pre" "$KEETS_OUTPUT_ROOT/app/src/main/jniLibs/$abi/lib$mod.$ver.so"
       COUNT=$((COUNT+1))
     fi
   done

@@ -194,11 +194,33 @@ android {
             ndk { abiFilters 'arm64-v8a' }
         }
     }
+    // Reuse Atelier/Salon standalone packaging: JSch and jspecify duplicate
+    // these OSGi/dependency metadata entries; Android does not consume them.
+    packaging {
+        resources {
+            excludes += ['META-INF/versions/9/OSGI-INF/MANIFEST.MF', 'META-INF/DEPENDENCIES']
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
 }
+
+// Generated Keets inputs are not in Git. Every checkout prepares the pinned inputs
+// before assets/JNI merging or AAR transforms; Gradle --offline also governs Keets.
+def prepareKeets = tasks.register('prepareKeets', Exec) {
+    workingDir rootProject.projectDir
+    commandLine(['python3', 'scripts/prepare-keets.py'] +
+            (gradle.startParameter.offline ? ['--offline'] : []))
+}
+def verifyKeetsArtifacts = tasks.register('verifyKeetsArtifacts', Exec) {
+    dependsOn prepareKeets
+    workingDir rootProject.projectDir
+    commandLine 'python3', 'scripts/verify-keets-artifacts.py'
+}
+tasks.named('preBuild').configure { dependsOn verifyKeetsArtifacts }
 
 dependencies {
 
@@ -227,7 +249,7 @@ dependencies {
     implementation files('libs/minima.jar')
     // bare-kit: the mobile JS runtime hosting the keets sidecar worklet.
     // NOT in git (~80MB) — scripts/fetch-bare-kit.sh builds it from the pinned release.
-    implementation files('libs/bare-kit.aar')
+    implementation files('libs/bare-kit.aar').builtBy(verifyKeetsArtifacts)
     implementation project(':minimaapi')
     implementation project(':localization')
     // Parlons/Maxima transport core, vendored under maxima-core/ (MAX# contacts in Chat).
@@ -265,10 +287,13 @@ dependencies {
     pandamoniumImplementation project(':integrated-salon')
 }
 
-// Generated Keets inputs are ignored by git. Fail before packaging rather than
-// ship a working node whose chat sidecar cannot start. Always recheck the files.
-def verifyKeetsArtifacts = tasks.register('verifyKeetsArtifacts', Exec) {
-    workingDir rootProject.projectDir
-    commandLine 'python3', 'scripts/verify-keets-artifacts.py'
+// Verify the packaged bytes, including code/data sections after Android strips symbols.
+android.applicationVariants.all { variant ->
+    def checkApk = tasks.register("verify${variant.name.capitalize()}KeetsApk", Exec) {
+        dependsOn variant.packageApplicationProvider
+        workingDir rootProject.projectDir
+        commandLine 'python3', 'scripts/verify-keets-artifacts.py', '--remove-invalid-apk', '--apk-dir',
+                layout.buildDirectory.dir("outputs/apk/${variant.flavorName}/${variant.buildType.name}").get().asFile.absolutePath
+    }
+    variant.assembleProvider.configure { dependsOn checkApk }
 }
-tasks.named('preBuild').configure { dependsOn verifyKeetsArtifacts }
