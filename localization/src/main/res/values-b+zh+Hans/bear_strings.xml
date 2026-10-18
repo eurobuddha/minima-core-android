@@ -7775,4 +7775,42 @@
     <plurals name="l10n_salon_social_following_count">
         <item quantity="other">"关注"</item>
     </plurals>
+    <string name="l10n_salon_holdings_holdings" formatted="false">"持有资产"</string>
+    <string name="l10n_salon_holdings_verifying" formatted="false">"正在您的节点上验证…"</string>
+    <string name="l10n_salon_holdings_connect" formatted="false">"连接节点以验证"</string>
+    <string name="l10n_salon_holdings_verified" formatted="false">"✓ 已验证持有"</string>
+    <string name="l10n_salon_holdings_full_artwork" formatted="false">"点击作品以全屏查看"</string>
+    <string name="l10n_salon_holdings_verify_again" formatted="false">"重新验证"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_holdings_collection_images">"此系列有 %1$d 张状态图像 · 点击放大"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_holdings_held_images">"您持有 %1$d 张状态图像 · 点击放大"</string>
+    <string name="l10n_salon_holdings_connect_node" formatted="false">"请连接节点。"</string>
+    <string name="l10n_salon_holdings_reading" formatted="false">"正在读取您的钱包…"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_holdings_balance_failed">"无法读取您的钱包：%1$s"</string>
+    <string name="l10n_salon_holdings_empty" formatted="false">"您的钱包中没有可证明持有的代币或 NFT。"</string>
+    <string name="l10n_salon_holdings_prove" formatted="false">"证明持有资产"</string>
+    <string name="l10n_salon_holdings_claim_first" formatted="false">"请先注册您的 Salon。"</string>
+    <string name="l10n_salon_holdings_generating" formatted="false">"正在生成链上证明…"</string>
+    <string name="l10n_salon_holdings_added" formatted="false">"证明已添加，请保存并发布以展示。"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_holdings_prove_failed">"无法证明持有资产：%1$s"</string>
+    <string name="l10n_salon_holdings_no_spendable" formatted="false">"您没有可花费的此资产币。"</string>
+    <string name="l10n_salon_holdings_no_coin_id" formatted="false">"币缺少 ID 或地址"</string>
+    <string name="l10n_salon_holdings_export_failed" formatted="false">"无法导出币证明"</string>
+    <string name="l10n_salon_holdings_not_simple" formatted="false">"此地址不是普通钱包地址（无法证明持有）"</string>
+    <string name="l10n_salon_holdings_sign_failed" formatted="false">"签名失败（您的节点已解锁吗？）"</string>
+    <string name="l10n_salon_holdings_no_signature" formatted="false">"未返回签名"</string>
+    <string name="l10n_salon_holdings_incomplete" formatted="false">"证明不完整"</string>
+    <string name="l10n_salon_holdings_coin_missing" formatted="false">"未在链上找到此币"</string>
+    <string name="l10n_salon_holdings_wrong_token" formatted="false">"代币不匹配"</string>
+    <string name="l10n_salon_holdings_spent" formatted="false">"此币已花费"</string>
+    <string name="l10n_salon_holdings_stale" formatted="false">"证明已过期，请重新发布以更新"</string>
+    <string name="l10n_salon_holdings_wrong_key" formatted="false">"此密钥不控制该币"</string>
+    <string name="l10n_salon_holdings_wrong_script" formatted="false">"脚本与地址不匹配"</string>
+    <string name="l10n_salon_holdings_wrong_signature" formatted="false">"签名对此个人页面无效"</string>
+    <string name="l10n_salon_holdings_verify_failed" formatted="false">"签名验证调用失败"</string>
+    <string name="l10n_salon_holdings_script_failed" formatted="false">"脚本检查失败"</string>
+    <string name="l10n_salon_holdings_coin_failed" formatted="false">"币检查失败（节点忙碌？）"</string>
 </resources>

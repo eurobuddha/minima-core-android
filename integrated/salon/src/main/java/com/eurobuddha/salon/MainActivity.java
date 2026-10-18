@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     // Per-tokenid caches so a re-render (expand/collapse, NEWBLOCK) does NOT re-hammer
     // the node: each holding's verify outcome + live edition icon is resolved once per
     // session. "Verify again" forces a fresh check. Cleared on profile switch.
-    private final java.util.Map<String, String> mVerifyText = new java.util.concurrent.ConcurrentHashMap<>();
+    private final java.util.Map<String, CharSequence> mVerifyText = new java.util.concurrent.ConcurrentHashMap<>();
     private final java.util.Map<String, Integer> mVerifyColor = new java.util.concurrent.ConcurrentHashMap<>();
     private final java.util.Map<String, String> mLiveIcon = new java.util.concurrent.ConcurrentHashMap<>();
     private String pubkey = "";
@@ -1733,7 +1733,7 @@ public class MainActivity extends AppCompatActivity {
     private void renderNftShowcase(JSONArray nfts, String profileTokenid) {
         LinearLayout c = card();
         LinearLayout hh = row();
-        hh.addView(Design.lot(this, "Holdings"), new LinearLayout.LayoutParams(0, -2, 1));
+        hh.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_holdings)), new LinearLayout.LayoutParams(0, -2, 1));
         hh.addView(Design.text(this, String.valueOf(nfts.length()), 11f, Design.DIM(), Design.mono()));
         c.addView(hh);
         // Rows go into their own container so a long collection can be a bounded
@@ -1753,7 +1753,7 @@ public class MainActivity extends AppCompatActivity {
             r.addView(iv, new LinearLayout.LayoutParams(dp(46), dp(46)));
             LinearLayout col = new LinearLayout(this); col.setOrientation(LinearLayout.VERTICAL); col.setPadding(dp(12), 0, dp(8), 0);
             col.addView(Design.text(this, n.optString("name", Util.shorten(tid)), 15, Design.INK(), Design.sansBold()));
-            final TextView badge = Design.text(this, "verifying on your node…", 11f, Design.DIM(), Design.mono());
+            final TextView badge = Design.text(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_verifying), 11f, Design.DIM(), Design.mono());
             col.addView(badge);
             r.addView(col, new LinearLayout.LayoutParams(0, -2, 1));
             r.addView(Design.text(this, open ? "▾" : "▸", 15, Design.DIM(), Design.mono()));
@@ -1769,15 +1769,15 @@ public class MainActivity extends AppCompatActivity {
                 d.addView(hero, new LinearLayout.LayoutParams(-1, dp(300)));
                 if (iconUrl != null) {
                     ImageLoader.loadFull(this, iconUrl, hero); hero.setClickable(true); hero.setOnClickListener(v -> openImage(iconUrl));
-                    d.addView(Design.text(this, "tap the artwork to view it full-screen", 10.5f, Design.DIM(), Design.mono()), lp(0, 4, 0, 2));
+                    d.addView(Design.text(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_full_artwork), 10.5f, Design.DIM(), Design.mono()), lp(0, 4, 0, 2));
                 } else {
                     liveFillNftImage(hero, tid, true);   // embedded plate from coin state[1] (owner)
                 }
-                copyRow(d, "Token id", tid);
-                if (!n.optString("coinid").isEmpty()) copyRow(d, "Coin id", n.optString("coinid"));
-                final TextView vline = Design.text(this, "verifying on your node…", 12f, Design.DIM(), Design.mono());
+                copyRow(d, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_utxo_token_id), tid);
+                if (!n.optString("coinid").isEmpty()) copyRow(d, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_nft_coin_id), n.optString("coinid"));
+                final TextView vline = Design.text(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_verifying), 12f, Design.DIM(), Design.mono());
                 d.addView(vline, lp(0, 8, 0, 6));
-                d.addView(btn("Verify again", false, () -> verifyInto(n, bindHex, vline, true)), lph(44, 0, 4, 0, 0));
+                d.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_verify_again), false, () -> verifyInto(n, bindHex, vline, true)), lp(0, 4, 0, 0));
                 rows.addView(d);
                 verifyInto(n, bindHex, vline);
                 // Editions: prefer the PUBLISHED set the owner captured at prove
@@ -1788,7 +1788,7 @@ public class MainActivity extends AppCompatActivity {
                 if (pubEds != null && pubEds.length() > 0) {
                     java.util.List<JSONObject> eds = new java.util.ArrayList<>();
                     for (int j = 0; j < pubEds.length(); j++) { JSONObject e = pubEds.optJSONObject(j); if (e != null) eds.add(e); }
-                    renderEditionTiles(d, eds, eds.size() + " STATE IMAGE" + (eds.size() == 1 ? "" : "S") + " IN THIS COLLECTION · TAP TO ENLARGE");
+                    renderEditionTiles(d, eds, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_collection_images, eds.size()));
                 } else {
                     renderEditionArt(d, tid);   // live gallery of what this node holds
                 }
@@ -1808,18 +1808,18 @@ public class MainActivity extends AppCompatActivity {
         verifyInto(n, bindHex, tv, false);
     }
 
-    /** @param force bypass the session cache and re-run the node check ("Verify again"). */
+    /** @param force bypass the session cache and re-run the node check on explicit retry. */
     private void verifyInto(final JSONObject n, final String bindHex, final TextView tv, boolean force) {
-        if (!nodeUp) { tv.setText("connect a node to verify"); tv.setTextColor(Design.DIM()); return; }
+        if (!nodeUp) { Language.setText(tv, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_connect)); tv.setTextColor(Design.DIM()); return; }
         final String tid = n.optString("tokenid");
         // Key by tid AND the binding profile: the same NFT on a different profile binds
         // to a different tokenid, so its frozen proof verdict differs — never share it.
         final String vkey = tid + "|" + (bindHex == null ? "" : bindHex);
         if (!force && mVerifyText.containsKey(vkey)) {   // resolved this session — paint from cache, no node call
-            tv.setText(mVerifyText.get(vkey)); tv.setTextColor(mVerifyColor.get(vkey));
+            Language.setText(tv, mVerifyText.get(vkey)); tv.setTextColor(mVerifyColor.get(vkey));
             return;
         }
-        tv.setText("verifying on your node…"); tv.setTextColor(Design.DIM());
+        Language.setText(tv, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_verifying)); tv.setTextColor(Design.DIM());
         // 1) LIVE check first (Axe-S3 style): if THIS node holds an unspent coin of the token,
         //    it's verified now — this is you viewing your own page, and it never goes stale like
         //    the frozen coinexport proof (which reports valid=false once the MMR has grown).
@@ -1833,7 +1833,7 @@ public class MainActivity extends AppCompatActivity {
         if (ownPage) {
             NftProof.holds(node, tid, (held, coin) -> runOnUiThread(() -> {
                 if (held) {
-                    setVerify(vkey, tv, "✓ VERIFIED HOLDING", 0xFF1F7A3F);
+                    setVerify(vkey, tv, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_verified), 0xFF1F7A3F);
                     maybeRefreshProof(n, bindHex);   // regenerate the stored proof so the PUBLISHED one stops aging out
                     return;
                 }
@@ -1846,9 +1846,9 @@ public class MainActivity extends AppCompatActivity {
 
     /** Paint a verify outcome into {@code tv} AND cache it under {@code vkey} (tid|bindHex)
      *  so a re-render repaints from the cache instead of re-calling the node. */
-    private void setVerify(String vkey, TextView tv, String text, int color) {
+    private void setVerify(String vkey, TextView tv, CharSequence text, int color) {
         mVerifyText.put(vkey, text); mVerifyColor.put(vkey, color);
-        tv.setText(text); tv.setTextColor(color);
+        Language.setText(tv, text); tv.setTextColor(color);
     }
 
     /** The trustless frozen proof: the coin is bound to the profile's tokenid by a
@@ -1856,7 +1856,7 @@ public class MainActivity extends AppCompatActivity {
     private void verifyBound(final JSONObject n, final String bindHex, final TextView tv) {
         final String vkey = n.optString("tokenid") + "|" + (bindHex == null ? "" : bindHex);
         NftProof.verify(node, n, bindHex, (ok, reason, stateImg) -> runOnUiThread(() -> {
-            setVerify(vkey, tv, ok ? "✓ VERIFIED HOLDING" : "✕ " + reason, ok ? 0xFF1F7A3F : 0xFFB4462A);
+            setVerify(vkey, tv, ok ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_verified) : Language.join("✕ ", HoldingMessages.message(reason)), ok ? 0xFF1F7A3F : 0xFFB4462A);
         }));
     }
 
@@ -1929,7 +1929,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** A 2-up grid of edition tiles; each taps into a fullscreen swipeable carousel. */
-    private void renderEditionTiles(final LinearLayout parent, final java.util.List<JSONObject> editions, final String label) {
+    private void renderEditionTiles(final LinearLayout parent, final java.util.List<JSONObject> editions, final CharSequence label) {
         if (editions.isEmpty()) return;
         parent.addView(Design.text(this, label, 9f, Design.DIM(), Design.sansBold()), lp(0, 12, 0, 6));
         LinearLayout g = null;
@@ -1951,7 +1951,7 @@ public class MainActivity extends AppCompatActivity {
         enumerateEditions(tokenid, editions -> {
             if (editions.isEmpty()) return;
             runOnUiThread(() -> renderEditionTiles(parent, editions,
-                    editions.size() + " STATE IMAGE" + (editions.size() == 1 ? "" : "S") + " YOU HOLD · TAP TO ENLARGE"));
+                    Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_held_images, editions.size())));
         });
     }
 
@@ -2020,8 +2020,8 @@ public class MainActivity extends AppCompatActivity {
     /* ---------------- prove & showcase a holding ---------------- */
 
     private void pickNftDialog() {
-        if (!nodeUp) { toast("Connect the node."); return; }
-        toast("Reading your wallet…");
+        if (!nodeUp) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_connect_node)); return; }
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_reading));
         node.cmd("balance", new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 JSONArray arr = j.optJSONArray("response");
@@ -2048,21 +2048,21 @@ public class MainActivity extends AppCompatActivity {
                 }
                 runOnUiThread(() -> showAssetPicker(assets));
             }
-            @Override public void onError(String m) { runOnUiThread(() -> toast("Balance failed: " + m)); }
+            @Override public void onError(String m) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_balance_failed, HoldingMessages.message(m)))); }
         });
     }
 
     private void showAssetPicker(java.util.List<JSONObject> assets) {
-        if (assets.isEmpty()) { toast("No tokens/NFTs in your wallet to prove."); return; }
+        if (assets.isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_empty)); return; }
         CharSequence[] items = new CharSequence[assets.size()];
         for (int i = 0; i < assets.size(); i++) items[i] = assets.get(i).optString("name");
-        new android.app.AlertDialog.Builder(this).setTitle("Prove a holding").setItems(items, (d, which) -> proveNft(assets.get(which))).show();
+        new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_prove)).setItems(items, (d, which) -> proveNft(assets.get(which))).show();
     }
 
     private void proveNft(JSONObject asset) {
         String myTid = SalonStore.get(this, "tokenid");
-        if (myTid.isEmpty()) { toast("Claim your Salon first."); return; }
-        toast("Generating on-chain proof…");
+        if (myTid.isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_claim_first)); return; }
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_generating));
         NftProof.generate(node, asset.optString("tokenid"), NftProof.hexOf(myTid), new NftProof.Gen() {
             @Override public void ok(JSONObject item) {
                 try { item.put("name", asset.optString("name")); item.put("image", asset.optString("image")); } catch (Exception ignored) {}
@@ -2079,10 +2079,10 @@ public class MainActivity extends AppCompatActivity {
                             if (e0 != null && !e0.optString("url").isEmpty()) item.put("image", e0.optString("url"));
                         }
                     } catch (Exception ignored) {}
-                    runOnUiThread(() -> { JSONArray a = SalonStore.arr(MainActivity.this, "nfts"); a.put(item); SalonStore.setArr(MainActivity.this, "nfts", a); toast("Proof added — Save & publish to show it."); render(); });
+                    runOnUiThread(() -> { JSONArray a = SalonStore.arr(MainActivity.this, "nfts"); a.put(item); SalonStore.setArr(MainActivity.this, "nfts", a); toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_added)); render(); });
                 });
             }
-            @Override public void fail(String msg) { runOnUiThread(() -> toast("Couldn't prove: " + msg)); }
+            @Override public void fail(String msg) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_prove_failed, HoldingMessages.message(msg)))); }
         });
     }
 

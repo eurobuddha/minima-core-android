@@ -1,0 +1,17 @@
+{
+  "Holdings": "salonHoldings.holdings",
+  "verifying on your node…": "salonHoldings.verifying",
+  "connect a node to verify": "salonHoldings.connect",
+  "✓ VERIFIED HOLDING": "salonHoldings.verified",
+  "tap the artwork to view it full-screen": "salonHoldings.fullArtwork",
+  "Verify again": "salonHoldings.verifyAgain",
+  "Connect the node.": "salonHoldings.connectNode",
+  "Reading your wallet…": "salonHoldings.reading",
+  "No tokens/NFTs in your wallet to prove.": "salonHoldings.empty",
+  "Prove a holding": "salonHoldings.prove",
+  "Claim your Salon first.": "salonHoldings.claimFirst",
+  "Generating on-chain proof…": "salonHoldings.generating",
+  "Proof added — Save & publish to show it.": "salonHoldings.added",
+  "Token id": "utxo.tokenId",
+  "Coin id": "nft.coinId"
+}

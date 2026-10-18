@@ -7883,4 +7883,42 @@
         <item quantity="many">"подписок"</item>
         <item quantity="other">"подписки"</item>
     </plurals>
+    <string name="l10n_salon_holdings_holdings" formatted="false">"Активы"</string>
+    <string name="l10n_salon_holdings_verifying" formatted="false">"проверка на вашем узле…"</string>
+    <string name="l10n_salon_holdings_connect" formatted="false">"подключите узел для проверки"</string>
+    <string name="l10n_salon_holdings_verified" formatted="false">"✓ ВЛАДЕНИЕ ПОДТВЕРЖДЕНО"</string>
+    <string name="l10n_salon_holdings_full_artwork" formatted="false">"нажмите на работу, чтобы открыть на весь экран"</string>
+    <string name="l10n_salon_holdings_verify_again" formatted="false">"Проверить снова"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_holdings_collection_images">"Изображения в состоянии монет этой коллекции: %1$d · нажмите для увеличения"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_holdings_held_images">"Изображения в состоянии ваших монет: %1$d · нажмите для увеличения"</string>
+    <string name="l10n_salon_holdings_connect_node" formatted="false">"Подключите узел."</string>
+    <string name="l10n_salon_holdings_reading" formatted="false">"Чтение вашего кошелька…"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_holdings_balance_failed">"Не удалось прочитать кошелёк: %1$s"</string>
+    <string name="l10n_salon_holdings_empty" formatted="false">"В кошельке нет токенов или NFT для подтверждения владения."</string>
+    <string name="l10n_salon_holdings_prove" formatted="false">"Подтвердить владение"</string>
+    <string name="l10n_salon_holdings_claim_first" formatted="false">"Сначала зарегистрируйте свой Salon."</string>
+    <string name="l10n_salon_holdings_generating" formatted="false">"Создание доказательства по данным блокчейна…"</string>
+    <string name="l10n_salon_holdings_added" formatted="false">"Доказательство добавлено — сохраните и опубликуйте страницу."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_holdings_prove_failed">"Не удалось подтвердить владение: %1$s"</string>
+    <string name="l10n_salon_holdings_no_spendable" formatted="false">"У вас нет доступной для расходования монеты этого актива."</string>
+    <string name="l10n_salon_holdings_no_coin_id" formatted="false">"у монеты нет ID или адреса"</string>
+    <string name="l10n_salon_holdings_export_failed" formatted="false">"не удалось экспортировать доказательство монеты"</string>
+    <string name="l10n_salon_holdings_not_simple" formatted="false">"это не обычный адрес кошелька (нельзя подтвердить владение)"</string>
+    <string name="l10n_salon_holdings_sign_failed" formatted="false">"не удалось подписать (узел разблокирован?)"</string>
+    <string name="l10n_salon_holdings_no_signature" formatted="false">"подпись не получена"</string>
+    <string name="l10n_salon_holdings_incomplete" formatted="false">"неполное доказательство"</string>
+    <string name="l10n_salon_holdings_coin_missing" formatted="false">"монета не найдена в блокчейне"</string>
+    <string name="l10n_salon_holdings_wrong_token" formatted="false">"другой токен"</string>
+    <string name="l10n_salon_holdings_spent" formatted="false">"монета потрачена"</string>
+    <string name="l10n_salon_holdings_stale" formatted="false">"доказательство устарело — опубликуйте страницу снова для обновления"</string>
+    <string name="l10n_salon_holdings_wrong_key" formatted="false">"ключ не управляет этой монетой"</string>
+    <string name="l10n_salon_holdings_wrong_script" formatted="false">"скрипт не соответствует адресу"</string>
+    <string name="l10n_salon_holdings_wrong_signature" formatted="false">"подпись недействительна для этого профиля"</string>
+    <string name="l10n_salon_holdings_verify_failed" formatted="false">"не удалось выполнить проверку подписи"</string>
+    <string name="l10n_salon_holdings_script_failed" formatted="false">"проверка скрипта не удалась"</string>
+    <string name="l10n_salon_holdings_coin_failed" formatted="false">"проверка монеты не удалась (узел занят?)"</string>
 </resources>

@@ -39238,5 +39238,209 @@
       "many": "підписок",
       "other": "підписки"
     }
+  },
+  "salonHoldings.holdings": {
+    "en": "Holdings",
+    "zh-Hans": "持有资产",
+    "ru": "Активы",
+    "uk": "Активи"
+  },
+  "salonHoldings.verifying": {
+    "en": "verifying on your node…",
+    "zh-Hans": "正在您的节点上验证…",
+    "ru": "проверка на вашем узле…",
+    "uk": "перевірка на вашому вузлі…"
+  },
+  "salonHoldings.connect": {
+    "en": "connect a node to verify",
+    "zh-Hans": "连接节点以验证",
+    "ru": "подключите узел для проверки",
+    "uk": "підключіть вузол для перевірки"
+  },
+  "salonHoldings.verified": {
+    "en": "✓ VERIFIED HOLDING",
+    "zh-Hans": "✓ 已验证持有",
+    "ru": "✓ ВЛАДЕНИЕ ПОДТВЕРЖДЕНО",
+    "uk": "✓ ВОЛОДІННЯ ПІДТВЕРДЖЕНО"
+  },
+  "salonHoldings.fullArtwork": {
+    "en": "tap the artwork to view it full-screen",
+    "zh-Hans": "点击作品以全屏查看",
+    "ru": "нажмите на работу, чтобы открыть на весь экран",
+    "uk": "натисніть на роботу, щоб відкрити на весь екран"
+  },
+  "salonHoldings.verifyAgain": {
+    "en": "Verify again",
+    "zh-Hans": "重新验证",
+    "ru": "Проверить снова",
+    "uk": "Перевірити знову"
+  },
+  "salonHoldings.collectionImages": {
+    "en": "{count} state images in this collection · tap to enlarge",
+    "zh-Hans": "此系列有 {count} 张状态图像 · 点击放大",
+    "ru": "Изображения в состоянии монет этой коллекции: {count} · нажмите для увеличения",
+    "uk": "Зображення у стані монет цієї колекції: {count} · натисніть для збільшення"
+  },
+  "salonHoldings.heldImages": {
+    "en": "{count} state images you hold · tap to enlarge",
+    "zh-Hans": "您持有 {count} 张状态图像 · 点击放大",
+    "ru": "Изображения в состоянии ваших монет: {count} · нажмите для увеличения",
+    "uk": "Зображення у стані ваших монет: {count} · натисніть для збільшення"
+  },
+  "salonHoldings.connectNode": {
+    "en": "Connect the node.",
+    "zh-Hans": "请连接节点。",
+    "ru": "Подключите узел.",
+    "uk": "Підключіть вузол."
+  },
+  "salonHoldings.reading": {
+    "en": "Reading your wallet…",
+    "zh-Hans": "正在读取您的钱包…",
+    "ru": "Чтение вашего кошелька…",
+    "uk": "Читання вашого гаманця…"
+  },
+  "salonHoldings.balanceFailed": {
+    "en": "Could not read your wallet: {error}",
+    "zh-Hans": "无法读取您的钱包：{error}",
+    "ru": "Не удалось прочитать кошелёк: {error}",
+    "uk": "Не вдалося прочитати гаманець: {error}"
+  },
+  "salonHoldings.empty": {
+    "en": "No tokens/NFTs in your wallet to prove.",
+    "zh-Hans": "您的钱包中没有可证明持有的代币或 NFT。",
+    "ru": "В кошельке нет токенов или NFT для подтверждения владения.",
+    "uk": "У гаманці немає токенів або NFT для підтвердження володіння."
+  },
+  "salonHoldings.prove": {
+    "en": "Prove a holding",
+    "zh-Hans": "证明持有资产",
+    "ru": "Подтвердить владение",
+    "uk": "Підтвердити володіння"
+  },
+  "salonHoldings.claimFirst": {
+    "en": "Claim your Salon first.",
+    "zh-Hans": "请先注册您的 Salon。",
+    "ru": "Сначала зарегистрируйте свой Salon.",
+    "uk": "Спершу зареєструйте свій Salon."
+  },
+  "salonHoldings.generating": {
+    "en": "Generating on-chain proof…",
+    "zh-Hans": "正在生成链上证明…",
+    "ru": "Создание доказательства по данным блокчейна…",
+    "uk": "Створення доказу за даними блокчейну…"
+  },
+  "salonHoldings.added": {
+    "en": "Proof added — Save & publish to show it.",
+    "zh-Hans": "证明已添加，请保存并发布以展示。",
+    "ru": "Доказательство добавлено — сохраните и опубликуйте страницу.",
+    "uk": "Доказ додано — збережіть і опублікуйте сторінку."
+  },
+  "salonHoldings.proveFailed": {
+    "en": "Could not prove holding: {error}",
+    "zh-Hans": "无法证明持有资产：{error}",
+    "ru": "Не удалось подтвердить владение: {error}",
+    "uk": "Не вдалося підтвердити володіння: {error}"
+  },
+  "salonHoldings.noSpendable": {
+    "en": "You don't hold a spendable coin of this asset.",
+    "zh-Hans": "您没有可花费的此资产币。",
+    "ru": "У вас нет доступной для расходования монеты этого актива.",
+    "uk": "У вас немає доступної для витрачання монети цього активу."
+  },
+  "salonHoldings.noCoinId": {
+    "en": "coin has no id/address",
+    "zh-Hans": "币缺少 ID 或地址",
+    "ru": "у монеты нет ID или адреса",
+    "uk": "монета не має ID або адреси"
+  },
+  "salonHoldings.exportFailed": {
+    "en": "could not export coin proof",
+    "zh-Hans": "无法导出币证明",
+    "ru": "не удалось экспортировать доказательство монеты",
+    "uk": "не вдалося експортувати доказ монети"
+  },
+  "salonHoldings.notSimple": {
+    "en": "address is not a simple wallet address (can't prove holding)",
+    "zh-Hans": "此地址不是普通钱包地址（无法证明持有）",
+    "ru": "это не обычный адрес кошелька (нельзя подтвердить владение)",
+    "uk": "це не звичайна адреса гаманця (неможливо підтвердити володіння)"
+  },
+  "salonHoldings.signFailed": {
+    "en": "signing failed (is your node unlocked?)",
+    "zh-Hans": "签名失败（您的节点已解锁吗？）",
+    "ru": "не удалось подписать (узел разблокирован?)",
+    "uk": "не вдалося підписати (вузол розблоковано?)"
+  },
+  "salonHoldings.noSignature": {
+    "en": "no signature returned",
+    "zh-Hans": "未返回签名",
+    "ru": "подпись не получена",
+    "uk": "підпис не отримано"
+  },
+  "salonHoldings.incomplete": {
+    "en": "incomplete proof",
+    "zh-Hans": "证明不完整",
+    "ru": "неполное доказательство",
+    "uk": "неповний доказ"
+  },
+  "salonHoldings.coinMissing": {
+    "en": "coin not found on-chain",
+    "zh-Hans": "未在链上找到此币",
+    "ru": "монета не найдена в блокчейне",
+    "uk": "монету не знайдено в блокчейні"
+  },
+  "salonHoldings.wrongToken": {
+    "en": "wrong token",
+    "zh-Hans": "代币不匹配",
+    "ru": "другой токен",
+    "uk": "інший токен"
+  },
+  "salonHoldings.spent": {
+    "en": "coin has been spent",
+    "zh-Hans": "此币已花费",
+    "ru": "монета потрачена",
+    "uk": "монету витрачено"
+  },
+  "salonHoldings.stale": {
+    "en": "proof out of date — re-publish to refresh it",
+    "zh-Hans": "证明已过期，请重新发布以更新",
+    "ru": "доказательство устарело — опубликуйте страницу снова для обновления",
+    "uk": "доказ застарів — опублікуйте сторінку знову для оновлення"
+  },
+  "salonHoldings.wrongKey": {
+    "en": "key doesn't control the coin",
+    "zh-Hans": "此密钥不控制该币",
+    "ru": "ключ не управляет этой монетой",
+    "uk": "ключ не керує цією монетою"
+  },
+  "salonHoldings.wrongScript": {
+    "en": "script/address mismatch",
+    "zh-Hans": "脚本与地址不匹配",
+    "ru": "скрипт не соответствует адресу",
+    "uk": "скрипт не відповідає адресі"
+  },
+  "salonHoldings.wrongSignature": {
+    "en": "signature not valid for this profile",
+    "zh-Hans": "签名对此个人页面无效",
+    "ru": "подпись недействительна для этого профиля",
+    "uk": "підпис недійсний для цього профілю"
+  },
+  "salonHoldings.verifyFailed": {
+    "en": "verify call failed",
+    "zh-Hans": "签名验证调用失败",
+    "ru": "не удалось выполнить проверку подписи",
+    "uk": "не вдалося виконати перевірку підпису"
+  },
+  "salonHoldings.scriptFailed": {
+    "en": "script check failed",
+    "zh-Hans": "脚本检查失败",
+    "ru": "проверка скрипта не удалась",
+    "uk": "перевірка скрипту не вдалася"
+  },
+  "salonHoldings.coinFailed": {
+    "en": "coin check failed (node busy?)",
+    "zh-Hans": "币检查失败（节点忙碌？）",
+    "ru": "проверка монеты не удалась (узел занят?)",
+    "uk": "перевірка монети не вдалася (вузол зайнятий?)"
   }
 }

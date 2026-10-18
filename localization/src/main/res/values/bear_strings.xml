@@ -7811,4 +7811,42 @@
         <item quantity="one">"following"</item>
         <item quantity="other">"following"</item>
     </plurals>
+    <string name="l10n_salon_holdings_holdings" formatted="false">"Holdings"</string>
+    <string name="l10n_salon_holdings_verifying" formatted="false">"verifying on your node…"</string>
+    <string name="l10n_salon_holdings_connect" formatted="false">"connect a node to verify"</string>
+    <string name="l10n_salon_holdings_verified" formatted="false">"✓ VERIFIED HOLDING"</string>
+    <string name="l10n_salon_holdings_full_artwork" formatted="false">"tap the artwork to view it full-screen"</string>
+    <string name="l10n_salon_holdings_verify_again" formatted="false">"Verify again"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_holdings_collection_images">"%1$d state images in this collection · tap to enlarge"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_holdings_held_images">"%1$d state images you hold · tap to enlarge"</string>
+    <string name="l10n_salon_holdings_connect_node" formatted="false">"Connect the node."</string>
+    <string name="l10n_salon_holdings_reading" formatted="false">"Reading your wallet…"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_holdings_balance_failed">"Could not read your wallet: %1$s"</string>
+    <string name="l10n_salon_holdings_empty" formatted="false">"No tokens/NFTs in your wallet to prove."</string>
+    <string name="l10n_salon_holdings_prove" formatted="false">"Prove a holding"</string>
+    <string name="l10n_salon_holdings_claim_first" formatted="false">"Claim your Salon first."</string>
+    <string name="l10n_salon_holdings_generating" formatted="false">"Generating on-chain proof…"</string>
+    <string name="l10n_salon_holdings_added" formatted="false">"Proof added — Save &amp; publish to show it."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_holdings_prove_failed">"Could not prove holding: %1$s"</string>
+    <string name="l10n_salon_holdings_no_spendable" formatted="false">"You don\'t hold a spendable coin of this asset."</string>
+    <string name="l10n_salon_holdings_no_coin_id" formatted="false">"coin has no id/address"</string>
+    <string name="l10n_salon_holdings_export_failed" formatted="false">"could not export coin proof"</string>
+    <string name="l10n_salon_holdings_not_simple" formatted="false">"address is not a simple wallet address (can\'t prove holding)"</string>
+    <string name="l10n_salon_holdings_sign_failed" formatted="false">"signing failed (is your node unlocked?)"</string>
+    <string name="l10n_salon_holdings_no_signature" formatted="false">"no signature returned"</string>
+    <string name="l10n_salon_holdings_incomplete" formatted="false">"incomplete proof"</string>
+    <string name="l10n_salon_holdings_coin_missing" formatted="false">"coin not found on-chain"</string>
+    <string name="l10n_salon_holdings_wrong_token" formatted="false">"wrong token"</string>
+    <string name="l10n_salon_holdings_spent" formatted="false">"coin has been spent"</string>
+    <string name="l10n_salon_holdings_stale" formatted="false">"proof out of date — re-publish to refresh it"</string>
+    <string name="l10n_salon_holdings_wrong_key" formatted="false">"key doesn\'t control the coin"</string>
+    <string name="l10n_salon_holdings_wrong_script" formatted="false">"script/address mismatch"</string>
+    <string name="l10n_salon_holdings_wrong_signature" formatted="false">"signature not valid for this profile"</string>
+    <string name="l10n_salon_holdings_verify_failed" formatted="false">"verify call failed"</string>
+    <string name="l10n_salon_holdings_script_failed" formatted="false">"script check failed"</string>
+    <string name="l10n_salon_holdings_coin_failed" formatted="false">"coin check failed (node busy?)"</string>
 </resources>

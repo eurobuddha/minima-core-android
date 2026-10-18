@@ -7883,4 +7883,42 @@
         <item quantity="many">"підписок"</item>
         <item quantity="other">"підписки"</item>
     </plurals>
+    <string name="l10n_salon_holdings_holdings" formatted="false">"Активи"</string>
+    <string name="l10n_salon_holdings_verifying" formatted="false">"перевірка на вашому вузлі…"</string>
+    <string name="l10n_salon_holdings_connect" formatted="false">"підключіть вузол для перевірки"</string>
+    <string name="l10n_salon_holdings_verified" formatted="false">"✓ ВОЛОДІННЯ ПІДТВЕРДЖЕНО"</string>
+    <string name="l10n_salon_holdings_full_artwork" formatted="false">"натисніть на роботу, щоб відкрити на весь екран"</string>
+    <string name="l10n_salon_holdings_verify_again" formatted="false">"Перевірити знову"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_holdings_collection_images">"Зображення у стані монет цієї колекції: %1$d · натисніть для збільшення"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_holdings_held_images">"Зображення у стані ваших монет: %1$d · натисніть для збільшення"</string>
+    <string name="l10n_salon_holdings_connect_node" formatted="false">"Підключіть вузол."</string>
+    <string name="l10n_salon_holdings_reading" formatted="false">"Читання вашого гаманця…"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_holdings_balance_failed">"Не вдалося прочитати гаманець: %1$s"</string>
+    <string name="l10n_salon_holdings_empty" formatted="false">"У гаманці немає токенів або NFT для підтвердження володіння."</string>
+    <string name="l10n_salon_holdings_prove" formatted="false">"Підтвердити володіння"</string>
+    <string name="l10n_salon_holdings_claim_first" formatted="false">"Спершу зареєструйте свій Salon."</string>
+    <string name="l10n_salon_holdings_generating" formatted="false">"Створення доказу за даними блокчейну…"</string>
+    <string name="l10n_salon_holdings_added" formatted="false">"Доказ додано — збережіть і опублікуйте сторінку."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_holdings_prove_failed">"Не вдалося підтвердити володіння: %1$s"</string>
+    <string name="l10n_salon_holdings_no_spendable" formatted="false">"У вас немає доступної для витрачання монети цього активу."</string>
+    <string name="l10n_salon_holdings_no_coin_id" formatted="false">"монета не має ID або адреси"</string>
+    <string name="l10n_salon_holdings_export_failed" formatted="false">"не вдалося експортувати доказ монети"</string>
+    <string name="l10n_salon_holdings_not_simple" formatted="false">"це не звичайна адреса гаманця (неможливо підтвердити володіння)"</string>
+    <string name="l10n_salon_holdings_sign_failed" formatted="false">"не вдалося підписати (вузол розблоковано?)"</string>
+    <string name="l10n_salon_holdings_no_signature" formatted="false">"підпис не отримано"</string>
+    <string name="l10n_salon_holdings_incomplete" formatted="false">"неповний доказ"</string>
+    <string name="l10n_salon_holdings_coin_missing" formatted="false">"монету не знайдено в блокчейні"</string>
+    <string name="l10n_salon_holdings_wrong_token" formatted="false">"інший токен"</string>
+    <string name="l10n_salon_holdings_spent" formatted="false">"монету витрачено"</string>
+    <string name="l10n_salon_holdings_stale" formatted="false">"доказ застарів — опублікуйте сторінку знову для оновлення"</string>
+    <string name="l10n_salon_holdings_wrong_key" formatted="false">"ключ не керує цією монетою"</string>
+    <string name="l10n_salon_holdings_wrong_script" formatted="false">"скрипт не відповідає адресі"</string>
+    <string name="l10n_salon_holdings_wrong_signature" formatted="false">"підпис недійсний для цього профілю"</string>
+    <string name="l10n_salon_holdings_verify_failed" formatted="false">"не вдалося виконати перевірку підпису"</string>
+    <string name="l10n_salon_holdings_script_failed" formatted="false">"перевірка скрипту не вдалася"</string>
+    <string name="l10n_salon_holdings_coin_failed" formatted="false">"перевірка монети не вдалася (вузол зайнятий?)"</string>
 </resources>
