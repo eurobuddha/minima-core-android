@@ -1,4 +1,6 @@
 package com.eurobuddha.pandadex;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -269,6 +271,19 @@ public class DexKeepAliveService extends Service {
         super.onTaskRemoved(rootIntent);
     }
 
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        try {
+            createChannel();
+            // Reuse AtomiX's active-service guard. A locale change does not start a maintenance pass.
+            if (started) {
+                NotificationManager manager = getSystemService(NotificationManager.class);
+                if (manager != null) manager.notify(FG_ID, fgNotification());
+            }
+        } catch (RuntimeException unavailable) { /* Keep the existing notification if the OS refuses an update. */ }
+    }
+
     @Override public void onDestroy() {
         started = false; // Ignore late pairing/scan callbacks before releasing the transport.
         passGate.invalidate();
@@ -284,8 +299,13 @@ public class DexKeepAliveService extends Service {
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationManager nm = getSystemService(NotificationManager.class);
-            if (nm != null) nm.createNotificationChannel(
-                    new NotificationChannel(CH_FG, "Order watcher", NotificationManager.IMPORTANCE_LOW));
+            if (nm != null) {
+                NotificationChannel channel = nm.getNotificationChannel(CH_FG);
+                if (channel == null) channel = new NotificationChannel(CH_FG,
+                        Language.text(this, l10n_dex_notice_watcher), NotificationManager.IMPORTANCE_LOW);
+                channel.setName(Language.text(this, l10n_dex_notice_watcher));
+                nm.createNotificationChannel(channel);
+            }
             Notifier.ensureChannels(this);
         }
     }
@@ -296,7 +316,7 @@ public class DexKeepAliveService extends Service {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         return new NotificationCompat.Builder(this, CH_FG)
                 .setContentTitle("PandaDEX")
-                .setContentText("Watching the order book — keeping your GTC orders alive")
+                .setContentText(Language.text(this, l10n_dex_notice_watching))
                 .setSmallIcon(android.R.drawable.stat_sys_upload_done)
                 .setContentIntent(pi)
                 .setOngoing(true)

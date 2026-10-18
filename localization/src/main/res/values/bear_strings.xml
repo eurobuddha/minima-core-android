@@ -6500,4 +6500,40 @@
     <string name="l10n_dex_maker_edit_creates">"• New rungs posted: %1$s."</string>
     <!-- Arguments: rungs -->
     <string name="l10n_dex_maker_edit_cancels">"• Rungs removed: %1$s."</string>
+    <string name="l10n_dex_notice_alerts" formatted="false">"Trade alerts"</string>
+    <string name="l10n_dex_notice_watcher" formatted="false">"Order watcher"</string>
+    <string name="l10n_dex_notice_watching" formatted="false">"Watching the order book — keeping your GTC orders alive"</string>
+    <string name="l10n_dex_notice_partial" formatted="false">"Order partially filled"</string>
+    <string name="l10n_dex_notice_filled" formatted="false">"Order filled"</string>
+    <string name="l10n_dex_notice_history" formatted="false">"Trade history needs attention"</string>
+    <string name="l10n_dex_notice_watcher_paused" formatted="false">"Order watcher paused"</string>
+    <string name="l10n_dex_notice_upkeep" formatted="false">"Order upkeep needs attention"</string>
+    <string name="l10n_dex_notice_created" formatted="false">"Order creation verified"</string>
+    <string name="l10n_dex_notice_complete" formatted="false">"Trade complete"</string>
+    <string name="l10n_dex_history_conflict" formatted="false">"A stored trade has conflicting inclusion evidence. Earlier evidence is retained while history reconciliation is pending."</string>
+    <string name="l10n_dex_history_storage_paused" formatted="false">"Trade-history recovery is paused by a storage error. Saved candidates are retained; free device storage and reopen PandaDEX."</string>
+    <string name="l10n_dex_history_read_failed" formatted="false">"Historical search progress could not be read. Existing receipts are retained."</string>
+    <string name="l10n_dex_history_pool_read_failed" formatted="false">"Pool history addresses could not be read. Existing receipts are retained; this search will retry."</string>
+    <string name="l10n_dex_history_save_failed" formatted="false">"Historical search progress could not be saved. Existing receipts are retained; this search will repeat."</string>
+    <string name="l10n_dex_maker_split_confirmed" formatted="false">"Funding split confirmed — maker funds are sendable."</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_sold">"Sold %1$s MINIMA @ %2$s MxUSD"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_bought">"Bought %1$s MINIMA @ %2$s MxUSD"</string>
+    <!-- Arguments: trade -->
+    <string name="l10n_dex_notice_confirming">"%1$s. Funds are confirming and will show as available shortly."</string>
+    <!-- Arguments: trade -->
+    <string name="l10n_dex_notice_proceeds">"✓ %1$s — proceeds are confirming, see ASSETS"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_buy_order">"Buy %1$s MINIMA @ %2$s"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_sell_order">"Sell %1$s MINIMA @ %2$s"</string>
+    <!-- Arguments: order -->
+    <string name="l10n_dex_notice_created_body">"%1$s was created on-chain"</string>
+    <!-- Arguments: order -->
+    <string name="l10n_dex_notice_created_stage">"%1$s — creation verified on-chain. Check Orders for its current status."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_notice_covenant_failure">"Covenant check failed: %1$s"</string>
+    <!-- Arguments: price, error -->
+    <string name="l10n_dex_notice_order_error">"Order @ %1$s — %2$s"</string>
 </resources>

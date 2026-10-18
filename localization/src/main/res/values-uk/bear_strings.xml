@@ -6562,4 +6562,40 @@
     <string name="l10n_dex_maker_edit_creates">"• Нових рівнів до розміщення: %1$s."</string>
     <!-- Arguments: rungs -->
     <string name="l10n_dex_maker_edit_cancels">"• Рівнів до зняття: %1$s."</string>
+    <string name="l10n_dex_notice_alerts" formatted="false">"Сповіщення про угоди"</string>
+    <string name="l10n_dex_notice_watcher" formatted="false">"Спостереження за заявками"</string>
+    <string name="l10n_dex_notice_watching" formatted="false">"Спостереження за книгою — підтримання ваших заявок GTC"</string>
+    <string name="l10n_dex_notice_partial" formatted="false">"Заявку частково виконано"</string>
+    <string name="l10n_dex_notice_filled" formatted="false">"Заявку виконано"</string>
+    <string name="l10n_dex_notice_history" formatted="false">"Історія угод потребує уваги"</string>
+    <string name="l10n_dex_notice_watcher_paused" formatted="false">"Спостереження за заявками призупинено"</string>
+    <string name="l10n_dex_notice_upkeep" formatted="false">"Обслуговування заявок потребує уваги"</string>
+    <string name="l10n_dex_notice_created" formatted="false">"Створення заявки перевірено"</string>
+    <string name="l10n_dex_notice_complete" formatted="false">"Угоду завершено"</string>
+    <string name="l10n_dex_history_conflict" formatted="false">"У збереженої угоди суперечливі докази включення до блоку. Попередні докази збережено до звіряння історії."</string>
+    <string name="l10n_dex_history_storage_paused" formatted="false">"Відновлення історії угод призупинено через помилку сховища. Збережені кандидати утримуються; звільніть місце й знову відкрийте PandaDEX."</string>
+    <string name="l10n_dex_history_read_failed" formatted="false">"Не вдалося прочитати перебіг пошуку історії. Наявні квитанції збережено."</string>
+    <string name="l10n_dex_history_pool_read_failed" formatted="false">"Не вдалося прочитати адреси історії пулів. Наявні квитанції збережено; пошук повториться."</string>
+    <string name="l10n_dex_history_save_failed" formatted="false">"Не вдалося зберегти перебіг пошуку історії. Наявні квитанції збережено; пошук повториться."</string>
+    <string name="l10n_dex_maker_split_confirmed" formatted="false">"Розділення коштів підтверджено — кошти маркетмейкера доступні для витрачання."</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_sold">"Продано %1$s MINIMA за %2$s MxUSD"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_bought">"Куплено %1$s MINIMA за %2$s MxUSD"</string>
+    <!-- Arguments: trade -->
+    <string name="l10n_dex_notice_confirming">"%1$s. Кошти підтверджуються й невдовзі стануть доступними."</string>
+    <!-- Arguments: trade -->
+    <string name="l10n_dex_notice_proceeds">"✓ %1$s — отримані кошти підтверджуються, див. активи"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_buy_order">"Купівля %1$s MINIMA за %2$s"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_sell_order">"Продаж %1$s MINIMA за %2$s"</string>
+    <!-- Arguments: order -->
+    <string name="l10n_dex_notice_created_body">"%1$s створена в блокчейні"</string>
+    <!-- Arguments: order -->
+    <string name="l10n_dex_notice_created_stage">"%1$s — створення перевірено в блокчейні. Поточний стан дивіться в розділі заявок."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_notice_covenant_failure">"Перевірка ковенанту не вдалася: %1$s"</string>
+    <!-- Arguments: price, error -->
+    <string name="l10n_dex_notice_order_error">"Заявка за %1$s — %2$s"</string>
 </resources>

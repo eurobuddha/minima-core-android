@@ -24,6 +24,8 @@ public final class NotificationLabels {
         update(context, manager, "swap_fg", R.string.l10n_atomix_notice_watcher, 0);
         update(context, manager, "atomix", R.string.l10n_atomix_notice_alerts, 0);
         update(context, manager, "swap_offline", R.string.l10n_atomix_notice_offline, 0);
+        update(context, manager, "pandadex_keepalive", R.string.l10n_dex_notice_watcher, 0);
+        update(context, manager, "pandadex_alert", R.string.l10n_dex_notice_alerts, 0);
         update(context, manager, "pp_keepalive", R.string.l10n_pools_keeper_channel, 0);
         update(context, manager, "pp_stranding", R.string.l10n_pools_keeper_warning_channel, R.string.l10n_pools_keeper_warning_help);
     }

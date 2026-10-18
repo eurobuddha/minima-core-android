@@ -31909,5 +31909,161 @@
     "zh-Hans": "• 移除档位：{rungs}。",
     "ru": "• Уровней к снятию: {rungs}.",
     "uk": "• Рівнів до зняття: {rungs}."
+  },
+  "dex.noticeAlerts": {
+    "en": "Trade alerts",
+    "zh-Hans": "交易提醒",
+    "ru": "Уведомления о сделках",
+    "uk": "Сповіщення про угоди"
+  },
+  "dex.noticeWatcher": {
+    "en": "Order watcher",
+    "zh-Hans": "订单监控",
+    "ru": "Наблюдение за заявками",
+    "uk": "Спостереження за заявками"
+  },
+  "dex.noticeWatching": {
+    "en": "Watching the order book — keeping your GTC orders alive",
+    "zh-Hans": "正在监控订单簿 — 维护您的 GTC 长期有效订单",
+    "ru": "Наблюдение за стаканом — поддержание ваших заявок GTC",
+    "uk": "Спостереження за книгою — підтримання ваших заявок GTC"
+  },
+  "dex.noticePartial": {
+    "en": "Order partially filled",
+    "zh-Hans": "订单部分成交",
+    "ru": "Заявка частично исполнена",
+    "uk": "Заявку частково виконано"
+  },
+  "dex.noticeFilled": {
+    "en": "Order filled",
+    "zh-Hans": "订单已成交",
+    "ru": "Заявка исполнена",
+    "uk": "Заявку виконано"
+  },
+  "dex.noticeHistory": {
+    "en": "Trade history needs attention",
+    "zh-Hans": "交易历史需要处理",
+    "ru": "История сделок требует внимания",
+    "uk": "Історія угод потребує уваги"
+  },
+  "dex.noticeWatcherPaused": {
+    "en": "Order watcher paused",
+    "zh-Hans": "订单监控已暂停",
+    "ru": "Наблюдение за заявками приостановлено",
+    "uk": "Спостереження за заявками призупинено"
+  },
+  "dex.noticeUpkeep": {
+    "en": "Order upkeep needs attention",
+    "zh-Hans": "订单维护需要处理",
+    "ru": "Обслуживание заявок требует внимания",
+    "uk": "Обслуговування заявок потребує уваги"
+  },
+  "dex.noticeCreated": {
+    "en": "Order creation verified",
+    "zh-Hans": "订单创建已验证",
+    "ru": "Создание заявки проверено",
+    "uk": "Створення заявки перевірено"
+  },
+  "dex.noticeComplete": {
+    "en": "Trade complete",
+    "zh-Hans": "交易完成",
+    "ru": "Сделка завершена",
+    "uk": "Угоду завершено"
+  },
+  "dex.historyConflict": {
+    "en": "A stored trade has conflicting inclusion evidence. Earlier evidence is retained while history reconciliation is pending.",
+    "zh-Hans": "已保存交易的入块证据存在冲突。历史对账完成前会保留原有证据。",
+    "ru": "У сохранённой сделки противоречивые доказательства включения в блок. Прежние доказательства сохранены до сверки истории.",
+    "uk": "У збереженої угоди суперечливі докази включення до блоку. Попередні докази збережено до звіряння історії."
+  },
+  "dex.historyStoragePaused": {
+    "en": "Trade-history recovery is paused by a storage error. Saved candidates are retained; free device storage and reopen PandaDEX.",
+    "zh-Hans": "存储错误导致交易历史恢复暂停。已保存的候选记录仍保留；请释放设备存储空间并重新打开 PandaDEX。",
+    "ru": "Восстановление истории сделок приостановлено из-за ошибки хранилища. Сохранённые кандидаты удерживаются; освободите место и снова откройте PandaDEX.",
+    "uk": "Відновлення історії угод призупинено через помилку сховища. Збережені кандидати утримуються; звільніть місце й знову відкрийте PandaDEX."
+  },
+  "dex.historyReadFailed": {
+    "en": "Historical search progress could not be read. Existing receipts are retained.",
+    "zh-Hans": "无法读取历史搜索进度。现有回执已保留。",
+    "ru": "Не удалось прочитать ход поиска истории. Существующие квитанции сохранены.",
+    "uk": "Не вдалося прочитати перебіг пошуку історії. Наявні квитанції збережено."
+  },
+  "dex.historyPoolReadFailed": {
+    "en": "Pool history addresses could not be read. Existing receipts are retained; this search will retry.",
+    "zh-Hans": "无法读取资金池历史地址。现有回执已保留；搜索将重试。",
+    "ru": "Не удалось прочитать адреса истории пулов. Существующие квитанции сохранены; поиск повторится.",
+    "uk": "Не вдалося прочитати адреси історії пулів. Наявні квитанції збережено; пошук повториться."
+  },
+  "dex.historySaveFailed": {
+    "en": "Historical search progress could not be saved. Existing receipts are retained; this search will repeat.",
+    "zh-Hans": "无法保存历史搜索进度。现有回执已保留；搜索将重复。",
+    "ru": "Не удалось сохранить ход поиска истории. Существующие квитанции сохранены; поиск повторится.",
+    "uk": "Не вдалося зберегти перебіг пошуку історії. Наявні квитанції збережено; пошук повториться."
+  },
+  "dex.makerSplitConfirmed": {
+    "en": "Funding split confirmed — maker funds are sendable.",
+    "zh-Hans": "资金拆分已确认 — 做市资金已可用。",
+    "ru": "Разделение средств подтверждено — средства маркетмейкера доступны для расходования.",
+    "uk": "Розділення коштів підтверджено — кошти маркетмейкера доступні для витрачання."
+  },
+  "dex.noticeSold": {
+    "en": "Sold {amount} MINIMA @ {price} MxUSD",
+    "zh-Hans": "已卖出 {amount} MINIMA，价格 {price} MxUSD",
+    "ru": "Продано {amount} MINIMA по {price} MxUSD",
+    "uk": "Продано {amount} MINIMA за {price} MxUSD"
+  },
+  "dex.noticeBought": {
+    "en": "Bought {amount} MINIMA @ {price} MxUSD",
+    "zh-Hans": "已买入 {amount} MINIMA，价格 {price} MxUSD",
+    "ru": "Куплено {amount} MINIMA по {price} MxUSD",
+    "uk": "Куплено {amount} MINIMA за {price} MxUSD"
+  },
+  "dex.noticeConfirming": {
+    "en": "{trade}. Funds are confirming and will show as available shortly.",
+    "zh-Hans": "{trade}。资金正在确认，稍后将显示为可用。",
+    "ru": "{trade}. Средства подтверждаются и вскоре станут доступны.",
+    "uk": "{trade}. Кошти підтверджуються й невдовзі стануть доступними."
+  },
+  "dex.noticeProceeds": {
+    "en": "✓ {trade} — proceeds are confirming, see ASSETS",
+    "zh-Hans": "✓ {trade} — 所得资金正在确认，请查看资产页",
+    "ru": "✓ {trade} — полученные средства подтверждаются, см. активы",
+    "uk": "✓ {trade} — отримані кошти підтверджуються, див. активи"
+  },
+  "dex.noticeBuyOrder": {
+    "en": "Buy {amount} MINIMA @ {price}",
+    "zh-Hans": "买入 {amount} MINIMA，价格 {price}",
+    "ru": "Покупка {amount} MINIMA по {price}",
+    "uk": "Купівля {amount} MINIMA за {price}"
+  },
+  "dex.noticeSellOrder": {
+    "en": "Sell {amount} MINIMA @ {price}",
+    "zh-Hans": "卖出 {amount} MINIMA，价格 {price}",
+    "ru": "Продажа {amount} MINIMA по {price}",
+    "uk": "Продаж {amount} MINIMA за {price}"
+  },
+  "dex.noticeCreatedBody": {
+    "en": "{order} was created on-chain",
+    "zh-Hans": "{order} 已在链上创建",
+    "ru": "{order} создана в блокчейне",
+    "uk": "{order} створена в блокчейні"
+  },
+  "dex.noticeCreatedStage": {
+    "en": "{order} — creation verified on-chain. Check Orders for its current status.",
+    "zh-Hans": "{order} — 链上创建已验证。请在订单页查看当前状态。",
+    "ru": "{order} — создание проверено в блокчейне. Текущий статус смотрите в разделе заявок.",
+    "uk": "{order} — створення перевірено в блокчейні. Поточний стан дивіться в розділі заявок."
+  },
+  "dex.noticeCovenantFailure": {
+    "en": "Covenant check failed: {error}",
+    "zh-Hans": "合约核查失败：{error}",
+    "ru": "Проверка ковенанта не удалась: {error}",
+    "uk": "Перевірка ковенанту не вдалася: {error}"
+  },
+  "dex.noticeOrderError": {
+    "en": "Order @ {price} — {error}",
+    "zh-Hans": "订单价格 {price} — {error}",
+    "ru": "Заявка по {price} — {error}",
+    "uk": "Заявка за {price} — {error}"
   }
 }

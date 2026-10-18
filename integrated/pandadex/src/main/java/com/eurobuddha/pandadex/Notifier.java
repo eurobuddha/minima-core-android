@@ -1,4 +1,6 @@
 package com.eurobuddha.pandadex;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -25,8 +27,11 @@ public final class Notifier {
         if (Build.VERSION.SDK_INT < 26) return;
         NotificationManager nm = c.getSystemService(NotificationManager.class);
         if (nm == null) return;
-        nm.createNotificationChannel(new NotificationChannel(CH_ALERT, "Trade alerts",
-                NotificationManager.IMPORTANCE_DEFAULT));
+        NotificationChannel channel = nm.getNotificationChannel(CH_ALERT);
+        if (channel == null) channel = new NotificationChannel(CH_ALERT,
+                Language.text(c, l10n_dex_notice_alerts), NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setName(Language.text(c, l10n_dex_notice_alerts));
+        nm.createNotificationChannel(channel);
     }
 
     public static void fill(Context c, boolean sold, BigDecimal minima, BigDecimal price, boolean partial) {
@@ -44,9 +49,9 @@ public final class Notifier {
                     new Intent(c, MainActivity.class),
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             Notification n = new NotificationCompat.Builder(c, CH_ALERT)
-                    .setContentTitle(title)
-                    .setContentText(body)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
+                    .setContentTitle(DexMessages.message(title))
+                    .setContentText(DexMessages.message(body))
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(DexMessages.message(body)))
                     .setSmallIcon(android.R.drawable.stat_sys_upload_done)
                     .setContentIntent(pi)
                     .setAutoCancel(true)

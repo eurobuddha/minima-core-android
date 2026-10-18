@@ -6562,4 +6562,40 @@
     <string name="l10n_dex_maker_edit_creates">"• Новых уровней к размещению: %1$s."</string>
     <!-- Arguments: rungs -->
     <string name="l10n_dex_maker_edit_cancels">"• Уровней к снятию: %1$s."</string>
+    <string name="l10n_dex_notice_alerts" formatted="false">"Уведомления о сделках"</string>
+    <string name="l10n_dex_notice_watcher" formatted="false">"Наблюдение за заявками"</string>
+    <string name="l10n_dex_notice_watching" formatted="false">"Наблюдение за стаканом — поддержание ваших заявок GTC"</string>
+    <string name="l10n_dex_notice_partial" formatted="false">"Заявка частично исполнена"</string>
+    <string name="l10n_dex_notice_filled" formatted="false">"Заявка исполнена"</string>
+    <string name="l10n_dex_notice_history" formatted="false">"История сделок требует внимания"</string>
+    <string name="l10n_dex_notice_watcher_paused" formatted="false">"Наблюдение за заявками приостановлено"</string>
+    <string name="l10n_dex_notice_upkeep" formatted="false">"Обслуживание заявок требует внимания"</string>
+    <string name="l10n_dex_notice_created" formatted="false">"Создание заявки проверено"</string>
+    <string name="l10n_dex_notice_complete" formatted="false">"Сделка завершена"</string>
+    <string name="l10n_dex_history_conflict" formatted="false">"У сохранённой сделки противоречивые доказательства включения в блок. Прежние доказательства сохранены до сверки истории."</string>
+    <string name="l10n_dex_history_storage_paused" formatted="false">"Восстановление истории сделок приостановлено из-за ошибки хранилища. Сохранённые кандидаты удерживаются; освободите место и снова откройте PandaDEX."</string>
+    <string name="l10n_dex_history_read_failed" formatted="false">"Не удалось прочитать ход поиска истории. Существующие квитанции сохранены."</string>
+    <string name="l10n_dex_history_pool_read_failed" formatted="false">"Не удалось прочитать адреса истории пулов. Существующие квитанции сохранены; поиск повторится."</string>
+    <string name="l10n_dex_history_save_failed" formatted="false">"Не удалось сохранить ход поиска истории. Существующие квитанции сохранены; поиск повторится."</string>
+    <string name="l10n_dex_maker_split_confirmed" formatted="false">"Разделение средств подтверждено — средства маркетмейкера доступны для расходования."</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_sold">"Продано %1$s MINIMA по %2$s MxUSD"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_bought">"Куплено %1$s MINIMA по %2$s MxUSD"</string>
+    <!-- Arguments: trade -->
+    <string name="l10n_dex_notice_confirming">"%1$s. Средства подтверждаются и вскоре станут доступны."</string>
+    <!-- Arguments: trade -->
+    <string name="l10n_dex_notice_proceeds">"✓ %1$s — полученные средства подтверждаются, см. активы"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_buy_order">"Покупка %1$s MINIMA по %2$s"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_sell_order">"Продажа %1$s MINIMA по %2$s"</string>
+    <!-- Arguments: order -->
+    <string name="l10n_dex_notice_created_body">"%1$s создана в блокчейне"</string>
+    <!-- Arguments: order -->
+    <string name="l10n_dex_notice_created_stage">"%1$s — создание проверено в блокчейне. Текущий статус смотрите в разделе заявок."</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_notice_covenant_failure">"Проверка ковенанта не удалась: %1$s"</string>
+    <!-- Arguments: price, error -->
+    <string name="l10n_dex_notice_order_error">"Заявка по %1$s — %2$s"</string>
 </resources>

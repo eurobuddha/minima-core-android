@@ -313,7 +313,23 @@
     "NOT pegged: the book gets YOUR exact prices — never repriced, never withdrawn, even if the price feed dies.": "dex.makerManualConsent",
     "Rungs post ONE PER SIDE per cycle — each is an on-chain transaction your phone does proof-of-work for, and each one's change has to confirm before the next on that side can be funded — so a full ladder takes a few minutes to build and a rung may retry before it sticks. The Maker tab shows each rung's progress.": "dex.makerPostingConsent",
     "Background checks are normally requested every 15 minutes. Android may delay or stop them, so automatic withdrawal is not a guaranteed price limit. Keep PandaDEX and MinimaCore running while monitoring the ladder; check Orders for confirmed cancellations.": "dex.makerBackgroundConsent",
-    "Rungs post one per side per cycle, so a large batch lands over a few minutes. The status panel shows each one.": "dex.makerEditTiming"
+    "Rungs post one per side per cycle, so a large batch lands over a few minutes. The status panel shows each one.": "dex.makerEditTiming",
+    "Trade alerts": "dex.noticeAlerts",
+    "Order watcher": "dex.noticeWatcher",
+    "Watching the order book — keeping your GTC orders alive": "dex.noticeWatching",
+    "Order partially filled": "dex.noticePartial",
+    "Order filled": "dex.noticeFilled",
+    "Trade history needs attention": "dex.noticeHistory",
+    "Order watcher paused": "dex.noticeWatcherPaused",
+    "Order upkeep needs attention": "dex.noticeUpkeep",
+    "Order creation verified": "dex.noticeCreated",
+    "Trade complete": "dex.noticeComplete",
+    "A stored trade has conflicting inclusion evidence. Earlier evidence is retained while history reconciliation is pending.": "dex.historyConflict",
+    "Trade-history recovery is paused by a storage error. Saved candidates are retained; free device storage and reopen PandaDEX.": "dex.historyStoragePaused",
+    "Historical search progress could not be read. Existing receipts are retained.": "dex.historyReadFailed",
+    "Pool history addresses could not be read. Existing receipts are retained; this search will retry.": "dex.historyPoolReadFailed",
+    "Historical search progress could not be saved. Existing receipts are retained; this search will repeat.": "dex.historySaveFailed",
+    "Funding split confirmed — maker funds are sendable.": "dex.makerSplitConfirmed"
   },
   "patterns": [
     {
@@ -1299,6 +1315,97 @@
         "integer"
       ],
       "key": "dex.makerEditCancels"
+    },
+    {
+      "template": "Sold {0} MINIMA @ {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.noticeSold"
+    },
+    {
+      "template": "Sold {0} MINIMA @ {1} MxUSD",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.noticeSold"
+    },
+    {
+      "template": "Bought {0} MINIMA @ {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.noticeBought"
+    },
+    {
+      "template": "Bought {0} MINIMA @ {1} MxUSD",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.noticeBought"
+    },
+    {
+      "template": "Buy {0} MINIMA @ {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.noticeBuyOrder"
+    },
+    {
+      "template": "Sell {0} MINIMA @ {1}",
+      "kinds": [
+        "number",
+        "number"
+      ],
+      "key": "dex.noticeSellOrder"
+    },
+    {
+      "template": "{0}. Funds are confirming and will show as available shortly.",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.noticeConfirming"
+    },
+    {
+      "template": "✓ {0} — proceeds are confirming, see ASSETS",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.noticeProceeds"
+    },
+    {
+      "template": "{0} was created on-chain",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.noticeCreatedBody"
+    },
+    {
+      "template": "{0} — creation verified on-chain. Check Orders for its current status.",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.noticeCreatedStage"
+    },
+    {
+      "template": "Covenant check failed: {0}",
+      "kinds": [
+        "diagnostic"
+      ],
+      "key": "dex.noticeCovenantFailure"
+    },
+    {
+      "template": "Order @ {0} — {1}",
+      "kinds": [
+        "number",
+        "diagnostic"
+      ],
+      "key": "dex.noticeOrderError"
     }
   ]
 }

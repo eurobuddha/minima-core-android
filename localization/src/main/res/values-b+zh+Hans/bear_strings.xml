@@ -6469,4 +6469,40 @@
     <string name="l10n_dex_maker_edit_creates">"• 提交新档位：%1$s。"</string>
     <!-- Arguments: rungs -->
     <string name="l10n_dex_maker_edit_cancels">"• 移除档位：%1$s。"</string>
+    <string name="l10n_dex_notice_alerts" formatted="false">"交易提醒"</string>
+    <string name="l10n_dex_notice_watcher" formatted="false">"订单监控"</string>
+    <string name="l10n_dex_notice_watching" formatted="false">"正在监控订单簿 — 维护您的 GTC 长期有效订单"</string>
+    <string name="l10n_dex_notice_partial" formatted="false">"订单部分成交"</string>
+    <string name="l10n_dex_notice_filled" formatted="false">"订单已成交"</string>
+    <string name="l10n_dex_notice_history" formatted="false">"交易历史需要处理"</string>
+    <string name="l10n_dex_notice_watcher_paused" formatted="false">"订单监控已暂停"</string>
+    <string name="l10n_dex_notice_upkeep" formatted="false">"订单维护需要处理"</string>
+    <string name="l10n_dex_notice_created" formatted="false">"订单创建已验证"</string>
+    <string name="l10n_dex_notice_complete" formatted="false">"交易完成"</string>
+    <string name="l10n_dex_history_conflict" formatted="false">"已保存交易的入块证据存在冲突。历史对账完成前会保留原有证据。"</string>
+    <string name="l10n_dex_history_storage_paused" formatted="false">"存储错误导致交易历史恢复暂停。已保存的候选记录仍保留；请释放设备存储空间并重新打开 PandaDEX。"</string>
+    <string name="l10n_dex_history_read_failed" formatted="false">"无法读取历史搜索进度。现有回执已保留。"</string>
+    <string name="l10n_dex_history_pool_read_failed" formatted="false">"无法读取资金池历史地址。现有回执已保留；搜索将重试。"</string>
+    <string name="l10n_dex_history_save_failed" formatted="false">"无法保存历史搜索进度。现有回执已保留；搜索将重复。"</string>
+    <string name="l10n_dex_maker_split_confirmed" formatted="false">"资金拆分已确认 — 做市资金已可用。"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_sold">"已卖出 %1$s MINIMA，价格 %2$s MxUSD"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_bought">"已买入 %1$s MINIMA，价格 %2$s MxUSD"</string>
+    <!-- Arguments: trade -->
+    <string name="l10n_dex_notice_confirming">"%1$s。资金正在确认，稍后将显示为可用。"</string>
+    <!-- Arguments: trade -->
+    <string name="l10n_dex_notice_proceeds">"✓ %1$s — 所得资金正在确认，请查看资产页"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_buy_order">"买入 %1$s MINIMA，价格 %2$s"</string>
+    <!-- Arguments: amount, price -->
+    <string name="l10n_dex_notice_sell_order">"卖出 %1$s MINIMA，价格 %2$s"</string>
+    <!-- Arguments: order -->
+    <string name="l10n_dex_notice_created_body">"%1$s 已在链上创建"</string>
+    <!-- Arguments: order -->
+    <string name="l10n_dex_notice_created_stage">"%1$s — 链上创建已验证。请在订单页查看当前状态。"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_dex_notice_covenant_failure">"合约核查失败：%1$s"</string>
+    <!-- Arguments: price, error -->
+    <string name="l10n_dex_notice_order_error">"订单价格 %1$s — %2$s"</string>
 </resources>
