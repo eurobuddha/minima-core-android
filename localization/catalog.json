@@ -38926,5 +38926,317 @@
     "zh-Hans": "无法生成此系列。请调整特征后重试。",
     "ru": "Не удалось создать коллекцию. Измените признаки и повторите попытку.",
     "uk": "Не вдалося створити колекцію. Змініть ознаки та спробуйте ще раз."
+  },
+  "salonSocial.feedEmpty": {
+    "en": "Your feed is quiet. Find people in Discover and follow them — their posts land here.",
+    "zh-Hans": "动态中还没有内容。在“发现”中关注用户，他们的帖子会显示在这里。",
+    "ru": "В ленте пока тихо. Найдите людей в разделе «Обзор» и подпишитесь — их публикации появятся здесь.",
+    "uk": "У стрічці поки тихо. Знайдіть людей у розділі «Огляд» і підпишіться — їхні дописи з’являться тут."
+  },
+  "salonSocial.discoverAction": {
+    "en": "Go to Discover",
+    "zh-Hans": "前往发现",
+    "ru": "Перейти к обзору",
+    "uk": "Перейти до огляду"
+  },
+  "salonSocial.pulling": {
+    "en": "Loading posts from salons: {count}…",
+    "zh-Hans": "正在加载 {count} 个沙龙的帖子…",
+    "ru": "Загрузка публикаций из салонов: {count}…",
+    "uk": "Завантаження дописів із салонів: {count}…"
+  },
+  "salonSocial.unreachable": {
+    "en": "Could not reach followed salons: {count}. Their hosts may be offline.",
+    "zh-Hans": "无法连接您关注的 {count} 个沙龙，其主机可能已离线。",
+    "ru": "Не удалось связаться с салонами из ваших подписок: {count}. Их хосты могут быть недоступны.",
+    "uk": "Не вдалося зв’язатися із салонами з ваших підписок: {count}. Їхні хости можуть бути недоступні."
+  },
+  "salonSocial.noPosts": {
+    "en": "No posts yet from anyone you follow.",
+    "zh-Hans": "您关注的用户还没有发帖。",
+    "ru": "У ваших подписок пока нет публикаций.",
+    "uk": "У ваших підписках поки немає дописів."
+  },
+  "salonSocial.discoverHelp": {
+    "en": "Everyone on the Salon — read straight from the on-chain directory ({address}). No directory server is needed.",
+    "zh-Hans": "直接从链上目录（{address}）查看 Salon 用户，无需目录服务器。",
+    "ru": "Все пользователи Salon — прямо из каталога в блокчейне ({address}). Сервер каталога не требуется.",
+    "uk": "Усі користувачі Salon — безпосередньо з каталогу в блокчейні ({address}). Сервер каталогу не потрібен."
+  },
+  "salonSocial.refresh": {
+    "en": "↻ Refresh the directory",
+    "zh-Hans": "↻ 刷新目录",
+    "ru": "↻ Обновить каталог",
+    "uk": "↻ Оновити каталог"
+  },
+  "salonSocial.refreshing": {
+    "en": "Refreshing…",
+    "zh-Hans": "正在刷新…",
+    "ru": "Обновление…",
+    "uk": "Оновлення…"
+  },
+  "salonSocial.reading": {
+    "en": "Reading the directory…",
+    "zh-Hans": "正在读取目录…",
+    "ru": "Чтение каталога…",
+    "uk": "Читання каталогу…"
+  },
+  "salonSocial.emptyDirectory": {
+    "en": "The directory is empty. Publish your Salon from My Salon to be the first.",
+    "zh-Hans": "目录为空。在“我的沙龙”中发布您的沙龙，成为第一位用户。",
+    "ru": "Каталог пуст. Опубликуйте свою страницу из раздела «Мой салон», чтобы стать первым.",
+    "uk": "Каталог порожній. Опублікуйте свою сторінку з розділу «Мій салон», щоб стати першим."
+  },
+  "salonSocial.following": {
+    "en": "Following",
+    "zh-Hans": "已关注",
+    "ru": "Вы подписаны",
+    "uk": "Ви підписані"
+  },
+  "salonSocial.notListed": {
+    "en": "That salon is not in the directory yet.",
+    "zh-Hans": "该沙龙尚未出现在目录中。",
+    "ru": "Этого салона пока нет в каталоге.",
+    "uk": "Цього салону поки немає в каталозі."
+  },
+  "salonSocial.backDiscover": {
+    "en": "← Discover",
+    "zh-Hans": "← 发现",
+    "ru": "← Обзор",
+    "uk": "← Огляд"
+  },
+  "salonSocial.follow": {
+    "en": "Follow",
+    "zh-Hans": "关注",
+    "ru": "Подписаться",
+    "uk": "Підписатися"
+  },
+  "salonSocial.unfollow": {
+    "en": "Unfollow",
+    "zh-Hans": "取消关注",
+    "ru": "Отписаться",
+    "uk": "Відписатися"
+  },
+  "salonSocial.pageUnreachable": {
+    "en": "Could not reach @{handle}’s page. Their host may be offline.",
+    "zh-Hans": "无法访问 @{handle} 的页面，其主机可能已离线。",
+    "ru": "Не удалось открыть страницу @{handle}. Её хост может быть недоступен.",
+    "uk": "Не вдалося відкрити сторінку @{handle}. Її хост може бути недоступний."
+  },
+  "salonSocial.pageLoading": {
+    "en": "Loading @{handle}’s page…",
+    "zh-Hans": "正在加载 @{handle} 的页面…",
+    "ru": "Загрузка страницы @{handle}…",
+    "uk": "Завантаження сторінки @{handle}…"
+  },
+  "salonSocial.openBrowser": {
+    "en": "Open in browser",
+    "zh-Hans": "在浏览器中打开",
+    "ru": "Открыть в браузере",
+    "uk": "Відкрити в браузері"
+  },
+  "salonSocial.message": {
+    "en": "💬 Message",
+    "zh-Hans": "💬 私信",
+    "ru": "💬 Сообщение",
+    "uk": "💬 Повідомлення"
+  },
+  "salonSocial.tip": {
+    "en": "💰 Tip",
+    "zh-Hans": "💰 打赏",
+    "ru": "💰 Чаевые",
+    "uk": "💰 Чайові"
+  },
+  "salonSocial.mySalon": {
+    "en": "My Salon",
+    "zh-Hans": "我的沙龙",
+    "ru": "Мой салон",
+    "uk": "Мій салон"
+  },
+  "salonSocial.updated": {
+    "en": "Updated {time}",
+    "zh-Hans": "更新于 {time}",
+    "ru": "Обновлено: {time}",
+    "uk": "Оновлено: {time}"
+  },
+  "salonSocial.editPage": {
+    "en": "Edit my page",
+    "zh-Hans": "编辑我的页面",
+    "ru": "Изменить мою страницу",
+    "uk": "Редагувати мою сторінку"
+  },
+  "salonSocial.sharePage": {
+    "en": "Share my page",
+    "zh-Hans": "分享我的页面",
+    "ru": "Поделиться страницей",
+    "uk": "Поділитися сторінкою"
+  },
+  "salonSocial.about": {
+    "en": "About",
+    "zh-Hans": "关于",
+    "ru": "О себе",
+    "uk": "Про себе"
+  },
+  "salonSocial.posts": {
+    "en": "Posts",
+    "zh-Hans": "帖子",
+    "ru": "Публикации",
+    "uk": "Дописи"
+  },
+  "salonSocial.scrollPosts": {
+    "en": "▲ Scroll within this section — posts: {count}",
+    "zh-Hans": "▲ 在此区域内滚动 — 帖子：{count}",
+    "ru": "▲ Прокручивайте внутри раздела — публикаций: {count}",
+    "uk": "▲ Прокручуйте всередині розділу — дописів: {count}"
+  },
+  "salonSocial.profileEmpty": {
+    "en": "Your page is empty. Add a bio, photos, video, music and posts — then publish to share it.",
+    "zh-Hans": "您的页面为空。添加简介、照片、视频、音乐和帖子，然后发布并分享。",
+    "ru": "Ваша страница пуста. Добавьте описание, фото, видео, музыку и публикации, затем опубликуйте страницу.",
+    "uk": "Ваша сторінка порожня. Додайте опис, фото, відео, музику й дописи, а потім опублікуйте сторінку."
+  },
+  "salonSocial.yourPage": {
+    "en": "Your page",
+    "zh-Hans": "您的页面",
+    "ru": "Ваша страница",
+    "uk": "Ваша сторінка"
+  },
+  "salonSocial.identityToken": {
+    "en": "Identity token",
+    "zh-Hans": "身份代币",
+    "ru": "Токен личности",
+    "uk": "Токен особи"
+  },
+  "salonSocial.profileUrl": {
+    "en": "Profile URL",
+    "zh-Hans": "资料网址",
+    "ru": "URL профиля",
+    "uk": "URL профілю"
+  },
+  "salonSocial.webVerified": {
+    "en": "✓ Web-verified",
+    "zh-Hans": "✓ 已通过网站验证",
+    "ru": "✓ Проверено сайтом",
+    "uk": "✓ Перевірено сайтом"
+  },
+  "salonSocial.verifiedHost": {
+    "en": "✓ Verified · {host}",
+    "zh-Hans": "✓ 已验证 · {host}",
+    "ru": "✓ Проверено · {host}",
+    "uk": "✓ Перевірено · {host}"
+  },
+  "salonSocial.onlyWeb": {
+    "en": "Only web (http/https) links open here.",
+    "zh-Hans": "这里只能打开网页（http/https）链接。",
+    "ru": "Здесь можно открывать только веб-ссылки (http/https).",
+    "uk": "Тут можна відкривати лише вебпосилання (http/https)."
+  },
+  "salonSocial.openFailed": {
+    "en": "Could not open link",
+    "zh-Hans": "无法打开链接",
+    "ru": "Не удалось открыть ссылку",
+    "uk": "Не вдалося відкрити посилання"
+  },
+  "salonSocial.shareText": {
+    "en": "@{handle} on The Salon — {url}",
+    "zh-Hans": "@{handle} 的 Salon 页面 — {url}",
+    "ru": "@{handle} в The Salon — {url}",
+    "uk": "@{handle} у The Salon — {url}"
+  },
+  "salonSocial.shareChooser": {
+    "en": "Share your Salon",
+    "zh-Hans": "分享您的沙龙",
+    "ru": "Поделиться своим салоном",
+    "uk": "Поділитися своїм салоном"
+  },
+  "salonSocial.shareFailed": {
+    "en": "Could not share",
+    "zh-Hans": "无法分享",
+    "ru": "Не удалось поделиться",
+    "uk": "Не вдалося поділитися"
+  },
+  "salonSocial.postCount": {
+    "en": {
+      "one": "post",
+      "other": "posts"
+    },
+    "zh-Hans": {
+      "other": "帖子"
+    },
+    "ru": {
+      "one": "публикация",
+      "few": "публикации",
+      "many": "публикаций",
+      "other": "публикации"
+    },
+    "uk": {
+      "one": "допис",
+      "few": "дописи",
+      "many": "дописів",
+      "other": "допису"
+    }
+  },
+  "salonSocial.holdingCount": {
+    "en": {
+      "one": "holding",
+      "other": "holdings"
+    },
+    "zh-Hans": {
+      "other": "持有资产"
+    },
+    "ru": {
+      "one": "актив",
+      "few": "актива",
+      "many": "активов",
+      "other": "актива"
+    },
+    "uk": {
+      "one": "актив",
+      "few": "активи",
+      "many": "активів",
+      "other": "активу"
+    }
+  },
+  "salonSocial.mediaCount": {
+    "en": {
+      "one": "media item",
+      "other": "media items"
+    },
+    "zh-Hans": {
+      "other": "媒体"
+    },
+    "ru": {
+      "one": "медиафайл",
+      "few": "медиафайла",
+      "many": "медиафайлов",
+      "other": "медиафайла"
+    },
+    "uk": {
+      "one": "медіафайл",
+      "few": "медіафайли",
+      "many": "медіафайлів",
+      "other": "медіафайлу"
+    }
+  },
+  "salonSocial.followingCount": {
+    "en": {
+      "one": "following",
+      "other": "following"
+    },
+    "zh-Hans": {
+      "other": "关注"
+    },
+    "ru": {
+      "one": "подписка",
+      "few": "подписки",
+      "many": "подписок",
+      "other": "подписки"
+    },
+    "uk": {
+      "one": "підписка",
+      "few": "підписки",
+      "many": "підписок",
+      "other": "підписки"
+    }
   }
 }

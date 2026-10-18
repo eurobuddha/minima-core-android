@@ -7716,4 +7716,63 @@
     <!-- Arguments: value -->
     <string name="l10n_atelier_art_unique_failed">"无法为作品 %1$s 找到唯一组合。请启用更多选项或减少系列数量。"</string>
     <string name="l10n_atelier_art_generate_failed" formatted="false">"无法生成此系列。请调整特征后重试。"</string>
+    <string name="l10n_salon_social_feed_empty" formatted="false">"动态中还没有内容。在“发现”中关注用户，他们的帖子会显示在这里。"</string>
+    <string name="l10n_salon_social_discover_action" formatted="false">"前往发现"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_social_pulling">"正在加载 %1$d 个沙龙的帖子…"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_social_unreachable">"无法连接您关注的 %1$d 个沙龙，其主机可能已离线。"</string>
+    <string name="l10n_salon_social_no_posts" formatted="false">"您关注的用户还没有发帖。"</string>
+    <!-- Arguments: address -->
+    <string name="l10n_salon_social_discover_help">"直接从链上目录（%1$s）查看 Salon 用户，无需目录服务器。"</string>
+    <string name="l10n_salon_social_refresh" formatted="false">"↻ 刷新目录"</string>
+    <string name="l10n_salon_social_refreshing" formatted="false">"正在刷新…"</string>
+    <string name="l10n_salon_social_reading" formatted="false">"正在读取目录…"</string>
+    <string name="l10n_salon_social_empty_directory" formatted="false">"目录为空。在“我的沙龙”中发布您的沙龙，成为第一位用户。"</string>
+    <string name="l10n_salon_social_following" formatted="false">"已关注"</string>
+    <string name="l10n_salon_social_not_listed" formatted="false">"该沙龙尚未出现在目录中。"</string>
+    <string name="l10n_salon_social_back_discover" formatted="false">"← 发现"</string>
+    <string name="l10n_salon_social_follow" formatted="false">"关注"</string>
+    <string name="l10n_salon_social_unfollow" formatted="false">"取消关注"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_social_page_unreachable">"无法访问 @%1$s 的页面，其主机可能已离线。"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_social_page_loading">"正在加载 @%1$s 的页面…"</string>
+    <string name="l10n_salon_social_open_browser" formatted="false">"在浏览器中打开"</string>
+    <string name="l10n_salon_social_message" formatted="false">"💬 私信"</string>
+    <string name="l10n_salon_social_tip" formatted="false">"💰 打赏"</string>
+    <string name="l10n_salon_social_my_salon" formatted="false">"我的沙龙"</string>
+    <!-- Arguments: time -->
+    <string name="l10n_salon_social_updated">"更新于 %1$s"</string>
+    <string name="l10n_salon_social_edit_page" formatted="false">"编辑我的页面"</string>
+    <string name="l10n_salon_social_share_page" formatted="false">"分享我的页面"</string>
+    <string name="l10n_salon_social_about" formatted="false">"关于"</string>
+    <string name="l10n_salon_social_posts" formatted="false">"帖子"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_social_scroll_posts">"▲ 在此区域内滚动 — 帖子：%1$d"</string>
+    <string name="l10n_salon_social_profile_empty" formatted="false">"您的页面为空。添加简介、照片、视频、音乐和帖子，然后发布并分享。"</string>
+    <string name="l10n_salon_social_your_page" formatted="false">"您的页面"</string>
+    <string name="l10n_salon_social_identity_token" formatted="false">"身份代币"</string>
+    <string name="l10n_salon_social_profile_url" formatted="false">"资料网址"</string>
+    <string name="l10n_salon_social_web_verified" formatted="false">"✓ 已通过网站验证"</string>
+    <!-- Arguments: host -->
+    <string name="l10n_salon_social_verified_host">"✓ 已验证 · %1$s"</string>
+    <string name="l10n_salon_social_only_web" formatted="false">"这里只能打开网页（http/https）链接。"</string>
+    <string name="l10n_salon_social_open_failed" formatted="false">"无法打开链接"</string>
+    <!-- Arguments: handle, url -->
+    <string name="l10n_salon_social_share_text">"@%1$s 的 Salon 页面 — %2$s"</string>
+    <string name="l10n_salon_social_share_chooser" formatted="false">"分享您的沙龙"</string>
+    <string name="l10n_salon_social_share_failed" formatted="false">"无法分享"</string>
+    <plurals name="l10n_salon_social_post_count">
+        <item quantity="other">"帖子"</item>
+    </plurals>
+    <plurals name="l10n_salon_social_holding_count">
+        <item quantity="other">"持有资产"</item>
+    </plurals>
+    <plurals name="l10n_salon_social_media_count">
+        <item quantity="other">"媒体"</item>
+    </plurals>
+    <plurals name="l10n_salon_social_following_count">
+        <item quantity="other">"关注"</item>
+    </plurals>
 </resources>

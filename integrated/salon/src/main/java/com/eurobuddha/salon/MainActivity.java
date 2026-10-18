@@ -1313,18 +1313,23 @@ public class MainActivity extends AppCompatActivity {
 
     /* ================= FEED ================= */
 
+    private CharSequence socialTime(long timestamp) {
+        if (timestamp <= 0) return "";
+        return Language.since(timestamp < 1_000_000_000_000L ? timestamp * 1000L : timestamp);
+    }
+
     private void renderFeed() {
-        masthead("Feed");
+        masthead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_feed));
         if (!SalonStore.hasIdentity(this)) { renderOnboard(); return; }
         JSONArray follows = SalonStore.follows(this);
         if (follows.length() == 0) {
             LinearLayout c = card();
-            c.addView(Design.note(this, "Your feed is quiet. Find people in Discover and follow them — their posts land here."));
-            c.addView(btn("Go to Discover", true, () -> go(Screen.DISCOVER)), lph(46, 0, 10, 0, 0));
+            c.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_feed_empty)));
+            c.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_discover_action), true, () -> go(Screen.DISCOVER)), lp(0, 10, 0, 0));
             body.addView(c, lp(0, 0, 0, 12));
             return;
         }
-        TextView status = Design.note(this, "Pulling posts from " + follows.length() + " salon(s)…");
+        TextView status = Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_pulling, follows.length()));
         body.addView(status, lp(0, 0, 0, 8));
         final List<JSONObject> posts = Collections.synchronizedList(new ArrayList<>());
         final int[] pending = { follows.length() }, fails = { 0 };
@@ -1339,15 +1344,24 @@ public class MainActivity extends AppCompatActivity {
                     String avatar = prof.optString("avatar", "");
                     JSONArray ps = prof.optJSONArray("posts");
                     if (ps != null) for (int k = 0; k < ps.length(); k++) {
-                        JSONObject post = ps.optJSONObject(k);
-                        if (post == null) continue;
-                        try { post.put("_author", author.isEmpty() ? prof.optString("handle") : author); post.put("_avatar", avatar); post.put("_tid", tid); } catch (Exception ignored) {}
-                        posts.add(post);
+                        JSONObject sourcePost = ps.optJSONObject(k);
+                        if (sourcePost == null) continue;
+                        try {
+                            JSONObject post = new JSONObject(sourcePost.toString());
+                            post.put("_author", author.isEmpty() ? prof.optString("handle") : author);
+                            post.put("_avatar", avatar); post.put("_tid", tid);
+                            posts.add(post);
+                        } catch (org.json.JSONException malformed) { /* Skip an unreadable post. */ }
                     }
-                } else fails[0]++;
-                runOnUiThread(() -> { if (--pending[0] == 0 && ep == renderEpoch) paintFeed(posts, status, fails[0]); });
+                }
+                final boolean failed = prof == null;
+                runOnUiThread(() -> {
+                    if (failed) fails[0]++;
+                    if (--pending[0] == 0 && ep == renderEpoch && !isFinishing() && !isDestroyed()) paintFeed(posts, status, fails[0]);
+                });
             });
         }
+        if (pending[0] == 0) paintFeed(posts, status, fails[0]);
     }
 
     private void paintFeed(List<JSONObject> posts, TextView status, int fails) {
@@ -1356,10 +1370,10 @@ public class MainActivity extends AppCompatActivity {
         if (posts.isEmpty()) {
             if (fails > 0) {
                 LinearLayout c = card();
-                c.addView(Design.note(this, "Couldn't reach " + fails + " of the salons you follow — they may be offline."));
-                c.addView(btn("Try again", true, this::render), lph(46, 0, 10, 0, 0));
+                c.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_unreachable, fails)));
+                c.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_pools_lp_try_again), true, this::render), lp(0, 10, 0, 0));
                 body.addView(c, lp(0, 0, 0, 12));
-            } else body.addView(Design.note(this, "No posts yet from anyone you follow."), lp(0, 0, 0, 12));
+            } else body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_no_posts)), lp(0, 0, 0, 12));
             return;
         }
         for (JSONObject post : posts) {
@@ -1370,8 +1384,8 @@ public class MainActivity extends AppCompatActivity {
             who.setPadding(dp(9), 0, 0, 0);
             who.setOnClickListener(v -> openTokenProfile(post.optString("_tid")));
             head.addView(who, new LinearLayout.LayoutParams(0, -2, 1));
-            String when = Util.ago(post.optLong("ts", 0));
-            if (!when.isEmpty()) head.addView(Design.text(this, when, 10.5f, Design.DIM(), Design.mono()));
+            CharSequence when = socialTime(post.optLong("ts", 0));
+            if (when.length() != 0) head.addView(Design.text(this, when, 10.5f, Design.DIM(), Design.mono()));
             c.addView(head, lp(0, 0, 0, 8));
             if (!post.optString("text").isEmpty()) c.addView(Design.body(this, post.optString("text")), lp(0, 0, 0, 6));
             addPostMedia(c, post);
@@ -1382,15 +1396,15 @@ public class MainActivity extends AppCompatActivity {
     /* ================= DISCOVER ================= */
 
     private void renderDiscover() {
-        masthead("Discover");
+        masthead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_discover));
         LinearLayout head = card();
-        head.addView(Design.note(this, "Everyone on the Salon — read straight off the chain's town square (" + SalonRegistry.SALON_ADDRESS + "). No server, no directory company."));
+        head.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_discover_help, SalonRegistry.SALON_ADDRESS)));
         body.addView(head, lp(0, 0, 0, 12));
         // Explicit refresh (pull-to-refresh also works) — re-reads the square.
-        body.addView(btn("↻ Refresh the square", false, () -> { toast("Refreshing…"); render(); }), lph(44, 0, 0, 0, 10));
-        TextView status = Design.note(this, "Reading the square…");
+        body.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_refresh), false, () -> { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_refreshing)); mProfileCache.clear(); mRegistryCache = null; render(); }), lp(0, 0, 0, 10));
+        TextView status = Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_reading));
         body.addView(status, lp(0, 0, 0, 8));
-        if (!nodeUp) { status.setText("Waiting for Minima Core."); return; }
+        if (!nodeUp) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_waiting_node)); return; }
         final int ep = renderEpoch;
         registryList(rawEntries -> runOnUiThread(() -> {
             if (ep != renderEpoch) return;   // user navigated away before the square loaded
@@ -1404,7 +1418,7 @@ public class MainActivity extends AppCompatActivity {
                 for (SalonRegistry.Entry e : entries) if (myTid.equals(e.tokenid)) { present = true; break; }
                 if (!present) entries.add(0, new SalonRegistry.Entry(myTid, SalonStore.get(this, "profileUrl"), SalonStore.get(this, "handle")));
             }
-            if (entries.isEmpty()) { body.addView(Design.note(this, "The square is empty — be the first. Publish your Salon from My Salon."), lp(0, 0, 0, 12)); return; }
+            if (entries.isEmpty()) { body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_empty_directory)), lp(0, 0, 0, 12)); return; }
             for (SalonRegistry.Entry e : entries) {
                 LinearLayout c = card(); c.setClickable(true); Design.pressable(c);
                 c.setOnClickListener(v -> openProfile(e));
@@ -1418,11 +1432,12 @@ public class MainActivity extends AppCompatActivity {
                 final TextView bioTv = Design.text(this, "", 12.5f, Design.DIM(), Design.sans()); bioTv.setMaxLines(2); bioTv.setVisibility(View.GONE);
                 col.addView(nameTv); col.addView(handleTv); col.addView(bioTv);
                 r.addView(col, new LinearLayout.LayoutParams(0, -2, 1));
-                if (SalonStore.isFollowing(this, e.tokenid)) r.addView(Design.pill(this, "following", Design.PILL_DONE));
+                if (SalonStore.isFollowing(this, e.tokenid)) r.addView(Design.pill(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_following), Design.PILL_DONE));
                 c.addView(r);
                 body.addView(c, lp(0, 0, 0, 10));
                 // enrich the card from the hosted profile: real avatar, display name, bio
                 io.execute(() -> { JSONObject prof = httpGetJson(e.url); if (prof == null) return; runOnUiThread(() -> {
+                    if (ep != renderEpoch || isFinishing() || isDestroyed()) return;
                     String nm = prof.optString("name", ""), av = prof.optString("avatar", ""), bio = prof.optString("bio", ""), wv = prof.optString("webvalidate", "");
                     if (!nm.isEmpty()) nameTv.setText(nm);
                     avSlot.removeAllViews(); avSlot.addView(badgedAvatar(av, e.handle, e.tokenid, wv, 48));
@@ -1433,45 +1448,52 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean viewFailed = false;
+    private int profileRequest = 0;
     private void openProfile(SalonRegistry.Entry e) {
         // A holding expanded on one profile must not carry its open state to the next.
         if (viewEntry == null || !viewEntry.tokenid.equals(e.tokenid)) expandedNft = null;
         viewEntry = e; viewProfile = null; viewFailed = false;
+        final int request = ++profileRequest;
         go(Screen.VIEW);
-        io.execute(() -> { JSONObject p = httpGetJson(e.url); runOnUiThread(() -> { viewProfile = p; viewFailed = (p == null); if (screen == Screen.VIEW) render(); }); });
+        io.execute(() -> { JSONObject p = httpGetJson(e.url); runOnUiThread(() -> {
+            if (request != profileRequest || viewEntry != e || isFinishing() || isDestroyed()) return;
+            viewProfile = p; viewFailed = (p == null); if (screen == Screen.VIEW) render();
+        }); });
     }
 
     private void openTokenProfile(String tokenid) {
-        registryList(entries -> {
-            for (SalonRegistry.Entry e : entries) if (e.tokenid.equals(tokenid)) { runOnUiThread(() -> openProfile(e)); return; }
-            runOnUiThread(() -> toast("That salon isn't on the square yet."));
-        });
+        final int request = ++profileRequest, ep = renderEpoch;
+        registryList(entries -> runOnUiThread(() -> {
+            if (request != profileRequest || ep != renderEpoch || isFinishing() || isDestroyed()) return;
+            for (SalonRegistry.Entry e : entries) if (e.tokenid.equals(tokenid)) { openProfile(e); return; }
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_not_listed));
+        }));
     }
 
     /* ================= VIEW someone else ================= */
 
     private void renderView() {
-        masthead("Salon");
+        masthead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_salon));
         if (viewEntry == null) { go(Screen.DISCOVER); return; }
         LinearLayout bar = row();
-        bar.addView(btn("← Discover", false, () -> go(Screen.DISCOVER)), weight(40, 0, 4));
+        bar.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_back_discover), false, () -> go(Screen.DISCOVER)), weight(-2, 0, 4));
         boolean following = SalonStore.isFollowing(this, viewEntry.tokenid);
-        bar.addView(btn(following ? "Unfollow" : "Follow", !following, () -> {
+        bar.addView(btn(following ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_unfollow) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_follow), !following, () -> {
             if (following) SalonStore.unfollow(this, viewEntry.tokenid);
             else SalonStore.follow(this, viewEntry.tokenid, viewEntry.handle, viewEntry.url);
             render();
-        }), weight(40, 4, 0));
+        }), weight(-2, 4, 0));
         body.addView(bar, lp(0, 0, 0, 8));
         if (viewProfile == null) {
             if (viewFailed) {
                 LinearLayout c = card();
-                c.addView(Design.note(this, "Couldn't reach @" + viewEntry.handle + "'s page — their host may be offline."));
+                c.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_page_unreachable, viewEntry.handle)));
                 LinearLayout er = row();
-                er.addView(btn("Try again", true, () -> openProfile(viewEntry)), weight(48, 0, 4));
-                er.addView(btn("Open in browser", false, () -> openUrl(viewEntry.url)), weight(48, 4, 0));
+                er.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_pools_lp_try_again), true, () -> openProfile(viewEntry)), weight(-2, 0, 4));
+                er.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_open_browser), false, () -> openUrl(viewEntry.url)), weight(-2, 4, 0));
                 c.addView(er, lp(0, 10, 0, 0));
                 body.addView(c, lp(0, 0, 0, 12));
-            } else body.addView(Design.note(this, "Loading @" + viewEntry.handle + "'s page…"), lp(0, 0, 0, 12));
+            } else body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_page_loading, viewEntry.handle)), lp(0, 0, 0, 12));
             return;
         }
         String tipAddr = viewProfile.optString("tipaddr", "");
@@ -1480,14 +1502,14 @@ public class MainActivity extends AppCompatActivity {
         boolean canMsg = !tipAddr.isEmpty() && !peerMsgpk.isEmpty();
         if (!tipAddr.isEmpty()) {
             LinearLayout arow = row();
-            if (canMsg) arow.addView(btn("💬 Message", true, () -> {
+            if (canMsg) arow.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_message), true, () -> {
                 // Learn/refresh their Maxima address from their page. Sticky: an empty
                 // value (stale fetch, or they're not advertising one right now) is a
                 // no-op, so we never lose an address we already knew.
                 MailDb.get(this).setMxAddr(peerMsgpk, peerMx);
                 openThread(peerMsgpk, viewEntry.handle, viewProfile.optString("avatar", ""), tipAddr);
-            }), weight(46, 0, 4));
-            arow.addView(btn("💰 Tip", false, () -> tipDialog(viewEntry.handle, tipAddr)), weight(46, canMsg ? 4 : 0, 0));
+            }), weight(-2, 0, 4));
+            arow.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_tip), false, () -> tipDialog(viewEntry.handle, tipAddr)), weight(-2, canMsg ? 4 : 0, 0));
             body.addView(arow, lp(0, 0, 0, 10));
         }
         renderProfilePage(viewProfile, false);
@@ -1496,13 +1518,14 @@ public class MainActivity extends AppCompatActivity {
     /* ================= HOME / My Salon ================= */
 
     private void renderHome() {
-        if (!SalonStore.hasIdentity(this)) { masthead("The Salon"); renderOnboard(); return; }
-        masthead("My Salon");
+        if (!SalonStore.hasIdentity(this)) { masthead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_salon)); renderOnboard(); return; }
+        masthead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_my_salon));
         renderProfilePage(buildProfileJson(), true);
     }
 
     /** The one renderer for any Salon — yours (mine=true) or someone else's. */
     private void renderProfilePage(JSONObject p, boolean mine) {
+        final String boundIdentity = (!mine && viewEntry != null) ? viewEntry.tokenid : p.optString("tokenid");
         LinearLayout headCard = card();
         String banner = p.optString("banner", "");
         if (!banner.isEmpty()) {
@@ -1511,7 +1534,7 @@ public class MainActivity extends AppCompatActivity {
             headCard.addView(bn, new LinearLayout.LayoutParams(-1, dp(130)));
         }
         LinearLayout idrow = row();
-        idrow.addView(badgedAvatar(p.optString("avatar"), p.optString("handle"), p.optString("tokenid"), p.optString("webvalidate"), 66));
+        idrow.addView(badgedAvatar(p.optString("avatar"), p.optString("handle"), boundIdentity, p.optString("webvalidate"), 66));
         LinearLayout col = new LinearLayout(this); col.setOrientation(LinearLayout.VERTICAL); col.setPadding(dp(12), 0, 0, 0);
         col.addView(Design.text(this, p.optString("name"), 19, Design.INK(), Design.sansBold()));
         TextView h = Design.text(this, "@" + p.optString("handle"), 13, Design.ACCENT(), Design.mono());
@@ -1523,10 +1546,10 @@ public class MainActivity extends AppCompatActivity {
         // profile; "following" is only meaningful (and known) on your own page.
         LinearLayout stats = row(); boolean anyStat = false;
         int nPosts = arrLen(p, "posts"), nHold = arrLen(p, "nfts"), nGal = arrLen(p, "gallery");
-        if (nPosts > 0) { stats.addView(statPill(nPosts, "posts")); anyStat = true; }
-        if (nHold  > 0) { stats.addView(statPill(nHold,  nHold == 1 ? "holding" : "holdings")); anyStat = true; }
-        if (nGal   > 0) { stats.addView(statPill(nGal,   "media")); anyStat = true; }
-        if (mine) { int nFol = SalonStore.follows(this).length(); if (nFol > 0) { stats.addView(statPill(nFol, "following")); anyStat = true; } }
+        if (nPosts > 0) { stats.addView(statPill(nPosts, Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_salon_social_post_count, nPosts))); anyStat = true; }
+        if (nHold  > 0) { stats.addView(statPill(nHold, Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_salon_social_holding_count, nHold))); anyStat = true; }
+        if (nGal   > 0) { stats.addView(statPill(nGal, Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_salon_social_media_count, nGal))); anyStat = true; }
+        if (mine) { int nFol = SalonStore.follows(this).length(); if (nFol > 0) { stats.addView(statPill(nFol, Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_salon_social_following_count, nFol))); anyStat = true; } }
         if (anyStat) {
             android.widget.HorizontalScrollView hs = new android.widget.HorizontalScrollView(this);
             hs.setHorizontalScrollBarEnabled(false); hs.addView(stats);   // never clip on narrow screens
@@ -1536,8 +1559,7 @@ public class MainActivity extends AppCompatActivity {
         // has changed since you last looked (shown for your own page too).
         long upd = p.optLong("updated", 0);
         if (upd > 0) {
-            String ago = Util.ago(upd);
-            String freshness = ago.isEmpty() || ago.equalsIgnoreCase("now") ? "Updated just now" : "Updated " + ago + " ago";
+            CharSequence freshness = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_updated, socialTime(upd));
             headCard.addView(Design.text(this, freshness, 10.5f, Design.DIM(), Design.mono()), lp(0, 6, 0, 0));
         }
         // web-validation shield (optional webvalidate URL in profile)
@@ -1546,35 +1568,35 @@ public class MainActivity extends AppCompatActivity {
         String wv = p.optString("webvalidate", "");
         if (!wv.isEmpty()) {
             final String host = urlHost(wv);
-            Boolean st = WebValidate.status(p.optString("tokenid"));
+            Boolean st = WebValidate.status(boundIdentity);
             if (Boolean.TRUE.equals(st)) shieldSlot.addView(verifiedBadge(host));
-            WebValidate.ensure(this, p.optString("tokenid"), wv, () -> { shieldSlot.removeAllViews(); if (Boolean.TRUE.equals(WebValidate.status(p.optString("tokenid")))) shieldSlot.addView(verifiedBadge(host)); });
+            WebValidate.ensure(this, boundIdentity, wv, () -> { shieldSlot.removeAllViews(); if (Boolean.TRUE.equals(WebValidate.status(boundIdentity))) shieldSlot.addView(verifiedBadge(host)); });
         }
         body.addView(headCard, lp(0, 0, 0, 12));
 
         if (mine) {
             LinearLayout actions = row();
-            actions.addView(btn("Edit my page", true, () -> go(Screen.EDIT)), weight(46, 0, 4));
-            actions.addView(btn("Publish", false, () -> publishSalon(null)), weight(46, 4, 0));
+            actions.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_edit_page), true, () -> go(Screen.EDIT)), weight(-2, 0, 4));
+            actions.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atomix_market_publish), false, () -> publishSalon(null)), weight(-2, 4, 0));
             body.addView(actions, lp(0, 0, 0, 8));
             String myUrl = SalonStore.get(this, "profileUrl");
             if (!myUrl.isEmpty()) {
                 LinearLayout share = row();
-                share.addView(btn("Share my page", false, () -> sharePage(myUrl)), weight(46, 0, 4));
-                if (myUrl.startsWith("http")) share.addView(btn("Open in browser", false, () -> openUrl(myUrl)), weight(46, 4, 0));
+                share.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_share_page), false, () -> sharePage(myUrl)), weight(-2, 0, 4));
+                if (myUrl.startsWith("http")) share.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_open_browser), false, () -> openUrl(myUrl)), weight(-2, 4, 0));
                 body.addView(share, lp(0, 0, 0, 12));
             }
         }
 
         if (!p.optString("about").isEmpty()) {
-            LinearLayout c = card(); c.addView(Design.lot(this, "About"));
+            LinearLayout c = card(); c.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_about)));
             c.addView(Design.body(this, p.optString("about")), lp(0, 6, 0, 0));
             body.addView(c, lp(0, 0, 0, 12));
         }
 
         JSONArray links = p.optJSONArray("links");
         if (links != null && links.length() > 0) {
-            LinearLayout c = card(); c.addView(Design.lot(this, "Links"));
+            LinearLayout c = card(); c.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_links)));
             for (int i = 0; i < links.length(); i++) {
                 JSONObject l = links.optJSONObject(i); if (l == null) continue;
                 c.addView(linkRow(l.optString("label", l.optString("url")), l.optString("url")));
@@ -1584,7 +1606,7 @@ public class MainActivity extends AppCompatActivity {
 
         JSONArray gal = p.optJSONArray("gallery");
         if (gal != null && gal.length() > 0) {
-            LinearLayout c = card(); c.addView(Design.lot(this, "Gallery"));
+            LinearLayout c = card(); c.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_nft_wallet_gallery)));
             // Bound the gallery to a scroll window so a large collection doesn't
             // stretch the page. Short galleries measure under the cap and just show.
             LinearLayout inner = new LinearLayout(this); inner.setOrientation(LinearLayout.VERTICAL);
@@ -1597,7 +1619,7 @@ public class MainActivity extends AppCompatActivity {
         if (posts != null && posts.length() > 0) {
             LinearLayout c = card();
             LinearLayout ph = row();
-            ph.addView(Design.lot(this, "Posts"), new LinearLayout.LayoutParams(0, -2, 1));
+            ph.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_posts)), new LinearLayout.LayoutParams(0, -2, 1));
             ph.addView(Design.text(this, String.valueOf(posts.length()), 11f, Design.DIM(), Design.mono()));
             c.addView(ph);
             // Newest first.
@@ -1616,7 +1638,7 @@ public class MainActivity extends AppCompatActivity {
                 };
                 rv.setAdapter(ad); ad.set(plist);
                 c.addView(rv, lp(0, 6, 0, 0));
-                c.addView(Design.text(this, "▲ scroll within — showing all " + plist.size() + " posts", 9.5f, Design.DIM(), Design.mono()), lp(0, 6, 0, 0));
+                c.addView(Design.text(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_scroll_posts, plist.size()), 9.5f, Design.DIM(), Design.mono()), lp(0, 6, 0, 0));
             }
             body.addView(c, lp(0, 0, 0, 12));
         }
@@ -1624,20 +1646,20 @@ public class MainActivity extends AppCompatActivity {
         JSONArray nfts = p.optJSONArray("nfts");
         // Bind proofs to the ON-CHAIN discovered tokenid when viewing others, not the
         // profile's self-declared one — else a profile could paste someone else's valid proofs.
-        String bindTid = (!mine && viewEntry != null) ? viewEntry.tokenid : p.optString("tokenid");
+        String bindTid = boundIdentity;
         if (nfts != null && nfts.length() > 0) renderNftShowcase(nfts, bindTid);
 
         if (mine && emptyProfile(p)) {
             LinearLayout nud = card(); nud.setBackground(Design.dashed(this, Design.CARD(), Design.DIM()));
-            nud.addView(Design.note(this, "Your page is empty. Add a bio, photos, video, music and posts — then publish to share it."));
-            nud.addView(btn("Edit your page", true, () -> go(Screen.EDIT)), lph(46, 0, 10, 0, 0));
+            nud.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_profile_empty)));
+            nud.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_edit_page), true, () -> go(Screen.EDIT)), lp(0, 10, 0, 0));
             body.addView(nud, lp(0, 0, 0, 12));
         }
 
         if (mine) {
-            LinearLayout meta = card(); meta.addView(Design.lot(this, "Your page"));
-            copyRow(meta, "Identity token", p.optString("tokenid"));
-            meta.addView(linkRow("Profile URL", SalonStore.get(this, "profileUrl")));
+            LinearLayout meta = card(); meta.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_your_page)));
+            copyRow(meta, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_identity_token), p.optString("tokenid"));
+            meta.addView(linkRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_profile_url), SalonStore.get(this, "profileUrl")));
             body.addView(meta, lp(0, 0, 0, 12));
         }
     }
@@ -1645,12 +1667,12 @@ public class MainActivity extends AppCompatActivity {
     private int arrLen(JSONObject p, String key) { JSONArray a = p.optJSONArray(key); return a == null ? 0 : a.length(); }
 
     /** A number + label chip for the profile stats row (e.g. "12 POSTS"). */
-    private View statPill(int n, String label) {
+    private View statPill(int n, CharSequence label) {
         LinearLayout p = new LinearLayout(this); p.setOrientation(LinearLayout.HORIZONTAL); p.setGravity(Gravity.CENTER_VERTICAL);
         p.setBackground(Design.ruled(this, Design.CARD(), Design.INK(), 1));
         p.setPadding(dp(9), dp(5), dp(9), dp(6));
         p.addView(Design.text(this, String.valueOf(n), 13, Design.INK(), Design.sansBold()));
-        TextView l = Design.text(this, label.toUpperCase(), 9f, Design.DIM(), Design.sansBold()); l.setLetterSpacing(0.08f); l.setPadding(dp(4), 0, 0, 0);
+        TextView l = Design.text(this, Language.upper(label), 9f, Design.DIM(), Design.sansBold()); l.setLetterSpacing(0.08f); l.setPadding(dp(4), 0, 0, 0);
         p.addView(l);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2); lp.rightMargin = dp(8);
         p.setLayoutParams(lp);
@@ -1662,9 +1684,9 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout pc = new LinearLayout(this); pc.setOrientation(LinearLayout.VERTICAL);
         pc.setPadding(0, dp(8), 0, dp(8));
         if (divider) pc.addView(Design.rule(this, 1), new LinearLayout.LayoutParams(-1, dp(1)));
-        String when = Util.ago(post.optLong("ts", 0));
-        if (!when.isEmpty()) pc.addView(Design.text(this, when, 10f, Design.DIM(), Design.mono()), lp(0, 6, 0, 0));
-        if (!post.optString("text").isEmpty()) pc.addView(Design.body(this, post.optString("text")), lp(0, when.isEmpty() ? 6 : 2, 0, 4));
+        CharSequence when = socialTime(post.optLong("ts", 0));
+        if (when.length() != 0) pc.addView(Design.text(this, when, 10f, Design.DIM(), Design.mono()), lp(0, 6, 0, 0));
+        if (!post.optString("text").isEmpty()) pc.addView(Design.body(this, post.optString("text")), lp(0, when.length() == 0 ? 6 : 2, 0, 4));
         addPostMedia(pc, post);
         return pc;
     }
@@ -3140,9 +3162,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** label + tappable vermilion underlined link (opens browser), long-press copies. */
-    private LinearLayout linkRow(String label, String url) {
+    private LinearLayout linkRow(CharSequence label, String url) {
         LinearLayout r = row(); r.setPadding(0, dp(5), 0, dp(5));
-        TextView key = Design.text(this, label.toUpperCase(), 9.5f, Design.DIM(), Design.sansBold()); key.setLetterSpacing(0.1f);
+        TextView key = Design.text(this, Language.upper(label), 9.5f, Design.DIM(), Design.sansBold()); key.setLetterSpacing(0.1f);
         r.addView(key, new LinearLayout.LayoutParams(0, -2, 1));
         TextView val = Design.text(this, url, 11f, Design.ACCENT(), Design.mono()); val.setGravity(Gravity.END);
         val.setPaintFlags(val.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG); val.setMaxLines(2);
@@ -3153,7 +3175,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView verifiedBadge(String host) {
         int gold = 0xFF9A7B1F;
-        String label = host == null || host.isEmpty() ? "✓ WEB-VERIFIED" : "✓ VERIFIED · " + host.toUpperCase();
+        CharSequence label = host == null || host.isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_web_verified) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_verified_host, host);
         TextView t = Design.text(this, label, 9.5f, gold, Design.sansBold());
         t.setLetterSpacing(0.1f); t.setPadding(dp(8), dp(5), dp(8), dp(6)); t.setBackground(Design.ruled(this, Design.CARD(), gold, 2)); return t;
     }
@@ -3238,7 +3260,7 @@ public class MainActivity extends AppCompatActivity {
         parent.addView(e, new LinearLayout.LayoutParams(-1, -2));
     }
 
-    private TextView btn(CharSequence label, boolean filled, Runnable click) { TextView b = Design.button(this, label, filled); b.setOnClickListener(v -> click.run()); return b; }
+    private TextView btn(CharSequence label, boolean filled, Runnable click) { TextView b = Design.button(this, label, filled); b.setMinHeight(dp(48)); b.setOnClickListener(v -> click.run()); return b; }
 
     private LinearLayout dialogBox() { LinearLayout b = new LinearLayout(this); b.setOrientation(LinearLayout.VERTICAL); b.setPadding(dp(18), dp(6), dp(18), dp(6)); return b; }
     private void showDialog(String title, LinearLayout content, String ok, Runnable onOk) {
@@ -3253,12 +3275,12 @@ public class MainActivity extends AppCompatActivity {
             String u = url.trim();
             if (u.matches("(?i)^https?://.*")) {                       // http/https: open
             } else if (u.matches("(?i)^[a-z][a-z0-9+.-]*://.*")) {     // any other scheme (file://, market://, app deep-links): refuse
-                toast("Only web (http/https) links open here."); return;
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_only_web)); return;
             } else {
                 u = "http://" + u;                                    // bare domain → http
             }
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(u)));
-        } catch (Exception e) { toast("Couldn't open link"); }
+        } catch (Exception e) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_open_failed)); }
     }
 
     /** One-tap: create + default a Blossom hosting profile (no server needed). */
@@ -3286,9 +3308,9 @@ public class MainActivity extends AppCompatActivity {
     private void sharePage(String url) {
         try {
             Intent i = new Intent(Intent.ACTION_SEND).setType("text/plain");
-            i.putExtra(Intent.EXTRA_TEXT, "@" + SalonStore.get(this, "handle") + " on The Salon — " + url);
-            startActivity(Intent.createChooser(i, "Share your Salon"));
-        } catch (Exception e) { toast("Couldn't share"); }
+            i.putExtra(Intent.EXTRA_TEXT, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_share_text, SalonStore.get(this, "handle"), url).toString());
+            startActivity(Intent.createChooser(i, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_share_chooser)));
+        } catch (Exception e) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_share_failed)); }
     }
 
     private void showQr(String title, String data) {
@@ -3311,7 +3333,7 @@ public class MainActivity extends AppCompatActivity {
 
     private LinearLayout.LayoutParams lp(int l, int t, int r, int b) { LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2); p.setMargins(dp(l), dp(t), dp(r), dp(b)); return p; }
     private LinearLayout.LayoutParams lph(int h, int l, int t, int r, int b) { LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, dp(h)); p.setMargins(dp(l), dp(t), dp(r), dp(b)); return p; }
-    private LinearLayout.LayoutParams weight(int hDp, int lm, int rm) { LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, dp(hDp), 1); p.setMargins(dp(lm), 0, dp(rm), 0); return p; }
+    private LinearLayout.LayoutParams weight(int hDp, int lm, int rm) { LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, hDp < 0 ? hDp : dp(hDp), 1); p.setMargins(dp(lm), 0, dp(rm), 0); return p; }
     private LinearLayout.LayoutParams weight1() { return new LinearLayout.LayoutParams(0, -2, 1); }
 
     /* Public web renderer uploaded beside profile.json — fetches ./profile.json and draws a real page. */

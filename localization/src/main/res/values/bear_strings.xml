@@ -7748,4 +7748,67 @@
     <!-- Arguments: value -->
     <string name="l10n_atelier_art_unique_failed">"Could not find a unique combination for plate %1$s. Enable more variants or reduce the collection size."</string>
     <string name="l10n_atelier_art_generate_failed" formatted="false">"Could not generate this collection. Adjust the traits and try again."</string>
+    <string name="l10n_salon_social_feed_empty" formatted="false">"Your feed is quiet. Find people in Discover and follow them — their posts land here."</string>
+    <string name="l10n_salon_social_discover_action" formatted="false">"Go to Discover"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_social_pulling">"Loading posts from salons: %1$d…"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_social_unreachable">"Could not reach followed salons: %1$d. Their hosts may be offline."</string>
+    <string name="l10n_salon_social_no_posts" formatted="false">"No posts yet from anyone you follow."</string>
+    <!-- Arguments: address -->
+    <string name="l10n_salon_social_discover_help">"Everyone on the Salon — read straight from the on-chain directory (%1$s). No directory server is needed."</string>
+    <string name="l10n_salon_social_refresh" formatted="false">"↻ Refresh the directory"</string>
+    <string name="l10n_salon_social_refreshing" formatted="false">"Refreshing…"</string>
+    <string name="l10n_salon_social_reading" formatted="false">"Reading the directory…"</string>
+    <string name="l10n_salon_social_empty_directory" formatted="false">"The directory is empty. Publish your Salon from My Salon to be the first."</string>
+    <string name="l10n_salon_social_following" formatted="false">"Following"</string>
+    <string name="l10n_salon_social_not_listed" formatted="false">"That salon is not in the directory yet."</string>
+    <string name="l10n_salon_social_back_discover" formatted="false">"← Discover"</string>
+    <string name="l10n_salon_social_follow" formatted="false">"Follow"</string>
+    <string name="l10n_salon_social_unfollow" formatted="false">"Unfollow"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_social_page_unreachable">"Could not reach @%1$s’s page. Their host may be offline."</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_social_page_loading">"Loading @%1$s’s page…"</string>
+    <string name="l10n_salon_social_open_browser" formatted="false">"Open in browser"</string>
+    <string name="l10n_salon_social_message" formatted="false">"💬 Message"</string>
+    <string name="l10n_salon_social_tip" formatted="false">"💰 Tip"</string>
+    <string name="l10n_salon_social_my_salon" formatted="false">"My Salon"</string>
+    <!-- Arguments: time -->
+    <string name="l10n_salon_social_updated">"Updated %1$s"</string>
+    <string name="l10n_salon_social_edit_page" formatted="false">"Edit my page"</string>
+    <string name="l10n_salon_social_share_page" formatted="false">"Share my page"</string>
+    <string name="l10n_salon_social_about" formatted="false">"About"</string>
+    <string name="l10n_salon_social_posts" formatted="false">"Posts"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_social_scroll_posts">"▲ Scroll within this section — posts: %1$d"</string>
+    <string name="l10n_salon_social_profile_empty" formatted="false">"Your page is empty. Add a bio, photos, video, music and posts — then publish to share it."</string>
+    <string name="l10n_salon_social_your_page" formatted="false">"Your page"</string>
+    <string name="l10n_salon_social_identity_token" formatted="false">"Identity token"</string>
+    <string name="l10n_salon_social_profile_url" formatted="false">"Profile URL"</string>
+    <string name="l10n_salon_social_web_verified" formatted="false">"✓ Web-verified"</string>
+    <!-- Arguments: host -->
+    <string name="l10n_salon_social_verified_host">"✓ Verified · %1$s"</string>
+    <string name="l10n_salon_social_only_web" formatted="false">"Only web (http/https) links open here."</string>
+    <string name="l10n_salon_social_open_failed" formatted="false">"Could not open link"</string>
+    <!-- Arguments: handle, url -->
+    <string name="l10n_salon_social_share_text">"@%1$s on The Salon — %2$s"</string>
+    <string name="l10n_salon_social_share_chooser" formatted="false">"Share your Salon"</string>
+    <string name="l10n_salon_social_share_failed" formatted="false">"Could not share"</string>
+    <plurals name="l10n_salon_social_post_count">
+        <item quantity="one">"post"</item>
+        <item quantity="other">"posts"</item>
+    </plurals>
+    <plurals name="l10n_salon_social_holding_count">
+        <item quantity="one">"holding"</item>
+        <item quantity="other">"holdings"</item>
+    </plurals>
+    <plurals name="l10n_salon_social_media_count">
+        <item quantity="one">"media item"</item>
+        <item quantity="other">"media items"</item>
+    </plurals>
+    <plurals name="l10n_salon_social_following_count">
+        <item quantity="one">"following"</item>
+        <item quantity="other">"following"</item>
+    </plurals>
 </resources>

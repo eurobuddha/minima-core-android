@@ -7812,4 +7812,75 @@
     <!-- Arguments: value -->
     <string name="l10n_atelier_art_unique_failed">"Не вдалося знайти унікальне поєднання для роботи %1$s. Увімкніть більше варіантів або зменште колекцію."</string>
     <string name="l10n_atelier_art_generate_failed" formatted="false">"Не вдалося створити колекцію. Змініть ознаки та спробуйте ще раз."</string>
+    <string name="l10n_salon_social_feed_empty" formatted="false">"У стрічці поки тихо. Знайдіть людей у розділі «Огляд» і підпишіться — їхні дописи з’являться тут."</string>
+    <string name="l10n_salon_social_discover_action" formatted="false">"Перейти до огляду"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_social_pulling">"Завантаження дописів із салонів: %1$d…"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_social_unreachable">"Не вдалося зв’язатися із салонами з ваших підписок: %1$d. Їхні хости можуть бути недоступні."</string>
+    <string name="l10n_salon_social_no_posts" formatted="false">"У ваших підписках поки немає дописів."</string>
+    <!-- Arguments: address -->
+    <string name="l10n_salon_social_discover_help">"Усі користувачі Salon — безпосередньо з каталогу в блокчейні (%1$s). Сервер каталогу не потрібен."</string>
+    <string name="l10n_salon_social_refresh" formatted="false">"↻ Оновити каталог"</string>
+    <string name="l10n_salon_social_refreshing" formatted="false">"Оновлення…"</string>
+    <string name="l10n_salon_social_reading" formatted="false">"Читання каталогу…"</string>
+    <string name="l10n_salon_social_empty_directory" formatted="false">"Каталог порожній. Опублікуйте свою сторінку з розділу «Мій салон», щоб стати першим."</string>
+    <string name="l10n_salon_social_following" formatted="false">"Ви підписані"</string>
+    <string name="l10n_salon_social_not_listed" formatted="false">"Цього салону поки немає в каталозі."</string>
+    <string name="l10n_salon_social_back_discover" formatted="false">"← Огляд"</string>
+    <string name="l10n_salon_social_follow" formatted="false">"Підписатися"</string>
+    <string name="l10n_salon_social_unfollow" formatted="false">"Відписатися"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_social_page_unreachable">"Не вдалося відкрити сторінку @%1$s. Її хост може бути недоступний."</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_social_page_loading">"Завантаження сторінки @%1$s…"</string>
+    <string name="l10n_salon_social_open_browser" formatted="false">"Відкрити в браузері"</string>
+    <string name="l10n_salon_social_message" formatted="false">"💬 Повідомлення"</string>
+    <string name="l10n_salon_social_tip" formatted="false">"💰 Чайові"</string>
+    <string name="l10n_salon_social_my_salon" formatted="false">"Мій салон"</string>
+    <!-- Arguments: time -->
+    <string name="l10n_salon_social_updated">"Оновлено: %1$s"</string>
+    <string name="l10n_salon_social_edit_page" formatted="false">"Редагувати мою сторінку"</string>
+    <string name="l10n_salon_social_share_page" formatted="false">"Поділитися сторінкою"</string>
+    <string name="l10n_salon_social_about" formatted="false">"Про себе"</string>
+    <string name="l10n_salon_social_posts" formatted="false">"Дописи"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_social_scroll_posts">"▲ Прокручуйте всередині розділу — дописів: %1$d"</string>
+    <string name="l10n_salon_social_profile_empty" formatted="false">"Ваша сторінка порожня. Додайте опис, фото, відео, музику й дописи, а потім опублікуйте сторінку."</string>
+    <string name="l10n_salon_social_your_page" formatted="false">"Ваша сторінка"</string>
+    <string name="l10n_salon_social_identity_token" formatted="false">"Токен особи"</string>
+    <string name="l10n_salon_social_profile_url" formatted="false">"URL профілю"</string>
+    <string name="l10n_salon_social_web_verified" formatted="false">"✓ Перевірено сайтом"</string>
+    <!-- Arguments: host -->
+    <string name="l10n_salon_social_verified_host">"✓ Перевірено · %1$s"</string>
+    <string name="l10n_salon_social_only_web" formatted="false">"Тут можна відкривати лише вебпосилання (http/https)."</string>
+    <string name="l10n_salon_social_open_failed" formatted="false">"Не вдалося відкрити посилання"</string>
+    <!-- Arguments: handle, url -->
+    <string name="l10n_salon_social_share_text">"@%1$s у The Salon — %2$s"</string>
+    <string name="l10n_salon_social_share_chooser" formatted="false">"Поділитися своїм салоном"</string>
+    <string name="l10n_salon_social_share_failed" formatted="false">"Не вдалося поділитися"</string>
+    <plurals name="l10n_salon_social_post_count">
+        <item quantity="one">"допис"</item>
+        <item quantity="few">"дописи"</item>
+        <item quantity="many">"дописів"</item>
+        <item quantity="other">"допису"</item>
+    </plurals>
+    <plurals name="l10n_salon_social_holding_count">
+        <item quantity="one">"актив"</item>
+        <item quantity="few">"активи"</item>
+        <item quantity="many">"активів"</item>
+        <item quantity="other">"активу"</item>
+    </plurals>
+    <plurals name="l10n_salon_social_media_count">
+        <item quantity="one">"медіафайл"</item>
+        <item quantity="few">"медіафайли"</item>
+        <item quantity="many">"медіафайлів"</item>
+        <item quantity="other">"медіафайлу"</item>
+    </plurals>
+    <plurals name="l10n_salon_social_following_count">
+        <item quantity="one">"підписка"</item>
+        <item quantity="few">"підписки"</item>
+        <item quantity="many">"підписок"</item>
+        <item quantity="other">"підписки"</item>
+    </plurals>
 </resources>
