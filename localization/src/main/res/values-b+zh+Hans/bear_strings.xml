@@ -8181,4 +8181,5 @@
     <string name="l10n_salon_restore_storage" formatted="false">"无法保存恢复的页面。请检查设备存储空间后重试。"</string>
     <string name="l10n_salon_restore_unavailable" formatted="false">"页面恢复暂不可用。请重新打开 Salon 后重试。"</string>
     <string name="l10n_salon_restore_invalid" formatted="false">"托管页面内容无效或属于其他身份。未恢复任何内容。"</string>
+    <string name="l10n_salon_setup_blossom_ready" formatted="false">"Blossom 托管已就绪。您现在可以申领用户名。"</string>
 </resources>

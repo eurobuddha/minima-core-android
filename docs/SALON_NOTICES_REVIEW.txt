@@ -1,0 +1,28 @@
+Salon display-message review — 2026-10-18
+
+Summary
+Two remaining display messages now follow the selected language. Incoming multiple
+message counts reuse chat.newMessages with the same Language.count/Language.join
+pattern as app/src/main/java/com/eurobuddha/minimacore/chat/ChatDrainer.java. A single
+sender name and message body remain literal. Blossom's setup confirmation now has
+English, Simplified Chinese, Russian and Ukrainian catalog entries.
+
+Scope
+Only the toast expressions change in MainActivity. No balance query, wallet write,
+message intake, hosting configuration, transfer command, credentials or token-cleanup
+operation is changed. A final pinned adapter reproduces the generated source.
+
+Verification
+15 existing Salon setup, social and hosting language tests passed, with no failures,
+errors or skips. Pandamonium release Java compilation passed. All 21 pinned imports
+reproduce. All 6802 catalog messages validate in four languages; whitespace checks
+pass. Logs: build/localization/salon-notices-{tests,import}.log.
+
+Verdict: Approve this display-only change. No blocking findings.
+
+Separate pending item
+The existing spare-token cleanup needs validation, ownership guards and translated
+feedback. Automatic approval review rejected changing that irreversible-transfer
+flow without explicit permission. No implementation was made. The proposal is in
+SALON_SPARE_CLEANUP_PROPOSAL.txt and the user's approval question is pending.
+The overall Atelier/Salon integration goal remains incomplete.

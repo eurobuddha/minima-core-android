@@ -325,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
                 unreadCache = unread;
                 if (fc > 0) {
                     if (screen == Screen.MESSAGES || screen == Screen.THREAD) render();
-                    else { buildNav(); toast("💬 " + (fc == 1 ? "@" + lf.replaceFirst("^@", "") + ": " + lb : fc + " new messages")); }
+                    else { buildNav(); toast(Language.join("💬 ", fc == 1 ? "@" + lf.replaceFirst("^@", "") + ": " + lb : Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_chat_new_messages, fc))); }
                 } else buildNav();
             });
         }));
@@ -3746,7 +3746,7 @@ public class MainActivity extends AppCompatActivity {
         Hosting.put(p.cfg(), "endpoint", BlossomUploader.DEFAULT_SERVER);
         saveHost(p);
         HostingStore.setDefault(this, p.id());
-        toast("Blossom hosting ready — now claim your handle.");
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_blossom_ready));
         render();
     }
 

@@ -8289,4 +8289,5 @@
     <string name="l10n_salon_restore_storage" formatted="false">"Не удалось сохранить восстановленную страницу. Проверьте память устройства и повторите попытку."</string>
     <string name="l10n_salon_restore_unavailable" formatted="false">"Восстановление страницы недоступно. Откройте Salon заново и повторите попытку."</string>
     <string name="l10n_salon_restore_invalid" formatted="false">"Размещённая страница содержит некорректные данные или принадлежит другой личности. Ничего не восстановлено."</string>
+    <string name="l10n_salon_setup_blossom_ready" formatted="false">"Хостинг Blossom готов. Теперь можно зарегистрировать своё имя."</string>
 </resources>

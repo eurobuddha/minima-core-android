@@ -8217,4 +8217,5 @@
     <string name="l10n_salon_restore_storage" formatted="false">"Could not save the restored page. Check device storage and try again."</string>
     <string name="l10n_salon_restore_unavailable" formatted="false">"Page restore is unavailable. Reopen Salon and try again."</string>
     <string name="l10n_salon_restore_invalid" formatted="false">"The hosted page has invalid content or belongs to another identity. Nothing was restored."</string>
+    <string name="l10n_salon_setup_blossom_ready" formatted="false">"Blossom hosting is ready. You can now claim your handle."</string>
 </resources>

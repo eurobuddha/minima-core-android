@@ -1,0 +1,43 @@
+Salon spare-identity cleanup — proposed change awaiting authorization
+
+Current code
+integrated/salon/src/main/java/com/eurobuddha/salon/MainActivity.java:
+burnSpares and burnOne already send one unit of each spare identity token to the
+constant GRAVEYARD after a confirmation dialog. This proposal does not add a new
+burn capability or change its destination or amount.
+
+Observed problems
+- The confirmation captures the current identity before asynchronous balance
+  lookup, but does not check it again when the confirmation is accepted.
+- Token IDs from the balance are concatenated into the send command without
+  Args validation. Serialized token metadata is skipped, unlike identity adoption.
+- Dialog and outcome messages are English only.
+
+Proposed implementation
+1. Expose the existing IdentityBalance parser's complete validated row list to
+   both adoption and cleanup. Preserve find's behavior; add a spare-list operation
+   that excludes the active identity case-insensitively, deduplicates token IDs and
+   rejects the native currency/zero token ID.
+2. Capture account identity, node instance and render generation before lookup.
+   Recheck them before displaying confirmation and immediately before dispatch.
+3. Consume each confirmation and callback once. Ignore responses after navigation,
+   account replacement or Activity destruction. Do not retry transfers automatically.
+4. Reuse LanguageDialog for the same confirmation and actions, with English,
+   Simplified Chinese, Russian and Ukrainian messages that update while open.
+5. Retain the current command amount and graveyard address. Say submitted and
+   confirmation pending on acceptance; say outcome unconfirmed on transport error.
+6. Test with a mocked NodeApi: no live node, signing, wallet transfer or device action.
+
+Review focus
+Prove that current active identity cannot enter the spare list, changed accounts
+cannot use an old dialog, malformed later balance rows invalidate the entire result,
+and language switches do not change IDs, listeners, amount or destination.
+
+Risk boundary
+Existing confirmed cleanup is irreversible. Already dispatched sends cannot be
+cancelled by leaving the screen. This proposal changes code and local tests only;
+it does not authorize executing a cleanup against a user's real wallet.
+
+Status
+Automatic approval review rejected implementation pending explicit user permission.
+No source change or transaction has been performed for this proposal.
