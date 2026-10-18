@@ -2750,3 +2750,17 @@ Summary: reviewed the parser change, version metadata, tests and NodeHealthMonit
 All 396 core test executions pass (131 PandaBear, 131 BlackBear, 134 Pandamonium). All three signed release builds complete with vital lint in 23 seconds. The prior full 2541 host suite remains historical evidence for the unchanged integrations; it is not relabeled as a current full-suite run. The current 559-source map changes only app/build.gradle and adds explicit hashes for NodeHealth and its test; protected sources and node JAR match. Evidence: `build/localization/node-health-locale-validation.json`, before-fix failing report, and `node-health-locale-build.log`. Signed APK verification and copy to established dist follow the source commit.
 
 The inherited optional MySQL result-format finding remains separate and unchanged. Current case/date source review does not close complete text, Fold, wallet/financial or final-release acceptance. Fold was not accessed and remains required for runtime acceptance. Publication remains pending.
+
+
+## Signed 1.9.44 health-fix candidates — 2026-10-18
+
+Committed/pushed source `9f155da9394023abe218d6571cdc322421bab3f3` includes the locale-safe node-health size parser and version 1.9.44/vc115. All three APKs passed the existing release verification recipe, adapted for the new version, 559-source checkpoint and unique output filenames. Certificates match 1.9.41; package/version, non-debuggable status, arm64-v8a ABI, 16KiB ZIP alignment, declared en/zh-Hans/ru/uk locales and all 5301 compiled messages per language were verified. Final dist APK hashes and sidecars were checked after copy.
+
+Artifacts: `/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-{PandaBear,BlackBear,Pandamonium}-1.9.44-candidate.apk`. Manifest: `bear-languages-1.9.44-candidate.json`; evidence: `build/localization/signed-candidates-1.9.44-validation.json`; reusable recipe snapshot: `build/localization/verify-signed-candidates-1.9.44.py`. All 1.9.43 artifacts are preserved under their original versioned names, and their manifest points to the superseding 1.9.44 candidate manifest. No public release or device installation occurred.
+
+SHA256:
+- PandaBear: `74ea96e0fb78ed7f15334c1162737da0a49967a8901c58c7eebfa4f3d57b9f1d`
+- BlackBear: `67f5fe9527b4188df1f95d166413ed93a5afe1ff07cf10eb3d51b09b52d9151f`
+- Pandamonium: `146770369fe4a389908f035fb5d2cd31fb60d4a9d56d275bc40ff7e8db16f11c`
+
+The health regression is fixed in all three variants; 396 core test executions pass. The static casing review is recorded for all 160 inventoried sites. Android runtime/state/visual acceptance on Fold, full app-owned text coverage, remaining financial reviews and the optional inherited MySQL result-format disposition remain open. These candidates are not yet approved for publication.
