@@ -2687,3 +2687,20 @@ Current candidates in /Users/eurobuddha/Projects/minima/apks/base/dist:
 Each has a .apk.sha256 sidecar. The colocated bear-languages-1.9.43-candidate.json records current source, signatures, hashes and pending gates. All three new APKs were verified before replacing any dist candidate. The prior 4bc8b62 APKs/checksums/manifest are preserved and re-hashed under dist/candidate-archive/1.9.43-4bc8b6253562; the archive includes a manifest pointing at those preserved files plus the original manifest.
 
 Packaging review: approve the refreshed local candidates. They have not been installed or published. Receipt/chain and consent/lifecycle reviews, Shop/remaining app text, minimaWallet runtime checks, Fold-only acceptance and final authorized publication are still open. If implementation changes again, rebuild the final artifacts. This refresh completes the current signed-build checkpoint, not the overall release goal.
+
+
+## Studio export error language coverage — 2026-10-18
+
+Audited lower-layer literal errors against the current generated message lookups and their callers. The wallet seed/counter/vault errors are already mapped at the display boundary. Future Cash's audit snapshot exceptions are converted to its existing translated wallet-audit failure; Filez's stream-open error already uses FilezMessages. These are narrow verified paths, not complete module coverage.
+
+Two Studio export failures were missing: `Invalid shop filename` and `Cannot create export folder`. Reused StudioMessages, its ShopMessages donor, the bounded wallet message generator adapted from Parlons SystemMessages, and the existing ShopExportTest fixtures. Added only two exact message lookups and English/Chinese/Russian/Ukrainian catalogue entries. The importer reproduces the generated lookup. ShopExport, its validation, file writes, product data and Activity export flow remain unchanged.
+
+### Code Review
+
+Summary: reviewed the adapter, generated lookup, four generated resource files, catalogue and both copies of the export test. The actual filename and folder-creation failures now produce language descriptors while their original exception text stays intact. Unrecognized diagnostics remain literal. Existing export snapshot, count, directory containment and file-preservation checks still pass.
+
+Findings: no blocking issue in this increment. This review does not close the outstanding device, financial or complete text-coverage gates.
+
+Validation: 21 Studio and 12 shared localization JVM tests passed, zero failures/errors/skips; two new regression cases. All three debug variants compile. All 19 pinned imports reproduce, catalogue generation and direct transport verification pass, and git diff --check is clean. The catalogue has 5301 entries in each language. The 557-source validation map changes only the expected nine files; protected engines, wallet audit and node JAR match. Evidence: `build/localization/studio-export-language-validation.json`. Verdict: approve this translation change.
+
+Fold R3GL805K7MB remains unavailable to ADB. No device data was changed. Signed 1.9.43 candidates still correspond to eb82bff and require rebuilding after this source checkpoint. Full language/runtime acceptance and authorized publication remain open.

@@ -75,7 +75,17 @@ def adapt(root):
  change('        idRow.addView(stats);','        idRow.addView(stats, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));')
  p.write_text(s)
  p=folder/'Design.java';s=p.read_text();change('String text,','CharSequence text,');change('0xFF6A6A78','0xFF9A9AA8');change('        t.setText(text);','        com.eurobuddha.minimacore.i18n.Language.setText(t, text);');p.write_text(s)
- source=(root/'merchshop/src/main/java/com/eurobuddha/merchshop/ShopMessages.java').read_text().replace('com.eurobuddha.merchshop','com.eurobuddha.merchstudio').replace('ShopMessages','StudioMessages').replace('Shop local','Studio local').replace('mall-shop-languages.py','mall-studio-languages.py');(folder/'StudioMessages.java').write_text(source)
+ source=(root/'merchshop/src/main/java/com/eurobuddha/merchshop/ShopMessages.java').read_text().replace('com.eurobuddha.merchshop','com.eurobuddha.merchstudio').replace('ShopMessages','StudioMessages').replace('Shop local','Studio local').replace('mall-shop-languages.py','mall-studio-languages.py')
+ # Export failures use the existing bounded diagnostic lookup at the UI boundary.
+ anchor='            case "The embedded node did not respond. Check its status in Minima Core.":'
+ assert source.count(anchor)==1
+ cases=''
+ for raw,key in [('Invalid shop filename','mallStudio.errorShopFilename'),('Cannot create export folder','mallStudio.errorExportFolder')]:
+  assert catalog[key]['en']==raw
+  name='l10n_'+re.sub(r'([a-z0-9])([A-Z])',r'\1_\2',key).replace('.','_').lower()
+  cases+='            case '+json.dumps(raw)+': return Language.msg('+name+');\n'
+ source=source.replace(anchor,cases+anchor)
+ (folder/'StudioMessages.java').write_text(source)
  for res in ['values','values-night']:
   p=root/f'merchstudio/src/main/res/{res}/themes.xml';s=p.read_text();donor=(root/f'merchinbox/src/main/res/{res}/themes.xml').read_text()
   # Preserve this module's resource name; reuse Inbox's reviewed fixed-dark palette.

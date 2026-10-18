@@ -6572,4 +6572,6 @@
     <string name="l10n_atomix_operation_market_changed" formatted="false">"Market changed; refresh and try again."</string>
     <!-- Arguments: 0, 1, 2 -->
     <string name="l10n_atomix_operation_market_stopped">"Sweep stopped — %1$s of %2$s parts done (part %3$s: market changed). Locked parts continue; unmatched parts refund automatically."</string>
+    <string name="l10n_mall_studio_error_shop_filename" formatted="false">"Invalid shop filename"</string>
+    <string name="l10n_mall_studio_error_export_folder" formatted="false">"Cannot create export folder"</string>
 </resources>

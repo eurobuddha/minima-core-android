@@ -32,6 +32,8 @@ public final class StudioMessages {
         if (value == null) return "";
         if (depth >= 8) return value;
         switch(value) {
+            case "Invalid shop filename": return Language.msg(l10n_mall_studio_error_shop_filename);
+            case "Cannot create export folder": return Language.msg(l10n_mall_studio_error_export_folder);
             case "The embedded node did not respond. Check its status in Minima Core.": return Language.msg(l10n_wallet_error_node_timeout);
             case "Node result unavailable. Outcome unknown.": return Language.msg(l10n_wallet_error_node_unknown);
             case "The embedded node is not running. No command was sent.": return Language.msg(l10n_vestr_transport_stopped);

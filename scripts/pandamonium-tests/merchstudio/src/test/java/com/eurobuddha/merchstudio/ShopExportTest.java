@@ -46,4 +46,25 @@ public class ShopExportTest {
    assertEquals(new java.math.BigDecimal(good.toString()).intValueExact(),StateNft.parseMeta(token,record).size);
   }
  }
+ @Test public void exportFailuresProduceLanguageDescriptorsWithoutChangingExceptions()throws Exception{
+  Exception name=assertThrows(IllegalArgumentException.class,()->new ShopExport(shop(),"../outside",Collections.emptyList()));
+  File cache=tmp.newFolder();assertTrue(new File(cache,"shops").createNewFile());
+  ShopExport export=new ShopExport(shop(),"Public-export",Collections.emptyList());
+  Exception folder=assertThrows(IOException.class,()->export.write(cache,i->""));
+  String[] messages={"Invalid shop filename","Cannot create export folder"};
+  int[] resources={com.eurobuddha.minimacore.i18n.R.string.l10n_mall_studio_error_shop_filename,
+    com.eurobuddha.minimacore.i18n.R.string.l10n_mall_studio_error_export_folder};
+  Exception[] errors={name,folder};
+  java.lang.reflect.Field resource=com.eurobuddha.minimacore.i18n.Language.Message.class.getDeclaredField("resource");resource.setAccessible(true);
+  for(int i=0;i<errors.length;i++){
+   CharSequence display=StudioMessages.error(errors[i]);
+   assertTrue(display instanceof com.eurobuddha.minimacore.i18n.Language.Message);
+   assertEquals(resources[i],resource.get(display));assertEquals(messages[i],errors[i].getMessage());
+  }
+  assertArrayEquals(new String[]{"shops"},cache.list());
+ }
+ @Test public void unknownExportDetailsRemainLiteral(){
+  for(String raw:new String[]{"Unknown export failure 中文 Українська $1 {error}","Invalid shop filename: custom.shop","Cannot create export folder\nprivate/path"})
+   assertEquals(raw,StudioMessages.error(new IOException(raw)));
+ }
 }

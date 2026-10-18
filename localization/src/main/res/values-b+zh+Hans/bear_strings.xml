@@ -6541,4 +6541,6 @@
     <string name="l10n_atomix_operation_market_changed" formatted="false">"市场已更改，请刷新后重试。"</string>
     <!-- Arguments: 0, 1, 2 -->
     <string name="l10n_atomix_operation_market_stopped">"批量交易已停止——已完成 %1$s/%2$s 笔（第 %3$s 笔：市场已更改）。已锁定的交易继续进行；未匹配的交易将自动退款。"</string>
+    <string name="l10n_mall_studio_error_shop_filename" formatted="false">"商店文件名无效"</string>
+    <string name="l10n_mall_studio_error_export_folder" formatted="false">"无法创建导出文件夹"</string>
 </resources>

@@ -6634,4 +6634,6 @@
     <string name="l10n_atomix_operation_market_changed" formatted="false">"Ринок змінився. Оновіть дані та спробуйте ще раз."</string>
     <!-- Arguments: 0, 1, 2 -->
     <string name="l10n_atomix_operation_market_stopped">"Серію угод зупинено: виконано %1$s із %2$s частин (частина %3$s: ринок змінився). Заблоковані частини продовжуються; для незнайдених відповідних угод кошти повертаються автоматично."</string>
+    <string name="l10n_mall_studio_error_shop_filename" formatted="false">"Недопустиме ім’я файлу магазину"</string>
+    <string name="l10n_mall_studio_error_export_folder" formatted="false">"Не вдалося створити папку для експорту"</string>
 </resources>

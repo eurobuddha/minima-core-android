@@ -6634,4 +6634,6 @@
     <string name="l10n_atomix_operation_market_changed" formatted="false">"Рынок изменился. Обновите данные и повторите попытку."</string>
     <!-- Arguments: 0, 1, 2 -->
     <string name="l10n_atomix_operation_market_stopped">"Серия сделок остановлена: выполнено %1$s из %2$s частей (часть %3$s: рынок изменился). Заблокированные части продолжаются; для несопоставленных частей средства возвращаются автоматически."</string>
+    <string name="l10n_mall_studio_error_shop_filename" formatted="false">"Недопустимое имя файла магазина"</string>
+    <string name="l10n_mall_studio_error_export_folder" formatted="false">"Не удалось создать папку для экспорта"</string>
 </resources>
