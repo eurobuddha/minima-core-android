@@ -36022,5 +36022,77 @@
     "zh-Hans": "作品无法压缩到已签名记录的 {0} 字节限制，请缩短文本或减少发行份数。",
     "ru": "Изображение не помещается в лимит подписанной записи ({0} Б). Сократите текст или число экземпляров.",
     "uk": "Зображення не вміщується в ліміт підписаного запису ({0} Б). Скоротіть текст або кількість примірників."
+  },
+  "atelierMint.draftChanged": {
+    "en": "The draft or screen changed. Review the details and tap Mint again.",
+    "zh-Hans": "草稿或页面已更改。请检查详情，然后再次点击铸造。",
+    "ru": "Черновик или экран изменился. Проверьте данные и снова нажмите «Выпустить».",
+    "uk": "Чернетка або екран змінилися. Перевірте дані й знову натисніть «Створити»."
+  },
+  "atelierMint.verifyingBusy": {
+    "en": "Hosted URLs are still being checked. Minting continues automatically when verification finishes.",
+    "zh-Hans": "仍在检查托管链接。验证完成后将自动继续铸造。",
+    "ru": "Проверка ссылок ещё идёт. Выпуск продолжится автоматически после её завершения.",
+    "uk": "Перевірка посилань ще триває. Створення продовжиться автоматично після її завершення."
+  },
+  "atelierMint.slowVerification": {
+    "en": "Fresh Arweave uploads may take 5–10 minutes to become available. You can hide this dialog; verification will continue.",
+    "zh-Hans": "新上传的 Arweave 文件可能需要 5–10 分钟才能访问。您可以隐藏此窗口，验证会继续进行。",
+    "ru": "Новые файлы Arweave могут стать доступны через 5–10 минут. Можно скрыть это окно: проверка продолжится.",
+    "uk": "Нові файли Arweave можуть стати доступними за 5–10 хвилин. Можна приховати це вікно: перевірка триватиме."
+  },
+  "atelierMint.verifying": {
+    "en": "Verifying…",
+    "zh-Hans": "正在验证…",
+    "ru": "Проверка…",
+    "uk": "Перевірка…"
+  },
+  "atelierMint.verifyTitle": {
+    "en": "Verifying hosted URLs",
+    "zh-Hans": "验证托管链接",
+    "ru": "Проверка ссылок на файлы",
+    "uk": "Перевірка посилань на файли"
+  },
+  "atelierMint.hide": {
+    "en": "Hide",
+    "zh-Hans": "隐藏",
+    "ru": "Скрыть",
+    "uk": "Приховати"
+  },
+  "atelierMint.stop": {
+    "en": "Stop",
+    "zh-Hans": "停止",
+    "ru": "Остановить",
+    "uk": "Зупинити"
+  },
+  "atelierMint.stopping": {
+    "en": "Stopping…",
+    "zh-Hans": "正在停止…",
+    "ru": "Остановка…",
+    "uk": "Зупинення…"
+  },
+  "atelierMint.stopped": {
+    "en": "Verification stopped. Nothing was minted.",
+    "zh-Hans": "验证已停止，未铸造任何内容。",
+    "ru": "Проверка остановлена. Ничего не выпущено.",
+    "uk": "Перевірку зупинено. Нічого не створено."
+  },
+  "atelierMint.progress": {
+    "en": "URL {0} of {1} · attempt {2} · {3}m {4}s elapsed",
+    "zh-Hans": "链接 {0}/{1} · 第 {2} 次尝试 · 已用时 {3} 分 {4} 秒",
+    "ru": "Ссылка {0} из {1} · попытка {2} · прошло {3} мин {4} с",
+    "uk": "Посилання {0} із {1} · спроба {2} · минуло {3} хв {4} с"
+  },
+  "atelierMint.unreachable": {
+    "en": "URL unreachable: {0}",
+    "zh-Hans": "无法访问链接：{0}",
+    "ru": "Ссылка недоступна: {0}",
+    "uk": "Посилання недоступне: {0}"
+  },
+  "atelierMint.verified": {
+    "en": "URLs verified ✓ — starting mint…",
+    "zh-Hans": "链接验证成功 ✓ — 开始铸造…",
+    "ru": "Ссылки проверены ✓ — начинаем выпуск…",
+    "uk": "Посилання перевірено ✓ — починаємо створення…"
   }
 }

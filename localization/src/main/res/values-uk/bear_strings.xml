@@ -7310,4 +7310,18 @@
     <string name="l10n_atelier_create_svg_editions">"За кількості примірників: %1$s."</string>
     <!-- Arguments: 0 -->
     <string name="l10n_atelier_create_art_too_large">"Зображення не вміщується в ліміт підписаного запису (%1$s Б). Скоротіть текст або кількість примірників."</string>
+    <string name="l10n_atelier_mint_draft_changed" formatted="false">"Чернетка або екран змінилися. Перевірте дані й знову натисніть «Створити»."</string>
+    <string name="l10n_atelier_mint_verifying_busy" formatted="false">"Перевірка посилань ще триває. Створення продовжиться автоматично після її завершення."</string>
+    <string name="l10n_atelier_mint_slow_verification" formatted="false">"Нові файли Arweave можуть стати доступними за 5–10 хвилин. Можна приховати це вікно: перевірка триватиме."</string>
+    <string name="l10n_atelier_mint_verifying" formatted="false">"Перевірка…"</string>
+    <string name="l10n_atelier_mint_verify_title" formatted="false">"Перевірка посилань на файли"</string>
+    <string name="l10n_atelier_mint_hide" formatted="false">"Приховати"</string>
+    <string name="l10n_atelier_mint_stop" formatted="false">"Зупинити"</string>
+    <string name="l10n_atelier_mint_stopping" formatted="false">"Зупинення…"</string>
+    <string name="l10n_atelier_mint_stopped" formatted="false">"Перевірку зупинено. Нічого не створено."</string>
+    <!-- Arguments: 0, 1, 2, 3, 4 -->
+    <string name="l10n_atelier_mint_progress">"Посилання %1$s із %2$s · спроба %3$s · минуло %4$s хв %5$s с"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_mint_unreachable">"Посилання недоступне: %1$s"</string>
+    <string name="l10n_atelier_mint_verified" formatted="false">"Посилання перевірено ✓ — починаємо створення…"</string>
 </resources>

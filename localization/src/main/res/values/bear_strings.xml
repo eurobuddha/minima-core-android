@@ -7246,4 +7246,18 @@
     <string name="l10n_atelier_create_svg_editions">"With %1$s editions."</string>
     <!-- Arguments: 0 -->
     <string name="l10n_atelier_create_art_too_large">"Artwork cannot fit the signed record limit of %1$s B. Shorten the text or reduce editions."</string>
+    <string name="l10n_atelier_mint_draft_changed" formatted="false">"The draft or screen changed. Review the details and tap Mint again."</string>
+    <string name="l10n_atelier_mint_verifying_busy" formatted="false">"Hosted URLs are still being checked. Minting continues automatically when verification finishes."</string>
+    <string name="l10n_atelier_mint_slow_verification" formatted="false">"Fresh Arweave uploads may take 5–10 minutes to become available. You can hide this dialog; verification will continue."</string>
+    <string name="l10n_atelier_mint_verifying" formatted="false">"Verifying…"</string>
+    <string name="l10n_atelier_mint_verify_title" formatted="false">"Verifying hosted URLs"</string>
+    <string name="l10n_atelier_mint_hide" formatted="false">"Hide"</string>
+    <string name="l10n_atelier_mint_stop" formatted="false">"Stop"</string>
+    <string name="l10n_atelier_mint_stopping" formatted="false">"Stopping…"</string>
+    <string name="l10n_atelier_mint_stopped" formatted="false">"Verification stopped. Nothing was minted."</string>
+    <!-- Arguments: 0, 1, 2, 3, 4 -->
+    <string name="l10n_atelier_mint_progress">"URL %1$s of %2$s · attempt %3$s · %4$sm %5$ss elapsed"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_mint_unreachable">"URL unreachable: %1$s"</string>
+    <string name="l10n_atelier_mint_verified" formatted="false">"URLs verified ✓ — starting mint…"</string>
 </resources>

@@ -113,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     private boolean nftEmbed = true;
     private boolean nftSign = true;
     private boolean nftBusy = false;
+    private boolean collectionBusy = false;
+    private long screenGeneration;
     private final ArrayList<String[]> nftTraits = new ArrayList<>();
     private String traitTypeDraft = "", traitValueDraft = "";
 
@@ -265,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     @Override protected void onDestroy() {
+        verifyGateCancel = true;
         main.removeCallbacks(rePair);
         main.removeCallbacks(mintLoop);
         if (node != null) node.onDestroy();
@@ -365,6 +368,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     private void setScreen(Screen s, Runnable back) {
+        screenGeneration++;
         screen = s;
         backAction = back;
         inlineStatus = null;
@@ -1642,6 +1646,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     private void createCollection(EditText name, EditText desc, EditText size, EditText base,
                                   EditText ext, EditText icon, EditText external, EditText web) {
+        if (collectionBusy) return;
         saveCollectionDraft(name, desc, size, base, ext, icon, external, web);
         String n = name.getText().toString().trim();
         String d = desc.getText().toString().trim();
@@ -1675,14 +1680,18 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         // for THIS collection (nothing recorded, or it no longer matches), it may point at a
         // DIFFERENT collection's images that merely happen to serve — the Gilbert & George
         // incident, where a live-but-wrong base sailed through verify-before-mint. Confirm intent.
-        if ("url".equals(createMode) && !mintBaseConfirmed
+        if ("url".equals(createMode) && !mintDraftSnapshot(2).equals(confirmedCollectionDraft)
                 && (createUploadedBase.isEmpty() || !bs.equals(createUploadedBase))) {
+            final String confirmationDraft = mintDraftSnapshot(2);
+            final long confirmationScreen = screenGeneration;
             new android.app.AlertDialog.Builder(this)
                     .setTitle("Use this Base URL?")
                     .setMessage("These images weren't uploaded for this collection here — the Base URL may point at a different set:\n\n"
                             + bs + "1" + x
                             + "\n\nTo use your own pictures, tap “Upload plates” first. Mint with this URL anyway?")
-                    .setPositiveButton("Mint anyway", (dg, wch) -> { mintBaseConfirmed = true;
+                    .setPositiveButton("Mint anyway", (dg, wch) -> {
+                            if (confirmationScreen != screenGeneration || !confirmationDraft.equals(mintDraftSnapshot(2))) { mintDraftChanged(); return; }
+                            confirmedCollectionDraft = confirmationDraft;
                             createCollection(name, desc, size, base, ext, icon, external, web); })
                     .setNegativeButton("Cancel", null)
                     .show();
@@ -1700,13 +1709,14 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             if (!urls.isEmpty()) {
                 verifyHostedThen(urls,
                         () -> { hostGatePassed = true;
-                                createCollection(name, desc, size, base, ext, icon, external, web); },
+                                try { createCollection(name, desc, size, base, ext, icon, external, web); }
+                                finally { hostGatePassed = false; } },
                         badMsg -> offerUploadedBaseRecovery(bs, extValue, badMsg));
                 return;
             }
         }
         hostGatePassed = false;
-        mintBaseConfirmed = false;
+        confirmedCollectionDraft = null;
         // auto web-validation: derive a path on the default hosting profile and
         // bake its URL into the token now; the engine writes the tokenid there
         // once minting reveals it
@@ -1721,10 +1731,15 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         final String bsF = bs, icF = ic, exF = ex, wF = effWeb, nF = n, dF = d;
         final String wvRelF = wvRel; final boolean wvAutoF = wvAuto;
         final int countF = count;
+        final String collectionDraft = mintDraftSnapshot(2);
+        final long collectionScreen = screenGeneration;
+        collectionBusy = true;
         node.cmd("getaddress", new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) {
-                JSONObject r = json.optJSONObject("response");
-                if (r == null) { toast("getaddress failed"); return; }
+                collectionBusy = false;
+                if (collectionScreen != screenGeneration || !collectionDraft.equals(mintDraftSnapshot(2))) { mintDraftChanged(); return; }
+                JSONObject r = json == null || !Boolean.TRUE.equals(json.opt("status")) ? null : json.optJSONObject("response");
+                if (r == null || r.optString("publickey").isEmpty() || r.optString("address").isEmpty()) { toast("getaddress failed"); return; }
                 StateNft.Meta m = new StateNft.Meta();
                 m.localId = LocalStore.nextId(MainActivity.this);
                 m.name = nF;
@@ -1855,7 +1870,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 loadLocalCollections();
                 openCollection(findCollectionByLocalId(m.localId, m));
             }
-            @Override public void onError(String message) { toast(message); }
+            @Override public void onError(String message) { collectionBusy = false; toast(message); }
         });
     }
 
@@ -2031,28 +2046,11 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             if (!nftEmbed && nftUrl.trim().startsWith("http")) urls.add(nftUrl.trim());
             if (!nftExternal.trim().isEmpty()) urls.add(nftExternal.trim());
             // nftWeb (validation doc) is NOT gated — written post-mint with the tokenid
-            if (!urls.isEmpty()) { verifyHostedThen(urls, () -> { hostGatePassed = true; mintNft(go); }); return; }
+            if (!urls.isEmpty()) { verifyHostedThen(urls, () -> { hostGatePassed = true; try { mintNft(go); } finally { hostGatePassed = false; } }); return; }
         }
         hostGatePassed = false;
         nftBusy = true;
         Language.setText(go, Language.upper(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_minting)));
-        NodeApi.Cb fin = new NodeApi.Cb() {
-            @Override public void onResult(JSONObject json) {
-                nftBusy = false;
-                if (!json.optBoolean("status", false)) {
-                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_mint_failed, json.isNull("error") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_node_refused) : json.optString("error")));
-                    renderCreateNft();
-                    return;
-                }
-                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_nft_minted));
-                nftName = ""; nftDesc = ""; nftImage = ""; nftUrl = ""; nftExternal = ""; nftWeb = ""; nftEditions = "1";
-                nftTraits.clear();
-                traitTypeDraft = ""; traitValueDraft = "";
-                LocalStore.clearDraft(MainActivity.this, "nft");
-                renderGallery();
-            }
-            @Override public void onError(String message) { nftBusy = false; toast(message); renderCreateNft(); }
-        };
         final org.json.JSONArray attrs = StateNft.traitsToAttributes(nftTraits);
         /* ALWAYS SIGNED: the artwork rides inside the token record with the
          * 8.4KB signature. editions>1 must also split (3 records/txn);
@@ -2069,14 +2067,14 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 if ("image/svg+xml".equals(ImageTools.mimeOf(nftImage))) {
                     nftBusy = false;
                     toast(Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_svg_too_large, nftImage.length(), artBudget), editions > 1 ? Language.join(" ", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_svg_editions, editions)) : ""));
-                    renderCreateNft();
+                    if (screen == Screen.CREATE_NFT) renderCreateNft();
                     return;
                 }
                 String out = ImageTools.recompressBase64(nftImage, Math.max(1500, artBudget));
                 if (out.isEmpty() || out.length() > artBudget) {
                     nftBusy = false;
                     toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_art_too_large, artBudget));
-                    renderCreateNft();
+                    if (screen == Screen.CREATE_NFT) renderCreateNft();
                     return;
                 }
                 nftImage = out;
@@ -2084,16 +2082,39 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_art_shrunk));
             }
         }
-        final String urlF = urlFit;
+        final String submittedDraft = mintDraftSnapshot(0);
+        final String mintCommand = StateNft.nftCreateCommand(n, nftDesc.trim(), urlFit, nftOwner.trim(),
+                nftExternal.trim(), nftWeb.trim(), attrs, editions, "");
+        NodeApi.Cb fin = new NodeApi.Cb() {
+            @Override public void onResult(JSONObject json) {
+                nftBusy = false;
+                if (!json.optBoolean("status", false)) {
+                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_mint_failed, json.isNull("error") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_node_refused) : json.optString("error")));
+                    if (screen == Screen.CREATE_NFT) renderCreateNft();
+                    return;
+                }
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_nft_minted));
+                if (!submittedDraft.equals(mintDraftSnapshot(0))) {
+                    if (screen == Screen.CREATE_NFT) renderCreateNft();
+                    return;
+                }
+                nftName = ""; nftDesc = ""; nftImage = ""; nftUrl = ""; nftExternal = ""; nftWeb = ""; nftEditions = "1";
+                nftTraits.clear();
+                traitTypeDraft = ""; traitValueDraft = "";
+                LocalStore.clearDraft(MainActivity.this, "nft");
+                if (screen == Screen.CREATE_NFT) renderGallery();
+            }
+            @Override public void onError(String message) { nftBusy = false; toast(message); if (screen == Screen.CREATE_NFT) renderCreateNft(); }
+        };
+
         node.cmd("getaddress", new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) {
-                JSONObject r = json.optJSONObject("response");
+                JSONObject r = json == null || !Boolean.TRUE.equals(json.opt("status")) ? null : json.optJSONObject("response");
                 String pk = r == null ? "" : r.optString("publickey", "");
-                if (pk.isEmpty()) { nftBusy = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_key_failed)); renderCreateNft(); return; }
-                node.cmd(StateNft.nftCreateCommand(n, nftDesc.trim(), urlF, nftOwner.trim(),
-                        nftExternal.trim(), nftWeb.trim(), attrs, editions, pk), fin);
+                if (pk.isEmpty()) { nftBusy = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_key_failed)); if (screen == Screen.CREATE_NFT) renderCreateNft(); return; }
+                node.cmd(mintCommand + " signtoken:" + pk, fin);
             }
-            @Override public void onError(String message) { nftBusy = false; toast(message); renderCreateNft(); }
+            @Override public void onError(String message) { nftBusy = false; toast(message); if (screen == Screen.CREATE_NFT) renderCreateNft(); }
         });
     }
 
@@ -2196,7 +2217,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         if (!hostGatePassed && tokUrl.trim().startsWith("http")) {
             java.util.List<String> urls = new java.util.ArrayList<>();
             urls.add(tokUrl.trim());
-            verifyHostedThen(urls, () -> { hostGatePassed = true; mintToken(go); });
+            verifyHostedThen(urls, () -> { hostGatePassed = true; try { mintToken(go); } finally { hostGatePassed = false; } });
             return;
         }
         hostGatePassed = false;
@@ -2220,46 +2241,48 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 } else {
                     tokBusy = false;
                     toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_icon_too_large));
-                    renderCreateToken();
+                    if (screen == Screen.CREATE_TOKEN) renderCreateToken();
                     return;
                 }
             } else if (probe.length() + MintEngine.DEF_SIGN_WEIGHT > MintEngine.DEF_SPLIT_MAX) {
                 tokBusy = false;
                 toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_record_too_large));
-                renderCreateToken();
+                if (screen == Screen.CREATE_TOKEN) renderCreateToken();
                 return;
             }
         }
-        final String iconFitF = iconFit;
-        final String nF = n;
-        final long supplyF = supply;
-        final int decF = dec;
+        final String submittedDraft = mintDraftSnapshot(1);
+        final String mintCommand = StateNft.tokenCreateCommand(n, tokDesc.trim(), tokTicker.trim(), iconFit, supply, dec, tokPairs);
         node.cmd("getaddress", new NodeApi.Cb() {
             @Override public void onResult(JSONObject ga) {
-                JSONObject gr = ga.optJSONObject("response");
+                JSONObject gr = ga == null || !Boolean.TRUE.equals(ga.opt("status")) ? null : ga.optJSONObject("response");
                 String pk = gr == null ? "" : gr.optString("publickey", "");
-                if (pk.isEmpty()) { tokBusy = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_key_failed)); renderCreateToken(); return; }
-        node.cmd(StateNft.tokenCreateCommand(nF, tokDesc.trim(), tokTicker.trim(), iconFitF, supplyF, decF, tokPairs)
+                if (pk.isEmpty()) { tokBusy = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_key_failed)); if (screen == Screen.CREATE_TOKEN) renderCreateToken(); return; }
+        node.cmd(mintCommand
                         + " signtoken:" + pk,
                 new NodeApi.Cb() {
                     @Override public void onResult(JSONObject json) {
                         tokBusy = false;
                         if (!json.optBoolean("status", false)) {
                             toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_mint_failed, json.isNull("error") ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_node_refused) : json.optString("error")));
-                            renderCreateToken();
+                            if (screen == Screen.CREATE_TOKEN) renderCreateToken();
                             return;
                         }
                         toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_token_minted));
+                        if (!submittedDraft.equals(mintDraftSnapshot(1))) {
+                            if (screen == Screen.CREATE_TOKEN) renderCreateToken();
+                            return;
+                        }
                         tokName = ""; tokTicker = ""; tokDesc = ""; tokUrl = ""; tokIcon = "";
                         tokPairs.clear();
                         pairKeyDraft = ""; pairValueDraft = "";
                         LocalStore.clearDraft(MainActivity.this, "token");
-                        renderGallery();
+                        if (screen == Screen.CREATE_TOKEN) renderGallery();
                     }
-                    @Override public void onError(String message) { tokBusy = false; toast(message); renderCreateToken(); }
+                    @Override public void onError(String message) { tokBusy = false; toast(message); if (screen == Screen.CREATE_TOKEN) renderCreateToken(); }
                 });
             }
-            @Override public void onError(String message) { tokBusy = false; toast(message); renderCreateToken(); }
+            @Override public void onError(String message) { tokBusy = false; toast(message); if (screen == Screen.CREATE_TOKEN) renderCreateToken(); }
         });
     }
 
@@ -4043,85 +4066,119 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         return b;
     }
 
+    // Only set during the synchronous, draft-checked verification continuation.
     private boolean hostGatePassed = false;
-    private boolean mintBaseConfirmed = false;   // user okayed a Base URL not from this collection's upload
+    private String confirmedCollectionDraft;
 
-    /** Verify every hosted URL the mint will seal, off the main thread, then
-     *  run onOk on the main thread. Any failure names the exact URL. */
+    /** Reuse persisted draft structure; include pending fields that must survive completion. */
+    private String mintDraftSnapshot(int kind) {
+        JSONObject draft = buildDraftJsons()[kind];
+        if (kind == 0) {
+            put(draft, "pendingType", traitTypeDraft); put(draft, "pendingValue", traitValueDraft);
+        } else if (kind == 1) {
+            put(draft, "pendingKey", pairKeyDraft); put(draft, "pendingValue", pairValueDraft);
+        } else {
+            put(draft, "wvAuto", createWvAuto);
+            put(draft, "itemTraits", collectionItemTraits);
+        }
+        return draft.toString();
+    }
+
+    private int mintDraftKind() {
+        return screen == Screen.CREATE_NFT ? 0 : screen == Screen.CREATE_TOKEN ? 1 : 2;
+    }
+
+    private void mintDraftChanged() {
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_draft_changed));
+    }
+
     private interface HostFail { void onFail(String msg); }
-
     private void verifyHostedThen(java.util.List<String> urls, Runnable onOk) {
         verifyHostedThen(urls, onOk, this::toast);
     }
-
     private volatile boolean verifyGateRunning = false;
     private volatile boolean verifyGateCancel = false;
 
+    /** Same hosted verifier/deadline as the standalone app, bound to this draft and screen. */
     private void verifyHostedThen(java.util.List<String> urls, Runnable onOk, HostFail onFail) {
         if (verifyGateRunning) {
-            toast("Still verifying your hosted URLs — hold on, fresh Arweave uploads can take up to 10 minutes. Minting continues automatically when they resolve.");
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_verifying_busy));
             return;
         }
+        final int kind = mintDraftKind();
+        final String draft = mintDraftSnapshot(kind);
+        final long generation = screenGeneration;
+        final java.util.List<String> checkedUrls = new java.util.ArrayList<>(urls);
         verifyGateRunning = true;
         verifyGateCancel = false;
         final Hosting.Profile p = HostingStore.getDefault(this);
         final boolean slow = p != null && Hosting.TYPE_ARWEAVE.equals(p.type());
-        LocalStore.logEvent(this, "MINT GATE start (" + urls.size() + " urls, type="
-                + (p == null ? "none" : p.type()) + "): " + urls);
-
-        // Live progress dialog — the gate can legitimately run ~10 min on Arweave.
-        // "Hide" backgrounds it (verification continues, completion toasts);
-        // "Stop" aborts the mint attempt cleanly.
-        final TextView msgV = Design.note(this, slow
-                ? "Fresh Arweave uploads take ~5–10 minutes to start serving. Verifying…"
-                : "Verifying…");
+        LocalStore.logEvent(this, "MINT GATE start (" + checkedUrls.size() + " urls, type="
+                + (p == null ? "none" : p.type()) + "): " + checkedUrls);
+        final TextView msgV = Design.note(this, Language.msg(slow
+                ? com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_slow_verification
+                : com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_verifying));
         msgV.setPadding(dp(20), dp(14), dp(20), dp(6));
-        android.app.AlertDialog dlg = null;
+        androidx.appcompat.app.AlertDialog dlg = null;
         try {
-            dlg = new android.app.AlertDialog.Builder(this)
-                    .setTitle("Verifying hosted URLs")
-                    .setView(msgV)
-                    .setCancelable(false)
-                    .setPositiveButton("Hide", null)
-                    .setNegativeButton("Stop", (d, w) -> { verifyGateCancel = true; toast("Stopping…"); })
-                    .show();
-        } catch (Throwable ignored) { }   // activity going away — thread still reports via log
-        final android.app.AlertDialog dlgF = dlg;
-
-        // ONE deadline shared across the whole batch — N urls can't each burn 10 min.
+            dlg = new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                    .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_verify_title))
+                    .setView(msgV).setCancelable(false)
+                    .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_hide), null)
+                    .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_stop), null).show();
+        } catch (RuntimeException unavailable) {
+            verifyGateRunning = false;
+            return; // No invisible, uncancellable mint attempt if the activity cannot show the gate.
+        }
+        final androidx.appcompat.app.AlertDialog dlgF = dlg;
+        // VoiceRecordDialog pattern: cancel synchronously in the click handler, before queued completion.
+        dlgF.getButton(android.content.DialogInterface.BUTTON_NEGATIVE).setOnClickListener(v -> {
+            verifyGateCancel = true;
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_stopping));
+            dlgF.dismiss();
+        });
         final long deadline = System.currentTimeMillis() + 12L * 60 * 1000;
         final long began = System.currentTimeMillis();
         new Thread(() -> {
             String bad = null;
-            for (int i = 0; i < urls.size(); i++) {
-                final String u = urls.get(i);
-                final int idx = i + 1, n = urls.size();
+            for (int i = 0; i < checkedUrls.size(); i++) {
+                if (verifyGateCancel) break;
+                final String u = checkedUrls.get(i);
+                final int idx = i + 1, n = checkedUrls.size();
                 try {
                     Hosting.verifyUrl(u, p, slow ? deadline : 0, (url, attempt, elapsedMs) -> {
                         if (verifyGateCancel) return false;
                         long el = (System.currentTimeMillis() - began) / 1000;
-                        final String line = "URL " + idx + " of " + n + " — attempt " + attempt
-                                + " · " + (el / 60) + "m " + (el % 60) + "s elapsed\n\n" + url
-                                + (slow ? "\n\nFresh Arweave uploads take ~5–10 minutes to start serving."
-                                        + " You can Hide this — minting continues automatically." : "");
-                        main.post(() -> { try { msgV.setText(line); } catch (Throwable ignored) { } });
+                        final CharSequence line = Language.join(
+                                Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_progress, idx, n, attempt, el / 60, el % 60),
+                                "\n\n", url, slow ? Language.join("\n\n", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_slow_verification)) : "");
+                        main.post(() -> { if (!verifyGateCancel) Language.setText(msgV, line); });
                         return true;
                     });
                     LocalStore.logEvent(this, "MINT GATE ok " + idx + "/" + n + " — " + u);
                 } catch (Hosting.HostingException e) { bad = e.getMessage(); break; }
-                catch (Throwable t) { bad = "URL unreachable: " + u; break; }
+                catch (Throwable t) { bad = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_unreachable, u).toString(); break; }
             }
             final String err = bad;
             final long took = (System.currentTimeMillis() - began) / 1000;
             main.post(() -> {
                 verifyGateRunning = false;
-                if (dlgF != null) { try { dlgF.dismiss(); } catch (Throwable ignored) { } }
+                if (dlgF != null) { try { dlgF.dismiss(); } catch (RuntimeException ignored) { } }
+                if (isFinishing() || isDestroyed()) return;
+                // Stop can land after the final HTTP response but before this main-thread callback.
+                if (verifyGateCancel) {
+                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_stopped));
+                    return;
+                }
+                if (generation != screenGeneration || !draft.equals(mintDraftSnapshot(kind))) {
+                    mintDraftChanged(); return;
+                }
                 if (err != null) {
                     LocalStore.logEvent(this, "MINT GATE FAILED after " + took + "s: " + err);
                     onFail.onFail(err);
                 } else {
                     LocalStore.logEvent(this, "MINT GATE passed in " + took + "s");
-                    toast("URLs verified ✓ — minting…");
+                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_mint_verified));
                     onOk.run();
                 }
             });

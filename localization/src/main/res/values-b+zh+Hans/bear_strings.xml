@@ -7214,4 +7214,18 @@
     <string name="l10n_atelier_create_svg_editions">"发行份数为 %1$s。"</string>
     <!-- Arguments: 0 -->
     <string name="l10n_atelier_create_art_too_large">"作品无法压缩到已签名记录的 %1$s 字节限制，请缩短文本或减少发行份数。"</string>
+    <string name="l10n_atelier_mint_draft_changed" formatted="false">"草稿或页面已更改。请检查详情，然后再次点击铸造。"</string>
+    <string name="l10n_atelier_mint_verifying_busy" formatted="false">"仍在检查托管链接。验证完成后将自动继续铸造。"</string>
+    <string name="l10n_atelier_mint_slow_verification" formatted="false">"新上传的 Arweave 文件可能需要 5–10 分钟才能访问。您可以隐藏此窗口，验证会继续进行。"</string>
+    <string name="l10n_atelier_mint_verifying" formatted="false">"正在验证…"</string>
+    <string name="l10n_atelier_mint_verify_title" formatted="false">"验证托管链接"</string>
+    <string name="l10n_atelier_mint_hide" formatted="false">"隐藏"</string>
+    <string name="l10n_atelier_mint_stop" formatted="false">"停止"</string>
+    <string name="l10n_atelier_mint_stopping" formatted="false">"正在停止…"</string>
+    <string name="l10n_atelier_mint_stopped" formatted="false">"验证已停止，未铸造任何内容。"</string>
+    <!-- Arguments: 0, 1, 2, 3, 4 -->
+    <string name="l10n_atelier_mint_progress">"链接 %1$s/%2$s · 第 %3$s 次尝试 · 已用时 %4$s 分 %5$s 秒"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_mint_unreachable">"无法访问链接：%1$s"</string>
+    <string name="l10n_atelier_mint_verified" formatted="false">"链接验证成功 ✓ — 开始铸造…"</string>
 </resources>

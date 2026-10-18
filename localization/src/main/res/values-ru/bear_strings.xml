@@ -7310,4 +7310,18 @@
     <string name="l10n_atelier_create_svg_editions">"При количестве экземпляров: %1$s."</string>
     <!-- Arguments: 0 -->
     <string name="l10n_atelier_create_art_too_large">"Изображение не помещается в лимит подписанной записи (%1$s Б). Сократите текст или число экземпляров."</string>
+    <string name="l10n_atelier_mint_draft_changed" formatted="false">"Черновик или экран изменился. Проверьте данные и снова нажмите «Выпустить»."</string>
+    <string name="l10n_atelier_mint_verifying_busy" formatted="false">"Проверка ссылок ещё идёт. Выпуск продолжится автоматически после её завершения."</string>
+    <string name="l10n_atelier_mint_slow_verification" formatted="false">"Новые файлы Arweave могут стать доступны через 5–10 минут. Можно скрыть это окно: проверка продолжится."</string>
+    <string name="l10n_atelier_mint_verifying" formatted="false">"Проверка…"</string>
+    <string name="l10n_atelier_mint_verify_title" formatted="false">"Проверка ссылок на файлы"</string>
+    <string name="l10n_atelier_mint_hide" formatted="false">"Скрыть"</string>
+    <string name="l10n_atelier_mint_stop" formatted="false">"Остановить"</string>
+    <string name="l10n_atelier_mint_stopping" formatted="false">"Остановка…"</string>
+    <string name="l10n_atelier_mint_stopped" formatted="false">"Проверка остановлена. Ничего не выпущено."</string>
+    <!-- Arguments: 0, 1, 2, 3, 4 -->
+    <string name="l10n_atelier_mint_progress">"Ссылка %1$s из %2$s · попытка %3$s · прошло %4$s мин %5$s с"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_mint_unreachable">"Ссылка недоступна: %1$s"</string>
+    <string name="l10n_atelier_mint_verified" formatted="false">"Ссылки проверены ✓ — начинаем выпуск…"</string>
 </resources>
