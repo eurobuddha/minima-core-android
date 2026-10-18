@@ -3959,7 +3959,7 @@
     <string name="l10n_nft_tools_review_again" formatted="false">"Selected coins changed or are unavailable. Review the selection and try again."</string>
     <string name="l10n_nft_history_empty_filter" formatted="false">"No transactions match this filter."</string>
     <string name="l10n_nft_history_export" formatted="false">"⇩ Export"</string>
-    <string name="l10n_nft_history_export_help" formatted="false">"Shares the rows currently shown, using the active filter."</string>
+    <string name="l10n_nft_history_export_help" formatted="false">"Exports downloaded on-chain history using the selected filter. Local activity is shown separately."</string>
     <!-- Arguments: format -->
     <string name="l10n_nft_history_export_subject">"NFT Wallet history export (%1$s)"</string>
     <string name="l10n_nft_history_no_export_app" formatted="false">"No app can receive the export."</string>
@@ -6561,4 +6561,12 @@
     <!-- Arguments: address -->
     <string name="l10n_mall_inbox_resume_help">"Resume this delivery to %1$s. Pending or unknown transfers will be checked without sending them again."</string>
     <string name="l10n_mall_inbox_reply_save_failed" formatted="false">"The reply could not be saved. Your draft is still here."</string>
+    <string name="l10n_nft_history_local_activity" formatted="false">"Local activity"</string>
+    <string name="l10n_nft_history_node_history" formatted="false">"On-chain history"</string>
+    <string name="l10n_nft_history_preparing" formatted="false">"Preparing transaction…"</string>
+    <string name="l10n_nft_history_not_submitted" formatted="false">"Not submitted"</string>
+    <string name="l10n_nft_history_confirmed" formatted="false">"Confirmed"</string>
+    <string name="l10n_nft_history_unverified_status" formatted="false">"Outcome unverified"</string>
+    <string name="l10n_nft_history_requested_amount" formatted="false">"Requested amount"</string>
+    <string name="l10n_nft_history_local_id" formatted="false">"Local reference"</string>
 </resources>

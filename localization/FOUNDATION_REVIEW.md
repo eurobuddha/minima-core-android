@@ -2524,3 +2524,20 @@ Summary: reviewed DistributeJob, DistributeManager, the lifecycle hook and adapt
 Validation: 258 NFT Wallet and 12 shared localization JVM cases pass (270 total, zero failures/errors/skips). The distribution cases include confirmed restart, failed saves/clears, concurrent controllers, late callbacks, malformed/altered saved plans, repeated recipients, Unicode names and exhausted retries. All three debug variants and the Pandamonium instrumentation APK build; instrumentation was compiled, not run. All 19 pinned imports reproduce, direct transport verification passes, and 5289 catalogue messages validate across four languages. Protected financial source maps, minimaWallet audit hashes and the node JAR remain unchanged. Detailed checkpoint: build/localization/nft-distribution-validation.json (529 source hashes).
 
 Verdict: approve this scoped confirmation/restart increment. Legacy-job reconciliation remains a compatibility limitation; malformed records remain held. These host tests do not establish real-chain execution or Fold acceptance. Candidate remains 1.9.43/vc114. No device changes, signing, push or publication. The remaining release checklist is still open.
+
+
+## NFT local activity history — 2026-10-18
+
+Previous turn completed distribution validation in 2e8a862. Current-source review confirmed that NFT History rendered only loadNodeTx, hiding its persisted local audit rows. Read the current full HistoryView and HistoryDb, transaction recovery/recording, journal tests, shared language bindings, and UTXO HistoryView/local-row helpers and localization tests. Reused UTXO's local row and detail presentation with NFT Wallet's existing Sheet/copy helpers. Its input-overlap resolver and dismiss/delete action do not fit the exact NFT journal contract and were not imported.
+
+LocalHistory is a read-only projection of the existing local rows and validated attempts. Journal phases override stale display status. Missing/unreadable journal evidence stays unverified. Exact confirmed rows are suppressed from the local section only once their transaction ID is present in downloaded node history; the database records remain intact. Tapping reloads the outcome before opening details. No retry, delete or financial mutation is exposed. Amounts and token names remain literal; local amount labels do not claim a completed debit. Inputs are labelled as inputs, not spent inputs. The existing 1000-row History display bound also applies to local records; older records remain stored.
+
+Added eight labels in English, Simplified Chinese, Russian and Ukrainian, and clarified that export uses filtered downloaded on-chain history. Status and detail labels use rebindable Language messages; export payloads and node parsing are unchanged. No database schema, transaction journal, recovery, signing or ownership-check implementation changed.
+
+### Code Review
+
+Summary: local pending and interrupted activity is now visible without weakening the evidence needed to call it confirmed. No blocking issue identified in the changed presentation/projection paths. Validated the six phases, corrupt journal fallback, legacy records, exact duplicate suppression, database reopen and fresh details. Widget doubles exercise the actual render/click methods; they are not visual acceptance.
+
+Validation: 266 NFT Wallet plus 12 shared localization JVM cases pass (278 total, zero failures/errors/skips). All three debug APKs and the Pandamonium instrumentation APK build. All 19 pinned imports reproduce; direct transport and catalogue checks pass (5297 messages/four languages). Protected financial maps, minimaWallet audit and node-JAR hashes remain unchanged. The prior fresh ownership snippet remains byte-identical. Evidence: build/localization/nft-local-history-validation.json (537 source hashes).
+
+Verdict: approve this scoped local History increment. Read-only ADB check of authorized Fold R3GL805K7MB returned device not found; no package/device data was changed. Remaining review, Fold acceptance, signed versioned artifacts and publication remain open. Candidate remains 1.9.43/vc114; no signing, push or publication.

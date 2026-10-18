@@ -4007,7 +4007,7 @@
     <string name="l10n_nft_tools_review_again" formatted="false">"Выбранные монеты изменились или недоступны. Проверьте выбор и повторите попытку."</string>
     <string name="l10n_nft_history_empty_filter" formatted="false">"Нет транзакций, соответствующих фильтру."</string>
     <string name="l10n_nft_history_export" formatted="false">"⇩ Экспорт"</string>
-    <string name="l10n_nft_history_export_help" formatted="false">"Поделиться отображаемыми записями с учётом выбранного фильтра."</string>
+    <string name="l10n_nft_history_export_help" formatted="false">"Экспорт загруженной истории блокчейна с выбранным фильтром. Локальные операции показаны отдельно."</string>
     <!-- Arguments: format -->
     <string name="l10n_nft_history_export_subject">"Экспорт истории NFT Wallet (%1$s)"</string>
     <string name="l10n_nft_history_no_export_app" formatted="false">"Нет приложения для получения экспорта."</string>
@@ -6623,4 +6623,12 @@
     <!-- Arguments: address -->
     <string name="l10n_mall_inbox_resume_help">"Продолжить доставку на %1$s. Ожидающие переводы и переводы с неизвестным результатом будут проверены без повторной отправки."</string>
     <string name="l10n_mall_inbox_reply_save_failed" formatted="false">"Не удалось сохранить ответ. Ваш черновик сохранён в поле ввода."</string>
+    <string name="l10n_nft_history_local_activity" formatted="false">"Локальные операции"</string>
+    <string name="l10n_nft_history_node_history" formatted="false">"История в блокчейне"</string>
+    <string name="l10n_nft_history_preparing" formatted="false">"Подготовка транзакции…"</string>
+    <string name="l10n_nft_history_not_submitted" formatted="false">"Не отправлено"</string>
+    <string name="l10n_nft_history_confirmed" formatted="false">"Подтверждено"</string>
+    <string name="l10n_nft_history_unverified_status" formatted="false">"Результат не проверен"</string>
+    <string name="l10n_nft_history_requested_amount" formatted="false">"Запрошенная сумма"</string>
+    <string name="l10n_nft_history_local_id" formatted="false">"Локальный идентификатор"</string>
 </resources>

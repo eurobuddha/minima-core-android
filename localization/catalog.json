@@ -20418,10 +20418,10 @@
     "uk": "⇩ Експорт"
   },
   "nft.history.exportHelp": {
-    "en": "Shares the rows currently shown, using the active filter.",
-    "zh-Hans": "按当前筛选条件分享当前显示的记录。",
-    "ru": "Поделиться отображаемыми записями с учётом выбранного фильтра.",
-    "uk": "Поділитися показаними записами з урахуванням вибраного фільтра."
+    "en": "Exports downloaded on-chain history using the selected filter. Local activity is shown separately.",
+    "zh-Hans": "按所选筛选条件导出已下载的链上历史记录。本地活动单独显示。",
+    "ru": "Экспорт загруженной истории блокчейна с выбранным фильтром. Локальные операции показаны отдельно.",
+    "uk": "Експорт завантаженої історії блокчейну з вибраним фільтром. Локальні операції показано окремо."
   },
   "nft.history.exportSubject": {
     "en": "NFT Wallet history export ({format})",
@@ -32197,5 +32197,53 @@
     "zh-Hans": "无法保存回复。您的草稿仍然保留。",
     "ru": "Не удалось сохранить ответ. Ваш черновик сохранён в поле ввода.",
     "uk": "Не вдалося зберегти відповідь. Ваша чернетка залишилася в полі введення."
+  },
+  "nft.history.localActivity": {
+    "en": "Local activity",
+    "zh-Hans": "本地活动",
+    "ru": "Локальные операции",
+    "uk": "Локальні операції"
+  },
+  "nft.history.nodeHistory": {
+    "en": "On-chain history",
+    "zh-Hans": "链上历史记录",
+    "ru": "История в блокчейне",
+    "uk": "Історія в блокчейні"
+  },
+  "nft.history.preparing": {
+    "en": "Preparing transaction…",
+    "zh-Hans": "正在准备交易…",
+    "ru": "Подготовка транзакции…",
+    "uk": "Підготовка транзакції…"
+  },
+  "nft.history.notSubmitted": {
+    "en": "Not submitted",
+    "zh-Hans": "未提交",
+    "ru": "Не отправлено",
+    "uk": "Не надіслано"
+  },
+  "nft.history.confirmed": {
+    "en": "Confirmed",
+    "zh-Hans": "已确认",
+    "ru": "Подтверждено",
+    "uk": "Підтверджено"
+  },
+  "nft.history.unverifiedStatus": {
+    "en": "Outcome unverified",
+    "zh-Hans": "结果尚未验证",
+    "ru": "Результат не проверен",
+    "uk": "Результат не перевірено"
+  },
+  "nft.history.requestedAmount": {
+    "en": "Requested amount",
+    "zh-Hans": "请求金额",
+    "ru": "Запрошенная сумма",
+    "uk": "Запитана сума"
+  },
+  "nft.history.localId": {
+    "en": "Local reference",
+    "zh-Hans": "本地参考编号",
+    "ru": "Локальный идентификатор",
+    "uk": "Локальний ідентифікатор"
   }
 }
