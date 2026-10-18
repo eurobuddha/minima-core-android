@@ -1,6 +1,6 @@
 # Four-language bear release
 
-## Current Atelier/Salon integration checkpoint — 1.9.91/162, 2026-10-19
+## Current Atelier/Salon integration checkpoint — 1.9.92/163, 2026-10-19
 
 This section supersedes the older source-version and completion-count snapshots
 below. The active goal remains incomplete. No final integration release has been
@@ -11,7 +11,7 @@ checkpoint performs no device changes.
   the common manual English, Simplified Chinese, Russian and Ukrainian selector.
   Menu identities 17/18, Pandamonium-only dependencies, non-exported activities and
   separate providers remain present. Salon uses the host MaxChat node/media.
-- Current host verification: 806 passing tests across Atelier (288), Salon (348),
+- Current host verification: 831 passing tests across Atelier (288), Salon (373),
   shared localization (12) and Pandamonium host (158). The prior real Chrome FILTR
   and Salon page four-language checks still apply to the unchanged browser assets.
   Host/browser checks do not prove Fold acceptance.
@@ -38,12 +38,15 @@ checkpoint performs no device changes.
   reject stale consent and commit pins before retrying. The 2 GB Salon test heap
   supports the complete suite. Review: `docs/SALON_HOSTING_CHECKS_REVIEW.txt`.
 
+- Salon foreground inbox/tip/key callbacks now retain account and node ownership,
+  validate complete reads and consume replies once. Startup/reconnect/restore
+  begin reads after key readiness. Review: `docs/SALON_NODE_CALLBACKS_REVIEW.txt`.
+
 Remaining before accepting the full goal:
 
-1. Finish account ownership checks for inbound scans and tip callbacks. Salon
-   hosting trust and outgoing-message ownership/durable retries are reviewed.
-2. Finish the hardcoded-label audit, including Atelier's `openMinimaCore()` fallback
-   toast, and finish Atelier's testProfile/confirmHostKey lifecycle guards.
+1. Finish Atelier's testProfile/confirmHostKey lifecycle guards and reuse embedded
+   host navigation in openMinimaCore(). The recorded Salon callback work is reviewed.
+2. Finish the active-label audit while preserving authored content and protocol values.
 3. Build final signed versioned APKs after review; verify actual packages, certificate,
    embedded Keets components, language resources, assets and version metadata.
 4. Run the authorized Fold navigation, four-language visual/retained-input, WebView,

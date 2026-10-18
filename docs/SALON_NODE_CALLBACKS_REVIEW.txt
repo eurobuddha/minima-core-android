@@ -1,0 +1,100 @@
+Salon node callback review — 2026-10-19, source 1.9.92/163
+
+Summary
+The remaining foreground inbox, tip and key lookup callbacks retain their original
+account and node connection. Delayed replies cannot write a replacement account,
+repaint its badge or send from an old tip confirmation. Repeated replies cannot
+repeat a tip. The existing direct transport, command values and four-language
+controls remain in use. No live wallet, transfer or key operation was exercised.
+
+Sources inspected and reused
+- Standalone apks/salon MainActivity inbox, tip and key methods and integrated
+  equivalents, callers in onNode/onResume/restore and render/destroy lifecycle.
+- Salon MinimaMail, TipTransport, Args, SalonComms, SalonStore and MailDb; existing
+  outgoing ownership checks, ClaimIdentity/SpareIdentityCleanup consumed callbacks
+  and strict IdentityBalance response validation. Existing tip balance preview
+  checks become one shared TipTransport.sendable helper with token-ID matching.
+- Existing SalonTipsLanguageTest, NodeApi/claim/outbox fixtures and backup locks.
+  The completed hosting callback guards supply the same captured-owner pattern.
+- Sibling AtomiX CommsTransport was inspected because TipTransport names it. Its
+  historical sendPayment helper has been removed; Salon's actual transport is
+  retained, including address/token/decimal validation and hex-encoded state.
+
+Findings resolved
+MAJOR — Account ownership was checked neither before delayed getaddress writes nor
+before incoming-mail/contact/reply database writes. AccountReads.java.inc captures
+backupOwner, the node instance and connection generation. Each request consumes
+one response and the latest request owns its completion. Address reads validate
+Boolean status and address shape, preserve existing storage, and start scans once.
+Mail writes recheck account/address under SalonStore's lock, the same lock used by
+restore. Cached crypto must also match the stored messaging public ID. Existing
+signature rejection, stable message-ID dedup, quoted reply and peer route are kept.
+New contacts are unread until the actual thread render clears them, avoiding a
+background write marking a no-longer-visible thread read. Badge refreshes retain
+their owner and latest request, and closed Activity callbacks are discarded.
+
+MAJOR — Key initialization and inbox reads could race. Startup now finishes local
+messaging-key preparation before starting reads with the resulting owner snapshot.
+The preparation itself checks the original owner under SalonComms -> SalonStore
+locks. A node disconnect invalidates reads, clears the cached node signer and
+rearms session setup for reconnect. Successful account restore starts fresh reads.
+NodeKeyRead.java.inc accepts only a successful, well-formed key result; its existing
+getaddress fallback is owned and consumed once too.
+
+MAJOR — A tip balance reply could be rejected, belong to another token, or arrive
+more than once, yet still trigger a send. TipTransport.sendable requires actual
+Boolean success, an array of zero or one row, the requested token ID and a valid
+string decimal. Both preview and send use it. Address and token ID are validated
+before the balance command. Amount, destination, selected token, original sender
+handle and UTF-8 note/state encoding remain exactly the accepted values.
+
+MAJOR — Old tip dialogs and completions had no account/screen ownership. The dialog
+now captures the owner/node/generation and retains its existing four-language
+inputs and callbacks. Dismissal/render/destruction consume or cancel consent.
+TipSend.java.inc checks its owner and screen immediately before dispatch under the
+account lock, consumes the balance reply once, and holds its own busy state until
+completion. A late completion cannot clear a newer operation or announce success
+for a replaced account. A submitted send cannot be recalled; no automatic retry is
+introduced. Transport acceptance requires actual Boolean status/pending and its
+callback completes once. Malformed/null acceptance is reported as unconfirmed.
+
+MAJOR — MinimaMail.scan dereferenced null results and could abort on one malformed
+sealed message. It now validates its command address and successful response,
+consumes one result, skips an individual decoder failure, and preserves later
+messages. The existing depth:200 bound and send/compose format are unchanged.
+Tip coin scans validate every row's coin ID before changing the seen/baseline state,
+so a malformed later row cannot turn an incomplete lookup into a valid baseline.
+
+Verification
+- Combined command passed in 43 seconds: Salon 373, Atelier 288, localization 12,
+  Pandamonium host 158 = 831 tests, zero failures/errors/skips. Release Java
+  compilation passed. Unchanged tasks may reuse valid Gradle outputs.
+- 25 new tests: 15 account/inbox/key lifecycle tests, six tip ownership tests and
+  four transport/parser tests. Node, crypto and database boundaries are mocked;
+  preferences and dialog controls are disposable Robolectric state.
+- Covers delayed/duplicate responses, replacement accounts/addresses/connections,
+  wrong cached crypto, locked inbound writes, stable IDs/replies/routes, stale badge
+  reads, complete tip baselines, strict signer fallback, disconnect recovery,
+  invalid inputs, wrong-token balances, old dialog consent, duplicate send replies,
+  old completion versus a newer operation, exact Boolean acceptance and malformed
+  seals preceding valid messages.
+- Seven existing tip language tests still prove retained inputs/cursor/currency,
+  literal sender/note/amount and exact transfer command in en/zh-Hans/ru/uk.
+  Fixtures now include the real balance token ID. Invalid addresses are rejected
+  before a node read, so the test explicitly checks that no command was sent.
+- Initial 31-test targeted run passed. First full run passed 372/373; the additional
+  reconnect fixture had not built HOME views before reaching normal render().
+  It now selects SETTINGS for the isolated connection test. The complete rerun
+  passes; production code was unchanged by that fixture correction.
+- All 21 imports reproduce the final canonical source/tests and adapter. All 6840
+  messages validate in four languages. Direct-transport and whitespace checks pass.
+- Evidence: build/localization/salon-node-callbacks-{compile,targeted,full,
+  full-final,import}.log and salon-node-callbacks-results.json. The full-final log
+  is the successful complete run; full records the corrected fixture failure.
+
+Verdict
+Approve this callback change. No unresolved blocking finding within this patch.
+The check is for foreground Salon methods and their transport helpers; it does not
+claim live-chain or physical-device acceptance. No APK was built, installed or
+published. Remaining integration gates are Atelier hosting/navigation, final label
+audit, signed APK contents/certificates and Fold acceptance. Goal remains active.

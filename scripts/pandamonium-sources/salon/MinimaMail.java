@@ -61,16 +61,20 @@ final class MinimaMail {
 
     /** Scan coins at {@code myAddress} and open each state[99] in-app; returns the DMs for me. */
     static void scan(final NodeApi node, final LocalEcCryptoProvider crypto, final String myAddress, final Scanned cb) {
-        node.cmd("coins address:" + myAddress + " order:desc depth:200", new NodeApi.Cb() {   // bounded: address is public, guard against dust-flood overflow
+        if(!Args.isAddr(myAddress)){cb.onMessages(new ArrayList<>());return;}
+        final java.util.concurrent.atomic.AtomicBoolean received=new java.util.concurrent.atomic.AtomicBoolean();
+        NodeApi.Cb result=new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
+                if(!received.compareAndSet(false,true))return;
                 List<Msg> out = new ArrayList<>();
-                JSONArray arr = j.optJSONArray("response");
+                JSONArray arr = j!=null && Boolean.TRUE.equals(j.opt("status"))?j.optJSONArray("response"):null;
                 if (arr != null) for (int i = 0; i < arr.length(); i++) {
                     JSONObject c = arr.optJSONObject(i); if (c == null) continue;
                     String cid = c.optString("coinid", ""); String s99 = state99(c);
                     if (cid.isEmpty() || s99.isEmpty()) continue;
                     String hex = (s99.startsWith("0x") || s99.startsWith("0X")) ? s99.substring(2) : s99;
-                    Opened o = crypto.open(hex);
+                    Opened o;
+                    try{o=crypto.open(hex);}catch(RuntimeException malformed){continue;}
                     if (o == null) continue;   // not for me / not a DM
                     try {
                         JSONObject m = new JSONObject(new String(o.plaintext, StandardCharsets.UTF_8));
@@ -84,8 +88,10 @@ final class MinimaMail {
                 }
                 cb.onMessages(out);
             }
-            @Override public void onError(String m) { cb.onMessages(new ArrayList<>()); }
-        });
+            @Override public void onError(String m) { if(received.compareAndSet(false,true))cb.onMessages(new ArrayList<>()); }
+        };
+        try{node.cmd("coins address:"+myAddress+" order:desc depth:200",result);}
+        catch(RuntimeException unavailable){result.onError("");}
     }
 
     /** Build the message JSON to seal. {@code fromAddr} is my own tip address so the peer can reply. */

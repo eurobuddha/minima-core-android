@@ -229,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onNode() {
+        if(nodeUp!=wasNodeUp){nodeReadEpoch++;if(!nodeUp){pubkey="";reannouncedThisSession=false;}}
         if (nodeChip != null) Language.setText(nodeChip, nodeUp ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_connected) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_node_not_ready));
         if (!nodeUp) startPairingRetry();   // keep re-registering after a disconnect
         if (nodeUp && pubkey.isEmpty()) fetchPubkey();
@@ -237,7 +238,6 @@ public class MainActivity extends AppCompatActivity {
             reannouncedThisSession = true;
             touchOwnRelay();   // refresh the 7-day TTL on any relay-hosted content
             ensureMailKey();
-            ensureInboxAndScan();
         }
         // Gossip mesh: re-post any FADED pointer (own + a few others) so the square stays
         // alive. Must run REPEATEDLY (on every connect + on a foreground timer), not once —
@@ -252,43 +252,110 @@ public class MainActivity extends AppCompatActivity {
         wasNodeUp = nodeUp;
     }
 
+    private static final class AccountRead {
+        final String owner;
+        final NodeApi node;
+        final long epoch;
+        final boolean nodeBound;
+        final java.util.concurrent.atomic.AtomicBoolean replied=new java.util.concurrent.atomic.AtomicBoolean();
+        AccountRead(String owner,NodeApi node,long epoch,boolean nodeBound) {
+            this.owner=owner;this.node=node;this.epoch=epoch;this.nodeBound=nodeBound;
+        }
+    }
+    private volatile long nodeReadEpoch;
+    private volatile boolean nodeWorkClosed;
+    private volatile AccountRead addressRead,mailRead,tipRead,unreadRead,keyRead;
+    private AccountRead captureRead(boolean nodeBound) {
+        if(nodeWorkClosed || isFinishing() || isDestroyed() || (nodeBound && (!nodeUp || node==null))) return null;
+        try { return new AccountRead(backupOwner(),node,nodeReadEpoch,nodeBound); }
+        catch(Exception unavailable) { return null; }
+    }
+    private boolean readCurrent(AccountRead op) {
+        if(op==null || nodeWorkClosed || isFinishing() || isDestroyed()) return false;
+        if(op.nodeBound && (!nodeUp || node!=op.node || nodeReadEpoch!=op.epoch)) return false;
+        try { return op.owner.equals(backupOwner()); }
+        catch(Exception unavailable) { return false; }
+    }
+    private boolean inboxCurrent(AccountRead op,String address) {
+        return readCurrent(op) && address.equals(SalonStore.get(this,"tipaddr"));
+    }
+    private void closeNodeWork() {
+        nodeWorkClosed=true;nodeReadEpoch++;
+        addressRead=null;mailRead=null;tipRead=null;unreadRead=null;keyRead=null;
+        cancelTipDialog();tipSend=null;mTipInFlight=false;
+    }
+
     /** Scan the inbox (tips + DMs) — but only once the tip address is captured. On a fresh
      *  identity getaddress is async, so we scan INSIDE its callback (fixes the race where a
      *  new device never scanned because tipaddr was still empty). */
     private void ensureInboxAndScan() {
-        String addr = SalonStore.get(this, "tipaddr");
-        if (!addr.isEmpty()) { scanTips(); scanMail(); return; }
-        node.cmd("getaddress", new NodeApi.Cb() {
-            @Override public void onResult(JSONObject r) {
-                JSONObject resp = r.optJSONObject("response");
-                String a = resp == null ? "" : resp.optString("address", "");
-                if (!a.isEmpty()) runOnUiThread(() -> { SalonStore.put(MainActivity.this, "tipaddr", a); scanTips(); scanMail(); });
-            }
-            @Override public void onError(String m) {}
-        });
+        final AccountRead op=captureRead(true);if(op==null)return;
+        final String addr=SalonStore.get(this,"tipaddr");
+        if(Args.isAddr(addr)) { scanTips();scanMail();return; }
+        // Preserve malformed existing storage instead of overwriting it with another account's address.
+        if(!addr.isEmpty())return;
+        addressRead=op;
+        NodeApi.Cb cb=new NodeApi.Cb() {
+            public void onResult(JSONObject reply) { runOnUiThread(()->{
+                if(!op.replied.compareAndSet(false,true) || addressRead!=op)return;
+                synchronized(SalonStore.class) {
+                    if(!inboxCurrent(op,addr) || reply==null || !Boolean.TRUE.equals(reply.opt("status")))return;
+                    JSONObject response=reply.optJSONObject("response");
+                    Object value=response==null?null:response.opt("address");
+                    if(!(value instanceof String) || !Args.isAddr((String)value))return;
+                    SalonStore.put(MainActivity.this,"tipaddr",(String)value);
+                }
+                if(readCurrent(op)){scanTips();scanMail();}
+            }); }
+            public void onError(String ignored){op.replied.compareAndSet(false,true);}
+        };
+        try { op.node.cmd("getaddress",cb); } catch(RuntimeException unavailable){cb.onError("");}
     }
 
     /** Derive our app-side messaging identity once (libsodium, no node/Maxima) and publish
      *  its public id as msgpk so others can seal DMs to us. */
     private void ensureMailKey() {
-        io.execute(() -> {
-            try { SalonComms.publicId(MainActivity.this); }
-            catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); }
-        });
+        final AccountRead op=captureRead(true);if(op==null)return;
+        try { io.execute(()->{
+            final AccountRead completed;
+            final boolean available;
+            synchronized(SalonComms.class) { synchronized(SalonStore.class) {
+                if(!readCurrent(op))return;
+                boolean ready;
+                try { ready=SalonComms.publicId(this).equals(SalonStore.get(this,"msgpk")); }
+                catch(SalonComms.IdentityUnavailable unavailable){ready=false;}
+                available=ready;completed=captureRead(true);
+            } }
+            runOnUiThread(()->{
+                if(!readCurrent(completed))return;
+                if(!available){identityUnavailable();return;}
+                // Key creation can change the owner snapshot; start reads only after it finishes.
+                ensureInboxAndScan();if(pubkey.isEmpty())fetchPubkey();
+            });
+        }); } catch(java.util.concurrent.RejectedExecutionException unavailable) { }
     }
 
     /** Scan on-chain mail at our address; store new DMs + refresh the badge/thread. */
     private void scanMail() {
         final String addr = SalonStore.get(this, "tipaddr");
-        if (addr.isEmpty()) return;
+        if (!Args.isAddr(addr) || captureRead(true)==null) return;
+        final AccountRead op;
         final LocalEcCryptoProvider identity;
-        try { identity = SalonComms.crypto(this); }
+        try { synchronized(SalonComms.class) { synchronized(SalonStore.class) {
+            identity=SalonComms.crypto(this);
+            if(!identity.identity().equals(SalonStore.get(this,"msgpk")))throw new SalonComms.IdentityUnavailable();
+            op=captureRead(true);if(op==null)return;mailRead=op;
+        } } }
         catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); return; }
-        MinimaMail.scan(node, identity, addr, msgs -> io.execute(() -> {   // DB writes off the UI thread
+        MinimaMail.scan(op.node, identity, addr, msgs -> {
+            if(!op.replied.compareAndSet(false,true))return;
+            try { io.execute(() -> {   // DB writes off the UI thread
+            synchronized(SalonStore.class) {
+            if(mailRead!=op || !inboxCurrent(op,addr))return;
             MailDb db = MailDb.get(MainActivity.this);
             int newCount = 0; String lastFrom = "", lastBody = "";
             for (MinimaMail.Msg m : msgs) {
-                if (m.coinid.isEmpty()) continue;
+                if (m==null || m.coinid.isEmpty()) continue;
                 if (!m.valid) continue;   // anonymous seal — drop messages whose sender signature doesn't verify (anti-impersonation)
                 String preview = !m.body.isEmpty() ? m.body : (!m.mediaRef.isEmpty() ? "📎 media" : "");
                 // Dedup on the sender's stable app id when present (agrees with the
@@ -300,37 +367,58 @@ public class MainActivity extends AppCompatActivity {
                 if (m.replyBody != null && !m.replyBody.isEmpty()) db.setReply(dedupId, m.replyBody, m.replyFrom);
                 db.setMxAddr(m.fromPublicId, m.peerMx);   // learn their Maxima address from an on-chain DM too (sticky, no-op if absent)
                 if (isNew) {
-                    db.upsertContact(m.fromPublicId, m.fromHandle, "", m.fromAddr, preview, m.ts, !m.fromPublicId.equals(threadPeer));
+                    db.upsertContact(m.fromPublicId, m.fromHandle, "", m.fromAddr, preview, m.ts, true);
                     newCount++; lastFrom = m.fromHandle; lastBody = preview;
                 }
             }
             final int fc = newCount; final String lf = lastFrom, lb = lastBody; final int unread = db.totalUnread();
             runOnUiThread(() -> {
+                if(mailRead!=op || !inboxCurrent(op,addr))return;
                 unreadCache = unread;
+                if(navRow==null)return;
                 if (fc > 0) {
                     if (screen == Screen.MESSAGES || screen == Screen.THREAD) render();
                     else { buildNav(); toast(Language.join("💬 ", fc == 1 ? "@" + lf.replaceFirst("^@", "") + ": " + lb : Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_chat_new_messages, fc))); }
                 } else buildNav();
             });
-        }));
+            }
+        }); } catch(java.util.concurrent.RejectedExecutionException unavailable) { }
+        });
     }
 
     private int unreadCache = 0;
     /** Refresh the cached unread count off the UI thread and repaint the nav badge. */
     private void refreshUnread() {
-        io.execute(() -> { int u = MailDb.get(MainActivity.this).totalUnread(); runOnUiThread(() -> { unreadCache = u; if (navRow != null) buildNav(); }); });
+        final AccountRead op=captureRead(false);if(op==null)return;unreadRead=op;
+        try { io.execute(()->{
+            final int count;
+            synchronized(SalonStore.class) {
+                if(unreadRead!=op || !readCurrent(op))return;
+                count=MailDb.get(this).totalUnread();
+            }
+            runOnUiThread(()->{if(unreadRead==op && readCurrent(op)){unreadCache=count;if(navRow!=null)buildNav();}});
+        }); } catch(java.util.concurrent.RejectedExecutionException unavailable) { }
     }
 
     /** Detect inbound tips at our address and announce new ones. Baselines silently
      *  on first run so old coins don't spam; thereafter new coinids → "X tipped you". */
     private void scanTips() {
         final String addr = SalonStore.get(this, "tipaddr");
-        if (addr.isEmpty()) return;
-        node.cmd("coinnotify action:add address:" + addr, new NodeApi.Cb() { public void onResult(JSONObject j) {} public void onError(String m) {} });
-        node.cmd("coins address:" + addr + " order:desc depth:200", new NodeApi.Cb() {   // bounded: the tip address is public and could be dust-flooded
+        final AccountRead op=captureRead(true);
+        if (!Args.isAddr(addr) || op==null) return;tipRead=op;
+        try { op.node.cmd("coinnotify action:add address:" + addr, new NodeApi.Cb() { public void onResult(JSONObject j) {} public void onError(String m) {} }); } catch(RuntimeException unavailable){return;}
+        NodeApi.Cb cb=new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
-                final JSONArray arr = j.optJSONArray("response"); if (arr == null) return;
-                runOnUiThread(() -> {
+                if(!op.replied.compareAndSet(false,true))return;
+                if(j==null || !Boolean.TRUE.equals(j.opt("status")))return;
+                final JSONArray arr=j.optJSONArray("response");if(arr==null)return;
+                // Validate the complete lookup before changing the seen/baseline state.
+                for(int i=0;i<arr.length();i++) {
+                    JSONObject coin=arr.optJSONObject(i);
+                    if(coin==null || !(coin.opt("coinid") instanceof String) || !Args.isTokenId(coin.optString("coinid")))return;
+                }
+                runOnUiThread(() -> { synchronized(SalonStore.class) {
+                    if(tipRead!=op || !inboxCurrent(op,addr))return;
                     JSONArray seen = SalonStore.arr(MainActivity.this, "tipseen");
                     java.util.HashSet<String> seenSet = new java.util.HashSet<>();
                     for (int i = 0; i < seen.length(); i++) seenSet.add(seen.optString(i));
@@ -345,11 +433,14 @@ public class MainActivity extends AppCompatActivity {
                     SalonStore.setArr(MainActivity.this, "tipseen", capArr(seen, 500));
                     if (!baselined) SalonStore.put(MainActivity.this, "tipbaselined", "1");
                     for (CharSequence d : fresh) toast(d);
-                });
+                } });
             }
-            @Override public void onError(String m) {}
-        });
+            @Override public void onError(String m) {op.replied.compareAndSet(false,true);}
+        };
+        try { op.node.cmd("coins address:"+addr+" order:desc depth:200",cb); }
+        catch(RuntimeException unavailable){cb.onError("");}
     }
+
 
     private CharSequence describeTip(JSONObject coin) {
         String amount = coin.optString("tokenamount", "");
@@ -384,6 +475,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void tipDialog(String handle, String toAddr) {
         if (!nodeUp) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_connect)); return; }
+        cancelTipDialog();
+        final AccountRead owner=captureRead(true);if(owner==null)return;
+        tipDialogRead=owner;final int epoch=renderEpoch;
         final String[] tokenid = { TipTransport.MXUSD };   // default dollar-pegged
         LinearLayout box = dialogBox();
         final TextView curBtn = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_currency, "mxUSD"), false);
@@ -404,29 +498,27 @@ public class MainActivity extends AppCompatActivity {
             final int request = ++balanceRequest[0];
             final String requestedToken = tokenid[0];
             Language.setText(bal, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_checking));
-            node.cmd("balance tokenid:" + requestedToken, new NodeApi.Cb() {
+            if(tipDialogRead!=owner || !readCurrent(owner) || epoch!=renderEpoch)return;
+            final java.util.concurrent.atomic.AtomicBoolean received=new java.util.concurrent.atomic.AtomicBoolean();
+            NodeApi.Cb cb=new NodeApi.Cb() {
                 @Override public void onResult(JSONObject j) {
-                    String amount = null;
-                    if (j != null && Boolean.TRUE.equals(j.opt("status"))) {
-                        JSONArray rows = j.optJSONArray("response");
-                        if (rows != null && rows.length() == 0) amount = "0";
-                        else if (rows != null && rows.length() == 1) {
-                            JSONObject row = rows.optJSONObject(0);
-                            if (row != null && Args.isDecimal(row.optString("sendable", ""))) amount = row.optString("sendable");
-                        }
-                    }
-                    final String have = amount;
+                    if(!received.compareAndSet(false,true))return;
+                    String value;
+                    try { value=TipTransport.sendable(j,requestedToken); } catch(IllegalArgumentException unavailable){value=null;}
+                    final String have=value;
                     runOnUiThread(() -> {
-                        if (request != balanceRequest[0] || !requestedToken.equals(tokenid[0]) || isFinishing() || isDestroyed()) return;
+                        if (tipDialogRead!=owner || !readCurrent(owner) || epoch!=renderEpoch || request != balanceRequest[0] || !requestedToken.equals(tokenid[0]) || isFinishing() || isDestroyed()) return;
                         Language.setText(bal, have == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_unavailable) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_available, have, TipTransport.label(requestedToken)));
                     });
                 }
                 @Override public void onError(String ignored) {
+                    if(!received.compareAndSet(false,true))return;
                     runOnUiThread(() -> {
-                        if (request == balanceRequest[0] && requestedToken.equals(tokenid[0]) && !isFinishing() && !isDestroyed()) Language.setText(bal, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_unavailable));
+                        if (tipDialogRead==owner && readCurrent(owner) && epoch==renderEpoch && request == balanceRequest[0] && requestedToken.equals(tokenid[0]) && !isFinishing() && !isDestroyed()) Language.setText(bal, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_unavailable));
                     });
                 }
-            });
+            };
+            try { owner.node.cmd("balance tokenid:"+requestedToken,cb); } catch(RuntimeException unavailable){cb.onError("");}
         };
         refreshBal.run();
         final EditText note = field(box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_note), "", false, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_note_hint));
@@ -436,37 +528,74 @@ public class MainActivity extends AppCompatActivity {
             presets.setVisibility(tokenid[0].equals(TipTransport.MXUSD) ? View.VISIBLE : View.GONE);
             refreshBal.run();
         });
-        new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_title, handle)).setView(box)
-                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_send), (d, w) -> sendTip(handle, toAddr, tokenid[0], text(amount).trim(), text(note).trim()))
+        tipConfirmDialog=new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_title, handle)).setView(box)
+                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_send), (d, w) -> {
+                    if(tipDialogRead!=owner)return;tipDialogRead=null;
+                    synchronized(SalonStore.class) {
+                        if(!readCurrent(owner) || epoch!=renderEpoch){toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_changed));return;}
+                        sendTip(handle,toAddr,tokenid[0],text(amount).trim(),text(note).trim());
+                    }
+                })
                 .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel), null).show();
+        tipConfirmDialog.setOnDismissListener(d->{if(tipDialogRead==owner)tipDialogRead=null;if(tipConfirmDialog==d)tipConfirmDialog=null;});
     }
 
-    private void sendTip(String handle, String toAddr, String tokenid, String amount, String note) {
-        if (!Args.isDecimal(amount)) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_utxo_valid_amount)); return; }
-        final java.math.BigDecimal amt;
-        try { amt = new java.math.BigDecimal(amount); } catch (Exception e) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_utxo_valid_amount)); return; }
-        if (amt.signum() <= 0) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_enter_amount)); return; }
-        if (mTipInFlight) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_busy)); return; }
-        mTipInFlight = true;
-        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_checking));
-        node.cmd("balance tokenid:" + tokenid, new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) {
-                String sendable = "0";
-                try { JSONArray a = j.optJSONArray("response"); if (a != null && a.length() > 0) sendable = a.optJSONObject(0).optString("sendable", "0"); } catch (Exception ignored) {}
-                java.math.BigDecimal haveBd; try { haveBd = new java.math.BigDecimal(sendable); } catch (Exception e) { haveBd = java.math.BigDecimal.ZERO; }
-                final java.math.BigDecimal have = haveBd;
-                runOnUiThread(() -> {
-                    if (amt.compareTo(have) > 0) { mTipInFlight = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_insufficient, TipTransport.label(tokenid), have.toPlainString())); return; }
-                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_sending));
-                    TipTransport.tip(node, toAddr, amount, tokenid, "@" + SalonStore.get(MainActivity.this, "handle"), note, new TipTransport.Cb() {
-                        @Override public void onSent(String txpowid) { runOnUiThread(() -> { mTipInFlight = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_submitted, handle)); }); }
-                        @Override public void onFailed(String msg) { runOnUiThread(() -> { mTipInFlight = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_failed, HoldingMessages.message(msg))); }); }
-                    });
-                });
-            }
-            @Override public void onError(String m) { runOnUiThread(() -> { mTipInFlight = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_balance_failed, HoldingMessages.message(m))); }); }
-        });
+    private AccountRead tipDialogRead;
+    private androidx.appcompat.app.AlertDialog tipConfirmDialog;
+    private static final class TipSend {
+        final AccountRead read;final int epoch;
+        boolean lookedUp,submitted;
+        TipSend(AccountRead read,int epoch){this.read=read;this.epoch=epoch;}
     }
+    private TipSend tipSend;
+    private void cancelTipDialog() {
+        tipDialogRead=null;
+        if(tipConfirmDialog!=null){androidx.appcompat.app.AlertDialog dialog=tipConfirmDialog;tipConfirmDialog=null;dialog.dismiss();}
+    }
+    private void cancelTipLookup() {
+        cancelTipDialog();
+        if(tipSend!=null && !tipSend.submitted){tipSend=null;mTipInFlight=false;}
+    }
+    private boolean tipCurrent(TipSend op){return tipSend==op && op.epoch==renderEpoch && readCurrent(op.read);}
+    private void finishTip(TipSend op,CharSequence message) {
+        if(tipSend!=op)return;
+        boolean current=tipCurrent(op);tipSend=null;mTipInFlight=false;
+        if(current && message!=null)toast(message);
+    }
+    private void sendTip(String handle,String toAddr,String tokenid,String amount,String note) {
+        if(!Args.isDecimal(amount)){toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_utxo_valid_amount));return;}
+        final java.math.BigDecimal wanted=new java.math.BigDecimal(amount);
+        if(wanted.signum()<=0){toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_enter_amount));return;}
+        if(!Args.isAddr(toAddr)){toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_failed, HoldingMessages.message("that profile's tip address is malformed — not sending")));return;}
+        if(!Args.isTokenId(tokenid)){toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_failed, HoldingMessages.message("bad token id")));return;}
+        if(mTipInFlight){toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_busy));return;}
+        final AccountRead read=captureRead(true);if(read==null){toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_connect));return;}
+        final TipSend op=new TipSend(read,renderEpoch);
+        final String from="@"+SalonStore.get(this,"handle");
+        tipSend=op;mTipInFlight=true;toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_checking));
+        NodeApi.Cb cb=new NodeApi.Cb() {
+            public void onResult(JSONObject reply){runOnUiThread(()->{
+                if(tipSend!=op || op.lookedUp)return;op.lookedUp=true;
+                synchronized(SalonStore.class) {
+                    if(!tipCurrent(op)){finishTip(op,null);return;}
+                    final java.math.BigDecimal have;
+                    try{have=new java.math.BigDecimal(TipTransport.sendable(reply,tokenid));}
+                    catch(IllegalArgumentException unavailable){finishTip(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_unavailable));return;}
+                    if(wanted.compareTo(have)>0){finishTip(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_insufficient, TipTransport.label(tokenid), have.toPlainString()));return;}
+                    op.submitted=true;toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_sending));
+                    TipTransport.tip(read.node,toAddr,amount,tokenid,from,note,new TipTransport.Cb(){
+                        public void onSent(String txpowid){runOnUiThread(()->finishTip(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_submitted, handle)));}
+                        public void onFailed(String message){runOnUiThread(()->finishTip(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_failed, HoldingMessages.message(message))));}
+                    });
+                }
+            });}
+            public void onError(String message){runOnUiThread(()->{
+                if(tipSend!=op || op.lookedUp)return;op.lookedUp=true;finishTip(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_balance_failed, HoldingMessages.message(message)));
+            });}
+        };
+        try{read.node.cmd("balance tokenid:"+tokenid,cb);}catch(RuntimeException unavailable){cb.onError("");}
+    }
+
 
     /* ================= Messages (DMs over Minima Mail) ================= */
 
@@ -1123,7 +1252,7 @@ public class MainActivity extends AppCompatActivity {
                 catch (SalonComms.IdentityUnavailable unavailable) { return; }
                 // Match hosted restore: old Edit widgets must not reapply the previous draft.
                 if (restoredDraft) edName = edBio = edAbout = edAvatar = edBanner = edWebvalidate = null;
-                toast(Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restored_destinations, hn), mo ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_restored_suffix) : "", sk ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_kept_suffix) : "")); render(); });
+                toast(Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restored_destinations, hn), mo ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_restored_suffix) : "", sk ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_kept_suffix) : "")); render(); if(nodeUp)ensureMailKey(); });
             } }
         } catch (Exception e) { runOnUiThread(() -> backupNotice(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_restore_failed))); }
     }
@@ -1255,6 +1384,7 @@ public class MainActivity extends AppCompatActivity {
         cancelSpareBurn();
         cancelOutboxDialog();
         cancelHostingCheck();
+        closeNodeWork();
         io.shutdownNow();
         stopAudio();
         videoRequest++;
@@ -1321,6 +1451,7 @@ public class MainActivity extends AppCompatActivity {
         cancelIdentityClaim();
         cancelOutboxDialog();
         cancelHostingCheck();
+        cancelTipLookup();
         renderEpoch++;
         if (swipe != null) swipe.setEnabled(screen == Screen.FEED || screen == Screen.DISCOVER);   // pull-to-refresh where it makes sense
         buildNav(); body.removeAllViews();
@@ -3814,19 +3945,39 @@ public class MainActivity extends AppCompatActivity {
     /* ================= node key ================= */
 
     private void fetchPubkey() {
-        node.cmd("keys", new NodeApi.Cb() {
-            @Override public void onResult(JSONObject json) { String pk = firstPublicKey(json); if (!pk.isEmpty()) runOnUiThread(() -> pubkey = pk); else node.cmd("getaddress", new NodeApi.Cb() {
-                @Override public void onResult(JSONObject j2) { JSONObject r = j2.optJSONObject("response"); if (r != null && !r.optString("publickey").isEmpty()) runOnUiThread(() -> pubkey = r.optString("publickey")); }
-                @Override public void onError(String m) {} }); }
-            @Override public void onError(String m) {} });
+        final AccountRead op=captureRead(true);if(op==null)return;keyRead=op;
+        NodeApi.Cb cb=new NodeApi.Cb() {
+            public void onResult(JSONObject reply){runOnUiThread(()->{
+                if(!op.replied.compareAndSet(false,true) || keyRead!=op || !readCurrent(op))return;
+                String key=firstPublicKey(reply);
+                if(!key.isEmpty()){pubkey=key;return;}
+                final java.util.concurrent.atomic.AtomicBoolean received=new java.util.concurrent.atomic.AtomicBoolean();
+                NodeApi.Cb fallback=new NodeApi.Cb(){
+                    public void onResult(JSONObject result){runOnUiThread(()->{
+                        if(!received.compareAndSet(false,true) || keyRead!=op || !readCurrent(op))return;
+                        String value=firstPublicKey(result);if(!value.isEmpty())pubkey=value;
+                    });}
+                    public void onError(String ignored){received.compareAndSet(false,true);}
+                };
+                try{op.node.cmd("getaddress",fallback);}catch(RuntimeException unavailable){fallback.onError("");}
+            });}
+            public void onError(String ignored){op.replied.compareAndSet(false,true);}
+        };
+        try{op.node.cmd("keys",cb);}catch(RuntimeException unavailable){cb.onError("");}
     }
-    private String firstPublicKey(JSONObject json) {
-        Object resp = json.opt("response");
-        try { if (resp instanceof JSONArray) { JSONArray a = (JSONArray) resp; if (a.length() > 0 && a.optJSONObject(0) != null) return a.optJSONObject(0).optString("publickey", ""); }
-            else if (resp instanceof JSONObject) { JSONArray keys = ((JSONObject) resp).optJSONArray("keys"); if (keys != null && keys.length() > 0) return keys.optJSONObject(0).optString("publickey", ""); return ((JSONObject) resp).optString("publickey", ""); }
-        } catch (Exception ignored) {}
-        return "";
+    private String firstPublicKey(JSONObject reply) {
+        if(reply==null || !Boolean.TRUE.equals(reply.opt("status")))return "";
+        Object response=reply.opt("response");
+        JSONObject row=null;
+        if(response instanceof JSONArray)row=((JSONArray)response).optJSONObject(0);
+        else if(response instanceof JSONObject){
+            JSONObject object=(JSONObject)response;JSONArray keys=object.optJSONArray("keys");
+            row=keys==null?object:keys.optJSONObject(0);
+        }
+        Object key=row==null?null:row.opt("publickey");
+        return key instanceof String && Args.isTokenId((String)key)?(String)key:"";
     }
+
 
     /* ================= HTTP ================= */
 

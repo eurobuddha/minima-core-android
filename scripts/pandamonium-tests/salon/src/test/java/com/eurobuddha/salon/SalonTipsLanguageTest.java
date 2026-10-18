@@ -34,7 +34,7 @@ public class SalonTipsLanguageTest {
     private void idle(){Shadows.shadowOf(Looper.getMainLooper()).idle();}
     private AlertDialog dialog(){return (AlertDialog)ShadowDialog.getLatestDialog();}
     private void open()throws Exception{call("tipDialog",new Class<?>[]{String.class,String.class},HANDLE,TO);idle();}
-    private JSONObject balance(String amount)throws Exception{return new JSONObject().put("status",true).put("response",new JSONArray().put(new JSONObject().put("sendable",amount)));}
+    private JSONObject balance(String amount)throws Exception{return new JSONObject().put("status",true).put("response",new JSONArray().put(new JSONObject().put("tokenid",TipTransport.MXUSD).put("sendable",amount)));}
     private View find(View v,String text){if(v instanceof TextView&&text.equals(((TextView)v).getText().toString()))return v;if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){View found=find(((ViewGroup)v).getChildAt(i),text);if(found!=null)return found;}return null;}
     private List<EditText> edits(View v){List<EditText> result=new ArrayList<>();if(v instanceof EditText)result.add((EditText)v);if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++)result.addAll(edits(((ViewGroup)v).getChildAt(i)));return result;}
     private String upper(int id,Object...args){return Language.upper(Language.msg(id,args)).toString();}
@@ -77,7 +77,7 @@ public class SalonTipsLanguageTest {
     }
     @Test public void presetsAndCurrencySelectionSurviveLanguageChanges()throws Exception{
         open();View root=dialog().getWindow().getDecorView();EditText amount=edits(root).get(0);View preset=find(root,"$5");preset.performClick();assertEquals("5",amount.getText().toString());
-        View currency=find(root,upper(l10n_salon_tips_currency,"mxUSD"));currency.performClick();idle();replies.get(1).onResult(balance("3"));idle();
+        View currency=find(root,upper(l10n_salon_tips_currency,"mxUSD"));currency.performClick();idle();JSONObject nativeBalance=balance("3");nativeBalance.getJSONArray("response").getJSONObject(0).put("tokenid",TipTransport.MINIMA);replies.get(1).onResult(nativeBalance);idle();
         for(String code:CODES){Language.select(activity,code);assertEquals("5",amount.getText().toString());assertNotNull(find(root,upper(l10n_salon_tips_currency,"MINIMA")));assertNotNull(find(root,Language.msg(l10n_salon_tips_available,"3","MINIMA").toString()));}
         assertEquals(View.GONE,((View)preset.getParent()).getVisibility());assertEquals(2,commands.size());
     }
@@ -96,7 +96,7 @@ public class SalonTipsLanguageTest {
             send(TO,"bad");notice(l10n_utxo_valid_amount);send(TO,"0");notice(l10n_mail_enter_amount);
             set("mTipInFlight",true);send(TO,"1");notice(l10n_salon_tips_busy);set("mTipInFlight",false);
             send(TO,"1");notice(l10n_salon_tips_checking);replies.get(replies.size()-1).onResult(balance("0"));idle();notice(l10n_salon_tips_insufficient,"mxUSD","0");
-            send("invalid address","1");replies.get(replies.size()-1).onResult(balance("2"));idle();notice(l10n_salon_tips_failed,Language.msg(l10n_salon_tips_bad_address));
+            int before=commands.size();send("invalid address","1");assertEquals(before,commands.size());idle();notice(l10n_salon_tips_failed,Language.msg(l10n_salon_tips_bad_address));
             send(TO,"1");replies.get(replies.size()-1).onError("Invalid node result. Outcome remains unknown.");idle();notice(l10n_salon_tips_balance_failed,Language.msg(l10n_vestr_transport_invalid));
             send(TO,"1");replies.get(replies.size()-1).onResult(balance("2"));idle();notice(l10n_salon_tips_sending);replies.get(replies.size()-1).onResult(new JSONObject().put("pending",true));idle();notice(l10n_salon_tips_submitted,HANDLE);
         }
