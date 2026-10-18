@@ -2886,3 +2886,23 @@ No owner node, wallet, seed, counter or device operation occurred. Fold R3GL805K
 Version 1.9.47/vc118 includes the committed AtomiX send-acknowledgement, chain-evidence and OTC-consent fixes and the 5,322-message four-language catalogue. Reused the existing app/build.gradle variant/signing configuration and build/localization/verify-signed-candidates-1.9.46.py verification recipe. The original 1.9.41 APK hashes and signing certificates were rechecked; all three tags and the base checkout still resolve to 9def96e6801a9bef261611e45349f28a1eb6ae1c. The authorized GitHub release list ends at the three 1.9.41 releases; no local 1.9.47 artifact exists.
 
 Only release metadata changes in application code. No signing credentials, node library, key modes, package identifiers or financial implementation are changed. Prior candidates remain preserved. Full host regression and all three release builds will run from this source checkpoint; artifact verification is recorded separately after the build. Remaining reviews and Fold runtime acceptance remain open. This entry does not claim a completed or published release.
+
+## Signed 1.9.47 candidates and full host regression — 2026-10-18
+
+All three signed candidates now contain pushed source `40096aa75381088def980d3e0d1fd6b26025c964`, including the recent AtomiX acknowledgement, chain evidence and persisted-consent fixes. Version is 1.9.47/vc118. The source-only version change leaves the final 1.9.41 node JAR, key modes, package identities and all 582 reviewed source hashes intact except the recorded app/build.gradle version update.
+
+The established full regression ran 25 test tasks: 2,611 passing cases, zero failures/errors/skips. Gradle reports four tasks with no test source and records reused up-to-date results explicitly; this count is not a claim that every module has host tests or that Android runtime acceptance is complete. All three release builds and vital lint completed in 2m15s. Evidence: `build/localization/bear-1.9.47-validation.json` and `bear-1.9.47-build.log`.
+
+Reused `build/localization/verify-signed-candidates-1.9.46.py` as `verify-signed-candidates-1.9.47.py`, updating version/checkpoint and remaining-work metadata. Verified all three APKs before adding any dist artifacts: v2 signature, original 1.9.41 family certificate, package/version metadata, non-debuggable status, arm64 ABI, 16KiB ZIP alignment, four declared locales, all 5,322 catalogue resource names per locale and all 582 source hashes. ZIP alignment is not an ELF page-size claim. The original 1.9.41 APK hashes and certificates were independently rechecked against the existing files.
+
+Artifacts: `/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-{PandaBear,BlackBear,Pandamonium}-1.9.47-candidate.apk`, each with a verified `.apk.sha256` sidecar. Manifest: `bear-languages-1.9.47-candidate.json`; artifact evidence: `build/localization/signed-candidates-1.9.47-validation.json`. Previous 1.9.46 APKs retain their original hashes, and their manifest links to the new candidates.
+
+- PandaBear: `f200c7f87a7ef68fe0702b06067577a7a124076eaef3ffb7336e1ebf67d73535`
+- BlackBear: `74353447f57972a6c241b9b257bb36d4dfd9fe5b9cb38272f5b39888ea010c64`
+- Pandamonium: `d1aa2306d2cd36e9518c1ec4ebb7ef0a33bfd4e0db39a0e7032ec9439211ad8b`
+
+### Code Review
+
+Summary: application changes are limited to version metadata. Reviewed the reused verification recipe's diff, full test-task states, resulting APK metadata/signatures/resources and copied artifact hashes. No new runtime implementation or signing configuration was introduced. Verdict: approve this candidate-build checkpoint.
+
+No installation or public release occurred. Fold R3GL805K7MB remains unavailable. Remaining requirements are the recorded AtomiX transaction/responder/host and Shop follow-ups, remaining text-coverage checks, data-preserving Fold language/state/accessibility and minimaWallet acceptance, optional inherited MySQL disposition, and final accepted publication to the authorized destinations. These builds are candidates, not a declaration that the goal is complete.
