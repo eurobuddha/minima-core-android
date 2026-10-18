@@ -2773,3 +2773,16 @@ Summary: reviewed every changed source/spec/resource and the generator's depende
 Separate MAJOR pre-existing finding: `MaxThreadActivity` restores a failed outgoing message with unconditional `input.setText(text)` in a delayed UI callback. A newer draft can be overwritten. Before fixing, inspect ChatEngine.send persistence/retry semantics and reuse the proven draft revision guards from Parlons or integrated Inbox; do not add automatic duplicate resend. This finding remains open and is not fixed by translating the error.
 
 Fold R3GL805K7MB is unavailable (`device not found` after an authorized serial-specific ADB check). No other device, emulator, owner wallet, seed, counter or AppLock was touched. Fold state/visual/accessibility acceptance, remaining financial reviews, optional inherited MySQL formatting disposition and final publication remain pending. Current candidates must not be described as accepted public releases.
+
+
+## Signed 1.9.45 chat-diagnostic candidates — 2026-10-18
+
+Source `37d7194fe1993b623223a84c8475cf180ebb6af1` is committed, pushed to the authorized fork feature branch and remote-verified. All three signed candidates passed the existing APK verification recipe adapted for 1.9.45/vc116 and the 568-source checkpoint. Certificates match 1.9.41; package/version, non-debuggable status, arm64-v8a ABI, 16KiB ZIP alignment, four declared languages and all 5,321 compiled catalogue resources per language were verified. This is ZIP alignment verification, not a claim about native ELF page sizes.
+
+Files are in `/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-{PandaBear,BlackBear,Pandamonium}-1.9.45-candidate.apk`, with checked SHA256 sidecars. Existing 1.9.44 APKs remain preserved and their manifest links to the newer candidate. Evidence: `build/localization/signed-candidates-1.9.45-validation.json`; recipe: `verify-signed-candidates-1.9.45.py`; dist manifest: `bear-languages-1.9.45-candidate.json`.
+
+- PandaBear: `ca8d67786217813b9aba1a116f9f0394ea2248b61fe69ef245690f12ac252f02`
+- BlackBear: `f3cf453c963bf8d097ea325e89393f8be9e6c5aa453a99ec9249bc1fa12bb1de`
+- Pandamonium: `eaec0a17ef34fa0d38b6b171b6eebb46114bcc3b230686cb3e8233379a84bbb8`
+
+572 JVM test executions pass. No device installation or public release occurred. Fold acceptance, the separately identified draft overwrite fix, remaining financial reviews and final acceptance/publication are still open.
