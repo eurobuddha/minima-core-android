@@ -3001,56 +3001,69 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     private void renderAirdrop(StateNft.Meta m, List<StateNft.Item> transferable) {
         setScreen(Screen.AIRDROP, () -> openCollection(m));
-        appbar("Airdrop", true, false);
+        final long generation = screenGeneration;
+        appbar(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_title), true, false);
         hideNav();
 
-        body.addView(Design.lot(this, "Dispatch — " + transferable.size() + " lots in custody"));
+        body.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_dispatch, transferable.size())));
         body.addView(Design.display(this, m.name, 18), lpm(0, 4, 0, 10));
 
         /* the whole collection to ONE address — a single txn is impossible
          * on-chain (state is per-transaction), so this queues one identity-
          * preserving transfer per lot through the resumable engine */
         LinearLayout wholeCard = lotCard();
-        wholeCard.addView(Design.lot(this, "Send the whole collection"));
-        wholeCard.addView(Design.note(this, "All " + transferable.size() + " lots to one recipient — "
-                + "delivered as " + transferable.size() + " sealed transfers, one per coin, resumable."), lpm(0, 4, 0, 8));
-        EditText oneAddr = input("Mx… or 0x…");
-        wholeCard.addView(oneAddr, lph(48, 0, 0, 0, 8));
-        TextView sendAll = Design.button(this, "Send all " + transferable.size() + " lots", true);
+        wholeCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_whole)));
+        wholeCard.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_whole_help, transferable.size())), lpm(0, 4, 0, 8));
+        EditText oneAddr = input(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_send_address_hint));
+        oneAddr.setMinHeight(dp(48));
+        wholeCard.addView(oneAddr, lpm(0, 0, 0, 8));
+        TextView sendAll = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_send_all, transferable.size()), true);
         sendAll.setOnClickListener(v -> {
+            if (isFinishing() || isDestroyed() || screen != Screen.AIRDROP || generation != screenGeneration) return;
             String a = oneAddr.getText().toString().trim().replace(" ", "");
-            if (!Util.isValidAddress(a)) { toast("That address does not parse — Mx… or 0x… format"); return; }
+            if (!Util.isValidAddress(a)) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_invalid_address)); return; }
             List<String> addrs = new ArrayList<>();
             for (int i = 0; i < transferable.size(); i++) addrs.add(a);
             JSONObject job = AirdropEngine.createJob(m, transferable, addrs);
-            if (AirdropEngine.progress(job)[1] == 0) { toast("Nothing deliverable"); return; }
+            if (AirdropEngine.progress(job)[1] == 0) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_nothing)); return; }
+            if (AirdropEngine.job(this, m.localId) != null) {
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_existing)); return;
+            }
             AirdropEngine.saveJob(this, job);
             engageEngine();
-            toast(transferable.size() + " lots queued to " + Util.shorten(a));
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_queued, AirdropEngine.progress(job)[1], Util.shorten(a)));
             openCollection(m);
         });
-        wholeCard.addView(sendAll, lph(50, 0, 0, 0, 0));
+        sendAll.setMinHeight(dp(50));
+        wholeCard.addView(sendAll, lpm(0, 0, 0, 0));
         body.addView(wholeCard, lpm(0, 0, 0, 16));
 
-        body.addView(sectionHead("Or map lots to a list", ""));
-        body.addView(Design.note(this, "One address per line. Lots are delivered in order — lot " +
-                (transferable.isEmpty() ? "—" : String.format(Locale.US, "%03d", transferable.get(0).index)) +
-                " to the first line. Every transfer replays the sealed identity."), lpm(0, 0, 0, 10));
+        body.addView(sectionHead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_list), ""));
+        body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_list_help, transferable.isEmpty() ? "—" : String.format(Locale.US, "%03d", transferable.get(0).index))), lpm(0, 0, 0, 10));
 
         EditText addrs = inputMulti("Mx…\nMx…\n0x…");
         body.addView(addrs, new LinearLayout.LayoutParams(-1, dp(140)){{ bottomMargin = dp(8); }});
-        TextView status = Design.note(this, "Paste recipients, then preview.");
+        TextView status = Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_paste));
         body.addView(status, lpm(0, 0, 0, 10));
 
         LinearLayout mapping = vertical();
         body.addView(mapping, lpm(0, 0, 0, 10));
 
         final List<String> valid = new ArrayList<>();
-        TextView preview = Design.button(this, "Preview mapping", false);
+        final String[] previewed = {null};
+        addrs.addTextChangedListener(watch(value -> {
+            valid.clear();
+            previewed[0] = null;
+            mapping.removeAllViews();
+            Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_preview_first));
+        }));
+        TextView preview = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_preview), false);
         preview.setOnClickListener(v -> {
+            if (isFinishing() || isDestroyed() || screen != Screen.AIRDROP || generation != screenGeneration) return;
             valid.clear();
             mapping.removeAllViews();
-            String[] lines = addrs.getText().toString().split("\n");
+            previewed[0] = addrs.getText().toString();
+            String[] lines = previewed[0].split("\n");
             int bad = 0;
             for (String line : lines) {
                 String a = line.trim().replace(" ", "");
@@ -3063,30 +3076,39 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 LinearLayout row = horizontal(Gravity.CENTER_VERTICAL);
                 row.setBackground(Design.ruled(this, Design.CARD(), Design.INK(), 1));
                 row.setPadding(dp(10), dp(6), dp(10), dp(6));
-                row.addView(Design.lot(this, String.format(Locale.US, "Lot %03d", transferable.get(i).index)),
+                row.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_lot, String.format(Locale.US, "%03d", transferable.get(i).index))),
                         new LinearLayout.LayoutParams(dp(74), -2));
                 row.addView(Design.text(this, Util.shorten(valid.get(i)), 11, Design.INK(), Design.mono()),
                         new LinearLayout.LayoutParams(0, -2, 1));
                 mapping.addView(row, lpm(0, 0, 0, 5));
             }
-            String msg = n + " deliveries ready";
-            if (bad > 0) msg += " · " + bad + " invalid lines skipped";
-            if (valid.size() > transferable.size()) msg += " · " + (valid.size() - transferable.size()) + " recipients beyond your lots";
-            if (transferable.size() > valid.size() && n > 0) msg += " · " + (transferable.size() - valid.size()) + " lots stay with you";
-            status.setText(msg);
+            Language.TextBuilder summary = new Language.TextBuilder().append(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_ready, n));
+            if (bad > 0) summary.append(" · ").append(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_invalid_lines, bad));
+            if (valid.size() > transferable.size()) summary.append(" · ").append(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_extra_recipients, valid.size() - transferable.size()));
+            if (transferable.size() > valid.size() && n > 0) summary.append(" · ").append(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_remaining, transferable.size() - valid.size()));
+            Language.setText(status, summary.build());
         });
-        body.addView(preview, lph(48, 0, 0, 0, 8));
+        preview.setMinHeight(dp(48));
+        body.addView(preview, lpm(0, 0, 0, 8));
 
-        TextView go = Design.button(this, "Begin delivery", true);
+        TextView go = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_begin), true);
         go.setOnClickListener(v -> {
-            if (valid.isEmpty()) { status.setText("Preview the mapping first."); return; }
+            if (isFinishing() || isDestroyed() || screen != Screen.AIRDROP || generation != screenGeneration) return;
+            if (valid.isEmpty() || !addrs.getText().toString().equals(previewed[0])) {
+                Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_preview_first)); return;
+            }
             JSONObject job = AirdropEngine.createJob(m, transferable, valid);
-            if (AirdropEngine.progress(job)[1] == 0) { status.setText("Nothing deliverable."); return; }
+            if (AirdropEngine.progress(job)[1] == 0) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_nothing)); return; }
+            if (AirdropEngine.job(this, m.localId) != null) {
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_existing)); return;
+            }
             AirdropEngine.saveJob(this, job);
-            toast("Airdrop armed — the engine delivers one lot per cycle while the app is open");
+            engageEngine();
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_armed));
             openCollection(m);
         });
-        body.addView(go, lph(54, 0, 0, 0, 0));
+        go.setMinHeight(dp(54));
+        body.addView(go, lpm(0, 0, 0, 0));
     }
 
     private EditText inputMulti(String hint) {

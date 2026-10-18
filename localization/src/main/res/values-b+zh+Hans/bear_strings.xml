@@ -8041,4 +8041,33 @@
     <string name="l10n_atelier_gallery_stamp" formatted="false">"刻印"</string>
     <string name="l10n_atelier_gallery_complete" formatted="false">"完成"</string>
     <string name="l10n_atelier_gallery_engine_engaged" formatted="false">"引擎已启动 — 熄屏后仍会继续封存"</string>
+    <string name="l10n_atelier_airdrop_title" formatted="false">"空投"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_dispatch">"发送 — 持有的藏品：%1$d"</string>
+    <string name="l10n_atelier_airdrop_whole" formatted="false">"发送整个系列"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_whole_help">"将全部 %1$d 件藏品发送给同一收件人。每枚代币单独转移，并保留封存的身份数据。中断后可继续发送。"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_send_all">"发送全部藏品（%1$d）"</string>
+    <string name="l10n_atelier_airdrop_invalid_address" formatted="false">"无法解析该地址，请使用 Mx… 或 0x… 格式。"</string>
+    <string name="l10n_atelier_airdrop_nothing" formatted="false">"没有可发送的藏品。"</string>
+    <!-- Arguments: count, address -->
+    <string name="l10n_atelier_airdrop_queued">"已加入发送队列：%1$d 件 → %2$s"</string>
+    <string name="l10n_atelier_airdrop_list" formatted="false">"或按列表分配藏品"</string>
+    <!-- Arguments: lot -->
+    <string name="l10n_atelier_airdrop_list_help">"每行一个地址。按顺序发送，首行对应第 %1$s 件藏品。每次转移都会保留封存的身份数据。"</string>
+    <string name="l10n_atelier_airdrop_paste" formatted="false">"粘贴收件人地址，然后预览。"</string>
+    <string name="l10n_atelier_airdrop_preview" formatted="false">"预览分配"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_ready">"准备发送：%1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_invalid_lines">"已跳过无效行：%1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_extra_recipients">"未分配藏品的收件人：%1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_remaining">"保留的藏品：%1$d"</string>
+    <string name="l10n_atelier_airdrop_begin" formatted="false">"开始发送"</string>
+    <string name="l10n_atelier_airdrop_preview_first" formatted="false">"请先预览当前收件人列表。"</string>
+    <string name="l10n_atelier_airdrop_armed" formatted="false">"发送已加入队列，引擎每轮转移一件藏品。"</string>
+    <string name="l10n_atelier_airdrop_existing" formatted="false">"此系列已有发送记录。开始新的发送前，请在系列中查看该记录。"</string>
 </resources>

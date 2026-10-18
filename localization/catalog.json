@@ -40642,5 +40642,125 @@
     "zh-Hans": "引擎已启动 — 熄屏后仍会继续封存",
     "ru": "Движок запущен — запечатывание продолжится и при выключенном экране",
     "uk": "Рушій запущено — запечатування триватиме й із вимкненим екраном"
+  },
+  "atelierAirdrop.title": {
+    "en": "Airdrop",
+    "zh-Hans": "空投",
+    "ru": "Раздача",
+    "uk": "Роздача"
+  },
+  "atelierAirdrop.dispatch": {
+    "en": "Dispatch — lots in custody: {count}",
+    "zh-Hans": "发送 — 持有的藏品：{count}",
+    "ru": "Отправка — экземпляров у вас: {count}",
+    "uk": "Надсилання — примірників у вас: {count}"
+  },
+  "atelierAirdrop.whole": {
+    "en": "Send the whole collection",
+    "zh-Hans": "发送整个系列",
+    "ru": "Отправить всю коллекцию",
+    "uk": "Надіслати всю колекцію"
+  },
+  "atelierAirdrop.wholeHelp": {
+    "en": "Send all {count} lots to one recipient. Each coin is transferred separately with its sealed identity preserved. Delivery can resume after interruption.",
+    "zh-Hans": "将全部 {count} 件藏品发送给同一收件人。每枚代币单独转移，并保留封存的身份数据。中断后可继续发送。",
+    "ru": "Отправить все экземпляры ({count}) одному получателю. Каждая монета передаётся отдельно с сохранением закреплённых данных. Отправку можно продолжить после прерывания.",
+    "uk": "Надіслати всі примірники ({count}) одному одержувачу. Кожна монета передається окремо зі збереженням закріплених даних. Надсилання можна продовжити після переривання."
+  },
+  "atelierAirdrop.sendAll": {
+    "en": "Send all lots ({count})",
+    "zh-Hans": "发送全部藏品（{count}）",
+    "ru": "Отправить все экземпляры ({count})",
+    "uk": "Надіслати всі примірники ({count})"
+  },
+  "atelierAirdrop.invalidAddress": {
+    "en": "That address does not parse — use Mx… or 0x… format.",
+    "zh-Hans": "无法解析该地址，请使用 Mx… 或 0x… 格式。",
+    "ru": "Не удалось распознать адрес — используйте формат Mx… или 0x….",
+    "uk": "Не вдалося розпізнати адресу — використовуйте формат Mx… або 0x…."
+  },
+  "atelierAirdrop.nothing": {
+    "en": "Nothing deliverable.",
+    "zh-Hans": "没有可发送的藏品。",
+    "ru": "Нет экземпляров для отправки.",
+    "uk": "Немає примірників для надсилання."
+  },
+  "atelierAirdrop.queued": {
+    "en": "Lots queued: {count} → {address}",
+    "zh-Hans": "已加入发送队列：{count} 件 → {address}",
+    "ru": "В очереди: {count} → {address}",
+    "uk": "У черзі: {count} → {address}"
+  },
+  "atelierAirdrop.list": {
+    "en": "Or map lots to a list",
+    "zh-Hans": "或按列表分配藏品",
+    "ru": "Или распределить по списку",
+    "uk": "Або розподілити за списком"
+  },
+  "atelierAirdrop.listHelp": {
+    "en": "One address per line. Lots are delivered in order, starting with lot {lot} for the first line. Every transfer preserves the sealed identity.",
+    "zh-Hans": "每行一个地址。按顺序发送，首行对应第 {lot} 件藏品。每次转移都会保留封存的身份数据。",
+    "ru": "По одному адресу в строке. Экземпляры отправляются по порядку: первый адрес получает экземпляр {lot}. Все закреплённые данные сохраняются.",
+    "uk": "По одній адресі в рядку. Примірники надсилаються за порядком: перша адреса отримує примірник {lot}. Усі закріплені дані зберігаються."
+  },
+  "atelierAirdrop.paste": {
+    "en": "Paste recipients, then preview.",
+    "zh-Hans": "粘贴收件人地址，然后预览。",
+    "ru": "Вставьте адреса получателей и проверьте распределение.",
+    "uk": "Вставте адреси одержувачів і перевірте розподіл."
+  },
+  "atelierAirdrop.preview": {
+    "en": "Preview mapping",
+    "zh-Hans": "预览分配",
+    "ru": "Проверить распределение",
+    "uk": "Перевірити розподіл"
+  },
+  "atelierAirdrop.ready": {
+    "en": "Deliveries ready: {count}",
+    "zh-Hans": "准备发送：{count}",
+    "ru": "Готово к отправке: {count}",
+    "uk": "Готово до надсилання: {count}"
+  },
+  "atelierAirdrop.invalidLines": {
+    "en": "Invalid lines skipped: {count}",
+    "zh-Hans": "已跳过无效行：{count}",
+    "ru": "Пропущено неверных строк: {count}",
+    "uk": "Пропущено некоректних рядків: {count}"
+  },
+  "atelierAirdrop.extraRecipients": {
+    "en": "Recipients without a lot: {count}",
+    "zh-Hans": "未分配藏品的收件人：{count}",
+    "ru": "Получателей без экземпляра: {count}",
+    "uk": "Одержувачів без примірника: {count}"
+  },
+  "atelierAirdrop.remaining": {
+    "en": "Lots staying with you: {count}",
+    "zh-Hans": "保留的藏品：{count}",
+    "ru": "Останется у вас: {count}",
+    "uk": "Залишиться у вас: {count}"
+  },
+  "atelierAirdrop.begin": {
+    "en": "Begin delivery",
+    "zh-Hans": "开始发送",
+    "ru": "Начать отправку",
+    "uk": "Почати надсилання"
+  },
+  "atelierAirdrop.previewFirst": {
+    "en": "Preview the current recipient list first.",
+    "zh-Hans": "请先预览当前收件人列表。",
+    "ru": "Сначала проверьте текущий список получателей.",
+    "uk": "Спочатку перевірте поточний список одержувачів."
+  },
+  "atelierAirdrop.armed": {
+    "en": "Delivery queued. The engine transfers one lot per cycle.",
+    "zh-Hans": "发送已加入队列，引擎每轮转移一件藏品。",
+    "ru": "Отправка поставлена в очередь. Движок передаёт по одному экземпляру за цикл.",
+    "uk": "Надсилання додано до черги. Рушій передає по одному примірнику за цикл."
+  },
+  "atelierAirdrop.existing": {
+    "en": "This collection already has a delivery record. Review it in the collection before starting another.",
+    "zh-Hans": "此系列已有发送记录。开始新的发送前，请在系列中查看该记录。",
+    "ru": "У этой коллекции уже есть запись отправки. Проверьте её в коллекции, прежде чем начинать новую.",
+    "uk": "Ця колекція вже має запис надсилання. Перегляньте його в колекції, перш ніж починати нове."
   }
 }

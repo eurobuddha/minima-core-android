@@ -8077,4 +8077,33 @@
     <string name="l10n_atelier_gallery_stamp" formatted="false">"Stamp"</string>
     <string name="l10n_atelier_gallery_complete" formatted="false">"Done"</string>
     <string name="l10n_atelier_gallery_engine_engaged" formatted="false">"Engine engaged — sealing continues even with the screen off"</string>
+    <string name="l10n_atelier_airdrop_title" formatted="false">"Airdrop"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_dispatch">"Dispatch — lots in custody: %1$d"</string>
+    <string name="l10n_atelier_airdrop_whole" formatted="false">"Send the whole collection"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_whole_help">"Send all %1$d lots to one recipient. Each coin is transferred separately with its sealed identity preserved. Delivery can resume after interruption."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_send_all">"Send all lots (%1$d)"</string>
+    <string name="l10n_atelier_airdrop_invalid_address" formatted="false">"That address does not parse — use Mx… or 0x… format."</string>
+    <string name="l10n_atelier_airdrop_nothing" formatted="false">"Nothing deliverable."</string>
+    <!-- Arguments: count, address -->
+    <string name="l10n_atelier_airdrop_queued">"Lots queued: %1$d → %2$s"</string>
+    <string name="l10n_atelier_airdrop_list" formatted="false">"Or map lots to a list"</string>
+    <!-- Arguments: lot -->
+    <string name="l10n_atelier_airdrop_list_help">"One address per line. Lots are delivered in order, starting with lot %1$s for the first line. Every transfer preserves the sealed identity."</string>
+    <string name="l10n_atelier_airdrop_paste" formatted="false">"Paste recipients, then preview."</string>
+    <string name="l10n_atelier_airdrop_preview" formatted="false">"Preview mapping"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_ready">"Deliveries ready: %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_invalid_lines">"Invalid lines skipped: %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_extra_recipients">"Recipients without a lot: %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_remaining">"Lots staying with you: %1$d"</string>
+    <string name="l10n_atelier_airdrop_begin" formatted="false">"Begin delivery"</string>
+    <string name="l10n_atelier_airdrop_preview_first" formatted="false">"Preview the current recipient list first."</string>
+    <string name="l10n_atelier_airdrop_armed" formatted="false">"Delivery queued. The engine transfers one lot per cycle."</string>
+    <string name="l10n_atelier_airdrop_existing" formatted="false">"This collection already has a delivery record. Review it in the collection before starting another."</string>
 </resources>

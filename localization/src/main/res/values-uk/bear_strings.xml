@@ -8149,4 +8149,33 @@
     <string name="l10n_atelier_gallery_stamp" formatted="false">"Штампування"</string>
     <string name="l10n_atelier_gallery_complete" formatted="false">"Готово"</string>
     <string name="l10n_atelier_gallery_engine_engaged" formatted="false">"Рушій запущено — запечатування триватиме й із вимкненим екраном"</string>
+    <string name="l10n_atelier_airdrop_title" formatted="false">"Роздача"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_dispatch">"Надсилання — примірників у вас: %1$d"</string>
+    <string name="l10n_atelier_airdrop_whole" formatted="false">"Надіслати всю колекцію"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_whole_help">"Надіслати всі примірники (%1$d) одному одержувачу. Кожна монета передається окремо зі збереженням закріплених даних. Надсилання можна продовжити після переривання."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_send_all">"Надіслати всі примірники (%1$d)"</string>
+    <string name="l10n_atelier_airdrop_invalid_address" formatted="false">"Не вдалося розпізнати адресу — використовуйте формат Mx… або 0x…."</string>
+    <string name="l10n_atelier_airdrop_nothing" formatted="false">"Немає примірників для надсилання."</string>
+    <!-- Arguments: count, address -->
+    <string name="l10n_atelier_airdrop_queued">"У черзі: %1$d → %2$s"</string>
+    <string name="l10n_atelier_airdrop_list" formatted="false">"Або розподілити за списком"</string>
+    <!-- Arguments: lot -->
+    <string name="l10n_atelier_airdrop_list_help">"По одній адресі в рядку. Примірники надсилаються за порядком: перша адреса отримує примірник %1$s. Усі закріплені дані зберігаються."</string>
+    <string name="l10n_atelier_airdrop_paste" formatted="false">"Вставте адреси одержувачів і перевірте розподіл."</string>
+    <string name="l10n_atelier_airdrop_preview" formatted="false">"Перевірити розподіл"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_ready">"Готово до надсилання: %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_invalid_lines">"Пропущено некоректних рядків: %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_extra_recipients">"Одержувачів без примірника: %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_airdrop_remaining">"Залишиться у вас: %1$d"</string>
+    <string name="l10n_atelier_airdrop_begin" formatted="false">"Почати надсилання"</string>
+    <string name="l10n_atelier_airdrop_preview_first" formatted="false">"Спочатку перевірте поточний список одержувачів."</string>
+    <string name="l10n_atelier_airdrop_armed" formatted="false">"Надсилання додано до черги. Рушій передає по одному примірнику за цикл."</string>
+    <string name="l10n_atelier_airdrop_existing" formatted="false">"Ця колекція вже має запис надсилання. Перегляньте його в колекції, перш ніж починати нове."</string>
 </resources>
