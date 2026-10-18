@@ -31,8 +31,8 @@ public class HostingRestoreBoundaryTest {
                 .put("github",new JSONObject().put("token","gcm:unreadable")));
         try(MockedStatic<Crypt> crypt=mockStatic(Crypt.class);MockedStatic<HostingStore> hosts=mockStatic(HostingStore.class);
             MockedStatic<SalonStore> store=mockStatic(SalonStore.class);MockedStatic<SalonComms> identity=mockStatic(SalonComms.class)) {
-            store.when(()->SalonStore.me(activity)).thenReturn(new JSONObject());identity.when(()->SalonComms.exportSeed(activity)).thenReturn("");
-            hosts.when(()->HostingStore.list(activity)).thenReturn(java.util.Arrays.asList(profile));
+            store.when(()->SalonStore.identityRecord(activity)).thenReturn(new JSONObject());identity.when(()->SalonComms.exportSeed(activity)).thenReturn("");
+            hosts.when(()->HostingStore.listForBackup(activity)).thenReturn(java.util.Arrays.asList(profile));
             crypt.when(()->Crypt.decrypt("plain:first")).thenReturn("first");
             crypt.when(()->Crypt.decrypt("gcm:unreadable")).thenThrow(new Crypt.Unavailable());
             Method backup=MainActivity.class.getDeclaredMethod("buildBackupJson");backup.setAccessible(true);

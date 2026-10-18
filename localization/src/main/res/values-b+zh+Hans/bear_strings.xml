@@ -8219,4 +8219,5 @@
     <string name="l10n_salon_tips_balance_failed">"余额检查失败：%1$s"</string>
     <string name="l10n_salon_tips_bad_address" formatted="false">"该资料的打赏地址无效。未发送任何内容。"</string>
     <string name="l10n_salon_tips_bad_token" formatted="false">"代币 ID 无效。"</string>
+    <string name="l10n_salon_backup_storage_failed" formatted="false">"无法读取或保存账户备份。请检查设备存储空间后重试。"</string>
 </resources>

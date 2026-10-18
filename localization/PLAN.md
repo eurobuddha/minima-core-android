@@ -1,29 +1,30 @@
 # Four-language bear release
 
-## Current Atelier/Salon integration checkpoint — 1.9.87/158, 2026-10-18
+## Current Atelier/Salon integration checkpoint — 1.9.88/159, 2026-10-18
 
 This section supersedes the older source-version and completion-count snapshots
 below. The active goal remains incomplete. No final integration release has been
-installed or published; the authorized Fold is connected and retains its working
-1.9.85 build.
+installed or published. The Fold's last verified working build is 1.9.85; this
+checkpoint performs no device changes.
 
 - Both full native apps are imported into Pandamonium, with FILTR/art assets and
   the common manual English, Simplified Chinese, Russian and Ukrainian selector.
   Menu identities 17/18, Pandamonium-only dependencies, non-exported activities and
   separate providers remain present. Salon uses the host MaxChat node/media.
-- Current host verification: 741 passing tests across Atelier (288), Salon (283),
-  shared localization (12) and Pandamonium host (158). Real Chrome FILTR and Salon
-  page tests pass in all four languages. These checks do not prove Fold acceptance.
-- 6828 catalogue messages validate in all four languages. All 21 pinned imports
-  reproduce. The direct-transport guard passes. Release Java compilation passes.
-- The latest fix validates backup structure before writes and prevents retained
-  editor widgets from undoing a restored draft. See
-  `docs/SALON_BACKUP_VALIDATION_REVIEW.txt` for scope and evidence.
+- Current host verification: 757 passing tests across Atelier (288), Salon (299),
+  shared localization (12) and Pandamonium host (158). The prior real Chrome FILTR
+  and Salon page four-language checks still apply to the unchanged browser assets.
+  Host/browser checks do not prove Fold acceptance.
+- 6829 catalogue messages validate in all four languages. All 21 pinned imports
+  reproduce. The direct-transport guard and release Java compilation pass.
+- Salon full backup now validates before writes and saves the key, draft and hosting
+  list together, activating the new key only after checked persistence. Corrupt
+  saved data cannot silently produce an incomplete backup. Restored content survives
+  returning to Edit. Review: `docs/SALON_BACKUP_PERSISTENCE_REVIEW.txt`.
 
 Remaining before accepting the full goal:
 
-1. Resolve full-backup persistence across the identity/draft/hosting stores and test
-   disk failures. Review account ownership through claim/mint/poll and outbox work.
+1. Review account ownership through claim/mint/poll and outgoing-message callbacks.
 2. Finish the hardcoded-label audit, including Atelier's `openMinimaCore()` fallback
    toast, and review the integrated apps' remaining asynchronous completion paths.
 3. Build final signed versioned APKs after review; verify actual packages, certificate,

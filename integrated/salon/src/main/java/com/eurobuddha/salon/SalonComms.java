@@ -79,20 +79,79 @@ final class SalonComms {
         } catch (Exception unavailable) { throw new IdentityUnavailable(); }
     }
 
-    /** Restore from a hex seed; returns true on success and re-derives the identity. */
-    static synchronized boolean importSeed(Context c, String hex) {
+    /** Derive/wrap first; activation is a separate step after durable persistence. */
+    static final class PreparedIdentity {
+        final String wrapped, publicId;
+        final LocalEcCryptoProvider crypto;
+        PreparedIdentity(String wrapped, String publicId, LocalEcCryptoProvider crypto) {
+            this.wrapped = wrapped; this.publicId = publicId; this.crypto = crypto;
+        }
+    }
+
+    static synchronized PreparedIdentity prepareSeed(String hex) {
         try {
             byte[] seed = checkedSeed(hex);
-            // Derive and wrap before changing any persisted or cached identity.
             CommsIdentity id = CommsIdentity.fromSeed(Sodium.get(), seed);
             LocalEcCryptoProvider next = new LocalEcCryptoProvider(Sodium.get(), id);
-            String wrapped = Crypt.encryptSecure(Hex.to(seed));
-            if (!SalonStore.writeIdentity(c, wrapped, id.publicId())) return false;
-            CRYPTO = next;
-            MSGPK = id.publicId();
-            NostrKeys.invalidate();
+            return new PreparedIdentity(Crypt.encryptSecure(Hex.to(seed)), id.publicId(), next);
+        } catch (Exception unavailable) { throw new IdentityUnavailable(); }
+    }
+
+    private static void activate(PreparedIdentity next) {
+        CRYPTO = next.crypto; MSGPK = next.publicId;
+        NostrKeys.invalidate();
+    }
+
+    /** Restore from a hex seed; returns true only after persistence and activation. */
+    static synchronized boolean importSeed(Context c, String hex) {
+        try {
+            PreparedIdentity next = prepareSeed(hex);
+            if (!SalonStore.writeIdentity(c, next.wrapped, next.publicId)) return false;
+            activate(next);
             return true;
         } catch (Exception unavailable) { return false; }
+    }
+
+    static final class BackupResult {
+        final int destinations;
+        final boolean draftRestored, keyRestored, keyKept;
+        BackupResult(int destinations, boolean draftRestored, boolean keyRestored, boolean keyKept) {
+            this.destinations = destinations; this.draftRestored = draftRestored;
+            this.keyRestored = keyRestored; this.keyKept = keyKept;
+        }
+    }
+
+    static final class BackupCancelled extends IllegalStateException { }
+
+    /** Stage encryption first; recheck the owner's lifetime immediately before the save. */
+    static synchronized BackupResult restoreBackup(Context c, JSONObject backup, org.json.JSONArray preparedHosts,
+            java.util.function.BooleanSupplier currentOwner) throws Exception {
+        synchronized (SalonStore.class) { synchronized (HostingStore.class) {
+            JSONObject current = SalonStore.identityRecord(c);
+            org.json.JSONArray hosts = HostingStore.mergeForRestore(c, preparedHosts);
+            PreparedIdentity next = null;
+            boolean keyKept = false;
+            String rawSeed = backup.optString("msgseed", "");
+            if (!rawSeed.isEmpty()) {
+                String seed = Hex.to(checkedSeed(rawSeed));
+                if (!MailDb.get(c).contacts().isEmpty() && !seed.equalsIgnoreCase(exportSeed(c))) keyKept = true;
+                else {
+                    next = prepareSeed(seed);
+                    if (next == null) throw new IdentityUnavailable();
+                }
+            }
+            boolean draftRestored = backup.has("me") && (current.optString("tokenid").isEmpty() || current.optString("handle").isEmpty());
+            JSONObject account = new JSONObject((draftRestored ? backup.getJSONObject("me") : current).toString());
+            for (String key : new String[]{"msgseed", "msgpk"}) {
+                if (current.has(key)) account.put(key, current.get(key)); else account.remove(key);
+            }
+            if (next != null) account.put("msgseed", next.wrapped).put("msgpk", next.publicId);
+            BackupResult result = new BackupResult(preparedHosts.length(), draftRestored, next != null, keyKept);
+            if (!currentOwner.getAsBoolean()) throw new BackupCancelled();
+            if (!SalonStore.commitBackup(c, account, hosts)) throw new SalonStore.BackupStorageUnavailable();
+            if (next != null) activate(next);
+            return result;
+        } }
     }
 
     private SalonComms() {}

@@ -928,7 +928,8 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_too_large))); return;
                     }
                     runOnUiThread(() -> launchBackupSave(operation, "salon-backup.json", content));
-                } catch (Crypt.Unavailable unavailable) { runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_unavailable))); }
+                } catch (SalonStore.BackupStorageUnavailable unavailable) { runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_storage_failed))); }
+                catch (Crypt.Unavailable unavailable) { runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_unavailable))); }
                 catch (SalonComms.IdentityUnavailable unavailable) { runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_unavailable))); }
             });
         } catch (java.util.concurrent.RejectedExecutionException unavailable) { finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_unavailable)); }
@@ -1085,18 +1086,21 @@ public class MainActivity extends AppCompatActivity {
         try {
             b.put("salonBackup", 1);
             b.put("created", System.currentTimeMillis() / 1000);
-            JSONObject me = new JSONObject(SalonStore.me(this).toString());
+            JSONObject me = new JSONObject(SalonStore.identityRecord(this).toString());
             me.remove("msgseed");   // device-bound; exported separately as plaintext
             b.put("me", me);
             String seed = SalonComms.exportSeed(this);
             if (!seed.isEmpty()) b.put("msgseed", seed);
             JSONArray hosts = new JSONArray();
-            for (Hosting.Profile p : HostingStore.list(this)) {
+            for (Hosting.Profile p : HostingStore.listForBackup(this)) {
                 JSONObject copy = HostingSecrets.copySecrets(p.j, false);
                 hosts.put(copy);
             }
             b.put("hosting", hosts);
-        } catch (Crypt.Unavailable unavailable) { throw unavailable; }
+            try { BackupValidation.check(b); }
+            catch (IllegalArgumentException invalid) { throw new SalonStore.BackupStorageUnavailable(); }
+        } catch (SalonStore.BackupStorageUnavailable unavailable) { throw unavailable; }
+        catch (Crypt.Unavailable unavailable) { throw unavailable; }
         catch (Exception unavailable) { throw new SalonComms.IdentityUnavailable(); }
         return b.toString();
     }
@@ -1119,34 +1123,20 @@ public class MainActivity extends AppCompatActivity {
                 if (operation != null && !backupCurrent(operation)) {
                     runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_changed))); return;
                 }
-            boolean msgOk = false, seedKept = false;
-            String rawSeed = b.optString("msgseed", "");
-            String seed = rawSeed.isEmpty() ? "" : Hex.to(SalonComms.checkedSeed(rawSeed));
-            if (!seed.isEmpty()) {
-                boolean activeInbox = !MailDb.get(this).contacts().isEmpty();
-                if (activeInbox && !seed.equalsIgnoreCase(SalonComms.exportSeed(this))) {
-                    seedKept = true;   // never silently replace a key that has a live inbox
-                } else {
-                    if (!SalonComms.importSeed(this, seed)) {
-                        runOnUiThread(() -> { if (!isFinishing() && !isDestroyed()) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_restore_failed)); });
-                        return;
-                    }
-                    msgOk = true;
-                }
+            final SalonComms.BackupResult restored;
+            try { restored = SalonComms.restoreBackup(this, b, preparedHosts, () -> operation == null || backupCurrent(operation)); }
+            catch (SalonComms.BackupCancelled cancelled) {
+                runOnUiThread(() -> finishBackup(operation, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_changed)));
+                return;
+            } catch (SalonComms.IdentityUnavailable unavailable) {
+                runOnUiThread(() -> backupNotice(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_restore_failed)));
+                return;
+            } catch (SalonStore.BackupStorageUnavailable unavailable) {
+                runOnUiThread(() -> backupNotice(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_backup_storage_failed)));
+                return;
             }
-            JSONObject me = b.optJSONObject("me");
-            final boolean restoredDraft = me != null && !SalonStore.hasIdentity(this);
-            if (restoredDraft) {   // don't clobber a live identity
-                JSONObject keepMsg = SalonStore.me(this);
-                if (keepMsg.has("msgseed")) try { me.put("msgseed", keepMsg.optString("msgseed")); } catch (Exception ignored) {}
-                SalonStore.save(this, me);
-            }
-            int hostN = 0;
-            for (int i = 0; i < preparedHosts.length(); i++) {
-                HostingStore.upsert(this, new Hosting.Profile(preparedHosts.getJSONObject(i)));
-                hostN++;
-            }
-            final int hn = hostN; final boolean mo = msgOk, sk = seedKept;
+            final int hn = restored.destinations;
+            final boolean mo = restored.keyRestored, sk = restored.keyKept, restoredDraft = restored.draftRestored;
             final String restoredOwner = backupOwner();
             runOnUiThread(() -> {
                 if (backupClosed || isFinishing() || isDestroyed()) return;

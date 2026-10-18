@@ -1,0 +1,91 @@
+Salon full-backup persistence review — 2026-10-18, source 1.9.88/159
+
+Summary
+A full restore prepares its messaging identity, profile draft and merged hosting
+list, then saves them with one checked SharedPreferences commit. The new key is
+activated only after that commit succeeds. Failed reads/writes have an explicit
+four-language message. A cancelled or replaced owner cannot commit after staging.
+
+Sources reused
+- integrated/atelier/src/main/java/com/eurobuddha/statenft/LocalStore.java:
+  writeAirdrop commits related preference keys together and restores Android's
+  in-memory snapshot after a failed commit; its strict trailing-data parser is
+  reused for stored hosting arrays.
+- scripts/pandamonium-sources/salon/SalonStore.java: existing checked identity
+  persistence and failed-commit rollback.
+- scripts/pandamonium-sources/salon/SalonComms.java: existing checked seed parsing,
+  native identity derivation, encryption and activation order. These steps are
+  shared with the existing explicit messaging-key restore, not reimplemented.
+- Original Salon and Atelier HostingStore: existing upsert-by-ID order/merge and
+  encryption boundary. MinimaMail's SQLite restore was inspected; moving Salon's
+  preference-backed records into its unrelated mail database was unnecessary.
+- AtelierBurialStoreTest.Prefs/AtelierDeliveryTest fault simulation, SalonIdentityTest,
+  BackupLifecycle, SettingsLanguage and HostingRestoreBoundary tests.
+
+Storage compatibility
+Before the first successful full restore, hosting still uses
+pandamonium_salon_hosting/hosting_profiles. Restore merges that complete list with
+the incoming destinations, then writes salon_identity/me and
+salon_identity/hosting_profiles in the same editor commit. Presence of the latter
+key selects the combined store for all subsequent hosting reads and edits.
+The legacy file is retained, and no key alias or encryption format changes.
+A failed first commit removes the uncommitted selector when restoring memory;
+a failed later commit restores the previous combined list. Corrupt combined data
+never causes backup/restore to fall back silently to an older legacy list.
+
+Android documents commit() as an atomic update whose true result means the new
+values reached persistent storage:
+https://developer.android.com/reference/android/content/SharedPreferences.Editor#commit()
+Both preference locations remain covered by the host's allowBackup=false and its
+explicit shared-preference exclusions for cloud backup and device transfer.
+The user-exported version-1 backup format remains unchanged. Older integration
+code predating this change does not read the combined hosting preference key.
+
+Findings resolved
+CRITICAL — Partial restore could activate a new key and then fail to save the
+profile/destinations. All resulting records now share one checked commit. Key
+preparation cannot activate a cache; cached messaging and derived Nostr identities
+change only after successful persistence. Existing live-inbox/key-retention and
+live-profile preservation rules remain intact.
+
+MAJOR — apply() supplied no write result, while UI reported restored destinations.
+The full restore uses commit() and propagates failure. Old editor widgets are reset
+only by the successful completion path. The prior owner/lifecycle checks remain,
+with an additional check after key preparation and immediately before committing.
+
+MAJOR — Corrupt hosting data could be exported as an empty list.
+Backup and restore now use a strict list read. Invalid JSON, trailing data, null
+rows, empty/duplicate IDs and malformed exported profile/configuration fields abort
+the operation without opening the save picker or discarding the stored data.
+
+Locking
+Restore acquires SalonComms, SalonStore, then HostingStore. Hosting CRUD is serialized
+under HostingStore; its preference selector does not acquire SalonStore. Profile
+reads now share SalonStore's lock, so they cannot observe a failed restore's
+intermediate memory update. Concurrent hosting edits wait and use the selected
+store after the restore. No new background worker or database is introduced.
+
+Validation
+- Final combined run: Salon 299, Atelier 288, localization 12 and Pandamonium host
+  158 = 757 tests, zero failures/errors/skips; Gradle succeeded in 2m 8s.
+- 16 new tests: 12 persistence/fault/concurrency cases and four Activity cases.
+- Tests cover one combined commit, legacy-to-combined selection, subsequent CRUD,
+  live identity/inbox preservation, encrypted-at-rest values, cached-key activation
+  order, false/throwing commits, failed staging, failed rollback writes, corrupt
+  legacy/combined records, concurrent hosting edits and cancellation during staging.
+- Simulated stop before commit reloads the old complete account; simulated stop
+  after commit reloads the new complete account/key even if activation did not run.
+  These are controlled persistence-boundary simulations, not physical power-cut tests.
+- All four languages are exercised through the actual Activity failure paths.
+- Release Java compilation passed. All 21 pinned imports reproduce. Direct-transport
+  and whitespace checks pass. 6829 catalogue messages validate in four languages.
+- Evidence: build/localization/salon-backup-persistence-{tests,full,final,import}.log
+  and salon-backup-persistence-results.json. Browser assets did not change; the
+  prior four-language FILTR/Salon page browser evidence remains applicable.
+
+Verdict
+Approve this persistence change. No unresolved blocking finding within this patch.
+The full integration goal remains incomplete: initial claim/mint/poll and outbox
+account ownership, final label audit, signed package verification and Fold visual,
+retained-state and lock acceptance remain. No real account/key operation, device
+installation or public release was performed.

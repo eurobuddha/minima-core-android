@@ -8327,4 +8327,5 @@
     <string name="l10n_salon_tips_balance_failed">"Не вдалося перевірити баланс: %1$s"</string>
     <string name="l10n_salon_tips_bad_address" formatted="false">"У профілі вказано некоректну адресу для чайових. Нічого не надіслано."</string>
     <string name="l10n_salon_tips_bad_token" formatted="false">"Некоректний ID токена."</string>
+    <string name="l10n_salon_backup_storage_failed" formatted="false">"Не вдалося прочитати або зберегти резервну копію облікового запису. Перевірте пам’ять пристрою та повторіть спробу."</string>
 </resources>

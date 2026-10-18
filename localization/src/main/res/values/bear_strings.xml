@@ -8255,4 +8255,5 @@
     <string name="l10n_salon_tips_balance_failed">"Balance check failed: %1$s"</string>
     <string name="l10n_salon_tips_bad_address" formatted="false">"The profile has an invalid tip address. Nothing was sent."</string>
     <string name="l10n_salon_tips_bad_token" formatted="false">"Invalid token ID."</string>
+    <string name="l10n_salon_backup_storage_failed" formatted="false">"Could not read or save the account backup. Check device storage and try again."</string>
 </resources>

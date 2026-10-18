@@ -22,7 +22,7 @@ final class SalonStore {
 
     private SalonStore() {}
 
-    private static SharedPreferences prefs(Context c) {
+    static SharedPreferences prefs(Context c) {
         return c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
@@ -49,6 +49,30 @@ final class SalonStore {
         // SharedPreferences updates memory even when commit reports a disk failure.
         try { prefs.edit().putString(KEY, previous).commit(); }
         catch (Exception unavailable) { /* Do not activate an identity after storage failure. */ }
+        return false;
+    }
+
+    static final String BACKUP_HOSTS = "hosting_profiles";
+
+    static final class BackupStorageUnavailable extends IllegalStateException {
+        BackupStorageUnavailable() { super("Salon account storage unavailable"); }
+    }
+
+    /** Same multi-key commit/rollback as Atelier LocalStore.writeAirdrop. */
+    static synchronized boolean commitBackup(Context c, JSONObject account, JSONArray hosts) {
+        SharedPreferences p = prefs(c);
+        final String previous, previousHosts;
+        try {
+            previous = p.getString(KEY, null);
+            previousHosts = p.getString(BACKUP_HOSTS, null);
+        } catch (RuntimeException unavailable) { return false; }
+        try {
+            // The hosted credentials remain encrypted; both keys share one disk commit.
+            if (p.edit().putString(KEY, account.toString())
+                    .putString(BACKUP_HOSTS, hosts.toString()).commit()) return true;
+        } catch (RuntimeException unavailable) { /* Restore Android's in-memory copy too. */ }
+        try { p.edit().putString(KEY, previous).putString(BACKUP_HOSTS, previousHosts).commit(); }
+        catch (RuntimeException unavailable) { /* Never activate the prepared key after a failed save. */ }
         return false;
     }
 
@@ -113,7 +137,7 @@ final class SalonStore {
         return RestoreResult.FAILED;
     }
 
-    static JSONObject me(Context c) {
+    static synchronized JSONObject me(Context c) {
         try {
             String s = prefs(c).getString(KEY, "");
             return s.isEmpty() ? new JSONObject() : new JSONObject(s);

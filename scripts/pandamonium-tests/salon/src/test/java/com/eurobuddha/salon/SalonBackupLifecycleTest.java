@@ -47,7 +47,7 @@ public class SalonBackupLifecycleTest {
         field("body").set(activity,new LinearLayout(activity));field("appbar").set(activity,new LinearLayout(activity));field("navRow").set(activity,new LinearLayout(activity));field("screen").set(activity,Enum.valueOf((Class)field("screen").getType(),"SETTINGS"));
         ((ExecutorService)field("io").get(activity)).shutdownNow();worker=mock(ExecutorService.class);field("io").set(activity,worker);doAnswer(c->{jobs.add(c.getArgument(0));return null;}).when(worker).execute(any(Runnable.class));
         activity.getSharedPreferences("salon_identity",Context.MODE_PRIVATE).edit().clear().commit();activity.getSharedPreferences(HostingStore.PREFS,Context.MODE_PRIVATE).edit().clear().commit();SalonStore.put(activity,"tokenid","original");SalonStore.put(activity,"handle","original");
-        identity=mockStatic(SalonComms.class);identity.when(()->SalonComms.exportSeed(activity)).thenReturn(SEED);identity.when(()->SalonComms.checkedSeed(anyString())).thenCallRealMethod();mail=mockStatic(MailDb.class);MailDb db=mock(MailDb.class);when(db.contacts()).thenReturn(Collections.emptyList());mail.when(()->MailDb.get(activity)).thenReturn(db);
+        identity=mockStatic(SalonComms.class);identity.when(()->SalonComms.exportSeed(activity)).thenReturn(SEED);identity.when(()->SalonComms.checkedSeed(anyString())).thenCallRealMethod();identity.when(()->SalonComms.restoreBackup(eq(activity),any(JSONObject.class),any(JSONArray.class),any(java.util.function.BooleanSupplier.class))).thenCallRealMethod();mail=mockStatic(MailDb.class);MailDb db=mock(MailDb.class);when(db.contacts()).thenReturn(Collections.emptyList());mail.when(()->MailDb.get(activity)).thenReturn(db);
         resolver=Shadows.shadowOf(activity.getContentResolver());((ClipboardManager)activity.getSystemService(Context.CLIPBOARD_SERVICE)).clearPrimaryClip();ShadowToast.reset();
     }
     @After public void cleanup(){android.app.Dialog d=ShadowDialog.getLatestDialog();if(d!=null)d.dismiss();identity.close();mail.close();worker.shutdownNow();Language.select(activity,"en");}
@@ -92,7 +92,7 @@ public class SalonBackupLifecycleTest {
         for(int mode=0;mode<3;mode++){In in=mode==0?new In(new byte[]{(byte)0xc3,(byte)0x28}):mode==1?new In(backup().getBytes(StandardCharsets.UTF_8)){@Override public synchronized int read(byte[] b,int o,int l){throw new IllegalStateException("read failure");}}:new In(backup().getBytes(StandardCharsets.UTF_8)){@Override public void close()throws IOException{super.close();throw new IOException("close failure");}};resolver.registerInputStream(uri,in);restore();result(52,Activity.RESULT_OK,uri);next();assertTrue(in.closed);assertTrue(HostingStore.list(activity).isEmpty());assertEquals(Language.msg(l10n_salon_backup_read_failed).toString(),ShadowToast.getTextOfLatestToast());}
     }
     @Test public void malformedOrUnavailableKeyCannotChangeDraftOrDestinations()throws Exception{
-        SalonStore.put(activity,"tokenid","");String original=SalonStore.me(activity).toString();for(Object value:new Object[]{"invalid",new JSONArray(),SEED}){JSONObject b=new JSONObject(backup()).put("me",new JSONObject().put("handle","replacement").put("tokenid","new")).put("msgseed",value);call("restoreFromBackup",new Class<?>[]{String.class},b.toString());idle();assertEquals(original,SalonStore.me(activity).toString());assertTrue(HostingStore.list(activity).isEmpty());}identity.verify(()->SalonComms.importSeed(activity,SEED));assertEquals(Language.msg(l10n_salon_identity_restore_failed).toString(),ShadowToast.getTextOfLatestToast());
+        SalonStore.put(activity,"tokenid","");String original=SalonStore.me(activity).toString();for(Object value:new Object[]{"invalid",new JSONArray(),SEED}){JSONObject b=new JSONObject(backup()).put("me",new JSONObject().put("handle","replacement").put("tokenid","new")).put("msgseed",value);call("restoreFromBackup",new Class<?>[]{String.class},b.toString());idle();assertEquals(original,SalonStore.me(activity).toString());assertTrue(HostingStore.list(activity).isEmpty());}identity.verify(()->SalonComms.prepareSeed(SEED));assertEquals(Language.msg(l10n_salon_identity_restore_failed).toString(),ShadowToast.getTextOfLatestToast());
     }
     @Test public void staleKeyDialogCannotCopySaveOrImport()throws Exception{
         call("backupMsgKey",new Class<?>[]{});next();AlertDialog d=(AlertDialog)ShadowDialog.getLatestDialog();SalonStore.put(activity,"tokenid","replacement");d.getButton(-3).performClick();idle();assertNull(((ClipboardManager)activity.getSystemService(Context.CLIPBOARD_SERVICE)).getPrimaryClip());assertEquals(Language.msg(l10n_salon_backup_changed).toString(),ShadowToast.getTextOfLatestToast());
@@ -127,6 +127,7 @@ public class SalonBackupLifecycleTest {
             }
         }
         identity.verify(()->SalonComms.importSeed(any(),anyString()),never());
+        identity.verify(()->SalonComms.prepareSeed(anyString()),never());
     }
     @SuppressWarnings({"rawtypes","unchecked"})
     @Test public void restoredDraftSurvivesReturningToEditorInAllFourLanguages()throws Exception {
@@ -161,6 +162,46 @@ public class SalonBackupLifecycleTest {
         restore.start();restore.join(5000);assertFalse(restore.isAlive());assertNull(failure.get());
         SalonStore.put(activity,"tokenid","replacement");SalonStore.put(activity,"name","replacement draft");idle();
         assertSame(old,field("edName").get(activity));assertEquals("replacement draft",SalonStore.get(activity,"name"));assertNull(ShadowToast.getTextOfLatestToast());
+    }
+
+    @Test public void failedAccountCommitNeverReportsSuccessOrClearsTheDraftInAnyLanguage()throws Exception {
+        EditText draft=new EditText(activity);draft.setText("keep this edit");field("edName").set(activity,draft);
+        String before=SalonStore.me(activity).toString();
+        try(MockedStatic<SalonStore> store=mockStatic(SalonStore.class,CALLS_REAL_METHODS)){
+            store.when(()->SalonStore.commitBackup(eq(activity),any(JSONObject.class),any(JSONArray.class))).thenReturn(false);
+            for(String code:new String[]{"en","zh-Hans","ru","uk"}){
+                Language.select(activity,code);call("restoreFromBackup",new Class<?>[]{String.class},backup());idle();
+                assertEquals(before,SalonStore.me(activity).toString());assertTrue(HostingStore.list(activity).isEmpty());assertSame(draft,field("edName").get(activity));
+                assertEquals(Language.msg(l10n_salon_backup_storage_failed).toString(),ShadowToast.getTextOfLatestToast());
+            }
+        }
+    }
+    @Test public void corruptHostingStorageStopsBackupInsteadOfExportingAnEmptyList()throws Exception {
+        activity.getSharedPreferences(HostingStore.PREFS,Context.MODE_PRIVATE).edit().putString("hosting_profiles","{corrupt").commit();
+        for(String code:new String[]{"en","zh-Hans","ru","uk"}){
+            Language.select(activity,code);call("backupAccount",new Class<?>[]{});next();
+            assertNull(operation());assertNull(Shadows.shadowOf(activity).getNextStartedActivityForResult());
+            assertEquals(Language.msg(l10n_salon_backup_storage_failed).toString(),ShadowToast.getTextOfLatestToast());
+        }
+        assertEquals("{corrupt",activity.getSharedPreferences(HostingStore.PREFS,Context.MODE_PRIVATE).getString("hosting_profiles",""));
+    }
+
+    @Test public void malformedStoredProfileStopsBackupInsteadOfProducingAnUnrestorableFile()throws Exception {
+        SalonStore.put(activity,"name","original");
+        JSONObject malformed=SalonStore.identityRecord(activity).put("gallery","not an array");
+        activity.getSharedPreferences("salon_identity",Context.MODE_PRIVATE).edit().putString("me",malformed.toString()).commit();
+        call("backupAccount",new Class<?>[]{});next();
+        assertNull(operation());assertNull(Shadows.shadowOf(activity).getNextStartedActivityForResult());
+        assertEquals(malformed.toString(),SalonStore.identityRecord(activity).toString());
+        assertEquals(Language.msg(l10n_salon_backup_storage_failed).toString(),ShadowToast.getTextOfLatestToast());
+    }
+
+    @Test public void cancellationWhilePreparingKeyCannotCommitOrActivateAnything()throws Exception {
+        String before=SalonStore.me(activity).toString();
+        identity.when(()->SalonComms.prepareSeed(SEED)).thenAnswer(c->{call("cancelBackup",new Class<?>[]{});return new SalonComms.PreparedIdentity("gcm:prepared","new-public",mock(LocalEcCryptoProvider.class));});
+        String json=new JSONObject(backup()).put("msgseed",SEED).toString();
+        resolver.registerInputStream(uri,new In(json.getBytes(StandardCharsets.UTF_8)));restore();result(52,Activity.RESULT_OK,uri);next();
+        assertEquals(before,SalonStore.me(activity).toString());assertTrue(HostingStore.list(activity).isEmpty());assertNull(operation());assertNull(ShadowToast.getTextOfLatestToast());
     }
 
 }

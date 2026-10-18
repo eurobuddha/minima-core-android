@@ -9,9 +9,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Profile CRUD on the app's SharedPreferences (LocalStore pattern, kept
- *  separate so mint bookkeeping and hosting config never contend). Secret
- *  fields arrive here already Crypt-wrapped by the editor UI. */
+/** Encrypted hosting profiles. After a full restore they share the account's
+ * preference file so the identity, draft and destinations commit together. */
 final class HostingStore {
 
     private static final String KEY = "hosting_profiles";
@@ -20,15 +19,15 @@ final class HostingStore {
 
     private HostingStore() {}
 
-    /** Own prefs file (NOT statenft_suite) so backup rules can exclude the
-     *  credentials without dropping collection state. */
+    /** Legacy location remains readable until the first successful full restore. */
     static final String PREFS = "pandamonium_salon_hosting";
 
     private static SharedPreferences prefs(Context c) {
-        return c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        SharedPreferences account = SalonStore.prefs(c);
+        return account.contains(SalonStore.BACKUP_HOSTS) ? account : c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
-    static List<Hosting.Profile> list(Context c) {
+    static synchronized List<Hosting.Profile> list(Context c) {
         List<Hosting.Profile> out = new ArrayList<>();
         try {
             JSONArray arr = new JSONArray(prefs(c).getString(KEY, "[]"));
@@ -40,7 +39,50 @@ final class HostingStore {
         return out;
     }
 
-    static void upsert(Context c, Hosting.Profile p) {
+    /** A corrupt store must not become an empty backup or be overwritten by restore. */
+    static synchronized List<Hosting.Profile> listForBackup(Context c) {
+        try {
+            String raw = prefs(c).getString(KEY, "[]");
+            if (raw == null || raw.indexOf(0) >= 0) throw new SalonStore.BackupStorageUnavailable();
+            // Reuse Atelier LocalStore's trailing-data guard for the stored array.
+            org.json.JSONTokener input = new org.json.JSONTokener(raw);
+            Object value = input.nextValue();
+            while (input.more()) {
+                char ch = input.next();
+                if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n') throw new SalonStore.BackupStorageUnavailable();
+            }
+            if (!(value instanceof JSONArray)) throw new SalonStore.BackupStorageUnavailable();
+            JSONArray rows = (JSONArray) value;
+            List<Hosting.Profile> result = new ArrayList<>();
+            java.util.HashSet<String> ids = new java.util.HashSet<>();
+            for (int i = 0; i < rows.length(); i++) {
+                JSONObject row = rows.getJSONObject(i);
+                Object id = row.opt("id");
+                if (!(id instanceof String) || ((String) id).isEmpty() || !ids.add((String) id))
+                    throw new SalonStore.BackupStorageUnavailable();
+                result.add(new Hosting.Profile(row));
+            }
+            return result;
+        } catch (Exception unavailable) { throw new SalonStore.BackupStorageUnavailable(); }
+    }
+
+    /** Preserve the existing upsert-by-ID behavior without writing intermediate lists. */
+    static synchronized JSONArray mergeForRestore(Context c, JSONArray incoming) throws org.json.JSONException {
+        List<Hosting.Profile> all = listForBackup(c);
+        for (int i = 0; i < incoming.length(); i++) {
+            Hosting.Profile profile = new Hosting.Profile(incoming.getJSONObject(i));
+            boolean replaced = false;
+            for (int n = 0; n < all.size(); n++) {
+                if (all.get(n).id().equals(profile.id())) { all.set(n, profile); replaced = true; break; }
+            }
+            if (!replaced) all.add(profile);
+        }
+        JSONArray result = new JSONArray();
+        for (Hosting.Profile profile : all) result.put(profile.j);
+        return result;
+    }
+
+    static synchronized void upsert(Context c, Hosting.Profile p) {
         List<Hosting.Profile> all = list(c);
         boolean replaced = false;
         for (int i = 0; i < all.size(); i++) {
@@ -50,20 +92,20 @@ final class HostingStore {
         save(c, all);
     }
 
-    static void remove(Context c, String id) {
+    static synchronized void remove(Context c, String id) {
         List<Hosting.Profile> all = list(c);
         List<Hosting.Profile> next = new ArrayList<>();
         for (Hosting.Profile p : all) if (!p.id().equals(id)) next.add(p);
         save(c, next);
     }
 
-    static void setDefault(Context c, String id) {
+    static synchronized void setDefault(Context c, String id) {
         List<Hosting.Profile> all = list(c);
         for (Hosting.Profile p : all) Hosting.put(p.j, "def", p.id().equals(id));
         save(c, all);
     }
 
-    static Hosting.Profile getDefault(Context c) {
+    static synchronized Hosting.Profile getDefault(Context c) {
         List<Hosting.Profile> all = list(c);
         for (Hosting.Profile p : all) if (p.isDefault()) return p;
         return all.isEmpty() ? null : all.get(0);
