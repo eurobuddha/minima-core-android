@@ -1,4 +1,5 @@
 package com.eurobuddha.nftwallet;
+import com.eurobuddha.minimacore.i18n.Language;
 
 import android.app.Notification;
 import android.app.Service;
@@ -29,6 +30,8 @@ import com.eurobuddha.minimaapi.direct.DirectNodeApi;
  */
 public class MintService extends Service {
 
+    private final Runnable languageChanged = this::refreshLanguageNotification;
+
     private static final int FG_ID = 7501;
     public static final String ACTION_HEARTBEAT = "com.eurobuddha.nftwallet.HEARTBEAT";
 
@@ -45,6 +48,7 @@ public class MintService extends Service {
         // If the OS refuses foreground promotion, bail gracefully rather than crashing — the mint
         // resumes when the app is next opened.
         if (!startForegroundCompat()) { stopSelf(); return; }
+        Language.addListener(languageChanged);
 
         // Nothing to do? Don't linger. (Boot and the worker both start us speculatively.)
         if (!MintDriver.hasWork(this)) { stopGracefully(); return; }
@@ -193,11 +197,20 @@ public class MintService extends Service {
     // Reuse Future Cash GuardianService's locale/configuration refresh without starting node work.
     @Override public void onConfigurationChanged(android.content.res.Configuration config) {
         super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        refreshLanguageNotification();
+    }
+
+    private void refreshLanguageNotification() {
         Notifier.ensureChannels(this);
-        if (foregroundActive) { fgText = ""; updateFg(stateText()); }
+        if (foregroundActive) {
+            android.app.NotificationManager manager = getSystemService(android.app.NotificationManager.class);
+            if (manager != null) manager.notify(FG_ID, buildFg(fgText.isEmpty() ? "Working…" : fgText));
+        }
     }
 
     @Override public void onDestroy() {
+        Language.removeListener(languageChanged);
         foregroundActive = false;
         super.onDestroy();
         if (node != null) node.onDestroy();

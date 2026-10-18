@@ -33,6 +33,8 @@ import java.util.Map;
  */
 public class DexKeepAliveService extends Service {
 
+    private final Runnable languageChanged = this::refreshLanguageNotification;
+
     private static final String CH_FG = "pandadex_keepalive";
     private static final int FG_ID = 7401;
     public static final String ACTION_HEARTBEAT = "com.eurobuddha.pandadex.HEARTBEAT";
@@ -60,6 +62,7 @@ public class DexKeepAliveService extends Service {
         super.onCreate();
         createChannel();
         if (!startForegroundCompat()) { stopSelf(); return; }
+        Language.addListener(languageChanged);
         node = new NodeApi(getApplicationContext(), this::onPaired);
         db = new DexDb(getApplicationContext());
         txn = new DexTxn(node, db);
@@ -274,6 +277,10 @@ public class DexKeepAliveService extends Service {
     @Override public void onConfigurationChanged(android.content.res.Configuration config) {
         super.onConfigurationChanged(config);
         Language.configurationChanged(this);
+        refreshLanguageNotification();
+    }
+
+    private void refreshLanguageNotification() {
         try {
             createChannel();
             // Reuse AtomiX's active-service guard. A locale change does not start a maintenance pass.
@@ -285,6 +292,7 @@ public class DexKeepAliveService extends Service {
     }
 
     @Override public void onDestroy() {
+        Language.removeListener(languageChanged);
         started = false; // Ignore late pairing/scan callbacks before releasing the transport.
         passGate.invalidate();
         super.onDestroy();

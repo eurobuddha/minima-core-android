@@ -1,4 +1,5 @@
 package com.eurobuddha.atomix;
+import com.eurobuddha.minimacore.i18n.Language;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -54,6 +55,8 @@ import com.eurobuddha.atomix.swap.SwapTake;
  */
 public class SwapService extends Service {
 
+    private final Runnable languageChanged = this::refreshLanguageNotification;
+
     private static final String CH_FG = "swap_fg";       // ongoing foreground notification
     private static final String CH_ALERT = "atomix"; // swap event alerts (same channel MainActivity uses)
     private static final String CH_OFFLINE = "swap_offline";   // HIGH-priority "market offline" alert
@@ -108,6 +111,7 @@ public class SwapService extends Service {
         // If the OS refuses the foreground service (e.g. a residual dataSync time-budget on Android 14),
         // bail gracefully instead of crashing — WorkManager/AlarmManager relaunch will retry.
         if (!startForegroundCompat()) { stopSelf(); return; }
+        Language.addListener(languageChanged);
 
         prefs = getSharedPreferences("atomix", MODE_PRIVATE);
         TradingContext.load(prefs);   // the selected trading currency — drives token/sentinels/pricing this session
@@ -181,6 +185,11 @@ public class SwapService extends Service {
 
     @Override public void onConfigurationChanged(android.content.res.Configuration config) {
         super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        refreshLanguageNotification();
+    }
+
+    private void refreshLanguageNotification() {
         createChannels();
         if (foregroundActive && fgText != null) {
             NotificationManager manager = getSystemService(NotificationManager.class);
@@ -189,6 +198,7 @@ public class SwapService extends Service {
     }
 
     @Override public void onDestroy() {
+        Language.removeListener(languageChanged);
         foregroundActive = false;
         super.onDestroy();
         h.removeCallbacksAndMessages(null);

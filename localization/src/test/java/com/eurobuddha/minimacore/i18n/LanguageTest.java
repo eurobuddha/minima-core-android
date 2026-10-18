@@ -148,6 +148,57 @@ public class LanguageTest {
         assertEquals(-1, Language.recentDay(java.time.Instant.parse("2026-01-02T00:00:00Z").toEpochMilli(),
                 java.time.Instant.parse("2026-01-01T23:59:00Z").toEpochMilli(), zone));
     }
+    @Test public void nonViewListenersFollowExplicitSelectionWithoutPlatformCallbacks() {
+        Language.select(context, "en");
+        java.util.List<String> changes = new java.util.ArrayList<>();
+        Runnable listener = () -> changes.add(Language.code());
+        Language.addListener(listener);
+        Language.addListener(listener);
+        try {
+            for (String code : new String[]{"zh-Hans", "ru", "uk", "en"}) {
+                Language.select(context, code);
+                Language.refresh(); // Repeated activity/configuration refresh is not another language change.
+                Language.select(context, code);
+            }
+            assertEquals(java.util.Arrays.asList("zh-Hans", "ru", "uk", "en"), changes);
+            Language.removeListener(listener);
+            Language.select(context, "uk");
+            assertEquals(4, changes.size());
+        } finally { Language.removeListener(listener); }
+    }
+    @Test public void listenerFailureAndRemovalDoNotInterruptOtherServicesOrViews() {
+        Language.select(context, "en");
+        TextView label = view(new AtomicReference<>(""));
+        Language.setText(label, Language.msg(1));
+        Runnable removed = mock(Runnable.class);
+        Runnable healthy = mock(Runnable.class);
+        Runnable removing = () -> Language.removeListener(removed);
+        Runnable failing = () -> { throw new IllegalStateException("synthetic notification refusal"); };
+        for (Runnable listener : new Runnable[]{removing, removed, failing, healthy}) Language.addListener(listener);
+        try {
+            Language.select(context, "ru");
+            verifyNoInteractions(removed);
+            verify(healthy).run();
+            assertEquals("ru label", label.getText());
+        } finally {
+            for (Runnable listener : new Runnable[]{removing, removed, failing, healthy}) Language.removeListener(listener);
+        }
+    }
+    @Test public void nestedRefreshAndSelectionDeliverOnlyTheCurrentLanguage() {
+        Language.select(context, "en");
+        java.util.List<String> seen = new java.util.ArrayList<>();
+        Runnable nested = () -> {
+            Language.refresh();
+            if ("ru".equals(Language.code())) Language.select(context, "uk");
+        };
+        Runnable observer = () -> seen.add(Language.code());
+        Language.addListener(nested); Language.addListener(observer);
+        try {
+            Language.select(context, "ru");
+            assertEquals(java.util.Collections.singletonList("uk"), seen);
+            assertEquals("uk", saved.get("code"));
+        } finally { Language.removeListener(nested); Language.removeListener(observer); }
+    }
     private TextView view(AtomicReference<CharSequence> value) {
         TextView view = mock(TextView.class);
         AtomicReference<CharSequence> hint = new AtomicReference<>("");

@@ -34,6 +34,8 @@ import androidx.core.app.NotificationCompat;
  */
 public class PoolKeepAliveService extends Service {
 
+    private final Runnable languageChanged = this::refreshLanguageNotification;
+
     private static final String CH_FG = "pp_keepalive";
     private static final int FG_ID = 7301;
     public static final String ACTION_HEARTBEAT = "com.eurobuddha.pandapools.HEARTBEAT";
@@ -54,6 +56,7 @@ public class PoolKeepAliveService extends Service {
         // If the OS refuses the foreground service (e.g. a residual dataSync time-budget on Android 14), bail
         // gracefully instead of crashing — the worker/alarm relaunch will retry.
         if (!startForegroundCompat()) { stopSelf(); return; }
+        Language.addListener(languageChanged);
         node = new NodeApi(getApplicationContext(), null);   // applicationContext → callbacks always deliver (no Activity)
         HeartbeatReceiver.schedule(this);
         started = true;
@@ -148,6 +151,10 @@ public class PoolKeepAliveService extends Service {
     @Override public void onConfigurationChanged(android.content.res.Configuration config) {
         super.onConfigurationChanged(config);
         Language.configurationChanged(this);
+        refreshLanguageNotification();
+    }
+
+    private void refreshLanguageNotification() {
         try {
             createChannel();
             // Reuse AtomiX's active-service guard. A locale change does not start a maintenance pass.
@@ -159,6 +166,7 @@ public class PoolKeepAliveService extends Service {
     }
 
     @Override public void onDestroy() {
+        Language.removeListener(languageChanged);
         started = false;
         super.onDestroy();
         if (node != null) { try { node.onDestroy(); } catch (Exception ignored) {} node = null; }

@@ -31,6 +31,9 @@ public final class Language {
     private static final String[] CODES = {"en", "zh-Hans", "ru", "uk"};
     private static final String[] NAMES = {"English", "简体中文", "Русский", "Українська"};
     private static final Map<View, Map<String, Binding>> bindings = new WeakHashMap<>();
+    // Parlons desktop's explicit listener contract, owned by each service's lifecycle.
+    private static final java.util.concurrent.CopyOnWriteArrayList<Runnable> listeners = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private static String listenerLanguage = "en";
     private static Application application;
     private static volatile String current = "en";
     private static java.lang.ref.WeakReference<AlertDialog> chooser = new java.lang.ref.WeakReference<>(null);
@@ -235,8 +238,27 @@ public final class Language {
         else if ("navigationDescription".equals(property)) ((androidx.appcompat.widget.Toolbar) view).setNavigationContentDescription(value);
         else throw new IllegalArgumentException("Unknown translated attribute: " + property);
     }
+    /** Main-thread callbacks for non-view presentation such as running service notifications.
+     * Register after successful foreground startup and remove in onDestroy; registration does not run the callback. */
+    public static void addListener(Runnable listener) { listeners.addIfAbsent(java.util.Objects.requireNonNull(listener)); }
+    public static void removeListener(Runnable listener) { listeners.remove(listener); }
+    private static void refreshListeners() {
+        String selected = current;
+        if (selected.equals(listenerLanguage)) return;
+        // Mark before dispatch: a callback may refresh views without recursively notifying services.
+        listenerLanguage = selected;
+        for (Runnable listener : listeners) {
+            if (!selected.equals(current)) break; // A nested selection already dispatched the newer language.
+            if (!listeners.contains(listener)) continue;
+            try { listener.run(); }
+            catch (RuntimeException unavailable) {
+                android.util.Log.w("Language", "A language listener could not refresh its presentation");
+            }
+        }
+    }
     public static void refresh() {
         if (application != null) NotificationLabels.update(application);
+        refreshListeners();
         // Values contain only resource IDs and interpolation arguments, never a view/activity.
         for (View view : new ArrayList<>(bindings.keySet())) {
             Map<String, Binding> entries = bindings.get(view);

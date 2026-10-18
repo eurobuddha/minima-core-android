@@ -35,6 +35,8 @@ import java.util.Set;
  */
 public class CasinoService extends Service {
 
+    private final Runnable languageChanged = this::refreshLanguageNotification;
+
     private static final String CH_FG = "casino_fg";
     private static final String CH_ALERT = "casino_alert";
     private static final int FG_ID = 5101;
@@ -62,6 +64,7 @@ public class CasinoService extends Service {
         super.onCreate();
         createChannels();
         if (!startForegroundCompat()) { stopSelf(); return; }
+        Language.addListener(languageChanged);
 
         secrets = new SecretStore(this);
         node = new NodeApi(this, enabled -> {});
@@ -86,6 +89,11 @@ public class CasinoService extends Service {
 
     @Override public void onConfigurationChanged(android.content.res.Configuration config) {
         super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        refreshLanguageNotification();
+    }
+
+    private void refreshLanguageNotification() {
         createChannels();
         if (foregroundActive) {
             NotificationManager nm = getSystemService(NotificationManager.class);
@@ -94,6 +102,7 @@ public class CasinoService extends Service {
     }
 
     @Override public void onDestroy() {
+        Language.removeListener(languageChanged);
         foregroundActive = false;
         super.onDestroy();
         if (node != null) node.onDestroy();

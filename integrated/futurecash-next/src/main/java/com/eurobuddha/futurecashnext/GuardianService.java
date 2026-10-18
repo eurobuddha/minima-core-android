@@ -36,6 +36,8 @@ import java.util.concurrent.Executors;
  */
 public class GuardianService extends Service {
 
+    private final Runnable languageChanged = this::refreshLanguageNotification;
+
     private static final int FG_ID = 3101;
 
     /** Set by MainActivity while it is visible; the service stands down so both don't post. */
@@ -85,6 +87,7 @@ public class GuardianService extends Service {
         // If the OS refuses the foreground service, bail gracefully rather than crashing — the
         // guardian resumes when the app is next opened or the budget resets.
         if (!startForegroundCompat()) { stopSelf(); return; }
+        Language.addListener(languageChanged);
 
         store = new Store(this);
         worker = Executors.newSingleThreadExecutor();
@@ -153,11 +156,17 @@ public class GuardianService extends Service {
 
     @Override public void onConfigurationChanged(android.content.res.Configuration config) {
         super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        refreshLanguageNotification();
+    }
+
+    private void refreshLanguageNotification() {
         Notifier.ensureChannels(this);
         if (foregroundActive) refreshNotification(this);
     }
 
     @Override public void onDestroy() {
+        Language.removeListener(languageChanged);
         foregroundActive = false;
         super.onDestroy();
         if (receiver != null) { try { DirectNodeEvents.unsubscribe(receiver); } catch (Exception ignored) {} }
