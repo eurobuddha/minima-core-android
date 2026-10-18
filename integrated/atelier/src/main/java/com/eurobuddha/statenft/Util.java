@@ -13,6 +13,14 @@ public final class Util {
         return a != null && a.matches("^(0x[0-9a-fA-F]{64}|Mx[A-Za-z0-9]{40,118})$");
     }
 
+    public static boolean isValidHexId(String id) {
+        return id != null && (MINIMA_TOKENID.equals(id) || id.matches("^0x[0-9a-fA-F]{2,64}$"));
+    }
+
+    public static boolean isValidAmount(String amt) {
+        return amt != null && amt.matches("^[0-9]+(\\.[0-9]+)?$");
+    }
+
     public static String shorten(String s) {
         if (s == null) return "";
         if (s.length() <= 18) return s;

@@ -620,6 +620,10 @@ public final class MintEngine {
     }
 
     static void postTxn(NodeApi node, String id, List<String> steps, Runnable ok, java.util.function.Consumer<String> fail) {
+        postTxnWithReceipt(node, id, steps, posted -> ok.run(), fail);
+    }
+
+    static void postTxnWithReceipt(NodeApi node, String id, List<String> steps, java.util.function.Consumer<JSONObject> ok, java.util.function.Consumer<String> fail) {
         cmd(node, "txndelete id:" + id, new Cb() {
             @Override public void ok(JSONObject ignored) { build(); }
             @Override public void fail(String e) { build(); }
@@ -638,7 +642,7 @@ public final class MintEngine {
         });
     }
 
-    private static void checkAndSign(NodeApi node, String id, List<String> signs, Runnable ok, java.util.function.Consumer<String> fail) {
+    private static void checkAndSign(NodeApi node, String id, List<String> signs, java.util.function.Consumer<JSONObject> ok, java.util.function.Consumer<String> fail) {
         cmd(node, "txncheck id:" + id, new Cb() {
             @Override public void ok(JSONObject res) {
                 JSONArray coins = res.optJSONObject("response") == null ? null : res.optJSONObject("response").optJSONArray("coins");
@@ -646,19 +650,21 @@ public final class MintEngine {
                 if (coins != null) {
                     for (int i = 0; i < coins.length(); i++) {
                         JSONObject c = coins.optJSONObject(i);
-                        if (c != null && !"0".equals(c.optString("difference"))) bad = true;
+                        if (c == null || !"0".equals(c.optString("difference"))) bad = true;
                     }
                 }
                 if (bad) { cleanup(node, id, fail, "unbalanced txn " + id); return; }
                 List<String> cmds = new ArrayList<>(signs);
                 cmds.add("txnbasics id:" + id);
-                cmds.add("txnpost id:" + id);
-                runCommands(node, cmds, () -> {
-                    cmd(node, "txndelete id:" + id, new Cb() {
-                        @Override public void ok(JSONObject ignored) { ok.run(); }
-                        @Override public void fail(String e) { ok.run(); }
-                    });
-                }, e -> cleanup(node, id, fail, e));
+                runCommands(node, cmds, () -> cmd(node, "txnpost id:" + id, new Cb() {
+                    @Override public void ok(JSONObject posted) {
+                        cmd(node, "txndelete id:" + id, new Cb() {
+                            @Override public void ok(JSONObject ignored) { ok.accept(posted); }
+                            @Override public void fail(String e) { ok.accept(posted); }
+                        });
+                    }
+                    @Override public void fail(String e) { cleanup(node, id, fail, e); }
+                }), e -> cleanup(node, id, fail, e));
             }
             @Override public void fail(String e) { cleanup(node, id, fail, e); }
         });

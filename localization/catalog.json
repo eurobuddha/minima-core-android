@@ -40762,5 +40762,95 @@
     "zh-Hans": "此系列已有发送记录。开始新的发送前，请在系列中查看该记录。",
     "ru": "У этой коллекции уже есть запись отправки. Проверьте её в коллекции, прежде чем начинать новую.",
     "uk": "Ця колекція вже має запис надсилання. Перегляньте його в колекції, перш ніж починати нове."
+  },
+  "atelierTransfer.title": {
+    "en": "Deed of transfer",
+    "zh-Hans": "转让凭证",
+    "ru": "Акт передачи",
+    "uk": "Акт передачі"
+  },
+  "atelierTransfer.help": {
+    "en": "Every state port is replayed verbatim. The sealed identity travels with the coin.",
+    "zh-Hans": "所有状态端口均原样保留。封存的身份随币一同转移。",
+    "ru": "Все порты состояния сохраняются без изменений. Закреплённая идентичность передаётся вместе с монетой.",
+    "uk": "Усі порти стану зберігаються без змін. Закріплена ідентичність передається разом із монетою."
+  },
+  "atelierTransfer.identity": {
+    "en": "Identity",
+    "zh-Hans": "身份",
+    "ru": "Идентичность",
+    "uk": "Ідентичність"
+  },
+  "atelierTransfer.image": {
+    "en": "Image",
+    "zh-Hans": "图像",
+    "ru": "Изображение",
+    "uk": "Зображення"
+  },
+  "atelierTransfer.port": {
+    "en": "port 0 = %1$s",
+    "zh-Hans": "端口 0 = %1$s",
+    "ru": "порт 0 = %1$s",
+    "uk": "порт 0 = %1$s"
+  },
+  "atelierTransfer.hosted": {
+    "en": "Hosted",
+    "zh-Hans": "外部托管",
+    "ru": "На хостинге",
+    "uk": "На хостингу"
+  },
+  "atelierTransfer.embedded": {
+    "en": "Embedded, travels with the coin",
+    "zh-Hans": "内嵌，随币转移",
+    "ru": "Встроено, передаётся с монетой",
+    "uk": "Вбудовано, передається з монетою"
+  },
+  "atelierTransfer.recipient": {
+    "en": "Recipient address",
+    "zh-Hans": "收款地址",
+    "ru": "Адрес получателя",
+    "uk": "Адреса одержувача"
+  },
+  "atelierTransfer.ready": {
+    "en": "Ready.",
+    "zh-Hans": "准备就绪。",
+    "ru": "Готово к отправке.",
+    "uk": "Готово до надсилання."
+  },
+  "atelierTransfer.submit": {
+    "en": "Transfer this lot",
+    "zh-Hans": "转让此拍品",
+    "ru": "Передать этот лот",
+    "uk": "Передати цей лот"
+  },
+  "atelierTransfer.building": {
+    "en": "Building transaction…",
+    "zh-Hans": "正在构建交易…",
+    "ru": "Создание транзакции…",
+    "uk": "Створення транзакції…"
+  },
+  "atelierTransfer.posted": {
+    "en": "Posted. Waiting for the intended output to appear on-chain…",
+    "zh-Hans": "已提交。正在等待目标输出出现在链上…",
+    "ru": "Отправлено. Ожидаем появления нужного выхода в блокчейне…",
+    "uk": "Надіслано. Очікуємо появи потрібного виходу в блокчейні…"
+  },
+  "atelierTransfer.confirmed": {
+    "en": "Lot %1$d transferred",
+    "zh-Hans": "拍品 %1$d 已转让",
+    "ru": "Лот %1$d передан",
+    "uk": "Лот %1$d передано"
+  },
+  "atelierTransfer.unconfirmed": {
+    "en": "Transfer not confirmed. Refresh the collection to check its current owner before trying again.",
+    "zh-Hans": "转让尚未确认。请刷新藏品系列，核实当前所有者后再重试。",
+    "ru": "Передача не подтверждена. Обновите коллекцию и проверьте текущего владельца перед повторной попыткой.",
+    "uk": "Передачу не підтверджено. Оновіть колекцію та перевірте поточного власника перед повторною спробою."
+  },
+  "atelierTransfer.failed": {
+    "en": "Transfer could not be verified: %1$s. Check the collection before trying again.",
+    "zh-Hans": "无法验证转让：%1$s。请先检查藏品系列，再重试。",
+    "ru": "Не удалось проверить передачу: %1$s. Проверьте коллекцию перед повторной попыткой.",
+    "uk": "Не вдалося перевірити передачу: %1$s. Перевірте колекцію перед повторною спробою."
   }
 }

@@ -13,6 +13,29 @@ public final class LocalStore {
 
     private LocalStore() {}
 
+    private static JSONArray burialCollections(Context ctx) {
+        try {
+            JSONArray rows = new JSONArray(prefs(ctx).getString(KEY_COLLECTIONS, "[]"));
+            for (int i = 0; i < rows.length(); i++) if (rows.optJSONObject(i) == null) throw BurialEvidence.invalid();
+            return rows;
+        } catch (Exception e) { throw BurialEvidence.invalid(); }
+    }
+
+    static synchronized boolean canDepart(Context ctx, String tokenid) {
+        if (!Util.isValidHexId(tokenid)) return false;
+        try {
+            JSONArray rows = burialCollections(ctx);
+            for (int i = 0; i < rows.length(); i++) {
+                JSONObject row = rows.getJSONObject(i);
+                if (BurialEvidence.same(tokenid, row.optString("tokenid"))) {
+                    String phase = row.optString("phase");
+                    if (!"DONE".equals(phase) && !"BURIED".equals(phase)) return false;
+                }
+            }
+            return true;
+        } catch (Exception e) { return false; }
+    }
+
     /* The collections blob embeds base64 images (hundreds of KB); parse it
      * once and keep the tree — callers hammer load()/findById() per card
      * and per slot on the UI thread. Single-process app, so the cache is

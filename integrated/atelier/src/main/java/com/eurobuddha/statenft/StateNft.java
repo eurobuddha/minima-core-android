@@ -170,16 +170,8 @@ public final class StateNft {
     }
 
     public static boolean replayableState(JSONObject coin) {
-        JSONArray st = coin == null ? null : coin.optJSONArray("state");
-        if (st == null) return true;
-        for (int i = 0; i < st.length(); i++) {
-            JSONObject s = st.optJSONObject(i);
-            if (s == null || !String.valueOf(s.opt("port")).matches("^[0-9]+$")
-                    || !safeStateValue(s.opt("data"))) {
-                return false;
-            }
-        }
-        return true;
+        try { BurialEvidence.stateHash(coin); return true; }
+        catch (RuntimeException e) { return false; }
     }
 
     public static String imageUrl(Meta meta, int idx, JSONObject coin) {
@@ -227,16 +219,45 @@ public final class StateNft {
 
     /* Build+sign steps for MintEngine.postTxn, which wraps them in
      * txncreate -> txncheck (balanced) -> signs -> txnbasics -> txnpost. */
+    public static List<String[]> rawStateEntries(JSONObject coin) {
+        List<String[]> out = new ArrayList<>();
+        if (coin == null) return out;
+        JSONArray arr = coin.optJSONArray("state");
+        if (arr != null) {
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject s = arr.optJSONObject(i);
+                if (s == null) continue;
+                out.add(new String[]{ String.valueOf(s.opt("port")), String.valueOf(s.opt("data")) });
+            }
+            return out;
+        }
+        JSONObject obj = coin.optJSONObject("state");
+        if (obj != null) {
+            JSONArray names = obj.names();
+            if (names != null) {
+                for (int i = 0; i < names.length(); i++) {
+                    String k = names.optString(i);
+                    out.add(new String[]{ k, String.valueOf(obj.opt(k)) });
+                }
+            }
+        }
+        return out;
+    }
+
+    public static String safeAmount(JSONObject coin) {
+        String a = coin == null ? "" : coin.optString("tokenamount", "1");
+        return a.matches("^[0-9]+(\\.[0-9]+)?$") ? a : "";
+    }
+
     public static List<String> transferCommands(String txn, String tokenid, JSONObject coin, String to) {
         List<String> cmds = new ArrayList<>();
         cmds.add("txninput id:" + txn + " coinid:" + coin.optString("coinid"));
-        cmds.add("txnoutput id:" + txn + " amount:1 address:" + to + " tokenid:" + tokenid + " storestate:true");
-        JSONArray st = coin.optJSONArray("state");
-        if (st != null) {
-            for (int i = 0; i < st.length(); i++) {
-                JSONObject s = st.optJSONObject(i);
-                cmds.add("txnstate id:" + txn + " port:" + s.opt("port") + " value:" + s.opt("data"));
-            }
+        // The unit's real amount — hardcoding 1 builds an unbalanced txn on any coin holding more,
+        // which posts "fine" and is silently rejected on-chain.
+        cmds.add("txnoutput id:" + txn + " amount:" + safeAmount(coin)
+                + " address:" + to + " tokenid:" + tokenid + " storestate:true");
+        for (String[] e : rawStateEntries(coin)) {
+            cmds.add("txnstate id:" + txn + " port:" + e[0] + " value:" + e[1]);
         }
         cmds.add("txnsign id:" + txn + " publickey:auto");
         return cmds;
@@ -245,15 +266,11 @@ public final class StateNft {
     public static List<String> buryCommands(String txn, String tokenid, String creatorPk, JSONObject coin, boolean preserve) {
         List<String> cmds = new ArrayList<>();
         cmds.add("txninput id:" + txn + " coinid:" + coin.optString("coinid"));
-        cmds.add("txnoutput id:" + txn + " amount:" + coin.optString("tokenamount", "1")
+        cmds.add("txnoutput id:" + txn + " amount:" + safeAmount(coin)
                 + " address:" + GRAVEYARD + " tokenid:" + tokenid + " storestate:" + (preserve ? "true" : "false"));
         if (preserve) {
-            JSONArray st = coin.optJSONArray("state");
-            if (st != null) {
-                for (int i = 0; i < st.length(); i++) {
-                    JSONObject s = st.optJSONObject(i);
-                    cmds.add("txnstate id:" + txn + " port:" + s.opt("port") + " value:" + s.opt("data"));
-                }
+            for (String[] e : rawStateEntries(coin)) {
+                cmds.add("txnstate id:" + txn + " port:" + e[0] + " value:" + e[1]);
             }
         }
         cmds.add("txnsign id:" + txn + " publickey:auto");

@@ -8178,4 +8178,19 @@
     <string name="l10n_atelier_airdrop_preview_first" formatted="false">"Сначала проверьте текущий список получателей."</string>
     <string name="l10n_atelier_airdrop_armed" formatted="false">"Отправка поставлена в очередь. Движок передаёт по одному экземпляру за цикл."</string>
     <string name="l10n_atelier_airdrop_existing" formatted="false">"У этой коллекции уже есть запись отправки. Проверьте её в коллекции, прежде чем начинать новую."</string>
+    <string name="l10n_atelier_transfer_title" formatted="false">"Акт передачи"</string>
+    <string name="l10n_atelier_transfer_help" formatted="false">"Все порты состояния сохраняются без изменений. Закреплённая идентичность передаётся вместе с монетой."</string>
+    <string name="l10n_atelier_transfer_identity" formatted="false">"Идентичность"</string>
+    <string name="l10n_atelier_transfer_image" formatted="false">"Изображение"</string>
+    <string name="l10n_atelier_transfer_port" formatted="false">"порт 0 = %1$s"</string>
+    <string name="l10n_atelier_transfer_hosted" formatted="false">"На хостинге"</string>
+    <string name="l10n_atelier_transfer_embedded" formatted="false">"Встроено, передаётся с монетой"</string>
+    <string name="l10n_atelier_transfer_recipient" formatted="false">"Адрес получателя"</string>
+    <string name="l10n_atelier_transfer_ready" formatted="false">"Готово к отправке."</string>
+    <string name="l10n_atelier_transfer_submit" formatted="false">"Передать этот лот"</string>
+    <string name="l10n_atelier_transfer_building" formatted="false">"Создание транзакции…"</string>
+    <string name="l10n_atelier_transfer_posted" formatted="false">"Отправлено. Ожидаем появления нужного выхода в блокчейне…"</string>
+    <string name="l10n_atelier_transfer_confirmed" formatted="false">"Лот %1$d передан"</string>
+    <string name="l10n_atelier_transfer_unconfirmed" formatted="false">"Передача не подтверждена. Обновите коллекцию и проверьте текущего владельца перед повторной попыткой."</string>
+    <string name="l10n_atelier_transfer_failed" formatted="false">"Не удалось проверить передачу: %1$s. Проверьте коллекцию перед повторной попыткой."</string>
 </resources>

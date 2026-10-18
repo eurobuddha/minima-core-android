@@ -8106,4 +8106,19 @@
     <string name="l10n_atelier_airdrop_preview_first" formatted="false">"Preview the current recipient list first."</string>
     <string name="l10n_atelier_airdrop_armed" formatted="false">"Delivery queued. The engine transfers one lot per cycle."</string>
     <string name="l10n_atelier_airdrop_existing" formatted="false">"This collection already has a delivery record. Review it in the collection before starting another."</string>
+    <string name="l10n_atelier_transfer_title" formatted="false">"Deed of transfer"</string>
+    <string name="l10n_atelier_transfer_help" formatted="false">"Every state port is replayed verbatim. The sealed identity travels with the coin."</string>
+    <string name="l10n_atelier_transfer_identity" formatted="false">"Identity"</string>
+    <string name="l10n_atelier_transfer_image" formatted="false">"Image"</string>
+    <string name="l10n_atelier_transfer_port" formatted="false">"port 0 = %1$s"</string>
+    <string name="l10n_atelier_transfer_hosted" formatted="false">"Hosted"</string>
+    <string name="l10n_atelier_transfer_embedded" formatted="false">"Embedded, travels with the coin"</string>
+    <string name="l10n_atelier_transfer_recipient" formatted="false">"Recipient address"</string>
+    <string name="l10n_atelier_transfer_ready" formatted="false">"Ready."</string>
+    <string name="l10n_atelier_transfer_submit" formatted="false">"Transfer this lot"</string>
+    <string name="l10n_atelier_transfer_building" formatted="false">"Building transaction…"</string>
+    <string name="l10n_atelier_transfer_posted" formatted="false">"Posted. Waiting for the intended output to appear on-chain…"</string>
+    <string name="l10n_atelier_transfer_confirmed" formatted="false">"Lot %1$d transferred"</string>
+    <string name="l10n_atelier_transfer_unconfirmed" formatted="false">"Transfer not confirmed. Refresh the collection to check its current owner before trying again."</string>
+    <string name="l10n_atelier_transfer_failed" formatted="false">"Transfer could not be verified: %1$s. Check the collection before trying again."</string>
 </resources>

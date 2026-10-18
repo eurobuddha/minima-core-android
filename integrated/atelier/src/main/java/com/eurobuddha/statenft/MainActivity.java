@@ -270,6 +270,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     @Override protected void onDestroy() {
         verifyGateCancel = true;
+        for (Runnable r : departureWatchers) main.removeCallbacks(r);
+        departureWatchers.clear();
         main.removeCallbacks(rePair);
         main.removeCallbacks(mintLoop);
         if (node != null) node.onDestroy();
@@ -1320,7 +1322,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         if (m == null || it.coin == null) return;
         transferItem = it;
         setScreen(Screen.TRANSFER, () -> openCollection(m));
-        appbar(String.format(Locale.US, "Lot %03d", it.index), true, false);
+        final long generation = screenGeneration;
+        appbar(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_lot, String.format(Locale.US, "%03d", it.index)), true, false);
         hideNav();
 
         ImageView img = new ImageView(this);
@@ -1333,36 +1336,66 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         body.addView(frame, lpm(0, 4, 0, 14));
 
         LinearLayout card = lotCard();
-        card.addView(Design.lot(this, "Deed of transfer"));
-        card.addView(Design.note(this, "Every state port is replayed verbatim — the sealed identity survives the move."), lpm(0, 4, 0, 8));
-        card.addView(kvRow("Identity", StateNft.state(it.coin, 0) == null ? "—" : "port 0 = " + StateNft.state(it.coin, 0)));
-        card.addView(kvRow("Image", StateNft.state(it.coin, 1) == null ? "hosted" : "embedded, travels with the coin"));
+        card.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_title)));
+        card.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_help)), lpm(0, 4, 0, 8));
+        card.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_identity), StateNft.state(it.coin, 0) == null ? "—" : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_port, StateNft.state(it.coin, 0))));
+        card.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_image), StateNft.state(it.coin, 1) == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_hosted) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_embedded)));
         body.addView(card, lpm(0, 0, 0, 14));
 
-        body.addView(Design.kicker(this, "Recipient address"));
-        EditText to = input("Mx… or 0x…");
-        body.addView(to, lph(50, 0, 6, 0, 8));
-        TextView status = Design.note(this, "Ready.");
+        body.addView(Design.kicker(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_recipient)));
+        EditText to = input(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_send_address_hint));
+        to.setMinHeight(dp(50));
+        body.addView(to, lpm(0, 6, 0, 8));
+        TextView status = Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_ready));
         body.addView(status, lpm(0, 0, 0, 10));
-        TextView go = Design.button(this, "Transfer this lot", true);
-        go.setOnClickListener(v -> doTransfer(it, to, status));
-        body.addView(go, lph(54, 0, 0, 0, 0));
+        TextView go = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_submit), true);
+        go.setOnClickListener(v -> doTransfer(m, it, to, status, go, generation));
+        go.setMinHeight(dp(54));
+        body.addView(go, lpm(0, 0, 0, 0));
     }
 
-    private void doTransfer(StateNft.Item it, EditText to, TextView msg) {
-        String addr = to.getText().toString().trim().replace(" ", "");
-        if (!Util.isValidAddress(addr)) { msg.setText("That address does not parse. Mx… or 0x… format."); return; }
-        if (!StateNft.replayableState(it.coin)) { msg.setText("Refusing malformed coin state."); return; }
-        msg.setText("Building transaction…");
-        String txn = "statenft" + System.currentTimeMillis();
-        final StateNft.Meta meta = openMeta;
-        MintEngine.postTxn(node, txn, StateNft.transferCommands(txn, meta.tokenid, it.coin, addr), () -> {
-            msg.setText("Posted. Watching the UTXO set for departure…");
-            watchDeparture(meta.tokenid, it.coin.optString("coinid"), () -> {
-                toast("Lot " + it.index + " transferred");
+    private boolean transferScreenActive(long generation) {
+        return !isFinishing() && !isDestroyed() && screen == Screen.TRANSFER && generation == screenGeneration;
+    }
+
+    private void doTransfer(StateNft.Meta meta, StateNft.Item it, EditText to, TextView msg, TextView go, long generation) {
+        if (!transferScreenActive(generation) || !go.isEnabled()) return;
+        String addr = to.getText().toString().trim();
+        if (!Util.isValidAddress(addr)) {
+            Language.setText(msg, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_airdrop_invalid_address)); return;
+        }
+        if (!LocalStore.canDepart(this, meta.tokenid)) {
+            Language.setText(msg, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_nft_actions_mint_unfinished)); return;
+        }
+        final JSONObject coin, intent;
+        try {
+            if (!it.owned || StateNft.stamped(it.coin) == null) throw BurialEvidence.invalid();
+            coin = new JSONObject(it.coin.toString());
+            intent = BurialEvidence.intent(coin, meta.tokenid);
+        } catch (Exception e) {
+            Language.setText(msg, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_nft_actions_invalid_departure)); return;
+        }
+        // A post error can mean an unknown outcome. Never silently enable another submission.
+        go.setEnabled(false);
+        to.setEnabled(false);
+        Language.setText(msg, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_building));
+        String txn = "statenft" + java.util.UUID.randomUUID().toString().replace("-", "");
+        MintEngine.postTxnWithReceipt(node, txn, StateNft.transferCommands(txn, meta.tokenid, coin, addr), posted -> {
+            if (!transferScreenActive(generation)) return;
+            final JSONObject receipt;
+            try { receipt = BurialEvidence.receipt(posted, intent, addr); }
+            catch (RuntimeException e) {
+                Language.setText(msg, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_nft_actions_output_unverified)); return;
+            }
+            Language.setText(msg, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_posted));
+            watchDeparture(meta.tokenid, receipt, generation, () -> {
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_confirmed, it.index));
                 openCollection(meta);
-            }, () -> msg.setText("Not confirmed yet — refresh the collection in a few minutes."));
-        }, e -> msg.setText("Failed: " + e));
+            }, () -> Language.setText(msg, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_unconfirmed)));
+        }, e -> {
+            if (transferScreenActive(generation)) Language.setText(msg,
+                    Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_transfer_failed, e));
+        });
     }
 
     /* ================= BURY ================= */
@@ -3754,36 +3787,41 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         });
     }
 
-    /** Poll a single coin until it leaves the UTXO set (spent = departed).
-     *  `coins coinid:` replies are tiny — immune to the 256KB IPC cap that a
-     *  full-state token query can hit on large embed collections. Watchers
-     *  die with the screen — setScreen() cancels them. */
-    private void watchDeparture(String tokenid, String coinid, Runnable ok, Runnable unsure) {
+    /** NFT Wallet's exact-output evidence; an absent input is never proof of delivery. */
+    private void watchDeparture(String tokenid, JSONObject receipt, long generation, Runnable ok, Runnable unsure) {
+        final String outputid, destination;
+        try {
+            BurialEvidence.journal(new JSONArray().put(receipt), tokenid);
+            outputid = BurialEvidence.id(receipt, "output");
+            destination = BurialEvidence.id(receipt, "address");
+        } catch (RuntimeException e) { unsure.run(); return; }
         final int[] tries = {0};
-        final Runnable[] pollRef = new Runnable[1];
-        Runnable poll = new Runnable() {
-            @Override public void run() {
-                tries[0]++;
-                node.cmd("coins coinid:" + coinid, new NodeApi.Cb() {
-                    @Override public void onResult(JSONObject json) {
-                        JSONArray cs = json.optJSONArray("response");
-                        boolean still = cs != null && cs.length() > 0;
-                        if (!departureWatchers.contains(pollRef[0])) return;   // cancelled while reply was in flight
-                        if (!still) { departureWatchers.remove(pollRef[0]); ok.run(); }
-                        else if (tries[0] > 20) { departureWatchers.remove(pollRef[0]); unsure.run(); }
-                        else main.postDelayed(pollRef[0], 20000);
-                    }
-                    @Override public void onError(String message) {
-                        if (!departureWatchers.contains(pollRef[0])) return;
-                        if (tries[0] > 20) { departureWatchers.remove(pollRef[0]); unsure.run(); }
-                        else main.postDelayed(pollRef[0], 20000);
-                    }
-                });
-            }
+        final Runnable[] poll = new Runnable[1];
+        poll[0] = () -> {
+            if (!transferScreenActive(generation) || !departureWatchers.contains(poll[0])) return;
+            node.cmd("coins coinid:" + outputid, new NodeApi.Cb() {
+                private boolean active() {
+                    return transferScreenActive(generation) && departureWatchers.contains(poll[0]);
+                }
+                @Override public void onResult(JSONObject json) {
+                    if (!active()) return;
+                    try {
+                        JSONArray coins = BurialEvidence.coins(json, tokenid);
+                        if (coins.length() == 1 && BurialEvidence.confirmed(receipt, coins.optJSONObject(0), destination)) {
+                            departureWatchers.remove(poll[0]); ok.run(); return;
+                        }
+                    } catch (RuntimeException e) { /* Incomplete evidence stays unconfirmed. */ }
+                    reschedule();
+                }
+                @Override public void onError(String message) { if (active()) reschedule(); }
+                private void reschedule() {
+                    if (++tries[0] >= 20) { departureWatchers.remove(poll[0]); unsure.run(); }
+                    else main.postDelayed(poll[0], 20000);
+                }
+            });
         };
-        pollRef[0] = poll;
-        departureWatchers.add(poll);
-        main.postDelayed(poll, 20000);
+        departureWatchers.add(poll[0]);
+        main.postDelayed(poll[0], 20000);
     }
 
     private int distinctStamped(JSONArray coins) {
