@@ -2460,3 +2460,20 @@ Validation:35 Inbox+12 shared language tests pass (47). This includes10 real SQL
 MAJOR remaining, separate paths: ordinary NFT CommsTransport acceptance still permits an empty receipt fallback; inspect pending responses and durable delivery handling there. Async order refresh still rebuilds the unsent reply form. These replace the now-resolved StateNFT blockers in the current checkpoint. Older AtomiX/NFT findings and safe Fold acceptance still need reconciliation before final signed publication.
 
 Verdict: approve this StateNFT receipt/recovery increment; request changes before the full release for the remaining paths and runtime acceptance.
+
+
+## Inbox reply drafts and refresh ownership — 2026-10-18
+
+The user-requested local checkpoint 36a9587 saved this increment as work in progress with three failing callback tests. The failures were uninitialized mock Activity lifecycle methods, not passing production evidence. Reused the existing InboxCoinEvidenceTest.Host isFinishing/isDestroyed stubs; all three tests now pass without weakening their draft, transport or navigation assertions.
+
+Reused AtomiX MainActivity.rememberOtcDraft and its focus-deferred render pattern after reading the relevant callers, watcher and editor setup. Current Inbox, pinned standalone Inbox, Mail/Shop and Parlons searches found no compatible per-order saved-state helper. ReplyDrafts adds order keys, exact raw text/selection, Bundle restoration, and submission identity/revision checks. Incoming order refreshes wait while the editor has focus, preserving its EditText and composing span. New fields restore the raw draft rather than binding it to translated text; language bindings remain on hints and labels. Identity setup and scans use the same current-order refresh helper. Navigation to another order is preserved when a previous save finishes.
+
+The send button retains the draft until insertChat succeeds. A false return, exception or rejected executor preserves text and allows retry. Duplicate submissions for the same order are suppressed while that local write is pending. Successful local saves clear only the submitted revision; subsequent edits, including edits back to the identical string, survive. This acknowledges local persistence, not network confirmation. Closed hosts suppress UI callbacks. No transport, financial engine, schema, donor source or node-JAR changes.
+
+### Code Review
+
+Summary: draft and asynchronous view ownership are explicit and match the existing AtomiX pattern. Six real EditText/Bundle tests cover Unicode, cursor selection, composition, focus, navigation/rebuild state, duplicate clicks, save failures, changed revisions and host closure. Three MainActivity callback tests cover the actual focused-refresh boundary, failed writes preventing transport, successful writes preserving another visible order, and newer drafts surviving late success. Shared language tests cover bound hint changes leaving raw user text untouched.
+
+Validation: 44 Inbox + 12 shared tests pass (56). All three debug variants and the Pandamonium Android test APK compile in 26 seconds. All 19 pinned imports reproduce; transport, catalogue and diff checks pass. The catalogue has 5289 messages in all four authorized languages. 506 source hashes are recorded in build/localization/inbox-drafts-validation.json. All protected engine maps, wallet-audit hashes and the node JAR remain unchanged; the reviewed MainActivity hash is updated for this scoped change. Candidate remains 1.9.43/vc114. No Fold operation, release signing, push or publication occurred.
+
+Verdict: approve this draft-preservation increment. The full release still requires the ordinary NFT pending/receipt path, reconciliation of earlier AtomiX/NFT findings, safe Fold acceptance and signed publication.

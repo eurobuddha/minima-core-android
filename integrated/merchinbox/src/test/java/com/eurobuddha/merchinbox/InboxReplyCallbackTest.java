@@ -24,7 +24,9 @@ public class InboxReplyCallbackTest {
     ArrayDeque<Runnable> writes,updates;ArrayDeque<View> stack;MockedStatic<Toast> toasts;MockedStatic<CommsTransport> transport;
     @Before public void setup()throws Exception {
         host=Robolectric.buildActivity(Activity.class).setup().get();LinearLayout root=new LinearLayout(host);root.setFocusableInTouchMode(true);host.setContentView(root);editor=new EditText(host);root.addView(editor);
-        activity=mock(MainActivity.class,CALLS_REAL_METHODS);db=mock(MerchDb.class);drafts=new ReplyDrafts();drafts.bind("one",editor,()->{});editor.setText("reply");
+        activity=mock(MainActivity.class,CALLS_REAL_METHODS);
+        doReturn(false).when(activity).isFinishing();doReturn(false).when(activity).isDestroyed();
+        db=mock(MerchDb.class);drafts=new ReplyDrafts();drafts.bind("one",editor,()->{});editor.setText("reply");
         writes=new ArrayDeque<>();updates=new ArrayDeque<>();stack=new ArrayDeque<>();View list=new View(host);list.setTag("list");stack.push(list);View other=new View(host);other.setTag("order:two");stack.push(other);
         ExecutorService io=mock(ExecutorService.class);Handler ui=mock(Handler.class);doAnswer(c->{writes.add(c.getArgument(0));return null;}).when(io).execute(any(Runnable.class));when(ui.post(any(Runnable.class))).thenAnswer(c->{updates.add(c.getArgument(0));return true;});
         for(Object[] pair:new Object[][]{{"db",db},{"replyDrafts",drafts},{"io",io},{"ui",ui},{"stack",stack},{"node",mock(NodeApi.class)},{"crypto",mock(CryptoProvider.class)},{"myId","public-fixture"}}){Field f=MainActivity.class.getDeclaredField((String)pair[0]);f.setAccessible(true);f.set(activity,pair[1]);}
