@@ -2807,3 +2807,16 @@ Validation: all501 JVM test executions pass (PandaBear146, BlackBear146, Pandamo
 Summary: reviewed the full helper, activity diff, test harness and original draft guard. The guard operates on the UI thread and ignores stale tickets even when current text looks unchanged. No blocking finding in this increment. Verdict: approve the source fix. Fold validation is still required for runtime acceptance.
 
 Version is1.9.46/vc117 under the core-source commit rule. Fold R3GL805K7MB still reports device not found. No owner app/data/wallet/seed/counter or other device was used. Remaining financial reviews, complete app-owned text/accessibility acceptance, optional inherited MySQL disposition and final publication remain open. Earlier signed candidates stay preserved; 1.9.46 artifacts are verified separately after this source checkpoint.
+
+
+## Signed 1.9.46 draft-guard candidates — 2026-10-18
+
+Source `ab92c21158e73184561a5bcb7123bacdd9b6d010` is committed, pushed to the authorized fork and remote-verified. All three signed APKs passed certificate comparison with 1.9.41, package/version117 metadata, non-debuggable and arm64 ABI checks, 16KiB ZIP alignment and four-language resource checks (5,321 catalogue entries per language). All570 checkpoint source hashes match. ZIP alignment verification does not establish ELF page-size compatibility.
+
+Artifacts: `/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-{PandaBear,BlackBear,Pandamonium}-1.9.46-candidate.apk`, with verified SHA256 sidecars. Manifest: `bear-languages-1.9.46-candidate.json`; verification evidence and recipe are `build/localization/signed-candidates-1.9.46-validation.json` and `verify-signed-candidates-1.9.46.py`. Existing1.9.45 artifacts remain preserved; their manifest links to1.9.46.
+
+- PandaBear: `91ac4a0ea7162941c56a7173bb08ae837825410bf98418e377c1a220b2a5af70`
+- BlackBear: `4ffd67bc7d368c8a886c943142f0ac50b3eba73d4b18f5273ac912fbe4e2ecba`
+- Pandamonium: `cba8a31c27edf5326efc3f90aa9dfc4ee6e96ff3a352efac97ae523afd189765`
+
+The delayed-failure draft overwrite has a source fix and passing regression coverage across all three variants (501 total test executions). Runtime keyboard, selection, language-switch, accessibility and layout acceptance remain pending on Fold. Financial review follow-ups, optional inherited MySQL formatting disposition and final release/publication also remain open. No installation or public release occurred.
