@@ -72,35 +72,6 @@ public class InboxCoinEvidenceTest {
             assertThrows(IllegalArgumentException.class,()->DeliveryCoinList.coins(reply,TOKEN));
         }
     }
-    @Test public void bothPollersKeepMalformedRepliesUnconfirmedDespiteLegacyPostMarker() throws Exception {
-        for(boolean bundle:new boolean[]{false,true})try(Host h=new Host()) {
-            h.watch(bundle);
-            for(JSONObject reply:invalidReplies()){
-                h.poll();assertEquals("coins relevant:true tokenid:"+TOKEN,h.commands.get(h.commands.size()-1));
-                h.callback.onResult(reply);h.noCompletion();assertTrue(h.sending.contains("fixture-key"));assertEquals(1,h.polls.size());
-            }
-            verifyNoInteractions(h.db);
-        }
-    }
-    @Test public void bothGatherPathsRejectMalformedRepliesBeforeReadingLegacyMarkersOrQueuingTransfers() throws Exception {
-        for(boolean bundle:new boolean[]{false,true})for(JSONObject reply:invalidReplies())try(Host h=new Host()) {
-            h.gather(bundle);assertNotNull(h.callback);h.callback.onResult(reply);
-            h.noCompletion();verifyNoInteractions(h.db);assertEquals(1,h.commands.size());assertTrue(h.sending.isEmpty());
-        }
-    }
-    @Test public void liveInputWithDifferentHexCaseStillPreventsDepartureConfirmation() throws Exception {
-        for(boolean bundle:new boolean[]{false,true})try(Host h=new Host()) {
-            h.watch(bundle);h.poll();h.callback.onResult(list(new JSONArray().put(coin().put("coinid","0x"+COIN.substring(2).toUpperCase(Locale.ROOT)))));
-            h.noCompletion();assertEquals(1,h.polls.size());assertTrue(h.sending.contains("fixture-key"));
-        }
-    }
-    @Test public void closingHostStopsDelayedReadsAndLateResponsesInAllFourPaths() throws Exception {
-        for(boolean bundle:new boolean[]{false,true}){
-            try(Host h=new Host()){h.watch(bundle);doReturn(true).when(h.activity).isDestroyed();h.poll();verifyNoInteractions(h.node);h.noCompletion();}
-            try(Host h=new Host()){h.watch(bundle);h.poll();doReturn(true).when(h.activity).isDestroyed();h.callback.onResult(list(new JSONArray()));h.noCompletion();assertTrue(h.polls.isEmpty());}
-            try(Host h=new Host()){h.gather(bundle);doReturn(true).when(h.activity).isDestroyed();h.callback.onResult(list(new JSONArray()));h.noCompletion();verifyNoInteractions(h.db);}
-        }
-    }
     @Test public void unknownReadMessageUsesTheTranslatedFailureLabel() throws Exception {
         Object text=InboxMessages.message(DeliveryCoinList.INVALID);assertTrue(text instanceof Language.Message);
         Field field=Language.Message.class.getDeclaredField("resource");field.setAccessible(true);

@@ -114,6 +114,20 @@ public class MainActivity extends AppCompatActivity {
     private final ArrayDeque<View> stack = new ArrayDeque<>();
     /** NFT sends in flight, keyed ref:tokenid — blocks double-taps while the node builds the txn. */
     private final java.util.HashSet<String> nftSending = new java.util.HashSet<>();
+    private DeliveryJournal deliveryJournal;
+    private synchronized DeliveryJournal deliveryJournal() {
+        if (deliveryJournal == null) deliveryJournal = new DeliveryJournal(db);
+        return deliveryJournal;
+    }
+    private String deliveredTx(MerchDb.Order order, String[] line) {
+        String key = lineKey(order.ref, line);
+        if ("0".equals(line[3]) && "0".equals(line[4])) return db.getMeta("nftsent:" + key, "");
+        try {
+            JSONObject record = deliveryJournal().load(key, order, line);
+            return DeliveryJournal.complete(record) ? record.optJSONArray("entries").optJSONObject(0).optString("txpowid") : "";
+        } catch (RuntimeException unavailable) { return ""; }
+    }
+
     /** NFT lines auto-attempted this process, keyed ref:tokenid — a failed auto-send is never looped;
      *  the next app open (autoDeliverSweep) gets exactly one more automatic attempt. */
     private final java.util.HashSet<String> autoTried = new java.util.HashSet<>();
@@ -171,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (notifyReceiver != null) try { DirectNodeEvents.unsubscribe(notifyReceiver); } catch (Exception ignored) {}
         if (node != null) node.onDestroy();
+        if (deliveryJournal != null) deliveryJournal.close();
         io.shutdownNow();
     }
 
@@ -368,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
         if (o.payaddr == null || o.payaddr.isEmpty()) return;   // undeliverable — order screen explains
         for (String[] line : nftLines(o)) {
             String key = lineKey(ref, line);
-            if (!db.getMeta("nftsent:" + key, "").isEmpty()) continue;
+            if (!deliveredTx(o, line).isEmpty()) continue;
             if (!autoTried.add(key)) continue;
             sendNft(o, line, true);
         }
@@ -684,7 +699,7 @@ public class MainActivity extends AppCompatActivity {
         final String key = lineKey(o.ref, line);
         final CharSequence label = bundle ? Language.msg(l10n_mall_inbox_complete_label, name)
                 : piece ? "\"" + name + "\"" : qty + " × " + name;
-        String sentTx = db.getMeta("nftsent:" + key, "");
+        String sentTx = deliveredTx(o, line);
         if (!sentTx.isEmpty()) {
             TextView t = new TextView(this);
             Language.setText(t, Language.msg(l10n_mall_inbox_sent_label, label, (("sent".equals(sentTx) || "posted".equals(sentTx)) ? "" : " · " + shortId(sentTx))));
@@ -694,7 +709,14 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout wrap = new LinearLayout(this); wrap.setOrientation(LinearLayout.VERTICAL);
         boolean ready = o.paid && o.payaddr != null && !o.payaddr.isEmpty();
         boolean inFlight = nftSending.contains(key);
-        TextView b = button(inFlight ? Language.msg(l10n_chat_sending) : Language.msg(l10n_mall_inbox_send_buyer, label), ready && !inFlight);
+        boolean resume = false;
+        if (piece || bundle) {
+            try { resume = deliveryJournal().load(key, o, line) != null
+                    || !db.getMeta("nftposted:" + key, "").isEmpty() || !db.getMeta("nftsent:" + key, "").isEmpty(); }
+            catch (RuntimeException unavailable) { resume = true; }
+        }
+        final boolean recovering = resume;
+        TextView b = button(inFlight ? Language.msg(l10n_chat_sending) : recovering ? Language.msg(l10n_mall_inbox_resume_delivery) : Language.msg(l10n_mall_inbox_send_buyer, label), ready && !inFlight);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.topMargin = dp(6); b.setLayoutParams(lp);
         b.setOnClickListener(v -> {
@@ -702,9 +724,9 @@ public class MainActivity extends AppCompatActivity {
             if (o.payaddr == null || o.payaddr.isEmpty()) { toast(Language.msg(l10n_mall_inbox_no_pay_address)); return; }
             if (nftSending.contains(key)) return;
             languageDialog()
-                    .setTitle(Language.msg(l10n_mall_inbox_send_nft))
-                    .setMessage(Language.msg(l10n_mall_inbox_send_help, label, shortId(tokenid), shortId(o.payaddr)))
-                    .setPositiveButton(Language.msg(l10n_mail_send), (d, w) -> sendNft(o, line, false))
+                    .setTitle(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mall_inbox_send_nft))
+                    .setMessage(recovering ? Language.msg(l10n_mall_inbox_resume_help, shortId(o.payaddr)) : Language.msg(l10n_mall_inbox_send_help, label, shortId(tokenid), shortId(o.payaddr)))
+                    .setPositiveButton(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mail_send), (d, w) -> sendNft(o, line, false))
                     .setNegativeButton(Language.msg(l10n_common_cancel), null)
                     .show();
         });
@@ -802,27 +824,6 @@ public class MainActivity extends AppCompatActivity {
         else toast(message);
     }
 
-    /** Serialize post-record persistence with the txn queue; never start confirmation before it succeeds. */
-    private void recordPostedDelivery(MerchDb.Order o, String key, String value, boolean auto, Runnable recorded) {
-        try {
-            io.execute(() -> {
-                boolean saved;
-                try { saved = db.setMetaChecked("nftposted:" + key, value); }
-                catch (RuntimeException unavailable) { saved = false; }
-                final boolean stored = saved;
-                ui.post(() -> {
-                    txDone();
-                    if (isFinishing() || isDestroyed()) return;
-                    if (!stored) { deliveryStorageFailed(o, key, auto); return; }
-                    recorded.run();
-                });
-            });
-        } catch (java.util.concurrent.RejectedExecutionException closed) {
-            txDone();
-            deliveryStorageFailed(o, key, auto);
-        }
-    }
-
     private void markSentAndMaybeAdvance(final MerchDb.Order o, final String key, final String txid, final boolean auto) {
         try {
             io.execute(() -> {
@@ -836,7 +837,7 @@ public class MainActivity extends AppCompatActivity {
                     fresh = db.order(o.ref);
                     boolean all = fresh != null;
                     if (fresh != null) for (String[] l : nftLines(fresh)) {
-                        if (db.getMeta("nftsent:" + lineKey(o.ref, l), "").isEmpty()) { all = false; break; }
+                        if (deliveredTx(fresh, l).isEmpty()) { all = false; break; }
                     }
                     advance = all && (MerchDb.PAID.equals(fresh.status) || MerchDb.CONFIRMED.equals(fresh.status));
                 } catch (RuntimeException unavailable) {
@@ -857,251 +858,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /** Transfer the exact coin carrying edition #idx to the buyer, replaying every state port, then
-     *  confirm by watching the coin LEAVE the UTXO set — `txnpost status:true` is not proof for a
-     *  manual script-token txn (the statenft-suite hard rule). Only then does the line mark sent. */
-    private void stateNftDeliver(final MerchDb.Order o, final String[] line, final boolean auto) {
-        final String name = line[0], tokenid = line[1], idx = line[3];
-        final String key = lineKey(o.ref, line);
-        if (!idx.matches("^[1-9][0-9]*$")) { deliverFailed(o, key, "bad edition index", auto); return; }
-        if (!nftSending.add(key)) return;
-        refreshOrderIfTopmost(o.ref);
-        node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) {
-                if (isFinishing() || isDestroyed()) return;
-                JSONObject coin = null;
-                final JSONArray arr;
-                try { arr = DeliveryCoinList.coins(j, tokenid); }
-                catch (RuntimeException incomplete) { deliverFailed(o, key, DeliveryCoinList.INVALID, auto); return; }
-                if (arr != null) for (int i = 0; i < arr.length(); i++) {
-                    JSONObject c = arr.optJSONObject(i);
-                    if (c != null && !StateNft.isBuried(c) && idx.equals(StateNft.stamped(c))) { coin = c; break; }
-                }
-                if (coin == null) {
-                    // Coin gone. If WE posted the transfer earlier, its departure IS the delivery.
-                    String posted = db.getMeta("nftposted:" + key, "");
-                    if (!posted.isEmpty()) { markSentAndMaybeAdvance(o, key, posted, auto); return; }
-                    deliverFailed(o, key, "piece #" + idx + " of " + name + " is not in this wallet — sold or moved?", auto);
-                    return;
-                }
-                if (!Util.isValidHexId(coin.optString("coinid", "")) || !StateNft.replayableState(coin)
-                        || StateNft.safeAmount(coin).isEmpty()) {
-                    deliverFailed(o, key, "piece #" + idx + " carries state this app won't replay", auto);
-                    return;
-                }
-                final JSONObject theCoin = coin;
-                enqueueTx(() -> runStateTransfer(o, key, tokenid, theCoin, auto));
-            }
-            @Override public void onError(String m) {
-                if (isFinishing() || isDestroyed()) return;
-                deliverFailed(o, key, NodeApi.ERR_TOO_LONG.equals(m) ? "coin list too large for this node" : m, auto);
-            }
-        });
+    private void stateNftDeliver(MerchDb.Order o, String[] line, boolean auto) {
+        if (!line[3].matches("^[1-9][0-9]*$")) { deliverFailed(o, lineKey(o.ref, line), "bad edition index", auto); return; }
+        stateDelivery(o, line, auto);
     }
-
-    private void runStateTransfer(final MerchDb.Order o, final String key, final String tokenid,
-                                  final JSONObject coin, final boolean auto) {
-        final String coinid = coin.optString("coinid", "");
-        // Deterministic txn id per coin: the pre-clean txndelete in transferCommands recovers from
-        // a previous abnormal exit instead of failing txncreate on the stale txn.
-        final String hex = coinid.replaceFirst("(?i)^0x", "");
-        final String txn = "md" + hex.substring(0, Math.min(10, hex.length()));
-        List<String> cmds = StateNft.transferCommands(txn, tokenid, coin, o.payaddr);
-        CmdChain.run(node, cmds, "txndelete id:" + txn, new CmdChain.Done() {
-            @Override public void ok(JSONObject last) {
-                node.cmd("txndelete id:" + txn, new NodeApi.Cb() {
-                    @Override public void onResult(JSONObject j) {}
-                    @Override public void onError(String m) {}
-                });
-                String txid = last == null ? "" : last.optString("txpowid", "");
-                if (txid.isEmpty() && last != null) {
-                    JSONObject r = last.optJSONObject("response");
-                    if (r != null) txid = r.optString("txpowid", "");
-                }
-                final String postedVal = txid.isEmpty() ? "posted" : txid;
-                recordPostedDelivery(o, key, postedVal, auto,
-                        () -> watchDeparture(o, key, tokenid, coinid, postedVal, auto, 0));
-            }
-            @Override public void fail(String message) {
-                txDone();
-                deliverFailed(o, key, message, auto);
-            }
-        });
-    }
-
-    // ---- complete-collection delivery: every held piece, one state-replay transfer each ----
-
-    /** Deliver a whole collection: gather every sendable piece, post one transfer per coin
-     *  (serially — the NFT Wallet's send-collection pattern), then confirm by watching every
-     *  posted coin leave the UTXO set. Retry re-gathers, so a partial delivery resumes where it
-     *  stopped: already-transferred coins are simply gone from the next gather. */
-    private void collectionDeliver(final MerchDb.Order o, final String[] line, final boolean auto) {
-        final String name = line[0], tokenid = line[1];
+    private void collectionDeliver(MerchDb.Order o, String[] line, boolean auto) { stateDelivery(o, line, auto); }
+    private void stateDelivery(MerchDb.Order o, String[] line, boolean auto) {
         final String key = lineKey(o.ref, line);
         if (!nftSending.add(key)) return;
         refreshOrderIfTopmost(o.ref);
-        node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) {
-                if (isFinishing() || isDestroyed()) return;
-                final List<JSONObject> coins = new ArrayList<>();
-                final JSONArray arr;
-                try { arr = DeliveryCoinList.coins(j, tokenid); }
-                catch (RuntimeException incomplete) { deliverFailed(o, key, DeliveryCoinList.INVALID, auto); return; }
-                if (arr != null) for (int i = 0; i < arr.length(); i++) {
-                    JSONObject c = arr.optJSONObject(i);
-                    if (c == null || !Util.isValidHexId(c.optString("coinid", ""))) continue;
-                    // Same refusals as a single transfer: buried, unstamped (creator bypass live),
-                    // or state this app won't replay.
-                    if (StateNft.isBuried(c) || StateNft.stamped(c) == null
-                            || !StateNft.replayableState(c) || StateNft.safeAmount(c).isEmpty()) continue;
-                    coins.add(c);
-                }
-                if (coins.isEmpty()) {
-                    // Nothing left to send. If WE posted transfers earlier, their departure IS the
-                    // completed delivery; otherwise the collection isn't here.
-                    String posted = db.getMeta("nftposted:" + key, "");
-                    if (!posted.isEmpty()) { markSentAndMaybeAdvance(o, key, posted, auto); return; }
-                    deliverFailed(o, key, "no pieces of " + name + " are in this wallet — sold or moved?", auto);
-                    return;
-                }
-                enqueueTx(() -> bundleTransferNext(o, key, tokenid, coins, 0, new ArrayList<>(), new String[]{null}, auto));
-            }
-            @Override public void onError(String m) {
-                if (isFinishing() || isDestroyed()) return;
-                deliverFailed(o, key, NodeApi.ERR_TOO_LONG.equals(m) ? "coin list too large for this node" : m, auto);
-            }
-        });
-    }
-
-    /** Serial per-coin transfer loop — one failure doesn't strand the rest (first error kept). */
-    private void bundleTransferNext(final MerchDb.Order o, final String key, final String tokenid,
-                                    final List<JSONObject> coins, final int i,
-                                    final List<String> postedIds, final String[] firstError, final boolean auto) {
-        if (i >= coins.size()) {
-            if (postedIds.isEmpty()) {
-                txDone();
-                deliverFailed(o, key, firstError[0] == null ? "no transfers could be posted" : firstError[0], auto);
-                return;
-            }
-            recordPostedDelivery(o, key, "posted", auto,
-                    () -> watchBundleDeparture(o, key, tokenid, postedIds, firstError[0], auto, 0));
-            return;
-        }
-        JSONObject coin = coins.get(i);
-        final String coinid = coin.optString("coinid", "");
-        final String hex = coinid.replaceFirst("(?i)^0x", "");
-        final String txn = "mc" + hex.substring(0, Math.min(10, hex.length()));
-        List<String> cmds = StateNft.transferCommands(txn, tokenid, coin, o.payaddr);
-        CmdChain.run(node, cmds, "txndelete id:" + txn, new CmdChain.Done() {
-            @Override public void ok(JSONObject last) {
-                node.cmd("txndelete id:" + txn, new NodeApi.Cb() {
-                    @Override public void onResult(JSONObject j) {}
-                    @Override public void onError(String m) {}
-                });
-                postedIds.add(coinid);
-                bundleTransferNext(o, key, tokenid, coins, i + 1, postedIds, firstError, auto);
-            }
-            @Override public void fail(String message) {
-                if (firstError[0] == null && message != null && !message.isEmpty()) firstError[0] = message;
-                bundleTransferNext(o, key, tokenid, coins, i + 1, postedIds, firstError, auto);
-            }
-        });
-    }
-
-    /** Wait for every posted coin to leave the UTXO set, then confirm nothing sendable remains. */
-    private void watchBundleDeparture(final MerchDb.Order o, final String key, final String tokenid,
-                                      final List<String> postedIds, final String firstError,
-                                      final boolean auto, final int attempt) {
-        if (isFinishing() || isDestroyed()) return;
-        if (attempt >= WATCH_TRIES) {
-            nftSending.remove(key);
-            if (auto) notifyDelivery(o.ref, false, o.ref + " — transfers posted but unconfirmed; open the order to retry");
-            else toast(Language.msg(l10n_mall_inbox_bundle_unconfirmed));
-            refreshOrderIfTopmost(o.ref);
-            return;
-        }
-        ui.postDelayed(() -> {
-            if (isFinishing() || isDestroyed()) return;
-            node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) {
-                if (isFinishing() || isDestroyed()) return;
-                java.util.HashSet<String> live = new java.util.HashSet<>();
-                int sendableLeft = 0;
-                final JSONArray arr;
-                try { arr = DeliveryCoinList.coins(j, tokenid); }
-                catch (RuntimeException incomplete) { watchBundleDeparture(o, key, tokenid, postedIds, firstError, auto, attempt + 1); return; }
-                if (arr != null) for (int i = 0; i < arr.length(); i++) {
-                    JSONObject c = arr.optJSONObject(i);
-                    if (c == null) continue;
-                    live.add(c.optString("coinid", "").toLowerCase(java.util.Locale.ROOT));
-                    if (!StateNft.isBuried(c) && StateNft.stamped(c) != null && StateNft.replayableState(c)) sendableLeft++;
-                }
-                boolean anyPostedLeft = false;
-                for (String id : postedIds) if (live.contains(id.toLowerCase(java.util.Locale.ROOT))) { anyPostedLeft = true; break; }
-                if (anyPostedLeft) { watchBundleDeparture(o, key, tokenid, postedIds, firstError, auto, attempt + 1); return; }
-                if (sendableLeft == 0) { markSentAndMaybeAdvance(o, key, "posted", auto); return; }
-                // Posted coins confirmed away, but some pieces failed to post — resumable.
+        enqueueTx(() -> new DeliveryFlow(node, deliveryJournal(), io, ui,
+                () -> !isFinishing() && !isDestroyed(), new DeliveryFlow.Listener() {
+            public void posted() { txDone(); }
+            public void confirmed() { markSentAndMaybeAdvance(o, key, "sent", auto); }
+            public void unconfirmed() {
                 nftSending.remove(key);
-                CharSequence msg = Language.msg(l10n_mall_inbox_partial, o.ref, postedIds.size(), sendableLeft, firstError == null ? "" : Language.msg(l10n_mall_inbox_first_error, InboxMessages.message(firstError)));
-                if (auto) notifyDelivery(o.ref, false, msg);
-                else toast(msg);
+                CharSequence message = Language.msg(l10n_mall_inbox_delivery_unconfirmed);
+                if (auto) notifyDelivery(o.ref, false, message); else toast(message);
                 refreshOrderIfTopmost(o.ref);
             }
-            @Override public void onError(String m) {
-                if (isFinishing() || isDestroyed()) return;
-                if (NodeApi.ERR_TOO_LONG.equals(m)) {
-                    nftSending.remove(key);
-                    if (auto) notifyDelivery(o.ref, false, o.ref + " — posted; can't confirm on this node");
-                    refreshOrderIfTopmost(o.ref);
-                } else watchBundleDeparture(o, key, tokenid, postedIds, firstError, auto, attempt + 1);
-            }
-            });
-        }, WATCH_INTERVAL_MS);
-    }
-
-    private static final long WATCH_INTERVAL_MS = 20000;
-    private static final int WATCH_TRIES = 20;   // ~6.7 minutes
-
-    /** Poll until the input coin leaves the UTXO set (delivery confirmed) or we give up for now.
-     *  On timeout the line stays unsent + nftposted stays set — a later retry (or next app open)
-     *  finds the coin gone and marks it sent, or finds it still here and reposts. */
-    private void watchDeparture(final MerchDb.Order o, final String key, final String tokenid,
-                                final String coinid, final String postedVal, final boolean auto, final int attempt) {
-        if (isFinishing() || isDestroyed()) return;
-        if (attempt >= WATCH_TRIES) {
-            nftSending.remove(key);
-            if (auto) notifyDelivery(o.ref, false, o.ref + " — transfer posted but unconfirmed; open the order to retry");
-            else toast(Language.msg(l10n_mall_inbox_one_unconfirmed));
-            refreshOrderIfTopmost(o.ref);
-            return;
-        }
-        ui.postDelayed(() -> {
-            if (isFinishing() || isDestroyed()) return;
-            node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) {
-                if (isFinishing() || isDestroyed()) return;
-                boolean present = false;
-                final JSONArray arr;
-                try { arr = DeliveryCoinList.coins(j, tokenid); }
-                catch (RuntimeException incomplete) { watchDeparture(o, key, tokenid, coinid, postedVal, auto, attempt + 1); return; }
-                if (arr != null) for (int i = 0; i < arr.length(); i++) {
-                    JSONObject c = arr.optJSONObject(i);
-                    if (c != null && DeliveryCoinList.same(coinid, c.optString("coinid", ""))) { present = true; break; }
-                }
-                if (!present) markSentAndMaybeAdvance(o, key, postedVal, auto);
-                else watchDeparture(o, key, tokenid, coinid, postedVal, auto, attempt + 1);
-            }
-            @Override public void onError(String m) {
-                if (isFinishing() || isDestroyed()) return;
-                if (NodeApi.ERR_TOO_LONG.equals(m)) {
-                    // can't confirm on this node — leave unsent, nftposted resolves it later
-                    nftSending.remove(key);
-                    if (auto) notifyDelivery(o.ref, false, o.ref + " — posted; can't confirm on this node");
-                    refreshOrderIfTopmost(o.ref);
-                } else watchDeparture(o, key, tokenid, coinid, postedVal, auto, attempt + 1);
-            }
-            });
-        }, WATCH_INTERVAL_MS);
+        }).start(o, key, line));
     }
 
     private View replyRow(final MerchDb.Order o) {

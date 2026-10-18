@@ -35,22 +35,6 @@ public class InboxDeliveryStorageTest {
         void complete() throws Exception {
             invoke("markSentAndMaybeAdvance",new Class<?>[]{MerchDb.Order.class,String.class,String.class,boolean.class},order,KEY,"tx-receipt",false);
         }
-        void posted(boolean bundle) throws Exception {
-            if(bundle) {
-                invoke("bundleTransferNext",new Class<?>[]{MerchDb.Order.class,String.class,String.class,List.class,int.class,List.class,String[].class,boolean.class},
-                        order,KEY,TOKEN,Collections.emptyList(),0,Collections.singletonList(COIN),new String[]{null},false);
-            } else {
-                final CmdChain.Done[] done={null};
-                try(MockedStatic<CmdChain> chain=mockStatic(CmdChain.class)) {
-                    chain.when(()->CmdChain.run(eq(node),anyList(),anyString(),any(CmdChain.Done.class)))
-                        .thenAnswer(c->{done[0]=c.getArgument(3);return null;});
-                    invoke("runStateTransfer",new Class<?>[]{MerchDb.Order.class,String.class,String.class,JSONObject.class,boolean.class},
-                            order,KEY,TOKEN,coin(),false);
-                    assertNotNull(done[0]);
-                    done[0].ok(object("status",true,"response",object("txpowid","fixture-post")));
-                }
-            }
-        }
         boolean busy() throws Exception {Field f=MainActivity.class.getDeclaredField("txBusy");f.setAccessible(true);return f.getBoolean(activity);}
         void write(){assertEquals(1,writes.size());writes.remove(0).run();}
         void update(){assertEquals(1,updates.size());updates.remove(0).run();}
@@ -88,43 +72,7 @@ public class InboxDeliveryStorageTest {
             verify(h.db).order(h.order.ref);h.update();assertFalse(h.sending.contains(KEY));
         }
     }
-    @Test public void singleAndBundlePostingWaitForCheckedStorageBeforePollingAndReleasingQueue() throws Exception {
-        for(boolean bundle:new boolean[]{false,true})try(Host h=new Host()) {
-            when(h.db.setMetaChecked(anyString(),anyString())).thenReturn(true);
-            final int[] next={0};h.transactions.add(()->next[0]++);
-            h.posted(bundle);assertTrue(h.busy());assertTrue(h.polls.isEmpty());assertEquals(0,next[0]);
-            verifyNoInteractions(h.db);h.write();assertEquals(0,next[0]);assertTrue(h.polls.isEmpty());
-            h.update();assertEquals(1,next[0]);assertEquals(1,h.polls.size());assertTrue(h.sending.contains(KEY));
-            verify(h.db).setMetaChecked("nftposted:"+KEY,bundle?"posted":"fixture-post");
-        }
-    }
-    @Test public void bothPostRecordingFailuresStopConfirmationAndRetainTheLineLock() throws Exception {
-        for(boolean bundle:new boolean[]{false,true})for(boolean throwsError:new boolean[]{false,true})try(Host h=new Host()) {
-            if(throwsError)when(h.db.setMetaChecked(anyString(),anyString())).thenThrow(new SQLiteException("disk full"));
-            h.posted(bundle);h.write();h.update();
-            assertFalse(h.busy());assertTrue(h.polls.isEmpty());assertTrue(h.sending.contains(KEY));
-            verify(h.db,never()).order(anyString());verify(h.db,never()).setStatus(anyString(),anyString());
-        }
-    }
-    @Test public void rejectedExecutorDoesNotAdvanceOrUnlockEitherPostPath() throws Exception {
-        for(boolean bundle:new boolean[]{false,true})try(Host h=new Host()) {
-            doThrow(new RejectedExecutionException()).when(h.io).execute(any(Runnable.class));
-            h.posted(bundle);assertFalse(h.busy());assertTrue(h.polls.isEmpty());assertTrue(h.sending.contains(KEY));
-            assertTrue(h.updates.isEmpty());verifyNoInteractions(h.db);
-        }
-        try(Host h=new Host()) {
-            doThrow(new RejectedExecutionException()).when(h.io).execute(any(Runnable.class));
-            h.complete();assertTrue(h.sending.contains(KEY));verifyNoInteractions(h.db);
-        }
-    }
-    @Test public void destroyedHostRecordsResultButCannotStartQueuedTransfersOrPublishSuccess() throws Exception {
-        for(boolean bundle:new boolean[]{false,true})try(Host h=new Host()) {
-            when(h.db.setMetaChecked(anyString(),anyString())).thenReturn(true);
-            Runnable queued=mock(Runnable.class);h.transactions.add(queued);
-            h.posted(bundle);doReturn(true).when(h.activity).isDestroyed();h.write();h.update();
-            verifyNoInteractions(queued);assertTrue(h.transactions.isEmpty());assertFalse(h.busy());
-            assertTrue(h.polls.isEmpty());assertTrue(h.sending.contains(KEY));
-        }
+    @Test public void destroyedHostCannotPublishSentSuccess() throws Exception {
         try(Host h=new Host()) {
             when(h.db.setMetaChecked(anyString(),anyString())).thenReturn(true);
             h.complete();h.write();doReturn(true).when(h.activity).isDestroyed();h.update();

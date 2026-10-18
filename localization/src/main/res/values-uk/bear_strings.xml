@@ -6618,4 +6618,8 @@
     <string name="l10n_core_key_uses">"Використань ключа: %1$s"</string>
     <string name="l10n_mall_inbox_coin_list_unconfirmed" formatted="false">"Дані списку монет неповні. Доставка залишається непідтвердженою."</string>
     <string name="l10n_mall_inbox_storage_unconfirmed" formatted="false">"Не вдалося перевірити або зберегти доставку. Не надсилайте повторно; спочатку перевірте транзакцію."</string>
+    <string name="l10n_mall_inbox_delivery_unconfirmed" formatted="false">"Доставку не підтверджено. Відкрийте замовлення, щоб продовжити перевірку. Переказ із невідомим результатом не буде надіслано повторно."</string>
+    <string name="l10n_mall_inbox_resume_delivery" formatted="false">"Продовжити доставку"</string>
+    <!-- Arguments: address -->
+    <string name="l10n_mall_inbox_resume_help">"Продовжити доставку на %1$s. Перекази, що очікують підтвердження або мають невідомий результат, буде перевірено без повторного надсилання."</string>
 </resources>

@@ -6556,4 +6556,8 @@
     <string name="l10n_core_key_uses">"Key uses: %1$s"</string>
     <string name="l10n_mall_inbox_coin_list_unconfirmed" formatted="false">"Incomplete coin-list evidence. Delivery remains unconfirmed."</string>
     <string name="l10n_mall_inbox_storage_unconfirmed" formatted="false">"Delivery could not be verified or saved. Do not send it again; check the transaction first."</string>
+    <string name="l10n_mall_inbox_delivery_unconfirmed" formatted="false">"Delivery is not confirmed. Open the order to resume verification. A transfer with an unknown result will not be sent again."</string>
+    <string name="l10n_mall_inbox_resume_delivery" formatted="false">"Resume delivery"</string>
+    <!-- Arguments: address -->
+    <string name="l10n_mall_inbox_resume_help">"Resume this delivery to %1$s. Pending or unknown transfers will be checked without sending them again."</string>
 </resources>
