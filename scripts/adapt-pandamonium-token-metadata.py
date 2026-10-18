@@ -1,13 +1,14 @@
-"""Reuse core balance TokenMeta's JSON coercion in UTXO and NFT display paths."""
+"""Reuse core balance TokenMeta's JSON coercion in UTXO, NFT Wallet and MiniMall Studio display paths."""
 from pathlib import Path
 
 
-def adapt(root):
+def adapt(root, apps=('utxo', 'NFTwallet', 'merchstudio')):
     def change(text, old, new):
         assert text.count(old) == 1, ('token metadata source drift', old)
         return text.replace(old, new)
 
-    for app, package in [('utxo', 'utxo'), ('NFTwallet', 'nftwallet')]:
+    for app in apps:
+        package = {'utxo': 'utxo', 'NFTwallet': 'nftwallet', 'merchstudio': 'merchstudio'}[app]
         folder = root / app / 'src/main/java/com/eurobuddha' / package
         p = folder / 'TokenMeta.java'
         s = p.read_text()
@@ -41,32 +42,43 @@ def adapt(root):
 
         p = folder / 'Util.java'
         s = p.read_text()
-        for result, method in [('String', 'tokenName'), ('boolean', 'tokenNameProvided')]:
+        methods = [('String', 'tokenName')]
+        if app != 'merchstudio':
+            methods.append(('boolean', 'tokenNameProvided'))
+        for result, method in methods:
             marker = '    public static ' + result + ' ' + method + '(Object token, String tokenid) {\n'
             s = change(s, marker, marker + '''        JSONObject object = TokenMeta.tokenObject(token);
         if (object != null) token = object;
 ''')
         # Both name readers must decode nested metadata just as TokenMeta does.
-        for expression in ['t.opt("name")', '((JSONObject)token).opt("name")']:
+        expressions = ['t.opt("name")']
+        if app != 'merchstudio':
+            expressions.append('((JSONObject)token).opt("name")')
+        for expression in expressions:
             old = '            Object name = ' + expression + ';'
             s = change(s, old, old + '''
             JSONObject nameObject = TokenMeta.asObject(name);
             if (nameObject != null) name = nameObject;''')
         p.write_text(s)
 
-        p = folder / 'WalletView.java'
-        s = p.read_text()
-        s = change(s, '        tok.setTextColor(Design.dim());', '''        tok.setTextColor(Design.dim());
+        if app != 'merchstudio':
+            p = folder / 'WalletView.java'
+            s = p.read_text()
+            s = change(s, '        tok.setTextColor(Design.dim());', '''        tok.setTextColor(Design.dim());
         // Match BalancesView's compact names, even for malformed or oversized metadata.
         tok.setMaxLines(1);
         tok.setEllipsize(android.text.TextUtils.TruncateAt.END);''')
-        p.write_text(s)
+            p.write_text(s)
 
-    p = root / 'NFTwallet/src/main/java/com/eurobuddha/nftwallet/StateNft.java'
-    s = p.read_text()
-    s = change(s, 'JSONObject root = tokenNode instanceof JSONObject ? (JSONObject) tokenNode : null;',
-               'JSONObject root = TokenMeta.asObject(tokenNode);')
-    s = change(s, '''        if (root != null && root.opt("token") instanceof JSONObject) {
+    for app in apps:
+        if app == 'utxo':
+            continue
+        package = 'nftwallet' if app == 'NFTwallet' else 'merchstudio'
+        p = root / app / 'src/main/java/com/eurobuddha' / package / 'StateNft.java'
+        s = p.read_text()
+        s = change(s, 'JSONObject root = tokenNode instanceof JSONObject ? (JSONObject) tokenNode : null;',
+                   'JSONObject root = TokenMeta.asObject(tokenNode);')
+        s = change(s, '''        if (root != null && root.opt("token") instanceof JSONObject) {
             envelope = root;
             root = root.optJSONObject("token");
         }
@@ -79,6 +91,6 @@ def adapt(root):
             root = nested;
         }
         JSONObject meta = root == null ? null : TokenMeta.asObject(root.opt("name"));''')
-    s = change(s, 'm.name = first(src.optString("name", ""), root.optString("name", ""), "Collection");',
-               'm.name = first(src.optString("name", ""), "Collection");')
-    p.write_text(s)
+        s = change(s, 'm.name = first(src.optString("name", ""), root.optString("name", ""), "Collection");',
+                   'm.name = first(src.optString("name", ""), "Collection");')
+        p.write_text(s)

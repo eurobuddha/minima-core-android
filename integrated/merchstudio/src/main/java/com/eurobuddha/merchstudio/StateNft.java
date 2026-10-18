@@ -91,21 +91,19 @@ public final class StateNft {
     public static Meta parseMeta(String tokenid, Object tokenNode) {
         Meta m = new Meta();
         m.tokenid = tokenid == null ? "" : tokenid;
-        JSONObject root = tokenNode instanceof JSONObject ? (JSONObject) tokenNode : null;
+        JSONObject root = TokenMeta.asObject(tokenNode);
         // `tokens tokenid:` returns an ENVELOPE — {token:{name:{…},totalamount},script} — while a
         // balance row hands us the token record directly. Unwrap so either shape parses.
         JSONObject envelope = null;
-        if (root != null && root.opt("token") instanceof JSONObject) {
+        JSONObject nested = root == null ? null : TokenMeta.asObject(root.opt("token"));
+        if (nested != null) {
             envelope = root;
-            root = root.optJSONObject("token");
+            root = nested;
         }
-        JSONObject meta = null;
-        if (root != null && root.opt("name") instanceof JSONObject) {
-            meta = root.optJSONObject("name");
-        }
+        JSONObject meta = root == null ? null : TokenMeta.asObject(root.opt("name"));
         JSONObject src = meta != null ? meta : root;
         if (src != null) {
-            m.name = first(src.optString("name", ""), root.optString("name", ""), "Collection");
+            m.name = first(src.optString("name", ""), "Collection");
             m.description = first(src.optString("description", ""), root.optString("description", ""));
             m.mode = first(src.optString("mode", ""), root.optString("mode", ""), src.optString("base", "").isEmpty() ? "embed" : "url");
             m.size = firstInt(src.opt("size"), root.opt("size"), root.opt("total"),

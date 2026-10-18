@@ -21,6 +21,8 @@ public class TokenMeta {
     public String externalUrl = "";
 
     public static TokenMeta parse(Object token, String tokenid) {
+        JSONObject object = tokenObject(token);
+        if (object != null) token = object;
         TokenMeta m = new TokenMeta();
         if (Util.isMinima(tokenid)) {
             m.name = "Minima";
@@ -37,6 +39,8 @@ public class TokenMeta {
 
             JSONObject meta = null;
             Object nameNode = t.opt("name");
+            JSONObject nameObject = asObject(nameNode);
+            if (nameObject != null) nameNode = nameObject;
             if (nameNode instanceof JSONObject) {
                 meta = (JSONObject) nameNode;
                 m.name = meta.optString("name", "Token");
@@ -69,6 +73,25 @@ public class TokenMeta {
                     t.optString("external_url", "")));
         }
         return m;
+    }
+
+    /** Core balance TokenMeta.asObject, adapted from Minima JSON to org.json. */
+    static JSONObject asObject(Object value) {
+        if (value == null || value == JSONObject.NULL) return null;
+        if (value instanceof JSONObject) return (JSONObject) value;
+        String text = value.toString().trim();
+        if (text.startsWith("{")) {
+            try { return new JSONObject(text); }
+            catch (org.json.JSONException ignored) { }
+        }
+        return null;
+    }
+
+    /** Balance metadata or the existing tokens-command envelope used by StateNft. */
+    static JSONObject tokenObject(Object value) {
+        JSONObject root = asObject(value);
+        JSONObject nested = root == null ? null : asObject(root.opt("token"));
+        return nested == null ? root : nested;
     }
 
     private static String first(String... vals) {

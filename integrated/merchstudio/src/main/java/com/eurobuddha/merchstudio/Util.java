@@ -48,11 +48,15 @@ public final class Util {
      * or (for raw coin entries) nested. Pull a human-readable name out of whatever we get.
      */
     public static String tokenName(Object token, String tokenid) {
+        JSONObject object = TokenMeta.tokenObject(token);
+        if (object != null) token = object;
         if (isMinima(tokenid)) return "Minima";
         if (token instanceof String) return (String) token;
         if (token instanceof JSONObject) {
             JSONObject t = (JSONObject) token;
             Object name = t.opt("name");
+            JSONObject nameObject = TokenMeta.asObject(name);
+            if (nameObject != null) name = nameObject;
             if (name instanceof JSONObject) {
                 return ((JSONObject) name).optString("name", "Token");
             }

@@ -38,4 +38,48 @@ public class StudioDataTest {
  @Test public void buriedAndUnstampedCoinsDoNotConflictWithListableEdition()throws Exception{
   JSONArray rows=new JSONArray().put(coin(1,"7")).put(coin(2,"7").put("address",StateNft.GRAVEYARD)).put(coin(3,"0"));assertEquals(3,StudioData.collection(reply(rows),TOKEN,100).length());
  }
+
+ @Test public void serializedNftBalanceMetadataResolvesNamesAndLargeIcons() throws Exception {
+  String image="data:image/png;base64,"+"AAAA".repeat(32768);
+  JSONObject metadata=obj("name","Shop NFT 中文 Українська","url",image,"ticker","NFT","decimals","0");
+  for(Object raw:new Object[]{metadata,metadata.toString(),obj("name",metadata),obj("name",metadata).toString(),obj("name",metadata.toString()),obj("name",metadata.toString()).toString()}) {
+   JSONObject input=balance().put("token",raw).put("decimals","0");String before=input.toString();
+   JSONArray accepted=StudioData.balances(reply(new JSONArray().put(input)));
+   TokenBalance token=TokenBalance.from(accepted.getJSONObject(0));
+   assertEquals("Shop NFT 中文 Українська",token.name);assertEquals(token.name,Util.tokenName(raw,TOKEN));
+   assertEquals(image,token.meta.iconUrl);assertTrue(token.hasIcon());
+   assertEquals("NFT",token.meta.ticker);assertEquals("0",token.meta.decimals);
+   assertEquals("2",token.sendable);assertEquals("100",token.total);assertEquals(before,input.toString());
+  }
+ }
+ @Test public void serializedShopCollectionsResolveCoversAndPieceArt() throws Exception {
+  JSONObject details=obj("name","Collection 中文 Українська","size",12,"mode","url",
+    "base","https://example.invalid/nft/","ext",".png","url","https://example.invalid/cover.png");
+  for(Object metadata:new Object[]{details,details.toString()}) {
+   JSONObject token=obj("name",metadata,"totalamount","12");
+   for(Object value:new Object[]{token,token.toString()}) {
+    JSONObject envelope=obj("token",value,"script","RETURN TRUE");String before=envelope.toString();
+    for(Object record:new Object[]{envelope,envelope.toString(),value}) {
+     StateNft.Meta meta=StateNft.parseMeta(TOKEN,record);
+     assertEquals("Collection 中文 Українська",meta.name);assertEquals(12,meta.size);
+     assertEquals("url",meta.mode);assertTrue(StateNft.isCandidate(meta));
+     assertEquals("https://example.invalid/cover.png",meta.icon);
+     assertEquals("https://example.invalid/nft/3.png",StateNft.imageUrl(meta,3,null));
+     TokenMeta cover=TokenMeta.parse(record,TOKEN);assertEquals(meta.name,cover.name);assertEquals(meta.icon,cover.iconUrl);
+    }
+    assertEquals(before,envelope.toString());
+   }
+  }
+ }
+ @Test public void missingNamesNeverExposeStructuredMetadataAsShopLabels() {
+  JSONObject details=obj("url","https://example.invalid/cover.png","size",12);
+  for(Object metadata:new Object[]{details,details.toString()}) {
+   JSONObject token=obj("name",metadata);
+   assertEquals("Collection",StateNft.parseMeta(TOKEN,token).name);
+   assertEquals("Token",TokenMeta.parse(token,TOKEN).name);
+   assertEquals("Token",Util.tokenName(token,TOKEN));
+  }
+  for(String name:new String[]{"Token","Send","[1,2]","{unfinished","中文 Русский Українська"})
+   assertEquals(name,TokenMeta.parse(name,TOKEN).name);
+ }
 }
