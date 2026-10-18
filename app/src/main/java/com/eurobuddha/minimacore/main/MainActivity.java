@@ -131,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 findViewById(R.id.tabs), findViewById(R.id.main_footer));
 
         mFooterLeft  = findViewById(R.id.main_footer_left);
+        Language.setText(mFooterLeft, Language.msg(l10n_core_awaiting_blocks));
         mFooterRight = findViewById(R.id.main_footer_right);
 
         mMainAdapter = new MainAdapter(this);

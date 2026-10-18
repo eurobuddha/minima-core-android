@@ -6609,4 +6609,9 @@
     <string name="l10n_mall_shop_payment_check" formatted="false">"Check payment"</string>
     <string name="l10n_mall_shop_payment_save_failed" formatted="false">"Could not save the order. Nothing was sent."</string>
     <string name="l10n_mall_shop_order_unknown" formatted="false">"Order delivery is not verified. No payment was started. Review the order before trying again."</string>
+    <string name="l10n_core_awaiting_blocks" formatted="false">"Awaiting blocks…"</string>
+    <string name="l10n_core_extra_params_error" formatted="false">"Invalid extra Minima parameters. Open Parameters and correct them."</string>
+    <string name="l10n_core_service_started" formatted="false">"Minima service started"</string>
+    <!-- Arguments: port -->
+    <string name="l10n_core_node_port_busy">"Another Minima node is already running on this device. Stop it first: two nodes cannot share port %1$s."</string>
 </resources>

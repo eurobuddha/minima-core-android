@@ -6671,4 +6671,9 @@
     <string name="l10n_mall_shop_payment_check" formatted="false">"Проверить оплату"</string>
     <string name="l10n_mall_shop_payment_save_failed" formatted="false">"Не удалось сохранить заказ. Ничего не отправлено."</string>
     <string name="l10n_mall_shop_order_unknown" formatted="false">"Доставка заказа не подтверждена. Оплата не начата. Проверьте заказ перед повторной попыткой."</string>
+    <string name="l10n_core_awaiting_blocks" formatted="false">"Ожидание блоков…"</string>
+    <string name="l10n_core_extra_params_error" formatted="false">"Некорректные дополнительные параметры Minima. Откройте параметры и исправьте их."</string>
+    <string name="l10n_core_service_started" formatted="false">"Служба Minima запущена"</string>
+    <!-- Arguments: port -->
+    <string name="l10n_core_node_port_busy">"На этом устройстве уже работает другой узел Minima. Сначала остановите его: два узла не могут использовать один порт %1$s."</string>
 </resources>

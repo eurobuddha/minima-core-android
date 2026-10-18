@@ -91,7 +91,7 @@ public class ReceiveView extends BaseView {
             }
             @Override public void onError(String message) {
                 if (!NodeApi.ERR_NOT_ENABLED.equals(message)) {
-                    Toast.makeText(act, message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(act, NftMessages.message(message), Toast.LENGTH_SHORT).show();
                 }
             }
         });

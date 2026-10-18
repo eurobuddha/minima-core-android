@@ -6578,4 +6578,9 @@
     <string name="l10n_mall_shop_payment_check" formatted="false">"检查付款"</string>
     <string name="l10n_mall_shop_payment_save_failed" formatted="false">"无法保存订单，未发送任何内容。"</string>
     <string name="l10n_mall_shop_order_unknown" formatted="false">"订单送达情况尚未验证，付款尚未开始。请先核实订单，再重试。"</string>
+    <string name="l10n_core_awaiting_blocks" formatted="false">"正在等待区块…"</string>
+    <string name="l10n_core_extra_params_error" formatted="false">"Minima 附加参数无效。请打开“参数”并进行修正。"</string>
+    <string name="l10n_core_service_started" formatted="false">"Minima 服务已启动"</string>
+    <!-- Arguments: port -->
+    <string name="l10n_core_node_port_busy">"此设备上已有另一个 Minima 节点正在运行。请先停止该节点：两个节点不能共用端口 %1$s。"</string>
 </resources>

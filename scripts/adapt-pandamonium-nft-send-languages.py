@@ -149,3 +149,4 @@ def adapt(root):
  source=module.build_source(spec,catalog).replace('com.eurobuddha.wallet','com.eurobuddha.nftwallet').replace('WalletMessages','NftMessages').replace('Explicit wallet failures only.','Explicit NFT local diagnostics only.').replace('adapt-pandamonium-wallet-error-languages.py from localization/wallet-errors.json','adapt-pandamonium-nft-send-languages.py')
  (folder/'NftMessages.java').write_text(source)
  p=folder/'MainActivity.java';s=p.read_text();s=change(s,'Toast.makeText(this, message, Toast.LENGTH_SHORT)','Toast.makeText(this, NftMessages.message(message), Toast.LENGTH_SHORT)');p.write_text(s)
+ p=folder/'ReceiveView.java';s=p.read_text();s=change(s,'Toast.makeText(act, message, Toast.LENGTH_SHORT)','Toast.makeText(act, NftMessages.message(message), Toast.LENGTH_SHORT)');p.write_text(s)

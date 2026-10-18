@@ -32443,5 +32443,29 @@
     "zh-Hans": "订单送达情况尚未验证，付款尚未开始。请先核实订单，再重试。",
     "ru": "Доставка заказа не подтверждена. Оплата не начата. Проверьте заказ перед повторной попыткой.",
     "uk": "Доставку замовлення не підтверджено. Оплату не розпочато. Перевірте замовлення перед повторною спробою."
+  },
+  "core.awaitingBlocks": {
+    "en": "Awaiting blocks…",
+    "zh-Hans": "正在等待区块…",
+    "ru": "Ожидание блоков…",
+    "uk": "Очікування блоків…"
+  },
+  "core.extraParamsError": {
+    "en": "Invalid extra Minima parameters. Open Parameters and correct them.",
+    "zh-Hans": "Minima 附加参数无效。请打开“参数”并进行修正。",
+    "ru": "Некорректные дополнительные параметры Minima. Откройте параметры и исправьте их.",
+    "uk": "Некоректні додаткові параметри Minima. Відкрийте параметри та виправте їх."
+  },
+  "core.serviceStarted": {
+    "en": "Minima service started",
+    "zh-Hans": "Minima 服务已启动",
+    "ru": "Служба Minima запущена",
+    "uk": "Службу Minima запущено"
+  },
+  "core.nodePortBusy": {
+    "en": "Another Minima node is already running on this device. Stop it first: two nodes cannot share port {port}.",
+    "zh-Hans": "此设备上已有另一个 Minima 节点正在运行。请先停止该节点：两个节点不能共用端口 {port}。",
+    "ru": "На этом устройстве уже работает другой узел Minima. Сначала остановите его: два узла не могут использовать один порт {port}.",
+    "uk": "На цьому пристрої вже працює інший вузол Minima. Спочатку зупиніть його: два вузли не можуть використовувати один порт {port}."
   }
 }

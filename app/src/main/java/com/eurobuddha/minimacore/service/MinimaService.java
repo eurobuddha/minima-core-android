@@ -385,7 +385,7 @@ public class MinimaService extends Service {
         }else{
 
             //Notify User service is now running!
-            Toast.makeText(this, "[!] Minima EXTRA Params Error.. pls fix", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, Language.msg(l10n_core_extra_params_error), Toast.LENGTH_LONG).show();
         }
 
         //Another Minima node already on our port? Say so - the classic and block apps both
@@ -401,9 +401,7 @@ public class MinimaService extends Service {
                         @Override
                         public void run() {
                             Toast.makeText(MinimaService.this,
-                                "[!] Another Minima node is already running on this device "
-                                + "(the other Minima app?). Stop it first - two nodes cannot "
-                                + "share port 11001.", Toast.LENGTH_LONG).show();
+                                Language.msg(l10n_core_node_port_busy, "11001"), Toast.LENGTH_LONG).show();
                         }
                     });
                 } catch (java.io.IOException free) {
@@ -438,7 +436,7 @@ public class MinimaService extends Service {
         }, "minima-port-check").start();
 
         //Notify User service is now running!
-        Toast.makeText(this, "Minima Service Started", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, Language.msg(l10n_core_service_started), Toast.LENGTH_SHORT).show();
 
         //Listen to Battery Events
         addBatteryListener();
