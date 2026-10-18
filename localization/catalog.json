@@ -34714,5 +34714,17 @@
     "zh-Hans": "Maxima 正通过 Pandamonium 连接。",
     "ru": "Maxima подключается через Pandamonium.",
     "uk": "Maxima підключається через Pandamonium."
+  },
+  "creative.identityMinting": {
+    "en": "Minting your identity token…",
+    "zh-Hans": "正在铸造你的身份代币…",
+    "ru": "Создаём ваш токен идентичности…",
+    "uk": "Створюємо ваш токен ідентичності…"
+  },
+  "creative.identityLookupFailed": {
+    "en": "Could not check for an existing Salon identity. Nothing was minted. Your published page is saved; try claiming again when the node is ready.",
+    "zh-Hans": "无法检查现有的 Salon 身份。未铸造任何代币。已发布的页面已保存；请在节点就绪后重试认领。",
+    "ru": "Не удалось проверить, есть ли уже идентичность Salon. Токен не создан. Опубликованная страница сохранена; повторите регистрацию, когда узел будет готов.",
+    "uk": "Не вдалося перевірити, чи вже є ідентичність Salon. Токен не створено. Опубліковану сторінку збережено; повторіть реєстрацію, коли вузол буде готовий."
   }
 }

@@ -476,15 +476,22 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         }
         node.cmd("tokens tokenid:" + tids.get(i), new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) {
-                JSONObject t = json.optJSONObject("response");
-                String script = t == null ? "" : t.optString("script", "");
+                JSONObject t = json == null ? null : json.optJSONObject("response");
+                // A failed, missing, mismatched or incomplete lookup proves nothing about this collection.
+                if (json == null || !Boolean.TRUE.equals(json.opt("status")) || t == null
+                        || !(t.opt("tokenid") instanceof String)
+                        || !tids.get(i).equalsIgnoreCase((String) t.opt("tokenid"))
+                        || !(t.opt("script") instanceof String) || t.optString("script").trim().isEmpty()) {
+                    onError(""); return;
+                }
+                String script = t.optString("script");
                 if (StateNft.creatorPk(script).isEmpty()) {
                     LocalStore.removeById(MainActivity.this, ids.get(i)[0]);
                     removed[0]++;
                 }
                 verifyPhantom(ids, tids, i + 1, removed);
             }
-            @Override public void onError(String message) { verifyPhantom(ids, tids, i + 1, removed); }
+            @Override public void onError(String message) { phantomsChecked = false; verifyPhantom(ids, tids, i + 1, removed); }
         });
     }
 

@@ -7006,4 +7006,6 @@
     <string name="l10n_salon_transport_mesh_usage">"Profile media: %1$s / %2$s MB."</string>
     <string name="l10n_salon_transport_connected" formatted="false">"✓ Embedded Maxima connected."</string>
     <string name="l10n_salon_transport_connecting" formatted="false">"Maxima is connecting through Pandamonium."</string>
+    <string name="l10n_creative_identity_minting" formatted="false">"Minting your identity token…"</string>
+    <string name="l10n_creative_identity_lookup_failed" formatted="false">"Could not check for an existing Salon identity. Nothing was minted. Your published page is saved; try claiming again when the node is ready."</string>
 </resources>

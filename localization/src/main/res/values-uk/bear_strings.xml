@@ -7070,4 +7070,6 @@
     <string name="l10n_salon_transport_mesh_usage">"Медіа профілю: %1$s / %2$s МБ."</string>
     <string name="l10n_salon_transport_connected" formatted="false">"✓ Вбудована Maxima підключена."</string>
     <string name="l10n_salon_transport_connecting" formatted="false">"Maxima підключається через Pandamonium."</string>
+    <string name="l10n_creative_identity_minting" formatted="false">"Створюємо ваш токен ідентичності…"</string>
+    <string name="l10n_creative_identity_lookup_failed" formatted="false">"Не вдалося перевірити, чи вже є ідентичність Salon. Токен не створено. Опубліковану сторінку збережено; повторіть реєстрацію, коли вузол буде готовий."</string>
 </resources>

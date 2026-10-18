@@ -6974,4 +6974,6 @@
     <string name="l10n_salon_transport_mesh_usage">"个人资料媒体：%1$s / %2$s MB。"</string>
     <string name="l10n_salon_transport_connected" formatted="false">"✓ 内置 Maxima 已连接。"</string>
     <string name="l10n_salon_transport_connecting" formatted="false">"Maxima 正通过 Pandamonium 连接。"</string>
+    <string name="l10n_creative_identity_minting" formatted="false">"正在铸造你的身份代币…"</string>
+    <string name="l10n_creative_identity_lookup_failed" formatted="false">"无法检查现有的 Salon 身份。未铸造任何代币。已发布的页面已保存；请在节点就绪后重试认领。"</string>
 </resources>

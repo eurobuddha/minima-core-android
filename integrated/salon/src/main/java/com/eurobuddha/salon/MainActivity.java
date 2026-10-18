@@ -2688,8 +2688,24 @@ public class MainActivity extends AppCompatActivity {
 
     private void adoptOrMint(String h, String n, String b, String url, TextView status) {
         node.cmd("balance", new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) { String tid = findSalonToken(j, h); if (!tid.isEmpty()) runOnUiThread(() -> finishClaim(tid)); else runOnUiThread(() -> { status.setText("Minting your identity token…"); mintIdentity(h, n, b, url, status); }); }
-            @Override public void onError(String m) { runOnUiThread(() -> { status.setText("Minting your identity token…"); mintIdentity(h, n, b, url, status); }); }
+            @Override public void onResult(JSONObject reply) {
+                final JSONObject existing;
+                try { existing = IdentityBalance.find(reply, h); }
+                catch (IllegalArgumentException unavailable) { onError(""); return; }
+                runOnUiThread(() -> {
+                    if (existing != null) finishClaim(existing.optString("tokenid"));
+                    else {
+                        Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_identity_minting));
+                        mintIdentity(h, n, b, url, status);
+                    }
+                });
+            }
+            @Override public void onError(String ignored) {
+                runOnUiThread(() -> {
+                    Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_identity_lookup_failed));
+                    claimFailed();
+                });
+            }
         });
     }
 
@@ -2731,12 +2747,8 @@ public class MainActivity extends AppCompatActivity {
     private JSONObject findAnySalonToken(JSONObject j) { return findSalonEntry(j, null); }
     private String findSalonToken(JSONObject j, String handle) { JSONObject t = findSalonEntry(j, handle); return t == null ? "" : t.optString("tokenid"); }
     private JSONObject findSalonEntry(JSONObject balanceJson, String handle) {
-        try {
-            JSONArray arr = balanceJson.optJSONArray("response"); if (arr == null) return null;
-            for (int i = 0; i < arr.length(); i++) { JSONObject t = arr.optJSONObject(i); if (t == null) continue; JSONObject meta = t.optJSONObject("token"); if (meta == null) continue;
-                if ("1".equals(meta.optString("salon")) && (handle == null || handle.equals(meta.optString("handle")))) return t; }
-        } catch (Exception ignored) {}
-        return null;
+        try { return IdentityBalance.find(balanceJson, handle); }
+        catch (IllegalArgumentException unavailable) { return null; }
     }
     private void adoptFromToken(JSONObject tokenRow) {
         try { JSONObject meta = tokenRow.optJSONObject("token");
