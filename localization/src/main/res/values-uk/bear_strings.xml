@@ -6631,4 +6631,7 @@
     <string name="l10n_nft_history_unverified_status" formatted="false">"Результат не перевірено"</string>
     <string name="l10n_nft_history_requested_amount" formatted="false">"Запитана сума"</string>
     <string name="l10n_nft_history_local_id" formatted="false">"Локальний ідентифікатор"</string>
+    <string name="l10n_atomix_operation_market_changed" formatted="false">"Ринок змінився. Оновіть дані та спробуйте ще раз."</string>
+    <!-- Arguments: 0, 1, 2 -->
+    <string name="l10n_atomix_operation_market_stopped">"Серію угод зупинено: виконано %1$s із %2$s частин (частина %3$s: ринок змінився). Заблоковані частини продовжуються; для незнайдених відповідних угод кошти повертаються автоматично."</string>
 </resources>

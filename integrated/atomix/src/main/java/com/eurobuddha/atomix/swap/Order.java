@@ -40,6 +40,10 @@ public final class Order {
     public double usdtAvail;         // maker's available USDT at publish time (liquidity, bid side)
     public final Map<String, Pair> pairs = new LinkedHashMap<>();   // "USDT" -> rate
 
+    // Local creation/scan market. Peer JSON cannot choose this attribution.
+    com.eurobuddha.atomix.TradingContext market = com.eurobuddha.atomix.TradingContext.active();
+    public com.eurobuddha.atomix.TradingContext market() { return market; }
+
     // set on receive (not part of the signed payload)
     public String signerPk;          // 0x + Ed25519 pk recovered from the coin (verified signer)
     public String coinid;            // source coin id (dedup / expiry)
@@ -214,6 +218,7 @@ public final class Order {
 
     public static Order fromJson(JSONObject o) {
         Order r = new Order();
+        r.market = null; // only a verified board scan can attribute a received order
         r.minimaPublicKey = o.optString("mpk", "");
         r.ethAddress = o.optString("eth", "");
         // A maker self-signs its own order, so mpk/eth are untrusted input: the Ed25519 signature proves

@@ -461,6 +461,7 @@ public class MainActivity extends AppCompatActivity {
             // commit-vs-reset race. Safe to reorder: the tombstone's sentinel was captured synchronously before
             // proceed was posted, and the clear-block/resetForSwitch operate on the single active prefs (currency-
             // agnostic keys) while restoreMarket takes an explicit target key — none depend on active being old.
+            PublishGate.bumpGen(); // invalidate publications started in the leaving market
             TradingContext.setActive(target, prefs);           // flip currency (drives token/sentinels/pricing/theme)
             // Quiesce the priced state (fund-safe: the active prefs are always the ACTIVE currency's, no bleed).
             prefs.edit()
@@ -993,7 +994,12 @@ public class MainActivity extends AppCompatActivity {
         if (prefs.getBoolean(PriceOracle.P_ENABLE, false) && !PriceOracle.fresh()) {
             // Pegged: grab a live price first so a user-tapped Publish never quotes a stale one.
             orderStatus = "Fetching " + PriceOracle.source() + " price…"; render();
-            io.execute(() -> { PriceOracle.refreshSync(); ui.post(this::publishOrderNow); });
+            final TradingContext market = TradingContext.active();
+            final long generation = PublishGate.gen();
+            io.execute(() -> { PriceOracle.refreshSync(); ui.post(() -> {
+                if (market != TradingContext.active() || generation != PublishGate.gen()) { orderStatus = SwapOrderBook.MARKET_ERROR; render(); return; }
+                publishOrderNow();
+            }); });
             return;
         }
         publishOrderNow();
@@ -1020,7 +1026,7 @@ public class MainActivity extends AppCompatActivity {
         // ensureLadderCoins clamps the ask ladder to the tranches I can actually lock right now (+ splits toward
         // full depth in the background); publishFresh then re-reads the live SENDABLE balance so the advertised
         // size is never a stale snapshot.
-        engine.ensureLadderCoins(o, !SWEEP_ACTIVE, () -> SwapOrderBook.publishFresh(node, ls, identity, o, new CommsTransport.SendCb() {
+        engine.ensureLadderCoins(o, !SWEEP_ACTIVE, () -> SwapOrderBook.publishFresh(node, ls, identity, o, gen, new CommsTransport.SendCb() {
             @Override public void onSent(String txpowid) {
                 if (gen != PublishGate.gen()) { SwapLog.d("fg manual publish superseded — result dropped"); return; }
                 prefs.edit().putLong("last_publish_ok", System.currentTimeMillis()).apply();
@@ -1071,7 +1077,7 @@ public class MainActivity extends AppCompatActivity {
                 SwapLog.d("fg publish superseded pre-send — dropped");
                 return;
             }
-            SwapOrderBook.publishFresh(node, ls, identity, o, new CommsTransport.SendCb() {
+            SwapOrderBook.publishFresh(node, ls, identity, o, gen, new CommsTransport.SendCb() {
             @Override public void onSent(String txpowid) {
                 if (gen != PublishGate.gen()) {   // a user edit/withdraw or peg-tombstone superseded this attempt
                     PublishGate.release(PublishGate.ORDER);
@@ -1165,7 +1171,7 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override public void onFailed(String message) { orderStatus = (live ? "Update" : "Withdraw") + " failed: " + message; render(); }
         };
-        if (live) engine.ensureLadderCoins(o, !SWEEP_ACTIVE, () -> SwapOrderBook.publishFresh(node, ls, identity, o, cb));
+        if (live) engine.ensureLadderCoins(o, !SWEEP_ACTIVE, () -> SwapOrderBook.publishFresh(node, ls, identity, o, gen, cb));
         else      SwapOrderBook.publish(node, ls, identity, o, cb);   // tombstone: no coins/balance read needed
     }
 
@@ -1716,7 +1722,7 @@ public class MainActivity extends AppCompatActivity {
                         if (sweepRun == null) { orderStatus = "✓ Buy started, but the maker's contact key is missing — they may not see it."; render(); }
                         return;
                     }
-                    SwapTake.send(node, crypto, maker.commsPublicId, identity.publicId(), hash, new CommsTransport.SendCb() {
+                    SwapTake.send(node, crypto, maker.commsPublicId, identity.publicId(), hash, maker.market(), new CommsTransport.SendCb() {
                         @Override public void onSent(String txpowid) { if (sweepRun == null) { orderStatus = "✓ Buy started — maker notified, watching."; render(); } }
                         @Override public void onFailed(String message) { if (sweepRun == null) { orderStatus = "Buy locked, but maker notify failed: " + message; render(); } }
                     });

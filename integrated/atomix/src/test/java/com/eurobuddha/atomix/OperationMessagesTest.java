@@ -8,11 +8,11 @@ import static org.junit.Assert.*;
 public class OperationMessagesTest {
  static JSONObject source()throws Exception{return new JSONObject(new String(java.nio.file.Files.readAllBytes(java.nio.file.Path.of("../../localization/atomix-operation-messages.json")),java.nio.charset.StandardCharsets.UTF_8));}
  @Test public void fixedStatusesUseDeclaredResources()throws Exception{
-  JSONObject fixed=source().getJSONObject("fixed");assertEquals(11,fixed.length());
+  JSONObject fixed=source().getJSONObject("fixed");assertEquals(17,fixed.length());
   for(Iterator<String>it=fixed.keys();it.hasNext();){String raw=it.next();Object value=OperationMessages.message(raw);assertTrue(value instanceof Language.Message);assertEquals(AtomixMessagesTest.resource(fixed.getString(raw)),AtomixMessagesTest.field(value,"resource"));}
  }
  @Test public void everyTemplateKeepsLiteralArguments()throws Exception{
-  JSONArray patterns=source().getJSONArray("patterns");assertEquals(18,patterns.length());
+  JSONArray patterns=source().getJSONArray("patterns");assertEquals(19,patterns.length());
   for(int i=0;i<patterns.length();i++){JSONObject row=patterns.getJSONObject(i);String raw=row.getString("template");Object[] args=new Object[row.getJSONArray("kinds").length()];for(int j=0;j<args.length;j++){args[j]="000123 中文 Русский Українська $1 {x}";raw=raw.replace("{"+j+"}",(String)args[j]);}Object value=OperationMessages.message(raw);assertTrue(raw,value instanceof Language.Message);assertEquals(raw,AtomixMessagesTest.resource(row.getString("key")),AtomixMessagesTest.field(value,"resource"));assertArrayEquals(raw,args,(Object[])AtomixMessagesTest.field(value,"arguments"));}
  }
  @Test public void existingMarketMessagesStillResolve()throws Exception{

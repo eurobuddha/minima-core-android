@@ -32,21 +32,32 @@ public final class SwapOrderBook {
     /** ~1 hour of Minima blocks — orders older than this are treated as stale. */
     public static final int SCAN_DEPTH = (60 * 60) / MinimaHtlc.MINIMA_BLOCK_TIME;
 
+    public static final String MARKET_ERROR = "Market changed; refresh and try again.";
+    private static boolean current(Order order, long generation) {
+        return order != null && order.market != null && order.market == TradingContext.active()
+                && generation == PublishGate.gen();
+    }
     private SwapOrderBook() {}
 
     /** Re-read the live SENDABLE Minima balance, stamp it onto {@code base}, then publish — so the advertised
      *  liquidity is never stale (contract-locked coins, e.g. casino, are excluded by the node's `sendable`). */
     public static void publishFresh(NodeApi node, LazySodium ls, CommsIdentity id, Order base, CommsTransport.SendCb cb) {
-        node.cmd("balance tokenid:" + TradingContext.active().tokenId, new NodeApi.Cb() {
+        publishFresh(node, ls, id, base, PublishGate.gen(), cb);
+    }
+    /** Keep the caller's generation through ladder preparation and the balance read. */
+    public static void publishFresh(NodeApi node, LazySodium ls, CommsIdentity id, Order base, long generation, CommsTransport.SendCb cb) {
+        if (!current(base, generation)) { cb.onFailed(MARKET_ERROR); return; }
+        node.cmd("balance tokenid:" + base.market.tokenId, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
+                if (!current(base, generation)) { cb.onFailed(MARKET_ERROR); return; }
                 Object resp = j.opt("response");
                 JSONObject t = null;
                 if (resp instanceof JSONArray && ((JSONArray) resp).length() > 0) t = ((JSONArray) resp).optJSONObject(0);
                 else if (resp instanceof JSONObject) t = (JSONObject) resp;
                 base.minimaAvail = parseD(t == null ? "0" : t.optString("sendable", "0"));
-                publish(node, ls, id, base, cb);
+                publish(node, ls, id, base, generation, cb);
             }
-            @Override public void onError(String m) { publish(node, ls, id, base, cb); }   // publish with what we have
+            @Override public void onError(String m) { publish(node, ls, id, base, generation, cb); }   // publish with what we have
         });
     }
 
@@ -54,6 +65,11 @@ public final class SwapOrderBook {
 
     /** Sign {@code order} with my comms key and broadcast it to the book. */
     public static void publish(NodeApi node, LazySodium ls, CommsIdentity id, Order order, CommsTransport.SendCb cb) {
+        publish(node, ls, id, order, PublishGate.gen(), cb);
+    }
+    private static void publish(NodeApi node, LazySodium ls, CommsIdentity id, Order order, long generation, CommsTransport.SendCb cb) {
+        if (!current(order, generation)) { cb.onFailed(MARKET_ERROR); return; }
+        final String destination = order.market.orderBookAddr;
         try {
             order.ts = System.currentTimeMillis();
             order.commsPublicId = id.publicId();
@@ -63,8 +79,15 @@ public final class SwapOrderBook {
             JSONObject extra = new JSONObject();
             extra.put("1", "0x" + Hex.to(id.signPk));
             extra.put("2", "0x" + Hex.to(sig));
-            CommsTransport.postBlob(node, address(), CommsTransport.MESSAGE_AMOUNT, CommsTransport.NATIVE,
-                    Hex.to(msg), extra, cb);
+            if (!current(order, generation)) { cb.onFailed(MARKET_ERROR); return; }
+            CommsTransport.postBlob(node, destination, CommsTransport.MESSAGE_AMOUNT, CommsTransport.NATIVE,
+                    Hex.to(msg), extra, new CommsTransport.SendCb() {
+                        @Override public void onSent(String txpowid) {
+                            if (!current(order, generation)) { cb.onFailed(MARKET_ERROR); return; }
+                            cb.onSent(txpowid);
+                        }
+                        @Override public void onFailed(String message) { cb.onFailed(message); }
+                    });
         } catch (Exception e) {
             cb.onFailed("publish: " + e.getMessage());
         }
@@ -80,15 +103,18 @@ public final class SwapOrderBook {
      * the node).
      */
     public static void scan(NodeApi node, LazySodium ls, Consumer<Map<String, Order>> ok, Consumer<String> err) {
-        node.cmd("coinnotify action:add address:" + address(), new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) { doScan(node, ls, ok, err); }
-            @Override public void onError(String m) { doScan(node, ls, ok, err); }   // proceed regardless
+        final TradingContext market = TradingContext.active();
+        node.cmd("coinnotify action:add address:" + market.orderBookAddr, new NodeApi.Cb() {
+            @Override public void onResult(JSONObject j) { doScan(node, ls, market, ok, err); }
+            @Override public void onError(String m) { doScan(node, ls, market, ok, err); }   // proceed regardless
         });
     }
 
-    private static void doScan(NodeApi node, LazySodium ls, Consumer<Map<String, Order>> ok, Consumer<String> err) {
-        node.cmd("coins simplestate:true order:desc depth:" + SCAN_DEPTH + " address:" + address(), new NodeApi.Cb() {
+    private static void doScan(NodeApi node, LazySodium ls, TradingContext market, Consumer<Map<String, Order>> ok, Consumer<String> err) {
+        if (market != TradingContext.active()) { err.accept(MARKET_ERROR); return; }
+        node.cmd("coins simplestate:true order:desc depth:" + SCAN_DEPTH + " address:" + market.orderBookAddr, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
+                if (market != TradingContext.active()) { err.accept(MARKET_ERROR); return; }
                 Object resp = j.opt("response");
                 JSONArray coins = resp instanceof JSONArray ? (JSONArray) resp : new JSONArray();
                 Map<String, Order> book = new LinkedHashMap<>();
@@ -96,8 +122,10 @@ public final class SwapOrderBook {
                     JSONObject coin = coins.optJSONObject(i);
                     Order o = verifyCoin(ls, coin);
                     if (o == null) continue;
+                    o.market = market;
                     mergeFreshest(book, o);
                 }
+                if (market != TradingContext.active()) { err.accept(MARKET_ERROR); return; }
                 ok.accept(book);
             }
             @Override public void onError(String m) { err.accept(m); }

@@ -28,6 +28,12 @@ public final class OperationMessages {
             case "At least 3 spendable coins are needed.": return Language.msg(l10n_atomix_operation_three);
             case "Coins are still confirming. Wait for 3 confirmations before another run.": return Language.msg(l10n_atomix_operation_confirm);
             case "Could not read the current block": return Language.msg(l10n_atomix_operation_no_block);
+            case "Market changed; refresh and try again.": return Language.msg(l10n_atomix_operation_market_changed);
+            case "Publish failed: Market changed; refresh and try again.": return Language.msg(l10n_atomix_operation_market_changed);
+            case "Update failed: Market changed; refresh and try again.": return Language.msg(l10n_atomix_operation_market_changed);
+            case "Withdraw failed: Market changed; refresh and try again.": return Language.msg(l10n_atomix_operation_market_changed);
+            case "Swap failed: Market changed; refresh and try again.": return Language.msg(l10n_atomix_operation_market_changed);
+            case "Book scan: Market changed; refresh and try again.": return Language.msg(l10n_atomix_operation_market_changed);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {
@@ -43,6 +49,7 @@ public final class OperationMessages {
         return MarketMessages.message(value);
     }
     private static final java.util.regex.Pattern[] PATTERNS={
+        java.util.regex.Pattern.compile("Sweep\\ stopped\\ —\\ ((?s:.*))\\ of\\ ((?s:.*))\\ parts\\ done\\ \\(part\\ ((?s:.*))\\ failed:\\ Market\\ changed;\\ refresh\\ and\\ try\\ again\\.\\)\\.\\ Locked\\ parts\\ continue;\\ unmatched\\ auto\\-refund\\."),
         java.util.regex.Pattern.compile("Swap\\ failed:\\ ((?s:.*))"),
         java.util.regex.Pattern.compile("Buy\\ locked,\\ but\\ maker\\ notify\\ failed:\\ ((?s:.*))"),
         java.util.regex.Pattern.compile("✓\\ Sweep\\ done\\ —\\ ((?s:.*))\\ of\\ ((?s:.*))\\ parts\\ locked\\ on\\-chain\\.\\ Watching\\ for\\ counterparties\\."),
@@ -62,6 +69,6 @@ public final class OperationMessages {
         java.util.regex.Pattern.compile("Coins:\\ ((?s:.*))\\ →\\ ((?s:.*))\\ ·\\ waiting\\ for\\ new\\ coins\\ to\\ age\\ 3\\ blocks\\.\\\n\\\nTransaction:\\ ((?s:.*))"),
         java.util.regex.Pattern.compile("Refresh\\ your\\ balance\\ after\\ confirmation\\.\\\nTransaction:\\ ((?s:.*))")
     };
-    private static final int[] RESOURCES={l10n_atomix_operation_failed,l10n_atomix_operation_notify_failed,l10n_atomix_operation_done_locked,l10n_atomix_operation_done_sent,l10n_atomix_operation_locking,l10n_atomix_operation_stalled,l10n_atomix_operation_sending,l10n_atomix_operation_sent,l10n_atomix_operation_stalled_confirm,l10n_atomix_operation_confirming,l10n_atomix_operation_stopped,l10n_atomix_operation_next,l10n_atomix_operation_locked,l10n_atomix_operation_unconfirmed,l10n_atomix_operation_wait_block,l10n_atomix_operation_uncertain,l10n_atomix_operation_submitted,l10n_atomix_operation_refresh};
-    private static final boolean[][] DIAGNOSTIC={{false},{false},{false,false},{false,false},{false,false},{false},{false,false,false},{false,false},{false},{false,false},{false,false,false,false},{false,false,false},{false,false},{false},{false,false},{false},{false,false,false},{false}};
+    private static final int[] RESOURCES={l10n_atomix_operation_market_stopped,l10n_atomix_operation_failed,l10n_atomix_operation_notify_failed,l10n_atomix_operation_done_locked,l10n_atomix_operation_done_sent,l10n_atomix_operation_locking,l10n_atomix_operation_stalled,l10n_atomix_operation_sending,l10n_atomix_operation_sent,l10n_atomix_operation_stalled_confirm,l10n_atomix_operation_confirming,l10n_atomix_operation_stopped,l10n_atomix_operation_next,l10n_atomix_operation_locked,l10n_atomix_operation_unconfirmed,l10n_atomix_operation_wait_block,l10n_atomix_operation_uncertain,l10n_atomix_operation_submitted,l10n_atomix_operation_refresh};
+    private static final boolean[][] DIAGNOSTIC={{false,false,false},{false},{false},{false,false},{false,false},{false,false},{false},{false,false,false},{false,false},{false},{false,false},{false,false,false,false},{false,false,false},{false,false},{false},{false,false},{false},{false,false,false},{false}};
 }

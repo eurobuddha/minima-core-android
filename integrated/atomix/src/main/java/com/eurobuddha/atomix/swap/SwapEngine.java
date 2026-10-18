@@ -317,6 +317,7 @@ public final class SwapEngine {
     void startMinimaToErc20(Order maker, String sellMinima, String tokenSymbol, String buyTokenAmount, boolean otc, com.eurobuddha.atomix.TradingContext market, StartCb result) {
         if (!ready()) { result.err("Not ready"); return; }
         if (market == null || market != com.eurobuddha.atomix.TradingContext.active() || !market.tokenId.equalsIgnoreCase(minima.activeToken())) { result.err(OtcController.MARKET_ERROR); return; }
+        if (!otc && (maker == null || maker.market != market)) { result.err(SwapOrderBook.MARKET_ERROR); return; }
         // M3: a responder burst-lock (or a coin-split) draws mxUSDT from the SAME coin pool that this
         // user-initiated node-auto-select lock does; both could pick the same coin → one tx is rejected as a
         // double-spend (fund-safe) but can leave a phantom LOCKED row. Decline briefly while a responder lock or
@@ -404,6 +405,7 @@ public final class SwapEngine {
     void startErc20ToMinima(Order maker, String tokenSymbol, String sellTokenAmount, String buyMinima, boolean otc, com.eurobuddha.atomix.TradingContext market, StartCb cb) {
         if (!ready()) { cb.err("Not ready"); return; }
         if (market == null || market != com.eurobuddha.atomix.TradingContext.active() || !market.tokenId.equalsIgnoreCase(minima.activeToken())) { cb.err(OtcController.MARKET_ERROR); return; }
+        if (!otc && (maker == null || maker.market != market)) { cb.err(SwapOrderBook.MARKET_ERROR); return; }
         final EthNet.Token token = net.token(tokenSymbol);
         if (token == null) { cb.err("Unknown token " + tokenSymbol); return; }
         // M1: request the mxUSDT at the 6dp trade grain. The responder locks grain(amount) (6dp), so a >6dp

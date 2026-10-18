@@ -10,9 +10,24 @@
     "Wallet busy — wait for the current lock or consolidation": "atomixOperation.busy",
     "At least 3 spendable coins are needed.": "atomixOperation.three",
     "Coins are still confirming. Wait for 3 confirmations before another run.": "atomixOperation.confirm",
-    "Could not read the current block": "atomixOperation.noBlock"
+    "Could not read the current block": "atomixOperation.noBlock",
+    "Market changed; refresh and try again.": "atomixOperation.marketChanged",
+    "Publish failed: Market changed; refresh and try again.": "atomixOperation.marketChanged",
+    "Update failed: Market changed; refresh and try again.": "atomixOperation.marketChanged",
+    "Withdraw failed: Market changed; refresh and try again.": "atomixOperation.marketChanged",
+    "Swap failed: Market changed; refresh and try again.": "atomixOperation.marketChanged",
+    "Book scan: Market changed; refresh and try again.": "atomixOperation.marketChanged"
   },
   "patterns": [
+    {
+      "template": "Sweep stopped — {0} of {1} parts done (part {2} failed: Market changed; refresh and try again.). Locked parts continue; unmatched auto-refund.",
+      "key": "atomixOperation.marketStopped",
+      "kinds": [
+        "literal",
+        "literal",
+        "literal"
+      ]
+    },
     {
       "template": "Swap failed: {0}",
       "key": "atomixOperation.failed",

@@ -440,7 +440,7 @@ public class SwapService extends Service {
                 updateFg(fgStateText());
                 return;
             }
-            SwapOrderBook.publishFresh(node, ls, identity, o, new CommsTransport.SendCb() {
+            SwapOrderBook.publishFresh(node, ls, identity, o, gen, new CommsTransport.SendCb() {
             @Override public void onSent(String txpowid) {
                 if (gen != PublishGate.gen()) {   // a user edit/withdraw or peg-tombstone superseded this attempt
                     PublishGate.release(PublishGate.ORDER);

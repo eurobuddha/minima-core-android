@@ -6569,4 +6569,7 @@
     <string name="l10n_nft_history_unverified_status" formatted="false">"Outcome unverified"</string>
     <string name="l10n_nft_history_requested_amount" formatted="false">"Requested amount"</string>
     <string name="l10n_nft_history_local_id" formatted="false">"Local reference"</string>
+    <string name="l10n_atomix_operation_market_changed" formatted="false">"Market changed; refresh and try again."</string>
+    <!-- Arguments: 0, 1, 2 -->
+    <string name="l10n_atomix_operation_market_stopped">"Sweep stopped — %1$s of %2$s parts done (part %3$s: market changed). Locked parts continue; unmatched parts refund automatically."</string>
 </resources>

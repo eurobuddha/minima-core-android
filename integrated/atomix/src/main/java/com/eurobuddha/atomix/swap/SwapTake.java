@@ -25,10 +25,17 @@ public final class SwapTake {
     /** Taker → maker: seal the hashlock to the maker's publicId and post it to the take channel. */
     public static void send(NodeApi node, CryptoProvider crypto, String makerPublicId, String myPublicId,
                             String hash, CommsTransport.SendCb cb) {
+        send(node, crypto, makerPublicId, myPublicId, hash, TradingContext.active(), cb);
+    }
+    /** A completed lock must notify its original market even if selection has since changed. */
+    public static void send(NodeApi node, CryptoProvider crypto, String makerPublicId, String myPublicId,
+                            String hash, TradingContext market, CommsTransport.SendCb cb) {
+        if (market == null) { cb.onFailed(SwapOrderBook.MARKET_ERROR); return; }
+        final String destination = market.takeAddr;
         try {
             JSONObject j = new JSONObject().put("to", makerPublicId).put("from", myPublicId).put("hash", hash);
             String blob = crypto.seal(makerPublicId, j.toString().getBytes(StandardCharsets.UTF_8));
-            CommsTransport.postBlob(node, address(), CommsTransport.MESSAGE_AMOUNT, CommsTransport.NATIVE, blob, null, cb);
+            CommsTransport.postBlob(node, destination, CommsTransport.MESSAGE_AMOUNT, CommsTransport.NATIVE, blob, null, cb);
         } catch (Exception e) {
             cb.onFailed("take send: " + e.getMessage());
         }
