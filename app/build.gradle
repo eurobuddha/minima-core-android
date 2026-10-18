@@ -264,3 +264,11 @@ dependencies {
     pandamoniumImplementation project(':integrated-atelier')
     pandamoniumImplementation project(':integrated-salon')
 }
+
+// Generated Keets inputs are ignored by git. Fail before packaging rather than
+// ship a working node whose chat sidecar cannot start. Always recheck the files.
+def verifyKeetsArtifacts = tasks.register('verifyKeetsArtifacts', Exec) {
+    workingDir rootProject.projectDir
+    commandLine 'python3', 'scripts/verify-keets-artifacts.py'
+}
+tasks.named('preBuild').configure { dependsOn verifyKeetsArtifacts }
