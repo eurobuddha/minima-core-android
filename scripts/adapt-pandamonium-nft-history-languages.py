@@ -48,7 +48,11 @@ def adapt(root):
     }
 ''' + s[end:]
  s=s.replace('setTextColor(Design.accent())','setTextColor(Design.accentText())')
- s=re.sub(r'\b([A-Za-z_][A-Za-z_0-9]*)\.setText\(',r'Language.setText(\1, ',s);p.write_text(s)
+ s=re.sub(r'\b([A-Za-z_][A-Za-z_0-9]*)\.setText\(',r'Language.setText(\1, ',s)
+ start=s.index('    /** Cached across sheets')
+ end=s.index('    private String prettyDeltas(',start)
+ s=s[:start]+(Path(__file__).with_name('pandamonium-sources')/'NFTwallet/history-ownership.inc').read_text()+'\n'+s[end:]
+ p.write_text(s)
  p=folder/'NodeTx.java';s=p.read_text()
  s=change(s,'package com.eurobuddha.nftwallet;','package com.eurobuddha.nftwallet;'+imports)
  s=change(s,'public String reshuffleLabel()','public CharSequence reshuffleLabel()')

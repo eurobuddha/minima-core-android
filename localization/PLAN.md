@@ -6,6 +6,18 @@ PandaBear, BlackBear and Pandamonium: English (`en`), Simplified Chinese (`zh-Ha
 
 Baseline: `9def96e6801a9bef261611e45349f28a1eb6ae1c` (all three 1.9.41 tags and fork/ui/full-redesign verified). Candidate: 1.9.43, versionCode 114. Isolated branch: feature/bear-languages-2026-10-16.
 
+## Current release status — 2026-10-18
+
+Use this section for current status. The dated entries below record earlier checkpoints.
+
+- **Verified source state:** the pushed 1.9.41 baseline is preserved; the candidate is 1.9.43/vc114 with an explicit English, Simplified Chinese, Russian and Ukrainian choice. All 19 integrated modules use the shared library, contain language bindings and handle locale changes. The current catalogue has 5289 messages. These structural checks do not establish complete inner-text or visual coverage.
+- **Completed Inbox fixes:** reply drafts survive asynchronous refresh; stateful and ordinary NFT delivery use persisted intents, exact receipts and chain inclusion; restart recovery does not repeat uncertain sends. Latest detailed evidence: `build/localization/inbox-plain-validation.json` (312 JVM cases across the affected modules).
+- **Completed NFT follow-ups:** native consolidation now uses PreparedConsolidation and the atomic TxnBuilder admission path; interrupted preparations have owner/restart handling; Tools selection reviews freeze their selections. NFT History now checks ownership afresh and keeps incomplete replies unverified. Follow-up validation: `build/localization/nft-ownership-validation.json` (245 NFT Wallet cases).
+- **Still to reconcile in NFT Wallet:** distribution confirmation/restart and saved-job validation; local pending/interrupted rows in History; older Tools status callbacks; nonexact Quick Send split compatibility; retained unsigned/signed transaction-file lifecycle. A review note is closed only when the current source and appropriate evidence support that conclusion.
+- **Other remaining reviews:** AtomiX admission/consent freshness, OTC market context and asynchronous locking, numeric limits and publish confirmation; Shop delayed checkout refresh and payment/retry evidence; minimaWallet real derivation performance, populated lifecycle and biometric responsiveness; remaining app-owned diagnostics and display text. Existing presentation tests do not certify these financial or runtime paths.
+- **Device acceptance:** use only Fold `R3GL805K7MB`. Preserve installed app data, seeds, wallets and counters. Disposable emulator fixtures disable AppLock and require an empty emulator; they must never run against the owner Fold. Read-only and data-preserving Fold acceptance still needs to cover language choice/persistence, retained inputs and operations, long text and accessibility.
+- **Release delivery:** signed, versioned APKs and checksums in `/Users/eurobuddha/Projects/minima/apks/base/dist`, then the authorized GitHub fork, PandaApps and eurobuddha.com publication remain outstanding. Never publish to Apple App Store or Google Play.
+
 ## Proven sources
 
 Reuse Parlons commit `41c9b0a967d9a2393a047bae6b13fa5ad9a3d5c5`, inspected in maxima/build/account-import:
@@ -26,9 +38,9 @@ Build inputs reuse base/app/libs/bare-kit.aar v2.5.5, keets.bundle and jniLibs, 
 - [x] Add shared four-language foundation and run inherited unit tests.
 - [x] Connect launcher, explicit selector, main tabs and overflow menu.
 - [ ] Translate core onboarding, lock, wallet, send/receive, backup/recovery, node/status, parameters, logs, apps and chat UI, including dialogs, errors, plurals and notifications.
-- [ ] Translate Pandamonium embedded ethwallet, atomix, pandapools, futurecash-next, pandadex, casino, blockexplorer, filez, history, vestr, entropy, terminalide and mail; preserve importer reproducibility.
+- [ ] Translate Pandamonium embedded ethwallet, atomix, pandapools, futurecash-next, pandadex, casino, blockexplorer, filez, history, vestr, entropy, terminalide, mail, UTXO Wallet, NFT Wallet, minimaWallet, miniMall, miniMall Studio and miniMall Inbox; preserve importer reproducibility.
 - [ ] Audit hardcoded text and display-only formatting; exclude protocol/debug/raw user data explicitly. Review the bundled node source too wherever locale-sensitive formatting can reach command or persisted values.
-- [ ] Exercise all four selections, persistence and switching with populated inputs on disposable emulators, including API below and above 33. Verify app lock, dialogs and long labels. No owner devices or live wallets.
+- [ ] Exercise all four selections, persistence and switching on the authorized Fold only, preserving installed data and wallet state. Verify app lock, retained inputs, dialogs and long labels. Keep disposable fixture guards intact; use host tests for additional API coverage.
 - [ ] Review code, run relevant regression tests, verify imports and direct transports.
 - [ ] Build all three release APKs, verify family signing certificate and version metadata, copy versioned artifacts and SHA256 sidecars to apks/base/dist.
 - [ ] Commit/push only to fork; publication destinations, if publishing, are GitHub, PandaApps and eurobuddha.com. Never Apple App Store/Google Play.
@@ -52,8 +64,14 @@ The user reiterated on 2026-10-16: every integrated app must follow the same lan
 - [ ] Entropy (`integrated/entropy`)
 - [ ] Terminal IDE (`integrated/terminalide`)
 - [ ] MinimaMail (`integrated/mail`)
+- [ ] UTXO Wallet (`integrated/utxo`)
+- [ ] NFT Wallet (`integrated/NFTwallet`)
+- [ ] minimaWallet (`integrated/wallet`)
+- [ ] miniMall (`integrated/merchshop`)
+- [ ] miniMall Studio (`integrated/merchstudio`)
+- [ ] miniMall Inbox (`integrated/merchinbox`)
 
-The shared drawer and every integrated activity must preserve state during switching. Update the reviewed importer adapters alongside snapshots. The importer defaults to ROOT.parent; isolated worktrees set `PANDAMONIUM_SOURCE_ROOT=/Users/eurobuddha/Projects/minima/apks`. Preserve the pinned snapshots. Baseline verification found omitted 1.9.32 adaptations for the AtomiX persistent menu and PandaPools shared codec. These are now reproduced by the existing navigation/direct adapters without changing the integrated app sources.
+The shared drawer and every integrated activity must preserve state during switching. Update the reviewed importer adapters alongside snapshots. The importer defaults to ROOT.parent; isolated worktrees set `PANDAMONIUM_SOURCE_ROOT=/Users/eurobuddha/Projects/minima/apks/base/build/multilingual-2026-10-16/build/localization/pinned-sources`. Preserve the pinned snapshots. Baseline verification found omitted 1.9.32 adaptations for the AtomiX persistent menu and PandaPools shared codec. These are now reproduced by the existing navigation/direct adapters without changing the integrated app sources.
 
 ## Shared implementation rules
 
@@ -83,7 +101,7 @@ Add the existing native UTXO Wallet (`apks/utxo`), NFT Wallet (`apks/NFTwallet`)
 
 Add miniMall (`apks/merchshop`), miniMall Studio (`apks/merchstudio`), and miniMall Inbox (`apks/merchinbox`), grouped elegantly under a single Mall navigation entry. These are the established product names from the user's naming memory. All six additional apps must participate in the shared English, Simplified Chinese, Russian and Ukrainian language choice, alongside the original 13.
 
-These additions are authorized. UTXO Wallet is now imported and device-checked; the other five remain pending. Source inspection is underway; no source changes were made to the six standalone repositories. Their core flows, storage namespaces, direct transport adaptation, signing and notification/service boundaries must be inspected before importing. Preserve the originals through the existing pinned-snapshot importer.
+These additions are authorized and all six are now imported alongside the original 13 apps. Current verification reproduces all 19 modules from pinned sources. The six standalone repositories remain unchanged. Source integration and Fold runtime acceptance are tracked separately above.
 
 Current source versions found: UTXO 0.4.33, NFT Wallet 0.1.13, minimaWallet 0.2.21; miniMall 0.4.4, Studio 0.3.4, Inbox 0.5.3. Older August memories about unreleased Studio 0.3.1 are stale: the inspected Studio source is clean at 0.3.4, commit 69aa5d8b0a80fb123f267b1957c490e6257a2a47.
 
@@ -2451,3 +2469,18 @@ Summary: direct reuse keeps the wallet's multi-input, amount-scale, destination,
 Validation: 60 Inbox, 240 NFT Wallet, and 12 shared language tests pass (312). Twenty-one new cases cover ordinary request/reference evidence, Mx recipients, missing/extra outputs, database failures, both-direction reservation conflicts, abandoned versus live owners, stale order identity, schema 3 migration, lost callbacks, changed signed references, shallow inclusion, bounded polling and changed mined headers. No node, signing or funds operation occurs in these tests. All three debug apps and the Pandamonium Android test APK compile in 32 seconds. All 19 pinned imports reproduce; catalogue/direct transport/diff checks pass. 521 source hashes are recorded in build/localization/inbox-plain-validation.json. All protected maps, original NFT Wallet evidence sources, wallet-audit hashes and node JAR remain unchanged; reviewed Inbox journal/controller/schema/MainActivity hashes are updated for this scoped change. Candidate remains 1.9.43/vc114. No device operation, release signing, push or publication.
 
 Verdict: approve the ordinary NFT delivery and mined-header recovery increment. The recorded Inbox receipt and draft blockers are resolved. This does not prove full release completion: earlier AtomiX/NFT findings still need source reconciliation, followed by safe Fold acceptance and final signed publication.
+
+
+## NFT History ownership and release checklist reconciliation — 2026-10-18
+
+Previous turn made progress as c635ce2. Revalidated all 521 saved source hashes and clean Git status. Current-source review confirmed the old static OWN_CACHE in NFT History still existed: it could survive wallet/session changes, and a missing response became a cached negative. Read the complete relevant HistoryView badge path and callers, BaseView/MainActivity lifecycle and address-pool refresh, standalone NFT Wallet's identical implementation, sibling UTXO SendView and History search results, NFT PreparedSendEvidence's strict reply checking, and the native checkaddress response contract. The existing lookup is reused directly. Its response shape differs from scripts/default-address evidence, so the minimal adapter validates status, Boolean relevance and the requested hex/Mx address at this existing display boundary.
+
+Removed the process-wide cache and local-address shortcut. Every newly opened address detail asks the current node. Malformed/failed/mismatched replies use the existing translated UNVERIFIED label; a valid explicit false uses NOT YOURS. Hex comparisons remain case-insensitive and Mx comparisons case-sensitive. The node relevance meaning is unchanged; the badge does not certify spendability. Existing NodeApi host-lifecycle callback filtering remains unchanged. No signing, journal, transaction, seed or persisted history behavior changed.
+
+### Code Review
+
+Summary: this closes a confirmed stale display and false-negative issue with a smaller lifetime and explicit reply validation. Five regressions invoke the actual private HistoryView callback and cover repeated opens, new HistoryView instances, valid true/false replies, malformed/failed replies, address forms, command-injection rejection and timeouts. The tests mock transport and label objects; they do not replace Fold visual acceptance.
+
+Validation: all 245 NFT Wallet JVM tests pass. Pandamonium debug builds in 27 seconds. All 19 pinned imports reproduce; catalogue and diff checks pass. All 19 modules declare the shared localization dependency, have locale/layoutDirection/screenLayout handling on their activities, and contain Language bindings. These checks prove integration hooks, not complete inner-text or visual coverage. The catalogue remains 5289 messages in four languages. All protected financial maps, wallet audit and node hashes remain unchanged. 524 sources are recorded in build/localization/nft-ownership-validation.json. Candidate remains 1.9.43/vc114. No device operation, signing, push or publication.
+
+Verdict: approve this ownership display fix. Current release checklist now distinguishes completed source hooks and Inbox work from the remaining text, financial-flow and Fold acceptance reviews. Earlier dated limitations remain historical evidence.

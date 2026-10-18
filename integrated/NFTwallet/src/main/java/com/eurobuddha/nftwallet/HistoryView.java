@@ -388,26 +388,26 @@ public class HistoryView extends BaseView {
         markOwnership(addr, badge);
     }
 
-    /** Cached across sheets — the same change address recurs constantly. */
-    private static final java.util.HashMap<String, Boolean> OWN_CACHE = new java.util.HashMap<>();
-
+    /** Check each opened sheet against the current node; ownership must not outlive a wallet session. */
     private void markOwnership(final String addr, final TextView badge) {
-        if (isMineLocally(addr)) { setBadge(badge, true, Language.msg(l10n_history_yours)); return; }
-        Boolean cached = OWN_CACHE.get(addr);
-        if (cached != null) { setBadge(badge, cached, cached ? Language.msg(l10n_history_yours) : Language.msg(l10n_nft_history_not_yours)); return; }
         if (!Util.isValidAddress(addr)) { Language.setText(badge, ""); return; }
-
         Language.setText(badge, Language.msg(l10n_future_checking));
         badge.setTextColor(Design.dim());
         act.node().cmd("checkaddress address:" + addr, new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) {
-                JSONObject r = json.optJSONObject("response");
-                boolean mine = r != null && r.optBoolean("relevant", false);
-                OWN_CACHE.put(addr, mine);
+                JSONObject r = json == null ? null : json.optJSONObject("response");
+                Object relevant = r == null ? null : r.opt("relevant");
+                boolean matches = r != null && (addr.startsWith("0x")
+                        ? r.opt("0x") instanceof String && addr.equalsIgnoreCase(r.optString("0x"))
+                        : r.opt("Mx") instanceof String && addr.equals(r.optString("Mx")));
+                if (json == null || !Boolean.TRUE.equals(json.opt("status")) || !matches || !(relevant instanceof Boolean)) {
+                    onError("Incomplete address evidence");
+                    return;
+                }
+                boolean mine = (Boolean) relevant;
                 setBadge(badge, mine, mine ? Language.msg(l10n_history_yours) : Language.msg(l10n_nft_history_not_yours));
             }
             @Override public void onError(String message) {
-                // Say we don't know rather than implying it isn't yours.
                 Language.setText(badge, Language.msg(l10n_nft_history_unverified));
                 badge.setTextColor(Design.amber());
             }
@@ -417,14 +417,6 @@ public class HistoryView extends BaseView {
     private void setBadge(TextView badge, boolean mine, CharSequence text) {
         Language.setText(badge, text);
         badge.setTextColor(mine ? Design.success() : Design.dim());
-    }
-
-    /** The wallet's known address pool, in either 0x or Mx form. */
-    private boolean isMineLocally(String addr) {
-        for (String[] pair : act.myAddresses()) {
-            if (addr.equals(pair[0]) || addr.equals(pair[1])) return true;
-        }
-        return false;
     }
 
     private String prettyDeltas(String json) {
