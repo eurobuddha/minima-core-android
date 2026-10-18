@@ -7072,4 +7072,40 @@
     <string name="l10n_salon_transport_connecting" formatted="false">"Maxima подключается через Pandamonium."</string>
     <string name="l10n_creative_identity_minting" formatted="false">"Создаём ваш токен идентичности…"</string>
     <string name="l10n_creative_identity_lookup_failed" formatted="false">"Не удалось проверить, есть ли уже идентичность Salon. Токен не создан. Опубликованная страница сохранена; повторите регистрацию, когда узел будет готов."</string>
+    <string name="l10n_salon_setup_open" formatted="false">"№ 1 · Откройте свой Salon"</string>
+    <string name="l10n_salon_setup_intro" formatted="false">"Ваша идентичность станет подписанным токеном, которым вы владеете. Ваша страница — файл, который вы размещаете и можете редактировать в любое время. Сначала настройте хостинг, затем зарегистрируйте имя пользователя."</string>
+    <string name="l10n_salon_setup_hosting" formatted="false">"Хостинг"</string>
+    <string name="l10n_salon_setup_destination" formatted="false">"Место размещения"</string>
+    <string name="l10n_salon_setup_no_destination" formatted="false">"не задано — обязательно"</string>
+    <string name="l10n_salon_setup_setup_hosting" formatted="false">"Настроить хостинг"</string>
+    <string name="l10n_salon_setup_manage_hosting" formatted="false">"Управление хостингом"</string>
+    <string name="l10n_salon_setup_blossom_help" formatted="false">"Нет сервера? Публикуйте в Blossom — бесплатном публичном хранилище файлов сети Nostr, не требующем настройки."</string>
+    <string name="l10n_salon_setup_blossom" formatted="false">"Опубликовать без сервера (Blossom)"</string>
+    <string name="l10n_salon_setup_claim_handle" formatted="false">"Зарегистрируйте имя пользователя"</string>
+    <string name="l10n_salon_setup_handle" formatted="false">"Имя пользователя"</string>
+    <string name="l10n_salon_setup_bio" formatted="false">"О себе"</string>
+    <string name="l10n_salon_setup_handle_example" formatted="false">"например, eurobuddha"</string>
+    <string name="l10n_salon_setup_bio_hint" formatted="false">"пара слов о себе"</string>
+    <string name="l10n_salon_setup_claim" formatted="false">"Зарегистрировать мой Salon"</string>
+    <string name="l10n_salon_setup_claiming" formatted="false">"Регистрация уже идёт — подождите."</string>
+    <string name="l10n_salon_setup_required" formatted="false">"Укажите имя пользователя и отображаемое имя."</string>
+    <string name="l10n_salon_setup_hosting_first" formatted="false">"Сначала задайте место размещения."</string>
+    <string name="l10n_salon_setup_waiting_node" formatted="false">"Ожидание Minima Core."</string>
+    <string name="l10n_salon_setup_fetching_key" formatted="false">"Получаем ваш ключ… повторите через несколько секунд."</string>
+    <string name="l10n_salon_setup_publishing" formatted="false">"Публикуем вашу страницу…"</string>
+    <string name="l10n_salon_setup_checking" formatted="false">"Страница опубликована. Проверяем идентичность…"</string>
+    <string name="l10n_salon_setup_safe_metadata" formatted="false">"Удалите { } и переносы строк из имени и описания."</string>
+    <string name="l10n_salon_setup_confirming" formatted="false">"Создаём токен… ожидаем подтверждения. Оставьте страницу открытой."</string>
+    <string name="l10n_salon_setup_pending" formatted="false">"Токен отправлен на создание, ожидается подтверждение. Откройте страницу чуть позже — приложение найдёт вашу идентичность."</string>
+    <string name="l10n_salon_setup_opened" formatted="false">"Ваш Salon открыт."</string>
+    <string name="l10n_salon_setup_no_hosted_url" formatted="false">"Адрес размещённой страницы пока неизвестен."</string>
+    <string name="l10n_salon_setup_restoring" formatted="false">"Восстанавливаем вашу страницу…"</string>
+    <string name="l10n_salon_setup_unreachable" formatted="false">"Не удалось открыть вашу размещённую страницу."</string>
+    <string name="l10n_salon_setup_restored" formatted="false">"Страница восстановлена с хостинга."</string>
+    <string name="l10n_salon_setup_empty_hosted" formatted="false">"Восстанавливать нечего — размещённая страница пуста."</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_setup_hosting_failed">"Ошибка хостинга: %1$s"</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_setup_mint_failed">"Не удалось создать токен: %1$s"</string>
+    <string name="l10n_salon_setup_rejected" formatted="false">"Узел отклонил запрос."</string>
 </resources>

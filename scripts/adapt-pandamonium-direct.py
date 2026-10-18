@@ -430,4 +430,7 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     spec=importlib.util.spec_from_file_location('creative_reads',Path(__file__).with_name('adapt-pandamonium-creative-reads.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
+    spec=importlib.util.spec_from_file_location('salon_setup_languages',Path(__file__).with_name('adapt-pandamonium-salon-setup-languages.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
 if __name__=='__main__': adapt(Path(sys.argv[1]))

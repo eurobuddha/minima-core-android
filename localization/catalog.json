@@ -34726,5 +34726,209 @@
     "zh-Hans": "无法检查现有的 Salon 身份。未铸造任何代币。已发布的页面已保存；请在节点就绪后重试认领。",
     "ru": "Не удалось проверить, есть ли уже идентичность Salon. Токен не создан. Опубликованная страница сохранена; повторите регистрацию, когда узел будет готов.",
     "uk": "Не вдалося перевірити, чи вже є ідентичність Salon. Токен не створено. Опубліковану сторінку збережено; повторіть реєстрацію, коли вузол буде готовий."
+  },
+  "salonSetup.open": {
+    "en": "№ 1 · Open your Salon",
+    "zh-Hans": "№ 1 · 开启你的 Salon",
+    "ru": "№ 1 · Откройте свой Salon",
+    "uk": "№ 1 · Відкрийте свій Salon"
+  },
+  "salonSetup.intro": {
+    "en": "Your identity becomes a signed token you own forever. Your page is a file you host and edit any time. First set hosting, then claim your handle.",
+    "zh-Hans": "你的身份将成为由你持有的签名代币。你的页面是你托管的文件，可随时编辑。请先设置托管，再认领用户名。",
+    "ru": "Ваша идентичность станет подписанным токеном, которым вы владеете. Ваша страница — файл, который вы размещаете и можете редактировать в любое время. Сначала настройте хостинг, затем зарегистрируйте имя пользователя.",
+    "uk": "Ваша ідентичність стане підписаним токеном, яким ви володієте. Ваша сторінка — файл, який ви розміщуєте й можете редагувати будь-коли. Спочатку налаштуйте хостинг, потім зареєструйте ім’я користувача."
+  },
+  "salonSetup.hosting": {
+    "en": "Hosting",
+    "zh-Hans": "托管",
+    "ru": "Хостинг",
+    "uk": "Хостинг"
+  },
+  "salonSetup.destination": {
+    "en": "Destination",
+    "zh-Hans": "目标位置",
+    "ru": "Место размещения",
+    "uk": "Місце розміщення"
+  },
+  "salonSetup.noDestination": {
+    "en": "none set — required",
+    "zh-Hans": "尚未设置 — 必填",
+    "ru": "не задано — обязательно",
+    "uk": "не задано — обов’язково"
+  },
+  "salonSetup.setupHosting": {
+    "en": "Set up hosting",
+    "zh-Hans": "设置托管",
+    "ru": "Настроить хостинг",
+    "uk": "Налаштувати хостинг"
+  },
+  "salonSetup.manageHosting": {
+    "en": "Manage hosting",
+    "zh-Hans": "管理托管",
+    "ru": "Управление хостингом",
+    "uk": "Керування хостингом"
+  },
+  "salonSetup.blossomHelp": {
+    "en": "No server? Publish to Blossom — free public file hosting on the nostr network, zero setup.",
+    "zh-Hans": "没有服务器？可发布到 Blossom：Nostr 网络上的免费公开文件托管服务，无需配置。",
+    "ru": "Нет сервера? Публикуйте в Blossom — бесплатном публичном хранилище файлов сети Nostr, не требующем настройки.",
+    "uk": "Немає сервера? Публікуйте в Blossom — безкоштовному публічному сховищі файлів мережі Nostr, що не потребує налаштування."
+  },
+  "salonSetup.blossom": {
+    "en": "Publish with no server (Blossom)",
+    "zh-Hans": "无需服务器即可发布（Blossom）",
+    "ru": "Опубликовать без сервера (Blossom)",
+    "uk": "Опублікувати без сервера (Blossom)"
+  },
+  "salonSetup.claimHandle": {
+    "en": "Claim your handle",
+    "zh-Hans": "认领用户名",
+    "ru": "Зарегистрируйте имя пользователя",
+    "uk": "Зареєструйте ім’я користувача"
+  },
+  "salonSetup.handle": {
+    "en": "Handle",
+    "zh-Hans": "用户名",
+    "ru": "Имя пользователя",
+    "uk": "Ім’я користувача"
+  },
+  "salonSetup.bio": {
+    "en": "Bio",
+    "zh-Hans": "简介",
+    "ru": "О себе",
+    "uk": "Про себе"
+  },
+  "salonSetup.handleExample": {
+    "en": "e.g. eurobuddha",
+    "zh-Hans": "例如 eurobuddha",
+    "ru": "например, eurobuddha",
+    "uk": "наприклад, eurobuddha"
+  },
+  "salonSetup.bioHint": {
+    "en": "one line about you",
+    "zh-Hans": "用一句话介绍自己",
+    "ru": "пара слов о себе",
+    "uk": "кілька слів про себе"
+  },
+  "salonSetup.claim": {
+    "en": "Claim my Salon",
+    "zh-Hans": "认领我的 Salon",
+    "ru": "Зарегистрировать мой Salon",
+    "uk": "Зареєструвати мій Salon"
+  },
+  "salonSetup.claiming": {
+    "en": "Already claiming — please wait.",
+    "zh-Hans": "正在认领，请稍候。",
+    "ru": "Регистрация уже идёт — подождите.",
+    "uk": "Реєстрація вже триває — зачекайте."
+  },
+  "salonSetup.required": {
+    "en": "Handle and display name are required.",
+    "zh-Hans": "请填写用户名和显示名称。",
+    "ru": "Укажите имя пользователя и отображаемое имя.",
+    "uk": "Укажіть ім’я користувача та відображуване ім’я."
+  },
+  "salonSetup.hostingFirst": {
+    "en": "Set a hosting destination first.",
+    "zh-Hans": "请先设置托管位置。",
+    "ru": "Сначала задайте место размещения.",
+    "uk": "Спочатку задайте місце розміщення."
+  },
+  "salonSetup.waitingNode": {
+    "en": "Waiting for Minima Core.",
+    "zh-Hans": "正在等待 Minima Core。",
+    "ru": "Ожидание Minima Core.",
+    "uk": "Очікування Minima Core."
+  },
+  "salonSetup.fetchingKey": {
+    "en": "Fetching your key… try again in a moment.",
+    "zh-Hans": "正在获取你的密钥…请稍后重试。",
+    "ru": "Получаем ваш ключ… повторите через несколько секунд.",
+    "uk": "Отримуємо ваш ключ… повторіть за кілька секунд."
+  },
+  "salonSetup.publishing": {
+    "en": "Publishing your page…",
+    "zh-Hans": "正在发布你的页面…",
+    "ru": "Публикуем вашу страницу…",
+    "uk": "Публікуємо вашу сторінку…"
+  },
+  "salonSetup.checking": {
+    "en": "Page live. Checking identity…",
+    "zh-Hans": "页面已发布。正在检查身份…",
+    "ru": "Страница опубликована. Проверяем идентичность…",
+    "uk": "Сторінку опубліковано. Перевіряємо ідентичність…"
+  },
+  "salonSetup.safeMetadata": {
+    "en": "Please remove { } or line breaks from your name/bio.",
+    "zh-Hans": "请移除姓名或简介中的 { } 和换行符。",
+    "ru": "Удалите { } и переносы строк из имени и описания.",
+    "uk": "Видаліть { } та переноси рядків з імені й опису."
+  },
+  "salonSetup.confirming": {
+    "en": "Minting… confirming (leave open).",
+    "zh-Hans": "正在铸造并确认…请保持页面打开。",
+    "ru": "Создаём токен… ожидаем подтверждения. Оставьте страницу открытой.",
+    "uk": "Створюємо токен… очікуємо підтвердження. Залиште сторінку відкритою."
+  },
+  "salonSetup.pending": {
+    "en": "Minted — confirming. Reopen shortly, it'll adopt.",
+    "zh-Hans": "已提交铸造，正在等待确认。请稍后重新打开，应用会识别你的身份。",
+    "ru": "Токен отправлен на создание, ожидается подтверждение. Откройте страницу чуть позже — приложение найдёт вашу идентичность.",
+    "uk": "Токен надіслано на створення, очікується підтвердження. Відкрийте сторінку трохи пізніше — застосунок знайде вашу ідентичність."
+  },
+  "salonSetup.opened": {
+    "en": "Your Salon is open.",
+    "zh-Hans": "你的 Salon 已开启。",
+    "ru": "Ваш Salon открыт.",
+    "uk": "Ваш Salon відкрито."
+  },
+  "salonSetup.noHostedUrl": {
+    "en": "No hosted page URL known yet.",
+    "zh-Hans": "尚无已托管页面的网址。",
+    "ru": "Адрес размещённой страницы пока неизвестен.",
+    "uk": "Адреса розміщеної сторінки поки невідома."
+  },
+  "salonSetup.restoring": {
+    "en": "Restoring your page…",
+    "zh-Hans": "正在恢复你的页面…",
+    "ru": "Восстанавливаем вашу страницу…",
+    "uk": "Відновлюємо вашу сторінку…"
+  },
+  "salonSetup.unreachable": {
+    "en": "Couldn't reach your hosted page.",
+    "zh-Hans": "无法访问你托管的页面。",
+    "ru": "Не удалось открыть вашу размещённую страницу.",
+    "uk": "Не вдалося відкрити вашу розміщену сторінку."
+  },
+  "salonSetup.restored": {
+    "en": "Page restored from your hosting.",
+    "zh-Hans": "已从托管位置恢复页面。",
+    "ru": "Страница восстановлена с хостинга.",
+    "uk": "Сторінку відновлено з хостингу."
+  },
+  "salonSetup.emptyHosted": {
+    "en": "Nothing to restore — your hosted page is empty.",
+    "zh-Hans": "没有可恢复的内容：托管页面为空。",
+    "ru": "Восстанавливать нечего — размещённая страница пуста.",
+    "uk": "Немає що відновлювати — розміщена сторінка порожня."
+  },
+  "salonSetup.hostingFailed": {
+    "en": "Hosting failed: {detail}",
+    "zh-Hans": "托管失败：{detail}",
+    "ru": "Ошибка хостинга: {detail}",
+    "uk": "Помилка хостингу: {detail}"
+  },
+  "salonSetup.mintFailed": {
+    "en": "Mint failed: {detail}",
+    "zh-Hans": "铸造失败：{detail}",
+    "ru": "Не удалось создать токен: {detail}",
+    "uk": "Не вдалося створити токен: {detail}"
+  },
+  "salonSetup.rejected": {
+    "en": "Rejected by the node.",
+    "zh-Hans": "节点已拒绝。",
+    "ru": "Узел отклонил запрос.",
+    "uk": "Вузол відхилив запит."
   }
 }

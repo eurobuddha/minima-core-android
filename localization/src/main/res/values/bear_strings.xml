@@ -7008,4 +7008,40 @@
     <string name="l10n_salon_transport_connecting" formatted="false">"Maxima is connecting through Pandamonium."</string>
     <string name="l10n_creative_identity_minting" formatted="false">"Minting your identity token…"</string>
     <string name="l10n_creative_identity_lookup_failed" formatted="false">"Could not check for an existing Salon identity. Nothing was minted. Your published page is saved; try claiming again when the node is ready."</string>
+    <string name="l10n_salon_setup_open" formatted="false">"№ 1 · Open your Salon"</string>
+    <string name="l10n_salon_setup_intro" formatted="false">"Your identity becomes a signed token you own forever. Your page is a file you host and edit any time. First set hosting, then claim your handle."</string>
+    <string name="l10n_salon_setup_hosting" formatted="false">"Hosting"</string>
+    <string name="l10n_salon_setup_destination" formatted="false">"Destination"</string>
+    <string name="l10n_salon_setup_no_destination" formatted="false">"none set — required"</string>
+    <string name="l10n_salon_setup_setup_hosting" formatted="false">"Set up hosting"</string>
+    <string name="l10n_salon_setup_manage_hosting" formatted="false">"Manage hosting"</string>
+    <string name="l10n_salon_setup_blossom_help" formatted="false">"No server? Publish to Blossom — free public file hosting on the nostr network, zero setup."</string>
+    <string name="l10n_salon_setup_blossom" formatted="false">"Publish with no server (Blossom)"</string>
+    <string name="l10n_salon_setup_claim_handle" formatted="false">"Claim your handle"</string>
+    <string name="l10n_salon_setup_handle" formatted="false">"Handle"</string>
+    <string name="l10n_salon_setup_bio" formatted="false">"Bio"</string>
+    <string name="l10n_salon_setup_handle_example" formatted="false">"e.g. eurobuddha"</string>
+    <string name="l10n_salon_setup_bio_hint" formatted="false">"one line about you"</string>
+    <string name="l10n_salon_setup_claim" formatted="false">"Claim my Salon"</string>
+    <string name="l10n_salon_setup_claiming" formatted="false">"Already claiming — please wait."</string>
+    <string name="l10n_salon_setup_required" formatted="false">"Handle and display name are required."</string>
+    <string name="l10n_salon_setup_hosting_first" formatted="false">"Set a hosting destination first."</string>
+    <string name="l10n_salon_setup_waiting_node" formatted="false">"Waiting for Minima Core."</string>
+    <string name="l10n_salon_setup_fetching_key" formatted="false">"Fetching your key… try again in a moment."</string>
+    <string name="l10n_salon_setup_publishing" formatted="false">"Publishing your page…"</string>
+    <string name="l10n_salon_setup_checking" formatted="false">"Page live. Checking identity…"</string>
+    <string name="l10n_salon_setup_safe_metadata" formatted="false">"Please remove { } or line breaks from your name/bio."</string>
+    <string name="l10n_salon_setup_confirming" formatted="false">"Minting… confirming (leave open)."</string>
+    <string name="l10n_salon_setup_pending" formatted="false">"Minted — confirming. Reopen shortly, it\'ll adopt."</string>
+    <string name="l10n_salon_setup_opened" formatted="false">"Your Salon is open."</string>
+    <string name="l10n_salon_setup_no_hosted_url" formatted="false">"No hosted page URL known yet."</string>
+    <string name="l10n_salon_setup_restoring" formatted="false">"Restoring your page…"</string>
+    <string name="l10n_salon_setup_unreachable" formatted="false">"Couldn\'t reach your hosted page."</string>
+    <string name="l10n_salon_setup_restored" formatted="false">"Page restored from your hosting."</string>
+    <string name="l10n_salon_setup_empty_hosted" formatted="false">"Nothing to restore — your hosted page is empty."</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_setup_hosting_failed">"Hosting failed: %1$s"</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_setup_mint_failed">"Mint failed: %1$s"</string>
+    <string name="l10n_salon_setup_rejected" formatted="false">"Rejected by the node."</string>
 </resources>

@@ -2629,46 +2629,46 @@ public class MainActivity extends AppCompatActivity {
 
     private void renderOnboard() {
         LinearLayout intro = card();
-        intro.addView(Design.lot(this, "№ 1 · Open your Salon"));
-        intro.addView(Design.note(this, "Your identity becomes a signed token you own forever. Your page is a file you host and edit any time. First set hosting, then claim your handle."), lp(0, 6, 0, 0));
+        intro.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_open)));
+        intro.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_intro)), lp(0, 6, 0, 0));
         body.addView(intro, lp(0, 0, 0, 12));
 
         Hosting.Profile def = HostingStore.getDefault(this);
-        LinearLayout hostCard = card(); hostCard.addView(Design.lot(this, "Hosting"));
-        addKvPlain(hostCard, "Destination", def == null ? "none set — required" : def.name() + " · " + def.type());
-        hostCard.addView(btn(def == null ? "Set up hosting" : "Manage hosting", def == null, () -> go(Screen.HOSTING)), lph(46, 0, 8, 0, 0));
+        LinearLayout hostCard = card(); hostCard.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting)));
+        addKvPlain(hostCard, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_destination), def == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_no_destination) : def.name() + " · " + def.type());
+        hostCard.addView(btn(def == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_setup_hosting) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_manage_hosting), def == null, () -> go(Screen.HOSTING)), lph(46, 0, 8, 0, 0));
         if (def == null) {
             // RETIRED (MaxLite sunset) — the one-tap encrypted-relay shortcut is gone. To restore:
             // hostCard.addView(Design.note(this, "No server? Publish to the encrypted relay — zero setup, your page is stored end-to-end encrypted."), lp(0, 8, 0, 4));
             // hostCard.addView(btn("Publish with no server (relay)", false, this::quickStartRelay), lph(44, 0, 4, 0, 0));
-            hostCard.addView(Design.note(this, "No server? Publish to Blossom — free public file hosting on the nostr network, zero setup."), lp(0, 8, 0, 4));
-            hostCard.addView(btn("Publish with no server (Blossom)", false, this::quickStartBlossom), lph(44, 0, 4, 0, 0));
+            hostCard.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_blossom_help)), lp(0, 8, 0, 4));
+            hostCard.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_blossom), false, this::quickStartBlossom), lph(44, 0, 4, 0, 0));
         }
         body.addView(hostCard, lp(0, 0, 0, 12));
 
-        LinearLayout form = card(); form.addView(Design.lot(this, "Claim your handle"));
-        EditText handle = field(form, "Handle", SalonStore.get(this, "handle"), false, "e.g. eurobuddha");
-        EditText name = field(form, "Display name", SalonStore.get(this, "name"), false, "Euro Buddha");
-        EditText bio = field(form, "Bio", SalonStore.get(this, "bio"), false, "one line about you");
+        LinearLayout form = card(); form.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_claim_handle)));
+        EditText handle = field(form, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_handle), SalonStore.get(this, "handle"), false, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_handle_example));
+        EditText name = field(form, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_display_name), SalonStore.get(this, "name"), false, "Euro Buddha");
+        EditText bio = field(form, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_bio), SalonStore.get(this, "bio"), false, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_bio_hint));
         final TextView status = Design.note(this, ""); form.addView(status, lp(0, 8, 0, 0));
-        claimBtn = btn("Claim my Salon", true, () -> claimIdentity(text(handle), text(name), text(bio), status));
+        claimBtn = btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_claim), true, () -> claimIdentity(text(handle), text(name), text(bio), status));
         claimBtn.setEnabled(!claiming); if (claiming) claimBtn.setAlpha(0.4f);
         form.addView(claimBtn, lph(52, 0, 10, 0, 0));
         body.addView(form, lp(0, 0, 0, 12));
     }
 
     private void claimIdentity(String handle, String name, String bio, TextView status) {
-        if (claiming) { status.setText("Already claiming — please wait."); return; }
+        if (claiming) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_claiming)); return; }
         handle = Hosting.slug(handle);
-        if (handle.isEmpty() || name.trim().isEmpty()) { status.setText("Handle and display name are required."); return; }
+        if (handle.isEmpty() || name.trim().isEmpty()) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_required)); return; }
         Hosting.Profile def = HostingStore.getDefault(this);
-        if (def == null) { status.setText("Set a hosting destination first."); return; }
-        if (!nodeUp) { status.setText("Waiting for Minima Core."); return; }
-        if (pubkey.isEmpty()) { status.setText("Fetching your key… try again in a moment."); fetchPubkey(); return; }
+        if (def == null) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting_first)); return; }
+        if (!nodeUp) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_waiting_node)); return; }
+        if (pubkey.isEmpty()) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_fetching_key)); fetchPubkey(); return; }
         claiming = true; setClaimEnabled(false);
         final String h = handle, n = name.trim(), b = bio.trim();
         SalonStore.put(this, "handle", h); SalonStore.put(this, "name", n); SalonStore.put(this, "bio", b);
-        status.setText("Publishing your page…");
+        Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_publishing));
         io.execute(() -> {
             try {
                 JSONObject profile = buildProfileJson();
@@ -2680,9 +2680,9 @@ public class MainActivity extends AppCompatActivity {
                         try { up.putFile(SALON_HTML.getBytes("UTF-8"), h + "/index.html", "text/html"); } catch (Exception ignore) {}
                 }
                 Hosting.verifyUrl(profileUrl, def);
-                runOnUiThread(() -> { SalonStore.put(this, "profileUrl", profileUrl); status.setText("Page live. Checking identity…"); adoptOrMint(h, n, b, profileUrl, status); });
+                runOnUiThread(() -> { SalonStore.put(this, "profileUrl", profileUrl); Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_checking)); adoptOrMint(h, n, b, profileUrl, status); });
             } catch (SftpUploader.HostKeyUnverified hk) { runOnUiThread(() -> { promptTrustHostKey(def, hk.fingerprint, status); claimFailed(); }); }
-            catch (Exception e) { runOnUiThread(() -> { status.setText("Hosting failed: " + e.getMessage()); claimFailed(); }); }
+            catch (Exception e) { runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting_failed, e.getMessage())); claimFailed(); }); }
         });
     }
 
@@ -2712,15 +2712,15 @@ public class MainActivity extends AppCompatActivity {
     private void mintIdentity(String handle, String name, String bio, String profileUrl, TextView status) {
         // Defense-in-depth: keep command/JSON-structure breakers out of the free-text metadata
         // that gets interpolated into the tokencreate command (quotes are JSON-escaped upstream).
-        if (!Args.isSafeMeta(name) || !Args.isSafeMeta(bio)) { status.setText("Please remove { } or line breaks from your name/bio."); claimFailed(); return; }
+        if (!Args.isSafeMeta(name) || !Args.isSafeMeta(bio)) { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_safe_metadata)); claimFailed(); return; }
         JSONObject meta = new JSONObject();
         putJson(meta, "salon", "1"); putJson(meta, "handle", handle); putJson(meta, "name", name); putJson(meta, "url", profileUrl); putJson(meta, "bio", bio);
         node.cmd("tokencreate name:" + meta + " amount:1 decimals:0 signtoken:" + pubkey, new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) {
-                if (!json.optBoolean("status", false)) { runOnUiThread(() -> { status.setText("Mint failed: " + json.optString("error", "rejected")); claimFailed(); }); return; }
-                runOnUiThread(() -> { status.setText("Minting… confirming (leave open)."); pollForIdentity(handle, 0, status); });
+                if (!json.optBoolean("status", false)) { runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_mint_failed, json.has("error") ? json.optString("error") : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_rejected))); claimFailed(); }); return; }
+                runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_confirming)); pollForIdentity(handle, 0, status); });
             }
-            @Override public void onError(String m) { runOnUiThread(() -> { status.setText("Mint failed: " + m); claimFailed(); }); }
+            @Override public void onError(String m) { runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_mint_failed, m)); claimFailed(); }); }
         });
     }
 
@@ -2730,7 +2730,7 @@ public class MainActivity extends AppCompatActivity {
                 String tid = findSalonToken(json, handle);
                 if (!tid.isEmpty()) runOnUiThread(() -> finishClaim(tid));
                 else if (tries < 30) body.postDelayed(() -> pollForIdentity(handle, tries + 1, status), 4000);
-                else runOnUiThread(() -> { status.setText("Minted — confirming. Reopen shortly, it'll adopt."); claiming = false; });
+                else runOnUiThread(() -> { Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_pending)); claiming = false; });
             }
             @Override public void onError(String m) { if (tries < 30) body.postDelayed(() -> pollForIdentity(handle, tries + 1, status), 4000); else runOnUiThread(() -> claiming = false); }
         });
@@ -2739,7 +2739,7 @@ public class MainActivity extends AppCompatActivity {
     private void finishClaim(String tokenid) {
         SalonStore.put(this, "tokenid", tokenid); claiming = false;
         publishSalon(null);   // put myself on the square
-        toast("Your Salon is open."); go(Screen.HOME);
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_opened)); go(Screen.HOME);
     }
     private void claimFailed() { claiming = false; setClaimEnabled(true); }
     private void setClaimEnabled(boolean on) { if (claimBtn != null) { claimBtn.setEnabled(on); claimBtn.setAlpha(on ? 1f : 0.4f); } }
@@ -2765,11 +2765,11 @@ public class MainActivity extends AppCompatActivity {
      *  everything — pull the CONTENT back so the page isn't blank. Never overwrites
      *  tokenid/handle (on-chain authoritative) or the local messaging key (msgpk). */
     private void hydrateFromHosted(final String url, final boolean loud) {
-        if (url == null || url.trim().isEmpty()) { if (loud) toast("No hosted page URL known yet."); return; }
-        if (loud) toast("Restoring your page…");
+        if (url == null || url.trim().isEmpty()) { if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_no_hosted_url)); return; }
+        if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_restoring));
         io.execute(() -> {
             final JSONObject p = httpGetJson(url);
-            if (p == null) { if (loud) runOnUiThread(() -> toast("Couldn't reach your hosted page.")); return; }
+            if (p == null) { if (loud) runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_unreachable))); return; }
             JSONObject me = SalonStore.me(this);
             boolean got = false;
             try {
@@ -2785,8 +2785,8 @@ public class MainActivity extends AppCompatActivity {
             SalonStore.save(this, me);
             final boolean restored = got;
             runOnUiThread(() -> {
-                if (restored) toast("Page restored from your hosting.");
-                else if (loud) toast("Nothing to restore — your hosted page is empty.");
+                if (restored) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_restored));
+                else if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_empty_hosted));
                 render();
             });
         });
@@ -3121,9 +3121,9 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout card() { LinearLayout c = new LinearLayout(this); c.setOrientation(LinearLayout.VERTICAL); c.setBackground(Design.blockShadow(this, Design.CARD())); c.setPadding(dp(14), dp(12), dp(14), dp(12)); return c; }
     private LinearLayout row() { LinearLayout r = new LinearLayout(this); r.setOrientation(LinearLayout.HORIZONTAL); r.setGravity(Gravity.CENTER_VERTICAL); return r; }
 
-    private void addKvPlain(LinearLayout parent, String k, String v) {
+    private void addKvPlain(LinearLayout parent, CharSequence k, CharSequence v) {
         LinearLayout r = row(); r.setPadding(0, dp(4), 0, dp(4));
-        TextView key = Design.text(this, k.toUpperCase(), 9.5f, Design.DIM(), Design.sansBold()); key.setLetterSpacing(0.12f);
+        TextView key = Design.text(this, Language.upper(k), 9.5f, Design.DIM(), Design.sansBold()); key.setLetterSpacing(0.12f);
         r.addView(key, new LinearLayout.LayoutParams(0, -2, 1));
         TextView val = Design.text(this, v == null ? "—" : v, 11.5f, Design.INK(), Design.mono()); val.setGravity(Gravity.END);
         r.addView(val, new LinearLayout.LayoutParams(0, -2, 1.6f)); parent.addView(r);
@@ -3196,9 +3196,9 @@ public class MainActivity extends AppCompatActivity {
         return f;
     }
 
-    private EditText field(LinearLayout parent, String label, String value, boolean secret, String hint) {
-        parent.addView(Design.text(this, label.toUpperCase(), 9.5f, Design.DIM(), Design.sansBold()), lp(0, 8, 0, 3));
-        EditText e = new EditText(this); e.setText(value == null ? "" : value); e.setHint(hint); e.setTextColor(Design.INK()); e.setTextSize(14);
+    private EditText field(LinearLayout parent, CharSequence label, String value, boolean secret, CharSequence hint) {
+        parent.addView(Design.text(this, Language.upper(label), 9.5f, Design.DIM(), Design.sansBold()), lp(0, 8, 0, 3));
+        EditText e = new EditText(this); e.setText(value == null ? "" : value); Language.hint(e, hint); e.setTextColor(Design.INK()); e.setTextSize(14);
         e.setBackground(Design.ruled(this, Design.PAPER(), Design.INK(), 1)); e.setPadding(dp(10), dp(9), dp(10), dp(9));
         if (secret) e.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         parent.addView(e, new LinearLayout.LayoutParams(-1, -2)); return e;
@@ -3220,7 +3220,7 @@ public class MainActivity extends AppCompatActivity {
         parent.addView(e, new LinearLayout.LayoutParams(-1, -2));
     }
 
-    private TextView btn(String label, boolean filled, Runnable click) { TextView b = Design.button(this, label, filled); b.setOnClickListener(v -> click.run()); return b; }
+    private TextView btn(CharSequence label, boolean filled, Runnable click) { TextView b = Design.button(this, label, filled); b.setOnClickListener(v -> click.run()); return b; }
 
     private LinearLayout dialogBox() { LinearLayout b = new LinearLayout(this); b.setOrientation(LinearLayout.VERTICAL); b.setPadding(dp(18), dp(6), dp(18), dp(6)); return b; }
     private void showDialog(String title, LinearLayout content, String ok, Runnable onOk) {
@@ -3286,7 +3286,7 @@ public class MainActivity extends AppCompatActivity {
         col.setOnClickListener(v -> d.dismiss());
         d.setContentView(col); d.show();
     }
-    private void toast(String m) { Toast.makeText(this, m, Toast.LENGTH_SHORT).show(); }
+    private void toast(CharSequence m) { Toast.makeText(this, m, Toast.LENGTH_SHORT).show(); }
     private String text(EditText e) { return e.getText().toString(); }
     private static void putJson(JSONObject o, String k, String v) { try { o.put(k, v == null ? "" : v); } catch (Exception ignored) {} }
     private TextWatcher watch(final java.util.function.Consumer<String> on) { return new TextWatcher() { public void beforeTextChanged(CharSequence s, int a, int b, int c) {} public void onTextChanged(CharSequence s, int a, int b, int c) {} public void afterTextChanged(android.text.Editable s) { on.accept(s.toString()); } }; }
