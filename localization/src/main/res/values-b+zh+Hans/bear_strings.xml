@@ -7983,4 +7983,62 @@
     <string name="l10n_salon_backup_save_incomplete" formatted="false">"未能完成保存。目标位置可能含有不完整的文件，使用此备份前请检查。"</string>
     <string name="l10n_salon_backup_too_large" formatted="false">"此备份超过 20 MB 限制。"</string>
     <string name="l10n_salon_backup_read_failed" formatted="false">"无法读取备份文件。请重新选择或使用其他副本。"</string>
+    <!-- Arguments: last -->
+    <string name="l10n_atelier_gallery_lot_range">"编号 001 — %1$s"</string>
+    <string name="l10n_atelier_gallery_lot_pending" formatted="false">"编号 —"</string>
+    <string name="l10n_atelier_gallery_token_pending" formatted="false">"代币待生成"</string>
+    <!-- Arguments: token, sealed, total, owned -->
+    <string name="l10n_atelier_gallery_collection_summary">"%1$s · 已封存 %2$s/%3$s · 持有 %4$s"</string>
+    <string name="l10n_atelier_gallery_images" formatted="false">"图像"</string>
+    <string name="l10n_atelier_gallery_buried" formatted="false">"已封存销毁"</string>
+    <string name="l10n_atelier_gallery_sealed" formatted="false">"已封存"</string>
+    <string name="l10n_atelier_gallery_open" formatted="false">"未封存"</string>
+    <string name="l10n_atelier_gallery_creating" formatted="false">"正在创建"</string>
+    <string name="l10n_atelier_gallery_gather" formatted="false">"归集"</string>
+    <string name="l10n_atelier_gallery_splitting" formatted="false">"正在拆分"</string>
+    <string name="l10n_atelier_gallery_stamping" formatted="false">"正在刻印"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_atelier_gallery_editions_summary">"版数 %1$s · %2$s"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_atelier_gallery_supply_summary">"供应量 %1$s · %2$s"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_atelier_gallery_adopted">"已收录“%1$s” — 在您的钱包中找到"</string>
+    <string name="l10n_atelier_gallery_reading" formatted="false">"正在读取区块链…"</string>
+    <!-- Arguments: sealed, total -->
+    <string name="l10n_atelier_gallery_resuming">"链上显示 %1$s/%2$s — 正在恢复铸造"</string>
+    <string name="l10n_atelier_gallery_editions" formatted="false">"版数"</string>
+    <string name="l10n_atelier_gallery_custody" formatted="false">"持有数量"</string>
+    <string name="l10n_atelier_gallery_partial" formatted="false">"正在显示此集合的部分内容。部分链上记录未能加载。"</string>
+    <string name="l10n_atelier_gallery_engine_live" formatted="false">"引擎运行中"</string>
+    <string name="l10n_atelier_gallery_engine_asleep" formatted="false">"引擎休眠"</string>
+    <!-- Arguments: seconds -->
+    <string name="l10n_atelier_gallery_tick">"%1$s 秒前运行 · 点按查看引擎日志"</string>
+    <string name="l10n_atelier_gallery_no_tick" formatted="false">"尚未运行 — 点按“恢复”，或点按此处查看日志"</string>
+    <string name="l10n_atelier_gallery_refresh" formatted="false">"刷新"</string>
+    <string name="l10n_atelier_gallery_resume" formatted="false">"恢复"</string>
+    <string name="l10n_atelier_gallery_recover" formatted="false">"恢复铸造状态"</string>
+    <string name="l10n_atelier_gallery_missing_row" formatted="false">"没有可恢复的本地铸造记录"</string>
+    <string name="l10n_atelier_gallery_bury" formatted="false">"封存销毁"</string>
+    <string name="l10n_atelier_gallery_airdrop" formatted="false">"正在分发"</string>
+    <!-- Arguments: sent, total -->
+    <string name="l10n_atelier_gallery_delivered">"已送达数量：%1$s / %2$s"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_atelier_gallery_lot">"编号 %1$s"</string>
+    <string name="l10n_atelier_gallery_pending" formatted="false">"待处理"</string>
+    <string name="l10n_atelier_gallery_posted" formatted="false">"已提交"</string>
+    <string name="l10n_atelier_gallery_done" formatted="false">"已送达"</string>
+    <string name="l10n_atelier_gallery_failed" formatted="false">"失败"</string>
+    <string name="l10n_atelier_gallery_clear_record" formatted="false">"清除记录"</string>
+    <string name="l10n_atelier_gallery_abandon" formatted="false">"放弃剩余分发"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_atelier_gallery_send_lots">"发送藏品（%1$s 件）— 单个地址或地址列表"</string>
+    <string name="l10n_atelier_gallery_view_lots" formatted="false">"藏品 — 点按查看"</string>
+    <string name="l10n_atelier_gallery_empty" formatted="false">"此节点上尚无可见的藏品币。"</string>
+    <string name="l10n_atelier_gallery_embedded" formatted="false">"内嵌图像版"</string>
+    <string name="l10n_atelier_gallery_hosted" formatted="false">"托管图像版"</string>
+    <string name="l10n_atelier_gallery_create" formatted="false">"创建"</string>
+    <string name="l10n_atelier_gallery_split" formatted="false">"拆分"</string>
+    <string name="l10n_atelier_gallery_stamp" formatted="false">"刻印"</string>
+    <string name="l10n_atelier_gallery_complete" formatted="false">"完成"</string>
+    <string name="l10n_atelier_gallery_engine_engaged" formatted="false">"引擎已启动 — 熄屏后仍会继续封存"</string>
 </resources>

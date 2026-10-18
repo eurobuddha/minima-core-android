@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     /* open collection */
     private StateNft.Meta openMeta;
+    private long detailRequest;
+    private boolean detailLoading;
     private JSONArray openOwned = new JSONArray();
     private JSONArray openAll = new JSONArray();
     private StateNft.Item transferItem;
@@ -158,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     private final Runnable mintLoop = new Runnable() {
         @Override public void run() {
             MintService.kick(MainActivity.this);
-            if (screen == Screen.COLLECTION && openMeta != null && activeMint(openMeta)) {
+            if (screen == Screen.COLLECTION && openMeta != null && activeMint(openMeta) && !detailLoading) {
                 loadLocalCollections();
                 openMeta = findCollectionByLocalId(openMeta.localId, openMeta);
                 refreshDetail();
@@ -508,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             requestPermissions(new String[]{ android.Manifest.permission.POST_NOTIFICATIONS }, 9001);
         }
         MintService.kick(this);
-        toast("Engine engaged — sealing continues even with the screen off");
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_engine_engaged));
     }
 
     private void refreshNodeDot() {
@@ -664,7 +666,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
         LinearLayout inner = vertical();
         inner.setPadding(dp(12), dp(10), dp(12), dp(12));
-        inner.addView(Design.lot(this, m.size > 0 ? String.format(Locale.US, "Lot 001 — %03d", m.size) : "Lot —"));
+        inner.addView(Design.lot(this, m.size > 0 ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_lot_range, String.format(Locale.US, "%03d", m.size)) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_lot_pending)));
         LinearLayout titleRow = horizontal(Gravity.CENTER_VERTICAL);
         TextView nm = Design.display(this, m.name, 14);
         nm.setSingleLine(true);
@@ -672,9 +674,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         titleRow.addView(nm, new LinearLayout.LayoutParams(0, -2, 1));
         titleRow.addView(statusPill(m));
         inner.addView(titleRow, lpm(0, 3, 0, 4));
-        inner.addView(Design.note(this, (m.tokenid.isEmpty() ? "token pending" : Util.shorten(m.tokenid))
-                + " · sealed " + Math.max(0, m.minted) + "/" + Math.max(m.size, 0)
-                + " · owned " + Math.max(0, m.owned)));
+        inner.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_collection_summary, m.tokenid.isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_token_pending) : Util.shorten(m.tokenid), Math.max(0, m.minted), Math.max(m.size, 0), Math.max(0, m.owned))));
         inner.addView(Design.meter(this, collectionProgress(m)), new LinearLayout.LayoutParams(-1, dp(5)){{ topMargin = dp(8); }});
         card.addView(inner);
         return card;
@@ -709,19 +709,19 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     private TextView statusPill(StateNft.Meta m) {
         String p = m.phase == null ? "DONE" : m.phase;
         if (activeMint(m)) {
-            if ("NEEDIMAGES".equals(p)) return Design.pill(this, "Images", Design.PILL_ERR);
+            if ("NEEDIMAGES".equals(p)) return Design.pill(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_images), Design.PILL_ERR);
             return Design.pill(this, statusWord(p), Design.PILL_LIVE);
         }
-        if ("BURIED".equals(p)) return Design.pill(this, "Buried", Design.PILL_DIM);
-        if (m.size > 0 && m.minted >= m.size) return Design.pill(this, "Sealed", Design.PILL_DONE);
-        return Design.pill(this, "Open", Design.PILL_DIM);
+        if ("BURIED".equals(p)) return Design.pill(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_buried), Design.PILL_DIM);
+        if (m.size > 0 && m.minted >= m.size) return Design.pill(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_sealed), Design.PILL_DONE);
+        return Design.pill(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_open), Design.PILL_DIM);
     }
 
-    private String statusWord(String p) {
-        if ("CREATE".equals(p)) return "Creating";
-        if ("MOVE".equals(p)) return "Gather";
-        if ("SPLIT".equals(p)) return "Splitting";
-        if ("STAMP".equals(p)) return "Stamping";
+    private CharSequence statusWord(String p) {
+        if ("CREATE".equals(p)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_creating);
+        if ("MOVE".equals(p)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_gather);
+        if ("SPLIT".equals(p)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_splitting);
+        if ("STAMP".equals(p)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_stamping);
         return p;
     }
 
@@ -747,7 +747,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         nm.setSingleLine(true);
         nm.setEllipsize(android.text.TextUtils.TruncateAt.END);
         inner.addView(nm);
-        inner.addView(Design.note(this, "ed. " + row.optString("total", "1") + " · " + Util.shorten(tid)));
+        inner.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_editions_summary, row.optString("total", "1"), Util.shorten(tid))));
         card.addView(inner);
         return card;
     }
@@ -774,7 +774,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         LinearLayout mid = vertical();
         mid.setPadding(dp(10), 0, 0, 0);
         mid.addView(Design.text(this, name + (ticker.isEmpty() ? "" : " · " + ticker.toUpperCase()), 12, Design.INK(), Design.sansBold()));
-        mid.addView(Design.note(this, "supply " + row.optString("total", "?") + " · " + Util.shorten(tid)));
+        mid.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_supply_summary, row.optString("total", "?"), Util.shorten(tid))));
         r.addView(mid, new LinearLayout.LayoutParams(0, -2, 1));
         TextView copy = Design.hash(this, "id");
         copy.setOnClickListener(v -> copyText(tid));
@@ -876,7 +876,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                         m.created = false;
                         LocalStore.upsert(MainActivity.this, MintEngine.rowFromMeta(m, new JSONArray()));
                         LocalStore.logEvent(MainActivity.this, "Adopted “" + m.name + "” — found in wallet");
-                        toast("Adopted “" + m.name + "” — found in your wallet");
+                        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_adopted, m.name));
                     }
                     autoAdopt(cands, i + 1, adopted + 1);
                 });
@@ -900,43 +900,67 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         appbar(m.name, true, false);
         bottomNav(0);
         openMeta = m;
+        detailPartial = false;
+        detailLoading = false;
         openOwned = new JSONArray();
         openAll = new JSONArray();
         lastDetailSig = "";
-        body.addView(Design.note(this, "Reading the chain…"), lpm(0, 8, 0, 0));
+        body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_reading)), lpm(0, 8, 0, 0));
         refreshDetail();
+    }
+
+    private boolean collectionCurrent(StateNft.Meta m, long generation) {
+        return !isFinishing() && !isDestroyed() && generation == screenGeneration
+                && screen == Screen.COLLECTION && openMeta != null
+                && openMeta.localId == m.localId && java.util.Objects.equals(openMeta.tokenid, m.tokenid);
+    }
+
+    private boolean detailCurrent(StateNft.Meta m, long generation, long request) {
+        return request == detailRequest && openMeta == m && collectionCurrent(m, generation);
     }
 
     private void refreshDetail() {
         StateNft.Meta m = openMeta;
-        if (m == null || screen != Screen.COLLECTION) return;
+        final long generation = screenGeneration, request = ++detailRequest;
+        if (m == null || !collectionCurrent(m, generation)) return;
+        detailLoading = true;
         if (m.tokenid == null || m.tokenid.isEmpty()) {
             openOwned = new JSONArray();
             openAll = new JSONArray();
+            detailPartial = false;
+            detailLoading = false;
             renderDetail();
             return;
         }
         MintEngine.tokenCoinsBounded(node, m.tokenid, true, (coins, partial) -> {
-            openOwned = coins;
-            detailPartial = partial;
-            m.owned = coins.length();
+            if (!detailCurrent(m, generation, request)) return;
             MintEngine.tokenCoinsBounded(node, m.tokenid, false, (all, partial2) -> {
-                openAll = all.length() == 0 ? openOwned : all;
-                detailPartial = detailPartial || partial2;
-                m.totalSeen = openAll.length();
-                m.minted = distinctStamped(openAll);
-                if (m.size <= 0) m.size = Math.max(m.minted, Math.max(m.totalSeen, m.owned));
-                persistCounts(m);
-                renderDetail();
+                if (!detailCurrent(m, generation, request)) return;
+                applyDetailCoins(m, coins, all.length() == 0 ? coins : all, partial || partial2);
             }, e -> {
-                openAll = openOwned;
-                m.totalSeen = openOwned.length();
-                m.minted = distinctStamped(openOwned);
-                if (m.size <= 0) m.size = Math.max(m.minted, Math.max(m.totalSeen, m.owned));
-                persistCounts(m);
-                renderDetail();
+                if (!detailCurrent(m, generation, request)) return;
+                applyDetailCoins(m, coins, coins, true);
             });
-        }, e -> renderDetail());
+        }, e -> {
+            if (!detailCurrent(m, generation, request)) return;
+            detailLoading = false;
+            detailPartial = true;
+            renderDetail();
+        });
+    }
+
+    /** Commit both reads together so overlapping refreshes cannot mix their coins. */
+    private void applyDetailCoins(StateNft.Meta m, JSONArray owned, JSONArray all, boolean partial) {
+        detailLoading = false;
+        openOwned = owned;
+        openAll = all;
+        detailPartial = partial;
+        m.owned = owned.length();
+        m.totalSeen = all.length();
+        m.minted = distinctStamped(all);
+        if (m.size <= 0) m.size = Math.max(m.minted, Math.max(m.totalSeen, m.owned));
+        persistCounts(m);
+        renderDetail();
     }
 
     private void persistCounts(StateNft.Meta m) {
@@ -962,8 +986,10 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         selfHealed = true;
         LocalStore.logEvent(this, m.name + ": marked DONE but chain shows " + m.minted
                 + "/" + m.size + " sealed — self-recovering");
-        toast("Chain shows " + m.minted + "/" + m.size + " — resuming this mint");
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_resuming, m.minted, m.size));
+        final long generation = screenGeneration;
         MintEngine.recover(this, node, row, lastTip, msg -> runOnUiThread(() -> {
+            if (!collectionCurrent(m, generation)) return;
             // a failed recover (chain unreadable) leaves the row on DONE —
             // unlatch so the next refresh retries instead of going silent
             JSONObject after = LocalStore.findById(this, m.localId);
@@ -979,7 +1005,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     private void renderDetail() {
         StateNft.Meta m = openMeta;
         if (m == null || screen != Screen.COLLECTION) return;
-        maybeSelfHeal(m);
+        if (!detailPartial) maybeSelfHeal(m);
         // 25s engine ticks re-enter here: skip the full view-tree rebuild
         // (and its mid-scroll stutter) when nothing user-visible changed
         JSONObject dropState = AirdropEngine.job(this, m.localId);
@@ -1033,24 +1059,24 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         heroBox.setOnClickListener(v -> { if (!shown.isEmpty()) showViewer(m, shown, 0); });
         body.addView(heroBox, lpm(0, 4, 0, 12));
 
-        body.addView(Design.lot(this, m.size > 0 ? String.format(Locale.US, "Lot 001 — %03d · %s", m.size, modeWord(m)) : modeWord(m)));
+        body.addView(Design.lot(this, m.size > 0 ? Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_lot_range, String.format(Locale.US, "%03d", m.size)), " · ", modeWord(m)) : modeWord(m)));
 
         LinearLayout meta = lotCard();
-        TextView tokHash = Design.hash(this, m.tokenid.isEmpty() ? "token pending" : Util.shorten(m.tokenid));
+        TextView tokHash = Design.hash(this, m.tokenid.isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_token_pending) : Util.shorten(m.tokenid));
         if (!m.tokenid.isEmpty()) tokHash.setOnClickListener(v -> copyText(m.tokenid));
         LinearLayout hr = horizontal(Gravity.CENTER_VERTICAL);
         hr.addView(tokHash);
         hr.addView(new Space(this), new LinearLayout.LayoutParams(0, 1, 1));
         hr.addView(statusPill(m));
         meta.addView(hr);
-        meta.addView(kvRow("Editions", String.valueOf(m.size)));
-        meta.addView(kvRow("Sealed", m.minted + " / " + m.size));
-        meta.addView(kvRow("In custody", String.valueOf(m.owned)));
+        meta.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_editions), String.valueOf(m.size)));
+        meta.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_sealed), m.minted + " / " + m.size));
+        meta.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_custody), String.valueOf(m.owned)));
         if (m.error != null && !m.error.isEmpty()) {
             meta.addView(Design.text(this, m.error, 11, Design.ACCENT(), Design.sansBold()), lpm(0, 6, 0, 0));
         }
         if (detailPartial) {
-            meta.addView(Design.note(this, "Large collection — showing the newest on-chain window; older records exceed the node link."), lpm(0, 6, 0, 0));
+            meta.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_partial)), lpm(0, 6, 0, 0));
         }
         body.addView(meta, lpm(0, 8, 0, 12));
 
@@ -1060,11 +1086,11 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             long beat = LocalStore.lastHeartbeat(this);
             long age = beat == 0 ? Long.MAX_VALUE : (System.currentTimeMillis() - beat) / 1000;
             LinearLayout beatRow = horizontal(Gravity.CENTER_VERTICAL);
-            beatRow.addView(Design.pill(this, age < 90 ? "Engine live" : "Engine asleep",
+            beatRow.addView(Design.pill(this, age < 90 ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_engine_live) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_engine_asleep),
                     age < 90 ? Design.PILL_DONE : Design.PILL_ERR));
             beatRow.addView(Design.note(this, age < 90
-                    ? "  ticked " + age + "s ago · tap for the engine log"
-                    : "  no tick yet — tap Resume, or tap here for the log"), new LinearLayout.LayoutParams(0, -2, 1){{ leftMargin = dp(8); }});
+                    ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_tick, age)
+                    : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_no_tick)), new LinearLayout.LayoutParams(0, -2, 1){{ leftMargin = dp(8); }});
             beatRow.setClickable(true);
             Design.pressable(beatRow);
             final StateNft.Meta mF = m;
@@ -1074,28 +1100,34 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         if ("NEEDIMAGES".equals(m.phase)) body.addView(recoveryPanel(m), lpm(0, 0, 0, 12));
 
         LinearLayout actions = horizontal(Gravity.CENTER_VERTICAL);
-        TextView refresh = Design.button(this, "Refresh", false);
+        TextView refresh = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_refresh), false);
         refresh.setOnClickListener(v -> refreshDetail());
-        actions.addView(refresh, weight(46, 0, 4));
+        refresh.setMinHeight(dp(48));
+        LinearLayout.LayoutParams refreshLp = weight(48, 0, 4); refreshLp.height = -2;
+        actions.addView(refresh, refreshLp);
         if (m.created && activeMint(m) && !"NEEDIMAGES".equals(m.phase)) {
-            TextView resume = Design.button(this, "Resume", true);
+            TextView resume = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_resume), true);
             resume.setOnClickListener(v -> {
                 engageEngine();
                 loadLocalCollections();
                 openMeta = findCollectionByLocalId(m.localId, m);
                 refreshDetail();
             });
-            actions.addView(resume, weight(46, 4, 4));
+            resume.setMinHeight(dp(48));
+            LinearLayout.LayoutParams resumeLp = weight(48, 4, 4); resumeLp.height = -2;
+            actions.addView(resume, resumeLp);
             /* Recover: re-derive this mint's phase from the chain (clears
              * local locks and counters, posts nothing) — the manual twin of
              * the stall watchdog. */
-            TextView doctor = Design.button(this, "Recover mint", false);
+            TextView doctor = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_recover), false);
             doctor.setOnClickListener(v -> {
                 JSONObject row = LocalStore.findById(this, m.localId);
                 if (row == null) row = LocalStore.findByTokenid(this, m.tokenid);
-                if (row == null) { toast("No local mint row to recover"); return; }
-                toast("Reading the chain…");
+                if (row == null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_missing_row)); return; }
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_reading));
+                final long generation = screenGeneration;
                 MintEngine.recover(this, node, row, lastTip, msg -> runOnUiThread(() -> {
+                    if (!collectionCurrent(m, generation)) return;
                     toast(msg);
                     engageEngine();
                     loadLocalCollections();
@@ -1104,11 +1136,15 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                     refreshDetail();
                 }));
             });
-            actions.addView(doctor, weight(46, 4, 4));
+            doctor.setMinHeight(dp(48));
+            LinearLayout.LayoutParams doctorLp = weight(48, 4, 4); doctorLp.height = -2;
+            actions.addView(doctor, doctorLp);
         }
-        TextView bury = Design.button(this, "Bury", false);
+        TextView bury = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_bury), false);
         bury.setOnClickListener(v -> renderBury());
-        actions.addView(bury, weight(46, 4, 0));
+        bury.setMinHeight(dp(48));
+        LinearLayout.LayoutParams buryLp = weight(48, 4, 0); buryLp.height = -2;
+        actions.addView(bury, buryLp);
         body.addView(actions, lpm(0, 0, 0, 14));
 
         /* airdrop: progress panel when a job runs, dispatch button when lots are deliverable */
@@ -1118,8 +1154,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             LinearLayout panel = vertical();
             panel.setBackground(Design.ruled(this, Design.CARD(), Design.ACCENT(), 2f));
             panel.setPadding(dp(12), dp(10), dp(12), dp(12));
-            panel.addView(Design.lot(this, "Airdrop in progress"));
-            panel.addView(Design.text(this, prog[0] + " / " + prog[1] + " lots delivered", 13, Design.INK(), Design.sansBold()), lpm(0, 4, 0, 6));
+            panel.addView(Design.lot(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_airdrop)));
+            panel.addView(Design.text(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_delivered, prog[0], prog[1]), 13, Design.INK(), Design.sansBold()), lpm(0, 4, 0, 6));
             panel.addView(Design.meter(this, prog[1] == 0 ? 0f : prog[0] / (float) prog[1]), new LinearLayout.LayoutParams(-1, dp(5)){{ bottomMargin = dp(8); }});
             JSONArray es = dropJob.optJSONArray("entries");
             if (es != null) for (int i = 0; i < es.length(); i++) {
@@ -1127,29 +1163,31 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 if (e == null) continue;
                 String st = e.optString("status");
                 String err = e.optString("error", "");
-                panel.addView(kvRow("Lot " + String.format(Locale.US, "%03d", e.optInt("idx")),
-                        ("FAIL".equals(st) && !err.isEmpty()) ? "FAIL — " + err : st + " → " + Util.shorten(e.optString("addr"))));
+                panel.addView(kvRow(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_lot, String.format(Locale.US, "%03d", e.optInt("idx"))),
+                        ("FAIL".equals(st) && !err.isEmpty()) ? Language.join(dropStatus(st), " — ", err) : Language.join(dropStatus(st), " → ", Util.shorten(e.optString("addr")))));
             }
-            TextView clear = Design.button(this, prog[0] >= prog[1] ? "Clear record" : "Abandon remaining", false);
+            TextView clear = Design.button(this, prog[0] >= prog[1] ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_clear_record) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_abandon), false);
             clear.setOnClickListener(v -> {
                 AirdropEngine.clearJob(this, m.localId);
                 refreshDetail();
             });
-            panel.addView(clear, lph(42, 0, 8, 0, 0));
+            clear.setMinHeight(dp(48));
+            panel.addView(clear, lpm(0, 8, 0, 0));
             body.addView(panel, lpm(0, 0, 0, 14));
         } else {
             List<StateNft.Item> transferable = new ArrayList<>();
             for (StateNft.Item it : shown) if (it.owned && it.coin != null && StateNft.stamped(it.coin) != null) transferable.add(it);
             if (!transferable.isEmpty()) {
-                TextView drop = Design.button(this, "Send " + transferable.size() + " lots — one address or a list", false);
+                TextView drop = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_send_lots, transferable.size()), false);
                 drop.setOnClickListener(v -> renderAirdrop(m, transferable));
-                body.addView(drop, lph(46, 0, 0, 0, 14));
+                drop.setMinHeight(dp(48));
+                body.addView(drop, lpm(0, 0, 0, 14));
             }
         }
 
-        body.addView(sectionHead("The lots — tap to view", shown.size() + ""));
+        body.addView(sectionHead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_view_lots), shown.size() + ""));
         if (shown.isEmpty()) {
-            body.addView(Design.note(this, "No item coins visible on this node yet."));
+            body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_empty)));
             return;
         }
         int cols = 3;
@@ -1172,8 +1210,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         }
     }
 
-    private String modeWord(StateNft.Meta m) {
-        return "embed".equalsIgnoreCase(m.mode) ? "embedded editions" : "hosted editions";
+    private CharSequence modeWord(StateNft.Meta m) {
+        return "embed".equalsIgnoreCase(m.mode) ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_embedded) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_hosted);
     }
 
     private View itemTile(StateNft.Meta m, List<StateNft.Item> items, int index) {
@@ -1199,7 +1237,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     private LinearLayout phaseRail(StateNft.Meta m) {
-        String[] names = {"Create", "Gather", "Split", "Stamp", "Done"};
+        CharSequence[] names = {Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_create), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_gather), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_split), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_stamp), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_complete)};
         int current = phaseIndex(m.phase == null ? "" : m.phase);
         LinearLayout rail = horizontal(Gravity.TOP);
         for (int i = 0; i < names.length; i++) {
@@ -1212,13 +1250,21 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                     : now ? Design.rect(Design.ACCENT())
                     : Design.ruled(this, Design.PAPER(), Design.INK(), 1.5f));
             nodeBox.addView(sq, new LinearLayout.LayoutParams(dp(12), dp(12)));
-            TextView lbl = Design.text(this, names[i].toUpperCase(), 7.5f,
+            TextView lbl = Design.text(this, Language.upper(names[i]), 7.5f,
                     now ? Design.ACCENT() : done ? Design.INK() : Design.DIM(), Design.sansBold());
             lbl.setLetterSpacing(0.1f);
             nodeBox.addView(lbl, lpm(0, 4, 0, 0));
             rail.addView(nodeBox, new LinearLayout.LayoutParams(0, -2, 1));
         }
         return rail;
+    }
+
+    private CharSequence dropStatus(String state) {
+        if ("PENDING".equals(state)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_pending);
+        if ("POSTED".equals(state)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_posted);
+        if ("DONE".equals(state)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_done);
+        if ("FAIL".equals(state)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_gallery_failed);
+        return state;
     }
 
     private int phaseIndex(String phase) {

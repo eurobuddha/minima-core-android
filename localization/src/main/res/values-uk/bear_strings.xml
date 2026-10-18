@@ -8091,4 +8091,62 @@
     <string name="l10n_salon_backup_save_incomplete" formatted="false">"Не вдалося завершити збереження. Файл може бути записано частково; перевірте його перед використанням резервної копії."</string>
     <string name="l10n_salon_backup_too_large" formatted="false">"Ця резервна копія перевищує ліміт 20 МБ."</string>
     <string name="l10n_salon_backup_read_failed" formatted="false">"Не вдалося прочитати резервну копію. Виберіть файл знову або скористайтеся іншою копією."</string>
+    <!-- Arguments: last -->
+    <string name="l10n_atelier_gallery_lot_range">"Лоти 001 — %1$s"</string>
+    <string name="l10n_atelier_gallery_lot_pending" formatted="false">"Лот —"</string>
+    <string name="l10n_atelier_gallery_token_pending" formatted="false">"токен очікується"</string>
+    <!-- Arguments: token, sealed, total, owned -->
+    <string name="l10n_atelier_gallery_collection_summary">"%1$s · запечатано %2$s/%3$s · у власності %4$s"</string>
+    <string name="l10n_atelier_gallery_images" formatted="false">"Зображення"</string>
+    <string name="l10n_atelier_gallery_buried" formatted="false">"Поховано"</string>
+    <string name="l10n_atelier_gallery_sealed" formatted="false">"Запечатано"</string>
+    <string name="l10n_atelier_gallery_open" formatted="false">"Не запечатано"</string>
+    <string name="l10n_atelier_gallery_creating" formatted="false">"Створення"</string>
+    <string name="l10n_atelier_gallery_gather" formatted="false">"Збирання"</string>
+    <string name="l10n_atelier_gallery_splitting" formatted="false">"Поділ"</string>
+    <string name="l10n_atelier_gallery_stamping" formatted="false">"Штампування"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_atelier_gallery_editions_summary">"прим. %1$s · %2$s"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_atelier_gallery_supply_summary">"випуск %1$s · %2$s"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_atelier_gallery_adopted">"Додано «%1$s» — знайдено у вашому гаманці"</string>
+    <string name="l10n_atelier_gallery_reading" formatted="false">"Читання блокчейну…"</string>
+    <!-- Arguments: sealed, total -->
+    <string name="l10n_atelier_gallery_resuming">"У блокчейні %1$s/%2$s — відновлюємо випуск"</string>
+    <string name="l10n_atelier_gallery_editions" formatted="false">"Примірники"</string>
+    <string name="l10n_atelier_gallery_custody" formatted="false">"У власності"</string>
+    <string name="l10n_atelier_gallery_partial" formatted="false">"Показано частину колекції. Деякі записи блокчейну не вдалося завантажити."</string>
+    <string name="l10n_atelier_gallery_engine_live" formatted="false">"Рушій працює"</string>
+    <string name="l10n_atelier_gallery_engine_asleep" formatted="false">"Рушій неактивний"</string>
+    <!-- Arguments: seconds -->
+    <string name="l10n_atelier_gallery_tick">"Цикл %1$s с тому · натисніть для перегляду журналу"</string>
+    <string name="l10n_atelier_gallery_no_tick" formatted="false">"Циклів ще не було — натисніть «Продовжити» або відкрийте журнал тут"</string>
+    <string name="l10n_atelier_gallery_refresh" formatted="false">"Оновити"</string>
+    <string name="l10n_atelier_gallery_resume" formatted="false">"Продовжити"</string>
+    <string name="l10n_atelier_gallery_recover" formatted="false">"Відновити випуск"</string>
+    <string name="l10n_atelier_gallery_missing_row" formatted="false">"Немає локального запису випуску для відновлення"</string>
+    <string name="l10n_atelier_gallery_bury" formatted="false">"Поховати"</string>
+    <string name="l10n_atelier_gallery_airdrop" formatted="false">"Розсилання триває"</string>
+    <!-- Arguments: sent, total -->
+    <string name="l10n_atelier_gallery_delivered">"Доставлено лотів: %1$s / %2$s"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_atelier_gallery_lot">"Лот %1$s"</string>
+    <string name="l10n_atelier_gallery_pending" formatted="false">"Очікує"</string>
+    <string name="l10n_atelier_gallery_posted" formatted="false">"Надіслано в мережу"</string>
+    <string name="l10n_atelier_gallery_done" formatted="false">"Доставлено"</string>
+    <string name="l10n_atelier_gallery_failed" formatted="false">"Помилка"</string>
+    <string name="l10n_atelier_gallery_clear_record" formatted="false">"Видалити запис"</string>
+    <string name="l10n_atelier_gallery_abandon" formatted="false">"Скасувати решту"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_atelier_gallery_send_lots">"Надіслати лоти (%1$s) — на одну адресу або за списком"</string>
+    <string name="l10n_atelier_gallery_view_lots" formatted="false">"Лоти — натисніть для перегляду"</string>
+    <string name="l10n_atelier_gallery_empty" formatted="false">"На цьому вузлі поки не видно монет колекції."</string>
+    <string name="l10n_atelier_gallery_embedded" formatted="false">"примірники з вбудованими даними"</string>
+    <string name="l10n_atelier_gallery_hosted" formatted="false">"примірники з даними на хостингу"</string>
+    <string name="l10n_atelier_gallery_create" formatted="false">"Створення"</string>
+    <string name="l10n_atelier_gallery_split" formatted="false">"Поділ"</string>
+    <string name="l10n_atelier_gallery_stamp" formatted="false">"Штампування"</string>
+    <string name="l10n_atelier_gallery_complete" formatted="false">"Готово"</string>
+    <string name="l10n_atelier_gallery_engine_engaged" formatted="false">"Рушій запущено — запечатування триватиме й із вимкненим екраном"</string>
 </resources>

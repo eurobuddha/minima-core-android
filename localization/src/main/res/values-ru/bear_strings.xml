@@ -8091,4 +8091,62 @@
     <string name="l10n_salon_backup_save_incomplete" formatted="false">"Не удалось завершить сохранение. Файл может быть записан частично; проверьте его перед использованием резервной копии."</string>
     <string name="l10n_salon_backup_too_large" formatted="false">"Эта резервная копия превышает лимит 20 МБ."</string>
     <string name="l10n_salon_backup_read_failed" formatted="false">"Не удалось прочитать резервную копию. Выберите файл заново или используйте другую копию."</string>
+    <!-- Arguments: last -->
+    <string name="l10n_atelier_gallery_lot_range">"Лоты 001 — %1$s"</string>
+    <string name="l10n_atelier_gallery_lot_pending" formatted="false">"Лот —"</string>
+    <string name="l10n_atelier_gallery_token_pending" formatted="false">"токен ожидается"</string>
+    <!-- Arguments: token, sealed, total, owned -->
+    <string name="l10n_atelier_gallery_collection_summary">"%1$s · запечатано %2$s/%3$s · в наличии %4$s"</string>
+    <string name="l10n_atelier_gallery_images" formatted="false">"Изображения"</string>
+    <string name="l10n_atelier_gallery_buried" formatted="false">"Захоронено"</string>
+    <string name="l10n_atelier_gallery_sealed" formatted="false">"Запечатано"</string>
+    <string name="l10n_atelier_gallery_open" formatted="false">"Не запечатано"</string>
+    <string name="l10n_atelier_gallery_creating" formatted="false">"Создание"</string>
+    <string name="l10n_atelier_gallery_gather" formatted="false">"Сбор"</string>
+    <string name="l10n_atelier_gallery_splitting" formatted="false">"Разделение"</string>
+    <string name="l10n_atelier_gallery_stamping" formatted="false">"Штамповка"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_atelier_gallery_editions_summary">"экз. %1$s · %2$s"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_atelier_gallery_supply_summary">"выпуск %1$s · %2$s"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_atelier_gallery_adopted">"Добавлено «%1$s» — найдено в вашем кошельке"</string>
+    <string name="l10n_atelier_gallery_reading" formatted="false">"Чтение блокчейна…"</string>
+    <!-- Arguments: sealed, total -->
+    <string name="l10n_atelier_gallery_resuming">"В блокчейне %1$s/%2$s — возобновляем выпуск"</string>
+    <string name="l10n_atelier_gallery_editions" formatted="false">"Экземпляры"</string>
+    <string name="l10n_atelier_gallery_custody" formatted="false">"В наличии"</string>
+    <string name="l10n_atelier_gallery_partial" formatted="false">"Показана часть коллекции. Некоторые записи блокчейна не удалось загрузить."</string>
+    <string name="l10n_atelier_gallery_engine_live" formatted="false">"Движок работает"</string>
+    <string name="l10n_atelier_gallery_engine_asleep" formatted="false">"Движок неактивен"</string>
+    <!-- Arguments: seconds -->
+    <string name="l10n_atelier_gallery_tick">"Цикл %1$s с назад · нажмите для просмотра журнала"</string>
+    <string name="l10n_atelier_gallery_no_tick" formatted="false">"Циклов ещё не было — нажмите «Продолжить» или откройте журнал здесь"</string>
+    <string name="l10n_atelier_gallery_refresh" formatted="false">"Обновить"</string>
+    <string name="l10n_atelier_gallery_resume" formatted="false">"Продолжить"</string>
+    <string name="l10n_atelier_gallery_recover" formatted="false">"Восстановить выпуск"</string>
+    <string name="l10n_atelier_gallery_missing_row" formatted="false">"Нет локальной записи выпуска для восстановления"</string>
+    <string name="l10n_atelier_gallery_bury" formatted="false">"Захоронить"</string>
+    <string name="l10n_atelier_gallery_airdrop" formatted="false">"Рассылка выполняется"</string>
+    <!-- Arguments: sent, total -->
+    <string name="l10n_atelier_gallery_delivered">"Доставлено лотов: %1$s / %2$s"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_atelier_gallery_lot">"Лот %1$s"</string>
+    <string name="l10n_atelier_gallery_pending" formatted="false">"Ожидает"</string>
+    <string name="l10n_atelier_gallery_posted" formatted="false">"Отправлено в сеть"</string>
+    <string name="l10n_atelier_gallery_done" formatted="false">"Доставлено"</string>
+    <string name="l10n_atelier_gallery_failed" formatted="false">"Ошибка"</string>
+    <string name="l10n_atelier_gallery_clear_record" formatted="false">"Удалить запись"</string>
+    <string name="l10n_atelier_gallery_abandon" formatted="false">"Отменить оставшиеся"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_atelier_gallery_send_lots">"Отправить лоты (%1$s) — на один адрес или по списку"</string>
+    <string name="l10n_atelier_gallery_view_lots" formatted="false">"Лоты — нажмите для просмотра"</string>
+    <string name="l10n_atelier_gallery_empty" formatted="false">"На этом узле пока не видны монеты коллекции."</string>
+    <string name="l10n_atelier_gallery_embedded" formatted="false">"экземпляры со встроенными данными"</string>
+    <string name="l10n_atelier_gallery_hosted" formatted="false">"экземпляры с данными на хостинге"</string>
+    <string name="l10n_atelier_gallery_create" formatted="false">"Создание"</string>
+    <string name="l10n_atelier_gallery_split" formatted="false">"Разделение"</string>
+    <string name="l10n_atelier_gallery_stamp" formatted="false">"Штамповка"</string>
+    <string name="l10n_atelier_gallery_complete" formatted="false">"Готово"</string>
+    <string name="l10n_atelier_gallery_engine_engaged" formatted="false">"Движок запущен — запечатывание продолжится и при выключенном экране"</string>
 </resources>

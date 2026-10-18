@@ -8019,4 +8019,62 @@
     <string name="l10n_salon_backup_save_incomplete" formatted="false">"Could not finish saving. The destination may contain a partial file; check it before using this backup."</string>
     <string name="l10n_salon_backup_too_large" formatted="false">"This backup exceeds the 20 MB limit."</string>
     <string name="l10n_salon_backup_read_failed" formatted="false">"Could not read the backup file. Select it again or use another copy."</string>
+    <!-- Arguments: last -->
+    <string name="l10n_atelier_gallery_lot_range">"Lot 001 — %1$s"</string>
+    <string name="l10n_atelier_gallery_lot_pending" formatted="false">"Lot —"</string>
+    <string name="l10n_atelier_gallery_token_pending" formatted="false">"token pending"</string>
+    <!-- Arguments: token, sealed, total, owned -->
+    <string name="l10n_atelier_gallery_collection_summary">"%1$s · sealed %2$s/%3$s · owned %4$s"</string>
+    <string name="l10n_atelier_gallery_images" formatted="false">"Images"</string>
+    <string name="l10n_atelier_gallery_buried" formatted="false">"Buried"</string>
+    <string name="l10n_atelier_gallery_sealed" formatted="false">"Sealed"</string>
+    <string name="l10n_atelier_gallery_open" formatted="false">"Open"</string>
+    <string name="l10n_atelier_gallery_creating" formatted="false">"Creating"</string>
+    <string name="l10n_atelier_gallery_gather" formatted="false">"Gather"</string>
+    <string name="l10n_atelier_gallery_splitting" formatted="false">"Splitting"</string>
+    <string name="l10n_atelier_gallery_stamping" formatted="false">"Stamping"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_atelier_gallery_editions_summary">"ed. %1$s · %2$s"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_atelier_gallery_supply_summary">"supply %1$s · %2$s"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_atelier_gallery_adopted">"Adopted “%1$s” — found in your wallet"</string>
+    <string name="l10n_atelier_gallery_reading" formatted="false">"Reading the chain…"</string>
+    <!-- Arguments: sealed, total -->
+    <string name="l10n_atelier_gallery_resuming">"Chain shows %1$s/%2$s — resuming this mint"</string>
+    <string name="l10n_atelier_gallery_editions" formatted="false">"Editions"</string>
+    <string name="l10n_atelier_gallery_custody" formatted="false">"In custody"</string>
+    <string name="l10n_atelier_gallery_partial" formatted="false">"Showing part of this collection. Some on-chain records could not be loaded."</string>
+    <string name="l10n_atelier_gallery_engine_live" formatted="false">"Engine live"</string>
+    <string name="l10n_atelier_gallery_engine_asleep" formatted="false">"Engine asleep"</string>
+    <!-- Arguments: seconds -->
+    <string name="l10n_atelier_gallery_tick">"Ticked %1$ss ago · tap for the engine log"</string>
+    <string name="l10n_atelier_gallery_no_tick" formatted="false">"No tick yet — tap Resume, or tap here for the log"</string>
+    <string name="l10n_atelier_gallery_refresh" formatted="false">"Refresh"</string>
+    <string name="l10n_atelier_gallery_resume" formatted="false">"Resume"</string>
+    <string name="l10n_atelier_gallery_recover" formatted="false">"Recover mint"</string>
+    <string name="l10n_atelier_gallery_missing_row" formatted="false">"No local mint row to recover"</string>
+    <string name="l10n_atelier_gallery_bury" formatted="false">"Bury"</string>
+    <string name="l10n_atelier_gallery_airdrop" formatted="false">"Airdrop in progress"</string>
+    <!-- Arguments: sent, total -->
+    <string name="l10n_atelier_gallery_delivered">"Lots delivered: %1$s / %2$s"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_atelier_gallery_lot">"Lot %1$s"</string>
+    <string name="l10n_atelier_gallery_pending" formatted="false">"Pending"</string>
+    <string name="l10n_atelier_gallery_posted" formatted="false">"Submitted"</string>
+    <string name="l10n_atelier_gallery_done" formatted="false">"Delivered"</string>
+    <string name="l10n_atelier_gallery_failed" formatted="false">"Failed"</string>
+    <string name="l10n_atelier_gallery_clear_record" formatted="false">"Clear record"</string>
+    <string name="l10n_atelier_gallery_abandon" formatted="false">"Abandon remaining"</string>
+    <!-- Arguments: amount -->
+    <string name="l10n_atelier_gallery_send_lots">"Send lots (%1$s) — one address or a list"</string>
+    <string name="l10n_atelier_gallery_view_lots" formatted="false">"The lots — tap to view"</string>
+    <string name="l10n_atelier_gallery_empty" formatted="false">"No item coins visible on this node yet."</string>
+    <string name="l10n_atelier_gallery_embedded" formatted="false">"embedded editions"</string>
+    <string name="l10n_atelier_gallery_hosted" formatted="false">"hosted editions"</string>
+    <string name="l10n_atelier_gallery_create" formatted="false">"Create"</string>
+    <string name="l10n_atelier_gallery_split" formatted="false">"Split"</string>
+    <string name="l10n_atelier_gallery_stamp" formatted="false">"Stamp"</string>
+    <string name="l10n_atelier_gallery_complete" formatted="false">"Done"</string>
+    <string name="l10n_atelier_gallery_engine_engaged" formatted="false">"Engine engaged — sealing continues even with the screen off"</string>
 </resources>

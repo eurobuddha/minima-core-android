@@ -40354,5 +40354,293 @@
     "zh-Hans": "无法读取备份文件。请重新选择或使用其他副本。",
     "ru": "Не удалось прочитать резервную копию. Выберите файл заново или используйте другую копию.",
     "uk": "Не вдалося прочитати резервну копію. Виберіть файл знову або скористайтеся іншою копією."
+  },
+  "atelierGallery.lotRange": {
+    "en": "Lot 001 — {last}",
+    "zh-Hans": "编号 001 — {last}",
+    "ru": "Лоты 001 — {last}",
+    "uk": "Лоти 001 — {last}"
+  },
+  "atelierGallery.lotPending": {
+    "en": "Lot —",
+    "zh-Hans": "编号 —",
+    "ru": "Лот —",
+    "uk": "Лот —"
+  },
+  "atelierGallery.tokenPending": {
+    "en": "token pending",
+    "zh-Hans": "代币待生成",
+    "ru": "токен ожидается",
+    "uk": "токен очікується"
+  },
+  "atelierGallery.collectionSummary": {
+    "en": "{token} · sealed {sealed}/{total} · owned {owned}",
+    "zh-Hans": "{token} · 已封存 {sealed}/{total} · 持有 {owned}",
+    "ru": "{token} · запечатано {sealed}/{total} · в наличии {owned}",
+    "uk": "{token} · запечатано {sealed}/{total} · у власності {owned}"
+  },
+  "atelierGallery.images": {
+    "en": "Images",
+    "zh-Hans": "图像",
+    "ru": "Изображения",
+    "uk": "Зображення"
+  },
+  "atelierGallery.buried": {
+    "en": "Buried",
+    "zh-Hans": "已封存销毁",
+    "ru": "Захоронено",
+    "uk": "Поховано"
+  },
+  "atelierGallery.sealed": {
+    "en": "Sealed",
+    "zh-Hans": "已封存",
+    "ru": "Запечатано",
+    "uk": "Запечатано"
+  },
+  "atelierGallery.open": {
+    "en": "Open",
+    "zh-Hans": "未封存",
+    "ru": "Не запечатано",
+    "uk": "Не запечатано"
+  },
+  "atelierGallery.creating": {
+    "en": "Creating",
+    "zh-Hans": "正在创建",
+    "ru": "Создание",
+    "uk": "Створення"
+  },
+  "atelierGallery.gather": {
+    "en": "Gather",
+    "zh-Hans": "归集",
+    "ru": "Сбор",
+    "uk": "Збирання"
+  },
+  "atelierGallery.splitting": {
+    "en": "Splitting",
+    "zh-Hans": "正在拆分",
+    "ru": "Разделение",
+    "uk": "Поділ"
+  },
+  "atelierGallery.stamping": {
+    "en": "Stamping",
+    "zh-Hans": "正在刻印",
+    "ru": "Штамповка",
+    "uk": "Штампування"
+  },
+  "atelierGallery.editionsSummary": {
+    "en": "ed. {amount} · {token}",
+    "zh-Hans": "版数 {amount} · {token}",
+    "ru": "экз. {amount} · {token}",
+    "uk": "прим. {amount} · {token}"
+  },
+  "atelierGallery.supplySummary": {
+    "en": "supply {amount} · {token}",
+    "zh-Hans": "供应量 {amount} · {token}",
+    "ru": "выпуск {amount} · {token}",
+    "uk": "випуск {amount} · {token}"
+  },
+  "atelierGallery.adopted": {
+    "en": "Adopted “{name}” — found in your wallet",
+    "zh-Hans": "已收录“{name}” — 在您的钱包中找到",
+    "ru": "Добавлено «{name}» — найдено в вашем кошельке",
+    "uk": "Додано «{name}» — знайдено у вашому гаманці"
+  },
+  "atelierGallery.reading": {
+    "en": "Reading the chain…",
+    "zh-Hans": "正在读取区块链…",
+    "ru": "Чтение блокчейна…",
+    "uk": "Читання блокчейну…"
+  },
+  "atelierGallery.resuming": {
+    "en": "Chain shows {sealed}/{total} — resuming this mint",
+    "zh-Hans": "链上显示 {sealed}/{total} — 正在恢复铸造",
+    "ru": "В блокчейне {sealed}/{total} — возобновляем выпуск",
+    "uk": "У блокчейні {sealed}/{total} — відновлюємо випуск"
+  },
+  "atelierGallery.editions": {
+    "en": "Editions",
+    "zh-Hans": "版数",
+    "ru": "Экземпляры",
+    "uk": "Примірники"
+  },
+  "atelierGallery.custody": {
+    "en": "In custody",
+    "zh-Hans": "持有数量",
+    "ru": "В наличии",
+    "uk": "У власності"
+  },
+  "atelierGallery.partial": {
+    "en": "Showing part of this collection. Some on-chain records could not be loaded.",
+    "zh-Hans": "正在显示此集合的部分内容。部分链上记录未能加载。",
+    "ru": "Показана часть коллекции. Некоторые записи блокчейна не удалось загрузить.",
+    "uk": "Показано частину колекції. Деякі записи блокчейну не вдалося завантажити."
+  },
+  "atelierGallery.engineLive": {
+    "en": "Engine live",
+    "zh-Hans": "引擎运行中",
+    "ru": "Движок работает",
+    "uk": "Рушій працює"
+  },
+  "atelierGallery.engineAsleep": {
+    "en": "Engine asleep",
+    "zh-Hans": "引擎休眠",
+    "ru": "Движок неактивен",
+    "uk": "Рушій неактивний"
+  },
+  "atelierGallery.tick": {
+    "en": "Ticked {seconds}s ago · tap for the engine log",
+    "zh-Hans": "{seconds} 秒前运行 · 点按查看引擎日志",
+    "ru": "Цикл {seconds} с назад · нажмите для просмотра журнала",
+    "uk": "Цикл {seconds} с тому · натисніть для перегляду журналу"
+  },
+  "atelierGallery.noTick": {
+    "en": "No tick yet — tap Resume, or tap here for the log",
+    "zh-Hans": "尚未运行 — 点按“恢复”，或点按此处查看日志",
+    "ru": "Циклов ещё не было — нажмите «Продолжить» или откройте журнал здесь",
+    "uk": "Циклів ще не було — натисніть «Продовжити» або відкрийте журнал тут"
+  },
+  "atelierGallery.refresh": {
+    "en": "Refresh",
+    "zh-Hans": "刷新",
+    "ru": "Обновить",
+    "uk": "Оновити"
+  },
+  "atelierGallery.resume": {
+    "en": "Resume",
+    "zh-Hans": "恢复",
+    "ru": "Продолжить",
+    "uk": "Продовжити"
+  },
+  "atelierGallery.recover": {
+    "en": "Recover mint",
+    "zh-Hans": "恢复铸造状态",
+    "ru": "Восстановить выпуск",
+    "uk": "Відновити випуск"
+  },
+  "atelierGallery.missingRow": {
+    "en": "No local mint row to recover",
+    "zh-Hans": "没有可恢复的本地铸造记录",
+    "ru": "Нет локальной записи выпуска для восстановления",
+    "uk": "Немає локального запису випуску для відновлення"
+  },
+  "atelierGallery.bury": {
+    "en": "Bury",
+    "zh-Hans": "封存销毁",
+    "ru": "Захоронить",
+    "uk": "Поховати"
+  },
+  "atelierGallery.airdrop": {
+    "en": "Airdrop in progress",
+    "zh-Hans": "正在分发",
+    "ru": "Рассылка выполняется",
+    "uk": "Розсилання триває"
+  },
+  "atelierGallery.delivered": {
+    "en": "Lots delivered: {sent} / {total}",
+    "zh-Hans": "已送达数量：{sent} / {total}",
+    "ru": "Доставлено лотов: {sent} / {total}",
+    "uk": "Доставлено лотів: {sent} / {total}"
+  },
+  "atelierGallery.lot": {
+    "en": "Lot {number}",
+    "zh-Hans": "编号 {number}",
+    "ru": "Лот {number}",
+    "uk": "Лот {number}"
+  },
+  "atelierGallery.pending": {
+    "en": "Pending",
+    "zh-Hans": "待处理",
+    "ru": "Ожидает",
+    "uk": "Очікує"
+  },
+  "atelierGallery.posted": {
+    "en": "Submitted",
+    "zh-Hans": "已提交",
+    "ru": "Отправлено в сеть",
+    "uk": "Надіслано в мережу"
+  },
+  "atelierGallery.done": {
+    "en": "Delivered",
+    "zh-Hans": "已送达",
+    "ru": "Доставлено",
+    "uk": "Доставлено"
+  },
+  "atelierGallery.failed": {
+    "en": "Failed",
+    "zh-Hans": "失败",
+    "ru": "Ошибка",
+    "uk": "Помилка"
+  },
+  "atelierGallery.clearRecord": {
+    "en": "Clear record",
+    "zh-Hans": "清除记录",
+    "ru": "Удалить запись",
+    "uk": "Видалити запис"
+  },
+  "atelierGallery.abandon": {
+    "en": "Abandon remaining",
+    "zh-Hans": "放弃剩余分发",
+    "ru": "Отменить оставшиеся",
+    "uk": "Скасувати решту"
+  },
+  "atelierGallery.sendLots": {
+    "en": "Send lots ({amount}) — one address or a list",
+    "zh-Hans": "发送藏品（{amount} 件）— 单个地址或地址列表",
+    "ru": "Отправить лоты ({amount}) — на один адрес или по списку",
+    "uk": "Надіслати лоти ({amount}) — на одну адресу або за списком"
+  },
+  "atelierGallery.viewLots": {
+    "en": "The lots — tap to view",
+    "zh-Hans": "藏品 — 点按查看",
+    "ru": "Лоты — нажмите для просмотра",
+    "uk": "Лоти — натисніть для перегляду"
+  },
+  "atelierGallery.empty": {
+    "en": "No item coins visible on this node yet.",
+    "zh-Hans": "此节点上尚无可见的藏品币。",
+    "ru": "На этом узле пока не видны монеты коллекции.",
+    "uk": "На цьому вузлі поки не видно монет колекції."
+  },
+  "atelierGallery.embedded": {
+    "en": "embedded editions",
+    "zh-Hans": "内嵌图像版",
+    "ru": "экземпляры со встроенными данными",
+    "uk": "примірники з вбудованими даними"
+  },
+  "atelierGallery.hosted": {
+    "en": "hosted editions",
+    "zh-Hans": "托管图像版",
+    "ru": "экземпляры с данными на хостинге",
+    "uk": "примірники з даними на хостингу"
+  },
+  "atelierGallery.create": {
+    "en": "Create",
+    "zh-Hans": "创建",
+    "ru": "Создание",
+    "uk": "Створення"
+  },
+  "atelierGallery.split": {
+    "en": "Split",
+    "zh-Hans": "拆分",
+    "ru": "Разделение",
+    "uk": "Поділ"
+  },
+  "atelierGallery.stamp": {
+    "en": "Stamp",
+    "zh-Hans": "刻印",
+    "ru": "Штамповка",
+    "uk": "Штампування"
+  },
+  "atelierGallery.complete": {
+    "en": "Done",
+    "zh-Hans": "完成",
+    "ru": "Готово",
+    "uk": "Готово"
+  },
+  "atelierGallery.engineEngaged": {
+    "en": "Engine engaged — sealing continues even with the screen off",
+    "zh-Hans": "引擎已启动 — 熄屏后仍会继续封存",
+    "ru": "Движок запущен — запечатывание продолжится и при выключенном экране",
+    "uk": "Рушій запущено — запечатування триватиме й із вимкненим екраном"
   }
 }
