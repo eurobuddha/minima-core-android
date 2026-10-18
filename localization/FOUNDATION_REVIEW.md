@@ -2720,3 +2720,16 @@ SHA256:
 - Pandamonium: `bfcfd66830f0b02c94fd672a2c1f373cac81d4037952131e176d12aa3b096162`
 
 The read-only ADB check again returned device not found for Fold R3GL805K7MB. No other device, owner state, seed or counter was accessed. Final Fold/language acceptance, the outstanding reviews above, and GitHub/PandaApps/eurobuddha.com publication remain open. These are signed candidates, not an accepted published release.
+
+
+## Current locale-format audit — 2026-10-18
+
+The preceding goal turn made progress with full host regression and refreshed signed candidates. This turn inspected current formatting sites instead of treating the old 205-row inventory as current. The fresh Java scan finds 192 lines: 12 default-locale hexadecimal formatters, 17 explicit-locale String.format calls, three explicit-US NumberFormat display calls, and 160 default case-conversion sites still needing caller review. The first 32 numeric sites have explicit locale or locale-invariant hexadecimal behavior. This does not establish complete text/formatting coverage.
+
+Reused `app/src/test/java/com/eurobuddha/minimacore/FormatTest.java` against the existing compiled app classes under en-GB, zh-CN, ru-RU and uk-UA: eight tests pass per locale (32 executions). The host-only LocaleAmountProbe uses six existing amount vectors and the actual shipped node JAR. All 24 MiniNumber text, serialized-byte and read-back checks match the ROOT baseline; 2048 lower/upper hexadecimal checks cover every byte under each locale. No node, wallet, signing, device or network operation ran. Existing full-suite reports remain untouched.
+
+Read MiniNumber source/serialization, the bundled MySQLConnect bytecode, remaining String.format sites in local node source, and selected date/export callers. Wallet HistoryView's fixed-English formatter is used only by CSV/JSON export; the inspected NFT/History date formatters likewise serve exports. Filez's old formatDate helper is unused, while visible dates use Language.stamp. Other date consumers remain to be reviewed.
+
+**Open inherited finding:** `MySQLConnect.searchCoins` formats Double result values with default-locale `%f`; the inspected bundled bytecode confirms this. The formatter produces `1,250000` under Russian/Ukrainian and `1.250000` under English/Chinese for 1.25. The node JAR's Git blob is identical to 1.9.41 (`24a063e587c7dc0da083df5ddcf5615cee209488`); no node replacement was made. None of the three signed APK DEX files contains the standard MySQL/MariaDB driver descriptors checked. That limits the evident runtime path but does not prove all dynamic reachability; the optional MySQL result-format issue remains open for disposition. Four SqlDB formatters substitute literal `%s` paths; MiniFormat's human-readable helpers still need consumer review before broader signoff.
+
+Evidence: `build/localization/locale-format-current-audit.json`, `amount-locale-{en,zh-Hans,ru,uk}.log`, `LocaleAmountProbe.java`, `locale-amount-probe.log`, and `node-mysql-format-bytecode.txt`. All 557 source checkpoint hashes still match. No production source changed; signed candidates from 14703cc remain current. Fold R3GL805K7MB is still unavailable. Case-conversion/date review, complete language/runtime acceptance and authorized publication remain outstanding.
