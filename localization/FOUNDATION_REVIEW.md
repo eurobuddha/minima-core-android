@@ -3117,3 +3117,5 @@ No unresolved correctness finding in this patch. The actual owner-specific Studi
 
 ### Verdict
 Approve this source patch for signed candidate builds. Fold visual confirmation, the exact owner Studio error and broader multilingual runtime acceptance remain pending. Evidence: `build/localization/bear-1.9.51-validation.json`.
+
+Signed build follow-up: all three 1.9.51/vc122 release candidates built successfully from 80ef5fc. Signature continuity, SHA256 checksums, package/version metadata, non-debuggable arm64 packaging, 16 KiB alignment and all four packaged language catalogues verified. Artifacts are in apks/base/dist with versioned filenames and checksum sidecars. Fold R3GL805K7MB disconnected before installation; no other device was updated. This build verification does not establish runtime acceptance.
