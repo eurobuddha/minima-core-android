@@ -35218,5 +35218,227 @@
     "zh-Hans": "nostr 网络上的免费公共文件托管，无需账户、密码或自己的服务器。文件使用从 Salon 消息身份派生的密钥签名，并按内容哈希存储，因此您的页面可在任何浏览器中查看，每次重新发布都会生成新 URL（Salon 会自动重新公告）。\n\n默认服务器 blossom.primal.net 免费接收页面和媒体。blossom.band 等仅支持媒体的服务器无法托管页面。免费服务器有文件大小限制（通常为几十 MB），较大的视频或音频请使用 SFTP、IPFS 或 GitHub。",
     "ru": "Бесплатное публичное хранение файлов в сети nostr: без аккаунта, пароля и собственного сервера. Файлы подписываются ключом, полученным из вашей идентичности сообщений Salon, и хранятся по хешу содержимого. Страница доступна в любом браузере, а каждая повторная публикация получает новый URL (Salon объявляет его автоматически).\n\nСервер по умолчанию blossom.primal.net бесплатно принимает и страницы, и медиафайлы. Серверы только для медиа, например blossom.band, не могут хранить саму страницу. Бесплатные серверы ограничивают размер файлов (обычно десятками МБ). Для больших видео и аудио используйте SFTP, IPFS или GitHub.",
     "uk": "Безкоштовне публічне зберігання файлів у мережі nostr: без облікового запису, пароля й власного сервера. Файли підписуються ключем, похідним від вашої ідентичності повідомлень Salon, і зберігаються за хешем вмісту. Сторінка доступна в будь-якому браузері, а кожна повторна публікація отримує нову URL-адресу (Salon оголошує її автоматично).\n\nТиповий сервер blossom.primal.net безкоштовно приймає і сторінки, і медіафайли. Сервери лише для медіа, наприклад blossom.band, не можуть зберігати саму сторінку. Безкоштовні сервери обмежують розмір файлів (зазвичай десятками МБ). Для великих відео й аудіо використовуйте SFTP, IPFS або GitHub."
+  },
+  "atelierHosting.empty": {
+    "en": "No destinations yet. Add one and Atelier can upload photos and fill every hosted URL for you.\n\nNo server? Create a free Pinata account, paste the JWT, and your art pins to IPFS with public links.",
+    "zh-Hans": "尚未添加存储位置。添加后，Atelier 可上传照片并自动填写托管 URL。\n\n没有服务器？创建免费 Pinata 账户并粘贴 JWT，即可将作品固定到 IPFS，获取公开链接。",
+    "ru": "Мест хранения пока нет. Добавьте одно, чтобы Atelier загружал фотографии и заполнял URL.\n\nНет сервера? Создайте бесплатный аккаунт Pinata и вставьте JWT: ваши работы будут закреплены в IPFS и получат публичные ссылки.",
+    "uk": "Місць зберігання ще немає. Додайте одне, щоб Atelier завантажував фотографії та заповнював URL-адреси.\n\nНемає сервера? Створіть безкоштовний обліковий запис Pinata й вставте JWT: ваші роботи будуть закріплені в IPFS та отримають публічні посилання."
+  },
+  "atelierHosting.serverHint": {
+    "en": "e.g. my server",
+    "zh-Hans": "例如：我的服务器",
+    "ru": "например, мой сервер",
+    "uk": "наприклад, мій сервер"
+  },
+  "atelierHosting.privateKey": {
+    "en": "Private key (paste PEM — begins -----BEGIN … PRIVATE KEY-----)",
+    "zh-Hans": "私钥（粘贴以 -----BEGIN … PRIVATE KEY----- 开头的 PEM）",
+    "ru": "Закрытый ключ (PEM, начинается с -----BEGIN … PRIVATE KEY-----)",
+    "uk": "Приватний ключ (PEM, починається з -----BEGIN … PRIVATE KEY-----)"
+  },
+  "atelierHosting.privateKeyHelp": {
+    "en": "Paste an OpenSSH/PEM private key (e.g. the contents of ~/.ssh/your_key). Passphrase-protected keys aren't supported yet — use an unencrypted key. This is how your shell already logs in.",
+    "zh-Hans": "粘贴 OpenSSH/PEM 私钥（例如 ~/.ssh/your_key 的内容）。暂不支持口令保护的私钥，请使用未加密的私钥。这与终端登录所用的密钥相同。",
+    "ru": "Вставьте закрытый ключ OpenSSH/PEM (например, содержимое ~/.ssh/your_key). Ключи с парольной фразой пока не поддерживаются — используйте незашифрованный ключ, как при входе через терминал.",
+    "uk": "Вставте приватний ключ OpenSSH/PEM (наприклад, вміст ~/.ssh/your_key). Ключі з парольною фразою поки не підтримуються — використовуйте незашифрований ключ, як для входу через термінал."
+  },
+  "atelierHosting.passwordHelp": {
+    "en": "Tap 👁 to reveal the password and check the on-screen keyboard didn't change it (a single wrong character reads to the server as a failed login).",
+    "zh-Hans": "点按 👁 显示密码，确认屏幕键盘未修改输入内容（一个错误字符就会导致登录失败）。",
+    "ru": "Нажмите 👁, чтобы показать пароль и проверить, не изменила ли его экранная клавиатура: один неверный символ приведёт к отказу во входе.",
+    "uk": "Натисніть 👁, щоб показати пароль і перевірити, чи не змінила його екранна клавіатура: один неправильний символ призведе до відмови у вході."
+  },
+  "atelierHosting.remoteFolder": {
+    "en": "Remote folder (web ROOT)",
+    "zh-Hans": "远程文件夹（网站根目录）",
+    "ru": "Папка на сервере (корень сайта)",
+    "uk": "Папка на сервері (корінь сайту)"
+  },
+  "atelierHosting.remoteHelp": {
+    "en": "Remote folder and URL prefix must point at the SAME place — the web root. Don't add a subfolder: Atelier creates its own atelier/… path under both. e.g. /var/www/html/ ↔ https://eurobuddha.com/ . First connect asks you to confirm the server's fingerprint.",
+    "zh-Hans": "远程文件夹和 URL 前缀必须指向同一位置，即网站根目录。不要添加子文件夹，Atelier 会在两者下创建 atelier/… 路径。例如 /var/www/html/ ↔ https://eurobuddha.com/。首次连接时会要求确认服务器指纹。",
+    "ru": "Папка на сервере и префикс URL должны указывать на одно место — корень сайта. Не добавляйте подпапку: Atelier сам создаёт путь atelier/… в обоих местах. Например: /var/www/html/ ↔ https://eurobuddha.com/. При первом подключении нужно подтвердить отпечаток сервера.",
+    "uk": "Папка на сервері та префікс URL мають вказувати на одне місце — корінь сайту. Не додавайте підпапку: Atelier сам створює шлях atelier/… в обох місцях. Наприклад: /var/www/html/ ↔ https://eurobuddha.com/. Під час першого підключення потрібно підтвердити відбиток сервера."
+  },
+  "atelierHosting.webdav": {
+    "en": "WebDAV write endpoint",
+    "zh-Hans": "WebDAV 写入地址",
+    "ru": "Адрес загрузки WebDAV",
+    "uk": "Адреса завантаження WebDAV"
+  },
+  "atelierHosting.kuboHelp": {
+    "en": "Uploads use /api/v0/add and pin. Files get a content CID; a url-mode collection becomes one directory CID. If your kubo RPC is behind HTTP Basic auth (reverse proxy), set the user + password here — the app sends an Authorization header (user:pass@ in the URL is dropped by Android → 401).",
+    "zh-Hans": "上传使用 /api/v0/add 并固定文件。文件获得内容 CID，URL 模式的合集获得一个目录 CID。如果 kubo RPC 通过反向代理使用 HTTP Basic 验证，请在此填写用户名和密码，应用会发送 Authorization 请求头（Android 会丢弃 URL 中的 user:pass@，导致 401 错误）。",
+    "ru": "Загрузка использует /api/v0/add с закреплением. Файл получает CID содержимого, коллекция в режиме URL — один CID каталога. Если kubo RPC защищён HTTP Basic через обратный прокси, задайте здесь пользователя и пароль: приложение отправит заголовок Authorization. Android отбрасывает user:pass@ из URL, что приводит к ошибке 401.",
+    "uk": "Завантаження використовує /api/v0/add із закріпленням. Файл отримує CID вмісту, колекція в режимі URL — один CID каталогу. Якщо kubo RPC захищено HTTP Basic через зворотний проксі, задайте тут користувача й пароль: застосунок надішле заголовок Authorization. Android відкидає user:pass@ з URL, що призводить до помилки 401."
+  },
+  "atelierHosting.jwtHint": {
+    "en": "eyJ… (free-tier key)",
+    "zh-Hans": "eyJ…（免费套餐密钥）",
+    "ru": "eyJ… (ключ бесплатного тарифа)",
+    "uk": "eyJ… (ключ безкоштовного тарифу)"
+  },
+  "atelierHosting.gatewayOptional": {
+    "en": "Gateway (optional)",
+    "zh-Hans": "网关（可选）",
+    "ru": "Шлюз (необязательно)",
+    "uk": "Шлюз (необов’язково)"
+  },
+  "atelierHosting.pinataHelp": {
+    "en": "No server needed — a free Pinata account pins your art to IPFS with public links.",
+    "zh-Hans": "无需服务器，免费 Pinata 账户可将作品固定到 IPFS 并提供公开链接。",
+    "ru": "Сервер не нужен: бесплатный аккаунт Pinata закрепляет работы в IPFS и предоставляет публичные ссылки.",
+    "uk": "Сервер не потрібен: безкоштовний обліковий запис Pinata закріплює роботи в IPFS і надає публічні посилання."
+  },
+  "atelierHosting.owner": {
+    "en": "Owner",
+    "zh-Hans": "所有者",
+    "ru": "Владелец",
+    "uk": "Власник"
+  },
+  "atelierHosting.repo": {
+    "en": "Repo",
+    "zh-Hans": "仓库",
+    "ru": "Репозиторий",
+    "uk": "Репозиторій"
+  },
+  "atelierHosting.pat": {
+    "en": "Personal access token",
+    "zh-Hans": "个人访问令牌",
+    "ru": "Персональный токен доступа",
+    "uk": "Особистий токен доступу"
+  },
+  "atelierHosting.pagesPrefix": {
+    "en": "Pages prefix (if pages)",
+    "zh-Hans": "Pages 前缀（使用 pages 时）",
+    "ru": "Префикс Pages (для pages)",
+    "uk": "Префікс Pages (для pages)"
+  },
+  "atelierHosting.generateWallet": {
+    "en": "Generate wallet",
+    "zh-Hans": "生成钱包",
+    "ru": "Создать кошелёк",
+    "uk": "Створити гаманець"
+  },
+  "atelierHosting.generating": {
+    "en": "GENERATING…",
+    "zh-Hans": "正在生成…",
+    "ru": "СОЗДАНИЕ…",
+    "uk": "СТВОРЕННЯ…"
+  },
+  "atelierHosting.walletCreated": {
+    "en": "Wallet created",
+    "zh-Hans": "钱包已创建",
+    "ru": "Кошелёк создан",
+    "uk": "Гаманець створено"
+  },
+  "atelierHosting.walletReopen": {
+    "en": "Reopen the destination to see your wallet address",
+    "zh-Hans": "重新打开此存储位置以查看钱包地址",
+    "ru": "Откройте место хранения снова, чтобы увидеть адрес кошелька",
+    "uk": "Відкрийте місце зберігання знову, щоб побачити адресу гаманця"
+  },
+  "atelierHosting.unreadable": {
+    "en": "(wallet unreadable — paste a valid JWK below)",
+    "zh-Hans": "（无法读取钱包，请在下方粘贴有效 JWK）",
+    "ru": "(кошелёк не читается — вставьте корректный JWK ниже)",
+    "uk": "(гаманець не читається — вставте коректний JWK нижче)"
+  },
+  "atelierHosting.walletAddress": {
+    "en": "Wallet address (tap to copy — fund it here)",
+    "zh-Hans": "钱包地址（点按复制，用于充值）",
+    "ru": "Адрес кошелька (нажмите для копирования и пополнения)",
+    "uk": "Адреса гаманця (натисніть для копіювання й поповнення)"
+  },
+  "atelierHosting.jwk": {
+    "en": "Arweave wallet (JWK JSON — paste to import)",
+    "zh-Hans": "Arweave 钱包（JWK JSON，粘贴以导入）",
+    "ru": "Кошелёк Arweave (JWK JSON — вставьте для импорта)",
+    "uk": "Гаманець Arweave (JWK JSON — вставте для імпорту)"
+  },
+  "atelierHosting.turboEndpoint": {
+    "en": "Turbo upload endpoint",
+    "zh-Hans": "Turbo 上传地址",
+    "ru": "Адрес загрузки Turbo",
+    "uk": "Адреса завантаження Turbo"
+  },
+  "atelierHosting.nameRequired": {
+    "en": "Give the destination a name",
+    "zh-Hans": "请为此存储位置命名",
+    "ru": "Укажите название места хранения",
+    "uk": "Вкажіть назву місця зберігання"
+  },
+  "atelierHosting.stored": {
+    "en": "•••••• (stored — type to replace)",
+    "zh-Hans": "••••••（已保存，输入以替换）",
+    "ru": "•••••• (сохранено — введите для замены)",
+    "uk": "•••••• (збережено — введіть для заміни)"
+  },
+  "atelierHosting.storedPaste": {
+    "en": "•••••• (stored — paste to replace)",
+    "zh-Hans": "••••••（已保存，粘贴以替换）",
+    "ru": "•••••• (сохранено — вставьте для замены)",
+    "uk": "•••••• (збережено — вставте для заміни)"
+  },
+  "atelierHosting.verifyKey": {
+    "en": "Verify server host key",
+    "zh-Hans": "验证服务器主机密钥",
+    "ru": "Проверьте ключ сервера",
+    "uk": "Перевірте ключ сервера"
+  },
+  "atelierHosting.verifyBody": {
+    "en": "First connection to this server. Confirm its fingerprint matches your server:\n\n{0}\n\nOnly accept if this is YOUR server.",
+    "zh-Hans": "首次连接此服务器，请确认指纹与您的服务器一致：\n\n{0}\n\n仅在确认这是您的服务器时接受。",
+    "ru": "Первое подключение к этому серверу. Убедитесь, что отпечаток совпадает с отпечатком вашего сервера:\n\n{0}\n\nПринимайте только если это ВАШ сервер.",
+    "uk": "Перше підключення до цього сервера. Переконайтеся, що відбиток збігається з відбитком вашого сервера:\n\n{0}\n\nПриймайте лише якщо це ВАШ сервер."
+  },
+  "atelierHosting.delete": {
+    "en": "Delete {0}?",
+    "zh-Hans": "删除 {0}？",
+    "ru": "Удалить {0}?",
+    "uk": "Видалити {0}?"
+  },
+  "atelierHosting.testTitle": {
+    "en": "Test — {0}",
+    "zh-Hans": "测试 — {0}",
+    "ru": "Проверка — {0}",
+    "uk": "Перевірка — {0}"
+  },
+  "atelierHosting.tested": {
+    "en": "uploaded ✓ · fetched ✓\n{0}",
+    "zh-Hans": "已上传 ✓ · 已读取 ✓\n{0}",
+    "ru": "загружено ✓ · получено ✓\n{0}",
+    "uk": "завантажено ✓ · отримано ✓\n{0}"
+  },
+  "atelierHosting.turboTested": {
+    "en": "uploaded ✓ — Turbo accepted it (free tier)\n{0}\n\nFresh Arweave URLs take ~5–10 min to start serving.",
+    "zh-Hans": "已上传 ✓，Turbo 已接收（免费额度）\n{0}\n\n新的 Arweave URL 通常约需 5–10 分钟才能访问。",
+    "ru": "загружено ✓ — Turbo принял файл (бесплатный тариф)\n{0}\n\nНовые URL Arweave обычно становятся доступны через 5–10 минут.",
+    "uk": "завантажено ✓ — Turbo прийняв файл (безкоштовний тариф)\n{0}\n\nНові URL Arweave зазвичай стають доступними через 5–10 хвилин."
+  },
+  "atelierHosting.generateFailed": {
+    "en": "Wallet generation failed: {0}",
+    "zh-Hans": "钱包生成失败：{0}",
+    "ru": "Не удалось создать кошелёк: {0}",
+    "uk": "Не вдалося створити гаманець: {0}"
+  },
+  "atelierHosting.copyBackup": {
+    "en": "Copy wallet backup",
+    "zh-Hans": "复制钱包备份",
+    "ru": "Скопировать резервную копию кошелька",
+    "uk": "Скопіювати резервну копію гаманця"
+  },
+  "atelierHosting.backupHelp": {
+    "en": "Use Copy wallet backup to copy the stored JWK, then save it somewhere safe. It exists only on this device and is excluded from Android backup. Uninstalling loses the wallet and any balance on it. Uploaded files stay live.",
+    "zh-Hans": "使用“复制钱包备份”复制已保存的 JWK，然后将其安全保存。钱包仅存储在此设备上，不包含在 Android 备份中。卸载应用会丢失钱包及其余额，已上传的文件仍然可用。",
+    "ru": "Нажмите «Скопировать резервную копию кошелька», чтобы скопировать сохранённый JWK, и сохраните его в надёжном месте. Он есть только на этом устройстве и исключён из резервной копии Android. При удалении приложения кошелёк и его баланс будут потеряны. Загруженные файлы останутся доступны.",
+    "uk": "Натисніть «Скопіювати резервну копію гаманця», щоб скопіювати збережений JWK, і збережіть його в надійному місці. Він є лише на цьому пристрої та виключений із резервної копії Android. Видалення застосунку призведе до втрати гаманця та його балансу. Завантажені файли залишаться доступними."
+  },
+  "atelierHosting.arweaveHelp": {
+    "en": "Permanent storage via ArDrive Turbo. Your wallet is your identity; no separate account is needed. Upload costs and free limits depend on the provider. Check or fund your wallet at https://turbo.ar.io. Uploaded files cannot be deleted or overwritten. New URLs may take several minutes to become available.",
+    "zh-Hans": "通过 ArDrive Turbo 永久存储。钱包即为身份，无需单独账户。上传费用和免费额度由服务提供方决定。可在 https://turbo.ar.io 查看或充值。上传的文件无法删除或覆盖，新的 URL 可能需要几分钟才能访问。",
+    "ru": "Постоянное хранение через ArDrive Turbo. Кошелёк служит вашей идентичностью, отдельный аккаунт не нужен. Стоимость загрузки и бесплатные лимиты устанавливает провайдер. Проверить баланс и пополнить кошелёк можно на https://turbo.ar.io. Загруженные файлы нельзя удалить или перезаписать. Новые URL могут стать доступны через несколько минут.",
+    "uk": "Постійне зберігання через ArDrive Turbo. Гаманець слугує вашою ідентичністю, окремий обліковий запис не потрібен. Вартість завантаження й безкоштовні ліміти встановлює провайдер. Перевірити баланс і поповнити гаманець можна на https://turbo.ar.io. Завантажені файли не можна видалити або перезаписати. Нові URL можуть стати доступними за кілька хвилин."
   }
 }

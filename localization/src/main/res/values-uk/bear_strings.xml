@@ -7160,4 +7160,47 @@
     <string name="l10n_creative_hosting_kubo_help" formatted="false">"Якщо kubo RPC захищено HTTP Basic через зворотний проксі, вкажіть тут користувача й пароль: застосунок надішле заголовок Authorization. Запис user:pass@ в URL API не працює на Android: заголовок втрачається, і сервер відповідає 401."</string>
     <string name="l10n_creative_hosting_github_help" formatted="false">"Налаштування (один раз):\n1. Створіть ПУБЛІЧНИЙ репозиторій на github.com (наприклад, salon). Owner — ваше ім’я користувача, Repo — назва репозиторію.\n2. Відкрийте Settings → Developer settings → Personal access tokens → Fine-grained → Generate. Надайте токену права Contents: Read and write для цього репозиторію. Вставте його в поле Token (PAT).\n3. Режим raw працює одразу (raw.githubusercontent.com). Для pages увімкніть публікацію з вашої гілки в Settings → Pages репозиторію та задайте префікс https://&lt;owner&gt;.github.io/&lt;repo&gt;/.\nПідійде гілка main. Потім збережіть і перевірте."</string>
     <string name="l10n_creative_hosting_blossom_help" formatted="false">"Безкоштовне публічне зберігання файлів у мережі nostr: без облікового запису, пароля й власного сервера. Файли підписуються ключем, похідним від вашої ідентичності повідомлень Salon, і зберігаються за хешем вмісту. Сторінка доступна в будь-якому браузері, а кожна повторна публікація отримує нову URL-адресу (Salon оголошує її автоматично).\n\nТиповий сервер blossom.primal.net безкоштовно приймає і сторінки, і медіафайли. Сервери лише для медіа, наприклад blossom.band, не можуть зберігати саму сторінку. Безкоштовні сервери обмежують розмір файлів (зазвичай десятками МБ). Для великих відео й аудіо використовуйте SFTP, IPFS або GitHub."</string>
+    <string name="l10n_atelier_hosting_empty" formatted="false">"Місць зберігання ще немає. Додайте одне, щоб Atelier завантажував фотографії та заповнював URL-адреси.\n\nНемає сервера? Створіть безкоштовний обліковий запис Pinata й вставте JWT: ваші роботи будуть закріплені в IPFS та отримають публічні посилання."</string>
+    <string name="l10n_atelier_hosting_server_hint" formatted="false">"наприклад, мій сервер"</string>
+    <string name="l10n_atelier_hosting_private_key" formatted="false">"Приватний ключ (PEM, починається з -----BEGIN … PRIVATE KEY-----)"</string>
+    <string name="l10n_atelier_hosting_private_key_help" formatted="false">"Вставте приватний ключ OpenSSH/PEM (наприклад, вміст ~/.ssh/your_key). Ключі з парольною фразою поки не підтримуються — використовуйте незашифрований ключ, як для входу через термінал."</string>
+    <string name="l10n_atelier_hosting_password_help" formatted="false">"Натисніть 👁, щоб показати пароль і перевірити, чи не змінила його екранна клавіатура: один неправильний символ призведе до відмови у вході."</string>
+    <string name="l10n_atelier_hosting_remote_folder" formatted="false">"Папка на сервері (корінь сайту)"</string>
+    <string name="l10n_atelier_hosting_remote_help" formatted="false">"Папка на сервері та префікс URL мають вказувати на одне місце — корінь сайту. Не додавайте підпапку: Atelier сам створює шлях atelier/… в обох місцях. Наприклад: /var/www/html/ ↔ https://eurobuddha.com/. Під час першого підключення потрібно підтвердити відбиток сервера."</string>
+    <string name="l10n_atelier_hosting_webdav" formatted="false">"Адреса завантаження WebDAV"</string>
+    <string name="l10n_atelier_hosting_kubo_help" formatted="false">"Завантаження використовує /api/v0/add із закріпленням. Файл отримує CID вмісту, колекція в режимі URL — один CID каталогу. Якщо kubo RPC захищено HTTP Basic через зворотний проксі, задайте тут користувача й пароль: застосунок надішле заголовок Authorization. Android відкидає user:pass@ з URL, що призводить до помилки 401."</string>
+    <string name="l10n_atelier_hosting_jwt_hint" formatted="false">"eyJ… (ключ безкоштовного тарифу)"</string>
+    <string name="l10n_atelier_hosting_gateway_optional" formatted="false">"Шлюз (необов’язково)"</string>
+    <string name="l10n_atelier_hosting_pinata_help" formatted="false">"Сервер не потрібен: безкоштовний обліковий запис Pinata закріплює роботи в IPFS і надає публічні посилання."</string>
+    <string name="l10n_atelier_hosting_owner" formatted="false">"Власник"</string>
+    <string name="l10n_atelier_hosting_repo" formatted="false">"Репозиторій"</string>
+    <string name="l10n_atelier_hosting_pat" formatted="false">"Особистий токен доступу"</string>
+    <string name="l10n_atelier_hosting_pages_prefix" formatted="false">"Префікс Pages (для pages)"</string>
+    <string name="l10n_atelier_hosting_generate_wallet" formatted="false">"Створити гаманець"</string>
+    <string name="l10n_atelier_hosting_generating" formatted="false">"СТВОРЕННЯ…"</string>
+    <string name="l10n_atelier_hosting_wallet_created" formatted="false">"Гаманець створено"</string>
+    <string name="l10n_atelier_hosting_wallet_reopen" formatted="false">"Відкрийте місце зберігання знову, щоб побачити адресу гаманця"</string>
+    <string name="l10n_atelier_hosting_unreadable" formatted="false">"(гаманець не читається — вставте коректний JWK нижче)"</string>
+    <string name="l10n_atelier_hosting_wallet_address" formatted="false">"Адреса гаманця (натисніть для копіювання й поповнення)"</string>
+    <string name="l10n_atelier_hosting_jwk" formatted="false">"Гаманець Arweave (JWK JSON — вставте для імпорту)"</string>
+    <string name="l10n_atelier_hosting_turbo_endpoint" formatted="false">"Адреса завантаження Turbo"</string>
+    <string name="l10n_atelier_hosting_name_required" formatted="false">"Вкажіть назву місця зберігання"</string>
+    <string name="l10n_atelier_hosting_stored" formatted="false">"•••••• (збережено — введіть для заміни)"</string>
+    <string name="l10n_atelier_hosting_stored_paste" formatted="false">"•••••• (збережено — вставте для заміни)"</string>
+    <string name="l10n_atelier_hosting_verify_key" formatted="false">"Перевірте ключ сервера"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_verify_body">"Перше підключення до цього сервера. Переконайтеся, що відбиток збігається з відбитком вашого сервера:\n\n%1$s\n\nПриймайте лише якщо це ВАШ сервер."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_delete">"Видалити %1$s?"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_test_title">"Перевірка — %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_tested">"завантажено ✓ · отримано ✓\n%1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_turbo_tested">"завантажено ✓ — Turbo прийняв файл (безкоштовний тариф)\n%1$s\n\nНові URL Arweave зазвичай стають доступними через 5–10 хвилин."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_generate_failed">"Не вдалося створити гаманець: %1$s"</string>
+    <string name="l10n_atelier_hosting_copy_backup" formatted="false">"Скопіювати резервну копію гаманця"</string>
+    <string name="l10n_atelier_hosting_backup_help" formatted="false">"Натисніть «Скопіювати резервну копію гаманця», щоб скопіювати збережений JWK, і збережіть його в надійному місці. Він є лише на цьому пристрої та виключений із резервної копії Android. Видалення застосунку призведе до втрати гаманця та його балансу. Завантажені файли залишаться доступними."</string>
+    <string name="l10n_atelier_hosting_arweave_help" formatted="false">"Постійне зберігання через ArDrive Turbo. Гаманець слугує вашою ідентичністю, окремий обліковий запис не потрібен. Вартість завантаження й безкоштовні ліміти встановлює провайдер. Перевірити баланс і поповнити гаманець можна на https://turbo.ar.io. Завантажені файли не можна видалити або перезаписати. Нові URL можуть стати доступними за кілька хвилин."</string>
 </resources>

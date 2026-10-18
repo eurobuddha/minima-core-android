@@ -7064,4 +7064,47 @@
     <string name="l10n_creative_hosting_kubo_help" formatted="false">"如果 kubo RPC 通过反向代理使用 HTTP Basic 身份验证，请在此填写用户名和密码，应用会发送正确的 Authorization 请求头。在 Android 上，将 user:pass@ 嵌入 API URL 无效（请求头会被丢弃，导致 401 错误）。"</string>
     <string name="l10n_creative_hosting_github_help" formatted="false">"一次性设置：\n1. 在 github.com 上创建公开仓库（例如 salon）。Owner 填写用户名，Repo 填写仓库名称。\n2. 进入 Settings → Developer settings → Personal access tokens → Fine-grained → Generate。授予该仓库 Contents: Read and write 权限，将令牌粘贴到 Token (PAT)。\n3. 使用 raw 可立即访问（raw.githubusercontent.com）。使用 pages 时，在仓库 Settings → Pages 中启用分支发布，并将 Pages 前缀设为 https://&lt;owner&gt;.github.io/&lt;repo&gt;/。\n分支可用 main，然后保存并测试。"</string>
     <string name="l10n_creative_hosting_blossom_help" formatted="false">"nostr 网络上的免费公共文件托管，无需账户、密码或自己的服务器。文件使用从 Salon 消息身份派生的密钥签名，并按内容哈希存储，因此您的页面可在任何浏览器中查看，每次重新发布都会生成新 URL（Salon 会自动重新公告）。\n\n默认服务器 blossom.primal.net 免费接收页面和媒体。blossom.band 等仅支持媒体的服务器无法托管页面。免费服务器有文件大小限制（通常为几十 MB），较大的视频或音频请使用 SFTP、IPFS 或 GitHub。"</string>
+    <string name="l10n_atelier_hosting_empty" formatted="false">"尚未添加存储位置。添加后，Atelier 可上传照片并自动填写托管 URL。\n\n没有服务器？创建免费 Pinata 账户并粘贴 JWT，即可将作品固定到 IPFS，获取公开链接。"</string>
+    <string name="l10n_atelier_hosting_server_hint" formatted="false">"例如：我的服务器"</string>
+    <string name="l10n_atelier_hosting_private_key" formatted="false">"私钥（粘贴以 -----BEGIN … PRIVATE KEY----- 开头的 PEM）"</string>
+    <string name="l10n_atelier_hosting_private_key_help" formatted="false">"粘贴 OpenSSH/PEM 私钥（例如 ~/.ssh/your_key 的内容）。暂不支持口令保护的私钥，请使用未加密的私钥。这与终端登录所用的密钥相同。"</string>
+    <string name="l10n_atelier_hosting_password_help" formatted="false">"点按 👁 显示密码，确认屏幕键盘未修改输入内容（一个错误字符就会导致登录失败）。"</string>
+    <string name="l10n_atelier_hosting_remote_folder" formatted="false">"远程文件夹（网站根目录）"</string>
+    <string name="l10n_atelier_hosting_remote_help" formatted="false">"远程文件夹和 URL 前缀必须指向同一位置，即网站根目录。不要添加子文件夹，Atelier 会在两者下创建 atelier/… 路径。例如 /var/www/html/ ↔ https://eurobuddha.com/。首次连接时会要求确认服务器指纹。"</string>
+    <string name="l10n_atelier_hosting_webdav" formatted="false">"WebDAV 写入地址"</string>
+    <string name="l10n_atelier_hosting_kubo_help" formatted="false">"上传使用 /api/v0/add 并固定文件。文件获得内容 CID，URL 模式的合集获得一个目录 CID。如果 kubo RPC 通过反向代理使用 HTTP Basic 验证，请在此填写用户名和密码，应用会发送 Authorization 请求头（Android 会丢弃 URL 中的 user:pass@，导致 401 错误）。"</string>
+    <string name="l10n_atelier_hosting_jwt_hint" formatted="false">"eyJ…（免费套餐密钥）"</string>
+    <string name="l10n_atelier_hosting_gateway_optional" formatted="false">"网关（可选）"</string>
+    <string name="l10n_atelier_hosting_pinata_help" formatted="false">"无需服务器，免费 Pinata 账户可将作品固定到 IPFS 并提供公开链接。"</string>
+    <string name="l10n_atelier_hosting_owner" formatted="false">"所有者"</string>
+    <string name="l10n_atelier_hosting_repo" formatted="false">"仓库"</string>
+    <string name="l10n_atelier_hosting_pat" formatted="false">"个人访问令牌"</string>
+    <string name="l10n_atelier_hosting_pages_prefix" formatted="false">"Pages 前缀（使用 pages 时）"</string>
+    <string name="l10n_atelier_hosting_generate_wallet" formatted="false">"生成钱包"</string>
+    <string name="l10n_atelier_hosting_generating" formatted="false">"正在生成…"</string>
+    <string name="l10n_atelier_hosting_wallet_created" formatted="false">"钱包已创建"</string>
+    <string name="l10n_atelier_hosting_wallet_reopen" formatted="false">"重新打开此存储位置以查看钱包地址"</string>
+    <string name="l10n_atelier_hosting_unreadable" formatted="false">"（无法读取钱包，请在下方粘贴有效 JWK）"</string>
+    <string name="l10n_atelier_hosting_wallet_address" formatted="false">"钱包地址（点按复制，用于充值）"</string>
+    <string name="l10n_atelier_hosting_jwk" formatted="false">"Arweave 钱包（JWK JSON，粘贴以导入）"</string>
+    <string name="l10n_atelier_hosting_turbo_endpoint" formatted="false">"Turbo 上传地址"</string>
+    <string name="l10n_atelier_hosting_name_required" formatted="false">"请为此存储位置命名"</string>
+    <string name="l10n_atelier_hosting_stored" formatted="false">"••••••（已保存，输入以替换）"</string>
+    <string name="l10n_atelier_hosting_stored_paste" formatted="false">"••••••（已保存，粘贴以替换）"</string>
+    <string name="l10n_atelier_hosting_verify_key" formatted="false">"验证服务器主机密钥"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_verify_body">"首次连接此服务器，请确认指纹与您的服务器一致：\n\n%1$s\n\n仅在确认这是您的服务器时接受。"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_delete">"删除 %1$s？"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_test_title">"测试 — %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_tested">"已上传 ✓ · 已读取 ✓\n%1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_turbo_tested">"已上传 ✓，Turbo 已接收（免费额度）\n%1$s\n\n新的 Arweave URL 通常约需 5–10 分钟才能访问。"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_generate_failed">"钱包生成失败：%1$s"</string>
+    <string name="l10n_atelier_hosting_copy_backup" formatted="false">"复制钱包备份"</string>
+    <string name="l10n_atelier_hosting_backup_help" formatted="false">"使用“复制钱包备份”复制已保存的 JWK，然后将其安全保存。钱包仅存储在此设备上，不包含在 Android 备份中。卸载应用会丢失钱包及其余额，已上传的文件仍然可用。"</string>
+    <string name="l10n_atelier_hosting_arweave_help" formatted="false">"通过 ArDrive Turbo 永久存储。钱包即为身份，无需单独账户。上传费用和免费额度由服务提供方决定。可在 https://turbo.ar.io 查看或充值。上传的文件无法删除或覆盖，新的 URL 可能需要几分钟才能访问。"</string>
 </resources>

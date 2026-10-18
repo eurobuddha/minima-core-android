@@ -3122,62 +3122,62 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     private void renderHosting() {
         setScreen(Screen.HOSTING, this::renderManage);
-        appbar("Hosting", true, false);
+        appbar(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting), true, false);
 
         java.util.List<Hosting.Profile> profiles = HostingStore.list(this);
         if (profiles.isEmpty()) {
             LinearLayout empty = lotCard();
-            empty.addView(Design.note(this, "No destinations yet. Add one and Atelier can upload photos and fill every hosted URL for you.\n\nNo server? Create a free Pinata account, paste the JWT, and your art pins to IPFS with public links."));
+            empty.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_empty)));
             body.addView(empty, lpm(0, 0, 0, 12));
         }
         for (Hosting.Profile p : profiles) {
             LinearLayout card = lotCard();
             LinearLayout head = horizontal(Gravity.CENTER_VERTICAL);
-            head.addView(Design.text(this, p.name().isEmpty() ? "(unnamed)" : p.name(), 15, Design.INK(), Design.sansBold()),
+            head.addView(Design.text(this, p.name().isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_unnamed) : p.name(), 15, Design.INK(), Design.sansBold()),
                     new LinearLayout.LayoutParams(0, -2, 1));
             head.addView(Design.pill(this, p.type(), Design.PILL_DIM));
-            if (p.isDefault()) head.addView(Design.pill(this, "default", Design.PILL_DONE));
+            if (p.isDefault()) head.addView(Design.pill(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_default), Design.PILL_DONE));
             card.addView(head, lpm(0, 0, 0, 8));
             LinearLayout row = horizontal(Gravity.CENTER_VERTICAL);
-            TextView test = Design.button(this, "Test", false);
+            TextView test = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_test), false);
             test.setOnClickListener(v -> testProfile(p));
-            row.addView(test, weight(31, 0, 4));
-            TextView edit = Design.button(this, "Edit", false);
+            row.addView(test, weight(48, 0, 4));
+            TextView edit = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_edit), false);
             edit.setOnClickListener(v -> renderHostingEdit(p));
-            row.addView(edit, weight(31, 4, 4));
-            TextView del = Design.button(this, "Delete", false);
-            del.setOnClickListener(v -> new android.app.AlertDialog.Builder(this)
-                    .setTitle("Delete " + p.name() + "?")
-                    .setPositiveButton("Delete", (d, w) -> { HostingStore.remove(this, p.id()); renderHosting(); })
-                    .setNegativeButton("Keep", null).show());
-            row.addView(del, weight(31, 4, 0));
+            row.addView(edit, weight(48, 4, 4));
+            TextView del = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_filez_delete), false);
+            del.setOnClickListener(v -> new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                    .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_delete, p.name()))
+                    .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_filez_delete), (d, w) -> { HostingStore.remove(this, p.id()); renderHosting(); })
+                    .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_backup_keep), null).show());
+            row.addView(del, weight(48, 4, 0));
             card.addView(row, lpm(0, 0, 0, 6));
             if (!p.isDefault()) {
-                TextView mkDef = Design.button(this, "Make default", false);
+                TextView mkDef = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_make_default), false);
                 mkDef.setOnClickListener(v -> { HostingStore.setDefault(this, p.id()); renderHosting(); });
                 card.addView(mkDef, lph(42, 0, 0, 0, 0));
             }
             body.addView(card, lpm(0, 0, 0, 12));
         }
-        TextView add = Design.button(this, "Add destination", true);
+        TextView add = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_add), true);
         add.setOnClickListener(v -> renderHostingEdit(null));
         body.addView(add, lph(52, 0, 4, 0, 8));
     }
 
     private static final String[] HOST_TYPES = { Hosting.TYPE_SFTP, Hosting.TYPE_WEBDAV,
             Hosting.TYPE_KUBO, Hosting.TYPE_PINATA, Hosting.TYPE_GITHUB, Hosting.TYPE_ARWEAVE };
-    private static final String[] HOST_TYPE_LABELS = { "SFTP", "WebDAV", "IPFS node", "Pinata", "GitHub", "Arweave" };
+    private static final CharSequence[] HOST_TYPE_LABELS = { "SFTP", "WebDAV", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_ipfs_node), "Pinata", "GitHub", "Arweave" };
 
     private void renderHostingEdit(Hosting.Profile existing) {
         setScreen(Screen.HOSTING_EDIT, this::renderHosting);
-        appbar(existing == null ? "Add destination" : "Edit destination", true, false);
+        appbar(existing == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_add) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_edit_destination), true, false);
         hostEditProfile = existing != null ? existing
                 : Hosting.Profile.fresh(Hosting.TYPE_SFTP);
 
-        EditText nameF = fieldInto(body, "Name", "e.g. my server", hostEditProfile.name());
+        EditText nameF = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_name), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_server_hint), hostEditProfile.name());
         nameF.addTextChangedListener(watch(sv -> Hosting.put(hostEditProfile.j, "name", sv)));
 
-        body.addView(Design.kicker(this, "Type"), lpm(0, 10, 0, 5));
+        body.addView(Design.kicker(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_type)), lpm(0, 10, 0, 5));
         LinearLayout chips = horizontal(Gravity.CENTER_VERTICAL);
         chips.setPadding(0, 0, 0, dp(4));
         for (int i = 0; i < HOST_TYPES.length; i++) {
@@ -3203,15 +3203,15 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         org.json.JSONObject cfg = hostEditProfile.cfg();
         switch (hostEditProfile.type()) {
             case Hosting.TYPE_SFTP:
-                hostField(cfg, "host", "Host", "eurobuddha.com", false);
-                hostField(cfg, "port", "Port", "22", false);
-                hostField(cfg, "user", "User", "root", false);
+                hostField(cfg, "host", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_host), "eurobuddha.com", false);
+                hostField(cfg, "port", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_terminal_txn_port), "22", false);
+                hostField(cfg, "user", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_user), "root", false);
                 final org.json.JSONObject sftpCfg = cfg;
                 boolean keyAuth = "key".equals(cfg.optString("auth", "password"));
-                body.addView(Design.kicker(this, "Authentication"), lpm(0, 10, 0, 5));
+                body.addView(Design.kicker(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_authentication)), lpm(0, 10, 0, 5));
                 LinearLayout authRow = horizontal(Gravity.CENTER_VERTICAL);
-                TextView pwChip = Design.chip(this, "Password", !keyAuth);
-                TextView keyChip = Design.chip(this, "Private key", keyAuth);
+                TextView pwChip = Design.chip(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_backup_password), !keyAuth);
+                TextView keyChip = Design.chip(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_eth_wallet_private_key), keyAuth);
                 pwChip.setPadding(dp(12), dp(6), dp(12), dp(6));
                 keyChip.setPadding(dp(12), dp(6), dp(12), dp(6));
                 pwChip.setOnClickListener(v -> { Hosting.put(sftpCfg, "auth", "password"); renderHostingEdit(hostEditProfile); });
@@ -3221,50 +3221,50 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 authRow.addView(keyChip, new LinearLayout.LayoutParams(-2, -2));
                 body.addView(authRow, lpm(0, 0, 0, 4));
                 if (keyAuth) {
-                    hostFieldMulti(cfg, "privateKey", "Private key (paste PEM — begins -----BEGIN … PRIVATE KEY-----)");
-                    body.addView(Design.note(this, "Paste an OpenSSH/PEM private key (e.g. the contents of ~/.ssh/your_key). Passphrase-protected keys aren't supported yet — use an unencrypted key. This is how your shell already logs in."), lpm(0, 6, 0, 0));
+                    hostFieldMulti(cfg, "privateKey", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_private_key));
+                    body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_private_key_help)), lpm(0, 6, 0, 0));
                 } else {
-                    hostField(cfg, "password", "Password", "••••••", true);
-                    body.addView(Design.note(this, "Tap 👁 to reveal the password and check the on-screen keyboard didn't change it (a single wrong character reads to the server as a failed login)."), lpm(0, 6, 0, 0));
+                    hostField(cfg, "password", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_backup_password), "••••••", true);
+                    body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_password_help)), lpm(0, 6, 0, 0));
                 }
-                hostField(cfg, "remoteRoot", "Remote folder (web ROOT)", "/var/www/html/", false);
-                hostField(cfg, "urlPrefix", "Public URL prefix", "https://eurobuddha.com/", false);
-                body.addView(Design.note(this, "Remote folder and URL prefix must point at the SAME place — the web root. Don't add a subfolder: Atelier creates its own atelier/… path under both. e.g. /var/www/html/ ↔ https://eurobuddha.com/ . First connect asks you to confirm the server's fingerprint."), lpm(0, 8, 0, 0));
+                hostField(cfg, "remoteRoot", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_remote_folder), "/var/www/html/", false);
+                hostField(cfg, "urlPrefix", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_url_prefix), "https://eurobuddha.com/", false);
+                body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_remote_help)), lpm(0, 8, 0, 0));
                 break;
             case Hosting.TYPE_WEBDAV:
-                hostField(cfg, "endpoint", "WebDAV write endpoint", "https://dav.example.com/files/", false);
-                hostField(cfg, "user", "User", "", false);
-                hostField(cfg, "password", "Password", "••••••", true);
-                hostField(cfg, "urlPrefix", "Public URL prefix", "https://example.com/files/", false);
+                hostField(cfg, "endpoint", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_webdav), "https://dav.example.com/files/", false);
+                hostField(cfg, "user", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_user), "", false);
+                hostField(cfg, "password", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_backup_password), "••••••", true);
+                hostField(cfg, "urlPrefix", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_url_prefix), "https://example.com/files/", false);
                 break;
             case Hosting.TYPE_KUBO:
                 hostField(cfg, "apiUrl", "kubo RPC API", "https://api-ipfs.eurobuddha.com", false);
-                hostField(cfg, "user", "API user (HTTP Basic — optional)", "ipfs", false);
-                hostField(cfg, "password", "API password (HTTP Basic — optional)", "", true);
-                hostField(cfg, "gateway", "Public gateway", "https://ipfs.eurobuddha.com", false);
-                body.addView(Design.note(this, "Uploads use /api/v0/add and pin. Files get a content CID; a url-mode collection becomes one directory CID. If your kubo RPC is behind HTTP Basic auth (reverse proxy), set the user + password here — the app sends an Authorization header (user:pass@ in the URL is dropped by Android → 401)."), lpm(0, 8, 0, 0));
+                hostField(cfg, "user", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_api_user), "ipfs", false);
+                hostField(cfg, "password", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_api_password), "", true);
+                hostField(cfg, "gateway", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_public_gateway), "https://ipfs.eurobuddha.com", false);
+                body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_kubo_help)), lpm(0, 8, 0, 0));
                 break;
             case Hosting.TYPE_PINATA:
-                hostField(cfg, "jwt", "Pinata JWT", "eyJ… (free-tier key)", true);
-                hostField(cfg, "gateway", "Gateway (optional)", "https://gateway.pinata.cloud", false);
-                body.addView(Design.note(this, "No server needed — a free Pinata account pins your art to IPFS with public links."), lpm(0, 8, 0, 0));
+                hostField(cfg, "jwt", "Pinata JWT", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_jwt_hint), true);
+                hostField(cfg, "gateway", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_gateway_optional), "https://gateway.pinata.cloud", false);
+                body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_pinata_help)), lpm(0, 8, 0, 0));
                 break;
             case Hosting.TYPE_GITHUB:
-                hostField(cfg, "owner", "Owner", "eurobuddha", false);
-                hostField(cfg, "repo", "Repo", "nft-assets", false);
-                hostField(cfg, "branch", "Branch", "main", false);
-                hostField(cfg, "token", "Personal access token", "ghp_…", true);
-                hostField(cfg, "serve", "Serve via (raw / pages)", "raw", false);
-                hostField(cfg, "pagesPrefix", "Pages prefix (if pages)", "https://you.github.io/nft-assets/", false);
+                hostField(cfg, "owner", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_owner), "eurobuddha", false);
+                hostField(cfg, "repo", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_repo), "nft-assets", false);
+                hostField(cfg, "branch", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_branch), "main", false);
+                hostField(cfg, "token", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_pat), "ghp_…", true);
+                hostField(cfg, "serve", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_serve), "raw", false);
+                hostField(cfg, "pagesPrefix", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_pages_prefix), "https://you.github.io/nft-assets/", false);
                 break;
             case Hosting.TYPE_ARWEAVE:
-                body.addView(Design.note(this, "Permanent storage via ArDrive Turbo — no account or signup; your wallet below IS the identity. Files under ~100 KiB upload free; larger files spend the prepaid balance attached to your wallet address (~$0.61 per 20 MiB — fund at https://turbo.ar.io). Uploads are PERMANENT and can never be deleted or overwritten. Fresh URLs take ~5–10 minutes to start serving."), lpm(0, 6, 0, 4));
+                body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_arweave_help)), lpm(0, 6, 0, 4));
                 if (cfg.optString("jwk", "").isEmpty()) {
-                    final TextView gen = Design.button(this, "Generate wallet", true);
+                    final TextView gen = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_generate_wallet), true);
                     final org.json.JSONObject arCfg = cfg;
                     final Hosting.Profile generatedProfile = hostEditProfile;
                     gen.setOnClickListener(v -> {
-                        gen.setText("GENERATING…"); gen.setEnabled(false); gen.setAlpha(0.5f);
+                        Language.setText(gen, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_generating)); gen.setEnabled(false); gen.setAlpha(0.5f);
                         new Thread(() -> {   // RSA-4096 keygen takes seconds on-device
                             try {
                                 String jwk = Ans104.generateJwkJson();
@@ -3275,57 +3275,63 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                                     // default the name so the upsert can't create a blank list entry
                                     if (generatedProfile.name().isEmpty()) Hosting.put(generatedProfile.j, "name", "Arweave");
                                     HostingStore.upsert(this, generatedProfile);
-                                    toast("Wallet created");
+                                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_wallet_created));
                                     if (screen == Screen.HOSTING_EDIT && hostEditProfile == generatedProfile) renderHostingEdit(generatedProfile);
-                                    else toast("Reopen the destination to see your wallet address");
+                                    else toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_wallet_reopen));
                                 });
                             } catch (Crypt.Unavailable unavailable) {
-                                main.post(() -> { hostingSecretUnavailable(); gen.setEnabled(true); gen.setAlpha(1f); gen.setText("Generate wallet"); });
+                                main.post(() -> { hostingSecretUnavailable(); gen.setEnabled(true); gen.setAlpha(1f); Language.setText(gen, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_generate_wallet)); });
                             } catch (Exception e) {
-                                main.post(() -> { toast("Wallet generation failed: " + e.getClass().getSimpleName());
+                                main.post(() -> { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_generate_failed, e.getClass().getSimpleName()));
                                         if (screen == Screen.HOSTING_EDIT && hostEditProfile == generatedProfile) renderHostingEdit(generatedProfile); });
                             }
                         }).start();
                     });
                     body.addView(gen, lph(48, 0, 4, 0, 4));
                 } else {
-                    String addr;
+                    CharSequence addr;
                     try { addr = Ans104.addressFromJwk(Crypt.decrypt(cfg.optString("jwk", ""))); }
-                    catch (Crypt.Unavailable unavailable) { addr = unavailable.getMessage(); }
-                    catch (Exception e) { addr = "(wallet unreadable — paste a valid JWK below)"; }
-                    final String addrF = addr;
-                    body.addView(Design.kicker(this, "Wallet address (tap to copy — fund it here)"), lpm(0, 8, 0, 5));
+                    catch (Crypt.Unavailable unavailable) { addr = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_unavailable); }
+                    catch (Exception e) { addr = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_unreadable); }
+                    final String addrF = addr.toString();
+                    body.addView(Design.kicker(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_wallet_address)), lpm(0, 8, 0, 5));
                     TextView addrV = Design.text(this, addr, 12f, Design.INK(), Design.mono());
                     addrV.setBackground(Design.ruled(this, Design.CARD(), Design.INK(), 1.5f));
                     addrV.setPadding(dp(12), dp(10), dp(12), dp(10));
                     addrV.setClickable(true);
                     addrV.setOnClickListener(v -> { if (addrF.matches("[A-Za-z0-9_-]{43}")) copyText(addrF); });
                     body.addView(addrV, lpm(0, 0, 0, 4));
-                    body.addView(Design.note(this, "Back up this wallet: reveal the field below and copy the JWK somewhere safe. It exists only on this device (excluded from Android backup) — uninstalling loses the wallet and any balance on it. Your uploaded files stay live regardless."), lpm(0, 4, 0, 4));
+                    body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_backup_help)), lpm(0, 4, 0, 4));
                 }
-                hostFieldMulti(cfg, "jwk", "Arweave wallet (JWK JSON — paste to import)", "{\"kty\":\"RSA\",\"n\":\"…\",\"e\":\"AQAB\",\"d\":\"…\"}");
-                hostField(cfg, "endpoint", "Turbo upload endpoint", ArweaveUploader.DEFAULT_ENDPOINT, false);
-                hostField(cfg, "gateway", "Gateway", "https://arweave.net", false);
+                if (!cfg.optString("jwk", "").isEmpty()) {
+                    TextView backup = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_copy_backup), false);
+                    backup.setMinHeight(dp(48)); backup.setPadding(dp(12), dp(8), dp(12), dp(8));
+                    backup.setOnClickListener(v -> copyArweaveBackup(cfg));
+                    body.addView(backup, lpm(0, 4, 0, 4));
+                }
+                hostFieldMulti(cfg, "jwk", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_jwk), "{\"kty\":\"RSA\",\"n\":\"…\",\"e\":\"AQAB\",\"d\":\"…\"}");
+                hostField(cfg, "endpoint", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_turbo_endpoint), ArweaveUploader.DEFAULT_ENDPOINT, false);
+                hostField(cfg, "gateway", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_gateway), "https://arweave.net", false);
                 break;
         }
 
         LinearLayout actions = horizontal(Gravity.CENTER_VERTICAL);
-        TextView save = Design.button(this, "Save", true);
+        TextView save = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_save), true);
         save.setOnClickListener(v -> {
             if (!hostingSecretsReady(hostEditProfile)) return;
-            if (hostEditProfile.name().isEmpty()) { toast("Give the destination a name"); return; }
+            if (hostEditProfile.name().isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_name_required)); return; }
             HostingStore.upsert(this, hostEditProfile);
             if (HostingStore.getDefault(this) == null || HostingStore.list(this).size() == 1) {
                 HostingStore.setDefault(this, hostEditProfile.id());
             }
-            toast("Saved");
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_terminal_ide_saved));
             renderHosting();
         });
         actions.addView(save, weight(48, 0, 4));
-        TextView testB = Design.button(this, "Save & test", false);
+        TextView testB = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_save_test), false);
         testB.setOnClickListener(v -> {
             if (!hostingSecretsReady(hostEditProfile)) return;
-            if (hostEditProfile.name().isEmpty()) { toast("Give the destination a name"); return; }
+            if (hostEditProfile.name().isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_name_required)); return; }
             HostingStore.upsert(this, hostEditProfile);
             testProfile(hostEditProfile);
         });
@@ -3364,7 +3370,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         }));
     }
 
-    private void hostField(org.json.JSONObject cfg, String key, String label, String hint, boolean secret) {
+    private void hostField(org.json.JSONObject cfg, String key, CharSequence label, CharSequence hint, boolean secret) {
         final boolean isSecret = secret;
         String cur = cfg.optString(key, "");
         if (!isSecret) {
@@ -3377,7 +3383,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         // server as "Failed password")
         body.addView(Design.kicker(this, label), lpm(0, 8, 0, 5));
         LinearLayout row = horizontal(Gravity.CENTER_VERTICAL);
-        final EditText e = input(!cur.isEmpty() ? "•••••• (stored — type to replace)" : hint);
+        final EditText e = input(!cur.isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_stored) : hint);
         // NO_SUGGESTIONS + password variation: stop autocaps/predictive text
         final int MASKED = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD
                 | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
@@ -3409,15 +3415,15 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     /** Multiline secret field (SFTP private key). Stored encrypted; the box
      *  stays blank when a key is already stored (type to replace). */
-    private void hostFieldMulti(org.json.JSONObject cfg, String key, String label) {
+    private void hostFieldMulti(org.json.JSONObject cfg, String key, CharSequence label) {
         hostFieldMulti(cfg, key, label, "-----BEGIN OPENSSH PRIVATE KEY-----\n…");
     }
 
-    private void hostFieldMulti(org.json.JSONObject cfg, String key, String label, String emptyHint) {
+    private void hostFieldMulti(org.json.JSONObject cfg, String key, CharSequence label, CharSequence emptyHint) {
         String cur = cfg.optString(key, "");
         body.addView(Design.kicker(this, label), lpm(0, 8, 0, 5));
         EditText e = new EditText(this);
-        e.setHint(cur.isEmpty() ? emptyHint : "•••••• (stored — paste to replace)");
+        Language.hint(e, cur.isEmpty() ? emptyHint : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_stored_paste));
         e.setTextColor(Design.INK());
         e.setHintTextColor(Design.DIM());
         e.setTextSize(11f);
@@ -3434,58 +3440,74 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     private void testProfile(Hosting.Profile p) {
-        toast("Testing " + p.name() + "…");
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_testing_name, p.name()));
         new Thread(() -> {
-            String result;
+            CharSequence result;
             try {
                 String nonce = "atelier-" + System.currentTimeMillis();
                 String rel = Hosting.fillTemplate("atelier/probe/{ts}-{rand}.txt",
                         mapOf("ts", Hosting.ts36(), "rand", Hosting.rand4()));
                 Hosting.Uploader u = Hosting.forProfile(p);
                 String url;
-                if (u instanceof Hosting.DirUploader && (Hosting.TYPE_KUBO.equals(p.type()) || Hosting.TYPE_PINATA.equals(p.type()))) {
+                try {
                     url = u.putFile(nonce.getBytes(java.nio.charset.StandardCharsets.UTF_8), rel, "text/plain");
-                } else {
-                    url = u.putFile(nonce.getBytes(java.nio.charset.StandardCharsets.UTF_8), rel, "text/plain");
+                } finally {
+                    if (u instanceof AutoCloseable) { try { ((AutoCloseable) u).close(); } catch (Exception ignored) { } }
                 }
-                if (u instanceof AutoCloseable) { try { ((AutoCloseable) u).close(); } catch (Exception ignored) { } }
                 if (Hosting.TYPE_ARWEAVE.equals(p.type())) {
                     // Turbo's 200 + txid IS the storage receipt; the URL itself
                     // only starts serving after gateway indexing (~5-10 min).
-                    result = "uploaded ✓ — Turbo accepted it (free tier)\n" + url
-                            + "\n\nFresh Arweave URLs take ~5–10 min to start serving.";
+                    result = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_turbo_tested, url);
                 } else {
                     // fetch-back leg
                     Hosting.verifyUrl(url, p);
-                    result = "uploaded ✓ · fetched ✓\n" + url;
+                    result = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_tested, url);
                 }
             } catch (SftpUploader.HostKeyUnverified hk) {
                 main.post(() -> confirmHostKey(p, hk.fingerprint));
                 return;
             } catch (Hosting.HostingException e) {
-                result = "failed: " + e.getMessage();
+                result = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_failed, e.getMessage());
             } catch (Throwable t) {
-                result = "failed: " + t.getClass().getSimpleName();
+                result = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_failed, t.getClass().getSimpleName());
             }
-            final String r = result;
-            main.post(() -> new android.app.AlertDialog.Builder(this)
-                    .setTitle("Test — " + p.name())
+            final CharSequence r = result;
+            main.post(() -> new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                    .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_test_title, p.name()))
                     .setMessage(r)
-                    .setPositiveButton("OK", null).show());
+                    .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_ok), null).show());
         }).start();
     }
 
     private void confirmHostKey(Hosting.Profile p, String fp) {
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("Verify server host key")
-                .setMessage("First connection to this server. Confirm its fingerprint matches your server:\n\n" + fp
-                        + "\n\nOnly accept if this is YOUR server.")
-                .setPositiveButton("Trust & pin", (d, w) -> {
+        new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_verify_key))
+                .setMessage(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_verify_body, fp))
+                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_trust_pin), (d, w) -> {
                     Hosting.put(p.cfg(), "hostKeyFp", fp);
                     HostingStore.upsert(this, p);
                     testProfile(p);
                 })
-                .setNegativeButton("Cancel", null).show();
+                .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel), null).show();
+    }
+
+    /** Explicit wallet backup; same sensitive-clipboard handling as minimaCore utils/Clip. */
+    private void copyArweaveBackup(JSONObject cfg) {
+        try {
+            String jwk = Crypt.decrypt(cfg.optString("jwk", ""));
+            Ans104.parseJwk(jwk); // Never claim a malformed value is a usable wallet backup.
+            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            if (cm == null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_core_wallet_clipboard)); return; }
+            ClipData clip = ClipData.newPlainText("Arweave JWK", jwk);
+            if (android.os.Build.VERSION.SDK_INT >= 33) {
+                android.os.PersistableBundle extras = new android.os.PersistableBundle();
+                extras.putBoolean(android.content.ClipDescription.EXTRA_IS_SENSITIVE, true);
+                clip.getDescription().setExtras(extras);
+            }
+            cm.setPrimaryClip(clip);
+            if (android.os.Build.VERSION.SDK_INT < 33) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_history_copied));
+        } catch (Crypt.Unavailable unavailable) { hostingSecretUnavailable(); }
+        catch (Exception invalid) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_hosting_unreadable)); }
     }
 
     private java.util.Map<String, String> mapOf(String... kv) {
@@ -4574,7 +4596,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         return box;
     }
 
-    private EditText fieldInto(LinearLayout parent, String label, String hint, String value) {
+    private EditText fieldInto(LinearLayout parent, CharSequence label, CharSequence hint, String value) {
         parent.addView(Design.kicker(this, label), lpm(0, 8, 0, 5));
         EditText e = input(hint);
         if (value != null && !value.isEmpty()) e.setText(value);
@@ -4582,9 +4604,9 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         return e;
     }
 
-    private EditText input(String hint) {
+    private EditText input(CharSequence hint) {
         EditText e = new EditText(this);
-        e.setHint(hint);
+        Language.hint(e, hint);
         e.setTextColor(Design.INK());
         e.setHintTextColor(Design.DIM());
         e.setTextSize(13.5f);
@@ -4639,7 +4661,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     private void copyText(String s) {
         ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         cm.setPrimaryClip(ClipData.newPlainText("atelier", s));
-        toast("Copied");
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_history_copied));
     }
 
     private void openMinimaCore() {
@@ -4653,7 +4675,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         }
     }
 
-    private void toast(String s) {
+    private void toast(CharSequence s) {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 

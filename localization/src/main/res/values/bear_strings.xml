@@ -7096,4 +7096,47 @@
     <string name="l10n_creative_hosting_kubo_help" formatted="false">"If your kubo RPC sits behind HTTP Basic auth (reverse proxy), put the user + password here — the app sends a proper Authorization header. Embedding user:pass@ in the API URL does NOT work on Android (the header is dropped → 401)."</string>
     <string name="l10n_creative_hosting_github_help" formatted="false">"Set-up (once):\n1. Make a PUBLIC repo on github.com (e.g. \'salon\'). Owner = your username, Repo = its name.\n2. Settings → Developer settings → Personal access tokens → Fine-grained → Generate. Give it Contents: Read and write on that repo. Paste it as Token (PAT).\n3. Serve via \'raw\' works instantly (raw.githubusercontent.com). For \'pages\': in the repo Settings → Pages, enable Pages from your branch, then set Pages prefix to https://&lt;owner&gt;.github.io/&lt;repo&gt;/.\nBranch \'main\' is fine. Then Save &amp; test."</string>
     <string name="l10n_creative_hosting_blossom_help" formatted="false">"Free public file hosting on the nostr network — no account, no password, no server of your own. Files are signed with a key derived from your Salon messaging identity and stored by content hash, so your page stays viewable in any web browser and every republish gets a fresh URL (Salon re-announces it automatically).\n\nThe default server (blossom.primal.net) accepts your page AND media for free. Media-only servers like blossom.band can\'t host the page itself. Free servers cap file size (typically tens of MB) — large video/audio belongs on SFTP/IPFS/GitHub."</string>
+    <string name="l10n_atelier_hosting_empty" formatted="false">"No destinations yet. Add one and Atelier can upload photos and fill every hosted URL for you.\n\nNo server? Create a free Pinata account, paste the JWT, and your art pins to IPFS with public links."</string>
+    <string name="l10n_atelier_hosting_server_hint" formatted="false">"e.g. my server"</string>
+    <string name="l10n_atelier_hosting_private_key" formatted="false">"Private key (paste PEM — begins -----BEGIN … PRIVATE KEY-----)"</string>
+    <string name="l10n_atelier_hosting_private_key_help" formatted="false">"Paste an OpenSSH/PEM private key (e.g. the contents of ~/.ssh/your_key). Passphrase-protected keys aren\'t supported yet — use an unencrypted key. This is how your shell already logs in."</string>
+    <string name="l10n_atelier_hosting_password_help" formatted="false">"Tap 👁 to reveal the password and check the on-screen keyboard didn\'t change it (a single wrong character reads to the server as a failed login)."</string>
+    <string name="l10n_atelier_hosting_remote_folder" formatted="false">"Remote folder (web ROOT)"</string>
+    <string name="l10n_atelier_hosting_remote_help" formatted="false">"Remote folder and URL prefix must point at the SAME place — the web root. Don\'t add a subfolder: Atelier creates its own atelier/… path under both. e.g. /var/www/html/ ↔ https://eurobuddha.com/ . First connect asks you to confirm the server\'s fingerprint."</string>
+    <string name="l10n_atelier_hosting_webdav" formatted="false">"WebDAV write endpoint"</string>
+    <string name="l10n_atelier_hosting_kubo_help" formatted="false">"Uploads use /api/v0/add and pin. Files get a content CID; a url-mode collection becomes one directory CID. If your kubo RPC is behind HTTP Basic auth (reverse proxy), set the user + password here — the app sends an Authorization header (user:pass@ in the URL is dropped by Android → 401)."</string>
+    <string name="l10n_atelier_hosting_jwt_hint" formatted="false">"eyJ… (free-tier key)"</string>
+    <string name="l10n_atelier_hosting_gateway_optional" formatted="false">"Gateway (optional)"</string>
+    <string name="l10n_atelier_hosting_pinata_help" formatted="false">"No server needed — a free Pinata account pins your art to IPFS with public links."</string>
+    <string name="l10n_atelier_hosting_owner" formatted="false">"Owner"</string>
+    <string name="l10n_atelier_hosting_repo" formatted="false">"Repo"</string>
+    <string name="l10n_atelier_hosting_pat" formatted="false">"Personal access token"</string>
+    <string name="l10n_atelier_hosting_pages_prefix" formatted="false">"Pages prefix (if pages)"</string>
+    <string name="l10n_atelier_hosting_generate_wallet" formatted="false">"Generate wallet"</string>
+    <string name="l10n_atelier_hosting_generating" formatted="false">"GENERATING…"</string>
+    <string name="l10n_atelier_hosting_wallet_created" formatted="false">"Wallet created"</string>
+    <string name="l10n_atelier_hosting_wallet_reopen" formatted="false">"Reopen the destination to see your wallet address"</string>
+    <string name="l10n_atelier_hosting_unreadable" formatted="false">"(wallet unreadable — paste a valid JWK below)"</string>
+    <string name="l10n_atelier_hosting_wallet_address" formatted="false">"Wallet address (tap to copy — fund it here)"</string>
+    <string name="l10n_atelier_hosting_jwk" formatted="false">"Arweave wallet (JWK JSON — paste to import)"</string>
+    <string name="l10n_atelier_hosting_turbo_endpoint" formatted="false">"Turbo upload endpoint"</string>
+    <string name="l10n_atelier_hosting_name_required" formatted="false">"Give the destination a name"</string>
+    <string name="l10n_atelier_hosting_stored" formatted="false">"•••••• (stored — type to replace)"</string>
+    <string name="l10n_atelier_hosting_stored_paste" formatted="false">"•••••• (stored — paste to replace)"</string>
+    <string name="l10n_atelier_hosting_verify_key" formatted="false">"Verify server host key"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_verify_body">"First connection to this server. Confirm its fingerprint matches your server:\n\n%1$s\n\nOnly accept if this is YOUR server."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_delete">"Delete %1$s?"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_test_title">"Test — %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_tested">"uploaded ✓ · fetched ✓\n%1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_turbo_tested">"uploaded ✓ — Turbo accepted it (free tier)\n%1$s\n\nFresh Arweave URLs take ~5–10 min to start serving."</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_atelier_hosting_generate_failed">"Wallet generation failed: %1$s"</string>
+    <string name="l10n_atelier_hosting_copy_backup" formatted="false">"Copy wallet backup"</string>
+    <string name="l10n_atelier_hosting_backup_help" formatted="false">"Use Copy wallet backup to copy the stored JWK, then save it somewhere safe. It exists only on this device and is excluded from Android backup. Uninstalling loses the wallet and any balance on it. Uploaded files stay live."</string>
+    <string name="l10n_atelier_hosting_arweave_help" formatted="false">"Permanent storage via ArDrive Turbo. Your wallet is your identity; no separate account is needed. Upload costs and free limits depend on the provider. Check or fund your wallet at https://turbo.ar.io. Uploaded files cannot be deleted or overwritten. New URLs may take several minutes to become available."</string>
 </resources>
