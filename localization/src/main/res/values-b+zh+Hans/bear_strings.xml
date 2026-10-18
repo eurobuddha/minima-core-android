@@ -7901,4 +7901,39 @@
     <!-- Arguments: size -->
     <string name="l10n_salon_upload_size">"所选文件超过 %1$s MB 限制。"</string>
     <string name="l10n_salon_upload_no_reference" formatted="false">"存储服务未返回文件引用。"</string>
+    <string name="l10n_salon_chat_cannot_receive" formatted="false">"此账户暂时无法接收消息。"</string>
+    <string name="l10n_salon_chat_claim_first" formatted="false">"请先创建你的 Salon 身份，再发送消息。"</string>
+    <string name="l10n_salon_chat_empty" formatted="false">"还没有对话。在“发现”中找到某人并点击“消息”即可开始加密聊天。消息会根据你的传输选择使用 Maxima 或 Minima。"</string>
+    <string name="l10n_salon_chat_thread_empty" formatted="false">"还没有消息。长按消息即可回复。消息会为收件人加密，附件媒体使用你选择的存储服务。"</string>
+    <string name="l10n_salon_chat_unknown_contact" formatted="false">"未知联系人"</string>
+    <string name="l10n_salon_chat_back" formatted="false">"← 消息"</string>
+    <string name="l10n_salon_chat_forced" formatted="false">" · 已指定"</string>
+    <string name="l10n_salon_chat_maxima" formatted="false">"⚡ Maxima · 链下"</string>
+    <string name="l10n_salon_chat_maxima_waiting" formatted="false">"⚡ Maxima · 等待连接"</string>
+    <string name="l10n_salon_chat_maxima_no_address" formatted="false">"⚡ Maxima · 需要地址"</string>
+    <string name="l10n_salon_chat_chain" formatted="false">"⛓ Minima · 链上"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_chat_earlier">"↑ 加载更早的消息（还有 %1$d 条）"</string>
+    <!-- Arguments: author -->
+    <string name="l10n_salon_chat_replying">"↩ 回复 %1$s"</string>
+    <string name="l10n_salon_chat_you" formatted="false">"你"</string>
+    <string name="l10n_salon_chat_sending" formatted="false">"正在发送…"</string>
+    <string name="l10n_salon_chat_type_message" formatted="false">"请输入消息。"</string>
+    <string name="l10n_salon_chat_no_contact" formatted="false">"尚无联系人。"</string>
+    <string name="l10n_salon_chat_no_maxima" formatted="false">"尚无此联系人的 Maxima 地址。请打开其个人资料或等待其发来消息。"</string>
+    <string name="l10n_salon_chat_no_delivery" formatted="false">"尚无此联系人的投递地址。"</string>
+    <string name="l10n_salon_chat_queued" formatted="false">"Maxima 正在连接，消息已排队。"</string>
+    <string name="l10n_salon_chat_seal_failed" formatted="false">"无法加密消息，消息仍在队列中。"</string>
+    <string name="l10n_salon_chat_sent_held" formatted="false">"已发送 ✓（等待对方上线）"</string>
+    <string name="l10n_salon_chat_sent" formatted="false">"已发送 ✓"</string>
+    <string name="l10n_salon_chat_retry" formatted="false">"已排队，将通过 Maxima 重试。"</string>
+    <string name="l10n_salon_chat_auto_choice" formatted="false">"自动：已知地址时使用 Maxima，否则使用链上方式"</string>
+    <string name="l10n_salon_chat_maxima_choice" formatted="false">"仅 Maxima — 链下"</string>
+    <string name="l10n_salon_chat_no_address_suffix" formatted="false">"（尚无地址）"</string>
+    <string name="l10n_salon_chat_chain_choice" formatted="false">"仅链上 — Minima 小额币"</string>
+    <string name="l10n_salon_chat_transport" formatted="false">"消息传输方式"</string>
+    <string name="l10n_salon_chat_selection_changed" formatted="false">"对话或身份已更改，请重新打开传输设置。"</string>
+    <string name="l10n_salon_chat_mining" formatted="false">"已发送 ⛏（正在挖矿）"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_chat_send_failed">"发送失败，已排队：%1$s"</string>
 </resources>

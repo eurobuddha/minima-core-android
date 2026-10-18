@@ -39904,5 +39904,197 @@
     "zh-Hans": "存储服务未返回文件引用。",
     "ru": "Хранилище не вернуло ссылку на файл.",
     "uk": "Сховище не повернуло посилання на файл."
+  },
+  "salonChat.cannotReceive": {
+    "en": "This account cannot receive messages yet.",
+    "zh-Hans": "此账户暂时无法接收消息。",
+    "ru": "Эта учётная запись пока не может получать сообщения.",
+    "uk": "Цей обліковий запис поки не може отримувати повідомлення."
+  },
+  "salonChat.claimFirst": {
+    "en": "Claim your Salon first to send messages.",
+    "zh-Hans": "请先创建你的 Salon 身份，再发送消息。",
+    "ru": "Сначала создайте свою личность Salon, чтобы отправлять сообщения.",
+    "uk": "Спочатку створіть свою особу Salon, щоб надсилати повідомлення."
+  },
+  "salonChat.empty": {
+    "en": "No conversations yet. Find someone in Discover and tap Message to start an encrypted chat. Messages use Maxima or Minima according to your transport choice.",
+    "zh-Hans": "还没有对话。在“发现”中找到某人并点击“消息”即可开始加密聊天。消息会根据你的传输选择使用 Maxima 或 Minima。",
+    "ru": "Разговоров пока нет. Найдите человека в разделе «Обзор» и нажмите «Сообщение», чтобы начать зашифрованный чат. Сообщения используют Maxima или Minima согласно выбранному способу доставки.",
+    "uk": "Розмов поки немає. Знайдіть людину в розділі «Огляд» і натисніть «Повідомлення», щоб почати зашифрований чат. Повідомлення використовують Maxima або Minima відповідно до обраного способу доставки."
+  },
+  "salonChat.threadEmpty": {
+    "en": "No messages yet. Long-press a message to reply. Messages are encrypted for the recipient; attached media uses your selected host.",
+    "zh-Hans": "还没有消息。长按消息即可回复。消息会为收件人加密，附件媒体使用你选择的存储服务。",
+    "ru": "Сообщений пока нет. Удерживайте сообщение, чтобы ответить. Сообщения зашифрованы для получателя; медиафайлы размещаются в выбранном хранилище.",
+    "uk": "Повідомлень поки немає. Утримуйте повідомлення, щоб відповісти. Повідомлення зашифровані для одержувача; медіафайли розміщуються у вибраному сховищі."
+  },
+  "salonChat.unknownContact": {
+    "en": "Unknown contact",
+    "zh-Hans": "未知联系人",
+    "ru": "Неизвестный контакт",
+    "uk": "Невідомий контакт"
+  },
+  "salonChat.back": {
+    "en": "← Messages",
+    "zh-Hans": "← 消息",
+    "ru": "← Сообщения",
+    "uk": "← Повідомлення"
+  },
+  "salonChat.forced": {
+    "en": " · selected",
+    "zh-Hans": " · 已指定",
+    "ru": " · выбран вручную",
+    "uk": " · вибрано вручну"
+  },
+  "salonChat.maxima": {
+    "en": "⚡ Maxima · off-chain",
+    "zh-Hans": "⚡ Maxima · 链下",
+    "ru": "⚡ Maxima · вне блокчейна",
+    "uk": "⚡ Maxima · поза блокчейном"
+  },
+  "salonChat.maximaWaiting": {
+    "en": "⚡ Maxima · waiting for connection",
+    "zh-Hans": "⚡ Maxima · 等待连接",
+    "ru": "⚡ Maxima · ожидание подключения",
+    "uk": "⚡ Maxima · очікування підключення"
+  },
+  "salonChat.maximaNoAddress": {
+    "en": "⚡ Maxima · address needed",
+    "zh-Hans": "⚡ Maxima · 需要地址",
+    "ru": "⚡ Maxima · нужен адрес",
+    "uk": "⚡ Maxima · потрібна адреса"
+  },
+  "salonChat.chain": {
+    "en": "⛓ Minima · on-chain",
+    "zh-Hans": "⛓ Minima · 链上",
+    "ru": "⛓ Minima · в блокчейне",
+    "uk": "⛓ Minima · у блокчейні"
+  },
+  "salonChat.earlier": {
+    "en": "↑ Load earlier ({count} more)",
+    "zh-Hans": "↑ 加载更早的消息（还有 {count} 条）",
+    "ru": "↑ Загрузить предыдущие (ещё {count})",
+    "uk": "↑ Завантажити попередні (ще {count})"
+  },
+  "salonChat.replying": {
+    "en": "↩ Replying to {author}",
+    "zh-Hans": "↩ 回复 {author}",
+    "ru": "↩ Ответ для {author}",
+    "uk": "↩ Відповідь для {author}"
+  },
+  "salonChat.you": {
+    "en": "You",
+    "zh-Hans": "你",
+    "ru": "Вы",
+    "uk": "Ви"
+  },
+  "salonChat.sending": {
+    "en": "sending…",
+    "zh-Hans": "正在发送…",
+    "ru": "отправка…",
+    "uk": "надсилання…"
+  },
+  "salonChat.typeMessage": {
+    "en": "Type a message.",
+    "zh-Hans": "请输入消息。",
+    "ru": "Введите сообщение.",
+    "uk": "Введіть повідомлення."
+  },
+  "salonChat.noContact": {
+    "en": "No contact yet.",
+    "zh-Hans": "尚无联系人。",
+    "ru": "Контакт ещё не добавлен.",
+    "uk": "Контакт ще не додано."
+  },
+  "salonChat.noMaxima": {
+    "en": "No Maxima address for this contact yet. Open their profile or wait for a message from them.",
+    "zh-Hans": "尚无此联系人的 Maxima 地址。请打开其个人资料或等待其发来消息。",
+    "ru": "Адрес Maxima этого контакта пока неизвестен. Откройте его профиль или дождитесь сообщения от него.",
+    "uk": "Адреса Maxima цього контакту поки невідома. Відкрийте його профіль або дочекайтеся повідомлення від нього."
+  },
+  "salonChat.noDelivery": {
+    "en": "No delivery address for this contact yet.",
+    "zh-Hans": "尚无此联系人的投递地址。",
+    "ru": "Адрес доставки этого контакта пока неизвестен.",
+    "uk": "Адреса доставки цього контакту поки невідома."
+  },
+  "salonChat.queued": {
+    "en": "Maxima connecting — message queued.",
+    "zh-Hans": "Maxima 正在连接，消息已排队。",
+    "ru": "Maxima подключается — сообщение в очереди.",
+    "uk": "Maxima підключається — повідомлення в черзі."
+  },
+  "salonChat.sealFailed": {
+    "en": "Could not encrypt the message. It remains queued.",
+    "zh-Hans": "无法加密消息，消息仍在队列中。",
+    "ru": "Не удалось зашифровать сообщение. Оно остаётся в очереди.",
+    "uk": "Не вдалося зашифрувати повідомлення. Воно залишається в черзі."
+  },
+  "salonChat.sentHeld": {
+    "en": "Sent ✓ (held until they are online)",
+    "zh-Hans": "已发送 ✓（等待对方上线）",
+    "ru": "Отправлено ✓ (ожидает появления получателя в сети)",
+    "uk": "Надіслано ✓ (очікує появи одержувача в мережі)"
+  },
+  "salonChat.sent": {
+    "en": "Sent ✓",
+    "zh-Hans": "已发送 ✓",
+    "ru": "Отправлено ✓",
+    "uk": "Надіслано ✓"
+  },
+  "salonChat.retry": {
+    "en": "Queued — will retry over Maxima.",
+    "zh-Hans": "已排队，将通过 Maxima 重试。",
+    "ru": "В очереди — повторная попытка через Maxima.",
+    "uk": "У черзі — повторна спроба через Maxima."
+  },
+  "salonChat.autoChoice": {
+    "en": "Automatic — Maxima if the address is known; otherwise on-chain",
+    "zh-Hans": "自动：已知地址时使用 Maxima，否则使用链上方式",
+    "ru": "Автоматически — Maxima, если адрес известен; иначе через блокчейн",
+    "uk": "Автоматично — Maxima, якщо адреса відома; інакше через блокчейн"
+  },
+  "salonChat.maximaChoice": {
+    "en": "Maxima only — off-chain",
+    "zh-Hans": "仅 Maxima — 链下",
+    "ru": "Только Maxima — вне блокчейна",
+    "uk": "Лише Maxima — поза блокчейном"
+  },
+  "salonChat.noAddressSuffix": {
+    "en": " (no address yet)",
+    "zh-Hans": "（尚无地址）",
+    "ru": " (адрес пока неизвестен)",
+    "uk": " (адреса поки невідома)"
+  },
+  "salonChat.chainChoice": {
+    "en": "On-chain only — Minima dust coin",
+    "zh-Hans": "仅链上 — Minima 小额币",
+    "ru": "Только блокчейн — мелкая монета Minima",
+    "uk": "Лише блокчейн — дрібна монета Minima"
+  },
+  "salonChat.transport": {
+    "en": "Message transport",
+    "zh-Hans": "消息传输方式",
+    "ru": "Доставка сообщений",
+    "uk": "Доставка повідомлень"
+  },
+  "salonChat.selectionChanged": {
+    "en": "This conversation or identity changed. Open transport settings again.",
+    "zh-Hans": "对话或身份已更改，请重新打开传输设置。",
+    "ru": "Разговор или личность изменились. Откройте настройки доставки заново.",
+    "uk": "Розмова або особа змінилися. Відкрийте налаштування доставки знову."
+  },
+  "salonChat.mining": {
+    "en": "Sent ⛏ (mining)",
+    "zh-Hans": "已发送 ⛏（正在挖矿）",
+    "ru": "Отправлено ⛏ (майнинг)",
+    "uk": "Надіслано ⛏ (майнінг)"
+  },
+  "salonChat.sendFailed": {
+    "en": "Send failed — queued: {error}",
+    "zh-Hans": "发送失败，已排队：{error}",
+    "ru": "Ошибка отправки — в очереди: {error}",
+    "uk": "Помилка надсилання — у черзі: {error}"
   }
 }

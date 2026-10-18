@@ -8009,4 +8009,39 @@
     <!-- Arguments: size -->
     <string name="l10n_salon_upload_size">"Выбранный файл превышает лимит %1$s МБ."</string>
     <string name="l10n_salon_upload_no_reference" formatted="false">"Хранилище не вернуло ссылку на файл."</string>
+    <string name="l10n_salon_chat_cannot_receive" formatted="false">"Эта учётная запись пока не может получать сообщения."</string>
+    <string name="l10n_salon_chat_claim_first" formatted="false">"Сначала создайте свою личность Salon, чтобы отправлять сообщения."</string>
+    <string name="l10n_salon_chat_empty" formatted="false">"Разговоров пока нет. Найдите человека в разделе «Обзор» и нажмите «Сообщение», чтобы начать зашифрованный чат. Сообщения используют Maxima или Minima согласно выбранному способу доставки."</string>
+    <string name="l10n_salon_chat_thread_empty" formatted="false">"Сообщений пока нет. Удерживайте сообщение, чтобы ответить. Сообщения зашифрованы для получателя; медиафайлы размещаются в выбранном хранилище."</string>
+    <string name="l10n_salon_chat_unknown_contact" formatted="false">"Неизвестный контакт"</string>
+    <string name="l10n_salon_chat_back" formatted="false">"← Сообщения"</string>
+    <string name="l10n_salon_chat_forced" formatted="false">" · выбран вручную"</string>
+    <string name="l10n_salon_chat_maxima" formatted="false">"⚡ Maxima · вне блокчейна"</string>
+    <string name="l10n_salon_chat_maxima_waiting" formatted="false">"⚡ Maxima · ожидание подключения"</string>
+    <string name="l10n_salon_chat_maxima_no_address" formatted="false">"⚡ Maxima · нужен адрес"</string>
+    <string name="l10n_salon_chat_chain" formatted="false">"⛓ Minima · в блокчейне"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_chat_earlier">"↑ Загрузить предыдущие (ещё %1$d)"</string>
+    <!-- Arguments: author -->
+    <string name="l10n_salon_chat_replying">"↩ Ответ для %1$s"</string>
+    <string name="l10n_salon_chat_you" formatted="false">"Вы"</string>
+    <string name="l10n_salon_chat_sending" formatted="false">"отправка…"</string>
+    <string name="l10n_salon_chat_type_message" formatted="false">"Введите сообщение."</string>
+    <string name="l10n_salon_chat_no_contact" formatted="false">"Контакт ещё не добавлен."</string>
+    <string name="l10n_salon_chat_no_maxima" formatted="false">"Адрес Maxima этого контакта пока неизвестен. Откройте его профиль или дождитесь сообщения от него."</string>
+    <string name="l10n_salon_chat_no_delivery" formatted="false">"Адрес доставки этого контакта пока неизвестен."</string>
+    <string name="l10n_salon_chat_queued" formatted="false">"Maxima подключается — сообщение в очереди."</string>
+    <string name="l10n_salon_chat_seal_failed" formatted="false">"Не удалось зашифровать сообщение. Оно остаётся в очереди."</string>
+    <string name="l10n_salon_chat_sent_held" formatted="false">"Отправлено ✓ (ожидает появления получателя в сети)"</string>
+    <string name="l10n_salon_chat_sent" formatted="false">"Отправлено ✓"</string>
+    <string name="l10n_salon_chat_retry" formatted="false">"В очереди — повторная попытка через Maxima."</string>
+    <string name="l10n_salon_chat_auto_choice" formatted="false">"Автоматически — Maxima, если адрес известен; иначе через блокчейн"</string>
+    <string name="l10n_salon_chat_maxima_choice" formatted="false">"Только Maxima — вне блокчейна"</string>
+    <string name="l10n_salon_chat_no_address_suffix" formatted="false">" (адрес пока неизвестен)"</string>
+    <string name="l10n_salon_chat_chain_choice" formatted="false">"Только блокчейн — мелкая монета Minima"</string>
+    <string name="l10n_salon_chat_transport" formatted="false">"Доставка сообщений"</string>
+    <string name="l10n_salon_chat_selection_changed" formatted="false">"Разговор или личность изменились. Откройте настройки доставки заново."</string>
+    <string name="l10n_salon_chat_mining" formatted="false">"Отправлено ⛏ (майнинг)"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_chat_send_failed">"Ошибка отправки — в очереди: %1$s"</string>
 </resources>

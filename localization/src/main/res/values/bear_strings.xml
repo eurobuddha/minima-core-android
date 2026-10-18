@@ -7937,4 +7937,39 @@
     <!-- Arguments: size -->
     <string name="l10n_salon_upload_size">"The selected file exceeds the %1$s MB limit."</string>
     <string name="l10n_salon_upload_no_reference" formatted="false">"The host did not return a file reference."</string>
+    <string name="l10n_salon_chat_cannot_receive" formatted="false">"This account cannot receive messages yet."</string>
+    <string name="l10n_salon_chat_claim_first" formatted="false">"Claim your Salon first to send messages."</string>
+    <string name="l10n_salon_chat_empty" formatted="false">"No conversations yet. Find someone in Discover and tap Message to start an encrypted chat. Messages use Maxima or Minima according to your transport choice."</string>
+    <string name="l10n_salon_chat_thread_empty" formatted="false">"No messages yet. Long-press a message to reply. Messages are encrypted for the recipient; attached media uses your selected host."</string>
+    <string name="l10n_salon_chat_unknown_contact" formatted="false">"Unknown contact"</string>
+    <string name="l10n_salon_chat_back" formatted="false">"← Messages"</string>
+    <string name="l10n_salon_chat_forced" formatted="false">" · selected"</string>
+    <string name="l10n_salon_chat_maxima" formatted="false">"⚡ Maxima · off-chain"</string>
+    <string name="l10n_salon_chat_maxima_waiting" formatted="false">"⚡ Maxima · waiting for connection"</string>
+    <string name="l10n_salon_chat_maxima_no_address" formatted="false">"⚡ Maxima · address needed"</string>
+    <string name="l10n_salon_chat_chain" formatted="false">"⛓ Minima · on-chain"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_chat_earlier">"↑ Load earlier (%1$d more)"</string>
+    <!-- Arguments: author -->
+    <string name="l10n_salon_chat_replying">"↩ Replying to %1$s"</string>
+    <string name="l10n_salon_chat_you" formatted="false">"You"</string>
+    <string name="l10n_salon_chat_sending" formatted="false">"sending…"</string>
+    <string name="l10n_salon_chat_type_message" formatted="false">"Type a message."</string>
+    <string name="l10n_salon_chat_no_contact" formatted="false">"No contact yet."</string>
+    <string name="l10n_salon_chat_no_maxima" formatted="false">"No Maxima address for this contact yet. Open their profile or wait for a message from them."</string>
+    <string name="l10n_salon_chat_no_delivery" formatted="false">"No delivery address for this contact yet."</string>
+    <string name="l10n_salon_chat_queued" formatted="false">"Maxima connecting — message queued."</string>
+    <string name="l10n_salon_chat_seal_failed" formatted="false">"Could not encrypt the message. It remains queued."</string>
+    <string name="l10n_salon_chat_sent_held" formatted="false">"Sent ✓ (held until they are online)"</string>
+    <string name="l10n_salon_chat_sent" formatted="false">"Sent ✓"</string>
+    <string name="l10n_salon_chat_retry" formatted="false">"Queued — will retry over Maxima."</string>
+    <string name="l10n_salon_chat_auto_choice" formatted="false">"Automatic — Maxima if the address is known; otherwise on-chain"</string>
+    <string name="l10n_salon_chat_maxima_choice" formatted="false">"Maxima only — off-chain"</string>
+    <string name="l10n_salon_chat_no_address_suffix" formatted="false">" (no address yet)"</string>
+    <string name="l10n_salon_chat_chain_choice" formatted="false">"On-chain only — Minima dust coin"</string>
+    <string name="l10n_salon_chat_transport" formatted="false">"Message transport"</string>
+    <string name="l10n_salon_chat_selection_changed" formatted="false">"This conversation or identity changed. Open transport settings again."</string>
+    <string name="l10n_salon_chat_mining" formatted="false">"Sent ⛏ (mining)"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_chat_send_failed">"Send failed — queued: %1$s"</string>
 </resources>

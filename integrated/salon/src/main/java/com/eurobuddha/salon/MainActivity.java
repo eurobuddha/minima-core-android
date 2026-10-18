@@ -465,8 +465,13 @@ public class MainActivity extends AppCompatActivity {
 
     /* ================= Messages (DMs over Minima Mail) ================= */
 
+    private CharSequence replyAuthor(String value) {
+        if (value == null || value.isEmpty()) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_reply);
+        return "You".equals(value) ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_you) : value;
+    }
+
     private void openThread(String peerpk, String handle, String avatar, String addr) {
-        if (peerpk == null || peerpk.isEmpty()) { toast("This account can't receive messages yet."); return; }
+        if (peerpk == null || peerpk.isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_cannot_receive)); return; }
         // Switching to a different peer: drop any in-progress reply and draft so
         // one conversation's private text can never carry into another's.
         if (!peerpk.equals(threadPeer)) { cancelMediaRequests(); replyBody = ""; replyFrom = ""; replyPeer = ""; threadDraft = ""; threadRenderedCount = -1; threadWindow = THREAD_WINDOW_STEP; }
@@ -480,12 +485,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void renderMessages() {
-        masthead("Messages");
-        if (!SalonStore.hasIdentity(this)) { body.addView(Design.note(this, "Claim your Salon first to send messages."), lp(0, 0, 0, 12)); return; }
+        masthead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_messages));
+        if (!SalonStore.hasIdentity(this)) { body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_claim_first)), lp(0, 0, 0, 12)); return; }
         List<MailDb.Contact> cs = MailDb.get(this).contacts();
         if (cs.isEmpty()) {
             LinearLayout c = card();
-            c.addView(Design.note(this, "No messages yet. Open someone in Discover and tap Message to start a private, end-to-end-encrypted chat — sent over the chain, no server, no one can read it but you two."));
+            c.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_empty)));
             body.addView(c, lp(0, 0, 0, 12));
             return;
         }
@@ -496,7 +501,7 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout r = row();
             r.addView(avatarView(ct.avatar, ct.handle == null ? "?" : ct.handle, 44));
             LinearLayout col = new LinearLayout(this); col.setOrientation(LinearLayout.VERTICAL); col.setPadding(dp(12), 0, dp(8), 0);
-            col.addView(Design.text(this, "@" + (ct.handle == null ? "someone" : ct.handle.replaceFirst("^@", "")), 15, Design.INK(), Design.sansBold()));
+            col.addView(Design.text(this, ct.handle == null || ct.handle.isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_unknown_contact) : "@" + ct.handle.replaceFirst("^@", ""), 15, Design.INK(), Design.sansBold()));
             TextView prev = Design.text(this, ct.lastbody == null ? "" : ct.lastbody, 12.5f, Design.DIM(), Design.sans()); prev.setMaxLines(1); prev.setEllipsize(android.text.TextUtils.TruncateAt.END);
             col.addView(prev);
             r.addView(col, new LinearLayout.LayoutParams(0, -2, 1));
@@ -510,19 +515,19 @@ public class MainActivity extends AppCompatActivity {
         if (threadPeer.isEmpty()) { go(Screen.MESSAGES); return; }
         MailDb db = MailDb.get(this);
         MailDb.Contact ct = db.contact(threadPeer);
-        String handle = ct != null && ct.handle != null ? ct.handle.replaceFirst("^@", "") : "chat";
-        masthead("@" + handle);
+        String handle = ct != null && ct.handle != null ? ct.handle.replaceFirst("^@", "") : "";
+        masthead(handle.isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_unknown_contact) : "@" + handle);
         db.clearUnread(threadPeer); refreshUnread();
         LinearLayout bar = row();
-        bar.addView(btn("← Messages", false, () -> go(Screen.MESSAGES)), weight(46, 0, 0));
+        bar.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_back), false, () -> go(Screen.MESSAGES)), weight(-2, 0, 0));
         body.addView(bar, lp(0, 0, 0, 8));
         // Which transport carries messages to THIS contact — tap to override.
         String xport = SalonStore.get(this, XPORT_PREF + threadPeer);
         boolean hasMxAddr = ct != null && ct.mxaddr != null && !ct.mxaddr.isEmpty();
-        boolean usingMaxima = !"chain".equals(xport) && hasMxAddr && MaximaLink.isReady(this);
-        String forced = "maxima".equals(xport) || "chain".equals(xport) ? " · forced" : "";
+        boolean usingMaxima = "maxima".equals(xport) || (!"chain".equals(xport) && hasMxAddr);
+        CharSequence forced = "maxima".equals(xport) || "chain".equals(xport) ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_forced) : "";
         TextView chip = Design.pill(this,
-                (usingMaxima ? "⚡ Maxima · off-chain" : "⛓ Minima · on-chain") + forced + "  ▾",
+                Language.join(usingMaxima ? (!hasMxAddr ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_maxima_no_address) : MaximaLink.isReady(this) ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_maxima) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_maxima_waiting)) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_chain), forced, "  ▾"),
                 usingMaxima ? Design.PILL_MINE : Design.PILL_DIM);
         chip.setOnClickListener(v -> transportDialog());
         LinearLayout tr = row();
@@ -534,9 +539,9 @@ public class MainActivity extends AppCompatActivity {
         // ack/inbound re-render. "Load earlier" grows the window on demand.
         int total = db.messageCount(threadPeer);
         List<MailDb.Message> msgs = db.messages(threadPeer, threadWindow);
-        if (msgs.isEmpty()) body.addView(Design.note(this, "No messages yet — say hi. Everything here is end-to-end encrypted and sent over the chain. Long-press a message to reply."), lp(0, 0, 0, 10));
+        if (msgs.isEmpty()) body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_thread_empty)), lp(0, 0, 0, 10));
         if (total > msgs.size()) {
-            body.addView(btn("↑ Load earlier (" + (total - msgs.size()) + " more)", false,
+            body.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_earlier, total - msgs.size()), false,
                     () -> { threadWindow += THREAD_WINDOW_STEP; render(); }), lp(0, 0, 0, 6));
         }
         for (MailDb.Message m : msgs) {
@@ -551,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
         if (!replyBody.isEmpty() && threadPeer.equals(replyPeer)) {
             LinearLayout rb = row(); rb.setBackground(Design.ruled(this, Design.CARD(), Design.ACCENT(), 1)); rb.setPadding(dp(10), dp(7), dp(8), dp(7));
             LinearLayout rcol = new LinearLayout(this); rcol.setOrientation(LinearLayout.VERTICAL);
-            rcol.addView(Design.text(this, "↩ Replying to " + replyFrom, 10f, Design.ACCENT(), Design.sansBold()));
+            rcol.addView(Design.text(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_replying, replyAuthor(replyFrom)), 10f, Design.ACCENT(), Design.sansBold()));
             TextView rsnip = Design.text(this, replyBody, 12f, Design.DIM(), Design.sans()); rsnip.setMaxLines(1); rsnip.setEllipsize(android.text.TextUtils.TruncateAt.END);
             rcol.addView(rsnip);
             rb.addView(rcol, new LinearLayout.LayoutParams(0, -2, 1));
@@ -560,11 +565,11 @@ public class MainActivity extends AppCompatActivity {
             rb.addView(x);
             comp.addView(rb, lp(0, 0, 0, 8));
         }
-        final EditText input = fieldMulti(comp, "Message", threadDraft);   // restore any preserved draft
+        final EditText input = fieldMulti(comp, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_chat_message), threadDraft);   // restore any preserved draft
         input.addTextChangedListener(watch(s -> threadDraft = s));          // keep the draft current across re-renders
         LinearLayout crow = row();
-        crow.addView(btn("📎", false, this::attachDmMedia), new LinearLayout.LayoutParams(dp(54), dp(46)));
-        crow.addView(btn("Send", true, () -> sendDm(text(input), "", "")), weight(46, 6, 0));
+        crow.addView(btn("📎", false, this::attachDmMedia), new LinearLayout.LayoutParams(dp(54), -2));
+        crow.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_send), true, () -> sendDm(text(input), "", "")), weight(-2, 6, 0));
         comp.addView(crow, lp(0, 6, 0, 0));
         body.addView(comp, lp(0, 8, 0, 0));
         // Auto-scroll to the newest only when the message set actually grew (fresh
@@ -595,7 +600,7 @@ public class MainActivity extends AppCompatActivity {
             int accent = m.mine ? Design.PAPER() : Design.ACCENT();
             q.setBackground(Design.ruled(this, m.mine ? Design.ACCENT() : Design.PAPER(), accent, 1));
             q.setPadding(dp(8), dp(5), dp(8), dp(6));
-            q.addView(Design.text(this, "↩ " + (m.replyFrom == null || m.replyFrom.isEmpty() ? "reply" : m.replyFrom), 9.5f, accent, Design.sansBold()));
+            q.addView(Design.text(this, Language.join("↩ ", replyAuthor(m.replyFrom)), 9.5f, accent, Design.sansBold()));
             TextView qs = Design.text(this, m.replyBody, 12f, m.mine ? Design.PAPER() : Design.DIM(), Design.sans()); qs.setMaxLines(2); qs.setEllipsize(android.text.TextUtils.TruncateAt.END);
             q.addView(qs);
             b.addView(q, lp(0, 0, 0, 6));
@@ -610,8 +615,8 @@ public class MainActivity extends AppCompatActivity {
         // Show delivery state on my own bubbles: an unconfirmed send reads
         // "sending…" (it's PENDING in the outbox) so nothing looks delivered
         // when it isn't; a confirmed one shows the timestamp.
-        String meta = m.mine && m.status == MailDb.PENDING ? "sending…" : Util.ago(m.ts);
-        if (!meta.isEmpty()) b.addView(Design.text(this, meta, 9.5f, m.mine ? Design.PAPER() : Design.DIM(), Design.mono()), lp(0, 3, 0, 0));
+        CharSequence meta = m.mine && m.status == MailDb.PENDING ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_sending) : socialTime(m.ts);
+        if (meta.length() != 0) b.addView(Design.text(this, meta, 9.5f, m.mine ? Design.PAPER() : Design.DIM(), Design.mono()), lp(0, 3, 0, 0));
         LinearLayout.LayoutParams blp = new LinearLayout.LayoutParams(-1, -2);
         blp.setMargins(m.mine ? dp(52) : 0, 0, m.mine ? 0 : dp(52), dp(6));
         b.setLayoutParams(blp);
@@ -621,10 +626,10 @@ public class MainActivity extends AppCompatActivity {
     private void sendDm(String text, String mediaRef, String mediaMime) {
         if (threadPeer.isEmpty()) return;
         final String body = text == null ? "" : text.trim();
-        if (body.isEmpty() && (mediaRef == null || mediaRef.isEmpty())) { toast("Type a message."); return; }
+        if (body.isEmpty() && (mediaRef == null || mediaRef.isEmpty())) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_type_message)); return; }
         MailDb db = MailDb.get(this);
         final MailDb.Contact ct = db.contact(threadPeer);
-        if (ct == null) { toast("No contact yet."); return; }
+        if (ct == null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_no_contact)); return; }
 
         // Transport choice. Chain needs an on-chain address; Maxima needs an
         // mxaddr. A Maxima-only contact (no coin addr) is fully messageable —
@@ -638,11 +643,11 @@ public class MainActivity extends AppCompatActivity {
         boolean forceChain = "chain".equals(xport);
         boolean forceMaxima = "maxima".equals(xport);
         if (forceMaxima && !hasMx) {
-            toast("No Maxima address for this contact yet — they teach it to you when they message you, or open their profile.");
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_no_maxima));
             return;
         }
         boolean viaChain = forceChain || (!forceMaxima && !hasMx);
-        if (viaChain && !hasAddr) { toast("No delivery address for this contact yet."); return; }
+        if (viaChain && !hasAddr) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_no_delivery)); return; }
 
         long ts = System.currentTimeMillis() / 1000;
         String myHandle = "@" + SalonStore.get(this, "handle");
@@ -677,7 +682,7 @@ public class MainActivity extends AppCompatActivity {
         if (!MaximaLink.isReady(this)) {
             // Left PENDING; the outbox flushes it when Maxima connects (onResume /
             // heartbeat). Not silently dropped, not put on the public ledger.
-            toast("Maxima connecting — message queued.");
+            toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_queued));
             return;
         }
         sendOverMaxima(ct.peerpk, ct.mxaddr, msg, msgId);
@@ -696,7 +701,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) { sealedHex = null; }
         if (sealedHex == null) {   // stays PENDING; retried
             mInFlight.remove(msgId);
-            runOnUiThread(() -> toast("Couldn't seal the message."));
+            runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_seal_failed)));
             return;
         }
         MaximaLink.sendDm(this, mxaddr, sealedHex, new MaximaLink.SendCb() {
@@ -705,13 +710,13 @@ public class MainActivity extends AppCompatActivity {
                 mInFlight.remove(msgId);
                 runOnUiThread(() -> {
                     if (screen == Screen.THREAD) render();
-                    toast(pending ? "Sent ✓ (held until they're online)" : "Sent ✓");
+                    toast(pending ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_sent_held) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_sent));
                 });
             }
             @Override public void onFailed(String error) {
                 // Stays PENDING in the outbox; retried when Maxima reconnects.
                 mInFlight.remove(msgId);
-                runOnUiThread(() -> toast("Queued — will retry over Maxima."));
+                runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_retry)));
             }
         });
     }
@@ -746,10 +751,11 @@ public class MainActivity extends AppCompatActivity {
             String xport = SalonStore.get(this, XPORT_PREF + m.peerpk);
             boolean hasMx = ct.mxaddr != null && !ct.mxaddr.isEmpty();
             boolean forceChain = "chain".equals(xport);
+            boolean forceMaxima = "maxima".equals(xport);
             if (!forceChain && hasMx && MaximaLink.isReady(this)) {
                 // Idempotent: the peer dedups by the stable id, so retry any time.
                 sendOverMaxima(ct.peerpk, ct.mxaddr, msg, m.coinid);
-            } else if ((forceChain || !hasMx) && nodeUp && ct.addr != null && !ct.addr.isEmpty()) {
+            } else if (!forceMaxima && (forceChain || !hasMx) && nodeUp && ct.addr != null && !ct.addr.isEmpty()) {
                 // Re-post on-chain only after waiting out the node write timeout (180s)
                 // since the LAST attempt — a send that timed out may still be mining a
                 // live coin, and re-posting inside that window double-spends the dust.
@@ -763,26 +769,32 @@ public class MainActivity extends AppCompatActivity {
 
     /** Let the user force the transport for THIS contact, or leave it automatic. */
     private void transportDialog() {
-        final MailDb.Contact ct = MailDb.get(this).contact(threadPeer);
+        final String peer = threadPeer, owner = mediaIdentity();
+        if (peer.isEmpty()) return;
+        final MailDb.Contact ct = MailDb.get(this).contact(peer);
         boolean hasMx = ct != null && ct.mxaddr != null && !ct.mxaddr.isEmpty();
-        final String[] labels = {
-                "Automatic — Maxima when possible, else on-chain",
-                "Prefer Maxima — off-chain, instant" + (hasMx ? "" : "  (no address yet)"),
-                "On-chain only — Minima dust coin"
+        final CharSequence[] labels = {
+                Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_auto_choice),
+                Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_maxima_choice), hasMx ? "" : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_no_address_suffix)),
+                Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_chain_choice)
         };
         final String[] vals = {"auto", "maxima", "chain"};
         String cur = SalonStore.get(this, XPORT_PREF + threadPeer);
         int sel = "maxima".equals(cur) ? 1 : "chain".equals(cur) ? 2 : 0;
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("Message transport")
+        new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_transport))
                 .setSingleChoiceItems(labels, sel, (d, which) -> {
-                    SalonStore.put(this, XPORT_PREF + threadPeer, vals[which]);
+                    if (isFinishing() || isDestroyed() || screen != Screen.THREAD
+                            || !peer.equals(threadPeer) || !owner.equals(mediaIdentity())) {
+                        d.dismiss(); if (!isFinishing() && !isDestroyed()) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_selection_changed)); return;
+                    }
+                    SalonStore.put(this, XPORT_PREF + peer, vals[which]);
                     d.dismiss();
                     if ("maxima".equals(vals[which]) && !hasMx)
-                        toast("No Maxima address for this contact yet — it's learned when they message you, or open their profile.");
+                        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_no_maxima));
                     render();
                 })
-                .setNegativeButton("Close", null)
+                .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_language_close), null)
                 .show();
     }
 
@@ -799,12 +811,12 @@ public class MainActivity extends AppCompatActivity {
             @Override public void onSent(String txpowid) {
                 MailDb.get(MainActivity.this).setStatus(msgId, MailDb.SENT);
                 mInFlight.remove(msgId);
-                runOnUiThread(() -> { if (screen == Screen.THREAD) render(); toast("Sent ⛏ (mining)"); });
+                runOnUiThread(() -> { if (screen == Screen.THREAD) render(); toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_mining)); });
             }
             @Override public void onFailed(String m) {
                 // Stays PENDING in the outbox; retried when the node is ready.
                 mInFlight.remove(msgId);
-                runOnUiThread(() -> toast("Send failed — queued: " + m));
+                runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_chat_send_failed, HoldingMessages.message(m))));
             }
         });
     }

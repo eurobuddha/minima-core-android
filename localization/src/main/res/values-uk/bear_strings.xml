@@ -8009,4 +8009,39 @@
     <!-- Arguments: size -->
     <string name="l10n_salon_upload_size">"Вибраний файл перевищує обмеження %1$s МБ."</string>
     <string name="l10n_salon_upload_no_reference" formatted="false">"Сховище не повернуло посилання на файл."</string>
+    <string name="l10n_salon_chat_cannot_receive" formatted="false">"Цей обліковий запис поки не може отримувати повідомлення."</string>
+    <string name="l10n_salon_chat_claim_first" formatted="false">"Спочатку створіть свою особу Salon, щоб надсилати повідомлення."</string>
+    <string name="l10n_salon_chat_empty" formatted="false">"Розмов поки немає. Знайдіть людину в розділі «Огляд» і натисніть «Повідомлення», щоб почати зашифрований чат. Повідомлення використовують Maxima або Minima відповідно до обраного способу доставки."</string>
+    <string name="l10n_salon_chat_thread_empty" formatted="false">"Повідомлень поки немає. Утримуйте повідомлення, щоб відповісти. Повідомлення зашифровані для одержувача; медіафайли розміщуються у вибраному сховищі."</string>
+    <string name="l10n_salon_chat_unknown_contact" formatted="false">"Невідомий контакт"</string>
+    <string name="l10n_salon_chat_back" formatted="false">"← Повідомлення"</string>
+    <string name="l10n_salon_chat_forced" formatted="false">" · вибрано вручну"</string>
+    <string name="l10n_salon_chat_maxima" formatted="false">"⚡ Maxima · поза блокчейном"</string>
+    <string name="l10n_salon_chat_maxima_waiting" formatted="false">"⚡ Maxima · очікування підключення"</string>
+    <string name="l10n_salon_chat_maxima_no_address" formatted="false">"⚡ Maxima · потрібна адреса"</string>
+    <string name="l10n_salon_chat_chain" formatted="false">"⛓ Minima · у блокчейні"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_chat_earlier">"↑ Завантажити попередні (ще %1$d)"</string>
+    <!-- Arguments: author -->
+    <string name="l10n_salon_chat_replying">"↩ Відповідь для %1$s"</string>
+    <string name="l10n_salon_chat_you" formatted="false">"Ви"</string>
+    <string name="l10n_salon_chat_sending" formatted="false">"надсилання…"</string>
+    <string name="l10n_salon_chat_type_message" formatted="false">"Введіть повідомлення."</string>
+    <string name="l10n_salon_chat_no_contact" formatted="false">"Контакт ще не додано."</string>
+    <string name="l10n_salon_chat_no_maxima" formatted="false">"Адреса Maxima цього контакту поки невідома. Відкрийте його профіль або дочекайтеся повідомлення від нього."</string>
+    <string name="l10n_salon_chat_no_delivery" formatted="false">"Адреса доставки цього контакту поки невідома."</string>
+    <string name="l10n_salon_chat_queued" formatted="false">"Maxima підключається — повідомлення в черзі."</string>
+    <string name="l10n_salon_chat_seal_failed" formatted="false">"Не вдалося зашифрувати повідомлення. Воно залишається в черзі."</string>
+    <string name="l10n_salon_chat_sent_held" formatted="false">"Надіслано ✓ (очікує появи одержувача в мережі)"</string>
+    <string name="l10n_salon_chat_sent" formatted="false">"Надіслано ✓"</string>
+    <string name="l10n_salon_chat_retry" formatted="false">"У черзі — повторна спроба через Maxima."</string>
+    <string name="l10n_salon_chat_auto_choice" formatted="false">"Автоматично — Maxima, якщо адреса відома; інакше через блокчейн"</string>
+    <string name="l10n_salon_chat_maxima_choice" formatted="false">"Лише Maxima — поза блокчейном"</string>
+    <string name="l10n_salon_chat_no_address_suffix" formatted="false">" (адреса поки невідома)"</string>
+    <string name="l10n_salon_chat_chain_choice" formatted="false">"Лише блокчейн — дрібна монета Minima"</string>
+    <string name="l10n_salon_chat_transport" formatted="false">"Доставка повідомлень"</string>
+    <string name="l10n_salon_chat_selection_changed" formatted="false">"Розмова або особа змінилися. Відкрийте налаштування доставки знову."</string>
+    <string name="l10n_salon_chat_mining" formatted="false">"Надіслано ⛏ (майнінг)"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_salon_chat_send_failed">"Помилка надсилання — у черзі: %1$s"</string>
 </resources>
