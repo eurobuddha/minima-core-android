@@ -3011,3 +3011,16 @@ Validation: 729 passing existing tests (146 PandaBear, 146 BlackBear, 149 Pandam
 ### Code Review
 
 Reviewed all changed source, adapter and four-language entries. The changes affect displayed labels and the required version only; no commands, amounts, wallet operations, services or node behavior changed. Verdict: approve this checkpoint. Evidence: `build/localization/startup-labels-validation.json`, `startup-labels-tests.log` and `startup-labels-import.log`. The native node and protected wallet/audit hashes remain unchanged. This audit increment does not claim full visual/accessibility acceptance. Current broad text-path coverage/disposition and Fold acceptance remain open; signed current-source candidates are built separately.
+
+
+## Signed 1.9.48 build checkpoint — 2026-10-18
+
+Source commit: `a98d9c2ee3b24885f6c538f5abd1c86f4a454870`, verified on fork branch `feature/bear-languages-2026-10-16`. All three signed release builds completed. The 25 host test tasks report 2,677 passing cases, zero failures/errors/skips; four tasks have no test source. Gradle reused five up-to-date test tasks and ran the remaining test tasks with source. All 630 checkpoint source hashes and the baseline node JAR match.
+
+APKs in `/Users/eurobuddha/Projects/minima/apks/base/dist` retain the baseline signing certificate and package IDs, version 1.9.48/vc119, non-debuggable release metadata and arm64 libraries. APK ZIP alignment was verified at 16 KiB. Each APK contains all 5,334 catalogue resources in English, Simplified Chinese, Russian and Ukrainian, with the four declared locales. SHA256 sidecars accompany each artifact.
+
+- `minima-core-PandaBear-1.9.48-candidate.apk`: `28eb5eccda1c0f7974b01f3e46ba1d33bd79be240d41f7b61cb08158e231dd27`
+- `minima-core-BlackBear-1.9.48-candidate.apk`: `edcf705218968aa15ba51426d6eb1538e1a021f6e417a43235ef50fb17a3aabd`
+- `minima-core-Pandamonium-1.9.48-candidate.apk`: `c8789f052e51d397fb1b32cde0d6148dc1e0e843ed4547b7d4bf14d5a6e7b13d`
+
+Evidence: `build/localization/bear-1.9.48-validation.json`, `signed-candidates-1.9.48-validation.json` and dist manifest `bear-languages-1.9.48-candidate.json`. Earlier candidates remain preserved. These are signed candidates; current text coverage/disposition and data-preserving Fold visual/runtime/minimaWallet acceptance remain open. No device installation or public release is claimed.
