@@ -1097,7 +1097,7 @@ public class MainActivity extends AppCompatActivity {
         return f;
     }
 
-    private void masthead(String title) {
+    private void masthead(CharSequence title) {
         appbar.removeAllViews();
         LinearLayout pad = new LinearLayout(this); pad.setOrientation(LinearLayout.HORIZONTAL); pad.setGravity(Gravity.CENTER_VERTICAL);
         pad.setPadding(dp(16), dp(10), dp(16), dp(8));
@@ -2881,38 +2881,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void renderHosting() {
-        masthead("Hosting");
+        masthead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting));
         List<Hosting.Profile> profiles = HostingStore.list(this);
-        if (profiles.isEmpty()) { LinearLayout e = card(); e.addView(Design.note(this, "No destinations yet. Add one — SFTP uploads straight to your own server.")); body.addView(e, lp(0, 0, 0, 12)); }
+        if (profiles.isEmpty()) { LinearLayout e = card(); e.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_empty))); body.addView(e, lp(0, 0, 0, 12)); }
         for (Hosting.Profile p : profiles) {
             LinearLayout c = card(); LinearLayout head = row();
-            head.addView(Design.text(this, p.name().isEmpty() ? "(unnamed)" : p.name(), 15, Design.INK(), Design.sansBold()), new LinearLayout.LayoutParams(0, -2, 1));
-            head.addView(Design.pill(this, p.type(), Design.PILL_DIM)); if (p.isDefault()) head.addView(Design.pill(this, "default", Design.PILL_DONE));
+            head.addView(Design.text(this, p.name().isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_unnamed) : p.name(), 15, Design.INK(), Design.sansBold()), new LinearLayout.LayoutParams(0, -2, 1));
+            head.addView(Design.pill(this, p.type(), Design.PILL_DIM)); if (p.isDefault()) head.addView(Design.pill(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_default), Design.PILL_DONE));
             c.addView(head, lp(0, 0, 0, 8));
             LinearLayout r = row();
-            r.addView(btn("Test", false, () -> testProfile(p)), weight(31, 0, 4));
-            r.addView(btn("Edit", false, () -> { hostEdit = p; go(Screen.HOSTING_EDIT); }), weight(31, 4, 4));
-            r.addView(btn("Delete", false, () -> { HostingStore.remove(this, p.id()); render(); }), weight(31, 4, 0));
+            r.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_test), false, () -> testProfile(p)), weight(48, 0, 4));
+            r.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_edit), false, () -> { hostEdit = p; go(Screen.HOSTING_EDIT); }), weight(48, 4, 4));
+            r.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_filez_delete), false, () -> { HostingStore.remove(this, p.id()); render(); }), weight(48, 4, 0));
             c.addView(r, lp(0, 0, 0, 6));
-            if (!p.isDefault()) c.addView(btn("Make default", false, () -> { HostingStore.setDefault(this, p.id()); render(); }), lph(42, 0, 0, 0, 0));
+            if (!p.isDefault()) c.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_make_default), false, () -> { HostingStore.setDefault(this, p.id()); render(); }), lph(42, 0, 0, 0, 0));
             body.addView(c, lp(0, 0, 0, 12));
         }
-        body.addView(btn("Add destination", true, () -> { hostEdit = null; go(Screen.HOSTING_EDIT); }), lph(52, 0, 4, 0, 8));
+        body.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_add), true, () -> { hostEdit = null; go(Screen.HOSTING_EDIT); }), lph(52, 0, 4, 0, 8));
     }
 
     // RETIRED (MaxLite sunset) — encrypted relay dropped from the picker. To restore, re-add
     // Hosting.TYPE_RELAY to HTYPES and "Encrypted relay" to HLABELS at the same index.
     private static final String[] HTYPES = { Hosting.TYPE_BLOSSOM, Hosting.TYPE_SFTP, Hosting.TYPE_WEBDAV, Hosting.TYPE_KUBO, Hosting.TYPE_PINATA, Hosting.TYPE_GITHUB, Hosting.TYPE_MAXIMA };
-    private static final String[] HLABELS = { "Blossom", "SFTP", "WebDAV", "IPFS node", "Pinata", "GitHub", "Maxima mesh" };
+    private static final CharSequence[] HLABELS = { "Blossom", "SFTP", "WebDAV", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_ipfs_node), "Pinata", "GitHub", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_maxima_mesh) };
 
     private void renderHostingEdit() {
-        masthead(hostEdit == null ? "Add destination" : "Edit destination");
+        masthead(hostEdit == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_add) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_edit_destination));
         if (hostEdit == null) hostEdit = Hosting.Profile.fresh(Hosting.TYPE_BLOSSOM);
         final Hosting.Profile p = hostEdit;
         LinearLayout card = card();
-        EditText nameF = field(card, "Name", p.name(), false, "my server");
+        EditText nameF = field(card, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_name), p.name(), false, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_server_hint));
         nameF.addTextChangedListener(watch(s -> Hosting.put(p.j, "name", s)));
-        card.addView(Design.kicker(this, "Type"), lp(0, 8, 0, 4));
+        card.addView(Design.kicker(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_type)), lp(0, 8, 0, 4));
         LinearLayout chips = row();
         for (int i = 0; i < HTYPES.length; i++) { final String t = HTYPES[i]; TextView chip = Design.chip(this, HLABELS[i], t.equals(p.type())); chip.setPadding(dp(11), dp(6), dp(11), dp(6));
             chip.setOnClickListener(v -> { if (!t.equals(p.type())) { Hosting.put(p.j, "type", t); if (p.j.optJSONObject(t) == null) Hosting.put(p.j, t, new JSONObject()); render(); } });
@@ -2922,34 +2922,30 @@ public class MainActivity extends AppCompatActivity {
         JSONObject cfg = p.cfg();
         switch (p.type()) {
             case Hosting.TYPE_SFTP:
-                cfgField(card, cfg, "host", "Host", "31.125.188.214", false); cfgField(card, cfg, "port", "Port", "22", false); cfgField(card, cfg, "user", "User", "root", false);
+                cfgField(card, cfg, "host", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_host), "31.125.188.214", false); cfgField(card, cfg, "port", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_terminal_txn_port), "22", false); cfgField(card, cfg, "user", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_user), "root", false);
                 boolean keyAuth = "key".equals(cfg.optString("auth", "password"));
-                card.addView(Design.kicker(this, "Authentication"), lp(0, 8, 0, 4));
-                LinearLayout ar = row(); TextView pw = Design.chip(this, "Password", !keyAuth), ky = Design.chip(this, "Private key", keyAuth);
+                card.addView(Design.kicker(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_authentication)), lp(0, 8, 0, 4));
+                LinearLayout ar = row(); TextView pw = Design.chip(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_backup_password), !keyAuth), ky = Design.chip(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_eth_wallet_private_key), keyAuth);
                 pw.setPadding(dp(11), dp(6), dp(11), dp(6)); ky.setPadding(dp(11), dp(6), dp(11), dp(6));
                 pw.setOnClickListener(v -> { Hosting.put(cfg, "auth", "password"); render(); }); ky.setOnClickListener(v -> { Hosting.put(cfg, "auth", "key"); render(); });
                 LinearLayout.LayoutParams m8 = new LinearLayout.LayoutParams(-2, -2); m8.rightMargin = dp(8); ar.addView(pw, m8); ar.addView(ky); card.addView(ar, lp(0, 0, 0, 6));
-                if (keyAuth) cfgSecretMulti(card, cfg, "privateKey", "Private key (paste PEM)"); else cfgSecret(card, cfg, "password", "Password");
-                cfgField(card, cfg, "remoteRoot", "Remote root (server dir)", "/var/www/html/salon", false);
-                cfgField(card, cfg, "urlPrefix", "Public URL prefix", "http://31.125.188.214/salon/", false); break;
+                if (keyAuth) cfgSecretMulti(card, cfg, "privateKey", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_private_key_pem)); else cfgSecret(card, cfg, "password", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_backup_password));
+                cfgField(card, cfg, "remoteRoot", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_remote_root), "/var/www/html/salon", false);
+                cfgField(card, cfg, "urlPrefix", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_url_prefix), "http://31.125.188.214/salon/", false); break;
             case Hosting.TYPE_WEBDAV:
-                cfgField(card, cfg, "endpoint", "Write endpoint", "https://dav.example.com/files/", false); cfgField(card, cfg, "user", "User", "", false); cfgSecret(card, cfg, "password", "Password"); cfgField(card, cfg, "urlPrefix", "Public URL prefix", "https://example.com/files/", false); break;
+                cfgField(card, cfg, "endpoint", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_write_endpoint), "https://dav.example.com/files/", false); cfgField(card, cfg, "user", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_user), "", false); cfgSecret(card, cfg, "password", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_backup_password)); cfgField(card, cfg, "urlPrefix", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_url_prefix), "https://example.com/files/", false); break;
             case Hosting.TYPE_KUBO:
                 cfgField(card, cfg, "apiUrl", "kubo RPC API", "https://api-ipfs.eurobuddha.com", false);
-                cfgField(card, cfg, "user", "API user (HTTP Basic — optional)", "ipfs", false);
-                cfgSecret(card, cfg, "password", "API password (HTTP Basic — optional)");
-                cfgField(card, cfg, "gateway", "Public gateway", "https://ipfs.eurobuddha.com", false);
-                card.addView(Design.note(this, "If your kubo RPC sits behind HTTP Basic auth (reverse proxy), put the user + password here — the app sends a proper Authorization header. Embedding user:pass@ in the API URL does NOT work on Android (the header is dropped → 401)."), lp(0, 6, 0, 2));
+                cfgField(card, cfg, "user", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_api_user), "ipfs", false);
+                cfgSecret(card, cfg, "password", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_api_password));
+                cfgField(card, cfg, "gateway", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_public_gateway), "https://ipfs.eurobuddha.com", false);
+                card.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_kubo_help)), lp(0, 6, 0, 2));
                 break;
             case Hosting.TYPE_PINATA:
-                cfgSecret(card, cfg, "jwt", "Pinata JWT"); cfgField(card, cfg, "gateway", "Gateway", "https://gateway.pinata.cloud", false); break;
+                cfgSecret(card, cfg, "jwt", "Pinata JWT"); cfgField(card, cfg, "gateway", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_gateway), "https://gateway.pinata.cloud", false); break;
             case Hosting.TYPE_GITHUB:
-                card.addView(Design.note(this, "Set-up (once):\n"
-                        + "1. Make a PUBLIC repo on github.com (e.g. 'salon'). Owner = your username, Repo = its name.\n"
-                        + "2. Settings → Developer settings → Personal access tokens → Fine-grained → Generate. Give it Contents: Read and write on that repo. Paste it as Token (PAT).\n"
-                        + "3. Serve via 'raw' works instantly (raw.githubusercontent.com). For 'pages': in the repo Settings → Pages, enable Pages from your branch, then set Pages prefix to https://<owner>.github.io/<repo>/.\n"
-                        + "Branch 'main' is fine. Then Save & test."), lp(0, 6, 0, 4));
-                cfgField(card, cfg, "owner", "Owner (GitHub username)", "", false); cfgField(card, cfg, "repo", "Repo name", "salon", false); cfgField(card, cfg, "branch", "Branch", "main", false); cfgSecret(card, cfg, "token", "Token (PAT — Contents: read & write)"); cfgField(card, cfg, "serve", "Serve via (raw / pages)", "raw", false); cfgField(card, cfg, "pagesPrefix", "Pages prefix (only if serve=pages)", "https://you.github.io/salon/", false); break;
+                card.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_github_help)), lp(0, 6, 0, 4));
+                cfgField(card, cfg, "owner", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_owner), "", false); cfgField(card, cfg, "repo", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_repo), "salon", false); cfgField(card, cfg, "branch", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_branch), "main", false); cfgSecret(card, cfg, "token", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_token)); cfgField(card, cfg, "serve", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_serve), "raw", false); cfgField(card, cfg, "pagesPrefix", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_pages_prefix), "https://you.github.io/salon/", false); break;
             // RETIRED (MaxLite sunset) — encrypted-relay config UI removed from the picker. To
             // restore, re-add TYPE_RELAY to HTYPES/HLABELS and uncomment this case:
             // case Hosting.TYPE_RELAY:
@@ -2957,14 +2953,14 @@ public class MainActivity extends AppCompatActivity {
             //     card.addView(Design.note(this, "Publish with NO server of your own: your phone encrypts your page + media (libsodium) and uploads only the CIPHERTEXT to this relay's blob store — the relay can never read it. The decryption key travels in your public pointer, so any Salon viewer can see your page.\n\nTrade-offs: viewable in the Salon app only (a web browser can't decrypt it — SFTP/IPFS keep the browser view); and content expires ~7 days after it's last opened/viewed, so open the app now and then to keep it alive."), lp(0, 6, 0, 2));
             //     break;
             case Hosting.TYPE_BLOSSOM:
-                card.addView(Design.note(this, "Free public file hosting on the nostr network — no account, no password, no server of your own. Files are signed with a key derived from your Salon messaging identity and stored by content hash, so your page stays viewable in any web browser and every republish gets a fresh URL (Salon re-announces it automatically).\n\nThe default server (blossom.primal.net) accepts your page AND media for free. Media-only servers like blossom.band can't host the page itself. Free servers cap file size (typically tens of MB) — large video/audio belongs on SFTP/IPFS/GitHub."), lp(0, 6, 0, 2));
+                card.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_blossom_help)), lp(0, 6, 0, 2));
                 // Pre-fill the actual value, not just the hint — the field must show
                 // where the page will land without the user typing anything.
                 if (cfg.optString("endpoint", "").isEmpty()) Hosting.put(cfg, "endpoint", BlossomUploader.DEFAULT_SERVER);
-                cfgField(card, cfg, "endpoint", "Blossom server", BlossomUploader.DEFAULT_SERVER, false);
-                card.addView(Design.kicker(this, "Your nostr identity"), lp(0, 8, 0, 4));
+                cfgField(card, cfg, "endpoint", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_blossom_server), BlossomUploader.DEFAULT_SERVER, false);
+                card.addView(Design.kicker(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_nostr_identity)), lp(0, 8, 0, 4));
                 try {
-                    copyRow(card, "public key (hex)", NostrKeys.pubkeyHex());
+                    copyRow(card, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_public_key_hex), NostrKeys.pubkeyHex());
                     copyRow(card, "npub", NostrKeys.npub());
                 } catch (SalonComms.IdentityUnavailable unavailable) {
                     TextView error = Design.note(this, "");
@@ -2984,8 +2980,8 @@ public class MainActivity extends AppCompatActivity {
         }
         final TextView status = Design.note(this, ""); card.addView(status, lp(0, 8, 0, 0));
         LinearLayout btns = row();
-        btns.addView(btn("Save", true, () -> { if (saveHost(p)) go(Screen.HOSTING); }), weight(48, 0, 4));
-        btns.addView(btn("Save & test", false, () -> { if (saveHost(p)) testProfile(p, status); }), weight(48, 4, 0));
+        btns.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_save), true, () -> { if (saveHost(p)) go(Screen.HOSTING); }), weight(48, 0, 4));
+        btns.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_save_test), false, () -> { if (saveHost(p)) testProfile(p, status); }), weight(48, 4, 0));
         card.addView(btns, lp(0, 8, 0, 0));
         body.addView(card, lp(0, 0, 0, 12));
     }
@@ -3001,23 +2997,23 @@ public class MainActivity extends AppCompatActivity {
 
     private void testProfile(Hosting.Profile p) { testProfile(p, null); }
     private void testProfile(Hosting.Profile p, TextView status) {
-        if (status != null) status.setText("Testing…"); else toast("Testing " + p.name() + "…");
+        if (status != null) Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_testing)); else toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_testing_name, p.name()));
         io.execute(() -> {
-            String msg;
+            CharSequence msg;
             try { String rel = "_test/probe-" + Long.toString(System.currentTimeMillis(), 36) + ".txt";
                 String url; try (Hosting.Uploader up = Hosting.forProfile(p)) { url = up.putFile(("salon-test").getBytes("UTF-8"), rel, "text/plain"); }
-                Hosting.verifyUrl(url, p); msg = "OK — uploaded and served: " + url;
+                Hosting.verifyUrl(url, p); msg = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_tested, url);
             } catch (SftpUploader.HostKeyUnverified hk) { runOnUiThread(() -> promptTrustHostKey(p, hk.fingerprint, status)); return;
-            } catch (Exception e) { msg = "Failed: " + e.getMessage(); }
-            final String m = msg; runOnUiThread(() -> { if (status != null) status.setText(m); else toast(m); });
+            } catch (Exception e) { msg = Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_failed, e.getMessage()); }
+            final CharSequence m = msg; runOnUiThread(() -> { if (status != null) Language.setText(status, m); else toast(m); });
         });
     }
 
     private void promptTrustHostKey(Hosting.Profile p, String fp, TextView status) {
-        new android.app.AlertDialog.Builder(this).setTitle("Trust this server?")
-                .setMessage("First connection to " + p.cfgStr("host") + ".\n\nSSH host-key fingerprint:\n" + fp + "\n\nTrust it only if this is your server. It'll be pinned.")
-                .setPositiveButton("Trust & pin", (d, w) -> { Hosting.put(p.cfg(), "hostKeyFp", fp); HostingStore.upsert(this, p); testProfile(p, status); })
-                .setNegativeButton("Cancel", (d, w) -> { if (status != null) status.setText("Not trusted."); }).show();
+        new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_trust_title))
+                .setMessage(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_trust_body, p.cfgStr("host"), fp))
+                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_trust_pin), (d, w) -> { Hosting.put(p.cfg(), "hostKeyFp", fp); HostingStore.upsert(this, p); testProfile(p, status); })
+                .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel), (d, w) -> { if (status != null) Language.setText(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_not_trusted)); }).show();
     }
 
     /* ================= node key ================= */
@@ -3123,12 +3119,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** kv row: shortened value, TAP copies the FULL value. */
-    private void copyRow(LinearLayout parent, String k, String full) {
+    private void copyRow(LinearLayout parent, CharSequence k, String full) {
         LinearLayout col = new LinearLayout(this); col.setOrientation(LinearLayout.VERTICAL); col.setPadding(0, dp(6), 0, dp(6));
         LinearLayout head = row();
-        TextView key = Design.text(this, k.toUpperCase(), 9.5f, Design.DIM(), Design.sansBold()); key.setLetterSpacing(0.12f);
+        TextView key = Design.text(this, Language.upper(k), 9.5f, Design.DIM(), Design.sansBold()); key.setLetterSpacing(0.12f);
         head.addView(key, new LinearLayout.LayoutParams(0, -2, 1));
-        head.addView(Design.text(this, "TAP TO COPY", 8.5f, Design.ACCENT(), Design.sansBold()));
+        head.addView(Design.text(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_tap_copy), 8.5f, Design.ACCENT(), Design.sansBold()));
         col.addView(head);
         // Show the FULL value (no truncation) in a tappable box — wraps rather than clipping.
         TextView val = Design.text(this, full, 11f, Design.INK(), Design.mono());
@@ -3140,7 +3136,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void copyOnTap(TextView t, String full) {
         t.setClickable(true);
-        t.setOnClickListener(v -> { ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE); cm.setPrimaryClip(ClipData.newPlainText("salon", full)); toast("Copied"); });
+        t.setOnClickListener(v -> { ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE); cm.setPrimaryClip(ClipData.newPlainText("salon", full)); toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_history_copied)); });
     }
 
     /** label + tappable vermilion underlined link (opens browser), long-press copies. */
@@ -3151,7 +3147,7 @@ public class MainActivity extends AppCompatActivity {
         TextView val = Design.text(this, url, 11f, Design.ACCENT(), Design.mono()); val.setGravity(Gravity.END);
         val.setPaintFlags(val.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG); val.setMaxLines(2);
         val.setClickable(true); val.setOnClickListener(v -> openUrl(url));
-        val.setOnLongClickListener(v -> { ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE); cm.setPrimaryClip(ClipData.newPlainText("salon", url)); toast("Copied"); return true; });
+        val.setOnLongClickListener(v -> { ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE); cm.setPrimaryClip(ClipData.newPlainText("salon", url)); toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_history_copied)); return true; });
         r.addView(val, new LinearLayout.LayoutParams(0, -2, 1.8f)); return r;
     }
 
@@ -3203,7 +3199,7 @@ public class MainActivity extends AppCompatActivity {
         e.setMinLines(3); e.setGravity(Gravity.TOP); e.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         parent.addView(e, new LinearLayout.LayoutParams(-1, -2)); return e;
     }
-    private void cfgField(LinearLayout parent, JSONObject cfg, String key, String label, String hint, boolean secret) { EditText e = field(parent, label, cfg.optString(key, ""), secret, hint); e.addTextChangedListener(watch(s -> Hosting.put(cfg, key, s))); }
+    private void cfgField(LinearLayout parent, JSONObject cfg, String key, CharSequence label, CharSequence hint, boolean secret) { EditText e = field(parent, label, cfg.optString(key, ""), secret, hint); e.addTextChangedListener(watch(s -> Hosting.put(cfg, key, s))); }
     private final HostingSecrets hostSecrets = new HostingSecrets();
 
     private void hostingSecretUnavailable() {
@@ -3233,9 +3229,9 @@ public class MainActivity extends AppCompatActivity {
         }));
     }
 
-    private void cfgSecret(LinearLayout parent, JSONObject cfg, String key, String label) { EditText e = field(parent, label, "", true, "••••••"); bindHostingSecret(e, cfg, key, true, false, false); }
-    private void cfgSecretMulti(LinearLayout parent, JSONObject cfg, String key, String label) {
-        parent.addView(Design.text(this, label.toUpperCase(), 9.5f, Design.DIM(), Design.sansBold()), lp(0, 8, 0, 3));
+    private void cfgSecret(LinearLayout parent, JSONObject cfg, String key, CharSequence label) { EditText e = field(parent, label, "", true, "••••••"); bindHostingSecret(e, cfg, key, true, false, false); }
+    private void cfgSecretMulti(LinearLayout parent, JSONObject cfg, String key, CharSequence label) {
+        parent.addView(Design.text(this, Language.upper(label), 9.5f, Design.DIM(), Design.sansBold()), lp(0, 8, 0, 3));
         EditText e = new EditText(this); e.setTextColor(Design.INK()); e.setTextSize(11); e.setTypeface(Design.mono());
         e.setBackground(Design.ruled(this, Design.PAPER(), Design.INK(), 1)); e.setPadding(dp(10), dp(9), dp(10), dp(9)); e.setMinLines(4); e.setGravity(Gravity.TOP);
         e.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE); bindHostingSecret(e, cfg, key, true, false, false);

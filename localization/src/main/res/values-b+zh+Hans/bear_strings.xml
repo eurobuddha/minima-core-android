@@ -7015,4 +7015,53 @@
     <string name="l10n_creative_secret_unavailable" formatted="false">"安全存储不可用，已保留保存的凭据。请解锁设备后重试，或使用备份中的凭据进行替换。"</string>
     <string name="l10n_creative_secret_not_saved" formatted="false">"无法加密此更改，尚未保存。原凭据未更改。请在安全存储可用时再次保存。"</string>
     <string name="l10n_creative_secret_restore_failed" formatted="false">"无法恢复备份。请检查文件，并在安全存储可用时重试。"</string>
+    <string name="l10n_creative_hosting_empty" formatted="false">"尚未添加存储位置。添加一个位置即可通过 SFTP 直接上传到您自己的服务器。"</string>
+    <string name="l10n_creative_hosting_unnamed" formatted="false">"（未命名）"</string>
+    <string name="l10n_creative_hosting_default" formatted="false">"默认"</string>
+    <string name="l10n_creative_hosting_test" formatted="false">"测试"</string>
+    <string name="l10n_creative_hosting_edit" formatted="false">"编辑"</string>
+    <string name="l10n_creative_hosting_make_default" formatted="false">"设为默认"</string>
+    <string name="l10n_creative_hosting_add" formatted="false">"添加存储位置"</string>
+    <string name="l10n_creative_hosting_edit_destination" formatted="false">"编辑存储位置"</string>
+    <string name="l10n_creative_hosting_server_hint" formatted="false">"我的服务器"</string>
+    <string name="l10n_creative_hosting_type" formatted="false">"类型"</string>
+    <string name="l10n_creative_hosting_ipfs_node" formatted="false">"IPFS 节点"</string>
+    <string name="l10n_creative_hosting_maxima_mesh" formatted="false">"Maxima 网状网络"</string>
+    <string name="l10n_creative_hosting_host" formatted="false">"主机"</string>
+    <string name="l10n_creative_hosting_user" formatted="false">"用户"</string>
+    <string name="l10n_creative_hosting_authentication" formatted="false">"身份验证"</string>
+    <string name="l10n_creative_hosting_private_key_pem" formatted="false">"私钥（粘贴 PEM）"</string>
+    <string name="l10n_creative_hosting_remote_root" formatted="false">"远程根目录（服务器目录）"</string>
+    <string name="l10n_creative_hosting_url_prefix" formatted="false">"公共 URL 前缀"</string>
+    <string name="l10n_creative_hosting_write_endpoint" formatted="false">"写入地址"</string>
+    <string name="l10n_creative_hosting_api_user" formatted="false">"API 用户（HTTP Basic，可选）"</string>
+    <string name="l10n_creative_hosting_api_password" formatted="false">"API 密码（HTTP Basic，可选）"</string>
+    <string name="l10n_creative_hosting_public_gateway" formatted="false">"公共网关"</string>
+    <string name="l10n_creative_hosting_gateway" formatted="false">"网关"</string>
+    <string name="l10n_creative_hosting_owner" formatted="false">"所有者（GitHub 用户名）"</string>
+    <string name="l10n_creative_hosting_repo" formatted="false">"仓库名称"</string>
+    <string name="l10n_creative_hosting_branch" formatted="false">"分支"</string>
+    <string name="l10n_creative_hosting_token" formatted="false">"令牌（PAT，Contents：读写）"</string>
+    <string name="l10n_creative_hosting_serve" formatted="false">"访问方式（raw / pages）"</string>
+    <string name="l10n_creative_hosting_pages_prefix" formatted="false">"Pages 前缀（仅当 serve=pages）"</string>
+    <string name="l10n_creative_hosting_blossom_server" formatted="false">"Blossom 服务器"</string>
+    <string name="l10n_creative_hosting_nostr_identity" formatted="false">"您的 nostr 身份"</string>
+    <string name="l10n_creative_hosting_public_key_hex" formatted="false">"公钥（十六进制）"</string>
+    <string name="l10n_creative_hosting_tap_copy" formatted="false">"点按复制"</string>
+    <string name="l10n_creative_hosting_save_test" formatted="false">"保存并测试"</string>
+    <string name="l10n_creative_hosting_testing" formatted="false">"正在测试…"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_creative_hosting_testing_name">"正在测试 %1$s…"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_creative_hosting_tested">"成功，已上传且可访问：%1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_creative_hosting_failed">"失败：%1$s"</string>
+    <string name="l10n_creative_hosting_trust_title" formatted="false">"信任此服务器？"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_creative_hosting_trust_body">"首次连接到 %1$s。\n\nSSH 主机密钥指纹：\n%2$s\n\n仅在确认这是您的服务器时选择信任。此指纹将被固定保存。"</string>
+    <string name="l10n_creative_hosting_trust_pin" formatted="false">"信任并固定"</string>
+    <string name="l10n_creative_hosting_not_trusted" formatted="false">"未信任。"</string>
+    <string name="l10n_creative_hosting_kubo_help" formatted="false">"如果 kubo RPC 通过反向代理使用 HTTP Basic 身份验证，请在此填写用户名和密码，应用会发送正确的 Authorization 请求头。在 Android 上，将 user:pass@ 嵌入 API URL 无效（请求头会被丢弃，导致 401 错误）。"</string>
+    <string name="l10n_creative_hosting_github_help" formatted="false">"一次性设置：\n1. 在 github.com 上创建公开仓库（例如 salon）。Owner 填写用户名，Repo 填写仓库名称。\n2. 进入 Settings → Developer settings → Personal access tokens → Fine-grained → Generate。授予该仓库 Contents: Read and write 权限，将令牌粘贴到 Token (PAT)。\n3. 使用 raw 可立即访问（raw.githubusercontent.com）。使用 pages 时，在仓库 Settings → Pages 中启用分支发布，并将 Pages 前缀设为 https://&lt;owner&gt;.github.io/&lt;repo&gt;/。\n分支可用 main，然后保存并测试。"</string>
+    <string name="l10n_creative_hosting_blossom_help" formatted="false">"nostr 网络上的免费公共文件托管，无需账户、密码或自己的服务器。文件使用从 Salon 消息身份派生的密钥签名，并按内容哈希存储，因此您的页面可在任何浏览器中查看，每次重新发布都会生成新 URL（Salon 会自动重新公告）。\n\n默认服务器 blossom.primal.net 免费接收页面和媒体。blossom.band 等仅支持媒体的服务器无法托管页面。免费服务器有文件大小限制（通常为几十 MB），较大的视频或音频请使用 SFTP、IPFS 或 GitHub。"</string>
 </resources>

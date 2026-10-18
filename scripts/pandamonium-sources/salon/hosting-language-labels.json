@@ -1,0 +1,196 @@
+{
+  "labels": [
+    [
+      "No destinations yet. Add one — SFTP uploads straight to your own server.",
+      "creativeHosting.empty"
+    ],
+    [
+      "(unnamed)",
+      "creativeHosting.unnamed"
+    ],
+    [
+      "default",
+      "creativeHosting.default"
+    ],
+    [
+      "Test",
+      "creativeHosting.test"
+    ],
+    [
+      "Edit",
+      "creativeHosting.edit"
+    ],
+    [
+      "Make default",
+      "creativeHosting.makeDefault"
+    ],
+    [
+      "Add destination",
+      "creativeHosting.add"
+    ],
+    [
+      "Edit destination",
+      "creativeHosting.editDestination"
+    ],
+    [
+      "my server",
+      "creativeHosting.serverHint"
+    ],
+    [
+      "Type",
+      "creativeHosting.type"
+    ],
+    [
+      "IPFS node",
+      "creativeHosting.ipfsNode"
+    ],
+    [
+      "Maxima mesh",
+      "creativeHosting.maximaMesh"
+    ],
+    [
+      "Host",
+      "creativeHosting.host"
+    ],
+    [
+      "User",
+      "creativeHosting.user"
+    ],
+    [
+      "Authentication",
+      "creativeHosting.authentication"
+    ],
+    [
+      "Private key (paste PEM)",
+      "creativeHosting.privateKeyPem"
+    ],
+    [
+      "Remote root (server dir)",
+      "creativeHosting.remoteRoot"
+    ],
+    [
+      "Public URL prefix",
+      "creativeHosting.urlPrefix"
+    ],
+    [
+      "Write endpoint",
+      "creativeHosting.writeEndpoint"
+    ],
+    [
+      "API user (HTTP Basic — optional)",
+      "creativeHosting.apiUser"
+    ],
+    [
+      "API password (HTTP Basic — optional)",
+      "creativeHosting.apiPassword"
+    ],
+    [
+      "Public gateway",
+      "creativeHosting.publicGateway"
+    ],
+    [
+      "Gateway",
+      "creativeHosting.gateway"
+    ],
+    [
+      "Owner (GitHub username)",
+      "creativeHosting.owner"
+    ],
+    [
+      "Repo name",
+      "creativeHosting.repo"
+    ],
+    [
+      "Branch",
+      "creativeHosting.branch"
+    ],
+    [
+      "Token (PAT — Contents: read & write)",
+      "creativeHosting.token"
+    ],
+    [
+      "Serve via (raw / pages)",
+      "creativeHosting.serve"
+    ],
+    [
+      "Pages prefix (only if serve=pages)",
+      "creativeHosting.pagesPrefix"
+    ],
+    [
+      "Blossom server",
+      "creativeHosting.blossomServer"
+    ],
+    [
+      "Your nostr identity",
+      "creativeHosting.nostrIdentity"
+    ],
+    [
+      "public key (hex)",
+      "creativeHosting.publicKeyHex"
+    ],
+    [
+      "TAP TO COPY",
+      "creativeHosting.tapCopy"
+    ],
+    [
+      "Save & test",
+      "creativeHosting.saveTest"
+    ],
+    [
+      "Testing…",
+      "creativeHosting.testing"
+    ],
+    [
+      "Trust this server?",
+      "creativeHosting.trustTitle"
+    ],
+    [
+      "Trust & pin",
+      "creativeHosting.trustPin"
+    ],
+    [
+      "Not trusted.",
+      "creativeHosting.notTrusted"
+    ],
+    [
+      "If your kubo RPC sits behind HTTP Basic auth (reverse proxy), put the user + password here — the app sends a proper Authorization header. Embedding user:pass@ in the API URL does NOT work on Android (the header is dropped → 401).",
+      "creativeHosting.kuboHelp"
+    ],
+    [
+      "Hosting",
+      "salonSetup.hosting"
+    ],
+    [
+      "Delete",
+      "filez.delete"
+    ],
+    [
+      "Name",
+      "mail.name"
+    ],
+    [
+      "Password",
+      "backup.password"
+    ],
+    [
+      "Private key",
+      "ethWallet.privateKey"
+    ],
+    [
+      "Port",
+      "terminalTxn.port"
+    ],
+    [
+      "Save",
+      "common.save"
+    ],
+    [
+      "Cancel",
+      "common.cancel"
+    ]
+  ],
+  "longNotes": {
+    "githubHelp": "\"Set-up (once):\\n\"\n                        + \"1. Make a PUBLIC repo on github.com (e.g. 'salon'). Owner = your username, Repo = its name.\\n\"\n                        + \"2. Settings → Developer settings → Personal access tokens → Fine-grained → Generate. Give it Contents: Read and write on that repo. Paste it as Token (PAT).\\n\"\n                        + \"3. Serve via 'raw' works instantly (raw.githubusercontent.com). For 'pages': in the repo Settings → Pages, enable Pages from your branch, then set Pages prefix to https://<owner>.github.io/<repo>/.\\n\"\n                        + \"Branch 'main' is fine. Then Save & test.\"",
+    "blossomHelp": "\"Free public file hosting on the nostr network — no account, no password, no server of your own. Files are signed with a key derived from your Salon messaging identity and stored by content hash, so your page stays viewable in any web browser and every republish gets a fresh URL (Salon re-announces it automatically).\\n\\nThe default server (blossom.primal.net) accepts your page AND media for free. Media-only servers like blossom.band can't host the page itself. Free servers cap file size (typically tens of MB) — large video/audio belongs on SFTP/IPFS/GitHub.\""
+  }
+}

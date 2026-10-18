@@ -34948,5 +34948,275 @@
     "zh-Hans": "无法恢复备份。请检查文件，并在安全存储可用时重试。",
     "ru": "Не удалось восстановить резервную копию. Проверьте файл и повторите, когда защищённое хранилище станет доступно.",
     "uk": "Не вдалося відновити резервну копію. Перевірте файл і повторіть, коли захищене сховище стане доступним."
+  },
+  "creativeHosting.empty": {
+    "en": "No destinations yet. Add one — SFTP uploads straight to your own server.",
+    "zh-Hans": "尚未添加存储位置。添加一个位置即可通过 SFTP 直接上传到您自己的服务器。",
+    "ru": "Мест хранения пока нет. Добавьте одно: SFTP загружает файлы прямо на ваш сервер.",
+    "uk": "Місць зберігання ще немає. Додайте одне: SFTP завантажує файли безпосередньо на ваш сервер."
+  },
+  "creativeHosting.unnamed": {
+    "en": "(unnamed)",
+    "zh-Hans": "（未命名）",
+    "ru": "(без названия)",
+    "uk": "(без назви)"
+  },
+  "creativeHosting.default": {
+    "en": "default",
+    "zh-Hans": "默认",
+    "ru": "по умолчанию",
+    "uk": "типове"
+  },
+  "creativeHosting.test": {
+    "en": "Test",
+    "zh-Hans": "测试",
+    "ru": "Проверить",
+    "uk": "Перевірити"
+  },
+  "creativeHosting.edit": {
+    "en": "Edit",
+    "zh-Hans": "编辑",
+    "ru": "Изменить",
+    "uk": "Змінити"
+  },
+  "creativeHosting.makeDefault": {
+    "en": "Make default",
+    "zh-Hans": "设为默认",
+    "ru": "Использовать по умолчанию",
+    "uk": "Використовувати як типове"
+  },
+  "creativeHosting.add": {
+    "en": "Add destination",
+    "zh-Hans": "添加存储位置",
+    "ru": "Добавить место хранения",
+    "uk": "Додати місце зберігання"
+  },
+  "creativeHosting.editDestination": {
+    "en": "Edit destination",
+    "zh-Hans": "编辑存储位置",
+    "ru": "Изменить место хранения",
+    "uk": "Змінити місце зберігання"
+  },
+  "creativeHosting.serverHint": {
+    "en": "my server",
+    "zh-Hans": "我的服务器",
+    "ru": "мой сервер",
+    "uk": "мій сервер"
+  },
+  "creativeHosting.type": {
+    "en": "Type",
+    "zh-Hans": "类型",
+    "ru": "Тип",
+    "uk": "Тип"
+  },
+  "creativeHosting.ipfsNode": {
+    "en": "IPFS node",
+    "zh-Hans": "IPFS 节点",
+    "ru": "Узел IPFS",
+    "uk": "Вузол IPFS"
+  },
+  "creativeHosting.maximaMesh": {
+    "en": "Maxima mesh",
+    "zh-Hans": "Maxima 网状网络",
+    "ru": "Сеть Maxima",
+    "uk": "Мережа Maxima"
+  },
+  "creativeHosting.host": {
+    "en": "Host",
+    "zh-Hans": "主机",
+    "ru": "Хост",
+    "uk": "Хост"
+  },
+  "creativeHosting.user": {
+    "en": "User",
+    "zh-Hans": "用户",
+    "ru": "Пользователь",
+    "uk": "Користувач"
+  },
+  "creativeHosting.authentication": {
+    "en": "Authentication",
+    "zh-Hans": "身份验证",
+    "ru": "Аутентификация",
+    "uk": "Автентифікація"
+  },
+  "creativeHosting.privateKeyPem": {
+    "en": "Private key (paste PEM)",
+    "zh-Hans": "私钥（粘贴 PEM）",
+    "ru": "Закрытый ключ (вставьте PEM)",
+    "uk": "Приватний ключ (вставте PEM)"
+  },
+  "creativeHosting.remoteRoot": {
+    "en": "Remote root (server dir)",
+    "zh-Hans": "远程根目录（服务器目录）",
+    "ru": "Корневая папка на сервере",
+    "uk": "Коренева папка на сервері"
+  },
+  "creativeHosting.urlPrefix": {
+    "en": "Public URL prefix",
+    "zh-Hans": "公共 URL 前缀",
+    "ru": "Префикс публичного URL",
+    "uk": "Префікс публічної URL-адреси"
+  },
+  "creativeHosting.writeEndpoint": {
+    "en": "Write endpoint",
+    "zh-Hans": "写入地址",
+    "ru": "Адрес для загрузки",
+    "uk": "Адреса для завантаження"
+  },
+  "creativeHosting.apiUser": {
+    "en": "API user (HTTP Basic — optional)",
+    "zh-Hans": "API 用户（HTTP Basic，可选）",
+    "ru": "Пользователь API (HTTP Basic, необязательно)",
+    "uk": "Користувач API (HTTP Basic, необов’язково)"
+  },
+  "creativeHosting.apiPassword": {
+    "en": "API password (HTTP Basic — optional)",
+    "zh-Hans": "API 密码（HTTP Basic，可选）",
+    "ru": "Пароль API (HTTP Basic, необязательно)",
+    "uk": "Пароль API (HTTP Basic, необов’язково)"
+  },
+  "creativeHosting.publicGateway": {
+    "en": "Public gateway",
+    "zh-Hans": "公共网关",
+    "ru": "Публичный шлюз",
+    "uk": "Публічний шлюз"
+  },
+  "creativeHosting.gateway": {
+    "en": "Gateway",
+    "zh-Hans": "网关",
+    "ru": "Шлюз",
+    "uk": "Шлюз"
+  },
+  "creativeHosting.owner": {
+    "en": "Owner (GitHub username)",
+    "zh-Hans": "所有者（GitHub 用户名）",
+    "ru": "Владелец (имя пользователя GitHub)",
+    "uk": "Власник (ім’я користувача GitHub)"
+  },
+  "creativeHosting.repo": {
+    "en": "Repo name",
+    "zh-Hans": "仓库名称",
+    "ru": "Название репозитория",
+    "uk": "Назва репозиторію"
+  },
+  "creativeHosting.branch": {
+    "en": "Branch",
+    "zh-Hans": "分支",
+    "ru": "Ветка",
+    "uk": "Гілка"
+  },
+  "creativeHosting.token": {
+    "en": "Token (PAT — Contents: read & write)",
+    "zh-Hans": "令牌（PAT，Contents：读写）",
+    "ru": "Токен (PAT, Contents: чтение и запись)",
+    "uk": "Токен (PAT, Contents: читання й запис)"
+  },
+  "creativeHosting.serve": {
+    "en": "Serve via (raw / pages)",
+    "zh-Hans": "访问方式（raw / pages）",
+    "ru": "Способ доступа (raw / pages)",
+    "uk": "Спосіб доступу (raw / pages)"
+  },
+  "creativeHosting.pagesPrefix": {
+    "en": "Pages prefix (only if serve=pages)",
+    "zh-Hans": "Pages 前缀（仅当 serve=pages）",
+    "ru": "Префикс Pages (только при serve=pages)",
+    "uk": "Префікс Pages (лише за serve=pages)"
+  },
+  "creativeHosting.blossomServer": {
+    "en": "Blossom server",
+    "zh-Hans": "Blossom 服务器",
+    "ru": "Сервер Blossom",
+    "uk": "Сервер Blossom"
+  },
+  "creativeHosting.nostrIdentity": {
+    "en": "Your nostr identity",
+    "zh-Hans": "您的 nostr 身份",
+    "ru": "Ваша идентичность nostr",
+    "uk": "Ваша ідентичність nostr"
+  },
+  "creativeHosting.publicKeyHex": {
+    "en": "public key (hex)",
+    "zh-Hans": "公钥（十六进制）",
+    "ru": "открытый ключ (hex)",
+    "uk": "публічний ключ (hex)"
+  },
+  "creativeHosting.tapCopy": {
+    "en": "TAP TO COPY",
+    "zh-Hans": "点按复制",
+    "ru": "НАЖМИТЕ, ЧТОБЫ СКОПИРОВАТЬ",
+    "uk": "НАТИСНІТЬ, ЩОБ СКОПІЮВАТИ"
+  },
+  "creativeHosting.saveTest": {
+    "en": "Save & test",
+    "zh-Hans": "保存并测试",
+    "ru": "Сохранить и проверить",
+    "uk": "Зберегти й перевірити"
+  },
+  "creativeHosting.testing": {
+    "en": "Testing…",
+    "zh-Hans": "正在测试…",
+    "ru": "Проверка…",
+    "uk": "Перевірка…"
+  },
+  "creativeHosting.testingName": {
+    "en": "Testing {0}…",
+    "zh-Hans": "正在测试 {0}…",
+    "ru": "Проверка {0}…",
+    "uk": "Перевірка {0}…"
+  },
+  "creativeHosting.tested": {
+    "en": "OK — uploaded and served: {0}",
+    "zh-Hans": "成功，已上传且可访问：{0}",
+    "ru": "Готово — файл загружен и доступен: {0}",
+    "uk": "Готово — файл завантажено й доступний: {0}"
+  },
+  "creativeHosting.failed": {
+    "en": "Failed: {0}",
+    "zh-Hans": "失败：{0}",
+    "ru": "Ошибка: {0}",
+    "uk": "Помилка: {0}"
+  },
+  "creativeHosting.trustTitle": {
+    "en": "Trust this server?",
+    "zh-Hans": "信任此服务器？",
+    "ru": "Доверять этому серверу?",
+    "uk": "Довіряти цьому серверу?"
+  },
+  "creativeHosting.trustBody": {
+    "en": "First connection to {0}.\n\nSSH host-key fingerprint:\n{1}\n\nTrust it only if this is your server. It'll be pinned.",
+    "zh-Hans": "首次连接到 {0}。\n\nSSH 主机密钥指纹：\n{1}\n\n仅在确认这是您的服务器时选择信任。此指纹将被固定保存。",
+    "ru": "Первое подключение к {0}.\n\nОтпечаток ключа SSH сервера:\n{1}\n\nДоверяйте ему только в том случае, если это ваш сервер. Отпечаток будет закреплён.",
+    "uk": "Перше підключення до {0}.\n\nВідбиток ключа SSH сервера:\n{1}\n\nДовіряйте йому лише якщо це ваш сервер. Відбиток буде закріплено."
+  },
+  "creativeHosting.trustPin": {
+    "en": "Trust & pin",
+    "zh-Hans": "信任并固定",
+    "ru": "Доверять и закрепить",
+    "uk": "Довіряти й закріпити"
+  },
+  "creativeHosting.notTrusted": {
+    "en": "Not trusted.",
+    "zh-Hans": "未信任。",
+    "ru": "Доверие не подтверждено.",
+    "uk": "Довіру не підтверджено."
+  },
+  "creativeHosting.kuboHelp": {
+    "en": "If your kubo RPC sits behind HTTP Basic auth (reverse proxy), put the user + password here — the app sends a proper Authorization header. Embedding user:pass@ in the API URL does NOT work on Android (the header is dropped → 401).",
+    "zh-Hans": "如果 kubo RPC 通过反向代理使用 HTTP Basic 身份验证，请在此填写用户名和密码，应用会发送正确的 Authorization 请求头。在 Android 上，将 user:pass@ 嵌入 API URL 无效（请求头会被丢弃，导致 401 错误）。",
+    "ru": "Если kubo RPC защищён HTTP Basic через обратный прокси, укажите здесь пользователя и пароль: приложение отправит заголовок Authorization. Запись user:pass@ в URL API не работает на Android: заголовок теряется, и сервер отвечает 401.",
+    "uk": "Якщо kubo RPC захищено HTTP Basic через зворотний проксі, вкажіть тут користувача й пароль: застосунок надішле заголовок Authorization. Запис user:pass@ в URL API не працює на Android: заголовок втрачається, і сервер відповідає 401."
+  },
+  "creativeHosting.githubHelp": {
+    "en": "Set-up (once):\n1. Make a PUBLIC repo on github.com (e.g. 'salon'). Owner = your username, Repo = its name.\n2. Settings → Developer settings → Personal access tokens → Fine-grained → Generate. Give it Contents: Read and write on that repo. Paste it as Token (PAT).\n3. Serve via 'raw' works instantly (raw.githubusercontent.com). For 'pages': in the repo Settings → Pages, enable Pages from your branch, then set Pages prefix to https://<owner>.github.io/<repo>/.\nBranch 'main' is fine. Then Save & test.",
+    "zh-Hans": "一次性设置：\n1. 在 github.com 上创建公开仓库（例如 salon）。Owner 填写用户名，Repo 填写仓库名称。\n2. 进入 Settings → Developer settings → Personal access tokens → Fine-grained → Generate。授予该仓库 Contents: Read and write 权限，将令牌粘贴到 Token (PAT)。\n3. 使用 raw 可立即访问（raw.githubusercontent.com）。使用 pages 时，在仓库 Settings → Pages 中启用分支发布，并将 Pages 前缀设为 https://<owner>.github.io/<repo>/。\n分支可用 main，然后保存并测试。",
+    "ru": "Настройка (один раз):\n1. Создайте ПУБЛИЧНЫЙ репозиторий на github.com (например, salon). Owner — ваше имя пользователя, Repo — название репозитория.\n2. Откройте Settings → Developer settings → Personal access tokens → Fine-grained → Generate. Дайте токену права Contents: Read and write для этого репозитория. Вставьте его в поле Token (PAT).\n3. Режим raw работает сразу (raw.githubusercontent.com). Для pages включите публикацию из вашей ветки в Settings → Pages репозитория и задайте префикс https://<owner>.github.io/<repo>/.\nПодойдёт ветка main. Затем сохраните и проверьте.",
+    "uk": "Налаштування (один раз):\n1. Створіть ПУБЛІЧНИЙ репозиторій на github.com (наприклад, salon). Owner — ваше ім’я користувача, Repo — назва репозиторію.\n2. Відкрийте Settings → Developer settings → Personal access tokens → Fine-grained → Generate. Надайте токену права Contents: Read and write для цього репозиторію. Вставте його в поле Token (PAT).\n3. Режим raw працює одразу (raw.githubusercontent.com). Для pages увімкніть публікацію з вашої гілки в Settings → Pages репозиторію та задайте префікс https://<owner>.github.io/<repo>/.\nПідійде гілка main. Потім збережіть і перевірте."
+  },
+  "creativeHosting.blossomHelp": {
+    "en": "Free public file hosting on the nostr network — no account, no password, no server of your own. Files are signed with a key derived from your Salon messaging identity and stored by content hash, so your page stays viewable in any web browser and every republish gets a fresh URL (Salon re-announces it automatically).\n\nThe default server (blossom.primal.net) accepts your page AND media for free. Media-only servers like blossom.band can't host the page itself. Free servers cap file size (typically tens of MB) — large video/audio belongs on SFTP/IPFS/GitHub.",
+    "zh-Hans": "nostr 网络上的免费公共文件托管，无需账户、密码或自己的服务器。文件使用从 Salon 消息身份派生的密钥签名，并按内容哈希存储，因此您的页面可在任何浏览器中查看，每次重新发布都会生成新 URL（Salon 会自动重新公告）。\n\n默认服务器 blossom.primal.net 免费接收页面和媒体。blossom.band 等仅支持媒体的服务器无法托管页面。免费服务器有文件大小限制（通常为几十 MB），较大的视频或音频请使用 SFTP、IPFS 或 GitHub。",
+    "ru": "Бесплатное публичное хранение файлов в сети nostr: без аккаунта, пароля и собственного сервера. Файлы подписываются ключом, полученным из вашей идентичности сообщений Salon, и хранятся по хешу содержимого. Страница доступна в любом браузере, а каждая повторная публикация получает новый URL (Salon объявляет его автоматически).\n\nСервер по умолчанию blossom.primal.net бесплатно принимает и страницы, и медиафайлы. Серверы только для медиа, например blossom.band, не могут хранить саму страницу. Бесплатные серверы ограничивают размер файлов (обычно десятками МБ). Для больших видео и аудио используйте SFTP, IPFS или GitHub.",
+    "uk": "Безкоштовне публічне зберігання файлів у мережі nostr: без облікового запису, пароля й власного сервера. Файли підписуються ключем, похідним від вашої ідентичності повідомлень Salon, і зберігаються за хешем вмісту. Сторінка доступна в будь-якому браузері, а кожна повторна публікація отримує нову URL-адресу (Salon оголошує її автоматично).\n\nТиповий сервер blossom.primal.net безкоштовно приймає і сторінки, і медіафайли. Сервери лише для медіа, наприклад blossom.band, не можуть зберігати саму сторінку. Безкоштовні сервери обмежують розмір файлів (зазвичай десятками МБ). Для великих відео й аудіо використовуйте SFTP, IPFS або GitHub."
   }
 }

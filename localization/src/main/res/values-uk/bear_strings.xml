@@ -7111,4 +7111,53 @@
     <string name="l10n_creative_secret_unavailable" formatted="false">"Захищене сховище недоступне. Збережені дані доступу не змінено. Розблокуйте пристрій і повторіть або замініть дані з резервної копії."</string>
     <string name="l10n_creative_secret_not_saved" formatted="false">"Не вдалося зашифрувати зміну. Її не збережено; попередні дані доступу не змінено. Повторіть збереження, коли захищене сховище стане доступним."</string>
     <string name="l10n_creative_secret_restore_failed" formatted="false">"Не вдалося відновити резервну копію. Перевірте файл і повторіть, коли захищене сховище стане доступним."</string>
+    <string name="l10n_creative_hosting_empty" formatted="false">"Місць зберігання ще немає. Додайте одне: SFTP завантажує файли безпосередньо на ваш сервер."</string>
+    <string name="l10n_creative_hosting_unnamed" formatted="false">"(без назви)"</string>
+    <string name="l10n_creative_hosting_default" formatted="false">"типове"</string>
+    <string name="l10n_creative_hosting_test" formatted="false">"Перевірити"</string>
+    <string name="l10n_creative_hosting_edit" formatted="false">"Змінити"</string>
+    <string name="l10n_creative_hosting_make_default" formatted="false">"Використовувати як типове"</string>
+    <string name="l10n_creative_hosting_add" formatted="false">"Додати місце зберігання"</string>
+    <string name="l10n_creative_hosting_edit_destination" formatted="false">"Змінити місце зберігання"</string>
+    <string name="l10n_creative_hosting_server_hint" formatted="false">"мій сервер"</string>
+    <string name="l10n_creative_hosting_type" formatted="false">"Тип"</string>
+    <string name="l10n_creative_hosting_ipfs_node" formatted="false">"Вузол IPFS"</string>
+    <string name="l10n_creative_hosting_maxima_mesh" formatted="false">"Мережа Maxima"</string>
+    <string name="l10n_creative_hosting_host" formatted="false">"Хост"</string>
+    <string name="l10n_creative_hosting_user" formatted="false">"Користувач"</string>
+    <string name="l10n_creative_hosting_authentication" formatted="false">"Автентифікація"</string>
+    <string name="l10n_creative_hosting_private_key_pem" formatted="false">"Приватний ключ (вставте PEM)"</string>
+    <string name="l10n_creative_hosting_remote_root" formatted="false">"Коренева папка на сервері"</string>
+    <string name="l10n_creative_hosting_url_prefix" formatted="false">"Префікс публічної URL-адреси"</string>
+    <string name="l10n_creative_hosting_write_endpoint" formatted="false">"Адреса для завантаження"</string>
+    <string name="l10n_creative_hosting_api_user" formatted="false">"Користувач API (HTTP Basic, необов’язково)"</string>
+    <string name="l10n_creative_hosting_api_password" formatted="false">"Пароль API (HTTP Basic, необов’язково)"</string>
+    <string name="l10n_creative_hosting_public_gateway" formatted="false">"Публічний шлюз"</string>
+    <string name="l10n_creative_hosting_gateway" formatted="false">"Шлюз"</string>
+    <string name="l10n_creative_hosting_owner" formatted="false">"Власник (ім’я користувача GitHub)"</string>
+    <string name="l10n_creative_hosting_repo" formatted="false">"Назва репозиторію"</string>
+    <string name="l10n_creative_hosting_branch" formatted="false">"Гілка"</string>
+    <string name="l10n_creative_hosting_token" formatted="false">"Токен (PAT, Contents: читання й запис)"</string>
+    <string name="l10n_creative_hosting_serve" formatted="false">"Спосіб доступу (raw / pages)"</string>
+    <string name="l10n_creative_hosting_pages_prefix" formatted="false">"Префікс Pages (лише за serve=pages)"</string>
+    <string name="l10n_creative_hosting_blossom_server" formatted="false">"Сервер Blossom"</string>
+    <string name="l10n_creative_hosting_nostr_identity" formatted="false">"Ваша ідентичність nostr"</string>
+    <string name="l10n_creative_hosting_public_key_hex" formatted="false">"публічний ключ (hex)"</string>
+    <string name="l10n_creative_hosting_tap_copy" formatted="false">"НАТИСНІТЬ, ЩОБ СКОПІЮВАТИ"</string>
+    <string name="l10n_creative_hosting_save_test" formatted="false">"Зберегти й перевірити"</string>
+    <string name="l10n_creative_hosting_testing" formatted="false">"Перевірка…"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_creative_hosting_testing_name">"Перевірка %1$s…"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_creative_hosting_tested">"Готово — файл завантажено й доступний: %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_creative_hosting_failed">"Помилка: %1$s"</string>
+    <string name="l10n_creative_hosting_trust_title" formatted="false">"Довіряти цьому серверу?"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_creative_hosting_trust_body">"Перше підключення до %1$s.\n\nВідбиток ключа SSH сервера:\n%2$s\n\nДовіряйте йому лише якщо це ваш сервер. Відбиток буде закріплено."</string>
+    <string name="l10n_creative_hosting_trust_pin" formatted="false">"Довіряти й закріпити"</string>
+    <string name="l10n_creative_hosting_not_trusted" formatted="false">"Довіру не підтверджено."</string>
+    <string name="l10n_creative_hosting_kubo_help" formatted="false">"Якщо kubo RPC захищено HTTP Basic через зворотний проксі, вкажіть тут користувача й пароль: застосунок надішле заголовок Authorization. Запис user:pass@ в URL API не працює на Android: заголовок втрачається, і сервер відповідає 401."</string>
+    <string name="l10n_creative_hosting_github_help" formatted="false">"Налаштування (один раз):\n1. Створіть ПУБЛІЧНИЙ репозиторій на github.com (наприклад, salon). Owner — ваше ім’я користувача, Repo — назва репозиторію.\n2. Відкрийте Settings → Developer settings → Personal access tokens → Fine-grained → Generate. Надайте токену права Contents: Read and write для цього репозиторію. Вставте його в поле Token (PAT).\n3. Режим raw працює одразу (raw.githubusercontent.com). Для pages увімкніть публікацію з вашої гілки в Settings → Pages репозиторію та задайте префікс https://&lt;owner&gt;.github.io/&lt;repo&gt;/.\nПідійде гілка main. Потім збережіть і перевірте."</string>
+    <string name="l10n_creative_hosting_blossom_help" formatted="false">"Безкоштовне публічне зберігання файлів у мережі nostr: без облікового запису, пароля й власного сервера. Файли підписуються ключем, похідним від вашої ідентичності повідомлень Salon, і зберігаються за хешем вмісту. Сторінка доступна в будь-якому браузері, а кожна повторна публікація отримує нову URL-адресу (Salon оголошує її автоматично).\n\nТиповий сервер blossom.primal.net безкоштовно приймає і сторінки, і медіафайли. Сервери лише для медіа, наприклад blossom.band, не можуть зберігати саму сторінку. Безкоштовні сервери обмежують розмір файлів (зазвичай десятками МБ). Для великих відео й аудіо використовуйте SFTP, IPFS або GitHub."</string>
 </resources>

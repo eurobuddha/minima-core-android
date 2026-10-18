@@ -7047,4 +7047,53 @@
     <string name="l10n_creative_secret_unavailable" formatted="false">"Secure storage is unavailable. Saved credentials have been kept. Unlock the device and try again, or replace the credential from your backup."</string>
     <string name="l10n_creative_secret_not_saved" formatted="false">"Could not encrypt this change. It is not saved. Your previous credential is unchanged. Try Save again when secure storage is available."</string>
     <string name="l10n_creative_secret_restore_failed" formatted="false">"Could not restore the backup. Check the file and try again when secure storage is available."</string>
+    <string name="l10n_creative_hosting_empty" formatted="false">"No destinations yet. Add one — SFTP uploads straight to your own server."</string>
+    <string name="l10n_creative_hosting_unnamed" formatted="false">"(unnamed)"</string>
+    <string name="l10n_creative_hosting_default" formatted="false">"default"</string>
+    <string name="l10n_creative_hosting_test" formatted="false">"Test"</string>
+    <string name="l10n_creative_hosting_edit" formatted="false">"Edit"</string>
+    <string name="l10n_creative_hosting_make_default" formatted="false">"Make default"</string>
+    <string name="l10n_creative_hosting_add" formatted="false">"Add destination"</string>
+    <string name="l10n_creative_hosting_edit_destination" formatted="false">"Edit destination"</string>
+    <string name="l10n_creative_hosting_server_hint" formatted="false">"my server"</string>
+    <string name="l10n_creative_hosting_type" formatted="false">"Type"</string>
+    <string name="l10n_creative_hosting_ipfs_node" formatted="false">"IPFS node"</string>
+    <string name="l10n_creative_hosting_maxima_mesh" formatted="false">"Maxima mesh"</string>
+    <string name="l10n_creative_hosting_host" formatted="false">"Host"</string>
+    <string name="l10n_creative_hosting_user" formatted="false">"User"</string>
+    <string name="l10n_creative_hosting_authentication" formatted="false">"Authentication"</string>
+    <string name="l10n_creative_hosting_private_key_pem" formatted="false">"Private key (paste PEM)"</string>
+    <string name="l10n_creative_hosting_remote_root" formatted="false">"Remote root (server dir)"</string>
+    <string name="l10n_creative_hosting_url_prefix" formatted="false">"Public URL prefix"</string>
+    <string name="l10n_creative_hosting_write_endpoint" formatted="false">"Write endpoint"</string>
+    <string name="l10n_creative_hosting_api_user" formatted="false">"API user (HTTP Basic — optional)"</string>
+    <string name="l10n_creative_hosting_api_password" formatted="false">"API password (HTTP Basic — optional)"</string>
+    <string name="l10n_creative_hosting_public_gateway" formatted="false">"Public gateway"</string>
+    <string name="l10n_creative_hosting_gateway" formatted="false">"Gateway"</string>
+    <string name="l10n_creative_hosting_owner" formatted="false">"Owner (GitHub username)"</string>
+    <string name="l10n_creative_hosting_repo" formatted="false">"Repo name"</string>
+    <string name="l10n_creative_hosting_branch" formatted="false">"Branch"</string>
+    <string name="l10n_creative_hosting_token" formatted="false">"Token (PAT — Contents: read &amp; write)"</string>
+    <string name="l10n_creative_hosting_serve" formatted="false">"Serve via (raw / pages)"</string>
+    <string name="l10n_creative_hosting_pages_prefix" formatted="false">"Pages prefix (only if serve=pages)"</string>
+    <string name="l10n_creative_hosting_blossom_server" formatted="false">"Blossom server"</string>
+    <string name="l10n_creative_hosting_nostr_identity" formatted="false">"Your nostr identity"</string>
+    <string name="l10n_creative_hosting_public_key_hex" formatted="false">"public key (hex)"</string>
+    <string name="l10n_creative_hosting_tap_copy" formatted="false">"TAP TO COPY"</string>
+    <string name="l10n_creative_hosting_save_test" formatted="false">"Save &amp; test"</string>
+    <string name="l10n_creative_hosting_testing" formatted="false">"Testing…"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_creative_hosting_testing_name">"Testing %1$s…"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_creative_hosting_tested">"OK — uploaded and served: %1$s"</string>
+    <!-- Arguments: 0 -->
+    <string name="l10n_creative_hosting_failed">"Failed: %1$s"</string>
+    <string name="l10n_creative_hosting_trust_title" formatted="false">"Trust this server?"</string>
+    <!-- Arguments: 0, 1 -->
+    <string name="l10n_creative_hosting_trust_body">"First connection to %1$s.\n\nSSH host-key fingerprint:\n%2$s\n\nTrust it only if this is your server. It\'ll be pinned."</string>
+    <string name="l10n_creative_hosting_trust_pin" formatted="false">"Trust &amp; pin"</string>
+    <string name="l10n_creative_hosting_not_trusted" formatted="false">"Not trusted."</string>
+    <string name="l10n_creative_hosting_kubo_help" formatted="false">"If your kubo RPC sits behind HTTP Basic auth (reverse proxy), put the user + password here — the app sends a proper Authorization header. Embedding user:pass@ in the API URL does NOT work on Android (the header is dropped → 401)."</string>
+    <string name="l10n_creative_hosting_github_help" formatted="false">"Set-up (once):\n1. Make a PUBLIC repo on github.com (e.g. \'salon\'). Owner = your username, Repo = its name.\n2. Settings → Developer settings → Personal access tokens → Fine-grained → Generate. Give it Contents: Read and write on that repo. Paste it as Token (PAT).\n3. Serve via \'raw\' works instantly (raw.githubusercontent.com). For \'pages\': in the repo Settings → Pages, enable Pages from your branch, then set Pages prefix to https://&lt;owner&gt;.github.io/&lt;repo&gt;/.\nBranch \'main\' is fine. Then Save &amp; test."</string>
+    <string name="l10n_creative_hosting_blossom_help" formatted="false">"Free public file hosting on the nostr network — no account, no password, no server of your own. Files are signed with a key derived from your Salon messaging identity and stored by content hash, so your page stays viewable in any web browser and every republish gets a fresh URL (Salon re-announces it automatically).\n\nThe default server (blossom.primal.net) accepts your page AND media for free. Media-only servers like blossom.band can\'t host the page itself. Free servers cap file size (typically tens of MB) — large video/audio belongs on SFTP/IPFS/GitHub."</string>
 </resources>
