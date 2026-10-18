@@ -7921,4 +7921,6 @@
     <string name="l10n_salon_holdings_verify_failed" formatted="false">"не удалось выполнить проверку подписи"</string>
     <string name="l10n_salon_holdings_script_failed" formatted="false">"проверка скрипта не удалась"</string>
     <string name="l10n_salon_holdings_coin_failed" formatted="false">"проверка монеты не удалась (узел занят?)"</string>
+    <string name="l10n_salon_holdings_request_changed" formatted="false">"Запрос доказательства больше не актуален."</string>
+    <string name="l10n_salon_holdings_request_busy" formatted="false">"Доказательство владения уже создаётся."</string>
 </resources>

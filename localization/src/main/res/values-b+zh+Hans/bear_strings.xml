@@ -7813,4 +7813,6 @@
     <string name="l10n_salon_holdings_verify_failed" formatted="false">"签名验证调用失败"</string>
     <string name="l10n_salon_holdings_script_failed" formatted="false">"脚本检查失败"</string>
     <string name="l10n_salon_holdings_coin_failed" formatted="false">"币检查失败（节点忙碌？）"</string>
+    <string name="l10n_salon_holdings_request_changed" formatted="false">"证明请求已失效。"</string>
+    <string name="l10n_salon_holdings_request_busy" formatted="false">"正在创建持有证明。"</string>
 </resources>

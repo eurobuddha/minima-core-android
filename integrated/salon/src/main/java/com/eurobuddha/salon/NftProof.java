@@ -48,9 +48,16 @@ final class NftProof {
 
     /** bindHex = hex of the owner's Salon tokenid (identity to bind the holding to). */
     static void generate(final NodeApi node, final String tokenid, final String bindHex, final Gen cb) {
+        generate(node, tokenid, bindHex, () -> true, cb);
+    }
+
+    static void generate(final NodeApi node, final String tokenid, final String bindHex,
+            final java.util.function.BooleanSupplier current, final Gen cb) {
+        if (!current.getAsBoolean()) { cb.fail("Proof request is no longer current."); return; }
         if (!safeId(tokenid) || !validBinding(bindHex)) { cb.fail("incomplete proof"); return; }
         node.cmd("coins relevant:true sendable:true tokenid:" + tokenid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject r) {
+                if (!current.getAsBoolean()) { cb.fail("Proof request is no longer current."); return; }
                 JSONArray arr = ok(r) ? r.optJSONArray("response") : null;
                 if (arr == null || arr.length() == 0) { cb.fail("You don't hold a spendable coin of this asset."); return; }
                 JSONObject coin = arr.optJSONObject(0);
@@ -59,17 +66,20 @@ final class NftProof {
                 if (coinid.isEmpty() || address.isEmpty()) { cb.fail("coin has no id/address"); return; }
                 node.cmd("coinexport coinid:" + coinid, new NodeApi.Cb() {
                     @Override public void onResult(JSONObject e) {
+                        if (!current.getAsBoolean()) { cb.fail("Proof request is no longer current."); return; }
                         JSONObject er = ok(e) ? e.optJSONObject("response") : null;
                         final String proof = text(er, "data");
                         if (!hexBytes(proof, 1_048_576)) { cb.fail("could not export coin proof"); return; }
                         node.cmd("scripts address:" + address, new NodeApi.Cb() {
                             @Override public void onResult(JSONObject s) {
+                                if (!current.getAsBoolean()) { cb.fail("Proof request is no longer current."); return; }
                                 JSONObject sr = ok(s) ? firstObj(s.opt("response")) : null;
                                 final String script = text(sr, "script");
                                 final String pk = text(sr, "publickey");
                                 if (!simpleScript(script, pk) || !Boolean.TRUE.equals(sr.opt("simple")) || !address.equalsIgnoreCase(text(sr, "address"))) { cb.fail("address is not a simple wallet address (can't prove holding)"); return; }
                                 node.cmd("sign publickey:" + pk + " data:" + bindHex, new NodeApi.Cb() {
                                     @Override public void onResult(JSONObject sg) {
+                                        if (!current.getAsBoolean()) { cb.fail("Proof request is no longer current."); return; }
                                         if (!ok(sg)) { cb.fail("signing failed (is your node unlocked?)"); return; }
                                         String sig = text(sg, "response");
                                         if (!hexBytes(sig, 1_048_576)) { cb.fail("no signature returned"); return; }

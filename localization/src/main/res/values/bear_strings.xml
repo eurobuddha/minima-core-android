@@ -7849,4 +7849,6 @@
     <string name="l10n_salon_holdings_verify_failed" formatted="false">"verify call failed"</string>
     <string name="l10n_salon_holdings_script_failed" formatted="false">"script check failed"</string>
     <string name="l10n_salon_holdings_coin_failed" formatted="false">"coin check failed (node busy?)"</string>
+    <string name="l10n_salon_holdings_request_changed" formatted="false">"Proof request is no longer current."</string>
+    <string name="l10n_salon_holdings_request_busy" formatted="false">"A holding proof is already being created."</string>
 </resources>

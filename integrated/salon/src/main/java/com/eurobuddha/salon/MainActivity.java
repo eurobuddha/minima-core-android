@@ -111,11 +111,7 @@ public class MainActivity extends AppCompatActivity {
      *  tick drives keepAlive and SalonKeepAliveWorker stays idle (openly's FOREGROUND pattern). */
     public static volatile boolean FOREGROUND = false;
     private String expandedNft = null;      // tokenid of the showcase holding currently expanded
-    // Per-tokenid caches so a re-render (expand/collapse, NEWBLOCK) does NOT re-hammer
-    // the node: each holding's verify outcome + live edition icon is resolved once per
-    // session. "Verify again" forces a fresh check. Cleared on profile switch.
-    private final java.util.Map<String, CharSequence> mVerifyText = new java.util.concurrent.ConcurrentHashMap<>();
-    private final java.util.Map<String, Integer> mVerifyColor = new java.util.concurrent.ConcurrentHashMap<>();
+    private final ProofRequests proofRequests = new ProofRequests(android.os.SystemClock::elapsedRealtime);
     private final java.util.Map<String, String> mLiveIcon = new java.util.concurrent.ConcurrentHashMap<>();
     private String pubkey = "";
     private boolean adoptChecked = false;
@@ -1060,6 +1056,7 @@ public class MainActivity extends AppCompatActivity {
         reannHandler.removeCallbacks(reannTick);
         io.shutdownNow();
         stopAudio();
+        proofRequests.close();
         if (node != null) node.onDestroy();   // release the DirectNodeApi receiver + cancel pending IPC timeouts
     }
 
@@ -1808,78 +1805,76 @@ public class MainActivity extends AppCompatActivity {
         verifyInto(n, bindHex, tv, false);
     }
 
-    /** @param force bypass the session cache and re-run the node check on explicit retry. */
+    /** Explicit retry replaces an older request; duplicate badges share the check. */
     private void verifyInto(final JSONObject n, final String bindHex, final TextView tv, boolean force) {
+        tv.setTag(null); // Rebinding also invalidates an old callback on this view.
         if (!nodeUp) { Language.setText(tv, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_connect)); tv.setTextColor(Design.DIM()); return; }
-        final String tid = n.optString("tokenid");
-        // Key by tid AND the binding profile: the same NFT on a different profile binds
-        // to a different tokenid, so its frozen proof verdict differs — never share it.
-        final String vkey = tid + "|" + (bindHex == null ? "" : bindHex);
-        if (!force && mVerifyText.containsKey(vkey)) {   // resolved this session — paint from cache, no node call
-            Language.setText(tv, mVerifyText.get(vkey)); tv.setTextColor(mVerifyColor.get(vkey));
-            return;
+        final String owner = SalonStore.get(this, "tokenid");
+        final int epoch = renderEpoch;
+        final JSONObject snapshot = ProofRequests.snapshot(n);
+        final String key = ProofRequests.key(snapshot, bindHex, owner);
+        final boolean ownPage = !owner.isEmpty() && bindHex != null && bindHex.equalsIgnoreCase(NftProof.hexOf(owner));
+        Language.setText(tv, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_verifying));
+        tv.setTextColor(Design.DIM());
+        java.util.function.Consumer<ProofRequests.Result> listener = new java.util.function.Consumer<ProofRequests.Result>() {
+            @Override public void accept(ProofRequests.Result result) {
+                if (tv.getTag() != this) return;
+                tv.setTag(null);
+                if (isFinishing() || isDestroyed() || epoch != renderEpoch || !nodeUp
+                        || !owner.equals(SalonStore.get(MainActivity.this, "tokenid"))
+                        || !key.equals(ProofRequests.key(n, bindHex, owner))) return;
+                Language.setText(tv, result.verified
+                        ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_verified)
+                        : Language.join("✕ ", HoldingMessages.message(result.reason)));
+                tv.setTextColor(result.verified ? 0xFF1F7A3F : 0xFFB4462A);
+                if (result.live && ownPage) maybeRefreshProof(n, bindHex);
+            }
+        };
+        tv.setTag(listener); // Requests retain subscribers weakly, as in WebValidate.
+        proofRequests.request(key, force, done -> {
+            Runnable bound = () -> NftProof.verify(node, snapshot, bindHex,
+                    (ok, reason, image) -> done.accept(new ProofRequests.Result(ok, reason, false)));
+            if (ownPage) NftProof.holds(node, snapshot.optString("tokenid"), (held, coin) -> {
+                if (held) done.accept(new ProofRequests.Result(true, "verified holding", true));
+                else bound.run();
+            });
+            else bound.run();
+        }, listener);
+    }
+
+    private String storedHolding(String tokenid) {
+        JSONArray items = SalonStore.arr(this, "nfts");
+        for (int i=0; i<items.length(); i++) {
+            JSONObject item = items.optJSONObject(i);
+            if (item != null && tokenid.equalsIgnoreCase(item.optString("tokenid"))) return item.toString();
         }
-        Language.setText(tv, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_verifying)); tv.setTextColor(Design.DIM());
-        // 1) LIVE check first (Axe-S3 style): if THIS node holds an unspent coin of the token,
-        //    it's verified now — this is you viewing your own page, and it never goes stale like
-        //    the frozen coinexport proof (which reports valid=false once the MMR has grown).
-        //    The "do I hold it?" fast-path is ONLY sound on YOUR OWN page: if you hold
-        //    the token you ARE the owner. On a STRANGER's page it would paint YOUR
-        //    holding as THEIRS (any shared/fungible/multi-holder token you also hold)
-        //    and skip the identity binding — so strangers always go through the
-        //    trustless bound proof, which ties the coin to the profile's tokenid.
-        boolean ownPage = bindHex != null
-                && bindHex.equalsIgnoreCase(NftProof.hexOf(SalonStore.get(this, "tokenid")));
-        if (ownPage) {
-            NftProof.holds(node, tid, (held, coin) -> runOnUiThread(() -> {
-                if (held) {
-                    setVerify(vkey, tv, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_verified), 0xFF1F7A3F);
-                    maybeRefreshProof(n, bindHex);   // regenerate the stored proof so the PUBLISHED one stops aging out
-                    return;
-                }
-                verifyBound(n, bindHex, tv);   // own page but not currently held → frozen proof
-            }));
-        } else {
-            verifyBound(n, bindHex, tv);       // stranger: only the trustless identity-bound proof
-        }
+        return "";
     }
 
-    /** Paint a verify outcome into {@code tv} AND cache it under {@code vkey} (tid|bindHex)
-     *  so a re-render repaints from the cache instead of re-calling the node. */
-    private void setVerify(String vkey, TextView tv, CharSequence text, int color) {
-        mVerifyText.put(vkey, text); mVerifyColor.put(vkey, color);
-        Language.setText(tv, text); tv.setTextColor(color);
-    }
-
-    /** The trustless frozen proof: the coin is bound to the profile's tokenid by a
-     *  signature, so a stranger cannot replay someone else's holding onto their page. */
-    private void verifyBound(final JSONObject n, final String bindHex, final TextView tv) {
-        final String vkey = n.optString("tokenid") + "|" + (bindHex == null ? "" : bindHex);
-        NftProof.verify(node, n, bindHex, (ok, reason, stateImg) -> runOnUiThread(() -> {
-            setVerify(vkey, tv, ok ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_verified) : Language.join("✕ ", HoldingMessages.message(reason)), ok ? 0xFF1F7A3F : 0xFFB4462A);
-        }));
-    }
-
-    /** Owner still holds the coin → regenerate the coinexport proof (once per session per token)
-     *  and update the stored showcase item, so the next Publish carries a FRESH proof that
-     *  strangers' nodes can verify. Silent; the live check already showed the green tick. */
+    /** Refresh once per identity/token, only while the saved holding remains unchanged. */
     private void maybeRefreshProof(final JSONObject n, final String bindHex) {
-        final String tid = n.optString("tokenid");
-        if (tid.isEmpty() || bindHex == null || bindHex.isEmpty() || !proofRefreshed.add(tid)) return;
-        NftProof.generate(node, tid, bindHex, new NftProof.Gen() {
+        final String tid = n.optString("tokenid"), owner = SalonStore.get(this, "tokenid"), draft = n.toString();
+        if (tid.isEmpty() || owner.isEmpty() || bindHex == null || !bindHex.equalsIgnoreCase(NftProof.hexOf(owner))) return;
+        final java.util.function.BooleanSupplier current = () -> !isFinishing() && !isDestroyed()
+                && owner.equals(SalonStore.get(this, "tokenid")) && draft.equals(storedHolding(tid));
+        final String request = owner + "|" + tid;
+        if (!current.getAsBoolean() || !proofRefreshed.add(request)) return;
+        NftProof.generate(node, tid, bindHex, current, new NftProof.Gen() {
             @Override public void ok(JSONObject item) {
+                if (!current.getAsBoolean()) return;
                 try { item.put("name", n.optString("name")); item.put("image", n.optString("image")); } catch (Exception ignored) {}
-                // Refresh the published editions too, so an already-proven holding
-                // (added before editions were captured) gains the full suite the
-                // next time the owner opens their own page, and stays current.
-                captureEditions(tid, editions -> {
+                captureEditions(tid, editions -> runOnUiThread(() -> {
+                    if (!current.getAsBoolean()) return;
                     try { item.put("editions", editions); } catch (Exception ignored) {}
                     JSONArray arr = SalonStore.arr(MainActivity.this, "nfts");
                     for (int i = 0; i < arr.length(); i++) {
                         JSONObject o = arr.optJSONObject(i);
-                        if (o != null && tid.equalsIgnoreCase(o.optString("tokenid"))) { try { arr.put(i, item); } catch (Exception ignored) {} SalonStore.setArr(MainActivity.this, "nfts", arr); break; }
+                        if (o != null && draft.equals(o.toString())) {
+                            try { arr.put(i, item); } catch (Exception ignored) { return; }
+                            SalonStore.setArr(MainActivity.this, "nfts", arr); break;
+                        }
                     }
-                });
+                }));
             }
             @Override public void fail(String message) {}
         });
@@ -2059,16 +2054,26 @@ public class MainActivity extends AppCompatActivity {
         new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_prove)).setItems(items, (d, which) -> proveNft(assets.get(which))).show();
     }
 
+    private boolean provingHolding;
+
     private void proveNft(JSONObject asset) {
-        String myTid = SalonStore.get(this, "tokenid");
+        if (provingHolding) { toast(HoldingMessages.message("A holding proof is already being created.")); return; }
+        final String myTid = SalonStore.get(this, "tokenid");
+        final String assetDraft = asset.toString(), holdingsDraft = SalonStore.arr(this, "nfts").toString();
+        final java.util.function.BooleanSupplier current = () -> !isFinishing() && !isDestroyed()
+                && myTid.equals(SalonStore.get(this, "tokenid")) && assetDraft.equals(asset.toString())
+                && holdingsDraft.equals(SalonStore.arr(this, "nfts").toString());
         if (myTid.isEmpty()) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_claim_first)); return; }
         toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_generating));
-        NftProof.generate(node, asset.optString("tokenid"), NftProof.hexOf(myTid), new NftProof.Gen() {
+        provingHolding = true;
+        NftProof.generate(node, asset.optString("tokenid"), NftProof.hexOf(myTid), current, new NftProof.Gen() {
             @Override public void ok(JSONObject item) {
+                if (!current.getAsBoolean()) { provingHolding = false; return; }
                 try { item.put("name", asset.optString("name")); item.put("image", asset.optString("image")); } catch (Exception ignored) {}
                 // Capture the editions this node holds so a remote viewer sees the
                 // whole collection, not just the top icon. Then store + publish.
                 captureEditions(asset.optString("tokenid"), editions -> {
+                    if (!current.getAsBoolean()) { provingHolding = false; return; }
                     try {
                         item.put("editions", editions);
                         // Embedded StateNFT with no small metadata icon: seed the showcase
@@ -2079,10 +2084,10 @@ public class MainActivity extends AppCompatActivity {
                             if (e0 != null && !e0.optString("url").isEmpty()) item.put("image", e0.optString("url"));
                         }
                     } catch (Exception ignored) {}
-                    runOnUiThread(() -> { JSONArray a = SalonStore.arr(MainActivity.this, "nfts"); a.put(item); SalonStore.setArr(MainActivity.this, "nfts", a); toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_added)); render(); });
+                    runOnUiThread(() -> { provingHolding = false; if (!current.getAsBoolean()) return; JSONArray a = SalonStore.arr(MainActivity.this, "nfts"); a.put(item); SalonStore.setArr(MainActivity.this, "nfts", a); toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_added)); render(); });
                 });
             }
-            @Override public void fail(String msg) { runOnUiThread(() -> toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_prove_failed, HoldingMessages.message(msg)))); }
+            @Override public void fail(String msg) { runOnUiThread(() -> { provingHolding = false; if (current.getAsBoolean()) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_prove_failed, HoldingMessages.message(msg))); }); }
         });
     }
 

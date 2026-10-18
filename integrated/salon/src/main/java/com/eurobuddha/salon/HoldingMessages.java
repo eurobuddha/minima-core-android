@@ -39,6 +39,8 @@ final class HoldingMessages {
             case "The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry.": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_explorer_node_retry);
             case "Node rejected the command.": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_utxo_rejected);
             case "Node reply exceeded the IPC limit — update Minima Core (needs 1.3.0+).": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_utxo_too_long);
+            case "Proof request is no longer current.": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_request_changed);
+            case "A holding proof is already being created.": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_request_busy);
             default: return reason;
         }
     }

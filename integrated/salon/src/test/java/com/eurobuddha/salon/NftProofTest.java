@@ -76,6 +76,16 @@ public class NftProofTest {
             resetCalls();NftProof.Gen cb=mock(NftProof.Gen.class);NftProof.generate(node,TOKEN,BIND,cb);if(stage>0)reply(ok(new JSONArray().put(coin())));if(stage>1)reply(ok(new JSONObject().put("data","0xaabb")));if(stage>2)reply(ok(new JSONObject().put("script","RETURN SIGNEDBY("+KEY+")").put("publickey",KEY).put("address",ADDR).put("simple",true)));pending.remove(0).onError("unavailable");verify(cb).fail("unavailable");verify(cb,never()).ok(any(JSONObject.class));assertEquals(stage+1,commands.size());
         }
     }
+    @Test public void changedDraftStopsBeforeEachFollowingCommandAndBeforeDelivery()throws Exception{
+        for(int stage=0;stage<=4;stage++){
+            resetCalls();boolean[] current={stage!=0};NftProof.Gen cb=mock(NftProof.Gen.class);NftProof.generate(node,TOKEN,BIND,()->current[0],cb);
+            if(stage>0){
+                JSONObject[] responses={ok(new JSONArray().put(coin())),ok(new JSONObject().put("data","0xaabb")),ok(new JSONObject().put("script","RETURN SIGNEDBY("+KEY+")").put("publickey",KEY).put("address",ADDR).put("simple",true)),ok("0xccdd")};
+                for(int i=0;i<stage-1;i++)reply(responses[i]);current[0]=false;reply(responses[stage-1]);
+            }
+            assertEquals(stage,commands.size());verify(cb).fail("Proof request is no longer current.");verify(cb,never()).ok(any(JSONObject.class));
+        }
+    }
     @Test public void stateArtworkAndEditionUrlsRemainLiteral()throws Exception{
         JSONObject c=coin().put("state",new JSONArray().put(new JSONObject().put("port",0).put("data","\"07\"")));assertEquals("https://example.invalid/art/07.svg",NftProof.editionImageUrl(c,"https://example.invalid/art/",".svg"));assertEquals("07",NftProof.state(c,0));assertEquals("",NftProof.stateImageUri(c));
     }

@@ -469,4 +469,7 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     spec=importlib.util.spec_from_file_location('salon_proof_safety',Path(__file__).with_name('adapt-pandamonium-salon-proof-safety.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
+    spec=importlib.util.spec_from_file_location('salon_proof_lifecycle',Path(__file__).with_name('adapt-pandamonium-salon-proof-lifecycle.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
 if __name__=='__main__': adapt(Path(sys.argv[1]))
