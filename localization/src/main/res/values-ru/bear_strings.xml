@@ -7056,4 +7056,6 @@
     <string name="l10n_terminal_ide_wait_commands" formatted="false">"Дождитесь завершения текущих команд, прежде чем запускать следующую."</string>
     <string name="l10n_terminal_ide_logs_preview" formatted="false">"Последние записи журнала · длинные записи сокращены. Сохранённые журналы не изменены."</string>
     <string name="l10n_terminal_ide_logs_failed" formatted="false">"Не удалось загрузить журнал. Откройте вкладку снова, чтобы повторить."</string>
+    <string name="l10n_salon_identity_unavailable" formatted="false">"Ключи сообщений временно недоступны. Сохранённые ключи не изменены. Откройте Salon снова; при необходимости восстановите ключ сообщений из резервной копии."</string>
+    <string name="l10n_salon_identity_restore_failed" formatted="false">"Не удалось восстановить ключ сообщений. Проверьте ключ и повторите, когда защищённое хранилище станет доступно. Прежняя идентичность сохранена."</string>
 </resources>

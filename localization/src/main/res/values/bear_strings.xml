@@ -6992,4 +6992,6 @@
     <string name="l10n_terminal_ide_wait_commands" formatted="false">"Please wait for pending commands to finish before running another."</string>
     <string name="l10n_terminal_ide_logs_preview" formatted="false">"Recent log preview · long entries are shortened. Stored logs are unchanged."</string>
     <string name="l10n_terminal_ide_logs_failed" formatted="false">"Could not load logs. Reopen this tab to retry."</string>
+    <string name="l10n_salon_identity_unavailable" formatted="false">"Your messaging identity is temporarily unavailable. Stored keys are preserved. Reopen Salon to retry; restore your messaging key from backup if needed."</string>
+    <string name="l10n_salon_identity_restore_failed" formatted="false">"Could not restore the messaging key. Check the key and try again when secure storage is available. Your previous identity is preserved."</string>
 </resources>

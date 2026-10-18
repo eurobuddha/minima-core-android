@@ -7056,4 +7056,6 @@
     <string name="l10n_terminal_ide_wait_commands" formatted="false">"Дочекайтеся завершення поточних команд, перш ніж запускати наступну."</string>
     <string name="l10n_terminal_ide_logs_preview" formatted="false">"Останні записи журналу · довгі записи скорочено. Збережені журнали не змінено."</string>
     <string name="l10n_terminal_ide_logs_failed" formatted="false">"Не вдалося завантажити журнал. Відкрийте вкладку знову, щоб повторити."</string>
+    <string name="l10n_salon_identity_unavailable" formatted="false">"Ключі повідомлень тимчасово недоступні. Збережені ключі не змінено. Відкрийте Salon знову; за потреби відновіть ключ повідомлень із резервної копії."</string>
+    <string name="l10n_salon_identity_restore_failed" formatted="false">"Не вдалося відновити ключ повідомлень. Перевірте ключ і повторіть, коли захищене сховище стане доступним. Попередню ідентичність збережено."</string>
 </resources>

@@ -293,10 +293,9 @@ public class MainActivity extends AppCompatActivity {
     /** Derive our app-side messaging identity once (libsodium, no node/Maxima) and publish
      *  its public id as msgpk so others can seal DMs to us. */
     private void ensureMailKey() {
-        if (!SalonStore.get(this, "msgpk").isEmpty()) return;
         io.execute(() -> {
-            String pk = SalonComms.publicId(MainActivity.this);   // generates+stores the seed if absent
-            runOnUiThread(() -> SalonStore.put(MainActivity.this, "msgpk", pk));
+            try { SalonComms.publicId(MainActivity.this); }
+            catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); }
         });
     }
 
@@ -304,7 +303,10 @@ public class MainActivity extends AppCompatActivity {
     private void scanMail() {
         final String addr = SalonStore.get(this, "tipaddr");
         if (addr.isEmpty()) return;
-        MinimaMail.scan(node, SalonComms.crypto(this), addr, msgs -> io.execute(() -> {   // DB writes off the UI thread
+        final LocalEcCryptoProvider identity;
+        try { identity = SalonComms.crypto(this); }
+        catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); return; }
+        MinimaMail.scan(node, identity, addr, msgs -> io.execute(() -> {   // DB writes off the UI thread
             MailDb db = MailDb.get(MainActivity.this);
             int newCount = 0; String lastFrom = "", lastBody = "";
             for (MinimaMail.Msg m : msgs) {
@@ -694,6 +696,8 @@ public class MainActivity extends AppCompatActivity {
         try {
             sealedHex = SalonComms.crypto(this).seal(peerpk,
                     msg.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        } catch (SalonComms.IdentityUnavailable unavailable) {
+            mInFlight.remove(msgId); identityUnavailable(); return;
         } catch (Exception e) { sealedHex = null; }
         if (sealedHex == null) {   // stays PENDING; retried
             mInFlight.remove(msgId);
@@ -791,7 +795,12 @@ public class MainActivity extends AppCompatActivity {
     private void coinSendDm(final MailDb.Contact ct, JSONObject msg, final String msgId) {
         if (!mInFlight.add(msgId)) return;   // already being posted by another trigger
         mLastChainAttempt.put(msgId, System.currentTimeMillis());   // start the re-post cooldown
-        MinimaMail.send(node, SalonComms.crypto(this), ct.addr, ct.peerpk, msg, new MinimaMail.Cb() {
+        final LocalEcCryptoProvider identity;
+        try { identity = SalonComms.crypto(this); }
+        catch (SalonComms.IdentityUnavailable unavailable) {
+            mInFlight.remove(msgId); identityUnavailable(); return;
+        }
+        MinimaMail.send(node, identity, ct.addr, ct.peerpk, msg, new MinimaMail.Cb() {
             @Override public void onSent(String txpowid) {
                 MailDb.get(MainActivity.this).setStatus(msgId, MailDb.SENT);
                 mInFlight.remove(msgId);
@@ -813,9 +822,29 @@ public class MainActivity extends AppCompatActivity {
 
     /* ---------------- messaging key backup / restore ---------------- */
 
+    private void identityUnavailable() {
+        runOnUiThread(() -> {
+            if (!isFinishing() && !isDestroyed()) toast(Language.text(this,
+                    com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_unavailable));
+        });
+    }
+
+    private void backupAccount() {
+        io.execute(() -> {
+            try {
+                String backup = buildBackupJson();
+                runOnUiThread(() -> {
+                    if (!isFinishing() && !isDestroyed()) saveTextFile("salon-backup.json", backup);
+                });
+            } catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); }
+        });
+    }
+
     private void backupMsgKey() {
         io.execute(() -> {
-            final String seed = SalonComms.exportSeed(this);
+            final String seed;
+            try { seed = SalonComms.exportSeed(this); }
+            catch (SalonComms.IdentityUnavailable unavailable) { identityUnavailable(); return; }
             runOnUiThread(() -> {
                 if (seed.isEmpty()) { toast("No messaging key yet."); return; }
                 LinearLayout box = dialogBox();
@@ -857,12 +886,12 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject cfg = copy.optJSONObject(copy.optString("type"));
                 if (cfg != null) for (String sf : HostingStore.SECRET_FIELDS) {
                     String enc = cfg.optString(sf, "");
-                    if (!enc.isEmpty()) cfg.put(sf, Crypt.decrypt(enc));
+                    if (!enc.isEmpty()) cfg.put(sf, Crypt.decryptSecure(enc));
                 }
                 hosts.put(copy);
             }
             b.put("hosting", hosts);
-        } catch (Exception ignored) {}
+        } catch (Exception unavailable) { throw new SalonComms.IdentityUnavailable(); }
         return b.toString();
     }
 
@@ -917,7 +946,7 @@ public class MainActivity extends AppCompatActivity {
         final EditText f = field(box, "Paste messaging key (hex)", "", false, "");
         showDialog("Restore messaging key", box, "Restore", () -> io.execute(() -> {
             final boolean ok = SalonComms.importSeed(this, text(f));
-            runOnUiThread(() -> { if (ok) { SalonStore.put(this, "msgpk", SalonComms.publicId(this)); toast("Restored. Re-publish your profile so others use the new key."); render(); } else toast("Invalid key."); });
+            runOnUiThread(() -> { if (ok) { SalonStore.put(this, "msgpk", SalonComms.publicId(this)); toast("Restored. Re-publish your profile so others use the new key."); render(); } else toast(Language.text(this, com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_restore_failed)); });
         }));
     }
 
@@ -2813,7 +2842,7 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout bkp = card(); bkp.addView(Design.lot(this, "Backup & restore"));
         bkp.addView(Design.note(this, "Save your messaging key + hosting logins to one file. After a reinstall, Restore brings them back — then your page content restores from hosting. Keep the file safe: it holds your credentials in the clear."), lp(0, 4, 0, 6));
-        bkp.addView(btn("Back up to file", true, () -> saveTextFile("salon-backup.json", buildBackupJson())), lph(48, 0, 6, 0, 0));
+        bkp.addView(btn("Back up to file", true, this::backupAccount), lph(48, 0, 6, 0, 0));
         bkp.addView(btn("Restore from file", false, this::restoreFromFile), lph(44, 0, 8, 0, 0));
         body.addView(bkp, lp(0, 0, 0, 12));
         if (SalonStore.hasIdentity(this)) {
@@ -2933,8 +2962,14 @@ public class MainActivity extends AppCompatActivity {
                 if (cfg.optString("endpoint", "").isEmpty()) Hosting.put(cfg, "endpoint", BlossomUploader.DEFAULT_SERVER);
                 cfgField(card, cfg, "endpoint", "Blossom server", BlossomUploader.DEFAULT_SERVER, false);
                 card.addView(Design.kicker(this, "Your nostr identity"), lp(0, 8, 0, 4));
-                copyRow(card, "public key (hex)", NostrKeys.pubkeyHex());
-                copyRow(card, "npub", NostrKeys.npub());
+                try {
+                    copyRow(card, "public key (hex)", NostrKeys.pubkeyHex());
+                    copyRow(card, "npub", NostrKeys.npub());
+                } catch (SalonComms.IdentityUnavailable unavailable) {
+                    TextView error = Design.note(this, "");
+                    Language.setText(error, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_identity_unavailable));
+                    card.addView(error);
+                }
                 break;
             case Hosting.TYPE_MAXIMA:
                 card.addView(Design.note(this, "You are the server. Media is encrypted on your phone, kept HERE, and mirrored across the Maxima relay mesh so it stays reachable while your phone sleeps — no single relay to trust, pay or lose. Needs the Maxima app installed (approve Salon once in Maxima → Connected apps).\n\nViewable in Maxima-capable apps only. This is the decentralised path: 100% of the network is hosted by its users.\n\nSize limit: up to 16 MB per file — great for photos and short clips. Large video/audio won't fit the mesh (it's user-hosted redundancy, not a storage locker); host those on a server type (SFTP/IPFS/GitHub), which has no size limit and stays online without you."

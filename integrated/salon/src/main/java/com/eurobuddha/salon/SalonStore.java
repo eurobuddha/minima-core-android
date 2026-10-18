@@ -26,6 +26,32 @@ final class SalonStore {
         return c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
+    /** Strict read for key operations: corrupt JSON is not an empty identity. */
+    static synchronized JSONObject identityRecord(Context c) {
+        try {
+            String value = prefs(c).getString(KEY, "");
+            JSONObject record = value.isEmpty() ? new JSONObject() : new JSONObject(value);
+            for (String key : new String[]{"msgseed", "msgpk"})
+                if (record.has(key) && !(record.get(key) instanceof String)) throw new SalonComms.IdentityUnavailable();
+            return record;
+        } catch (Exception unavailable) { throw new SalonComms.IdentityUnavailable(); }
+    }
+
+    /** Like KeyVault.saveKey, report success only after synchronous persistence. */
+    static synchronized boolean writeIdentity(Context c, String wrapped, String publicId) {
+        SharedPreferences prefs = prefs(c);
+        JSONObject current = identityRecord(c);
+        String previous = prefs.getString(KEY, "");
+        try {
+            current.put("msgseed", wrapped); current.put("msgpk", publicId);
+            if (prefs.edit().putString(KEY, current.toString()).commit()) return true;
+        } catch (Exception unavailable) { /* Restore the in-memory prefs snapshot too. */ }
+        // SharedPreferences updates memory even when commit reports a disk failure.
+        try { prefs.edit().putString(KEY, previous).commit(); }
+        catch (Exception unavailable) { /* Do not activate an identity after storage failure. */ }
+        return false;
+    }
+
     static JSONObject me(Context c) {
         try {
             String s = prefs(c).getString(KEY, "");
@@ -33,8 +59,18 @@ final class SalonStore {
         } catch (Exception e) { return new JSONObject(); }
     }
 
-    static void save(Context c, JSONObject me) {
-        prefs(c).edit().putString(KEY, me.toString()).apply();
+    static synchronized void save(Context c, JSONObject me) {
+        try {
+            JSONObject current = identityRecord(c);
+            // A stale profile draft or hosted profile must never replace local messaging keys.
+            for (String key : new String[]{"msgseed", "msgpk"}) {
+                if (current.has(key)) me.put(key, current.get(key));
+                else me.remove(key);
+            }
+            prefs(c).edit().putString(KEY, me.toString()).apply();
+        } catch (Exception unavailable) {
+            // Preserve malformed storage; identity operations report a recoverable error.
+        }
     }
 
     static boolean hasIdentity(Context c) {
@@ -44,7 +80,8 @@ final class SalonStore {
 
     static String get(Context c, String k) { return me(c).optString(k, ""); }
 
-    static void put(Context c, String k, String v) {
+    static synchronized void put(Context c, String k, String v) {
+        if ("msgseed".equals(k) || "msgpk".equals(k)) return;
         JSONObject m = me(c);
         try { m.put(k, v == null ? "" : v); } catch (Exception ignored) {}
         save(c, m);
@@ -57,7 +94,7 @@ final class SalonStore {
         return a == null ? new JSONArray() : a;
     }
 
-    static void setArr(Context c, String k, JSONArray a) {
+    static synchronized void setArr(Context c, String k, JSONArray a) {
         JSONObject m = me(c);
         try { m.put(k, a == null ? new JSONArray() : a); } catch (Exception ignored) {}
         save(c, m);
@@ -78,7 +115,7 @@ final class SalonStore {
         return false;
     }
 
-    static void follow(Context c, String tokenid, String handle, String url) {
+    static synchronized void follow(Context c, String tokenid, String handle, String url) {
         if (tokenid == null || tokenid.isEmpty() || isFollowing(c, tokenid)) return;
         JSONArray f = follows(c);
         try {
@@ -89,7 +126,7 @@ final class SalonStore {
         setArr(c, "follows", f);
     }
 
-    static void unfollow(Context c, String tokenid) {
+    static synchronized void unfollow(Context c, String tokenid) {
         JSONArray f = follows(c), next = new JSONArray();
         for (int i = 0; i < f.length(); i++) {
             JSONObject o = f.optJSONObject(i);

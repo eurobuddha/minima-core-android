@@ -6960,4 +6960,6 @@
     <string name="l10n_terminal_ide_wait_commands" formatted="false">"请等待待处理命令完成后再运行其他命令。"</string>
     <string name="l10n_terminal_ide_logs_preview" formatted="false">"最近日志预览 · 长条目已缩短，存储的日志保持不变。"</string>
     <string name="l10n_terminal_ide_logs_failed" formatted="false">"无法加载日志。请重新打开此标签页重试。"</string>
+    <string name="l10n_salon_identity_unavailable" formatted="false">"你的消息身份暂时不可用。已保留存储的密钥。请重新打开 Salon 重试；如有需要，可从备份恢复消息密钥。"</string>
+    <string name="l10n_salon_identity_restore_failed" formatted="false">"无法恢复消息密钥。请检查密钥，并在安全存储可用时重试。已保留你原来的身份。"</string>
 </resources>

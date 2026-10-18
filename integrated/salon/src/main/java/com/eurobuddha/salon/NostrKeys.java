@@ -30,16 +30,18 @@ final class NostrKeys {
     }
 
     /** Lowercase-hex x-only public key — the nostr "pubkey". */
-    static synchronized String pubkeyHex() {
-        if (PUBHEX.isEmpty()) PUBHEX = Hex.to(Secp256k1.pubkeyXOnly(secKey()));
-        return PUBHEX;
+    static String pubkeyHex() {
+        synchronized (SalonComms.class) {
+            if (PUBHEX.isEmpty()) PUBHEX = Hex.to(Secp256k1.pubkeyXOnly(secKey()));
+            return PUBHEX;
+        }
     }
 
     /** NIP-19 npub (bech32) form of the same public key. */
     static String npub() { return npub(Hex.from(pubkeyHex())); }
 
     /** Drop the cached pubkey after a seed import — the identity changed. */
-    static synchronized void invalidate() { PUBHEX = ""; }
+    static void invalidate() { synchronized (SalonComms.class) { PUBHEX = ""; } }
 
     /* ---------------- bech32 (encode-only, NIP-19: plain bech32, const 1) ---------------- */
 

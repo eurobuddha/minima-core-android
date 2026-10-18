@@ -25,9 +25,15 @@ final class Crypt {
     private Crypt() {}
 
     static String encrypt(String value) {
+        try { return encryptSecure(value); }
+        catch (Exception unavailable) { return "plain:" + (value == null ? "" : value); }
+    }
+
+    /** Identity storage must never fall back to plaintext. */
+    static String encryptSecure(String value) {
         if (value == null || value.isEmpty()) return "";
         try {
-            SecretKey key = key();
+            SecretKey key = key(true);
             Cipher c = Cipher.getInstance("AES/GCM/NoPadding");
             c.init(Cipher.ENCRYPT_MODE, key);
             byte[] iv = c.getIV();
@@ -36,12 +42,18 @@ final class Crypt {
             System.arraycopy(iv, 0, out, 0, iv.length);
             System.arraycopy(ct, 0, out, iv.length, ct.length);
             return "gcm:" + Base64.encodeToString(out, Base64.NO_WRAP);
-        } catch (Throwable t) {
-            return "plain:" + value;
+        } catch (Exception t) {
+            throw new SalonComms.IdentityUnavailable();
         }
     }
 
     static String decrypt(String stored) {
+        try { return decryptSecure(stored); }
+        catch (Exception unavailable) { return ""; }
+    }
+
+    /** Distinguish an unavailable encrypted value from an absent one. */
+    static String decryptSecure(String stored) {
         if (stored == null || stored.isEmpty()) return "";
         if (stored.startsWith("plain:")) return stored.substring(6);
         if (!stored.startsWith("gcm:")) return stored;   // legacy/unknown: as-is
@@ -52,20 +64,21 @@ final class Crypt {
             System.arraycopy(all, 0, iv, 0, 12);
             System.arraycopy(all, 12, ct, 0, ct.length);
             Cipher c = Cipher.getInstance("AES/GCM/NoPadding");
-            c.init(Cipher.DECRYPT_MODE, key(), new GCMParameterSpec(128, iv));
+            c.init(Cipher.DECRYPT_MODE, key(false), new GCMParameterSpec(128, iv));
             return new String(c.doFinal(ct), java.nio.charset.StandardCharsets.UTF_8);
-        } catch (Throwable t) {
-            return "";
+        } catch (Exception t) {
+            throw new SalonComms.IdentityUnavailable();
         }
     }
 
-    private static SecretKey key() throws Exception {
+    private static synchronized SecretKey key(boolean create) throws Exception {
         KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
         ks.load(null);
         KeyStore.Entry e = ks.getEntry(ALIAS, null);
         if (e instanceof KeyStore.SecretKeyEntry) {
             return ((KeyStore.SecretKeyEntry) e).getSecretKey();
         }
+        if (!create || e != null) throw new SalonComms.IdentityUnavailable();
         KeyGenerator kg = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
         kg.init(new KeyGenParameterSpec.Builder(ALIAS,
                 KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
