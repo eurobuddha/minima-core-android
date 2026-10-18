@@ -18,6 +18,7 @@ Use this section for current status. The dated entries below record earlier chec
 - **Still to reconcile in NFT Wallet:** older Tools status callbacks; nonexact Quick Send split compatibility; retained unsigned/signed transaction-file lifecycle. A review note is closed only when the current source and appropriate evidence support that conclusion.
 - **Other remaining reviews:** AtomiX admission/consent freshness, OTC market context and asynchronous locking, numeric limits and publish confirmation; Shop delayed checkout refresh and payment/retry evidence; minimaWallet real derivation performance, populated lifecycle and biometric responsiveness; remaining app-owned diagnostics and display text. Existing presentation tests do not certify these financial or runtime paths.
 - **Device acceptance:** use only Fold `R3GL805K7MB`. Preserve installed app data, seeds, wallets and counters. Disposable emulator fixtures disable AppLock and require an empty emulator; they must never run against the owner Fold. Read-only and data-preserving Fold acceptance still needs to cover language choice/persistence, retained inputs and operations, long text and accessibility.
+- **Signed candidates available:** all three 1.9.43/vc114 release candidates are in `apks/base/dist`, with SHA256 sidecars and certificates matched against 1.9.41. Compiled resources contain all 5297 messages in each language. Detailed evidence: `build/localization/signed-candidates-validation.json`. Candidate packaging is verified; final acceptance remains open.
 - **Release delivery:** signed, versioned APKs and checksums in `/Users/eurobuddha/Projects/minima/apks/base/dist`, then the authorized GitHub fork, PandaApps and eurobuddha.com publication remain outstanding. Never publish to Apple App Store or Google Play.
 
 ## Proven sources
@@ -44,7 +45,8 @@ Build inputs reuse base/app/libs/bare-kit.aar v2.5.5, keets.bundle and jniLibs, 
 - [ ] Audit hardcoded text and display-only formatting; exclude protocol/debug/raw user data explicitly. Review the bundled node source too wherever locale-sensitive formatting can reach command or persisted values.
 - [ ] Exercise all four selections, persistence and switching on the authorized Fold only, preserving installed data and wallet state. Verify app lock, retained inputs, dialogs and long labels. Keep disposable fixture guards intact; use host tests for additional API coverage.
 - [ ] Review code, run relevant regression tests, verify imports and direct transports.
-- [ ] Build all three release APKs, verify family signing certificate and version metadata, copy versioned artifacts and SHA256 sidecars to apks/base/dist.
+- [x] Build initial signed candidates for all three apps; verify certificates, package/version metadata, packaged language resources and SHA256 sidecars in apks/base/dist.
+- [ ] Rebuild and verify final accepted release APKs after remaining changes; copy final versioned artifacts and SHA256 sidecars to apks/base/dist.
 - [ ] Commit/push only to fork; publication destinations, if publishing, are GitHub, PandaApps and eurobuddha.com. Never Apple App Store/Google Play.
 
 This is an in-progress implementation, not a completed translation or release.
@@ -2524,3 +2526,21 @@ Summary: local pending and interrupted activity is now visible without weakening
 Validation: 266 NFT Wallet plus 12 shared localization JVM cases pass (278 total, zero failures/errors/skips). All three debug APKs and the Pandamonium instrumentation APK build. All 19 pinned imports reproduce; direct transport and catalogue checks pass (5297 messages/four languages). Protected financial maps, minimaWallet audit and node-JAR hashes remain unchanged. The prior fresh ownership snippet remains byte-identical. Evidence: build/localization/nft-local-history-validation.json (537 source hashes).
 
 Verdict: approve this scoped local History increment. Read-only ADB check of authorized Fold R3GL805K7MB returned device not found; no package/device data was changed. Remaining review, Fold acceptance, signed versioned artifacts and publication remain open. Candidate remains 1.9.43/vc114; no signing, push or publication.
+
+
+## Signed multilingual candidates — 2026-10-18
+
+Built all three release variants from clean source commit 4bc8b62535623438023ae9f12fefc179c487cd34 using the existing app/build.gradle family signing configuration and locally configured credentials. No signing keys or passwords were copied or printed. Reused the established dist candidate naming. The original 1.9.41/vc112 APKs remain in apks/base/app/build/outputs/apk/{classic,block,pandamonium}/release and were verified before comparison.
+
+All three 1.9.43/vc114 candidates pass apksigner verification and match the original 1.9.41 family certificate (SHA-256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f). Verified each APK's package ID/version, non-debuggable release metadata, ARM64-only native libraries and 16 KiB ZIP alignment. Inspected the compiled resources: all 5297 catalogue entries are present in each of the default English, Simplified Chinese, Russian and Ukrainian configurations, and the manifest points to a locale-config declaring en/zh-Hans/ru/uk. Android's release resource-path shortening was resolved through the resource table rather than assuming a res/xml filename. This proves packaging, not translation quality or runtime acceptance.
+
+Release Gradle tasks completed successfully in 1m41s, including vital lint. All 537 checkpoint source hashes remain unchanged. Detailed evidence: build/localization/signed-candidates-validation.json; baseline signature evidence: build/localization/release-baseline-signatures.json; build log: build/localization/signed-candidates-build.log.
+
+Versioned signed candidates and SHA256 sidecars are now in /Users/eurobuddha/Projects/minima/apks/base/dist:
+- minima-core-PandaBear-1.9.43-candidate.apk
+- minima-core-BlackBear-1.9.43-candidate.apk
+- minima-core-Pandamonium-1.9.43-candidate.apk
+
+A colocated bear-languages-1.9.43-candidate.json records source commit, signatures, hashes and pending gates. These candidates have not been installed or published. Remaining source review and Fold acceptance still apply; rebuild final artifacts after any implementation changes. The last authorized Fold check returned device not found. No other device was used.
+
+Current-source reconciliation confirms the remaining NFT notes are substantive: WalletTools callback status writes lack per-operation ownership, unlike SendView's generation checks; PreparedSendEvidence.quick requires exact equal split totals while the bundled sendnosign rounding behavior remains to resolve; PreparedSend has no terminal unsigned/signed-file cleanup. Preserve exact economics and recovery evidence when addressing those paths.
