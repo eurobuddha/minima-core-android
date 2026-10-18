@@ -1,0 +1,64 @@
+Salon backup validation and editor state review — 2026-10-18
+
+Summary
+Full backup restore now rejects malformed known profile fields, malformed hosting
+configurations and missing/duplicate destination IDs before importing a messaging
+key or changing a draft. After restoring a draft, old editor widgets are discarded
+so returning to Edit cannot overwrite the restored content. A queued completion
+cannot redraw an account that has since been replaced. Source version 1.9.87/158.
+
+Sources reused
+- Standalone Salon MainActivity.buildBackupJson/restoreFromBackup and Hosting.Profile:
+  native version-1 format, destination IDs, optional fields and merge behavior.
+- scripts/pandamonium-sources/salon/SalonStore.java: hosted-restore type checks.
+- scripts/pandamonium-sources/salon/HostedRestore.java.inc: discard retained editor
+  references before rendering restored content.
+- BackupOperations.java.inc: existing owner snapshot and lifecycle boundary.
+- Existing HostingSecrets.prepareRestore, SalonComms.checkedSeed/importSeed and
+  four-language invalid-backup/result messages remain in use.
+- Existing BackupLifecycle, HostingRestoreBoundary, SettingsLanguage and
+  HostedRestore tests; sibling Atelier HostingStore was also inspected.
+
+Findings resolved
+MAJOR — Nested malformed values were accepted by permissive JSONObject opt calls.
+A valid messaging seed could be imported before invalid profile or destination
+records were applied. BackupValidation now checks the supported integer version,
+known field types, complete content-array shape, destination IDs and configuration
+objects first. Unknown extension fields and authored strings remain unchanged.
+Credential staging and checked messaging-seed parsing still happen before writes.
+
+MAJOR — Restored content could be replaced by retained editor fields.
+The full restore now uses the same reset as hosted restore, only when the backup
+actually supplied the restored draft. An existing live identity keeps its widgets,
+text and cursor. A completion checks the resulting owner before resetting views.
+
+Validation
+- Full final run: 288 Atelier + 283 Salon + 12 localization + 158 Pandamonium host
+  tests = 741 tests; zero failures, errors or skips. Gradle succeeded in 45 seconds.
+- Nine new tests: five structure tests and four real Activity lifecycle cases.
+  Lifecycle coverage includes four languages, literal authored text, preservation
+  of active identities and a worker completion queued before account replacement.
+- Existing second-credential encryption failure test still exercises encryption
+  failure; its fixture now has real-format IDs and verifies the failing call.
+- Existing settings summary fixture also now has the IDs used by the real writer.
+- Release Java compilation passed (25 seconds with the targeted tests).
+- Real Chrome FILTR and Salon page tests passed in all four languages, preserving
+  editor/media state and authored content; these are not Android device checks.
+- Catalogue: 6828 messages in four languages. Direct transport guard passes.
+- All 21 pinned imports reproduce after the final test-fixture correction.
+- Logs/results: build/localization/salon-backup-validation-{tests,full,import}.log,
+  salon-backup-validation-results.json, creative-final-{filtr,salon-page}.log.
+
+Remaining review work — not resolved by this patch
+Full backup still persists its messaging key, draft and hosting destinations through
+separate stores; draft/hosting use apply(), so the existing code cannot guarantee
+an all-or-nothing durable restore or truthful success after disk failure. A dedicated
+persistence change and fault-injection tests are required before release acceptance.
+Initial claim/mint/poll and outgoing-message account ownership also remain to review.
+The final hardcoded-label audit, signed package verification and owner Fold visual,
+retained-state and app-lock acceptance are not complete.
+
+Verdict: Approve this validation/editor patch. The overall integration remains
+incomplete and is not approved for installation or publication by this review.
+No real key import, token transfer, device mutation, installation or publication
+was performed. Test keys, files, stores and node boundaries are synthetic/mocked.

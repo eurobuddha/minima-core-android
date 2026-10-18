@@ -76,12 +76,12 @@ public class SalonSettingsLanguageTest {
     }
     @Test public void backupSchemaAndOriginalProfileAreIndependentOfLanguage()throws Exception{
         SalonStore.put(activity,"name","Моє ім’я 中文");SalonStore.put(activity,"bio","Original Русский");String profile=SalonStore.me(activity).toString();
-        for(String code:CODES){Language.select(activity,code);JSONObject backup=new JSONObject((String)call("buildBackupJson",new Class<?>[]{}));assertEquals(1,backup.getInt("salonBackup"));assertEquals(SEED,backup.getString("msgseed"));assertEquals("Моє ім’я 中文",backup.getJSONObject("me").getString("name"));assertEquals("Original Русский",backup.getJSONObject("me").getString("bio"));assertEquals(profile,SalonStore.me(activity).toString());assertEquals(0,backup.getJSONArray("hosting").length());call("restoreFromBackup",new Class<?>[]{String.class},"{}");idle();assertEquals(Language.msg(l10n_salon_settings_invalid_backup).toString(),ShadowToast.getTextOfLatestToast());}
+        for(String code:CODES){Language.select(activity,code);JSONObject backup=new JSONObject((String)call("buildBackupJson",new Class<?>[]{}));BackupValidation.check(backup);assertEquals(1,backup.getInt("salonBackup"));assertEquals(SEED,backup.getString("msgseed"));assertEquals("Моє ім’я 中文",backup.getJSONObject("me").getString("name"));assertEquals("Original Русский",backup.getJSONObject("me").getString("bio"));assertEquals(profile,SalonStore.me(activity).toString());assertEquals(0,backup.getJSONArray("hosting").length());call("restoreFromBackup",new Class<?>[]{String.class},"{}");idle();assertEquals(Language.msg(l10n_salon_settings_invalid_backup).toString(),ShadowToast.getTextOfLatestToast());}
     }
     @Test public void restoreSummaryTranslatesCountAndKeyOutcome()throws Exception{
         try(MockedStatic<MailDb> mail=mockStatic(MailDb.class)){
             MailDb db=mock(MailDb.class);mail.when(()->MailDb.get(activity)).thenReturn(db);
-            JSONObject backup=new JSONObject().put("salonBackup",1).put("msgseed","cd".repeat(32)).put("hosting",new JSONArray().put(new JSONObject().put("type","blossom")).put(new JSONObject().put("type","mesh")));
+            JSONObject backup=new JSONObject().put("salonBackup",1).put("msgseed","cd".repeat(32)).put("hosting",new JSONArray().put(new JSONObject().put("id","first").put("type","blossom")).put(new JSONObject().put("id","second").put("type","mesh")));
             identity.when(()->SalonComms.importSeed(activity,"cd".repeat(32))).thenReturn(true);identity.when(()->SalonComms.publicId(activity)).thenReturn("public-id");
             for(boolean keep:new boolean[]{true,false}){
                 when(db.contacts()).thenReturn(keep?Arrays.asList(new MailDb.Contact()):Collections.emptyList());

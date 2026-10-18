@@ -1,5 +1,40 @@
 # Four-language bear release
 
+## Current Atelier/Salon integration checkpoint — 1.9.87/158, 2026-10-18
+
+This section supersedes the older source-version and completion-count snapshots
+below. The active goal remains incomplete. No final integration release has been
+installed or published; the authorized Fold is connected and retains its working
+1.9.85 build.
+
+- Both full native apps are imported into Pandamonium, with FILTR/art assets and
+  the common manual English, Simplified Chinese, Russian and Ukrainian selector.
+  Menu identities 17/18, Pandamonium-only dependencies, non-exported activities and
+  separate providers remain present. Salon uses the host MaxChat node/media.
+- Current host verification: 741 passing tests across Atelier (288), Salon (283),
+  shared localization (12) and Pandamonium host (158). Real Chrome FILTR and Salon
+  page tests pass in all four languages. These checks do not prove Fold acceptance.
+- 6828 catalogue messages validate in all four languages. All 21 pinned imports
+  reproduce. The direct-transport guard passes. Release Java compilation passes.
+- The latest fix validates backup structure before writes and prevents retained
+  editor widgets from undoing a restored draft. See
+  `docs/SALON_BACKUP_VALIDATION_REVIEW.txt` for scope and evidence.
+
+Remaining before accepting the full goal:
+
+1. Resolve full-backup persistence across the identity/draft/hosting stores and test
+   disk failures. Review account ownership through claim/mint/poll and outbox work.
+2. Finish the hardcoded-label audit, including Atelier's `openMinimaCore()` fallback
+   toast, and review the integrated apps' remaining asynchronous completion paths.
+3. Build final signed versioned APKs after review; verify actual packages, certificate,
+   embedded Keets components, language resources, assets and version metadata.
+4. Run the authorized Fold navigation, four-language visual/retained-input, WebView,
+   notification and lock acceptance checks while preserving owner data. Never run
+   disposable test fixtures on the owner device or operate on the S10+.
+5. Commit/push only to the fork. Any final publication remains subject to the
+   established acceptance gate and uses GitHub, PandaApps and eurobuddha.com only.
+
+
 ## Scope
 
 PandaBear, BlackBear and Pandamonium: English (`en`), Simplified Chinese (`zh-Hans`), Russian (`ru`) and Ukrainian (`uk`, Українська). Ukrainian explicitly authorized on 2026-10-16. Users choose the language; retain their choice. Language changes must preserve wallet state, edited input, active operations and app lock behavior.

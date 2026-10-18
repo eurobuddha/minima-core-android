@@ -114,4 +114,53 @@ public class SalonBackupLifecycleTest {
     @Test public void rejectedWorkerReleasesOperationForRetry()throws Exception{
         doThrow(new RejectedExecutionException()).when(worker).execute(any(Runnable.class));call("backupAccount",new Class<?>[]{});assertNull(operation());assertEquals(Language.msg(l10n_salon_backup_unavailable).toString(),ShadowToast.getTextOfLatestToast());
     }
+    @Test public void invalidNestedBackupNeverImportsKeyDraftOrDestinationsInAnyLanguage()throws Exception {
+        String before=SalonStore.me(activity).toString();
+        for(String code:new String[]{"en","zh-Hans","ru","uk"}){
+            Language.select(activity,code);
+            JSONObject[] malformed={new JSONObject(backup()).put("me",new JSONObject().put("name",17)),
+                    new JSONObject(backup()).put("hosting",new JSONArray().put(new JSONObject().put("id","broken").put("type","github").put("github","not a config")))};
+            for(JSONObject b:malformed){
+                b.put("msgseed",SEED);call("restoreFromBackup",new Class<?>[]{String.class},b.toString());idle();
+                assertEquals(before,SalonStore.me(activity).toString());assertTrue(HostingStore.list(activity).isEmpty());
+                assertEquals(Language.msg(l10n_salon_settings_invalid_backup).toString(),ShadowToast.getTextOfLatestToast());
+            }
+        }
+        identity.verify(()->SalonComms.importSeed(any(),anyString()),never());
+    }
+    @SuppressWarnings({"rawtypes","unchecked"})
+    @Test public void restoredDraftSurvivesReturningToEditorInAllFourLanguages()throws Exception {
+        field("scroll").set(activity,new ScrollView(activity));
+        for(String code:new String[]{"en","zh-Hans","ru","uk"}){
+            Language.select(activity,code);SalonStore.put(activity,"tokenid","");
+            field("screen").set(activity,Enum.valueOf((Class)field("screen").getType(),"SETTINGS"));
+            for(String key:new String[]{"edName","edBio","edAbout","edAvatar","edBanner","edWebvalidate"}){
+                EditText old=new EditText(activity);old.setText("old editor value");field(key).set(activity,old);
+            }
+            JSONObject me=new JSONObject().put("handle","restored").put("tokenid","restored-token").put("name","Literal 中文 Русский Українська");
+            call("restoreFromBackup",new Class<?>[]{String.class},new JSONObject(backup()).put("me",me).toString());idle();
+            assertNull(field("edName").get(activity));
+            Class type=field("screen").getType();call("go",new Class<?>[]{type},Enum.valueOf(type,"EDIT"));
+            assertEquals("Literal 中文 Русский Українська",((EditText)field("edName").get(activity)).getText().toString());
+            assertEquals("Literal 中文 Русский Українська",SalonStore.get(activity,"name"));
+        }
+    }
+    @Test public void preservingAnExistingIdentityAlsoKeepsItsRetainedEditorWidgets()throws Exception {
+        EditText name=new EditText(activity);name.setText("current user's edit");name.setSelection(3);field("edName").set(activity,name);
+        call("restoreFromBackup",new Class<?>[]{String.class},new JSONObject(backup()).put("me",new JSONObject().put("name","imported")).toString());idle();
+        assertSame(name,field("edName").get(activity));assertEquals("current user's edit",name.getText().toString());assertEquals(3,name.getSelectionStart());
+        assertEquals("original",SalonStore.get(activity,"tokenid"));
+    }
+
+    @Test public void queuedRestoreCompletionCannotRedrawAReplacementAccount()throws Exception {
+        SalonStore.put(activity,"tokenid","");
+        EditText old=new EditText(activity);old.setText("retained widget");field("edName").set(activity,old);
+        String json=new JSONObject(backup()).put("me",new JSONObject().put("tokenid","restored").put("handle","restored").put("name","restored draft")).toString();
+        AtomicReference<Throwable> failure=new AtomicReference<>();
+        Thread restore=new Thread(()->{try{call("restoreFromBackup",new Class<?>[]{String.class},json);}catch(Throwable e){failure.set(e);}});
+        restore.start();restore.join(5000);assertFalse(restore.isAlive());assertNull(failure.get());
+        SalonStore.put(activity,"tokenid","replacement");SalonStore.put(activity,"name","replacement draft");idle();
+        assertSame(old,field("edName").get(activity));assertEquals("replacement draft",SalonStore.get(activity,"name"));assertNull(ShadowToast.getTextOfLatestToast());
+    }
+
 }

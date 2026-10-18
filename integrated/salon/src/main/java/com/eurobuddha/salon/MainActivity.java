@@ -1108,10 +1108,11 @@ public class MainActivity extends AppCompatActivity {
     private void restoreFromBackup(String json, BackupOperation operation) {
         try {
             JSONObject b = new JSONObject(json);
-            if (b.optInt("salonBackup", 0) != 1) { runOnUiThread(() -> backupNotice(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_invalid_backup))); return; }
-            if ((b.has("hosting") && !(b.opt("hosting") instanceof JSONArray))
-                    || (b.has("me") && !(b.opt("me") instanceof JSONObject))
-                    || (b.has("msgseed") && !(b.opt("msgseed") instanceof String))) throw new IllegalArgumentException("Invalid backup fields");
+            try { BackupValidation.check(b); }
+            catch (IllegalArgumentException invalid) {
+                runOnUiThread(() -> backupNotice(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_invalid_backup)));
+                return;
+            }
             JSONArray preparedHosts = HostingSecrets.prepareRestore(b.optJSONArray("hosting"));
             // Stage credential encryption before taking the profile-edit lock.
             synchronized (SalonComms.class) { synchronized (SalonStore.class) {
@@ -1134,7 +1135,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             JSONObject me = b.optJSONObject("me");
-            if (me != null && !SalonStore.hasIdentity(this)) {   // don't clobber a live identity
+            final boolean restoredDraft = me != null && !SalonStore.hasIdentity(this);
+            if (restoredDraft) {   // don't clobber a live identity
                 JSONObject keepMsg = SalonStore.me(this);
                 if (keepMsg.has("msgseed")) try { me.put("msgseed", keepMsg.optString("msgseed")); } catch (Exception ignored) {}
                 SalonStore.save(this, me);
@@ -1145,7 +1147,14 @@ public class MainActivity extends AppCompatActivity {
                 hostN++;
             }
             final int hn = hostN; final boolean mo = msgOk, sk = seedKept;
-            runOnUiThread(() -> { if (backupClosed || isFinishing() || isDestroyed()) return; toast(Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restored_destinations, hn), mo ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_restored_suffix) : "", sk ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_kept_suffix) : "")); render(); });
+            final String restoredOwner = backupOwner();
+            runOnUiThread(() -> {
+                if (backupClosed || isFinishing() || isDestroyed()) return;
+                try { if (!restoredOwner.equals(backupOwner())) return; }
+                catch (SalonComms.IdentityUnavailable unavailable) { return; }
+                // Match hosted restore: old Edit widgets must not reapply the previous draft.
+                if (restoredDraft) edName = edBio = edAbout = edAvatar = edBanner = edWebvalidate = null;
+                toast(Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restored_destinations, hn), mo ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_restored_suffix) : "", sk ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_key_kept_suffix) : "")); render(); });
             } }
         } catch (Exception e) { runOnUiThread(() -> backupNotice(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_secret_restore_failed))); }
     }
