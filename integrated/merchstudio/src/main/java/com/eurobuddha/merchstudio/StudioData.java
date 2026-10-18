@@ -52,13 +52,14 @@ final class StudioData {
             java.util.Iterator<String> keys = object.keys();
             while (keys.hasNext()) { String port = keys.next(); add(ports, port, object.opt(port)); }
         } else throw invalid();
-        if (!ports.containsKey(0)) throw invalid();
+        // Empty/missing edition state is an unstamped coin. The existing collection
+        // loop skips it, and replayableState separately gates listable pieces.
     }
     private static void add(TreeMap<Integer,String> ports, Object rawPort, Object rawValue) {
         if (!(rawPort instanceof String || rawPort instanceof Number)
                 || !(rawValue instanceof String || rawValue instanceof Number)) throw invalid();
         String p = String.valueOf(rawPort), value = String.valueOf(rawValue);
-        if (!p.matches("[0-9]{1,3}") || !StateNft.safeStateValue(value)) throw invalid();
+        if (!p.matches("[0-9]{1,3}")) throw invalid();
         int port = Integer.parseInt(p);
         if (port > 255 || ports.put(port, value) != null) throw invalid();
     }

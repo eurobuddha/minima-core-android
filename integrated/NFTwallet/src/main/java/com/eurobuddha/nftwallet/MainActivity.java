@@ -783,16 +783,6 @@ public class MainActivity extends AppCompatActivity {
         left.setOnClickListener(scroll);
         right.setOnClickListener(scroll);
 
-        android.view.ViewGroup strip = (android.view.ViewGroup) tabs.getChildAt(0);
-        for (int i=0;i<strip.getChildCount();i++) {
-            final int position = i;
-            View tabView = strip.getChildAt(i);
-            tabView.addOnLayoutChangeListener((view, edgeLeft, edgeTop, edgeRight, edgeBottom, oldLeft, oldTop, oldRight, oldBottom) ->
-                    view.post(() -> {
-                        if (view.isAttachedToWindow() && tabs.getSelectedTabPosition() == position)
-                            view.requestRectangleOnScreen(new android.graphics.Rect(0, 0, view.getWidth(), view.getHeight()), true);
-                    }));
-        }
         tabs.getViewTreeObserver().addOnScrollChangedListener(() -> updateTabArrows(tabs, left, right));
         tabs.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or2, ob) -> updateTabArrows(tabs, left, right));
         // Selecting a tab scrolls the strip, which changes what's still off-screen.
@@ -822,18 +812,14 @@ public class MainActivity extends AppCompatActivity {
         int slack = (int) (2 * getResources().getDisplayMetrics().density);
         int overflow = strip.getWidth() - tabs.getWidth();
         int x = tabs.getScrollX();
-        final int wantLeft = x > slack ? View.VISIBLE : View.GONE;
-        final int wantRight = overflow > slack && x < overflow - slack ? View.VISIBLE : View.GONE;
+        final int wantLeft = x > slack ? View.VISIBLE : View.INVISIBLE;
+        final int wantRight = overflow > slack && x < overflow - slack ? View.VISIBLE : View.INVISIBLE;
         if (wantLeft == lastLeftVis && wantRight == lastRightVis) return;
         lastLeftVis = wantLeft;
         lastRightVis = wantRight;
         left.setVisibility(wantLeft);
         right.setVisibility(wantRight);
-        // These flips happen from a layout-change listener, i.e. DURING a layout pass, where
-        // requestLayout() is swallowed — the chevrons went VISIBLE but were never measured, so they
-        // sat at 0x0 and looked like they had never appeared. Re-request outside the pass.
-        final View row = (View) right.getParent();
-        if (row != null) row.post(row::requestLayout);
+
     }
 
     // ===== StateNFT mint engine driver =====

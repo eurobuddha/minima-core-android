@@ -28,13 +28,10 @@ def adapt(root):
  s=change(s,'    private final java.util.Set<android.app.Dialog>',utxo[start:end]+'    private final java.util.Set<android.app.Dialog>')
  s=change(s,'        Language.configurationChanged(this);','        Language.configurationChanged(this);\n        relabelMenus();')
  s=change(s,'        languageDialogs.clear();','        languageDialogs.clear();\n        for (androidx.appcompat.widget.PopupMenu m : new java.util.ArrayList<>(languageMenus.keySet())) m.dismiss();\n        languageMenus.clear();')
- # Reuse Future Cash's selected-label reveal after the tab strip has been remeasured.
- future=(root/'futurecash-next/src/main/java/com/eurobuddha/futurecashnext/MainActivity.java').read_text()
- start=future.index('            if (active) t.addOnLayoutChangeListener(')
- end=future.index('            tabsBar.addView(t);',start)
- reveal=future[start:end].replace('if (active) t.addOnLayoutChangeListener(', 'tabView.addOnLayoutChangeListener(').replace('tab.equals(id)', 'tabs.getSelectedTabPosition() == position').replace('(view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom)', '(view, edgeLeft, edgeTop, edgeRight, edgeBottom, oldLeft, oldTop, oldRight, oldBottom)')
- hook='        android.view.ViewGroup strip = (android.view.ViewGroup) tabs.getChildAt(0);\n        for (int i=0;i<strip.getChildCount();i++) {\n            final int position = i;\n            View tabView = strip.getChildAt(i);\n' + reveal + "        }\n"
- s=change(s,'        tabs.getViewTreeObserver().addOnScrollChangedListener(',hook+'        tabs.getViewTreeObserver().addOnScrollChangedListener(')
+ s=change(s,'x > slack ? View.VISIBLE : View.GONE','x > slack ? View.VISIBLE : View.INVISIBLE')
+ s=change(s,'x < overflow - slack ? View.VISIBLE : View.GONE','x < overflow - slack ? View.VISIBLE : View.INVISIBLE')
+ start=s.index('        // These flips happen from a layout-change listener');end=s.index('\n    }',start)
+ s=s[:start]+s[end:]
  save(p,s)
  p,s=load('WalletView');s=change(s,'        menu.show();','        act.showLanguageMenu(menu);')
  s=change(s,'        clearBtn.setTextColor(Design.accent());','        clearBtn.setTextColor(Design.accent());\n        for (Button button : new Button[]{toolsBtn, clearBtn, sendBtn})\n            button.setPaddingRelative(dp(6), button.getPaddingTop(), dp(6), button.getPaddingBottom());')

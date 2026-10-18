@@ -32,7 +32,7 @@ public class StudioDataTest {
   rejects(()->StudioData.collection(reply(new JSONArray().put(coin(1,"7")).put(coin(2,"0007"))),TOKEN,100));
  }
  @Test public void malformedStateCannotSilentlyEraseKnownPieces()throws Exception{
-  for(Object state:new Object[]{JSONObject.NULL,"invalid",obj(),new JSONArray(),new JSONArray().put("bad"),new JSONArray().put(obj("port",0,"data","1")).put(obj("port","00","data","2")),obj("0",true),obj("0","1","256","2")}){JSONObject bad=coin(1,"1").put("state",state);rejects(()->StudioData.collection(reply(new JSONArray().put(bad)),TOKEN,100));}
+  for(Object state:new Object[]{JSONObject.NULL,"invalid",new JSONArray().put("bad"),new JSONArray().put(obj("port",0,"data","1")).put(obj("port","00","data","2")),obj("0",true),obj("0","1","256","2")}){JSONObject bad=coin(1,"1").put("state",state);rejects(()->StudioData.collection(reply(new JSONArray().put(bad)),TOKEN,100));}
   JSONObject good=coin(1,"1").put("state",new JSONArray().put(obj("port",0,"data","1")));assertEquals(1,StudioData.collection(reply(new JSONArray().put(good)),TOKEN,100).length());
  }
  @Test public void buriedAndUnstampedCoinsDoNotConflictWithListableEdition()throws Exception{
@@ -81,5 +81,16 @@ public class StudioDataTest {
   }
   for(String name:new String[]{"Token","Send","[1,2]","{unfinished","中文 Русский Українська"})
    assertEquals(name,TokenMeta.parse(name,TOKEN).name);
+ }
+
+ @Test public void unstampedAndUnsupportedStateDoNotHideTheEntireCollection() throws Exception {
+  for(Object state:new Object[]{new JSONArray(),obj(),obj("1","[AAAA]"),obj("0","\"1\""),obj("0","1","2","creator note")}) {
+   JSONObject other=coin(2,"1").put("state",state),good=coin(1,"7");
+   JSONArray rows=new JSONArray().put(good).put(other);String before=rows.toString();
+   assertSame(rows,StudioData.collection(reply(rows),TOKEN,100));
+   assertEquals(before,rows.toString());
+   assertEquals(7,StudioData.pieceIndex(good,100));assertTrue(StateNft.replayableState(good));
+   assertTrue(StateNft.stamped(other)==null || !StateNft.replayableState(other));
+  }
  }
 }

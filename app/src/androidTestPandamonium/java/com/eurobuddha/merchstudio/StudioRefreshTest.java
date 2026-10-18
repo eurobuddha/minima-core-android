@@ -71,4 +71,19 @@ public class StudioRefreshTest {
    s.onActivity(a->{fixture(a);p.set(product(a));file.set(photo(a));show(a,"buildProductEditor",p.get());page.set(stack(a).peek());inputs(page.get()).get(1).setSelection(3);worker.set(io(a));attach(a,p.get(),file.get());});worker.get().submit(()->{}).get(15,TimeUnit.SECONDS);settle();s.onActivity(a->{assertSame(page.get(),stack(a).peek());assertEquals(3,inputs(page.get()).get(1).getSelectionStart());String accepted=(String)get(p.get(),"imageB64");assertFalse(accepted.isEmpty());assertNotNull(((ImageView)page.get().findViewWithTag(p.get())).getDrawable());long request=(Long)get(p.get(),"photoRequest");call(a,"applyPhoto",new Class<?>[]{p.get().getClass(),long.class,String.class},p.get(),request-1,"stale");assertEquals(accepted,get(p.get(),"imageB64"));products(a).remove(p.get());call(a,"applyPhoto",new Class<?>[]{p.get().getClass(),long.class,String.class},p.get(),request,"removed");assertEquals(accepted,get(p.get(),"imageB64"));assertSame(page.get(),stack(a).peek());});
   }finally{if(file.get()!=null)assertTrue(file.get().delete());}
  }
+
+ @Test public void unstampedCoinsDoNotBlockCollectionOrDiscardEditedListings(){
+  try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){settle();s.onActivity(a->{
+   ReplayNode n=fixture(a);Object col=collection(a);load(a,col);
+   n.take("coins relevant:true tokenid:"+TOKEN).onResult(reply(new JSONArray().put(coin(1,"1"))));
+   Object piece=listings(a).get(TOKEN+"#1");assertNotNull(piece);set(piece,"listed",true);set(piece,"price","0004.2500");set(piece,"name","Edited name");
+   JSONObject unstamped=coin(2,"0"),unsupported=coin(3,"3");
+   try {unstamped.put("state",new JSONArray());unsupported.put("state",obj("0","3","2","creator note"));}catch(Exception e){throw new AssertionError(e);}
+   load(a,col);n.take("coins relevant:true tokenid:"+TOKEN).onResult(reply(new JSONArray().put(coin(1,"1")).put(unstamped).put(unsupported)));
+   assertEquals(true,get(col,"coinsVerified"));assertEquals(false,get(col,"coinsLoading"));
+   assertEquals(1,get(col,"unstampedCount"));assertEquals(1,((List<?>)get(col,"ownedCoins")).size());
+   assertSame(piece,listings(a).get(TOKEN+"#1"));assertEquals("0004.2500",get(piece,"price"));assertEquals("Edited name",get(piece,"name"));
+   assertFalse(listings(a).containsKey(TOKEN+"#3"));
+  });}
+ }
 }

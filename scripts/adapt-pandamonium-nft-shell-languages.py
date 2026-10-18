@@ -107,6 +107,7 @@ def adapt(root):
    if raw in mapping:
     assert v.get(a+'tag') is None
     v.set(a+'text','@string/'+mapping[raw]);v.set(a+'tag','l10n:text='+mapping[raw])
+   if v.get(a+'id','').endswith(('tabScrollLeft','tabScrollRight')):v.set(a+'visibility','invisible')
    if v.get(a+'id','').endswith(('designToggle','settingsBtn','tabScrollLeft','tabScrollRight')):
     v.set(a+'minHeight','48dp');v.set(a+'minWidth','48dp');v.set(a+'gravity','center')
   E.indent(tree,space='    ');tree.write(p,encoding='unicode',xml_declaration=True)

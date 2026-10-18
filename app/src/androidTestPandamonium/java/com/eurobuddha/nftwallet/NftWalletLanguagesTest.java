@@ -84,4 +84,35 @@ public class NftWalletLanguagesTest {
             s.onActivity(a->exact(details.get().getWindow().getDecorView(),Language.msg(l10n_language_close)).performClick());settle();s.onActivity(a->assertTrue(dialogs(a).isEmpty()));
         }
     }
+
+    @Test public void manualTabScrollSurvivesArrowChangesAndLayout() throws Exception {
+        try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)) {
+            settle();
+            scenario.onActivity(a->{
+                freeze(a);a.goToTab(MainActivity.TAB_BALANCES);
+                com.google.android.material.tabs.TabLayout tabs=a.findViewById(R.id.pm_nftwallet_tabs);
+                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)tabs.getLayoutParams();
+                lp.width=(int)(180*a.getResources().getDisplayMetrics().density);lp.weight=0;tabs.setLayoutParams(lp);
+            });
+            settle();android.os.SystemClock.sleep(1300);
+            scenario.onActivity(a->{
+                com.google.android.material.tabs.TabLayout tabs=a.findViewById(R.id.pm_nftwallet_tabs);
+                assertTrue(tabs.getChildAt(0).getWidth()>tabs.getWidth());
+                tabs.smoothScrollTo(tabs.getChildAt(0).getWidth()-tabs.getWidth(),0);
+            });
+            settle();android.os.SystemClock.sleep(500);
+            scenario.onActivity(a->{a.findViewById(R.id.pm_nftwallet_tabs).requestLayout();});
+            settle();
+            scenario.onActivity(a->{
+                com.google.android.material.tabs.TabLayout tabs=a.findViewById(R.id.pm_nftwallet_tabs);
+                assertEquals(MainActivity.TAB_BALANCES,a.currentTab());
+                assertTrue("Manual scroll must not snap back to the selected tab",tabs.getScrollX()>0);
+                View history=((android.view.ViewGroup)tabs.getChildAt(0)).getChildAt(MainActivity.TAB_HISTORY);
+                android.graphics.Rect visible=new android.graphics.Rect();
+                assertTrue("Last tab must remain reachable",history.getGlobalVisibleRect(visible));
+                assertEquals(history.getWidth(),visible.width());history.performClick();
+                assertEquals(MainActivity.TAB_HISTORY,a.currentTab());
+            });
+        }
+    }
 }

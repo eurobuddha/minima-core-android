@@ -3100,3 +3100,20 @@ The full NFT display fix review and 25-task regression finished before building 
 - `minima-core-Pandamonium-1.9.50-candidate.apk`: `ed4a2e30dfe491fce0d82b89f3a7e9f6d3c9a7471fb268958dbbb5bab3b92b53`
 
 Evidence: `build/localization/signed-candidates-1.9.50-validation.json` and `dist/bear-languages-1.9.50-candidate.json`. These builds include the integrated UTXO Wallet, NFT Wallet and MiniMall Studio fixes. No 1.9.50 installation or public publication occurred. The owner disconnected the Fold while AFK; resume data-preserving installation and visual/runtime acceptance when it is reconnected.
+
+
+## NFT tab scrolling and Studio collection reads — 1.9.51, 2026-10-18
+
+### Summary
+Reviewed all changed files against ad369c4 and their callers. NFT Wallet now keeps the arrow slots measured and delegates selected-tab scrolling to its existing TabLayout/ViewPager implementation. Removing unconditional selected-tab reveal callbacks prevents manual scrolling from being undone by layout. Importer adapters reproduce both Java and layout changes.
+
+StudioData now accepts structurally valid empty or unsupported state in a complete coin snapshot. Existing MainActivity.loadCollectionCoins and StateNft.stamped/replayableState logic counts unstamped coins and excludes unsupported pieces from listings. Coin identity, duplicate detection, amount validation, state shape/port checks, edition bounds and sale/export replayability checks remain enforced. Existing edited listings are retained for surviving valid pieces.
+
+### Findings
+No unresolved correctness finding in this patch. The actual owner-specific Studio response remains unobserved; the regression proves a concrete cause of the same error rather than confirming every possible source of that toast.
+
+### Validation
+2,687 host tests pass across 25 tasks (four NO-SOURCE). The new Studio regression failed before the validation fix and passes afterward. All 19 pinned imports reproduce; direct transport and 5,337-message/four-language catalogue checks pass. New guarded device regressions cover manual tab scrolling through a layout pass and retaining edited listings alongside unstamped/unsupported coins. These compile with the unrelated Atomix fixture group excluded; full instrumentation compilation fails on existing obsolete OtcDb calls in AtomixOtcLanguagesTest and AtomixCurrencyLanguagesTest. They were not run on the owner Fold, and their disposable-device guards remain intact.
+
+### Verdict
+Approve this source patch for signed candidate builds. Fold visual confirmation, the exact owner Studio error and broader multilingual runtime acceptance remain pending. Evidence: `build/localization/bear-1.9.51-validation.json`.
