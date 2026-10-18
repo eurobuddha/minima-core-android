@@ -67,5 +67,6 @@ availability or user verification of a fingerprint. No real upload, message, tok
 transfer, seed operation, install or publication was performed for this change.
 
 Verdict
-Approve this source patch. Signed package verification and authorized Fold acceptance
-remain separate requirements before completing the Atelier/Salon integration goal.
+Approve this source patch. All three signed 1.9.93 candidates subsequently passed
+package verification; see ATELIER_SALON_CANDIDATE_1.9.93.txt. Authorized Fold acceptance
+remains required before completing the Atelier/Salon integration goal.

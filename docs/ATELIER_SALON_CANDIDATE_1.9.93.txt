@@ -1,0 +1,49 @@
+Atelier/Salon integration — signed 1.9.93 candidates, 2026-10-19
+
+Source commit: 27c23e5253258ac2341d6df9136d49175b89a7bd
+Branch: feature/bear-languages-2026-10-16
+Fork: https://github.com/eurobuddha/minima-core-android
+Version: 1.9.93, versionCode 164
+
+All three local candidates passed:
+- Original family signing certificate and APK v2 signature verification.
+- Package ID, version name/code and non-debuggable release metadata.
+- arm64-v8a packaging and 16 KiB ZIP alignment.
+- All 6843 catalogue resources in English, Simplified Chinese, Russian and Ukrainian.
+- Explicit four-language locale configuration.
+- Exact pinned Keets bundle, 21 native addon versions and Bare runtime contents.
+
+Pandamonium additionally passed:
+- Atelier, FILTR, MintService, Salon, SalonComms, MaximaLink and DirectNodeApi classes in DEX.
+- Private Atelier/FILTR/Salon activities and separate non-exported file providers.
+- All 11 Atelier art/FILTR/model assets byte-identical to imported sources.
+- Creative classes/assets absent from PandaBear and BlackBear.
+
+Candidates (each has an adjacent .sha256 sidecar):
+PandaBear: /Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-PandaBear-1.9.93-candidate.apk
+SHA-256: fdc00dc8351bb0d765fb9507936c4e23526958245d3cfbe455544effa61fc5cc
+BlackBear: /Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-BlackBear-1.9.93-candidate.apk
+SHA-256: 345adced6f56341e1fa49122a77977d571f6cbf90dc77ac75ca4a9e52a50c64b
+Pandamonium: /Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-1.9.93-candidate.apk
+SHA-256: 35e32ebf72bad101429ed20221a195299cc4ccce19dc047c5ca35f811ec0f2f6
+
+Build: build/localization/bear-1.9.93-build.log (953 tasks; successful).
+Package evidence: build/localization/signed-candidates-1.9.93-validation.json
+Verifier: build/localization/verify-signed-candidates-1.9.93.py
+Candidate manifest: /Users/eurobuddha/Projects/minima/apks/base/dist/bear-languages-1.9.93-candidate.json
+
+Source review: docs/ATELIER_HOSTING_CHECKS_REVIEW.txt and the preceding scoped
+Atelier/Salon review documents. Full host suite: 848 passing tests; all 21 pinned
+imports reproduce; direct-node transport and catalogue validation pass.
+
+Acceptance boundary
+These are verified local candidates, not a published release. No phone installation,
+real upload/message/token transfer, seed operation or publication was performed.
+The Fold last verified on this task remains 1.9.85/code156. Only Fold R3GL805K7MB
+user 0 is authorized; the S10+ must remain untouched.
+
+Still required: owner Fold checks of app navigation, all four languages, retained
+inputs, WebView exports, notifications and lock behavior. Keep disposable test
+fixtures off the owner device. The integration goal remains incomplete until that
+acceptance is established. Subsequent accepted publication destinations are the
+GitHub fork, PandaApps and eurobuddha.com only.

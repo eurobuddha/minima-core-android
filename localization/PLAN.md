@@ -47,14 +47,18 @@ checkpoint performs no device changes.
   The native active-label audit completed, including the remaining NFT reclassification
   toast in all four languages. Review: `docs/ATELIER_HOSTING_CHECKS_REVIEW.txt`.
 
+- All three signed 1.9.93/code164 candidates were built from 27c23e5 and verified
+  against the existing certificate, actual APK metadata, all four packaged languages,
+  Keets bundle/native runtime, and Pandamonium's creative classes/assets/providers.
+  Versioned APKs and SHA256 sidecars are in `apks/base/dist`. Details and hashes:
+  `docs/ATELIER_SALON_CANDIDATE_1.9.93.txt`. No install or publication occurred.
+
 Remaining before accepting the full goal:
 
-1. Build final signed versioned APKs after review; verify actual packages, certificate,
-   embedded Keets components, language resources, assets and version metadata.
-2. Run the authorized Fold navigation, four-language visual/retained-input, WebView,
+1. Run the authorized Fold navigation, four-language visual/retained-input, WebView,
    notification and lock acceptance checks while preserving owner data. Never run
    disposable test fixtures on the owner device or operate on the S10+.
-3. Commit/push only to the fork. Any final publication remains subject to the
+2. Source 27c23e5 is committed and pushed to the fork. Any final publication remains subject to the
    established acceptance gate and uses GitHub, PandaApps and eurobuddha.com only.
 
 
