@@ -6614,4 +6614,11 @@
     <string name="l10n_core_service_started" formatted="false">"Minima service started"</string>
     <!-- Arguments: port -->
     <string name="l10n_core_node_port_busy">"Another Minima node is already running on this device. Stop it first: two nodes cannot share port %1$s."</string>
+    <!-- Arguments: count -->
+    <plurals name="l10n_chat_new_messages">
+        <item quantity="one">"%1$d new message"</item>
+        <item quantity="other">"%1$d new messages"</item>
+    </plurals>
+    <string name="l10n_chat_tap_open" formatted="false">"Tap to open"</string>
+    <string name="l10n_chat_payment_preview" formatted="false">"💸 Payment"</string>
 </resources>

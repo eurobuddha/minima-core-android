@@ -9,6 +9,9 @@ import android.content.Intent;
 import androidx.core.app.NotificationCompat;
 
 import com.eurobuddha.minimacore.R;
+import com.eurobuddha.minimacore.i18n.ChatPreview;
+import com.eurobuddha.minimacore.i18n.Language;
+import static com.eurobuddha.minimacore.i18n.R.string.*;
 import com.eurobuddha.minimacore.chat.ChatDrainer;
 import com.eurobuddha.maxima.core.MaximaNode;
 import com.eurobuddha.maxima.core.chat.ChatEngine;
@@ -29,9 +32,9 @@ final class MaxChatNotifier {
     static void onInbound(Context zCtx, MaximaNode zNode, ChatEngine.Entry zEntry) {
         try {
             Contact c = zNode.contact(zEntry.sender);
-            String who = c != null && !c.name.isEmpty() ? c.name : "Parlons contact";
-            String what = ChatMedia.isMedia(zEntry.body) ? ChatMedia.preview(zEntry.body)
-                    : ChatPay.isPayment(zEntry.body) ? "💸 Payment"
+            String who = c != null && !c.name.isEmpty() ? c.name : Language.text(zCtx, l10n_chat_parlons_contact);
+            String what = ChatMedia.isMedia(zEntry.body) ? ChatPreview.text(zCtx, zEntry.body)
+                    : ChatPay.isPayment(zEntry.body) ? Language.text(zCtx, l10n_chat_payment_preview)
                     : zEntry.body;
 
             Intent it = zCtx.getPackageManager()

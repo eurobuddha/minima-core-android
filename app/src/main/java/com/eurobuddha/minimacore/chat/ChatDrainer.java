@@ -169,8 +169,8 @@ public class ChatDrainer {
                         fresh++;
                         lastFrom = from;
                         lastName = db.contactName(from);
-                        lastBody = d.state.equals("image") ? "📷 Photo"
-                                 : d.state.equals("audio") ? "🎤 Voice note"
+                        lastBody = d.state.equals("image") ? Language.text(zService, l10n_media_photo)
+                                 : d.state.equals("audio") ? Language.text(zService, l10n_media_voice)
                                  : d.state.equals("payment") ? "💸 " + d.amt + " " + (d.tokname.equals("") ? "Minima" : d.tokname)
                                  : d.body;
 
@@ -230,8 +230,9 @@ public class ChatDrainer {
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
             Notification n = new NotificationCompat.Builder(zService, CHANNEL_ID)
-                    .setContentTitle(zFresh > 1 ? "KeetChat — " + zFresh + " new messages" : zName)
-                    .setContentText(zFresh > 1 ? "Tap to open" : zBody)
+                    .setContentTitle(zFresh > 1 ? Language.join("KeetChat — ", Language.count(
+                            com.eurobuddha.minimacore.i18n.R.plurals.l10n_chat_new_messages, zFresh)) : zName)
+                    .setContentText(zFresh > 1 ? Language.msg(l10n_chat_tap_open) : zBody)
                     .setSmallIcon(R.drawable.ic_minima)
                     .setAutoCancel(true)
                     .setContentIntent(pi)

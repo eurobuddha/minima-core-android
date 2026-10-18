@@ -6676,4 +6676,13 @@
     <string name="l10n_core_service_started" formatted="false">"Служба Minima запущена"</string>
     <!-- Arguments: port -->
     <string name="l10n_core_node_port_busy">"На этом устройстве уже работает другой узел Minima. Сначала остановите его: два узла не могут использовать один порт %1$s."</string>
+    <!-- Arguments: count -->
+    <plurals name="l10n_chat_new_messages">
+        <item quantity="one">"%1$d новое сообщение"</item>
+        <item quantity="few">"%1$d новых сообщения"</item>
+        <item quantity="many">"%1$d новых сообщений"</item>
+        <item quantity="other">"%1$d нового сообщения"</item>
+    </plurals>
+    <string name="l10n_chat_tap_open" formatted="false">"Нажмите, чтобы открыть"</string>
+    <string name="l10n_chat_payment_preview" formatted="false">"💸 Платёж"</string>
 </resources>
