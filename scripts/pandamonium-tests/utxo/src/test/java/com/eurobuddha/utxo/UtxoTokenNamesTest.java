@@ -41,4 +41,25 @@ public class UtxoTokenNamesTest {
         assertEquals("Send Русский Українська $1",parsed.description);assertEquals("public owner",parsed.owner);
         assertEquals("8",parsed.decimals);assertEquals("https://example.invalid/token name",parsed.externalUrl);
     }
+
+    @Test public void serializedMetadataUsesTheCoreBalanceNameAndIcon() throws Exception {
+        String image = "data:image/png;base64," + String.join("", java.util.Collections.nCopies(32768, "AAAA"));
+        JSONObject details=name("Колекція 中文").put("url",image).put("ticker","NFT");
+        for (Object token : new Object[]{details.toString(), name(details).toString(), name(details.toString()), name(details.toString()).toString()}) {
+            JSONObject input=row(token); String before=input.toString();
+            Coin coin=Coin.from(input); TokenBalance balance=TokenBalance.from(input);
+            assertEquals("Колекція 中文",coin.tokenName);
+            assertEquals("Колекція 中文",balance.name);
+            assertTrue(coin.tokenNameProvided); assertTrue(balance.meta.nameProvided);
+            assertEquals(image,balance.meta.iconUrl); assertEquals("NFT",balance.meta.ticker);
+            assertEquals("12.340000",coin.amount); assertEquals(before,input.toString());
+        }
+    }
+    @Test public void serializedMissingNamesDoNotBecomeJsonLabels() throws Exception {
+        for (Object token : new Object[]{"{}", name(new JSONObject()).toString(), name("{}"), name(JSONObject.NULL).toString()}) {
+            assertFalse(TokenMeta.parse(token,"0x1234").nameProvided);
+            assertFalse(Coin.from(row(token)).tokenNameProvided);
+        }
+        assertEquals("{unfinished",TokenMeta.parse("{unfinished","0x1234").name);
+    }
 }

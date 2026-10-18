@@ -41,4 +41,59 @@ public class NftTokenNamesTest {
         assertEquals("Send Русский Українська $1",parsed.description);assertEquals("public owner",parsed.owner);
         assertEquals("8",parsed.decimals);assertEquals("https://example.invalid/token name",parsed.externalUrl);
     }
+
+    @Test public void serializedMetadataUsesTheCoreBalanceNameAndIcon() throws Exception {
+        String image = "data:image/png;base64," + String.join("", java.util.Collections.nCopies(32768, "AAAA"));
+        JSONObject details=name("Колекція 中文").put("url",image).put("ticker","NFT");
+        for (Object token : new Object[]{details.toString(), name(details).toString(), name(details.toString()), name(details.toString()).toString()}) {
+            JSONObject input=row(token); String before=input.toString();
+            Coin coin=Coin.from(input); TokenBalance balance=TokenBalance.from(input);
+            assertEquals("Колекція 中文",coin.tokenName);
+            assertEquals("Колекція 中文",balance.name);
+            assertTrue(coin.tokenNameProvided); assertTrue(balance.meta.nameProvided);
+            assertEquals(image,balance.meta.iconUrl); assertEquals("NFT",balance.meta.ticker);
+            assertEquals("12.340000",coin.amount); assertEquals(before,input.toString());
+        }
+    }
+    @Test public void serializedMissingNamesDoNotBecomeJsonLabels() throws Exception {
+        for (Object token : new Object[]{"{}", name(new JSONObject()).toString(), name("{}"), name(JSONObject.NULL).toString()}) {
+            assertFalse(TokenMeta.parse(token,"0x1234").nameProvided);
+            assertFalse(Coin.from(row(token)).tokenNameProvided);
+        }
+        assertEquals("{unfinished",TokenMeta.parse("{unfinished","0x1234").name);
+    }
+
+    @Test public void serializedCollectionsKeepTheirCoverAndIdentity() throws Exception {
+        JSONObject details=name("Collection 中文 Українська").put("mode","url").put("size",12)
+                .put("base","https://example.invalid/nft/").put("ext",".png")
+                .put("url","https://example.invalid/cover.png");
+        for (Object metadata : new Object[]{details,details.toString()}) {
+            JSONObject token=name(metadata).put("totalamount","12");
+            for (Object value : new Object[]{token,token.toString()}) {
+                JSONObject envelope=new JSONObject().put("token",value).put("script","RETURN TRUE");
+                String before=envelope.toString();
+                for (Object record : new Object[]{envelope,envelope.toString(),value}) {
+                    StateNft.Meta meta=StateNft.parseMeta("0x1234",record);
+                    assertEquals("Collection 中文 Українська",meta.name); assertEquals(12,meta.size);
+                    assertEquals("url",meta.mode); assertTrue(StateNft.isCandidate(meta));
+                    assertEquals("https://example.invalid/cover.png",meta.icon);
+                    assertEquals("https://example.invalid/nft/3.png",StateNft.imageUrl(meta,3,null));
+                    TokenMeta cover=TokenMeta.parse(record,"0x1234");
+                    assertEquals(meta.name,cover.name); assertEquals(meta.icon,cover.iconUrl);
+                }
+                StateNft.Meta meta=StateNft.parseMeta("0x1234",envelope);
+                assertEquals(meta.name,NftText.collection(meta,envelope));
+                assertEquals(before,envelope.toString());
+            }
+        }
+    }
+    @Test public void unnamedCollectionDoesNotFallBackToItsJsonImagePayload() throws Exception {
+        JSONObject details=new JSONObject().put("url","https://example.invalid/cover.png").put("size",12);
+        for(Object value:new Object[]{details,details.toString()}) {
+            JSONObject token=name(value);
+            StateNft.Meta meta=StateNft.parseMeta("0x1234",token);
+            assertEquals("Collection",meta.name);
+            assertTrue(NftText.collection(meta,token) instanceof Language.Message);
+        }
+    }
 }

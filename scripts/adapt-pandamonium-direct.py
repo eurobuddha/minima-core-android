@@ -403,4 +403,7 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     spec=importlib.util.spec_from_file_location('nft_local_history',Path(__file__).with_name('adapt-pandamonium-nft-local-history.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
+    spec=importlib.util.spec_from_file_location('token_metadata',Path(__file__).with_name('adapt-pandamonium-token-metadata.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
 if __name__=='__main__': adapt(Path(sys.argv[1]))

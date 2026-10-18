@@ -37,11 +37,15 @@ public final class Util {
      * or (for raw coin entries) nested. Pull a human-readable name out of whatever we get.
      */
     public static String tokenName(Object token, String tokenid) {
+        JSONObject object = TokenMeta.tokenObject(token);
+        if (object != null) token = object;
         if (isMinima(tokenid)) return "Minima";
         if (token instanceof String) return (String) token;
         if (token instanceof JSONObject) {
             JSONObject t = (JSONObject) token;
             Object name = t.opt("name");
+            JSONObject nameObject = TokenMeta.asObject(name);
+            if (nameObject != null) name = nameObject;
             if (name instanceof JSONObject) {
                 return ((JSONObject) name).optString("name", "Token");
             }
@@ -54,10 +58,14 @@ public final class Util {
 
     /** Same provenance rule as core TokenMeta: literal Token is distinct from absent metadata. */
     public static boolean tokenNameProvided(Object token, String tokenid) {
+        JSONObject object = TokenMeta.tokenObject(token);
+        if (object != null) token = object;
         if (isMinima(tokenid)) return true;
         if (token instanceof String) return !((String)token).isEmpty();
         if (token instanceof JSONObject) {
             Object name = ((JSONObject)token).opt("name");
+            JSONObject nameObject = TokenMeta.asObject(name);
+            if (nameObject != null) name = nameObject;
             if (name instanceof JSONObject) {
                 JSONObject meta = (JSONObject)name;
                 return meta.has("name") && !meta.isNull("name") && !meta.optString("name", "").isEmpty();
