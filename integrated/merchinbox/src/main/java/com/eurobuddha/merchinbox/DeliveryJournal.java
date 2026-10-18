@@ -25,7 +25,7 @@ public final class DeliveryJournal {
             .put(o.items==null?"":o.items).put(line[1].toLowerCase(Locale.ROOT)).put(line[2]).put(line[3]).put(line[4]).toString(); }
         catch(RuntimeException e){throw DeliveryEvidence.invalid();}
     }
-    private void fresh(MerchDb.Order expected,String[] line) {
+    void fresh(MerchDb.Order expected,String[] line) {
         MerchDb.Order current=store.order(expected.ref);
         if(!binding(expected,line).equals(binding(current,line))||!current.paid
             ||!Arrays.asList(MerchDb.PAID,MerchDb.CONFIRMED,MerchDb.SHIPPED,MerchDb.DELIVERED).contains(current.status))throw DeliveryEvidence.invalid();
@@ -123,8 +123,13 @@ public final class DeliveryJournal {
                     if(abandoned)save(db,c.getString(0),other,false);
                 }
             }
+            PlainDeliveryJournal.assertAvailable(db,claiming,null);
             save(db,key,row,insert);db.setTransactionSuccessful();return row;
         }catch(JSONException e){throw DeliveryEvidence.invalid();}finally{db.endTransaction();}
+    }
+    static boolean reserved(JSONObject e) {
+        return !NOT_SUBMITTED.equals(e.optString("phase"))
+                && !(PREPARED.equals(e.optString("phase"))&&!LIVE.contains(e.optString("owner")));
     }
     boolean owned(JSONObject e) {return LIVE.contains(owner)&&PREPARED.equals(e.optString("phase"))&&owner.equals(e.optString("owner"));}
     /** PREPARED may be retried only before POSTING was durably recorded. */

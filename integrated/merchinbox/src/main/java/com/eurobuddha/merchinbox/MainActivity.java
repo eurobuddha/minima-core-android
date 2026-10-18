@@ -115,6 +115,11 @@ public class MainActivity extends AppCompatActivity {
     /** NFT sends in flight, keyed ref:tokenid — blocks double-taps while the node builds the txn. */
     private final java.util.HashSet<String> nftSending = new java.util.HashSet<>();
     private DeliveryJournal deliveryJournal;
+    private PlainDeliveryJournal plainDeliveryJournal;
+    private synchronized PlainDeliveryJournal plainDeliveryJournal() {
+        if (plainDeliveryJournal == null) plainDeliveryJournal = new PlainDeliveryJournal(db, deliveryJournal());
+        return plainDeliveryJournal;
+    }
     private final ReplyDrafts replyDrafts = new ReplyDrafts();
     private synchronized DeliveryJournal deliveryJournal() {
         if (deliveryJournal == null) deliveryJournal = new DeliveryJournal(db);
@@ -122,7 +127,12 @@ public class MainActivity extends AppCompatActivity {
     }
     private String deliveredTx(MerchDb.Order order, String[] line) {
         String key = lineKey(order.ref, line);
-        if ("0".equals(line[3]) && "0".equals(line[4])) return db.getMeta("nftsent:" + key, "");
+        if ("0".equals(line[3]) && "0".equals(line[4])) {
+            try {
+                JSONObject record = plainDeliveryJournal().load(key, order, line);
+                return PlainDeliveryJournal.complete(record) ? record.optJSONObject("receipt").optString("txpowid") : "";
+            } catch (RuntimeException unavailable) { return ""; }
+        }
         try {
             JSONObject record = deliveryJournal().load(key, order, line);
             return DeliveryJournal.complete(record) ? record.optJSONArray("entries").optJSONObject(0).optString("txpowid") : "";
@@ -200,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
         if (notifyReceiver != null) try { DirectNodeEvents.unsubscribe(notifyReceiver); } catch (Exception ignored) {}
         if (node != null) node.onDestroy();
         if (deliveryJournal != null) deliveryJournal.close();
+        if (plainDeliveryJournal != null) plainDeliveryJournal.close();
         io.shutdownNow();
     }
 
@@ -731,8 +742,8 @@ public class MainActivity extends AppCompatActivity {
         boolean ready = o.paid && o.payaddr != null && !o.payaddr.isEmpty();
         boolean inFlight = nftSending.contains(key);
         boolean resume = false;
-        if (piece || bundle) {
-            try { resume = deliveryJournal().load(key, o, line) != null
+        {
+            try { resume = (piece || bundle ? deliveryJournal().load(key, o, line) : plainDeliveryJournal().load(key, o, line)) != null
                     || !db.getMeta("nftposted:" + key, "").isEmpty() || !db.getMeta("nftsent:" + key, "").isEmpty(); }
             catch (RuntimeException unavailable) { resume = true; }
         }
@@ -762,7 +773,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** Deliver one order line. StateNFT pieces (stateIdx ≥ 1) transfer the exact coin with its state
-     *  replayed; plain NFTs go via `send` (atomic, mark-on-post). auto=true is the headless
+     *  replayed; plain NFTs use a verified native unsigned transaction. auto=true is the headless
      *  payment-confirmed path: no toasts, notifications instead, refresh only if visible. */
     private void sendNft(final MerchDb.Order o, final String[] line, final boolean auto) {
         final String tokenid = line[1], qty = line[2];
@@ -775,20 +786,20 @@ public class MainActivity extends AppCompatActivity {
 
         if (!nftSending.add(key)) return;
         refreshOrderIfTopmost(o.ref);
-        CommsTransport.sendPayment(node, o.payaddr, qty, tokenid, o.ref, new CommsTransport.SendCb() {
-            @Override public void onSent(final String txid) {
-                markSentAndMaybeAdvance(o, key, txid == null || txid.isEmpty() ? "sent" : txid, auto);
+        enqueueTx(() -> new PlainDeliveryFlow(node, plainDeliveryJournal(), io, ui,
+                () -> !isFinishing() && !isDestroyed(), new DeliveryFlow.Listener() {
+            public void posted() { txDone(); }
+            public void confirmed() { markSentAndMaybeAdvance(o, key, "sent", auto); }
+            public void unconfirmed() {
+                nftSending.remove(key);
+                CharSequence message = Language.msg(l10n_mall_inbox_delivery_unconfirmed);
+                if (auto) notifyDelivery(o.ref, false, message); else toast(message);
+                refreshOrderIfTopmost(o.ref);
             }
-            @Override public void onFailed(final String e) {
-                // A StateNFT collection sold by an old .shop has no edition index — `send` fails with
-                // an opaque sendable:0; name the real cause for the vendor.
-                if (isKnownStateCollection(tokenid)) deliverFailed(o, key, "this is a StateNFT collection but the order names no edition — the buyer's miniMall is outdated", auto);
-                else deliverFailed(o, key, e, auto);
-            }
-        });
+        }).start(o, key, line));
     }
 
-    // ---- StateNFT piece delivery (state-replay transfer, confirm by coin departure) ----
+    // ---- StateNFT piece delivery (state-replay transfer, exact receipt and inclusion) ----
 
     /** Tokenids whose script fingerprints as a StateNFT collection (memoized). */
     private final java.util.HashMap<String, Boolean> stateNftScripts = new java.util.HashMap<>();

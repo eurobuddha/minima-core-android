@@ -88,4 +88,13 @@ public class InboxDeliveryFlowTest extends InboxDeliveryFixture {
         start();assertEquals(0,posts());chains.verifyNoInteractions();verify(listener).confirmed();
     }
 
+    @Test public void postedPreMiningIdRecoversFromTheMinedHistoryHeader()throws Exception {
+        String returned=postReply.getJSONObject("response").getString("txpowid");
+        JSONObject mined=reply(1).getJSONObject("response");mined.put("txpowid","0x"+"aa".repeat(32));
+        historyReply=object("status",true,"response",object("txpows",new JSONArray().put(mined)));
+        doAnswer(c->{commands.add(c.getArgument(0));((NodeApi.Cb)c.getArgument(1)).onResult(object("status",true,"response",object("found",false)));return null;})
+            .when(node).cmd(eq("txpow onchain:"+returned),any(NodeApi.Cb.class));
+        start();assertEquals(1,posts());verify(listener).confirmed();assertEquals(DeliveryJournal.CONFIRMED,phase());
+        assertEquals(mined.getString("txpowid"),DeliveryJournal.entry(journal.load(KEY,order,line),coin(1).optString("coinid")).getString("txpowid"));
+    }
 }

@@ -106,7 +106,7 @@ final class DeliveryFlow {
     private void verifyKnown(int index) {
         if(!live())return;
         JSONArray entries=saved.optJSONArray("entries");
-        if(index>=entries.length()){pages=0;page();return;}
+        if(index>=entries.length()){work(()->saved=journal.load(key,order,line),()->{if(DeliveryJournal.complete(saved)){success();return;}pages=0;page();});return;}
         JSONObject entry=entries.optJSONObject(index);
         if(!DeliveryJournal.POSTED.equals(entry.optString("phase"))){verifyKnown(index+1);return;}
         String input=entry.optString("input"),txid=entry.optString("txpowid");
@@ -119,15 +119,15 @@ final class DeliveryFlow {
             public void onError(String error){if(live())verifyKnown(index+1);}
         });
     }
-    private boolean unknown() {
+    private boolean needsHistory() {
         JSONArray entries=saved.optJSONArray("entries");
-        for(int i=0;i<entries.length();i++)if(Arrays.asList(DeliveryJournal.POSTING,DeliveryJournal.UNKNOWN).contains(entries.optJSONObject(i).optString("phase")))return true;
+        for(int i=0;i<entries.length();i++)if(Arrays.asList(DeliveryJournal.POSTING,DeliveryJournal.UNKNOWN,DeliveryJournal.POSTED).contains(entries.optJSONObject(i).optString("phase")))return true;
         return false;
     }
     /** Reuse NFT Wallet's bounded history scan and shrink oversized replies, never a full-history request. */
     private void page() {
         if(!live())return;
-        if(!unknown()){finishPoll();return;}
+        if(!needsHistory()){finishPoll();return;}
         int start=offset,requested=pageSize;
         node.cmd("history relevant:true max:"+requested+" offset:"+start,new NodeApi.Cb(){
             public void onResult(JSONObject reply) {
@@ -159,7 +159,7 @@ final class DeliveryFlow {
         String matched=null;JSONArray entries=saved.optJSONArray("entries");
         for(int i=0;i<entries.length();i++) {
             JSONObject entry=entries.optJSONObject(i);
-            if(!Arrays.asList(DeliveryJournal.POSTING,DeliveryJournal.UNKNOWN).contains(entry.optString("phase")))continue;
+            if(!Arrays.asList(DeliveryJournal.POSTING,DeliveryJournal.UNKNOWN,DeliveryJournal.POSTED).contains(entry.optString("phase")))continue;
             try{DeliveryEvidence.receipt(reply,entry,order.payaddr);matched=entry.optString("input");break;}catch(RuntimeException mismatch){}
         }
         if(matched==null){inspect(txpows,index+1,done);return;}
