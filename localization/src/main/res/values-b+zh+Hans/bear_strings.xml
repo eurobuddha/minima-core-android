@@ -4165,7 +4165,7 @@
     <string name="l10n_mall_shop_sending_order" formatted="false">"正在发送订单和付款…"</string>
     <string name="l10n_mall_shop_placed" formatted="false">"订单已提交！"</string>
     <string name="l10n_mall_shop_unpaid" formatted="false">"订单已发送，但付款失败。请打开订单重试。"</string>
-    <string name="l10n_mall_shop_retry_unavailable" formatted="false">"无法在此重试，请打开商店重新下单。"</string>
+    <string name="l10n_mall_shop_retry_unavailable" formatted="false">"原付款地址不可用。再次付款前，请与卖家核实此订单。"</string>
     <string name="l10n_mall_shop_retrying" formatted="false">"正在重试付款"</string>
     <string name="l10n_mall_shop_payment_sent" formatted="false">"付款已发送。"</string>
     <string name="l10n_mall_shop_orders" formatted="false">"我的订单"</string>

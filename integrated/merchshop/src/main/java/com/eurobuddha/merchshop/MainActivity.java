@@ -1060,6 +1060,7 @@ public class MainActivity extends AppCompatActivity {
         m.amount = totalStr; m.currency = catalog.currency; m.tokenid = catalog.tokenid;
         m.shipping = shipId; m.delivery = delivery; m.message = note; m.buyerPayaddr = buyerPayaddr;
         m.shopId = catalog.shopId; m.shopName = catalog.shopName;
+        final String vendorAddress = catalog.vendorAddress;
 
         final AlertDialog progress = languageDialog()
                 .setTitle(Language.msg(l10n_mall_shop_placing)).setMessage(Language.msg(l10n_mall_shop_sending_order)).setCancelable(false).create();
@@ -1067,10 +1068,10 @@ public class MainActivity extends AppCompatActivity {
 
         io.execute(() -> {
             db.upsertOrder(m, "buyer", "");
-            db.setMeta("vendoraddr:" + ref, catalog.vendorAddress);   // so Retry payment works without the live catalog
-            CommsTransport.sendMessage(node, crypto, catalog.vendorPublicId, m.toWire(), new CommsTransport.SendCb() {
+            db.setMeta("vendoraddr:" + ref, vendorAddress);   // so Retry payment works without the live catalog
+            CommsTransport.sendMessage(node, crypto, m.to, m.toWire(), new CommsTransport.SendCb() {
                 @Override public void onSent(String txid) {
-                    CommsTransport.sendPayment(node, catalog.vendorAddress, totalStr, catalog.tokenid, ref, new CommsTransport.SendCb() {
+                    CommsTransport.sendPayment(node, vendorAddress, m.amount, m.tokenid, ref, new CommsTransport.SendCb() {
                         @Override public void onSent(String ptx) {
                             ui.post(() -> { dismiss(progress); cart.clear(); pop(); toast(Language.msg(l10n_mall_shop_placed)); showMyOrders(); });
                         }
@@ -1086,22 +1087,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void retryPayment(final MerchDb.Order o) {
-        // Resolve the vendor address WITHOUT the live catalog (null when reached from Home → My Orders):
-        // per-order meta first, then the stored shop, then the open catalog.
-        String vaddr = db.getMeta("vendoraddr:" + o.ref, "");
-        if (vaddr.isEmpty() && o.shopId != null && !o.shopId.isEmpty()) {
-            Catalog c = store.get(o.shopId);
-            if (c != null) vaddr = c.vendorAddress;
-        }
-        if (vaddr.isEmpty() && catalog != null) vaddr = catalog.vendorAddress;
-        if (vaddr.isEmpty()) { toast(Language.msg(l10n_mall_shop_retry_unavailable)); return; }
+        // The original order owns the destination. Imported shops may have changed since purchase.
+        final String ref = o.ref, amount = o.amount, tokenid = o.tokenid, currency = o.currency;
+        final String vaddr = db.getMeta("vendoraddr:" + ref, "");
+        if (vaddr == null || vaddr.isEmpty()) { toast(Language.msg(l10n_mall_shop_retry_unavailable)); return; }
         final AlertDialog progress = languageDialog()
-                .setTitle(Language.msg(l10n_mall_shop_retrying)).setMessage(Language.msg(l10n_mall_shop_sending_payment, o.amount, o.currency)).setCancelable(false).create();
+                .setTitle(Language.msg(l10n_mall_shop_retrying)).setMessage(Language.msg(l10n_mall_shop_sending_payment, amount, currency)).setCancelable(false).create();
         progress.show();
-        CommsTransport.sendPayment(node, vaddr, o.amount, o.tokenid, o.ref, new CommsTransport.SendCb() {
+        CommsTransport.sendPayment(node, vaddr, amount, tokenid, ref, new CommsTransport.SendCb() {
             @Override public void onSent(String txid) {
-                io.execute(() -> db.setMeta("unpaid:" + o.ref, ""));
-                ui.post(() -> { dismiss(progress); toast(Language.msg(l10n_mall_shop_payment_sent)); refreshTop(buildOrderDetail(o.ref)); });
+                io.execute(() -> db.setMeta("unpaid:" + ref, ""));
+                ui.post(() -> { dismiss(progress); toast(Language.msg(l10n_mall_shop_payment_sent)); refreshTop(buildOrderDetail(ref)); });
             }
             @Override public void onFailed(String e) { ui.post(() -> { dismiss(progress); toast(Language.msg(l10n_chat_payment_failed, ShopMessages.message(e))); }); }
         });

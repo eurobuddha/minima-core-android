@@ -4192,7 +4192,7 @@
     <string name="l10n_mall_shop_sending_order" formatted="false">"Sending your order and payment…"</string>
     <string name="l10n_mall_shop_placed" formatted="false">"Order placed!"</string>
     <string name="l10n_mall_shop_unpaid" formatted="false">"Order sent, but payment failed — open the order to retry."</string>
-    <string name="l10n_mall_shop_retry_unavailable" formatted="false">"Can\'t retry from here — open the shop and re-order."</string>
+    <string name="l10n_mall_shop_retry_unavailable" formatted="false">"The original payment address is unavailable. Review this order with the seller before paying again."</string>
     <string name="l10n_mall_shop_retrying" formatted="false">"Retrying payment"</string>
     <string name="l10n_mall_shop_payment_sent" formatted="false">"Payment sent."</string>
     <string name="l10n_mall_shop_orders" formatted="false">"My orders"</string>

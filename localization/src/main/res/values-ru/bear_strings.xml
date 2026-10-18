@@ -4246,7 +4246,7 @@
     <string name="l10n_mall_shop_sending_order" formatted="false">"Отправляем заказ и оплату…"</string>
     <string name="l10n_mall_shop_placed" formatted="false">"Заказ оформлен!"</string>
     <string name="l10n_mall_shop_unpaid" formatted="false">"Заказ отправлен, но оплата не прошла. Откройте заказ, чтобы повторить."</string>
-    <string name="l10n_mall_shop_retry_unavailable" formatted="false">"Здесь нельзя повторить оплату — откройте магазин и оформите заказ заново."</string>
+    <string name="l10n_mall_shop_retry_unavailable" formatted="false">"Исходный адрес оплаты недоступен. Прежде чем платить снова, уточните этот заказ у продавца."</string>
     <string name="l10n_mall_shop_retrying" formatted="false">"Повторная оплата"</string>
     <string name="l10n_mall_shop_payment_sent" formatted="false">"Оплата отправлена."</string>
     <string name="l10n_mall_shop_orders" formatted="false">"Мои заказы"</string>

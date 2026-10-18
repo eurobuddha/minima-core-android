@@ -4246,7 +4246,7 @@
     <string name="l10n_mall_shop_sending_order" formatted="false">"Надсилаємо замовлення й оплату…"</string>
     <string name="l10n_mall_shop_placed" formatted="false">"Замовлення оформлено!"</string>
     <string name="l10n_mall_shop_unpaid" formatted="false">"Замовлення надіслано, але оплата не пройшла. Відкрийте замовлення, щоб повторити."</string>
-    <string name="l10n_mall_shop_retry_unavailable" formatted="false">"Тут не можна повторити оплату — відкрийте магазин та оформіть замовлення знову."</string>
+    <string name="l10n_mall_shop_retry_unavailable" formatted="false">"Початкова адреса оплати недоступна. Перш ніж платити знову, уточніть це замовлення у продавця."</string>
     <string name="l10n_mall_shop_retrying" formatted="false">"Повторна оплата"</string>
     <string name="l10n_mall_shop_payment_sent" formatted="false">"Оплату надіслано."</string>
     <string name="l10n_mall_shop_orders" formatted="false">"Мої замовлення"</string>

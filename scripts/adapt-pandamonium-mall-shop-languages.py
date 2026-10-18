@@ -87,7 +87,8 @@ def adapt(root):
  dynamic={'identityError','products','added','removeTitle','nftPays','pays','collectionPieces','completePieces','editions','cartSummary','maximum','bundleContents','editionOf','buy','subtotal','shippingFee','grandTotal','payAmount','payTitle','payHelp','orderError','sendingPayment','paymentError','vendorSays','youSay','sendError','free','allPieces','enquiry','timelinePlaced','timelinePaid','timelineDelivered','minus','plus','messageVendor','invalidPayment'}|{k for k in labels if k.startswith('status')}
  for key in labels:
   if key in dynamic:continue
-  literal=json.dumps(catalog[labels[key]]['en'],ensure_ascii=False)
+  source = "Can't retry from here — open the shop and re-order." if key == 'retryUnavailable' else catalog[labels[key]]['en']
+  literal=json.dumps(source,ensure_ascii=False)
   if literal in s:change(literal,msg(key))
   else:raise AssertionError(('Unused Shop label',key,literal))
  # Helpers retain descriptors; arbitrary strings are never matched against translated labels.
