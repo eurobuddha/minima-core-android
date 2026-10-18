@@ -757,9 +757,11 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         Object tok = row.opt("token");
         String name = Util.tokenName(tok);
         String ticker = "";
-        if (tok instanceof JSONObject) {
-            Object n = ((JSONObject) tok).opt("name");
-            if (n instanceof JSONObject) ticker = ((JSONObject) n).optString("ticker", "");
+        JSONObject tokenObject = Util.tokenObject(tok);
+        if (tokenObject != null) {
+            JSONObject n = Util.asObject(tokenObject.opt("name"));
+            ticker = n == null ? "" : n.optString("ticker", "");
+            if (ticker.isEmpty()) ticker = tokenObject.optString("ticker", "");
         }
         LinearLayout r = horizontal(Gravity.CENTER_VERTICAL);
         r.setBackground(Design.ruled(this, Design.CARD(), Design.INK(), 1.5f));
@@ -817,10 +819,10 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                     String tid = row.optString("tokenid", "");
                     if ("0x00".equals(tid) || known.contains(tid)) continue;
                     Object tok = row.opt("token");
-                    if (!(tok instanceof JSONObject)) { tokenRows.add(row); continue; }
-                    JSONObject t = (JSONObject) tok;
-                    Object nameObj = t.opt("name");
-                    JSONObject metaObj = nameObj instanceof JSONObject ? (JSONObject) nameObj : t;
+                    JSONObject t = Util.tokenObject(tok);
+                    if (t == null) { tokenRows.add(row); continue; }
+                    JSONObject metaObj = Util.asObject(t.opt("name"));
+                    if (metaObj == null) metaObj = t;
                     StateNft.Meta cand = StateNft.parseMeta(tid, t);
                     if (StateNft.isCandidate(cand)) {
                         // un-adopted StateNFT held in this wallet: adopt it

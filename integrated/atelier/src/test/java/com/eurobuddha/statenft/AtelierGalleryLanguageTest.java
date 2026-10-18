@@ -146,4 +146,15 @@ public class AtelierGalleryLanguageTest {
         for(String code:CODES){Language.select(activity,code);Language.apply(card);layout(card);assertNotNull(find(card,Language.msg(l10n_atelier_gallery_collection_summary,Language.msg(l10n_atelier_gallery_token_pending),0,0,0).toString()));assertNotNull(find(card,upper(l10n_atelier_gallery_lot_pending)));}
     }
 
+    @Test public void galleryClassifiesSerializedNftMetadataAndRetainsRawRows()throws Exception{
+        NodeApi node=(NodeApi)field("node").get(activity);List<NodeApi.Cb> balance=new ArrayList<>();when(node.isEnabled()).thenReturn(true);
+        doAnswer(call->{balance.add(call.getArgument(1));return null;}).when(node).cmd(eq("balance"),any(NodeApi.Cb.class));
+        JSONObject metadata=new JSONObject().put("name","Literal NFT 中文").put("nft",true).put("url","https://example.invalid/art.png");
+        for(Object raw:new Object[]{metadata,metadata.toString(),new JSONObject().put("name",metadata.toString()).toString(),new JSONObject().put("token",metadata.toString())}){
+            JSONObject row=new JSONObject().put("tokenid","0x1234").put("token",raw).put("total","1");String before=row.toString();
+            render("galleryScan");balance.get(balance.size()-1).onResult(new JSONObject().put("status",true).put("response",new JSONArray().put(row)));
+            List<?> nfts=(List<?>)field("nftRows").get(activity),tokens=(List<?>)field("tokenRows").get(activity);assertEquals(1,nfts.size());assertSame(row,nfts.get(0));assertTrue(tokens.isEmpty());assertEquals(before,row.toString());
+        }
+    }
+
 }
