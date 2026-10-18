@@ -7,6 +7,15 @@ import android.util.LruCache;
 import android.widget.ImageView;
 
 import java.io.InputStream;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
+import java.lang.ref.WeakReference;
+import java.util.function.Consumer;
+import com.eurobuddha.minimacore.utils.BackgroundWork;
+import com.eurobuddha.minimacore.utils.ExpiringCache;
+import com.eurobuddha.minimacore.utils.SharedRequests;
+import com.eurobuddha.minimacore.main.views.balance.tokens.NetFetch;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -21,8 +30,11 @@ public final class ImageLoader {
     private static final int THUMB_PX = 420;
     private static final int FULL_PX = 1800;
     private static final int MAX_BYTES = 8 * 1024 * 1024;
-    private static final java.util.concurrent.ExecutorService EXEC =
-            java.util.concurrent.Executors.newFixedThreadPool(4);
+    private static final Handler MAIN = new Handler(Looper.getMainLooper());
+    private static final SharedRequests<String, Bitmap> REQUESTS =
+            new SharedRequests<>(BackgroundWork.pool(4, 64), task -> MAIN.post(task));
+    private static final ExpiringCache<String, Boolean> FAILED =
+            new ExpiringCache<>(256, SystemClock::elapsedRealtime);
 
     private ImageLoader() {}
 
@@ -34,41 +46,75 @@ public final class ImageLoader {
         loadOver(act, url, iv, FULL_PX);
     }
 
-    private static void loadOver(final android.app.Activity act, final String url, final ImageView iv, final int reqPx) {
-        iv.setTag(url);
-        if (url == null || url.isEmpty()) return;
-        // data-URI "urls" are 12KB strings — digest the cache key instead of
-        // hashing/equals-ing the whole payload on every lookup
-        String key = reqPx + "|" + url.length() + ":" + url.hashCode();
-        Bitmap cached = CACHE.get(key);
-        if (cached != null) { iv.setImageBitmap(cached); return; }
-        EXEC.execute(() -> {
-            final Bitmap b = decode(act, url, reqPx);
-            if (b == null) return;
-            CACHE.put(key, b);
-            act.runOnUiThread(() -> {
-                if (act.isDestroyed()) return;
-                if (url.equals(iv.getTag())) iv.setImageBitmap(b);
-            });
-        });
+    // Core wallet's weak subscription: the view owns its current request.
+    private static final class Target implements Consumer<Bitmap> {
+        final WeakReference<android.app.Activity> activity;
+        final WeakReference<ImageView> view;
+        final String key;
+        Target(android.app.Activity act, ImageView iv, String key) {
+            activity = new WeakReference<>(act); view = new WeakReference<>(iv); this.key = key;
+        }
+        @Override public void accept(Bitmap bitmap) {
+            android.app.Activity act = activity.get(); ImageView iv = view.get();
+            if (bitmap == null || act == null || act.isDestroyed() || act.isFinishing()
+                    || iv == null || iv.getTag() != this) return;
+            iv.setImageBitmap(bitmap);
+        }
     }
 
-    static Bitmap decode(android.content.Context ctx, String url, int reqPx) {
+    // Fixed-size digest keys retain neither giant inline images nor Java hash collisions.
+    private static String cacheKey(String url, int reqPx) {
         try {
-            byte[] bytes = RelayResolver.isMediaRef(url) ? relayBytes(url)
-                    : url.startsWith("data:") ? dataUriBytes(url)
-                    : fetchCached(ctx, url);
-            if (bytes == null || bytes.length == 0) return null;
-            if (looksLikeSvg(bytes, url)) return renderSvg(bytes, reqPx);
-            BitmapFactory.Options bounds = new BitmapFactory.Options();
-            bounds.inJustDecodeBounds = true;
-            BitmapFactory.decodeByteArray(bytes, 0, bytes.length, bounds);
+            byte[] hash = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(url.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return reqPx + "|" + Base64.encodeToString(hash, Base64.NO_WRAP);
+        } catch (java.security.NoSuchAlgorithmException impossible) { throw new AssertionError(impossible); }
+    }
+
+    private static void loadOver(final android.app.Activity act, final String url, final ImageView iv, final int reqPx) {
+        if (url == null || url.isEmpty()) { iv.setTag(url); return; }
+        if (act.isDestroyed() || act.isFinishing() || url.length() > ((MAX_BYTES + 2L) / 3) * 4 + 1024) {
+            iv.setTag(null); return;
+        }
+        String key = cacheKey(url, reqPx);
+        Object previous = iv.getTag();
+        Target target = previous instanceof Target && key.equals(((Target) previous).key)
+                ? (Target) previous : new Target(act, iv, key);
+        iv.setTag(target);
+        Bitmap cached = CACHE.get(key);
+        if (cached != null) { target.accept(cached); return; }
+        if (FAILED.get(key) != null) return;
+        final android.content.Context ctx = act.getApplicationContext();
+        REQUESTS.request(key, () -> {
+            Bitmap bitmap = CACHE.get(key);
+            if (bitmap == null) bitmap = decode(ctx, url, reqPx);
+            if (bitmap != null) CACHE.put(key, bitmap);
+            else FAILED.put(key, Boolean.TRUE, 30_000);
+            return bitmap;
+        }, target);
+    }
+
+    // Direct callers (exports) own this fresh bitmap; never hand them CACHE entries.
+    static Bitmap decode(android.content.Context ctx, String url, int reqPx) {
+        if (url == null || url.isEmpty() || reqPx <= 0 || reqPx > FULL_PX) return null;
+        try {
+            if (RelayResolver.isMediaRef(url)) return decodeBytes(relayBytes(url), url, reqPx);
+            if (url.startsWith("data:")) return decodeBytes(dataUriBytes(url), url, reqPx);
+            return fetchCached(ctx, url, reqPx);
+        } catch (Throwable t) { return null; }
+    }
+
+    private static Bitmap decodeBytes(byte[] bytes, String url, int reqPx) {
+        if (bytes == null || bytes.length == 0 || bytes.length > MAX_BYTES) return null;
+        BitmapFactory.Options bounds = new BitmapFactory.Options();
+        bounds.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, bounds);
+        if (bounds.outWidth > 0 && bounds.outHeight > 0) {
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.inSampleSize = sampleSize(bounds.outWidth, bounds.outHeight, reqPx);
             return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, opt);
-        } catch (Throwable t) {
-            return null;
         }
+        return looksLikeSvg(bytes, url) ? renderSvg(bytes, reqPx) : null;
     }
 
     private static boolean looksLikeSvg(byte[] bytes, String url) {
@@ -83,10 +129,14 @@ public final class ImageLoader {
             String xml = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
             // Refuse DTDs / entity declarations from untrusted SVG (billion-laughs
             // entity-expansion DoS). AndroidSVG runs no JS and fetches nothing external.
-            String lower = xml.toLowerCase();
+            String lower = xml.toLowerCase(java.util.Locale.ROOT);
             if (lower.contains("<!doctype") || lower.contains("<!entity")) return null;
             com.caverock.androidsvg.SVG svg = com.caverock.androidsvg.SVG.getFromString(xml);
             float dw = svg.getDocumentWidth(), dh = svg.getDocumentHeight();
+            // Explicit dimensions without viewBox otherwise leave tiny artwork on a large canvas.
+            android.graphics.RectF viewBox = svg.getDocumentViewBox();
+            if (viewBox == null && dw > 0 && dh > 0) svg.setDocumentViewBox(0, 0, dw, dh);
+            if ((dw <= 0 || dh <= 0) && viewBox != null) { dw = viewBox.width(); dh = viewBox.height(); }
             int w = reqPx, h = reqPx;
             if (dw > 0 && dh > 0) {
                 if (dw >= dh) { w = reqPx; h = Math.max(1, Math.round(reqPx * dh / dw)); }
@@ -128,28 +178,48 @@ public final class ImageLoader {
         }
     }
 
-    private static byte[] fetchCached(android.content.Context ctx, String url) {
+    private static Bitmap fetchCached(android.content.Context ctx, String url, int reqPx) {
         java.io.File f = ctx == null ? null : diskFile(ctx, url);
-        byte[] bytes = null;
-        try { bytes = fetch(url); } catch (Exception ignored) {}
-        if (bytes != null && bytes.length > 0) {
-            if (f != null) {
-                try (java.io.FileOutputStream out = new java.io.FileOutputStream(f)) {
-                    out.write(bytes);
-                    trimDisk(f.getParentFile());
-                } catch (Exception ignored) {}
+        try {
+            byte[] bytes = fetch(url);
+            Bitmap bitmap = decodeBytes(bytes, url, reqPx);
+            if (bitmap != null) {
+                if (f != null) storeImage(f, bytes);
+                return bitmap;
             }
-            return bytes;
-        }
-        if (f != null && f.exists()) {                 // offline: serve the last-seen bytes
-            try { return java.nio.file.Files.readAllBytes(f.toPath()); }
-            catch (Exception ignored) {}
+        } catch (Exception ignored) { }
+        // A failed download/decoder must not replace the last usable offline image.
+        if (f != null && f.isFile() && f.length() <= MAX_BYTES) {
+            try (InputStream in = new java.io.FileInputStream(f);
+                 java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream()) {
+                byte[] buf = new byte[8192]; int n;
+                while ((n = in.read(buf)) != -1) {
+                    if (n > MAX_BYTES - out.size()) return null;
+                    out.write(buf, 0, n);
+                }
+                return decodeBytes(out.toByteArray(), url, reqPx);
+            } catch (Exception ignored) { }
         }
         return null;
     }
 
+    private static void storeImage(java.io.File f, byte[] bytes) {
+        java.io.File pending = null;
+        try {
+            // FiltrHandoff/NodeFiles: sync a private sibling, then replace atomically.
+            pending = java.io.File.createTempFile(".image-", ".part", f.getParentFile());
+            try (java.io.FileOutputStream out = new java.io.FileOutputStream(pending)) {
+                out.write(bytes); out.getFD().sync();
+            }
+            java.nio.file.Files.move(pending.toPath(), f.toPath(),
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            trimDisk(f.getParentFile());
+        } catch (Exception ignored) { }
+        finally { if (pending != null) pending.delete(); }
+    }
+
     private static void trimDisk(java.io.File dir) {
-        java.io.File[] all = dir == null ? null : dir.listFiles();
+        java.io.File[] all = dir == null ? null : dir.listFiles(f -> f.isFile() && f.getName().matches("[0-9a-f]{40}"));
         if (all == null || all.length <= DISK_MAX) return;
         java.util.Arrays.sort(all, (a, b) -> Long.compare(a.lastModified(), b.lastModified()));
         for (int i = 0; i < all.length - DISK_MAX; i++) all[i].delete();
@@ -166,12 +236,13 @@ public final class ImageLoader {
     static HttpURLConnection openChecked(String url, int maxHops) {
         String cur = url;
         for (int i = 0; i <= maxHops; i++) {
+            HttpURLConnection c = null;
             try {
                 URL u = new URL(cur);
                 String proto = u.getProtocol();
                 if (!"http".equalsIgnoreCase(proto) && !"https".equalsIgnoreCase(proto)) return null;
                 if (isBlockedHost(u.getHost())) return null;
-                HttpURLConnection c = (HttpURLConnection) u.openConnection();
+                c = (HttpURLConnection) u.openConnection();
                 c.setInstanceFollowRedirects(false);
                 c.setConnectTimeout(8000);
                 c.setReadTimeout(15000);
@@ -186,6 +257,7 @@ public final class ImageLoader {
                 }
                 return c;   // final response — caller checks code + reads the body
             } catch (Exception e) {
+                if (c != null) c.disconnect();
                 return null;
             }
         }
@@ -194,37 +266,10 @@ public final class ImageLoader {
 
     private static byte[] fetch(String url) throws Exception {
         String f = url.startsWith("ipfs://") ? "https://ipfs.io/ipfs/" + url.substring("ipfs://".length()) : url;
-        HttpURLConnection con = openChecked(f, 4);   // SSRF-safe: re-checks each redirect hop
-        if (con == null) return null;
-        try (InputStream in = con.getInputStream(); java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream()) {
-            byte[] buf = new byte[8192];
-            int n;
-            int total = 0;
-            while ((n = in.read(buf)) > 0) {
-                total += n;
-                if (total > MAX_BYTES) return null;
-                bos.write(buf, 0, n);
-            }
-            return bos.toByteArray();
-        } finally {
-            con.disconnect();
-        }
+        return NetFetch.get(f, MAX_BYTES, 8000, 15000, false);
     }
 
-    static boolean isBlockedHost(String host) {
-        if (host == null || host.isEmpty()) return true;
-        try {
-            for (java.net.InetAddress a : java.net.InetAddress.getAllByName(host)) {
-                if (a.isLoopbackAddress() || a.isAnyLocalAddress()
-                        || a.isLinkLocalAddress() || a.isSiteLocalAddress()) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            return true;
-        }
-        return false;
-    }
+    static boolean isBlockedHost(String host) { return NetFetch.isBlockedHost(host); }
 
     /** Encrypted-relay image: fetch ciphertext chunks + decrypt (off the main thread). */
     private static byte[] relayBytes(String ref) {
@@ -233,10 +278,10 @@ public final class ImageLoader {
 
     private static byte[] dataUriBytes(String dataUri) {
         int comma = dataUri.indexOf(',');
-        if (comma < 0) return null;
+        if (comma < 0 || comma > 1024) return null;
         if (!dataUri.substring(0, comma).contains("base64")) return null;
-        String b64 = dataUri.substring(comma + 1);
-        if (b64.length() > (MAX_BYTES / 3) * 4) return null;   // cap the decoded size before allocating (untrusted data: URIs)
-        return Base64.decode(b64, Base64.DEFAULT);
+        if (dataUri.length() - comma - 1 > ((MAX_BYTES + 2L) / 3) * 4) return null;
+        byte[] bytes = Base64.decode(dataUri.substring(comma + 1), Base64.DEFAULT);
+        return bytes.length <= MAX_BYTES ? bytes : null;
     }
 }

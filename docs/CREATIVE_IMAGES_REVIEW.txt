@@ -1,0 +1,76 @@
+Atelier and Salon image loading review — 2026-10-18
+
+Scope
+Integrated creative image loading, the pinned-source adapter, and direct reuse of
+minimaapi NetFetch. The standalone source applications are unchanged.
+
+Sources inspected and reused
+- app/src/main/java/com/eurobuddha/minimacore/main/views/balance/tokens/ImageLoader.java:
+  weak view subscriptions, exact current-target checks, shared requests, bounded
+  worker queue and expiring failed-request cache.
+- minimaapi/src/main/java/com/eurobuddha/minimacore/main/views/balance/tokens/NetFetch.java:
+  HTTP(S) policy, per-hop redirect validation, address checks and bounded body.
+  Only class/method visibility changes; transport behavior is unchanged.
+- minimaapi utils BackgroundWork, SharedRequests, ExpiringCache and RequestWorkTest.
+- Both imported ImageLoader files, byte-identical to their standalone donors at
+  inspection; callers, libraries, Salon RelayResolver and public-profile caller.
+- scripts/pandamonium-sources/atelier/FiltrHandoff.java:
+  bounded reads and synced temporary-file/atomic-replacement pattern.
+- Salon's SVG declaration refusal and core wallet's inline-image size cap.
+
+Problems resolved
+- Java string-hash collisions could display another NFT's image. Memory-cache keys
+  now use fixed-size SHA-256 digests and include the requested image size.
+- Invalid HTTP bodies could overwrite the only offline copy. Decode succeeds
+  before persistence; replacements are atomic and cache reads are bounded.
+  Existing nfticons SHA-1 filenames and directory are preserved. Cache trimming
+  ignores temporary writes. Storage failure still permits the fetched image to display.
+- Atelier automatically followed unchecked redirects. Both image loaders now use
+  the core fetcher, including private/multicast/unique-local/CGNAT checks at each hop.
+- Unbounded queues and Activity captures retained screens. Bounded shared work uses
+  application context; weak targets require exact identity and a live Activity.
+- Inline, cached and relay image bytes obey the existing 8 MiB decoder budget.
+  Requests with invalid output sizes fail. Export decoding returns fresh owned
+  bitmaps, so exports cannot recycle a displayed cached bitmap.
+- Actual raster bytes take precedence over a misleading .svg URL suffix.
+- SVG explicit dimensions without viewBox previously enlarged the canvas without
+  scaling artwork. The existing AndroidSVG 1.4 viewport API now supplies that missing
+  viewBox. ViewBox-only SVGs retain their aspect ratio. Existing viewBoxes stay intact.
+- Atelier now also refuses SVG DTD/entity declarations. Salon's retained public-profile
+  connection helper disconnects when opening/reading response status throws.
+
+Preserved behavior
+Image URLs, user metadata and relay references remain literal through all four
+language selections. IPFS gateway mapping, encrypted relay resolution, 420/1800 px
+budgets, fallbacks and offline-cache compatibility remain. No financial, node,
+identity, version, signing or release changes.
+
+Limits
+The shared fetcher documents a remaining DNS check/connection resolution race.
+No claim of eliminating DNS rebinding is made. Relay transport's own media budgets
+and decryption are unchanged; the 8 MiB check here applies before image decoding.
+This review covers image loading. Hosting URL verification, Salon metadata/restore/
+outbox/publishing and the public-page language audit remain separate integration work.
+Full integration acceptance and physical Fold checks are still pending.
+
+Validation
+Full Atelier suite: 276 tests. Full Salon suite: 183 tests. Shared NetFetch and
+RequestWork suites: 15 tests. All 474 passed with zero failures/errors/skips;
+release Java compilation passed in the same Gradle invocation (2m 7s).
+After making the Mockito offline-result fixture explicit, reran the affected image
+suites: 13 Atelier and 14 Salon tests pass. No production changes followed the
+full regression. Native graphics tests check real pixels for raster/SVG artwork,
+including the newly demonstrated missing-viewBox case and viewBox-only aspect ratio.
+Tests also cover offline fallback after invalid downloads, atomic replacement output,
+independently owned export bitmaps, byte limits, cache collisions, IPFS routing,
+private-address policy, stale/finishing targets, relay compatibility and all four
+language selections. Existing shared tests cover redirect targets/counts, overload,
+coalescing and failure retry. No real HTTP server or live node was used.
+
+All 21 pinned imports reproduce; all 6,776 catalogue messages validate in four
+languages; git diff --check passes. Evidence: build/localization/creative-image-
+{tests.log,full-validation.json,final-tests.log,import.log}.
+
+Verdict: Approve this image-loading patch. No unresolved blocking findings within
+this scope. Full creative integration remains active and unapproved for release.
+No APK build, device installation or public publication was performed.

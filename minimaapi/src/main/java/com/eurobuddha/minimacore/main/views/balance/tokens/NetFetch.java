@@ -17,7 +17,7 @@ import java.net.URL;
  * Residual: DNS is resolved once for the check and again by the connection, so a rebinding server
  * could still race it; all resolved addresses are checked to narrow that window.
  */
-final class NetFetch {
+public final class NetFetch {
 
     private static final int MAX_HOPS = 3;
 
@@ -27,7 +27,7 @@ final class NetFetch {
      * GET {@code url}. Returns the body, or null when refused / non-200 / failed. If the body exceeds
      * {@code maxBytes}: {@code truncateAtCap} true → the first maxBytes are returned; false → null.
      */
-    static byte[] get(String url, int maxBytes, int connectMs, int readMs, boolean truncateAtCap) throws Exception {
+    public static byte[] get(String url, int maxBytes, int connectMs, int readMs, boolean truncateAtCap) throws Exception {
         return get(url, maxBytes, connectMs, readMs, truncateAtCap,
                 u -> (HttpURLConnection) u.openConnection());
     }
@@ -81,7 +81,7 @@ final class NetFetch {
      *  address is checked. Beyond the JDK predicates (isSiteLocalAddress only knows RFC1918 and the dead
      *  fec0::/10) this also blocks IPv6 unique-local fc00::/7 (today's LAN IPv6), carrier-grade NAT
      *  100.64.0.0/10 and 0.0.0.0/8. */
-    static boolean isBlockedHost(String host) {
+    public static boolean isBlockedHost(String host) {
         if (host == null || host.isEmpty()) return true;
         try {
             for (InetAddress a : InetAddress.getAllByName(host)) {
