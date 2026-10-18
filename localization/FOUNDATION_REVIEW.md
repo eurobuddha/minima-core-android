@@ -2793,3 +2793,17 @@ Files are in `/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-{Pand
 - Pandamonium: `eaec0a17ef34fa0d38b6b171b6eebb46114bcc3b230686cb3e8233379a84bbb8`
 
 572 JVM test executions pass. No device installation or public release occurred. Fold acceptance, the separately identified draft overwrite fix, remaining financial reviews and final acceptance/publication are still open.
+
+## Chat composer late-failure guard — 2026-10-18
+
+Closed the source-level draft overwrite finding recorded with 1.9.45. A send exception previously called `input.setText(text)` unconditionally, so an old background send could replace a newer draft. Reused the revision/identity checks, exact raw text and selection capture, and closed-host guard from `integrated/merchinbox/src/main/java/com/eurobuddha/merchinbox/ReplyDrafts.java` and its InboxReplyDraftTest/InboxReplyCallbackTest coverage. Also inspected standalone Parlons ChatActivity/CloudChatActivity send paths and current ChatEngine.send, record/persist, delivery and retry callers. Normal network delivery failure returns an entry with a receipt state; the engine keeps its existing retry behavior. Exception restoration is a distinct UI path.
+
+The minimal `maxchat/SendDraft.java` adaptation owns one composer, snapshots the raw text/selection, clears immediately as before, and restores only if no subsequent text revision occurred. Typing then deleting back to blank counts as a new revision. Ticket ownership and one-time completion reject foreign/repeated callbacks. Closing detaches the watcher; activity send-result UI callbacks also check finishing/destroyed state. Outgoing text retains the existing trim policy. No new send, resend, persistence, receipt or protocol behavior was introduced.
+
+Validation: all501 JVM test executions pass (PandaBear146, BlackBear146, Pandamonium149, Inbox60). Eight new cases run in every core variant: exact Unicode/spacing/selection restoration, preserving a newer Editable, edits back to blank, out-of-order failures, identical retyped text, blank and closed-host behavior, foreign/repeated tickets and invalid selection clamping. Core tests use mocked EditText/TextWatcher boundaries and do not prove Android keyboard/IME behavior; reused Inbox tests exercise their original real EditText behavior under Robolectric. All three release builds and vital lint pass in45seconds. All19 pinned imports reproduce; catalogue/transport/diff checks pass. The570-source checkpoint changes only the activity and version source and adds the helper/test; protected financial, wallet-audit, node and chat-transport hashes remain unchanged. Evidence: `build/localization/chat-draft-validation.json`, `chat-draft-build.log`.
+
+### Code Review
+
+Summary: reviewed the full helper, activity diff, test harness and original draft guard. The guard operates on the UI thread and ignores stale tickets even when current text looks unchanged. No blocking finding in this increment. Verdict: approve the source fix. Fold validation is still required for runtime acceptance.
+
+Version is1.9.46/vc117 under the core-source commit rule. Fold R3GL805K7MB still reports device not found. No owner app/data/wallet/seed/counter or other device was used. Remaining financial reviews, complete app-owned text/accessibility acceptance, optional inherited MySQL disposition and final publication remain open. Earlier signed candidates stay preserved; 1.9.46 artifacts are verified separately after this source checkpoint.

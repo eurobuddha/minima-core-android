@@ -57,6 +57,7 @@ public class MaxThreadActivity extends AppCompatActivity {
     }
 
 
+    private SendDraft mSendDraft;
     private String mPeer;
     private MsgAdapter mAdapter;
     private final Runnable mOnChange = () -> runOnUiThread(() -> {
@@ -101,6 +102,7 @@ public class MaxThreadActivity extends AppCompatActivity {
                 new androidx.activity.result.contract.ActivityResultContracts.GetContent(),
                 uri -> { if (uri != null) sendPhoto(uri); });
         EditText input = findViewById(R.id.chat_input);
+        mSendDraft = new SendDraft(input);
         findViewById(R.id.chat_attach).setOnClickListener(v ->
                 dialog()
                         .setItems(new CharSequence[]{Language.msg(l10n_media_photo), Language.msg(l10n_media_voice)}, (d, which) -> {
@@ -119,18 +121,20 @@ public class MaxThreadActivity extends AppCompatActivity {
                 Toast.makeText(this, Language.msg(l10n_chat_transport_not_ready), Toast.LENGTH_SHORT).show();
                 return;
             }
-            input.setText("");
+            final SendDraft.Submission submission = mSendDraft.begin();
+            if (submission == null) return;
             new Thread(() -> {
                 try {
-                    chat.send(c, text);
+                    chat.send(c, submission.text());
                 } catch (Exception e) {
                     runOnUiThread(() -> {
-                        input.setText(text);   // never eat a typed message
+                        if (isFinishing() || isDestroyed()) return;
+                        mSendDraft.failed(submission);
                         Toast.makeText(this,
                                 Language.msg(l10n_chat_send_failed, ChatMessages.error(e)), Toast.LENGTH_LONG).show();
                     });
                 }
-                runOnUiThread(mAdapter::reload);
+                runOnUiThread(() -> { if (!isFinishing() && !isDestroyed()) mAdapter.reload(); });
             }, "maxchat-send").start();
         });
 
@@ -191,6 +195,7 @@ public class MaxThreadActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        if (mSendDraft != null) mSendDraft.close();
         for (AlertDialog value : new java.util.ArrayList<>(dialogs)) value.dismiss();
         dialogs.clear();
         stopAudio();
