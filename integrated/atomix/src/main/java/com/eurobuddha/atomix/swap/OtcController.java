@@ -90,6 +90,15 @@ public final class OtcController {
         return s.toString();
     }
 
+    public static final String CHANGED_ERROR = "Deal changed. Review the latest terms.";
+    private static boolean negotiating(OtcDb.Deal d) {
+        return OtcDb.ST_PROPOSED.equals(d.status) || OtcDb.ST_COUNTERED.equals(d.status);
+    }
+    private static boolean matchingTerms(OtcMessage m, OtcDb.Deal d) {
+        return validDeal(d) && java.util.Objects.equals(d.side, m.side)
+                && java.util.Objects.equals(d.amount, m.amount) && java.util.Objects.equals(d.price, m.price);
+    }
+
     private static boolean isTerminal(String st) {
         return OtcDb.ST_REJECTED.equals(st) || OtcDb.ST_EXPIRED.equals(st) || OtcDb.ST_COMPLETE.equals(st);
     }
@@ -137,7 +146,7 @@ public final class OtcController {
         d.peerCommsId = m.from; d.peerMinimaPk = m.minimaPk; d.peerEthAddr = m.ethAddr;
         d.side = m.side; d.amount = m.amount; d.price = m.price;
         d.status = OtcDb.ST_PROPOSED; d.whoseTurn = OtcDb.TURN_ME;
-        otcDb.upsertDeal(d);
+        if (!otcDb.createDeal(d)) return false;
         noteProposeRateLimited(m.amount + " " + market.coinLabel + " @ " + m.price + " — your call");
         ui.onDealsChanged();
         return true;
@@ -148,9 +157,10 @@ public final class OtcController {
         // CONSENT + AUTHENTICITY: every non-PROPOSE transition needs an existing deal AND must genuinely come from
         // that deal's counterparty (not just any sealed sender). Without this, a hostile instigator could self-ACCEPT.
         if (!sameMarket(d) || m.from == null || !m.from.equals(d.peerCommsId)) return;
+        OtcDb.Deal expected = d.copy();
         if (OtcMessage.REJECT.equals(m.type)) {
-            if (isTerminal(d.status)) return;
-            d.status = OtcDb.ST_REJECTED; otcDb.upsertDeal(d);
+            if (isTerminal(d.status) || OtcDb.ST_EXECUTING.equals(d.status)) return;
+            d.status = OtcDb.ST_REJECTED; if (!otcDb.replaceDeal(expected, d)) return;
             ui.note("OTC rejected", "The counterparty ended the deal");
         } else if (OtcMessage.EXECUTE.equals(m.type)) {
             if (!OtcDb.ROLE_LP.equals(d.role) || m.hash == null || m.hash.isEmpty()) return;
@@ -160,8 +170,8 @@ public final class OtcController {
             // on-chain otcVerify* remains the fund gate, and the terms are my own standing counter.
             boolean agreed = OtcDb.ST_AGREED.equals(d.status);
             boolean implicitAccept = OtcDb.ST_COUNTERED.equals(d.status) && OtcDb.TURN_PEER.equals(d.whoseTurn);
-            if (!agreed && !implicitAccept) return;
-            d.hash = m.hash; d.status = OtcDb.ST_EXECUTING; otcDb.upsertDeal(d);
+            if ((!agreed && !implicitAccept) || !matchingTerms(m, d)) return;
+            d.hash = m.hash; d.status = OtcDb.ST_EXECUTING; if (!otcDb.replaceDeal(expected, d)) return;
             if (OtcOffer.LP_SELLS_MINIMA.equals(d.side)) {   // instigator locked USDT → find it via getContract
                 engine.addIncomingHashlock(m.hash);
                 engine.checkBuyNow(m.hash);
@@ -170,16 +180,16 @@ public final class OtcController {
         } else if (!OtcDb.TURN_PEER.equals(d.whoseTurn)) {
             return;   // CONSENT: a COUNTER/ACCEPT is only legal when I'm genuinely waiting on the peer (their turn)
         } else if (OtcMessage.COUNTER.equals(m.type)) {
-            if (isTerminal(d.status) || !validTerms(m.amount, m.price)) return;
+            if (!negotiating(d) || !java.util.Objects.equals(d.side, m.side) || !validTerms(m.amount, m.price)) return;
             d.amount = m.amount; d.price = m.price; d.status = OtcDb.ST_COUNTERED; d.whoseTurn = OtcDb.TURN_ME;
-            otcDb.upsertDeal(d);
+            if (!otcDb.replaceDeal(expected, d)) return;
             ui.note("OTC counter", m.amount + " " + market.coinLabel + " @ " + m.price + " — your call");
         } else if (OtcMessage.ACCEPT.equals(m.type)) {
-            if (!validDeal(d)) return;
+            if (!matchingTerms(m, d)) return;
             if (isTerminal(d.status) || OtcDb.ST_AGREED.equals(d.status) || OtcDb.ST_EXECUTING.equals(d.status)) return;
             d.status = OtcDb.ST_AGREED;
             d.whoseTurn = OtcDb.ROLE_INSTIGATOR.equals(d.role) ? OtcDb.TURN_ME : OtcDb.TURN_PEER;
-            otcDb.upsertDeal(d);
+            if (!otcDb.replaceDeal(expected, d)) return;
             ui.note("OTC agreed", d.amount + " " + market.coinLabel + " @ " + d.price);
             if (OtcDb.ROLE_INSTIGATOR.equals(d.role)) executeDeal(d);   // I opened it → I lock leg 1
         }
@@ -207,28 +217,30 @@ public final class OtcController {
         d.peerCommsId = lp.commsPublicId; d.peerMinimaPk = lp.minimaPublicKey; d.peerEthAddr = lp.ethAddress;
         d.side = dealSide; d.amount = amount; d.price = price;
         d.status = OtcDb.ST_PROPOSED; d.whoseTurn = OtcDb.TURN_PEER;
-        otcDb.upsertDeal(d);
+        if (!otcDb.createDeal(d)) { res.err(CHANGED_ERROR); return; }
         sendMsg(d, OtcMessage.PROPOSE, "", res);
     }
 
     public void counter(OtcDb.Deal d, String amount, String price, SendResult res) {
         if (!sameMarket(d)) { res.err(MARKET_ERROR); return; }
-        if (!ready() || isTerminal(d.status) || !OtcDb.TURN_ME.equals(d.whoseTurn)) { res.err("not your turn"); return; }
+        if (!ready() || !negotiating(d) || !OtcDb.TURN_ME.equals(d.whoseTurn)) { res.err("not your turn"); return; }
         if (!validTerms(amount, price)) { res.err("enter amount + price"); return; }
-        d.amount = amount; d.price = price; d.status = OtcDb.ST_COUNTERED; d.whoseTurn = OtcDb.TURN_PEER;
-        otcDb.upsertDeal(d);
-        sendMsg(d, OtcMessage.COUNTER, "", res);
+        OtcDb.Deal next = d.copy();
+        next.amount = amount; next.price = price; next.status = OtcDb.ST_COUNTERED; next.whoseTurn = OtcDb.TURN_PEER;
+        if (!otcDb.replaceDeal(d, next)) { res.err(CHANGED_ERROR); return; }
+        sendMsg(next, OtcMessage.COUNTER, "", res);
     }
 
     public void accept(OtcDb.Deal d, SendResult res) {
         if (!validDeal(d)) { res.err("enter amount + price"); return; }
         if (!sameMarket(d)) { res.err(MARKET_ERROR); return; }
-        if (!ready() || isTerminal(d.status) || !OtcDb.TURN_ME.equals(d.whoseTurn)) { res.err("not your turn"); return; }
-        d.status = OtcDb.ST_AGREED;
-        d.whoseTurn = OtcDb.ROLE_INSTIGATOR.equals(d.role) ? OtcDb.TURN_ME : OtcDb.TURN_PEER;
-        otcDb.upsertDeal(d);
-        sendMsg(d, OtcMessage.ACCEPT, "", new SendResult() {
-            @Override public void ok() { if (OtcDb.ROLE_INSTIGATOR.equals(d.role)) executeDeal(d); res.ok(); }
+        if (!ready() || !negotiating(d) || !OtcDb.TURN_ME.equals(d.whoseTurn)) { res.err("not your turn"); return; }
+        final OtcDb.Deal agreed = d.copy();
+        agreed.status = OtcDb.ST_AGREED;
+        agreed.whoseTurn = OtcDb.ROLE_INSTIGATOR.equals(d.role) ? OtcDb.TURN_ME : OtcDb.TURN_PEER;
+        if (!otcDb.replaceDeal(d, agreed)) { res.err(CHANGED_ERROR); return; }
+        sendMsg(agreed, OtcMessage.ACCEPT, "", new SendResult() {
+            @Override public void ok() { if (OtcDb.ROLE_INSTIGATOR.equals(agreed.role)) executeDeal(agreed); res.ok(); }
             @Override public void err(String m) { res.err(m); }
         });
     }
@@ -236,12 +248,15 @@ public final class OtcController {
     public void reject(OtcDb.Deal d, SendResult res) {
         if (!sameMarket(d)) { res.err(MARKET_ERROR); return; }
         if (!ready()) { res.err("still connecting"); return; }
-        d.status = OtcDb.ST_REJECTED; otcDb.upsertDeal(d);
-        sendMsg(d, OtcMessage.REJECT, "", res);
+        if (isTerminal(d.status) || OtcDb.ST_EXECUTING.equals(d.status)) { res.err(CHANGED_ERROR); return; }
+        OtcDb.Deal next = d.copy(); next.status = OtcDb.ST_REJECTED;
+        if (!otcDb.replaceDeal(d, next)) { res.err(CHANGED_ERROR); return; }
+        sendMsg(next, OtcMessage.REJECT, "", res);
     }
 
     private void sendMsg(OtcDb.Deal d, String type, String hash, SendResult res) {
         if (!sameMarket(d) || !ready()) { res.err(MARKET_ERROR); return; }
+        if (!OtcDb.sameSnapshot(d, otcDb.getDeal(d.ref))) { res.err(CHANGED_ERROR); return; }
         OtcMessage m = new OtcMessage();
         m.type = type; m.ref = d.ref; m.randomid = rndHex(12);
         m.from = identity.publicId(); m.to = d.peerCommsId; m.date = System.currentTimeMillis();
@@ -255,26 +270,27 @@ public final class OtcController {
         });
     }
 
-    /** Instigator: on AGREED, lock leg 1 (otc=TRUE) then EXECUTE-notify the LP with the hashlock. Idempotent: the
-     *  status is flipped to EXECUTING synchronously BEFORE the async lock, so a second call is a no-op. */
-    public synchronized void executeDeal(OtcDb.Deal d) {
+    /** Atomically reserve the exact agreed snapshot before asking either engine to lock leg 1. */
+    public void executeDeal(OtcDb.Deal d) {
         if (!sameMarket(d) || !ready() || !OtcDb.ROLE_INSTIGATOR.equals(d.role)) return;
-        OtcDb.Deal cur = otcDb.getDeal(d.ref);
-        if (!sameMarket(cur) || !validDeal(cur) || !OtcDb.ST_AGREED.equals(cur.status)) return;   // already executing / not agreed / terminal
-        cur.status = OtcDb.ST_EXECUTING; otcDb.upsertDeal(cur); ui.onDealsChanged();
-        engine.executeOtcDeal(cur, new SwapEngine.StartCb() {
+        OtcDb.Deal current = otcDb.getDeal(d.ref);
+        if (!sameMarket(current) || !validDeal(current) || !OtcDb.ST_AGREED.equals(current.status)
+                || !OtcDb.sameSnapshot(d, current)) return;
+        final OtcDb.Deal executing = current.copy(); executing.status = OtcDb.ST_EXECUTING;
+        if (!otcDb.replaceDeal(current, executing)) return;
+        ui.onDealsChanged();
+        engine.executeOtcDeal(executing.copy(), new SwapEngine.StartCb() {
             @Override public void ok(String hash) {
-                OtcDb.Deal c2 = otcDb.getDeal(cur.ref); if (c2 == null) return;
-                c2.hash = hash; c2.status = OtcDb.ST_EXECUTING; otcDb.upsertDeal(c2);
-                sendMsg(c2, OtcMessage.EXECUTE, hash, new SendResult() { public void ok() {} public void err(String m) {} });
+                OtcDb.Deal locked = executing.copy(); locked.hash = hash;
+                if (!otcDb.replaceDeal(executing, locked)) return;
+                sendMsg(locked, OtcMessage.EXECUTE, hash, new SendResult() { public void ok() {} public void err(String m) {} });
                 ui.note("OTC executing", "Locked your side — waiting for the counterparty");
                 ui.onDealsChanged();
             }
             @Override public void err(String m) {
-                OtcDb.Deal c2 = otcDb.getDeal(cur.ref);
-                if (c2 != null && OtcDb.ST_EXECUTING.equals(c2.status) && (c2.hash == null || c2.hash.isEmpty())) {
-                    c2.status = OtcDb.ST_AGREED; otcDb.upsertDeal(c2); ui.onDealsChanged();   // reset so it can retry
-                }
+                OtcDb.Deal retry = executing.copy(); retry.status = OtcDb.ST_AGREED;
+                if (!otcDb.replaceDeal(executing, retry)) return;
+                ui.onDealsChanged();
                 ui.note("OTC execute failed", m);
             }
         });
@@ -288,21 +304,26 @@ public final class OtcController {
             boolean stale = now - d.updated > EXPIRE_MS;
             if (OtcDb.ST_EXECUTING.equals(d.status) && d.hash != null && !d.hash.isEmpty()) {
                 String ss = engine.swapStatus(d.hash);
-                if (SwapDb.ST_COMPLETE.equals(ss)) { d.status = OtcDb.ST_COMPLETE; otcDb.upsertDeal(d); ui.onDealsChanged(); }
-                else if (SwapDb.ST_REFUNDED.equals(ss) || SwapDb.ST_ERROR.equals(ss)) { d.status = OtcDb.ST_REJECTED; otcDb.upsertDeal(d); ui.onDealsChanged(); }
-                else if (ss == null && stale) { d.status = OtcDb.ST_EXPIRED; otcDb.upsertDeal(d); ui.onDealsChanged(); }   // a mismatched EXECUTE never produced a swap
+                if (SwapDb.ST_COMPLETE.equals(ss)) { changeStatus(d, OtcDb.ST_COMPLETE); }
+                else if (SwapDb.ST_REFUNDED.equals(ss) || SwapDb.ST_ERROR.equals(ss)) { changeStatus(d, OtcDb.ST_REJECTED); }
+                else if (ss == null && stale) { changeStatus(d, OtcDb.ST_EXPIRED); }   // a mismatched EXECUTE never produced a swap
                 else if (OtcDb.ROLE_INSTIGATOR.equals(d.role) && SwapDb.ST_STARTED.equals(ss)
                         && now - d.created < EXEC_RESEND_WINDOW_MS) resendExecute(d, now);   // leg 1 locked but LP silent → my EXECUTE may have been lost
             } else if (stale && (OtcDb.ST_AGREED.equals(d.status)
                     || (OtcDb.ST_EXECUTING.equals(d.status) && (d.hash == null || d.hash.isEmpty()))   // execute never produced a hash
                     || ((OtcDb.ST_PROPOSED.equals(d.status) || OtcDb.ST_COUNTERED.equals(d.status)) && OtcDb.TURN_PEER.equals(d.whoseTurn)))) {
-                d.status = OtcDb.ST_EXPIRED; otcDb.upsertDeal(d); ui.onDealsChanged();   // no progress → abandon (any locked leg refunds at timelock)
+                changeStatus(d, OtcDb.ST_EXPIRED);   // no progress → abandon (any locked leg refunds at timelock)
             } else if ((OtcDb.ST_PROPOSED.equals(d.status) || OtcDb.ST_COUNTERED.equals(d.status))
                     && OtcDb.TURN_ME.equals(d.whoseTurn) && now - d.updated > INBOUND_EXPIRE_MS) {
-                d.status = OtcDb.ST_EXPIRED; otcDb.upsertDeal(d); ui.onDealsChanged();   // ignored inbound offer → zombie on the peer's side, stale price on mine
+                changeStatus(d, OtcDb.ST_EXPIRED);   // ignored inbound offer → zombie on the peer's side, stale price on mine
             }
-            if (isTerminal(d.status) && now - d.updated > PRUNE_MS) { otcDb.deleteDeal(d.ref); lastExecResend.remove(d.ref); }
+            if (isTerminal(d.status) && now - d.updated > PRUNE_MS) { if (otcDb.deleteDeal(d)) lastExecResend.remove(d.ref); }
         }
+    }
+
+    private void changeStatus(OtcDb.Deal expected, String status) {
+        OtcDb.Deal next = expected.copy(); next.status = status;
+        if (otcDb.replaceDeal(expected, next)) ui.onDealsChanged();
     }
 
     /** Leg 1 is locked but the counterparty still hasn't responded — my one-shot EXECUTE may have failed to send.

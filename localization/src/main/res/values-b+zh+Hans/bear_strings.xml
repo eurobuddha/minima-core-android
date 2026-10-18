@@ -6569,4 +6569,5 @@
     <!-- Arguments: 0, 1 -->
     <string name="l10n_chat_error_package_too_big">"MaximaPackage 过大：%1$s &gt; %2$s（对方将回复 TOOBIG）"</string>
     <string name="l10n_chat_error_operation_failed" formatted="false">"聊天操作失败"</string>
+    <string name="l10n_atomix_otc_deal_changed" formatted="false">"交易已更改。请查看最新条款。"</string>
 </resources>

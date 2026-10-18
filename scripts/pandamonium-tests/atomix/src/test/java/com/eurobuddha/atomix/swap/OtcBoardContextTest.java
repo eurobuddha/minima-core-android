@@ -139,11 +139,14 @@ public class OtcBoardContextTest {
             OtcOffer offer = scanned(market);
             NodeApi node = mock(NodeApi.class); OtcDb db = mock(OtcDb.class); CryptoProvider crypto = mock(CryptoProvider.class);
             when(crypto.seal(eq("peer"), any())).thenReturn("abcd");
+            when(db.createDeal(any())).thenAnswer(i -> {
+                OtcDb.Deal stored = i.getArgument(0); when(db.getDeal(stored.ref)).thenReturn(stored.copy()); return true;
+            });
             OtcController c = controller(node, db, mock(SwapEngine.class), crypto);
             try (MockedStatic<CommsTransport> transport = mockStatic(CommsTransport.class)) {
                 c.propose(offer, "SELL", "2", "3", mock(OtcController.SendResult.class));
                 ArgumentCaptor<OtcDb.Deal> captured = ArgumentCaptor.forClass(OtcDb.Deal.class);
-                verify(db).upsertDeal(captured.capture()); OtcDb.Deal deal = captured.getValue();
+                verify(db).createDeal(captured.capture()); OtcDb.Deal deal = captured.getValue();
                 assertEquals(market.key, deal.currency); assertEquals("2", deal.amount); assertEquals("3", deal.price); assertEquals("peer", deal.peerCommsId);
                 transport.verify(() -> CommsTransport.postBlob(eq(node), eq(market.otcChatAddr), eq(CommsTransport.MESSAGE_AMOUNT), eq(CommsTransport.NATIVE), eq("abcd"), isNull(), any()));
             }

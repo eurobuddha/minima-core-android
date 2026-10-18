@@ -61,6 +61,7 @@ public final class AtomixMessages {
             case "OTC currency changed or is unknown; switch to the deal's market.": return Language.msg(l10n_atomix_otc_market_unavailable);
             case "— (node didn't answer)": return Language.msg(l10n_atomix_notice_node_no_answer);
             case "Could not create the trading identity. Retry when the node is ready.": return Language.msg(l10n_atomix_notice_identity_failed);
+            case "Deal changed. Review the latest terms.": return Language.msg(l10n_atomix_otc_deal_changed);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {

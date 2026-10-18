@@ -43,7 +43,8 @@
     "Locked your side — waiting for the counterparty": "atomixOtc.lockedWaiting",
     "OTC currency changed or is unknown; switch to the deal's market.": "atomixOtc.marketUnavailable",
     "— (node didn't answer)": "atomixNotice.nodeNoAnswer",
-    "Could not create the trading identity. Retry when the node is ready.": "atomixNotice.identityFailed"
+    "Could not create the trading identity. Retry when the node is ready.": "atomixNotice.identityFailed",
+    "Deal changed. Review the latest terms.": "atomixOtc.dealChanged"
   },
   "patterns": [
     {

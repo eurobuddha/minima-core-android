@@ -6662,4 +6662,5 @@
     <!-- Arguments: 0, 1 -->
     <string name="l10n_chat_error_package_too_big">"MaximaPackage слишком велик: %1$s &gt; %2$s (собеседник ответит TOOBIG)"</string>
     <string name="l10n_chat_error_operation_failed" formatted="false">"Не удалось выполнить действие в чате"</string>
+    <string name="l10n_atomix_otc_deal_changed" formatted="false">"Условия сделки изменились. Проверьте актуальные условия."</string>
 </resources>

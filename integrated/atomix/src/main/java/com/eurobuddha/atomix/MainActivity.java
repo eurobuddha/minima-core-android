@@ -4114,7 +4114,10 @@ public class MainActivity extends AppCompatActivity {
     private OtcController.SendResult otcRes(CharSequence okMsg) {
         return new OtcController.SendResult() {
             @Override public void ok() { ui.post(() -> { toast(okMsg); if (currentTab == TAB_OTC && !modalOpen) render(); }); }
-            @Override public void err(String m) { ui.post(() -> toast(Language.join("OTC: ", AtomixMessages.message(m)))); }
+            @Override public void err(String m) { ui.post(() -> {
+                toast(Language.join("OTC: ", AtomixMessages.message(m)));
+                if (OtcController.CHANGED_ERROR.equals(m) && currentTab == TAB_OTC && !modalOpen) render();
+            }); }
         };
     }
 
