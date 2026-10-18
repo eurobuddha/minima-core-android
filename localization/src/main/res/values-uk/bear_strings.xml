@@ -6685,4 +6685,7 @@
     </plurals>
     <string name="l10n_chat_tap_open" formatted="false">"Натисніть, щоб відкрити"</string>
     <string name="l10n_chat_payment_preview" formatted="false">"💸 Платіж"</string>
+    <string name="l10n_terminal_ide_preview" formatted="false">"Попередній перегляд скорочено. Експортуйте цей блок або поділіться ним, щоб отримати повний результат."</string>
+    <string name="l10n_terminal_ide_display_busy" formatted="false">"Обробка виводу зайнята. Команду вже надіслано; перед повтором перевірте результат її виконання."</string>
+    <string name="l10n_terminal_ide_wait_commands" formatted="false">"Дочекайтеся завершення поточних команд, перш ніж запускати наступну."</string>
 </resources>

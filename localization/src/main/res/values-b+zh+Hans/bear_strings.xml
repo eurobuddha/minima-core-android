@@ -6589,4 +6589,7 @@
     </plurals>
     <string name="l10n_chat_tap_open" formatted="false">"点按打开"</string>
     <string name="l10n_chat_payment_preview" formatted="false">"💸 付款"</string>
+    <string name="l10n_terminal_ide_preview" formatted="false">"预览已缩短。导出或分享此输出块以获取完整结果。"</string>
+    <string name="l10n_terminal_ide_display_busy" formatted="false">"输出显示正忙。此命令已提交；重试前请检查其执行结果。"</string>
+    <string name="l10n_terminal_ide_wait_commands" formatted="false">"请等待待处理命令完成后再运行其他命令。"</string>
 </resources>

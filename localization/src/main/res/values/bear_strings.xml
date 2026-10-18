@@ -6621,4 +6621,7 @@
     </plurals>
     <string name="l10n_chat_tap_open" formatted="false">"Tap to open"</string>
     <string name="l10n_chat_payment_preview" formatted="false">"💸 Payment"</string>
+    <string name="l10n_terminal_ide_preview" formatted="false">"Preview shortened. Export or share this block for the complete result."</string>
+    <string name="l10n_terminal_ide_display_busy" formatted="false">"Output display is busy. This command was already submitted; check its outcome before retrying."</string>
+    <string name="l10n_terminal_ide_wait_commands" formatted="false">"Please wait for pending commands to finish before running another."</string>
 </resources>
