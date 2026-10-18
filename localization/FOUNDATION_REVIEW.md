@@ -2666,3 +2666,24 @@ Summary: queued stale board publications now use the same dispatch boundary alre
 Validation: 352 AtomiX, 21 direct API and 12 shared localization JVM cases pass (385 total, zero failures/errors/skips). Ten new methods exercise the real publication → SignGate → NodeApi → DirectNodeApi.Request path against synthetic host work and preferences: both boards/markets, cancellation in both queues, invalid guards, unchanged success, changes during signing, post-execution late/duplicate replies, pending/incomplete replies, timeout recovery, ordinary-message continuity and input/node rejection. Pandamonium debug and AndroidTest APK compile (13 seconds); instrumentation was not run. All 19 pinned imports reproduce; catalogue/transport/diff checks pass. Evidence: build/localization/atomix-publish-queue-validation.json (557 source hashes). The changed transport is moved out of the unchanged map; explicitly superseded scoped hashes are recorded. All other protected sources, wallet audit and node JAR match. PandaBear/BlackBear source/artifacts remain unchanged from 0dffcfb.
 
 Verdict: approve this dispatch-guard change. Work already executing cannot be cancelled by a later edit and keeps its late reply. A cancellation delivered by the shared queue still follows the existing incomplete-transport-result contract: the durable write pause remains for explicit review. These guards do not automatically acknowledge that pause or claim a node rejection. Receipt/chain confirmation, OTC consent freshness, responder/host lifecycle, and other app reviews remain open. The read-only ADB check for Fold R3GL805K7MB returned device not found; no other device was accessed. Final Fold acceptance, signed rebuilds and GitHub/PandaApps/eurobuddha.com publication remain outstanding. Older signed candidates still require rebuilding.
+
+
+## Refreshed signed four-language candidates — 2026-10-18
+
+Previous goal turn made progress as eb82bff. Built all three release variants from that clean committed source, after verifying all 557 checkpoint hashes and the unchanged node JAR. Re-read the graph's prior signed-candidate recipe and reused app/build.gradle's existing family signing configuration and /private/tmp/verify-bear-signed-candidates.py. Adapted only the source checkpoint/build-log references and archive-before-replace delivery. No credentials or signing material were copied or printed.
+
+The fork's current Bear release tags still end at 1.9.41 and point to 9def96e6801a9bef261611e45349f28a1eb6ae1c. Revalidated the retained 1.9.41 APK hashes before comparing signatures. All refreshed APKs are 1.9.43/vc114, non-debuggable, ARM64-only, with verified v2 signatures matching the original family certificate (SHA256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f), correct package IDs and 16 KiB ZIP alignment. Compiled resource tables contain all 5299 catalogue entries for default English, Simplified Chinese, Russian and Ukrainian. Each manifest references a locale config declaring en/zh-Hans/ru/uk. These checks establish packaging and signing; runtime state retention, visual acceptance and translation completeness remain separate.
+
+Release tasks, including vital lint, passed in 25 seconds. No production source changed during this refresh. Evidence: build/localization/signed-candidates-refresh-validation.json; build log: build/localization/signed-candidates-refresh-build.log; verifier snapshot: build/localization/verify-signed-candidates-refresh.py. The earlier signed-candidates-validation.json remains historical evidence for source 4bc8b62.
+
+Current candidates in /Users/eurobuddha/Projects/minima/apks/base/dist:
+
+| APK | SHA256 |
+| --- | --- |
+| minima-core-PandaBear-1.9.43-candidate.apk | 9161155c8dcf4b7810733e9cbf1e4496b14476f316d2fc2bb0fddabd0335a75d |
+| minima-core-BlackBear-1.9.43-candidate.apk | 4fac6880813e32e0e3d13c499ca7d5b747186638273bbb2ceb98041d02369786 |
+| minima-core-Pandamonium-1.9.43-candidate.apk | 5f54381e7c0955d21bc65356acdc95786f7d786a6958ac8a3846bfd69936b91b |
+
+Each has a .apk.sha256 sidecar. The colocated bear-languages-1.9.43-candidate.json records current source, signatures, hashes and pending gates. All three new APKs were verified before replacing any dist candidate. The prior 4bc8b62 APKs/checksums/manifest are preserved and re-hashed under dist/candidate-archive/1.9.43-4bc8b6253562; the archive includes a manifest pointing at those preserved files plus the original manifest.
+
+Packaging review: approve the refreshed local candidates. They have not been installed or published. Receipt/chain and consent/lifecycle reviews, Shop/remaining app text, minimaWallet runtime checks, Fold-only acceptance and final authorized publication are still open. If implementation changes again, rebuild the final artifacts. This refresh completes the current signed-build checkpoint, not the overall release goal.
