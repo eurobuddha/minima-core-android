@@ -79,13 +79,8 @@ Look at the Terminal APK for an example of how this works..
 
 ## Keets build inputs
 
-Keets requires generated assets that are excluded from Git. Before building a fresh
-checkout or worktree, run `scripts/fetch-bare-kit.sh` and
-`KEETS_SIDECAR_DIR=/absolute/path/to/keets/sidecar scripts/pack-keets-worklet.sh`.
-The latter produces `app/src/main/assets/keets.bundle` and its versioned native
-addons in `app/src/main/jniLibs` (including nested dependency versions).
-
-Gradle verifies these files and the Bare runtime before every build, using
-`scripts/verify-keets-artifacts.py` (Python 3.9+). It requires all three supported
-build ABIs; release packaging remains arm64 only. Run the packaging regression
-checks with `python3 scripts/test-keets-artifacts.py`.
+Normal Gradle builds automatically prepare checksum-pinned Keets dependencies and
+verify the final APK contents. Fresh checkouts and worktrees share a verified cache;
+`--offline` works when the required dependencies are cached. See
+[the Keets build process](docs/KEETS_BUILD.md) for pins, prerequisites, cache recovery
+and validation commands.

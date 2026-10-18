@@ -68,5 +68,59 @@ class KeetsArtifactsTest(unittest.TestCase):
         with self.assertRaises(KeyError): self.verify()
 
 
+class ApkArtifactsTest(KeetsArtifactsTest):
+    @staticmethod
+    def elf(code=b'example native code', machine=183):
+        import struct
+        strings = b'\0.text\0.shstrtab\0'
+        header = bytearray(64)
+        header[:6] = b'\x7fELF\x02\x01'
+        struct.pack_into('<H', header, 18, machine)
+        sections = 64 + len(code) + len(strings)
+        struct.pack_into('<Q', header, 40, sections)
+        struct.pack_into('<HHH', header, 58, 64, 3, 2)
+        null = bytes(64)
+        text = struct.pack('<IIQQQQIIQQ', 1, 1, 6, 4096, 64, len(code), 0, 0, 16, 0)
+        names = struct.pack('<IIQQQQIIQQ', 7, 3, 0, 0, 64 + len(code), len(strings), 0, 0, 1, 0)
+        return bytes(header) + code + strings + null + text + names
+
+    def setUp(self):
+        super().setUp()
+        for path in self.libs.glob('*.so'): path.write_bytes(self.elf())
+        with zipfile.ZipFile(self.runtime, 'w') as z:
+            for name in ('libbare-kit.so', 'libc++_shared.so'):
+                z.writestr('jni/arm64-v8a/' + name, self.elf())
+        self.apk = self.root / 'fixture.apk'
+
+    def package(self, omit=None, change=None):
+        entries = {'assets/keets.bundle': self.bundle.read_bytes()}
+        for path in self.libs.glob('*.so'): entries['lib/arm64-v8a/' + path.name] = path.read_bytes()
+        for name in ('libbare-kit.so', 'libc++_shared.so'): entries['lib/arm64-v8a/' + name] = self.elf()
+        if omit: entries.pop(omit)
+        if change: entries.update(change)
+        with zipfile.ZipFile(self.apk, 'w') as z:
+            for name, data in entries.items(): z.writestr(name, data)
+
+    def test_apk_complete(self):
+        self.package()
+        guard.verify_apk(self.root, self.apk)
+
+    def test_apk_missing_nested_addon(self):
+        self.package(omit='lib/arm64-v8a/libbare-signals.5.0.0.so')
+        with self.assertRaises(KeyError): guard.verify_apk(self.root, self.apk)
+
+    def test_apk_modified_bundle(self):
+        self.package(change={'assets/keets.bundle': self.bundle.read_bytes() + b'corrupt'})
+        with self.assertRaisesRegex(ValueError, 'changed Keets bundle'): guard.verify_apk(self.root, self.apk)
+
+    def test_apk_modified_runtime_code(self):
+        self.package(change={'lib/arm64-v8a/libbare-kit.so': self.elf(b'changed code')})
+        with self.assertRaisesRegex(ValueError, 'changed native code'): guard.verify_apk(self.root, self.apk)
+
+    def test_apk_wrong_architecture(self):
+        self.package(change={'lib/arm64-v8a/libbare-kit.so': self.elf(machine=62)})
+        with self.assertRaisesRegex(ValueError, 'wrong native library architecture'): guard.verify_apk(self.root, self.apk)
+
+
 if __name__ == '__main__':
     unittest.main()
