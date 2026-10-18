@@ -8109,4 +8109,45 @@
     <string name="l10n_atelier_delivery_help" formatted="false">"送达须由链上匹配的输出确认。检查已保存的回执不会重发作品。清除此记录无法取消已提交的交易。"</string>
     <string name="l10n_atelier_delivery_check" formatted="false">"检查送达状态"</string>
     <string name="l10n_atelier_delivery_unverified" formatted="false">"未验证"</string>
+    <string name="l10n_atelier_image_changed" formatted="false">"图片请求已更改。已保留当前草稿。"</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_atelier_image_failed">"图片上传失败：%1$s"</string>
+    <string name="l10n_atelier_image_reselect" formatted="false">"请重新选择图片以附加到此草稿。"</string>
+    <string name="l10n_atelier_image_busy" formatted="false">"请先完成当前图片选择或上传。"</string>
+    <string name="l10n_atelier_image_choose" formatted="false">"选择图片"</string>
+    <string name="l10n_atelier_image_picker_failed" formatted="false">"无法打开图片选择器。"</string>
+    <string name="l10n_atelier_image_no_host" formatted="false">"请先设置托管目标。"</string>
+    <string name="l10n_atelier_image_process_failed" formatted="false">"无法处理所选图片。"</string>
+    <string name="l10n_atelier_image_icon_failed" formatted="false">"无法将此图片压缩到图标大小限制内。"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_image_restored">"已恢复的图版：%1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_image_loaded">"已加载的图版：%1$d"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_atelier_image_plate_loaded">"已加载图版 %1$s"</string>
+    <!-- Arguments: expected, picked -->
+    <string name="l10n_atelier_image_exact_count">"请选择恰好 %1$s 张图片；已选择 %2$s 张。如有需要，请先更改版数。"</string>
+    <!-- Arguments: host -->
+    <string name="l10n_atelier_image_uploading">"正在上传到 %1$s…"</string>
+    <!-- Arguments: count, host -->
+    <string name="l10n_atelier_image_uploading_plates">"正在向 %2$s 上传 %1$d 张图版…"</string>
+    <string name="l10n_atelier_image_cancelled" formatted="false">"上传已在发送前取消。未产生费用。"</string>
+    <string name="l10n_atelier_image_uploaded" formatted="false">"上传完成。已填写图片网址。"</string>
+    <string name="l10n_atelier_image_uploaded_slow" formatted="false">"上传完成。已填写图片网址；可能需要 5–10 分钟才能访问。"</string>
+    <string name="l10n_atelier_image_plates_uploaded" formatted="false">"上传完成。已填写系列基础网址。"</string>
+    <string name="l10n_atelier_image_plates_slow" formatted="false">"上传完成。已填写系列基础网址；可能需要 5–10 分钟才能访问。"</string>
+    <string name="l10n_atelier_image_cost_title" formatted="false">"Arweave 上传费用"</string>
+    <!-- Arguments: count, size, bytes, estimate -->
+    <string name="l10n_atelier_image_cost">"%1$d 个文件 · %2$s（%3$s 字节）。预计将从您的 Arweave 余额中扣除：%4$s。存储是永久性的。是否继续？"</string>
+    <string name="l10n_atelier_image_fee_unknown" formatted="false">"费用未知（无法获取实时估价）"</string>
+    <string name="l10n_atelier_image_upload" formatted="false">"上传"</string>
+    <string name="l10n_atelier_image_missing_title" formatted="false">"缺少嵌入图片"</string>
+    <string name="l10n_atelier_image_missing_help" formatted="false">"这些图片字节将被封存。请补充缺失的图版以完成铸造。"</string>
+    <string name="l10n_atelier_image_choose_missing" formatted="false">"选择缺失图片"</string>
+    <string name="l10n_atelier_image_all_present" formatted="false">"所有图版均已齐备。可以继续。"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_image_missing_count">"仍缺少的图版：%1$d"</string>
+    <string name="l10n_atelier_image_resume" formatted="false">"继续写入"</string>
+    <string name="l10n_atelier_image_too_large" formatted="false">"图片超出 60 MB 上传限制。"</string>
+    <string name="l10n_atelier_image_empty_reference" formatted="false">"托管服务未返回图片网址。"</string>
 </resources>

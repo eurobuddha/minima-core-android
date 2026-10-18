@@ -270,6 +270,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     @Override protected void onDestroy() {
+        cancelImageRequests();
+        imageIo.shutdownNow();
         verifyGateCancel = true;
         for (Runnable r : departureWatchers) main.removeCallbacks(r);
         departureWatchers.clear();
@@ -373,6 +375,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     private void setScreen(Screen s, Runnable back) {
+        cancelImageRequests();
         screenGeneration++;
         screen = s;
         backAction = back;
@@ -1326,11 +1329,20 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     /** The Plate Room — full-screen image editor overlay. */
     private void showEditor(String b64, int budget, ImageEditor.Done done) {
+        final long generation = screenGeneration;
+        final int context = screen == Screen.COLLECTION ? PICK_RECOVERY : PICK_CREATE;
+        final long recovery = openMeta == null ? 0 : openMeta.localId;
+        final String target = imageTarget(context,recovery);
+        final View[] editor = {null};
+        final java.util.function.BooleanSupplier current = () -> !isFinishing() && !isDestroyed()
+                && generation == screenGeneration && target.equals(imageTarget(context,recovery))
+                && overlay.getChildCount() == 1 && overlay.getChildAt(0) == editor[0];
         overlay.removeAllViews();
-        View v = ImageEditor.build(this, b64, budget, this::onCloseViewer, edited -> {
-            onCloseViewer();
-            done.edited(edited);
+        View v = ImageEditor.build(this, b64, budget, () -> { if (current.getAsBoolean()) onCloseViewer(); }, edited -> {
+            if (!current.getAsBoolean()) return;
+            onCloseViewer(); done.edited(edited); saveDrafts();
         });
+        editor[0] = v;
         v.setPadding(0, 0, 0, insetBottom);
         overlay.addView(v, new FrameLayout.LayoutParams(-1, -1));
         overlay.setVisibility(View.VISIBLE);
@@ -3111,7 +3123,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         }
     }
 
-    private void artPhotoFromBitmap(android.graphics.Bitmap big) {
+    private void artPhotoFromBitmap(android.graphics.Bitmap big) { artPhotoFromBitmap(big, null); }
+    private void artPhotoFromBitmap(android.graphics.Bitmap big, ImagePick pick) {
         android.graphics.Bitmap toon = big == null ? null : AiCartoon.cartoonize(this, big);
         final boolean ai = toon != null;
         int[] px = ImageTools.gridPixels(ai ? toon : big, 96);
@@ -3120,8 +3133,12 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
          * painting itself rides along for the Painted finish */
         final String paint = ai ? ImageTools.paintB64(toon, 8600) : "";  // fits the PROVEN 19500 pair budget
         runOnUiThread(() -> {
+            if (pick != null && !acceptImageResult(pick)) return;
             if (rgba == null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_photo_read_failed)); return; }
-            ArtStudio.with(this, s -> s.setPhoto(rgba, ai ? 10 : 8, paint, k -> {
+            ArtStudio.with(this, s -> {
+                if (pick != null && !imageCurrent(pick)) return;
+                s.setPhoto(rgba, ai ? 10 : 8, paint, k -> {
+                if (pick != null && !imageCurrent(pick)) return;
                 artPhotoLoaded = k > 0;
                 ART_THUMBS.remove("photo");
                 artItems = new JSONArray();
@@ -3130,7 +3147,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                         : ai ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_photo_ready)
                              : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_art_photo_fallback));
                 if (screen == Screen.CREATE_GENERATIVE) renderGenerative();
-            }));
+            }); });
         });
     }
 
@@ -4091,6 +4108,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     private View imageSlotCell(int idx) {
+        final long generation = screenGeneration;
         boolean ready = idx < createImages.length && createImages[idx] != null && !createImages[idx].isEmpty();
         FrameLayout cell = new FrameLayout(this);
         cell.setBackground(ready ? Design.ruled(this, Design.CARD(), Design.INK(), 1.5f)
@@ -4110,6 +4128,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         cell.addView(tag, tagLp);
         cell.setClickable(true);
         cell.setOnClickListener(v -> {
+            if (isFinishing() || isDestroyed() || generation != screenGeneration || screen != Screen.CREATE_COLLECTION || idx >= createImages.length) return;
             if (ready) {
                 if ("image/svg+xml".equals(ImageTools.mimeOf(createImages[idx]))) {
                     toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_vector_replace));
@@ -4145,22 +4164,24 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     /* ---- recovery (NEEDIMAGES) ---- */
 
     private LinearLayout recoveryPanel(StateNft.Meta m) {
+        final long generation = screenGeneration;
         LinearLayout panel = vertical();
         panel.setBackground(Design.ruled(this, Design.CARD(), Design.ACCENT(), 2f));
         panel.setPadding(dp(12), dp(10), dp(12), dp(12));
-        panel.addView(Design.text(this, "MISSING EMBEDDED IMAGES", 12, Design.ACCENT(), Design.sansBold()));
-        panel.addView(Design.note(this, "These exact bytes get sealed. Re-supply the missing plates to finish the mint."), lpm(0, 4, 0, 10));
-        TextView pick = Design.button(this, "Choose missing images", true);
-        pick.setOnClickListener(v -> pickRecoveryImages(m));
-        panel.addView(pick, lph(46, 0, 0, 0, 10));
+        panel.addView(Design.text(this, Language.msg(l10n_atelier_image_missing_title), 12, Design.ACCENT(), Design.sansBold()));
+        panel.addView(Design.note(this, Language.msg(l10n_atelier_image_missing_help)), lpm(0, 4, 0, 10));
+        TextView pick = Design.button(this, Language.msg(l10n_atelier_image_choose_missing), true);
+        pick.setOnClickListener(v -> { if (collectionCurrent(m,generation)) pickRecoveryImages(m); });
+        pick.setMinHeight(dp(48)); panel.addView(pick, lpm(0, 0, 0, 10));
         panel.addView(recoveryImageGrid(m));
         int missing = missingLocalImages(m);
-        panel.addView(Design.note(this, missing == 0 ? "All plates present — ready to resume." : missing + " plates still missing."), lpm(0, 6, 0, 0));
+        panel.addView(Design.note(this, missing == 0 ? Language.msg(l10n_atelier_image_all_present) : Language.msg(l10n_atelier_image_missing_count, missing)), lpm(0, 6, 0, 0));
         if (missing == 0) {
-            TextView resume = Design.button(this, "Resume stamping", true);
+            TextView resume = Design.button(this, Language.msg(l10n_atelier_image_resume), true);
             resume.setOnClickListener(v -> {
+                if (!collectionCurrent(m,generation)) return;
                 JSONObject row = LocalStore.findById(this, m.localId);
-                if (row != null) {
+                if (row != null && "NEEDIMAGES".equals(row.optString("phase")) && missingLocalImagesInRow(row) == 0) {
                     put(row, "phase", "MOVE");
                     put(row, "error", "");
                     LocalStore.upsert(this, row);
@@ -4170,7 +4191,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                     openCollection(openMeta);
                 }
             });
-            panel.addView(resume, lph(46, 0, 10, 0, 0));
+            resume.setMinHeight(dp(48)); panel.addView(resume, lpm(0, 10, 0, 0));
         }
         return panel;
     }
@@ -4195,6 +4216,8 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     private View recoverySlotCell(StateNft.Meta m, JSONObject storeRow, int idx) {
+        final long generation = screenGeneration;
+        final String expected = storeRow == null ? "" : storeRow.toString();
         String image = storeRow == null ? "" : localImageInRow(storeRow, idx);
         boolean ready = image != null && !image.isEmpty();
         FrameLayout cell = new FrameLayout(this);
@@ -4215,6 +4238,9 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         cell.addView(tag, tagLp);
         cell.setClickable(true);
         cell.setOnClickListener(v -> {
+            JSONObject current = LocalStore.findById(this,m.localId);
+            if (!collectionCurrent(m,generation) || current == null || !expected.equals(current.toString())
+                    || !"NEEDIMAGES".equals(current.optString("phase"))) return;
             if (ready && !"image/svg+xml".equals(ImageTools.mimeOf(image))) {
                 showEditor(image, ImageTools.STATE_IMG_BUDGET, edited -> {
                     JSONObject row = LocalStore.findById(this, m.localId);
@@ -4339,11 +4365,128 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     }
 
     private void launchPicker(boolean multiple) {
-        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-        i.setType("image/*");
-        if (multiple) i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(i, "Choose image"), 7001);
+        if (pendingImagePick != null || activeImagePick != null) { toast(Language.msg(l10n_atelier_image_busy)); return; }
+        if (isFinishing() || isDestroyed()) return;
+        ImagePick pick = new ImagePick();
+        pick.context = pendingPickContext; pick.batch = pendingBatchImages;
+        pick.start = pick.context == PICK_CREATE && pick.batch ? firstEmptyImageSlot() : pendingImageIndex;
+        pick.recovery = pendingRecoveryId; pick.lane = pendingHostLane; pick.count = pendingHostPlateCount;
+        Screen expected = pick.context == PICK_RECOVERY ? Screen.COLLECTION
+                : pick.context == PICK_ARTPHOTO ? Screen.CREATE_GENERATIVE
+                : pick.context == PICK_NFT ? Screen.CREATE_NFT
+                : pick.context == PICK_TOKICON ? Screen.CREATE_TOKEN : Screen.CREATE_COLLECTION;
+        if (pick.context == PICK_HOST_ICON || pick.context == PICK_HOST_EXTERNAL) {
+            if ("nfturl".equals(pick.lane) || "nftext".equals(pick.lane)) expected = Screen.CREATE_NFT;
+            else if ("tokicon".equals(pick.lane)) expected = Screen.CREATE_TOKEN;
+        }
+        if (screen != expected) return;
+        pick.screen = screen; pick.generation = screenGeneration; pick.sequence = ++imageSequence;
+        pick.target = imageTarget(pick.context,pick.recovery);
+        pick.slug = Hosting.slug(screen == Screen.CREATE_NFT ? nftName : screen == Screen.CREATE_TOKEN ? tokName : createName);
+        if (pick.context >= PICK_HOST_ICON) {
+            Hosting.Profile host = HostingStore.getDefault(this);
+            if (host == null) { toast(Language.msg(l10n_atelier_image_no_host)); return; }
+            try { pick.hostJson = host.j.toString(); pick.host = new Hosting.Profile(new JSONObject(pick.hostJson)); }
+            catch (org.json.JSONException invalid) { return; }
+        }
+        if (!imageCurrent(pick)) { toast(Language.msg(l10n_atelier_image_changed)); return; }
+        pendingImagePick = pick;
+        try {
+            Intent i = new Intent(Intent.ACTION_GET_CONTENT); i.setType("image/*");
+            if (multiple) i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            startActivityForResult(Intent.createChooser(i, Language.msg(l10n_atelier_image_choose)), 7001);
+        } catch (RuntimeException unavailable) {
+            pendingImagePick = null; toast(Language.msg(l10n_atelier_image_picker_failed));
+        }
     }
+
+    /** Salon media-request pattern, scoped to Atelier's draft and screen generation. */
+    private static final class ImagePick {
+        int context, start, count; boolean batch; long recovery, generation, sequence;
+        Screen screen; String lane, target, slug, hostJson;
+        Hosting.Profile host; volatile boolean cancelled;
+        Runnable cancelConfirmation;
+    }
+    private ImagePick pendingImagePick, activeImagePick;
+    private long imageSequence;
+    private final java.util.concurrent.ExecutorService imageIo = java.util.concurrent.Executors.newSingleThreadExecutor();
+
+    private String imageTarget(int context, long recovery) {
+        if (context == PICK_RECOVERY) {
+            JSONObject row = LocalStore.findById(this, recovery);
+            return row == null ? "" : row.toString();
+        }
+        if (context == PICK_ARTPHOTO) return artDraftSnapshot();
+        return mintDraftSnapshot(mintDraftKind());
+    }
+    private boolean imageCurrent(ImagePick pick) {
+        if (pick == null || pick.cancelled || isFinishing() || isDestroyed()
+                || pick.sequence != imageSequence || pick.generation != screenGeneration || pick.screen != screen
+                || !pick.target.equals(imageTarget(pick.context,pick.recovery))) return false;
+        if (pick.context == PICK_RECOVERY) {
+            JSONObject row = LocalStore.findById(this,pick.recovery);
+            if (openMeta == null || openMeta.localId != pick.recovery || row == null
+                    || !"NEEDIMAGES".equals(row.optString("phase"))) return false;
+        }
+        if (pick.host != null) {
+            Hosting.Profile current = HostingStore.getDefault(this);
+            if (current == null || !pick.hostJson.equals(current.j.toString())) return false;
+        }
+        return true;
+    }
+    private void cancelImageRequests() {
+        for (ImagePick pick : new ImagePick[]{pendingImagePick,activeImagePick}) if (pick != null) {
+            pick.cancelled = true;
+            if (pick.cancelConfirmation != null) pick.cancelConfirmation.run();
+        }
+    }
+    private boolean acceptImageResult(ImagePick pick) {
+        if (activeImagePick != pick) return false;
+        activeImagePick = null;
+        if (imageCurrent(pick)) return true;
+        if (!isFinishing() && !isDestroyed()) toast(Language.msg(l10n_atelier_image_changed));
+        return false;
+    }
+    private void executeImageWork(ImagePick pick, Runnable work) {
+        try {
+            imageIo.execute(() -> {
+                if (pick.cancelled) { main.post(() -> acceptImageResult(pick)); return; }
+                try { work.run(); }
+                catch (Exception failure) { main.post(() -> {
+                    if (acceptImageResult(pick)) toast(Language.msg(l10n_atelier_image_failed, failure.getClass().getSimpleName()));
+                }); }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException stopped) {
+            if (acceptImageResult(pick)) toast(Language.msg(l10n_atelier_image_failed, stopped.getClass().getSimpleName()));
+        }
+    }
+    /** Worker-to-UI handoff before creating a transport; all draft reads stay on the UI thread. */
+    private boolean allowImageUpload(ImagePick pick) {
+        // This handoff must never block the UI thread if called by a synchronous executor.
+        if (Looper.myLooper() == main.getLooper()) {
+            if (activeImagePick == pick && imageCurrent(pick)) return true;
+            acceptImageResult(pick); return false;
+        }
+        java.util.concurrent.CountDownLatch ready = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.atomic.AtomicBoolean allowed = new java.util.concurrent.atomic.AtomicBoolean();
+        main.post(() -> { allowed.set(activeImagePick == pick && imageCurrent(pick)); ready.countDown(); });
+        try {
+            if (ready.await(30, java.util.concurrent.TimeUnit.SECONDS) && allowed.get() && !pick.cancelled) return true;
+        } catch (InterruptedException stopped) { Thread.currentThread().interrupt(); }
+        pick.cancelled = true;
+        main.post(() -> acceptImageResult(pick));
+        return false;
+    }
+
+    private CharSequence imageError(String error) {
+        if ("could not open the image".equals(error) || "Could not encode the image as JPEG".equals(error))
+            return Language.msg(l10n_atelier_image_process_failed);
+        if ("image is over 60MB".equals(error)) return Language.msg(l10n_atelier_image_too_large);
+        if ("Empty upload reference".equals(error)) return Language.msg(l10n_atelier_image_empty_reference);
+        if ("Upload stopped after navigation".equals(error)) return Language.msg(l10n_atelier_image_changed);
+        return error;
+    }
+
 
     /* ---- hosting upload rows + lanes ---- */
 
@@ -4534,10 +4677,12 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     /** Runs the upload off the main thread, fills the target field on success,
      *  reports honestly on failure. Single-file lanes only. */
     private void hostUploadSingle(int context, String lane, Uri uri) {
-        final Hosting.Profile p = HostingStore.getDefault(this);
-        if (p == null) { toast("No hosting destination set"); return; }
-        toast("Uploading to " + p.name() + "…");
-        new Thread(() -> {
+        final ImagePick pick = activeImagePick;
+        if (!imageCurrent(pick)) { if (pick != null) acceptImageResult(pick); return; }
+        final Hosting.Profile p = pick.host;
+        if (p == null) { acceptImageResult(pick); toast(Language.msg(l10n_atelier_image_no_host)); return; }
+        toast(Language.msg(l10n_atelier_image_uploading, p.name()));
+        executeImageWork(pick, () -> {
             String result = null, url = null;
             Hosting.Uploader u = null;
             try {
@@ -4553,29 +4698,32 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                     mime = getContentResolver().getType(uri);
                     if (mime == null) mime = "application/octet-stream";
                 }
+                if (bytes.length == 0) throw new Hosting.HostingException("could not open the image");
                 String ext = extFromMime(mime);
-                String coll = slugForHost();
+                String coll = pick.slug;
                 String rel = Hosting.fillTemplate(p.pathTemplate(), mapOf(
                         "collection", coll, "name", lane, "ext", ext,
                         "ts", Hosting.ts36(), "rand", Hosting.rand4(), "idx", ""));
                 if (Hosting.TYPE_ARWEAVE.equals(p.type()) && bytes.length > ArweaveUploader.FREE_TIER_BYTES
-                        && !confirmArweaveSpend(bytes.length, 1)) {
-                    main.post(() -> toast("Upload cancelled — nothing was spent"));
+                        && !confirmArweaveSpend(pick, bytes.length, 1)) {
+                    main.post(() -> { if (acceptImageResult(pick)) toast(Language.msg(l10n_atelier_image_cancelled)); });
                     return;
                 }
+                if (!allowImageUpload(pick)) return;
                 u = Hosting.forProfile(p);
                 if (u.exists(rel)) throw new Hosting.HostingException("Remote file already exists: " + rel);
                 url = u.putFile(bytes, rel, mime);
+                if (url == null || url.isEmpty()) throw new Hosting.HostingException("Empty upload reference");
                 // arweave: Turbo's 200 + txid is the receipt; the URL only starts
                 // serving after gateway indexing (~5-10 min) — don't block on it.
                 if (!Hosting.TYPE_ARWEAVE.equals(p.type())) Hosting.verifyUrl(url, p);
             } catch (SftpUploader.HostKeyUnverified hk) {
-                main.post(() -> confirmHostKey(p, hk.fingerprint));
+                main.post(() -> { if (acceptImageResult(pick)) confirmHostKey(p, hk.fingerprint); });
                 return;
             } catch (Hosting.HostingException e) {
-                result = e.getMessage();
+                result = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
             } catch (Throwable t) {
-                result = "upload failed: " + t.getClass().getSimpleName()
+                result = t.getClass().getSimpleName()
                         + (t.getMessage() == null ? "" : " — " + t.getMessage());
             } finally {
                 if (u instanceof AutoCloseable) { try { ((AutoCloseable) u).close(); } catch (Exception ignored) { } }
@@ -4585,38 +4733,42 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 if (err != null) {
                     LocalStore.logEvent(this, "HOSTING " + lane + " FAILED: " + err);
                     android.util.Log.e("AtelierHost", lane + " failed: " + err);
-                    toast(err);
+                    if (acceptImageResult(pick)) toast(Language.msg(l10n_atelier_image_failed, imageError(err)));
                     return;
                 }
                 LocalStore.logEvent(this, "HOSTING " + lane + " OK — " + okUrl);
+                if (!acceptImageResult(pick)) return;
                 fillHostLane(lane, okUrl, null);
+                saveDrafts();
                 toast(Hosting.TYPE_ARWEAVE.equals(p.type())
-                        ? "Uploaded ✓ — URL filled (live in ~5–10 min)" : "Uploaded ✓ — URL filled");
+                        ? Language.msg(l10n_atelier_image_uploaded_slow) : Language.msg(l10n_atelier_image_uploaded));
             });
-        }).start();
+        });
     }
 
     /** N plates → one directory (IPFS) or sequence (sftp/webdav/github) named
      *  1..N + ext; fills base + ext. */
     private void hostUploadPlates(ArrayList<Uri> uris) {
-        final Hosting.Profile p = HostingStore.getDefault(this);
-        if (p == null) { toast("No hosting destination set"); return; }
-        if (uris.size() != pendingHostPlateCount) {
-            LocalStore.logEvent(this, "HOSTING plates: picked " + uris.size() + " but need " + pendingHostPlateCount);
-            toast("Pick exactly " + pendingHostPlateCount + " images (got " + uris.size()
-                    + "). Set Editions to " + uris.size() + " first, or pick " + pendingHostPlateCount + ".");
+        final ImagePick pick = activeImagePick;
+        if (!imageCurrent(pick)) { if (pick != null) acceptImageResult(pick); return; }
+        final Hosting.Profile p = pick.host;
+        if (p == null) { acceptImageResult(pick); toast(Language.msg(l10n_atelier_image_no_host)); return; }
+        if (uris.size() != pick.count) {
+            acceptImageResult(pick);
+            LocalStore.logEvent(this, "HOSTING plates: picked " + uris.size() + " but need " + pick.count);
+            toast(Language.msg(l10n_atelier_image_exact_count, pick.count, uris.size()));
             return;
         }
         LocalStore.logEvent(this, "HOSTING plates start: type=" + p.type()
                 + " root=" + p.cfgStr("remoteRoot") + " prefix=" + p.cfgStr("urlPrefix")
                 + " dirTpl=" + p.dirTemplate());
-        toast("Uploading " + uris.size() + " plates to " + p.name() + "…");
-        new Thread(() -> {
+        toast(Language.msg(l10n_atelier_image_uploading_plates, uris.size(), p.name()));
+        executeImageWork(pick, () -> {
             String result = null, base = null, ext = null;
             Hosting.Uploader u = null;
             try {
                 java.util.List<Hosting.Entry> files = new java.util.ArrayList<>();
-                String coll = slugForHost();
+                String coll = pick.slug;
                 String dirRel = Hosting.fillTemplate(p.dirTemplate(), mapOf(
                         "collection", coll, "ts", Hosting.ts36(), "rand", Hosting.rand4()));
                 // every plate → display-grade JPEG, so the set is homogeneous
@@ -4629,17 +4781,19 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 if (Hosting.TYPE_ARWEAVE.equals(p.type())) {
                     long total = 0;
                     for (Hosting.Entry e : files) total += e.bytes.length;
-                    if (total > ArweaveUploader.FREE_TIER_BYTES && !confirmArweaveSpend(total, files.size())) {
-                        main.post(() -> toast("Upload cancelled — nothing was spent"));
+                    if (total > ArweaveUploader.FREE_TIER_BYTES && !confirmArweaveSpend(pick, total, files.size())) {
+                        main.post(() -> { if (acceptImageResult(pick)) toast(Language.msg(l10n_atelier_image_cancelled)); });
                         return;
                     }
                 }
+                if (!allowImageUpload(pick)) return;
                 u = Hosting.forProfile(p);
                 if (u instanceof Hosting.DirUploader) {
                     base = ((Hosting.DirUploader) u).putDirectory(files, null);
                 } else {
-                    base = Hosting.putSequence(u, p, dirRel, files, null);
+                    base = Hosting.putSequence(u, p, dirRel, files, (done,total,path) -> { if (pick.cancelled) throw new IllegalStateException("Upload stopped after navigation"); });
                 }
+                if (base == null || base.isEmpty()) throw new Hosting.HostingException("Empty upload reference");
                 // verify plate 1 and plate N — except arweave, where the Turbo
                 // receipt is trusted and the pre-mint gate retry-verifies later
                 // (fresh txids take ~5-10 min to serve)
@@ -4648,12 +4802,12 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                     Hosting.verifyUrl(base + uris.size() + ext, p);
                 }
             } catch (SftpUploader.HostKeyUnverified hk) {
-                main.post(() -> confirmHostKey(p, hk.fingerprint));
+                main.post(() -> { if (acceptImageResult(pick)) confirmHostKey(p, hk.fingerprint); });
                 return;
             } catch (Hosting.HostingException e) {
-                result = e.getMessage();
+                result = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
             } catch (Throwable t) {
-                result = "upload failed: " + t.getClass().getSimpleName()
+                result = t.getClass().getSimpleName()
                         + (t.getMessage() == null ? "" : " — " + t.getMessage());
             } finally {
                 if (u instanceof AutoCloseable) { try { ((AutoCloseable) u).close(); } catch (Exception ignored) { } }
@@ -4663,47 +4817,51 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 if (err != null) {
                     LocalStore.logEvent(this, "HOSTING plates FAILED: " + err);
                     android.util.Log.e("AtelierHost", "plates failed: " + err);
-                    toast(err);
+                    if (acceptImageResult(pick)) toast(Language.msg(l10n_atelier_image_failed, imageError(err)));
                     return;
                 }
                 LocalStore.logEvent(this, "HOSTING plates OK — base " + okBase);
+                if (!acceptImageResult(pick)) return;
                 createBase = okBase;
                 createExt = okExt;
                 createUploadedBase = okBase;
                 createUploadedExt = okExt;
                 createMode = "url";
                 toast(Hosting.TYPE_ARWEAVE.equals(p.type())
-                        ? "Uploaded ✓ — base URL filled (live in ~5–10 min)" : "Uploaded ✓ — base URL filled");
+                        ? Language.msg(l10n_atelier_image_plates_slow) : Language.msg(l10n_atelier_image_plates_uploaded));
                 renderCreateCollection();
+                saveDrafts();
             });
-        }).start();
+        });
     }
 
-    /** Background-thread gate before a PAID (>100 KiB) Arweave upload: live price
-     *  estimate + a blocking confirm dialog. True = proceed. Estimate failure fails
-     *  open — the uploader's 402 path still stops unfunded spends. */
-    private boolean confirmArweaveSpend(long totalBytes, int fileCount) {
-        String est = ArweaveUploader.priceEstimate(totalBytes);
+    /** The existing paid-upload gate, tied to the selected draft and released on navigation. */
+    private boolean confirmArweaveSpend(ImagePick pick, long totalBytes, int fileCount) {
+        String estimate = ArweaveUploader.priceEstimate(totalBytes);
         final java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
-        final boolean[] ok = { false };
+        final java.util.concurrent.atomic.AtomicBoolean approved = new java.util.concurrent.atomic.AtomicBoolean();
+        final androidx.appcompat.app.AlertDialog[] dialog = {null};
         main.post(() -> {
+            if (activeImagePick != pick || !imageCurrent(pick)) { latch.countDown(); return; }
             try {
-                if (isFinishing() || isDestroyed()) { latch.countDown(); return; }
-                new android.app.AlertDialog.Builder(this)
-                        .setTitle("Arweave upload cost")
-                        .setMessage((fileCount > 1 ? fileCount + " files · " : "")
-                                + String.format(java.util.Locale.US, "%.1f MiB", totalBytes / 1048576.0)
-                                + " (" + totalBytes + " bytes) will spend ≈ "
-                                + (est.isEmpty() ? "a fee (live estimate unavailable)" : est)
-                                + " from your Arweave balance. Storage is permanent. Continue?")
-                        .setPositiveButton("Upload", (d, w) -> { ok[0] = true; latch.countDown(); })
-                        .setNegativeButton("Cancel", (d, w) -> latch.countDown())
-                        .setOnCancelListener(d -> latch.countDown())
-                        .show();
-            } catch (Throwable t) { latch.countDown(); }   // dead activity → treat as cancel, never strand the upload thread
+                dialog[0] = new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                        .setTitle(Language.msg(l10n_atelier_image_cost_title))
+                        .setMessage(Language.msg(l10n_atelier_image_cost, fileCount,
+                                String.format(Locale.US, "%.1f MiB", totalBytes / 1048576.0), totalBytes,
+                                estimate.isEmpty() ? Language.msg(l10n_atelier_image_fee_unknown) : estimate))
+                        .setPositiveButton(Language.msg(l10n_atelier_image_upload), (d,w) -> {
+                            approved.set(activeImagePick == pick && imageCurrent(pick)); latch.countDown();
+                        })
+                        .setNegativeButton(Language.msg(l10n_common_cancel), (d,w) -> latch.countDown())
+                        .setOnCancelListener(d -> latch.countDown()).show();
+                dialog[0].setOnDismissListener(d -> latch.countDown());
+                pick.cancelConfirmation = () -> { approved.set(false); latch.countDown(); dialog[0].dismiss(); };
+            } catch (RuntimeException unavailable) { latch.countDown(); }
         });
-        try { latch.await(); } catch (InterruptedException ignored) { }
-        return ok[0];
+        try { latch.await(5, java.util.concurrent.TimeUnit.MINUTES); }
+        catch (InterruptedException stopped) { Thread.currentThread().interrupt(); }
+        main.post(() -> { pick.cancelConfirmation = null; if (dialog[0] != null) dialog[0].dismiss(); });
+        return approved.get() && !pick.cancelled;
     }
 
     private void fillHostLane(String lane, String url, String ext) {
@@ -4746,7 +4904,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
     /** A collection plate for hosting: display-grade JPEG, long edge ≤ 2048.
      *  "Processed and sent" per the brief — the on-chain record only points at
      *  the URL, so multi-MB sensor dumps buy nothing and make 20-plate uploads
-     *  crawl. Falls back to raw bytes if decoding fails. */
+     *  crawl. Refuses undecodable files rather than labelling raw bytes as JPEG. */
     private byte[] plateBytes(Uri uri) throws Exception {
         android.graphics.Bitmap bmp = ImageTools.boundedBitmap(this, uri, 2048);
         if (bmp != null) {
@@ -4755,7 +4913,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 return jbos.toByteArray();
             }
         }
-        return readUri(uri);
+        throw new Exception("Could not encode the image as JPEG");
     }
 
     private static String extFromMime(String mime) {
@@ -4780,28 +4938,29 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != 7001 || resultCode != RESULT_OK || data == null) return;
+        if (requestCode != 7001) return;
+        final ImagePick pick = pendingImagePick;
+        pendingImagePick = null;
+        if (resultCode != RESULT_OK || data == null) return;
+        if (pick == null) { toast(Language.msg(l10n_atelier_image_reselect)); return; }
+        if (!imageCurrent(pick)) { toast(Language.msg(l10n_atelier_image_changed)); return; }
         ArrayList<Uri> uris = selectedImageUris(data);
         if (uris.isEmpty()) return;
-        int start = pendingBatchImages ? firstEmptyImageSlot() : pendingImageIndex;
-        boolean batch = pendingBatchImages;
-        int context = pendingPickContext;
-        long recoveryId = pendingRecoveryId;
-        pendingImageIndex = -1;
-        pendingBatchImages = false;
-        pendingPickContext = PICK_CREATE;
-        pendingRecoveryId = 0;
+        final int start = pick.start, context = pick.context;
+        final boolean batch = pick.batch;
+        final long recoveryId = pick.recovery;
+        activeImagePick = pick;
         if (context == PICK_ARTPHOTO) {
             final Uri photoUri = uris.get(0);
-            toast("Cartoonizing on-device…");
-            new Thread(() -> {
+            toast(Language.msg(l10n_atelier_art_cartoonizing));
+            executeImageWork(pick, () -> {
                 android.graphics.Bitmap big = ImageTools.squareBitmap(this, photoUri, 512);
-                artPhotoFromBitmap(big);
-            }).start();
+                artPhotoFromBitmap(big, pick);
+            });
             return;
         }
         if (context == PICK_HOST_ICON || context == PICK_HOST_EXTERNAL) {
-            hostUploadSingle(context, pendingHostLane, uris.get(0));
+            hostUploadSingle(context, pick.lane, uris.get(0));
             return;
         }
         if (context == PICK_HOST_PLATES) {
@@ -4811,7 +4970,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         int budget = context == PICK_NFT ? ImageTools.ARTIMAGE_BUDGET
                 : (context == PICK_TOKICON || context == PICK_COLLICON) ? ImageTools.ICON_BUDGET
                 : ImageTools.STATE_IMG_BUDGET;
-        new Thread(() -> {
+        executeImageWork(pick, () -> {
             ArrayList<String> out = new ArrayList<>();
             for (Uri uri : uris) {
                 try {
@@ -4823,9 +4982,10 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 } catch (Exception ignored) { out.add(""); }
             }
             runOnUiThread(() -> {
+                if (!acceptImageResult(pick)) return;
                 if (context == PICK_NFT) {
                     String b64 = out.isEmpty() ? "" : out.get(0);
-                    if (b64 == null || b64.isEmpty()) { toast("Could not process that image"); renderCreateNft(); return; }
+                    if (b64 == null || b64.isEmpty()) { toast(Language.msg(l10n_atelier_image_process_failed)); renderCreateNft(); return; }
                     nftImage = b64;
                     renderCreateNft();
                     // straight into the plate room — a bad crop is sealed forever
@@ -4838,29 +4998,30 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                     }
                 } else if (context == PICK_TOKICON || context == PICK_COLLICON) {
                     String b64 = out.isEmpty() ? "" : out.get(0);
-                    if (b64 == null || b64.isEmpty()) toast("Could not fit that image into an icon (6000 chars)");
+                    if (b64 == null || b64.isEmpty()) toast(Language.msg(l10n_atelier_image_icon_failed));
                     else if (context == PICK_TOKICON) tokIcon = b64;
                     else createIconB64 = b64;
                     if (context == PICK_TOKICON) renderCreateToken();
                     else renderCreateCollection();
                 } else if (context == PICK_RECOVERY) {
                     int added = applyRecoveryImages(recoveryId, start, batch, out);
-                    toast(added == 0 ? "Could not process selected image"
-                            : (batch ? added + " plates restored" : "Plate restored"));
+                    toast(added == 0 ? Language.msg(l10n_atelier_image_process_failed)
+                            : (batch ? Language.msg(l10n_atelier_image_restored, added) : Language.msg(l10n_atelier_image_restored, 1)));
                     loadLocalCollections();
                     openMeta = findCollectionByLocalId(recoveryId, openMeta);
                     if (openMeta != null && !"NEEDIMAGES".equals(openMeta.phase)) {
                         engageEngine();
                     }
-                    openCollection(openMeta);
+                    if (openMeta != null) openCollection(openMeta);
                 } else {
                     int added = batch ? applyPickedImages(start, out) : applyReplacementImage(start, out);
-                    toast(added == 0 ? "Could not process selected image"
-                            : (batch ? added + " plates loaded" : "Plate " + (start + 1) + " loaded"));
+                    toast(added == 0 ? Language.msg(l10n_atelier_image_process_failed)
+                            : (batch ? Language.msg(l10n_atelier_image_loaded, added) : Language.msg(l10n_atelier_image_plate_loaded, start + 1)));
                     renderCreateCollection();
                 }
+                saveDrafts();
             });
-        }).start();
+        });
     }
 
 

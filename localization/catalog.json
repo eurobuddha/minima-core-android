@@ -40990,5 +40990,197 @@
     "zh-Hans": "未验证",
     "ru": "Не подтверждено",
     "uk": "Не підтверджено"
+  },
+  "atelier.image.changed": {
+    "en": "The image request changed. Your current draft was kept.",
+    "zh-Hans": "图片请求已更改。已保留当前草稿。",
+    "ru": "Запрос изображения изменился. Текущий черновик сохранён.",
+    "uk": "Запит зображення змінився. Поточну чернетку збережено."
+  },
+  "atelier.image.failed": {
+    "en": "Image upload failed: {detail}",
+    "zh-Hans": "图片上传失败：{detail}",
+    "ru": "Не удалось загрузить изображение: {detail}",
+    "uk": "Не вдалося завантажити зображення: {detail}"
+  },
+  "atelier.image.reselect": {
+    "en": "Choose the image again to attach it to this draft.",
+    "zh-Hans": "请重新选择图片以附加到此草稿。",
+    "ru": "Выберите изображение заново, чтобы добавить его в этот черновик.",
+    "uk": "Виберіть зображення знову, щоб додати його до цієї чернетки."
+  },
+  "atelier.image.busy": {
+    "en": "Finish the current image selection or upload first.",
+    "zh-Hans": "请先完成当前图片选择或上传。",
+    "ru": "Сначала завершите текущий выбор или загрузку изображения.",
+    "uk": "Спочатку завершіть поточний вибір або завантаження зображення."
+  },
+  "atelier.image.choose": {
+    "en": "Choose image",
+    "zh-Hans": "选择图片",
+    "ru": "Выбрать изображение",
+    "uk": "Вибрати зображення"
+  },
+  "atelier.image.pickerFailed": {
+    "en": "Could not open the image picker.",
+    "zh-Hans": "无法打开图片选择器。",
+    "ru": "Не удалось открыть выбор изображения.",
+    "uk": "Не вдалося відкрити вибір зображення."
+  },
+  "atelier.image.noHost": {
+    "en": "Set up a hosting destination first.",
+    "zh-Hans": "请先设置托管目标。",
+    "ru": "Сначала настройте место хранения.",
+    "uk": "Спочатку налаштуйте місце зберігання."
+  },
+  "atelier.image.processFailed": {
+    "en": "Could not process the selected image.",
+    "zh-Hans": "无法处理所选图片。",
+    "ru": "Не удалось обработать выбранное изображение.",
+    "uk": "Не вдалося обробити вибране зображення."
+  },
+  "atelier.image.iconFailed": {
+    "en": "Could not fit this image into the icon size limit.",
+    "zh-Hans": "无法将此图片压缩到图标大小限制内。",
+    "ru": "Не удалось уменьшить изображение до допустимого размера значка.",
+    "uk": "Не вдалося зменшити зображення до допустимого розміру значка."
+  },
+  "atelier.image.restored": {
+    "en": "Plates restored: {count}",
+    "zh-Hans": "已恢复的图版：{count}",
+    "ru": "Восстановлено изображений: {count}",
+    "uk": "Відновлено зображень: {count}"
+  },
+  "atelier.image.loaded": {
+    "en": "Plates loaded: {count}",
+    "zh-Hans": "已加载的图版：{count}",
+    "ru": "Загружено изображений: {count}",
+    "uk": "Завантажено зображень: {count}"
+  },
+  "atelier.image.plateLoaded": {
+    "en": "Plate {number} loaded",
+    "zh-Hans": "已加载图版 {number}",
+    "ru": "Изображение {number} загружено",
+    "uk": "Зображення {number} завантажено"
+  },
+  "atelier.image.exactCount": {
+    "en": "Choose exactly {expected} images; {picked} were selected. Change Editions first if needed.",
+    "zh-Hans": "请选择恰好 {expected} 张图片；已选择 {picked} 张。如有需要，请先更改版数。",
+    "ru": "Выберите ровно {expected} изображений; выбрано {picked}. При необходимости сначала измените число экземпляров.",
+    "uk": "Виберіть рівно {expected} зображень; вибрано {picked}. За потреби спочатку змініть кількість примірників."
+  },
+  "atelier.image.uploading": {
+    "en": "Uploading to {host}…",
+    "zh-Hans": "正在上传到 {host}…",
+    "ru": "Загрузка в {host}…",
+    "uk": "Завантаження до {host}…"
+  },
+  "atelier.image.uploadingPlates": {
+    "en": "Uploading {count} plates to {host}…",
+    "zh-Hans": "正在向 {host} 上传 {count} 张图版…",
+    "ru": "Загрузка {count} изображений в {host}…",
+    "uk": "Завантаження {count} зображень до {host}…"
+  },
+  "atelier.image.cancelled": {
+    "en": "Upload cancelled before dispatch. Nothing was spent.",
+    "zh-Hans": "上传已在发送前取消。未产生费用。",
+    "ru": "Загрузка отменена до отправки. Средства не списаны.",
+    "uk": "Завантаження скасовано до надсилання. Кошти не списано."
+  },
+  "atelier.image.uploaded": {
+    "en": "Uploaded. The image URL has been filled.",
+    "zh-Hans": "上传完成。已填写图片网址。",
+    "ru": "Загружено. Ссылка на изображение заполнена.",
+    "uk": "Завантажено. Посилання на зображення заповнено."
+  },
+  "atelier.image.uploadedSlow": {
+    "en": "Uploaded. The image URL has been filled; it may take 5–10 minutes to become available.",
+    "zh-Hans": "上传完成。已填写图片网址；可能需要 5–10 分钟才能访问。",
+    "ru": "Загружено. Ссылка заполнена; изображение может стать доступным через 5–10 минут.",
+    "uk": "Завантажено. Посилання заповнено; зображення може стати доступним через 5–10 хвилин."
+  },
+  "atelier.image.platesUploaded": {
+    "en": "Uploaded. The collection base URL has been filled.",
+    "zh-Hans": "上传完成。已填写系列基础网址。",
+    "ru": "Загружено. Базовая ссылка коллекции заполнена.",
+    "uk": "Завантажено. Базове посилання колекції заповнено."
+  },
+  "atelier.image.platesSlow": {
+    "en": "Uploaded. The collection base URL has been filled; it may take 5–10 minutes to become available.",
+    "zh-Hans": "上传完成。已填写系列基础网址；可能需要 5–10 分钟才能访问。",
+    "ru": "Загружено. Базовая ссылка коллекции заполнена; доступ может появиться через 5–10 минут.",
+    "uk": "Завантажено. Базове посилання колекції заповнено; доступ може з’явитися через 5–10 хвилин."
+  },
+  "atelier.image.costTitle": {
+    "en": "Arweave upload cost",
+    "zh-Hans": "Arweave 上传费用",
+    "ru": "Стоимость загрузки в Arweave",
+    "uk": "Вартість завантаження до Arweave"
+  },
+  "atelier.image.cost": {
+    "en": "{count} file(s) · {size} ({bytes} bytes). Estimated charge: {estimate} from your Arweave balance. Storage is permanent. Continue?",
+    "zh-Hans": "{count} 个文件 · {size}（{bytes} 字节）。预计将从您的 Arweave 余额中扣除：{estimate}。存储是永久性的。是否继续？",
+    "ru": "Файлов: {count} · {size} ({bytes} байт). Примерная стоимость: {estimate} с вашего баланса Arweave. Хранение постоянное. Продолжить?",
+    "uk": "Файлів: {count} · {size} ({bytes} байтів). Орієнтовна вартість: {estimate} з вашого балансу Arweave. Зберігання постійне. Продовжити?"
+  },
+  "atelier.image.feeUnknown": {
+    "en": "a fee (live estimate unavailable)",
+    "zh-Hans": "费用未知（无法获取实时估价）",
+    "ru": "комиссия (оценка сейчас недоступна)",
+    "uk": "комісія (оцінка зараз недоступна)"
+  },
+  "atelier.image.upload": {
+    "en": "Upload",
+    "zh-Hans": "上传",
+    "ru": "Загрузить",
+    "uk": "Завантажити"
+  },
+  "atelier.image.missingTitle": {
+    "en": "Missing embedded images",
+    "zh-Hans": "缺少嵌入图片",
+    "ru": "Отсутствуют встроенные изображения",
+    "uk": "Відсутні вбудовані зображення"
+  },
+  "atelier.image.missingHelp": {
+    "en": "These exact bytes will be sealed. Supply the missing plates to finish the mint.",
+    "zh-Hans": "这些图片字节将被封存。请补充缺失的图版以完成铸造。",
+    "ru": "Именно эти байты будут записаны в блокчейн. Добавьте недостающие изображения, чтобы завершить выпуск.",
+    "uk": "Саме ці байти буде записано до блокчейну. Додайте відсутні зображення, щоб завершити випуск."
+  },
+  "atelier.image.chooseMissing": {
+    "en": "Choose missing images",
+    "zh-Hans": "选择缺失图片",
+    "ru": "Выбрать недостающие изображения",
+    "uk": "Вибрати відсутні зображення"
+  },
+  "atelier.image.allPresent": {
+    "en": "All plates are present. Ready to resume.",
+    "zh-Hans": "所有图版均已齐备。可以继续。",
+    "ru": "Все изображения на месте. Можно продолжить.",
+    "uk": "Усі зображення на місці. Можна продовжити."
+  },
+  "atelier.image.missingCount": {
+    "en": "Plates still missing: {count}",
+    "zh-Hans": "仍缺少的图版：{count}",
+    "ru": "Не хватает изображений: {count}",
+    "uk": "Бракує зображень: {count}"
+  },
+  "atelier.image.resume": {
+    "en": "Resume stamping",
+    "zh-Hans": "继续写入",
+    "ru": "Продолжить запись",
+    "uk": "Продовжити запис"
+  },
+  "atelier.image.tooLarge": {
+    "en": "The image exceeds the 60 MB upload limit.",
+    "zh-Hans": "图片超出 60 MB 上传限制。",
+    "ru": "Изображение превышает лимит загрузки 60 МБ.",
+    "uk": "Зображення перевищує ліміт завантаження 60 МБ."
+  },
+  "atelier.image.emptyReference": {
+    "en": "The host did not return an image URL.",
+    "zh-Hans": "托管服务未返回图片网址。",
+    "ru": "Хранилище не вернуло ссылку на изображение.",
+    "uk": "Сховище не повернуло посилання на зображення."
   }
 }

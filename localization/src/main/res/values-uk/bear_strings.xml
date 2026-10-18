@@ -8217,4 +8217,45 @@
     <string name="l10n_atelier_delivery_help" formatted="false">"Для підтвердження доставки потрібен відповідний вихід у блокчейні. Перевірка збережених квитанцій не надсилає примірники повторно. Видалення запису не скасовує вже надіслану транзакцію."</string>
     <string name="l10n_atelier_delivery_check" formatted="false">"Перевірити доставку"</string>
     <string name="l10n_atelier_delivery_unverified" formatted="false">"Не підтверджено"</string>
+    <string name="l10n_atelier_image_changed" formatted="false">"Запит зображення змінився. Поточну чернетку збережено."</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_atelier_image_failed">"Не вдалося завантажити зображення: %1$s"</string>
+    <string name="l10n_atelier_image_reselect" formatted="false">"Виберіть зображення знову, щоб додати його до цієї чернетки."</string>
+    <string name="l10n_atelier_image_busy" formatted="false">"Спочатку завершіть поточний вибір або завантаження зображення."</string>
+    <string name="l10n_atelier_image_choose" formatted="false">"Вибрати зображення"</string>
+    <string name="l10n_atelier_image_picker_failed" formatted="false">"Не вдалося відкрити вибір зображення."</string>
+    <string name="l10n_atelier_image_no_host" formatted="false">"Спочатку налаштуйте місце зберігання."</string>
+    <string name="l10n_atelier_image_process_failed" formatted="false">"Не вдалося обробити вибране зображення."</string>
+    <string name="l10n_atelier_image_icon_failed" formatted="false">"Не вдалося зменшити зображення до допустимого розміру значка."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_image_restored">"Відновлено зображень: %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_image_loaded">"Завантажено зображень: %1$d"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_atelier_image_plate_loaded">"Зображення %1$s завантажено"</string>
+    <!-- Arguments: expected, picked -->
+    <string name="l10n_atelier_image_exact_count">"Виберіть рівно %1$s зображень; вибрано %2$s. За потреби спочатку змініть кількість примірників."</string>
+    <!-- Arguments: host -->
+    <string name="l10n_atelier_image_uploading">"Завантаження до %1$s…"</string>
+    <!-- Arguments: count, host -->
+    <string name="l10n_atelier_image_uploading_plates">"Завантаження %1$d зображень до %2$s…"</string>
+    <string name="l10n_atelier_image_cancelled" formatted="false">"Завантаження скасовано до надсилання. Кошти не списано."</string>
+    <string name="l10n_atelier_image_uploaded" formatted="false">"Завантажено. Посилання на зображення заповнено."</string>
+    <string name="l10n_atelier_image_uploaded_slow" formatted="false">"Завантажено. Посилання заповнено; зображення може стати доступним через 5–10 хвилин."</string>
+    <string name="l10n_atelier_image_plates_uploaded" formatted="false">"Завантажено. Базове посилання колекції заповнено."</string>
+    <string name="l10n_atelier_image_plates_slow" formatted="false">"Завантажено. Базове посилання колекції заповнено; доступ може з’явитися через 5–10 хвилин."</string>
+    <string name="l10n_atelier_image_cost_title" formatted="false">"Вартість завантаження до Arweave"</string>
+    <!-- Arguments: count, size, bytes, estimate -->
+    <string name="l10n_atelier_image_cost">"Файлів: %1$d · %2$s (%3$s байтів). Орієнтовна вартість: %4$s з вашого балансу Arweave. Зберігання постійне. Продовжити?"</string>
+    <string name="l10n_atelier_image_fee_unknown" formatted="false">"комісія (оцінка зараз недоступна)"</string>
+    <string name="l10n_atelier_image_upload" formatted="false">"Завантажити"</string>
+    <string name="l10n_atelier_image_missing_title" formatted="false">"Відсутні вбудовані зображення"</string>
+    <string name="l10n_atelier_image_missing_help" formatted="false">"Саме ці байти буде записано до блокчейну. Додайте відсутні зображення, щоб завершити випуск."</string>
+    <string name="l10n_atelier_image_choose_missing" formatted="false">"Вибрати відсутні зображення"</string>
+    <string name="l10n_atelier_image_all_present" formatted="false">"Усі зображення на місці. Можна продовжити."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_image_missing_count">"Бракує зображень: %1$d"</string>
+    <string name="l10n_atelier_image_resume" formatted="false">"Продовжити запис"</string>
+    <string name="l10n_atelier_image_too_large" formatted="false">"Зображення перевищує ліміт завантаження 60 МБ."</string>
+    <string name="l10n_atelier_image_empty_reference" formatted="false">"Сховище не повернуло посилання на зображення."</string>
 </resources>

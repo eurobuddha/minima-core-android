@@ -8145,4 +8145,45 @@
     <string name="l10n_atelier_delivery_help" formatted="false">"Delivery requires a matching output on the chain. Checking saved receipts never resends a lot. Clearing this record cannot cancel a transaction already submitted."</string>
     <string name="l10n_atelier_delivery_check" formatted="false">"Check delivery status"</string>
     <string name="l10n_atelier_delivery_unverified" formatted="false">"Unverified"</string>
+    <string name="l10n_atelier_image_changed" formatted="false">"The image request changed. Your current draft was kept."</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_atelier_image_failed">"Image upload failed: %1$s"</string>
+    <string name="l10n_atelier_image_reselect" formatted="false">"Choose the image again to attach it to this draft."</string>
+    <string name="l10n_atelier_image_busy" formatted="false">"Finish the current image selection or upload first."</string>
+    <string name="l10n_atelier_image_choose" formatted="false">"Choose image"</string>
+    <string name="l10n_atelier_image_picker_failed" formatted="false">"Could not open the image picker."</string>
+    <string name="l10n_atelier_image_no_host" formatted="false">"Set up a hosting destination first."</string>
+    <string name="l10n_atelier_image_process_failed" formatted="false">"Could not process the selected image."</string>
+    <string name="l10n_atelier_image_icon_failed" formatted="false">"Could not fit this image into the icon size limit."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_image_restored">"Plates restored: %1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_image_loaded">"Plates loaded: %1$d"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_atelier_image_plate_loaded">"Plate %1$s loaded"</string>
+    <!-- Arguments: expected, picked -->
+    <string name="l10n_atelier_image_exact_count">"Choose exactly %1$s images; %2$s were selected. Change Editions first if needed."</string>
+    <!-- Arguments: host -->
+    <string name="l10n_atelier_image_uploading">"Uploading to %1$s…"</string>
+    <!-- Arguments: count, host -->
+    <string name="l10n_atelier_image_uploading_plates">"Uploading %1$d plates to %2$s…"</string>
+    <string name="l10n_atelier_image_cancelled" formatted="false">"Upload cancelled before dispatch. Nothing was spent."</string>
+    <string name="l10n_atelier_image_uploaded" formatted="false">"Uploaded. The image URL has been filled."</string>
+    <string name="l10n_atelier_image_uploaded_slow" formatted="false">"Uploaded. The image URL has been filled; it may take 5–10 minutes to become available."</string>
+    <string name="l10n_atelier_image_plates_uploaded" formatted="false">"Uploaded. The collection base URL has been filled."</string>
+    <string name="l10n_atelier_image_plates_slow" formatted="false">"Uploaded. The collection base URL has been filled; it may take 5–10 minutes to become available."</string>
+    <string name="l10n_atelier_image_cost_title" formatted="false">"Arweave upload cost"</string>
+    <!-- Arguments: count, size, bytes, estimate -->
+    <string name="l10n_atelier_image_cost">"%1$d file(s) · %2$s (%3$s bytes). Estimated charge: %4$s from your Arweave balance. Storage is permanent. Continue?"</string>
+    <string name="l10n_atelier_image_fee_unknown" formatted="false">"a fee (live estimate unavailable)"</string>
+    <string name="l10n_atelier_image_upload" formatted="false">"Upload"</string>
+    <string name="l10n_atelier_image_missing_title" formatted="false">"Missing embedded images"</string>
+    <string name="l10n_atelier_image_missing_help" formatted="false">"These exact bytes will be sealed. Supply the missing plates to finish the mint."</string>
+    <string name="l10n_atelier_image_choose_missing" formatted="false">"Choose missing images"</string>
+    <string name="l10n_atelier_image_all_present" formatted="false">"All plates are present. Ready to resume."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_atelier_image_missing_count">"Plates still missing: %1$d"</string>
+    <string name="l10n_atelier_image_resume" formatted="false">"Resume stamping"</string>
+    <string name="l10n_atelier_image_too_large" formatted="false">"The image exceeds the 60 MB upload limit."</string>
+    <string name="l10n_atelier_image_empty_reference" formatted="false">"The host did not return an image URL."</string>
 </resources>

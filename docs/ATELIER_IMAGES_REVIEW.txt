@@ -1,0 +1,71 @@
+Atelier image selection and hosting review — 2026-10-18
+
+Summary
+
+Image selections and upload callbacks now belong to the draft, screen generation
+and hosting profile captured when the picker opened. A late result cannot replace
+a newer draft, return to an old screen, or approve a paid upload after navigation.
+Picker, upload, recovery and cost messages support English, Simplified Chinese,
+Russian and Ukrainian through retained Language bindings.
+
+Reuse
+
+Read and reused these existing implementations:
+- scripts/pandamonium-sources/salon/MediaUploads.java.inc and its tests in
+  scripts/pandamonium-tests/salon/src/test/java/com/eurobuddha/salon/SalonMediaUploadTest.java:
+  captured request ownership, one selection/upload at a time, worker lifetime,
+  current-target checks and rejection of unowned activity results.
+- integrated/atelier/src/main/java/com/eurobuddha/statenft/MainActivity.java:
+  mintDraftSnapshot, artDraftSnapshot, screenGeneration, image result handling,
+  hostUploadSingle, hostUploadPlates and the existing paid-upload confirmation.
+- Atelier ImageTools, Hosting, HostingStore and ArweaveUploader: existing codecs,
+  profile schema, backend selection, overwrite refusal, URL verification and price
+  lookup remain the implementations used by the integration.
+- localization LanguageDialog and the existing Design/Language bindings preserve
+  translated dialogs and controls without rebuilding them on language changes.
+
+Resolved findings
+
+- Mutable picker fields could route an old result into a different draft or lane.
+  Selection context, slots, recovery ID, draft and host are now captured together.
+  Cancelled, duplicate and unowned results do not start processing.
+- Background results could overwrite edits or navigate back to an earlier screen.
+  Completion checks both generation and draft. Uploads check again on the UI
+  before constructing a transport; the original profile and slug are retained.
+- Paid confirmation could outlive its activity or wait indefinitely. It now uses
+  a translated retained dialog, checks the request on approval, releases its wait
+  on dismissal/navigation, and has a five-minute timeout. Worker shutdown interrupts
+  pending waits. No timeout or missing approval authorizes a spend.
+- Late editor results could close a newer overlay. Both callbacks now check the
+  screen, draft and exact overlay view before applying or closing anything.
+- JPEG-labelled plates could contain undecoded raw data. A failed JPEG conversion
+  now fails the upload instead of publishing incorrectly labelled bytes.
+- Empty upload references and exceptions with null messages could look successful.
+  Both now report failure and retain the current draft. Completed remote URLs stay
+  in the existing local engine log even if the draft changed during upload.
+- Recovery controls could act after navigation or a collection phase change.
+  They now check their screen and the NEEDIMAGES phase; old slot controls also
+  reject replaced or resized drafts. Recovery actions use wrapping controls and
+  retained translations.
+
+Validation
+
+- Full Atelier suite: 234 tests passed; zero failures, errors or skips.
+- 15 new AtelierImagePickTest cases exercise the picker, fake hosting, worker
+  rejection, stale results, editor ownership, recovery phase guard, translated
+  errors, and real dialog callbacks with a mocked price lookup.
+- Pandamonium release Java compilation passed.
+- All 21 pinned imported feature snapshots reproduce exactly.
+- Catalogue validation: 6,774 messages in all four languages.
+- No live upload, payment, blockchain transaction, installation or publication.
+
+Evidence: build/localization/atelier-images-tests.log and the Gradle XML results.
+The image adapter and canonical fragments reproduce the checked-in MainActivity.
+
+Verdict
+
+Approve this checkpoint. No unresolved blocking finding in these changes.
+The whole Atelier/Salon integration remains incomplete: viewer share/save, the
+FILTR handoff, remaining Salon metadata/restore/outbox/publish checks, the public
+page language controls, network image loading review, signed builds and device
+acceptance still need completion.
