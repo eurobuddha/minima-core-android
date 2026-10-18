@@ -33,6 +33,7 @@ public final class InboxMessages {
         if (value == null) return "";
         if (depth >= 8) return value;
         switch(value) {
+            case DeliveryCoinList.INVALID: return Language.msg(l10n_mall_inbox_coin_list_unconfirmed);
             case "transaction does not balance — refusing to sign": return Language.msg(l10n_mall_inbox_unbalanced);
             case "TOO_LONG": return Language.msg(l10n_mall_inbox_coin_list_large);
             case "buyer pay address is malformed": return Language.msg(l10n_mall_inbox_bad_address);

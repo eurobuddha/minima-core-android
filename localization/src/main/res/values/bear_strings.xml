@@ -6554,4 +6554,5 @@
     <string name="l10n_core_last_key_block">"Last key block: %1$s"</string>
     <!-- Arguments: value -->
     <string name="l10n_core_key_uses">"Key uses: %1$s"</string>
+    <string name="l10n_mall_inbox_coin_list_unconfirmed" formatted="false">"Incomplete coin-list evidence. Delivery remains unconfirmed."</string>
 </resources>

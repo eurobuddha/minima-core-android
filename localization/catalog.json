@@ -32161,5 +32161,11 @@
     "zh-Hans": "密钥使用次数：{value}",
     "ru": "Использований ключа: {value}",
     "uk": "Використань ключа: {value}"
+  },
+  "mallInbox.coinListUnconfirmed": {
+    "en": "Incomplete coin-list evidence. Delivery remains unconfirmed.",
+    "zh-Hans": "币列表信息不完整，交付仍未确认。",
+    "ru": "Данные списка монет неполны. Доставка остаётся неподтверждённой.",
+    "uk": "Дані списку монет неповні. Доставка залишається непідтвердженою."
   }
 }

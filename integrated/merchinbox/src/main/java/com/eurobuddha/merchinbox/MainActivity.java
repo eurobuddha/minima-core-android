@@ -821,8 +821,11 @@ public class MainActivity extends AppCompatActivity {
         refreshOrderIfTopmost(o.ref);
         node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
+                if (isFinishing() || isDestroyed()) return;
                 JSONObject coin = null;
-                JSONArray arr = j.optJSONArray("response");
+                final JSONArray arr;
+                try { arr = DeliveryCoinList.coins(j, tokenid); }
+                catch (RuntimeException incomplete) { deliverFailed(o, key, DeliveryCoinList.INVALID, auto); return; }
                 if (arr != null) for (int i = 0; i < arr.length(); i++) {
                     JSONObject c = arr.optJSONObject(i);
                     if (c != null && !StateNft.isBuried(c) && idx.equals(StateNft.stamped(c))) { coin = c; break; }
@@ -843,6 +846,7 @@ public class MainActivity extends AppCompatActivity {
                 enqueueTx(() -> runStateTransfer(o, key, tokenid, theCoin, auto));
             }
             @Override public void onError(String m) {
+                if (isFinishing() || isDestroyed()) return;
                 deliverFailed(o, key, NodeApi.ERR_TOO_LONG.equals(m) ? "coin list too large for this node" : m, auto);
             }
         });
@@ -892,8 +896,11 @@ public class MainActivity extends AppCompatActivity {
         refreshOrderIfTopmost(o.ref);
         node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
+                if (isFinishing() || isDestroyed()) return;
                 final List<JSONObject> coins = new ArrayList<>();
-                JSONArray arr = j.optJSONArray("response");
+                final JSONArray arr;
+                try { arr = DeliveryCoinList.coins(j, tokenid); }
+                catch (RuntimeException incomplete) { deliverFailed(o, key, DeliveryCoinList.INVALID, auto); return; }
                 if (arr != null) for (int i = 0; i < arr.length(); i++) {
                     JSONObject c = arr.optJSONObject(i);
                     if (c == null || !Util.isValidHexId(c.optString("coinid", ""))) continue;
@@ -914,6 +921,7 @@ public class MainActivity extends AppCompatActivity {
                 enqueueTx(() -> bundleTransferNext(o, key, tokenid, coins, 0, new ArrayList<>(), new String[]{null}, auto));
             }
             @Override public void onError(String m) {
+                if (isFinishing() || isDestroyed()) return;
                 deliverFailed(o, key, NodeApi.ERR_TOO_LONG.equals(m) ? "coin list too large for this node" : m, auto);
             }
         });
@@ -966,19 +974,24 @@ public class MainActivity extends AppCompatActivity {
             refreshOrderIfTopmost(o.ref);
             return;
         }
-        ui.postDelayed(() -> node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
+        ui.postDelayed(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
+                if (isFinishing() || isDestroyed()) return;
                 java.util.HashSet<String> live = new java.util.HashSet<>();
                 int sendableLeft = 0;
-                JSONArray arr = j.optJSONArray("response");
+                final JSONArray arr;
+                try { arr = DeliveryCoinList.coins(j, tokenid); }
+                catch (RuntimeException incomplete) { watchBundleDeparture(o, key, tokenid, postedIds, firstError, auto, attempt + 1); return; }
                 if (arr != null) for (int i = 0; i < arr.length(); i++) {
                     JSONObject c = arr.optJSONObject(i);
                     if (c == null) continue;
-                    live.add(c.optString("coinid", ""));
+                    live.add(c.optString("coinid", "").toLowerCase(java.util.Locale.ROOT));
                     if (!StateNft.isBuried(c) && StateNft.stamped(c) != null && StateNft.replayableState(c)) sendableLeft++;
                 }
                 boolean anyPostedLeft = false;
-                for (String id : postedIds) if (live.contains(id)) { anyPostedLeft = true; break; }
+                for (String id : postedIds) if (live.contains(id.toLowerCase(java.util.Locale.ROOT))) { anyPostedLeft = true; break; }
                 if (anyPostedLeft) { watchBundleDeparture(o, key, tokenid, postedIds, firstError, auto, attempt + 1); return; }
                 if (sendableLeft == 0) { markSentAndMaybeAdvance(o, key, "posted", auto); return; }
                 // Posted coins confirmed away, but some pieces failed to post — resumable.
@@ -989,13 +1002,15 @@ public class MainActivity extends AppCompatActivity {
                 refreshOrderIfTopmost(o.ref);
             }
             @Override public void onError(String m) {
+                if (isFinishing() || isDestroyed()) return;
                 if (NodeApi.ERR_TOO_LONG.equals(m)) {
                     nftSending.remove(key);
                     if (auto) notifyDelivery(o.ref, false, o.ref + " — posted; can't confirm on this node");
                     refreshOrderIfTopmost(o.ref);
                 } else watchBundleDeparture(o, key, tokenid, postedIds, firstError, auto, attempt + 1);
             }
-        }), WATCH_INTERVAL_MS);
+            });
+        }, WATCH_INTERVAL_MS);
     }
 
     private static final long WATCH_INTERVAL_MS = 20000;
@@ -1014,18 +1029,24 @@ public class MainActivity extends AppCompatActivity {
             refreshOrderIfTopmost(o.ref);
             return;
         }
-        ui.postDelayed(() -> node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
+        ui.postDelayed(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
+                if (isFinishing() || isDestroyed()) return;
                 boolean present = false;
-                JSONArray arr = j.optJSONArray("response");
+                final JSONArray arr;
+                try { arr = DeliveryCoinList.coins(j, tokenid); }
+                catch (RuntimeException incomplete) { watchDeparture(o, key, tokenid, coinid, postedVal, auto, attempt + 1); return; }
                 if (arr != null) for (int i = 0; i < arr.length(); i++) {
                     JSONObject c = arr.optJSONObject(i);
-                    if (c != null && coinid.equals(c.optString("coinid", ""))) { present = true; break; }
+                    if (c != null && DeliveryCoinList.same(coinid, c.optString("coinid", ""))) { present = true; break; }
                 }
                 if (!present) markSentAndMaybeAdvance(o, key, postedVal, auto);
                 else watchDeparture(o, key, tokenid, coinid, postedVal, auto, attempt + 1);
             }
             @Override public void onError(String m) {
+                if (isFinishing() || isDestroyed()) return;
                 if (NodeApi.ERR_TOO_LONG.equals(m)) {
                     // can't confirm on this node — leave unsent, nftposted resolves it later
                     nftSending.remove(key);
@@ -1033,7 +1054,8 @@ public class MainActivity extends AppCompatActivity {
                     refreshOrderIfTopmost(o.ref);
                 } else watchDeparture(o, key, tokenid, coinid, postedVal, auto, attempt + 1);
             }
-        }), WATCH_INTERVAL_MS);
+            });
+        }, WATCH_INTERVAL_MS);
     }
 
     private View replyRow(final MerchDb.Order o) {
