@@ -3054,3 +3054,20 @@ User reported image payloads and JSON names expanding UTXO coin rows and appeari
 Both integrated apps and their reproducible importer adaptations are fixed. Standalone sibling repositories have not been modified. The regressions cover 128 KiB embedded-image metadata, serialized balance/coin records, nested JSON names, collection envelopes/covers, missing names, multilingual literal names, raw-input preservation and exact amounts. Two overlapping initial Gradle runs interfered with report writing; a fresh sequential run regenerated all relevant reports successfully: UTXO 12, NFT Wallet 292, Pandamonium host 149, total 453; zero failures/errors/skips. All 19 pinned imports, transport, catalogue (5,337 messages in four languages) and whitespace checks pass.
 
 Code review: all changed Java, tests, adapter and version changes inspected. Financial command construction, coin amounts, raw state, selection/spendability checks and image-loading security code are unchanged. StateNft changes are confined to metadata parsing. No blocking findings. Verdict: approve the source patch; device visual/runtime acceptance remains pending. Version is 1.9.50/vc121. Evidence: `build/localization/bear-1.9.50-validation.json` and `nft-metadata-final-tests.log`. Build signed candidates next; do not interrupt the owner's active Send form.
+
+
+## Full review: NFT metadata fixes including MiniMall Studio — 2026-10-18
+
+### Summary
+
+Reviewed the complete patch since `5fb4fa5`: UTXO Wallet and NFT Wallet metadata/name parsing and bounded coin labels; NFT Wallet and MiniMall Studio collection parsing; Studio token names/icons; the shared importer adaptation; regression tests and canonical test copies; version metadata and validation records. Studio's three new regression cases initially failed, reproducing serialized JSON labels, missing images and raw JSON fallback names. It now reuses the core balance coercion and existing collection envelope logic. Its cards and exporter already consume these fields, so their layout, editable catalog, image pipeline and export logic remain intact. Standalone sibling repositories remain unchanged.
+
+### Findings
+
+No blocking findings in the final patch. Confirmed ordinary and multilingual names remain literal, missing-name localization remains intact in both wallets, root/nested/enveloped JSON metadata decodes consistently, large image payloads no longer become names, and malformed coin labels remain bounded. Metadata inputs and exact amounts are preserved. Both StateNft files are byte-identical to the prior source outside `parseMeta`; transaction/state handling, supply overflow checks, Studio data validation and shop-export ownership checks are retained. Importer source-drift guards and all 19 pinned imports pass.
+
+### Verdict
+
+Approve the source patch. Full host regression: 25 tasks, 2,686 passing tests, zero failures/errors/skips; valid UP-TO-DATE tasks are recorded separately from executed tasks. Transport, 5,337-message/four-language catalogue and whitespace checks pass; the node JAR still matches the baseline SHA256. Evidence: `build/localization/bear-1.9.50-validation.json`, `nft-studio-full-regression.log`, and `nft-studio-metadata-import.log`. The full review and checks completed before the final signed build.
+
+The owner is AFK and disconnected the Fold for about one hour, requesting completed fixes, full review and prepared APKs. Do not attempt installation or device interaction. Rebuild the three signed 1.9.50/vc121 candidates with the Studio fix before staging any artifact in dist. The earlier wallet-only 1.9.50 build was not staged, installed or published. Device visual/runtime acceptance and publication remain pending.
