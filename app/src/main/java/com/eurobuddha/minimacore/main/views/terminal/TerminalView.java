@@ -143,18 +143,29 @@ public class TerminalView extends BaseView  {
         });
     }
 
+    /** Retain the original terminal's tail policy, including for one oversized response. */
+    public static String boundedAppend(String existing, String incoming, int limit) {
+        if (limit < 3) throw new IllegalArgumentException("Terminal limit must allow a truncation marker");
+        if (incoming.length() >= limit) {
+            int from = incoming.length() - (limit - 2);
+            if (Character.isLowSurrogate(incoming.charAt(from))) from++;
+            return "…\n" + incoming.substring(from);
+        }
+        int room = limit - incoming.length() - 1;
+        int from = Math.max(0, existing.length() - room);
+        if (from > 0 && from < existing.length() && Character.isLowSurrogate(existing.charAt(from))) from++;
+        return existing.substring(from) + "\n" + incoming;
+    }
+
     public void appendText(String zText) {
+        // Bound the new response before posting it: the previous guard trimmed only old output.
+        final String incoming = zText.length() >= MAX_TERMINAL_LENGTH
+                ? TerminalView.boundedAppend("", zText, MAX_TERMINAL_LENGTH) : zText;
         mMainText.post(new Runnable() {
             @Override
             public void run() {
-                String text = mMainText.getText().toString();
-                int len     = text.length();
-                if(len > MAX_TERMINAL_LENGTH){
-                    String newtext = text.substring(len-MAX_TERMINAL_LENGTH,len)+"\n" + zText;
-                    mMainText.setText(newtext);
-                }else{
-                    mMainText.append("\n" + zText);
-                }
+                mMainText.setText(TerminalView.boundedAppend(
+                        mMainText.getText().toString(), incoming, MAX_TERMINAL_LENGTH));
 
                 mScroller.post(new Runnable() {
                     @Override

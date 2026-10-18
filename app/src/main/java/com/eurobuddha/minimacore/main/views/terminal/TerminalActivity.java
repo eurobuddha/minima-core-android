@@ -130,17 +130,14 @@ public class TerminalActivity extends AppCompatActivity {
     }
 
     public void appendText(String zText) {
+        // Bound the new response before posting it: the previous guard trimmed only old output.
+        final String incoming = zText.length() >= MAX_TERMINAL_LENGTH
+                ? TerminalView.boundedAppend("", zText, MAX_TERMINAL_LENGTH) : zText;
         mMainText.post(new Runnable() {
             @Override
             public void run() {
-                String text = mMainText.getText().toString();
-                int len     = text.length();
-                if(len > MAX_TERMINAL_LENGTH){
-                    String newtext = text.substring(len-MAX_TERMINAL_LENGTH,len)+"\n" + zText;
-                    mMainText.setText(newtext);
-                }else{
-                    mMainText.append("\n" + zText);
-                }
+                mMainText.setText(TerminalView.boundedAppend(
+                        mMainText.getText().toString(), incoming, MAX_TERMINAL_LENGTH));
 
                 mScroller.post(new Runnable() {
                     @Override

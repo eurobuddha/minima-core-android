@@ -42,6 +42,12 @@ import java.util.List;
 public class TerminalView extends BaseView {
 
     private static final int MAX_ENTRIES = 300;
+    private final java.util.concurrent.ThreadPoolExecutor formatter = TerminalOutput.worker();
+    private boolean destroyed;
+    private int generation;
+    private int inFlight;
+    private static final int MAX_DISPLAY_CHARS = 120000;
+    private static final int MAX_RETAINED_CHARS = 8 * 1024 * 1024;
 
     SelectionScrollView mScroller;
     LinearLayout mOutput;
@@ -162,12 +168,17 @@ public class TerminalView extends BaseView {
     }
 
     public void clearTerminal() {
+        generation++;
+        inFlight = 0;
+        formatter.getQueue().clear();
         mOutput.removeAllViews();
         banner();
     }
 
     @Override
     public void onDestroy() {
+        destroyed = true;
+        formatter.shutdownNow();
         if (mHistory != null) mHistory.close();
     }
 
@@ -415,51 +426,77 @@ public class TerminalView extends BaseView {
     }
 
     private void execute(String zCommand) {
+        if (destroyed) return;
+        // Admit before dispatch, so a saturated formatter never loses an accepted result.
+        if (inFlight >= 8) {
+            Toast.makeText(mActivity, Language.msg(l10n_terminal_ide_wait_commands), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        inFlight++;
         mHistory.addHistory(zCommand);
         appendEntry(OutputFormatter.colored("❯ " + zCommand, OutputFormatter.COL_CMD));
 
         final TerminalLabel result = (TerminalLabel) appendEntry("");
         result.bind(() -> OutputFormatter.colored(Language.msg(l10n_terminal_ide_running).toString(), OutputFormatter.COL_DIM));
         final long start = System.currentTimeMillis();
+        final int requestGeneration = generation;
 
         mNode.cmd(zCommand, new NodeApi.Cb() {
             @Override
             public void onResult(JSONObject json) {
-                long ms = System.currentTimeMillis() - start;
-                boolean failed = !json.optBoolean("status", true);
-
-                CharSequence rendered = renderHelp(zCommand, json);
-                final String helpSnapshot = rendered == null ? null : json.toString();
-                if (rendered == null) {
-                    String pretty;
-                    try {
-                        pretty = json.toString(2);
-                    } catch (JSONException e) {
-                        pretty = json.toString();
-                    }
-                    // Render embedded multi-line text as real lines, not \n-escaped strings.
-                    pretty = pretty.replace("\\n", "\n").replace("\\t", "    ");
-                    rendered = OutputFormatter.json(pretty, false);
+                if (destroyed || requestGeneration != generation) return;
+                if (result.getParent() != mOutput) { inFlight--; return; }
+                final long ms = System.currentTimeMillis() - start;
+                final boolean failed = !json.optBoolean("status", true);
+                try {
+                    formatter.execute(() -> {
+                        String pretty;
+                        try { pretty = json.toString(2); }
+                        catch (JSONException e) { pretty = json.toString(); }
+                        final TerminalOutput output = new TerminalOutput(pretty);
+                        mActivity.runOnUiThread(() -> {
+                            if (destroyed || requestGeneration != generation) return;
+                            if (result.getParent() != mOutput) { inFlight--; return; }
+                            inFlight--;
+                            // Only small help replies can use the retained translated help renderer.
+                            CharSequence help = output.shortened ? null : renderHelp(zCommand, json);
+                            final String helpSnapshot = help == null ? null : output.full;
+                            final CharSequence raw = new android.text.SpannedString(help == null
+                                    ? OutputFormatter.json(output.preview, false) : help);
+                            result.setFullOutput(help == null ? output.full : null);
+                            result.bind(() -> {
+                                android.text.SpannableStringBuilder display = new android.text.SpannableStringBuilder(
+                                        helpSnapshot == null ? raw : refreshHelp(zCommand, helpSnapshot, raw));
+                                if (output.shortened) display.append(OutputFormatter.colored("\n" + Language.msg(l10n_terminal_ide_preview), OutputFormatter.COL_DIM));
+                                if (failed) display.append(OutputFormatter.colored("\n" + Language.msg(l10n_terminal_ide_command_failed), OutputFormatter.COL_ERROR));
+                                display.append(OutputFormatter.colored("\n" + Language.msg(l10n_terminal_ide_milliseconds, ms), OutputFormatter.COL_DIM));
+                                return display;
+                            });
+                            trimOutput();
+                            scrollToBottom();
+                        });
+                    });
+                } catch (java.util.concurrent.RejectedExecutionException busy) {
+                    inFlight--;
+                    result.bind(() -> OutputFormatter.colored(Language.msg(l10n_terminal_ide_display_busy).toString(), OutputFormatter.COL_ERROR));
                 }
-                final CharSequence raw = new android.text.SpannedString(rendered);
-                result.bind(() -> {
-                    android.text.SpannableStringBuilder display = new android.text.SpannableStringBuilder(
-                            helpSnapshot == null ? raw : refreshHelp(zCommand, helpSnapshot, raw));
-                    if (failed) display.append(OutputFormatter.colored("\n" + Language.msg(l10n_terminal_ide_command_failed), OutputFormatter.COL_ERROR));
-                    display.append(OutputFormatter.colored("\n" + Language.msg(l10n_terminal_ide_milliseconds, ms), OutputFormatter.COL_DIM));
-                    return display;
-                });
-                scrollToBottom();
             }
 
             @Override
             public void onError(String message) {
+                if (destroyed || requestGeneration != generation) return;
+                if (result.getParent() != mOutput) { inFlight--; return; }
+                inFlight--;
                 if (NodeApi.ERR_NOT_ENABLED.equals(message)) {
                     result.bind(() -> OutputFormatter.colored(Language.msg(l10n_explorer_node_retry).toString(), OutputFormatter.COL_ERROR));
                 } else {
                     if ("The embedded node did not respond. Check its status in Minima Core.".equals(message))
                         result.bind(() -> OutputFormatter.colored("✖ " + Language.msg(l10n_terminal_ide_timeout), OutputFormatter.COL_ERROR));
-                    else result.setText(OutputFormatter.colored("✖ " + message, OutputFormatter.COL_ERROR));
+                    else {
+                        TerminalOutput output = new TerminalOutput("✖ " + message);
+                        result.setFullOutput(output.full);
+                        result.setText(OutputFormatter.colored(output.preview, OutputFormatter.COL_ERROR));
+                    }
                 }
                 scrollToBottom();
             }
@@ -539,7 +576,7 @@ public class TerminalView extends BaseView {
     public String exportText() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < mOutput.getChildCount(); i++) {
-            sb.append(((TextView) mOutput.getChildAt(i)).getText().toString()).append("\n\n");
+            sb.append(((TerminalLabel) mOutput.getChildAt(i)).exportText()).append("\n\n");
         }
         return sb.toString();
     }
@@ -589,7 +626,7 @@ public class TerminalView extends BaseView {
 
     /** Long-press on one output block: copy or share just that block. */
     private void showBlockMenu(final TextView block) {
-        final String text = block.getText().toString();
+        final String text = ((TerminalLabel)block).exportText();
         final CharSequence[] actions = {
                 Language.msg(l10n_terminal_ide_copy_block),
                 Language.msg(l10n_terminal_ide_select_block),
@@ -658,7 +695,9 @@ public class TerminalView extends BaseView {
         TextView tv = new TerminalLabel(mActivity);
         tv.setTypeface(Typeface.MONOSPACE);
         tv.setTextSize(13);
-        tv.setText(text);
+        TerminalOutput output = new TerminalOutput(text.toString());
+        tv.setText(output.shortened ? output.preview : text);
+        if (output.shortened) ((TerminalLabel)tv).setFullOutput(output.full);
         tv.setPadding(0, 8, 0, 8);
         // In select mode the platform handles the long-press (start a selection);
         // otherwise it opens the explicit copy/share menu for this block.
@@ -669,8 +708,23 @@ public class TerminalView extends BaseView {
             return true;
         });
         mOutput.addView(tv);
+        trimOutput();
         scrollToBottom();
         return tv;
+    }
+
+    private void trimOutput() {
+        long displayed = 0, retained = 0;
+        for (int i=0; i<mOutput.getChildCount(); i++) {
+            TerminalLabel label = (TerminalLabel)mOutput.getChildAt(i);
+            displayed += label.length(); retained += label.exportText().length();
+        }
+        // As with MAX_ENTRIES, only old blocks are discarded. Keep the latest full reply.
+        while (mOutput.getChildCount() > 1 && (displayed > MAX_DISPLAY_CHARS || retained > MAX_RETAINED_CHARS)) {
+            TerminalLabel oldest = (TerminalLabel)mOutput.getChildAt(0);
+            displayed -= oldest.length(); retained -= oldest.exportText().length();
+            mOutput.removeViewAt(0);
+        }
     }
 
     private void scrollToBottom() {

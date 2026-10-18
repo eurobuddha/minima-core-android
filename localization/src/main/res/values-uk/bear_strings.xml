@@ -7051,4 +7051,7 @@
     <string name="l10n_filtr_preset_vhstape" formatted="false">"VHS-касета"</string>
     <string name="l10n_filtr_preset_stainedglass" formatted="false">"Вітраж"</string>
     <string name="l10n_filtr_preset_topographic" formatted="false">"Топографія"</string>
+    <string name="l10n_terminal_ide_preview" formatted="false">"Попередній перегляд скорочено. Експортуйте цей блок або поділіться ним, щоб отримати повний результат."</string>
+    <string name="l10n_terminal_ide_display_busy" formatted="false">"Обробка виводу зайнята. Команду вже надіслано; перед повтором перевірте результат її виконання."</string>
+    <string name="l10n_terminal_ide_wait_commands" formatted="false">"Дочекайтеся завершення поточних команд, перш ніж запускати наступну."</string>
 </resources>

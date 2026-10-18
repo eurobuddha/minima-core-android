@@ -11,6 +11,9 @@ import java.util.function.Supplier;
 public final class TerminalLabel extends androidx.appcompat.widget.AppCompatTextView {
     private Supplier<CharSequence> display;
     private boolean rendering;
+    private String fullOutput;
+    public void setFullOutput(String value) { fullOutput = value; }
+    public String exportText() { return fullOutput == null ? getText().toString() : fullOutput; }
     public TerminalLabel(Context context) { super(context); }
     public void bind(Supplier<CharSequence> value) { display = value; refreshDisplay(); }
     public void refreshDisplay() {
