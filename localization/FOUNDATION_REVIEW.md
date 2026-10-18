@@ -2704,3 +2704,19 @@ Findings: no blocking issue in this increment. This review does not close the ou
 Validation: 21 Studio and 12 shared localization JVM tests passed, zero failures/errors/skips; two new regression cases. All three debug variants compile. All 19 pinned imports reproduce, catalogue generation and direct transport verification pass, and git diff --check is clean. The catalogue has 5301 entries in each language. The 557-source validation map changes only the expected nine files; protected engines, wallet audit and node JAR match. Evidence: `build/localization/studio-export-language-validation.json`. Verdict: approve this translation change.
 
 Fold R3GL805K7MB remains unavailable to ADB. No device data was changed. Signed 1.9.43 candidates still correspond to eb82bff and require rebuilding after this source checkpoint. Full language/runtime acceptance and authorized publication remain open.
+
+
+## Full host regression and refreshed signed candidates — 2026-10-18
+
+Source checkpoint `14703cc3d797f46b40bceeb4920715e06e3eacab` was clean and already pushed. Ran all existing JVM test tasks for the 19 integrated modules, minimaapi, localization, all three Bear debug variants, and maxima-core. The run passed in 1m51s: **2541 executions, zero failures, errors or skips**, recorded from 372 JUnit reports. This includes repeat executions of shared app tests across variants; it is not a distinct-case count. Explorer, Filez, Terminal IDE and maxima-core report NO-SOURCE and have no JVM cases. Up-to-date Gradle results were retained where valid. Evidence: `build/localization/full-host-regression-validation.json` with task results, log/report hashes and source tree. This is host regression evidence, not full UI or live-node acceptance.
+
+Built all three signed 1.9.43/vc114 release candidates in 24s, including vital lint. Reused the existing signed-candidate verifier, adapting only the expected source/checkpoint, previous-candidate commit and evidence filenames. All 557 recorded source hashes match. The preserved 1.9.41 APKs are unchanged. Each current APK verifies with v2 signatures and the same family certificate as 1.9.41; package ID, release version, non-debuggable status, arm64-v8a ABI, 16KiB ZIP alignment, four declared locales and all 5301 compiled catalogue resources per language were checked. ZIP alignment is not an ELF page-alignment claim.
+
+Current artifacts are `/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-{PandaBear,BlackBear,Pandamonium}-1.9.43-candidate.apk`, each with a SHA256 sidecar. Old eb82bff candidates are preserved in `dist/candidate-archive/1.9.43-eb82bff4ce4a`; earlier 4bc8b625 candidates remain in their own archive. Current manifest: `dist/bear-languages-1.9.43-candidate.json`. Evidence: `build/localization/signed-candidates-host-regression-validation.json`; verifier: `build/localization/verify-signed-candidates-host-regression.py`.
+
+SHA256:
+- PandaBear: `d57dd25fc99a03dda30e1bd57d7b85198268c3e1fab742dfa659808b972e529c`
+- BlackBear: `40f1746871ad91d812ae18d47a5c7f78063f7c8d434a835a6547e0580141b95d`
+- Pandamonium: `bfcfd66830f0b02c94fd672a2c1f373cac81d4037952131e176d12aa3b096162`
+
+The read-only ADB check again returned device not found for Fold R3GL805K7MB. No other device, owner state, seed or counter was accessed. Final Fold/language acceptance, the outstanding reviews above, and GitHub/PandaApps/eurobuddha.com publication remain open. These are signed candidates, not an accepted published release.
