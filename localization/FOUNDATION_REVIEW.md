@@ -3143,3 +3143,18 @@ No blocking finding in this checkpoint. The real-graphics regression confirms th
 ### Verdict
 
 Approve this source checkpoint. This is not approval of the complete integration or a public release. See PLAN.md and build/localization/creative-presentation-validation.json for scope and evidence.
+
+
+## Code Review — FILTR language checkpoint 1.9.54
+
+### Summary
+
+Reviewed the native WebView bridge/lifecycle, retained DOM helper, FILTR UI and sheet changes, importer adaptations, new browser/native tests, catalogue additions and reproducible resources. The editor uses the existing rendering engine and enum schema. Translation updates text and accessibility attributes without rebuilding controls or invoking image export/mint actions.
+
+### Findings
+
+No blocking finding in this checkpoint. Review caught a translated empty-image label being unsuitable as a loading-state sentinel; the code now checks FILTR.full. Screenshot review caught Russian Apply overflowing the narrow toolbar; existing icon buttons and a short Apply label resolve it, with browser bounds assertions. All four translations retain placeholder parity. The generated dictionary and helper/test mirrors match their canonical sources. The node JAR, FILTR engine, art engine and existing integrated apps are unchanged.
+
+### Verdict
+
+Approve this source checkpoint. The broader integration is incomplete and is not approved for release. Full Fold runtime/visual acceptance and the remaining donor error-path review in PLAN.md are still required.

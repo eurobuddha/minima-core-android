@@ -232,7 +232,7 @@ function filtrLoadFile(f) {
   reader.onload = function () {
     var img = new Image();
     img.onload = function () { filtrLoadImage(img, f.name || "image"); };
-    img.onerror = function () { toast("could not load that image"); };
+    img.onerror = function () { toast(FiltrI18n.t("filtr.ui.loadFailed")); };
     img.src = reader.result;
   };
   reader.readAsDataURL(f);
@@ -266,11 +266,10 @@ function filtrLoadImage(img, name) {
 }
 
 function filtrMeta() {
-  $("filtr-meta").innerText = FILTR.full
-    ? FILTR.name + " · " + FILTR.full.width + "×" + FILTR.full.height +
-      (FILTR.src.width !== FILTR.full.width
-        ? " · editing at " + FILTR.src.width + "px" : "")
-    : "no image loaded";
+  FiltrI18n.render($("filtr-meta"), function () {
+    return FILTR.full ? FiltrI18n.t("filtr.ui.imageMeta", {name:FILTR.name,width:FILTR.full.width,height:FILTR.full.height}) +
+      (FILTR.src.width !== FILTR.full.width ? FiltrI18n.t("filtr.ui.editingSize", {width:FILTR.src.width}) : "") : FiltrI18n.t("filtr.ui.noImage");
+  });
 }
 
 /* ---------- history (structural ops only; sliders don't spam it) ---------- */
@@ -362,8 +361,7 @@ function filtrFit() {
 function filtrView() {
   $("filtr-zoomwrap").style.transform = "translate(" + FILTR.panX + "px," +
     FILTR.panY + "px) scale(" + FILTR.zoom + ")";
-  $("filtr-zoominfo").innerText = "zoom " + Math.round(FILTR.zoom * 100) + "%" +
-    (FILTR.fitted ? " · fit" : "");
+  FiltrI18n.render($("filtr-zoominfo"), function () { return FiltrI18n.t("filtr.ui.zoom", {percent:Math.round(FILTR.zoom * 100)}) + (FILTR.fitted ? FiltrI18n.t("filtr.ui.fitSuffix") : ""); });
   filtrDrawAnn();
   filtrDrawCrop();
 }
@@ -400,22 +398,22 @@ function filtrToolOpts() {
   function btn(label, on, fn) {
     var b = document.createElement("button");
     b.className = "filtr-tool" + (on ? " on" : "");
-    b.innerText = label;
+    if (label.indexOf("filtr.") === 0) FiltrI18n.bind(b,label); else FiltrI18n.text(b,label);
     b.onclick = fn;
     host.appendChild(b);
     return b;
   }
-  function note(t) {
+  function note(t, vars) {
     var s = document.createElement("span");
     s.className = "filtr-note";
-    s.innerText = t;
+    FiltrI18n.bind(s,t,vars);
     host.appendChild(s);
   }
   if (FILTR.tool === "crop") {
-    note("drag on the image, then");
-    btn("Apply crop", false, filtrApplyCrop);
-    note("ratio:");
-    var ratios = [[0, "Free"], [1, "1:1"], [4 / 5, "4:5"], [16 / 10, "16:10"]];
+    note("filtr.ui.cropHelp");
+    btn("filtr.ui.applyCrop", false, filtrApplyCrop);
+    note("filtr.ui.ratio");
+    var ratios = [[0, "filtr.ui.free"], [1, "1:1"], [4 / 5, "4:5"], [16 / 10, "16:10"]];
     for (var i = 0; i < ratios.length; i++) {
       (function (rv, lb) {
         btn(lb, FILTR.cropRatio === rv, function () {
@@ -429,21 +427,21 @@ function filtrToolOpts() {
       })(ratios[i][0], ratios[i][1]);
     }
   } else if (FILTR.tool === "erase") {
-    note("paint to erase · brush " + FILTR.brush + "px");
+    note("filtr.ui.eraseHelp", {size:FILTR.brush});
     var r = document.createElement("input");
     r.type = "range"; r.min = 4; r.max = 120; r.step = 2; r.value = FILTR.brush;
     r.className = "filtr-brushrange";
     r.oninput = function () { FILTR.brush = parseInt(r.value, 10); filtrToolOpts(); };
     host.appendChild(r);
-    btn(FILTR.soft ? "Soft" : "Hard", true, function () {
+    btn(FILTR.soft ? "filtr.ui.soft" : "filtr.ui.hard", true, function () {
       FILTR.soft = !FILTR.soft; filtrToolOpts();
     });
   } else if (FILTR.tool === "bubble") {
-    note("tap the image to place a bubble");
+    note("filtr.ui.bubbleHelp");
   } else if (FILTR.tool === "text") {
-    note("tap the image to place text");
+    note("filtr.ui.textHelp");
   } else {
-    note("pan: drag · zoom: wheel / pinch");
+    note("filtr.ui.panHelp");
   }
 }
 
@@ -487,7 +485,7 @@ function filtrFlip(h) {
 function filtrResizePrompt() {
   var cur = FILTR.full ? Math.max(FILTR.full.width, FILTR.full.height) : 0;
   if (!cur) { return; }
-  var v = prompt("New long-edge size in px (64–" + FILTR_MAX_FULL + "):", "" + cur);
+  var v = prompt(FiltrI18n.t("filtr.ui.resizePrompt", {max:FILTR_MAX_FULL}), "" + cur);
   var n = parseInt(v, 10);
   if (!n || n < 64 || n > FILTR_MAX_FULL) { return; }
   filtrMapBoth(function (cv) {
@@ -663,7 +661,7 @@ function filtrWheel(ev) {
 function filtrAddAnn(type, p) {
   FILTR.ann.push({
     type: type,                        // speech | thought | shout | box | text
-    text: type === "text" ? "YOUR TEXT" : "WEN MOON?",
+    text: FiltrI18n.t(type === "text" ? "filtr.ui.defaultText" : "filtr.ui.defaultBubble"),
     x: p.x / FILTR.src.width,          // centre, image fractions
     y: p.y / FILTR.src.height,
     size: 0.05,                        // text height as fraction of image height
@@ -743,7 +741,7 @@ function filtrDrawAnn() {
       };
       el.ondblclick = function (ev) {
         ev.stopPropagation();
-        var t = prompt("Text:", a.text);
+        var t = prompt(FiltrI18n.t("filtr.ui.textPrompt"), a.text);
         if (t !== null) { a.text = t; filtrPush(); filtrDrawAnn(); filtrAnnPanel(); }
       };
     })(FILTR.ann[i], i);
@@ -755,15 +753,16 @@ function filtrAnnPanel() {
   host.innerHTML = "";
   var a = FILTR.ann[FILTR.sel];
   if (!a) {
-    host.innerHTML = "<p class='filtr-note'>use the Bubble or Text tool, or tap " +
-      "an annotation to edit it</p>";
+    host.innerHTML = "<p class='filtr-note'></p>";
+    FiltrI18n.bind(host.firstChild,"filtr.ui.annotationHelp");
     return;
   }
   function row(label, el) {
     var r = document.createElement("div");
     r.className = "filtr-crow";
     var l = document.createElement("label");
-    l.innerText = label;
+    FiltrI18n.bind(l,"filtr.annotation."+label);
+    FiltrI18n.attribute(el,"aria-label","filtr.annotation."+label);
     r.appendChild(l);
     r.appendChild(el);
     host.appendChild(r);
@@ -775,7 +774,7 @@ function filtrAnnPanel() {
     ["speech", "thought", "shout", "box"].forEach(function (tp) {
       var s = document.createElement("button");
       s.className = "filtr-seg" + (a.type === tp ? " on" : "");
-      s.innerText = tp;
+      FiltrI18n.bind(s,"filtr.annotation."+tp);
       s.onclick = function () { a.type = tp; filtrPush(); filtrDrawAnn(); filtrAnnPanel(); };
       segs.appendChild(s);
     });
@@ -791,7 +790,7 @@ function filtrAnnPanel() {
   ["comic", "sans", "mono"].forEach(function (fn) {
     var s = document.createElement("button");
     s.className = "filtr-seg" + (a.font === fn ? " on" : "");
-    s.innerText = fn;
+    FiltrI18n.bind(s,"filtr.annotation."+fn);
     s.onclick = function () { a.font = fn; filtrPush(); filtrDrawAnn(); filtrAnnPanel(); };
     fonts.appendChild(s);
   });
@@ -814,7 +813,7 @@ function filtrAnnPanel() {
   fill.type = "color"; fill.value = a.fill;
   fill.oninput = function () { a.fill = fill.value; filtrDrawAnn(); };
   fill.onchange = function () { filtrPush(); };
-  row(a.type === "text" ? "text color" : "fill", fill);
+  row(a.type === "text" ? "textColor" : "fill", fill);
   var ink = document.createElement("input");
   ink.type = "color"; ink.value = a.ink;
   ink.oninput = function () { a.ink = ink.value; filtrDrawAnn(); };
@@ -822,7 +821,7 @@ function filtrAnnPanel() {
   row("ink", ink);
   var del = document.createElement("button");
   del.className = "filtr-tool warn";
-  del.innerText = "Delete annotation";
+  FiltrI18n.bind(del,"filtr.ui.deleteAnnotation");
   del.onclick = function () {
     FILTR.ann.splice(FILTR.sel, 1);
     FILTR.sel = -1;
@@ -952,9 +951,9 @@ function filtrRenderFull(withAnn, cb) {
 
 function filtrApply() {
   if (!FILTR.src) { return; }
-  filtrStatus("baking…");
+  filtrStatus("filtr.ui.baking");
   filtrRenderFull(false, function (out) {
-    if (!out) { filtrStatus("bake failed", true); return; }
+    if (!out) { filtrStatus("filtr.ui.bakeFailed", true); return; }
     FILTR.full = out;
     FILTR.src = filtrScaled(out, FILTR_MAX_WORK);
     /* the look is now IN the pixels — reset the look, keep annotations */
@@ -967,7 +966,7 @@ function filtrApply() {
     filtrPush();
     filtrTouch();
     filtrFit();
-    filtrStatus("applied — pick the next effect");
+    filtrStatus("filtr.ui.applied");
   });
 }
 
@@ -975,14 +974,14 @@ function filtrApply() {
 
 function filtrStatus(msg, err) {
   var el = $("filtr-status");
-  el.innerText = msg || "";
+  if (msg) FiltrI18n.bind(el, msg); else FiltrI18n.text(el, "");
   el.className = "modal-status" + (err ? " err" : msg ? " ok" : "");
 }
 
 function filtrExport(jpeg, cb) {
-  if (!FILTR.src) { toast("load an image first"); return; }
+  if (!FILTR.src) { toast(FiltrI18n.t("filtr.ui.loadFirst")); return; }
   filtrRenderFull(true, function (out) {
-    if (!out) { filtrStatus("export failed", true); return; }
+    if (!out) { filtrStatus("filtr.ui.exportFailed", true); return; }
     if (jpeg) {
       var flat = document.createElement("canvas");
       flat.width = out.width; flat.height = out.height;
@@ -998,12 +997,12 @@ function filtrExport(jpeg, cb) {
 function filtrDownload(jpeg) {
   filtrExport(jpeg, function (cv) {
     cv.toBlob(function (blob) {
-      if (!blob) { filtrStatus("encode failed", true); return; }
+      if (!blob) { filtrStatus("filtr.ui.encodeFailed", true); return; }
       var base = (FILTR.name || "filtr").replace(/\.[A-Za-z0-9]+$/, "")
                    .replace(/[^A-Za-z0-9_-]+/g, "_") || "filtr";
       downloadBlob(base + "-filtr." + (jpeg ? "jpg" : "png"), blob,
                    jpeg ? "image/jpeg" : "image/png");
-      filtrStatus("downloaded");
+      filtrStatus("filtr.ui.downloaded");
     }, jpeg ? "image/jpeg" : "image/png", 0.92);
   });
 }
@@ -1032,12 +1031,12 @@ function filtrJpegB64(cv, budget) {
 function filtrSendToMint() {
   filtrExport(true, function (cv) {
     var b64 = filtrJpegB64(cv, ARTIMAGE_BUDGET);
-    if (!b64) { filtrStatus("could not fit the artimage budget", true); return; }
+    if (!b64) { filtrStatus("filtr.ui.budgetFailed", true); return; }
     NFT_ART = b64;
     show("view-create");
     studioShow("nft");
     nftArtShow();
-    toast("edited image loaded into the NFT wizard");
+    toast(FiltrI18n.t("filtr.ui.sentMint"));
   });
 }
 
@@ -1052,7 +1051,7 @@ function filtrSendToPhoto() {
     studioShow("art");
     artStudioEnter();
     artPhotoIntake(sq);
-    toast("edited image sent to the Photo Cartoon pack");
+    toast(FiltrI18n.t("filtr.ui.sentPhoto"));
   });
 }
 
@@ -1072,7 +1071,7 @@ function filtrBuildFxList() {
     (function (fx) {
       var li = document.createElement("div");
       li.className = "filtr-fx" + (FILTR.settings.active === fx.id ? " on" : "");
-      li.innerText = fx.label;
+      FiltrI18n.bind(li,"filtr.effect."+fx.id);
       li.onclick = function () {
         FILTR.settings.active = fx.id;
         filtrBuildFxList();
@@ -1089,7 +1088,8 @@ function filtrControlRow(host, label, el, valEl) {
   var r = document.createElement("div");
   r.className = "filtr-crow";
   var l = document.createElement("label");
-  l.innerText = label;
+  FiltrI18n.bind(l,"filtr.control."+label);
+  FiltrI18n.attribute(el,"aria-label","filtr.control."+label);
   r.appendChild(l);
   r.appendChild(el);
   if (valEl) { r.appendChild(valEl); }
@@ -1100,7 +1100,7 @@ function filtrBuildControls(host, obj, schema, onChange) {
   host.innerHTML = "";
   for (var i = 0; i < schema.length; i++) {
     (function (cdef) {
-      var label = cdef.lb || cdef.k.replace(/([A-Z])/g, " $1").toLowerCase();
+      var label = cdef.k;
       if (cdef.t === "r" || cdef.t === undefined) {
         var r = document.createElement("input");
         r.type = "range"; r.min = cdef.mi; r.max = cdef.ma; r.step = cdef.st;
@@ -1131,7 +1131,7 @@ function filtrBuildControls(host, obj, schema, onChange) {
           (function (opt, oi) {
             var s = document.createElement("button");
             s.className = "filtr-seg" + (obj[cdef.k] === opt ? " on" : "");
-            s.innerText = "" + (cdef.lo ? cdef.lo[oi] : opt);
+            FiltrI18n.bind(s,"filtr.option."+(cdef.lo ? cdef.lo[oi] : opt));
             s.onclick = function () {
               obj[cdef.k] = opt;
               onChange();
@@ -1149,7 +1149,7 @@ function filtrBuildControls(host, obj, schema, onChange) {
         for (var o2 = 0; o2 < cdef.o.length; o2++) {
           var op = document.createElement("option");
           op.value = cdef.o[o2];
-          op.text = "" + cdef.o[o2];
+          FiltrI18n.bind(op,"filtr.option."+cdef.o[o2]);
           if (obj[cdef.k] === cdef.o[o2]) { op.selected = true; }
           sel.appendChild(op);
         }
@@ -1162,11 +1162,11 @@ function filtrBuildControls(host, obj, schema, onChange) {
 
 function filtrBuildFxControls() {
   var fx = filtrFxById(FILTR.settings.active);
-  $("filtr-fx-name").innerText = fx.label;
+  FiltrI18n.bind($("filtr-fx-name"),"filtr.effect."+fx.id);
   var host = $("filtr-fx-controls");
   if (!fx.c.length) {
-    host.innerHTML = "<p class='filtr-note'>no effect — geometry, adjustments, " +
-      "annotations and post fx still apply</p>";
+    host.innerHTML = "<p class='filtr-note'></p>";
+    FiltrI18n.bind(host.firstChild,"filtr.ui.noEffectHelp");
     return;
   }
   filtrBuildControls(host, FILTR.settings[fx.id], fx.c, filtrTouch);
@@ -1186,10 +1186,11 @@ function filtrBuildPost() {
       var head = document.createElement("div");
       head.className = "filtr-postrow";
       var lab = document.createElement("span");
-      lab.innerText = pd.id.replace(/([A-Z])/g, " $1").toLowerCase();
+      FiltrI18n.bind(lab,"filtr.post."+pd.id);
       var chk = document.createElement("input");
       chk.type = "checkbox";
       chk.checked = !!p.enabled;
+      FiltrI18n.attribute(chk,"aria-label","filtr.post."+pd.id);
       var sub = document.createElement("div");
       sub.className = "filtr-postsub" + (p.enabled ? "" : " hidden");
       chk.onchange = function () {
@@ -1207,7 +1208,7 @@ function filtrBuildPost() {
         ["green", "amber", "white"].forEach(function (col) {
           var s = document.createElement("button");
           s.className = "filtr-seg" + (p.color === col ? " on" : "");
-          s.innerText = col;
+          FiltrI18n.bind(s,"filtr.option."+col);
           s.onclick = function () {
             p.color = col;
             filtrTouch();
@@ -1230,13 +1231,13 @@ function filtrBuildPresets() {
     (function (p) {
       var b = document.createElement("button");
       b.className = "filtr-preset";
-      b.innerText = p.name;
+      FiltrI18n.bind(b,"filtr.preset."+p.id.replace(/-/g,""));
       b.onclick = function () {
         FILTR.settings = FiltrEngine.applyPreset(p.id, FILTR.settings);
         FILTR.settings.output.maxPreviewDim = FILTR_PREVIEW_DIM;
         filtrSyncPanels();
         filtrTouch();
-        toast(p.name);
+        toast(FiltrI18n.t("filtr.preset."+p.id.replace(/-/g,"")));
       };
       host.appendChild(b);
     })(list[i]);

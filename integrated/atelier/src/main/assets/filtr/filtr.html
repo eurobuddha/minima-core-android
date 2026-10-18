@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <!-- FILTR WebView host for the Android app. The #view-filtr markup below is
      COPIED from minidapp/index.html (keep in sync when the tab changes);
-     filtr-engine.js + filtr.js + styles.css are byte-identical copies
-     enforced by test/run.sh's bridge parity gate. -->
+     The engine stays byte-identical. Display bindings are adapted for the shared four-language selector. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -11,6 +10,11 @@
 <link rel="stylesheet" href="styles.css">
 <style>
   body { padding: 0.7rem; }
+  @media (max-width: 900px) {
+    .filtr-cat .cl { font-size: 0.5rem; line-height: 1.2; height: 2.4em;
+      white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
+    .filtr-topbar #filtr-undo, .filtr-topbar #filtr-redo { font-size: 1rem; line-height: 1; }
+  }
   /* narrow layout (<=900px) takes its 38vh stage from styles.css */
   @media (min-width: 901px) { .filtr-stage { height: 46vh; } }
   @media (max-width: 900px) { #filtr-layout { height: calc(100dvh - 22px); } }
@@ -50,52 +54,52 @@ function downloadBlob(name, data, mime) {
   <section id="view-filtr">
     <div id="filtr-unsupported" class="empty-state hidden">
       <p class="empty-glyph">&#9670;</p>
-      <p><b>FILTR is installed and ready</b> &mdash; but this viewer doesn&rsquo;t provide
+      <p data-i18n="filtr.ui.unsupported"><b>FILTR is installed and ready</b> &mdash; but this viewer doesn&rsquo;t provide
          WebGL2, which the editor needs. Nothing has been removed; open Atelier in a
          desktop browser or a newer device/webview and the full editor appears here.</p>
     </div>
     <div id="filtr-layout" class="filtr-layout">
       <div class="filtr-rail">
         <div class="filtr-panel" id="filtr-panel-import">
-          <p class="wizard-kick">Import</p>
+          <p class="wizard-kick" data-i18n="filtr.ui.import">Import</p>
           <label class="art-drop filtr-drop" id="filtr-drop">
-            <span id="filtr-drop-hint">+ drop / tap to choose &middot; paste &#8984;V</span>
+            <span id="filtr-drop-hint" data-i18n="filtr.ui.dropHint">+ drop / tap to choose &middot; paste &#8984;V</span>
             <input type="file" accept="image/*" class="slot-input" id="filtr-file"/>
           </label>
-          <p class="filtr-meta mono" id="filtr-meta">no image loaded</p>
+          <p class="filtr-meta mono" id="filtr-meta" data-i18n="filtr.ui.noImage">no image loaded</p>
         </div>
         <div class="filtr-panel" id="filtr-panel-effects">
-          <p class="wizard-kick">Effects</p>
+          <p class="wizard-kick" data-i18n="filtr.ui.effects">Effects</p>
           <div id="filtr-fx-list"></div>
         </div>
         <div class="filtr-panel" id="filtr-panel-presets">
-          <p class="wizard-kick">Presets</p>
+          <p class="wizard-kick" data-i18n="filtr.ui.presets">Presets</p>
           <div id="filtr-presets" class="filtr-presets"></div>
         </div>
       </div>
       <div class="filtr-center">
         <div class="toolbar filtr-toolbar">
-          <button class="filtr-tool" id="filtr-tool-crop">Crop</button>
-          <button class="filtr-tool" id="filtr-rotl" title="rotate left">&#10226;</button>
-          <button class="filtr-tool" id="filtr-rotr" title="rotate right">&#10227;</button>
-          <button class="filtr-tool" id="filtr-fliph">Flip H</button>
-          <button class="filtr-tool" id="filtr-flipv">Flip V</button>
-          <button class="filtr-tool" id="filtr-tool-erase">Erase</button>
-          <button class="filtr-tool" id="filtr-resize">Resize</button>
-          <button class="filtr-tool" id="filtr-tool-bubble">Bubble</button>
-          <button class="filtr-tool" id="filtr-tool-text">Text</button>
+          <button class="filtr-tool" id="filtr-tool-crop" data-i18n="filtr.ui.crop">Crop</button>
+          <button class="filtr-tool" id="filtr-rotl" title="rotate left" data-i18n-title="filtr.ui.rotateLeft" data-i18n-aria-label="filtr.ui.rotateLeft">&#10226;</button>
+          <button class="filtr-tool" id="filtr-rotr" title="rotate right" data-i18n-title="filtr.ui.rotateRight" data-i18n-aria-label="filtr.ui.rotateRight">&#10227;</button>
+          <button class="filtr-tool" id="filtr-fliph" data-i18n="filtr.ui.flipH">Flip H</button>
+          <button class="filtr-tool" id="filtr-flipv" data-i18n="filtr.ui.flipV">Flip V</button>
+          <button class="filtr-tool" id="filtr-tool-erase" data-i18n="filtr.ui.erase">Erase</button>
+          <button class="filtr-tool" id="filtr-resize" data-i18n="filtr.ui.resize">Resize</button>
+          <button class="filtr-tool" id="filtr-tool-bubble" data-i18n="filtr.ui.bubble">Bubble</button>
+          <button class="filtr-tool" id="filtr-tool-text" data-i18n="filtr.ui.text">Text</button>
           <span class="spacer" style="flex:1"></span>
-          <button class="filtr-tool" id="filtr-undo">Undo</button>
-          <button class="filtr-tool" id="filtr-redo">Redo</button>
-          <button class="filtr-tool warn" id="filtr-ab" title="hold to compare">A/B</button>
-          <button class="filtr-tool" id="filtr-fit">Fit</button>
+          <button class="filtr-tool" id="filtr-undo" data-i18n-title="filtr.ui.undo" data-i18n-aria-label="filtr.ui.undo">↶</button>
+          <button class="filtr-tool" id="filtr-redo" data-i18n-title="filtr.ui.redo" data-i18n-aria-label="filtr.ui.redo">↷</button>
+          <button class="filtr-tool warn" id="filtr-ab" title="hold to compare" data-i18n-title="filtr.ui.compare" data-i18n-aria-label="filtr.ui.compare">A/B</button>
+          <button class="filtr-tool" id="filtr-fit" data-i18n="filtr.ui.fit">Fit</button>
           <span class="filtr-note" id="filtr-zoominfo"></span>
         </div>
         <div class="filtr-stage filtr-empty" id="filtr-stage">
           <div class="filtr-emptyhint">
             <span class="fe-glyph">&#8681;</span>
-            <span class="fe-title">Tap to import an image</span>
-            <span class="fe-sub">or drop / paste one here</span>
+            <span class="fe-title" data-i18n="filtr.ui.emptyTitle">Tap to import an image</span>
+            <span class="fe-sub" data-i18n="filtr.ui.emptyHelp">or drop / paste one here</span>
           </div>
           <div id="filtr-zoomwrap" class="filtr-zoomwrap">
             <canvas id="filtr-canvas"></canvas>
@@ -106,36 +110,36 @@ function downloadBlob(name, data, mime) {
         <div class="toolbar filtr-toolbar" id="filtr-toolopts"></div>
         <div class="toolbar filtr-toolbar">
           <button class="btn btn-gold" id="filtr-apply"
-                  title="bake the current look into the image, then layer the next effect">
+                  title="bake the current look into the image, then layer the next effect" data-i18n-title="filtr.ui.applyHelp" data-i18n-aria-label="filtr.ui.applyHelp" data-i18n="filtr.ui.apply">
             Apply &mdash; bake &amp; continue</button>
           <p id="filtr-status" class="modal-status" style="margin:0"></p>
         </div>
       </div>
       <div class="filtr-rail">
         <div class="filtr-acc open" id="filtr-acc-effect">
-          <h4><span id="filtr-fx-name">Effect</span><span class="arr">&#9662;</span></h4>
+          <h4><span id="filtr-fx-name" data-i18n="filtr.ui.effect">Effect</span><span class="arr">&#9662;</span></h4>
           <div class="filtr-accbody" id="filtr-fx-controls"></div>
         </div>
         <div class="filtr-acc open" id="filtr-acc-adjust">
-          <h4>Adjustments<span class="arr">&#9662;</span></h4>
+          <h4><span data-i18n="filtr.ui.adjustments">Adjustments</span><span class="arr">&#9662;</span></h4>
           <div class="filtr-accbody" id="filtr-adjust-controls"></div>
         </div>
         <div class="filtr-acc" id="filtr-acc-post">
-          <h4>Post FX<span class="arr">&#9662;</span></h4>
+          <h4><span data-i18n="filtr.ui.post">Post FX</span><span class="arr">&#9662;</span></h4>
           <div class="filtr-accbody" id="filtr-post-controls"></div>
         </div>
         <div class="filtr-acc" id="filtr-acc-annotate">
-          <h4>Annotate<span class="arr">&#9662;</span></h4>
+          <h4><span data-i18n="filtr.ui.annotate">Annotate</span><span class="arr">&#9662;</span></h4>
           <div class="filtr-accbody" id="filtr-annotate-controls"></div>
         </div>
         <div class="filtr-acc open" id="filtr-acc-save">
-          <h4>Save<span class="arr">&#9662;</span></h4>
+          <h4><span data-i18n="filtr.ui.save">Save</span><span class="arr">&#9662;</span></h4>
           <div class="filtr-accbody">
-            <button class="btn btn-gold filtr-savebtn" id="filtr-save-mint">Send to NFT mint &rarr;</button>
-            <button class="btn filtr-savebtn" id="filtr-save-photo">Send to Photo Cartoon &rarr;</button>
-            <button class="btn btn-ghost filtr-savebtn" id="filtr-save-png">Download PNG</button>
-            <button class="btn btn-ghost filtr-savebtn" id="filtr-save-jpg">Download JPG</button>
-            <p class="cert-note">Everything runs on this device. Send-to-mint
+            <button class="btn btn-gold filtr-savebtn" id="filtr-save-mint" data-i18n="filtr.ui.sendMint">Send to NFT mint &rarr;</button>
+            <button class="btn filtr-savebtn" id="filtr-save-photo" data-i18n="filtr.ui.sendPhoto">Send to Photo Cartoon &rarr;</button>
+            <button class="btn btn-ghost filtr-savebtn" id="filtr-save-png" data-i18n="filtr.ui.downloadPng">Download PNG</button>
+            <button class="btn btn-ghost filtr-savebtn" id="filtr-save-jpg" data-i18n="filtr.ui.downloadJpg">Download JPG</button>
+            <p class="cert-note" data-i18n="filtr.ui.saveHelp">Everything runs on this device. Send-to-mint
               compresses the flattened image into the Single-NFT wizard
               (&le;9000 b64); Photo Cartoon feeds it to the AI collection pack.</p>
           </div>
@@ -151,10 +155,10 @@ function downloadBlob(name, data, mime) {
       <div class="filtr-sheet" id="filtr-sheet">
         <div class="filtr-grip" id="filtr-grip"><i></i></div>
         <div class="filtr-shead">
-          <h3 id="filtr-sheet-title">Adjust</h3>
+          <h3 id="filtr-sheet-title" data-i18n="filtr.ui.adjust">Adjust</h3>
           <div class="filtr-shead-tools">
-            <button id="filtr-sheet-expand" title="expand">&#10530;</button>
-            <button id="filtr-sheet-close" title="close">&times;</button>
+            <button id="filtr-sheet-expand" title="expand" data-i18n-title="filtr.ui.expand" data-i18n-aria-label="filtr.ui.expand">&#10530;</button>
+            <button id="filtr-sheet-close" title="close" data-i18n-title="filtr.ui.close" data-i18n-aria-label="filtr.ui.close">&times;</button>
           </div>
         </div>
         <div class="filtr-sbody" id="filtr-sbody">
@@ -169,18 +173,20 @@ function downloadBlob(name, data, mime) {
         </div>
       </div>
       <div class="filtr-catbar" id="filtr-catbar">
-        <button class="filtr-cat" data-cat="import"><span class="ci">&#8681;</span><span class="cl">Import</span></button>
-        <button class="filtr-cat" data-cat="transform"><span class="ci">&#9634;</span><span class="cl">Transform</span></button>
-        <button class="filtr-cat" data-cat="effects"><span class="ci">&#10022;</span><span class="cl">Effects</span></button>
-        <button class="filtr-cat" data-cat="presets"><span class="ci">&#9638;</span><span class="cl">Presets</span></button>
-        <button class="filtr-cat" data-cat="adjust"><span class="ci">&#9788;</span><span class="cl">Adjust</span></button>
-        <button class="filtr-cat" data-cat="post"><span class="ci">&#9673;</span><span class="cl">Post FX</span></button>
-        <button class="filtr-cat" data-cat="annotate"><span class="ci">&#9998;</span><span class="cl">Annotate</span></button>
-        <button class="filtr-cat" data-cat="save"><span class="ci">&#9635;</span><span class="cl">Save</span></button>
+        <button class="filtr-cat" data-cat="import"><span class="ci">&#8681;</span><span class="cl" data-i18n="filtr.ui.import">Import</span></button>
+        <button class="filtr-cat" data-cat="transform"><span class="ci">&#9634;</span><span class="cl" data-i18n="filtr.ui.transform">Transform</span></button>
+        <button class="filtr-cat" data-cat="effects"><span class="ci">&#10022;</span><span class="cl" data-i18n="filtr.ui.effects">Effects</span></button>
+        <button class="filtr-cat" data-cat="presets"><span class="ci">&#9638;</span><span class="cl" data-i18n="filtr.ui.presets">Presets</span></button>
+        <button class="filtr-cat" data-cat="adjust"><span class="ci">&#9788;</span><span class="cl" data-i18n="filtr.ui.adjust">Adjust</span></button>
+        <button class="filtr-cat" data-cat="post"><span class="ci">&#9673;</span><span class="cl" data-i18n="filtr.ui.post">Post FX</span></button>
+        <button class="filtr-cat" data-cat="annotate"><span class="ci">&#9998;</span><span class="cl" data-i18n="filtr.ui.annotate">Annotate</span></button>
+        <button class="filtr-cat" data-cat="save"><span class="ci">&#9635;</span><span class="cl" data-i18n="filtr.ui.save">Save</span></button>
       </div>
     </div>
   </section>
 
+<script src="filtr-messages.js"></script>
+<script src="filtr-i18n.js"></script>
 <script src="filtr-engine.js"></script>
 <script src="filtr.js"></script>
 <script src="filtr-sheet.js"></script>

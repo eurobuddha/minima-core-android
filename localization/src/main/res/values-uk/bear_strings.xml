@@ -6775,4 +6775,280 @@
     <string name="l10n_creative_look_warm" formatted="false">"Тепло"</string>
     <string name="l10n_creative_look_fade" formatted="false">"Блякло"</string>
     <string name="l10n_creative_rotate90" formatted="false">"Повернути на 90 градусів"</string>
+    <string name="l10n_filtr_ui_import" formatted="false">"Імпорт"</string>
+    <string name="l10n_filtr_ui_transform" formatted="false">"Геометрія"</string>
+    <string name="l10n_filtr_ui_effects" formatted="false">"Ефекти"</string>
+    <string name="l10n_filtr_ui_presets" formatted="false">"Пресети"</string>
+    <string name="l10n_filtr_ui_adjust" formatted="false">"Налаштування"</string>
+    <string name="l10n_filtr_ui_adjustments" formatted="false">"Корекція"</string>
+    <string name="l10n_filtr_ui_post" formatted="false">"Постефекти"</string>
+    <string name="l10n_filtr_ui_annotate" formatted="false">"Написи"</string>
+    <string name="l10n_filtr_ui_save" formatted="false">"Зберегти"</string>
+    <string name="l10n_filtr_ui_crop" formatted="false">"Обрізання"</string>
+    <string name="l10n_filtr_ui_flip_h" formatted="false">"По горизонталі"</string>
+    <string name="l10n_filtr_ui_flip_v" formatted="false">"По вертикалі"</string>
+    <string name="l10n_filtr_ui_erase" formatted="false">"Гумка"</string>
+    <string name="l10n_filtr_ui_resize" formatted="false">"Розмір"</string>
+    <string name="l10n_filtr_ui_bubble" formatted="false">"Хмаринка"</string>
+    <string name="l10n_filtr_ui_text" formatted="false">"Текст"</string>
+    <string name="l10n_filtr_ui_undo" formatted="false">"Скасувати"</string>
+    <string name="l10n_filtr_ui_redo" formatted="false">"Повторити"</string>
+    <string name="l10n_filtr_ui_fit" formatted="false">"Умістити"</string>
+    <string name="l10n_filtr_ui_apply" formatted="false">"Застосувати"</string>
+    <string name="l10n_filtr_ui_effect" formatted="false">"Ефект"</string>
+    <string name="l10n_filtr_ui_send_mint" formatted="false">"До карбування NFT →"</string>
+    <string name="l10n_filtr_ui_send_photo" formatted="false">"До «Фото в мультфільм» →"</string>
+    <string name="l10n_filtr_ui_download_png" formatted="false">"Завантажити PNG"</string>
+    <string name="l10n_filtr_ui_download_jpg" formatted="false">"Завантажити JPG"</string>
+    <string name="l10n_filtr_ui_drop_hint" formatted="false">"+ перетягніть / виберіть · вставте ⌘V"</string>
+    <string name="l10n_filtr_ui_no_image" formatted="false">"зображення не завантажено"</string>
+    <string name="l10n_filtr_ui_empty_title" formatted="false">"Натисніть, щоб додати зображення"</string>
+    <string name="l10n_filtr_ui_empty_help" formatted="false">"або перетягніть / вставте його сюди"</string>
+    <string name="l10n_filtr_ui_save_help" formatted="false">"Усе обробляється на цьому пристрої. Для карбування NFT підсумкове зображення стискається до 9000 символів base64. «Фото в мультфільм» використовує його для ШІ-колекції."</string>
+    <string name="l10n_filtr_ui_unsupported" formatted="false">"FILTR установлено, але цей WebView не підтримує WebGL2. Відкрийте Atelier у браузері на комп’ютері або в новішому WebView."</string>
+    <string name="l10n_filtr_ui_rotate_left" formatted="false">"Повернути ліворуч"</string>
+    <string name="l10n_filtr_ui_rotate_right" formatted="false">"Повернути праворуч"</string>
+    <string name="l10n_filtr_ui_compare" formatted="false">"Утримуйте для порівняння"</string>
+    <string name="l10n_filtr_ui_apply_help" formatted="false">"Закріпіть поточний ефект у зображенні, потім додайте наступний"</string>
+    <string name="l10n_filtr_ui_expand" formatted="false">"Розгорнути"</string>
+    <string name="l10n_filtr_ui_close" formatted="false">"Закрити"</string>
+    <string name="l10n_filtr_ui_load_failed" formatted="false">"Не вдалося завантажити зображення"</string>
+    <string name="l10n_filtr_ui_load_first" formatted="false">"Спочатку завантажте зображення"</string>
+    <string name="l10n_filtr_ui_sent_mint" formatted="false">"Зображення завантажено в майстер NFT"</string>
+    <string name="l10n_filtr_ui_sent_photo" formatted="false">"Зображення надіслано до «Фото в мультфільм»"</string>
+    <string name="l10n_filtr_ui_baking" formatted="false">"Застосування ефекту…"</string>
+    <string name="l10n_filtr_ui_bake_failed" formatted="false">"Не вдалося застосувати ефект"</string>
+    <string name="l10n_filtr_ui_applied" formatted="false">"Застосовано — виберіть наступний ефект"</string>
+    <string name="l10n_filtr_ui_export_failed" formatted="false">"Не вдалося експортувати"</string>
+    <string name="l10n_filtr_ui_encode_failed" formatted="false">"Не вдалося закодувати зображення"</string>
+    <string name="l10n_filtr_ui_downloaded" formatted="false">"Файл підготовлено"</string>
+    <string name="l10n_filtr_ui_budget_failed" formatted="false">"Не вдалося стиснути зображення до потрібного розміру"</string>
+    <!-- Arguments: name, width, height -->
+    <string name="l10n_filtr_ui_image_meta">"%1$s · %2$s×%3$s"</string>
+    <!-- Arguments: width -->
+    <string name="l10n_filtr_ui_editing_size">" · редагування: %1$s пкс"</string>
+    <!-- Arguments: percent -->
+    <string name="l10n_filtr_ui_zoom">"масштаб %1$s%%"</string>
+    <string name="l10n_filtr_ui_fit_suffix" formatted="false">" · уміщено"</string>
+    <string name="l10n_filtr_ui_crop_help" formatted="false">"Виділіть область, потім"</string>
+    <string name="l10n_filtr_ui_apply_crop" formatted="false">"Обрізати"</string>
+    <string name="l10n_filtr_ui_ratio" formatted="false">"Пропорції:"</string>
+    <string name="l10n_filtr_ui_free" formatted="false">"Вільно"</string>
+    <string name="l10n_filtr_ui_soft" formatted="false">"М’яка"</string>
+    <string name="l10n_filtr_ui_hard" formatted="false">"Жорстка"</string>
+    <string name="l10n_filtr_ui_bubble_help" formatted="false">"Натисніть на зображення, щоб додати хмаринку"</string>
+    <string name="l10n_filtr_ui_text_help" formatted="false">"Натисніть на зображення, щоб додати текст"</string>
+    <string name="l10n_filtr_ui_pan_help" formatted="false">"Зсув: перетягування · масштаб: колесо / щипок"</string>
+    <!-- Arguments: size -->
+    <string name="l10n_filtr_ui_erase_help">"Проведіть для стирання · пензель %1$s пкс"</string>
+    <!-- Arguments: max -->
+    <string name="l10n_filtr_ui_resize_prompt">"Новий розмір довгої сторони в пікселях (64–%1$s):"</string>
+    <string name="l10n_filtr_ui_text_prompt" formatted="false">"Текст:"</string>
+    <string name="l10n_filtr_ui_default_text" formatted="false">"ВАШ ТЕКСТ"</string>
+    <string name="l10n_filtr_ui_default_bubble" formatted="false">"КОЛИ НА МІСЯЦЬ?"</string>
+    <string name="l10n_filtr_ui_annotation_help" formatted="false">"Виберіть «Хмаринка» чи «Текст» або натисніть на напис для редагування"</string>
+    <string name="l10n_filtr_ui_delete_annotation" formatted="false">"Видалити напис"</string>
+    <string name="l10n_filtr_ui_no_effect_help" formatted="false">"Без ефекту — геометрія, корекція, написи й постефекти зберігаються"</string>
+    <string name="l10n_filtr_effect_none" formatted="false">"Немає (лише правки)"</string>
+    <string name="l10n_filtr_effect_halftone" formatted="false">"Півтон"</string>
+    <string name="l10n_filtr_effect_dithering" formatted="false">"Дизеринг"</string>
+    <string name="l10n_filtr_effect_ascii" formatted="false">"ASCII"</string>
+    <string name="l10n_filtr_effect_pixel_sort" formatted="false">"Сортування пікселів"</string>
+    <string name="l10n_filtr_effect_edge_detection" formatted="false">"Виділення країв"</string>
+    <string name="l10n_filtr_effect_contour" formatted="false">"Контури"</string>
+    <string name="l10n_filtr_effect_crosshatch" formatted="false">"Штрихування"</string>
+    <string name="l10n_filtr_effect_blockify" formatted="false">"Блоки"</string>
+    <string name="l10n_filtr_effect_dots" formatted="false">"Точки"</string>
+    <string name="l10n_filtr_effect_threshold" formatted="false">"Поріг"</string>
+    <string name="l10n_filtr_effect_wave_lines" formatted="false">"Хвилясті лінії"</string>
+    <string name="l10n_filtr_effect_voronoi" formatted="false">"Вороного"</string>
+    <string name="l10n_filtr_effect_noise_field" formatted="false">"Поле шуму"</string>
+    <string name="l10n_filtr_effect_matrix_rain" formatted="false">"Матричний дощ"</string>
+    <string name="l10n_filtr_effect_vhs" formatted="false">"VHS"</string>
+    <string name="l10n_filtr_control_shape" formatted="false">"Форма"</string>
+    <string name="l10n_filtr_control_spacing" formatted="false">"Інтервал"</string>
+    <string name="l10n_filtr_control_dot_scale" formatted="false">"Масштаб точок"</string>
+    <string name="l10n_filtr_control_angle" formatted="false">"Кут"</string>
+    <string name="l10n_filtr_control_invert" formatted="false">"Інверсія"</string>
+    <string name="l10n_filtr_control_color_mode" formatted="false">"Колірний режим"</string>
+    <string name="l10n_filtr_control_fg_color" formatted="false">"Колір переднього плану"</string>
+    <string name="l10n_filtr_control_bg_color" formatted="false">"Колір тла"</string>
+    <string name="l10n_filtr_control_method" formatted="false">"Метод"</string>
+    <string name="l10n_filtr_control_intensity" formatted="false">"Інтенсивність"</string>
+    <string name="l10n_filtr_control_gamma" formatted="false">"Гама"</string>
+    <string name="l10n_filtr_control_color_levels" formatted="false">"Рівні кольору"</string>
+    <string name="l10n_filtr_control_palette" formatted="false">"Палітра"</string>
+    <string name="l10n_filtr_control_palette_size" formatted="false">"Розмір палітри"</string>
+    <string name="l10n_filtr_control_foreground_color" formatted="false">"Колір переднього плану"</string>
+    <string name="l10n_filtr_control_background_color" formatted="false">"Колір тла"</string>
+    <string name="l10n_filtr_control_scale" formatted="false">"Масштаб"</string>
+    <string name="l10n_filtr_control_set" formatted="false">"Набір символів"</string>
+    <string name="l10n_filtr_control_custom" formatted="false">"Колір символів"</string>
+    <string name="l10n_filtr_control_brightness_mapping" formatted="false">"Відображення яскравості"</string>
+    <string name="l10n_filtr_control_direction" formatted="false">"Напрямок"</string>
+    <string name="l10n_filtr_control_mode" formatted="false">"Режим"</string>
+    <string name="l10n_filtr_control_threshold" formatted="false">"Поріг"</string>
+    <string name="l10n_filtr_control_streak_length" formatted="false">"Довжина смуг"</string>
+    <string name="l10n_filtr_control_reverse" formatted="false">"Зворотний порядок"</string>
+    <string name="l10n_filtr_control_algorithm" formatted="false">"Алгоритм"</string>
+    <string name="l10n_filtr_control_line_width" formatted="false">"Ширина ліній"</string>
+    <string name="l10n_filtr_control_edge_color" formatted="false">"Колір країв"</string>
+    <string name="l10n_filtr_control_fill_mode" formatted="false">"Режим заливки"</string>
+    <string name="l10n_filtr_control_levels" formatted="false">"Рівні"</string>
+    <string name="l10n_filtr_control_line_thickness" formatted="false">"Товщина ліній"</string>
+    <string name="l10n_filtr_control_line_color" formatted="false">"Колір ліній"</string>
+    <string name="l10n_filtr_control_density" formatted="false">"Щільність"</string>
+    <string name="l10n_filtr_control_layers" formatted="false">"Шари"</string>
+    <string name="l10n_filtr_control_randomness" formatted="false">"Випадковість"</string>
+    <string name="l10n_filtr_control_style" formatted="false">"Стиль"</string>
+    <string name="l10n_filtr_control_block_size" formatted="false">"Розмір блока"</string>
+    <string name="l10n_filtr_control_border_width" formatted="false">"Ширина межі"</string>
+    <string name="l10n_filtr_control_border_color" formatted="false">"Колір межі"</string>
+    <string name="l10n_filtr_control_grid_type" formatted="false">"Тип сітки"</string>
+    <string name="l10n_filtr_control_size_multiplier" formatted="false">"Множник розміру"</string>
+    <string name="l10n_filtr_control_threshold_point" formatted="false">"Порогове значення"</string>
+    <string name="l10n_filtr_control_dither" formatted="false">"Дизеринг"</string>
+    <string name="l10n_filtr_control_line_count" formatted="false">"Кількість ліній"</string>
+    <string name="l10n_filtr_control_amplitude" formatted="false">"Амплітуда"</string>
+    <string name="l10n_filtr_control_frequency" formatted="false">"Частота"</string>
+    <string name="l10n_filtr_control_cell_size" formatted="false">"Розмір комірки"</string>
+    <string name="l10n_filtr_control_edge_width" formatted="false">"Ширина країв"</string>
+    <string name="l10n_filtr_control_randomize" formatted="false">"Рандомізація"</string>
+    <string name="l10n_filtr_control_noise_type" formatted="false">"Тип шуму"</string>
+    <string name="l10n_filtr_control_octaves" formatted="false">"Октави"</string>
+    <string name="l10n_filtr_control_speed" formatted="false">"Швидкість"</string>
+    <string name="l10n_filtr_control_animate" formatted="false">"Анімація"</string>
+    <string name="l10n_filtr_control_distort_only" formatted="false">"Лише спотворення"</string>
+    <string name="l10n_filtr_control_character_set" formatted="false">"Набір символів"</string>
+    <string name="l10n_filtr_control_trail_length" formatted="false">"Довжина сліду"</string>
+    <string name="l10n_filtr_control_glow_intensity" formatted="false">"Сила світіння"</string>
+    <string name="l10n_filtr_control_bg_opacity" formatted="false">"Непрозорість тла"</string>
+    <string name="l10n_filtr_control_rain_color" formatted="false">"Колір дощу"</string>
+    <string name="l10n_filtr_control_distortion" formatted="false">"Спотворення"</string>
+    <string name="l10n_filtr_control_noise" formatted="false">"Шум"</string>
+    <string name="l10n_filtr_control_color_bleed" formatted="false">"Розтікання кольору"</string>
+    <string name="l10n_filtr_control_scanlines" formatted="false">"Рядки розгортки"</string>
+    <string name="l10n_filtr_control_tracking_error" formatted="false">"Збій трекінгу"</string>
+    <string name="l10n_filtr_control_brightness" formatted="false">"Яскравість"</string>
+    <string name="l10n_filtr_control_contrast" formatted="false">"Контраст"</string>
+    <string name="l10n_filtr_control_saturation" formatted="false">"Насиченість"</string>
+    <string name="l10n_filtr_control_hue" formatted="false">"Відтінок"</string>
+    <string name="l10n_filtr_control_sharpness" formatted="false">"Різкість"</string>
+    <string name="l10n_filtr_control_blur" formatted="false">"Розмиття"</string>
+    <string name="l10n_filtr_control_edge" formatted="false">"Підсилення країв"</string>
+    <string name="l10n_filtr_control_quantize" formatted="false">"Квантування"</string>
+    <string name="l10n_filtr_control_size" formatted="false">"Розмір"</string>
+    <string name="l10n_filtr_control_radius" formatted="false">"Радіус"</string>
+    <string name="l10n_filtr_control_opacity" formatted="false">"Непрозорість"</string>
+    <string name="l10n_filtr_control_offset" formatted="false">"Зміщення"</string>
+    <string name="l10n_filtr_control_amount" formatted="false">"Сила"</string>
+    <string name="l10n_filtr_option_circle" formatted="false">"Коло"</string>
+    <string name="l10n_filtr_option_square" formatted="false">"Квадрат"</string>
+    <string name="l10n_filtr_option_diamond" formatted="false">"Ромб"</string>
+    <string name="l10n_filtr_option_line" formatted="false">"Лінія"</string>
+    <string name="l10n_filtr_option_bw" formatted="false">"Чорно-білий"</string>
+    <string name="l10n_filtr_option_color" formatted="false">"Кольоровий"</string>
+    <string name="l10n_filtr_option_mono" formatted="false">"Монохромний"</string>
+    <string name="l10n_filtr_option_tonal" formatted="false">"Тональний"</string>
+    <string name="l10n_filtr_option_indexed" formatted="false">"Індексований"</string>
+    <string name="l10n_filtr_option_rgb" formatted="false">"RGB"</string>
+    <string name="l10n_filtr_option_original" formatted="false">"Оригінальний"</string>
+    <string name="l10n_filtr_option_grayscale" formatted="false">"Відтінки сірого"</string>
+    <string name="l10n_filtr_option_gameboy" formatted="false">"GameBoy"</string>
+    <string name="l10n_filtr_option_amber" formatted="false">"Бурштиновий"</string>
+    <string name="l10n_filtr_option_green" formatted="false">"Зелений"</string>
+    <string name="l10n_filtr_option_c64" formatted="false">"C64"</string>
+    <string name="l10n_filtr_option_newspaper" formatted="false">"Газета"</string>
+    <string name="l10n_filtr_option_riso" formatted="false">"Ризограф"</string>
+    <string name="l10n_filtr_option_cyberpunk" formatted="false">"Кіберпанк"</string>
+    <string name="l10n_filtr_option_sepia" formatted="false">"Сепія"</string>
+    <string name="l10n_filtr_option_standard" formatted="false">"Стандартний"</string>
+    <string name="l10n_filtr_option_blocks" formatted="false">"Блоки"</string>
+    <string name="l10n_filtr_option_binary" formatted="false">"Двійковий"</string>
+    <string name="l10n_filtr_option_detailed" formatted="false">"Докладний"</string>
+    <string name="l10n_filtr_option_minimal" formatted="false">"Мінімальний"</string>
+    <string name="l10n_filtr_option_alphabetic" formatted="false">"Літерний"</string>
+    <string name="l10n_filtr_option_numeric" formatted="false">"Цифровий"</string>
+    <string name="l10n_filtr_option_math" formatted="false">"Математика"</string>
+    <string name="l10n_filtr_option_symbols" formatted="false">"Символи"</string>
+    <string name="l10n_filtr_option_horizontal" formatted="false">"Горизонтально"</string>
+    <string name="l10n_filtr_option_vertical" formatted="false">"Вертикально"</string>
+    <string name="l10n_filtr_option_diagonal" formatted="false">"По діагоналі"</string>
+    <string name="l10n_filtr_option_brightness" formatted="false">"Яскравість"</string>
+    <string name="l10n_filtr_option_hue" formatted="false">"Відтінок"</string>
+    <string name="l10n_filtr_option_saturation" formatted="false">"Насиченість"</string>
+    <string name="l10n_filtr_option_custom" formatted="false">"Власний колір"</string>
+    <string name="l10n_filtr_option_filled" formatted="false">"Заливка"</string>
+    <string name="l10n_filtr_option_lines" formatted="false">"Лінії"</string>
+    <string name="l10n_filtr_option_full" formatted="false">"Повний"</string>
+    <string name="l10n_filtr_option_shaded" formatted="false">"Затінений"</string>
+    <string name="l10n_filtr_option_outline" formatted="false">"Контур"</string>
+    <string name="l10n_filtr_option_hex" formatted="false">"Шестикутна"</string>
+    <string name="l10n_filtr_option_black" formatted="false">"Чорний"</string>
+    <string name="l10n_filtr_option_white" formatted="false">"Білий"</string>
+    <string name="l10n_filtr_option_dark" formatted="false">"Темний"</string>
+    <string name="l10n_filtr_option_avg" formatted="false">"Середній"</string>
+    <string name="l10n_filtr_option_centre" formatted="false">"Центр"</string>
+    <string name="l10n_filtr_option_grad" formatted="false">"Градієнт"</string>
+    <string name="l10n_filtr_option_down" formatted="false">"Униз"</string>
+    <string name="l10n_filtr_option_up" formatted="false">"Угору"</string>
+    <string name="l10n_filtr_option_left" formatted="false">"Ліворуч"</string>
+    <string name="l10n_filtr_option_right" formatted="false">"Праворуч"</string>
+    <string name="l10n_filtr_option_clustered_dot" formatted="false">"Згруповані точки"</string>
+    <string name="l10n_filtr_option_blue_noise" formatted="false">"Синій шум"</string>
+    <string name="l10n_filtr_option_interleaved_gradient" formatted="false">"Чергований градієнт"</string>
+    <string name="l10n_filtr_option_sierra_two_row" formatted="false">"Sierra: два ряди"</string>
+    <string name="l10n_filtr_option_sierra_lite" formatted="false">"Sierra Lite"</string>
+    <string name="l10n_filtr_option_floyd_steinberg" formatted="false">"Floyd–Steinberg"</string>
+    <string name="l10n_filtr_option_atkinson" formatted="false">"Atkinson"</string>
+    <string name="l10n_filtr_option_jarvis_judice_ninke" formatted="false">"Jarvis–Judice–Ninke"</string>
+    <string name="l10n_filtr_option_stucki" formatted="false">"Stucki"</string>
+    <string name="l10n_filtr_option_burkes" formatted="false">"Burkes"</string>
+    <string name="l10n_filtr_option_sierra" formatted="false">"Sierra"</string>
+    <string name="l10n_filtr_option_bayer2x2" formatted="false">"Bayer 2×2"</string>
+    <string name="l10n_filtr_option_bayer4x4" formatted="false">"Bayer 4×4"</string>
+    <string name="l10n_filtr_option_bayer8x8" formatted="false">"Bayer 8×8"</string>
+    <string name="l10n_filtr_option_bayer16x16" formatted="false">"Bayer 16×16"</string>
+    <string name="l10n_filtr_option_sobel" formatted="false">"Sobel"</string>
+    <string name="l10n_filtr_option_prewitt" formatted="false">"Prewitt"</string>
+    <string name="l10n_filtr_option_laplacian" formatted="false">"Laplacian"</string>
+    <string name="l10n_filtr_option_perlin" formatted="false">"Perlin"</string>
+    <string name="l10n_filtr_option_simplex" formatted="false">"Simplex"</string>
+    <string name="l10n_filtr_option_worley" formatted="false">"Worley"</string>
+    <string name="l10n_filtr_annotation_style" formatted="false">"Стиль"</string>
+    <string name="l10n_filtr_annotation_text" formatted="false">"Текст"</string>
+    <string name="l10n_filtr_annotation_font" formatted="false">"Шрифт"</string>
+    <string name="l10n_filtr_annotation_size" formatted="false">"Розмір"</string>
+    <string name="l10n_filtr_annotation_tail" formatted="false">"Хвостик"</string>
+    <string name="l10n_filtr_annotation_text_color" formatted="false">"Колір тексту"</string>
+    <string name="l10n_filtr_annotation_fill" formatted="false">"Заливка"</string>
+    <string name="l10n_filtr_annotation_ink" formatted="false">"Колір контуру"</string>
+    <string name="l10n_filtr_annotation_speech" formatted="false">"Мовлення"</string>
+    <string name="l10n_filtr_annotation_thought" formatted="false">"Думка"</string>
+    <string name="l10n_filtr_annotation_shout" formatted="false">"Крик"</string>
+    <string name="l10n_filtr_annotation_box" formatted="false">"Рамка"</string>
+    <string name="l10n_filtr_annotation_comic" formatted="false">"Комікс"</string>
+    <string name="l10n_filtr_annotation_sans" formatted="false">"Без зарубок"</string>
+    <string name="l10n_filtr_annotation_mono" formatted="false">"Моноширинний"</string>
+    <string name="l10n_filtr_post_grain" formatted="false">"Зерно"</string>
+    <string name="l10n_filtr_post_vignette" formatted="false">"Віньєтка"</string>
+    <string name="l10n_filtr_post_scanlines" formatted="false">"Рядки розгортки"</string>
+    <string name="l10n_filtr_post_bloom" formatted="false">"Світіння"</string>
+    <string name="l10n_filtr_post_chromatic" formatted="false">"Хроматичний зсув"</string>
+    <string name="l10n_filtr_post_crt_curve" formatted="false">"Вигин ЕПТ"</string>
+    <string name="l10n_filtr_post_phosphor" formatted="false">"Люмінофор"</string>
+    <string name="l10n_filtr_preset_classicterminal" formatted="false">"Класичний термінал"</string>
+    <string name="l10n_filtr_preset_ambercrt" formatted="false">"Бурштиновий ЕПТ"</string>
+    <string name="l10n_filtr_preset_newsprint" formatted="false">"Газетний друк"</string>
+    <string name="l10n_filtr_preset_risograph" formatted="false">"Ризограф"</string>
+    <string name="l10n_filtr_preset_gameboy" formatted="false">"GameBoy"</string>
+    <string name="l10n_filtr_preset_cyberpunk" formatted="false">"Кіберпанк"</string>
+    <string name="l10n_filtr_preset_blueprint" formatted="false">"Креслення"</string>
+    <string name="l10n_filtr_preset_comicink" formatted="false">"Комікс тушшю"</string>
+    <string name="l10n_filtr_preset_matrixrain" formatted="false">"Матричний дощ"</string>
+    <string name="l10n_filtr_preset_vaporwave" formatted="false">"Вейпорвейв"</string>
+    <string name="l10n_filtr_preset_glitchsort" formatted="false">"Глітч-сортування"</string>
+    <string name="l10n_filtr_preset_vhstape" formatted="false">"VHS-касета"</string>
+    <string name="l10n_filtr_preset_stainedglass" formatted="false">"Вітраж"</string>
+    <string name="l10n_filtr_preset_topographic" formatted="false">"Топографія"</string>
 </resources>

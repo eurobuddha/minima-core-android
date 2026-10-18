@@ -6711,4 +6711,280 @@
     <string name="l10n_creative_look_warm" formatted="false">"Warm"</string>
     <string name="l10n_creative_look_fade" formatted="false">"Fade"</string>
     <string name="l10n_creative_rotate90" formatted="false">"Rotate 90 degrees"</string>
+    <string name="l10n_filtr_ui_import" formatted="false">"Import"</string>
+    <string name="l10n_filtr_ui_transform" formatted="false">"Transform"</string>
+    <string name="l10n_filtr_ui_effects" formatted="false">"Effects"</string>
+    <string name="l10n_filtr_ui_presets" formatted="false">"Presets"</string>
+    <string name="l10n_filtr_ui_adjust" formatted="false">"Adjust"</string>
+    <string name="l10n_filtr_ui_adjustments" formatted="false">"Adjustments"</string>
+    <string name="l10n_filtr_ui_post" formatted="false">"Post FX"</string>
+    <string name="l10n_filtr_ui_annotate" formatted="false">"Annotate"</string>
+    <string name="l10n_filtr_ui_save" formatted="false">"Save"</string>
+    <string name="l10n_filtr_ui_crop" formatted="false">"Crop"</string>
+    <string name="l10n_filtr_ui_flip_h" formatted="false">"Flip H"</string>
+    <string name="l10n_filtr_ui_flip_v" formatted="false">"Flip V"</string>
+    <string name="l10n_filtr_ui_erase" formatted="false">"Erase"</string>
+    <string name="l10n_filtr_ui_resize" formatted="false">"Resize"</string>
+    <string name="l10n_filtr_ui_bubble" formatted="false">"Bubble"</string>
+    <string name="l10n_filtr_ui_text" formatted="false">"Text"</string>
+    <string name="l10n_filtr_ui_undo" formatted="false">"Undo"</string>
+    <string name="l10n_filtr_ui_redo" formatted="false">"Redo"</string>
+    <string name="l10n_filtr_ui_fit" formatted="false">"Fit"</string>
+    <string name="l10n_filtr_ui_apply" formatted="false">"Apply"</string>
+    <string name="l10n_filtr_ui_effect" formatted="false">"Effect"</string>
+    <string name="l10n_filtr_ui_send_mint" formatted="false">"Send to NFT mint →"</string>
+    <string name="l10n_filtr_ui_send_photo" formatted="false">"Send to Photo Cartoon →"</string>
+    <string name="l10n_filtr_ui_download_png" formatted="false">"Download PNG"</string>
+    <string name="l10n_filtr_ui_download_jpg" formatted="false">"Download JPG"</string>
+    <string name="l10n_filtr_ui_drop_hint" formatted="false">"+ drop / tap to choose · paste ⌘V"</string>
+    <string name="l10n_filtr_ui_no_image" formatted="false">"no image loaded"</string>
+    <string name="l10n_filtr_ui_empty_title" formatted="false">"Tap to import an image"</string>
+    <string name="l10n_filtr_ui_empty_help" formatted="false">"or drop / paste one here"</string>
+    <string name="l10n_filtr_ui_save_help" formatted="false">"Everything runs on this device. Send-to-mint compresses the flattened image for the Single NFT wizard (up to 9000 base64 characters). Photo Cartoon uses it for the AI collection pack."</string>
+    <string name="l10n_filtr_ui_unsupported" formatted="false">"FILTR is installed, but this WebView does not support WebGL2. Open Atelier in a desktop browser or a newer WebView to use the editor."</string>
+    <string name="l10n_filtr_ui_rotate_left" formatted="false">"Rotate left"</string>
+    <string name="l10n_filtr_ui_rotate_right" formatted="false">"Rotate right"</string>
+    <string name="l10n_filtr_ui_compare" formatted="false">"Hold to compare"</string>
+    <string name="l10n_filtr_ui_apply_help" formatted="false">"Bake the current look into the image, then add the next effect"</string>
+    <string name="l10n_filtr_ui_expand" formatted="false">"Expand"</string>
+    <string name="l10n_filtr_ui_close" formatted="false">"Close"</string>
+    <string name="l10n_filtr_ui_load_failed" formatted="false">"Could not load that image"</string>
+    <string name="l10n_filtr_ui_load_first" formatted="false">"Load an image first"</string>
+    <string name="l10n_filtr_ui_sent_mint" formatted="false">"Edited image loaded into the NFT wizard"</string>
+    <string name="l10n_filtr_ui_sent_photo" formatted="false">"Edited image sent to Photo Cartoon"</string>
+    <string name="l10n_filtr_ui_baking" formatted="false">"Applying effect…"</string>
+    <string name="l10n_filtr_ui_bake_failed" formatted="false">"Could not apply effect"</string>
+    <string name="l10n_filtr_ui_applied" formatted="false">"Applied — choose the next effect"</string>
+    <string name="l10n_filtr_ui_export_failed" formatted="false">"Export failed"</string>
+    <string name="l10n_filtr_ui_encode_failed" formatted="false">"Image encoding failed"</string>
+    <string name="l10n_filtr_ui_downloaded" formatted="false">"Download prepared"</string>
+    <string name="l10n_filtr_ui_budget_failed" formatted="false">"Could not compress the image to the required size"</string>
+    <!-- Arguments: name, width, height -->
+    <string name="l10n_filtr_ui_image_meta">"%1$s · %2$s×%3$s"</string>
+    <!-- Arguments: width -->
+    <string name="l10n_filtr_ui_editing_size">" · editing at %1$spx"</string>
+    <!-- Arguments: percent -->
+    <string name="l10n_filtr_ui_zoom">"zoom %1$s%%"</string>
+    <string name="l10n_filtr_ui_fit_suffix" formatted="false">" · fit"</string>
+    <string name="l10n_filtr_ui_crop_help" formatted="false">"Drag on the image, then"</string>
+    <string name="l10n_filtr_ui_apply_crop" formatted="false">"Apply crop"</string>
+    <string name="l10n_filtr_ui_ratio" formatted="false">"Ratio:"</string>
+    <string name="l10n_filtr_ui_free" formatted="false">"Free"</string>
+    <string name="l10n_filtr_ui_soft" formatted="false">"Soft"</string>
+    <string name="l10n_filtr_ui_hard" formatted="false">"Hard"</string>
+    <string name="l10n_filtr_ui_bubble_help" formatted="false">"Tap the image to place a bubble"</string>
+    <string name="l10n_filtr_ui_text_help" formatted="false">"Tap the image to place text"</string>
+    <string name="l10n_filtr_ui_pan_help" formatted="false">"Pan: drag · zoom: wheel / pinch"</string>
+    <!-- Arguments: size -->
+    <string name="l10n_filtr_ui_erase_help">"Paint to erase · brush %1$spx"</string>
+    <!-- Arguments: max -->
+    <string name="l10n_filtr_ui_resize_prompt">"New long-edge size in pixels (64–%1$s):"</string>
+    <string name="l10n_filtr_ui_text_prompt" formatted="false">"Text:"</string>
+    <string name="l10n_filtr_ui_default_text" formatted="false">"YOUR TEXT"</string>
+    <string name="l10n_filtr_ui_default_bubble" formatted="false">"WEN MOON?"</string>
+    <string name="l10n_filtr_ui_annotation_help" formatted="false">"Use Bubble or Text, or tap an annotation to edit it"</string>
+    <string name="l10n_filtr_ui_delete_annotation" formatted="false">"Delete annotation"</string>
+    <string name="l10n_filtr_ui_no_effect_help" formatted="false">"No effect — geometry, adjustments, annotations and post effects still apply"</string>
+    <string name="l10n_filtr_effect_none" formatted="false">"None (edit only)"</string>
+    <string name="l10n_filtr_effect_halftone" formatted="false">"Halftone"</string>
+    <string name="l10n_filtr_effect_dithering" formatted="false">"Dithering"</string>
+    <string name="l10n_filtr_effect_ascii" formatted="false">"ASCII"</string>
+    <string name="l10n_filtr_effect_pixel_sort" formatted="false">"Pixel Sort"</string>
+    <string name="l10n_filtr_effect_edge_detection" formatted="false">"Edge Detect"</string>
+    <string name="l10n_filtr_effect_contour" formatted="false">"Contour"</string>
+    <string name="l10n_filtr_effect_crosshatch" formatted="false">"Crosshatch"</string>
+    <string name="l10n_filtr_effect_blockify" formatted="false">"Blockify"</string>
+    <string name="l10n_filtr_effect_dots" formatted="false">"Dots"</string>
+    <string name="l10n_filtr_effect_threshold" formatted="false">"Threshold"</string>
+    <string name="l10n_filtr_effect_wave_lines" formatted="false">"Wave Lines"</string>
+    <string name="l10n_filtr_effect_voronoi" formatted="false">"Voronoi"</string>
+    <string name="l10n_filtr_effect_noise_field" formatted="false">"Noise Field"</string>
+    <string name="l10n_filtr_effect_matrix_rain" formatted="false">"Matrix Rain"</string>
+    <string name="l10n_filtr_effect_vhs" formatted="false">"VHS"</string>
+    <string name="l10n_filtr_control_shape" formatted="false">"Shape"</string>
+    <string name="l10n_filtr_control_spacing" formatted="false">"Spacing"</string>
+    <string name="l10n_filtr_control_dot_scale" formatted="false">"Dot scale"</string>
+    <string name="l10n_filtr_control_angle" formatted="false">"Angle"</string>
+    <string name="l10n_filtr_control_invert" formatted="false">"Invert"</string>
+    <string name="l10n_filtr_control_color_mode" formatted="false">"Colour mode"</string>
+    <string name="l10n_filtr_control_fg_color" formatted="false">"Foreground colour"</string>
+    <string name="l10n_filtr_control_bg_color" formatted="false">"Background colour"</string>
+    <string name="l10n_filtr_control_method" formatted="false">"Method"</string>
+    <string name="l10n_filtr_control_intensity" formatted="false">"Intensity"</string>
+    <string name="l10n_filtr_control_gamma" formatted="false">"Gamma"</string>
+    <string name="l10n_filtr_control_color_levels" formatted="false">"Colour levels"</string>
+    <string name="l10n_filtr_control_palette" formatted="false">"Palette"</string>
+    <string name="l10n_filtr_control_palette_size" formatted="false">"Palette size"</string>
+    <string name="l10n_filtr_control_foreground_color" formatted="false">"Foreground colour"</string>
+    <string name="l10n_filtr_control_background_color" formatted="false">"Background colour"</string>
+    <string name="l10n_filtr_control_scale" formatted="false">"Scale"</string>
+    <string name="l10n_filtr_control_set" formatted="false">"Character set"</string>
+    <string name="l10n_filtr_control_custom" formatted="false">"Character colour"</string>
+    <string name="l10n_filtr_control_brightness_mapping" formatted="false">"Brightness mapping"</string>
+    <string name="l10n_filtr_control_direction" formatted="false">"Direction"</string>
+    <string name="l10n_filtr_control_mode" formatted="false">"Mode"</string>
+    <string name="l10n_filtr_control_threshold" formatted="false">"Threshold"</string>
+    <string name="l10n_filtr_control_streak_length" formatted="false">"Streak length"</string>
+    <string name="l10n_filtr_control_reverse" formatted="false">"Reverse"</string>
+    <string name="l10n_filtr_control_algorithm" formatted="false">"Algorithm"</string>
+    <string name="l10n_filtr_control_line_width" formatted="false">"Line width"</string>
+    <string name="l10n_filtr_control_edge_color" formatted="false">"Edge colour"</string>
+    <string name="l10n_filtr_control_fill_mode" formatted="false">"Fill mode"</string>
+    <string name="l10n_filtr_control_levels" formatted="false">"Levels"</string>
+    <string name="l10n_filtr_control_line_thickness" formatted="false">"Line thickness"</string>
+    <string name="l10n_filtr_control_line_color" formatted="false">"Line colour"</string>
+    <string name="l10n_filtr_control_density" formatted="false">"Density"</string>
+    <string name="l10n_filtr_control_layers" formatted="false">"Layers"</string>
+    <string name="l10n_filtr_control_randomness" formatted="false">"Randomness"</string>
+    <string name="l10n_filtr_control_style" formatted="false">"Style"</string>
+    <string name="l10n_filtr_control_block_size" formatted="false">"Block size"</string>
+    <string name="l10n_filtr_control_border_width" formatted="false">"Border width"</string>
+    <string name="l10n_filtr_control_border_color" formatted="false">"Border colour"</string>
+    <string name="l10n_filtr_control_grid_type" formatted="false">"Grid type"</string>
+    <string name="l10n_filtr_control_size_multiplier" formatted="false">"Size multiplier"</string>
+    <string name="l10n_filtr_control_threshold_point" formatted="false">"Threshold point"</string>
+    <string name="l10n_filtr_control_dither" formatted="false">"Dither"</string>
+    <string name="l10n_filtr_control_line_count" formatted="false">"Line count"</string>
+    <string name="l10n_filtr_control_amplitude" formatted="false">"Amplitude"</string>
+    <string name="l10n_filtr_control_frequency" formatted="false">"Frequency"</string>
+    <string name="l10n_filtr_control_cell_size" formatted="false">"Cell size"</string>
+    <string name="l10n_filtr_control_edge_width" formatted="false">"Edge width"</string>
+    <string name="l10n_filtr_control_randomize" formatted="false">"Randomisation"</string>
+    <string name="l10n_filtr_control_noise_type" formatted="false">"Noise type"</string>
+    <string name="l10n_filtr_control_octaves" formatted="false">"Octaves"</string>
+    <string name="l10n_filtr_control_speed" formatted="false">"Speed"</string>
+    <string name="l10n_filtr_control_animate" formatted="false">"Animate"</string>
+    <string name="l10n_filtr_control_distort_only" formatted="false">"Distort only"</string>
+    <string name="l10n_filtr_control_character_set" formatted="false">"Character set"</string>
+    <string name="l10n_filtr_control_trail_length" formatted="false">"Trail length"</string>
+    <string name="l10n_filtr_control_glow_intensity" formatted="false">"Glow intensity"</string>
+    <string name="l10n_filtr_control_bg_opacity" formatted="false">"Background opacity"</string>
+    <string name="l10n_filtr_control_rain_color" formatted="false">"Rain colour"</string>
+    <string name="l10n_filtr_control_distortion" formatted="false">"Distortion"</string>
+    <string name="l10n_filtr_control_noise" formatted="false">"Noise"</string>
+    <string name="l10n_filtr_control_color_bleed" formatted="false">"Colour bleed"</string>
+    <string name="l10n_filtr_control_scanlines" formatted="false">"Scanlines"</string>
+    <string name="l10n_filtr_control_tracking_error" formatted="false">"Tracking error"</string>
+    <string name="l10n_filtr_control_brightness" formatted="false">"Brightness"</string>
+    <string name="l10n_filtr_control_contrast" formatted="false">"Contrast"</string>
+    <string name="l10n_filtr_control_saturation" formatted="false">"Saturation"</string>
+    <string name="l10n_filtr_control_hue" formatted="false">"Hue"</string>
+    <string name="l10n_filtr_control_sharpness" formatted="false">"Sharpness"</string>
+    <string name="l10n_filtr_control_blur" formatted="false">"Blur"</string>
+    <string name="l10n_filtr_control_edge" formatted="false">"Edge enhancement"</string>
+    <string name="l10n_filtr_control_quantize" formatted="false">"Quantisation"</string>
+    <string name="l10n_filtr_control_size" formatted="false">"Size"</string>
+    <string name="l10n_filtr_control_radius" formatted="false">"Radius"</string>
+    <string name="l10n_filtr_control_opacity" formatted="false">"Opacity"</string>
+    <string name="l10n_filtr_control_offset" formatted="false">"Offset"</string>
+    <string name="l10n_filtr_control_amount" formatted="false">"Amount"</string>
+    <string name="l10n_filtr_option_circle" formatted="false">"Circle"</string>
+    <string name="l10n_filtr_option_square" formatted="false">"Square"</string>
+    <string name="l10n_filtr_option_diamond" formatted="false">"Diamond"</string>
+    <string name="l10n_filtr_option_line" formatted="false">"Line"</string>
+    <string name="l10n_filtr_option_bw" formatted="false">"Black &amp; white"</string>
+    <string name="l10n_filtr_option_color" formatted="false">"Colour"</string>
+    <string name="l10n_filtr_option_mono" formatted="false">"Monochrome"</string>
+    <string name="l10n_filtr_option_tonal" formatted="false">"Tonal"</string>
+    <string name="l10n_filtr_option_indexed" formatted="false">"Indexed"</string>
+    <string name="l10n_filtr_option_rgb" formatted="false">"RGB"</string>
+    <string name="l10n_filtr_option_original" formatted="false">"Original"</string>
+    <string name="l10n_filtr_option_grayscale" formatted="false">"Grayscale"</string>
+    <string name="l10n_filtr_option_gameboy" formatted="false">"GameBoy"</string>
+    <string name="l10n_filtr_option_amber" formatted="false">"Amber"</string>
+    <string name="l10n_filtr_option_green" formatted="false">"Green"</string>
+    <string name="l10n_filtr_option_c64" formatted="false">"C64"</string>
+    <string name="l10n_filtr_option_newspaper" formatted="false">"Newsprint"</string>
+    <string name="l10n_filtr_option_riso" formatted="false">"Risograph"</string>
+    <string name="l10n_filtr_option_cyberpunk" formatted="false">"Cyberpunk"</string>
+    <string name="l10n_filtr_option_sepia" formatted="false">"Sepia"</string>
+    <string name="l10n_filtr_option_standard" formatted="false">"Standard"</string>
+    <string name="l10n_filtr_option_blocks" formatted="false">"Blocks"</string>
+    <string name="l10n_filtr_option_binary" formatted="false">"Binary"</string>
+    <string name="l10n_filtr_option_detailed" formatted="false">"Detailed"</string>
+    <string name="l10n_filtr_option_minimal" formatted="false">"Minimal"</string>
+    <string name="l10n_filtr_option_alphabetic" formatted="false">"Alphabetic"</string>
+    <string name="l10n_filtr_option_numeric" formatted="false">"Numeric"</string>
+    <string name="l10n_filtr_option_math" formatted="false">"Math"</string>
+    <string name="l10n_filtr_option_symbols" formatted="false">"Symbols"</string>
+    <string name="l10n_filtr_option_horizontal" formatted="false">"Horizontal"</string>
+    <string name="l10n_filtr_option_vertical" formatted="false">"Vertical"</string>
+    <string name="l10n_filtr_option_diagonal" formatted="false">"Diagonal"</string>
+    <string name="l10n_filtr_option_brightness" formatted="false">"Brightness"</string>
+    <string name="l10n_filtr_option_hue" formatted="false">"Hue"</string>
+    <string name="l10n_filtr_option_saturation" formatted="false">"Saturation"</string>
+    <string name="l10n_filtr_option_custom" formatted="false">"Custom"</string>
+    <string name="l10n_filtr_option_filled" formatted="false">"Filled"</string>
+    <string name="l10n_filtr_option_lines" formatted="false">"Lines"</string>
+    <string name="l10n_filtr_option_full" formatted="false">"Full"</string>
+    <string name="l10n_filtr_option_shaded" formatted="false">"Shaded"</string>
+    <string name="l10n_filtr_option_outline" formatted="false">"Outline"</string>
+    <string name="l10n_filtr_option_hex" formatted="false">"Hexagonal"</string>
+    <string name="l10n_filtr_option_black" formatted="false">"Black"</string>
+    <string name="l10n_filtr_option_white" formatted="false">"White"</string>
+    <string name="l10n_filtr_option_dark" formatted="false">"Dark"</string>
+    <string name="l10n_filtr_option_avg" formatted="false">"Average"</string>
+    <string name="l10n_filtr_option_centre" formatted="false">"Centre"</string>
+    <string name="l10n_filtr_option_grad" formatted="false">"Gradient"</string>
+    <string name="l10n_filtr_option_down" formatted="false">"Down"</string>
+    <string name="l10n_filtr_option_up" formatted="false">"Up"</string>
+    <string name="l10n_filtr_option_left" formatted="false">"Left"</string>
+    <string name="l10n_filtr_option_right" formatted="false">"Right"</string>
+    <string name="l10n_filtr_option_clustered_dot" formatted="false">"Clustered dots"</string>
+    <string name="l10n_filtr_option_blue_noise" formatted="false">"Blue noise"</string>
+    <string name="l10n_filtr_option_interleaved_gradient" formatted="false">"Interleaved gradient"</string>
+    <string name="l10n_filtr_option_sierra_two_row" formatted="false">"Sierra two-row"</string>
+    <string name="l10n_filtr_option_sierra_lite" formatted="false">"Sierra Lite"</string>
+    <string name="l10n_filtr_option_floyd_steinberg" formatted="false">"Floyd–Steinberg"</string>
+    <string name="l10n_filtr_option_atkinson" formatted="false">"Atkinson"</string>
+    <string name="l10n_filtr_option_jarvis_judice_ninke" formatted="false">"Jarvis–Judice–Ninke"</string>
+    <string name="l10n_filtr_option_stucki" formatted="false">"Stucki"</string>
+    <string name="l10n_filtr_option_burkes" formatted="false">"Burkes"</string>
+    <string name="l10n_filtr_option_sierra" formatted="false">"Sierra"</string>
+    <string name="l10n_filtr_option_bayer2x2" formatted="false">"Bayer 2×2"</string>
+    <string name="l10n_filtr_option_bayer4x4" formatted="false">"Bayer 4×4"</string>
+    <string name="l10n_filtr_option_bayer8x8" formatted="false">"Bayer 8×8"</string>
+    <string name="l10n_filtr_option_bayer16x16" formatted="false">"Bayer 16×16"</string>
+    <string name="l10n_filtr_option_sobel" formatted="false">"Sobel"</string>
+    <string name="l10n_filtr_option_prewitt" formatted="false">"Prewitt"</string>
+    <string name="l10n_filtr_option_laplacian" formatted="false">"Laplacian"</string>
+    <string name="l10n_filtr_option_perlin" formatted="false">"Perlin"</string>
+    <string name="l10n_filtr_option_simplex" formatted="false">"Simplex"</string>
+    <string name="l10n_filtr_option_worley" formatted="false">"Worley"</string>
+    <string name="l10n_filtr_annotation_style" formatted="false">"Style"</string>
+    <string name="l10n_filtr_annotation_text" formatted="false">"Text"</string>
+    <string name="l10n_filtr_annotation_font" formatted="false">"Font"</string>
+    <string name="l10n_filtr_annotation_size" formatted="false">"Size"</string>
+    <string name="l10n_filtr_annotation_tail" formatted="false">"Tail"</string>
+    <string name="l10n_filtr_annotation_text_color" formatted="false">"Text colour"</string>
+    <string name="l10n_filtr_annotation_fill" formatted="false">"Fill"</string>
+    <string name="l10n_filtr_annotation_ink" formatted="false">"Outline colour"</string>
+    <string name="l10n_filtr_annotation_speech" formatted="false">"Speech"</string>
+    <string name="l10n_filtr_annotation_thought" formatted="false">"Thought"</string>
+    <string name="l10n_filtr_annotation_shout" formatted="false">"Shout"</string>
+    <string name="l10n_filtr_annotation_box" formatted="false">"Box"</string>
+    <string name="l10n_filtr_annotation_comic" formatted="false">"Comic"</string>
+    <string name="l10n_filtr_annotation_sans" formatted="false">"Sans serif"</string>
+    <string name="l10n_filtr_annotation_mono" formatted="false">"Monospace"</string>
+    <string name="l10n_filtr_post_grain" formatted="false">"Grain"</string>
+    <string name="l10n_filtr_post_vignette" formatted="false">"Vignette"</string>
+    <string name="l10n_filtr_post_scanlines" formatted="false">"Scanlines"</string>
+    <string name="l10n_filtr_post_bloom" formatted="false">"Bloom"</string>
+    <string name="l10n_filtr_post_chromatic" formatted="false">"Chromatic shift"</string>
+    <string name="l10n_filtr_post_crt_curve" formatted="false">"CRT curvature"</string>
+    <string name="l10n_filtr_post_phosphor" formatted="false">"Phosphor"</string>
+    <string name="l10n_filtr_preset_classicterminal" formatted="false">"Classic Terminal"</string>
+    <string name="l10n_filtr_preset_ambercrt" formatted="false">"Amber CRT"</string>
+    <string name="l10n_filtr_preset_newsprint" formatted="false">"Newsprint"</string>
+    <string name="l10n_filtr_preset_risograph" formatted="false">"Risograph"</string>
+    <string name="l10n_filtr_preset_gameboy" formatted="false">"GameBoy"</string>
+    <string name="l10n_filtr_preset_cyberpunk" formatted="false">"Cyberpunk"</string>
+    <string name="l10n_filtr_preset_blueprint" formatted="false">"Blueprint"</string>
+    <string name="l10n_filtr_preset_comicink" formatted="false">"Comic Ink"</string>
+    <string name="l10n_filtr_preset_matrixrain" formatted="false">"Matrix Rain"</string>
+    <string name="l10n_filtr_preset_vaporwave" formatted="false">"Vaporwave"</string>
+    <string name="l10n_filtr_preset_glitchsort" formatted="false">"Glitch Sort"</string>
+    <string name="l10n_filtr_preset_vhstape" formatted="false">"VHS Tape"</string>
+    <string name="l10n_filtr_preset_stainedglass" formatted="false">"Stained Glass"</string>
+    <string name="l10n_filtr_preset_topographic" formatted="false">"Topographic"</string>
 </resources>

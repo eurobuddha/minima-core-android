@@ -28,7 +28,7 @@ import java.io.OutputStream;
 
 /**
  * FILTR on Android: the same editor the MiniDapp ships (assets/filtr — the
- * engine bundle, tab UI and styles are byte-identical copies, parity-gated),
+ * engine bundle is unchanged; display labels follow the shared selector),
  * hosted in a WebView with three native bridges: save to Photos, send the
  * flattened image to the Single-NFT wizard, send it to the Photo Cartoon
  * pack. MainActivity consumes the pending handoffs in onResume.
@@ -40,11 +40,13 @@ public class FiltrActivity extends Activity {
     static volatile String pendingPhoto = null;
 
     private ValueCallback<Uri[]> filePick;
+    private WebView web;
+    private final Runnable languageChanged = this::refreshLanguage;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        WebView web = new WebView(this);
+        web = new WebView(this);
         web.getSettings().setJavaScriptEnabled(true);
         web.getSettings().setDomStorageEnabled(true);
         web.getSettings().setAllowFileAccess(true);
@@ -59,6 +61,13 @@ public class FiltrActivity extends Activity {
                 return true;
             }
         });
+        web.setWebViewClient(new android.webkit.WebViewClient() {
+            @Override public void onPageFinished(WebView view, String url) { refreshLanguage(); }
+            @Override public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest request) {
+                return !"file:///android_asset/filtr/filtr.html".equals(request.getUrl().toString());
+            }
+        });
+        Language.addListener(languageChanged);
         web.addJavascriptInterface(new Bridge(), "AndroidFiltr");
         web.loadUrl("file:///android_asset/filtr/filtr.html");
 
@@ -100,7 +109,31 @@ public class FiltrActivity extends Activity {
         filePick = null;
     }
 
+    private void refreshLanguage() {
+        if (web != null && "file:///android_asset/filtr/filtr.html".equals(web.getUrl())) {
+            web.evaluateJavascript("window.FiltrI18n && FiltrI18n.setLanguage(" +
+                    org.json.JSONObject.quote(Language.code()) + ");", null);
+        }
+    }
+
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        Language.configurationChanged(this);
+        refreshLanguage();
+    }
+
+    @Override protected void onResume() { super.onResume(); refreshLanguage(); }
+
+    @Override protected void onDestroy() {
+        Language.removeListener(languageChanged);
+        if (filePick != null) { filePick.onReceiveValue(null); filePick = null; }
+        if (web != null) { web.removeJavascriptInterface("AndroidFiltr"); web.destroy(); web = null; }
+        super.onDestroy();
+    }
+
     private class Bridge {
+        @JavascriptInterface public String getLanguage() { return Language.code(); }
+
         @JavascriptInterface public void toastMsg(String m) {
             runOnUiThread(() -> Toast.makeText(FiltrActivity.this, m, Toast.LENGTH_SHORT).show());
         }

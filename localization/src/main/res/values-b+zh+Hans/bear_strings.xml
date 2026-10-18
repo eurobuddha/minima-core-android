@@ -6679,4 +6679,280 @@
     <string name="l10n_creative_look_warm" formatted="false">"暖色"</string>
     <string name="l10n_creative_look_fade" formatted="false">"褪色"</string>
     <string name="l10n_creative_rotate90" formatted="false">"旋转 90 度"</string>
+    <string name="l10n_filtr_ui_import" formatted="false">"导入"</string>
+    <string name="l10n_filtr_ui_transform" formatted="false">"变换"</string>
+    <string name="l10n_filtr_ui_effects" formatted="false">"效果"</string>
+    <string name="l10n_filtr_ui_presets" formatted="false">"预设"</string>
+    <string name="l10n_filtr_ui_adjust" formatted="false">"调整"</string>
+    <string name="l10n_filtr_ui_adjustments" formatted="false">"调整"</string>
+    <string name="l10n_filtr_ui_post" formatted="false">"后期效果"</string>
+    <string name="l10n_filtr_ui_annotate" formatted="false">"标注"</string>
+    <string name="l10n_filtr_ui_save" formatted="false">"保存"</string>
+    <string name="l10n_filtr_ui_crop" formatted="false">"裁剪"</string>
+    <string name="l10n_filtr_ui_flip_h" formatted="false">"水平翻转"</string>
+    <string name="l10n_filtr_ui_flip_v" formatted="false">"垂直翻转"</string>
+    <string name="l10n_filtr_ui_erase" formatted="false">"擦除"</string>
+    <string name="l10n_filtr_ui_resize" formatted="false">"调整大小"</string>
+    <string name="l10n_filtr_ui_bubble" formatted="false">"气泡"</string>
+    <string name="l10n_filtr_ui_text" formatted="false">"文本"</string>
+    <string name="l10n_filtr_ui_undo" formatted="false">"撤销"</string>
+    <string name="l10n_filtr_ui_redo" formatted="false">"重做"</string>
+    <string name="l10n_filtr_ui_fit" formatted="false">"适应"</string>
+    <string name="l10n_filtr_ui_apply" formatted="false">"应用"</string>
+    <string name="l10n_filtr_ui_effect" formatted="false">"效果"</string>
+    <string name="l10n_filtr_ui_send_mint" formatted="false">"发送至 NFT 铸造 →"</string>
+    <string name="l10n_filtr_ui_send_photo" formatted="false">"发送至照片卡通 →"</string>
+    <string name="l10n_filtr_ui_download_png" formatted="false">"下载 PNG"</string>
+    <string name="l10n_filtr_ui_download_jpg" formatted="false">"下载 JPG"</string>
+    <string name="l10n_filtr_ui_drop_hint" formatted="false">"+ 拖入或点击选择 · 粘贴 ⌘V"</string>
+    <string name="l10n_filtr_ui_no_image" formatted="false">"未加载图片"</string>
+    <string name="l10n_filtr_ui_empty_title" formatted="false">"点击导入图片"</string>
+    <string name="l10n_filtr_ui_empty_help" formatted="false">"或在此拖入或粘贴图片"</string>
+    <string name="l10n_filtr_ui_save_help" formatted="false">"所有处理均在本设备上完成。发送至铸造会将合成图片压缩至单个 NFT 向导所需大小（最多 9000 个 base64 字符）。照片卡通将其用于 AI 藏品集。"</string>
+    <string name="l10n_filtr_ui_unsupported" formatted="false">"FILTR 已安装，但此 WebView 不支持 WebGL2。请在桌面浏览器或较新的 WebView 中打开 Atelier 以使用编辑器。"</string>
+    <string name="l10n_filtr_ui_rotate_left" formatted="false">"向左旋转"</string>
+    <string name="l10n_filtr_ui_rotate_right" formatted="false">"向右旋转"</string>
+    <string name="l10n_filtr_ui_compare" formatted="false">"按住以比较"</string>
+    <string name="l10n_filtr_ui_apply_help" formatted="false">"将当前效果合成到图片中，然后添加下一种效果"</string>
+    <string name="l10n_filtr_ui_expand" formatted="false">"展开"</string>
+    <string name="l10n_filtr_ui_close" formatted="false">"关闭"</string>
+    <string name="l10n_filtr_ui_load_failed" formatted="false">"无法加载此图片"</string>
+    <string name="l10n_filtr_ui_load_first" formatted="false">"请先加载图片"</string>
+    <string name="l10n_filtr_ui_sent_mint" formatted="false">"编辑后的图片已加载到 NFT 向导"</string>
+    <string name="l10n_filtr_ui_sent_photo" formatted="false">"编辑后的图片已发送至照片卡通"</string>
+    <string name="l10n_filtr_ui_baking" formatted="false">"正在应用效果…"</string>
+    <string name="l10n_filtr_ui_bake_failed" formatted="false">"无法应用效果"</string>
+    <string name="l10n_filtr_ui_applied" formatted="false">"已应用 — 请选择下一种效果"</string>
+    <string name="l10n_filtr_ui_export_failed" formatted="false">"导出失败"</string>
+    <string name="l10n_filtr_ui_encode_failed" formatted="false">"图片编码失败"</string>
+    <string name="l10n_filtr_ui_downloaded" formatted="false">"下载已准备好"</string>
+    <string name="l10n_filtr_ui_budget_failed" formatted="false">"无法将图片压缩至所需大小"</string>
+    <!-- Arguments: name, width, height -->
+    <string name="l10n_filtr_ui_image_meta">"%1$s · %2$s×%3$s"</string>
+    <!-- Arguments: width -->
+    <string name="l10n_filtr_ui_editing_size">" · 编辑宽度 %1$spx"</string>
+    <!-- Arguments: percent -->
+    <string name="l10n_filtr_ui_zoom">"缩放 %1$s%%"</string>
+    <string name="l10n_filtr_ui_fit_suffix" formatted="false">" · 适应"</string>
+    <string name="l10n_filtr_ui_crop_help" formatted="false">"在图片上拖动，然后"</string>
+    <string name="l10n_filtr_ui_apply_crop" formatted="false">"应用裁剪"</string>
+    <string name="l10n_filtr_ui_ratio" formatted="false">"比例："</string>
+    <string name="l10n_filtr_ui_free" formatted="false">"自由"</string>
+    <string name="l10n_filtr_ui_soft" formatted="false">"柔边"</string>
+    <string name="l10n_filtr_ui_hard" formatted="false">"硬边"</string>
+    <string name="l10n_filtr_ui_bubble_help" formatted="false">"点击图片放置气泡"</string>
+    <string name="l10n_filtr_ui_text_help" formatted="false">"点击图片放置文字"</string>
+    <string name="l10n_filtr_ui_pan_help" formatted="false">"平移：拖动 · 缩放：滚轮或双指"</string>
+    <!-- Arguments: size -->
+    <string name="l10n_filtr_ui_erase_help">"涂抹以擦除 · 画笔 %1$spx"</string>
+    <!-- Arguments: max -->
+    <string name="l10n_filtr_ui_resize_prompt">"新的长边像素数（64–%1$s）："</string>
+    <string name="l10n_filtr_ui_text_prompt" formatted="false">"文本："</string>
+    <string name="l10n_filtr_ui_default_text" formatted="false">"您的文字"</string>
+    <string name="l10n_filtr_ui_default_bubble" formatted="false">"何时起飞？"</string>
+    <string name="l10n_filtr_ui_annotation_help" formatted="false">"使用气泡或文本工具，或点击已有标注进行编辑"</string>
+    <string name="l10n_filtr_ui_delete_annotation" formatted="false">"删除标注"</string>
+    <string name="l10n_filtr_ui_no_effect_help" formatted="false">"无效果 — 几何变换、调整、标注和后期效果仍然有效"</string>
+    <string name="l10n_filtr_effect_none" formatted="false">"无（仅编辑）"</string>
+    <string name="l10n_filtr_effect_halftone" formatted="false">"半色调"</string>
+    <string name="l10n_filtr_effect_dithering" formatted="false">"抖色"</string>
+    <string name="l10n_filtr_effect_ascii" formatted="false">"ASCII"</string>
+    <string name="l10n_filtr_effect_pixel_sort" formatted="false">"像素排序"</string>
+    <string name="l10n_filtr_effect_edge_detection" formatted="false">"边缘检测"</string>
+    <string name="l10n_filtr_effect_contour" formatted="false">"等高线"</string>
+    <string name="l10n_filtr_effect_crosshatch" formatted="false">"交叉线"</string>
+    <string name="l10n_filtr_effect_blockify" formatted="false">"方块化"</string>
+    <string name="l10n_filtr_effect_dots" formatted="false">"圆点"</string>
+    <string name="l10n_filtr_effect_threshold" formatted="false">"阈值"</string>
+    <string name="l10n_filtr_effect_wave_lines" formatted="false">"波浪线"</string>
+    <string name="l10n_filtr_effect_voronoi" formatted="false">"沃罗诺伊"</string>
+    <string name="l10n_filtr_effect_noise_field" formatted="false">"噪声场"</string>
+    <string name="l10n_filtr_effect_matrix_rain" formatted="false">"矩阵雨"</string>
+    <string name="l10n_filtr_effect_vhs" formatted="false">"VHS"</string>
+    <string name="l10n_filtr_control_shape" formatted="false">"形状"</string>
+    <string name="l10n_filtr_control_spacing" formatted="false">"间距"</string>
+    <string name="l10n_filtr_control_dot_scale" formatted="false">"点缩放"</string>
+    <string name="l10n_filtr_control_angle" formatted="false">"角度"</string>
+    <string name="l10n_filtr_control_invert" formatted="false">"反转"</string>
+    <string name="l10n_filtr_control_color_mode" formatted="false">"色彩模式"</string>
+    <string name="l10n_filtr_control_fg_color" formatted="false">"前景色"</string>
+    <string name="l10n_filtr_control_bg_color" formatted="false">"背景色"</string>
+    <string name="l10n_filtr_control_method" formatted="false">"方法"</string>
+    <string name="l10n_filtr_control_intensity" formatted="false">"强度"</string>
+    <string name="l10n_filtr_control_gamma" formatted="false">"伽马"</string>
+    <string name="l10n_filtr_control_color_levels" formatted="false">"色阶"</string>
+    <string name="l10n_filtr_control_palette" formatted="false">"调色板"</string>
+    <string name="l10n_filtr_control_palette_size" formatted="false">"调色板大小"</string>
+    <string name="l10n_filtr_control_foreground_color" formatted="false">"前景色"</string>
+    <string name="l10n_filtr_control_background_color" formatted="false">"背景色"</string>
+    <string name="l10n_filtr_control_scale" formatted="false">"缩放"</string>
+    <string name="l10n_filtr_control_set" formatted="false">"字符集"</string>
+    <string name="l10n_filtr_control_custom" formatted="false">"字符颜色"</string>
+    <string name="l10n_filtr_control_brightness_mapping" formatted="false">"亮度映射"</string>
+    <string name="l10n_filtr_control_direction" formatted="false">"方向"</string>
+    <string name="l10n_filtr_control_mode" formatted="false">"模式"</string>
+    <string name="l10n_filtr_control_threshold" formatted="false">"阈值"</string>
+    <string name="l10n_filtr_control_streak_length" formatted="false">"条纹长度"</string>
+    <string name="l10n_filtr_control_reverse" formatted="false">"反向"</string>
+    <string name="l10n_filtr_control_algorithm" formatted="false">"算法"</string>
+    <string name="l10n_filtr_control_line_width" formatted="false">"线宽"</string>
+    <string name="l10n_filtr_control_edge_color" formatted="false">"边缘颜色"</string>
+    <string name="l10n_filtr_control_fill_mode" formatted="false">"填充模式"</string>
+    <string name="l10n_filtr_control_levels" formatted="false">"层级"</string>
+    <string name="l10n_filtr_control_line_thickness" formatted="false">"线条粗细"</string>
+    <string name="l10n_filtr_control_line_color" formatted="false">"线条颜色"</string>
+    <string name="l10n_filtr_control_density" formatted="false">"密度"</string>
+    <string name="l10n_filtr_control_layers" formatted="false">"图层"</string>
+    <string name="l10n_filtr_control_randomness" formatted="false">"随机性"</string>
+    <string name="l10n_filtr_control_style" formatted="false">"样式"</string>
+    <string name="l10n_filtr_control_block_size" formatted="false">"方块大小"</string>
+    <string name="l10n_filtr_control_border_width" formatted="false">"边框宽度"</string>
+    <string name="l10n_filtr_control_border_color" formatted="false">"边框颜色"</string>
+    <string name="l10n_filtr_control_grid_type" formatted="false">"网格类型"</string>
+    <string name="l10n_filtr_control_size_multiplier" formatted="false">"大小倍数"</string>
+    <string name="l10n_filtr_control_threshold_point" formatted="false">"阈值点"</string>
+    <string name="l10n_filtr_control_dither" formatted="false">"抖色"</string>
+    <string name="l10n_filtr_control_line_count" formatted="false">"线条数量"</string>
+    <string name="l10n_filtr_control_amplitude" formatted="false">"振幅"</string>
+    <string name="l10n_filtr_control_frequency" formatted="false">"频率"</string>
+    <string name="l10n_filtr_control_cell_size" formatted="false">"单元格大小"</string>
+    <string name="l10n_filtr_control_edge_width" formatted="false">"边缘宽度"</string>
+    <string name="l10n_filtr_control_randomize" formatted="false">"随机化"</string>
+    <string name="l10n_filtr_control_noise_type" formatted="false">"噪声类型"</string>
+    <string name="l10n_filtr_control_octaves" formatted="false">"倍频层数"</string>
+    <string name="l10n_filtr_control_speed" formatted="false">"速度"</string>
+    <string name="l10n_filtr_control_animate" formatted="false">"动画"</string>
+    <string name="l10n_filtr_control_distort_only" formatted="false">"仅扭曲"</string>
+    <string name="l10n_filtr_control_character_set" formatted="false">"字符集"</string>
+    <string name="l10n_filtr_control_trail_length" formatted="false">"拖尾长度"</string>
+    <string name="l10n_filtr_control_glow_intensity" formatted="false">"发光强度"</string>
+    <string name="l10n_filtr_control_bg_opacity" formatted="false">"背景不透明度"</string>
+    <string name="l10n_filtr_control_rain_color" formatted="false">"雨滴颜色"</string>
+    <string name="l10n_filtr_control_distortion" formatted="false">"失真"</string>
+    <string name="l10n_filtr_control_noise" formatted="false">"噪声"</string>
+    <string name="l10n_filtr_control_color_bleed" formatted="false">"色彩溢出"</string>
+    <string name="l10n_filtr_control_scanlines" formatted="false">"扫描线"</string>
+    <string name="l10n_filtr_control_tracking_error" formatted="false">"磁迹误差"</string>
+    <string name="l10n_filtr_control_brightness" formatted="false">"亮度"</string>
+    <string name="l10n_filtr_control_contrast" formatted="false">"对比度"</string>
+    <string name="l10n_filtr_control_saturation" formatted="false">"饱和度"</string>
+    <string name="l10n_filtr_control_hue" formatted="false">"色相"</string>
+    <string name="l10n_filtr_control_sharpness" formatted="false">"锐度"</string>
+    <string name="l10n_filtr_control_blur" formatted="false">"模糊"</string>
+    <string name="l10n_filtr_control_edge" formatted="false">"边缘增强"</string>
+    <string name="l10n_filtr_control_quantize" formatted="false">"量化"</string>
+    <string name="l10n_filtr_control_size" formatted="false">"大小"</string>
+    <string name="l10n_filtr_control_radius" formatted="false">"半径"</string>
+    <string name="l10n_filtr_control_opacity" formatted="false">"不透明度"</string>
+    <string name="l10n_filtr_control_offset" formatted="false">"偏移"</string>
+    <string name="l10n_filtr_control_amount" formatted="false">"程度"</string>
+    <string name="l10n_filtr_option_circle" formatted="false">"圆形"</string>
+    <string name="l10n_filtr_option_square" formatted="false">"正方形"</string>
+    <string name="l10n_filtr_option_diamond" formatted="false">"菱形"</string>
+    <string name="l10n_filtr_option_line" formatted="false">"线条"</string>
+    <string name="l10n_filtr_option_bw" formatted="false">"黑白"</string>
+    <string name="l10n_filtr_option_color" formatted="false">"彩色"</string>
+    <string name="l10n_filtr_option_mono" formatted="false">"单色"</string>
+    <string name="l10n_filtr_option_tonal" formatted="false">"色调"</string>
+    <string name="l10n_filtr_option_indexed" formatted="false">"索引色"</string>
+    <string name="l10n_filtr_option_rgb" formatted="false">"RGB"</string>
+    <string name="l10n_filtr_option_original" formatted="false">"原始"</string>
+    <string name="l10n_filtr_option_grayscale" formatted="false">"灰度"</string>
+    <string name="l10n_filtr_option_gameboy" formatted="false">"GameBoy"</string>
+    <string name="l10n_filtr_option_amber" formatted="false">"琥珀色"</string>
+    <string name="l10n_filtr_option_green" formatted="false">"绿色"</string>
+    <string name="l10n_filtr_option_c64" formatted="false">"C64"</string>
+    <string name="l10n_filtr_option_newspaper" formatted="false">"报纸"</string>
+    <string name="l10n_filtr_option_riso" formatted="false">"孔版印刷"</string>
+    <string name="l10n_filtr_option_cyberpunk" formatted="false">"赛博朋克"</string>
+    <string name="l10n_filtr_option_sepia" formatted="false">"棕褐色"</string>
+    <string name="l10n_filtr_option_standard" formatted="false">"标准"</string>
+    <string name="l10n_filtr_option_blocks" formatted="false">"方块"</string>
+    <string name="l10n_filtr_option_binary" formatted="false">"二进制"</string>
+    <string name="l10n_filtr_option_detailed" formatted="false">"详细"</string>
+    <string name="l10n_filtr_option_minimal" formatted="false">"极简"</string>
+    <string name="l10n_filtr_option_alphabetic" formatted="false">"字母"</string>
+    <string name="l10n_filtr_option_numeric" formatted="false">"数字"</string>
+    <string name="l10n_filtr_option_math" formatted="false">"数学"</string>
+    <string name="l10n_filtr_option_symbols" formatted="false">"符号"</string>
+    <string name="l10n_filtr_option_horizontal" formatted="false">"水平"</string>
+    <string name="l10n_filtr_option_vertical" formatted="false">"垂直"</string>
+    <string name="l10n_filtr_option_diagonal" formatted="false">"对角"</string>
+    <string name="l10n_filtr_option_brightness" formatted="false">"亮度"</string>
+    <string name="l10n_filtr_option_hue" formatted="false">"色相"</string>
+    <string name="l10n_filtr_option_saturation" formatted="false">"饱和度"</string>
+    <string name="l10n_filtr_option_custom" formatted="false">"自定义"</string>
+    <string name="l10n_filtr_option_filled" formatted="false">"填充"</string>
+    <string name="l10n_filtr_option_lines" formatted="false">"线条"</string>
+    <string name="l10n_filtr_option_full" formatted="false">"完整"</string>
+    <string name="l10n_filtr_option_shaded" formatted="false">"阴影"</string>
+    <string name="l10n_filtr_option_outline" formatted="false">"轮廓"</string>
+    <string name="l10n_filtr_option_hex" formatted="false">"六边形"</string>
+    <string name="l10n_filtr_option_black" formatted="false">"黑色"</string>
+    <string name="l10n_filtr_option_white" formatted="false">"白色"</string>
+    <string name="l10n_filtr_option_dark" formatted="false">"深色"</string>
+    <string name="l10n_filtr_option_avg" formatted="false">"平均"</string>
+    <string name="l10n_filtr_option_centre" formatted="false">"中心"</string>
+    <string name="l10n_filtr_option_grad" formatted="false">"渐变"</string>
+    <string name="l10n_filtr_option_down" formatted="false">"向下"</string>
+    <string name="l10n_filtr_option_up" formatted="false">"向上"</string>
+    <string name="l10n_filtr_option_left" formatted="false">"向左"</string>
+    <string name="l10n_filtr_option_right" formatted="false">"向右"</string>
+    <string name="l10n_filtr_option_clustered_dot" formatted="false">"聚集点"</string>
+    <string name="l10n_filtr_option_blue_noise" formatted="false">"蓝噪声"</string>
+    <string name="l10n_filtr_option_interleaved_gradient" formatted="false">"交错渐变"</string>
+    <string name="l10n_filtr_option_sierra_two_row" formatted="false">"Sierra 双行"</string>
+    <string name="l10n_filtr_option_sierra_lite" formatted="false">"Sierra 简化"</string>
+    <string name="l10n_filtr_option_floyd_steinberg" formatted="false">"Floyd–Steinberg"</string>
+    <string name="l10n_filtr_option_atkinson" formatted="false">"Atkinson"</string>
+    <string name="l10n_filtr_option_jarvis_judice_ninke" formatted="false">"Jarvis–Judice–Ninke"</string>
+    <string name="l10n_filtr_option_stucki" formatted="false">"Stucki"</string>
+    <string name="l10n_filtr_option_burkes" formatted="false">"Burkes"</string>
+    <string name="l10n_filtr_option_sierra" formatted="false">"Sierra"</string>
+    <string name="l10n_filtr_option_bayer2x2" formatted="false">"Bayer 2×2"</string>
+    <string name="l10n_filtr_option_bayer4x4" formatted="false">"Bayer 4×4"</string>
+    <string name="l10n_filtr_option_bayer8x8" formatted="false">"Bayer 8×8"</string>
+    <string name="l10n_filtr_option_bayer16x16" formatted="false">"Bayer 16×16"</string>
+    <string name="l10n_filtr_option_sobel" formatted="false">"Sobel"</string>
+    <string name="l10n_filtr_option_prewitt" formatted="false">"Prewitt"</string>
+    <string name="l10n_filtr_option_laplacian" formatted="false">"Laplacian"</string>
+    <string name="l10n_filtr_option_perlin" formatted="false">"Perlin"</string>
+    <string name="l10n_filtr_option_simplex" formatted="false">"Simplex"</string>
+    <string name="l10n_filtr_option_worley" formatted="false">"Worley"</string>
+    <string name="l10n_filtr_annotation_style" formatted="false">"样式"</string>
+    <string name="l10n_filtr_annotation_text" formatted="false">"文本"</string>
+    <string name="l10n_filtr_annotation_font" formatted="false">"字体"</string>
+    <string name="l10n_filtr_annotation_size" formatted="false">"大小"</string>
+    <string name="l10n_filtr_annotation_tail" formatted="false">"尾部"</string>
+    <string name="l10n_filtr_annotation_text_color" formatted="false">"文字颜色"</string>
+    <string name="l10n_filtr_annotation_fill" formatted="false">"填充"</string>
+    <string name="l10n_filtr_annotation_ink" formatted="false">"描边颜色"</string>
+    <string name="l10n_filtr_annotation_speech" formatted="false">"对话"</string>
+    <string name="l10n_filtr_annotation_thought" formatted="false">"思考"</string>
+    <string name="l10n_filtr_annotation_shout" formatted="false">"喊叫"</string>
+    <string name="l10n_filtr_annotation_box" formatted="false">"方框"</string>
+    <string name="l10n_filtr_annotation_comic" formatted="false">"漫画"</string>
+    <string name="l10n_filtr_annotation_sans" formatted="false">"无衬线"</string>
+    <string name="l10n_filtr_annotation_mono" formatted="false">"等宽"</string>
+    <string name="l10n_filtr_post_grain" formatted="false">"颗粒"</string>
+    <string name="l10n_filtr_post_vignette" formatted="false">"晕影"</string>
+    <string name="l10n_filtr_post_scanlines" formatted="false">"扫描线"</string>
+    <string name="l10n_filtr_post_bloom" formatted="false">"辉光"</string>
+    <string name="l10n_filtr_post_chromatic" formatted="false">"色差偏移"</string>
+    <string name="l10n_filtr_post_crt_curve" formatted="false">"CRT 曲率"</string>
+    <string name="l10n_filtr_post_phosphor" formatted="false">"荧光"</string>
+    <string name="l10n_filtr_preset_classicterminal" formatted="false">"经典终端"</string>
+    <string name="l10n_filtr_preset_ambercrt" formatted="false">"琥珀色 CRT"</string>
+    <string name="l10n_filtr_preset_newsprint" formatted="false">"报纸"</string>
+    <string name="l10n_filtr_preset_risograph" formatted="false">"孔版印刷"</string>
+    <string name="l10n_filtr_preset_gameboy" formatted="false">"GameBoy"</string>
+    <string name="l10n_filtr_preset_cyberpunk" formatted="false">"赛博朋克"</string>
+    <string name="l10n_filtr_preset_blueprint" formatted="false">"蓝图"</string>
+    <string name="l10n_filtr_preset_comicink" formatted="false">"漫画墨线"</string>
+    <string name="l10n_filtr_preset_matrixrain" formatted="false">"矩阵雨"</string>
+    <string name="l10n_filtr_preset_vaporwave" formatted="false">"蒸汽波"</string>
+    <string name="l10n_filtr_preset_glitchsort" formatted="false">"故障排序"</string>
+    <string name="l10n_filtr_preset_vhstape" formatted="false">"VHS 录像带"</string>
+    <string name="l10n_filtr_preset_stainedglass" formatted="false">"彩色玻璃"</string>
+    <string name="l10n_filtr_preset_topographic" formatted="false">"地形图"</string>
 </resources>

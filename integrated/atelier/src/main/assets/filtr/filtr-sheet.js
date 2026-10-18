@@ -100,7 +100,7 @@ function fsheetOpen(cat) {
   for (var i = 0; i < slots.length; i++) {
     slots[i].classList.toggle("on", slots[i].getAttribute("data-cat") === cat);
   }
-  fsheetEl("filtr-sheet-title").textContent = FSHEET_TITLES[cat] || "";
+  FiltrI18n.bind(fsheetEl("filtr-sheet-title"),"filtr.ui."+cat);
   fsheetEl("filtr-sheet").classList.add("on");
   var cats = document.querySelectorAll("#filtr-catbar .filtr-cat");
   for (var c = 0; c < cats.length; c++) {
@@ -156,7 +156,7 @@ function fsheetSync() {
   if (meta && typeof MutationObserver !== "undefined") {
     new MutationObserver(function () {
       if (FSHEET_SEEN_IMG || !FSHEET_ON) return;
-      if ((meta.textContent || "").indexOf("no image") === -1) {
+      if (FILTR.full) {
         FSHEET_SEEN_IMG = true;
         fsheetOpen("effects");
       }

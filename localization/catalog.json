@@ -32980,5 +32980,1631 @@
     "zh-Hans": "旋转 90 度",
     "ru": "Повернуть на 90 градусов",
     "uk": "Повернути на 90 градусів"
+  },
+  "filtr.ui.import": {
+    "en": "Import",
+    "zh-Hans": "导入",
+    "ru": "Импорт",
+    "uk": "Імпорт"
+  },
+  "filtr.ui.transform": {
+    "en": "Transform",
+    "zh-Hans": "变换",
+    "ru": "Геометрия",
+    "uk": "Геометрія"
+  },
+  "filtr.ui.effects": {
+    "en": "Effects",
+    "zh-Hans": "效果",
+    "ru": "Эффекты",
+    "uk": "Ефекти"
+  },
+  "filtr.ui.presets": {
+    "en": "Presets",
+    "zh-Hans": "预设",
+    "ru": "Пресеты",
+    "uk": "Пресети"
+  },
+  "filtr.ui.adjust": {
+    "en": "Adjust",
+    "zh-Hans": "调整",
+    "ru": "Настройка",
+    "uk": "Налаштування"
+  },
+  "filtr.ui.adjustments": {
+    "en": "Adjustments",
+    "zh-Hans": "调整",
+    "ru": "Коррекция",
+    "uk": "Корекція"
+  },
+  "filtr.ui.post": {
+    "en": "Post FX",
+    "zh-Hans": "后期效果",
+    "ru": "Постэффекты",
+    "uk": "Постефекти"
+  },
+  "filtr.ui.annotate": {
+    "en": "Annotate",
+    "zh-Hans": "标注",
+    "ru": "Надписи",
+    "uk": "Написи"
+  },
+  "filtr.ui.save": {
+    "en": "Save",
+    "zh-Hans": "保存",
+    "ru": "Сохранить",
+    "uk": "Зберегти"
+  },
+  "filtr.ui.crop": {
+    "en": "Crop",
+    "zh-Hans": "裁剪",
+    "ru": "Обрезка",
+    "uk": "Обрізання"
+  },
+  "filtr.ui.flipH": {
+    "en": "Flip H",
+    "zh-Hans": "水平翻转",
+    "ru": "По горизонтали",
+    "uk": "По горизонталі"
+  },
+  "filtr.ui.flipV": {
+    "en": "Flip V",
+    "zh-Hans": "垂直翻转",
+    "ru": "По вертикали",
+    "uk": "По вертикалі"
+  },
+  "filtr.ui.erase": {
+    "en": "Erase",
+    "zh-Hans": "擦除",
+    "ru": "Ластик",
+    "uk": "Гумка"
+  },
+  "filtr.ui.resize": {
+    "en": "Resize",
+    "zh-Hans": "调整大小",
+    "ru": "Размер",
+    "uk": "Розмір"
+  },
+  "filtr.ui.bubble": {
+    "en": "Bubble",
+    "zh-Hans": "气泡",
+    "ru": "Облачко",
+    "uk": "Хмаринка"
+  },
+  "filtr.ui.text": {
+    "en": "Text",
+    "zh-Hans": "文本",
+    "ru": "Текст",
+    "uk": "Текст"
+  },
+  "filtr.ui.undo": {
+    "en": "Undo",
+    "zh-Hans": "撤销",
+    "ru": "Отменить",
+    "uk": "Скасувати"
+  },
+  "filtr.ui.redo": {
+    "en": "Redo",
+    "zh-Hans": "重做",
+    "ru": "Повторить",
+    "uk": "Повторити"
+  },
+  "filtr.ui.fit": {
+    "en": "Fit",
+    "zh-Hans": "适应",
+    "ru": "Вписать",
+    "uk": "Умістити"
+  },
+  "filtr.ui.apply": {
+    "en": "Apply",
+    "zh-Hans": "应用",
+    "ru": "Применить",
+    "uk": "Застосувати"
+  },
+  "filtr.ui.effect": {
+    "en": "Effect",
+    "zh-Hans": "效果",
+    "ru": "Эффект",
+    "uk": "Ефект"
+  },
+  "filtr.ui.sendMint": {
+    "en": "Send to NFT mint →",
+    "zh-Hans": "发送至 NFT 铸造 →",
+    "ru": "К выпуску NFT →",
+    "uk": "До карбування NFT →"
+  },
+  "filtr.ui.sendPhoto": {
+    "en": "Send to Photo Cartoon →",
+    "zh-Hans": "发送至照片卡通 →",
+    "ru": "В «Фото в мультфильм» →",
+    "uk": "До «Фото в мультфільм» →"
+  },
+  "filtr.ui.downloadPng": {
+    "en": "Download PNG",
+    "zh-Hans": "下载 PNG",
+    "ru": "Скачать PNG",
+    "uk": "Завантажити PNG"
+  },
+  "filtr.ui.downloadJpg": {
+    "en": "Download JPG",
+    "zh-Hans": "下载 JPG",
+    "ru": "Скачать JPG",
+    "uk": "Завантажити JPG"
+  },
+  "filtr.ui.dropHint": {
+    "en": "+ drop / tap to choose · paste ⌘V",
+    "zh-Hans": "+ 拖入或点击选择 · 粘贴 ⌘V",
+    "ru": "+ перетащите / выберите · вставьте ⌘V",
+    "uk": "+ перетягніть / виберіть · вставте ⌘V"
+  },
+  "filtr.ui.noImage": {
+    "en": "no image loaded",
+    "zh-Hans": "未加载图片",
+    "ru": "изображение не загружено",
+    "uk": "зображення не завантажено"
+  },
+  "filtr.ui.emptyTitle": {
+    "en": "Tap to import an image",
+    "zh-Hans": "点击导入图片",
+    "ru": "Нажмите, чтобы добавить изображение",
+    "uk": "Натисніть, щоб додати зображення"
+  },
+  "filtr.ui.emptyHelp": {
+    "en": "or drop / paste one here",
+    "zh-Hans": "或在此拖入或粘贴图片",
+    "ru": "или перетащите / вставьте его сюда",
+    "uk": "або перетягніть / вставте його сюди"
+  },
+  "filtr.ui.saveHelp": {
+    "en": "Everything runs on this device. Send-to-mint compresses the flattened image for the Single NFT wizard (up to 9000 base64 characters). Photo Cartoon uses it for the AI collection pack.",
+    "zh-Hans": "所有处理均在本设备上完成。发送至铸造会将合成图片压缩至单个 NFT 向导所需大小（最多 9000 个 base64 字符）。照片卡通将其用于 AI 藏品集。",
+    "ru": "Всё обрабатывается на этом устройстве. Для выпуска NFT итоговое изображение сжимается до 9000 символов base64. «Фото в мультфильм» использует его для ИИ-коллекции.",
+    "uk": "Усе обробляється на цьому пристрої. Для карбування NFT підсумкове зображення стискається до 9000 символів base64. «Фото в мультфільм» використовує його для ШІ-колекції."
+  },
+  "filtr.ui.unsupported": {
+    "en": "FILTR is installed, but this WebView does not support WebGL2. Open Atelier in a desktop browser or a newer WebView to use the editor.",
+    "zh-Hans": "FILTR 已安装，但此 WebView 不支持 WebGL2。请在桌面浏览器或较新的 WebView 中打开 Atelier 以使用编辑器。",
+    "ru": "FILTR установлен, но этот WebView не поддерживает WebGL2. Откройте Atelier в браузере на компьютере или в более новом WebView.",
+    "uk": "FILTR установлено, але цей WebView не підтримує WebGL2. Відкрийте Atelier у браузері на комп’ютері або в новішому WebView."
+  },
+  "filtr.ui.rotateLeft": {
+    "en": "Rotate left",
+    "zh-Hans": "向左旋转",
+    "ru": "Повернуть влево",
+    "uk": "Повернути ліворуч"
+  },
+  "filtr.ui.rotateRight": {
+    "en": "Rotate right",
+    "zh-Hans": "向右旋转",
+    "ru": "Повернуть вправо",
+    "uk": "Повернути праворуч"
+  },
+  "filtr.ui.compare": {
+    "en": "Hold to compare",
+    "zh-Hans": "按住以比较",
+    "ru": "Удерживайте для сравнения",
+    "uk": "Утримуйте для порівняння"
+  },
+  "filtr.ui.applyHelp": {
+    "en": "Bake the current look into the image, then add the next effect",
+    "zh-Hans": "将当前效果合成到图片中，然后添加下一种效果",
+    "ru": "Закрепите текущий эффект в изображении, затем добавьте следующий",
+    "uk": "Закріпіть поточний ефект у зображенні, потім додайте наступний"
+  },
+  "filtr.ui.expand": {
+    "en": "Expand",
+    "zh-Hans": "展开",
+    "ru": "Развернуть",
+    "uk": "Розгорнути"
+  },
+  "filtr.ui.close": {
+    "en": "Close",
+    "zh-Hans": "关闭",
+    "ru": "Закрыть",
+    "uk": "Закрити"
+  },
+  "filtr.ui.loadFailed": {
+    "en": "Could not load that image",
+    "zh-Hans": "无法加载此图片",
+    "ru": "Не удалось загрузить изображение",
+    "uk": "Не вдалося завантажити зображення"
+  },
+  "filtr.ui.loadFirst": {
+    "en": "Load an image first",
+    "zh-Hans": "请先加载图片",
+    "ru": "Сначала загрузите изображение",
+    "uk": "Спочатку завантажте зображення"
+  },
+  "filtr.ui.sentMint": {
+    "en": "Edited image loaded into the NFT wizard",
+    "zh-Hans": "编辑后的图片已加载到 NFT 向导",
+    "ru": "Изображение загружено в мастер NFT",
+    "uk": "Зображення завантажено в майстер NFT"
+  },
+  "filtr.ui.sentPhoto": {
+    "en": "Edited image sent to Photo Cartoon",
+    "zh-Hans": "编辑后的图片已发送至照片卡通",
+    "ru": "Изображение отправлено в «Фото в мультфильм»",
+    "uk": "Зображення надіслано до «Фото в мультфільм»"
+  },
+  "filtr.ui.baking": {
+    "en": "Applying effect…",
+    "zh-Hans": "正在应用效果…",
+    "ru": "Применение эффекта…",
+    "uk": "Застосування ефекту…"
+  },
+  "filtr.ui.bakeFailed": {
+    "en": "Could not apply effect",
+    "zh-Hans": "无法应用效果",
+    "ru": "Не удалось применить эффект",
+    "uk": "Не вдалося застосувати ефект"
+  },
+  "filtr.ui.applied": {
+    "en": "Applied — choose the next effect",
+    "zh-Hans": "已应用 — 请选择下一种效果",
+    "ru": "Применено — выберите следующий эффект",
+    "uk": "Застосовано — виберіть наступний ефект"
+  },
+  "filtr.ui.exportFailed": {
+    "en": "Export failed",
+    "zh-Hans": "导出失败",
+    "ru": "Не удалось экспортировать",
+    "uk": "Не вдалося експортувати"
+  },
+  "filtr.ui.encodeFailed": {
+    "en": "Image encoding failed",
+    "zh-Hans": "图片编码失败",
+    "ru": "Не удалось закодировать изображение",
+    "uk": "Не вдалося закодувати зображення"
+  },
+  "filtr.ui.downloaded": {
+    "en": "Download prepared",
+    "zh-Hans": "下载已准备好",
+    "ru": "Файл подготовлен",
+    "uk": "Файл підготовлено"
+  },
+  "filtr.ui.budgetFailed": {
+    "en": "Could not compress the image to the required size",
+    "zh-Hans": "无法将图片压缩至所需大小",
+    "ru": "Не удалось сжать изображение до нужного размера",
+    "uk": "Не вдалося стиснути зображення до потрібного розміру"
+  },
+  "filtr.ui.imageMeta": {
+    "en": "{name} · {width}×{height}",
+    "zh-Hans": "{name} · {width}×{height}",
+    "ru": "{name} · {width}×{height}",
+    "uk": "{name} · {width}×{height}"
+  },
+  "filtr.ui.editingSize": {
+    "en": " · editing at {width}px",
+    "zh-Hans": " · 编辑宽度 {width}px",
+    "ru": " · редактирование: {width} пкс",
+    "uk": " · редагування: {width} пкс"
+  },
+  "filtr.ui.zoom": {
+    "en": "zoom {percent}%",
+    "zh-Hans": "缩放 {percent}%",
+    "ru": "масштаб {percent}%",
+    "uk": "масштаб {percent}%"
+  },
+  "filtr.ui.fitSuffix": {
+    "en": " · fit",
+    "zh-Hans": " · 适应",
+    "ru": " · вписано",
+    "uk": " · уміщено"
+  },
+  "filtr.ui.cropHelp": {
+    "en": "Drag on the image, then",
+    "zh-Hans": "在图片上拖动，然后",
+    "ru": "Выделите область, затем",
+    "uk": "Виділіть область, потім"
+  },
+  "filtr.ui.applyCrop": {
+    "en": "Apply crop",
+    "zh-Hans": "应用裁剪",
+    "ru": "Обрезать",
+    "uk": "Обрізати"
+  },
+  "filtr.ui.ratio": {
+    "en": "Ratio:",
+    "zh-Hans": "比例：",
+    "ru": "Пропорции:",
+    "uk": "Пропорції:"
+  },
+  "filtr.ui.free": {
+    "en": "Free",
+    "zh-Hans": "自由",
+    "ru": "Свободно",
+    "uk": "Вільно"
+  },
+  "filtr.ui.soft": {
+    "en": "Soft",
+    "zh-Hans": "柔边",
+    "ru": "Мягкий",
+    "uk": "М’яка"
+  },
+  "filtr.ui.hard": {
+    "en": "Hard",
+    "zh-Hans": "硬边",
+    "ru": "Жёсткий",
+    "uk": "Жорстка"
+  },
+  "filtr.ui.bubbleHelp": {
+    "en": "Tap the image to place a bubble",
+    "zh-Hans": "点击图片放置气泡",
+    "ru": "Нажмите на изображение, чтобы добавить облачко",
+    "uk": "Натисніть на зображення, щоб додати хмаринку"
+  },
+  "filtr.ui.textHelp": {
+    "en": "Tap the image to place text",
+    "zh-Hans": "点击图片放置文字",
+    "ru": "Нажмите на изображение, чтобы добавить текст",
+    "uk": "Натисніть на зображення, щоб додати текст"
+  },
+  "filtr.ui.panHelp": {
+    "en": "Pan: drag · zoom: wheel / pinch",
+    "zh-Hans": "平移：拖动 · 缩放：滚轮或双指",
+    "ru": "Сдвиг: перетаскивание · масштаб: колесо / щипок",
+    "uk": "Зсув: перетягування · масштаб: колесо / щипок"
+  },
+  "filtr.ui.eraseHelp": {
+    "en": "Paint to erase · brush {size}px",
+    "zh-Hans": "涂抹以擦除 · 画笔 {size}px",
+    "ru": "Проведите для стирания · кисть {size} пкс",
+    "uk": "Проведіть для стирання · пензель {size} пкс"
+  },
+  "filtr.ui.resizePrompt": {
+    "en": "New long-edge size in pixels (64–{max}):",
+    "zh-Hans": "新的长边像素数（64–{max}）：",
+    "ru": "Новый размер длинной стороны в пикселях (64–{max}):",
+    "uk": "Новий розмір довгої сторони в пікселях (64–{max}):"
+  },
+  "filtr.ui.textPrompt": {
+    "en": "Text:",
+    "zh-Hans": "文本：",
+    "ru": "Текст:",
+    "uk": "Текст:"
+  },
+  "filtr.ui.defaultText": {
+    "en": "YOUR TEXT",
+    "zh-Hans": "您的文字",
+    "ru": "ВАШ ТЕКСТ",
+    "uk": "ВАШ ТЕКСТ"
+  },
+  "filtr.ui.defaultBubble": {
+    "en": "WEN MOON?",
+    "zh-Hans": "何时起飞？",
+    "ru": "КОГДА НА ЛУНУ?",
+    "uk": "КОЛИ НА МІСЯЦЬ?"
+  },
+  "filtr.ui.annotationHelp": {
+    "en": "Use Bubble or Text, or tap an annotation to edit it",
+    "zh-Hans": "使用气泡或文本工具，或点击已有标注进行编辑",
+    "ru": "Выберите «Облачко» или «Текст», либо нажмите на надпись для редактирования",
+    "uk": "Виберіть «Хмаринка» чи «Текст» або натисніть на напис для редагування"
+  },
+  "filtr.ui.deleteAnnotation": {
+    "en": "Delete annotation",
+    "zh-Hans": "删除标注",
+    "ru": "Удалить надпись",
+    "uk": "Видалити напис"
+  },
+  "filtr.ui.noEffectHelp": {
+    "en": "No effect — geometry, adjustments, annotations and post effects still apply",
+    "zh-Hans": "无效果 — 几何变换、调整、标注和后期效果仍然有效",
+    "ru": "Без эффекта — геометрия, коррекция, надписи и постэффекты сохраняются",
+    "uk": "Без ефекту — геометрія, корекція, написи й постефекти зберігаються"
+  },
+  "filtr.effect.none": {
+    "en": "None (edit only)",
+    "zh-Hans": "无（仅编辑）",
+    "ru": "Нет (только правка)",
+    "uk": "Немає (лише правки)"
+  },
+  "filtr.effect.halftone": {
+    "en": "Halftone",
+    "zh-Hans": "半色调",
+    "ru": "Полутон",
+    "uk": "Півтон"
+  },
+  "filtr.effect.dithering": {
+    "en": "Dithering",
+    "zh-Hans": "抖色",
+    "ru": "Дизеринг",
+    "uk": "Дизеринг"
+  },
+  "filtr.effect.ascii": {
+    "en": "ASCII",
+    "zh-Hans": "ASCII",
+    "ru": "ASCII",
+    "uk": "ASCII"
+  },
+  "filtr.effect.pixelSort": {
+    "en": "Pixel Sort",
+    "zh-Hans": "像素排序",
+    "ru": "Сортировка пикселей",
+    "uk": "Сортування пікселів"
+  },
+  "filtr.effect.edgeDetection": {
+    "en": "Edge Detect",
+    "zh-Hans": "边缘检测",
+    "ru": "Выделение краёв",
+    "uk": "Виділення країв"
+  },
+  "filtr.effect.contour": {
+    "en": "Contour",
+    "zh-Hans": "等高线",
+    "ru": "Контуры",
+    "uk": "Контури"
+  },
+  "filtr.effect.crosshatch": {
+    "en": "Crosshatch",
+    "zh-Hans": "交叉线",
+    "ru": "Штриховка",
+    "uk": "Штрихування"
+  },
+  "filtr.effect.blockify": {
+    "en": "Blockify",
+    "zh-Hans": "方块化",
+    "ru": "Блоки",
+    "uk": "Блоки"
+  },
+  "filtr.effect.dots": {
+    "en": "Dots",
+    "zh-Hans": "圆点",
+    "ru": "Точки",
+    "uk": "Точки"
+  },
+  "filtr.effect.threshold": {
+    "en": "Threshold",
+    "zh-Hans": "阈值",
+    "ru": "Порог",
+    "uk": "Поріг"
+  },
+  "filtr.effect.waveLines": {
+    "en": "Wave Lines",
+    "zh-Hans": "波浪线",
+    "ru": "Волнистые линии",
+    "uk": "Хвилясті лінії"
+  },
+  "filtr.effect.voronoi": {
+    "en": "Voronoi",
+    "zh-Hans": "沃罗诺伊",
+    "ru": "Вороной",
+    "uk": "Вороного"
+  },
+  "filtr.effect.noiseField": {
+    "en": "Noise Field",
+    "zh-Hans": "噪声场",
+    "ru": "Поле шума",
+    "uk": "Поле шуму"
+  },
+  "filtr.effect.matrixRain": {
+    "en": "Matrix Rain",
+    "zh-Hans": "矩阵雨",
+    "ru": "Матричный дождь",
+    "uk": "Матричний дощ"
+  },
+  "filtr.effect.vhs": {
+    "en": "VHS",
+    "zh-Hans": "VHS",
+    "ru": "VHS",
+    "uk": "VHS"
+  },
+  "filtr.control.shape": {
+    "en": "Shape",
+    "zh-Hans": "形状",
+    "ru": "Форма",
+    "uk": "Форма"
+  },
+  "filtr.control.spacing": {
+    "en": "Spacing",
+    "zh-Hans": "间距",
+    "ru": "Интервал",
+    "uk": "Інтервал"
+  },
+  "filtr.control.dotScale": {
+    "en": "Dot scale",
+    "zh-Hans": "点缩放",
+    "ru": "Масштаб точек",
+    "uk": "Масштаб точок"
+  },
+  "filtr.control.angle": {
+    "en": "Angle",
+    "zh-Hans": "角度",
+    "ru": "Угол",
+    "uk": "Кут"
+  },
+  "filtr.control.invert": {
+    "en": "Invert",
+    "zh-Hans": "反转",
+    "ru": "Инверсия",
+    "uk": "Інверсія"
+  },
+  "filtr.control.colorMode": {
+    "en": "Colour mode",
+    "zh-Hans": "色彩模式",
+    "ru": "Цветовой режим",
+    "uk": "Колірний режим"
+  },
+  "filtr.control.fgColor": {
+    "en": "Foreground colour",
+    "zh-Hans": "前景色",
+    "ru": "Цвет переднего плана",
+    "uk": "Колір переднього плану"
+  },
+  "filtr.control.bgColor": {
+    "en": "Background colour",
+    "zh-Hans": "背景色",
+    "ru": "Цвет фона",
+    "uk": "Колір тла"
+  },
+  "filtr.control.method": {
+    "en": "Method",
+    "zh-Hans": "方法",
+    "ru": "Метод",
+    "uk": "Метод"
+  },
+  "filtr.control.intensity": {
+    "en": "Intensity",
+    "zh-Hans": "强度",
+    "ru": "Интенсивность",
+    "uk": "Інтенсивність"
+  },
+  "filtr.control.gamma": {
+    "en": "Gamma",
+    "zh-Hans": "伽马",
+    "ru": "Гамма",
+    "uk": "Гама"
+  },
+  "filtr.control.colorLevels": {
+    "en": "Colour levels",
+    "zh-Hans": "色阶",
+    "ru": "Уровни цвета",
+    "uk": "Рівні кольору"
+  },
+  "filtr.control.palette": {
+    "en": "Palette",
+    "zh-Hans": "调色板",
+    "ru": "Палитра",
+    "uk": "Палітра"
+  },
+  "filtr.control.paletteSize": {
+    "en": "Palette size",
+    "zh-Hans": "调色板大小",
+    "ru": "Размер палитры",
+    "uk": "Розмір палітри"
+  },
+  "filtr.control.foregroundColor": {
+    "en": "Foreground colour",
+    "zh-Hans": "前景色",
+    "ru": "Цвет переднего плана",
+    "uk": "Колір переднього плану"
+  },
+  "filtr.control.backgroundColor": {
+    "en": "Background colour",
+    "zh-Hans": "背景色",
+    "ru": "Цвет фона",
+    "uk": "Колір тла"
+  },
+  "filtr.control.scale": {
+    "en": "Scale",
+    "zh-Hans": "缩放",
+    "ru": "Масштаб",
+    "uk": "Масштаб"
+  },
+  "filtr.control.set": {
+    "en": "Character set",
+    "zh-Hans": "字符集",
+    "ru": "Набор символов",
+    "uk": "Набір символів"
+  },
+  "filtr.control.custom": {
+    "en": "Character colour",
+    "zh-Hans": "字符颜色",
+    "ru": "Цвет символов",
+    "uk": "Колір символів"
+  },
+  "filtr.control.brightnessMapping": {
+    "en": "Brightness mapping",
+    "zh-Hans": "亮度映射",
+    "ru": "Отображение яркости",
+    "uk": "Відображення яскравості"
+  },
+  "filtr.control.direction": {
+    "en": "Direction",
+    "zh-Hans": "方向",
+    "ru": "Направление",
+    "uk": "Напрямок"
+  },
+  "filtr.control.mode": {
+    "en": "Mode",
+    "zh-Hans": "模式",
+    "ru": "Режим",
+    "uk": "Режим"
+  },
+  "filtr.control.threshold": {
+    "en": "Threshold",
+    "zh-Hans": "阈值",
+    "ru": "Порог",
+    "uk": "Поріг"
+  },
+  "filtr.control.streakLength": {
+    "en": "Streak length",
+    "zh-Hans": "条纹长度",
+    "ru": "Длина полос",
+    "uk": "Довжина смуг"
+  },
+  "filtr.control.reverse": {
+    "en": "Reverse",
+    "zh-Hans": "反向",
+    "ru": "Обратный порядок",
+    "uk": "Зворотний порядок"
+  },
+  "filtr.control.algorithm": {
+    "en": "Algorithm",
+    "zh-Hans": "算法",
+    "ru": "Алгоритм",
+    "uk": "Алгоритм"
+  },
+  "filtr.control.lineWidth": {
+    "en": "Line width",
+    "zh-Hans": "线宽",
+    "ru": "Ширина линий",
+    "uk": "Ширина ліній"
+  },
+  "filtr.control.edgeColor": {
+    "en": "Edge colour",
+    "zh-Hans": "边缘颜色",
+    "ru": "Цвет краёв",
+    "uk": "Колір країв"
+  },
+  "filtr.control.fillMode": {
+    "en": "Fill mode",
+    "zh-Hans": "填充模式",
+    "ru": "Режим заливки",
+    "uk": "Режим заливки"
+  },
+  "filtr.control.levels": {
+    "en": "Levels",
+    "zh-Hans": "层级",
+    "ru": "Уровни",
+    "uk": "Рівні"
+  },
+  "filtr.control.lineThickness": {
+    "en": "Line thickness",
+    "zh-Hans": "线条粗细",
+    "ru": "Толщина линий",
+    "uk": "Товщина ліній"
+  },
+  "filtr.control.lineColor": {
+    "en": "Line colour",
+    "zh-Hans": "线条颜色",
+    "ru": "Цвет линий",
+    "uk": "Колір ліній"
+  },
+  "filtr.control.density": {
+    "en": "Density",
+    "zh-Hans": "密度",
+    "ru": "Плотность",
+    "uk": "Щільність"
+  },
+  "filtr.control.layers": {
+    "en": "Layers",
+    "zh-Hans": "图层",
+    "ru": "Слои",
+    "uk": "Шари"
+  },
+  "filtr.control.randomness": {
+    "en": "Randomness",
+    "zh-Hans": "随机性",
+    "ru": "Случайность",
+    "uk": "Випадковість"
+  },
+  "filtr.control.style": {
+    "en": "Style",
+    "zh-Hans": "样式",
+    "ru": "Стиль",
+    "uk": "Стиль"
+  },
+  "filtr.control.blockSize": {
+    "en": "Block size",
+    "zh-Hans": "方块大小",
+    "ru": "Размер блока",
+    "uk": "Розмір блока"
+  },
+  "filtr.control.borderWidth": {
+    "en": "Border width",
+    "zh-Hans": "边框宽度",
+    "ru": "Ширина границы",
+    "uk": "Ширина межі"
+  },
+  "filtr.control.borderColor": {
+    "en": "Border colour",
+    "zh-Hans": "边框颜色",
+    "ru": "Цвет границы",
+    "uk": "Колір межі"
+  },
+  "filtr.control.gridType": {
+    "en": "Grid type",
+    "zh-Hans": "网格类型",
+    "ru": "Тип сетки",
+    "uk": "Тип сітки"
+  },
+  "filtr.control.sizeMultiplier": {
+    "en": "Size multiplier",
+    "zh-Hans": "大小倍数",
+    "ru": "Множитель размера",
+    "uk": "Множник розміру"
+  },
+  "filtr.control.thresholdPoint": {
+    "en": "Threshold point",
+    "zh-Hans": "阈值点",
+    "ru": "Пороговое значение",
+    "uk": "Порогове значення"
+  },
+  "filtr.control.dither": {
+    "en": "Dither",
+    "zh-Hans": "抖色",
+    "ru": "Дизеринг",
+    "uk": "Дизеринг"
+  },
+  "filtr.control.lineCount": {
+    "en": "Line count",
+    "zh-Hans": "线条数量",
+    "ru": "Число линий",
+    "uk": "Кількість ліній"
+  },
+  "filtr.control.amplitude": {
+    "en": "Amplitude",
+    "zh-Hans": "振幅",
+    "ru": "Амплитуда",
+    "uk": "Амплітуда"
+  },
+  "filtr.control.frequency": {
+    "en": "Frequency",
+    "zh-Hans": "频率",
+    "ru": "Частота",
+    "uk": "Частота"
+  },
+  "filtr.control.cellSize": {
+    "en": "Cell size",
+    "zh-Hans": "单元格大小",
+    "ru": "Размер ячейки",
+    "uk": "Розмір комірки"
+  },
+  "filtr.control.edgeWidth": {
+    "en": "Edge width",
+    "zh-Hans": "边缘宽度",
+    "ru": "Ширина краёв",
+    "uk": "Ширина країв"
+  },
+  "filtr.control.randomize": {
+    "en": "Randomisation",
+    "zh-Hans": "随机化",
+    "ru": "Рандомизация",
+    "uk": "Рандомізація"
+  },
+  "filtr.control.noiseType": {
+    "en": "Noise type",
+    "zh-Hans": "噪声类型",
+    "ru": "Тип шума",
+    "uk": "Тип шуму"
+  },
+  "filtr.control.octaves": {
+    "en": "Octaves",
+    "zh-Hans": "倍频层数",
+    "ru": "Октавы",
+    "uk": "Октави"
+  },
+  "filtr.control.speed": {
+    "en": "Speed",
+    "zh-Hans": "速度",
+    "ru": "Скорость",
+    "uk": "Швидкість"
+  },
+  "filtr.control.animate": {
+    "en": "Animate",
+    "zh-Hans": "动画",
+    "ru": "Анимация",
+    "uk": "Анімація"
+  },
+  "filtr.control.distortOnly": {
+    "en": "Distort only",
+    "zh-Hans": "仅扭曲",
+    "ru": "Только искажение",
+    "uk": "Лише спотворення"
+  },
+  "filtr.control.characterSet": {
+    "en": "Character set",
+    "zh-Hans": "字符集",
+    "ru": "Набор символов",
+    "uk": "Набір символів"
+  },
+  "filtr.control.trailLength": {
+    "en": "Trail length",
+    "zh-Hans": "拖尾长度",
+    "ru": "Длина следа",
+    "uk": "Довжина сліду"
+  },
+  "filtr.control.glowIntensity": {
+    "en": "Glow intensity",
+    "zh-Hans": "发光强度",
+    "ru": "Сила свечения",
+    "uk": "Сила світіння"
+  },
+  "filtr.control.bgOpacity": {
+    "en": "Background opacity",
+    "zh-Hans": "背景不透明度",
+    "ru": "Непрозрачность фона",
+    "uk": "Непрозорість тла"
+  },
+  "filtr.control.rainColor": {
+    "en": "Rain colour",
+    "zh-Hans": "雨滴颜色",
+    "ru": "Цвет дождя",
+    "uk": "Колір дощу"
+  },
+  "filtr.control.distortion": {
+    "en": "Distortion",
+    "zh-Hans": "失真",
+    "ru": "Искажение",
+    "uk": "Спотворення"
+  },
+  "filtr.control.noise": {
+    "en": "Noise",
+    "zh-Hans": "噪声",
+    "ru": "Шум",
+    "uk": "Шум"
+  },
+  "filtr.control.colorBleed": {
+    "en": "Colour bleed",
+    "zh-Hans": "色彩溢出",
+    "ru": "Растекание цвета",
+    "uk": "Розтікання кольору"
+  },
+  "filtr.control.scanlines": {
+    "en": "Scanlines",
+    "zh-Hans": "扫描线",
+    "ru": "Строки развёртки",
+    "uk": "Рядки розгортки"
+  },
+  "filtr.control.trackingError": {
+    "en": "Tracking error",
+    "zh-Hans": "磁迹误差",
+    "ru": "Сбой трекинга",
+    "uk": "Збій трекінгу"
+  },
+  "filtr.control.brightness": {
+    "en": "Brightness",
+    "zh-Hans": "亮度",
+    "ru": "Яркость",
+    "uk": "Яскравість"
+  },
+  "filtr.control.contrast": {
+    "en": "Contrast",
+    "zh-Hans": "对比度",
+    "ru": "Контраст",
+    "uk": "Контраст"
+  },
+  "filtr.control.saturation": {
+    "en": "Saturation",
+    "zh-Hans": "饱和度",
+    "ru": "Насыщенность",
+    "uk": "Насиченість"
+  },
+  "filtr.control.hue": {
+    "en": "Hue",
+    "zh-Hans": "色相",
+    "ru": "Оттенок",
+    "uk": "Відтінок"
+  },
+  "filtr.control.sharpness": {
+    "en": "Sharpness",
+    "zh-Hans": "锐度",
+    "ru": "Резкость",
+    "uk": "Різкість"
+  },
+  "filtr.control.blur": {
+    "en": "Blur",
+    "zh-Hans": "模糊",
+    "ru": "Размытие",
+    "uk": "Розмиття"
+  },
+  "filtr.control.edge": {
+    "en": "Edge enhancement",
+    "zh-Hans": "边缘增强",
+    "ru": "Усиление краёв",
+    "uk": "Підсилення країв"
+  },
+  "filtr.control.quantize": {
+    "en": "Quantisation",
+    "zh-Hans": "量化",
+    "ru": "Квантование",
+    "uk": "Квантування"
+  },
+  "filtr.control.size": {
+    "en": "Size",
+    "zh-Hans": "大小",
+    "ru": "Размер",
+    "uk": "Розмір"
+  },
+  "filtr.control.radius": {
+    "en": "Radius",
+    "zh-Hans": "半径",
+    "ru": "Радиус",
+    "uk": "Радіус"
+  },
+  "filtr.control.opacity": {
+    "en": "Opacity",
+    "zh-Hans": "不透明度",
+    "ru": "Непрозрачность",
+    "uk": "Непрозорість"
+  },
+  "filtr.control.offset": {
+    "en": "Offset",
+    "zh-Hans": "偏移",
+    "ru": "Смещение",
+    "uk": "Зміщення"
+  },
+  "filtr.control.amount": {
+    "en": "Amount",
+    "zh-Hans": "程度",
+    "ru": "Сила",
+    "uk": "Сила"
+  },
+  "filtr.option.circle": {
+    "en": "Circle",
+    "zh-Hans": "圆形",
+    "ru": "Круг",
+    "uk": "Коло"
+  },
+  "filtr.option.square": {
+    "en": "Square",
+    "zh-Hans": "正方形",
+    "ru": "Квадрат",
+    "uk": "Квадрат"
+  },
+  "filtr.option.diamond": {
+    "en": "Diamond",
+    "zh-Hans": "菱形",
+    "ru": "Ромб",
+    "uk": "Ромб"
+  },
+  "filtr.option.line": {
+    "en": "Line",
+    "zh-Hans": "线条",
+    "ru": "Линия",
+    "uk": "Лінія"
+  },
+  "filtr.option.bw": {
+    "en": "Black & white",
+    "zh-Hans": "黑白",
+    "ru": "Чёрно-белый",
+    "uk": "Чорно-білий"
+  },
+  "filtr.option.color": {
+    "en": "Colour",
+    "zh-Hans": "彩色",
+    "ru": "Цветной",
+    "uk": "Кольоровий"
+  },
+  "filtr.option.mono": {
+    "en": "Monochrome",
+    "zh-Hans": "单色",
+    "ru": "Монохромный",
+    "uk": "Монохромний"
+  },
+  "filtr.option.tonal": {
+    "en": "Tonal",
+    "zh-Hans": "色调",
+    "ru": "Тональный",
+    "uk": "Тональний"
+  },
+  "filtr.option.indexed": {
+    "en": "Indexed",
+    "zh-Hans": "索引色",
+    "ru": "Индексированный",
+    "uk": "Індексований"
+  },
+  "filtr.option.rgb": {
+    "en": "RGB",
+    "zh-Hans": "RGB",
+    "ru": "RGB",
+    "uk": "RGB"
+  },
+  "filtr.option.original": {
+    "en": "Original",
+    "zh-Hans": "原始",
+    "ru": "Исходный",
+    "uk": "Оригінальний"
+  },
+  "filtr.option.grayscale": {
+    "en": "Grayscale",
+    "zh-Hans": "灰度",
+    "ru": "Оттенки серого",
+    "uk": "Відтінки сірого"
+  },
+  "filtr.option.gameboy": {
+    "en": "GameBoy",
+    "zh-Hans": "GameBoy",
+    "ru": "GameBoy",
+    "uk": "GameBoy"
+  },
+  "filtr.option.amber": {
+    "en": "Amber",
+    "zh-Hans": "琥珀色",
+    "ru": "Янтарный",
+    "uk": "Бурштиновий"
+  },
+  "filtr.option.green": {
+    "en": "Green",
+    "zh-Hans": "绿色",
+    "ru": "Зелёный",
+    "uk": "Зелений"
+  },
+  "filtr.option.c64": {
+    "en": "C64",
+    "zh-Hans": "C64",
+    "ru": "C64",
+    "uk": "C64"
+  },
+  "filtr.option.newspaper": {
+    "en": "Newsprint",
+    "zh-Hans": "报纸",
+    "ru": "Газета",
+    "uk": "Газета"
+  },
+  "filtr.option.riso": {
+    "en": "Risograph",
+    "zh-Hans": "孔版印刷",
+    "ru": "Ризограф",
+    "uk": "Ризограф"
+  },
+  "filtr.option.cyberpunk": {
+    "en": "Cyberpunk",
+    "zh-Hans": "赛博朋克",
+    "ru": "Киберпанк",
+    "uk": "Кіберпанк"
+  },
+  "filtr.option.sepia": {
+    "en": "Sepia",
+    "zh-Hans": "棕褐色",
+    "ru": "Сепия",
+    "uk": "Сепія"
+  },
+  "filtr.option.standard": {
+    "en": "Standard",
+    "zh-Hans": "标准",
+    "ru": "Стандартный",
+    "uk": "Стандартний"
+  },
+  "filtr.option.blocks": {
+    "en": "Blocks",
+    "zh-Hans": "方块",
+    "ru": "Блоки",
+    "uk": "Блоки"
+  },
+  "filtr.option.binary": {
+    "en": "Binary",
+    "zh-Hans": "二进制",
+    "ru": "Двоичный",
+    "uk": "Двійковий"
+  },
+  "filtr.option.detailed": {
+    "en": "Detailed",
+    "zh-Hans": "详细",
+    "ru": "Подробный",
+    "uk": "Докладний"
+  },
+  "filtr.option.minimal": {
+    "en": "Minimal",
+    "zh-Hans": "极简",
+    "ru": "Минимальный",
+    "uk": "Мінімальний"
+  },
+  "filtr.option.alphabetic": {
+    "en": "Alphabetic",
+    "zh-Hans": "字母",
+    "ru": "Буквенный",
+    "uk": "Літерний"
+  },
+  "filtr.option.numeric": {
+    "en": "Numeric",
+    "zh-Hans": "数字",
+    "ru": "Цифровой",
+    "uk": "Цифровий"
+  },
+  "filtr.option.math": {
+    "en": "Math",
+    "zh-Hans": "数学",
+    "ru": "Математика",
+    "uk": "Математика"
+  },
+  "filtr.option.symbols": {
+    "en": "Symbols",
+    "zh-Hans": "符号",
+    "ru": "Символы",
+    "uk": "Символи"
+  },
+  "filtr.option.horizontal": {
+    "en": "Horizontal",
+    "zh-Hans": "水平",
+    "ru": "Горизонтально",
+    "uk": "Горизонтально"
+  },
+  "filtr.option.vertical": {
+    "en": "Vertical",
+    "zh-Hans": "垂直",
+    "ru": "Вертикально",
+    "uk": "Вертикально"
+  },
+  "filtr.option.diagonal": {
+    "en": "Diagonal",
+    "zh-Hans": "对角",
+    "ru": "По диагонали",
+    "uk": "По діагоналі"
+  },
+  "filtr.option.brightness": {
+    "en": "Brightness",
+    "zh-Hans": "亮度",
+    "ru": "Яркость",
+    "uk": "Яскравість"
+  },
+  "filtr.option.hue": {
+    "en": "Hue",
+    "zh-Hans": "色相",
+    "ru": "Оттенок",
+    "uk": "Відтінок"
+  },
+  "filtr.option.saturation": {
+    "en": "Saturation",
+    "zh-Hans": "饱和度",
+    "ru": "Насыщенность",
+    "uk": "Насиченість"
+  },
+  "filtr.option.custom": {
+    "en": "Custom",
+    "zh-Hans": "自定义",
+    "ru": "Свой цвет",
+    "uk": "Власний колір"
+  },
+  "filtr.option.filled": {
+    "en": "Filled",
+    "zh-Hans": "填充",
+    "ru": "Заливка",
+    "uk": "Заливка"
+  },
+  "filtr.option.lines": {
+    "en": "Lines",
+    "zh-Hans": "线条",
+    "ru": "Линии",
+    "uk": "Лінії"
+  },
+  "filtr.option.full": {
+    "en": "Full",
+    "zh-Hans": "完整",
+    "ru": "Полный",
+    "uk": "Повний"
+  },
+  "filtr.option.shaded": {
+    "en": "Shaded",
+    "zh-Hans": "阴影",
+    "ru": "Затенённый",
+    "uk": "Затінений"
+  },
+  "filtr.option.outline": {
+    "en": "Outline",
+    "zh-Hans": "轮廓",
+    "ru": "Контур",
+    "uk": "Контур"
+  },
+  "filtr.option.hex": {
+    "en": "Hexagonal",
+    "zh-Hans": "六边形",
+    "ru": "Шестиугольная",
+    "uk": "Шестикутна"
+  },
+  "filtr.option.black": {
+    "en": "Black",
+    "zh-Hans": "黑色",
+    "ru": "Чёрный",
+    "uk": "Чорний"
+  },
+  "filtr.option.white": {
+    "en": "White",
+    "zh-Hans": "白色",
+    "ru": "Белый",
+    "uk": "Білий"
+  },
+  "filtr.option.dark": {
+    "en": "Dark",
+    "zh-Hans": "深色",
+    "ru": "Тёмный",
+    "uk": "Темний"
+  },
+  "filtr.option.avg": {
+    "en": "Average",
+    "zh-Hans": "平均",
+    "ru": "Средний",
+    "uk": "Середній"
+  },
+  "filtr.option.centre": {
+    "en": "Centre",
+    "zh-Hans": "中心",
+    "ru": "Центр",
+    "uk": "Центр"
+  },
+  "filtr.option.grad": {
+    "en": "Gradient",
+    "zh-Hans": "渐变",
+    "ru": "Градиент",
+    "uk": "Градієнт"
+  },
+  "filtr.option.down": {
+    "en": "Down",
+    "zh-Hans": "向下",
+    "ru": "Вниз",
+    "uk": "Униз"
+  },
+  "filtr.option.up": {
+    "en": "Up",
+    "zh-Hans": "向上",
+    "ru": "Вверх",
+    "uk": "Угору"
+  },
+  "filtr.option.left": {
+    "en": "Left",
+    "zh-Hans": "向左",
+    "ru": "Влево",
+    "uk": "Ліворуч"
+  },
+  "filtr.option.right": {
+    "en": "Right",
+    "zh-Hans": "向右",
+    "ru": "Вправо",
+    "uk": "Праворуч"
+  },
+  "filtr.option.clusteredDot": {
+    "en": "Clustered dots",
+    "zh-Hans": "聚集点",
+    "ru": "Сгруппированные точки",
+    "uk": "Згруповані точки"
+  },
+  "filtr.option.blueNoise": {
+    "en": "Blue noise",
+    "zh-Hans": "蓝噪声",
+    "ru": "Синий шум",
+    "uk": "Синій шум"
+  },
+  "filtr.option.interleavedGradient": {
+    "en": "Interleaved gradient",
+    "zh-Hans": "交错渐变",
+    "ru": "Чередующийся градиент",
+    "uk": "Чергований градієнт"
+  },
+  "filtr.option.sierraTwoRow": {
+    "en": "Sierra two-row",
+    "zh-Hans": "Sierra 双行",
+    "ru": "Sierra: два ряда",
+    "uk": "Sierra: два ряди"
+  },
+  "filtr.option.sierraLite": {
+    "en": "Sierra Lite",
+    "zh-Hans": "Sierra 简化",
+    "ru": "Sierra Lite",
+    "uk": "Sierra Lite"
+  },
+  "filtr.option.floydSteinberg": {
+    "en": "Floyd–Steinberg",
+    "zh-Hans": "Floyd–Steinberg",
+    "ru": "Floyd–Steinberg",
+    "uk": "Floyd–Steinberg"
+  },
+  "filtr.option.atkinson": {
+    "en": "Atkinson",
+    "zh-Hans": "Atkinson",
+    "ru": "Atkinson",
+    "uk": "Atkinson"
+  },
+  "filtr.option.jarvisJudiceNinke": {
+    "en": "Jarvis–Judice–Ninke",
+    "zh-Hans": "Jarvis–Judice–Ninke",
+    "ru": "Jarvis–Judice–Ninke",
+    "uk": "Jarvis–Judice–Ninke"
+  },
+  "filtr.option.stucki": {
+    "en": "Stucki",
+    "zh-Hans": "Stucki",
+    "ru": "Stucki",
+    "uk": "Stucki"
+  },
+  "filtr.option.burkes": {
+    "en": "Burkes",
+    "zh-Hans": "Burkes",
+    "ru": "Burkes",
+    "uk": "Burkes"
+  },
+  "filtr.option.sierra": {
+    "en": "Sierra",
+    "zh-Hans": "Sierra",
+    "ru": "Sierra",
+    "uk": "Sierra"
+  },
+  "filtr.option.bayer2x2": {
+    "en": "Bayer 2×2",
+    "zh-Hans": "Bayer 2×2",
+    "ru": "Bayer 2×2",
+    "uk": "Bayer 2×2"
+  },
+  "filtr.option.bayer4x4": {
+    "en": "Bayer 4×4",
+    "zh-Hans": "Bayer 4×4",
+    "ru": "Bayer 4×4",
+    "uk": "Bayer 4×4"
+  },
+  "filtr.option.bayer8x8": {
+    "en": "Bayer 8×8",
+    "zh-Hans": "Bayer 8×8",
+    "ru": "Bayer 8×8",
+    "uk": "Bayer 8×8"
+  },
+  "filtr.option.bayer16x16": {
+    "en": "Bayer 16×16",
+    "zh-Hans": "Bayer 16×16",
+    "ru": "Bayer 16×16",
+    "uk": "Bayer 16×16"
+  },
+  "filtr.option.sobel": {
+    "en": "Sobel",
+    "zh-Hans": "Sobel",
+    "ru": "Sobel",
+    "uk": "Sobel"
+  },
+  "filtr.option.prewitt": {
+    "en": "Prewitt",
+    "zh-Hans": "Prewitt",
+    "ru": "Prewitt",
+    "uk": "Prewitt"
+  },
+  "filtr.option.laplacian": {
+    "en": "Laplacian",
+    "zh-Hans": "Laplacian",
+    "ru": "Laplacian",
+    "uk": "Laplacian"
+  },
+  "filtr.option.perlin": {
+    "en": "Perlin",
+    "zh-Hans": "Perlin",
+    "ru": "Perlin",
+    "uk": "Perlin"
+  },
+  "filtr.option.simplex": {
+    "en": "Simplex",
+    "zh-Hans": "Simplex",
+    "ru": "Simplex",
+    "uk": "Simplex"
+  },
+  "filtr.option.worley": {
+    "en": "Worley",
+    "zh-Hans": "Worley",
+    "ru": "Worley",
+    "uk": "Worley"
+  },
+  "filtr.annotation.style": {
+    "en": "Style",
+    "zh-Hans": "样式",
+    "ru": "Стиль",
+    "uk": "Стиль"
+  },
+  "filtr.annotation.text": {
+    "en": "Text",
+    "zh-Hans": "文本",
+    "ru": "Текст",
+    "uk": "Текст"
+  },
+  "filtr.annotation.font": {
+    "en": "Font",
+    "zh-Hans": "字体",
+    "ru": "Шрифт",
+    "uk": "Шрифт"
+  },
+  "filtr.annotation.size": {
+    "en": "Size",
+    "zh-Hans": "大小",
+    "ru": "Размер",
+    "uk": "Розмір"
+  },
+  "filtr.annotation.tail": {
+    "en": "Tail",
+    "zh-Hans": "尾部",
+    "ru": "Хвостик",
+    "uk": "Хвостик"
+  },
+  "filtr.annotation.textColor": {
+    "en": "Text colour",
+    "zh-Hans": "文字颜色",
+    "ru": "Цвет текста",
+    "uk": "Колір тексту"
+  },
+  "filtr.annotation.fill": {
+    "en": "Fill",
+    "zh-Hans": "填充",
+    "ru": "Заливка",
+    "uk": "Заливка"
+  },
+  "filtr.annotation.ink": {
+    "en": "Outline colour",
+    "zh-Hans": "描边颜色",
+    "ru": "Цвет контура",
+    "uk": "Колір контуру"
+  },
+  "filtr.annotation.speech": {
+    "en": "Speech",
+    "zh-Hans": "对话",
+    "ru": "Речь",
+    "uk": "Мовлення"
+  },
+  "filtr.annotation.thought": {
+    "en": "Thought",
+    "zh-Hans": "思考",
+    "ru": "Мысль",
+    "uk": "Думка"
+  },
+  "filtr.annotation.shout": {
+    "en": "Shout",
+    "zh-Hans": "喊叫",
+    "ru": "Крик",
+    "uk": "Крик"
+  },
+  "filtr.annotation.box": {
+    "en": "Box",
+    "zh-Hans": "方框",
+    "ru": "Рамка",
+    "uk": "Рамка"
+  },
+  "filtr.annotation.comic": {
+    "en": "Comic",
+    "zh-Hans": "漫画",
+    "ru": "Комикс",
+    "uk": "Комікс"
+  },
+  "filtr.annotation.sans": {
+    "en": "Sans serif",
+    "zh-Hans": "无衬线",
+    "ru": "Без засечек",
+    "uk": "Без зарубок"
+  },
+  "filtr.annotation.mono": {
+    "en": "Monospace",
+    "zh-Hans": "等宽",
+    "ru": "Моноширинный",
+    "uk": "Моноширинний"
+  },
+  "filtr.post.grain": {
+    "en": "Grain",
+    "zh-Hans": "颗粒",
+    "ru": "Зерно",
+    "uk": "Зерно"
+  },
+  "filtr.post.vignette": {
+    "en": "Vignette",
+    "zh-Hans": "晕影",
+    "ru": "Виньетка",
+    "uk": "Віньєтка"
+  },
+  "filtr.post.scanlines": {
+    "en": "Scanlines",
+    "zh-Hans": "扫描线",
+    "ru": "Строки развёртки",
+    "uk": "Рядки розгортки"
+  },
+  "filtr.post.bloom": {
+    "en": "Bloom",
+    "zh-Hans": "辉光",
+    "ru": "Свечение",
+    "uk": "Світіння"
+  },
+  "filtr.post.chromatic": {
+    "en": "Chromatic shift",
+    "zh-Hans": "色差偏移",
+    "ru": "Хроматический сдвиг",
+    "uk": "Хроматичний зсув"
+  },
+  "filtr.post.crtCurve": {
+    "en": "CRT curvature",
+    "zh-Hans": "CRT 曲率",
+    "ru": "Изгиб ЭЛТ",
+    "uk": "Вигин ЕПТ"
+  },
+  "filtr.post.phosphor": {
+    "en": "Phosphor",
+    "zh-Hans": "荧光",
+    "ru": "Люминофор",
+    "uk": "Люмінофор"
+  },
+  "filtr.preset.classicterminal": {
+    "en": "Classic Terminal",
+    "zh-Hans": "经典终端",
+    "ru": "Классический терминал",
+    "uk": "Класичний термінал"
+  },
+  "filtr.preset.ambercrt": {
+    "en": "Amber CRT",
+    "zh-Hans": "琥珀色 CRT",
+    "ru": "Янтарный ЭЛТ",
+    "uk": "Бурштиновий ЕПТ"
+  },
+  "filtr.preset.newsprint": {
+    "en": "Newsprint",
+    "zh-Hans": "报纸",
+    "ru": "Газетная печать",
+    "uk": "Газетний друк"
+  },
+  "filtr.preset.risograph": {
+    "en": "Risograph",
+    "zh-Hans": "孔版印刷",
+    "ru": "Ризограф",
+    "uk": "Ризограф"
+  },
+  "filtr.preset.gameboy": {
+    "en": "GameBoy",
+    "zh-Hans": "GameBoy",
+    "ru": "GameBoy",
+    "uk": "GameBoy"
+  },
+  "filtr.preset.cyberpunk": {
+    "en": "Cyberpunk",
+    "zh-Hans": "赛博朋克",
+    "ru": "Киберпанк",
+    "uk": "Кіберпанк"
+  },
+  "filtr.preset.blueprint": {
+    "en": "Blueprint",
+    "zh-Hans": "蓝图",
+    "ru": "Чертёж",
+    "uk": "Креслення"
+  },
+  "filtr.preset.comicink": {
+    "en": "Comic Ink",
+    "zh-Hans": "漫画墨线",
+    "ru": "Комикс тушью",
+    "uk": "Комікс тушшю"
+  },
+  "filtr.preset.matrixrain": {
+    "en": "Matrix Rain",
+    "zh-Hans": "矩阵雨",
+    "ru": "Матричный дождь",
+    "uk": "Матричний дощ"
+  },
+  "filtr.preset.vaporwave": {
+    "en": "Vaporwave",
+    "zh-Hans": "蒸汽波",
+    "ru": "Вейпорвейв",
+    "uk": "Вейпорвейв"
+  },
+  "filtr.preset.glitchsort": {
+    "en": "Glitch Sort",
+    "zh-Hans": "故障排序",
+    "ru": "Глитч-сортировка",
+    "uk": "Глітч-сортування"
+  },
+  "filtr.preset.vhstape": {
+    "en": "VHS Tape",
+    "zh-Hans": "VHS 录像带",
+    "ru": "VHS-кассета",
+    "uk": "VHS-касета"
+  },
+  "filtr.preset.stainedglass": {
+    "en": "Stained Glass",
+    "zh-Hans": "彩色玻璃",
+    "ru": "Витраж",
+    "uk": "Вітраж"
+  },
+  "filtr.preset.topographic": {
+    "en": "Topographic",
+    "zh-Hans": "地形图",
+    "ru": "Топография",
+    "uk": "Топографія"
   }
 }
