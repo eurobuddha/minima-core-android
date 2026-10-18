@@ -181,4 +181,66 @@ public class PublishQueueTest {
             verify(invalid).onFailed("bad post address"); assertEquals(1, host.requests.size());
         }
     }
+
+    @Test public void malformedPositiveSendRepliesKeepDurablePauseAndNeverReportSent() throws Exception {
+        List<JSONObject> replies = new ArrayList<>();
+        replies.add(new JSONObject().put("status", true));
+        for (Object response : new Object[]{JSONObject.NULL, "missing", 7, new org.json.JSONArray(), new JSONObject()})
+            replies.add(new JSONObject().put("status", true).put("response", response));
+        for (Object id : new Object[]{JSONObject.NULL, "", false, 12, "0x12", "0x" + "00".repeat(32),
+                "0x" + "ab".repeat(33), "0x" + "zz".repeat(32), "0x" + "ab".repeat(32) + "\n"})
+            replies.add(new JSONObject().put("status", true).put("response", new JSONObject().put("txpowid", id)));
+        for (String flag : new String[]{"pending", "dryrun"}) for (Object value : new Object[]{true, "true", "false", JSONObject.NULL, 0})
+            replies.add(sent().put(flag, value));
+        for (boolean otc : new boolean[]{false, true}) for (JSONObject reply : replies) {
+            WriteSafety.resetForTest();
+            try (Host host = new Host()) {
+                CommsTransport.SendCb cb = mock(CommsTransport.SendCb.class); publish(host, otc, signer(), cb);
+                assertTrue(host.requests.get(0).begin()); String marker = (String) host.persisted.get("pending");
+                host.requests.get(0).accept(reply);
+                verify(cb).onFailed(NodeApi.ERR_WRITE_UNCERTAIN); verify(cb, never()).onSent(anyString());
+                assertEquals(marker, host.persisted.get("pending")); assertEquals(WriteSafety.WHY_INCOMPLETE, host.persisted.get("pending_why"));
+                WriteSafety.resetForTest(); assertTrue(host.node.hasInterruptedWrite());
+                NodeApi.Cb blocked = mock(NodeApi.Cb.class); host.node.cmd("send amount:1", blocked);
+                verify(blocked).onError(NodeApi.ERR_WRITE_UNCERTAIN); assertEquals(1, host.requests.size());
+            }
+        }
+    }
+    @Test public void completeSendReceiptKeepsTheExactIdAndPreviewContractsStaySeparate() throws Exception {
+        String id = "0x" + "aB".repeat(32);
+        try (Host host = new Host()) {
+            CommsTransport.SendCb cb = mock(CommsTransport.SendCb.class); publish(host, false, signer(), cb);
+            JSONObject reply = sent().put("pending", false).put("dryrun", false);
+            reply.getJSONObject("response").put("txpowid", id);
+            assertTrue(host.requests.get(0).begin()); host.requests.get(0).accept(reply);
+            verify(cb).onSent(id); assertFalse(host.node.hasInterruptedWrite());
+            assertFalse(host.persisted.containsKey("pending"));
+        }
+        JSONObject preview = new JSONObject().put("status", true).put("dryrun", true);
+        assertTrue(WriteSafety.completeReply("send amount:1 dryrun:true", preview));
+        assertFalse(WriteSafety.completeReply("send amount:1", preview));
+        assertTrue(WriteSafety.completeReply("status", new JSONObject().put("status", true)));
+        assertTrue(WriteSafety.completeReply("txnsign id:fixture", new JSONObject().put("status", true)));
+    }
+    @Test public void lateMalformedSendReceiptDoesNotResolveTimedOutEvidence() throws Exception {
+        try (Host host = new Host()) {
+            CommsTransport.SendCb cb = mock(CommsTransport.SendCb.class); publish(host, true, signer(), cb);
+            assertTrue(host.requests.get(0).begin()); host.timeouts.get(0).run();
+            String marker = (String) host.persisted.get("pending");
+            host.requests.get(0).accept(new JSONObject().put("status", true));
+            assertEquals(marker, host.persisted.get("pending")); assertTrue(host.node.hasInterruptedWrite());
+            verify(cb, times(1)).onFailed(NodeApi.ERR_WRITE_UNCERTAIN); verify(cb, never()).onSent(anyString());
+        }
+    }
+    @Test public void unusableReplyStopsTheAlreadyQueuedPublicationBeforeNodeDispatch() throws Exception {
+        try (Host host = new Host()) {
+            CommsTransport.SendCb first = mock(CommsTransport.SendCb.class), next = mock(CommsTransport.SendCb.class);
+            publish(host, false, signer(), first); publish(host, true, signer(), next);
+            assertEquals(1, host.requests.size()); assertTrue(host.requests.get(0).begin());
+            host.requests.get(0).accept(new JSONObject().put("status", true));
+            verify(first).onFailed(NodeApi.ERR_WRITE_UNCERTAIN); verify(next).onFailed(NodeApi.ERR_WRITE_UNCERTAIN);
+            verify(first, never()).onSent(anyString()); verify(next, never()).onSent(anyString());
+            assertEquals(1, host.requests.size()); assertTrue(host.node.hasInterruptedWrite());
+        }
+    }
 }

@@ -249,7 +249,7 @@ public class NodeApi {
             public void response(JSONObject zResponse) {
                 mMain.post(() -> {
                     // A late complete reply resolves only this write's durable marker; never a newer one.
-                    if (funds) WriteSafety.returned(writePrefs(), writeId, WriteSafety.completeReply(zResponse));
+                    if (funds) WriteSafety.returned(writePrefs(), writeId, WriteSafety.completeReply(command, zResponse));
                     if (done[0]) return;
                     done[0] = true;
                     mMain.removeCallbacks(timeout);
@@ -262,7 +262,7 @@ public class NodeApi {
                     // Keep transaction callbacks alive even after Activity teardown; UI consumers guard their views.
                     if (mReleased) return;
                     try {
-                    if (!WriteSafety.completeReply(zResponse)) {
+                    if (!WriteSafety.completeReply(command, zResponse)) {
                         if (cb != null) cb.onError(funds ? ERR_WRITE_UNCERTAIN : "Incomplete node reply");
                         return;
                     }

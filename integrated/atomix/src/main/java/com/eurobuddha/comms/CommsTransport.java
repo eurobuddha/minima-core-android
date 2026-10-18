@@ -92,10 +92,9 @@ public final class CommsTransport {
             @Override public void onResult(JSONObject j) {
                 gate.free();
                 // NodeApi already holds pending/incomplete writes for review; never report them sent.
-                if (j == null || !WriteSafety.completeReply(j)) { cb.onFailed(NodeApi.ERR_WRITE_UNCERTAIN); return; }
+                if (j == null || !WriteSafety.completeReply(cmd, j)) { cb.onFailed(NodeApi.ERR_WRITE_UNCERTAIN); return; }
                 if (Boolean.TRUE.equals(j.opt("status"))) {
-                    JSONObject r = j.optJSONObject("response");
-                    cb.onSent(r != null ? r.optString("txpowid", "") : "");
+                    cb.onSent(WriteSafety.sendReceipt(j));
                 } else {
                     cb.onFailed(j.optString("error", "the node rejected the send"));
                 }
