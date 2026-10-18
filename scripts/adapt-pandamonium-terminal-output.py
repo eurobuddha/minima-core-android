@@ -101,3 +101,11 @@ def adapt(root):
     p=root/'terminalide/build.gradle';s=p.read_text().replace('    buildFeatures { buildConfig true }','    buildFeatures { buildConfig true }\n    testOptions { unitTests.includeAndroidResources = true }')
     s=s.replace('dependencies {',"dependencies {\n    testImplementation 'org.robolectric:robolectric:4.14.1'\n    testImplementation 'org.mockito:mockito-core:5.12.0'")
     p.write_text(s)
+
+    shutil.copy2(project/'scripts/pandamonium-sources/terminalide/LogsView.java', folder.parent/'LogsView.java')
+    p=folder.parent/'receiver/ReceiverDB.java';s=p.read_text()
+    marker='    public JSONArray getAllMessages() {'
+    assert marker in s
+    method=(project/'scripts/pandamonium-sources/terminalide/RecentLogs.java.inc').read_text()
+    s=s.replace(marker,method+'\n'+marker)
+    p.write_text(s)

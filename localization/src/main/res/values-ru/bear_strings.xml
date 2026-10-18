@@ -7054,4 +7054,6 @@
     <string name="l10n_terminal_ide_preview" formatted="false">"Предпросмотр сокращён. Экспортируйте этот блок или поделитесь им, чтобы получить полный результат."</string>
     <string name="l10n_terminal_ide_display_busy" formatted="false">"Обработка вывода занята. Команда уже отправлена; перед повтором проверьте результат её выполнения."</string>
     <string name="l10n_terminal_ide_wait_commands" formatted="false">"Дождитесь завершения текущих команд, прежде чем запускать следующую."</string>
+    <string name="l10n_terminal_ide_logs_preview" formatted="false">"Последние записи журнала · длинные записи сокращены. Сохранённые журналы не изменены."</string>
+    <string name="l10n_terminal_ide_logs_failed" formatted="false">"Не удалось загрузить журнал. Откройте вкладку снова, чтобы повторить."</string>
 </resources>
