@@ -41,6 +41,10 @@ final class HoldingMessages {
             case "Node reply exceeded the IPC limit — update Minima Core (needs 1.3.0+).": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_utxo_too_long);
             case "Proof request is no longer current.": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_request_changed);
             case "A holding proof is already being created.": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_holdings_request_busy);
+            case "that profile's tip address is malformed — not sending": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_bad_address);
+            case "bad token id": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_bad_token);
+            case "bad amount": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_utxo_valid_amount);
+            case "the node rejected the tip": return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_utxo_rejected);
             default: return reason;
         }
     }

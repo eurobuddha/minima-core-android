@@ -8305,4 +8305,26 @@
     <string name="l10n_salon_spares_submitted">"Запрос на сжигание %1$s отправлен. Ожидается подтверждение."</string>
     <!-- Arguments: token -->
     <string name="l10n_salon_spares_unknown">"Результат сжигания %1$s не подтверждён. Проверьте узел перед повторной попыткой."</string>
+    <string name="l10n_salon_tips_connect" formatted="false">"Подключите узел, чтобы отправить чаевые."</string>
+    <!-- Arguments: token -->
+    <string name="l10n_salon_tips_currency">"Валюта: %1$s"</string>
+    <string name="l10n_salon_tips_checking" formatted="false">"Проверяем баланс…"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_salon_tips_available">"Доступно: %1$s %2$s"</string>
+    <string name="l10n_salon_tips_unavailable" formatted="false">"Баланс недоступен. Повторите проверку."</string>
+    <string name="l10n_salon_tips_note_hint" formatted="false">"Отличная работа!"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_tips_title">"Отправить чаевые @%1$s"</string>
+    <string name="l10n_salon_tips_busy" formatted="false">"Чаевые уже отправляются. Подождите."</string>
+    <!-- Arguments: token, amount -->
+    <string name="l10n_salon_tips_insufficient">"Недостаточно %1$s. Доступно: %2$s."</string>
+    <string name="l10n_salon_tips_sending" formatted="false">"Отправляем чаевые…"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_tips_submitted">"Чаевые для @%1$s отправлены. Ожидается подтверждение."</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_tips_failed">"Не удалось подтвердить чаевые: %1$s"</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_tips_balance_failed">"Не удалось проверить баланс: %1$s"</string>
+    <string name="l10n_salon_tips_bad_address" formatted="false">"В профиле указан неверный адрес для чаевых. Ничего не отправлено."</string>
+    <string name="l10n_salon_tips_bad_token" formatted="false">"Неверный ID токена."</string>
 </resources>

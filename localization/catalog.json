@@ -41416,5 +41416,95 @@
     "zh-Hans": "无法确认 {token} 的销毁结果。重试前请检查节点。",
     "ru": "Результат сжигания {token} не подтверждён. Проверьте узел перед повторной попыткой.",
     "uk": "Результат спалення {token} не підтверджено. Перевірте вузол перед повторною спробою."
+  },
+  "salonTips.connect": {
+    "en": "Connect the node to send a tip.",
+    "zh-Hans": "请连接节点后发送打赏。",
+    "ru": "Подключите узел, чтобы отправить чаевые.",
+    "uk": "Підключіть вузол, щоб надіслати чайові."
+  },
+  "salonTips.currency": {
+    "en": "Currency: {token}",
+    "zh-Hans": "币种：{token}",
+    "ru": "Валюта: {token}",
+    "uk": "Валюта: {token}"
+  },
+  "salonTips.checking": {
+    "en": "Checking balance…",
+    "zh-Hans": "正在检查余额…",
+    "ru": "Проверяем баланс…",
+    "uk": "Перевіряємо баланс…"
+  },
+  "salonTips.available": {
+    "en": "Available: {amount} {token}",
+    "zh-Hans": "可用：{amount} {token}",
+    "ru": "Доступно: {amount} {token}",
+    "uk": "Доступно: {amount} {token}"
+  },
+  "salonTips.unavailable": {
+    "en": "Balance unavailable. Try checking again.",
+    "zh-Hans": "余额暂不可用。请重试。",
+    "ru": "Баланс недоступен. Повторите проверку.",
+    "uk": "Баланс недоступний. Повторіть перевірку."
+  },
+  "salonTips.noteHint": {
+    "en": "Nice work!",
+    "zh-Hans": "做得真好！",
+    "ru": "Отличная работа!",
+    "uk": "Чудова робота!"
+  },
+  "salonTips.title": {
+    "en": "Send a tip to @{handle}",
+    "zh-Hans": "向 @{handle} 发送打赏",
+    "ru": "Отправить чаевые @{handle}",
+    "uk": "Надіслати чайові @{handle}"
+  },
+  "salonTips.busy": {
+    "en": "A tip is already being sent. Please wait.",
+    "zh-Hans": "正在发送打赏，请稍候。",
+    "ru": "Чаевые уже отправляются. Подождите.",
+    "uk": "Чайові вже надсилаються. Зачекайте."
+  },
+  "salonTips.insufficient": {
+    "en": "Not enough {token}. Available: {amount}.",
+    "zh-Hans": "{token} 不足。可用余额：{amount}。",
+    "ru": "Недостаточно {token}. Доступно: {amount}.",
+    "uk": "Недостатньо {token}. Доступно: {amount}."
+  },
+  "salonTips.sending": {
+    "en": "Sending tip…",
+    "zh-Hans": "正在发送打赏…",
+    "ru": "Отправляем чаевые…",
+    "uk": "Надсилаємо чайові…"
+  },
+  "salonTips.submitted": {
+    "en": "Tip to @{handle} submitted. Confirmation is pending.",
+    "zh-Hans": "已提交向 @{handle} 的打赏，等待确认。",
+    "ru": "Чаевые для @{handle} отправлены. Ожидается подтверждение.",
+    "uk": "Чайові для @{handle} надіслано. Очікується підтвердження."
+  },
+  "salonTips.failed": {
+    "en": "Could not confirm the tip: {detail}",
+    "zh-Hans": "无法确认打赏结果：{detail}",
+    "ru": "Не удалось подтвердить чаевые: {detail}",
+    "uk": "Не вдалося підтвердити чайові: {detail}"
+  },
+  "salonTips.balanceFailed": {
+    "en": "Balance check failed: {detail}",
+    "zh-Hans": "余额检查失败：{detail}",
+    "ru": "Не удалось проверить баланс: {detail}",
+    "uk": "Не вдалося перевірити баланс: {detail}"
+  },
+  "salonTips.badAddress": {
+    "en": "The profile has an invalid tip address. Nothing was sent.",
+    "zh-Hans": "该资料的打赏地址无效。未发送任何内容。",
+    "ru": "В профиле указан неверный адрес для чаевых. Ничего не отправлено.",
+    "uk": "У профілі вказано некоректну адресу для чайових. Нічого не надіслано."
+  },
+  "salonTips.badToken": {
+    "en": "Invalid token ID.",
+    "zh-Hans": "代币 ID 无效。",
+    "ru": "Неверный ID токена.",
+    "uk": "Некоректний ID токена."
   }
 }

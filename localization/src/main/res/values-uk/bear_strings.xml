@@ -8305,4 +8305,26 @@
     <string name="l10n_salon_spares_submitted">"Запит на спалення %1$s надіслано. Очікується підтвердження."</string>
     <!-- Arguments: token -->
     <string name="l10n_salon_spares_unknown">"Результат спалення %1$s не підтверджено. Перевірте вузол перед повторною спробою."</string>
+    <string name="l10n_salon_tips_connect" formatted="false">"Підключіть вузол, щоб надіслати чайові."</string>
+    <!-- Arguments: token -->
+    <string name="l10n_salon_tips_currency">"Валюта: %1$s"</string>
+    <string name="l10n_salon_tips_checking" formatted="false">"Перевіряємо баланс…"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_salon_tips_available">"Доступно: %1$s %2$s"</string>
+    <string name="l10n_salon_tips_unavailable" formatted="false">"Баланс недоступний. Повторіть перевірку."</string>
+    <string name="l10n_salon_tips_note_hint" formatted="false">"Чудова робота!"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_tips_title">"Надіслати чайові @%1$s"</string>
+    <string name="l10n_salon_tips_busy" formatted="false">"Чайові вже надсилаються. Зачекайте."</string>
+    <!-- Arguments: token, amount -->
+    <string name="l10n_salon_tips_insufficient">"Недостатньо %1$s. Доступно: %2$s."</string>
+    <string name="l10n_salon_tips_sending" formatted="false">"Надсилаємо чайові…"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_tips_submitted">"Чайові для @%1$s надіслано. Очікується підтвердження."</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_tips_failed">"Не вдалося підтвердити чайові: %1$s"</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_tips_balance_failed">"Не вдалося перевірити баланс: %1$s"</string>
+    <string name="l10n_salon_tips_bad_address" formatted="false">"У профілі вказано некоректну адресу для чайових. Нічого не надіслано."</string>
+    <string name="l10n_salon_tips_bad_token" formatted="false">"Некоректний ID токена."</string>
 </resources>

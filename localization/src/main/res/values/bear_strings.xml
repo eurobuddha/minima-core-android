@@ -8233,4 +8233,26 @@
     <string name="l10n_salon_spares_submitted">"Burn submitted for %1$s. Confirmation is pending."</string>
     <!-- Arguments: token -->
     <string name="l10n_salon_spares_unknown">"Burn outcome for %1$s is unconfirmed. Check the node before trying again."</string>
+    <string name="l10n_salon_tips_connect" formatted="false">"Connect the node to send a tip."</string>
+    <!-- Arguments: token -->
+    <string name="l10n_salon_tips_currency">"Currency: %1$s"</string>
+    <string name="l10n_salon_tips_checking" formatted="false">"Checking balance…"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_salon_tips_available">"Available: %1$s %2$s"</string>
+    <string name="l10n_salon_tips_unavailable" formatted="false">"Balance unavailable. Try checking again."</string>
+    <string name="l10n_salon_tips_note_hint" formatted="false">"Nice work!"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_tips_title">"Send a tip to @%1$s"</string>
+    <string name="l10n_salon_tips_busy" formatted="false">"A tip is already being sent. Please wait."</string>
+    <!-- Arguments: token, amount -->
+    <string name="l10n_salon_tips_insufficient">"Not enough %1$s. Available: %2$s."</string>
+    <string name="l10n_salon_tips_sending" formatted="false">"Sending tip…"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_tips_submitted">"Tip to @%1$s submitted. Confirmation is pending."</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_tips_failed">"Could not confirm the tip: %1$s"</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_tips_balance_failed">"Balance check failed: %1$s"</string>
+    <string name="l10n_salon_tips_bad_address" formatted="false">"The profile has an invalid tip address. Nothing was sent."</string>
+    <string name="l10n_salon_tips_bad_token" formatted="false">"Invalid token ID."</string>
 </resources>

@@ -8197,4 +8197,26 @@
     <string name="l10n_salon_spares_submitted">"已提交 %1$s 的销毁请求，等待确认。"</string>
     <!-- Arguments: token -->
     <string name="l10n_salon_spares_unknown">"无法确认 %1$s 的销毁结果。重试前请检查节点。"</string>
+    <string name="l10n_salon_tips_connect" formatted="false">"请连接节点后发送打赏。"</string>
+    <!-- Arguments: token -->
+    <string name="l10n_salon_tips_currency">"币种：%1$s"</string>
+    <string name="l10n_salon_tips_checking" formatted="false">"正在检查余额…"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_salon_tips_available">"可用：%1$s %2$s"</string>
+    <string name="l10n_salon_tips_unavailable" formatted="false">"余额暂不可用。请重试。"</string>
+    <string name="l10n_salon_tips_note_hint" formatted="false">"做得真好！"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_tips_title">"向 @%1$s 发送打赏"</string>
+    <string name="l10n_salon_tips_busy" formatted="false">"正在发送打赏，请稍候。"</string>
+    <!-- Arguments: token, amount -->
+    <string name="l10n_salon_tips_insufficient">"%1$s 不足。可用余额：%2$s。"</string>
+    <string name="l10n_salon_tips_sending" formatted="false">"正在发送打赏…"</string>
+    <!-- Arguments: handle -->
+    <string name="l10n_salon_tips_submitted">"已提交向 @%1$s 的打赏，等待确认。"</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_tips_failed">"无法确认打赏结果：%1$s"</string>
+    <!-- Arguments: detail -->
+    <string name="l10n_salon_tips_balance_failed">"余额检查失败：%1$s"</string>
+    <string name="l10n_salon_tips_bad_address" formatted="false">"该资料的打赏地址无效。未发送任何内容。"</string>
+    <string name="l10n_salon_tips_bad_token" formatted="false">"代币 ID 无效。"</string>
 </resources>

@@ -351,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
                     java.util.HashSet<String> seenSet = new java.util.HashSet<>();
                     for (int i = 0; i < seen.length(); i++) seenSet.add(seen.optString(i));
                     boolean baselined = "1".equals(SalonStore.get(MainActivity.this, "tipbaselined"));
-                    java.util.List<String> fresh = new java.util.ArrayList<>();
+                    java.util.List<CharSequence> fresh = new java.util.ArrayList<>();
                     for (int i = 0; i < arr.length(); i++) {
                         JSONObject c = arr.optJSONObject(i); if (c == null) continue;
                         String cid = c.optString("coinid", ""); if (cid.isEmpty() || seenSet.contains(cid)) continue;
@@ -360,26 +360,26 @@ public class MainActivity extends AppCompatActivity {
                     }
                     SalonStore.setArr(MainActivity.this, "tipseen", capArr(seen, 500));
                     if (!baselined) SalonStore.put(MainActivity.this, "tipbaselined", "1");
-                    for (String d : fresh) toast(d);
+                    for (CharSequence d : fresh) toast(d);
                 });
             }
             @Override public void onError(String m) {}
         });
     }
 
-    private String describeTip(JSONObject coin) {
+    private CharSequence describeTip(JSONObject coin) {
         String amount = coin.optString("tokenamount", "");
         if (amount.isEmpty()) amount = coin.optString("amount", "?");
         String tokenid = coin.optString("tokenid", TipTransport.MINIMA);
-        String from = "someone", note = "";
+        String from = "", note = "";
         JSONArray st = coin.optJSONArray("state");
         if (st != null) for (int k = 0; k < st.length(); k++) {
             JSONObject s = st.optJSONObject(k); if (s == null) continue;
             int p = s.optInt("port", -1); String v = SalonRegistry.unhex(s.optString("data", ""));
             if (p == 1 && !v.isEmpty()) from = v; else if (p == 2) note = v;
         }
-        return "💰 @" + from.replaceFirst("^@", "") + " tipped you " + amount + " " + TipTransport.label(tokenid)
-                + (note.isEmpty() ? "" : " — " + note);
+        CharSequence sender = from.isEmpty() ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_sender) : "@" + from.replaceFirst("^@", "");
+        return Language.join("💰 ", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_tip_from, sender, amount, TipTransport.label(tokenid)), note.isEmpty() ? "" : " — " + note);
     }
 
     private static boolean arrEmpty(JSONArray a) { return a == null || a.length() == 0; }
@@ -399,12 +399,12 @@ public class MainActivity extends AppCompatActivity {
     /* ---------------- tipping UI ---------------- */
 
     private void tipDialog(String handle, String toAddr) {
-        if (!nodeUp) { toast("Connect the node to tip."); return; }
+        if (!nodeUp) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_connect)); return; }
         final String[] tokenid = { TipTransport.MXUSD };   // default dollar-pegged
         LinearLayout box = dialogBox();
-        final TextView curBtn = Design.button(this, "Currency: mxUSD", false);
+        final TextView curBtn = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_currency, "mxUSD"), false);
         box.addView(curBtn, lph(46, 0, 2, 0, 8));
-        final EditText amount = field(box, "Amount", "", false, "1");
+        final EditText amount = field(box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_amount), "", false, "1");
         amount.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
         final LinearLayout presets = row();
         for (String amt : new String[]{"1", "5", "20"}) {
@@ -413,37 +413,58 @@ public class MainActivity extends AppCompatActivity {
             presets.addView(pb, weight(40, 0, amt.equals("20") ? 0 : 6));
         }
         box.addView(presets, lp(0, 6, 0, 4));
-        final TextView bal = Design.note(this, "Checking your balance…");
+        final TextView bal = Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_checking));
         box.addView(bal, lp(0, 0, 0, 4));
-        final Runnable refreshBal = () -> node.cmd("balance tokenid:" + tokenid[0], new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) {
-                String s = "0"; try { JSONArray a = j.optJSONArray("response"); if (a != null && a.length() > 0) s = a.optJSONObject(0).optString("sendable", "0"); } catch (Exception ignored) {}
-                final String have = s;
-                runOnUiThread(() -> bal.setText("Available: " + have + " " + TipTransport.label(tokenid[0])));
-            }
-            @Override public void onError(String m) {}
-        });
+        final int[] balanceRequest = {0};
+        final Runnable refreshBal = () -> {
+            final int request = ++balanceRequest[0];
+            final String requestedToken = tokenid[0];
+            Language.setText(bal, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_checking));
+            node.cmd("balance tokenid:" + requestedToken, new NodeApi.Cb() {
+                @Override public void onResult(JSONObject j) {
+                    String amount = null;
+                    if (j != null && Boolean.TRUE.equals(j.opt("status"))) {
+                        JSONArray rows = j.optJSONArray("response");
+                        if (rows != null && rows.length() == 0) amount = "0";
+                        else if (rows != null && rows.length() == 1) {
+                            JSONObject row = rows.optJSONObject(0);
+                            if (row != null && Args.isDecimal(row.optString("sendable", ""))) amount = row.optString("sendable");
+                        }
+                    }
+                    final String have = amount;
+                    runOnUiThread(() -> {
+                        if (request != balanceRequest[0] || !requestedToken.equals(tokenid[0]) || isFinishing() || isDestroyed()) return;
+                        Language.setText(bal, have == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_unavailable) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_available, have, TipTransport.label(requestedToken)));
+                    });
+                }
+                @Override public void onError(String ignored) {
+                    runOnUiThread(() -> {
+                        if (request == balanceRequest[0] && requestedToken.equals(tokenid[0]) && !isFinishing() && !isDestroyed()) Language.setText(bal, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_unavailable));
+                    });
+                }
+            });
+        };
         refreshBal.run();
-        final EditText note = field(box, "Note (optional)", "", false, "nice work!");
+        final EditText note = field(box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_note), "", false, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_note_hint));
         curBtn.setOnClickListener(v -> {
             tokenid[0] = tokenid[0].equals(TipTransport.MXUSD) ? TipTransport.MINIMA : TipTransport.MXUSD;
-            curBtn.setText("Currency: " + TipTransport.label(tokenid[0]));
+            Language.setText(curBtn, Language.upper(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_currency, TipTransport.label(tokenid[0]))));
             presets.setVisibility(tokenid[0].equals(TipTransport.MXUSD) ? View.VISIBLE : View.GONE);
             refreshBal.run();
         });
-        new android.app.AlertDialog.Builder(this).setTitle("Send a tip to @" + handle).setView(box)
-                .setPositiveButton("Send", (d, w) -> sendTip(handle, toAddr, tokenid[0], text(amount).trim(), text(note).trim()))
-                .setNegativeButton("Cancel", null).show();
+        new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_title, handle)).setView(box)
+                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_send), (d, w) -> sendTip(handle, toAddr, tokenid[0], text(amount).trim(), text(note).trim()))
+                .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel), null).show();
     }
 
     private void sendTip(String handle, String toAddr, String tokenid, String amount, String note) {
-        if (!Args.isDecimal(amount)) { toast("Enter a valid amount."); return; }
+        if (!Args.isDecimal(amount)) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_utxo_valid_amount)); return; }
         final java.math.BigDecimal amt;
-        try { amt = new java.math.BigDecimal(amount); } catch (Exception e) { toast("Enter a valid amount."); return; }
-        if (amt.signum() <= 0) { toast("Enter an amount."); return; }
-        if (mTipInFlight) { toast("A tip is already sending — one moment."); return; }
+        try { amt = new java.math.BigDecimal(amount); } catch (Exception e) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_utxo_valid_amount)); return; }
+        if (amt.signum() <= 0) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_enter_amount)); return; }
+        if (mTipInFlight) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_busy)); return; }
         mTipInFlight = true;
-        toast("Checking balance…");
+        toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_checking));
         node.cmd("balance tokenid:" + tokenid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 String sendable = "0";
@@ -451,15 +472,15 @@ public class MainActivity extends AppCompatActivity {
                 java.math.BigDecimal haveBd; try { haveBd = new java.math.BigDecimal(sendable); } catch (Exception e) { haveBd = java.math.BigDecimal.ZERO; }
                 final java.math.BigDecimal have = haveBd;
                 runOnUiThread(() -> {
-                    if (amt.compareTo(have) > 0) { mTipInFlight = false; toast("Not enough " + TipTransport.label(tokenid) + " (you have " + have.toPlainString() + ")"); return; }
-                    toast("Sending tip…");
+                    if (amt.compareTo(have) > 0) { mTipInFlight = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_insufficient, TipTransport.label(tokenid), have.toPlainString())); return; }
+                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_sending));
                     TipTransport.tip(node, toAddr, amount, tokenid, "@" + SalonStore.get(MainActivity.this, "handle"), note, new TipTransport.Cb() {
-                        @Override public void onSent(String txpowid) { runOnUiThread(() -> { mTipInFlight = false; toast("Tip sent to @" + handle + " — mining ⛏"); }); }
-                        @Override public void onFailed(String msg) { runOnUiThread(() -> { mTipInFlight = false; toast("Tip failed: " + msg); }); }
+                        @Override public void onSent(String txpowid) { runOnUiThread(() -> { mTipInFlight = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_submitted, handle)); }); }
+                        @Override public void onFailed(String msg) { runOnUiThread(() -> { mTipInFlight = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_failed, HoldingMessages.message(msg))); }); }
                     });
                 });
             }
-            @Override public void onError(String m) { runOnUiThread(() -> { mTipInFlight = false; toast("Balance check failed: " + m); }); }
+            @Override public void onError(String m) { runOnUiThread(() -> { mTipInFlight = false; toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_tips_balance_failed, HoldingMessages.message(m))); }); }
         });
     }
 

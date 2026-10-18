@@ -1,0 +1,45 @@
+Salon tipping presentation review — 2026-10-18
+
+Summary
+The tip dialog, validation/status messages and foreground incoming-tip notices now
+follow English, Simplified Chinese, Russian and Ukrainian selection. Existing input
+widgets, cursor positions, currency selection and callbacks survive a language
+change. Authored handles/notes and numeric amount strings remain literal.
+
+Reuse
+Read the standalone and integrated Salon tipDialog/sendTip/scanTips/describeTip,
+complete TipTransport and Args validation, existing language adapters/tests and
+HoldingMessages. Reused LanguageDialog, Language.setText/hint, shared amount/note/
+send/cancel labels, and creative.tipFrom/creative.sender already used by the Salon
+notification receiver. Added four fixed error mappings to the existing diagnostic
+lookup; unknown external diagnostics remain literal.
+
+Display corrections
+- Balance previews capture currency and request order. Old replies cannot replace
+  a newer result, including after switching away from a currency and back again.
+- Failed/malformed previews show unavailable instead of implying a zero balance.
+- Accepted tips say submitted, confirmation pending. A failure reports that the
+  outcome could not be confirmed, retaining the available diagnostic detail.
+- Only the default missing sender is translated. An authored handle such as
+  Someone is preserved, as are on-chain notes and exact amount formatting.
+
+Transport boundary
+TipTransport.java is byte-for-byte unchanged from the previous commit. The existing
+sendTip validation, balance gate and invocation are unchanged apart from displayed
+text. Tests inspect the exact captured send command and UTF-8 state encoding for
+sender and note. All NodeApi calls are mocked; no live send, signing or wallet access.
+
+Validation
+19 targeted tests passed: seven new SalonTipsLanguageTest and 12 existing holdings
+language/diagnostic tests. Coverage includes a live open dialog across all four
+languages, input/cursor retention, preset/currency behavior, out-of-order reads,
+failed/malformed previews, authored incoming content and exact transport arguments.
+Release Java compilation passed (20 seconds together with the tests).
+All 21 pinned imports reproduce. All 6828 messages validate in four languages.
+Canonical/generated tests match and staged whitespace checks pass.
+Logs: build/localization/salon-tips-{tests,import}.log.
+
+Verdict: Approve this presentation change. No blocking findings within its scope.
+Initial claim/mint and full backup/outbox ownership audits, final integration/device
+acceptance and signed release builds remain part of the active overall goal.
+No version bump, APK installation, publication or live token operation occurred.
