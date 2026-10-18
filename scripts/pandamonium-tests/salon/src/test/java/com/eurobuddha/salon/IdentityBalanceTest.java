@@ -73,4 +73,19 @@ public class IdentityBalanceTest {
     private static Object get(MainActivity activity,String name) throws Exception {
         Field f=MainActivity.class.getDeclaredField(name);f.setAccessible(true);return f.get(activity);
     }
+    @Test public void sparesReuseCompleteParserAndDeduplicateCaseInsensitively() throws Exception {
+        String spare="0x"+"cd".repeat(32),upper="0x"+"CD".repeat(32);
+        JSONObject input=reply(new JSONArray().put(row(meta())).put(row(meta().toString()).put("tokenid",spare))
+                .put(row(meta()).put("tokenid",upper)).put(row("Minima").put("tokenid","0x00")));
+        String original=input.toString();assertEquals(Collections.singletonList(spare),IdentityBalance.spares(input,"0x"+"AB".repeat(32)));assertEquals(original,input.toString());
+    }
+    @Test public void invalidActiveOrNativeIdentityOrLaterRowPreventsAllCleanup() throws Exception {
+        JSONObject good=reply(new JSONArray().put(row(meta())));
+        for(String keep:new String[]{null,"","0x00","0x0000","bad","0xaa address:evil"})
+            assertThrows(IllegalArgumentException.class,()->IdentityBalance.spares(good,keep));
+        for(JSONObject bad:new JSONObject[]{reply(new JSONArray().put(row(meta())).put(JSONObject.NULL)),
+                reply(new JSONArray().put(row(meta()).put("tokenid","0x00"))),
+                reply(new JSONArray().put(row(meta()).put("tokenid","0xaa;send"))),
+                good.put("status",false)}) assertThrows(IllegalArgumentException.class,()->IdentityBalance.spares(bad,ID));
+    }
 }

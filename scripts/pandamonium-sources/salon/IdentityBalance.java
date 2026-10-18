@@ -8,10 +8,17 @@ import org.json.JSONObject;
 final class IdentityBalance {
     private IdentityBalance() {}
     static JSONObject find(JSONObject reply, String handle) {
+        for (JSONObject row : all(reply))
+            if (handle == null || handle.equals(row.optJSONObject("token").optString("handle"))) return row;
+        return null;
+    }
+
+    /** Use the same complete lookup for adoption and spare-identity cleanup. */
+    private static java.util.List<JSONObject> all(JSONObject reply) {
         if (reply == null || !Boolean.TRUE.equals(reply.opt("status"))) throw invalid();
         JSONArray rows = reply.optJSONArray("response");
         if (rows == null) throw invalid();
-        JSONObject found = null;
+        java.util.List<JSONObject> found = new java.util.ArrayList<>();
         for (int i=0; i<rows.length(); i++) {
             JSONObject row = rows.optJSONObject(i);
             if (row == null || !(row.opt("tokenid") instanceof String)
@@ -21,15 +28,24 @@ final class IdentityBalance {
             JSONObject meta = asObject(token);
             if (meta == null || !"1".equals(meta.optString("salon"))) continue;
             if (!(meta.opt("handle") instanceof String) || meta.optString("handle").isEmpty()) throw invalid();
-            if (found == null && (handle == null || handle.equals(meta.optString("handle")))) {
-                try {
-                    // Normalize serialized metadata for the existing adoption caller without changing the reply.
-                    found = new JSONObject(row.toString()).put("token", meta);
-                } catch (org.json.JSONException malformed) { throw invalid(); }
-            }
+            try {
+                // Normalize serialized metadata without changing the reply.
+                found.add(new JSONObject(row.toString()).put("token", meta));
+            } catch (org.json.JSONException malformed) { throw invalid(); }
         }
         return found;
     }
+    static java.util.List<String> spares(JSONObject reply, String keep) {
+        if (!Args.isTokenId(keep) || new java.math.BigInteger(keep.substring(2), 16).signum() == 0) throw invalid();
+        java.util.Map<String, String> ids = new java.util.LinkedHashMap<>();
+        for (JSONObject row : all(reply)) {
+            String id = row.optString("tokenid");
+            if (new java.math.BigInteger(id.substring(2), 16).signum() == 0) throw invalid();
+            if (!id.equalsIgnoreCase(keep)) ids.putIfAbsent(id.toLowerCase(java.util.Locale.ROOT), id);
+        }
+        return new java.util.ArrayList<>(ids.values());
+    }
+
     private static JSONObject asObject(Object value) {
         if (value == null || value == JSONObject.NULL) return null;
         if (value instanceof JSONObject) return (JSONObject) value;

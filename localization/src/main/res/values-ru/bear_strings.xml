@@ -8290,4 +8290,19 @@
     <string name="l10n_salon_restore_unavailable" formatted="false">"Восстановление страницы недоступно. Откройте Salon заново и повторите попытку."</string>
     <string name="l10n_salon_restore_invalid" formatted="false">"Размещённая страница содержит некорректные данные или принадлежит другой личности. Ничего не восстановлено."</string>
     <string name="l10n_salon_setup_blossom_ready" formatted="false">"Хостинг Blossom готов. Теперь можно зарегистрировать своё имя."</string>
+    <string name="l10n_salon_spares_node" formatted="false">"Подключите узел перед проверкой лишних идентификаторов."</string>
+    <string name="l10n_salon_spares_busy" formatted="false">"Удаление лишних идентификаторов уже выполняется."</string>
+    <string name="l10n_salon_spares_identity" formatted="false">"Для проверки лишних токенов нужен действующий активный идентификатор."</string>
+    <string name="l10n_salon_spares_lookup" formatted="false">"Не удалось проверить полный баланс кошелька. Запрос на сжигание не отправлен."</string>
+    <string name="l10n_salon_spares_empty" formatted="false">"Лишних токенов идентификаторов не найдено."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_spares_title">"Сжечь лишние токены идентификаторов (%1$d)?"</string>
+    <!-- Arguments: identity, tokens -->
+    <string name="l10n_salon_spares_confirm">"Ваш активный идентификатор будет сохранён:\n%1$s\n\nЭти лишние токены будут отправлены на адрес без возможности расходования. Это необратимо.\n\n%2$s"</string>
+    <string name="l10n_salon_spares_burn" formatted="false">"Сжечь"</string>
+    <string name="l10n_salon_spares_changed" formatted="false">"Аккаунт, узел или экран изменились. Перед сжиганием проверьте лишние токены заново."</string>
+    <!-- Arguments: token -->
+    <string name="l10n_salon_spares_submitted">"Запрос на сжигание %1$s отправлен. Ожидается подтверждение."</string>
+    <!-- Arguments: token -->
+    <string name="l10n_salon_spares_unknown">"Результат сжигания %1$s не подтверждён. Проверьте узел перед повторной попыткой."</string>
 </resources>

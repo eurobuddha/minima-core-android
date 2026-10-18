@@ -1,0 +1,58 @@
+Salon spare-identity cleanup review — 2026-10-18
+
+Summary
+The existing spare-token cleanup now validates the complete balance snapshot,
+protects the active identity against stale confirmations, and uses the manual
+four-language selection for its dialog and results. The existing send amount and
+GRAVEYARD constant are unchanged. The user explicitly approved code changes and
+mocked tests only; no live token operation was performed.
+
+Sources reused
+- Original standalone Salon MainActivity burnSpares/burnOne, including the existing
+  one-unit send command and graveyard destination.
+- IdentityBalance's complete status/row/type validation and serialized-token parser,
+  already used by identity adoption. find now consumes the shared validated list;
+  the new spare-list method deduplicates and excludes the active ID ignoring case.
+- Args.isTokenId, backupOwner and SalonStore.identityRecord. The backupOwner overload
+  accepts a captured record so the protected token and owner come from one snapshot.
+- Atelier burial-ui.inc/burial-flow.inc ownership/lifecycle checks. Salon retains its
+  existing high-level send; Atelier's StateNFT transaction construction is not copied.
+- Shared LanguageDialog and existing language message bindings/plural infrastructure.
+
+Findings resolved
+1. Invalid IDs could reach string-built commands. Complete validation now rejects
+   malformed rows/IDs and a native zero-token identity before showing confirmation.
+2. Serialized metadata was skipped. The same parser as adoption now normalizes it.
+3. An old confirmation could burn a newly active identity. Account, messaging-key
+   identity, node instance, connection and screen generation are checked again at
+   confirmation and immediately before dispatch. Navigation/destruction cancel the
+   retained operation and dismiss the dialog.
+4. Duplicate lookup replies, taps and post callbacks could repeat or misreport work.
+   Each operation/confirmation/result is consumed once; pending batch results keep
+   the operation busy until every dispatched callback has completed.
+5. English-only warnings and outcomes now use English, Simplified Chinese, Russian
+   and Ukrainian. The open dialog retains IDs and listeners when language changes.
+   Successful command acceptance is described as submitted, confirmation pending.
+   Rejected/malformed/timed-out outcomes are unconfirmed; there is no automatic retry.
+
+Validation
+- 35 targeted tests passed: ten new mocked-node cleanup tests, seven identity lookup
+  tests (two new parser cases), and 18 existing backup lifecycle tests.
+- Full Salon suite: 267 tests passed, zero failures/errors/skips (37 seconds).
+- Release Java compilation passed (22 seconds with targeted tests).
+- All 21 pinned imports reproduce the canonical adapter, sources and tests.
+- All 6813 messages validate in four languages. Whitespace checks pass.
+- Tests inspect actual dialogs while switching languages, exact captured commands,
+  zero sends before confirmation, changed identity/key/node/screen, malformed later
+  rows, serialized metadata, native-token rejection, duplicate callbacks/taps,
+  cancellation, finishing Activity, synchronous errors and truthful result messages.
+- NodeApi is mocked throughout cleanup tests. No private wallet or live node is used.
+- Logs: build/localization/salon-spares-{tests,full,import}.log.
+
+Limitations
+An already dispatched command cannot be cancelled by leaving the screen. This
+change does not claim on-chain confirmation or add transaction retry/recovery.
+Physical-device acceptance and the remaining Atelier/Salon integration audit are
+still required. No app version change, APK installation or publication occurred.
+
+Verdict: Approve. No unresolved blocking findings within this change.

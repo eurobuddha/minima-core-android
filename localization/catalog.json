@@ -41350,5 +41350,71 @@
     "zh-Hans": "Blossom 托管已就绪。您现在可以申领用户名。",
     "ru": "Хостинг Blossom готов. Теперь можно зарегистрировать своё имя.",
     "uk": "Хостинг Blossom готовий. Тепер можна зареєструвати своє ім’я."
+  },
+  "salonSpares.node": {
+    "en": "Connect the node before checking spare identities.",
+    "zh-Hans": "请先连接节点，再检查多余身份。",
+    "ru": "Подключите узел перед проверкой лишних идентификаторов.",
+    "uk": "Підключіть вузол перед перевіркою зайвих ідентифікаторів."
+  },
+  "salonSpares.busy": {
+    "en": "Spare-identity cleanup is already in progress.",
+    "zh-Hans": "正在清理多余身份，请稍候。",
+    "ru": "Удаление лишних идентификаторов уже выполняется.",
+    "uk": "Видалення зайвих ідентифікаторів уже триває."
+  },
+  "salonSpares.identity": {
+    "en": "A valid active identity is required before checking spare tokens.",
+    "zh-Hans": "检查多余代币前，必须有有效的当前身份。",
+    "ru": "Для проверки лишних токенов нужен действующий активный идентификатор.",
+    "uk": "Для перевірки зайвих токенів потрібен чинний активний ідентифікатор."
+  },
+  "salonSpares.lookup": {
+    "en": "Could not verify the complete wallet balance. No burn was submitted.",
+    "zh-Hans": "无法验证完整的钱包余额。未提交销毁请求。",
+    "ru": "Не удалось проверить полный баланс кошелька. Запрос на сжигание не отправлен.",
+    "uk": "Не вдалося перевірити повний баланс гаманця. Запит на спалення не надіслано."
+  },
+  "salonSpares.empty": {
+    "en": "No spare identity tokens were found.",
+    "zh-Hans": "未找到多余的身份代币。",
+    "ru": "Лишних токенов идентификаторов не найдено.",
+    "uk": "Зайвих токенів ідентифікаторів не знайдено."
+  },
+  "salonSpares.title": {
+    "en": "Burn spare identity tokens ({count})?",
+    "zh-Hans": "销毁多余的身份代币（{count} 个）？",
+    "ru": "Сжечь лишние токены идентификаторов ({count})?",
+    "uk": "Спалити зайві токени ідентифікаторів ({count})?"
+  },
+  "salonSpares.confirm": {
+    "en": "Your active identity will be kept:\n{identity}\n\nThese spare tokens will be sent to the unspendable graveyard. This is irreversible.\n\n{tokens}",
+    "zh-Hans": "将保留您的当前身份：\n{identity}\n\n以下多余代币将发送到无法支出的墓地地址。此操作不可撤销。\n\n{tokens}",
+    "ru": "Ваш активный идентификатор будет сохранён:\n{identity}\n\nЭти лишние токены будут отправлены на адрес без возможности расходования. Это необратимо.\n\n{tokens}",
+    "uk": "Ваш активний ідентифікатор буде збережено:\n{identity}\n\nЦі зайві токени буде надіслано на адресу без можливості витрачання. Це незворотно.\n\n{tokens}"
+  },
+  "salonSpares.burn": {
+    "en": "Burn",
+    "zh-Hans": "销毁",
+    "ru": "Сжечь",
+    "uk": "Спалити"
+  },
+  "salonSpares.changed": {
+    "en": "The account, node or screen changed. Check the spare tokens again before burning.",
+    "zh-Hans": "账户、节点或页面已更改。销毁前请重新检查多余代币。",
+    "ru": "Аккаунт, узел или экран изменились. Перед сжиганием проверьте лишние токены заново.",
+    "uk": "Обліковий запис, вузол або екран змінилися. Перед спаленням перевірте зайві токени знову."
+  },
+  "salonSpares.submitted": {
+    "en": "Burn submitted for {token}. Confirmation is pending.",
+    "zh-Hans": "已提交 {token} 的销毁请求，等待确认。",
+    "ru": "Запрос на сжигание {token} отправлен. Ожидается подтверждение.",
+    "uk": "Запит на спалення {token} надіслано. Очікується підтвердження."
+  },
+  "salonSpares.unknown": {
+    "en": "Burn outcome for {token} is unconfirmed. Check the node before trying again.",
+    "zh-Hans": "无法确认 {token} 的销毁结果。重试前请检查节点。",
+    "ru": "Результат сжигания {token} не подтверждён. Проверьте узел перед повторной попыткой.",
+    "uk": "Результат спалення {token} не підтверджено. Перевірте вузол перед повторною спробою."
   }
 }

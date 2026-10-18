@@ -850,8 +850,9 @@ public class MainActivity extends AppCompatActivity {
     private BackupOperation backupOperation;
     private volatile boolean backupClosed;
 
-    private String backupOwner() {
-        JSONObject record = SalonStore.identityRecord(this);
+    private String backupOwner() { return backupOwner(SalonStore.identityRecord(this)); }
+
+    private String backupOwner(JSONObject record) {
         return new JSONArray().put(record.optString("tokenid")).put(record.optString("handle"))
                 .put(record.optString("msgpk")).put(record.optString("msgseed")).toString();
     }
@@ -1251,6 +1252,7 @@ public class MainActivity extends AppCompatActivity {
         cancelBackup();
         cancelPublication();
         cancelHostedRestore();
+        cancelSpareBurn();
         io.shutdownNow();
         stopAudio();
         videoRequest++;
@@ -1306,7 +1308,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void go(Screen s) {
-        if (screen != s) { cancelMediaRequests(); cancelPublication(); cancelHostedRestore(); }
+        if (screen != s) { cancelMediaRequests(); cancelPublication(); cancelHostedRestore(); cancelSpareBurn(); }
         if (screen == Screen.EDIT && s != Screen.EDIT) commitEditFields();   // preserve the draft when leaving Edit
         screen = s; render();
     }
@@ -3259,42 +3261,107 @@ public class MainActivity extends AppCompatActivity {
         catch (RuntimeException unavailable) { result.done(false, ""); }
     }
 
-    /** Burn any salon identity token that ISN'T your active one (e.g. a spare from
-     *  an old double-mint) — sent to the unspendable graveyard. Never touches the
-     *  token in SalonStore, so your live identity is always safe. */
-    private void burnSpares() {
-        if (!nodeUp) { toast("Need the node connected."); return; }
-        final String keep = SalonStore.get(this, "tokenid");
-        if (keep.isEmpty()) { toast("No active identity — nothing to compare against."); return; }   // never bury everything
-        node.cmd("balance", new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) {
-                final List<String> spares = new ArrayList<>();
-                JSONArray arr = j.optJSONArray("response");
-                if (arr != null) for (int i = 0; i < arr.length(); i++) {
-                    JSONObject t = arr.optJSONObject(i); if (t == null) continue;
-                    JSONObject meta = t.optJSONObject("token"); if (meta == null) continue;
-                    if ("1".equals(meta.optString("salon"))) { String tid = t.optString("tokenid"); if (!tid.equalsIgnoreCase(keep) && !spares.contains(tid)) spares.add(tid); }
-                }
-                runOnUiThread(() -> {
-                    if (spares.isEmpty()) { toast("No spare identity tokens — nothing to burn."); return; }
-                    StringBuilder sb = new StringBuilder();
-                    for (String s : spares) sb.append("• ").append(s).append("\n");
-                    new android.app.AlertDialog.Builder(MainActivity.this)
-                            .setTitle("Burn " + spares.size() + " spare token(s)?")
-                            .setMessage("Your active identity " + Util.shorten(keep) + " is KEPT. These other salon tokens go to the unspendable graveyard — irreversible:\n\n" + sb)
-                            .setPositiveButton("Burn", (d, w) -> { for (String tid : spares) burnOne(tid); })
-                            .setNegativeButton("Cancel", null).show();
-                });
-            }
-            @Override public void onError(String m) { runOnUiThread(() -> toast("Balance failed: " + m)); }
-        });
+    private static final class SpareBurn {
+        final String owner, keep;
+        final int epoch;
+        final NodeApi node;
+        boolean lookedUp, submitted;
+        int pending;
+        androidx.appcompat.app.AlertDialog dialog;
+        SpareBurn(String owner, String keep, int epoch, NodeApi node) {
+            this.owner = owner; this.keep = keep; this.epoch = epoch; this.node = node;
+        }
+    }
+    private SpareBurn spareBurn;
+
+    private boolean spareBurnCurrent(SpareBurn op) {
+        if (spareBurn != op || isFinishing() || isDestroyed() || op.epoch != renderEpoch
+                || node != op.node || !nodeUp) return false;
+        try { return op.owner.equals(backupOwner()); }
+        catch (Exception unavailable) { return false; }
     }
 
-    private void burnOne(final String tid) {
-        node.cmd("send amount:1 tokenid:" + tid + " address:" + GRAVEYARD, new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) { runOnUiThread(() -> toast(j.optBoolean("status", false) ? "Burn sent, mining: " + Util.shorten(tid) : "Burn failed: " + j.optString("error", ""))); }
-            @Override public void onError(String m) { runOnUiThread(() -> toast("Burn error: " + m)); }
-        });
+    private void cancelSpareBurn() {
+        SpareBurn op = spareBurn;
+        spareBurn = null;
+        if (op != null && op.dialog != null) op.dialog.dismiss();
+    }
+
+    private void spareBurnNotice(SpareBurn op, CharSequence message) {
+        if (spareBurnCurrent(op)) toast(message);
+    }
+
+    /** Confirm only validated spare identities, retaining the original amount/destination. */
+    private void burnSpares() {
+        if (isFinishing() || isDestroyed()) return;
+        if (!nodeUp || node == null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_node)); return; }
+        if (spareBurn != null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_busy)); return; }
+        final SpareBurn op;
+        try {
+            JSONObject me = SalonStore.identityRecord(this);
+            String keep = me.optString("tokenid");
+            if (!Args.isTokenId(keep) || new java.math.BigInteger(keep.substring(2), 16).signum() == 0) {
+                toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_identity)); return;
+            }
+            op = new SpareBurn(backupOwner(me), keep, renderEpoch, node);
+        } catch (Exception unavailable) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_identity)); return; }
+        spareBurn = op;
+        NodeApi.Cb result = new NodeApi.Cb() {
+            @Override public void onResult(JSONObject reply) { runOnUiThread(() -> showSpareBurn(op, reply)); }
+            @Override public void onError(String ignored) { runOnUiThread(() -> showSpareBurn(op, null)); }
+        };
+        try { op.node.cmd("balance", result); } catch (RuntimeException unavailable) { result.onError(""); }
+    }
+
+    private void showSpareBurn(SpareBurn op, JSONObject reply) {
+        if (spareBurn != op || op.lookedUp) return;
+        op.lookedUp = true;
+        if (!spareBurnCurrent(op)) { cancelSpareBurn(); return; }
+        final List<String> spares;
+        try { spares = IdentityBalance.spares(reply, op.keep); }
+        catch (RuntimeException unavailable) { spareBurnNotice(op, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_lookup)); cancelSpareBurn(); return; }
+        if (spares.isEmpty()) { spareBurnNotice(op, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_empty)); cancelSpareBurn(); return; }
+        StringBuilder ids = new StringBuilder();
+        for (String id : spares) ids.append("• ").append(id).append("\n");
+        op.dialog = new com.eurobuddha.minimacore.i18n.LanguageDialog(this)
+                .setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_title, spares.size()))
+                .setMessage(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_confirm, op.keep, ids.toString()))
+                .setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_burn), (d, which) -> submitSpareBurn(op, spares))
+                .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel), null).create();
+        op.dialog.setOnDismissListener(d -> { if (spareBurn == op && !op.submitted) spareBurn = null; });
+        op.dialog.show();
+    }
+
+    private void submitSpareBurn(SpareBurn op, List<String> spares) {
+        if (spareBurn != op || op.submitted) return;
+        if (!spareBurnCurrent(op)) {
+            if (!isFinishing() && !isDestroyed()) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_changed));
+            cancelSpareBurn(); return;
+        }
+        op.submitted = true;
+        op.pending = spares.size();
+        for (String tid : spares) {
+            // Recheck immediately before dispatch. Already dispatched sends cannot be cancelled.
+            if (!spareBurnCurrent(op) || tid.equalsIgnoreCase(SalonStore.get(this, "tokenid"))) {
+                cancelSpareBurn(); return;
+            }
+            final boolean[] received = {false};
+            NodeApi.Cb result = new NodeApi.Cb() {
+                private void finish(JSONObject reply) {
+                    runOnUiThread(() -> {
+                        if (received[0]) return;
+                        received[0] = true;
+                        if (reply != null && Boolean.TRUE.equals(reply.opt("status"))) spareBurnNotice(op, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_submitted, tid));
+                        else spareBurnNotice(op, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_spares_unknown, tid));
+                        if (--op.pending == 0 && spareBurn == op) spareBurn = null;
+                    });
+                }
+                @Override public void onResult(JSONObject reply) { finish(reply); }
+                @Override public void onError(String ignored) { finish(null); }
+            };
+            try { op.node.cmd("send amount:1 tokenid:" + tid + " address:" + GRAVEYARD, result); }
+            catch (RuntimeException unavailable) { result.onError(""); }
+        }
     }
 
     /* ================= SETTINGS + HOSTING (unchanged) ================= */

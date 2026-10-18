@@ -20,9 +20,8 @@ pass. Logs: build/localization/salon-notices-{tests,import}.log.
 
 Verdict: Approve this display-only change. No blocking findings.
 
-Separate pending item
-The existing spare-token cleanup needs validation, ownership guards and translated
-feedback. Automatic approval review rejected changing that irreversible-transfer
-flow without explicit permission. No implementation was made. The proposal is in
-SALON_SPARE_CLEANUP_PROPOSAL.txt and the user's approval question is pending.
+Separate cleanup change
+The existing spare-token cleanup was awaiting explicit permission at this display
+checkpoint. The user subsequently approved code changes and mocked tests only;
+see SALON_SPARE_CLEANUP_REVIEW.txt for the implemented protections and validation.
 The overall Atelier/Salon integration goal remains incomplete.

@@ -8218,4 +8218,19 @@
     <string name="l10n_salon_restore_unavailable" formatted="false">"Page restore is unavailable. Reopen Salon and try again."</string>
     <string name="l10n_salon_restore_invalid" formatted="false">"The hosted page has invalid content or belongs to another identity. Nothing was restored."</string>
     <string name="l10n_salon_setup_blossom_ready" formatted="false">"Blossom hosting is ready. You can now claim your handle."</string>
+    <string name="l10n_salon_spares_node" formatted="false">"Connect the node before checking spare identities."</string>
+    <string name="l10n_salon_spares_busy" formatted="false">"Spare-identity cleanup is already in progress."</string>
+    <string name="l10n_salon_spares_identity" formatted="false">"A valid active identity is required before checking spare tokens."</string>
+    <string name="l10n_salon_spares_lookup" formatted="false">"Could not verify the complete wallet balance. No burn was submitted."</string>
+    <string name="l10n_salon_spares_empty" formatted="false">"No spare identity tokens were found."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_spares_title">"Burn spare identity tokens (%1$d)?"</string>
+    <!-- Arguments: identity, tokens -->
+    <string name="l10n_salon_spares_confirm">"Your active identity will be kept:\n%1$s\n\nThese spare tokens will be sent to the unspendable graveyard. This is irreversible.\n\n%2$s"</string>
+    <string name="l10n_salon_spares_burn" formatted="false">"Burn"</string>
+    <string name="l10n_salon_spares_changed" formatted="false">"The account, node or screen changed. Check the spare tokens again before burning."</string>
+    <!-- Arguments: token -->
+    <string name="l10n_salon_spares_submitted">"Burn submitted for %1$s. Confirmation is pending."</string>
+    <!-- Arguments: token -->
+    <string name="l10n_salon_spares_unknown">"Burn outcome for %1$s is unconfirmed. Check the node before trying again."</string>
 </resources>

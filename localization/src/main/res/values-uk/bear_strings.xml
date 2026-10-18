@@ -8290,4 +8290,19 @@
     <string name="l10n_salon_restore_unavailable" formatted="false">"Відновлення сторінки недоступне. Відкрийте Salon знову та повторіть спробу."</string>
     <string name="l10n_salon_restore_invalid" formatted="false">"Розміщена сторінка містить некоректні дані або належить іншій особі. Нічого не відновлено."</string>
     <string name="l10n_salon_setup_blossom_ready" formatted="false">"Хостинг Blossom готовий. Тепер можна зареєструвати своє ім’я."</string>
+    <string name="l10n_salon_spares_node" formatted="false">"Підключіть вузол перед перевіркою зайвих ідентифікаторів."</string>
+    <string name="l10n_salon_spares_busy" formatted="false">"Видалення зайвих ідентифікаторів уже триває."</string>
+    <string name="l10n_salon_spares_identity" formatted="false">"Для перевірки зайвих токенів потрібен чинний активний ідентифікатор."</string>
+    <string name="l10n_salon_spares_lookup" formatted="false">"Не вдалося перевірити повний баланс гаманця. Запит на спалення не надіслано."</string>
+    <string name="l10n_salon_spares_empty" formatted="false">"Зайвих токенів ідентифікаторів не знайдено."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_salon_spares_title">"Спалити зайві токени ідентифікаторів (%1$d)?"</string>
+    <!-- Arguments: identity, tokens -->
+    <string name="l10n_salon_spares_confirm">"Ваш активний ідентифікатор буде збережено:\n%1$s\n\nЦі зайві токени буде надіслано на адресу без можливості витрачання. Це незворотно.\n\n%2$s"</string>
+    <string name="l10n_salon_spares_burn" formatted="false">"Спалити"</string>
+    <string name="l10n_salon_spares_changed" formatted="false">"Обліковий запис, вузол або екран змінилися. Перед спаленням перевірте зайві токени знову."</string>
+    <!-- Arguments: token -->
+    <string name="l10n_salon_spares_submitted">"Запит на спалення %1$s надіслано. Очікується підтвердження."</string>
+    <!-- Arguments: token -->
+    <string name="l10n_salon_spares_unknown">"Результат спалення %1$s не підтверджено. Перевірте вузол перед повторною спробою."</string>
 </resources>

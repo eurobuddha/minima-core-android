@@ -1,4 +1,4 @@
-Salon spare-identity cleanup — proposed change awaiting authorization
+Salon spare-identity cleanup — approved code change
 
 Current code
 integrated/salon/src/main/java/com/eurobuddha/salon/MainActivity.java:
@@ -13,7 +13,7 @@ Observed problems
   Args validation. Serialized token metadata is skipped, unlike identity adoption.
 - Dialog and outcome messages are English only.
 
-Proposed implementation
+Approved implementation
 1. Expose the existing IdentityBalance parser's complete validated row list to
    both adoption and cleanup. Preserve find's behavior; add a spare-list operation
    that excludes the active identity case-insensitively, deduplicates token IDs and
@@ -39,5 +39,6 @@ cancelled by leaving the screen. This proposal changes code and local tests only
 it does not authorize executing a cleanup against a user's real wallet.
 
 Status
-Automatic approval review rejected implementation pending explicit user permission.
-No source change or transaction has been performed for this proposal.
+The user explicitly approved code changes and mocked tests only on 2026-10-18.
+Implementation and validation are recorded in SALON_SPARE_CLEANUP_REVIEW.txt.
+No live transaction, installation or publication was performed.

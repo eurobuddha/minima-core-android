@@ -14,8 +14,9 @@
     private BackupOperation backupOperation;
     private volatile boolean backupClosed;
 
-    private String backupOwner() {
-        JSONObject record = SalonStore.identityRecord(this);
+    private String backupOwner() { return backupOwner(SalonStore.identityRecord(this)); }
+
+    private String backupOwner(JSONObject record) {
         return new JSONArray().put(record.optString("tokenid")).put(record.optString("handle"))
                 .put(record.optString("msgpk")).put(record.optString("msgseed")).toString();
     }
