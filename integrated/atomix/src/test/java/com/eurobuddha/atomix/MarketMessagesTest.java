@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 public class MarketMessagesTest {
  static JSONObject source()throws Exception{return new JSONObject(new String(java.nio.file.Files.readAllBytes(java.nio.file.Path.of("../../localization/atomix-market-messages.json")),java.nio.charset.StandardCharsets.UTF_8));}
  @Test public void fixedStatusesResolveWithoutChangingStoredStrings()throws Exception{
-  JSONObject fixed=source().getJSONObject("fixed");assertEquals(6,fixed.length());
+  JSONObject fixed=source().getJSONObject("fixed");assertEquals(8,fixed.length());
   for(Iterator<String>it=fixed.keys();it.hasNext();){String raw=it.next();Object value=MarketMessages.message(raw);assertTrue(value instanceof Language.Message);assertEquals(AtomixMessagesTest.resource(fixed.getString(raw)),AtomixMessagesTest.field(value,"resource"));}
  }
  @Test public void allTemplatesPreservePublicAndDiagnosticArguments()throws Exception{

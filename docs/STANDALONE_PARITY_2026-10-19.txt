@@ -10,7 +10,7 @@ No APK has been installed or published during this overnight propagation work.
 Current standalone checkpoints
 App / version (code) / repair commit / JVM tests at latest checkpoint
 ETH Wallet       0.2.9 (209)   c1fb535 28 debug +28 release
-AtomiX           0.1.76 (176)  ccd813a 292 debug +292 release
+AtomiX           0.1.77 (177)  2aa2de8 308 debug +308 release
 PandaPools       0.9.67 (967)  2f39f65              303
 Future Cash Next 0.1.9 (109)   ee080af              49
 PandaDEX         0.4.23 (423)  fbe0645              712
@@ -118,9 +118,9 @@ Only Fold R3GL805K7MB may be used when it returns; no other phone is authorized.
 Reproducibility
 All22 staging sources are detached at exact integrated/sources.lock.json revisions.
 Atelier uses its pinned parent worktree plus Android subdirectory link. No lock
-revision was silently advanced. Main source checkpoint1.9.115/code186: AtomiX manual-send context repair.
+revision was silently advanced. Main source checkpoint1.9.116/code187: AtomiX exhausted-maker funding repair.
 Latest all22 snapshot/provenance verification passes after the standalone ports.
-Language check:6891 messages in English, Chinese, Russian and Ukrainian passes.
+Language check:6893 messages in English, Chinese, Russian and Ukrainian passes.
 Transport check:all bundled clients use DirectNodeApi; no internal IPC relay,
 notification receiver, secondary process or whole-package reset remains.
 Main latest full signed APK is still1.9.101; do not label it2.0.0.
@@ -136,3 +136,16 @@ AtomiX manual sends now freeze the reviewed owner, RPC, token and fee, invalidat
 stale/cancelled preflight and Max work, and show the actual rounded token amount.
 Integrated four-language confirmation/diagnostics tested. Durable ETH recovery
 and full parity remain open; see the full review report.
+
+AtomiX exhausted-maker repair: final Minima/mxUSDT ask publication validates live
+funds and bounded mempool-filtered coins, reserves postage, removes unbacked asks
+(including a single5000 level) and refuses failed reads. Received old zero-backed
+ladders are filtered. Native/embedded regression suites and signed candidate pass.
+
+Next continuation: unfinished UTXO history evidence/recovery work was saved before
+prioritizing the user's AtomiX report. Checked snapshot and manifest live under
+build/localization/utxo-history-wip. Task-owned UTXO sources were restored to their
+pushed checkpoint; unrelated graph work preserved. Reapply those14 files only,
+restore the saved adapter registration, bump the next main version, add complete
+history/migration/recovery tests, review and then commit. This WIP has not passed
+behavioral tests and is not release-ready. It is not full prepared-journal parity.

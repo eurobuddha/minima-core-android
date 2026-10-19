@@ -8405,4 +8405,6 @@
     <string name="l10n_atomix_send_token_balance" formatted="false">"Ця сума перевищує баланс USDT у гаманці."</string>
     <string name="l10n_atomix_send_gas_balance" formatted="false">"Для надсилання USDT потрібен ETH на комісію — спочатку поповніть гаманець ETH."</string>
     <string name="l10n_atomix_send_fee_cap" formatted="false">"Комісія Ethereum виходить за безпечні межі. Перевірте RPC-сервер."</string>
+    <string name="l10n_atomix_market_funds_unverified" formatted="false">"Помилка публікації: не вдалося перевірити доступні кошти. Ордер не оновлено."</string>
+    <string name="l10n_atomix_market_update_funds_unverified" formatted="false">"Помилка оновлення: не вдалося перевірити доступні кошти. Ордер не оновлено."</string>
 </resources>

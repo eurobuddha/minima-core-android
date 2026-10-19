@@ -23,6 +23,8 @@ public final class MarketMessages {
             case "✓ Order updated": return Language.msg(l10n_atomix_market_updated);
             case "✓ Order withdrawn — removed from the book": return Language.msg(l10n_atomix_market_withdrawn);
             case "✓ Order published — auto-refreshes every 30 min": return Language.msg(l10n_atomix_market_published);
+            case "Publish failed: Could not verify spendable funds. Order was not refreshed.": return Language.msg(l10n_atomix_market_funds_unverified);
+            case "Update failed: Could not verify spendable funds. Order was not refreshed.": return Language.msg(l10n_atomix_market_update_funds_unverified);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {

@@ -161,6 +161,30 @@ public final class Order {
         if (p.asks.isEmpty()) p.buy = 0;
     }
 
+    /** Reuse checkLadderCoins' best-price prefix and trimAsks' scalar suppression at final publication.
+     *  Exact decimal accounting: a tolerance must not fund an otherwise unbacked tranche.
+     *  Only the outgoing/received order is changed; saved market configuration is left intact. */
+    public void clampAsksToBalance(java.math.BigDecimal available) {
+        if(available==null||available.signum()<0)available=java.math.BigDecimal.ZERO;
+        java.math.BigDecimal remaining=available;
+        for(Map.Entry<String,Pair> entry:pairs.entrySet()) {
+            Pair pair=entry.getValue();if(pair==null||!pair.enable)continue;
+            sanitize(pair);
+            if(!pair.asks.isEmpty()) {
+                int keep=0;
+                for(Level level:pair.asks) {
+                    java.math.BigDecimal size=java.math.BigDecimal.valueOf(level.amount);
+                    if(level.amount<pair.min||size.compareTo(remaining)>0)break;
+                    remaining=remaining.subtract(size);keep++;
+                }
+                trimAsks(entry.getKey(),keep);
+            } else if(validPos(pair.buy)) {
+                if(remaining.signum()==0||remaining.compareTo(java.math.BigDecimal.valueOf(Math.max(0,pair.min)))<0)pair.buy=0;
+                else remaining=java.math.BigDecimal.ZERO;
+            }
+        }
+    }
+
     // ---- (de)serialization — ONE pair codec shared by the signed wire format AND the local config ----
 
     /** Pair → JSON. Always writes en/buy/sell/min (0.8.x compat) + bids/asks when present. */
@@ -239,6 +263,7 @@ public final class Order {
                 if (v != null) r.pairs.put(k, pairFromJson(v, 0));
             }
         }
+        r.clampAsksToBalance(java.math.BigDecimal.valueOf(r.minimaAvail));
         return r;
     }
 

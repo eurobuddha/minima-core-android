@@ -8405,4 +8405,6 @@
     <string name="l10n_atomix_send_token_balance" formatted="false">"Эта сумма превышает баланс USDT в кошельке."</string>
     <string name="l10n_atomix_send_gas_balance" formatted="false">"Для отправки USDT нужен ETH на комиссию — сначала пополните кошелёк ETH."</string>
     <string name="l10n_atomix_send_fee_cap" formatted="false">"Комиссия Ethereum выходит за безопасные пределы. Проверьте RPC-сервер."</string>
+    <string name="l10n_atomix_market_funds_unverified" formatted="false">"Ошибка публикации: не удалось проверить доступные средства. Ордер не обновлён."</string>
+    <string name="l10n_atomix_market_update_funds_unverified" formatted="false">"Ошибка обновления: не удалось проверить доступные средства. Ордер не обновлён."</string>
 </resources>

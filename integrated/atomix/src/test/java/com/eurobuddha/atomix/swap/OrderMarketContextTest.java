@@ -88,8 +88,9 @@ public class OrderMarketContextTest {
         final CommsTransport.SendCb result = mock(CommsTransport.SendCb.class);
         void fresh(long gen) { SwapOrderBook.publishFresh(node, sodium, identity, order, gen, result); }
         void balance(boolean ok) throws Exception {
-            if (ok) callbacks.get(0).onResult(new JSONObject().put("response", new JSONArray().put(new JSONObject().put("sendable", "12.5"))));
+            if (ok) callbacks.get(0).onResult(new JSONObject().put("status",true).put("response", new JSONArray().put(new JSONObject().put("tokenid",TradingContext.active().tokenId).put("coins","1").put("sendable", "12.5"))));
             else callbacks.get(0).onError("balance unavailable");
+            if(ok&&callbacks.size()>1)callbacks.get(1).onResult(new JSONObject().put("status",true).put("response",new JSONArray().put(new JSONObject().put("coinid","0x"+"ab".repeat(32)).put("tokenid",TradingContext.active().tokenId).put("amount","12.5").put("tokenamount","12.5"))));
         }
         void reject() { verify(result).onFailed(SwapOrderBook.MARKET_ERROR); verify(result, never()).onSent(anyString()); }
     }
@@ -121,13 +122,13 @@ public class OrderMarketContextTest {
             }
         }
     }
-    @Test public void unchangedPublicationAndBalanceFallbackKeepOriginalDestination() throws Exception {
+    @Test public void verifiedPublicationKeepsDestinationAndFailedBalanceCannotRefresh() throws Exception {
         for (TradingContext market : TradingContext.values()) for (boolean reply : new boolean[]{true, false}) {
             TradingContext.setActive(market, null); Pub p = new Pub(); p.fresh(PublishGate.gen());
             try (MockedStatic<CommsTransport> transport = mockStatic(CommsTransport.class)) {
                 transport.when(() -> CommsTransport.postBlob(any(), anyString(), anyString(), anyString(), anyString(), any(), any(), any()))
                     .thenAnswer(i -> { assertEquals(market.orderBookAddr, i.getArgument(1)); ((CommsTransport.SendCb)i.getArgument(7)).onSent("fixture-tx"); return null; });
-                p.balance(reply); assertEquals(reply ? 12.5 : 5, p.order.minimaAvail, 0); verify(p.result).onSent("fixture-tx"); verify(p.result, never()).onFailed(anyString());
+                p.balance(reply); if(reply) { assertEquals(market==TradingContext.MINIMA ? 12.5-0.000000001 : 12.5,p.order.minimaAvail,0); verify(p.result).onSent("fixture-tx"); verify(p.result,never()).onFailed(anyString()); } else { verify(p.result).onFailed(SwapOrderBook.BALANCE_ERROR); transport.verifyNoInteractions(); }
             }
         }
     }

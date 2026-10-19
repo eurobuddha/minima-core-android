@@ -381,3 +381,52 @@ Verdict: approve this bounded manual-send repair. This is NOT durable Ethereum
 recovery: shared nonce allocation, timed nonce reuse, unknown broadcasts and
 complete RPC validation remain open. Full2.0.0 review/parity remains incomplete.
 No real transactions, device installation or publication.
+
+User-reported exhausted maker order — Pandamonium1.9.116/187; AtomiX0.1.77/177
+MAJOR: after a5000-unit sell fill depleted the Minima-side balance, a single-level
+order skipped checkLadderCoins. publishFresh updated minimaAvail without removing
+its ask, and a read error republished stale values. A zero-backed ladder therefore
+remained live. The older reader also treated its raw ladder as available liquidity.
+
+Reused Order.trimAsks and SwapEngine.checkLadderCoins' cumulative best-price prefix,
+MinimaHtlc.tokenBalance shape/token/decimal validation, its maxSafeCoinRows preflight
+and myFreeCoins query (coinage:1 checkmempool:true), plus PublishGate cancellation.
+Inspected both complete Order/SwapOrderBook implementations and Activity/Service
+publish callers, relevant tests, MinimaSwap/UsdtSwap equivalents and MDS maker/book.
+The sibling/MDS versions have the same single-level/fallback gaps; no alternative
+working final validator was found. Kept the wire format and signatures unchanged.
+
+Final publish now validates the requested token's balance, bounds coin reads, then
+excludes coins already mining/in the mempool. The core node balance.java does not
+exclude those spends; coins.java checkmempool does. Match unique valid coin IDs,
+token IDs and positive human amounts; reject malformed/failed reads. Native Minima
+reserves CommsTransport.MESSAGE_AMOUNT for publication. Clamp all ask ladders,
+including one level, with exact decimal accounting; clear the legacy ask scalar
+when no tranche is backed. Scalar-only zero/below-minimum asks are also removed.
+Readers apply the same clamp to older signed payloads. The independently funded
+bid side remains available. Saved market configuration is preserved for later
+funding; an all-empty publication uses the existing withdrawal/tombstone behavior.
+Manual status uses the existing withdrawal message instead of claiming a live peg.
+New failed-verification statuses are translated in all four integrated languages.
+
+Review: complete changed source, callers, adapter, generated messages and tests
+reviewed. Approved for this reported Minima/mxUSDT ask-refresh defect. Sixteen new
+mocked publication regressions verify the actual signed payload handed to transport:
+5000->0, partial balance, postage, exact cumulative decimals, scalar fallback,
+old phantom payloads, funding return, token scaling, pending spends, malformed or
+oversized reads, and edits/withdrawal/currency changes during validation. No live
+node write or funds used. Existing stale-balance fallback regression corrected.
+Validation:451 integrated tests +308 in EACH standalone debug/release suite (1067
+executions), no failures/errors/skips. Host and standalone release lint pass with
+zero errors; standalone retains195 warnings. All22 pinned import snapshots and
+provenance pass;6893 translations and direct transport validation pass.
+Signed local APK package/version, ZIP integrity and family certificate verified.
+Candidate: dist/atomix-0.1.77-candidate.apk
+SHA256 c080c1984072f114d4a84fb845f46c41ece000f478110accc01dc8bc06a8bb5f
+No device install or publication. Final2.0.0 awaits complete review and Fold check.
+
+Limits: this validates a publication snapshot, not escrow or a guarantee of peers'
+future balances. Withdrawal publication still needs its tiny native posting cost;
+if unavailable the old on-chain quote can only expire or be superseded after funding.
+Fresh ERC20 bid-side funding and shared ETH nonce/uncertain-send recovery remain
+separate open full-review work. This checkpoint does not complete standalone parity.

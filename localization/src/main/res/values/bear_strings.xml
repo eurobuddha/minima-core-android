@@ -8331,4 +8331,6 @@
     <string name="l10n_atomix_send_token_balance" formatted="false">"That is more USDT than this wallet holds."</string>
     <string name="l10n_atomix_send_gas_balance" formatted="false">"Sending USDT needs a little ETH for gas — fund the wallet with ETH first."</string>
     <string name="l10n_atomix_send_fee_cap" formatted="false">"Ethereum fee is outside the safe range. Review your RPC endpoint."</string>
+    <string name="l10n_atomix_market_funds_unverified" formatted="false">"Publish failed: Could not verify spendable funds. Order was not refreshed."</string>
+    <string name="l10n_atomix_market_update_funds_unverified" formatted="false">"Update failed: Could not verify spendable funds. Order was not refreshed."</string>
 </resources>

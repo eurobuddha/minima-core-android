@@ -5,7 +5,9 @@
     "Withdrawing your order…": "atomixMarket.withdrawing",
     "✓ Order updated": "atomixMarket.updated",
     "✓ Order withdrawn — removed from the book": "atomixMarket.withdrawn",
-    "✓ Order published — auto-refreshes every 30 min": "atomixMarket.published"
+    "✓ Order published — auto-refreshes every 30 min": "atomixMarket.published",
+    "Publish failed: Could not verify spendable funds. Order was not refreshed.": "atomixMarket.fundsUnverified",
+    "Update failed: Could not verify spendable funds. Order was not refreshed.": "atomixMarket.updateFundsUnverified"
   },
   "patterns": [
     {

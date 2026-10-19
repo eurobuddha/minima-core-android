@@ -47,21 +47,84 @@ public final class SwapOrderBook {
     /** Keep the caller's generation through ladder preparation and the balance read. */
     public static void publishFresh(NodeApi node, LazySodium ls, CommsIdentity id, Order base, long generation, CommsTransport.SendCb cb) {
         if (!current(base, generation)) { cb.onFailed(MARKET_ERROR); return; }
-        node.cmd("balance tokenid:" + base.market.tokenId, new NodeApi.Cb() {
+        final String token=TradingContext.active().tokenId;
+        node.cmd("balance tokenid:" + token, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 if (!current(base, generation)) { cb.onFailed(MARKET_ERROR); return; }
-                Object resp = j.opt("response");
-                JSONObject t = null;
-                if (resp instanceof JSONArray && ((JSONArray) resp).length() > 0) t = ((JSONArray) resp).optJSONObject(0);
-                else if (resp instanceof JSONObject) t = (JSONObject) resp;
-                base.minimaAvail = parseD(t == null ? "0" : t.optString("sendable", "0"));
-                publish(node, ls, id, base, generation, cb);
+                final java.math.BigDecimal available;
+                try { available=spendableBalance(j,token); requireBoundedCoins(j,token,available); }
+                catch(RuntimeException invalid) { cb.onFailed(BALANCE_ERROR);return; }
+                if(available.signum()==0) { base.minimaAvail=0; base.clampAsksToBalance(available); publish(node, ls, id, base, generation, cb); return; }
+                node.cmd("coins relevant:true sendable:true tokenid:"+token+" coinage:1 checkmempool:true",new NodeApi.Cb() {
+                    @Override public void onResult(JSONObject coins) {
+                        if (!current(base, generation)) { cb.onFailed(MARKET_ERROR);return; }
+                        try {
+                            java.math.BigDecimal free=available.min(freeCoinBalance(coins,token));
+                            if("0x00".equals(token))free=free.subtract(new java.math.BigDecimal(CommsTransport.MESSAGE_AMOUNT)).max(java.math.BigDecimal.ZERO);
+                            base.minimaAvail=free.doubleValue();base.clampAsksToBalance(free);
+                        } catch(RuntimeException invalid) { cb.onFailed(BALANCE_ERROR);return; }
+                        publish(node, ls, id, base, generation, cb);
+                    }
+                    @Override public void onError(String message) { if (!current(base, generation)) { cb.onFailed(MARKET_ERROR);return; } cb.onFailed(BALANCE_ERROR); }
+                });
             }
-            @Override public void onError(String m) { publish(node, ls, id, base, generation, cb); }   // publish with what we have
+            @Override public void onError(String m) { if (!current(base, generation)) { cb.onFailed(MARKET_ERROR); return; } cb.onFailed(BALANCE_ERROR); }
         });
     }
 
-    private static double parseD(String s) { try { return Double.parseDouble(s.trim()); } catch (Exception e) { return 0; } }
+    public static final String BALANCE_ERROR = "Could not verify spendable funds. Order was not refreshed.";
+    /** Reuse MinimaHtlc.tokenBalance's strict reply shape, requested token and decimal checks. */
+    static java.math.BigDecimal spendableBalance(JSONObject reply,String token) {
+        try {
+            if(reply==null||!Boolean.TRUE.equals(reply.opt("status")))throw new IllegalArgumentException();
+            Object response=reply.opt("response");JSONObject row;
+            if(response instanceof JSONArray) {
+                JSONArray rows=(JSONArray)response;
+                if(rows.length()==0)return java.math.BigDecimal.ZERO;
+                if(rows.length()!=1)throw new IllegalArgumentException();
+                row=rows.getJSONObject(0);
+            } else if(response instanceof JSONObject)row=(JSONObject)response;
+            else throw new IllegalArgumentException();
+            if(!token.equalsIgnoreCase(row.getString("tokenid")))throw new IllegalArgumentException();
+            Object raw=row.opt("sendable");
+            if(!(raw instanceof String)||((String)raw).length()>128||!((String)raw).matches("[0-9]+(?:\\.[0-9]+)?"))throw new IllegalArgumentException();
+            java.math.BigDecimal value=new java.math.BigDecimal((String)raw);
+            if(!Double.isFinite(value.doubleValue()))throw new IllegalArgumentException();
+            return value;
+        } catch(Exception invalid) { throw new IllegalArgumentException(BALANCE_ERROR); }
+    }
+
+
+    /** Same preflight limit as MinimaHtlc.myFreeCoins, before asking a node for coin bodies. */
+    private static void requireBoundedCoins(JSONObject reply,String token,java.math.BigDecimal balance) {
+        if(balance.signum()==0)return;
+        try {
+            Object response=reply.get("response");
+            JSONObject row=response instanceof JSONArray?((JSONArray)response).getJSONObject(0):(JSONObject)response;
+            int count=new java.math.BigDecimal(row.get("coins").toString()).intValueExact();
+            if(count<1||count>MinimaHtlc.maxSafeCoinRows(token))throw new IllegalArgumentException();
+        }catch(Exception invalid){throw new IllegalArgumentException(BALANCE_ERROR);}
+    }
+    static java.math.BigDecimal freeCoinBalance(JSONObject reply,String token) {
+        try {
+            if(reply==null||!Boolean.TRUE.equals(reply.opt("status")))throw new IllegalArgumentException();
+            JSONArray coins=reply.getJSONArray("response");
+            if(coins.length()>MinimaHtlc.maxSafeCoinRows(token))throw new IllegalArgumentException();
+            java.util.Set<String> ids=new java.util.HashSet<>();java.math.BigDecimal sum=java.math.BigDecimal.ZERO;
+            for(int i=0;i<coins.length();i++) {
+                JSONObject coin=coins.getJSONObject(i);Object rawId=coin.opt("coinid");
+                if(!(rawId instanceof String)||!((String)rawId).matches("0x[0-9a-fA-F]{64}")
+                        ||new java.math.BigInteger(((String)rawId).substring(2),16).signum()==0
+                        ||!ids.add(((String)rawId).toLowerCase(java.util.Locale.ROOT))
+                        ||!token.equalsIgnoreCase(coin.getString("tokenid")))throw new IllegalArgumentException();
+                Object raw=coin.opt("0x00".equals(token)?"amount":"tokenamount");
+                if(!(raw instanceof String)||((String)raw).length()>128||!((String)raw).matches("[0-9]+(?:\\.[0-9]+)?"))throw new IllegalArgumentException();
+                java.math.BigDecimal value=new java.math.BigDecimal((String)raw);
+                if(value.signum()<=0)throw new IllegalArgumentException();sum=sum.add(value);
+            }
+            return sum;
+        }catch(Exception invalid){throw new IllegalArgumentException(BALANCE_ERROR);}
+    }
 
     /** Sign {@code order} with my comms key and broadcast it to the book. */
     public static void publish(NodeApi node, LazySodium ls, CommsIdentity id, Order order, CommsTransport.SendCb cb) {

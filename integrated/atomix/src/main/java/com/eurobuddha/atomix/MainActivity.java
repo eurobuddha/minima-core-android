@@ -1035,7 +1035,7 @@ public class MainActivity extends AppCompatActivity {
                 SwapLog.d("fg manual publish OK " + txpowid);
                 if (peg == PriceOracle.PEG_APPLIED || wide) PriceOracle.commitPeg(prefs, pegMid, wide);   // baseline moves only on a CONFIRMED publish
                 engine.setMyOrder(o);
-                orderStatus = wide
+                orderStatus = !o.hasLiquidity() ? "✓ Order withdrawn — removed from the book" : wide
                         ? "✓ Order live — pegged to " + PriceOracle.source() + " (feed stale — defensive spread; auto-tightens when it recovers)"
                         : peg == PriceOracle.PEG_APPLIED
                         ? "✓ Order live — pegged to " + PriceOracle.source() + " (mid " + fmtPrice(PriceOracle.mid()) + "), auto-reprices"

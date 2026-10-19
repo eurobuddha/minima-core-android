@@ -41899,5 +41899,17 @@
     "zh-Hans": "以太坊手续费超出安全范围。请检查 RPC 端点。",
     "ru": "Комиссия Ethereum выходит за безопасные пределы. Проверьте RPC-сервер.",
     "uk": "Комісія Ethereum виходить за безпечні межі. Перевірте RPC-сервер."
+  },
+  "atomixMarket.fundsUnverified": {
+    "en": "Publish failed: Could not verify spendable funds. Order was not refreshed.",
+    "zh-Hans": "发布失败：无法核实可用资金，订单未刷新。",
+    "ru": "Ошибка публикации: не удалось проверить доступные средства. Ордер не обновлён.",
+    "uk": "Помилка публікації: не вдалося перевірити доступні кошти. Ордер не оновлено."
+  },
+  "atomixMarket.updateFundsUnverified": {
+    "en": "Update failed: Could not verify spendable funds. Order was not refreshed.",
+    "zh-Hans": "更新失败：无法核实可用资金，订单未刷新。",
+    "ru": "Ошибка обновления: не удалось проверить доступные средства. Ордер не обновлён.",
+    "uk": "Помилка оновлення: не вдалося перевірити доступні кошти. Ордер не оновлено."
   }
 }

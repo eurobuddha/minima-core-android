@@ -8294,4 +8294,6 @@
     <string name="l10n_atomix_send_token_balance" formatted="false">"该金额超过钱包的 USDT 余额。"</string>
     <string name="l10n_atomix_send_gas_balance" formatted="false">"发送 USDT 需要少量 ETH 支付手续费，请先向钱包充值 ETH。"</string>
     <string name="l10n_atomix_send_fee_cap" formatted="false">"以太坊手续费超出安全范围。请检查 RPC 端点。"</string>
+    <string name="l10n_atomix_market_funds_unverified" formatted="false">"发布失败：无法核实可用资金，订单未刷新。"</string>
+    <string name="l10n_atomix_market_update_funds_unverified" formatted="false">"更新失败：无法核实可用资金，订单未刷新。"</string>
 </resources>
