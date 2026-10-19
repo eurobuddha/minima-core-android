@@ -528,3 +528,11 @@ failed on original code and pass after repair. Signed local candidate, lint,
 23 pinned imports, direct transport and actual APK Keets/signature verified.
 See UTXO_TOOL_REVIEW_2026-10-19.txt. No install/publication; demo remains2.0.0.
 Full application review and cached-history/reorg presentation remain open.
+
+Post-release wallet history pagination checkpoint (2.0.3/code198)
+See WALLET_HISTORY_PAGING_2026-10-19.txt. Both wallet controllers now use raw page
+offsets with head-scan reset, whole-page validation, rollback/request-height refresh
+and reachable older-page controls. NFT offline errors no longer trigger shrinking
+retries. 525 relevant tests pass, including26 new cases (21 original failures).
+General cached-history inclusion/reorg status and retention/caps remain open.
+Demo device/public release stays2.0.0; standalone parity remains deferred.

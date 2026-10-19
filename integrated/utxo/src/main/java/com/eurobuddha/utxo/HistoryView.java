@@ -45,6 +45,8 @@ public class HistoryView extends BaseView {
     private boolean fetching = false;
     private int lastFetchBlock = -1;
     private boolean moreAvailable = false;
+    // Raw node rows consumed, independent of persisted/filtered transaction count.
+    private int nextOffset = 0;
     private int shown = SHOW_STEP;              // how many persisted rows are currently rendered
     private static final int AUTO_PAGES_MAX = 5; // extra pages fetched on their own while a send is still "posted"
     private int autoPages = 0;
@@ -67,29 +69,49 @@ public class HistoryView extends BaseView {
 
     private void fetch(boolean force) {
         if (fetching) return;
-        if (!force && act.chainBlock() <= lastFetchBlock) return;
+        if (!force && act.chainBlock() == lastFetchBlock) return;
         // Gentle recovery: a page size shrunk under the reply cap grows back one step per later block,
         // so one oversized page (or a transient shrink) doesn't pin History to 1-tx pages for the session.
         if (pageMax < PAGE_MAX && act.chainBlock() > shrunkAtBlock) pageMax = Math.min(PAGE_MAX, pageMax * 2);
+        nextOffset = 0;
         fetchPage(0);
     }
 
-    private void loadOlder() { if (!fetching) fetchPage(act.history().nodeTxCount()); }
+    private void loadOlder() {
+        if (fetching) return;
+        if (act.chainBlock() != lastFetchBlock) fetch(true);
+        else fetchPage(nextOffset);
+    }
 
     /** One adaptive `history` page: shrink (8→4→2→1) + retry under the 256 KB cap; persist new rows; re-render. */
     private void fetchPage(final int offset) {
+        final int requestedBlock = act.chainBlock();
         fetching = true;
         act.node().cmd("history relevant:true max:" + pageMax + " offset:" + offset, new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) {
-                JSONObject resp = json.optJSONObject("response");
+                JSONObject resp = json == null ? null : json.optJSONObject("response");
                 JSONArray txpows = resp == null ? null : resp.optJSONArray("txpows");
-                if (resp == null || txpows == null) {          // status:false arrives via onError since 0.4.9
+                if (resp == null || txpows == null || !Boolean.TRUE.equals(json.opt("status"))) {
                     fetching = false; render(); return;
                 }
-                fetching = false;
-                lastFetchBlock = act.chainBlock();
                 JSONArray details = resp.optJSONArray("details");
                 int got = txpows.length();
+                // Reuse HistorySync's whole-page gate. Missing economic detail must not
+                // become a permanently cached zero/self transaction or advance the cursor.
+                for (int i = 0; i < got; i++) {
+                    JSONObject tx = txpows.optJSONObject(i);
+                    Object id = tx == null ? null : tx.opt("txpowid");
+                    JSONObject detail = details == null ? null : details.optJSONObject(i);
+                    if (!(id instanceof String) || ((String) id).trim().isEmpty()
+                            || !(tx.opt("istransaction") instanceof Boolean)
+                            || (Boolean.TRUE.equals(tx.opt("istransaction"))
+                                && (detail == null || detail.optJSONObject("difference") == null))) {
+                        fetching = false; render(); return;
+                    }
+                }
+                fetching = false;
+                if (offset == 0) lastFetchBlock = requestedBlock;
+                nextOffset = offset + got;
                 for (int i = 0; i < got; i++) {
                     JSONObject t = txpows.optJSONObject(i);
                     if (t == null || !t.optBoolean("istransaction", false)) continue;
@@ -104,7 +126,7 @@ public class HistoryView extends BaseView {
                 if (moreAvailable && autoPages < AUTO_PAGES_MAX && act.history().hasOpenWaiting()) {
                     autoPages++;
                     render();
-                    fetchPage(act.history().nodeTxCount());
+                    fetchPage(nextOffset);
                     return;
                 }
                 render();
@@ -149,7 +171,6 @@ public class HistoryView extends BaseView {
             empty.setGravity(Gravity.CENTER);
             empty.setPadding(0, dp(40), 0, 0);
             container.addView(empty);
-            return;
         }
         for (NodeTx n : rows) container.addView(row(n));
         if (stored > rows.size()) {

@@ -56,28 +56,46 @@ public class HistoryView extends BaseView {
 
     private void fetch(boolean force) {
         if (fetching) return;
-        if (!force && act.chainBlock() <= lastFetchBlock) return;
+        if (!force && act.chainBlock() == lastFetchBlock) return;
+        nextOffset = 0;
         fetchPage(0);
     }
 
-    private void loadOlder() { if (!fetching) fetchPage(nextOffset); }
+    private void loadOlder() {
+        if (fetching) return;
+        if (act.chainBlock() != lastFetchBlock) fetch(true);
+        else fetchPage(nextOffset);
+    }
 
     /** One adaptive `history` page: shrink (8→4→2→1) + retry under the 256 KB cap; persist new rows; re-render. */
     private void fetchPage(final int offset) {
+        final int requestedBlock = act.chainBlock();
         fetching = true;
         act.node().cmd("history relevant:true max:" + pageMax + " offset:" + offset, new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) {
-                JSONObject resp = json.optJSONObject("response");
+                JSONObject resp = json == null ? null : json.optJSONObject("response");
                 JSONArray txpows = resp == null ? null : resp.optJSONArray("txpows");
-                if (resp == null || txpows == null || !json.optBoolean("status", true)) {
-                    if (pageMax > 1) { pageMax = Math.max(1, pageMax / 2); fetchPage(offset); return; }
+                if (resp == null || txpows == null || !Boolean.TRUE.equals(json.opt("status"))) {
                     fetching = false; render(); return;
                 }
-                fetching = false;
-                lastFetchBlock = act.chainBlock();
                 JSONArray details = resp.optJSONArray("details");
                 int got = txpows.length();
-                if (offset + got > nextOffset) nextOffset = offset + got;
+                // Reuse HistorySync's whole-page gate. Missing economic detail must not
+                // become a permanently cached zero/self transaction or advance the cursor.
+                for (int i = 0; i < got; i++) {
+                    JSONObject tx = txpows.optJSONObject(i);
+                    Object id = tx == null ? null : tx.opt("txpowid");
+                    JSONObject detail = details == null ? null : details.optJSONObject(i);
+                    if (!(id instanceof String) || ((String) id).trim().isEmpty()
+                            || !(tx.opt("istransaction") instanceof Boolean)
+                            || (Boolean.TRUE.equals(tx.opt("istransaction"))
+                                && (detail == null || detail.optJSONObject("difference") == null))) {
+                        fetching = false; render(); return;
+                    }
+                }
+                fetching = false;
+                if (offset == 0) lastFetchBlock = requestedBlock;
+                nextOffset = offset + got;
                 for (int i = 0; i < got; i++) {
                     JSONObject t = txpows.optJSONObject(i);
                     if (t == null || !t.optBoolean("istransaction", false)) continue;
@@ -88,7 +106,7 @@ public class HistoryView extends BaseView {
                 render();
             }
             @Override public void onError(String message) {
-                if (pageMax > 1) { pageMax = Math.max(1, pageMax / 2); fetchPage(offset); return; }
+                if (NodeApi.ERR_TOO_LONG.equals(message) && pageMax > 1) { pageMax = Math.max(1, pageMax / 2); fetchPage(offset); return; }
                 fetching = false; render();
             }
         });
@@ -115,7 +133,6 @@ public class HistoryView extends BaseView {
             empty.setGravity(Gravity.CENTER);
             empty.setPadding(0, dp(40), 0, 0);
             container.addView(empty);
-            return;
         }
         int shown = 0;
         for (NodeTx n : rows) {
@@ -123,7 +140,7 @@ public class HistoryView extends BaseView {
             container.addView(row(n));
             shown++;
         }
-        if (shown == 0) {
+        if (shown == 0 && !rows.isEmpty()) {
             TextView empty = new TextView(act);
             Language.setText(empty, Language.msg(l10n_nft_history_empty_filter));
             empty.setTextColor(Design.dim());

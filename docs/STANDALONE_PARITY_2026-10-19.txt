@@ -229,3 +229,11 @@ Preserve UTXO's existing IPC, themed dialogs and English messages. The six donor
 controller bodies are exact NFT reuse after helper-name changes; shared selection
 snapshots are provided by the prior Send repair. Integrated194 tests pass; host
 local2.0.2 signed candidate verified. Standalone source still unchanged here.
+
+Pending after demo — UTXO + NFT history pagination (2.0.3 integrated checkpoint)
+Port scripts/adapt-pandamonium-wallet-history-pages.py behavior and each wallet's
+HistoryPagingTest into standalone HistoryView: raw offset independent of cache,
+reset cursor at fresh head, request-height/rollback handling, whole-page typed
+validation with economic details, empty-list older footer, oversize-only NFT retry.
+Preserve standalone IPC and native UI. See WALLET_HISTORY_PAGING_2026-10-19.txt.
+This does not resolve general cached-history confirmation/reorg presentation.

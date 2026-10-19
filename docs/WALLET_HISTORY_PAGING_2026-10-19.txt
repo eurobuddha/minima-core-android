@@ -1,0 +1,73 @@
+Wallet history pagination review — 2026-10-19
+Scope: Pandamonium integrated UTXO Wallet and NFT Wallet history loading.
+Local 2.0.3/code198 checkpoint. Fold and public stores remain on verified 2.0.0.
+
+Findings fixed
+MAJOR: UTXO used its accumulated database row count as a node offset. A fresh
+session with 70 cached rows loaded the first eight and then requested offset70,
+skipping the intervening records. Filtered non-transactions also prevented the
+cursor advancing. NFT already counted raw rows but retained its previous maximum
+cursor across fresh head scans, allowing newly inserted records to be skipped.
+MINOR: both empty-list renderers returned before adding Load older, making earlier
+transactions unreachable when a page contained only non-transactions.
+MAJOR: malformed pages could partially persist; absent economic details became
+zero/self transactions in an insert-ignore cache. Both now validate the entire
+page before persistence, including each transaction's difference object.
+MINOR: the <= height guard suppressed refresh following a rollback. Recording the
+callback's current height also marked a block as fetched when the request began
+at an earlier height. Both now compare equal heights and record the requested
+head-page height. Load older restarts at the head if that height changed.
+MINOR: NFT retried offline errors with progressively smaller pages. Reuse UTXO's
+explicit oversize-only retry behavior; preserve the same raw offset on failure.
+
+Reuse gate and source evidence
+Inspected integrated/{utxo,NFTwallet}/src/main/java/com/eurobuddha/{utxo,nftwallet}/
+HistoryView.java, NodeApi.java, relevant MainActivity lifecycle/callers,
+UTXO HistoryDb/NodeTx/BaseView, NFT LocalHistoryViewTest and existing history tests.
+Compared standalone apks/{utxo,NFTwallet}/app/src/main/java/.../HistoryView.java.
+Read integrated/history/.../HistorySync.java and its complete HistorySyncTest.
+Read core/Minima/src/org/minima/system/commands/search/history.java to confirm raw
+pagination and the one-to-one details array with a difference object.
+Reuse: NFT's raw nextOffset and HistorySync's offset+got and whole-page validation;
+UTXO's oversize-only error retry. Minimum additional checks require typed transaction
+flags and economic details before NodeTx can persist its default zero/self values.
+Tests reuse LocalHistoryViewTest widget doubles and HistorySyncTest reply patterns.
+No dependency, signing, journal, settlement or transaction algorithm changed.
+Canonical adapter: scripts/adapt-pandamonium-wallet-history-pages.py, invoked last
+from adapt-pandamonium-direct.py. Generated sources reproduce with pinned imports.
+
+Validation
+525 tests pass: UTXO207, NFT308, shared History10. No failures/errors/skips.
+26 new synthetic controller/UI regressions: original UTXO failed11/13 and original
+NFT failed10/13; all26 now pass. Tests cover cached-count gaps, filtered pages and
+footer reachability, restart at a new tip, rollback, height changes during replies,
+malformed/missing data, string status, offline and oversized replies, retry offsets.
+No node or network was used by these tests and no real transaction was sent.
+23 source snapshots/provenance reproduce; direct transport verifier passes.
+Logs: build/localization/history-pages-{before,nft-before,tests,import,build}.log.
+
+Review verdict
+APPROVE this pagination repair. Read changed controllers, adapter and tests;
+checked node response schema, callback ordering, failed-page cursor preservation,
+empty and filtered rendering, bounded automatic paging, cache and journal callers.
+The full Pandamonium review remains incomplete. This change does not establish
+that old cached TxPoW records remain included after a reorganization, nor does it
+recheck confirmed journal entries. A same-height fork needs a tip hash/fresh proof,
+not just this height gate. Preserve historical evidence while reviewing that
+presentation separately. Database retention/cap behavior also remains to review.
+
+Standalone parity
+Equivalent source fixes belong in both standalone wallet APK repositories after
+the demo. They have not been ported or published by this checkpoint. Preserve their
+existing IPC, UI/languages, native dialogs, journals and unrelated changes.
+
+Signed local candidate verification
+Offline assemble and release lint pass (zero errors,362 existing warnings).
+Actual APK exact Keets bundle and21addons/runtime per ABI verified.
+Version/package verified: com.eurobuddha.pandamonium,2.0.3-Pandamonium/code198.
+APK v2 signature verified, existing family RSA4096 certificate.
+Path: /Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.3-candidate.apk
+SHA256 044e50cbbfe8bc2b069313700b12e1081e2bdb256fdf83e025933bc1325df424
+Bytes 137052349
+Certificate SHA256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Not installed or published. No Fold interaction for this checkpoint.
