@@ -8433,4 +8433,21 @@
     <string name="l10n_wallet_reset_done" formatted="false">"钱包已清除。请创建新种子或导入种子。"</string>
     <!-- Arguments: reason -->
     <string name="l10n_wallet_reset_failed">"无法重置钱包：%1$s"</string>
+    <string name="l10n_salon_keets_title" formatted="false">"在此设备上托管"</string>
+    <string name="l10n_salon_keets_button" formatted="false">"在此设备上托管 · 24 MB"</string>
+    <string name="l10n_salon_keets_use" formatted="false">"使用此设备"</string>
+    <string name="l10n_salon_keets_name" formatted="false">"此设备（Keets）"</string>
+    <string name="l10n_salon_keets_ready" formatted="false">"Keets 已就绪，此设备可以托管您的 Salon。"</string>
+    <!-- Arguments: size -->
+    <string name="l10n_salon_keets_usage">"资料用量：%1$s / 24 MB"</string>
+    <string name="l10n_salon_keets_confirm" formatted="false">"您的公开 Salon 资料和媒体将通过 Keets 从此手机提供。请保持节点运行并联网。访客需要 Salon 或兼容 Keets 的应用。每个资料的总限额为 24 MB。"</string>
+    <string name="l10n_salon_keets_help" formatted="false">"通过 Keets 在此手机上托管公开资料和媒体，无需托管账户。请保持节点运行并联网，供他人查看。离线时，其他用户持有的副本可能仍可访问。\n\n可在 Salon 和兼容 Keets 的应用中查看，普通浏览器不支持。私聊照片不会上传到这里。\n\n每个资料总限额为 24 MB，包含媒体。现有外部链接仍由原服务提供。"</string>
+    <string name="l10n_salon_keets_full" formatted="false">"托管资料及其媒体最多可占用 24 MB。请删除一些媒体或选择较小的文件。"</string>
+    <string name="l10n_salon_keets_update" formatted="false">"请更新 Keets 节点以使用 Salon 设备托管"</string>
+    <string name="l10n_salon_keets_offline" formatted="false">"媒体暂不可用。托管设备可能已离线，请稍后重试。"</string>
+    <string name="l10n_salon_keets_running" formatted="false">"请在 Keets 节点运行时打开 Salon"</string>
+    <string name="l10n_salon_keets_restart" formatted="false">"Keets 已重启。请重试。"</string>
+    <string name="l10n_salon_keets_starting" formatted="false">"Keets 正在启动。请稍后重试。"</string>
+    <string name="l10n_salon_keets_private" formatted="false">"公开设备托管不用于私聊照片。请连接 Maxima 或选择其他托管服务。"</string>
+    <string name="l10n_salon_keets_timeout" formatted="false">"Keets 未响应。请确认节点正在运行，然后重试。"</string>
 </resources>

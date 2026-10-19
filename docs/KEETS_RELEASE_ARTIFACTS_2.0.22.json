@@ -1,0 +1,22 @@
+[
+  {
+    "apk": "/Users/eurobuddha/Projects/minima/apks/salon/dist/Salon-0.11.38.apk",
+    "sha256": "475486447dee8083db8e3ec95c74322e4e4dc6b46cc5fe81bf7ea5aaa368bdad",
+    "metadata": "package: name='com.eurobuddha.salon' versionCode='1138' versionName='0.11.38' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'"
+  },
+  {
+    "apk": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-PandaBear-2.0.22.apk",
+    "sha256": "a06823647970a4ce753a089547d56467469e97986a16428b6812c0742281fc35",
+    "metadata": "package: name='com.eurobuddha.minimacore' versionCode='217' versionName='2.0.22-PandaBear' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'"
+  },
+  {
+    "apk": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-BlackBear-2.0.22.apk",
+    "sha256": "08b589d7acf9c24fa370a30d8a20b7defcc717b69da2c8b615664e92e5581b01",
+    "metadata": "package: name='com.eurobuddha.minimablock' versionCode='217' versionName='2.0.22-BlackBear' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'"
+  },
+  {
+    "apk": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-2.0.22.apk",
+    "sha256": "4dc4827dfae7079cf054789f4b1d4d06ca5242ddb016fd7364c129f955db6dee",
+    "metadata": "package: name='com.eurobuddha.pandamonium' versionCode='217' versionName='2.0.22-Pandamonium' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'"
+  }
+]

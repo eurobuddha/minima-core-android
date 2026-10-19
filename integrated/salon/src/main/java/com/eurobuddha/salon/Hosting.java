@@ -23,6 +23,7 @@ final class Hosting {
 
     /* ==================== profile ==================== */
 
+    static final String TYPE_KEETS = "keets";
     static final String TYPE_SFTP = "sftp";
     static final String TYPE_WEBDAV = "webdav";
     static final String TYPE_KUBO = "kubo";
@@ -214,6 +215,7 @@ final class Hosting {
     static Uploader forProfile(Profile p) throws HostingException {
         HostingSecrets.requireReadable(p);
         switch (p.type()) {
+            case TYPE_KEETS: return new KeetsHostUploader(p);
             case TYPE_SFTP:   return new SftpUploader(p);
             case TYPE_WEBDAV: return new WebDavUploader(p);
             case TYPE_KUBO:   return new IpfsUploader(p);

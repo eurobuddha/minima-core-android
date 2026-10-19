@@ -19,7 +19,7 @@ final class ProfileHosting {
                 requireRef(base);
                 if (!base.endsWith("/")) base += "/";
                 url = base + "profile.json"; pageUrl = base + "index.html";
-            } else if (Hosting.TYPE_MAXIMA.equals(host.type()) || Hosting.TYPE_BLOSSOM.equals(host.type())
+            } else if (Hosting.TYPE_KEETS.equals(host.type()) || Hosting.TYPE_MAXIMA.equals(host.type()) || Hosting.TYPE_BLOSSOM.equals(host.type())
                     || Hosting.TYPE_RELAY.equals(host.type())) {
                 url = up.putFile(json, path + "/profile.json", "application/json");
             } else {

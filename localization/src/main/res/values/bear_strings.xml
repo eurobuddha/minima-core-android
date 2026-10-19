@@ -8470,4 +8470,21 @@
     <string name="l10n_wallet_reset_done" formatted="false">"Wallet erased. Set up a new or imported seed."</string>
     <!-- Arguments: reason -->
     <string name="l10n_wallet_reset_failed">"Could not reset wallet: %1$s"</string>
+    <string name="l10n_salon_keets_title" formatted="false">"Host on this device"</string>
+    <string name="l10n_salon_keets_button" formatted="false">"Host on this device · 24 MB"</string>
+    <string name="l10n_salon_keets_use" formatted="false">"Use this device"</string>
+    <string name="l10n_salon_keets_name" formatted="false">"This device (Keets)"</string>
+    <string name="l10n_salon_keets_ready" formatted="false">"Keets ready — this device can host your Salon."</string>
+    <!-- Arguments: size -->
+    <string name="l10n_salon_keets_usage">"Profile usage: %1$s / 24 MB"</string>
+    <string name="l10n_salon_keets_confirm" formatted="false">"Your public Salon profile and media will be served from this phone through Keets. Keep your node running and connected. Viewers need Salon or a compatible Keets app. Your total profile allowance is 24 MB."</string>
+    <string name="l10n_salon_keets_help" formatted="false">"Host your public profile and media on this phone through Keets. No hosting account needed. Keep your node running and connected for others to view it. Copies held by other users may remain available while you are offline.\n\nViewable in Salon and compatible Keets apps, not ordinary browsers. Photos sent privately are not uploaded here.\n\n24 MB total per profile, including media. Existing external links stay with their current hosts."</string>
+    <string name="l10n_salon_keets_full" formatted="false">"Your hosted profile can use up to 24 MB, including its media. Remove some media or choose a smaller file."</string>
+    <string name="l10n_salon_keets_update" formatted="false">"Update your Keets node to use Salon device hosting"</string>
+    <string name="l10n_salon_keets_offline" formatted="false">"The media is unavailable. Its host may be offline; try again later."</string>
+    <string name="l10n_salon_keets_running" formatted="false">"Open Salon with your Keets node running"</string>
+    <string name="l10n_salon_keets_restart" formatted="false">"Keets restarted. Try again."</string>
+    <string name="l10n_salon_keets_starting" formatted="false">"Keets is starting. Try again shortly."</string>
+    <string name="l10n_salon_keets_private" formatted="false">"Public device hosting is not used for private photos. Connect Maxima or choose another host."</string>
+    <string name="l10n_salon_keets_timeout" formatted="false">"Keets did not respond. Check that your node is running and try again."</string>
 </resources>

@@ -206,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         node = new NodeApi(this, enabled -> runOnUiThread(() -> { nodeUp = enabled; onNode(); }));
+        KeetsLink.connect(this, node);
         startPairingRetry();   // re-broadcast REGISTER while unpaired (recovers if Salon starts before Minima Core, e.g. after reboot)
         if (android.os.Build.VERSION.SDK_INT >= 33
                 && checkSelfPermission("android.permission.POST_NOTIFICATIONS") != android.content.pm.PackageManager.PERMISSION_GRANTED)
@@ -1391,6 +1392,7 @@ public class MainActivity extends AppCompatActivity {
         videoRequest++;
         dismissVideo();
         proofRequests.close();
+        KeetsLink.release(node);
         if (node != null) node.onDestroy();   // release the DirectNodeApi receiver + cancel pending IPC timeouts
     }
 
@@ -1630,7 +1632,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hostProfile(TextView status, Runnable done) {
-        if (profilePublish != null || announcement != null) { publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_busy)); return; }
+        if (activeMediaUpload != null || profilePublish != null || announcement != null) { publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_busy)); return; }
         Hosting.Profile host = HostingStore.getDefault(this);
         if (host == null) { publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_host)); return; }
         final ProfilePublish op;
@@ -1918,7 +1920,7 @@ public class MainActivity extends AppCompatActivity {
                 c.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_page_unreachable, viewEntry.handle)));
                 LinearLayout er = row();
                 er.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_pools_lp_try_again), true, () -> openProfile(viewEntry)), weight(-2, 0, 4));
-                er.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_open_browser), false, () -> openUrl(viewEntry.url)), weight(-2, 4, 0));
+                if (!KeetsRef.isRef(viewEntry.url)) er.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_open_browser), false, () -> openUrl(viewEntry.url)), weight(-2, 4, 0));
                 c.addView(er, lp(0, 10, 0, 0));
                 body.addView(c, lp(0, 0, 0, 12));
             } else body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_page_loading, viewEntry.handle)), lp(0, 0, 0, 12));
@@ -2387,7 +2389,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isPublishableEditionUrl(String u) {
         if (u == null || u.length() >= 1024) return false;
         String s = u.trim().toLowerCase();
-        return s.startsWith("http://") || s.startsWith("https://") || s.startsWith("ipfs:")
+        return KeetsRef.isRef(s) || s.startsWith("http://") || s.startsWith("https://") || s.startsWith("ipfs:")
                 || s.startsWith("ar://") || s.startsWith("relay1:") || s.startsWith("mx1:");
     }
 
@@ -2694,7 +2696,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void pickMedia(int code, String mime) {
         if (code < PICK_AVATAR || code > PICK_DM_IMG) return;
-        if (pendingMediaPick != null || activeMediaUpload != null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_busy)); return; }
+        if (profilePublish != null || pendingMediaPick != null || activeMediaUpload != null) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_busy)); return; }
         if (screen != (code == PICK_DM_IMG ? Screen.THREAD : Screen.EDIT)) return;
         if (code == PICK_DM_IMG && threadPeer.isEmpty()) return;
         boolean meshDm = code == PICK_DM_IMG && MaximaLink.isReady(this);
@@ -2731,8 +2733,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     final byte[] bytes;
                     final String kind, mime, extension;
-                    if (pick.code == PICK_GALLERY_VID) { bytes = readCapped(uri, 60); kind = "video"; mime = "video/mp4"; extension = ".mp4"; }
-                    else if (pick.code == PICK_GALLERY_AUD) { bytes = readCapped(uri, 25); kind = "audio"; mime = "audio/mpeg"; extension = ".mp3"; }
+                    if (pick.code == PICK_GALLERY_VID) { bytes = readCapped(uri, Hosting.TYPE_KEETS.equals(pick.host.type()) ? 24 : 60); kind = "video"; mime = "video/mp4"; extension = ".mp4"; }
+                    else if (pick.code == PICK_GALLERY_AUD) { bytes = readCapped(uri, Hosting.TYPE_KEETS.equals(pick.host.type()) ? 24 : 25); kind = "audio"; mime = "audio/mpeg"; extension = ".mp3"; }
                     else { bytes = readScaledJpeg(uri, pick.code == PICK_AVATAR ? 640 : 1400); kind = "image"; mime = "image/jpeg"; extension = ".jpg"; }
                     // Recheck typed fields and recipient on the UI before dispatch.
                     runOnUiThread(() -> dispatchMedia(pick, bytes, kind, mime, extension));
@@ -2745,6 +2747,13 @@ public class MainActivity extends AppCompatActivity {
         if (activeMediaUpload != pick) return;
         if (!mediaCurrent(pick)) { finishMedia(pick, null, null); return; }
         if (bytes.length == 0) { finishMedia(pick, null, new Exception("cannot read file")); return; }
+        try {
+            if (Hosting.TYPE_KEETS.equals(pick.host.type())) {
+                if (pick.code == PICK_DM_IMG) throw new Exception(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_private).toString());
+                KeetsRef.checkAddition(buildProfileJson(), pick.code == PICK_AVATAR ? "avatar" : pick.code == PICK_BANNER ? "banner" : "gallery", pick.handle, bytes, mime);
+            }
+        } catch (Exception error) { finishMedia(pick, null, error); return; }
+
         // Random suffix prevents two successful selections in the same millisecond colliding.
         final String path = Hosting.slug(pick.handle) + "/media/" + kind + "-" + java.util.UUID.randomUUID() + extension;
         try {
@@ -2806,6 +2815,23 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         String detail = error.getMessage();
+        // Keets hosting errors
+        if ("Host on this device".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_title);
+        if ("Host on this device · 24 MB".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_button);
+        if ("Use this device".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_use);
+        if ("This device (Keets)".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_name);
+        if ("Keets ready — this device can host your Salon.".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_ready);
+        if ("Your public Salon profile and media will be served from this phone through Keets. Keep your node running and connected. Viewers need Salon or a compatible Keets app. Your total profile allowance is 24 MB.".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_confirm);
+        if ("Host your public profile and media on this phone through Keets. No hosting account needed. Keep your node running and connected for others to view it. Copies held by other users may remain available while you are offline.\n\nViewable in Salon and compatible Keets apps, not ordinary browsers. Photos sent privately are not uploaded here.\n\n24 MB total per profile, including media. Existing external links stay with their current hosts.".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_help);
+        if ("Your hosted profile can use up to 24 MB, including its media. Remove some media or choose a smaller file.".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_full);
+        if ("Update your Keets node to use Salon device hosting".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_update);
+        if ("The media is unavailable. Its host may be offline; try again later.".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_offline);
+        if ("Open Salon with your Keets node running".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_running);
+        if ("Keets restarted. Try again.".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_restart);
+        if ("Keets is starting. Try again shortly.".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_starting);
+        if ("Public device hosting is not used for private photos. Connect Maxima or choose another host.".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_private);
+        if ("Keets did not respond. Check that your node is running and try again.".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_timeout);
+        if ("file too large (max 24 MB)".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_size, 24);
         if ("cannot read file".equals(detail) || "could not read image".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_read_failed);
         if ("file too large (max 60 MB)".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_size, 60);
         if ("file too large (max 25 MB)".equals(detail)) return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_upload_size, 25);
@@ -3755,6 +3781,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void renderHosting() {
         masthead(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting));
+        body.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_button), true, this::quickStartKeets), lp(0, 0, 0, 12));
         List<Hosting.Profile> profiles = HostingStore.list(this);
         if (profiles.isEmpty()) { LinearLayout e = card(); e.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_empty))); body.addView(e, lp(0, 0, 0, 12)); }
         for (Hosting.Profile p : profiles) {
@@ -3775,8 +3802,8 @@ public class MainActivity extends AppCompatActivity {
 
     // RETIRED (MaxLite sunset) — encrypted relay dropped from the picker. To restore, re-add
     // Hosting.TYPE_RELAY to HTYPES and "Encrypted relay" to HLABELS at the same index.
-    private static final String[] HTYPES = { Hosting.TYPE_BLOSSOM, Hosting.TYPE_SFTP, Hosting.TYPE_WEBDAV, Hosting.TYPE_KUBO, Hosting.TYPE_PINATA, Hosting.TYPE_GITHUB, Hosting.TYPE_MAXIMA };
-    private static final CharSequence[] HLABELS = { "Blossom", "SFTP", "WebDAV", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_ipfs_node), "Pinata", "GitHub", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_maxima_mesh) };
+    private static final String[] HTYPES = { Hosting.TYPE_KEETS, Hosting.TYPE_BLOSSOM, Hosting.TYPE_SFTP, Hosting.TYPE_WEBDAV, Hosting.TYPE_KUBO, Hosting.TYPE_PINATA, Hosting.TYPE_GITHUB, Hosting.TYPE_MAXIMA };
+    private static final CharSequence[] HLABELS = { Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_title), "Blossom", "SFTP", "WebDAV", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_ipfs_node), "Pinata", "GitHub", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_maxima_mesh) };
 
     private void renderHostingEdit() {
         masthead(hostEdit == null ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_add) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_edit_destination));
@@ -3794,6 +3821,11 @@ public class MainActivity extends AppCompatActivity {
         card.addView(hs, lp(0, 0, 0, 6));
         JSONObject cfg = p.cfg();
         switch (p.type()) {
+            case Hosting.TYPE_KEETS:
+                card.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_help)), lp(0, 6, 0, 2));
+                try { card.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_usage, mibOf(KeetsRef.usage(buildProfileJson())))), lp(0, 6, 0, 2)); }
+                catch (Exception full) { card.addView(Design.note(this, mediaError(full)), lp(0, 6, 0, 2)); }
+                break;
             case Hosting.TYPE_SFTP:
                 cfgField(card, cfg, "host", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_host), "31.125.188.214", false); cfgField(card, cfg, "port", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_terminal_txn_port), "22", false); cfgField(card, cfg, "user", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_user), "root", false);
                 boolean keyAuth = "key".equals(cfg.optString("auth", "password"));
@@ -3928,6 +3960,11 @@ public class MainActivity extends AppCompatActivity {
             io.execute(()->{
                 if(!hostingStoredCurrent(op)) return;
                 try {
+                    if (Hosting.TYPE_KEETS.equals(op.profile.type())) {
+                        KeetsLink.ready();
+                        runOnUiThread(() -> finishHostingCheck(op, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_ready)));
+                        return;
+                    }
                     String rel="_test/probe-"+java.util.UUID.randomUUID()+".txt";
                     String url;
                     try(Hosting.Uploader up=Hosting.forProfile(op.profile)) {
@@ -3940,7 +3977,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch(SftpUploader.HostKeyUnverified untrusted) {
                     runOnUiThread(()->showHostingTrust(op,untrusted.fingerprint));
                 } catch(Exception error) {
-                    runOnUiThread(()->finishHostingCheck(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_failed, error.getMessage())));
+                    runOnUiThread(()->finishHostingCheck(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_creative_hosting_failed, mediaError(error))));
                 }
             });
         } catch(java.util.concurrent.RejectedExecutionException unavailable) { finishHostingCheck(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); }
@@ -4286,6 +4323,16 @@ public class MainActivity extends AppCompatActivity {
             }
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(u)));
         } catch (Exception e) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_social_open_failed)); }
+    }
+
+    private void quickStartKeets() {
+        new com.eurobuddha.minimacore.i18n.LanguageDialog(this).setTitle(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_title))
+                .setMessage(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_confirm))
+                .setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_common_cancel), null).setPositiveButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_use), (d,w) -> {
+                    Hosting.Profile p=Hosting.Profile.fresh(Hosting.TYPE_KEETS);
+                    Hosting.put(p.j,"name",Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_keets_name).toString());saveHost(p);HostingStore.setDefault(this,p.id());
+                    render();testProfile(p);
+                }).show();
     }
 
     /** One-tap: create + default a Blossom hosting profile (no server needed). */

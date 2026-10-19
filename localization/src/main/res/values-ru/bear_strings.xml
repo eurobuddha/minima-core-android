@@ -8544,4 +8544,21 @@
     <string name="l10n_wallet_reset_done" formatted="false">"Кошелёк удалён. Создайте или импортируйте сид-фразу."</string>
     <!-- Arguments: reason -->
     <string name="l10n_wallet_reset_failed">"Не удалось сбросить кошелёк: %1$s"</string>
+    <string name="l10n_salon_keets_title" formatted="false">"Разместить на этом устройстве"</string>
+    <string name="l10n_salon_keets_button" formatted="false">"Хранить здесь · 24 МБ"</string>
+    <string name="l10n_salon_keets_use" formatted="false">"Использовать это устройство"</string>
+    <string name="l10n_salon_keets_name" formatted="false">"Это устройство (Keets)"</string>
+    <string name="l10n_salon_keets_ready" formatted="false">"Keets готов — это устройство может хранить ваш Salon."</string>
+    <!-- Arguments: size -->
+    <string name="l10n_salon_keets_usage">"Объём профиля: %1$s / 24 МБ"</string>
+    <string name="l10n_salon_keets_confirm" formatted="false">"Ваш общедоступный профиль Salon и медиа будут передаваться с этого телефона через Keets. Узел должен работать и быть в сети. Для просмотра нужен Salon или совместимое с Keets приложение. Общий лимит профиля — 24 МБ."</string>
+    <string name="l10n_salon_keets_help" formatted="false">"Храните публичный профиль и медиа на этом телефоне через Keets. Аккаунт хостинга не нужен. Для просмотра узел должен работать и быть в сети. Копии у других пользователей могут оставаться доступными, когда вы не в сети.\n\nПросмотр — в Salon и совместимых с Keets приложениях, обычные браузеры не поддерживаются. Личные фотографии сюда не загружаются.\n\nВсего 24 МБ на профиль вместе с медиа. Существующие внешние ссылки остаются на своих хостингах."</string>
+    <string name="l10n_salon_keets_full" formatted="false">"Профиль вместе с медиа может занимать до 24 МБ. Удалите часть медиа или выберите файл поменьше."</string>
+    <string name="l10n_salon_keets_update" formatted="false">"Обновите узел Keets для размещения Salon на устройстве"</string>
+    <string name="l10n_salon_keets_offline" formatted="false">"Медиа недоступно. Устройство владельца может быть не в сети; повторите позже."</string>
+    <string name="l10n_salon_keets_running" formatted="false">"Откройте Salon при работающем узле Keets"</string>
+    <string name="l10n_salon_keets_restart" formatted="false">"Keets перезапущен. Повторите попытку."</string>
+    <string name="l10n_salon_keets_starting" formatted="false">"Keets запускается. Повторите чуть позже."</string>
+    <string name="l10n_salon_keets_private" formatted="false">"Публичное хранилище не используется для личных фото. Подключите Maxima или выберите другой хостинг."</string>
+    <string name="l10n_salon_keets_timeout" formatted="false">"Keets не ответил. Убедитесь, что узел работает, и повторите попытку."</string>
 </resources>

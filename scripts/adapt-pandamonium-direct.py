@@ -649,6 +649,9 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     spec=importlib.util.spec_from_file_location('history_wallet_scope',Path(__file__).with_name('adapt-pandamonium-history-wallet-scope.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
+    spec=importlib.util.spec_from_file_location('salon_keets',Path(__file__).with_name('adapt-pandamonium-salon-keets.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
     spec=importlib.util.spec_from_file_location('integrated_lint',Path(__file__).with_name('adapt-pandamonium-lint.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 

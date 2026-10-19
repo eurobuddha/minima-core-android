@@ -1,0 +1,41 @@
+## Code Review
+
+### Summary
+Reviewed the new shared Java uploader, strict references, loopback transport,
+node bridge changes, both MainActivity integrations, the canonical adapter,
+translations/tests, Keets API/media changes and immutable build pins in context.
+The implementation reuses existing hosting, media rendering and file permissions.
+Public-drive isolation preserves attachment drive identities. Strict references
+never become node commands; byte limits precede P2P blob allocation. Authentication
+stays on loopback, redirects/proxies are disabled, and fetched media is hash checked.
+
+### Findings
+
+#### MAJOR — Translation initialization leaked into pure validation (fixed)
+File: scripts/adapt-pandamonium-salon-keets.py
+The first translation pass introduced Android language-state dependency into
+KeetsRef, detected by unit failures. Shared validators now remain byte-identical
+to standalone; the existing MainActivity.mediaError boundary translates errors.
+Pure tests and real hosting-view tests in four languages now pass.
+
+#### MAJOR — Upload write could outlive read timeout (fixed)
+File: integrated/salon/src/main/java/com/eurobuddha/salon/KeetsLink.java
+HttpURLConnection readTimeout alone does not bound a blocked upload write.
+A daemon watchdog now disconnects each request at 50 seconds and is cancelled
+in finally. Existing byte caps, connect/read deadlines and hash checks remain.
+Real loopback tests verify authentication, size rejection and redirect refusal.
+
+#### MINOR — Active-profile budget is not a physical storage quota (documented)
+File: integrated/salon/src/main/java/com/eurobuddha/salon/KeetsRef.java
+24 MiB covers the published profile plus its referenced unique Keets media.
+Hyperdrive historical blocks and abandoned uploads can occupy more disk space.
+Do not describe this as a device-wide storage ceiling. Cleanup/quotas would need
+a separate storage lifecycle design and must not delete old personal files silently.
+
+### Verdict
+Approve with suggestions. No known unresolved critical or major finding in this
+change. 41 standalone and 400 integrated tests, release lint, all three node APK
+assemblies, signed-version checks and private two-node media fixtures passed.
+The near-limit synthetic transfer also passed on Bare 1.34.1. Physical Android
+end-to-end publishing and the Worklet memory limit remain unverified; those are
+explicit validation limits, not claims that this was tested on the user's phone.

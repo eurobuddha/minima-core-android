@@ -1,0 +1,98 @@
+COMPLETION CHECKPOINT — supersedes the historical in-progress notes below.
+Implemented both variants. Standalone 0.11.38/1138 committed 94ebaa1.
+Pandamonium 2.0.22/217 source ready for commit. Keets 1.2.1 79ee38c pushed.
+Final checks: 41 standalone tests, 400 integrated Salon tests, lint, all three
+node flavor release builds, family signatures/version metadata, exact Keets APK
+payloads, 9 preparation + 19 artifact tests passed. Canonical adapter replay
+reproduced the current Salon Java bytes. Near-24-MiB Bare P2P fixture passed.
+Versioned APKs saved to Salon dist and base dist. See KEETS_RELEASE_ARTIFACTS_2.0.22.json.
+No device installation, personal profile publishing, wallet actions or public APK
+release. Physical phone check remains a follow-up. User remains AFK; parity paused.
+Review and implementation notes: KEETS_CODE_REVIEW_2026-10-19.txt,
+KEETS_HOSTING_2.0.22.txt. No more source fixes pending at this checkpoint.
+
+HISTORICAL IN-PROGRESS NOTES (not current status):
+
+Active goal: build Keets hosting for BOTH standalone Salon and Pandamonium Salon.
+User AFK; explicitly invoked /goal. 24 MiB total profile cap. Other parity PAUSED.
+No real transactions, personal profile/media publication or device resets authorized.
+No APK installs or releases performed for this task. No subagents permitted/used.
+
+Repositories:
+Standalone /Users/eurobuddha/Projects/minima/apks/salon on main, existing _artifacts/
+untracked preserved. Changes uncommitted; bumped 0.11.37/1137 -> 0.11.38/1138.
+Host /Users/eurobuddha/Projects/minima/apks/base/build/multilingual-2026-10-16,
+feature/bear-languages-2026-10-16. Changes uncommitted; 2.0.21/216 -> 2.0.22/217.
+Keets /Users/eurobuddha/Projects/minima/keets master; source committed 79ee38c,
+version 1.2.1. Existing graph dirt preserved. Source push in progress at checkpoint.
+
+Implemented:
+KeetsRef.java: strict profile/media URLs, media path includes byte size and SHA256,
+24 MiB JSON+unique media total, 1 MiB JSON max, 8 MiB images, replacement-aware
+preflight. KeetsLink.java: node info + existing admin FILE bridge reads per-boot
+apitoken; authenticated loopback-only HTTP with no redirects/proxy, capped reads,
+finite deadlines. Avoids blocking transaction queue for media transfers. Requires
+boundedMedia capability and salondrive. Never persists/logs token.
+KeetsHostUploader: public profile/media paths only, verified publish response and
+readback; stable hashless profile pointer authenticated by Hyperdrive; media pinned
+with SHA. DM fallback refuses this public uploader. Current profile aggregate cap
+is enforced at upload preflight and publication; not a global node storage quota.
+New option, setup dialog, usage note, tests. No external browser support promised.
+Standalone and host NodeApi reuse Filez FileCommand via same guarded response path.
+RelayResolver handles Keets, so profile/image/video/audio readers reuse existing UI.
+Standalone publication callbacks gained owner/draft guard and mutual upload guard.
+
+Keets transport changes:
+Existing attachment drive namespace media preserved. /salon/* publish/delete uses
+separate salon namespace; /info exposes salondrive + boundedMedia; /files?scope=salon.
+media-read.js validates signed entry byteLength BEFORE blob allocation, reads exact
+entry, updates mutable drives, real 30-second deadline and per-request cancellation.
+GET media maxbytes query defaults64MiB. Existing hash verification retained.
+Six unit tests passed. Existing services-test.sh has KEETS_MEDIA_ONLY=1; private
+2-node media-only run passed auth, byte exact, bad hash, over-limit refusal,
+isolation and stable profile updates. Last fixture /tmp/keets-salon-isolated.*.
+Earlier full suite (before task) failed mailbox restart delivery; unrelated, not fixed.
+
+App validation so far:
+Standalone compileDebug and testDebugUnitTest passed, logs build/keets-compile.log
+and build/keets-tests.log. New tests KeetsRefTest (7) and KeetsHostUploaderTest (2).
+Host :integrated-salon:compileDebugJavaWithJavac passed, build/keets-salon-compile.log.
+Use :integrated-salon (not :salon). No final release builds/tests yet.
+
+Canonical host adapter:
+scripts/adapt-pandamonium-salon-keets.py runs near end adapt-pandamonium-direct.py.
+Copies scripts/pandamonium-sources/salon/keets/*.java. Extra UI .inc files from
+standalone. Adapter is guarded/idempotent for already-patched MainActivity. After
+changing a UI patch, modify the current generated source too or regenerate from
+pinned original donor; do not accidentally reimport latest sibling changes.
+Host source lock still donor Salon0.11.34 f216ab1. Standalone now based0.11.37.
+Do not resume parity or replace integrated MainActivity with standalone wholesale.
+
+Remaining:
+- Add/copy app tests into host canonical tests and run relevant full Salon suite.
+- Review/read all changed code with code-review skill (already read this task).
+- Finish shared UI/localization: current new host UI/error strings are English;
+  Pandamonium is four-language. Use existing catalog/message mapping conventions.
+- Handle shared Keets links in-app (paste/open on Discover) or safe deep links:
+  do not export embedded activity and bypass host app lock. Existing discovery/feed
+  works via registered profile links. Hide Open in browser for Keets failures in
+  host too (already changed standalone). Host edition URL whitelist may need Keets.
+- Standalone initial claim path has legacy async guards; audit new hosting branch.
+- Optional cached bytes are not yet added; current profile cache90s existing,
+  images memorycache; clear offline errors existing. Don't claim persistent offline.
+- Consider storage cleanup for replaced/removed media; live profile cap currently
+  does not bound Hyperdrive historical/orphan disk bytes. Explain accurately.
+- API Session URI auth validation can be tightened (content:// authority known node).
+- No user-phone media data was touched; all testing synthetic.
+- Update pinned Keets source in scripts/keets-dependencies.lock.json (currently old
+  d5bab159) to new pushed source revision, codeload archive SHA, npm-lock SHA, rebuild
+  in isolation using prepare-keets.py build() to record reviewed output hashes.
+  Never bypass gates. Source dependencies unchanged; native hashes expected same.
+  docs/KEETS_BUILD.md requires build/check ALL THREE flavor APKs for pin updates.
+- Normal preparation cache ~/.gradle/caches/minima-keets, Node24.8/npm11.6,
+  JAVA_HOME=/Applications/Android Studio.app/Contents/jbr/Contents/Home,
+  ANDROID_HOME=/Users/eurobuddha/Library/Android/sdk; offline Gradle supported.
+- Final standalone release/lint/tests; host release/lint/tests, signed APK filenames
+  versioned, verify signatures and ZIP/native artifacts. Save docs + commit source
+  checkpoints, own fork remote only. No public APK release requested for new build.
+- Goal active, complete only once builds/implementation are actually delivered.

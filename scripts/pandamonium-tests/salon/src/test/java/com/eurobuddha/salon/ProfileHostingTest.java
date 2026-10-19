@@ -46,8 +46,8 @@ public class ProfileHostingTest {
         }
     }
     @Test public void meshAndBlossomUploadOnlyJson()throws Exception {
-        for(String type:new String[]{Hosting.TYPE_MAXIMA,Hosting.TYPE_BLOSSOM})ProfileHosting.upload(Hosting.Profile.fresh(type),"owner","JSON","HTML");
-        verify(uploader,times(2)).putFile(any(),eq("owner/profile.json"),eq("application/json"));verify(uploader,never()).putFile(any(),anyString(),eq("text/html"));verify(uploader,times(2)).close();
+        for(String type:new String[]{Hosting.TYPE_MAXIMA,Hosting.TYPE_BLOSSOM,Hosting.TYPE_KEETS})ProfileHosting.upload(Hosting.Profile.fresh(type),"owner","JSON","HTML");
+        verify(uploader,times(3)).putFile(any(),eq("owner/profile.json"),eq("application/json"));verify(uploader,never()).putFile(any(),anyString(),eq("text/html"));verify(uploader,times(3)).close();
     }
     @Test public void emptyReferenceFailsAndClosesUploader()throws Exception {
         when(uploader.putFile(any(),anyString(),anyString())).thenReturn(" ");

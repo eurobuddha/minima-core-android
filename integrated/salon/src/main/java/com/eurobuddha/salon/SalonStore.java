@@ -128,6 +128,7 @@ final class SalonStore {
     }
 
     static boolean validRecoveryUrl(String value) {
+        if (KeetsRef.isRef(value)) return KeetsRef.parse(value).profile;
         try {
             java.net.URI uri = new java.net.URI(value);
             return "https".equalsIgnoreCase(uri.getScheme()) && uri.getHost() != null

@@ -42607,5 +42607,101 @@
     "zh-Hans": "无法重置钱包：{reason}",
     "ru": "Не удалось сбросить кошелёк: {reason}",
     "uk": "Не вдалося скинути гаманець: {reason}"
+  },
+  "salonKeets.title": {
+    "en": "Host on this device",
+    "zh-Hans": "在此设备上托管",
+    "ru": "Разместить на этом устройстве",
+    "uk": "Розмістити на цьому пристрої"
+  },
+  "salonKeets.button": {
+    "en": "Host on this device · 24 MB",
+    "zh-Hans": "在此设备上托管 · 24 MB",
+    "ru": "Хранить здесь · 24 МБ",
+    "uk": "Зберігати тут · 24 МБ"
+  },
+  "salonKeets.use": {
+    "en": "Use this device",
+    "zh-Hans": "使用此设备",
+    "ru": "Использовать это устройство",
+    "uk": "Використати цей пристрій"
+  },
+  "salonKeets.name": {
+    "en": "This device (Keets)",
+    "zh-Hans": "此设备（Keets）",
+    "ru": "Это устройство (Keets)",
+    "uk": "Цей пристрій (Keets)"
+  },
+  "salonKeets.ready": {
+    "en": "Keets ready — this device can host your Salon.",
+    "zh-Hans": "Keets 已就绪，此设备可以托管您的 Salon。",
+    "ru": "Keets готов — это устройство может хранить ваш Salon.",
+    "uk": "Keets готовий — цей пристрій може зберігати ваш Salon."
+  },
+  "salonKeets.usage": {
+    "en": "Profile usage: {size} / 24 MB",
+    "zh-Hans": "资料用量：{size} / 24 MB",
+    "ru": "Объём профиля: {size} / 24 МБ",
+    "uk": "Обсяг профілю: {size} / 24 МБ"
+  },
+  "salonKeets.confirm": {
+    "en": "Your public Salon profile and media will be served from this phone through Keets. Keep your node running and connected. Viewers need Salon or a compatible Keets app. Your total profile allowance is 24 MB.",
+    "zh-Hans": "您的公开 Salon 资料和媒体将通过 Keets 从此手机提供。请保持节点运行并联网。访客需要 Salon 或兼容 Keets 的应用。每个资料的总限额为 24 MB。",
+    "ru": "Ваш общедоступный профиль Salon и медиа будут передаваться с этого телефона через Keets. Узел должен работать и быть в сети. Для просмотра нужен Salon или совместимое с Keets приложение. Общий лимит профиля — 24 МБ.",
+    "uk": "Ваш загальнодоступний профіль Salon і медіа передаватимуться з цього телефона через Keets. Вузол має працювати й бути в мережі. Для перегляду потрібен Salon або сумісний із Keets застосунок. Загальний ліміт профілю — 24 МБ."
+  },
+  "salonKeets.help": {
+    "en": "Host your public profile and media on this phone through Keets. No hosting account needed. Keep your node running and connected for others to view it. Copies held by other users may remain available while you are offline.\n\nViewable in Salon and compatible Keets apps, not ordinary browsers. Photos sent privately are not uploaded here.\n\n24 MB total per profile, including media. Existing external links stay with their current hosts.",
+    "zh-Hans": "通过 Keets 在此手机上托管公开资料和媒体，无需托管账户。请保持节点运行并联网，供他人查看。离线时，其他用户持有的副本可能仍可访问。\n\n可在 Salon 和兼容 Keets 的应用中查看，普通浏览器不支持。私聊照片不会上传到这里。\n\n每个资料总限额为 24 MB，包含媒体。现有外部链接仍由原服务提供。",
+    "ru": "Храните публичный профиль и медиа на этом телефоне через Keets. Аккаунт хостинга не нужен. Для просмотра узел должен работать и быть в сети. Копии у других пользователей могут оставаться доступными, когда вы не в сети.\n\nПросмотр — в Salon и совместимых с Keets приложениях, обычные браузеры не поддерживаются. Личные фотографии сюда не загружаются.\n\nВсего 24 МБ на профиль вместе с медиа. Существующие внешние ссылки остаются на своих хостингах.",
+    "uk": "Зберігайте публічний профіль і медіа на цьому телефоні через Keets. Обліковий запис хостингу не потрібен. Для перегляду вузол має працювати й бути в мережі. Копії в інших користувачів можуть залишатися доступними, коли ви не в мережі.\n\nПерегляд — у Salon і сумісних із Keets застосунках, звичайні браузери не підтримуються. Приватні фотографії сюди не завантажуються.\n\nУсього 24 МБ на профіль разом із медіа. Наявні зовнішні посилання залишаються на своїх хостингах."
+  },
+  "salonKeets.full": {
+    "en": "Your hosted profile can use up to 24 MB, including its media. Remove some media or choose a smaller file.",
+    "zh-Hans": "托管资料及其媒体最多可占用 24 MB。请删除一些媒体或选择较小的文件。",
+    "ru": "Профиль вместе с медиа может занимать до 24 МБ. Удалите часть медиа или выберите файл поменьше.",
+    "uk": "Профіль разом із медіа може займати до 24 МБ. Видаліть частину медіа або виберіть менший файл."
+  },
+  "salonKeets.update": {
+    "en": "Update your Keets node to use Salon device hosting",
+    "zh-Hans": "请更新 Keets 节点以使用 Salon 设备托管",
+    "ru": "Обновите узел Keets для размещения Salon на устройстве",
+    "uk": "Оновіть вузол Keets для розміщення Salon на пристрої"
+  },
+  "salonKeets.offline": {
+    "en": "The media is unavailable. Its host may be offline; try again later.",
+    "zh-Hans": "媒体暂不可用。托管设备可能已离线，请稍后重试。",
+    "ru": "Медиа недоступно. Устройство владельца может быть не в сети; повторите позже.",
+    "uk": "Медіа недоступне. Пристрій власника може бути не в мережі; повторіть пізніше."
+  },
+  "salonKeets.running": {
+    "en": "Open Salon with your Keets node running",
+    "zh-Hans": "请在 Keets 节点运行时打开 Salon",
+    "ru": "Откройте Salon при работающем узле Keets",
+    "uk": "Відкрийте Salon, коли вузол Keets працює"
+  },
+  "salonKeets.restart": {
+    "en": "Keets restarted. Try again.",
+    "zh-Hans": "Keets 已重启。请重试。",
+    "ru": "Keets перезапущен. Повторите попытку.",
+    "uk": "Keets перезапущено. Спробуйте ще раз."
+  },
+  "salonKeets.starting": {
+    "en": "Keets is starting. Try again shortly.",
+    "zh-Hans": "Keets 正在启动。请稍后重试。",
+    "ru": "Keets запускается. Повторите чуть позже.",
+    "uk": "Keets запускається. Повторіть трохи пізніше."
+  },
+  "salonKeets.private": {
+    "en": "Public device hosting is not used for private photos. Connect Maxima or choose another host.",
+    "zh-Hans": "公开设备托管不用于私聊照片。请连接 Maxima 或选择其他托管服务。",
+    "ru": "Публичное хранилище не используется для личных фото. Подключите Maxima или выберите другой хостинг.",
+    "uk": "Публічне сховище не використовується для приватних фото. Підключіть Maxima або виберіть інший хостинг."
+  },
+  "salonKeets.timeout": {
+    "en": "Keets did not respond. Check that your node is running and try again.",
+    "zh-Hans": "Keets 未响应。请确认节点正在运行，然后重试。",
+    "ru": "Keets не ответил. Убедитесь, что узел работает, и повторите попытку.",
+    "uk": "Keets не відповів. Переконайтеся, що вузол працює, і спробуйте ще раз."
   }
 }

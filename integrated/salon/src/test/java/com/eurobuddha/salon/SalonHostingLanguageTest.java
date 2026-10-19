@@ -72,6 +72,20 @@ public class SalonHostingLanguageTest {
             appbar.layout(0,0,width,appbar.getMeasuredHeight());fits(appbar);
         }
     }
+    @Test public void deviceHostingExplainsAvailabilityAndLimitInEveryLanguage() throws Exception {
+        Hosting.Profile p=Hosting.Profile.fresh(Hosting.TYPE_KEETS);field("hostEdit").set(activity,p);
+        invoke("renderHostingEdit",new Class<?>[]{});
+        String snapshot=p.j.toString();
+        for(String code:CODES) {
+            Language.select(activity,code);layout();
+            assertTrue(contains(body,Language.text(activity,l10n_salon_keets_help)));
+            Method error=MainActivity.class.getDeclaredMethod("mediaError",Exception.class);error.setAccessible(true);
+            assertEquals(Language.text(activity,l10n_salon_keets_full),error.invoke(activity,new Exception(KeetsRef.FULL)).toString());
+            assertEquals(snapshot,p.j.toString());
+        }
+        verifyNoInteractions(worker);
+    }
+
     @Test public void allDestinationEditorsKeepDraftsAndCursorWhileLabelsChange() throws Exception {
         String[] types={"sftp","webdav","kubo","pinata","github","blossom","maxima","sftp"};
         int[] labels={l10n_creative_hosting_host,l10n_creative_hosting_write_endpoint,l10n_creative_hosting_api_user,l10n_creative_hosting_gateway,l10n_creative_hosting_owner,l10n_creative_hosting_blossom_server,l10n_creative_hosting_save_test,l10n_creative_hosting_private_key_pem};
