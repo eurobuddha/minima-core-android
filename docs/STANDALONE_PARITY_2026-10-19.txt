@@ -420,3 +420,12 @@ Core detail input1060.00000213467;1000to minimaWallet plus change. No agent send
 sign, reset or counter mutation.2.0.21/code216 History correction now in progress.
 Reuses standalone minimaWallet HistoryTx own-address netting and existing History
 Ownership/DB. Cached native rows repaired without deleting transaction evidence.
+
+2.0.21 physical History verification — PASS
+After the user unlocked, the Fold Core History displayed -1000 Minima at block
+2374784 and +1000 Minima at block2374792 (the return Sweep). The incorrect Split
+classification is gone.336 transactions, synced to2374808. Read-only observation;
+no agent transaction, signing, reset or counter mutation. User confirms simple
+Sweep and real AtomiX/PandaPools/PandaDEX trades succeeded. Large-TxPoW automatic
+handling remains device-untested. Full review and standalone parity stay open.
+User now explicitly requests publication of2.0.21, then continued parity work.
