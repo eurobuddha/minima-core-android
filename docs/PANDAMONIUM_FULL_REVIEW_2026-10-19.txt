@@ -596,3 +596,9 @@ Corrected the earlier wrong-checkout diagnosis: the bundled jar has the size che
 See WALLET_SWEEP_SIZE_RECOVERY_2026-10-19.txt for source/runtime evidence and tests.
 Unknown responses retain saved bytes; NFT state is never split. Full review remains
 open, with no installation or publication of this candidate before device checking.
+
+Ethereum retry gas identity follow-up —2.0.10/code205
+Four regressions reproduced duplicate payment on changed gas estimate and replay
+above a newly reviewed gas price. Fixed in the existing shared journal;752 affected
+JVM tests pass. See ETHEREUM_RETRY_GAS_2026-10-19.txt for scope and remaining manual
+acknowledgement/recovery UI, external key-sharing, receipt/reorg and retention review.

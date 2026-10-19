@@ -42,7 +42,7 @@ public final class EthereumTransactions {
     }
     public static EthereumTransactions shared() throws IOException {
         EthereumTransactions value=shared;
-        if(value==null)throw new IOException("Ethereum transaction storage is unavailable. Reopen Pandamonium.");
+        if(value==null)throw new IOException("Ethereum transaction storage is unavailable. Reopen the app.");
         return value;
     }
     /** Immutable public intent for one nonce. Fee replacements have identical spending fields. */
@@ -104,9 +104,11 @@ public final class EthereumTransactions {
             Row target=null;
             for(Row row:rows) {
                 boolean sameOperation=operation!=null&&operation.equals(row.operation)&&(!"pending".equals(operation)||intent.equals(row.intent));
-                boolean repeatUnknown=operation==null&&"POSTING".equals(row.phase)&&intent.equals(row.intent);
+                // A refreshed gas estimate does not turn an unknown payment into a new payment.
+                boolean repeatUnknown=operation==null&&"POSTING".equals(row.phase)
+                        &&intent(destination,payload,amount,row.latest().getGasLimit()).equals(row.intent);
                 if((sameOperation||repeatUnknown)&&!"REVERTED".equals(row.phase)) {
-                    if(!intent.equals(row.intent))throw new IOException("Saved Ethereum operation differs from this request.");
+                    if(!intent.equals(row.intent)&&!repeatUnknown)throw new IOException("Saved Ethereum operation differs from this request.");
                     target=row;
                 }
             }
@@ -120,6 +122,14 @@ public final class EthereumTransactions {
                     }
                     target=null;
                 }
+            }
+            if(target!=null) {
+                SignedRawTransaction saved=target.latest();
+                // Retain the original gas limit and payment. A retry may not exceed either
+                // fee field just reviewed, even when replaying an already signed attempt.
+                if(gas.compareTo(saved.getGasLimit())<0||price.compareTo(saved.getGasPrice())<0)
+                    throw new Uncertain(target.latestHash());
+                gas=saved.getGasLimit();
             }
             // Keep earlier nonce gaps recoverable with their original signed transaction. Never replace
             // one with another payment/lock, even if another endpoint reports a lower pending count.

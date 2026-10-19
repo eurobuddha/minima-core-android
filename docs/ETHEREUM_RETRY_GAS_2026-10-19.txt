@@ -1,0 +1,85 @@
+Ethereum unknown-payment retry and standalone ETH Wallet parity — 2026-10-19
+
+Findings and reproduction
+MAJOR: an unknown manual payment was identified by recipient, calldata, value AND
+gas limit. A fresh estimate changed that identity. The retry path could replay the
+old transaction, allocate another nonce and submit the same payment again. A receipt
+for the original did not prevent this second payment when the estimate changed.
+MAJOR: replaying saved bytes could exceed a lower gas price just reviewed by the
+caller. Existing fee-cap checks bounded the new request, but not the older signature.
+Four regressions using EthereumTransactionsTest's public key, in-memory store and
+fake RPC all failed before the fix and passed afterward. No real transaction used.
+
+Repair and reuse
+Kept the existing journal, decoder, intent builder, exact-hash reconciliation and
+account lock. Unknown manual retries now compare payment fields using the stored
+gas limit. The original receipt is checked first. Unsettled retries retain that gas
+limit and cannot exceed either newly reviewed fee field. If the new gas limit or
+price is below the saved attempt, return its existing uncertain hash without signing
+or broadcasting. Eligible fee replacements still use the original nonce/payment.
+Stable automatic operation identities keep their existing strict intent checks.
+No store migration, private-key copy, new dependency or transport change.
+
+Standalone port
+apks/ethwallet now uses byte-identical EthTx.java, EthRpc.java and the shared
+EthereumTransactions.java. Its existing minimaapi.aar has no ethereum classes;
+the reviewed journal is included as source in the same namespace. Existing R8 rules
+already preserve that namespace and web3j crypto/RLP. Activity startup initializes
+the journal; unknown submissions save the exact hash for Last transaction and show
+an uncertainty message instead of 'Send failed'. IPC derivation, secure key storage,
+manifest backup rules, account/endpoint review guards and asset identity stay intact.
+Standalone0.2.10/code210 and Pandamonium2.0.10/code205 are separate signed candidates.
+Shared journal SHA256:
+47a79bf41aff1ece7e8bafb6a3b7220a3fa7126dd41cf11dcca23873a3cffd5e
+
+Validation
+Shared/API54, integrated ETH Wallet35, integrated AtomiX482 and host181 JVM tests
+passed (752 total, zero failures/errors/skips). Standalone68 tests pass in each of
+debug and release. Reused journal/funding/authorization/RPC regressions and adapted
+the host's SQLite test to two standalone connections. Additional checks cover actual
+Activity startup and the real send callback retaining an uncertain hash. All RPCs
+are mocked; SQLite is disposable Robolectric application storage.
+The standalone debug source overlay, .gitattributes, graphify data and older candidate
+checksum files were present before this work and are not included in the commit.
+Final build/signature evidence is appended below after checks complete.
+
+Code review
+Read the changed shared journal, standalone callers, RPC boundary, initialization,
+manifest, shrinker rules and copied/adapted tests. Both reproduced findings above
+are fixed; approve this bounded port. Signed records are public transaction data;
+private keys/credentials are not serialized. No claim of a completed full-app review.
+
+Remaining review and verification
+Standalone private storage coordinates this APK's submissions only. It does not
+share a database with standalone AtomiX, Pandamonium, another device or another
+wallet using the same key. Integrated clients share the host journal as before.
+The manual flow still lacks a full pending/history/recovery screen. An accepted
+send followed by a UI/process crash before acknowledgement needs a dedicated request
+identity/recovery UX audit; a newly entered payment is not generally deduplicated
+against all accepted history. Journal retention/large-history performance and wider
+receipt/reorg handling remain open. Standalone AtomiX has not received this port yet.
+These candidates have not been device-tested, installed or published. Public2.0.0
+remains the previously verified release. No real seed/counter changes were made.
+
+Final build evidence
+Both offline release builds and lint succeeded. APK ZIP integrity, package/version,
+actual journal classes and v2 signatures verified. Family certificate (RSA4096):
+eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Standalone lint0 errors/0 fatal/71 warnings; Pandamonium0/0/362, unchanged counts.
+Pandamonium Keets verifies the exact bundle and21 addons/runtime per ABI.
+
+Standalone candidate:
+/Users/eurobuddha/Projects/minima/apks/ethwallet/dist/eth-wallet-0.2.10-candidate.apk
+8793906 bytes; com.eurobuddha.ethwallet0.2.10/code210
+SHA256 56f038b5ff7f29ecf2b9de758d013e625f0a60f62d799fcdc2dc154768b051f5
+
+Pandamonium candidate:
+/Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.10-candidate.apk
+137144493 bytes; com.eurobuddha.pandamonium2.0.10-Pandamonium/code205
+SHA256 4dfb9fbeb375b02d65a7aae90018f414e57168def53c1d18ee980e0e98261709
+Includes all preceding local checkpoints, including restored Sweep size recovery.
+
+Fold R3GL805K7MB is connected and Android reports unlocked/home. Asked the user to
+leave it idle and unlock Pandamonium before installation/checks; no response yet at
+this checkpoint. No APK was installed and no application interaction was performed.
+Public/device2.0.0 remains unchanged by this work. Full review/parity remain active.

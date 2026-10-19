@@ -293,3 +293,10 @@ Pandamonium now reuses standalone0.2.23's recursive batch splitting, gated by ex
 pre-mining rejection evidence. See WALLET_SWEEP_SIZE_RECOVERY_2026-10-19.txt.
 Standalone still needs durable unknown-outcome retry and stricter rejection parity.
 ETH Wallet parity was read-only this turn; its working tree was left unchanged.
+
+ETH Wallet durable journal parity — standalone0.2.10/code210
+Exact reviewed shared journal/signing/RPC code ported with startup and unknown-outcome
+message adaptation.68 tests pass in each debug/release suite. Includes the new gas
+retry identity and fee-consent repair from Pandamonium2.0.10. IPC/key storage retained.
+See ETHEREUM_RETRY_GAS_2026-10-19.txt. Cross-APK coordination is not provided by this
+private store. Standalone AtomiX and the remaining parity ledger are still open.

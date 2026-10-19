@@ -149,4 +149,31 @@ public class EthereumTransactionsTest {
         assertThrows(IllegalStateException.class,()->e.send(rpc,KEY,1,TO,"0x",BigInteger.ONE,GAS,PRICE,null,()->{if(++checks[0]==6)throw new IllegalStateException("cancelled");}));
         assertEquals(1,m.writes);assertTrue(rpc.sent.isEmpty());send(e,rpc,TO,null);assertEquals(BigInteger.valueOf(4),nonce(rpc.sent.get(0)));
     }
+    @Test public void unknownManualRetryWithChangedGasEstimateCannotCreateAnotherPayment()throws Exception {
+        Memory store=new Memory();EthereumTransactions journal=new EthereumTransactions(store);Rpc rpc=new Rpc();rpc.fail=true;
+        EthereumTransactions.Uncertain first=assertThrows(EthereumTransactions.Uncertain.class,()->send(journal,rpc,TO,null));
+        rpc.fail=false;EthereumTransactions restarted=new EthereumTransactions(store);
+        String result=restarted.send(rpc,KEY,1,TO,"0x",BigInteger.ONE,GAS.multiply(BigInteger.TWO),PRICE,null,()->{});
+        assertEquals(first.hash,result);assertEquals(2,rpc.sent.size());assertEquals(rpc.sent.get(0),rpc.sent.get(1));
+    }
+    @Test public void lowerReviewedGasLimitCannotAuthorizeReplayOrAnotherNonce()throws Exception {
+        Memory store=new Memory();EthereumTransactions journal=new EthereumTransactions(store);Rpc rpc=new Rpc();rpc.fail=true;
+        EthereumTransactions.Uncertain first=assertThrows(EthereumTransactions.Uncertain.class,()->journal.send(rpc,KEY,1,TO,"0x",BigInteger.ONE,GAS.multiply(BigInteger.TWO),PRICE,null,()->{}));
+        rpc.fail=false;EthereumTransactions restarted=new EthereumTransactions(store);
+        EthereumTransactions.Uncertain retry=assertThrows(EthereumTransactions.Uncertain.class,()->send(restarted,rpc,TO,null));
+        assertEquals(first.hash,retry.hash);assertEquals(1,rpc.sent.size());
+    }
+    @Test public void lowerReviewedGasPriceCannotReplayAnOlderMoreExpensiveAttempt()throws Exception {
+        EthereumTransactions journal=new EthereumTransactions(new Memory());Rpc rpc=new Rpc();rpc.fail=true;
+        EthereumTransactions.Uncertain first=assertThrows(EthereumTransactions.Uncertain.class,()->send(journal,rpc,TO,null));rpc.fail=false;
+        EthereumTransactions.Uncertain retry=assertThrows(EthereumTransactions.Uncertain.class,()->journal.send(rpc,KEY,1,TO,"0x",BigInteger.ONE,GAS,PRICE.divide(BigInteger.TWO),null,()->{}));
+        assertEquals(first.hash,retry.hash);assertEquals(1,rpc.sent.size());
+    }
+    @Test public void changedGasRetryReturnsAlreadyConfirmedOriginalInsteadOfSendingAgain()throws Exception {
+        EthereumTransactions journal=new EthereumTransactions(new Memory());Rpc rpc=new Rpc();rpc.fail=true;
+        EthereumTransactions.Uncertain first=assertThrows(EthereumTransactions.Uncertain.class,()->send(journal,rpc,TO,null));
+        rpc.fail=false;rpc.settle(rpc.sent.get(0),true);
+        assertEquals(first.hash,journal.send(rpc,KEY,1,TO,"0x",BigInteger.ONE,GAS.multiply(BigInteger.TWO),PRICE,null,()->{}));
+        assertEquals(1,rpc.sent.size());
+    }
 }
