@@ -2,7 +2,8 @@
   "fixed": {
     "Node returned no seedrandom — is the node write-enabled?": "ethWallet.errorNoSeed",
     "Node returned an all-zero key. Not using it.": "ethWallet.errorZeroKey",
-    "no decimals() — not an ERC20?": "ethWallet.errorNoDecimals"
+    "no decimals() — not an ERC20?": "ethWallet.errorNoDecimals",
+    "Wallet session changed. Review again.": "wallet.reviewAgain"
   },
   "patterns": [
     {

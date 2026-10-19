@@ -22,7 +22,7 @@ public class EthMessagesTest {
         return new JSONObject(new String(Files.readAllBytes(Path.of("../../localization/eth-errors.json")), java.nio.charset.StandardCharsets.UTF_8));
     }
     @Test public void everyDeclaredFixedFailureResolves()throws Exception {
-        JSONObject fixed=source().getJSONObject("fixed");assertTrue(fixed.length()==3);
+        JSONObject fixed=source().getJSONObject("fixed");assertEquals(4, fixed.length());
         for(Iterator<String> it=fixed.keys();it.hasNext();) {
             String raw=it.next();
             CharSequence value=EthMessages.message(raw);assertTrue(raw,value instanceof Language.Message);

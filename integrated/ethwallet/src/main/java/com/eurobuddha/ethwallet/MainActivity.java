@@ -99,7 +99,8 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
 
     private android.content.SharedPreferences prefs;
     private EthNet net;
-    private EthRpc rpc;
+    private volatile EthRpc rpc;
+    private volatile long sendGeneration;
     private final EthWallet wallet = new EthWallet();
     private TokenStore tokens;
     private KeyVault vault;
@@ -359,18 +360,21 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
 
     private void refresh() {
         if (!wallet.ready()) return;
+        final SendContext context = new SendContext();
+        final List<EthNet.Token> requestedTokens = tokens.tokens();
         io.execute(() -> {
             try {
-                BigInteger wei = wallet.ethBalanceWei(rpc);
+                if (!context.current()) return;
+                BigInteger wei = context.connection.getBalance(context.owner.getAddress());
                 String eth = EthWallet.format(wei, 18, 6);
                 Map<String, String> bals = new LinkedHashMap<>();
-                for (EthNet.Token tk : tokens.tokens()) {
-                    try { bals.put(tokenKey(tk), EthWallet.format(wallet.erc20BalanceRaw(rpc, tk.address), tk.decimals, 6)); }
+                for (EthNet.Token tk : requestedTokens) {
+                    try { bals.put(tokenKey(tk), EthWallet.format(EthWallet.erc20BalanceRaw(context.connection, tk.address, context.owner.getAddress()), tk.decimals, 6)); }
                     catch (Exception e) { bals.put(tokenKey(tk), "—"); }
                 }
-                onUi(() -> { ethBal = eth; tokenBals.clear(); tokenBals.putAll(bals); ethErr = null; lastUpdate = System.currentTimeMillis(); render(); });
+                onUi(() -> { if (!context.current()) return; ethBal = eth; tokenBals.clear(); tokenBals.putAll(bals); ethErr = null; lastUpdate = System.currentTimeMillis(); render(); });
             } catch (Exception e) {
-                onUi(() -> { ethErr = Language.join("RPC: ", EthMessages.error(e)); render(); });
+                onUi(() -> { if (!context.current()) return; ethErr = Language.join("RPC: ", EthMessages.error(e)); render(); });
             }
         });
     }
@@ -531,8 +535,22 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
 
     // ---- send ----
 
+    /** Same owner/connection capture used by AtomiX's ethCounterLegGuard. */
+    private final class SendContext {
+        final org.web3j.crypto.Credentials owner = wallet.creds();
+        final EthRpc connection = rpc;
+        final EthNet network = net;
+        final long generation = sendGeneration;
+        boolean current() {
+            return owner != null && owner == wallet.creds() && connection == rpc && network == net
+                    && generation == sendGeneration && !gone() && !io.isShutdown();
+        }
+    }
+
     private void sendDialog(EthNet.Token startToken) {
         if (!wallet.ready()) return;
+        sendGeneration++;
+        final SendContext context = new SendContext();
         modalOpen = true;
         final List<EthNet.Token> assets = new ArrayList<>();
         assets.add(null); // Native ETH is distinct from every ERC20 symbol.
@@ -576,18 +594,19 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         TextView max = Design.pill(this, Language.msg(l10n_eth_wallet_max), Design.SURFACE2, Design.DIM);
         max.setMinimumHeight(dp(48));
         max.setOnClickListener(v -> {
+            if (!context.current()) { toast(Language.msg(l10n_wallet_review_again)); return; }
             if (chosen[0] != null) { Language.setText(amt, balOf(chosen[0])); return; }   // ERC20: gas is paid in ETH
             final String typedAmount = amt.getText().toString();
             toast(Language.msg(l10n_eth_wallet_reserving));                                                    // ETH: leave enough for the fee
             io.execute(() -> {
                 try {
-                    BigInteger wei = wallet.ethBalanceWei(rpc);
-                    BigInteger gp = rpc.gasPrice(); if (gp.signum() <= 0) gp = BigInteger.valueOf(2_000_000_000L);
+                    BigInteger wei = context.connection.getBalance(context.owner.getAddress());
+                    BigInteger gp = context.connection.gasPrice(); if (gp.signum() <= 0) gp = BigInteger.valueOf(2_000_000_000L);
                     BigInteger fee = BigInteger.valueOf(21000).multiply(gp.multiply(BigInteger.valueOf(17)).divide(BigInteger.TEN)); // reserve for the High tier
                     BigInteger spend = wei.subtract(fee);
                     String out = spend.signum() > 0 ? EthWallet.format(spend, 18, 8) : "0";
-                    onUi(() -> { if (chosen[0] == null && typedAmount.equals(amt.getText().toString())) Language.setText(amt, out); });
-                } catch (Exception e) { onUi(() -> { if (chosen[0] == null && typedAmount.equals(amt.getText().toString())) Language.setText(amt, balOf(null)); }); }
+                    onUi(() -> { if (context.current() && chosen[0] == null && typedAmount.equals(amt.getText().toString())) Language.setText(amt, out); });
+                } catch (Exception e) { onUi(() -> { if (context.current() && chosen[0] == null && typedAmount.equals(amt.getText().toString())) Language.setText(amt, balOf(null)); }); }
             });
         });
         LinearLayout.LayoutParams mp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -598,6 +617,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                 .setView(wrapScroll(box))
                 .setPositiveButton(Language.msg(l10n_eth_wallet_review), (d, w) -> {
                     modalOpen = false;
+                    if (!context.current()) { toast(Language.msg(l10n_wallet_review_again)); return; }
                     confirmSend(chosen[0], to.getText().toString().trim(), amt.getText().toString().trim());
                 })
                 .setNegativeButton(Language.msg(l10n_eth_wallet_cancel), null)
@@ -606,6 +626,9 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
     }
 
     private void confirmSend(EthNet.Token tk, String to, String amount) {
+        sendGeneration++;
+        final SendContext context = new SendContext();
+        if (!context.current()) { toast(Language.msg(l10n_wallet_review_again)); return; }
         final boolean isEth = tk == null;
         final String sym = isEth ? "ETH" : tk.symbol;
         if (!isEth && !tokens.has(tk.address)) { toast(Language.msg(l10n_eth_wallet_missing_token, sym)); return; }
@@ -621,7 +644,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
             try { sum = Keys.toChecksumAddress(to); } catch (Exception e) { sum = null; }
             if (sum != null && !sum.equals(to)) { toast(Language.msg(l10n_eth_wallet_bad_checksum)); return; }
         }
-        if (to.equalsIgnoreCase(wallet.address())) { toast(Language.msg(l10n_eth_wallet_own_address)); return; }
+        if (to.equalsIgnoreCase(context.owner.getAddress())) { toast(Language.msg(l10n_eth_wallet_own_address)); return; }
         final BigDecimal amtDec;
         // The decimal keypad emits the LOCALE's separator — a comma across most of Europe, which
         // BigDecimal rejects. Normalise before parsing so decimals are enterable everywhere.
@@ -632,6 +655,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         toast(Language.msg(l10n_eth_wallet_estimating));
         io.execute(() -> {
             try {
+                EthTx.requireAuthorized(context::current);
                 final int decimals = isEth ? 18 : tk.decimals;
                 final BigInteger raw = amtDec.movePointRight(decimals).toBigInteger();
                 if (raw.signum() <= 0) { onUi(() -> toast(Language.msg(l10n_eth_wallet_below_unit))); return; }
@@ -641,7 +665,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                 final BigInteger value = isEth ? raw : BigInteger.ZERO;
                 BigInteger gasLimit;
                 try {
-                    gasLimit = rpc.estimateGas(wallet.address(), txTo, data, value).multiply(BigInteger.valueOf(12)).divide(BigInteger.TEN);
+                    gasLimit = context.connection.estimateGas(context.owner.getAddress(), txTo, data, value).multiply(BigInteger.valueOf(12)).divide(BigInteger.TEN);
                 } catch (Exception ge) {
                     // FAIL CLOSED. Only a pure transport failure justifies guessing a gas limit; anything
                     // the node actually evaluated and rejected means the send would fail too, so aborting
@@ -655,7 +679,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                     if (!transport) { onUi(() -> toast(Language.msg(l10n_eth_wallet_refuse, EthMessages.error(ge)))); return; }
                     gasLimit = BigInteger.valueOf(isEth ? 21000 : 90000);
                 }
-                BigInteger gp = rpc.gasPrice(); if (gp.signum() <= 0) gp = BigInteger.valueOf(2_000_000_000L);
+                BigInteger gp = context.connection.gasPrice(); if (gp.signum() <= 0) gp = BigInteger.valueOf(2_000_000_000L);
                 // Bail out here with a readable message rather than letting EthTx throw after the
                 // user has already tapped Send. Checked against the top fee tier, since that's the
                 // highest the user could select from the confirm screen.
@@ -669,7 +693,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                     onUi(() -> toast(Language.msg(l10n_eth_wallet_high_gas, rpcHost(), gl))); return;
                 }
                 final BigInteger gasLimitF = gasLimit, baseGp = gp;
-                onUi(() -> showConfirm(sym, to, normalised, isEth, txTo, data, value, gasLimitF, baseGp));
+                onUi(() -> showConfirm(sym, to, normalised, isEth, txTo, data, value, gasLimitF, baseGp, context));
             } catch (Exception e) {
                 onUi(() -> toast(Language.msg(l10n_eth_wallet_prepare_failed, EthMessages.error(e))));
             }
@@ -680,10 +704,13 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
     private static final CharSequence[] FEE_TIERS = {Language.msg(l10n_eth_wallet_low), Language.msg(l10n_eth_wallet_medium), Language.msg(l10n_eth_wallet_high)};
     private static final int[] FEE_MULT = {100, 130, 170};
 
-    private void showConfirm(String sym, String to, String amount, boolean isEth, String txTo, String data, BigInteger value, BigInteger gasLimit, BigInteger baseGp) {
+    private void showConfirm(String sym, String to, String amount, boolean isEth, String txTo, String data, BigInteger value, BigInteger gasLimit, BigInteger baseGp, SendContext context) {
+        if (!context.current()) { toast(Language.msg(l10n_wallet_review_again)); return; }
         modalOpen = true;
         final int[] tier = {1};   // default Medium
         LinearLayout box = colBox();
+        box.addView(kvLine(Language.msg(l10n_eth_wallet_your_address), ""));
+        box.addView(fullAddrBlock(context.owner.getAddress()));
         box.addView(kvLine(Language.msg(l10n_eth_wallet_send), amount + " " + sym));
         if (!isEth) {
             box.addView(kvLine(Language.msg(l10n_eth_wallet_contract_hint), ""));
@@ -749,11 +776,12 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                 .setView(wrapScroll(box))
                 .setPositiveButton(Language.msg(l10n_eth_wallet_send), (d, w) -> {
                     modalOpen = false;
+                    if (!context.current()) { toast(Language.msg(l10n_wallet_review_again)); return; }
                     final BigInteger gasPrice = baseGp.multiply(BigInteger.valueOf(FEE_MULT[tier[0]])).divide(BigInteger.valueOf(100));
                     toast(Language.msg(l10n_eth_wallet_broadcasting));
                     io.execute(() -> {
                         try {
-                            String tx = EthTx.send(rpc, wallet.creds(), net.chainId, txTo, data, isEth ? value : BigInteger.ZERO, gasLimit, gasPrice);
+                            String tx = EthTx.send(context.connection, context.owner, context.network.chainId, txTo, data, isEth ? value : BigInteger.ZERO, gasLimit, gasPrice, context::current);
                             // Persist BEFORE showing it: the tx is already on the network, and losing the
                             // hash to a rotation or a crash would leave the user with no way to find it.
                             prefs.edit().putString("lastTx", tx).apply();
@@ -875,8 +903,8 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         box.addView(note);
         languageDialog().setTitle(Language.msg(l10n_eth_wallet_rpc_endpoint))
                 .setView(wrapScroll(box))
-                .setPositiveButton(Language.msg(l10n_eth_wallet_save), (d, w) -> { modalOpen = false; String u = in.getText().toString().trim(); if (!u.isEmpty()) { prefs.edit().putString("rpc", u).apply(); rpc.setUrl(u); refresh(); } })
-                .setNeutralButton(Language.msg(l10n_eth_wallet_default), (d, w) -> { modalOpen = false; prefs.edit().remove("rpc").apply(); rpc.setUrl(net.defaultRpc); refresh(); })
+                .setPositiveButton(Language.msg(l10n_eth_wallet_save), (d, w) -> { modalOpen = false; String u = in.getText().toString().trim(); if (!u.isEmpty()) { prefs.edit().putString("rpc", u).apply(); rpc = new EthRpc(u); refresh(); } })
+                .setNeutralButton(Language.msg(l10n_eth_wallet_default), (d, w) -> { modalOpen = false; prefs.edit().remove("rpc").apply(); rpc = new EthRpc(net.defaultRpc); refresh(); })
                 .setNegativeButton(Language.msg(l10n_eth_wallet_cancel), null)
                 .setOnDismissListener(d -> modalOpen = false)
                 .show();

@@ -20,6 +20,7 @@ public final class EthMessages {
             case "Node returned no seedrandom — is the node write-enabled?": return Language.msg(l10n_eth_wallet_error_no_seed);
             case "Node returned an all-zero key. Not using it.": return Language.msg(l10n_eth_wallet_error_zero_key);
             case "no decimals() — not an ERC20?": return Language.msg(l10n_eth_wallet_error_no_decimals);
+            case "Wallet session changed. Review again.": return Language.msg(l10n_wallet_review_again);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {

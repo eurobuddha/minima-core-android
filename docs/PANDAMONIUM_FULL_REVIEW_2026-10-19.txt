@@ -163,3 +163,15 @@ Verdict: Approve this asset fix. Account-context and cross-module nonce fixes re
 Standalone inventory: 22 source projects found. Most source HEADs equal import pins;
 minimaWallet is four commits newer. Local changes are mainly graph/build artifacts
 and debug support; preserve them and inspect the newer wallet commits before ports.
+
+ETH Wallet captured account repair — 1.9.104
+Reused AtomiX owner/connection capture and pre-sign/pre-broadcast authorization.
+Review, MAX, estimate, send and balance refresh retain the original account/RPC;
+changed ownership or connection requires another review. RPC edits replace the
+connection instance. The sender address is visible in the confirmation. A receipt
+already returned by a dispatched send remains recorded after a context change.
+Reviewed canonical adapter, generated activity/EthTx, error mapping and mocked
+regressions. All 19 ETH tests passed, including guard failures before nonce read,
+after nonce read and after signing, account/RPC changes, and stale balance results.
+Importer verification passed for all 22 snapshots; catalog, transport and diff
+checks passed. Verdict: Approve this change. Full review and nonce repair remain.
