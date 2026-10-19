@@ -287,3 +287,9 @@ are combined without double counting. New local sends invalidate delayed posting
 lint verify. See ATOMIX_PENDING_FUNDS_2026-10-19.txt. Device/public2.0.0 unchanged.
 Gas/allowance, journal retention, wider receipt/reorg and standalone parity review
 remain open. This closes the local unknown-token-spend funding gap from2.0.6.
+
+Sweep size-recovery follow-up —2.0.9/code204
+Pandamonium now reuses standalone0.2.23's recursive batch splitting, gated by exact
+pre-mining rejection evidence. See WALLET_SWEEP_SIZE_RECOVERY_2026-10-19.txt.
+Standalone still needs durable unknown-outcome retry and stricter rejection parity.
+ETH Wallet parity was read-only this turn; its working tree was left unchanged.

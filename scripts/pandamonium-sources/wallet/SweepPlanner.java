@@ -266,6 +266,7 @@ final class SweepPlanner {
 
     /** Split a pooled job in half (used when the node refuses it as too large). */
     static List<Job> split(Job zJob) {
+        if(zJob.whole||zJob.coins.size()<2)throw new IllegalArgumentException("Cannot split a whole or single coin");
         List<Job> out = new ArrayList<>(2);
         int mid = zJob.coins.size() / 2;
         out.add(new Job(false, zJob.tokenid, new ArrayList<>(zJob.coins.subList(0, mid)),

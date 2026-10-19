@@ -8409,7 +8409,7 @@
     <string name="l10n_sweep_signatures">"%1$s transactions, %2$s one-time signatures."</string>
     <!-- Arguments: key, used, maximum -->
     <string name="l10n_sweep_key">"Key %1$s: next signature #%2$s of %3$s"</string>
-    <string name="l10n_sweep_warning" formatted="false">"Transactions are sent one by one. You can stop between batches. Uncertain transactions remain pending and are not automatically signed again. Transfers are irreversible once broadcast."</string>
+    <string name="l10n_sweep_warning" formatted="false">"Transactions are sent one by one. You can stop between batches. Uncertain transactions remain pending and are not automatically signed again. Transfers are irreversible once broadcast. Batches rejected as too large before broadcast are automatically split and retried to the same destination, using additional signatures."</string>
     <string name="l10n_sweep_confirm" formatted="false">"Confirm sweep — review carefully"</string>
     <string name="l10n_sweep_sign" formatted="false">"Sign &amp; broadcast all"</string>
     <string name="l10n_sweep_working" formatted="false">"Sweeping"</string>
@@ -8428,4 +8428,8 @@
     <string name="l10n_sweep_native_state" formatted="false">"Minima (state)"</string>
     <string name="l10n_sweep_replay" formatted="false">"Resend saved transactions"</string>
     <string name="l10n_sweep_replay_help" formatted="false">"Retry sends the identical saved transactions to the addresses below. It uses no new signatures and cannot change their amounts or destinations."</string>
+    <string name="l10n_sweep_splitting" formatted="false">"Batch too large. Splitting into smaller batches and continuing…"</string>
+    <string name="l10n_sweep_single_large" formatted="false">"The node rejected this single coin as too large before broadcast. It cannot be split without changing its state. Other batches will continue."</string>
+    <string name="l10n_sweep_split_a" formatted="false">"(split A)"</string>
+    <string name="l10n_sweep_split_b" formatted="false">"(split B)"</string>
 </resources>

@@ -8372,7 +8372,7 @@
     <string name="l10n_sweep_signatures">"%1$s 笔交易，%2$s 次一次性签名。"</string>
     <!-- Arguments: key, used, maximum -->
     <string name="l10n_sweep_key">"密钥 %1$s：下次签名 #%2$s，上限 %3$s"</string>
-    <string name="l10n_sweep_warning" formatted="false">"交易逐笔发送，可在批次间停止。结果不明的交易保持待确认状态，不会自动重新签名。广播后转移不可撤销。"</string>
+    <string name="l10n_sweep_warning" formatted="false">"交易逐笔发送，可在批次间停止。结果不明的交易保持待确认状态，不会自动重新签名。广播后转移不可撤销。 在广播前因过大而被拒绝的批次会自动拆分，并使用额外签名重试发送到同一地址。"</string>
     <string name="l10n_sweep_confirm" formatted="false">"确认转移 — 请仔细核对"</string>
     <string name="l10n_sweep_sign" formatted="false">"全部签名并广播"</string>
     <string name="l10n_sweep_working" formatted="false">"正在转移"</string>
@@ -8391,4 +8391,8 @@
     <string name="l10n_sweep_native_state" formatted="false">"Minima（状态）"</string>
     <string name="l10n_sweep_replay" formatted="false">"重发已保存交易"</string>
     <string name="l10n_sweep_replay_help" formatted="false">"重试会将完全相同的已保存交易发送至以下地址，不使用新签名，也不会更改金额或目标地址。"</string>
+    <string name="l10n_sweep_splitting" formatted="false">"批次过大。正在拆分为更小的批次并继续…"</string>
+    <string name="l10n_sweep_single_large" formatted="false">"节点在广播前因交易过大拒绝了这枚单独的币。无法在保留状态的同时拆分。其他批次将继续。"</string>
+    <string name="l10n_sweep_split_a" formatted="false">"（拆分 A）"</string>
+    <string name="l10n_sweep_split_b" formatted="false">"（拆分 B）"</string>
 </resources>

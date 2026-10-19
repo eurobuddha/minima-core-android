@@ -1,0 +1,82 @@
+Pandamonium Sweep: automatic oversized-batch recovery — 2026-10-19
+
+Request and source reuse
+The user specifically required the standalone APK's automatic recovery when a sweep
+hits the TxPoW size limit. Reused apks/wallet/app/src/main/java/com/eurobuddha/wallet/
+SweepFlow.java (donor 690e9bc, standalone0.2.23): split a rejected pooled batch in
+half, replace that job with both halves, and continue to the reviewed destination.
+This batches/consolidates plain inputs into fewer outputs at that destination; it
+does not add an intermediate transfer back to the old wallet. Whole state/NFT coins
+are never pooled or split. Existing planner limits and exact-state builders remain.
+
+Correction to the2.0.7 port decision
+The earlier investigation looked at core/Minima/src/.../txnpost.java. That checkout
+lacks a synchronous size check, but it is not the node bundled in Pandamonium.
+app/libs/minima.jar DOES check the completed size before either mining call.
+Verified by javap and by executing that jar's txnpost.postTxn with a mocked chain,
+TxPoW generator and Main. Both sync/async oversized cases throw before accessing
+Main's miner. Matching source is _worktrees/minima-core-keets-android/src/org/minima/
+system/commands/txn/txnpost.java:175. Bundled jar SHA256:
+d1ca0f0a34e21ff9755e8b356afeb6513f1fcf6391473feb4b73c127c1ce7cc3
+This supersedes the claim in WALLET_SWEEP_PORT_2026-10-19.txt that the bundled node's
+pre-broadcast size refusal was unproven. Omitting the automatic split was a port gap.
+
+Changes
+NodeLink now delivers a distinct size-rejection callback only for an exact structured
+status:false, pending:false txnpost reply with the current attempt's id and the node's
+size/max message (size greater than max, max at least65536). Transport error strings,
+timeouts, import/basics failures, malformed replies and generic 'too big' cannot enter
+this branch. Each publish stage accepts only its first terminal callback.
+The initial Sweep submission releases its own durable reservation after this proven
+rejection. The saved bytes must still match and there must be no accepted receipt.
+Failed persistence retains the reservation and prevents replacement signing. NFT UI
+reservations are cleared only if their recorded generation still matches.
+A pooled job then uses the donor splitter and continues. Its original signature stays
+consumed; smaller jobs use new signatures through the existing authenticated worker.
+Single/whole coins are reported and skipped, so they cannot cause a split loop or
+alter NFT state. Stop-between-batches and session guards remain active.
+Retries of previously unknown submissions still replay identical saved bytes. A size
+error on such a retry cannot prove the earlier attempt was never accepted, so it does
+not release that reservation or sign replacements. No timeout is treated as failure.
+Review, progress and single-coin messages exist in English, Chinese, Russian, Ukrainian.
+
+Code review
+MAJOR resolved: the previous integration copied split() but never invoked it, so
+recoverable oversized batches became permanently pending instead of continuing.
+Reviewed canonical flow/planner/pending records, NodeLink adapter, generated source,
+caller guards, tests and localized messages. Kept continuation calls outside the
+reservation-write exception handler to avoid advancing twice if a later callback throws.
+Verdict: approve this bounded repair after regression/build checks below. The complete
+Pandamonium review and standalone parity are still open.
+
+Limits and remaining work
+No live sweep, seed change, real signing-counter change or real transaction was used
+for validation. Fold UI/stop/review/confirmation and large real collections remain
+untested on this candidate. A single coin whose full transaction exceeds the limit
+cannot be made smaller by splitting its input list. The prior pending-history and
+cross-flow reservation limits remain documented in WALLET_SWEEP_PORT_2026-10-19.txt.
+Standalone Sweep already has automatic splitting; its generic error recognition,
+timeout-based re-signing and lack of durable retry still need the reviewed safety
+parity changes. ETH Wallet parity investigation was interrupted by this user request;
+no standalone ETH Wallet files were changed in this checkpoint. Public/device2.0.0
+is unchanged. This candidate must not be called a completed full-app review.
+
+Final validation and signed candidate
+202 wallet JVM tests and181 Pandamonium host JVM tests passed, zero failures/errors/
+skips. Fourteen added wallet regressions plus one added bundled-node boundary test
+cover recursive splitting, exact errors, failed persistence, wrong attempt/receipt,
+duplicate callbacks, timeouts, lock revocation, single coins, same destination,
+fresh one-time signatures and preserving a newer NFT reservation. The tests use
+public synthetic wallet fixtures and mocked chain/transport only.
+Pinned imports reproduce all23 apps; direct transport verifier passes; all6,982
+messages validate in four languages. Final release/test/lint invocation succeeded
+in4m05s. Lint:0 errors,0 fatal,362 warnings (unchanged from2.0.8).
+APK ZIP integrity, version/package, actual DEX recovery classes, Keets bundle and
+21 addons/runtime per ABI passed. APK Signature Scheme v2 verifies, RSA4096.
+Package com.eurobuddha.pandamonium,2.0.9-Pandamonium,versionCode204.
+/Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.9-candidate.apk
+137144501 bytes
+SHA256 817eb919f9f344f16a70bf3360d2d78565fa35658d2e3aee79a397cd8f1d0eed
+Signing certificate SHA256:
+eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+No installation or publication. Fold verification remains required before rollout.

@@ -67,4 +67,26 @@ public class SweepPendingTest {
         JSONObject root=new JSONObject(store.value);root.getJSONObject(built.getTransactionID().to0xString()).put("signed",built.getImportHex()+"00");store.value=root.toString();
         assertThrows(IllegalStateException.class,pending::savedTransactions);
     }
+    static JSONObject sizeRefusal(TxnFactory.BuiltTxn built)throws Exception {
+        return new JSONObject().put("command","txnpost").put("params",new JSONObject().put("id",built.getID()))
+            .put("status",false).put("pending",false).put("error","TxPoW size too large.. 71234/65536");
+    }
+    @Test public void exactPreMiningSizeRejectionReleasesOnlyItsSavedAttempt()throws Exception{
+        Store store=new Store();SweepPending pending=new SweepPending(store);TxnFactory.BuiltTxn built=built();pending.reserve(built);
+        pending.rejectedSize(built,sizeRefusal(built));assertTrue(new SweepPending(store).coins().isEmpty());
+        assertTrue(new SweepPending(store).savedTransactions().isEmpty());
+    }
+    @Test public void failedSizeRejectionCommitKeepsOriginalBytesReserved()throws Exception{
+        Store store=new Store();SweepPending pending=new SweepPending(store);TxnFactory.BuiltTxn built=built();pending.reserve(built);store.fail=true;
+        assertThrows(IllegalStateException.class,()->pending.rejectedSize(built,sizeRefusal(built)));
+        assertEquals(built.getImportHex(),new SweepPending(store).savedTransactions().get(0).getImportHex());
+    }
+    @Test public void sizeRejectionCannotReleaseAcceptedOrMismatchedAttempt()throws Exception{
+        Store store=new Store();SweepPending pending=new SweepPending(store);TxnFactory.BuiltTxn built=built();pending.reserve(built);
+        JSONObject wrong=sizeRefusal(built);wrong.getJSONObject("params").put("id","another_attempt");
+        assertThrows(IllegalStateException.class,()->pending.rejectedSize(built,wrong));
+        pending.receipt(built.getTransactionID().to0xString(),receipt(built));
+        assertThrows(IllegalStateException.class,()->pending.rejectedSize(built,sizeRefusal(built)));
+        assertFalse(pending.coins().isEmpty());
+    }
 }

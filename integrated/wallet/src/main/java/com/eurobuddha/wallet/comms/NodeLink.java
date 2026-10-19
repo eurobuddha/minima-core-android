@@ -186,14 +186,30 @@ public class NodeLink {
      * @param zBuilt the finished transaction from {@link TxnFactory}.
      * @param zCb    receives the {@code txnpost} response (which carries the txpowid), or the first error.
      */
+    /** Only a structured, correlated pre-mining refusal can authorize sweep splitting. */
+    public interface SizeAwareCb extends NodeApi.Cb { void onSizeRefusal(JSONObject reply); }
+    public static boolean isSizeRefusal(JSONObject reply,String id) {
+        if(reply==null||id==null||!Boolean.FALSE.equals(reply.opt("status"))
+            ||!"txnpost".equals(reply.opt("command"))||!Boolean.FALSE.equals(reply.opt("pending"))
+            ||reply.has("response")||reply.optJSONObject("params")==null
+            ||!id.equals(reply.optJSONObject("params").opt("id")))return false;
+        Object error=reply.opt("error");if(!(error instanceof String))return false;
+        java.util.regex.Matcher match=java.util.regex.Pattern.compile("TxPoW size too large\\.\\. ([1-9][0-9]{0,18})/([1-9][0-9]{0,18})").matcher((String)error);
+        if(!match.matches())return false;
+        java.math.BigInteger size=new java.math.BigInteger(match.group(1)),max=new java.math.BigInteger(match.group(2));
+        return max.compareTo(java.math.BigInteger.valueOf(65536))>=0&&size.compareTo(max)>0;
+    }
+
     public void publish(final TxnFactory.BuiltTxn zBuilt, final NodeApi.Cb zCb) {
         final String importCmd = zBuilt.getTxnImportCommand();
         final String basicsCmd = "txnbasics id:" + zBuilt.getID();
         final String postCmd   = zBuilt.getTxnPostCommand();
 
+        final java.util.concurrent.atomic.AtomicBoolean imported=new java.util.concurrent.atomic.AtomicBoolean(), basics=new java.util.concurrent.atomic.AtomicBoolean(), posted=new java.util.concurrent.atomic.AtomicBoolean();
         // Step 1 — txnimport (signatures-only witness).
         mApi.cmd(importCmd, new NodeApi.Cb() {
             @Override public void onResult(JSONObject importResp) {
+                if(!imported.compareAndSet(false,true))return;
                 if (!importResp.optBoolean("status", false)) {
                     if (zCb != null) zCb.onError("txnimport failed: " + importResp.optString("error", importResp.toString()));
                     return;
@@ -201,6 +217,7 @@ public class NodeLink {
                 // Step 2 — txnbasics: node adds MMR proofs + scripts once.
                 mApi.cmd(basicsCmd, new NodeApi.Cb() {
                     @Override public void onResult(JSONObject basicsResp) {
+                if(!basics.compareAndSet(false,true))return;
                         if (!basicsResp.optBoolean("status", false)) {
                             if (zCb != null) zCb.onError("txnbasics failed: " + basicsResp.optString("error", basicsResp.toString()));
                             return;
@@ -208,19 +225,21 @@ public class NodeLink {
                         // Step 3 — txnpost (mine:true, NO auto).
                         mApi.cmd(postCmd, new NodeApi.Cb() {
                             @Override public void onResult(JSONObject postResp) {
+                if(!posted.compareAndSet(false,true))return;
                                 if (!postResp.optBoolean("status", false)) {
+                                    if(zCb instanceof SizeAwareCb && isSizeRefusal(postResp,zBuilt.getID())){((SizeAwareCb)zCb).onSizeRefusal(postResp);return;}
                                     if (zCb != null) zCb.onError("txnpost failed: " + postResp.optString("error", postResp.toString()));
                                     return;
                                 }
                                 if (zCb != null) zCb.onResult(postResp);
                             }
-                            @Override public void onError(String message) { if (zCb != null) zCb.onError(message); }
+                            @Override public void onError(String message) { if (posted.compareAndSet(false,true) && zCb != null) zCb.onError(message); }
                         });
                     }
-                    @Override public void onError(String message) { if (zCb != null) zCb.onError(message); }
+                    @Override public void onError(String message) { if (basics.compareAndSet(false,true) && zCb != null) zCb.onError(message); }
                 });
             }
-            @Override public void onError(String message) { if (zCb != null) zCb.onError(message); }
+            @Override public void onError(String message) { if (imported.compareAndSet(false,true) && zCb != null) zCb.onError(message); }
         });
     }
 

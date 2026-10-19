@@ -26,9 +26,43 @@ def adapt(root):
         for(String id:PENDING.keySet())result.add(id.toLowerCase(java.util.Locale.ROOT));
         return result;
     }
-    static void markPending(String id){PENDING.put(id,System.currentTimeMillis());}
+    static long markPending(String id){
+        return PENDING.compute(id,(key,previous)->Math.max(System.currentTimeMillis(),previous==null?0:previous+1));
+    }
+    static void clearSweepPending(String id,long stamp){PENDING.remove(id,stamp);}
 '''+text[pos:]
         nft.write_text(text)
+    p=base/'comms/NodeLink.java';s=p.read_text()
+    if 'interface SizeAwareCb' not in s:
+        marker='    public void publish(final TxnFactory.BuiltTxn zBuilt, final NodeApi.Cb zCb) {'
+        helper=r"""    /** Only a structured, correlated pre-mining refusal can authorize sweep splitting. */
+    public interface SizeAwareCb extends NodeApi.Cb { void onSizeRefusal(JSONObject reply); }
+    public static boolean isSizeRefusal(JSONObject reply,String id) {
+        if(reply==null||id==null||!Boolean.FALSE.equals(reply.opt("status"))
+            ||!"txnpost".equals(reply.opt("command"))||!Boolean.FALSE.equals(reply.opt("pending"))
+            ||reply.has("response")||reply.optJSONObject("params")==null
+            ||!id.equals(reply.optJSONObject("params").opt("id")))return false;
+        Object error=reply.opt("error");if(!(error instanceof String))return false;
+        java.util.regex.Matcher match=java.util.regex.Pattern.compile("TxPoW size too large\\.\\. ([1-9][0-9]{0,18})/([1-9][0-9]{0,18})").matcher((String)error);
+        if(!match.matches())return false;
+        java.math.BigInteger size=new java.math.BigInteger(match.group(1)),max=new java.math.BigInteger(match.group(2));
+        return max.compareTo(java.math.BigInteger.valueOf(65536))>=0&&size.compareTo(max)>0;
+    }
+
+"""
+        assert marker in s;s=s.replace(marker,helper+marker)
+        s=s.replace('        // Step 1 — txnimport (signatures-only witness).',
+            '        final java.util.concurrent.atomic.AtomicBoolean imported=new java.util.concurrent.atomic.AtomicBoolean(), basics=new java.util.concurrent.atomic.AtomicBoolean(), posted=new java.util.concurrent.atomic.AtomicBoolean();\n        // Step 1 — txnimport (signatures-only witness).')
+        for response,guard in [('importResp','imported'),('basicsResp','basics'),('postResp','posted')]:
+            marker='public void onResult(JSONObject '+response+') {'
+            assert marker in s;s=s.replace(marker,marker+'\n                if(!'+guard+'.compareAndSet(false,true))return;')
+        marker='                                if (!postResp.optBoolean("status", false)) {'
+        assert marker in s;s=s.replace(marker,marker+'\n                                    if(zCb instanceof SizeAwareCb && isSizeRefusal(postResp,zBuilt.getID())){((SizeAwareCb)zCb).onSizeRefusal(postResp);return;}')
+        marker='if (zCb != null) zCb.onError(message);'
+        assert s.count(marker)==3
+        for guard in ['posted','basics','imported']:
+            s=s.replace(marker,'if ('+guard+'.compareAndSet(false,true) && zCb != null) zCb.onError(message);',1)
+        p.write_text(s)
     p=base/'TxnFactory.java';s=p.read_text()
     if '    public BuiltTxn buildWholeTransfer(' in s:
         return

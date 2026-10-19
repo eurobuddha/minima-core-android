@@ -81,6 +81,13 @@ final class SweepPending {
         if(saved.length()>8*1024*1024)throw new IllegalStateException("Confirm the pending batches before preparing more");
         store.write(saved);
     }catch(org.json.JSONException error){throw new IllegalStateException(error);}}}
+    /** Called only for the first submission's exact pre-mining rejection, never a replay. */
+    void rejectedSize(TxnFactory.BuiltTxn built,JSONObject reply){synchronized(SweepPending.class){try{
+        if(!com.eurobuddha.wallet.comms.NodeLink.isSizeRefusal(reply,built.getID()))throw new IllegalStateException("Not a definite size rejection");
+        JSONObject root=read();String id=built.getTransactionID().to0xString();JSONObject row=root.getJSONObject(id);
+        if(!row.getString("txpow").isEmpty()||!built.getImportHex().equals(row.getString("signed")))throw new IllegalStateException("Sweep attempt changed");
+        root.remove(id);store.write(root.toString());
+    }catch(org.json.JSONException error){throw new IllegalStateException(error);}}}
     void receipt(String transaction,JSONObject reply){synchronized(SweepPending.class){try{
         String proof=receiptId(transaction,reply);JSONObject root=read();JSONObject row=root.getJSONObject(transaction);
         row.put("txpow",proof);store.write(root.toString());

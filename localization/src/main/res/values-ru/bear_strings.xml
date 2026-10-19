@@ -8483,7 +8483,7 @@
     <string name="l10n_sweep_signatures">"Транзакций: %1$s; одноразовых подписей: %2$s."</string>
     <!-- Arguments: key, used, maximum -->
     <string name="l10n_sweep_key">"Ключ %1$s: следующая подпись №%2$s из %3$s"</string>
-    <string name="l10n_sweep_warning" formatted="false">"Транзакции отправляются по одной. Между группами можно остановиться. Транзакции с неизвестным результатом остаются в ожидании без повторной подписи. После отправки перевод необратим."</string>
+    <string name="l10n_sweep_warning" formatted="false">"Транзакции отправляются по одной. Между группами можно остановиться. Транзакции с неизвестным результатом остаются в ожидании без повторной подписи. После отправки перевод необратим. Группы, отклонённые до отправки из-за размера, автоматически разделяются и повторно отправляются на тот же адрес с дополнительными подписями."</string>
     <string name="l10n_sweep_confirm" formatted="false">"Подтвердить перевод — проверьте внимательно"</string>
     <string name="l10n_sweep_sign" formatted="false">"Подписать и отправить всё"</string>
     <string name="l10n_sweep_working" formatted="false">"Перевод активов"</string>
@@ -8502,4 +8502,8 @@
     <string name="l10n_sweep_native_state" formatted="false">"Minima (состояние)"</string>
     <string name="l10n_sweep_replay" formatted="false">"Повторно отправить сохранённые транзакции"</string>
     <string name="l10n_sweep_replay_help" formatted="false">"Повтор отправит те же сохранённые транзакции на адреса ниже. Новые подписи не создаются; суммы и адреса не меняются."</string>
+    <string name="l10n_sweep_splitting" formatted="false">"Группа слишком велика. Разделяем на меньшие группы и продолжаем…"</string>
+    <string name="l10n_sweep_single_large" formatted="false">"Узел отклонил эту отдельную монету до отправки: транзакция слишком велика. Разделить её без изменения состояния нельзя. Остальные группы продолжатся."</string>
+    <string name="l10n_sweep_split_a" formatted="false">"(часть A)"</string>
+    <string name="l10n_sweep_split_b" formatted="false">"(часть B)"</string>
 </resources>

@@ -68,7 +68,10 @@ public class NftView extends BaseView {
         for(String id:PENDING.keySet())result.add(id.toLowerCase(java.util.Locale.ROOT));
         return result;
     }
-    static void markPending(String id){PENDING.put(id,System.currentTimeMillis());}
+    static long markPending(String id){
+        return PENDING.compute(id,(key,previous)->Math.max(System.currentTimeMillis(),previous==null?0:previous+1));
+    }
+    static void clearSweepPending(String id,long stamp){PENDING.remove(id,stamp);}
     private static boolean isPending(String coinid) { return PENDING.containsKey(coinid); }
     private static boolean retryReady(String coinid) {
         Long time = PENDING.get(coinid);

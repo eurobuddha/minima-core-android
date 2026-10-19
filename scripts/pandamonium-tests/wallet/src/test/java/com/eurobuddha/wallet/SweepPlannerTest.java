@@ -246,4 +246,13 @@ public class SweepPlannerTest {
         assertTrue(plan.jobs.get(0).whole);assertEquals("[keep]",Nft.rawStateEntries(plan.jobs.get(0).coins.get(0)).get(0)[1]);
     }
 
+    @Test public void repeatedSplitsPreserveEveryInputWithoutDuplicatesAndTerminateAtSingles(){
+        JSONArray coins=new JSONArray();for(int i=0;i<9;i++)coins.add(coin("0x"+Integer.toHexString(i+1),ADDR_OURS_A,"1",MINIMA));
+        java.util.List<SweepPlanner.Job> jobs=new java.util.ArrayList<>(SweepPlanner.plan(coins,KEYS,new HashSet<>()).jobs);
+        for(int i=0;i<jobs.size();){SweepPlanner.Job job=jobs.get(i);if(job.coins.size()>1){jobs.remove(i);jobs.addAll(i,SweepPlanner.split(job));}else i++;}
+        java.util.Set<String> ids=new HashSet<>();for(SweepPlanner.Job job:jobs){assertEquals(1,job.coins.size());assertTrue(ids.add(Nft.str(job.coins.get(0),"coinid")));}
+        assertEquals(9,ids.size());assertEquals(9,jobs.size());
+        org.junit.Assert.assertThrows(IllegalArgumentException.class,()->SweepPlanner.split(jobs.get(0)));
+        org.junit.Assert.assertThrows(IllegalArgumentException.class,()->SweepPlanner.split(new SweepPlanner.Job(true,MINIMA,jobs.get(0).coins,"whole",1)));
+    }
 }

@@ -589,3 +589,10 @@ are combined without double counting. New local sends invalidate delayed posting
 lint verify. See ATOMIX_PENDING_FUNDS_2026-10-19.txt. Device/public2.0.0 unchanged.
 Gas/allowance, journal retention, wider receipt/reorg and standalone parity review
 remain open. This closes the local unknown-token-spend funding gap from2.0.6.
+
+Sweep size-recovery follow-up —2.0.9/code204
+Restored standalone automatic splitting after an exact pre-mining size refusal.
+Corrected the earlier wrong-checkout diagnosis: the bundled jar has the size check.
+See WALLET_SWEEP_SIZE_RECOVERY_2026-10-19.txt for source/runtime evidence and tests.
+Unknown responses retain saved bytes; NFT state is never split. Full review remains
+open, with no installation or publication of this candidate before device checking.

@@ -258,9 +258,28 @@ public class SweepFlow {
                     pending.reserve(built);return built;
                 },built->{
                     if(!current()){dialog.dismiss();return;}
-                    for(JSONObject coin:job.coins)NftView.markPending(Nft.str(coin,"coinid"));
+                    Map<String,Long> marked=new LinkedHashMap<>();
+                    for(JSONObject coin:job.coins){String id=Nft.str(coin,"coinid");marked.put(id,NftView.markPending(id));}
                     AtomicBoolean published=new AtomicBoolean();
-                    node.publish(built,new NodeApi.Cb(){
+                    node.publish(built,new NodeLink.SizeAwareCb(){
+                        public void onSizeRefusal(org.json.JSONObject reply){
+                            if(!published.compareAndSet(false,true)||!current())return;
+                            try {
+                                // An acknowledged rejection releases only this first attempt's reservation.
+                                // If saving fails, retain the signed bytes and do not create replacements.
+                                pending.rejectedSize(built,reply);
+                                for(Map.Entry<String,Long> mark:marked.entrySet())NftView.clearSweepPending(mark.getKey(),mark.getValue());
+                            }catch(Exception unavailable){
+                                failures.add(localLine(job.label)+": "+t(l10n_sweep_unknown));advance.run();return;
+                            }
+                            if(!job.whole&&job.coins.size()>1){
+                                progress.setText(t(l10n_sweep_splitting));
+                                plan.jobs.remove(i);plan.jobs.addAll(i,split(job));
+                                next(plan,destination,i,txpowids,sentCoinIds,failures,progress,dialog,cancelled);
+                                return;
+                            }
+                            failures.add(localLine(job.label)+": "+t(l10n_sweep_single_large));advance.run();
+                        }
                         public void onResult(org.json.JSONObject reply){
                             if(!published.compareAndSet(false,true)||!current())return;
                             try {
@@ -390,7 +409,8 @@ public class SweepFlow {
             if(resource!=0)return line.substring(0,cut)+" — "+t(resource);
         }
         return line.replace("NFT / state items",t(l10n_sweep_items)).replace("Minima (state)",t(l10n_sweep_native_state))
-            .replace("item(s), sent whole",t(l10n_sweep_whole)).replace("coin(s)",t(l10n_sweep_coins)).replace("(part ","("+t(l10n_sweep_part)+" ");
+            .replace("item(s), sent whole",t(l10n_sweep_whole)).replace("coin(s)",t(l10n_sweep_coins)).replace("(part ","("+t(l10n_sweep_part)+" ")
+            .replace("(split A)",t(l10n_sweep_split_a)).replace("(split B)",t(l10n_sweep_split_b));
     }
 
     private int dp(int zDp) {

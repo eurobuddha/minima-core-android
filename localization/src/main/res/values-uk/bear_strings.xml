@@ -8483,7 +8483,7 @@
     <string name="l10n_sweep_signatures">"Транзакцій: %1$s; одноразових підписів: %2$s."</string>
     <!-- Arguments: key, used, maximum -->
     <string name="l10n_sweep_key">"Ключ %1$s: наступний підпис №%2$s з %3$s"</string>
-    <string name="l10n_sweep_warning" formatted="false">"Транзакції надсилаються по одній. Між групами можна зупинитися. Транзакції з невідомим результатом залишаються в очікуванні без повторного підпису. Після надсилання переказ незворотний."</string>
+    <string name="l10n_sweep_warning" formatted="false">"Транзакції надсилаються по одній. Між групами можна зупинитися. Транзакції з невідомим результатом залишаються в очікуванні без повторного підпису. Після надсилання переказ незворотний. Групи, відхилені до надсилання через розмір, автоматично діляться й повторно надсилаються на ту саму адресу з додатковими підписами."</string>
     <string name="l10n_sweep_confirm" formatted="false">"Підтвердити переказ — перевірте уважно"</string>
     <string name="l10n_sweep_sign" formatted="false">"Підписати й надіслати все"</string>
     <string name="l10n_sweep_working" formatted="false">"Переказ активів"</string>
@@ -8502,4 +8502,8 @@
     <string name="l10n_sweep_native_state" formatted="false">"Minima (стан)"</string>
     <string name="l10n_sweep_replay" formatted="false">"Повторно надіслати збережені транзакції"</string>
     <string name="l10n_sweep_replay_help" formatted="false">"Повтор надішле ті самі збережені транзакції на адреси нижче. Нові підписи не створюються; суми й адреси не змінюються."</string>
+    <string name="l10n_sweep_splitting" formatted="false">"Група завелика. Ділимо на менші групи та продовжуємо…"</string>
+    <string name="l10n_sweep_single_large" formatted="false">"Вузол відхилив цю окрему монету до надсилання: транзакція завелика. Поділити її без зміни стану неможливо. Решта груп продовжаться."</string>
+    <string name="l10n_sweep_split_a" formatted="false">"(частина A)"</string>
+    <string name="l10n_sweep_split_b" formatted="false">"(частина B)"</string>
 </resources>

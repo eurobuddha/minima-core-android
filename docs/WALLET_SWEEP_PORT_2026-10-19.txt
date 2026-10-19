@@ -90,3 +90,10 @@ SweepPending, buildWholeTransfer and savedTransactions. Lint: zero errors,
 Final wallet regression rerun passed after moving planning off the UI thread and
 bounding pending-journal size. Release build and lint succeeded in1m57s.
 This APK has not been installed or published; Fold UI verification remains open.
+
+Correction / follow-up:2.0.9 automatic size recovery
+The earlier size-check conclusion used the wrong core checkout. The actual bundled
+minima.jar rejects oversized TxPoW before mining. Automatic pooled-batch splitting
+has now been restored with a structured correlated rejection callback and durable
+reservation guards. See WALLET_SWEEP_SIZE_RECOVERY_2026-10-19.txt for proof, validation
+and limits; the generic timeout/re-sign behavior remains excluded.
