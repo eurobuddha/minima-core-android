@@ -507,4 +507,5 @@ and publication remain pending at this checkpoint; the full review is still open
 2.0.0/code195 candidate: final MiniMall Shop connection label repair passed 44
 tests; signed offline build and pinned import verification passed. See
 PANDAMONIUM_2_0_0_RELEASE_2026-10-19.txt for scoped review, Fold evidence and limits.
-Full review remains open; final Fold unlock and publication pending.
+Full review remains open. Final Fold startup, node, AtomiX, Shop, NFT navigation
+and both terminals now checked; publication and user messaging check pending.
