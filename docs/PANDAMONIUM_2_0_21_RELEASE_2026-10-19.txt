@@ -1,0 +1,38 @@
+Pandamonium2.0.21 publication —2026-10-19
+
+User explicitly requested publication before continued standalone parity.
+Released the exact signed, installed and phone-tested candidate, unchanged.
+Package com.eurobuddha.pandamonium;2.0.21-Pandamonium/code216.
+Asset minima-core-Pandamonium-2.0.21.apk;137185733 bytes.
+SHA25628731e6ebb12b1993ac3d503667b3c8725ef3c4fcbfb9a51c582db64ba1c5f67
+Certificate eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+
+GitHub public release:
+https://github.com/eurobuddha/minima-core-android/releases/tag/v2.0.21-Pandamonium
+Tag target369a2460140fb0cff3652b8987f447cde352a455. GitHub asset size/digest match.
+The first create attempt used an abbreviated SHA rejected by GitHub; full SHA
+succeeded. No conflicting or duplicate release was created.
+
+PandaApps/minimaCore App Store catalog commit:
+f4fef795dfecb8a5049340ab9f0e677bbd0418a4 (eurobuddha/minima-core-apks/main).
+Existing scripts/publish-app.py verified download/identity/hash; check.py and
+mandatory pre-push gate both pass53entries/52binaries. Only Pandamonium row changed;
+concurrent Minima AI Skill1.2.0 retained. Website copied atomically from immutable
+commit with hash/downgrade check and backup. Hourly minute19 curl fetched stale CDN
+content and reverted it once; restored immutable catalog after that run. No cron
+configuration change. Public GitHub-main/website subsequently verified code216.
+
+Existing deployed build_ipfs_store.sh equals inspected source in tools/dappstore.
+Waited for an existing cron job; ran publisher using immutable APKS_JSON_URL.
+Snapshot:bafybeie2ejbmiqh5f6xw36v7cj6moo3u5ve2bcj62ck233ncrhaji4ilxq
+Local pin and IPNS publication succeeded; historical artifacts/pins preserved.
+Optional Filebase redundancy could not read its pin list (same existing limitation).
+Fresh public immutable-snapshot APK download matches137185733bytes/SHA above.
+Friendly https://ipfs.eurobuddha.com/apks/apks.json initially cached the previous
+snapshot, then verified2.0.21/code216/new CID. https://eurobuddha.com/apks.json
+also reverified2.0.21. All requested publication destinations are updated.
+
+User-confirmed simple Sweep and real AtomiX/PandaPools/PandaDEX trades pass. Actual
+fast integrated unlock and repaired send/return Core History observed on Fold.
+Large-TxPoW automatic handling still device-untested. Full review/parity IN PROGRESS.
+No Apple/Google store publication. No agent transaction, signing or seed changes.

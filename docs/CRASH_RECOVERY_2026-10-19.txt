@@ -194,3 +194,24 @@ no agent transaction, signing, reset or counter mutation. User confirms simple
 Sweep and real AtomiX/PandaPools/PandaDEX trades succeeded. Large-TxPoW automatic
 handling remains device-untested. Full review and standalone parity stay open.
 User now explicitly requests publication of2.0.21, then continued parity work.
+
+2026-10-19 publication and resumed parity — latest
+Pandamonium2.0.21 is PUBLISHED on GitHub, PandaApps/minimaCore App Store,
+eurobuddha.com and IPFS. Exact Fold-tested APK hash28731e6e...a1c5f67.
+See PANDAMONIUM_2_0_21_RELEASE_2026-10-19.txt for release/catalog/CID evidence.
+
+Standalone History0.3.13/code313 committed/pushed7d5cd10: Core-owned accounting,
+existing cached sends/receipts, list/search/export and known-row refresh parity.
+20debug+20release tests pass; lint0errors49warnings; signed candidate verified.
+SHA2566f2cfa8ec8854d24344957deda6e0ae5f9cdbca6e5f6c7f714b03c976ed2bc01.
+
+Standalone minimaWallet0.2.28/code228 committed/pushedff061e3: readable Sweep review,
+full destination/edit/cancel, owned-only skipped counts and distinct same-name asset
+rows.63debug+63release tests pass; lint0errors167warnings; signed candidate verified.
+SHA2562a527f43fcf946b7b3fdf492de93a6b7bc03ce04ed8ffa4f0eaa126d8c5727b8.
+Both standalone candidates remain uninstalled/unpublished. Existing graph/user
+dirt preserved (normal commit hooks may regenerate their own graph outputs).
+Standalone wallet durable unknown-outcome/receipt/retry, strict size rejection and
+planner/native-state preservation parity remain OPEN. Full review/parity continues.
+User asks how much remains; old append-only ledger has superseded entries. Do not
+claim a precise total/percentage without reconciling them against current source.
