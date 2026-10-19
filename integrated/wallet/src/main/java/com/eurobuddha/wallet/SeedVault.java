@@ -95,7 +95,7 @@ public class SeedVault {
     private volatile Object mSessionToken = new Object();
 
     public SeedVault(Context context) {
-        this(new PrefsBlobStore(context), phrase -> new NodeKeyUses(phrase, new PrefsKeyUses(context,
+        this(new PrefsBlobStore(context), phrase -> new NodeKeyUses(context, phrase, new PrefsKeyUses(context,
                 PublicAuditKeys.namespace(phrase))));
     }
 

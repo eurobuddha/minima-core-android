@@ -13,6 +13,10 @@ public final class NodeKeyUses implements KeyUses {
     private final IntFunction<String> publicKey;
     private final EmbeddedWallet.Source source;
 
+    public NodeKeyUses(android.content.Context context,String phrase,KeyUses local) {
+        this(local,CachedPublicKeys.open(context,new WalletCore(phrase,local)),EmbeddedWallet.NODE);
+    }
+
     public NodeKeyUses(String phrase, KeyUses local) {
         this(local, new WalletCore(phrase, local), EmbeddedWallet.NODE);
     }
@@ -79,6 +83,7 @@ public final class NodeKeyUses implements KeyUses {
         for (int i=0; i<WalletCore.NUM_BASE_KEYS; i++) indices.add(i);
         Map<Integer,String> keys = new LinkedHashMap<>();
         for (int index : indices) keys.put(index, key(index));
+        if(publicKey instanceof CachedPublicKeys)((CachedPublicKeys)publicKey).save();
         return keys;
     }
     @Override public Map<Integer,Integer> snapshotAllUses() {

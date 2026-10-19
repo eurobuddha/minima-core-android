@@ -61,7 +61,7 @@ def adapt_seed_counters(java):
     private long mGeneration;
 
     public SeedVault(Context context) {
-        this(new PrefsBlobStore(context), phrase -> new NodeKeyUses(phrase, new PrefsKeyUses(context,
+        this(new PrefsBlobStore(context), phrase -> new NodeKeyUses(context, phrase, new PrefsKeyUses(context,
                 "classic_" + org.minima.utils.Crypto.getInstance().hashObject(
                         org.minima.utils.BIP39.convertStringToSeed(phrase)).to0xString().substring(2))));
     }""")

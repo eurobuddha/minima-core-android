@@ -64,7 +64,7 @@ public class SweepFlow {
                     return plan(coins,act::keyIndexForAddress,reserved);
                 },plan->{
                     if(!current())return;
-                    if(plan.isEmpty()){showReport(t(l10n_sweep_empty),t(l10n_sweep_empty_body)+"\n"+joinLines(plan.skipped),null,null);return;}
+                    if(plan.isEmpty()){showReport(t(l10n_sweep_empty),t(l10n_sweep_empty_body)+remainingSummary(plan),null,null);return;}
                     promptDestination(plan);
                 },error->{if(current())showReport(t(l10n_sweep_title),t(l10n_sweep_load_error),null,null);});
             }
@@ -157,62 +157,63 @@ public class SweepFlow {
         try {
             if (!isValidDestination(zDest)) throw new IllegalArgumentException(t(l10n_sweep_invalid));
 
-            StringBuilder sb = new StringBuilder();
-            sb.append(t(l10n_sweep_to)).append("\n").append(zDest).append("\n");
-            try {
-                String d0x = TxnFactory.parseAddress(zDest).to0xString();
-                Integer ki = act.keyIndexForAddress(d0x);
-                if (ki != null) {
-                    sb.append("\n⚠ ").append(t(l10n_sweep_self,ki)).append("\n");
-                }
-            } catch (Exception ignore) { }
+            LinearLayout contents = new LinearLayout(act);
+            contents.setOrientation(LinearLayout.VERTICAL);
+            contents.setPadding(dp(24),dp(8),dp(24),dp(16));
+            reviewText(contents,t(l10n_sweep_moving),true);
+            for (AssetTotal asset : zPlan.totals)
+                reviewText(contents,asset.amount + "  " + asset.name,false);
+            if(zPlan.wholeItems>0)reviewText(contents,t(l10n_sweep_whole_count,zPlan.wholeItems),false);
 
-            sb.append("\n").append(t(l10n_sweep_moving)).append("\n");
-            for (Map.Entry<String, String> e : zPlan.totals.entrySet()) {
-                sb.append("  ").append(localLine(e.getKey())).append(": ").append(localLine(e.getValue())).append("\n");
-            }
-            if (!zPlan.skipped.isEmpty()) {
-                sb.append("\n").append(t(l10n_sweep_skipping,zPlan.skipped.size())).append("\n")
-                  .append(joinLines(zPlan.skipped)).append("\n");
-            }
-            if (!zPlan.oversizedWarnings.isEmpty()) {
-                sb.append("\n⚠ ").append(t(l10n_sweep_heavy,zPlan.oversizedWarnings.size())).append("\n")
-                  .append(joinLines(zPlan.oversizedWarnings)).append("\n");
-            }
+            reviewText(contents,t(l10n_sweep_to),true);
+            TextView address=reviewText(contents,zDest,false);
+            address.setTypeface(Typeface.MONOSPACE);
+            address.setTextSize(14f);
+            address.setTextDirection(android.view.View.TEXT_DIRECTION_LTR);
+            reviewText(contents,t(l10n_sweep_address_help),false);
+            String d0x = TxnFactory.parseAddress(zDest).to0xString();
+            if(act.keyIndexForAddress(d0x)!=null)reviewText(contents,t(l10n_sweep_self_review),false);
 
-            sb.append("\n").append(t(l10n_sweep_signatures,zPlan.jobs.size(),zPlan.signatures));
-            List<Integer> seen = new ArrayList<>();
-            for (Job j : zPlan.jobs) {
-                for (JSONObject c : j.coins) {
-                    Integer ki = act.keyIndexForAddress(Nft.str(c, "address"));
-                    if (ki != null && !seen.contains(ki)) {
-                        seen.add(ki);
-                        sb.append("\n  ").append(t(l10n_sweep_key,ki,act.keyUses().currentUses(ki),Util.WOTS_MAX_USES));
-                    }
-                }
+            String remaining=remainingSummary(zPlan);
+            if(!remaining.isEmpty()) {
+                reviewText(contents,t(l10n_sweep_remaining),true);
+                reviewText(contents,remaining.trim(),false);
             }
-
-            sb.append("\n\n").append(t(l10n_sweep_warning));
-
-            TextView msg = new TextView(act);
-            msg.setText(sb.toString());
-            msg.setTextIsSelectable(true);
-            msg.setTypeface(Typeface.MONOSPACE);
-            msg.setTextColor(Design.text());
-            msg.setTextSize(12f);
-            msg.setPadding(dp(20), dp(12), dp(20), dp(8));
+            if(!zPlan.oversizedWarnings.isEmpty())
+                reviewText(contents,t(l10n_sweep_large_summary,zPlan.oversizedWarnings.size()),false);
+            reviewText(contents,t(l10n_sweep_review_warning),false);
+            reviewText(contents,t(l10n_sweep_review_next),false);
             ScrollView wrap = new ScrollView(act);
-            wrap.addView(msg);
+            wrap.addView(contents);
 
             new WalletDialog(act)
                     .setTitle(t(l10n_sweep_confirm))
                     .setView(wrap)
                     .setPositiveButton(t(l10n_sweep_confirm_destination), (d, w) -> confirmDestination(zPlan, zDest))
+                    .setNeutralButton(t(l10n_sweep_edit_destination), (d, w) -> promptDestination(zPlan))
                     .setNegativeButton(t(l10n_sweep_cancel), null)
                     .show();
         } catch (Exception e) {
             Toast.makeText(act, String.valueOf(e.getMessage()), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private TextView reviewText(LinearLayout parent,String text,boolean heading) {
+        TextView view=new TextView(act);
+        view.setText(text);view.setTextColor(Design.text());view.setTextIsSelectable(true);
+        view.setTextSize(16f);
+        view.setTypeface(Typeface.DEFAULT,heading?Typeface.BOLD:Typeface.NORMAL);
+        view.setPadding(0,dp(heading?16:8),0,0);
+        parent.addView(view,new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
+        return view;
+    }
+
+    private String remainingSummary(Plan plan) {
+        StringBuilder text=new StringBuilder();
+        if(plan.pendingCount>0)text.append("\n").append(t(l10n_sweep_pending_summary,plan.pendingCount));
+        if(plan.lockedCount>0)text.append("\n").append(t(l10n_sweep_locked_summary,plan.lockedCount));
+        return text.toString();
     }
 
     // ---------------------------------------------------------------------------------------------

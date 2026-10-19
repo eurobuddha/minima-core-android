@@ -8476,10 +8476,10 @@
     <string name="l10n_sweep_review" formatted="false">"Перевірити"</string>
     <string name="l10n_sweep_cancel" formatted="false">"Скасувати"</string>
     <string name="l10n_sweep_invalid" formatted="false">"Введіть дійсну Mx-адресу з правильною контрольною сумою. Для переказу всіх коштів адреси 0x не приймаються."</string>
-    <string name="l10n_sweep_to" formatted="false">"Перевести все на адресу:"</string>
+    <string name="l10n_sweep_to" formatted="false">"Адреса одержувача"</string>
     <!-- Arguments: key -->
     <string name="l10n_sweep_self">"Це адреса поточного гаманця (ключ %1$s). Монети повернуться в цей гаманець."</string>
-    <string name="l10n_sweep_moving" formatted="false">"Буде переведено:"</string>
+    <string name="l10n_sweep_moving" formatted="false">"Ви надсилаєте"</string>
     <!-- Arguments: number -->
     <string name="l10n_sweep_skipping">"Пропущено монет: %1$s:"</string>
     <!-- Arguments: number -->
@@ -8489,8 +8489,8 @@
     <!-- Arguments: key, used, maximum -->
     <string name="l10n_sweep_key">"Ключ гаманця-відправника %1$s: наступний підпис №%2$s з %3$s"</string>
     <string name="l10n_sweep_warning" formatted="false">"Транзакції надсилаються по одній. Між групами можна зупинитися. Транзакції з невідомим результатом залишаються в очікуванні без повторного підпису. Після надсилання переказ незворотний. Групи, відхилені до надсилання через розмір, автоматично діляться й повторно надсилаються на ту саму адресу з додатковими підписами."</string>
-    <string name="l10n_sweep_confirm" formatted="false">"Підтвердити переказ — перевірте уважно"</string>
-    <string name="l10n_sweep_sign" formatted="false">"Підписати й надіслати все"</string>
+    <string name="l10n_sweep_confirm" formatted="false">"Перевірка переказу"</string>
+    <string name="l10n_sweep_sign" formatted="false">"Підтвердити переказ"</string>
     <string name="l10n_sweep_working" formatted="false">"Переказ активів"</string>
     <string name="l10n_sweep_stop" formatted="false">"Зупинити після поточної"</string>
     <string name="l10n_sweep_close" formatted="false">"Закрити"</string>
@@ -8515,7 +8515,21 @@
     <string name="l10n_atomix_otc_recovery_save_failed" formatted="false">"Блокування коштів для обміну не надіслано: не вдалося зберегти дані відновлення."</string>
     <string name="l10n_sweep_confirm_destination" formatted="false">"Підтвердити адресу…"</string>
     <string name="l10n_sweep_repeat_address" formatted="false">"Введіть повну Mx-адресу ще раз"</string>
-    <string name="l10n_sweep_address_check" formatted="false">"Звірте повну адресу з гаманцем одержувача та введіть її ще раз. Формат і контрольна сума правильні, але це не підтверджує, хто контролює адресу. Буде переказано весь доступний баланс. Скасувати переказ неможливо."</string>
+    <string name="l10n_sweep_address_check" formatted="false">"Звірте повну адресу нижче з гаманцем одержувача. Вставте або введіть її знову з того гаманця. Кнопка «Підтвердити переказ» надішле перевірені вами активи. Скасувати переказ неможливо."</string>
     <!-- Arguments: reason -->
     <string name="l10n_sweep_inputs_error">"Не вдалося підготувати вхідні монети гаманця: %1$s. Цю групу не підписано й не надіслано вузлу."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_sweep_whole_count">"NFT та інші об’єкти цілком: %1$d"</string>
+    <string name="l10n_sweep_address_help" formatted="false">"Звірте з гаманцем одержувача. Коректна адреса не доводить, що ви маєте до неї доступ."</string>
+    <string name="l10n_sweep_self_review" formatted="false">"Ця адреса належить цьому гаманцю. Активи залишаться в ньому."</string>
+    <string name="l10n_sweep_remaining" formatted="false">"Не включено"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_sweep_pending_summary">"Уже надсилаються: %1$d. Дочекайтеся підтвердження цих переказів."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_sweep_locked_summary">"Заблоковані примірники залишаться тут: %1$d. Перед переказом проштампуйте їх у NFT Wallet."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_sweep_large_summary">"Великі об’єкти: %1$d. Вони можуть перевищити ліміт мережі й залишитися тут. Решту активів можна переказати."</string>
+    <string name="l10n_sweep_review_warning" formatted="false">"Буде переказано всі доступні активи, зазначені вище. Завершені перекази неможливо скасувати."</string>
+    <string name="l10n_sweep_review_next" formatted="false">"Поки нічого не надіслано. Далі підтвердьте адресу одержувача."</string>
+    <string name="l10n_sweep_edit_destination" formatted="false">"Змінити адресу"</string>
 </resources>

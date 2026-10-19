@@ -255,4 +255,21 @@ public class SweepPlannerTest {
         org.junit.Assert.assertThrows(IllegalArgumentException.class,()->SweepPlanner.split(jobs.get(0)));
         org.junit.Assert.assertThrows(IllegalArgumentException.class,()->SweepPlanner.split(new SweepPlanner.Job(true,MINIMA,jobs.get(0).coins,"whole",1)));
     }
+    @Test public void reviewCountsOnlyThisWalletAndPreservesSameNamedAssets() {
+        JSONArray coins=new JSONArray();
+        coins.add(coin("0x01",ADDR_OURS_A,"5",MINIMA));
+        coins.add(coin("0x02",ADDR_FOREIGN,"7",MINIMA));
+        coins.add(stateNftCoin("0x03",ADDR_OURS_A,"0"));
+        for(int i=4;i<6;i++) {
+            JSONObject c=coin("0x0"+i,ADDR_OURS_A,"10","0xD"+i);
+            c.put("token",tokenNode("Same name","RETURN TRUE"));c.put("tokenamount","100");coins.add(c);
+        }
+        SweepPlanner.Plan p=SweepPlanner.plan(coins,KEYS,new HashSet<>(java.util.Arrays.asList("0x01","0x02")));
+        assertEquals(1,p.pendingCount);assertEquals(1,p.lockedCount);
+        assertEquals(2,p.totals.size());assertEquals("100",p.totals.get(0).amount);
+        assertEquals("100",p.totals.get(1).amount);
+        assertFalse(p.totals.get(0).tokenid.equals(p.totals.get(1).tokenid));
+        assertEquals(2,p.jobs.size());
+    }
+
 }

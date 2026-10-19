@@ -8402,10 +8402,10 @@
     <string name="l10n_sweep_review" formatted="false">"Review"</string>
     <string name="l10n_sweep_cancel" formatted="false">"Cancel"</string>
     <string name="l10n_sweep_invalid" formatted="false">"Enter a valid Mx address with a correct checksum. Raw 0x addresses are not accepted for Sweep."</string>
-    <string name="l10n_sweep_to" formatted="false">"Sweep everything to:"</string>
+    <string name="l10n_sweep_to" formatted="false">"Receiving address"</string>
     <!-- Arguments: key -->
     <string name="l10n_sweep_self">"This is your current wallet’s own address (key %1$s). The coins will return to this wallet."</string>
-    <string name="l10n_sweep_moving" formatted="false">"Moving:"</string>
+    <string name="l10n_sweep_moving" formatted="false">"You’re sending"</string>
     <!-- Arguments: number -->
     <string name="l10n_sweep_skipping">"Skipping %1$s coins:"</string>
     <!-- Arguments: number -->
@@ -8415,8 +8415,8 @@
     <!-- Arguments: key, used, maximum -->
     <string name="l10n_sweep_key">"Source wallet key %1$s: next signature #%2$s of %3$s"</string>
     <string name="l10n_sweep_warning" formatted="false">"Transactions are sent one by one. You can stop between batches. Uncertain transactions remain pending and are not automatically signed again. Transfers are irreversible once broadcast. Batches rejected as too large before broadcast are automatically split and retried to the same destination, using additional signatures."</string>
-    <string name="l10n_sweep_confirm" formatted="false">"Confirm sweep — review carefully"</string>
-    <string name="l10n_sweep_sign" formatted="false">"Sign &amp; broadcast all"</string>
+    <string name="l10n_sweep_confirm" formatted="false">"Review sweep"</string>
+    <string name="l10n_sweep_sign" formatted="false">"Confirm &amp; sweep"</string>
     <string name="l10n_sweep_working" formatted="false">"Sweeping"</string>
     <string name="l10n_sweep_stop" formatted="false">"Stop after current"</string>
     <string name="l10n_sweep_close" formatted="false">"Close"</string>
@@ -8441,7 +8441,21 @@
     <string name="l10n_atomix_otc_recovery_save_failed" formatted="false">"The swap lock was not submitted because recovery data could not be saved."</string>
     <string name="l10n_sweep_confirm_destination" formatted="false">"Confirm destination…"</string>
     <string name="l10n_sweep_repeat_address" formatted="false">"Enter the full Mx address again"</string>
-    <string name="l10n_sweep_address_check" formatted="false">"Compare this full address with the receiving wallet, then enter it again. The format and checksum are valid; this does not verify who controls the address. This will send your entire available balance and cannot be undone."</string>
+    <string name="l10n_sweep_address_check" formatted="false">"Compare the full address below with the receiving wallet. Paste or enter it again from that wallet to confirm. Confirm &amp; sweep will send the assets you reviewed. Transfers cannot be undone."</string>
     <!-- Arguments: reason -->
     <string name="l10n_sweep_inputs_error">"Could not prepare the wallet’s input coins: %1$s. This batch was not signed or sent to the node."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_sweep_whole_count">"NFTs and other whole items: %1$d"</string>
+    <string name="l10n_sweep_address_help" formatted="false">"Check this against the receiving wallet. A valid address does not prove you can access it."</string>
+    <string name="l10n_sweep_self_review" formatted="false">"This address belongs to this wallet. These assets would stay in this wallet."</string>
+    <string name="l10n_sweep_remaining" formatted="false">"Not included"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_sweep_pending_summary">"Already being sent: %1$d. Wait for those transfers to confirm."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_sweep_locked_summary">"Locked editions staying here: %1$d. Stamp them in NFT Wallet before moving them."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_sweep_large_summary">"Large items: %1$d. These may exceed the network’s size limit and stay here. Other assets can still move."</string>
+    <string name="l10n_sweep_review_warning" formatted="false">"This moves all available assets shown above. Completed transfers cannot be undone."</string>
+    <string name="l10n_sweep_review_next" formatted="false">"Nothing is sent yet. Next, confirm the receiving address."</string>
+    <string name="l10n_sweep_edit_destination" formatted="false">"Edit address"</string>
 </resources>

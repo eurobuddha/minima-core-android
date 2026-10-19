@@ -1,0 +1,74 @@
+Pandamonium2.0.18/code213 — readable Sweep review and repeat-unlock derivation
+
+User request
+User clarified that the irrelevant key/address wall was in Sweep review, then cancelled
+manual Sweep on2.0.17 to preserve the funded wallet for testing the corrected build.
+No automated signing, broadcast, retry, pending clearing, seed or counter modifications.
+The Fold was left untouched throughout local development. Live Sweep success remains
+unverified; the user will execute it. Physical unlock timings have not been measured.
+
+Reuse gate and implementation
+Read standalone wallet SweepFlow.java and SendView.java, integrated SendView.java,
+SweepFlow.java, SweepPlanner.java, TxnFactory/WalletCore callers and existing planner,
+worker and real-dialog tests. Kept the existing native WalletDialog/ScrollView pattern,
+plan calculations, whole-item classification, transaction batching and signing gates.
+Review now uses normal16sp text with section headings, amounts/names, full14sp Mx
+address, meaningful own-wallet warning, concise owned pending/locked counts, large-item
+warning only when relevant, irreversible-transfer warning and explicit nothing-sent-yet
+copy. Edit address and Cancel are available. Final address re-entry and checksum/
+canonical32-byte validation remain. Address validity cannot prove spending access.
+No source coin IDs, foreign-node addresses, public-key numbers or signature counters
+appear in review. Empty-result screen also omits unrelated node data. Skipped diagnostics
+remain internal. Ownership filtering precedes pending counting so unrelated assets cannot
+inflate the user-facing counts. Distinct same-named tokens retain separate amount rows.
+
+Unlock diagnosis and fix
+SeedVault.open creates a fresh NodeKeyUses with its own WalletCore. Audit export and
+counter reconciliation ask for all64 public keys; that core did not use the persisted
+AddressBook cache. This rederived classic TreeKeys every unlock. Standalone has no
+NodeKeyUses provider, so this particular repetition is integrated-only.
+Read AddressBook.java, WalletCore.java, NodeKeyUses.java, PublicAuditKeys.java,
+SeedVault.java/VaultBlob.java and VaultCrypto.java plus sibling wallet/NFTwallet/utxo
+candidates and counter/audit/startup tests. Existing AddressBook/audit public metadata
+is not authenticated: trusting it for node counter lookup could hide a higher counter
+by substituting the public key. It is unsuitable as signing-counter authority.
+New CachedPublicKeys supplies NodeKeyUses' existing IntFunction hook. It uses the
+unchanged WalletCore.getPublicKey derivation on a miss and existing VaultCrypto HKDF
+plus authenticated container for persistence. Only public keys are cached, bound to
+the decrypted seed with a domain-separated derived secret. No private keys, seed,
+passphrase, counters or trust flags are stored in this cache. The optional cache uses
+one KDF iteration with a seed-derived256-bit credential; human-passphrase vault KDF
+stays210000. Header work and payload size are bounded before decryption. Invalid,
+missing, corrupt, wrong-seed or failed-write caches fall back to derivation. It cannot
+reset counters or permit signing. Current node/local counter reconciliation, reservation,
+locking, persistence and vault authentication remain unchanged. Existing installations
+populate this protected cache on their first successful unlock; subsequent opens reuse
+it. No measured Fold unlock duration is claimed. No standalone unlock change needed.
+
+Verification
+220 integrated-wallet tests +187 host tests =407; zero failures/errors/skips.
+New tests cover cached base/extra keys with zero derivation on repeated open, wrong-seed
+and ciphertext corruption rejection, malformed/expensive-header cache misses, failed
+writes, invalid keys, fresh node counter reads despite old cache, durable reservations
+and query failure blocking. All signing/counter fixtures are disposable local test data.
+Planner regression covers owned pending/locked counts and same-named tokens. Real UI
+regression covers asset/destination/warnings,100 foreign skipped coins never displayed,
+no key-counter lookups and cancellation with no signing. Existing final-confirmation
+controls are tested in all4 languages, including mismatches and cancel.
+Release build/lint pass:1827 warnings, no errors/fatals.6998 messages/4 languages,
+pinned-source importer regeneration, direct-node transport and Keets artifact checks
+pass. APK ZIP integrity, package/version and release signing certificate verified.
+
+Code Review
+Summary: focused presentation change preserving execution, plus authenticated optional
+public-key acceleration preserving live counters. Read all changed source/adapter/test
+and generated translation changes. Existing unsigned cache cannot be reused as counter
+authority, which justifies the small authenticated storage wrapper. No new dependency.
+Findings: no blocking defect found. Phone timing and real-network success are unverified.
+Verdict: approve for user-controlled candidate testing; full review/parity IN PROGRESS.
+
+Artifact — candidate only, not published
+base/dist/pandamonium-2.0.18-candidate.apk
+SHA256 bc5429b2fad946fcf4f1ca871fbb3cc2c6521bfb41303e5ccd1c4d75c4dc1602
+Certificate eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Installation and commit handoff are recorded in the latest crash-recovery entry.

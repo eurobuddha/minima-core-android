@@ -659,3 +659,16 @@ before-fix failing real-dispatcher regression and external destination UI accept
 Local errors now preserve reasons; source-coin/key labels are explicit. Standalone
 lacks this worker defect and remains0.2.27. See WALLET_SWEEP_WORKER_2026-10-19.txt.
 No agent transaction or retry. Live successful Sweep still unverified. Full review open.
+
+2026-10-19 Sweep UX/unlock candidate2.0.18 — latest checkpoint
+User confirmed the wall of source coin/key data was in Sweep review and cancelled
+manual Sweep pending a usable build. Implemented readable amounts/asset names and full
+Mx destination, owned-only skipped summaries, no node/coin/key dump, edit/cancel and
+separate destination confirmation. Fixed repeated unlock key derivation using a
+seed-authenticated optional public-key cache; first unlock populates it once. Live
+signing counters still reconcile normally.407 tests pass; signed release/lint/importer/
+transport/Keets checks pass. Artifact base/dist/pandamonium-2.0.18-candidate.apk,
+SHA256 bc5429b2fad946fcf4f1ca871fbb3cc2c6521bfb41303e5ccd1c4d75c4dc1602.
+See docs/WALLET_SWEEP_UX_UNLOCK_2026-10-19.txt. No live signing or timing claim.
+Installation is the next step. Full review/parity stays IN PROGRESS; standalone0.2.27
+still has the older Sweep presentation and needs the applicable UX parity adaptation.

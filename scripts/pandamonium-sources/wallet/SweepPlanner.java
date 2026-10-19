@@ -53,11 +53,20 @@ final class SweepPlanner {
         }
     }
 
+    static final class AssetTotal {
+        final String tokenid, name, amount;
+        AssetTotal(String tokenid,String name,String amount) {
+            this.tokenid=tokenid;this.name=name;this.amount=amount;
+        }
+    }
+
     static final class Plan {
         final List<Job> jobs = new ArrayList<>();
         final List<String> skipped = new ArrayList<>();      // human reasons, one per skipped coin
         final List<String> oversizedWarnings = new ArrayList<>(); // singles estimated over budget
-        final Map<String, String> totals = new LinkedHashMap<>(); // display label -> amount summary
+        // A list preserves distinct tokens with the same display name.
+        final List<AssetTotal> totals = new ArrayList<>();
+        int wholeItems, pendingCount, lockedCount;
         int signatures = 0;                                   // total WOTS leaves the plan consumes
 
         boolean isEmpty() { return jobs.isEmpty(); }
@@ -101,12 +110,13 @@ final class SweepPlanner {
             if(coinid.isEmpty()||addr.isEmpty()||!seen.add(coinid.toLowerCase(java.util.Locale.ROOT)))
                 throw new IllegalArgumentException("Duplicate or incomplete sweep coin");
 
-            if (pending.contains(coinid.toLowerCase(Locale.ROOT))) {
-                plan.skipped.add(coinid + " — already confirming from an earlier send");
-                continue;
-            }
             if (zKeys.keyIndexFor(addr) == null) {
                 plan.skipped.add(coinid + " — address " + addr + " is not in this wallet");
+                continue;
+            }
+            if (pending.contains(coinid.toLowerCase(Locale.ROOT))) {
+                plan.pendingCount++;
+                plan.skipped.add(coinid + " — already confirming from an earlier send");
                 continue;
             }
 
@@ -121,6 +131,7 @@ final class SweepPlanner {
             JSONObject tokNode = (c.get("token") instanceof JSONObject) ? (JSONObject) c.get("token") : null;
             Nft.Meta meta = Nft.meta(tokNode);
             if (Nft.isUnstampedLocked(meta, c)) {
+                plan.lockedCount++;
                 plan.skipped.add(meta.name + " (" + coinid + ") — UNSTAMPED locked edition; the "
                         + "creator could reclaim it. Stamp it in NFT wallet first");
                 continue;
@@ -163,19 +174,18 @@ final class SweepPlanner {
             plan.signatures++;
             nftCount++;
         }
-        if (nftCount > 0) plan.totals.put("NFT / state items", nftCount + " item(s), sent whole");
+        plan.wholeItems = nftCount;
 
         // 2. Plain fungible tokens — pooled, chunked.
         for (Map.Entry<String, List<JSONObject>> e : fungible.entrySet()) {
             String name = fungibleNames.get(e.getKey());
-            plan.totals.put("Token \"" + name + "\"",
-                    tokenTotals.get(e.getKey()) + " (" + e.getValue().size() + " coin(s))");
+            plan.totals.add(new AssetTotal(e.getKey(),name,tokenTotals.get(e.getKey()).toString()));
             chunkInto(plan, e.getValue(), zKeys, e.getKey(), name);
         }
 
         // 3. Native Minima next.
         if (!minima.isEmpty()) {
-            plan.totals.put("Minima", minimaTotal + " (" + minima.size() + " coin(s))");
+            plan.totals.add(0,new AssetTotal(Util.MINIMA_TOKENID,"Minima",minimaTotal.toString()));
             chunkInto(plan, minima, zKeys, Util.MINIMA_TOKENID, "Minima");
         }
 

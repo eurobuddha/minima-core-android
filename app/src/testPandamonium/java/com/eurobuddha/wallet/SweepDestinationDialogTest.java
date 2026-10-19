@@ -85,4 +85,38 @@ public class SweepDestinationDialogTest {
         verify(activity,never()).runSigningWork(any(),any(),any());
     }
 
+    private static String visibleText(View view) {
+        StringBuilder text=new StringBuilder();
+        if(view instanceof android.widget.TextView)text.append(((android.widget.TextView)view).getText()).append("\n");
+        if(view instanceof ViewGroup)for(int i=0;i<((ViewGroup)view).getChildCount();i++)text.append(visibleText(((ViewGroup)view).getChildAt(i)));
+        return text.toString();
+    }
+    @Test public void reviewShowsAssetsAndDestinationWithoutNodeDataOrKeyCounters()throws Exception {
+        Language.initialize(RuntimeEnvironment.getApplication(),()->false);
+        Language.select(RuntimeEnvironment.getApplication(),"en");
+        MainActivity activity=spy(Robolectric.buildActivity(MainActivity.class).get());
+        activity.setTheme(com.eurobuddha.wallet.R.style.pm_wallet_Theme_Utxo);
+        doReturn(null).when(activity).keyIndexForAddress(anyString());
+        SweepFlow flow=mock(SweepFlow.class,CALLS_REAL_METHODS);
+        put(flow,"act",activity);put(flow,"session",(java.util.function.BooleanSupplier)()->true);
+        SweepPlanner.Plan plan=new SweepPlanner.Plan();
+        plan.totals.add(new SweepPlanner.AssetTotal("0x00","Minima","12.5"));
+        plan.wholeItems=3;plan.pendingCount=2;plan.lockedCount=1;
+        for(int i=0;i<100;i++)plan.skipped.add("0xFOREIGNCOIN"+i+" — address 0xFOREIGNADDRESS is not in this wallet");
+        plan.oversizedWarnings.add("0xHUGEITEM — estimated ~100K");
+        Method review=SweepFlow.class.getDeclaredMethod("review",SweepPlanner.Plan.class,String.class);
+        review.setAccessible(true);review.invoke(flow,plan,MX);
+        AlertDialog dialog=(AlertDialog)ShadowDialog.getLatestDialog();
+        String text=visibleText(dialog.getWindow().getDecorView());
+        assertTrue(text,text.contains("12.5  Minima"));assertTrue(text,text.contains(MX));
+        assertTrue(text,text.contains("whole items: 3"));assertTrue(text,text.contains("Already being sent: 2"));
+        assertTrue(text,text.contains("Locked editions staying here: 1"));assertTrue(text,text.contains("Large items: 1"));
+        assertTrue(text,text.contains("Nothing is sent yet"));assertTrue(text,text.contains("cannot be undone"));
+        assertFalse(text,text.contains("0x"));assertFalse(text,text.contains("262144"));
+        verify(activity,never()).keyUses();verify(activity,never()).runSigningWork(any(),any(),any());
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).performClick();
+        org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
+        assertFalse(dialog.isShowing());
+    }
+
 }
