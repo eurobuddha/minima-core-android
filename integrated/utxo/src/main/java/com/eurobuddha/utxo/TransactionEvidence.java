@@ -186,13 +186,19 @@ final class TransactionEvidence {
     }
     /** Match the node's configured default confirmation depth (GlobalParams.MINIMA_CONFIRM_DEPTH = 3). */
     static JSONObject inclusion(JSONObject reply) {
+        JSONObject proof=observedInclusion(reply);
+        if(new java.math.BigInteger(proof.optString("confirmations")).compareTo(java.math.BigInteger.valueOf(3))<0)throw invalid();
+        return proof;
+    }
+    /** Complete current-chain observation; display may show depths below settlement's three blocks. */
+    static JSONObject observedInclusion(JSONObject reply) {
         if (reply == null || !Boolean.TRUE.equals(reply.opt("status")) || Boolean.TRUE.equals(reply.opt("pending"))) throw invalid();
         JSONObject value = reply.optJSONObject("response");
         if (value == null || !Boolean.TRUE.equals(value.opt("found"))) throw invalid();
         String blockId = TransactionFields.id(value,"blockid");
         if (new java.math.BigInteger(blockId.substring(2),16).signum() == 0) throw invalid();
         java.math.BigInteger block = whole(value,"block"), tip = whole(value,"tip"), depth = whole(value,"confirmations");
-        if (block.signum() <= 0 || depth.compareTo(java.math.BigInteger.valueOf(3)) < 0
+        if (block.signum() <= 0 || depth.signum() < 0
                 || !tip.subtract(block).equals(depth)) throw invalid();
         try { return new JSONObject().put("found",true).put("blockid",blockId)
                 .put("block",block.toString()).put("tip",tip.toString()).put("confirmations",depth.toString()); }

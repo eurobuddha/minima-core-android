@@ -1,0 +1,90 @@
+Wallet cached-history status review — 2026-10-19
+Scope: integrated UTXO and NFT Wallet history rows and transaction details.
+Local Pandamonium2.0.4/code199 checkpoint. Verified public demo remains2.0.0.
+
+Problem and repair
+MAJOR: stored confirmed journal/display rows were presented as currently confirmed
+without a fresh chain lookup. Node history also displayed a cached block number
+without distinguishing saved evidence from current inclusion. A restart, offline
+node or reorganization could leave that presentation misleading indefinitely.
+Rows now say Saved, retaining their recorded block, amount, direction and detail.
+Saved confirmed receipts say Previously confirmed and invite a recheck. Their
+visual state no longer shows a green confirmation check without a fresh lookup.
+Opening either cached node history or a local receipt starts a read-only
+`txpow onchain:<id>` query. Each opening performs a new check; positive results
+include the node-reported inclusion block/depth and time of the check. No inferred
+confirmation count is derived from the saved TxPoW header or elapsed time.
+Typed absence is shown as Not found on this node plus Outcome unverified, never
+as a failed transfer. Malformed/failed replies show Outcome unverified; raw errors
+are not rendered. No current status is persisted or used to change journal state.
+
+Reuse and compatibility
+Inspected complete wallet HistoryView/HistoryDb/NodeTx, LocalHistory and its tests,
+TransactionRecovery, TransactionEvidence and callers. Compared standalone UTXO,
+NFT, History and minimaWallet paths; searched shared minimaapi and integrated
+helpers. Read core txpow.java and its retained-chain inclusion response.
+Reused the asynchronous detail lookup/display from integrated/blockexplorer/
+src/main/java/com/eurobuddha/blockexplorer/MainActivity.java, and the strict parser
+in integrated/NFTwallet/.../TransactionEvidence.java. PandaPools ActivityLog/
+CollectConfirmation and tests supplied the historical/check-time distinction.
+The Explorer parser alone accepts incomplete evidence; the Pools helper is coupled
+to its own persistent activity DB and payout queue. Neither can be directly used
+as a wallet UI helper. HistoryChainCheck is the small adapter connecting the
+existing wallet NodeApi, evidence parser and Language/TextView display.
+The full inclusion parser is reused as observedInclusion. Existing inclusion still
+requires depth>=3 for settlement. Display alone may report a fully validated
+inclusion with0–2 confirmations. Typed status/found, nonzero block identity,
+positive block and exact tip-minus-block depth checks are retained.
+
+Safety and behavior
+Invalid/local handles never become commands. Each callback is single-use and
+rejects a closing/destroyed host. Existing NodeApi supplies timeout and main-thread
+lifecycle delivery. Each dialog owns its label, so later dialog checks cannot be
+replaced by a previous dialog's response. No DB access, receipt deletion,
+reservation release, transaction replay, key use or signing occurs in the helper.
+No history rows or local records are removed. Confirmed journal entries retain
+historical settlement evidence; the display does not downgrade or reopen them.
+
+Canonical changes
+scripts/pandamonium-sources/NFTwallet/HistoryChainCheck.java is copied to both
+wallet namespaces by scripts/adapt-pandamonium-wallet-history-status.py. That
+adapter runs after the existing history and transaction adaptations.
+The four-language catalog adds three saved-evidence labels, generated with the
+existing tools/localization/generate.cjs. Existing Explorer/Pools status and checked
+time messages retain live language bindings. Standalone sources remain untouched
+until after the demo; use this adapter and tests for the equivalent later port.
+
+Review verdict
+APPROVE this bounded display repair. Reviewed both generated controllers, the
+canonical helper, adapter, parser extraction, tests and translations. Settlement's
+three-block boundary remains separately tested, including immature positive proof.
+The node is the authority for each observed inclusion; this does not independently
+validate the blockchain. An open dialog shows a timestamped observation, not a
+promise that future reorganizations cannot change it. Reopening checks again.
+Manual visual coverage on the Fold has not been repeated for this checkpoint.
+Full Pandamonium review and standalone parity remain incomplete. Shared History,
+Explorer and PandaPools cached-status/error presentation require their own coverage;
+wallet database retention/caps and legacy stored-data handling remain review items.
+
+Validation evidence
+Six actual view regressions failed against original HistoryView controllers
+(three per wallet) and pass with the repair: saved labels, cached detail query,
+and local receipt detail query. Mock transport only; no node or live transaction.
+Sixteen helper/parser regressions cover fresh checks after prior confirmation,
+not-found versus malformed replies, no raw error display, invalid IDs, repeated
+callbacks, closed hosts, typed evidence and the unchanged settlement threshold.
+All pinned imports/provenance and direct transport checks pass;6927 catalog messages
+validate in English, Chinese, Russian and Ukrainian.
+Logs: build/localization/history-status-{tests,ui-tests,before,final,import}.log.
+Final suite totals and signed artifact verification follow below.
+
+Final verification
+549 tests pass: UTXO218, NFT319, localization12; no failures/errors/skips.
+Offline signed build and release lint pass:0 errors,362 existing warnings.
+Actual APK Keets bundle and21addons/runtime per ABI verified.
+Package com.eurobuddha.pandamonium,2.0.4-Pandamonium/code199 verified.
+APK v2 signature verifies with the existing RSA4096 family certificate.
+Path: /Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.4-candidate.apk
+SHA256 7c2a43136fc929c7998f55eb0c6abf1c754c15e8b3c405f102c60e2e789009f0
+Certificate SHA256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+No installation/publication or live transactions.

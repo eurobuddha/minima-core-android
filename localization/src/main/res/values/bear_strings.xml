@@ -8364,4 +8364,8 @@
     <string name="l10n_faucet_failed" formatted="false">"Failed to reach the faucet. Try again later."</string>
     <string name="l10n_faucet_unexpected" formatted="false">"Unexpected response from faucet."</string>
     <string name="l10n_faucet_response" formatted="false">"Faucet: %1$s"</string>
+    <string name="l10n_wallet_history_previously_confirmed" formatted="false">"Previously confirmed · open to recheck"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_wallet_history_saved_block">"Saved\n#%1$s"</string>
+    <string name="l10n_wallet_history_recorded_block" formatted="false">"Recorded block"</string>
 </resources>

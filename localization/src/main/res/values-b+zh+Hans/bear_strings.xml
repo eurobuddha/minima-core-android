@@ -8327,4 +8327,8 @@
     <string name="l10n_faucet_failed" formatted="false">"无法连接水龙头。请稍后重试。"</string>
     <string name="l10n_faucet_unexpected" formatted="false">"水龙头返回了意外响应。"</string>
     <string name="l10n_faucet_response" formatted="false">"水龙头：%1$s"</string>
+    <string name="l10n_wallet_history_previously_confirmed" formatted="false">"此前已确认 · 打开以重新检查"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_wallet_history_saved_block">"已保存\n#%1$s"</string>
+    <string name="l10n_wallet_history_recorded_block" formatted="false">"记录的区块"</string>
 </resources>

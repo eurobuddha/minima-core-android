@@ -536,3 +536,12 @@ and reachable older-page controls. NFT offline errors no longer trigger shrinkin
 retries. 525 relevant tests pass, including26 new cases (21 original failures).
 General cached-history inclusion/reorg status and retention/caps remain open.
 Demo device/public release stays2.0.0; standalone parity remains deferred.
+
+Post-release cached wallet status checkpoint (2.0.4/code199)
+See WALLET_HISTORY_STATUS_2026-10-19.txt. UTXO/NFT rows distinguish saved block and
+previous confirmation evidence from current inclusion. Opening either detail
+checks the node again, validates a complete proof, and shows its check time.
+Missing/malformed replies remain unverified; the display does not mutate journals,
+reservations, balances or signing. Settlement still requires at least3 confirmations.
+Full review remains open: other apps' cached status, retention/caps, legacy data,
+remaining app feature paths and standalone parity. No demo APK replacement.

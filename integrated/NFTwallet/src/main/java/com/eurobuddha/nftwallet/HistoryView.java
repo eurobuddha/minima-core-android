@@ -302,7 +302,7 @@ public class HistoryView extends BaseView {
         row.addView(mid);
 
         TextView right = new TextView(act);
-        Language.setText(right, "#" + n.block); right.setTextColor(Design.dim()); right.setTextSize(11f); right.setGravity(Gravity.END);
+        Language.setText(right, Language.msg(l10n_wallet_history_saved_block, String.valueOf(n.block))); right.setTextColor(Design.dim()); right.setTextSize(11f); right.setGravity(Gravity.END);
         row.addView(right);
 
         row.setOnClickListener(v -> showDetail(n));
@@ -315,7 +315,7 @@ public class HistoryView extends BaseView {
             case HistoryDb.PREPARED:return Language.msg(l10n_nft_history_preparing);
             case HistoryDb.POSTING:return Language.msg(l10n_utxo_status_posting);
             case HistoryDb.POSTED:return Language.msg(l10n_utxo_status_posted);
-            case HistoryDb.CONFIRMED:return Language.msg(l10n_nft_history_confirmed);
+            case HistoryDb.CONFIRMED:return Language.msg(l10n_wallet_history_previously_confirmed);
             case HistoryDb.NOT_SUBMITTED:return Language.msg(l10n_nft_history_not_submitted);
             default:return Language.msg(l10n_nft_history_unverified_status);
         }
@@ -333,10 +333,10 @@ public class HistoryView extends BaseView {
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(8), dp(11), dp(8), dp(11));
         boolean failed = HistoryDb.NOT_SUBMITTED.equals(entry.phase());
-        int color = entry.confirmed() ? Design.success() : failed ? Design.red() : Design.amber();
+        int color = failed ? Design.red() : Design.amber();
 
         TextView glyph = new TextView(act);
-        Language.setText(glyph, entry.confirmed() ? "✓" : failed ? "✗" : "⏳"); glyph.setTextColor(color); glyph.setTextSize(18f); glyph.setWidth(dp(28));
+        Language.setText(glyph, failed ? "✗" : "⏳"); glyph.setTextColor(color); glyph.setTextSize(18f); glyph.setWidth(dp(28));
         row.addView(glyph);
 
         LinearLayout mid = new LinearLayout(act);
@@ -373,6 +373,7 @@ public class HistoryView extends BaseView {
         box.setPadding(dp(20), dp(12), dp(20), dp(12));
         box.setBackgroundColor(Design.bg());
         kv(box, Language.msg(l10n_utxo_status), localStatus(entry));
+        HistoryChainCheck.show(act,box,entry.txpowid());
         if (!entry.note().isEmpty()) kv(box, Language.msg(l10n_utxo_note), NftMessages.message(entry.note()));
         copyRow(box, Language.msg(l10n_nft_history_local_id), r.internalid);
         if(!entry.txpowid().isEmpty())copyRow(box, Language.msg(l10n_history_txpow), entry.txpowid());
@@ -412,7 +413,8 @@ public class HistoryView extends BaseView {
         box.setOrientation(LinearLayout.VERTICAL);
         kv(box, Language.msg(l10n_history_direction), directionLabel(n.direction));
         kv(box, Language.msg(l10n_history_amount), (n.incoming ? "+" : "sent".equals(n.direction) ? "−" : "") + Util.tidyAmount(n.amount) + " " + n.tokenName);
-        kv(box, Language.msg(l10n_history_block), String.valueOf(n.block));
+        kv(box, Language.msg(l10n_wallet_history_recorded_block), String.valueOf(n.block));
+        HistoryChainCheck.show(act,box,n.txpowid);
         kv(box, Language.msg(l10n_history_date_time), Language.stamp(n.timemilli, "yMMMdHms"));
         copyRow(box, Language.msg(l10n_history_txpow), n.txpowid);
         if (n.counterparty != null && !n.counterparty.isEmpty()) {

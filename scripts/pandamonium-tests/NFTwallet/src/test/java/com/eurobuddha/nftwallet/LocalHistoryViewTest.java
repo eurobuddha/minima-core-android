@@ -43,7 +43,7 @@ public class LocalHistoryViewTest {
         Method status=HistoryView.class.getDeclaredMethod("localStatus",LocalHistory.Entry.class);status.setAccessible(true);
         Field resource=Language.Message.class.getDeclaredField("resource");resource.setAccessible(true);
         String owner="a".repeat(32)+":"+"b".repeat(32);
-        Object[][] phases={{HistoryDb.PREPARED,l10n_nft_history_preparing},{HistoryDb.POSTING,l10n_utxo_status_posting},{HistoryDb.UNKNOWN,l10n_nft_history_unverified_status},{HistoryDb.POSTED,l10n_utxo_status_posted},{HistoryDb.CONFIRMED,l10n_nft_history_confirmed},{HistoryDb.NOT_SUBMITTED,l10n_nft_history_not_submitted}};
+        Object[][] phases={{HistoryDb.PREPARED,l10n_nft_history_preparing},{HistoryDb.POSTING,l10n_utxo_status_posting},{HistoryDb.UNKNOWN,l10n_nft_history_unverified_status},{HistoryDb.POSTED,l10n_utxo_status_posted},{HistoryDb.CONFIRMED,l10n_wallet_history_previously_confirmed},{HistoryDb.NOT_SUBMITTED,l10n_nft_history_not_submitted}};
         for(Object[] pair:phases) {
             String phase=(String)pair[0],saved="";
             if(HistoryDb.POSTED.equals(phase)||HistoryDb.CONFIRMED.equals(phase)) {

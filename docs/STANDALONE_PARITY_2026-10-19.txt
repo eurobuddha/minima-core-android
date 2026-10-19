@@ -237,3 +237,10 @@ reset cursor at fresh head, request-height/rollback handling, whole-page typed
 validation with economic details, empty-list older footer, oversize-only NFT retry.
 Preserve standalone IPC and native UI. See WALLET_HISTORY_PAGING_2026-10-19.txt.
 This does not resolve general cached-history confirmation/reorg presentation.
+
+Pending after demo — wallet history status (2.0.4 integrated checkpoint)
+Port wallet-history-status adapter/helper and HistoryChainCheckTest/
+HistoryStatusViewTest to standalone UTXO/NFT. Preserve existing standalone transport,
+native dialogs and economic records. Reuse strict observed inclusion but retain
+three-block settlement gate; no cached reorg result may reopen a journal attempt.
+See WALLET_HISTORY_STATUS_2026-10-19.txt for paths, checks and explicit limits.

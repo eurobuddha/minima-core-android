@@ -223,7 +223,7 @@ public class HistoryView extends BaseView {
         row.addView(mid);
 
         TextView right = new TextView(act);
-        Language.setText(right, "#" + n.block); right.setTextColor(Design.dim()); right.setTextSize(11f); right.setGravity(Gravity.END);
+        Language.setText(right, Language.msg(l10n_wallet_history_saved_block, String.valueOf(n.block))); right.setTextColor(Design.dim()); right.setTextSize(11f); right.setGravity(Gravity.END);
         row.addView(right);
 
         row.setOnClickListener(v -> showDetail(n));
@@ -236,7 +236,7 @@ public class HistoryView extends BaseView {
 
     private static CharSequence statusWord(HistoryRow r) {
         switch (r.status == null ? "" : r.status) {
-            case HistoryDb.STATUS_CONFIRMED: return Language.msg(l10n_nft_history_confirmed);
+            case HistoryDb.STATUS_CONFIRMED: return Language.msg(l10n_wallet_history_previously_confirmed);
             case HistoryDb.STATUS_POSTING: return Language.msg(l10n_utxo_status_posting);
             case HistoryDb.STATUS_POSTED:  return Language.msg(l10n_utxo_status_posted);
             case HistoryDb.STATUS_UNKNOWN: return Language.msg(l10n_utxo_status_unknown);
@@ -251,10 +251,10 @@ public class HistoryView extends BaseView {
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(8), dp(11), dp(8), dp(11));
         boolean failed = isFailed(r);
-        int color = failed ? Design.red() : HistoryDb.STATUS_CONFIRMED.equals(r.status) ? 0xFF1EA85A : Design.amber();
+        int color = failed ? Design.red() : Design.amber();
 
         TextView glyph = new TextView(act);
-        Language.setText(glyph, failed ? "✗" : HistoryDb.STATUS_CONFIRMED.equals(r.status) ? "✓" : "⏳"); glyph.setTextColor(color); glyph.setTextSize(18f); glyph.setWidth(dp(28));
+        Language.setText(glyph, failed ? "✗" : "⏳"); glyph.setTextColor(color); glyph.setTextSize(18f); glyph.setWidth(dp(28));
         row.addView(glyph);
 
         LinearLayout mid = new LinearLayout(act);
@@ -287,6 +287,7 @@ public class HistoryView extends BaseView {
         box.setPadding(dp(20), dp(12), dp(20), dp(12));
         box.setBackgroundColor(Design.bg());
         kv(box, Language.msg(l10n_utxo_status), statusWord(r));
+        HistoryChainCheck.show(act,box,r.txnid);
         if (Util.isValidHexId(r.txnid)) copyRow(box, Language.msg(l10n_history_txpow), r.txnid);
         if (r.note != null && !r.note.isEmpty()) kv(box, isFailed(r) ? Language.msg(l10n_utxo_error) : Language.msg(l10n_utxo_note), UtxoMessages.message(r.note));
         kv(box, Language.msg(l10n_history_amount), "−" + Util.tidyAmount(r.amount) + " " + r.tokenName);
@@ -332,7 +333,8 @@ public class HistoryView extends BaseView {
         box.setBackgroundColor(Design.bg());
         kv(box, Language.msg(l10n_history_direction), directionLabel(n.direction));
         kv(box, Language.msg(l10n_history_amount), (n.incoming ? "+" : "sent".equals(n.direction) ? "−" : "") + Util.tidyAmount(n.amount) + " " + n.tokenName);
-        kv(box, Language.msg(l10n_history_block), String.valueOf(n.block));
+        kv(box, Language.msg(l10n_wallet_history_recorded_block), String.valueOf(n.block));
+        HistoryChainCheck.show(act,box,n.txpowid);
         kv(box, Language.msg(l10n_history_date_time), Language.stamp(n.timemilli, "yMMMdHms"));
         copyRow(box, Language.msg(l10n_history_txpow), n.txpowid);
         if (!Util.isMinima(n.tokenid)) copyRow(box, Language.msg(l10n_history_token), n.tokenid);

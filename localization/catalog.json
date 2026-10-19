@@ -42097,5 +42097,23 @@
     "zh-Hans": "水龙头：%1$s",
     "ru": "Кран: %1$s",
     "uk": "Кран: %1$s"
+  },
+  "wallet.history.previouslyConfirmed": {
+    "en": "Previously confirmed · open to recheck",
+    "zh-Hans": "此前已确认 · 打开以重新检查",
+    "ru": "Ранее подтверждено · откройте для проверки",
+    "uk": "Раніше підтверджено · відкрийте для перевірки"
+  },
+  "wallet.history.savedBlock": {
+    "en": "Saved\n#{block}",
+    "zh-Hans": "已保存\n#{block}",
+    "ru": "Сохранено\n#{block}",
+    "uk": "Збережено\n#{block}"
+  },
+  "wallet.history.recordedBlock": {
+    "en": "Recorded block",
+    "zh-Hans": "记录的区块",
+    "ru": "Записанный блок",
+    "uk": "Записаний блок"
   }
 }
