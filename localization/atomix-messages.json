@@ -53,7 +53,9 @@
     "Sending USDT needs a little ETH for gas — fund the wallet with ETH first.": "atomixSend.gasBalance",
     "Ethereum fee is outside the safe range. Review your RPC endpoint.": "atomixSend.feeCap",
     "Wallet session changed. Review again.": "wallet.reviewAgain",
-    "Market changed; refresh and try again.": "atomixOperation.marketChanged"
+    "Market changed; refresh and try again.": "atomixOperation.marketChanged",
+    "Submission outcome is unknown. The saved swap will be checked; do not create a replacement deal.": "atomixOtc.submissionUnknown",
+    "The swap lock was not submitted because recovery data could not be saved.": "atomixOtc.recoverySaveFailed"
   },
   "patterns": [
     {

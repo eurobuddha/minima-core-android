@@ -147,9 +147,45 @@ public class OtcConsentTest {
             controller.executeDeal(db.getDeal(agreed.ref));SwapEngine.StartCb second=callback(engine);
             OtcDb.Deal running=db.getDeal(agreed.ref);first.err("late error");first.ok("11".repeat(32));
             assertTrue(OtcDb.sameSnapshot(running,db.getDeal(agreed.ref)));assertTrue(sends.isEmpty());
-            second.ok("22".repeat(32));assertEquals("22".repeat(32),db.getDeal(agreed.ref).hash);assertEquals(1,sends.size());
+            assertTrue(second.onPrepared("22".repeat(32)));second.ok("22".repeat(32));assertEquals("22".repeat(32),db.getDeal(agreed.ref).hash);assertEquals(1,sends.size());
             second.err("duplicate error");second.ok("33".repeat(32));assertEquals("22".repeat(32),db.getDeal(agreed.ref).hash);
             assertTrue(other.deleteDeal(db.getDeal(agreed.ref)));second.ok("44".repeat(32));assertNull(db.getDeal(agreed.ref));
+        }
+    }
+    @Test public void preparedHashSurvivesLostCallbackRestartAndRecoveryNotification() {
+        List<CommsTransport.SendCb> sends=new ArrayList<>();
+        try(MockedStatic<CommsTransport> transport=hold(sends)) {
+            OtcDb.Deal agreed=create("lost result",OtcDb.ST_AGREED);controller.executeDeal(agreed);
+            SwapEngine.StartCb cb=callback(engine);String hash="ab".repeat(32);
+            assertTrue(cb.onPrepared("0x"+hash.toUpperCase(java.util.Locale.ROOT)));
+            assertFalse(cb.onPrepared(hash));
+            OtcDb.Deal prepared=db.getDeal(agreed.ref);assertEquals(hash,prepared.hash);assertTrue(sends.isEmpty());
+            cb.err("response lost");cb.ok(hash);assertTrue(sends.isEmpty());
+            db.close();db=new OtcDb(context);controller=controller(db,engine);
+            controller.executeDeal(agreed);controller.executeDeal(db.getDeal(agreed.ref));
+            verify(engine,times(1)).executeOtcDeal(any(),any());
+            when(engine.swapStatus(hash)).thenReturn(SwapDb.ST_STARTED);
+            controller.expireStale(System.currentTimeMillis());assertEquals(1,sends.size());
+            assertTrue(OtcDb.sameSnapshot(prepared,db.getDeal(agreed.ref)));
+            assertEquals(hash,db.msgs(agreed.ref).get(0).hash);
+        }
+    }
+    @Test public void staleOrInvalidPreparationCannotAuthorizeSubmission() {
+        OtcDb.Deal d=create("preparation",OtcDb.ST_AGREED);controller.executeDeal(d);
+        SwapEngine.StartCb cb=callback(engine);
+        assertFalse(cb.onPrepared(null));assertFalse(cb.onPrepared("bad"));
+        OtcDb.Deal running=db.getDeal(d.ref);change(running,x->x.status=OtcDb.ST_EXPIRED);
+        assertFalse(cb.onPrepared("ab".repeat(32)));cb.err("changed");
+        assertEquals(OtcDb.ST_EXPIRED,db.getDeal(d.ref).status);
+    }
+    @Test public void onlyPreparedMatchingSuccessCanNotifyThePeer() {
+        List<CommsTransport.SendCb> sends=new ArrayList<>();
+        try(MockedStatic<CommsTransport> transport=hold(sends)) {
+            OtcDb.Deal d=create("success",OtcDb.ST_AGREED);controller.executeDeal(d);
+            SwapEngine.StartCb cb=callback(engine);cb.ok("ab".repeat(32));assertTrue(sends.isEmpty());
+            assertTrue(cb.onPrepared("ab".repeat(32)));cb.ok("cd".repeat(32));assertTrue(sends.isEmpty());
+            cb.ok("0x"+"AB".repeat(32));cb.ok("ab".repeat(32));cb.err("duplicate");
+            assertEquals(1,sends.size());assertEquals(OtcDb.ST_EXECUTING,db.getDeal(d.ref).status);
         }
     }
     @Test public void inboundAcceptAndExecuteMustMatchStandingTermsAndCounterCannotReopenAgreement() {

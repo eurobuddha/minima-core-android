@@ -300,3 +300,10 @@ message adaptation.68 tests pass in each debug/release suite. Includes the new g
 retry identity and fee-consent repair from Pandamonium2.0.10. IPC/key storage retained.
 See ETHEREUM_RETRY_GAS_2026-10-19.txt. Cross-APK coordination is not provided by this
 private store. Standalone AtomiX and the remaining parity ledger are still open.
+
+AtomiX next required parity —2026-10-19, host2.0.12
+The host now persists the OTC first-leg hash before submission and saves initiator
+secret/request/swap atomically. Port this with the host OTC consent/market and engine
+responder changes into standalone AtomiX0.1.80; it is not yet in the standalone APK.
+Reuse adapt-pandamonium-atomix-first-leg.py, otc-execute.inc, initiator-store.inc,
+OtcFirstLegTest and OtcConsentTest. Details: ATOMIX_OTC_FIRST_LEG_2026-10-19.txt.

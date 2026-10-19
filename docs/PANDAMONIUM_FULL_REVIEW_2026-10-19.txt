@@ -602,3 +602,11 @@ Four regressions reproduced duplicate payment on changed gas estimate and replay
 above a newly reviewed gas price. Fixed in the existing shared journal;752 affected
 JVM tests pass. See ETHEREUM_RETRY_GAS_2026-10-19.txt for scope and remaining manual
 acknowledgement/recovery UI, external key-sharing, receipt/reorg and retention review.
+
+OTC first-leg recovery follow-up —2.0.12/code207
+Resolved agreement reopening after an unknown first-leg result, plus incomplete
+initiator recovery persistence.493 AtomiX and181 host tests pass; signed candidate
+verified, not installed or published. See ATOMIX_OTC_FIRST_LEG_2026-10-19.txt for
+reused sources, original-controller reproduction, review and remaining limitations.
+Fold absent; standalone OTC/engine parity remains the next checkpoint. Full review
+is still incomplete. The existing Sweep size recovery remains included.

@@ -8506,4 +8506,6 @@
     <string name="l10n_sweep_single_large" formatted="false">"Вузол відхилив цю окрему монету до надсилання: транзакція завелика. Поділити її без зміни стану неможливо. Решта груп продовжаться."</string>
     <string name="l10n_sweep_split_a" formatted="false">"(частина A)"</string>
     <string name="l10n_sweep_split_b" formatted="false">"(частина B)"</string>
+    <string name="l10n_atomix_otc_submission_unknown" formatted="false">"Результат надсилання невідомий. Збережений обмін буде перевірено; не створюйте нову угоду на заміну."</string>
+    <string name="l10n_atomix_otc_recovery_save_failed" formatted="false">"Блокування коштів для обміну не надіслано: не вдалося зберегти дані відновлення."</string>
 </resources>

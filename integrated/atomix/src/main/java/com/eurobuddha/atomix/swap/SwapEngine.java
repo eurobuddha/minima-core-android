@@ -80,7 +80,12 @@ public final class SwapEngine {
         void notify(String title, String body);   // OS notification for a meaningful transition
         void onSwapsChanged();                     // ask the UI to re-render swap cards
     }
-    public interface StartCb { void ok(String hash); void err(String msg); }
+    public interface StartCb {
+        /** Persist the recovery identity before the first leg is submitted. False stops submission. */
+        default boolean onPrepared(String hash) { return true; }
+        void ok(String hash);
+        void err(String msg);
+    }
     public interface ConfirmCb { void done(boolean onChain); }
     public interface InspectCb { void report(java.util.List<String> lines); }
 
@@ -412,6 +417,7 @@ public final class SwapEngine {
             }
         }
         final StartCb cb = new StartCb() {
+            public boolean onPrepared(String hash) { return result.onPrepared(hash); }
             public void ok(String hash) { synchronized (CP_LOCKING) { inflight.remove("sell"); } result.ok(hash); }
             public void err(String error) { synchronized (CP_LOCKING) { inflight.remove("sell"); } result.err(error); }
         };
@@ -429,12 +435,17 @@ public final class SwapEngine {
                         // checkExpiredMinima) reclaims the coin at the timelock regardless of the DB. A row whose
                         // broadcast never landed is a harmless phantom (no coin at the HTLC address for this hash
                         // → no responder engages, nothing to refund).
-                        db.insertSecret(hash, secret);
-                        db.insertMyHtlc(hash, buyTokenAmount, reqToken);
                         SwapDb.Swap s = baseSwap(hash, "INITIATOR", "MINIMA_TO_ERC20",
                                 market.coinLabel, sellMinima, tokenSymbol, buyTokenAmount, maker.ethAddress);
                         s.myTimelock = timelock; s.myLegIsMinima = true; s.status = SwapDb.ST_STARTED;
-                        db.upsertSwap(s);
+                        try {
+                            db.prepareInitiator(s, secret, buyTokenAmount, reqToken);
+                            if (!cb.onPrepared(hash)) {
+                                cb.err("The swap lock was not submitted because recovery data could not be saved."); return;
+                            }
+                        } catch (RuntimeException storageFailure) {
+                            cb.err("The swap lock was not submitted because recovery data could not be saved."); return;
+                        }
                         notifier.onSwapsChanged();
                         minima.lock(sellMinima, buyTokenAmount, token.address, maker.minimaPublicKey,
                                 myEth(), hash, timelock, otc ? "TRUE" : "FALSE", new MinimaHtlc.PostCb() {
@@ -516,13 +527,18 @@ public final class SwapEngine {
                         // db.allSwaps() and refunds at timelock even if the broadcast response is lost. A row whose
                         // broadcast never landed is a harmless phantom (getContract → null → no-op). Only the UI
                         // callback goes to ui.post.
-                        db.insertSecret(hash, secret);
-                        db.insertMyHtlc(hash, reqMinima, "minima");
                         SwapDb.Swap s = baseSwap(hash, "INITIATOR", "ERC20_TO_MINIMA",
                                 tokenSymbol, sellTokenAmount, market.coinLabel, reqMinima, maker.minimaPublicKey);
                         s.myTimelock = timelock; s.myLegIsMinima = false; s.status = SwapDb.ST_STARTED;
                         s.contractId = EthHtlc.contractId(hash);
-                        db.upsertSwap(s);
+                        try {
+                            db.prepareInitiator(s, secret, reqMinima, "minima");
+                            if (!cb.onPrepared(hash)) {
+                                ui.post(() -> cb.err("The swap lock was not submitted because recovery data could not be saved.")); return;
+                            }
+                        } catch (RuntimeException storageFailure) {
+                            ui.post(() -> cb.err("The swap lock was not submitted because recovery data could not be saved.")); return;
+                        }
                         ui.post(notifier::onSwapsChanged);
                         String txhash = eth.newContract(myMinimaPk, maker.ethAddress, hash,
                                 BigInteger.valueOf(timelock), token.address, sellRaw, reqRaw, otc);

@@ -71,6 +71,8 @@ public final class AtomixMessages {
             case "Ethereum fee is outside the safe range. Review your RPC endpoint.": return Language.msg(l10n_atomix_send_fee_cap);
             case "Wallet session changed. Review again.": return Language.msg(l10n_wallet_review_again);
             case "Market changed; refresh and try again.": return Language.msg(l10n_atomix_operation_market_changed);
+            case "Submission outcome is unknown. The saved swap will be checked; do not create a replacement deal.": return Language.msg(l10n_atomix_otc_submission_unknown);
+            case "The swap lock was not submitted because recovery data could not be saved.": return Language.msg(l10n_atomix_otc_recovery_save_failed);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {

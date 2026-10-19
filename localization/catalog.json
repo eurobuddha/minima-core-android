@@ -42445,5 +42445,17 @@
     "zh-Hans": "（拆分 B）",
     "ru": "(часть B)",
     "uk": "(частина B)"
+  },
+  "atomixOtc.submissionUnknown": {
+    "en": "Submission outcome is unknown. The saved swap will be checked; do not create a replacement deal.",
+    "zh-Hans": "提交结果未知。系统将检查已保存的兑换，请勿创建替代交易。",
+    "ru": "Результат отправки неизвестен. Сохранённый обмен будет проверен; не создавайте новую сделку взамен.",
+    "uk": "Результат надсилання невідомий. Збережений обмін буде перевірено; не створюйте нову угоду на заміну."
+  },
+  "atomixOtc.recoverySaveFailed": {
+    "en": "The swap lock was not submitted because recovery data could not be saved.",
+    "zh-Hans": "由于无法保存恢复数据，未提交兑换锁定交易。",
+    "ru": "Блокировка средств для обмена не отправлена: не удалось сохранить данные восстановления.",
+    "uk": "Блокування коштів для обміну не надіслано: не вдалося зберегти дані відновлення."
   }
 }

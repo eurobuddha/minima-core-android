@@ -8506,4 +8506,6 @@
     <string name="l10n_sweep_single_large" formatted="false">"Узел отклонил эту отдельную монету до отправки: транзакция слишком велика. Разделить её без изменения состояния нельзя. Остальные группы продолжатся."</string>
     <string name="l10n_sweep_split_a" formatted="false">"(часть A)"</string>
     <string name="l10n_sweep_split_b" formatted="false">"(часть B)"</string>
+    <string name="l10n_atomix_otc_submission_unknown" formatted="false">"Результат отправки неизвестен. Сохранённый обмен будет проверен; не создавайте новую сделку взамен."</string>
+    <string name="l10n_atomix_otc_recovery_save_failed" formatted="false">"Блокировка средств для обмена не отправлена: не удалось сохранить данные восстановления."</string>
 </resources>

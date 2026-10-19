@@ -8395,4 +8395,6 @@
     <string name="l10n_sweep_single_large" formatted="false">"节点在广播前因交易过大拒绝了这枚单独的币。无法在保留状态的同时拆分。其他批次将继续。"</string>
     <string name="l10n_sweep_split_a" formatted="false">"（拆分 A）"</string>
     <string name="l10n_sweep_split_b" formatted="false">"（拆分 B）"</string>
+    <string name="l10n_atomix_otc_submission_unknown" formatted="false">"提交结果未知。系统将检查已保存的兑换，请勿创建替代交易。"</string>
+    <string name="l10n_atomix_otc_recovery_save_failed" formatted="false">"由于无法保存恢复数据，未提交兑换锁定交易。"</string>
 </resources>

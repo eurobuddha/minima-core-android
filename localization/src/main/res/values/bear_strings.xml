@@ -8432,4 +8432,6 @@
     <string name="l10n_sweep_single_large" formatted="false">"The node rejected this single coin as too large before broadcast. It cannot be split without changing its state. Other batches will continue."</string>
     <string name="l10n_sweep_split_a" formatted="false">"(split A)"</string>
     <string name="l10n_sweep_split_b" formatted="false">"(split B)"</string>
+    <string name="l10n_atomix_otc_submission_unknown" formatted="false">"Submission outcome is unknown. The saved swap will be checked; do not create a replacement deal."</string>
+    <string name="l10n_atomix_otc_recovery_save_failed" formatted="false">"The swap lock was not submitted because recovery data could not be saved."</string>
 </resources>

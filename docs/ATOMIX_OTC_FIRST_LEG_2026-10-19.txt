@@ -1,0 +1,80 @@
+Pandamonium OTC first-leg recovery — 2026-10-19
+
+Scope and source reuse
+This continues the full app review. It repairs the next AtomiX transaction finding;
+it does not complete the full review or standalone parity.
+Reused the onPrepared callback contract from integrated/pandadex/.../DexTxn.java,
+the persistence-before-signing caller in MakerEngine.java, and AtomiX OtcDb's
+existing replaceDeal compare-and-swap transaction. Canonical sources live in
+scripts/pandamonium-sources/atomix/{otc-execute,initiator-store}.inc and are applied
+by adapt-pandamonium-atomix-consent.py and adapt-pandamonium-atomix-first-leg.py.
+
+Finding and repair
+MAJOR: executeDeal reset its status to AGREED on any engine error, including an
+error after its first lock was submitted. Retrying generated a new secret/hash,
+so the Ethereum journal's per-hash idempotency did not prevent a second lock.
+The Minima path had the same reset. With the original controller, both corrected
+real-engine regressions failed: expected EXECUTING, actual AGREED.
+The initial test fixture incorrectly changed an immutable deal side; it was fixed
+before the before/after result was accepted. Tests use real SQLite, public synthetic
+identities, mocked node/network calls and a deterministic worker, with no transactions.
+
+StartCb.onPrepared now saves the exact recovery hash into the executing deal before
+submission. False or failed persistence stops dispatch. Prepared failures retain the
+hash and cannot reopen agreement. Pre-preparation errors can still retry. Callbacks
+are synchronized and checked against the exact persisted snapshot; late, duplicate,
+invalid-hash or mismatched success cannot mutate another attempt or notify a peer.
+Restart reuses the existing expireStale/resendExecute and chain-driven swap recovery.
+The Minima wrapper forwards onPrepared. Ethereum failure callbacks keep the existing
+UI-thread delivery contract. Messages cover English, Chinese, Russian and Ukrainian.
+
+MAJOR: initiator recovery saved secret, requested amount and swap in separate writes,
+and ignored failed secret/request inserts. prepareInitiator now saves them in one
+SQLite transaction, checks secret/request persistence, and uses the existing checked
+swap insert. A failure rolls the entire set back and prevents dispatch. Existing
+secrets cannot be replaced with a different preimage.
+
+Code review
+Read the changed canonical adapter/snippets, generated Java, callback callers,
+real SQLite tests and localization entries. Both chain directions save the swap
+before invoking the synchronous persistence hook and before sending their first leg.
+No signing algorithm, destination, seed, key counter or negotiated amount was changed.
+The success callback requires the saved hash; unknown outcomes retain recovery state.
+The notification avoids claiming a first-leg failure when its outcome is unknown.
+The preparation error refers to the swap lock specifically: an earlier ERC20 approval
+may already have been sent by the unchanged allowance flow.
+Verdict: approve this bounded repair once the recorded validation below passes.
+
+Remaining work
+No real swap, approval, signing-counter change, seed change or device test was used.
+Fold R3GL805K7MB was absent; another connected phone was not used. This candidate is
+not installed/published. Public/device Pandamonium2.0.0 remains unchanged.
+Standalone AtomiX0.1.80 still needs this repair together with the pending OTC consent,
+market and responder parity. That is the next source checkpoint. Other standalone
+parity and full-review entries remain open in the existing ledgers.
+Legacy AGREED rows already reset by older builds cannot be safely associated with an
+unrelated saved hash automatically. There is no new automatic replacement for a
+prepared submission that never landed: the existing saved swap/chain recovery remains
+in charge. Final initiator context changes, pending-state presentation, receipt/reorg
+review and physical Fold flows remain separate review items.
+
+Validation and signed candidate
+493 AtomiX tests and181 Pandamonium host tests pass, zero failures/errors/skips.
+Eight new regressions cover the real-engine first legs and OTC callback/restart
+contract; existing tests still cover late callbacks, stale consent and concurrent
+execution. Original-controller reproduction: both lost-reply tests fail with AGREED
+instead of EXECUTING; repaired suite passes. Preparation-failure tests exercise both
+chains and ignored inserts in all three recovery tables, with rollback assertions.
+Pinned import verification reproduces all23 apps. Direct-transport verification
+passes. All6,984 messages validate in four languages. Release/host-test/lint build
+succeeded in1m09s. Lint has0 errors/fatal and362 warnings, unchanged.
+APK ZIP integrity and DEX inspection verify prepareInitiator then onPrepared before
+both MinimaHtlc.lock and EthHtlc.newContract. The APK also contains the transactional
+store and the OTC replaceDeal hook. Exact Keets bundle and21 addons/runtime per ABI
+verify. APK v2 signature verifies with the existing RSA4096 family certificate.
+Package com.eurobuddha.pandamonium,2.0.12-Pandamonium,versionCode207.
+Artifact: /Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.12-candidate.apk
+Bytes:137146497
+SHA256:bf21c53690e1ad472bdd5cbad0713f8c08b119739d0ebbb30eb6a5045c8c2d22
+Certificate SHA256:eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Review verdict: approve this bounded repair after the completed checks above.
