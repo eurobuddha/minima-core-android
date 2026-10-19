@@ -236,6 +236,16 @@ public class DistributeManager {
                 act.refreshTools();
             }
 
+            @Override public void onNotStarted(String message) {
+                if (!live() || job != pending) return;
+                // TxnBuilder's pre-command admission failure is stronger than a missing receipt.
+                // Persist that distinction before allowing the ordinary not-sent retry/clear path.
+                DistributeJob stopped=pending.copy();stopped.uncertain=false;
+                stopped.pendingRecipients=0;stopped.batchIntent=null;
+                stopped.waiting=stopped.batchesDone>0;
+                if (!stopped.save(act)) { inFlight=false;toast(TransactionEvidence.DISTRIBUTION_UNKNOWN);act.refreshTools();return; }
+                job=stopped;failBatch(message);
+            }
             @Override public void onFailed(String message) { if (live() && job == pending) failBatch(message); }
             @Override public void onUnknown(String message) {
                 if (!live() || job != pending) return;

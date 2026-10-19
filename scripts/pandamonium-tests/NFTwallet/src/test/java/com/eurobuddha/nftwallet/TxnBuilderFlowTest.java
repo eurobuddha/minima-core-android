@@ -146,7 +146,7 @@ public class TxnBuilderFlowTest {
         }
     }
     @Test public void reservationFailureSendsNoNodeCommand() {
-        try(Flow f=new Flow()){when(f.history.prepareAttempt(anyString(),anyString(),any())).thenReturn(false);f.run("0x00","10","3","7",null);assertTrue(f.commands.isEmpty());verify(f.done).onFailed(TransactionEvidence.RECORD_FAILED);}
+        try(Flow f=new Flow()){when(f.history.prepareAttempt(anyString(),anyString(),any())).thenReturn(false);f.run("0x00","10","3","7",null);assertTrue(f.commands.isEmpty());verify(f.done).onNotStarted(TransactionEvidence.RECORD_FAILED);}
     }
     @Test public void postingCheckpointFailureCannotSignOrReleaseItsReservation() {
         try(Flow f=new Flow()){when(f.history.markAttempt(anyString(),eq(HistoryDb.POSTING),any())).thenReturn(false);f.run("0x00","10","3","7",null);

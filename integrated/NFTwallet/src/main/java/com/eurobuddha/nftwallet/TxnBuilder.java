@@ -20,6 +20,8 @@ public class TxnBuilder {
     public interface Done {
         void onPosted(String txpowid, List<OutCoin> outputs);
         void onFailed(String message);
+        /** The builder issued no node command; preparation/admission itself failed. */
+        default void onNotStarted(String message) { onFailed(message); }
         /** Required: callers must preserve an unknown outcome instead of treating it as failed. */
         void onUnknown(String message);
     }
@@ -100,11 +102,11 @@ public class TxnBuilder {
         if (started) return;
         started = true;
         try { intent = TransactionEvidence.intent(inputs, outputs, tokenid, burn); }
-        catch (RuntimeException invalid) { finished = true; done.onFailed(TransactionEvidence.INVALID); return; }
+        catch (RuntimeException invalid) { finished = true; done.onNotStarted(TransactionEvidence.INVALID); return; }
         try {
             if (historyId == null || !act.history().prepareAttempt(historyId,txid,intent)) throw new IllegalStateException();
             prepared=true;
-        } catch (RuntimeException failure) { finished=true;done.onFailed(TransactionEvidence.RECORD_FAILED);return; }
+        } catch (RuntimeException failure) { finished=true;done.onNotStarted(TransactionEvidence.RECORD_FAILED);return; }
         stage("Building transaction…");
         act.node().cmd("txncreate id:" + txid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) { addInput(0); }

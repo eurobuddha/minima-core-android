@@ -30,7 +30,8 @@ public class DistributeResumeTest {
             doAnswer(c->{String command=c.getArgument(0);commands.add(command);assertEquals("getaddress",command);((NodeApi.Cb)c.getArgument(1)).onResult(object("status",true,"response",object("address",ADDRESS)));return null;}).when(node).cmd(anyString(),any(NodeApi.Cb.class));
         }
         DistributeManager manager(){DistributeManager m=new DistributeManager(act);managers.add(m);return m;}
-        Coin input(){Coin c=new Coin();c.coinid=COIN;c.address=ADDRESS;c.miniaddress="";c.tokenid="0x00";c.amount=c.rawAmount="30";c.confirmed=c.sendable=true;return c;}
+        String initialAmount="30";
+        Coin input(){Coin c=new Coin();c.coinid=COIN;c.address=ADDRESS;c.miniaddress="";c.tokenid="0x00";c.amount=c.rawAmount=initialAmount;c.confirmed=c.sendable=true;return c;}
         DistributeManager start(int recipients){DistributeManager m=manager();m.start(Collections.singletonList(input()),new ArrayList<>(Collections.nCopies(recipients,RECIPIENT)),"1","0x00","Minima");return m;}
         @SuppressWarnings("unchecked") JSONObject intent(){List<?> b=builds.get(builds.size()-1);return TransactionEvidence.intent((List<Coin>)b.get(1),(List<TxnBuilder.Out>)b.get(2),(String)b.get(3),null);}
         JSONObject reply(){JSONObject intent=intent();JSONArray outs=new JSONArray();for(int i=0;i<intent.optJSONArray("outputs").length();i++){JSONObject want=intent.optJSONArray("outputs").optJSONObject(i);outs.put(object("coinid",id(100*builds.size()+i),"tokenid","0x00","address",want.optString("address"),"amount",want.optString("amount")));}
@@ -104,4 +105,28 @@ public class DistributeResumeTest {
         }
     }
 
+    @Test public void admissionFailureBeforeAnyNodeCommandCannotStrandANewJob() {
+        try(Flow f=new Flow()) {
+            DistributeManager m=f.start(15);f.attempts.clear();f.done().onNotStarted(TransactionEvidence.RECORD_FAILED);
+            assertFalse(m.isActive());assertNull(DistributeJob.load(f.act));assertEquals(1,f.builds.size());
+        }
+    }
+    @Test public void allFourBatchesAdvanceExactlyOnceAfterTheirOwnConfirmations() {
+        try(Flow f=new Flow()) {
+            f.initialAmount="100";DistributeManager m=f.start(56);
+            for(int i=1;i<=4;i++) {
+                assertEquals(i,f.builds.size());f.posted();m.onCoinsUpdated();assertEquals(i,f.builds.size());
+                f.phase(HistoryDb.CONFIRMED);f.supplyChange();m.onCoinsUpdated();
+                if(i<4){assertEquals(56-14*i,DistributeJob.load(f.act).remaining.size());m.onCoinsUpdated();}
+            }
+            assertFalse(m.isActive());assertNull(DistributeJob.load(f.act));m.onCoinsUpdated();assertEquals(4,f.builds.size());
+        }
+    }
+    @Test public void finalBatchWithNoChangeStaysPendingUntilItsReceiptConfirms() {
+        try(Flow f=new Flow()) {
+            f.initialAmount="2";DistributeManager m=f.start(2);f.phase(HistoryDb.UNKNOWN);f.done().onUnknown(TransactionEvidence.UNKNOWN);
+            m.onCoinsUpdated();assertTrue(m.isActive());assertEquals(2,DistributeJob.load(f.act).remaining.size());
+            f.phase(HistoryDb.CONFIRMED);m.onCoinsUpdated();assertFalse(m.isActive());assertEquals(1,f.builds.size());
+        }
+    }
 }
