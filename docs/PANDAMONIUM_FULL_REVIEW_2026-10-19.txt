@@ -444,3 +444,13 @@ lint checks,22 pinned imports,6904 translations and direct transport checks pass
 Standalone Future Cash0.1.10/code110 receives shared repairs only; no wallet bridge.
 Signed local candidate verified, not installed or published. Full2.0.0 review and
 standalone parity remain incomplete; existing saved UTXO work is still untouched.
+
+Fold-discovered Future Cash audit ANR — Pandamonium1.9.118/code189
+MAJOR regression in1.9.117: retired-risk reload gained node reads but its audit
+callback still ran on the UI thread, deadlocking the reply Handler. Actual Fold
+ANR confirms MainActivity.onDone -> Guardian.reloadAtRisk -> Node.cmd await.
+Remove the redundant callback read; reuse refresh/listStakes worker reload. Safety
+checks retained. Regression reproduced before repair;99 integrated +114 standalone
+executions and both release lints/builds pass. Imports, languages, transport and
+actual APK Keets contents verified. Signed1.9.118 installed on Fold; awaiting user
+unlock for functional check. See FUTURE_CASH_AUDIT_ANR_2026-10-19.txt. No publication.

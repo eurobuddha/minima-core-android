@@ -800,7 +800,8 @@ public class MainActivity extends AppCompatActivity {
             @Override public void onDone(KeyAudit.Result result, long archiveTip) {
                 auditRunning = false;
                 lastAudit = result;
-                guardian.reloadAtRisk();
+                // Audit callbacks may run on the UI thread. refresh() queues listStakes(),
+                // which reloads risk (including node reads) on the existing worker.
                 // refresh(), not render(): the cached verdict was computed BEFORE this audit ran, so
                 // rendering it now showed "audited just now · stale" — two lines of the same card
                 // disagreeing about the same fact.

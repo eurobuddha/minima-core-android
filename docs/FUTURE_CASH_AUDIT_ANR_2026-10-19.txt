@@ -1,0 +1,57 @@
+Future Cash Next audit-completion ANR — 2026-10-19
+Repair checkpoint: Pandamonium1.9.118/code189; standalone0.1.11/code111
+
+Evidence
+Fold R3GL805K7MB on1.9.117: input dispatch timed out after10000ms on a MotionEvent.
+Android ANR main-thread trace: MainActivity$3.onDone:803 -> Guardian.reloadAtRisk:652
+-> Wallet.retiredAddresses:401 -> Node.cmd:67 -> CountDownLatch.await.
+AuditApi delivered its completion on the main Handler. NodeApi also needs that
+Handler to dispatch commands and deliver replies. The prior retired-risk repair
+added node reads to reloadAtRisk without moving this callback caller. This was an
+introduced regression, not a transport-size or node-engine crash.
+Raw phone diagnostics remain local under build/localization/futurecash-anr-1.9.117;
+they are not committed. No credentials, private wallet data or binaries in Git.
+
+Fix and reuse
+Inspected full MainActivity audit/refresh/lifecycle paths, AuditRunner, Node/NodeApi,
+Guardian's reload/list/manual collection callers, and the matching standalone app.
+Reuse existing MainActivity.refresh -> submit -> single worker -> listStakes.
+Remove the redundant direct reloadAtRisk from the audit completion callback.
+listStakes still reloads risk including retired keys on the background worker, and
+manual collection/reconciliation retain their existing checks. No safety gate or
+wallet feature is removed. No new dependency or executor abstraction.
+Update the canonical import adapter and test overlay so imports preserve this fix.
+
+Regression and review
+AuditCompletionThreadingTest invokes the actual private maybeAudit entrypoint,
+captures the real AuditRunner callback and reuses the repository's mocked executor
+queue pattern. Success/error callbacks only enqueue refresh; late success after
+worker shutdown cannot read the node or enqueue work. Before repair,2 of3 tests
+failed at the exact onDone -> reloadAtRisk call; after repair all3 pass.
+The existing retired-risk, locked-vault, both-wallet discovery and collection tests
+also pass. Reviewed every changed source, adapter, test and version field.
+MAJOR finding: UI callback blocked waiting for its own Handler. Fixed.
+Verdict: approve this bounded ANR repair. Full app review/2.0.0 remains incomplete.
+
+Validation
+99 integrated Future Cash tests plus57 standalone debug and57 standalone release
+executions pass, zero failures/errors/skips. Pandamonium and standalone release
+lint pass. Both signed release builds pass. All22 pinned source/provenance checks,
+6904 four-language messages and DirectNodeApi validation pass. The actual host APK
+passes exact Keets bundle,21 addon versions and Bare runtime verification.
+Family certificate SHA256:
+eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+
+Fold installation
+Signed version1.9.118/code189 installed successfully with adb install -r on the Fold
+only; existing app data retained. Installed version independently checked with
+dumpsys. StartActivity opens the normal LockActivity. As of this checkpoint, the
+phone is awaiting the user's unlock before live audit-completion/navigation checks.
+Do not claim that functional device check has passed yet. No real transactions were
+performed for testing. No public release published.
+Local host candidate: /Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-1.9.118-candidate.apk
+SHA256 0ea313947f94c093e782b7564ac56969a4645deadd3de0cb6b71eb5d53d6caa0
+Standalone repair commit a006491; local candidate dist/futurecash-next-0.1.11-candidate.apk
+SHA256 b1a545081281a601e7fea2a2fb5093a77466ccd0476591587947435b5a69a01a
+Standalone APK not installed or published. The minimaWallet integration remains
+Pandamonium-only. Earlier1.9.117 notes predate this discovered regression and repair.

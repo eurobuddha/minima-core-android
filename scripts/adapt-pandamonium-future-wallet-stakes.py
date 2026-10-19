@@ -229,3 +229,5 @@ def adapt(root):
 
     change(fc+'Wallet.java','        final JSONObject resp = Node.obj(node.cmd("status"));\n        return resp == null || !(resp.opt("locked") instanceof Boolean) || resp.optBoolean("locked", true);','        final JSONObject reply = node.cmd("status");\n        final JSONObject resp = Node.obj(reply);\n        return !Node.ok(reply) || resp == null || !(resp.opt("locked") instanceof Boolean) || resp.optBoolean("locked", true);')
     change(fc+'Guardian.java','    public synchronized void reloadAtRisk() {\n        atRisk.clear();','    public synchronized void reloadAtRisk() {\n        atRisk.clear();\n        for (String retired : wallet.retiredAddresses()) atRisk.add(Wallet.canonAddr(retired));')
+
+    change(fc+'MainActivity.java','                lastAudit = result;\n                guardian.reloadAtRisk();','                lastAudit = result;\n                // Audit callbacks may run on the UI thread. refresh() queues listStakes(),\n                // which reloads risk (including node reads) on the existing worker.')

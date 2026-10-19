@@ -12,7 +12,7 @@ App / version (code) / repair commit / JVM tests at latest checkpoint
 ETH Wallet       0.2.9 (209)   c1fb535 28 debug +28 release
 AtomiX           0.1.77 (177)  2aa2de8 308 debug +308 release
 PandaPools       0.9.67 (967)  2f39f65              303
-Future Cash Next 0.1.10(110)   bd7ede5 54 debug +54 release
+Future Cash Next 0.1.11(111)   a006491 57 debug +57 release
 PandaDEX         0.4.23 (423)  fbe0645              712
 Casino           0.7.4 (704)   0218dd0              25
 Block Explorer   0.1.6 (106)   f0fe019              no JVM suite
@@ -118,12 +118,12 @@ Only Fold R3GL805K7MB may be used when it returns; no other phone is authorized.
 Reproducibility
 All22 staging sources are detached at exact integrated/sources.lock.json revisions.
 Atelier uses its pinned parent worktree plus Android subdirectory link. No lock
-revision was silently advanced. Main source checkpoint1.9.117/code188: Pandamonium Future Cash wallet stakes.
+revision was silently advanced. Main source checkpoint1.9.118/code189: Future Cash audit-completion ANR repair.
 Latest all22 snapshot/provenance verification passes after the standalone ports.
 Language check:6904 messages in English, Chinese, Russian and Ukrainian passes.
 Transport check:all bundled clients use DirectNodeApi; no internal IPC relay,
 notification receiver, secondary process or whole-package reset remains.
-Main latest full signed APK is still1.9.101; do not label it2.0.0.
+Main latest signed candidate is1.9.118, installed on Fold; do not label it2.0.0.
 
 Nonce checkpoint: both ETH apps now reject malformed/missing nonce replies and
 exhausted counts; AtomiX preserves unsigned precision. Full nonce coordination and
@@ -157,3 +157,9 @@ repairs only.54 debug +54 release tests pass; signed local candidate verified.
 No standalone minimaWallet changes from this feature. Integrated96 Future Cash +159
 wallet tests and release lint pass; see FUTURE_CASH_WALLET_STAKES_2026-10-19.txt.
 No new Pandamonium APK built, device install or publication at this checkpoint.
+
+Post-checkpoint device regression: Fold ANR exposed a UI-thread risk reload after
+successful audit. Fixed both copies with the existing background refresh path.
+Standalone0.1.11/a006491:57 debug +57 release tests pass, signed candidate verified.
+Host1.9.118 installed on Fold; awaiting unlock for live confirmation. No public
+release. See FUTURE_CASH_AUDIT_ANR_2026-10-19.txt for exact trace and regression.
