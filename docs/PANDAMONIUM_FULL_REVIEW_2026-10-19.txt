@@ -304,3 +304,31 @@ All22 importer snapshots/provenance,6884-message/four-language catalog and direc
 transport checks pass after replacing every live staging link with pinned sources.
 No installation/publication, no real transactions, no final2.0.0 build yet.
 Full feature review and the financial/hosting/recovery issues remain open.
+
+ETH nonce reply review — 1.9.113 / code 184
+MAJOR: eth_getTransactionCount used a generic ABI parser that returned zero for
+missing/empty replies and accepted non-quantity forms. AtomiX also truncated the
+unsigned nonce into a signed long, allowing counter overflow. Fixed in embedded
+and standalone AtomiX/ETH Wallet, using the existing RPC and signing entrypoints.
+Validate typed canonical hex quantities inside the fallback loop and at the public
+read boundary; a malformed primary now tries the next endpoint. Padded contract
+DATA keeps its existing parser. AtomiX retains full BigInteger nonce precision.
+Both signers refuse exhausted/out-of-range counts before signing or broadcasting.
+No fee policy, authorization guard or network dependency was replaced.
+Reviewed both complete RPC/signing implementations, callers, source adapter,
+existing authorization/contract tests and the new mocked HTTP/signing regressions.
+Reference: https://ethereum.org/developers/docs/apis/json-rpc/#hex-value-encoding
+Reference: https://eips.ethereum.org/EIPS/eip-2681
+Validation: integrated AtomiX409 + ETH Wallet33 tests; standalone AtomiX267 and
+ETH Wallet28 in EACH debug/release suite:1032 tests, zero failures/errors/skips.
+Pandamonium release lint and both standalone release lint pass without errors.
+Standalone existing warnings: AtomiX194, ETH Wallet71. All22 pinned importer
+snapshots/provenance pass, including the new reproducible regression-test overlay.
+The initial HTTP-server fixture failed Android test compilation; replaced with the
+existing Salon mocked HttpURLConnection boundary. Final tests use no live RPC.
+Signed standalone candidates0.1.74/174 and0.2.9/209 verified for actual package,
+version, ZIP integrity and family certificate. No installation/publication.
+Verdict: approve this bounded parsing/overflow repair. Full2.0.0 review remains
+open: shared embedded nonce allocation, two-minute reuse, lost-broadcast recovery
+and RPC reply/contract-event validation still require work. Do not infer release
+approval or complete Ethereum safety from this checkpoint.

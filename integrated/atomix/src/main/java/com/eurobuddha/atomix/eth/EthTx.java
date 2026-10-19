@@ -33,7 +33,7 @@ public final class EthTx {
     private static final Map<String, NonceState> NONCE = new ConcurrentHashMap<>();
 
     private static final class NonceState {
-        long next = -1;      // next nonce to hand out; -1 = cold → read "pending"
+        BigInteger next;     // null = cold; never truncate an unsigned 64-bit RPC count
         long syncAtMs = 0;   // last time "pending" was even-with / ahead-of our counter (in sync)
     }
 
@@ -71,20 +71,23 @@ public final class EthTx {
         final BigInteger gasPrice = EthSend.effectiveGasPriceWei(rawGp, rpc.baseFeePerGasOrZero());
         synchronized (st) {
             requireAuthorized(authorized);
-            long pending = rpc.getTransactionCount(creds.getAddress()).longValue();   // fresh "pending"
+            BigInteger pending = rpc.getTransactionCount(creds.getAddress());
+            EthRpc.requireSendableNonce(pending);   // fresh "pending"
             long now = System.currentTimeMillis();
-            long alloc, newNext, newSync;
-            if (st.next < 0 || pending >= st.next) {              // cold | in-sync | external tx advanced us
-                alloc = pending; newNext = pending + 1; newSync = now;
+            BigInteger alloc, newNext;
+            long newSync;
+            if (st.next == null || pending.compareTo(st.next) >= 0) {              // cold | in-sync | external tx advanced us
+                alloc = pending; newNext = pending.add(BigInteger.ONE); newSync = now;
             } else if (now - st.syncAtMs >= STALE_MS) {           // stuck behind too long → our tx dropped → HEAL
-                alloc = pending; newNext = pending + 1; newSync = now;
+                alloc = pending; newNext = pending.add(BigInteger.ONE); newSync = now;
             } else {                                              // pending just lagging our broadcast → keep counting
-                alloc = st.next; newNext = st.next + 1; newSync = st.syncAtMs;
+                alloc = st.next; newNext = st.next.add(BigInteger.ONE); newSync = st.syncAtMs;
             }
 
             requireAuthorized(authorized);
+            EthRpc.requireSendableNonce(alloc);
             RawTransaction raw = RawTransaction.createTransaction(
-                    BigInteger.valueOf(alloc), gasPrice, gasLimit, to,
+                    alloc, gasPrice, gasLimit, to,
                     value == null ? BigInteger.ZERO : value, data);
             byte[] signed = TransactionEncoder.signMessage(raw, chainId, creds);
             requireAuthorized(authorized);

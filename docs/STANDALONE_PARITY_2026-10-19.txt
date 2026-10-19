@@ -9,8 +9,8 @@ No APK has been installed or published during this overnight propagation work.
 
 Current standalone checkpoints
 App / version (code) / repair commit / JVM tests at latest checkpoint
-ETH Wallet       0.2.8 (208)   f16ab10 [docs10b7ecd] 22
-AtomiX           0.1.73 (173)  881fe67              260 debug +260 release
+ETH Wallet       0.2.9 (209)   c1fb535 28 debug +28 release
+AtomiX           0.1.74 (174)  a630080 267 debug +267 release
 PandaPools       0.9.67 (967)  2f39f65              303
 Future Cash Next 0.1.9 (109)   ee080af              49
 PandaDEX         0.4.23 (423)  fbe0645              712
@@ -118,9 +118,13 @@ Only Fold R3GL805K7MB may be used when it returns; no other phone is authorized.
 Reproducibility
 All22 staging sources are detached at exact integrated/sources.lock.json revisions.
 Atelier uses its pinned parent worktree plus Android subdirectory link. No lock
-revision was silently advanced. Main source checkpoint1.9.112/code183:207a88e.
+revision was silently advanced. Main source checkpoint1.9.113/code184: nonce validation/overflow repair.
 Latest all22 snapshot/provenance verification passes after the standalone ports.
 Language check:6884 messages in English, Chinese, Russian and Ukrainian passes.
 Transport check:all bundled clients use DirectNodeApi; no internal IPC relay,
 notification receiver, secondary process or whole-package reset remains.
 Main latest full signed APK is still1.9.101; do not label it2.0.0.
+
+Nonce checkpoint: both ETH apps now reject malformed/missing nonce replies and
+exhausted counts; AtomiX preserves unsigned precision. Full nonce coordination and
+unknown-broadcast recovery remain open. See full review and each standalone report.
