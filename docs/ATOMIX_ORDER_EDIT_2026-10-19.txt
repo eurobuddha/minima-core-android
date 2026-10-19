@@ -1,0 +1,67 @@
+AtomiX saved-order identity repair — 2026-10-19
+
+Review finding (MAJOR, fixed)
+MainActivity.editOrderDialog loads Order.fromConfigJson, which deliberately stores
+pairs only. pushOrderEdit passed that object to the publisher without the Minima
+HTLC public key or Ethereum address. In Pandamonium, the funding/context guard
+therefore rejected live edits. The standalone publisher could sign a payload with
+those fields absent. The same omission affected the editor's withdrawal payload.
+
+Reuse and fix
+Reused the three assignments from MainActivity.baseOrder in the standalone APK
+and integrated source: current Minima public key, current wallet address, cached
+USDT display balance. Applied them after the existing readiness/identity checks
+and before peg/funding work. Existing Pandamonium publishFresh still replaces the
+cached balance with checked funding; no funding or authorization guard was removed.
+Saved pairs and user-entered prices/amounts are retained. Other order publishers
+(currency switch, background refresh, peg withdrawal, zombie-order withdrawal)
+already attach their identities and were inspected for the same gap.
+The host adapter scripts/adapt-pandamonium-atomix-bid-backing.py reproduces the
+repair from pinned donor sources. No standalone AAR or generated binary is copied.
+
+Regression evidence
+Reused ManualSendContextTest's actual unstarted Robolectric MainActivity fixture,
+synthetic Ethereum key, mocked engine/node/sodium, and the existing config parser.
+Before the repair, liveEditCarriesCurrentIdentitiesBeforeFundingChecks failed on a
+null Minima key; withdrawalSignsIdentifiedEmptyOrderWithoutFundingReads failed
+because signed JSON had no mpk field. The identity-halted test already passed.
+After the repair, all three pass in both packages. Complete debug suites: standalone
+359 tests, integrated AtomiX485 tests, zero failures/errors/skips. The withdrawal
+test examines the exact JSON passed to the signer and confirms no liquidity or
+funding reads. The live test checks identities at the entry to funding preparation;
+existing BidBackingTest separately covers the real engine's funding/queue guards.
+All23 pinned imports reproduce; direct-transport verification passes; all6982
+messages validate in English, Chinese, Russian and Ukrainian.
+
+Code-review verdict
+Approve this bounded repair after build/signature checks. Read the changed code,
+canonical adapter, tests, config serialization, publisher and surrounding callers.
+No changes to contract logic, secrets, seed derivation, fees or key counters.
+The full-app review remains incomplete; this checkpoint is not a complete audit.
+
+Outstanding
+Standalone AtomiX still needs the integrated bid-funding and delayed-publication
+guards. Its SDK Command posts to its own asynchronous queue and may wait for node
+discovery; authorization must reach that final dispatch boundary. A check only in
+NodeApi/SignGate is not full parity. Continue from the existing reviewed host
+adapters and tests, preserving the durable Ethereum recovery port in0.1.78.
+Sweep automatic oversized-batch recovery remains included in Pandamonium.
+The authorized Fold R3GL805K7MB is currently absent from adb devices. A different
+phone is connected and was not used. No installation, real transaction, real
+seed/counter change or release publication was performed. Public2.0.0 remains.
+
+Final build evidence
+Standalone release tests359 and host tests181 passed, zero failures/errors/skips.
+Offline release builds/lint succeeded. Lint: standalone0 errors/195 warnings;
+Pandamonium0 errors/362 warnings, unchanged counts. ZIP integrity, package/version,
+actual APK DEX identity assignments and shared recovery classes verified.
+Keets bundle,21 addons/runtime per ABI verified in Pandamonium.
+Both APKs verify Signature Scheme v2, RSA4096, family certificate SHA256:
+eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+/Users/eurobuddha/Projects/minima/apks/atomix/dist/atomix-0.1.79-candidate.apk
+22563630 bytes; SHA256 62db0c59ef5736538c774fe0c9f68e1503609f7f0f445ed86899f62172a30115
+/Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.11-candidate.apk
+137144497 bytes; SHA256 faf40ee41ee6709e53a5e3fa4759f85cf366a2cf883a0f66a15d6ae08a8e9e52
+Standalone com.eurobuddha.atomix0.1.79/code179;
+Pandamonium com.eurobuddha.pandamonium2.0.11-Pandamonium/code206.
+No installation or publication; Fold verification remains pending.

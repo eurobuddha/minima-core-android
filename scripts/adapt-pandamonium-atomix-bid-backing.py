@@ -148,3 +148,9 @@ def adapt(root):
     for name in ['MainActivity.java','SwapService.java']:
         p=base/name;s=p.read_text();old='restored && peg == PriceOracle.PEG_APPLIED'
         assert s.count(old)==1;p.write_text(s.replace(old,'restored && peg == PriceOracle.PEG_APPLIED && o.hasLiquidity()'))
+
+    # The editor loads pairs-only configuration, unlike baseOrder().
+    p=base/'MainActivity.java';s=p.read_text()
+    old='        if (identity == null || myMinimaPk == null || !wallet.ready()) return;\n        final boolean live = o.hasLiquidity();'
+    new='        if (identity == null || myMinimaPk == null || !wallet.ready()) return;\n        // Saved configuration contains pairs only; attach identities just as baseOrder() does.\n        o.minimaPublicKey = myMinimaPk;\n        o.ethAddress = wallet.address();\n        o.usdtAvail = parseD(Util.tidyAmount(tokenBals.get("USDT")), 0);\n        final boolean live = o.hasLiquidity();'
+    assert s.count(old)==1;p.write_text(s.replace(old,new))
