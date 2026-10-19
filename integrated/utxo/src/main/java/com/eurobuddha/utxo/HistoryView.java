@@ -215,6 +215,7 @@ public class HistoryView extends BaseView {
 
     private static CharSequence statusWord(HistoryRow r) {
         switch (r.status == null ? "" : r.status) {
+            case HistoryDb.STATUS_CONFIRMED: return Language.msg(l10n_nft_history_confirmed);
             case HistoryDb.STATUS_POSTING: return Language.msg(l10n_utxo_status_posting);
             case HistoryDb.STATUS_POSTED:  return Language.msg(l10n_utxo_status_posted);
             case HistoryDb.STATUS_UNKNOWN: return Language.msg(l10n_utxo_status_unknown);
@@ -229,10 +230,10 @@ public class HistoryView extends BaseView {
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(8), dp(11), dp(8), dp(11));
         boolean failed = isFailed(r);
-        int color = failed ? Design.red() : Design.amber();
+        int color = failed ? Design.red() : HistoryDb.STATUS_CONFIRMED.equals(r.status) ? 0xFF1EA85A : Design.amber();
 
         TextView glyph = new TextView(act);
-        Language.setText(glyph, failed ? "✗" : "⏳"); glyph.setTextColor(color); glyph.setTextSize(18f); glyph.setWidth(dp(28));
+        Language.setText(glyph, failed ? "✗" : HistoryDb.STATUS_CONFIRMED.equals(r.status) ? "✓" : "⏳"); glyph.setTextColor(color); glyph.setTextSize(18f); glyph.setWidth(dp(28));
         row.addView(glyph);
 
         LinearLayout mid = new LinearLayout(act);
@@ -265,6 +266,7 @@ public class HistoryView extends BaseView {
         box.setPadding(dp(20), dp(12), dp(20), dp(12));
         box.setBackgroundColor(Design.bg());
         kv(box, Language.msg(l10n_utxo_status), statusWord(r));
+        if (Util.isValidHexId(r.txnid)) copyRow(box, Language.msg(l10n_history_txpow), r.txnid);
         if (r.note != null && !r.note.isEmpty()) kv(box, isFailed(r) ? Language.msg(l10n_utxo_error) : Language.msg(l10n_utxo_note), UtxoMessages.message(r.note));
         kv(box, Language.msg(l10n_history_amount), "−" + Util.tidyAmount(r.amount) + " " + r.tokenName);
         kv(box, Language.msg(l10n_history_date_time), Language.stamp(r.ts, "yMMMdHms"));
@@ -277,11 +279,10 @@ public class HistoryView extends BaseView {
         addLocalCoins(box, Language.msg(l10n_history_outputs), r.outputs, null);
         ScrollView sv = new ScrollView(act);
         sv.addView(box);
-        AlertDialog.Builder b = Design.dialog(act).setTitle(isFailed(r) ? Language.msg(l10n_utxo_failed_transaction) : Language.msg(l10n_utxo_pending_transaction))
+        AlertDialog.Builder b = Design.dialog(act).setTitle(Language.msg(l10n_history_transaction))
                 .setView(sv).setPositiveButton(Language.msg(l10n_utxo_close), null);
-        // Dismiss: failed rows, and any open row older than a day (something the resolver could never match).
-        boolean stale = System.currentTimeMillis() - r.ts > 24L * 60 * 60 * 1000;
-        if (isFailed(r) || stale) b.setNegativeButton(Language.msg(l10n_utxo_dismiss), (d, w) -> { act.history().delete(r.internalid); render(); });
+        // Pending evidence must survive elapsed time; only failed audit rows offer dismissal.
+        if (isFailed(r)) b.setNegativeButton(Language.msg(l10n_utxo_dismiss), (d, w) -> { act.history().delete(r.internalid); render(); });
         b.show();
     }
 

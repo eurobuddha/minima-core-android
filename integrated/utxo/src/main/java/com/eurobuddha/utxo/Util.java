@@ -10,6 +10,20 @@ public final class Util {
 
     private Util() {}
 
+    public static boolean isValidHexId(String id) {
+        return id != null && (MINIMA_TOKENID.equals(id) || id.matches("^0x[0-9a-fA-F]{2,64}$"));
+    }
+
+    /**
+     * A plain decimal amount as the node emits them. Amounts are interpolated into commands too,
+     * so a chain-supplied "1 burn:9999" must never reach one.
+     */
+    public static boolean isValidAmount(String amt) {
+        return amt != null && amt.matches("^[0-9]+(\\.[0-9]+)?$");
+    }
+
+
+
     /** A Minima address: 0x + exactly 64 hex (32-byte script hash), or Mx + 40–118 alnum.
      *  Matches the dapp's validateAddress; a pre-filter before the node's checkaddress. */
     public static boolean isValidAddress(String a) {

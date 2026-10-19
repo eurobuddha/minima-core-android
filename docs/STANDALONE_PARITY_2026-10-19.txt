@@ -189,3 +189,14 @@ tests and 5 original NFT tests passed. Signed local candidates and release lint
 verified. No install/publication. Full receipt validation, durable reservations,
 distribution recovery and prepared consolidation remain release-blocking work.
 Evidence and artifact hashes: docs/UTXO_NODE_RESPONSES_2026-10-19.txt.
+
+UTXO durable journal — Pandamonium 1.9.122 / standalone 0.4.38
+Reuses NFT complete intent/receipt matching, SQLite reservations, recovery,
+distribution and unsigned prepared consolidation. DB8 preserves legacy history;
+strict coin loading and a distinct pre-command admission result prevent malformed
+balances and stuck initial distributions. 474 UTXO + 98 NFT test executions pass;
+both signed offline candidates, release lints, 23 imports, catalogue, direct
+transport and actual APK Keets checks pass. No install or publication.
+See docs/UTXO_TRANSACTION_JOURNAL_2026-10-19.txt for review, artifact hashes and
+remaining work. Draft/confirmation guards, cached-history presentation and full
+application/standalone parity remain open; this is not final release approval.

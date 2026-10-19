@@ -40,6 +40,7 @@ final class CoinLoader {
     private int expected = -1;
     private String mode = "whole";
     private boolean finished = false;
+    private static final String INVALID="Coin list unavailable — the node returned an invalid reply.";
 
     private CoinLoader(MainActivity act, Done done) { this.act = act; this.done = done; }
 
@@ -58,10 +59,11 @@ final class CoinLoader {
                 List<String> tokens = new ArrayList<>();
                 int sum = 0;
                 JSONArray arr = json.optJSONArray("response");
-                if (arr != null) for (int i = 0; i < arr.length(); i++) {
+                if (arr == null) { fail(INVALID); return; }
+                for (int i = 0; i < arr.length(); i++) {
                     JSONObject b = arr.optJSONObject(i);
-                    if (b == null) continue;
-                    tokens.add(b.optString("tokenid", Util.MINIMA_TOKENID));
+                    if (b == null || !Util.isValidHexId(b.optString("tokenid", ""))) { fail(INVALID); return; }
+                    tokens.add(b.optString("tokenid"));
                     sum += b.optInt("coins", 0);
                 }
                 expected = sum;
@@ -88,11 +90,12 @@ final class CoinLoader {
             @Override public void onResult(JSONObject json) {
                 LinkedHashSet<String> seen = new LinkedHashSet<>();
                 JSONArray arr = json.optJSONArray("response");
-                if (arr != null) for (int i = 0; i < arr.length(); i++) {
+                if (arr == null) { fail(INVALID); return; }
+                for (int i = 0; i < arr.length(); i++) {
                     JSONObject s = arr.optJSONObject(i);
-                    if (s == null) continue;
-                    String hex = s.optString("address", "");
-                    if (!hex.isEmpty()) seen.add(hex);
+                    String hex = s == null ? "" : s.optString("address", "");
+                    if (!Util.isValidHexId(hex) || !Util.isValidAddress(hex)) { fail(INVALID); return; }
+                    seen.add(hex);
                 }
                 scriptAddrs = new ArrayList<>(seen);
                 nextAddr(tid, 0, then);
@@ -119,15 +122,22 @@ final class CoinLoader {
                 List<Coin> got = new ArrayList<>();
                 for (int i = 0; i < arr.length(); i++) {
                     JSONObject c = arr.optJSONObject(i);
-                    if (c != null) got.add(Coin.from(c));
+                    Coin coin = c == null ? null : Coin.from(c);
+                    if (coin == null || !coin.isWellFormed() || coin.spent) { failCb.run(INVALID); return; }
+                    got.add(coin);
                 }
                 act.node().cmd(base + " sendable:true", new NodeApi.Cb() {
                     @Override public void onResult(JSONObject json2) {
                         JSONArray a2 = json2.optJSONArray("response");
-                        if (a2 != null) for (int i = 0; i < a2.length(); i++) {
+                        if (a2 == null) { failCb.run(INVALID); return; }
+                        Set<String> checked = new HashSet<>();
+                        for (int i = 0; i < a2.length(); i++) {
                             JSONObject c = a2.optJSONObject(i);
-                            if (c != null) sendable.add(c.optString("coinid", ""));
+                            Coin coin = c == null ? null : Coin.from(c);
+                            if (coin == null || !coin.isWellFormed() || coin.spent) { failCb.run(INVALID); return; }
+                            checked.add(coin.coinid);
                         }
+                        sendable.addAll(checked);
                         coins.addAll(got);
                         ok.run();
                     }

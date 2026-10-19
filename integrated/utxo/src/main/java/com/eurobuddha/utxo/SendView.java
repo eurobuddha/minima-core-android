@@ -359,7 +359,7 @@ public class SendView extends BaseView {
                 act.clearSelection();
                 act.reload();
             }
-        }).onProgress(label -> status(UtxoMessages.message(label), true)).run();
+        }).record(internalid).onProgress(label -> status(UtxoMessages.message(label), true)).run();
     }
 
     // ----- small helpers -----

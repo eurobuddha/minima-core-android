@@ -40,9 +40,9 @@ public class UncertainWriteTest {
             }).when(api).Command(anyString(),any());
         });
         final NodeApi node=new NodeApi(act,null);
-        Flow(){when(act.node()).thenReturn(node);when(act.history()).thenReturn(history);}
-        void sign(){Coin c=new Coin();c.coinid="0x"+"11".repeat(32);c.tokenid="0x00";c.amount="10";
-            new TxnBuilder(act,Collections.singletonList(c),Collections.singletonList(new TxnBuilder.Out("0x"+"22".repeat(32),"10")),"0x00",done).run();}
+        Flow(){when(act.node()).thenReturn(node);when(act.history()).thenReturn(history);when(history.insertPosting(any())).thenReturn(true);when(history.prepareAttempt(anyString(),anyString(),any())).thenReturn(true);when(history.markAttempt(anyString(),anyString(),any())).thenReturn(true);}
+        void sign(){Coin c=new Coin();c.coinid="0x"+"11".repeat(32);c.tokenid="0x00";c.amount=c.rawAmount="10";c.confirmed=c.sendable=true;
+            new TxnBuilder(act,Collections.singletonList(c),Collections.singletonList(new TxnBuilder.Out("0x"+"22".repeat(32),"10")),"0x00",done).record("public-attempt").run();}
         void consolidate()throws Exception {WalletTools tools=new WalletTools(act,mock(WalletTools.Status.class));
             java.lang.reflect.Method method=WalletTools.class.getDeclaredMethod("autoConsolidate",String.class);method.setAccessible(true);method.invoke(tools,"0x00");}
         public void close(){node.onDestroy();clients.close();handlers.close();}
@@ -55,7 +55,7 @@ public class UncertainWriteTest {
     }
     @Test public void timeoutSuppressesTheLateReplyAndDoesNotScheduleDeletion(){try(Flow f=new Flow()){
         f.hold=true;f.sign();assertEquals(1,f.timeouts.size());f.timeouts.get(0).run();f.pending.response(object("status",true));
-        verify(f.done,times(1)).onUnknown(NodeApi.ERR_TIMEOUT);verify(f.done,never()).onPosted(any(),any());verify(f.done,never()).onFailed(anyString());
+        verify(f.done,times(1)).onUnknown(TransactionEvidence.UNKNOWN);verify(f.done,never()).onPosted(any(),any());verify(f.done,never()).onFailed(anyString());
         assertFalse(f.commands.stream().anyMatch(c->c.startsWith("txndelete ")));
     }}
     @Test public void explicitRejectionsRemainFailures(){for(JSONObject rejected:new JSONObject[]{object("status",false,"error","Rejected"),object("enabled",false),object("transporterror","The embedded node is not running. No command was sent.")})try(Flow f=new Flow()){
@@ -64,17 +64,17 @@ public class UncertainWriteTest {
     @Test public void thrownTransportIsUnknownAndCancelsItsTimeout(){try(Flow f=new Flow()){
         f.throwsTransport=true;f.sign();verify(f.done).onUnknown(anyString());assertTrue(f.timeouts.isEmpty());verify(f.done,never()).onFailed(anyString());assertFalse(f.commands.stream().anyMatch(c->c.startsWith("txndelete ")));
     }}
-    @Test public void consolidationUncertaintyIsPersistedWithoutClaimingFailureOrSuccess()throws Exception {
+    @Test public void uncertainUnsignedConsolidationCannotSignOrPost()throws Exception {
         for(int mode=0;mode<4;mode++)try(Flow f=new Flow()){
             if(mode==0)f.reply=object("transporterror","Invalid node result. Outcome remains unknown.");
             if(mode==1)f.reply=object("status",false,"response","Result too long!");
             if(mode==2)f.hold=true;
             if(mode==3)f.throwsTransport=true;
             f.consolidate();if(f.hold)f.timeouts.get(0).run();
-            verify(f.history).update(anyString(),eq(HistoryDb.STATUS_UNKNOWN),isNull(),anyString());
-            verify(f.history,never()).update(anyString(),eq(HistoryDb.STATUS_ERROR),any(),any());
+            verify(f.history).update(anyString(),eq(HistoryDb.STATUS_ERROR),isNull(),eq(TransactionEvidence.NOT_SENT));
+            verify(f.history,never()).update(anyString(),eq(HistoryDb.STATUS_UNKNOWN),any(),any());
             verify(f.history,never()).update(anyString(),eq(HistoryDb.STATUS_POSTED),any(),any());
-            assertEquals(1,f.commands.size());verify(f.act).reload();
+            assertEquals(1,f.commands.size());assertTrue(f.commands.get(0).endsWith("dryrun:true"));
         }
     }
     @Test public void consolidationDefiniteRejectionRemainsAnError()throws Exception {try(Flow f=new Flow()){

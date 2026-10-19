@@ -1,0 +1,91 @@
+UTXO transaction journal and distribution review — 2026-10-19
+
+Scope: Pandamonium 1.9.122/code 193 and standalone UTXO 0.4.38/code 438.
+Source checkpoint only. Full Pandamonium review, standalone parity and 2.0.0
+release remain incomplete. Neither candidate was installed or published.
+
+Problems fixed
+- Partial post receipts could report success without matching the full transfer.
+- In-memory submission state could be lost on restart and overlapping inputs
+  could be selected while a prior submission remained unresolved.
+- Distribution advanced from guessed change instead of confirmed batch evidence.
+- Native consolidation bypassed custom transaction reservations.
+- Malformed/missing token amounts and fallback coin responses could enter the UI.
+
+Reuse and adaptations
+Read and reused integrated/NFTwallet/.../TxnBuilder.java and the implementations
+in scripts/pandamonium-sources/NFTwallet/{TransactionEvidence,TransactionRecovery,
+DistributeJob,DistributeManager,PreparedConsolidation,PreparedSendEvidence}.java,
+transaction-journal.inc and the ID/amount/address helpers from BurialEvidence.
+Reused their tests and added UTXO-specific migration, admission and coin-loader
+coverage. Canonical UTXO sources live in scripts/pandamonium-sources/utxo; the
+new adapt-pandamonium-utxo-journal.py runs after the existing response adapter.
+
+The transaction journal fragment is unchanged except the helper class name.
+UTXO keeps its database/preferences, display history and existing legacy recovery.
+Integrated UTXO retains direct transport and four-language messages; standalone
+retains IPC and its current English UI. No seed, private key or signature is stored
+in the public intent/receipt journal.
+
+Behavior
+Database v8 adds durable attempts without dropping either history table. Exact
+validated input/output economics are frozen and persisted before any node command.
+POSTING is committed before signing/posting; exact receipt evidence is required
+before POSTED. Uncertain submission retains input reservations and cannot be
+replayed merely because a response was lost. Recovery requires matching transaction
+contents and fresh three-block inclusion. Legacy matching excludes journalled
+attempts. Unresolved audit rows cannot be deleted. Confirmed local rows remain
+visible until their corresponding node-history record is cached.
+
+Distribution persists its exact batch before submission and advances only after
+that journal attempt is confirmed. Change selection requires exact output coin ID,
+amount, address and token. Final batches without change also wait for confirmation.
+Old jobs lacking frozen intent remain held. A distinct onNotStarted callback
+records admission failure before any node command, so a rejected initial
+reservation does not leave a new distribution permanently uncertain. Failed
+persistence retains the hold. This additional admission fix also needs porting
+back to NFT Wallet during the remaining parity work.
+
+Native Minima consolidation uses the existing unsigned dry run, validates wallet
+ownership and full economics, then submits through the same durable builder.
+Coin loading validates every result before replacing displayed balances. Missing
+human token amounts cannot fall back to raw units. Spent inputs and pending node
+responses cannot establish transaction evidence.
+
+Validation and review
+- Integrated UTXO: 164 tests; standalone debug: 155; standalone release: 155.
+- Original NFT donor suites: 98 tests. All 572 executions passed without skips.
+- Mocked node calls and disposable SQLite only; no real transactions.
+- Release lint: Pandamonium 0 errors/358 warnings; UTXO 0 errors/106 warnings.
+- Both offline signed release builds passed.
+- All 23 pinned imports/provenance reproduced; 6924 four-language catalogue
+  messages and direct-transport verification passed.
+- Actual Pandamonium APK Keets bundle, 21 linked addons per ABI and Bare verified.
+- Canonical/generated UTXO sources and tests match byte-for-byte.
+- Package metadata and signing certificate verified for both APKs.
+
+Reviewed changed production, adapters and tests, including donor adaptations,
+restart/late callback paths, failed persistence, exact change recovery and v7
+migration. Approve this bounded checkpoint. Full application approval remains
+withheld pending the review items below and Fold checks.
+
+Remaining review work
+- Send/tool immutable drafts and stale confirmation guards.
+- General cached-history confirmation/reorg presentation.
+- Legacy unknown attempts cannot retroactively gain complete intent or reservations.
+- Prepared consolidation display rows should expose the journal's full audit data.
+- NFT standalone parity and the new pre-command admission distinction.
+- Remaining integrated apps, standalone equivalents and final 2.0.0 Fold checks.
+
+Artifacts (local candidates only)
+Pandamonium: /Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-1.9.122-candidate.apk
+SHA256 7199aaae3439c1ec6d388980c9904379e2569fdf8586157c003901585d48852f
+UTXO: /Users/eurobuddha/Projects/minima/apks/utxo/dist/utxo-wallet-0.4.38-candidate.apk
+SHA256 a5de023d045f344410b45a3ed99c7b12ea031c271d4abcb63734f5f79cba8417
+Certificate SHA256 (both):
+eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+
+Build evidence: build/localization/utxo-journal-build.log,
+utxo-journal-review-tests.log, utxo-journal-import.log in the Pandamonium worktree;
+/tmp/utxo-journal-standalone-build.log for standalone. XML results are in each
+module's build/test-results directory. Fold remains on 1.9.119/code190.

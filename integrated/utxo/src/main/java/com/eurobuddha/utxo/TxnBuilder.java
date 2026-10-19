@@ -20,7 +20,9 @@ public class TxnBuilder {
     public interface Done {
         void onPosted(String txpowid, List<OutCoin> outputs);
         void onFailed(String message);
-        /** A possibly submitted transaction must never become a definite failure. */
+        /** The builder issued no node command; preparation/admission itself failed. */
+        default void onNotStarted(String message) { onFailed(message); }
+        /** Required: callers must preserve an unknown outcome instead of treating it as failed. */
         void onUnknown(String message);
     }
 
@@ -35,7 +37,9 @@ public class TxnBuilder {
     public static class Out {
         public final String address;
         public final String amount;
-        public Out(String address, String amount) { this.address = address; this.amount = amount; }
+        public final Boolean storestate;
+        public Out(String address, String amount) { this(address,amount,null); }
+        public Out(String address,String amount,Boolean storestate) { this.address=address;this.amount=amount;this.storestate=storestate; }
     }
 
     /** An output coin as it came back in the posted transaction (both address forms kept). */
@@ -44,12 +48,15 @@ public class TxnBuilder {
         public final String address;       // 0x… hex form
         public final String miniaddress;   // Mx… form
         public final String amount;
-        public OutCoin(String coinid, String address, String miniaddress, String amount) {
+        public final Boolean storestate;
+        public OutCoin(String coinid,String address,String miniaddress,String amount) { this(coinid,address,miniaddress,amount,null); }
+        public OutCoin(String coinid, String address, String miniaddress, String amount,Boolean storestate) {
+            this.storestate=storestate;
             this.coinid = coinid; this.address = address; this.miniaddress = miniaddress; this.amount = amount;
         }
         /** True if either address form equals the given address. */
         public boolean addressIs(String a) {
-            return a != null && (a.equals(address) || a.equals(miniaddress));
+            return a != null && ((a.startsWith("0x") && a.equalsIgnoreCase(address)) || a.equals(miniaddress));
         }
     }
 
@@ -58,9 +65,21 @@ public class TxnBuilder {
     private final List<Out> outputs;
     private final String tokenid;
     private final boolean minima;
-    private final String burn;          // Minima-only burn, informational: it is realised as the inputs−outputs gap, never sent as txnpostburn
+    private final String burn;          // Minima-only burn, already reserved by the caller in the input/output difference
     private final Done done;
     private final String txid;
+    private JSONObject intent;
+    private boolean started, finished, prepared;
+    private String historyId;
+    /** Every custom builder must be linked to its saved display row before it can issue commands. */
+    public TxnBuilder record(String id) {
+        if (started) throw new IllegalStateException("Transaction already started");
+        historyId=id;return this;
+    }
+    private boolean mark(String phase, JSONObject reply) {
+        try { return prepared && act.history().markAttempt(historyId,phase,reply); }
+        catch (RuntimeException failure) { return false; }
+    }
 
     public TxnBuilder(MainActivity act, List<Coin> inputs, List<Out> outputs, String tokenid, Done done) {
         this(act, inputs, outputs, tokenid, null, done);
@@ -80,6 +99,14 @@ public class TxnBuilder {
     }
 
     public void run() {
+        if (started) return;
+        started = true;
+        try { intent = TransactionEvidence.intent(inputs, outputs, tokenid, burn); }
+        catch (RuntimeException invalid) { finished = true; done.onNotStarted(TransactionEvidence.INVALID); return; }
+        try {
+            if (historyId == null || !act.history().prepareAttempt(historyId,txid,intent)) throw new IllegalStateException();
+            prepared=true;
+        } catch (RuntimeException failure) { finished=true;done.onNotStarted(TransactionEvidence.RECORD_FAILED);return; }
         stage("Building transaction…");
         act.node().cmd("txncreate id:" + txid, new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) { addInput(0); }
@@ -88,20 +115,25 @@ public class TxnBuilder {
     }
 
     private void addInput(int i) {
-        if (i >= inputs.size()) { addOutput(0); return; }
-        stage("Adding inputs (" + (i + 1) + "/" + inputs.size() + ")…");
-        act.node().cmd("txninput id:" + txid + " coinid:" + inputs.get(i).coinid, new NodeApi.Cb() {
+        if (finished) return;
+        JSONArray frozen = intent.optJSONArray("inputs");
+        if (i >= frozen.length()) { addOutput(0); return; }
+        stage("Adding inputs (" + (i + 1) + "/" + frozen.length() + ")…");
+        act.node().cmd("txninput id:" + txid + " coinid:" + frozen.optJSONObject(i).optString("coinid"), new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) { addInput(i + 1); }
             @Override public void onError(String message) { fail(message); }
         });
     }
 
     private void addOutput(int i) {
-        if (i >= outputs.size()) { sign(); return; }
-        stage("Adding outputs (" + (i + 1) + "/" + outputs.size() + ")…");
-        Out o = outputs.get(i);
-        String cmd = "txnoutput id:" + txid + " amount:" + o.amount + " address:" + o.address
-                + (minima ? "" : " tokenid:" + tokenid);
+        if (finished) return;
+        JSONArray frozen = intent.optJSONArray("outputs");
+        if (i >= frozen.length()) { sign(); return; }
+        stage("Adding outputs (" + (i + 1) + "/" + frozen.length() + ")…");
+        JSONObject o = frozen.optJSONObject(i);
+        String cmd = "txnoutput id:" + txid + " amount:" + o.optString("amount") + " address:" + o.optString("address")
+                + (minima ? "" : " tokenid:" + tokenid)
+                + (o.has("storestate")?" storestate:"+o.optBoolean("storestate"):"");
         act.node().cmd(cmd, new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) { addOutput(i + 1); }
             @Override public void onError(String message) { fail(message); }
@@ -109,6 +141,7 @@ public class TxnBuilder {
     }
 
     private void sign() {
+        if (!mark(HistoryDb.POSTING,null)) { unknown(TransactionEvidence.UNKNOWN); return; }
         stage("Signing & posting (proof-of-work — can take a moment)…");
         // BURN: the caller already reserves the burn by leaving a gap between inputs and outputs
         // (change = inputs − amount − burn); the node burns that surplus (Transaction.getBurn).
@@ -118,55 +151,34 @@ public class TxnBuilder {
         act.node().cmd("txnsign id:" + txid + " publickey:auto txnpostauto:true txndelete:true",
                 new NodeApi.Cb() {
                     @Override public void onResult(JSONObject json) {
-                        done.onPosted(parseTxpowid(json), parseOutputs(json));
+                        if (finished) return;
+                        final List<OutCoin> receipt;
+                        try { receipt = TransactionEvidence.receipt(json, intent); }
+                        catch (RuntimeException incomplete) { unknown(TransactionEvidence.UNKNOWN); return; }
+                        if (!mark(HistoryDb.POSTED,json)) { unknown(TransactionEvidence.UNKNOWN); return; }
+                        finished = true;
+                        done.onPosted(TransactionEvidence.txpow(json).optString("txpowid"), receipt);
                     }
                     @Override public void onError(String message) { fail(message); }
-                    @Override public void onUnknown(String message) {
-                        // Reuse NFT TxnBuilder: an executing post may still finish. Do not delete or retry it.
-                        done.onUnknown(message);
-                    }
+                    @Override public void onUnknown(String message) { unknown(message); }
                 });
     }
 
+    private void unknown(String message) {
+        if (finished) return;
+        finished = true;
+        mark(HistoryDb.UNKNOWN,null); // failed updates leave the earlier intent and reservation intact
+        // An executing post may still finish. Keep its record; never schedule cleanup or a retry.
+        done.onUnknown(TransactionEvidence.UNKNOWN);
+    }
+
     private void fail(String message) {
+        if (finished) return;
+        if (!mark(HistoryDb.NOT_SUBMITTED,null)) { unknown(TransactionEvidence.UNKNOWN); return; }
+        finished = true;
         // Best-effort cleanup of the half-built custom txn on the node.
         act.node().cmd("txndelete id:" + txid, null);
         done.onFailed(message);
     }
 
-    private JSONObject txpowOf(JSONObject json) {
-        JSONObject resp = json.optJSONObject("response");
-        if (resp == null) return null;
-        JSONObject txpow = resp.optJSONObject("txpow");
-        return txpow != null ? txpow : resp;   // some responses are the txpow directly
-    }
-
-    private String parseTxpowid(JSONObject json) {
-        JSONObject txpow = txpowOf(json);
-        if (txpow != null) {
-            String t = txpow.optString("txpowid", "");
-            if (!t.isEmpty()) return t;
-        }
-        return txid;
-    }
-
-    private List<OutCoin> parseOutputs(JSONObject json) {
-        List<OutCoin> out = new ArrayList<>();
-        JSONObject txpow = txpowOf(json);
-        if (txpow == null) return out;
-        JSONObject body = txpow.optJSONObject("body");
-        if (body == null) return out;
-        JSONObject txn = body.optJSONObject("txn");
-        if (txn == null) return out;
-        JSONArray arr = txn.optJSONArray("outputs");
-        if (arr == null) return out;
-        for (int i = 0; i < arr.length(); i++) {
-            JSONObject o = arr.optJSONObject(i);
-            if (o == null) continue;
-            String amt = o.optString("tokenamount", o.optString("amount", ""));
-            out.add(new OutCoin(o.optString("coinid", ""), o.optString("address", ""),
-                    o.optString("miniaddress", ""), amt));
-        }
-        return out;
-    }
 }

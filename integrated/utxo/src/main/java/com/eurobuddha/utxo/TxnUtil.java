@@ -12,6 +12,16 @@ public final class TxnUtil {
 
     private TxnUtil() {}
 
+    /** Native selection cannot bypass reservations held by a custom transaction. */
+    static boolean canUseNativeFunds(MainActivity act,String tokenid,String burn) {
+        try {
+            if (act.history().hasUnresolvedAttempt(tokenid)) return false;
+            if (burn == null || burn.isEmpty()) return true;
+            if (!Util.isValidAmount(burn)) return false;
+            return new java.math.BigDecimal(burn).signum()==0 || !act.history().hasUnresolvedAttempt(Util.MINIMA_TOKENID);
+        } catch (RuntimeException unreadable) { return false; }
+    }
+
     /** Callback for the async getaddress loop in {@link #fetchAddresses}. */
     public interface AddrList {
         void onAddresses(List<String> addresses);
@@ -46,8 +56,7 @@ public final class TxnUtil {
         r.outputs = outputsJson(outputs);
         r.changeaddr = changeaddr == null ? "" : changeaddr;
         r.burn = burn == null ? "" : burn;
-        act.history().insertPosting(r);
-        return internalid;
+        return act.history().insertPosting(r) ? internalid : null;
     }
 
     // Inputs are stored as JSON [{coinid,address,amount}] — the coinids are what the resolver later
