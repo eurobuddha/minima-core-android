@@ -9,6 +9,7 @@ android {
         buildConfigField 'int', 'VERSION_CODE', '310'
     }
     buildFeatures { buildConfig true }
+    testOptions { unitTests.returnDefaultValues = true }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -16,6 +17,7 @@ android {
 }
 dependencies {
     implementation project(':localization')
+    testImplementation 'org.mockito:mockito-core:5.12.0'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20240303'
     implementation libs.appcompat

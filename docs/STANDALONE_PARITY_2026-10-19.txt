@@ -62,3 +62,20 @@ at the1.9.107 checkpoint. Remaining links must be detached before upstream edits
 Main review findings still open include cross-module ETH nonce allocation and
 UTXO receipt/history/distribution evidence. Full feature review not yet complete.
 Do not rename a partial candidate2.0.0 or publish based only on passing unit tests.
+
+Additional verified checkpoints
+Casino0.7.4/code704 0218dd0: result overlay fits narrow screens, accessible48dp
+ sound/currency controls and scrolling tabs.25 tests, lint0 errors67 warnings.
+BlockExplorer0.1.6/code106 f0fe019: theme button accessibility description.
+ No JVM suite exists; signed build/lint pass (0 errors54 warnings).
+NFT Wallet0.1.15/code115 b5c983f: node Boolean-status gate/main-handler dispatch,
+ closed-screen guards, unknown transport outcomes;70 tests, lint0 errors236 warnings.
+ Existing transaction clients still need durable unknown-outcome parity.
+KeyUses0.1.5 checkpoint commit is0485da9; complete audit-engine parity remains open.
+History0.3.12/code312: never skip failed pages; bounded retries/cancellation,
+ malformed-page rejection, truthful incomplete status, retained-history rescan.
+ 10 tests, lint0 errors48 warnings. Shared repair in host1.9.108.
+Sixteen standalone repositories have pushed repair checkpoints. This is partial
+parity; the remaining source comparisons above still apply. Casino/Explorer's
+small adapter ports are complete. All candidates remain local, signed/versioned,
+with hashes; no installation or publication. Full2.0.0 review remains open.
