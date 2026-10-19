@@ -130,3 +130,44 @@ No remaining findings in this revision. Validation results follow after executio
 - The prior full-lint limitation remains: unchanged lock-screen MissingSuperCall.
   No full-lint success is claimed. Live verification of this revision follows the
   Fold's normal unlock after the in-place update.
+
+Original goal completion audit — 2026-10-19, source af6be04
+Scope: integrate KeyUses into Pandamonium; audit the existing node and both
+same-seed key families (64 classic, 32 block); optionally include minimaWallet's
+64 classic keys when it uses a different seed. Preserve the later requested
+section numbering, visible warning colours and no public phrase-entry field.
+
+Current-state evidence
+1. Integration: app/build.gradle includes integrated-keyreuses; the non-exported
+   activity and PandamoniumDestinations entry are present. The signed 1.9.97 APK
+   contains MainActivity, AuditSelection, NodeAuditKeys, PublicAuditKeys and the
+   shared AuditApi classes. APK ZIP integrity, recorded SHA256 and family signing
+   certificate were rechecked against the retained artifact.
+2. Same-seed families: NodeAuditKeys reads the current embedded node seed through
+   the authenticated wallet bridge and derives indices0-63 at64/3 and0-31 at128/4.
+   It exposes public descriptors only. NodeAuditKeysTest checks all96 selections,
+   lock boundaries, caching, changed seeds/counters, failed reads and all16 donor
+   golden public-key/address vectors against real native TreeKey derivation.
+3. Optional wallet: PublicAuditKeys reads a descriptor atomically saved with the
+   encrypted wallet blob. Its namespace follows that wallet's seed. All64 base
+   indices are required; additional used indices are included. AuditSelectionTest
+   proves96 keys without the option and160 unique keys for a different wallet,
+   plus correct same-key merging and conservative unknown counters.
+4. Actual screen: KeyUsesScreenTest selects the checkbox, observes the160-key API
+   request, and verifies all four languages, separate64/32/64 groups, numbering,
+   warning colours and320dp layout. It rejects changed node/wallet snapshots and
+   ignores backgrounded results. No EditText/phrase input exists in the screen.
+5. Seed lifecycle: PublicAuditKeysTest exercises actual vault create/unlock,
+   password change and replacement backup import with synthetic fixtures. Failed
+   storage cannot mix descriptors; untrusted counters cannot appear verified.
+
+Reran current offline integrated suites: KeyUses37, wallet150, Future Cash73;
+260 tests total, zero failures/errors/skips. The goal-relevant KeyUses integration,
+NodeAuditKeys and PublicAuditKeys sources are unchanged since accepted1.9.97.
+The conversation records the user's acceptance ('perfect') after the Fold display
+corrections. No new phone test or real seed/counter change was performed overnight;
+the independent-seed wallet path is verified with synthetic fixtures.
+
+Verdict: the original KeyUses integration goal is achieved. This does not complete
+the later full-Pandamonium review, standalone parity or2.0.0 release. Those remain
+open in PANDAMONIUM_FULL_REVIEW_2026-10-19.txt and STANDALONE_PARITY_2026-10-19.txt.
