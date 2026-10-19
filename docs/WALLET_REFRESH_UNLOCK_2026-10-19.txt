@@ -68,8 +68,8 @@ User reported "opened fast" on installed2.0.20. Duration-only logcat confirms
 15:41:21 unlock_ms=96 and prepare_ms=2 on the actual funded integrated wallet.
 This closes the repeated-unlock timing check for this opening. Earlier isolated
 fixture had62/64ms cached opens and12162ms first64-key derivation.
-Core wallet entry was observed with current displayed balance; no tab-switch was
-needed after returning to its page. Continuous foreground/resume timing was not
+Core balance rendered on Wallet tab selection; that alone does not establish
+foreground-refresh behavior. Continuous foreground/resume timing was not
 fully measured on-device because user resumed trading. Automated real-view tests
 cover missed-event refresh, failure retry, hidden late replies and host resume.
 Integrated reset prompt/cancel on-device remains untested; actual dialogs in all
