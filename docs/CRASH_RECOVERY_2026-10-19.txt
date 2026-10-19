@@ -54,3 +54,22 @@ Authoritative ledgers
 - docs/WALLET_SWEEP_SIZE_RECOVERY_2026-10-19.txt
 Do not infer complete parity from a signed candidate per repository: several
 financial-context/recovery/hosting and remaining feature comparisons are still open.
+
+2026-10-19 continuation — latest checkpoint supersedes pending items above
+- Vestr2.0.15 physical Creator/Collector/About rotation checks PASS on Fold.
+  Original rotation settings restored. Evidence and widths are recorded in
+  docs/WALLET_SWEEP_DESTINATION_2026-10-19.txt. Wallet was unlocked; key0=5/262144.
+- User requested Mx-only checksum validation plus an additional destination
+  confirmation. Implemented in host2.0.16/code211 and wallet0.2.27/code227.
+- Host commit554a78a pushed to fork/feature/bear-languages-2026-10-16. Standalone
+  wallet commit6d3bfbe pushed to origin/main. Both versioned release APKs built,
+  signed and verified; unit/UI tests, lint, importer and transport checks pass.
+- Installed pandamonium-2.0.16-candidate.apk with adb install -r on authorized Fold
+  R3GL805K7MB: Success. Opened the normal launcher. Data preserved.
+- New physical Sweep review/confirmation/cancel check remains pending. Do not
+  execute Sign & broadcast, Replay, a real transaction, seed or counter changes.
+- Address validation checks canonical Mx, checksum and decoded32-byte length; it
+  does NOT prove recipient key ownership or spendability. Final UI states this.
+- Full review/parity remains IN PROGRESS. No candidate or standalone publication.
+- Installed version verified:2.0.16-Pandamonium/code211. Fresh UI shows LockActivity
+  fingerprint/PIN prompt; user unlock requested. Do not keep navigating while waiting.
