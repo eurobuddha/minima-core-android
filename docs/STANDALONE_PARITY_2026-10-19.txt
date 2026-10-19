@@ -212,3 +212,11 @@ After demo: propagate the MiniMall Shop status-label refresh from
 scripts/adapt-pandamonium-shop-checkout.py and CheckoutRefreshTest into standalone
 merchshop. Preserve form/Editable state; refresh pairing/identity labels only.
 Integrated 44 tests pass; no standalone code changed for this last repair.
+
+After-demo UTXO Send parity
+Port the reviewed draft/generation/input-freeze behavior from
+scripts/adapt-pandamonium-utxo-send-review.py into standalone UTXO0.4.38's SendView
+and TxnUtil, preserving IPC, English UI, journal and unrelated graph/build work.
+Use SendDraftReviewTest behavior coverage; no host localization dependency in the
+standalone adaptation. Integrated174 tests pass. Signed host2.0.1 candidate only;
+no standalone edit, install or publication at this checkpoint.

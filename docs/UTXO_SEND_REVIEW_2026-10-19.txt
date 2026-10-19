@@ -1,0 +1,64 @@
+UTXO Send confirmation and draft review — 2026-10-19
+Scope: integrated UTXO in local Pandamonium 2.0.1/code196 candidate.
+Published/installed demo remains 2.0.0/code195. No installation or publication
+is part of this checkpoint. Standalone parity is deferred until after the demo.
+
+Findings fixed
+MAJOR: delayed checkaddress replies could show an obsolete confirmation after
+fields or selected coin economics changed. Confirm also retained mutable Coin
+objects, so an old dialog could submit different values from its displayed review.
+MINOR: refresh re-enabled Preview during submission; callbacks could clear a newer
+draft/selection. The existing durable journal still guarded overlapping spends;
+this repair restores UI consent and draft ownership rather than replacing it.
+
+Reuse
+Read integrated and standalone UTXO SendView, MainActivity selection/lifecycle,
+Coin, TxnUtil, journal adapter and tests; compared standalone NFT SendView and the
+integrated NFT SendView/TxnUtil/WalletTools implementations. Reused NFT generation
+and literal field/selection comparisons, full public selection snapshots, frozen
+coin copies and success-draft checks. Reused ToolReviewTest and
+TransactionOutcomeCallbacksTest patterns in a real Robolectric UTXO form.
+Canonical adapter: scripts/adapt-pandamonium-utxo-send-review.py.
+Canonical test: scripts/pandamonium-tests/utxo/.../SendDraftReviewTest.java.
+No new dependency, node command, signing algorithm or transaction journal change.
+
+Behavior
+Address checks and confirmation acceptance require the same fields, selected coin
+IDs, token IDs, human/raw amounts, addresses and spendability flags. The generation
+rejects earlier callbacks and repeated confirmations. Closed activities cannot
+accept a review. Frozen public Coin copies preserve the values shown to the user.
+Preview stays disabled during a pending review or submission. Success clears only
+the matching submitted draft; newer text and selections survive. Unknown outcome
+preserves the draft/selection; the existing durable journal retains reservations.
+The review-again message reuses NFT Wallet's existing four-language translation.
+
+Validation
+174 integrated UTXO tests passed, including10 new UI/callback regressions. No
+failures, errors or skipped tests. Tests use mocked node/builder and public fixture
+coins; no live transaction, seed or counter operation was performed.
+Original-code comparison: seven behavior regressions failed before the fix,
+including obsolete dialogs, mutable reviewed inputs, changed-selection acceptance,
+unknown-result selection clearing, earlier callbacks, in-flight Preview, and
+closed-host confirmation. An eighth preliminary assertion referenced the new
+sending field; it was removed from the final positive-path test. Final tests also
+cover repeated confirmation after failure and late success preserving a new draft.
+All23 source snapshots/provenance reproduce from pinned checkouts; direct node
+transport verifier passes. Canonical and generated tests match.
+Offline signed build and release lint pass: zero errors,362 existing warnings.
+Actual APK Keets bundle plus21 addon/runtime files per ABI verified. Package,
+versionCode196, versionName2.0.1-Pandamonium and family signing certificate verified.
+
+Code review verdict: APPROVE this bounded repair
+Reviewed generated production, adapter, test fixture, callback/lifecycle paths and
+registration order. Existing coin validation and durable submission admission are
+retained. No unresolved finding in this Send change. Full app review remains open.
+Next: WalletTools confirmation/async selection guards, cached-history/reorg UI,
+remaining integrated features, and standalone APK/MDS parity after the demo.
+
+Local artifact
+/Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.1-candidate.apk
+137052349 bytes
+SHA256 1987a59512027bf76f416553c36f12232a6ae6e4ca281403ee2c9684e4568888
+Certificate SHA256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Published2.0.0 local APK was rehashed and remains unchanged (a21659bc...6792b4).
+Logs: build/localization/utxo-send-review-{before,tests,build,import}.log.

@@ -37,7 +37,8 @@ public class SendView extends BaseView {
 
     private boolean changeTouched = false;     // user edited the change field
     private boolean settingChange = false;     // guard for programmatic change-field writes
-    private long changeGeneration;
+    private long changeGeneration, reviewGeneration;
+    private boolean sending, reviewPending;
     private boolean changeFetching = false;
 
     /** Binds the form fields, wires Max/Next/Preview, and tracks manual edits to the change field. */
@@ -109,7 +110,7 @@ public class SendView extends BaseView {
             previewBtn.setEnabled(false);
             return;
         }
-        previewBtn.setEnabled(true);
+        previewBtn.setEnabled(!sending && !reviewPending);
 
         String tokenName = sel.get(0).tokenName;
         boolean minima = Util.isMinima(act.selectedTokenid());
@@ -196,11 +197,42 @@ public class SendView extends BaseView {
         });
     }
 
+    private String[] selectionSnapshot() { return TxnUtil.selectionSnapshot(act.selectedCoins()); }
+    private boolean matchesDraft(String[] fields, String[] coins) {
+        return java.util.Arrays.equals(fields, fieldValues())
+                && (coins == null || java.util.Arrays.equals(coins, selectionSnapshot()));
+    }
+    private boolean acceptReview(long generation, String[] fields, String[] coins) {
+        if (generation != reviewGeneration || sending || act.isFinishing() || act.isDestroyed()) return false;
+        reviewPending = false;
+        previewBtn.setEnabled(true);
+        if (!matchesDraft(fields, coins)) {
+            status(Language.msg(l10n_nft_send_review_again), false);
+            return false;
+        }
+        return true;
+    }
+
+    private List<Coin> freezeSelection() {
+        List<Coin> selected=act.selectedCoins(), coins=new ArrayList<>();
+            for (Coin source : selected) {
+                if (source == null) { coins.add(null); continue; }
+                Coin c = new Coin();
+                c.coinid=source.coinid;c.tokenid=source.tokenid;c.amount=source.amount;c.rawAmount=source.rawAmount;
+                c.address=source.address;c.miniaddress=source.miniaddress;
+                c.confirmed=source.confirmed;c.sendable=source.sendable;c.spent=source.spent;
+                c.tokenName=source.tokenName;c.tokenNameProvided=source.tokenNameProvided;
+                coins.add(c);
+            }
+        return coins;
+    }
+
     // ----- preview / validate -----
 
     /** Validates every field, computes change, then asks the node to confirm the recipient before Confirm. */
     private void onPreview() {
-        final List<Coin> sel = act.selectedCoins();
+        if (sending || act.isFinishing() || act.isDestroyed()) return;
+        final List<Coin> sel = freezeSelection();
         if (sel.isEmpty()) { status(Language.msg(l10n_utxo_select_first), false); return; }
 
         final String recipient = addrInput.getText().toString().trim();
@@ -242,17 +274,21 @@ public class SendView extends BaseView {
         final String burnStr = burn.signum() > 0 ? burn.stripTrailingZeros().toPlainString() : null;
 
         // Confirm the recipient with the node before showing the breakdown.
+        final long generation = ++reviewGeneration;
+        final String[] reviewedFields = fieldValues();
+        final String[] reviewedCoins = selectionSnapshot();
+        reviewPending = true;
         previewBtn.setEnabled(false);
         status(Language.msg(l10n_utxo_checking), true);
         act.node().cmd("checkaddress address:" + recipient, new NodeApi.Cb() {
             @Override public void onResult(JSONObject json) {
-                previewBtn.setEnabled(true);
+                if (!acceptReview(generation, reviewedFields, reviewedCoins)) return;
                 statusView.setVisibility(View.GONE);
                 showConfirm(sel, recipient, amount.stripTrailingZeros().toPlainString(),
-                        hasChange ? changeAddr : null, changeStr, burnStr, tokenid, tokenName, total);
+                        hasChange ? changeAddr : null, changeStr, burnStr, tokenid, tokenName, total, generation, reviewedFields, reviewedCoins);
             }
             @Override public void onError(String message) {
-                previewBtn.setEnabled(true);
+                if (!acceptReview(generation, reviewedFields, reviewedCoins)) return;
                 // NodeApi turns the node's status:false (invalid address) into onError with its message.
                 setNote(addrNote, NodeApi.ERR_NOT_ENABLED.equals(message)
                         ? Language.msg(l10n_explorer_node_retry)
@@ -267,7 +303,8 @@ public class SendView extends BaseView {
     /** The Confirm step: a read-only Inputs / Outputs / Change / Burn breakdown before signing. */
     private void showConfirm(final List<Coin> sel, final String recipient, final String amountStr,
                              final String changeAddr, final String changeStr, final String burnStr,
-                             final String tokenid, final String tokenName, BigDecimal total) {
+                             final String tokenid, final String tokenName, BigDecimal total, final long generation,
+                             final String[] reviewedFields, final String[] reviewedCoins) {
         LinearLayout body = new LinearLayout(act);
         body.setOrientation(LinearLayout.VERTICAL);
         body.setBackgroundColor(Design.bg());   // match the current theme (dialog frame is fixed; content must adapt)
@@ -306,7 +343,7 @@ public class SendView extends BaseView {
                 .setView(sv)
                 .setNegativeButton(Language.msg(l10n_utxo_back), null)
                 .setPositiveButton(Language.msg(l10n_utxo_sign_post), (d, w) ->
-                        buildSend(sel, recipient, amountStr, changeAddr, changeStr, burnStr, tokenid, tokenName))
+                        { if (acceptReview(generation, reviewedFields, reviewedCoins)) buildSend(sel, recipient, amountStr, changeAddr, changeStr, burnStr, tokenid, tokenName); })
                 .show();
     }
 
@@ -314,6 +351,10 @@ public class SendView extends BaseView {
     private void buildSend(List<Coin> sel, final String recipient, final String amountStr,
                            String changeAddr, String changeStr, String burnStr,
                            final String tokenid, final String tokenName) {
+        reviewGeneration++; reviewPending = false;
+        final String[] submittedFields = fieldValues();
+        final String[] submittedCoins = selectionSnapshot();
+        sending = true;
         previewBtn.setEnabled(false);
         status(Language.msg(l10n_utxo_recording), true);
 
@@ -334,20 +375,24 @@ public class SendView extends BaseView {
                 // fills the real txpowid (and marks confirmed) once the transaction is mined.
                 act.history().update(internalid, HistoryDb.STATUS_POSTED, null, "");
                 status(Language.msg(l10n_utxo_posted, Util.tidyAmount(amountStr), UtxoText.token(sel.get(0))), true);
-                Language.setText(addrInput, "");
-                Language.setText(amountInput, "");
-                Language.setText(burnInput, "");
-                changeGeneration++; changeFetching = false;
-                settingChange = true; Language.setText(changeInput, ""); settingChange = false;
-                changeTouched = false;
+                if (matchesDraft(submittedFields, submittedCoins)) {
+                    Language.setText(addrInput, "");
+                    Language.setText(amountInput, "");
+                    Language.setText(burnInput, "");
+                    changeGeneration++; changeFetching = false;
+                    settingChange = true; Language.setText(changeInput, ""); settingChange = false;
+                    changeTouched = false;
+                    act.clearSelection();
+                }
+                sending = false;
                 previewBtn.setEnabled(true);
-                act.clearSelection();
                 act.reload();
             }
             @Override public void onFailed(String message) {
                 if (NodeApi.ERR_NOT_ENABLED.equals(message)) message = "The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry.";
                 act.history().update(internalid, HistoryDb.STATUS_ERROR, null, message);
                 status(Language.msg(l10n_utxo_failed, UtxoMessages.message(message)), false);
+                sending = false;
                 previewBtn.setEnabled(true);
             }
             @Override public void onUnknown(String message) {
@@ -355,8 +400,8 @@ public class SendView extends BaseView {
                 // can be retried; the row sits at the top of History as "posted?" until the coins decide.
                 act.history().update(internalid, HistoryDb.STATUS_UNKNOWN, null, "node reply timed out — awaiting settlement");
                 status(Language.msg(l10n_utxo_unknown), false);
+                sending = false;
                 previewBtn.setEnabled(true);
-                act.clearSelection();
                 act.reload();
             }
         }).record(internalid).onProgress(label -> status(UtxoMessages.message(label), true)).run();

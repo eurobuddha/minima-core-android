@@ -511,3 +511,11 @@ Full review remains open. Final Fold startup, node, AtomiX, Shop, NFT navigation
 and both terminals now checked. User reports the requested messaging and
 minimaWallet checks done. Release published to GitHub, PandaApps and eurobuddha.com;
 public IPFS APK download hash also verified. Full review and parity remain open.
+
+Post-release review checkpoint — local2.0.1/code196
+UTXO Send now reuses NFT immutable public input copies, generation/draft checks,
+in-flight gating and matching-success cleanup.174 module tests pass; original-code
+comparison reproduced seven behavior failures. Signed local candidate, lint,
+23 pinned imports, direct transport and actual APK Keets/signature checks passed.
+See UTXO_SEND_REVIEW_2026-10-19.txt. No install/publication; Fold and stores remain
+on2.0.0. WalletTools/cached-history and full application review remain open.

@@ -12,6 +12,18 @@ public final class TxnUtil {
 
     private TxnUtil() {}
 
+    /** Literal public selection fields: refreshes and edits must not alter an accepted review. */
+    static String[] selectionSnapshot(List<Coin> coins) {
+        List<String> values=new ArrayList<>();
+        for(Coin coin:coins) {
+            if(coin==null){values.add(null);continue;}
+            values.add(coin.coinid);values.add(coin.tokenid);values.add(coin.amount);values.add(coin.rawAmount);
+            values.add(coin.address);values.add(coin.miniaddress);
+            values.add(Boolean.toString(coin.confirmed));values.add(Boolean.toString(coin.sendable));values.add(Boolean.toString(coin.spent));
+        }
+        return values.toArray(new String[0]);
+    }
+
     /** Native selection cannot bypass reservations held by a custom transaction. */
     static boolean canUseNativeFunds(MainActivity act,String tokenid,String burn) {
         try {
