@@ -1,0 +1,92 @@
+Pandamonium minimaWallet Sweep port — 2026-10-19
+
+Cause
+Sweep already existed in standalone minimaWallet, introduced in 0.2.22 and updated
+in 0.2.23 (SweepFlow donor commit 690e9bc). The integrated wallet snapshot is 0.2.21.
+It was never included in Pandamonium, rather than moved to another menu.
+
+Port
+Settings > Sweep everything > Sweep everything to a new address.
+Reused standalone SweepFlow's address/QR input, destination and key-use review,
+sequential whole-NFT or pooled-token/native transfers, stop-between-batches control,
+and confirmation screen. Reused its planner and chunk limits (10 inputs, 4 keys,
+48 KiB estimated budget). The preparation checkpoint is 5c92ead.
+Whole stateful native coins now use the same whole-coin builder as NFTs.
+Existing NFT wrapper guards remain intact. No standalone wallet source was replaced.
+Canonical sources and tests are copied by adapt-pandamonium-wallet-sweep.py so a
+fresh pinned import retains this port and all existing direct-transport fixes.
+All new interface messages are provided in English, Chinese, Russian and Ukrainian.
+
+Host adaptations and transaction handling
+Planning and signing use the existing authenticated wallet worker. Captured session,
+node and factory prevent a delayed review/callback from acting in a different session.
+Duplicate callbacks cannot schedule duplicate signing or publication continuations.
+A fresh full coin list precedes review; the planner owns a deep copy of its inputs.
+Existing resolveInputs obtains byte-exact custom-token coins before signing.
+Pending signed transactions are saved in app-private storage before publication,
+using the wallet BlobStore's acknowledged write boundary and SalonStore's rollback
+rule. No seed or private key is stored in these records. Pending inputs cannot be
+selected by another Sweep; the existing NFT pending display is also maintained.
+Publication failure remains unknown, rather than claiming the coins never moved.
+An explicit retry republishes identical saved bytes, without signing again.
+Receipts must match the signed transaction ID. Current-chain inclusion must have a
+nonzero block ID, consistent block/tip/depth values and at least three confirmations,
+using the existing NFT wallet evidence rules. Missing coins do not prove success.
+Lost post responses can be recovered from the latest 100 relevant transactions by
+matching their signed transaction ID. Unknown records survive restart and timeouts.
+The journal limits new saved data to 8 MiB; further batches fail preparation before
+publication. Confirm pending batches before sweeping additional remaining coins.
+
+Intentional difference from the older standalone executor
+It no longer clears pending coins and signs again after 15 minutes. Retry reuses
+saved signatures. It does not automatically split/re-sign after a generic size error.
+The inspected core txnpost path does not establish the standalone comment's assumed
+synchronous size-refusal guarantee. Original conservative planning limits remain.
+These differences preserve Pandamonium's transaction-safety requirements.
+
+Validation
+188 wallet JVM tests and 180 Pandamonium host JVM tests passed. The wallet suite
+includes 14 planner tests, 2 whole-transfer tests, 8 pending-record tests and 5 flow
+continuation tests. All use public synthetic fixtures and mocks, with no real node
+submissions or real wallet seed/key-counter changes.
+Coverage includes state preservation, duplicate IDs, malformed state, chunk limits,
+serialization/signature validity, restart persistence, failed writes, exact receipt
+matching, strict inclusion, revoked sessions, duplicate callbacks and identical retry.
+Pinned import reproduction, direct-node transport verification and the complete
+6,978-message four-language catalogue passed.
+Initial Android compile exposed unsupported JSONObject.keySet() and a dialog builder
+return type; fixed using Android's keys() and the existing WalletDialog builder.
+A mocked Language.text returned null in three tests; fixed the fixture to return text.
+Full suites then passed. Final release build/signing checks are recorded below.
+
+Review
+Read the port, planner, adapter, integration changes and tests with code-review skill.
+Fixed duplicate-resolution callbacks dismissing an active progress dialog; moved
+planning off the UI thread; kept the confirmation screen awake as in the donor.
+Reviewed signing/persistence order, rollback, immutable serialization, session guards
+and callback guards. No claim that the complete Pandamonium review is finished.
+
+Limits and follow-up
+Fold UI/QR/review/cancel/status screens have not yet been checked on this candidate.
+No live sweep or chain settlement was performed. Large real collections have not
+been load-tested. Unknown transactions outside the bounded recent-history lookup,
+or inputs spent by another wallet transaction, require further reconciliation work;
+no timeout is used as evidence to discard their records. This port's reservation is
+Sweep-specific and does not retrofit every other wallet send path with a journal.
+Propagating the integration's safety improvements to standalone Sweep remains part
+of the deferred standalone parity work. Public/device 2.0.0 remains unchanged.
+
+Signed local candidate
+Pandamonium 2.0.7-Pandamonium, versionCode202, com.eurobuddha.pandamonium.
+/Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.7-candidate.apk
+137124177 bytes
+SHA256 d9ed57c196865631ec41f44702868350c3f3283edc3035f2a7c1487f26f0d3ba
+APK Signature Scheme v2 verified; RSA4096 certificate SHA256
+ eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Keets verifier confirms the exact bundle, 21 addons per ABI and Bare runtime.
+Archive integrity passed; actual APK DEX contains SweepFlow, SweepPlanner,
+SweepPending, buildWholeTransfer and savedTransactions. Lint: zero errors,
+362 warnings (same count as the previous candidate).
+Final wallet regression rerun passed after moving planning off the UI thread and
+bounding pending-journal size. Release build and lint succeeded in1m57s.
+This APK has not been installed or published; Fold UI verification remains open.

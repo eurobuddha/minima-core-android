@@ -75,3 +75,10 @@ restoration can be called complete. Existing planner size estimates remain estim
 the future executor must verify resolved inputs and handle publication uncertainty.
 No APK built, installed or published for this source-only checkpoint. App version
 remains 2.0.6; bump before building the next candidate. Device/public 2.0.0 unchanged.
+
+Sweep port follow-up: standalone SweepFlow is now wired into Pandamonium Settings,
+with authenticated worker signing, four-language UI, saved signed-transaction retry
+and exact on-chain confirmation. 188 wallet + 180 host JVM tests passed. See
+WALLET_SWEEP_PORT_2026-10-19.txt for source reuse, adaptations and remaining device /
+large-collection / standalone parity checks. This supersedes the earlier statement
+that only planner preparation exists; it does not claim the full app review complete.

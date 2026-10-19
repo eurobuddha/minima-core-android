@@ -8331,4 +8331,64 @@
     <!-- Arguments: block -->
     <string name="l10n_wallet_history_saved_block">"已保存\n#%1$s"</string>
     <string name="l10n_wallet_history_recorded_block" formatted="false">"记录的区块"</string>
+    <string name="l10n_sweep_title" formatted="false">"转移全部资产"</string>
+    <string name="l10n_sweep_connect" formatted="false">"请先连接节点。"</string>
+    <string name="l10n_sweep_pending" formatted="false">"转移待确认"</string>
+    <string name="l10n_sweep_pending_body" formatted="false">"部分转移交易仍未确认。再次转移前请检查状态。超时不代表交易失败。"</string>
+    <string name="l10n_sweep_check" formatted="false">"检查状态"</string>
+    <string name="l10n_sweep_store_error" formatted="false">"无法读取或保存待确认记录。不会开始新的转移。"</string>
+    <string name="l10n_sweep_empty" formatted="false">"无可转移资产"</string>
+    <string name="l10n_sweep_empty_body" formatted="false">"此钱包没有可转移的币。"</string>
+    <string name="l10n_sweep_load_error" formatted="false">"无法读取完整币列表。请刷新后重试。"</string>
+    <!-- Arguments: number, total -->
+    <string name="l10n_sweep_progress">"正在签名并广播交易 %1$s/%2$s…"</string>
+    <string name="l10n_sweep_unknown" formatted="false">"结果未知；已保存签名交易。重试前请检查状态。"</string>
+    <string name="l10n_sweep_prepare_error" formatted="false">"无法准备此交易。本批次未尝试广播。"</string>
+    <!-- Arguments: accepted, total -->
+    <string name="l10n_sweep_summary">"节点已接受 %1$s/%2$s 笔交易。"</string>
+    <string name="l10n_sweep_stopped" formatted="false">"已停止。剩余批次未签名或广播。"</string>
+    <string name="l10n_sweep_confirming" formatted="false">"等待链上确认"</string>
+    <string name="l10n_sweep_hide" formatted="false">"隐藏 — 可从转移页面再次检查"</string>
+    <string name="l10n_sweep_complete" formatted="false">"转移交易已确认"</string>
+    <string name="l10n_sweep_confirmed" formatted="false">"所有记录的转移交易已获链上确认。请查看摘要中的跳过或失败批次。"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_sweep_waiting">"正在等待 %1$s 笔交易确认。签名交易已保存，不会自动重新签名。"</string>
+    <string name="l10n_sweep_destination" formatted="false">"目标地址（Mx… 或 0x…）"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_sweep_description">"将所有可用 Minima、代币和 NFT（包括状态）通过 %1$s 笔交易转移至同一地址。"</string>
+    <string name="l10n_sweep_qr" formatted="false">"扫描二维码"</string>
+    <string name="l10n_sweep_review" formatted="false">"核对"</string>
+    <string name="l10n_sweep_cancel" formatted="false">"取消"</string>
+    <string name="l10n_sweep_invalid" formatted="false">"目标地址无效"</string>
+    <string name="l10n_sweep_to" formatted="false">"全部转移至："</string>
+    <!-- Arguments: key -->
+    <string name="l10n_sweep_self">"这是当前钱包自己的地址（密钥 %1$s）。币将返回此钱包。"</string>
+    <string name="l10n_sweep_moving" formatted="false">"转移资产："</string>
+    <!-- Arguments: number -->
+    <string name="l10n_sweep_skipping">"跳过 %1$s 个币："</string>
+    <!-- Arguments: number -->
+    <string name="l10n_sweep_heavy">"%1$s 项可能超出交易大小限制："</string>
+    <!-- Arguments: transactions, signatures -->
+    <string name="l10n_sweep_signatures">"%1$s 笔交易，%2$s 次一次性签名。"</string>
+    <!-- Arguments: key, used, maximum -->
+    <string name="l10n_sweep_key">"密钥 %1$s：下次签名 #%2$s，上限 %3$s"</string>
+    <string name="l10n_sweep_warning" formatted="false">"交易逐笔发送，可在批次间停止。结果不明的交易保持待确认状态，不会自动重新签名。广播后转移不可撤销。"</string>
+    <string name="l10n_sweep_confirm" formatted="false">"确认转移 — 请仔细核对"</string>
+    <string name="l10n_sweep_sign" formatted="false">"全部签名并广播"</string>
+    <string name="l10n_sweep_working" formatted="false">"正在转移"</string>
+    <string name="l10n_sweep_stop" formatted="false">"当前交易后停止"</string>
+    <string name="l10n_sweep_close" formatted="false">"关闭"</string>
+    <string name="l10n_sweep_settings" formatted="false">"将全部资产转移至新地址…"</string>
+    <string name="l10n_sweep_help" formatted="false">"将所有可用资金、代币和 NFT 转移至同一地址。签名前请核对目标地址和批次。"</string>
+    <string name="l10n_sweep_items" formatted="false">"NFT / 状态资产"</string>
+    <string name="l10n_sweep_whole" formatted="false">"项，完整转移"</string>
+    <string name="l10n_sweep_coins" formatted="false">"币"</string>
+    <string name="l10n_sweep_part" formatted="false">"部分"</string>
+    <string name="l10n_sweep_pending_skip" formatted="false">"之前发送的交易正在等待确认"</string>
+    <string name="l10n_sweep_foreign_skip" formatted="false">"地址不属于此钱包"</string>
+    <string name="l10n_sweep_locked_skip" formatted="false">"未盖章的锁定版本。请先在 NFT 钱包中盖章。"</string>
+    <string name="l10n_sweep_large_item" formatted="false">"状态数据较大，节点可能拒绝此交易。"</string>
+    <string name="l10n_sweep_native_state" formatted="false">"Minima（状态）"</string>
+    <string name="l10n_sweep_replay" formatted="false">"重发已保存交易"</string>
+    <string name="l10n_sweep_replay_help" formatted="false">"重试会将完全相同的已保存交易发送至以下地址，不使用新签名，也不会更改金额或目标地址。"</string>
 </resources>

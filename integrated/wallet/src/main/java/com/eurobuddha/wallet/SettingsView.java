@@ -79,6 +79,10 @@ public class SettingsView extends BaseView {
             container.addView(outlineButton(Language.msg(l10n_wallet_restore_key_uses), v -> restore()));
         }
 
+        container.addView(sectionTitle(Language.msg(l10n_sweep_title)));
+        container.addView(outlineButton(Language.msg(l10n_sweep_settings),v->{if(currentSession())new SweepFlow(act).start();}));
+        container.addView(hint(Language.msg(l10n_sweep_help)));
+
         // --- Seed backup --------------------------------------------------------------------------
         container.addView(sectionTitle(Language.msg(l10n_wallet_seed_backup_heading)));
         container.addView(outlineButton(Language.join(Language.msg(l10n_wallet_change_seed), "…"), v -> act.changeSeed()));

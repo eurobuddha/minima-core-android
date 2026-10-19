@@ -8442,4 +8442,64 @@
     <!-- Arguments: block -->
     <string name="l10n_wallet_history_saved_block">"Сохранено\n#%1$s"</string>
     <string name="l10n_wallet_history_recorded_block" formatted="false">"Записанный блок"</string>
+    <string name="l10n_sweep_title" formatted="false">"Перевести все активы"</string>
+    <string name="l10n_sweep_connect" formatted="false">"Перед переводом подключитесь к узлу."</string>
+    <string name="l10n_sweep_pending" formatted="false">"Перевод ожидает подтверждения"</string>
+    <string name="l10n_sweep_pending_body" formatted="false">"Некоторые транзакции ещё не подтверждены. Проверьте их статус перед новым переводом. Тайм-аут не означает отказ транзакции."</string>
+    <string name="l10n_sweep_check" formatted="false">"Проверить статус"</string>
+    <string name="l10n_sweep_store_error" formatted="false">"Не удалось прочитать или сохранить запись перевода. Новый перевод не начнётся."</string>
+    <string name="l10n_sweep_empty" formatted="false">"Нет активов для перевода"</string>
+    <string name="l10n_sweep_empty_body" formatted="false">"В этом кошельке нет доступных для перевода монет."</string>
+    <string name="l10n_sweep_load_error" formatted="false">"Не удалось прочитать полный список монет. Обновите и повторите попытку."</string>
+    <!-- Arguments: number, total -->
+    <string name="l10n_sweep_progress">"Подпись и отправка транзакции %1$s из %2$s…"</string>
+    <string name="l10n_sweep_unknown" formatted="false">"Результат неизвестен; подписанная транзакция сохранена. Проверьте статус перед повтором."</string>
+    <string name="l10n_sweep_prepare_error" formatted="false">"Не удалось подготовить транзакцию. Отправка этой группы не выполнялась."</string>
+    <!-- Arguments: accepted, total -->
+    <string name="l10n_sweep_summary">"Узел принял %1$s из %2$s транзакций."</string>
+    <string name="l10n_sweep_stopped" formatted="false">"Остановлено. Оставшиеся группы не подписаны и не отправлены."</string>
+    <string name="l10n_sweep_confirming" formatted="false">"Подтверждение в блокчейне"</string>
+    <string name="l10n_sweep_hide" formatted="false">"Скрыть — проверить позже в разделе перевода"</string>
+    <string name="l10n_sweep_complete" formatted="false">"Транзакции перевода подтверждены"</string>
+    <string name="l10n_sweep_confirmed" formatted="false">"Все записанные транзакции подтверждены в блокчейне. Проверьте сводку: возможны пропущенные или неудачные группы."</string>
+    <!-- Arguments: number -->
+    <string name="l10n_sweep_waiting">"Ожидается подтверждение %1$s транзакций. Подписанные транзакции сохранены и не будут автоматически подписаны повторно."</string>
+    <string name="l10n_sweep_destination" formatted="false">"Адрес получателя (Mx… или 0x…)"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_sweep_description">"Перевести все доступные Minima, токены и NFT с их состоянием на один адрес за %1$s транзакций."</string>
+    <string name="l10n_sweep_qr" formatted="false">"Сканировать QR"</string>
+    <string name="l10n_sweep_review" formatted="false">"Проверить"</string>
+    <string name="l10n_sweep_cancel" formatted="false">"Отмена"</string>
+    <string name="l10n_sweep_invalid" formatted="false">"Недопустимый адрес получателя"</string>
+    <string name="l10n_sweep_to" formatted="false">"Перевести всё на адрес:"</string>
+    <!-- Arguments: key -->
+    <string name="l10n_sweep_self">"Это адрес текущего кошелька (ключ %1$s). Монеты вернутся в этот кошелёк."</string>
+    <string name="l10n_sweep_moving" formatted="false">"Будут переведены:"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_sweep_skipping">"Пропущено монет: %1$s:"</string>
+    <!-- Arguments: number -->
+    <string name="l10n_sweep_heavy">"%1$s объектов могут превышать допустимый размер транзакции:"</string>
+    <!-- Arguments: transactions, signatures -->
+    <string name="l10n_sweep_signatures">"Транзакций: %1$s; одноразовых подписей: %2$s."</string>
+    <!-- Arguments: key, used, maximum -->
+    <string name="l10n_sweep_key">"Ключ %1$s: следующая подпись №%2$s из %3$s"</string>
+    <string name="l10n_sweep_warning" formatted="false">"Транзакции отправляются по одной. Между группами можно остановиться. Транзакции с неизвестным результатом остаются в ожидании без повторной подписи. После отправки перевод необратим."</string>
+    <string name="l10n_sweep_confirm" formatted="false">"Подтвердить перевод — проверьте внимательно"</string>
+    <string name="l10n_sweep_sign" formatted="false">"Подписать и отправить всё"</string>
+    <string name="l10n_sweep_working" formatted="false">"Перевод активов"</string>
+    <string name="l10n_sweep_stop" formatted="false">"Остановить после текущей"</string>
+    <string name="l10n_sweep_close" formatted="false">"Закрыть"</string>
+    <string name="l10n_sweep_settings" formatted="false">"Перевести все активы на новый адрес…"</string>
+    <string name="l10n_sweep_help" formatted="false">"Перевести все доступные средства, токены и NFT на один адрес. Проверьте адрес и группы перед подписью."</string>
+    <string name="l10n_sweep_items" formatted="false">"NFT / объекты с состоянием"</string>
+    <string name="l10n_sweep_whole" formatted="false">"объектов, переводятся целиком"</string>
+    <string name="l10n_sweep_coins" formatted="false">"монет"</string>
+    <string name="l10n_sweep_part" formatted="false">"часть"</string>
+    <string name="l10n_sweep_pending_skip" formatted="false">"Ожидается подтверждение предыдущей отправки"</string>
+    <string name="l10n_sweep_foreign_skip" formatted="false">"Адрес не принадлежит этому кошельку"</string>
+    <string name="l10n_sweep_locked_skip" formatted="false">"Непроштампованный заблокированный экземпляр. Сначала проштампуйте его в NFT Wallet."</string>
+    <string name="l10n_sweep_large_item" formatted="false">"Объект с большим состоянием; узел может отклонить транзакцию."</string>
+    <string name="l10n_sweep_native_state" formatted="false">"Minima (состояние)"</string>
+    <string name="l10n_sweep_replay" formatted="false">"Повторно отправить сохранённые транзакции"</string>
+    <string name="l10n_sweep_replay_help" formatted="false">"Повтор отправит те же сохранённые транзакции на адреса ниже. Новые подписи не создаются; суммы и адреса не меняются."</string>
 </resources>

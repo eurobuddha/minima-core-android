@@ -60,9 +60,15 @@ public class NftView extends BaseView {
 
     /** Broadcasts remain pending until fresh evidence or explicit retry review.
      * Elapsed time only enables a review; it is never evidence that a transaction failed. */
-    private static final java.util.HashMap<String, Long> PENDING = new java.util.HashMap<>();
+    private static final java.util.Map<String, Long> PENDING = new java.util.concurrent.ConcurrentHashMap<>();
     private static final long RETRY_WAIT_MS = 10 * 60_000;
 
+    static java.util.Set<String> pendingCoinIds(){
+        java.util.Set<String> result=new java.util.HashSet<>();
+        for(String id:PENDING.keySet())result.add(id.toLowerCase(java.util.Locale.ROOT));
+        return result;
+    }
+    static void markPending(String id){PENDING.put(id,System.currentTimeMillis());}
     private static boolean isPending(String coinid) { return PENDING.containsKey(coinid); }
     private static boolean retryReady(String coinid) {
         Long time = PENDING.get(coinid);
