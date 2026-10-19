@@ -9,7 +9,7 @@ android {
         buildConfigField 'int', 'VERSION_CODE', '206'
     }
     buildFeatures { buildConfig true }
-    testOptions { unitTests.returnDefaultValues = true }
+    testOptions { unitTests.returnDefaultValues = true; unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = '2g' } }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -18,6 +18,7 @@ android {
 dependencies {
     implementation project(':localization')
     testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity

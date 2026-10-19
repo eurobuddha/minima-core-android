@@ -139,3 +139,27 @@ Overnight release hold (user 2026-10-19)
 User is going to bed and disconnecting the Fold. Continue review, repairs and signed
 2.0.0 candidate preparation. Hold the final release push/publication for a Fold
 check in the morning. Do not interact with the other connected phone.
+
+Additional overnight scope: standalone app parity
+User explicitly requested all applicable small-bug repairs in the integrated apps
+be ported to their standalone APK sources so function and presentation do not drift.
+Include earlier integrated repairs, not only today's review fixes. Audit each module
+against its real standalone repository, preserve concurrent work, port canonical
+behavior with the minimum transport/resource adaptations, test and build signed
+versioned standalone candidates. Keep a per-app source/test/build ledger. Final
+publication remains held for the morning check. Host-only lock/IPC and embedded
+DirectNodeApi wiring must be evaluated for applicability rather than copied blindly.
+
+ETH Wallet asset identity repair — 1.9.103
+Balances now use normalized contract addresses; cards, picker, MAX and confirmation
+carry the existing immutable EthNet.Token. Native ETH has a distinct null selection,
+so an ERC20 named ETH cannot become a native transfer. Missing selections are
+rejected rather than silently falling back to ETH. Picker and confirmation show
+contract addresses. Delayed native MAX cannot overwrite a different selected asset
+or an edited amount. Existing TokenStore address checks and full-address UI reused.
+Reviewed adapter, generated changes, test configuration and six mocked UI/RPC
+regressions. All 11 ETH Wallet tests passed; no real network/signing/transfers.
+Verdict: Approve this asset fix. Account-context and cross-module nonce fixes remain.
+Standalone inventory: 22 source projects found. Most source HEADs equal import pins;
+minimaWallet is four commits newer. Local changes are mainly graph/build artifacts
+and debug support; preserve them and inspect the newer wallet commits before ports.
