@@ -172,3 +172,16 @@ Core detail input1060.00000213467;1000to minimaWallet plus change. No agent send
 sign, reset or counter mutation.2.0.21/code216 History correction now in progress.
 Reuses standalone minimaWallet HistoryTx own-address netting and existing History
 Ownership/DB. Cached native rows repaired without deleting transaction evidence.
+
+2.0.21 installed — latest checkpoint
+Core History repair committed/pushed60c76e7 to fork/feature/bear-languages-2026-10-16.
+17history+196host tests pass,0failures/errors/skips; release/lint0errors1829warnings,
+pinned importer/transport/localization7009messages/Keets/signature/ZIP verified.
+APK base/dist/pandamonium-2.0.21-candidate.apk SHA256
+28731e6ebb12b1993ac3d503667b3c8725ef3c4fcbfb9a51c582db64ba1c5f67.
+adb install -r Success on authorizedFoldR3GL805K7MB; observed2.0.21/code216.
+Normal launcher at app lock. Requested user unlock to inspect corrected Core History
+1000sent and simple return Sweep receipt. No live transaction needed/performed.
+User-confirmed live passes:AtomiX/PandaPools/PandaDEX trades; simple minimaWallet
+Sweep. Large-TxPoW automatic handling remains device-untested. Full review/parity open.
+See docs/CORE_HISTORY_WALLET_SCOPE_2026-10-19.txt; standalone History parity pending.
