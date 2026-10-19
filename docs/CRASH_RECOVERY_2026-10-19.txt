@@ -73,3 +73,20 @@ financial-context/recovery/hosting and remaining feature comparisons are still o
 - Full review/parity remains IN PROGRESS. No candidate or standalone publication.
 - Installed version verified:2.0.16-Pandamonium/code211. Fresh UI shows LockActivity
   fingerprint/PIN prompt; user unlock requested. Do not keep navigating while waiting.
+
+2026-10-19 manual Sweep failure resolved in code — latest checkpoint
+User took phone control to sweep; automation was interrupted before wallet navigation.
+User then reported Sweep failure. Read-only UI showed0/1 accepted and local preparation
+failure. Reproduced integrated Sweep calling its idle guard inside its own busy signing
+worker; this prevented the builder from running. Removed only that redundant check,
+retaining real runSigningWork gates. Local errors now retain reasons and source/input
+ownership labels are explicit. Foreign destinations pass a new actual-dialog test.
+214 wallet +186 host tests pass; release build/lint/importer/transport/artifacts verified.
+Commit a068543 pushed to fork/feature/bear-languages-2026-10-16. Signed candidate
+base/dist/pandamonium-2.0.17-candidate.apk installed with adb install -r on Fold
+R3GL805K7MB: Success; observed2.0.17-Pandamonium/code212. App data preserved.
+No automated live signing, retry, broadcast, pending-data clearing or counter mutation.
+Phone remains under user control; app was not launched after this install. Live Sweep
+success has NOT been verified. See docs/WALLET_SWEEP_WORKER_2026-10-19.txt.
+Standalone0.2.27 does not have this integrated-worker defect. Optional clarification
+of the user's separate wallet/key-check wording remains unanswered. Full review open.

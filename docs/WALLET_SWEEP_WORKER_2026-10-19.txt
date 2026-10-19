@@ -66,3 +66,6 @@ Signed candidate; not published
 SHA256 e9db14e4357f0476de3fb670b69b36f0fdff34e31f4bd712068ca433e363d5f3
 Certificate SHA256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
 Release build/lint pass: {'Warning': 1821}; no errors/fatals. APK ZIP and metadata verified.
+
+Installation:2.0.17-Pandamonium/code212 verified on Fold after adb install -r Success.
+Commit a068543 pushed. Phone left under user control; no live retry or broadcast.
