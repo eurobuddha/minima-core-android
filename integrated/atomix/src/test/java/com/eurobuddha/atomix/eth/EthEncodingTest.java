@@ -155,7 +155,9 @@ public class EthEncodingTest {
 
         JSONObject log = new JSONObject();
         log.put("blockNumber", "0x10");
-        log.put("transactionHash", "0xabc");
+        log.put("transactionHash", "0x" + "ab".repeat(32));
+        log.put("address", EthNet.MAINNET.htlc);
+        log.put("removed", false);
         log.put("topics", new JSONArray()
                 .put(EthHtlc.NEW_TOPIC)
                 .put(contractId)
@@ -180,7 +182,7 @@ public class EthEncodingTest {
 
     /** ABI-encode the non-indexed event params exactly as the vault emits them, then strip the 4-byte
      *  function selector so what remains is the raw {@code data} field of the log. */
-    private static String encodeNewData(String minimaPk, String token, BigInteger amount, BigInteger req,
+    static String encodeNewData(String minimaPk, String token, BigInteger amount, BigInteger req,
                                         String hashlock, BigInteger timelock, boolean otc) {
         Function f = new Function("x", Arrays.asList(
                 new Bytes32(EthHtlc.b32(minimaPk)),

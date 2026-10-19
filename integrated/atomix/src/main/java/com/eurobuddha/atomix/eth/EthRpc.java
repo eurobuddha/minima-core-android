@@ -115,6 +115,7 @@ public final class EthRpc {
             Object result = resp.opt("result");
             // Validate inside the fallback loop too: an empty reply is not account nonce zero.
             if ("eth_getTransactionCount".equals(method)) transactionCount(result);
+            if ("eth_getLogs".equals(method)) logArray(result);
             return result;
         } catch (JSONException e) {
             throw new IOException(host(url) + " parse error: " + e.getMessage());
@@ -144,7 +145,16 @@ public final class EthRpc {
 
     public JSONArray getLogs(JSONObject filter) throws IOException {
         Object r = call("eth_getLogs", new JSONArray().put(filter));
-        return r instanceof JSONArray ? (JSONArray) r : new JSONArray();
+        return logArray(r);
+    }
+
+    private static JSONArray logArray(Object result) throws IOException {
+        if (!(result instanceof JSONArray)) throw new IOException("Invalid Ethereum log response");
+        JSONArray logs = (JSONArray) result;
+        for (int i = 0; i < logs.length(); i++) {
+            if (!(logs.opt(i) instanceof JSONObject)) throw new IOException("Incomplete Ethereum log response");
+        }
+        return logs;
     }
 
     public BigInteger getBalance(String address) throws IOException {

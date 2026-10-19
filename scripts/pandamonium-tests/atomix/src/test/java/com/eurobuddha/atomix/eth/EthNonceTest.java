@@ -87,7 +87,7 @@ public class EthNonceTest {
             }
         }
     }
-    private static java.net.HttpURLConnection response(String body) throws Exception {
+    static java.net.HttpURLConnection response(String body) throws Exception {
         java.net.HttpURLConnection c = mock(java.net.HttpURLConnection.class);
         when(c.getResponseCode()).thenReturn(200);
         when(c.getOutputStream()).thenReturn(new java.io.ByteArrayOutputStream());

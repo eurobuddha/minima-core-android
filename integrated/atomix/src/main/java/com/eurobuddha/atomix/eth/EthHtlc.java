@@ -175,7 +175,7 @@ public final class EthHtlc {
         if (ret == null || !ret.matches("0[xX][0-9a-fA-F]{" + (words * 64) + "}"))
             throw new Exception("Incomplete or malformed Ethereum contract reply");
         // ABI booleans must be 0 or 1; lenient decoding must not fabricate withdrawn/refunded flags.
-        if (words == 12) for (int index : new int[]{8, 9, 11}) {
+        for (int index : words == 12 ? new int[]{8, 9, 11} : words == 7 ? new int[]{6} : new int[0]) {
             BigInteger v = new BigInteger(ret.substring(2 + index * 64, 2 + (index + 1) * 64), 16);
             if (v.compareTo(BigInteger.ONE) > 0) throw new Exception("Invalid contract boolean reply");
         }
@@ -224,7 +224,13 @@ public final class EthHtlc {
         for (int i = 0; i < logs.length(); i++) {
             JSONObject log = logs.optJSONObject(i);
             Contract c = parseNew(log);
-            if (c != null) out.add(c);
+            // Never let a partial/mismatched batch advance SwapEngine's discovery bookmark.
+            if (c == null || !net.htlc.equalsIgnoreCase(log.optString("address"))
+                    || BigInteger.valueOf(c.block).compareTo(from) < 0 || BigInteger.valueOf(c.block).compareTo(to) > 0
+                    || ownerTopic != null && !ownerTopic.equalsIgnoreCase(padAddr(c.owner))
+                    || receiverTopic != null && !receiverTopic.equalsIgnoreCase(padAddr(c.receiver)))
+                throw new Exception("Incomplete or mismatched Ethereum contract events");
+            out.add(c);
         }
         return out;
     }
@@ -234,10 +240,17 @@ public final class EthHtlc {
         if (log == null) return null;
         try {
             JSONArray topics = log.optJSONArray("topics");
-            if (topics == null || topics.length() < 4) return null;
+            if (topics == null || topics.length() != 4 || !NEW_TOPIC.equalsIgnoreCase(topics.optString(0))
+                    || !Boolean.FALSE.equals(log.opt("removed"))) return null;
+            for (int i = 0; i < 4; i++) if (!(topics.opt(i) instanceof String)
+                    || !((String) topics.opt(i)).matches("0x[0-9a-fA-F]{64}")) return null;
+            for (int i : new int[]{2, 3}) if (!topics.getString(i).substring(2, 26).equals("000000000000000000000000")) return null;
+            if (!(log.opt("address") instanceof String) || !log.getString("address").matches("0x[0-9a-fA-F]{40}")
+                    || !(log.opt("transactionHash") instanceof String)
+                    || !log.getString("transactionHash").matches("0x[0-9a-fA-F]{64}")) return null;
             Contract c = new Contract();
-            c.block = EthRpc.hexToBig(log.optString("blockNumber", "0x0")).longValue();
-            c.txnhash = log.optString("transactionHash", "");
+            c.block = new java.math.BigDecimal(EthRpc.transactionCount(log.opt("blockNumber"))).longValueExact();
+            c.txnhash = log.getString("transactionHash");
             c.contractId = topics.optString(1);
             c.owner = "0x" + topics.optString(2).substring(26);     // last 20 bytes of the 32-byte topic
             c.receiver = "0x" + topics.optString(3).substring(26);
@@ -248,14 +261,18 @@ public final class EthHtlc {
                     new TypeReference<Uint256>() {}, new TypeReference<Uint256>() {},
                     new TypeReference<Bytes32>() {}, new TypeReference<Uint256>() {},
                     new TypeReference<Bool>() {});
-            List<Type> d = FunctionReturnDecoder.decode(log.optString("data", ""), org.web3j.abi.Utils.convert(refs));
-            if (d.size() < 7) return null;
+            if (!(log.opt("data") instanceof String)) return null;
+            String data = log.getString("data");
+            requireReturnWords(data, 7);
+            if (!data.substring(66, 90).equals("000000000000000000000000")) return null; // ABI address padding
+            List<Type> d = FunctionReturnDecoder.decode(data, org.web3j.abi.Utils.convert(refs));
+            if (d.size() != 7) return null;
             c.minimaPublicKey = Numeric.toHexString((byte[]) d.get(0).getValue());
             c.tokenContract = ((String) d.get(1).getValue());
             c.amount = (BigInteger) d.get(2).getValue();
             c.requestAmount = (BigInteger) d.get(3).getValue();
             c.hashlock = Numeric.toHexString((byte[]) d.get(4).getValue());
-            c.timelock = ((BigInteger) d.get(5).getValue()).longValue();
+            c.timelock = new java.math.BigDecimal((BigInteger) d.get(5).getValue()).longValueExact();
             c.otc = (Boolean) d.get(6).getValue();
             return c;
         } catch (Exception e) {

@@ -332,3 +332,24 @@ Verdict: approve this bounded parsing/overflow repair. Full2.0.0 review remains
 open: shared embedded nonce allocation, two-minute reuse, lost-broadcast recovery
 and RPC reply/contract-event validation still require work. Do not infer release
 approval or complete Ethereum safety from this checkpoint.
+
+AtomiX event discovery repair — 1.9.114 / code185
+MAJOR: invalid eth_getLogs payloads became empty arrays; malformed events were
+silently skipped. SwapEngine could then advance lastEthScanned past unread events.
+Reuse existing requireReturnWords/exact integer conversion and RPC fallback checks.
+Reject invalid/partial log batches and malformed topics, addresses, required fields,
+ABI data/booleans, removed events and overflow. Complete batches must match the
+requested vault, receiver and block range before any discovered contract is returned.
+Existing scan catch/retry retains its bookmark on failure. Known-swap eth_call
+recovery and write/fee policy remain unchanged. Empty valid arrays remain valid.
+Complete source/callers, standalone implementation, canonical adapter, ABI fixtures
+and mocked RPC regressions reviewed. The standalone already had strict getContract
+checks; those were reused, not newly claimed as a port in this checkpoint.
+Integrated419 tests and standalone277 tests in each debug/release suite pass:
+973 total, zero failures/errors/skips. Pandamonium and standalone release lint pass
+without errors. All22 pinned importer snapshots and regression overlays reproduce.
+Standalone0.1.75/175 APK verified for actual version/package, ZIP integrity and
+family signature. No device install, publication or live transaction performed.
+Verdict: approve this bounded discovery repair. Shared nonce allocation, timed
+nonce reuse, uncertain broadcast recovery and complete RPC envelope/body handling
+remain open. Full review/standalone parity and final2.0.0 release remain incomplete.
