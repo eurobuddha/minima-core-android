@@ -90,3 +90,11 @@ lint0 errors164 warnings. Preserves newer sweep/reset/passphrase recovery commit
 Signed candidates verified locally. Seventeen repos now have repair checkpoints;
 remaining financial/hosting/identity parity and full review are still open.
 History0.3.12 repair commit8a404c7; matching host1.9.108 commit25e9f60.
+
+Latest checkpoints
+Host1.9.109 f443999 and minimaWallet0.2.26 d8d0aec: biometric decode error containment.
+Salon0.11.37/code1137: retry failed automatic identity reads, request/owner guards,
+serialized identity balance parser;27 tests, lint0 errors107 warnings. Signed APK
+retained in _artifacts. Matching host1.9.110 passes385 integrated Salon tests.
+Full claim lifecycle, atomic identity persistence and hosted restore ports remain
+open; standalone still uses its existing storage/hydration entrypoint.

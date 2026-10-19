@@ -172,4 +172,22 @@ public class SalonClaimTest {
         SalonStore.put(activity,"name","new edit");reply(0,balance(true));assertEquals("new edit",SalonStore.get(activity,"name"));assertEquals(1,commands.stream().filter("balance"::equals).count());
     }
 
+    @Test public void failedAutomaticLookupCanRetryWithoutAnotherActivity()throws Exception {
+        set("wasNodeUp",true);call("onNode",new Class<?>[]{});
+        assertFalse((boolean)field("adoptChecked").get(activity));
+        callbacks.get(0).onError("timeout");idle();call("onNode",new Class<?>[]{});
+        assertEquals(Arrays.asList("balance","balance"),commands);
+        reply(1,balance(false));assertTrue((boolean)field("adoptChecked").get(activity));
+        call("onNode",new Class<?>[]{});assertEquals(2,commands.size());
+    }
+    @Test public void malformedAutomaticLookupDoesNotMarkAdoptionChecked()throws Exception {
+        for(JSONObject invalid:new JSONObject[]{new JSONObject(),new JSONObject().put("status",false),
+                new JSONObject().put("status",true).put("response",new JSONArray().put(JSONObject.NULL))}) {
+            call("checkIdentityAdoption",new Class<?>[]{});reply(callbacks.size()-1,invalid);
+            assertFalse((boolean)field("adoptChecked").get(activity));
+        }
+        call("checkIdentityAdoption",new Class<?>[]{});reply(callbacks.size()-1,balance(true));
+        assertEquals(ID,SalonStore.get(activity,"tokenid"));assertTrue((boolean)field("adoptChecked").get(activity));
+    }
+
 }

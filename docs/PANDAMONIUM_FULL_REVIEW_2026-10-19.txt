@@ -259,3 +259,16 @@ wallet0.2.26 build/signature/lint verified; unrelated newer wallet commits prese
 Changed source, adapter, callers and tests reviewed; approve this bounded repair.
 No physical biometric test, installation or release publication. Full review remains
 open, including ETH nonce allocation, UTXO evidence and Salon adoption retry.
+
+Salon automatic adoption repair —1.9.110/code181
+Previously the attempt set adoptChecked before its balance lookup, permanently
+suppressing retries after a timeout/malformed reply in that activity. The flag is
+now set only on validated absence or successful save. Failed lookups retry on
+resume/reconnect with existing in-flight, account, node and screen guards.
+Canonical source/adapter, generated activity, caller lifecycle and tests reviewed.
+Integrated Salon385 tests and standalone Salon27 tests pass, no failures/errors/
+skips; Pandamonium release lint and all22 importer snapshots/provenance pass.
+Standalone0.11.37 ports retry/request ownership and the existing complete balance
+parser. It retains its old storage/hydration path; full claim/hosting parity remains
+open. No mint, transfer, server upload, installation or publication performed.
+Verdict: approve this bounded retry repair. Full2.0.0 review is still in progress.

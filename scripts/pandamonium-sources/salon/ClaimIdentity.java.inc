@@ -229,7 +229,7 @@
 
     /** Automatic adoption may finish only for the empty account that requested the balance. */
     private void checkIdentityAdoption() {
-        if(identityAdoption!=null || claiming || SalonStore.hasIdentity(this)) return;
+        if(!nodeUp || node==null || adoptChecked || identityAdoption!=null || claiming || SalonStore.hasIdentity(this) || isFinishing() || isDestroyed()) return;
         final String snapshot;
         try { snapshot=SalonStore.publicationSnapshot(SalonStore.identityRecord(this)); }
         catch(Exception unavailable) { return; }
@@ -244,7 +244,7 @@
                     if(!snapshot.equals(SalonStore.publicationSnapshot(current))) return;
                     JSONObject pending=current.optJSONObject("claimPending");
                     JSONObject row=IdentityBalance.find(reply,pending==null?null:pending.optString("handle"));
-                    if(row==null) return;
+                    if(row==null) { adoptChecked=true; return; }
                     String tokenid=row.optString("tokenid");
                     if(new java.math.BigInteger(tokenid.substring(2),16).signum()==0) return;
                     JSONObject meta=row.getJSONObject("token"),change=new JSONObject();
@@ -252,6 +252,7 @@
                     for(String key:new String[]{"name","bio"}) if(current.optString(key).isEmpty()) change.put(key,meta.optString(key));
                     change.put("claimPending",JSONObject.NULL);
                     if(!SalonStore.saveClaim(MainActivity.this,snapshot,change)) { toast(MSG_STORAGE); return; }
+                    adoptChecked=true;
                     if(screen==Screen.HOME || screen==Screen.ONBOARD || screen==Screen.FEED) go(Screen.HOME);
                     hydrateFromHosted(meta.optString("url"),false);
                 } catch(Exception unavailable) { /* A failed lookup cannot adopt or mint. */ }

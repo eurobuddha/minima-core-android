@@ -19,7 +19,7 @@ def adapt(root):
     a=s.index('        if (nodeUp && !adoptChecked');b=s.index('        // One-time-per-session setup',a)
     s=s[:a]+s[b:]
     old='        wasNodeUp = nodeUp;';assert s.count(old)==1
-    s=s.replace(old,'        if (nodeUp && !adoptChecked && !claiming && !SalonStore.hasIdentity(this)) { adoptChecked=true; checkIdentityAdoption(); }\n'+old)
+    s=s.replace(old,'        if (nodeUp && !adoptChecked && !claiming && !SalonStore.hasIdentity(this)) { checkIdentityAdoption(); }\n'+old)
     old='        cancelHostedRestore();';assert s.count(old)==1
     s=s.replace(old,old+'\n        cancelIdentityClaim();')
     old='        renderEpoch++;';assert s.count(old)==1
@@ -28,4 +28,6 @@ def adapt(root):
     s=s.replace(old,'        claimHandleField=handle; claimNameField=name; claimBioField=bio; setClaimEnabled(!claiming);')
     old='        form.addView(claimBtn, lph(52, 0, 10, 0, 0));';assert s.count(old)==1
     s=s.replace(old,old+'\n        if (SalonStore.me(this).has("claimPending")) {\n            claimRetryButton=btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_claim_retry_title),false,this::confirmClaimRetry);\n            form.addView(claimRetryButton,lph(48,0,8,0,0));\n        }')
+    old='    @Override protected void onResume() {\n        super.onResume();';assert s.count(old)==1
+    s=s.replace(old,old+'\n        checkIdentityAdoption();')
     p.write_text(s)
