@@ -24,6 +24,8 @@ public class NodeApi {
     public interface Cb {
         void onResult(JSONObject json);
         void onError(String message);
+        /** An executing command may have completed despite a missing usable reply. */
+        default void onUnknown(String message) { onError(message); }
     }
 
     public interface PairingListener {
@@ -76,7 +78,7 @@ public class NodeApi {
             public void response(JSONObject zResponse) {
                 final boolean enabled = zResponse.optBoolean("enabled", false);
                 mMain.post(() -> {
-                    if (dead()) return;
+                    if (isClosed()) return;
                     if (mPairing != null) mPairing.onEnabled(enabled);
                 });
             }
@@ -89,67 +91,93 @@ public class NodeApi {
                 && (((Activity) mContext).isFinishing() || ((Activity) mContext).isDestroyed());
     }
 
+    /** Reuse the bundled Vestr/Future Cash Boolean-status gate before reporting success. */
+    private static Cb checked(Cb callback) {
+        if (callback == null) return null;
+        return new Cb() {
+            @Override public void onResult(JSONObject result) {
+                if (result == null || !(result.opt("status") instanceof Boolean)) {
+                    String message = result == null ? "Node result unavailable. Outcome unknown."
+                            : result.optString("transporterror", "Node result unavailable. Outcome unknown.");
+                    if (nothingSent(message)) callback.onError(message);
+                    else callback.onUnknown(message);
+                } else if (!result.optBoolean("status", false)) {
+                    callback.onError(result.optString("error", result.optString("response", "Node rejected the command.")));
+                } else {
+                    callback.onResult(result);
+                }
+            }
+            @Override public void onError(String message) { callback.onError(message); }
+            @Override public void onUnknown(String message) { callback.onUnknown(message); }
+        };
+    }
+
+    /** Exact local transport rejections that occur before execution, from DirectNodeApi. */
+    private static boolean nothingSent(String message) {
+        return "The embedded node is not running. No command was sent.".equals(message)
+                || "Too many pending node requests. Nothing was sent.".equals(message)
+                || "Node request cancelled before execution. Nothing was sent.".equals(message)
+                || "Node connection is closed.".equals(message);
+    }
+
+    public boolean isClosed() { return mReleased || dead(); }
+
     public void cmd(String command, Cb cb) {
-        if (mReleased) return;
+        mMain.post(() -> cmdOnMain(command, checked(cb)));
+    }
+
+    private void cmdOnMain(String command, Cb cb) {
+        if (isClosed()) {
+            if (cb != null) mMain.post(() -> cb.onError("Node API released"));
+            return;
+        }
         final boolean[] done = {false};
         final Runnable[] ref = new Runnable[1];
         final Runnable timeout = () -> {
             mPending.remove(ref[0]);
-            if (done[0] || dead()) return;
+            if (done[0] || isClosed()) return;
             done[0] = true;
-            if (cb != null) cb.onError(ERR_TIMEOUT);
+            if (cb != null) cb.onUnknown(ERR_TIMEOUT);
         };
         ref[0] = timeout;
         mPending.add(timeout);
         mMain.postDelayed(timeout, timeoutFor(command));
 
-        mApi.Command(command, new MinimaAPIListener() {
+        try { mApi.Command(command, new MinimaAPIListener() {
             @Override
             public void response(JSONObject zResponse) {
                 mMain.post(() -> {
-                    if (done[0]) return;
+                    if (done[0] || isClosed()) return;
                     done[0] = true;
                     mMain.removeCallbacks(timeout);
                     mPending.remove(timeout);
                     if (dead()) return;   // cleaned up above; just don't touch dead views
 
-                    // "enabled":false only appears on the gating reply; real command
-                    // responses omit the key, so default true.
-                    if (!zResponse.optBoolean("enabled", true)) {
-                        if (mPairing != null) mPairing.onEnabled(false);
-                        if (cb != null) cb.onError(ERR_NOT_ENABLED);
-                        return;
+                    try {
+                        if (zResponse != null && Boolean.FALSE.equals(zResponse.opt("enabled"))) {
+                            if (mPairing != null) mPairing.onEnabled(false);
+                            if (cb != null) cb.onError(ERR_NOT_ENABLED);
+                            return;
+                        }
+                        Object response = zResponse == null ? null : zResponse.opt("response");
+                        String text = response instanceof String ? ((String) response).toLowerCase(java.util.Locale.ROOT) : "";
+                        boolean tooLong = zResponse != null && Boolean.FALSE.equals(zResponse.opt("status"))
+                                && (text.contains("too long") || text.contains("max(256000)"));
+                        if (tooLong) { if (cb != null) cb.onUnknown(ERR_TOO_LONG); return; }
+                        if (cb != null) cb.onResult(zResponse);
+                    } catch (RuntimeException malformed) {
+                        if (cb != null) { try { cb.onUnknown("Node result unavailable. Outcome unknown."); } catch (RuntimeException ignored) {} }
                     }
-                    // A pre-file-transport node (< 1.3.0-ui-h2) answers an oversized reply with the
-                    // {"status":false,"response":"Result too long! MAX(256000)"} stub instead of the
-                    // content:// hand-off — surface it as an error, never as an empty result.
-                    Object resp = zResponse.opt("response");
-                    boolean tooLong = !zResponse.optBoolean("status", true) && resp instanceof String
-                            && ((String) resp).contains("too long");
-                    // Support diagnostic (command keyword, reply size, overflow flag; no addresses/ids).
-                    // Serialising a 180K reply on the UI thread is not free, so only when enabled:
-                    //   adb shell setprop log.tag.NodeApi DEBUG   then   adb logcat -s NodeApi
-                    if (android.util.Log.isLoggable("NodeApi", android.util.Log.DEBUG)) {
-                        android.util.Log.d("NodeApi", firstWord(command) + " reply " + zResponse.toString().length()
-                                + " chars" + (tooLong ? " — TOO LONG (node < 1.3.0 reply cap)" : ""));
-                    }
-                    if (tooLong) {
-                        if (cb != null) cb.onError(ERR_TOO_LONG);
-                        return;
-                    }
-                    // Any other status:false is a REJECTED command ({"status":false,"error":"..."}) — it must
-                    // surface as an error, never reach onResult looking like success. (TxnBuilder used to
-                    // chain txninput→txnoutput→txnsign straight through such replies and report "sent".)
-                    if (!zResponse.optBoolean("status", true)) {
-                        String err = zResponse.optString("error", "");
-                        if (err.isEmpty() && resp instanceof String) err = (String) resp;
-                        if (cb != null) cb.onError(err.isEmpty() ? "Node rejected the command." : err);
-                        return;
-                    }
-                    if (cb != null) cb.onResult(zResponse);
                 });
             }
-        });
+        }); } catch (RuntimeException transportFailure) {
+            // The transport can throw after dispatch; this is not proof that nothing ran.
+            if (done[0]) return;
+            done[0] = true;
+            mMain.removeCallbacks(timeout);
+            mPending.remove(timeout);
+            if (!isClosed() && cb != null) cb.onUnknown("Node result unavailable. Outcome unknown.");
+        }
     }
 
     public void onDestroy() {

@@ -1,0 +1,73 @@
+UTXO node response review checkpoint — 2026-10-19
+Pandamonium 1.9.121 (192); standalone UTXO Wallet 0.4.37 (437).
+This is an intermediate repair checkpoint. Full application review and 2.0.0 release remain open.
+
+Problem and resulting behavior
+UTXO NodeApi defaulted a missing/non-Boolean status to success. A malformed
+transport result could advance construction or claim a submitted transaction.
+A timeout scheduled txndelete while signing/posting might still be executing.
+Native consolidation treated a missing reply as a definite failed transaction.
+
+Both implementations now require a Boolean success envelope. Missing/invalid
+results, reply overflow, timeout and transport exceptions after possible dispatch
+reach onUnknown. Definite node rejection and exact known local not-sent errors
+remain failures. Custom signing handles uncertainty explicitly without cleanup or
+retry. Native consolidation stores UNKNOWN and refreshes History. Read callbacks
+retain their existing error/retry handling through the default onUnknown callback.
+Command setup is serialized on the main handler, a closed client cannot dispatch,
+and late results after closure or timeout cannot complete a write twice.
+
+Reuse and adaptations
+Read integrated/nftwallet/src/main/java/com/eurobuddha/nftwallet/NodeApi.java,
+TxnBuilder.java, TransactionEvidence.java, HistoryDb.java, DistributeManager.java
+and their canonical counterparts/test callers. Reused NodeApi.checked,
+nothingSent, main-handler setup/closed-client guards, and TxnBuilder's explicit
+uncertain-write/no-cleanup handling. Read standalone UTXO NodeApi, TxnBuilder,
+WalletTools and integrated callers/history recovery. Preserved DirectNodeApi in
+Pandamonium and MinimaAPI IPC in standalone. Retained existing UTXO timeout/overflow
+constants and translated diagnostics. No new runtime dependency or database change.
+
+Durable importer entrypoint:
+scripts/adapt-pandamonium-review-utxo-response.py
+Canonical tests:
+scripts/pandamonium-tests/utxo/src/test/java/com/eurobuddha/utxo/
+  NodeApiResponseTest.java, NodeApiThreadingTest.java, UncertainWriteTest.java
+The first two reuse NFT tests; uncertain-write fixtures reuse NFT TxnBuilderFlowTest.
+Mockito 5.12.0 is an existing repository test dependency, now used by UTXO tests.
+
+Validation
+- Integrated UTXO: 49 tests, no failures/errors/skips.
+- Standalone UTXO: 40 debug + 40 release tests, no failures/errors/skips.
+- Original NFT NodeApi response/threading suites: 5 tests passed.
+- Release lint: zero errors. Pandamonium 358 warnings; standalone 106 warnings
+  (the added Mockito test dependency adds a UseTomlInstead advisory).
+- All 23 pinned integrated sources/importer provenance verified.
+- Catalogue: 6924 messages in English, Chinese, Russian and Ukrainian verified.
+- Integrated transport verifier passed; canonical and generated tests agree.
+- Signed APK package IDs, version metadata and release certificate verified.
+- Pandamonium APK: exact Keets bundle, all 21 addon versions per ABI and Bare runtime verified.
+- No device command, real transfer, installation or publication performed.
+
+Code review
+Read changed production code, adapter, test files, build metadata and callers.
+No new blocking finding in this response-handling checkpoint. Source checkpoint
+approved; this is not approval to release UTXO or Pandamonium 2.0.0.
+
+Release-blocking work still open
+- A Boolean-success reply is not itself a complete transaction receipt. UTXO's
+  existing parseTxpowid local-handle fallback and partial output parser still need
+  NFT TransactionEvidence/journal reuse.
+- Distribution can still guess change from address/amount after an uncertain post,
+  and its pre-post persistence/restart/final-batch handling needs the NFT journal
+  integration. This checkpoint does not claim to repair distribution.
+- Consolidation needs the prepared-intent/reservation flow; a lost native reply
+  may leave insufficient economic evidence for automatic history recovery.
+- Full immutable review/input reservation and standalone parity remain in progress.
+
+Local artifacts (not published)
+/Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-1.9.121-candidate.apk
+SHA256 3eb86e5f5777914b060590e9c5cb13c277958101aacc9554417e6f6a9bdd4098
+/Users/eurobuddha/Projects/minima/apks/utxo/dist/utxo-wallet-0.4.37-candidate.apk
+SHA256 ad7c750b4fc6d62d8a9ce84dd80aaa28ee8675698f96bc5e22b671d9e18fbcf1
+Both certificate SHA256:
+eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f

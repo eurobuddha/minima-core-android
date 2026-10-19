@@ -180,3 +180,12 @@ prepared; no install/publication. Full review remains open, including prepared
 submission/distribution and general cached-history confirmation/reorg display.
 See docs/UTXO_HISTORY_CONFIRMATION_2026-10-19.txt. Saved WIP was evaluated and
 superseded by these reviewed sources; do not blindly reapply its old snapshots.
+
+UTXO response handling — 1.9.121 / standalone 0.4.37
+Both versions reuse NFT NodeApi strict Boolean responses, uncertain write callbacks
+and main-handler lifecycle guards. Signing uncertainty no longer queues deletion;
+native consolidation persists UNKNOWN. 49 integrated + 40 debug + 40 release UTXO
+tests and 5 original NFT tests passed. Signed local candidates and release lint
+verified. No install/publication. Full receipt validation, durable reservations,
+distribution recovery and prepared consolidation remain release-blocking work.
+Evidence and artifact hashes: docs/UTXO_NODE_RESPONSES_2026-10-19.txt.

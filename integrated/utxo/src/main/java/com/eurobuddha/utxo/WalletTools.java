@@ -206,6 +206,11 @@ public class WalletTools {
                 status.show(Language.msg(l10n_utxo_consolidate_submitted), true);
                 act.reload();
             }
+            @Override public void onUnknown(String message) {
+                act.history().update(internalid, HistoryDb.STATUS_UNKNOWN, null, "Node result unavailable. Outcome unknown.");
+                status.show(UtxoMessages.message("Node result unavailable. Outcome unknown."), false);
+                act.reload();
+            }
             @Override public void onError(String message) {
                 if (NodeApi.ERR_NOT_ENABLED.equals(message)) message = "The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry.";
                 act.history().update(internalid, HistoryDb.STATUS_ERROR, null, message);
