@@ -4805,7 +4805,10 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
                 if (context == PICK_HOST_ICON) {
                     android.graphics.Bitmap sq = ImageTools.squareBitmap(this, uri, 512);
                     java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
-                    sq.compress(android.graphics.Bitmap.CompressFormat.WEBP_LOSSY, 85, bos);
+                    android.graphics.Bitmap.CompressFormat format = android.os.Build.VERSION.SDK_INT >= 30
+                            ? android.graphics.Bitmap.CompressFormat.WEBP_LOSSY
+                            : android.graphics.Bitmap.CompressFormat.WEBP;
+                    sq.compress(format, 85, bos);
                     bytes = bos.toByteArray();
                     mime = "image/webp";
                 } else {

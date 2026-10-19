@@ -217,3 +217,17 @@ errors or skipped tests. All22 importer snapshots/provenance verify. Standalone
 Studio refresh passed18 tests with0 lint errors; export checkpoint in progress.
 Changed files reviewed: only exact conversion compatibility and version metadata.
 No open issue in this repair. Full application review and final2.0.0 remain pending.
+
+Atelier Android compatibility repair — 1.9.107 / code178
+Standalone release lint exposed unguarded API30 WEBP_LOSSY in hosted icon uploads.
+Reused ImageTools.encode's existing SDK version check and legacy WEBP fallback.
+Updated canonical image-host-uploads.inc, generated integration and standalone
+Atelier together. Full integrated Atelier suite:306 tests, no failures/errors/skips.
+All22 pinned source snapshots/provenance verify; Pandamonium release lint passes.
+An initial debug-library lint run required uncached instrumentation dependencies;
+validation used the actual release variant. No dependency versions were changed.
+Changed source and the shared format-selection pattern reviewed; no blocking
+finding in this compatibility repair. No new full signed host build yet.
+Standalone propagation has now reached14 source repos (scope per ledger), still
+partial. Each checkpoint is versioned, tested, signed and retained locally; no
+candidate is installed/published. Final2.0.0 still awaits full review and Fold.
