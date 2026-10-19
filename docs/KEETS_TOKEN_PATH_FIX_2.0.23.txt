@@ -1,0 +1,30 @@
+Pandamonium 2.0.23 / code 218 — Salon Keets Save & test fix
+
+User reported “Not a file : keets/apitoken” on the Fold after 2.0.22.
+Observed Keets startup uses /data/user/0/com.eurobuddha.pandamonium/files/1.1.
+The FILE bridge is rooted at getFilesDir(), above the versioned data folder.
+The initial implementation incorrectly treated those two roots as identical.
+
+Reused Filez's status response.data discovery and FILE stat canonical/base
+response, with the existing NodeApi callback and read-only FILE get bridge.
+Salon now asks the node to canonicalize its actual data-directory token path,
+checks it is under the node FILE root and ends in keets/apitoken, then sends
+only the derived relative path to FILE get. No hard-coded version or Android
+path alias. Existing token memory-only handling, node/drive matching, strict
+loopback destination, size caps and no-redirect rules remain unchanged.
+
+Same shared source applied to standalone Salon 0.11.39 / code 1139.
+Regression tests exercise the complete readiness handshake with files/1.1,
+Android /data/user/0 versus /data/data aliases, alternate version folders,
+root-level nodes, missing files, sibling-prefix escape and wrong filenames.
+402 integrated + 43 standalone tests passed; both Salon release lint checks and
+signed release builds passed. Pandamonium's packaged Keets check passed.
+Review: inspected every changed source/test/version file; no open major finding.
+
+APK SHA256:
+Pandamonium: 2b09acb749ce4a8f67ca72bf12b5904992b222b60ee2693c7ce5290161abcd67
+Salon: 915994c58260fb45b0b87c5ff946816fe3b53056dcf4babc9838f8aa69c6a603
+Pandamonium installed successfully on Fold R3GL805K7MB with adb install -r;
+package manager confirms 2.0.23-Pandamonium / 218. Standalone not installed.
+Physical Save & test verification follows normal user unlock; no publication,
+wallet transaction, secret disclosure or data reset is required.
