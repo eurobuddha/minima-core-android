@@ -51,7 +51,7 @@ public class SalonClaimTest {
         HostingStore.upsert(activity,Hosting.Profile.fresh(Hosting.TYPE_WEBDAV));
         node=mock(NodeApi.class);set("node",node);set("nodeUp",true);set("pubkey","0x1234");
         doAnswer(c->{commands.add(c.getArgument(0));callbacks.add(c.getArgument(1));return null;}).when(node).cmd(anyString(),any(NodeApi.Cb.class));
-        set("body",new LinearLayout(activity));set("appbar",new LinearLayout(activity));set("navRow",new LinearLayout(activity));set("scroll",new ScrollView(activity));set("claimBtn",new TextView(activity));
+        set("body",new LinearLayout(activity));set("appbar",new LinearLayout(activity));set("navRow",new LinearLayout(activity));set("scroll",new androidx.core.widget.NestedScrollView(activity));set("claimBtn",new TextView(activity));
         set("screen",Enum.valueOf((Class)field("screen").getType(),"ONBOARD"));
         hosting=mockStatic(ProfileHosting.class);hosting.when(()->ProfileHosting.upload(any(),anyString(),anyString(),anyString())).thenReturn(URL);
         maxima=mockStatic(MaximaLink.class);maxima.when(()->MaximaLink.myAddresses(activity)).thenReturn("");

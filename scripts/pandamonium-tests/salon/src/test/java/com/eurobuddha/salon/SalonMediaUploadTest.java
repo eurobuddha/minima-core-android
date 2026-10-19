@@ -42,7 +42,7 @@ public class SalonMediaUploadTest {
     private void render()throws Exception{call("render",new Class<?>[]{});}
     @Before public void setup()throws Exception{
         Language.initialize(RuntimeEnvironment.getApplication(),()->false);Language.select(RuntimeEnvironment.getApplication(),"en");activity=Robolectric.buildActivity(MainActivity.class).get();activity.setTheme(R.style.pm_salon_Theme_StateNFT);
-        LinearLayout body=new LinearLayout(activity);body.setOrientation(LinearLayout.VERTICAL);set("body",body);set("appbar",new LinearLayout(activity));set("navRow",new LinearLayout(activity));set("scroll",new ScrollView(activity));screen("EDIT");
+        LinearLayout body=new LinearLayout(activity);body.setOrientation(LinearLayout.VERTICAL);set("body",body);set("appbar",new LinearLayout(activity));set("navRow",new LinearLayout(activity));set("scroll",new androidx.core.widget.NestedScrollView(activity));screen("EDIT");
         ((ExecutorService)field("io").get(activity)).shutdownNow();worker=mock(ExecutorService.class);set("io",worker);doAnswer(c->{jobs.add(c.getArgument(0));return null;}).when(worker).execute(any(Runnable.class));
         activity.getSharedPreferences("salon_identity",Context.MODE_PRIVATE).edit().clear().commit();activity.getSharedPreferences(HostingStore.PREFS,Context.MODE_PRIVATE).edit().clear().commit();SalonStore.put(activity,"tokenid","0xowner");SalonStore.put(activity,"handle","owner");
         host=Hosting.Profile.fresh(Hosting.TYPE_WEBDAV);Hosting.put(host.j,"def",true);Hosting.put(host.j,"name","Original host");HostingStore.upsert(activity,host);

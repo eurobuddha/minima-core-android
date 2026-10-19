@@ -133,7 +133,7 @@ public class SalonPublishingTest {
     @SuppressWarnings({"unchecked","rawtypes"})
     @Test public void actualEditorPublishKeepsDraftVisibleUntilAnnouncementResult()throws Exception {
         activity.setTheme(R.style.pm_salon_Theme_StateNFT);
-        LinearLayout body=new LinearLayout(activity);set("body",body);set("appbar",new LinearLayout(activity));set("navRow",new LinearLayout(activity));set("scroll",new ScrollView(activity));
+        LinearLayout body=new LinearLayout(activity);set("body",body);set("appbar",new LinearLayout(activity));set("navRow",new LinearLayout(activity));set("scroll",new androidx.core.widget.NestedScrollView(activity));
         set("screen",Enum.valueOf((Class)field("screen").getType(),"EDIT"));
         try(MockedStatic<MailDb> mail=mockStatic(MailDb.class)) {
             MailDb db=mock(MailDb.class);mail.when(()->MailDb.get(activity)).thenReturn(db);

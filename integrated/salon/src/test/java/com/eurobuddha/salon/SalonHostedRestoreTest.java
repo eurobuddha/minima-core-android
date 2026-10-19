@@ -41,7 +41,7 @@ public class SalonHostedRestoreTest {
         doAnswer(c->{jobs.add(c.getArgument(0));return null;}).when(worker).execute(any(Runnable.class));
         activity.getSharedPreferences("salon_identity",Context.MODE_PRIVATE).edit().clear().commit();activity.getSharedPreferences(HostingStore.PREFS,Context.MODE_PRIVATE).edit().clear().commit();
         SalonStore.put(activity,"handle","owner");SalonStore.put(activity,"tokenid","token");SalonStore.put(activity,"profileUrl",URL);SalonStore.put(activity,"name","local");
-        set("body",new LinearLayout(activity));set("navRow",new LinearLayout(activity));set("appbar",new LinearLayout(activity));set("scroll",new ScrollView(activity));
+        set("body",new LinearLayout(activity));set("navRow",new LinearLayout(activity));set("appbar",new LinearLayout(activity));set("scroll",new androidx.core.widget.NestedScrollView(activity));
         set("screen",Enum.valueOf((Class)field("screen").getType(),"SETTINGS"));
         transport=mockStatic(RelayResolver.class);transport.when(()->RelayResolver.isMediaRef(URL)).thenReturn(true);
         transport.when(()->RelayResolver.resolveJson(URL)).thenReturn(new JSONObject().put("name","Literal 中文 Русский Українська"));

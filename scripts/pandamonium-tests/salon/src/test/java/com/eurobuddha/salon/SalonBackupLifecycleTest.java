@@ -131,7 +131,7 @@ public class SalonBackupLifecycleTest {
     }
     @SuppressWarnings({"rawtypes","unchecked"})
     @Test public void restoredDraftSurvivesReturningToEditorInAllFourLanguages()throws Exception {
-        field("scroll").set(activity,new ScrollView(activity));
+        field("scroll").set(activity,new androidx.core.widget.NestedScrollView(activity));
         for(String code:new String[]{"en","zh-Hans","ru","uk"}){
             Language.select(activity,code);SalonStore.put(activity,"tokenid","");
             field("screen").set(activity,Enum.valueOf((Class)field("screen").getType(),"SETTINGS"));

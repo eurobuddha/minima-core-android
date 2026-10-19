@@ -44,7 +44,7 @@ public class SalonOutboxTest {
         Language.initialize(RuntimeEnvironment.getApplication(),()->false);Language.select(RuntimeEnvironment.getApplication(),"en");
         activity=Robolectric.buildActivity(MainActivity.class).get();activity.setTheme(R.style.pm_salon_Theme_StateNFT);
         ((ExecutorService)field("io").get(activity)).shutdownNow();worker=mock(ExecutorService.class);set("io",worker);doAnswer(c->{jobs.add(c.getArgument(0));return null;}).when(worker).execute(any(Runnable.class));
-        set("body",new LinearLayout(activity));set("appbar",new LinearLayout(activity));set("navRow",new LinearLayout(activity));set("scroll",new ScrollView(activity));set("screen",Enum.valueOf((Class)field("screen").getType(),"THREAD"));set("threadPeer",peer);
+        set("body",new LinearLayout(activity));set("appbar",new LinearLayout(activity));set("navRow",new LinearLayout(activity));set("scroll",new androidx.core.widget.NestedScrollView(activity));set("screen",Enum.valueOf((Class)field("screen").getType(),"THREAD"));set("threadPeer",peer);
         activity.getSharedPreferences("salon_identity",0).edit().clear().commit();SalonStore.writeIdentity(activity,"wrapped:owner",owner);SalonStore.put(activity,"handle","original");SalonStore.put(activity,"tipaddr",addr);
         activity.deleteDatabase("salon_mail");db=openDb();mail=mockStatic(MailDb.class,CALLS_REAL_METHODS);mail.when(()->MailDb.get(activity)).thenAnswer(c->db);
         db.upsertContact(peer,"Peer","",addr,"",0,false);db.setMxAddr(peer,"MAX#original");
