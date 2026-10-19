@@ -1,0 +1,90 @@
+Pandamonium integrated dependency audit — 2026-10-19
+
+Scope and source reuse
+The standalone AtomiX0.1.81 parity validation found an API31-only BigInteger method
+in the shared Minima receipt validator, although both apps support API28. Reused
+EthHtlc's existing exact BigDecimal conversion in the canonical adapter and generated
+MinimaHtlc. Overflow and malformed evidence still fail validation. Standalone fix
+and OTC/responder parity are committed and pushed at a5db5d7 on eurobuddha's fork.
+
+The host's previous app lint omitted dependency source. A library-only lint command
+also lacked the actual app targetSDK and incorrectly flagged USE_EXACT_ALARM.
+The authoritative audit now runs app:lintPandamoniumRelease with checkDependencies
+enabled permanently in app/build.gradle, using the shipping min28/target35 config.
+The first complete dependency pass reported40 errors and1822 warnings. This does
+not mean40 independent runtime faults; several findings share a manifest cause.
+
+Reused standalone corrections, with no new libraries:
+- apks/mail/app/src/main/java/com/eurobuddha/mail/MainActivity.java: GravityCompat
+  START for the four DrawerLayout operations (same value, correct API annotation).
+- apks/NFTwallet/app/src/main/java/com/eurobuddha/nftwallet/ReceiveView.java:
+  LineBreaker.BREAK_STRATEGY_SIMPLE, the existing standalone inline integer constant.
+- apks/merchstudio/app/src/main/java/com/eurobuddha/merchstudio/MainActivity.java:
+  AppCompatImageView for the custom square image, preserving measurement/crop.
+The adapter retains pinned donor provenance and reproduces these minimal changes.
+
+Integration corrections
+- Generated wallet session and publish-stage guards are indented according to
+  their callback; no guard or branch behavior changes. Terminal/Pools launch
+  fallback indentation is corrected without changing launch choices.
+- The importer removes intent filters from already non-exported Activities. The
+  only additional removed filter is MiniMall's inaccessible external .shop filter.
+  Screens stay private and launch explicitly through the host. MiniMall's Add a
+  shop document picker and bounded import remain available. No component is newly
+  exported to satisfy lint. Direct-transport verification rejects a future private
+  Activity with an implicit filter. External .shop opening via a host-authenticated
+  gateway remains outside this patch; it did not work on the private Activity.
+- Camera-using libraries mirror the host's existing optional camera/autofocus
+  declarations; the shipping app already had these. This fixes library inspection
+  context without changing camera permission or requiring new hardware.
+- Eight ImpliedQuantity errors refer to four Salon noun-only plurals in Russian
+  and Ukrainian. Reviewed statPill and its callers: the numeric TextView is already
+  adjacent to the noun. Existing SalonSocialLanguageTest covers1,2,5,21 and all four
+  languages. Only those four named resources receive documented tools:ignore;
+  the generator checks they exist and contain no format arguments. Other plural
+  lint remains active. No baseline or blanket suppression was added.
+
+Code review
+MAJOR resolved: API28-30 receipt handling could hit an unavailable method; app-only
+lint missed integrated source. Reviewed every changed block, source donors,
+canonical adapters, generated differences and actual Salon count renderer/test.
+MINOR resolved: stale UI constants/widget choice and misleading generated indent.
+Private screen policy and optional hardware match the existing host architecture.
+The source importer reproduces all23 apps and the transport guard passes.
+
+Open review / limits
+This is a bounded compatibility and integration audit, not completion of the full
+app review. Existing warnings need triage, especially boot receiver entry checks,
+native16KB alignment, default-locale formatting, lifecycle leaks and UI coverage.
+The BouncyCastle trust-manager warnings are in a dependency jar; they do not alone
+prove the app uses insecure TLS. Vestr's insets callback appears to add left/right
+padding repeatedly; inspect/reproduce it in the next UI review checkpoint.
+Full AtomiX form/initiator context, receipt/reorg/gas, wallet Sweep standalone
+durable retry parity, other app parity, device and live large-collection checks
+remain open. Only Fold R3GL805K7MB is authorized; it is absent at this checkpoint.
+No installation, publication, real transaction, seed or real key-counter change.
+Public/device2.0.0 remains unchanged.
+
+Final validation and review verdict
+1,614 affected JVM tests pass, zero failures/errors/skips: AtomiX493, wallet202,
+Salon385, Mail9, NFT Wallet319, MiniMall Studio25, host181. The final offline test,
+assemble and dependency-lint invocation succeeds in3m39s. Lint reports0 errors,
+0 fatal and1821 warnings across the expanded dependency scope. The prior40
+errors are resolved or narrowly explained above; warnings remain review work.
+Pinned importer reproduces23 apps. Direct transport guard and6,984 four-language
+messages pass. Parsed catalogs preserve all message/plural text and values.
+Actual APK verifies ZIP integrity, Settings Sweep entry, confirmed-size splitting,
+API28-compatible receipt conversion, both OTC first-leg persistence sequences and
+transactional recovery. Actual manifest keeps MiniMall private without the obsolete
+external filter. Exact Keets bundle,21 addons/runtime per ABI and RSA4096 APKv2
+certificate verify. Package com.eurobuddha.pandamonium;2.0.13-Pandamonium/code208.
+Artifact: /Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.13-candidate.apk
+Size: 137146245 bytes
+SHA256: 66c8d522f35ce16633e5cd55a58ed30697619b52cd7269c30c32d28a30a40d73
+Certificate SHA256: eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Verdict: approve this bounded source checkpoint. No new release or Fold verification
+is claimed. All generated binaries and credentials stay outside Git.
+
+Final source review corrected seven optional-camera declaration order warnings.
+Rebuild and expanded lint pass in22s; pinned importer re-verifies. This is the
+artifact identified above; the earlier pre-ordering candidate was replaced locally.

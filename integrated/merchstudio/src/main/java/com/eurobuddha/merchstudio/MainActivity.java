@@ -910,7 +910,7 @@ public class MainActivity extends AppCompatActivity {
 
     /** ImageView measured square (height = width) — the marketplace-grid look. */
     private ImageView squareImage() {
-        ImageView iv = new ImageView(this) {
+        ImageView iv = new androidx.appcompat.widget.AppCompatImageView(this) {
             @Override protected void onMeasure(int w, int h) { super.onMeasure(w, w); }
         };
         iv.setScaleType(ImageView.ScaleType.CENTER_CROP);

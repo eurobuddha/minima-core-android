@@ -5,6 +5,8 @@
     </queries>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <application>
         <activity android:name="com.eurobuddha.merchinbox.MainActivity" android:exported="false" android:windowSoftInputMode="adjustResize" android:theme="@style/pm_merchinbox_Theme.Utxo" android:configChanges="locale|layoutDirection|screenLayout">
             </activity>

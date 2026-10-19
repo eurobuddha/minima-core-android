@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override public void onBackPressed() {
-        if (drawer.isDrawerOpen(Gravity.START)) { drawer.closeDrawer(Gravity.START); return; }
+        if (drawer.isDrawerOpen(androidx.core.view.GravityCompat.START)) { drawer.closeDrawer(androidx.core.view.GravityCompat.START); return; }
         if (stack.size() > 1) pop();
         else if (folder != Folder.INBOX) showFolder(Folder.INBOX);
         else super.onBackPressed();
@@ -429,7 +429,7 @@ public class MainActivity extends AppCompatActivity {
             ((ViewGroup.MarginLayoutParams) mlp).rightMargin = dp(12);
             row.setLayoutParams(mlp);
         }
-        row.setOnClickListener(v -> { drawer.closeDrawer(Gravity.START); showFolder(target); });
+        row.setOnClickListener(v -> { drawer.closeDrawer(androidx.core.view.GravityCompat.START); showFolder(target); });
         return row;
     }
 
@@ -2297,7 +2297,7 @@ public class MainActivity extends AppCompatActivity {
         if (back) {
             h.addView(iconBtn(R.drawable.pm_mail_ic_back, v -> pop()));
         } else {
-            ImageView burger = iconBtn(R.drawable.pm_mail_ic_menu, v -> drawer.openDrawer(Gravity.START));
+            ImageView burger = iconBtn(R.drawable.pm_mail_ic_menu, v -> drawer.openDrawer(androidx.core.view.GravityCompat.START));
             h.addView(burger);
         }
         TextView t = new TextView(this);

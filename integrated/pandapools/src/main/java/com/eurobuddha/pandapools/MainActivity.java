@@ -493,7 +493,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             Intent i = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
             if (i == null) i = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.minimablock");
-        if (i == null) i = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
+            if (i == null) i = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
             if (i != null) startActivity(i);
         } catch (Exception ignore) {}
     }

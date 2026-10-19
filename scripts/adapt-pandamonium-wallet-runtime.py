@@ -88,8 +88,8 @@ def adapt(root):
         s,n=re.subn(pattern,lambda m:m[1]+'\n        if (!session.getAsBoolean()) return;',s,count=1,flags=re.S)
         assert n==1,('NFT session entry drift',method)
     for method in ['onResolved','onResult','onError']:
-        pattern=r'(public void '+method+r'\([^)]*\) \{)'
-        s,n=re.subn(pattern,lambda m:m[1]+'\n                if (!session.getAsBoolean()) return;',s)
+        pattern=r'(?m)^([ \t]*)(@Override )?(public void '+method+r'\([^)]*\) \{)'
+        s,n=re.subn(pattern,lambda m:m[0]+'\n'+m[1]+'    if (!session.getAsBoolean()) return;',s)
         assert n>0,('NFT callback drift',method)
     s=s.replace('if (stopped[0] || act.isDestroyed()) return;',
         'if (stopped[0] || act.isDestroyed() || !session.getAsBoolean()) return;')

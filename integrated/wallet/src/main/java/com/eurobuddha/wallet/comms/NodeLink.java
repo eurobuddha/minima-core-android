@@ -217,7 +217,7 @@ public class NodeLink {
                 // Step 2 — txnbasics: node adds MMR proofs + scripts once.
                 mApi.cmd(basicsCmd, new NodeApi.Cb() {
                     @Override public void onResult(JSONObject basicsResp) {
-                if(!basics.compareAndSet(false,true))return;
+                        if(!basics.compareAndSet(false,true))return;
                         if (!basicsResp.optBoolean("status", false)) {
                             if (zCb != null) zCb.onError("txnbasics failed: " + basicsResp.optString("error", basicsResp.toString()));
                             return;
@@ -225,7 +225,7 @@ public class NodeLink {
                         // Step 3 — txnpost (mine:true, NO auto).
                         mApi.cmd(postCmd, new NodeApi.Cb() {
                             @Override public void onResult(JSONObject postResp) {
-                if(!posted.compareAndSet(false,true))return;
+                                if(!posted.compareAndSet(false,true))return;
                                 if (!postResp.optBoolean("status", false)) {
                                     if(zCb instanceof SizeAwareCb && isSizeRefusal(postResp,zBuilt.getID())){((SizeAwareCb)zCb).onSizeRefusal(postResp);return;}
                                     if (zCb != null) zCb.onError("txnpost failed: " + postResp.optString("error", postResp.toString()));

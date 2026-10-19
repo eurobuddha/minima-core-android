@@ -610,3 +610,16 @@ verified, not installed or published. See ATOMIX_OTC_FIRST_LEG_2026-10-19.txt fo
 reused sources, original-controller reproduction, review and remaining limitations.
 Fold absent; standalone OTC/engine parity remains the next checkpoint. Full review
 is still incomplete. The existing Sweep size recovery remains included.
+
+Integrated dependency audit and AtomiX parity —2.0.13/code208
+Standalone AtomiX0.1.81/code181 OTC/engine/consent/responder parity is now committed
+and pushed to eurobuddha/minima-core-android-atomix at a5db5d727e77fa2616d5d8cbf65d5ac5dbd79381.
+526 debug and526 release tests passed; signed candidate verified, not installed or
+published. This supersedes the earlier open OTC parity entry. Remaining AtomiX
+forms/initiator/gas/receipt/reorg and cross-APK coordination review remain open.
+Host lint now checks all integrated dependencies. Fixed API28 receipt compatibility,
+reused three standalone UI corrections, repaired generated guard indentation and
+private-screen intent metadata. Documented only the four intentional Salon noun
+plural exceptions.1,614 affected tests and full dependency lint pass; signed local
+2.0.13 candidate verified. See INTEGRATED_DEPENDENCY_AUDIT_2026-10-19.txt for evidence,
+remaining warnings and source paths. Fold absent; public/device2.0.0 unchanged.

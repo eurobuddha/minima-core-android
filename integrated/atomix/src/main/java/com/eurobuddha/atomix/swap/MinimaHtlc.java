@@ -695,7 +695,7 @@ public final class MinimaHtlc {
             if (new java.math.BigInteger(((String) raw).substring(2), 16).signum() == 0) return -1;
             java.math.BigInteger block = whole(r, "block"), tip = whole(r, "tip"), depth = whole(r, "confirmations");
             if (block.signum() <= 0 || !tip.subtract(block).equals(depth)) return -1;
-            return depth.intValueExact();
+            return new java.math.BigDecimal(depth).intValueExact();
         } catch (Exception invalid) { return -1; }
     }
     private static java.math.BigInteger whole(JSONObject object, String key) {

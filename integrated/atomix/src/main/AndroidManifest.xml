@@ -15,6 +15,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <application>
         <activity android:name="com.eurobuddha.atomix.MainActivity" android:exported="false" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode|locale|layoutDirection" android:windowSoftInputMode="adjustResize" android:theme="@style/pm_atomix_Theme.Utxo">
             </activity>

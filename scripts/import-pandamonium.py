@@ -138,6 +138,14 @@ def import_app(name, target_root=None):
     manifest=target/'src/main/AndroidManifest.xml'
     tree=ET.parse(manifest);app=tree.getroot().find('application');theme=app.get(ANDROID+'theme')
     app.attrib.clear()  # base owns backup policy, application class, icon and label
+    # Mirror the host's existing optional-camera policy in libraries for dependency lint.
+    if any(p.get(ANDROID+'name')=='android.permission.CAMERA' for p in tree.getroot().findall('uses-permission')):
+        for feature_name in ('android.hardware.camera','android.hardware.camera.autofocus'):
+            feature=next((f for f in tree.getroot().findall('uses-feature') if f.get(ANDROID+'name')==feature_name),None)
+            if feature is None:
+                feature=ET.Element('uses-feature',{ANDROID+'name':feature_name})
+                tree.getroot().insert(list(tree.getroot()).index(app),feature)
+            feature.set(ANDROID+'required','false')
     for component in list(app):
         component_name=component.get(ANDROID+'name','')
         if component_name.startswith('.'):
@@ -148,7 +156,10 @@ def import_app(name, target_root=None):
             component.set(ANDROID+'exported','false')
             if theme and not component.get(ANDROID+'theme'):component.set(ANDROID+'theme',theme)
             for filt in list(component.findall('intent-filter')):
-                if any(c.get(ANDROID+'name')=='android.intent.category.LAUNCHER' for c in filt.findall('category')):component.remove(filt)
+                # Private embedded screens are opened explicitly after host authentication.
+                # External filters cannot be used and interfere with Android 14 intent resolution.
+                # MiniMall retains its in-app document picker for importing .shop files.
+                component.remove(filt)
         if component.tag=='provider':
             provider=namespace+'.IntegratedFileProvider'
             component.set(ANDROID+'name',provider)

@@ -162,7 +162,7 @@ public class ReceiveView extends BaseView {
             if (android.os.Build.VERSION.SDK_INT >= 23) {
                 // An address is one unbroken token; the default strategies try to keep it whole and
                 // then clip. SIMPLE + no hyphenation wraps it at a character boundary instead.
-                t.setBreakStrategy(android.text.Layout.BREAK_STRATEGY_SIMPLE);
+                t.setBreakStrategy(android.graphics.text.LineBreaker.BREAK_STRATEGY_SIMPLE);
                 t.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NONE);
             }
             r.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));

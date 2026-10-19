@@ -134,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
         mPairBanner = findViewById(R.id.pm_terminalide_pair_banner);
         mPairBanner.setOnClickListener(v -> {
             Intent launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
-        if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.minimablock");
-        if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
+            if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.minimablock");
+            if (launch == null) launch = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
             if (launch != null) startActivity(launch);
         });
 

@@ -129,8 +129,8 @@ android {
         // vc113: explicit English, Chinese, Russian and Ukrainian selection across all bears.
         // vc114: core notifications and retained main-screen controls follow the selected language.
         // vc118: current four-language catalogue and reviewed AtomiX receipt/consent fixes.
-        versionCode 207
-        versionName "2.0.12"
+        versionCode 208
+        versionName "2.0.13"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -201,6 +201,9 @@ android {
             excludes += ['META-INF/versions/9/OSGI-INF/MANIFEST.MF', 'META-INF/DEPENDENCIES']
         }
     }
+
+    // Audit the integrated app code under the SDK configuration that actually ships.
+    lint { checkDependencies = true }
 
     testOptions { unitTests.includeAndroidResources = true }
 

@@ -55,7 +55,7 @@ def adapt(root):
             '        final java.util.concurrent.atomic.AtomicBoolean imported=new java.util.concurrent.atomic.AtomicBoolean(), basics=new java.util.concurrent.atomic.AtomicBoolean(), posted=new java.util.concurrent.atomic.AtomicBoolean();\n        // Step 1 — txnimport (signatures-only witness).')
         for response,guard in [('importResp','imported'),('basicsResp','basics'),('postResp','posted')]:
             marker='public void onResult(JSONObject '+response+') {'
-            assert marker in s;s=s.replace(marker,marker+'\n                if(!'+guard+'.compareAndSet(false,true))return;')
+            assert marker in s;s=s.replace(marker,marker+'\n'+(' '*{'imported':16,'basics':24,'posted':32}[guard])+'if(!'+guard+'.compareAndSet(false,true))return;')
         marker='                                if (!postResp.optBoolean("status", false)) {'
         assert marker in s;s=s.replace(marker,marker+'\n                                    if(zCb instanceof SizeAwareCb && isSizeRefusal(postResp,zBuilt.getID())){((SizeAwareCb)zCb).onSizeRefusal(postResp);return;}')
         marker='if (zCb != null) zCb.onError(message);'

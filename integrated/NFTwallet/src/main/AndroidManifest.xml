@@ -14,6 +14,8 @@
     <queries>
         <package android:name="com.eurobuddha.minimacore" />
     </queries>
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <application>
         <activity android:name="com.eurobuddha.nftwallet.MainActivity" android:exported="false" android:windowSoftInputMode="adjustResize" android:theme="@style/pm_nftwallet_Theme.NFTWallet" android:configChanges="locale|layoutDirection|screenLayout">
             </activity>

@@ -20,5 +20,6 @@ for app in (ROOT/'integrated').iterdir():
         if component.get(A+'process'):errors.append(str(app)+': secondary process')
         if component.get(A+'name','').endswith(('.NodeTransportService','.MinimaNotifyReceiver')):errors.append(str(app)+': legacy node component')
         if component.tag=='activity' and component.get(A+'exported')!='false':errors.append(str(app)+': exported bundled screen')
+        if component.tag=='activity' and component.findall('intent-filter'):errors.append(str(app)+': implicit filter on a private bundled screen')
 if errors:raise SystemExit('\n'.join(errors))
 print('All bundled clients use DirectNodeApi; no internal IPC relay, notification receiver, secondary process or whole-package reset action remains.')

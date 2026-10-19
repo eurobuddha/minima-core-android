@@ -652,7 +652,7 @@ public class NftView extends BaseView {
             one.add(coin);
             act.resolveInputs(one, new MainActivity.InputsCb() {
                 @Override public void onResolved(List<TxnFactory.InputCoin> inputs) {
-                if (!session.getAsBoolean()) return;
+                    if (!session.getAsBoolean()) return;
                     final TxnFactory.InputCoin in = inputs.get(0);
                     CharSequence review = Language.join("NFT: ", g.meta.name, idx >= 0 ? " #" + idx : "", "\n",
                             g.meta.stateNft ? Language.msg(l10n_nft_state_replayed) : Language.msg(l10n_nft_sent_whole), "\n",
@@ -669,7 +669,7 @@ public class NftView extends BaseView {
                             });
                 }
                 @Override public void onError(String message) {
-                if (!session.getAsBoolean()) return;
+                    if (!session.getAsBoolean()) return;
                     Toast.makeText(act, Language.msg(l10n_nft_prepare_failed, WalletMessages.message(message)), Toast.LENGTH_LONG).show();
                 }
             });
@@ -932,7 +932,7 @@ public class NftView extends BaseView {
                 Language.setText(msg, Language.join(zHeader, "\n", Language.msg(l10n_nft_confirmed_count, (totalSent - zRemaining.size()), totalSent), "…\n\n", Language.msg(l10n_nft_keep_screen_on)));
                 act.node().coinsRelevant(new NodeApi.Cb() {
                     @Override public void onResult(org.json.JSONObject json) {
-                if (!session.getAsBoolean()) return;
+                        if (!session.getAsBoolean()) return;
                         if (stopped[0] || act.isDestroyed() || !session.getAsBoolean()) return;
                         // A missing or malformed list cannot prove a coin has left the chain state.
                         if (json == null || !Boolean.TRUE.equals(json.opt("status"))) {
@@ -969,7 +969,7 @@ public class NftView extends BaseView {
                         schedule();
                     }
                     @Override public void onError(String message) {
-                if (!session.getAsBoolean()) return;
+                        if (!session.getAsBoolean()) return;
                         if (stopped[0] || act.isDestroyed() || !session.getAsBoolean()) return;
                         schedule();   // transient node hiccup — keep watching
                     }
