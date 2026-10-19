@@ -3,7 +3,9 @@
     "Node returned no seedrandom — is the node write-enabled?": "ethWallet.errorNoSeed",
     "Node returned an all-zero key. Not using it.": "ethWallet.errorZeroKey",
     "no decimals() — not an ERC20?": "ethWallet.errorNoDecimals",
-    "Wallet session changed. Review again.": "wallet.reviewAgain"
+    "Wallet session changed. Review again.": "wallet.reviewAgain",
+    "Node returned an invalid Ethereum key. Not using it.": "atomixNotice.keyInvalid",
+    "Ethereum key derivation failed. Retry when the node is ready.": "atomixNotice.keyFailed"
   },
   "patterns": [
     {

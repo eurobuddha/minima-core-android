@@ -21,6 +21,8 @@ public final class EthMessages {
             case "Node returned an all-zero key. Not using it.": return Language.msg(l10n_eth_wallet_error_zero_key);
             case "no decimals() — not an ERC20?": return Language.msg(l10n_eth_wallet_error_no_decimals);
             case "Wallet session changed. Review again.": return Language.msg(l10n_wallet_review_again);
+            case "Node returned an invalid Ethereum key. Not using it.": return Language.msg(l10n_atomix_notice_key_invalid);
+            case "Ethereum key derivation failed. Retry when the node is ready.": return Language.msg(l10n_atomix_notice_key_failed);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {

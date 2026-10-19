@@ -175,3 +175,25 @@ regressions. All 19 ETH tests passed, including guard failures before nonce read
 after nonce read and after signing, account/RPC changes, and stale balance results.
 Importer verification passed for all 22 snapshots; catalog, transport and diff
 checks passed. Verdict: Approve this change. Full review and nonce repair remain.
+
+ETH Wallet node-key race repair — 1.9.105
+AtomiX's strict status/32-byte/secp256k1 validation now protects ETH Wallet node
+replies and explicit key imports. A request generation is checked at UI delivery,
+atomically with adoption and callback. Import, clear and newer requests supersede
+old replies; duplicate callbacks are ignored. Error messages cannot echo key data.
+Volatile credentials are captured once for address/export/balance reads.
+Review: canonical source, adapter, generated wallet/error map and eight synthetic
+key regressions inspected. Full ETH suite: 27 tests, no failures/errors/skips.
+All 22 importer snapshots/provenance, catalog, transport and diff checks pass.
+Verdict: Approve this repair. Full app review remains open.
+
+Standalone parity work in progress
+ETH Wallet 0.2.7 candidate ports 1.9.103/104 asset and account-context fixes.
+14 standalone mocked tests passed. Existing optional-camera lint error repaired
+using AtomiX's declaration; signed release build and final verification pending.
+Future Cash Next 0.1.9 ports the complete dual-key audit adapter (including partial
+results, risk preservation, cache versioning and backwards-clock repair); test and
+signed release build pending. No live transactions or phone installation performed.
+The pinned-source ETH Wallet/Future Cash paths now use detached worktrees at their
+recorded source revisions. This preserves reproducible integration verification as
+the upstream standalone working copies advance. No source lock was silently moved.
