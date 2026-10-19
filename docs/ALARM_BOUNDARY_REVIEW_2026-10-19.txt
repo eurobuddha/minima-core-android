@@ -1,0 +1,65 @@
+Pandamonium internal alarm boundary review — 2026-10-19
+
+Finding and reuse
+MAJOR: the host's service.Alarm receiver was exported without a permission or action
+filter. An external explicit broadcast could reach a receiver that requests node
+foreground-service startup and a health check. OS foreground-start restrictions may
+reject some requests, but the app did not need or intend an external entry point.
+
+Read app/src/main/java/com/eurobuddha/minimacore/service/Alarm.java in full, its
+MinimaService scheduling calls and ResyncLauncher.afterShutdown caller. Hourly and
+one-shot requests already use explicit immutable PendingIntents with separate codes
+0 and1. Reused the existing private-receiver policy in integrated/NFTwallet's
+HeartbeatReceiver/manifest, also present in standalone NFT Wallet, PandaPools,
+PandaDEX and AtomiX. The production change is only exported=false plus its comment.
+Alarm timing, cancellation, health checks, restart handling and service code are
+unchanged. The host manifest is shared by all three bear flavors. This checkpoint
+builds Pandamonium; other flavor APKs are not claimed newly verified.
+
+Warnings triaged without speculative changes
+The three UnsafeProtectedBroadcastReceiver warnings name NFT Wallet, PandaPools
+and PandaDEX BootReceiver. Read their complete implementations and both integrated
+and standalone manifests: all are already exported=false. Other apps cannot invoke
+them directly, so the warning alone does not establish an externally callable bug.
+AtomiX has the same private receiver policy. Main BootReceiver checks the protected
+BOOT_COMPLETED action before starting an initialized node. Future Cash Next checks
+its boot/update/quickboot action allowlist and configured rescue readiness. Its OEM
+quickboot policy and real device reboot behavior remain wider review/device work.
+No standalone boot receiver change is required by the confirmed host Alarm finding.
+
+Regression evidence
+Reused EthereumClientsTest's existing Robolectric SDK34/Application.class fixture
+to inspect the real merged manifest, avoiding MinimaApplication/node initialization.
+AlarmBoundaryTest checks the receiver metadata and executes the real scheduler:
+hourly requests deduplicate, PendingIntents remain explicit/immutable and belong to
+the app, cancellation removes the hourly alarm while preserving the resync one-shot,
+and sending the internal PendingIntent still reaches the receiver and requests the
+node service plus one health check. NodeHealthMonitor is mocked; Robolectric records
+the service launch without running a real node or using a device.
+Against the original manifest:2 tests ran, exactly the private-entry assertion
+failed; the scheduler behavior test passed. After the fix both are required to pass.
+This verifies configuration and internal delivery, not a physical external-UID attack
+or real OEM power-management behavior. No funds, seeds or real counters are touched.
+
+Code review
+Reviewed all changed files and callers. No new runtime dependency, permission,
+receiver action, timer or service-start path. Private PendingIntent delivery is
+preserved in the regression. Broader startup/foreground-service failures, battery
+behavior and integrated app review remain open. The previous full review is not
+declared complete by this checkpoint. No installation or publication is requested
+by this source validation; Fold verification remains required for a new rollout.
+
+Final validation and verdict
+183 host JVM tests pass, zero failures/errors/skips, including both boundary tests.
+Offline test/build/dependency-lint completes in32s. Lint:0 errors,0 fatal,1820 warnings;
+the exported-alarm warning is gone. The existing private-boot warnings are triaged
+above, not globally suppressed. APK ZIP, version/code, actual receiver export flag,
+exact Keets bundle with21 addons/runtime per ABI and family RSA4096 APKv2 verify.
+Package com.eurobuddha.pandamonium;2.0.14-Pandamonium;versionCode209.
+Artifact: /Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.14-candidate.apk
+Size: 137146245 bytes
+SHA256: a6cdc7c3b06a26e96839139a70a20f79271d8b00603e4bb75343d54ca90af673
+Certificate SHA256: eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Verdict: approve the bounded internal-alarm fix. No app installation or publication.
+Public/device2.0.0 remains unchanged. The full review and standalone parity remain
+active; this finding needs no change to the already-private standalone receivers.

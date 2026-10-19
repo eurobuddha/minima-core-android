@@ -320,3 +320,13 @@ private-screen intent metadata. Documented only the four intentional Salon noun
 plural exceptions.1,614 affected tests and full dependency lint pass; signed local
 2.0.13 candidate verified. See INTEGRATED_DEPENDENCY_AUDIT_2026-10-19.txt for evidence,
 remaining warnings and source paths. Fold absent; public/device2.0.0 unchanged.
+
+Internal alarm boundary —2.0.14/code209
+Host Alarm receiver is now private, matching existing heartbeat receiver policy.
+Original merged-manifest regression failed; internal hourly/one-shot/cancellation
+paths pass before and after.183 host tests, dependency lint and signed APK checks
+pass. See ALARM_BOUNDARY_REVIEW_2026-10-19.txt. Three lint-flagged integrated and
+standalone boot receivers were inspected and are already private; no speculative
+parity changes made. Host manifest is shared by all bear flavors; only Pandamonium
+APK built here. Physical reboot/OEM behavior and the full feature review remain
+open. No install/publication; public/device2.0.0 unchanged.

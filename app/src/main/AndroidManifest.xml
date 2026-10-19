@@ -144,7 +144,8 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".service.Alarm" android:exported="true"/>
+        <!-- Only our immutable explicit PendingIntents trigger hourly health checks/resync restarts. -->
+        <receiver android:name=".service.Alarm" android:exported="false"/>
 
     </application>
 
