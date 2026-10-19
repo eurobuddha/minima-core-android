@@ -1541,5 +1541,37 @@
       "src/test/java/com/eurobuddha/salon/NostrEventTest.java": "c25a98e549108d2d625313887343a656b7f6c4e41ef97347479c63a2f21575d2"
     },
     "resource_prefix": "pm_salon_"
+  },
+  "keyreuses": {
+    "source": "../keyreuses",
+    "revision": "263ac87e173dd82ab8e0b00e40d70b3c252665fc",
+    "version": "0.1.4",
+    "namespace": "com.eurobuddha.keyreuses",
+    "files": {
+      "src/main/AndroidManifest.xml": "063c3e6c683190dce1684989a0a1e2248b32cccfec0243fe41e03c93088e40fb",
+      "src/main/java/com/eurobuddha/keyreuses/Design.java": "1dfd1c816cf77ad4c95218fe5052dd231ef378500e2218731575b7649f595539",
+      "src/main/java/com/eurobuddha/keyreuses/AuditApi.java": "12657d278ac7653d37bb44ae9bf5cb35ddb2af3e75cf6649137bee632246702a",
+      "src/main/java/com/eurobuddha/keyreuses/MinimaAddress.java": "dc0d03706454613a3fdefb9b8d2f0633dfae27739e02345f0aa5765fde775713",
+      "src/main/java/com/eurobuddha/keyreuses/MainActivity.java": "1a8e1fcdf695d13baf640092b2cb702adfa57498224aa73d415f4423960fb1cc",
+      "src/main/java/com/eurobuddha/keyreuses/NodeApi.java": "8d517b34705ebfd90365fb368f0a0a9dbb0543136d2b514fb4a9383e6d60dcd9",
+      "src/main/java/com/eurobuddha/keyreuses/Sha3.java": "590145bfe43379b994c5d89338048a62a1b8531f3574dc074fbc277b87cd496e",
+      "src/main/java/com/eurobuddha/keyreuses/Copy.java": "e9c6140d1c5291ac46451df93e6189d0d8f28f602145b2710b0ec07018d156ca",
+      "src/main/java/com/eurobuddha/keyreuses/KeyAudit.java": "d05cdabc80bf5537d3c5b046bab8fc62b6638678ed913c379d18dfbe1662f9a1",
+      "src/main/res/drawable/ic_launcher_foreground.xml": "c2f68367d842bf87fe4de64843a01f741faf92b82cc537312e432a33d86f0251",
+      "src/main/res/drawable/ic_launcher_background.xml": "a82c8898147868a6d116cd8f9f6a375cf005b224daae4ca33234dbbe2cb8b0f8",
+      "src/main/res/layout/activity_main.xml": "856a38ec1aa34f99186d49e635cf980bfd231f5cf60403609c7e9f1143265c2b",
+      "src/main/res/values-night/themes.xml": "a2f0e6855f14ac3d622b4faae92e3a32b1937a41c09f07187e2d61c065f31554",
+      "src/main/res/values/colors.xml": "0977fa99f92b08446729eebe03ac774e7b66154eb47827d486cf6bf30fb5c789",
+      "src/main/res/values/themes.xml": "3c23cdcacb0fe582891bbe452aeb44dc26631a9f38ed8ff4c56fe3e85b9358fc",
+      "src/main/res/values/strings.xml": "777a0478263ca3be847e4d14024c4ae6dc555685df59f635a3a43a09784234f0",
+      "src/main/res/xml/backup_rules.xml": "6cf1a27e6807b1d24e41d3fbe7ddc1bfe1f42226027964f6eaf477d71b43b283",
+      "src/main/res/xml/data_extraction_rules.xml": "cb1fc47ab4a984530ed60e0e6ee638929c3038290e7e7e0b4b03a3a30fbe7381",
+      "src/main/res/mipmap-anydpi/ic_launcher.xml": "1c832bf194d8eecd439a92bcced0df144c9f566b934b3d7865e983d8ee8dbdeb",
+      "src/main/res/mipmap-anydpi/ic_launcher_round.xml": "1c832bf194d8eecd439a92bcced0df144c9f566b934b3d7865e983d8ee8dbdeb",
+      "src/test/java/com/eurobuddha/keyreuses/MinimaAddressTest.java": "172d7b02dc06b90d26349c2476a67a828cc71a164bfa5761e4ee92c96577d962",
+      "src/test/java/com/eurobuddha/keyreuses/Sha3Test.java": "645956d319f0e8b030d7cabcd2f0cb10db28ec334d1fc651028458fec9b429de",
+      "src/test/java/com/eurobuddha/keyreuses/KeyAuditTest.java": "67a7ddd9184fa37dbc31407bcce4f8e89a2a1a3e882bdc1b28c4f2f2963f7de2"
+    },
+    "resource_prefix": "pm_keyreuses_"
   }
 }

@@ -1,0 +1,12 @@
+<resources>
+    <color name="pm_keyreuses_ku_bg">#FF0A0A0F</color>
+    <color name="pm_keyreuses_ku_card">#FF15151F</color>
+    <color name="pm_keyreuses_ku_border">#FF2A2A38</color>
+    <color name="pm_keyreuses_ku_text">#FFE8E6E3</color>
+    <color name="pm_keyreuses_ku_dim">#FF8D8B89</color>
+    <color name="pm_keyreuses_ku_accent">#FFF7931A</color>
+    <color name="pm_keyreuses_ku_accent2">#FFFF5E3A</color>
+    <color name="pm_keyreuses_ku_ok">#FF4ADE80</color>
+    <color name="pm_keyreuses_ku_warn">#FFFBBF24</color>
+    <color name="pm_keyreuses_ku_risk">#FFF87171</color>
+</resources>

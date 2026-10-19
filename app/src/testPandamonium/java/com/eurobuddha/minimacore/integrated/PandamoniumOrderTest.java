@@ -38,6 +38,11 @@ public class PandamoniumOrderTest {
         assertEquals(order, PandamoniumOrder.decode(PandamoniumOrder.encode(order)));
     }
 
+    @Test public void keyUsesAppendsToExistingDestinations() {
+        assertEquals(19, PandamoniumDestinations.indexFor("com.eurobuddha.keyreuses.MainActivity"));
+        assertEquals("KeyUses", PandamoniumDestinations.NAMES[19]);
+    }
+
     @Test public void creativeAppsAppendAndPreserveSavedOrder() {
         assertEquals(17, PandamoniumDestinations.indexFor("com.eurobuddha.statenft.MainActivity"));
         assertEquals(18, PandamoniumDestinations.indexFor("com.eurobuddha.salon.MainActivity"));
@@ -46,8 +51,8 @@ public class PandamoniumOrderTest {
         List<Integer> order = PandamoniumOrder.decode(prior);
         for (int i = 0; i < 19; i++) assertEquals(Integer.valueOf(i), order.get(i));
         assertEquals(order, PandamoniumOrder.decode(PandamoniumOrder.encode(order)));
-        assertEquals(19, PandamoniumDestinations.NAMES.length);
-        assertEquals(19, PandamoniumDestinations.ICONS.length);
+        assertEquals(20, PandamoniumDestinations.NAMES.length);
+        assertEquals(20, PandamoniumDestinations.ICONS.length);
     }
 
 }

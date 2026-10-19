@@ -1,6 +1,6 @@
 # Pandamonium native apps
 
-These thirteen Android library snapshots are compiled only into the `pandamonium` flavor. The standalone apps remain in their sibling repositories. `sources.lock.json` records each source revision, app version and original file hashes (including any uncommitted source changes present at import).
+These twenty-two Android library snapshots are compiled only into the `pandamonium` flavor. The standalone apps remain in their sibling repositories. `sources.lock.json` records each source revision, app version and original file hashes (including any uncommitted source changes present at import).
 
 Pandamonium opens on Wallet, with tabs ordered Wallet / History / Apps / Logs / Node. Node is the former Home dashboard. History occupies the core utility tab. The sidebar contains ETH Wallet, AtomiX, PandaPools, Future Cash Next, PandaDEX, Zero Edge Casino, Minima Explorer, Filez, Minima Vestr, Entropy, Terminal IDE and MinimaMail. The user confirmed that the requested “Vesta” is the existing Minima Vestr app. On the Core screen, centred Minima Core / Pandamonium branding shares one toolbar row with the left drawer button and right overflow menu. Long-hold an app in the drawer to drag it vertically; the order persists across screens and restarts. Core home remains first. Sidebar rows show each app's bundled launcher icon, bound to its destination so icons follow the saved order. Embedded app headers retain their own controls.
 
@@ -8,7 +8,7 @@ Pandamonium opens on Wallet, with tabs ordered Wallet / History / Apps / Logs / 
 
 The importer refuses to overwrite an existing snapshot. Run `python3 scripts/import-pandamonium.py --verify` to recreate imports in a temporary directory and compare them with the snapshots and source lock. Run `python3 scripts/verify-pandamonium-transport.py` to guard the direct-only integration boundary. Builds use these local snapshots and never require sibling repositories or automatically pull upstream code. Updating an app requires a reviewed source refresh and validation.
 
-All thirteen apps use `DirectNodeApi`, backed by `EmbeddedNodeTransport` and the core JAR's existing admin command runner. There are no internal registration broadcasts, pairing tokens, Binder command/result parcels, response-cache files or relay processes. Commands and file metadata use structured JSON copies. External companion clients retain their authenticated IPC bridge; Android file pickers, services and notifications still use normal system APIs.
+Bundled node-command clients use `DirectNodeApi`, backed by `EmbeddedNodeTransport` and the core JAR's existing admin command runner. There are no internal registration broadcasts, pairing tokens, Binder command/result parcels, response-cache files or relay processes. Commands and file metadata use structured JSON copies. External companion clients retain their authenticated IPC bridge; Android file pickers, services and notifications still use normal system APIs.
 
 The transport shares simultaneous identical `status`, `balance`, `block`, `network` and `peers` reads. It never caches completed replies or coalesces signing, address creation, coin selection or batches. Integrated requests, core UI mutations and external bridge mutations share a bounded execution queue. Requests are tied to the node instance that accepted them. Closed clients cancel queued work; executing writes retain late results for the existing durable recovery logic. Missing results remain uncertain and never impersonate a confirmed node rejection.
 
@@ -51,3 +51,30 @@ Pandamonium defaults to block key uses with low RAM. Settings → Startup Params
 The disposable integration fixture now switches modes twice and checks the live flags, persistence, retained key shapes/counters and refreshed drawer label. Add `-e classicMode true` on a fresh disposable emulator installation to start with classic keys and test the reverse sequence. The fixture never signs transactions or imports an existing wallet.
 
 The owner confirmed 1.9.9 working on Fold R3GL805K7MB after an in-place update. History normalizes serialized token metadata for new responses, cached rows and imported records without deleting history. Mail retains encrypted identity keys across restarts and preserves the prior identity when a malformed backup fails to import.
+
+## KeyUses (Pandamonium 1.9.96)
+
+KeyUses is appended to the shared app list, preserving saved app order. Its native
+screen comes from `apks/keyreuses` 0.1.4; `sources.lock.json` pins the donor revision.
+`scripts/adapt-pandamonium-keyuses.py` applies the integration using canonical
+sources and tests under `scripts/pandamonium-sources` and `scripts/pandamonium-tests`.
+
+Every audit includes the node's current keys and 64 classic plus 32 block-based
+keys derived from its existing seed. The optional minimaWallet checkbox adds that
+wallet's public classic keys, including when it uses a different seed. Matching
+public keys are merged and retain their source labels. There is no phrase input.
+Only public keys and default addresses go to the existing HTTPS audit service.
+
+The embedded wallet bridge checks host unlock/readiness and takes the normal node
+locks to obtain a consistent public snapshot. Tree derivation happens on one worker
+outside those locks. It writes no counters, creates no node keys and signs nothing.
+Cached descriptors contain public keys only. A seed/counter change during the audit
+invalidates the result. Backgrounding cancels preparation and discards late results.
+Unknown stored counters remain unknown; incomplete evidence cannot produce a clear
+verdict. Witness-confirmed reuse is still reported for either family. Custom scripts
+and multisig addresses are outside the default-address audit.
+
+The screen follows the shared English, Chinese, Russian and Ukrainian selector.
+Builds continue to use checked-in source snapshots; sibling checkouts are needed
+only for importer regeneration/verification. See `docs/KEYUSES_INTEGRATION_REVIEW.txt`
+for derivation provenance and validation.

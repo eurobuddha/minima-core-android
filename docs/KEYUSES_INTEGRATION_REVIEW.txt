@@ -1,0 +1,78 @@
+KeyUses integration — Pandamonium 1.9.96 / code 167
+
+Code Review
+Summary
+The native KeyUses screen audits the embedded node and both deterministic key
+families, with an optional minimaWallet public-key set. No seed-entry UI is included.
+It uses the existing Future Cash audit engine/client and wallet readiness/storage
+bridges. Signing, transfers, counter writes and seed changes are outside this flow.
+
+Reuse and provenance
+Native UI: apks/keyreuses 0.1.4, 263ac87e173dd82ab8e0b00e40d70b3c252665fc.
+Dual-family recipe: mds/keyuses phrase/derive.js and scanner/DeriveVectors.java,
+be26bf7c6f13c6f0ef68cc54ec419b51ab9fead6 (phrase build 0.1.8).
+NodeAuditKeys reuses WalletCore.derivePrivateSeed and the node TreeKey implementation:
+64 indices with shape 64/3, and 32 indices with shape 128/4. The same seed/index
+modifier hashing is used for both families. No JavaScript crypto port was added.
+All 16 known public fixture vectors are preserved in keyuses-derive-vectors.json:
+SHA256 c5352367d308445fc0780249c9d50b3dae7119d8f707e5ed5ee4d9d1272ce64c.
+These fixture seeds are test data from the donor, not account credentials.
+
+Shared building blocks are integrated/futurecash-next KeyAudit, AuditApi and
+MinimaAddress, and integrated/wallet EmbeddedWallet, WalletCore and PublicAuditKeys.
+The native donor's unchanged helper/test snapshots are retained for reproducibility;
+the screen explicitly imports the shared Future Cash audit implementation.
+
+Review boundaries
+Read canonical bridge, selection, lifecycle and copy changes with callers, node SQL,
+wallet public-descriptor validation, shared engine/client, source adapter, tests,
+manifest, navigation, catalog and version wiring. Canonical importer regeneration
+preserves every prior integrated module except the new wallet bridge/test additions.
+An initial Robolectric harness failure was fixed by assigning the real activity
+theme to the test subclass before creation. The SHA3 self-test failure message now
+survives language changes and audit execution checks the same guard directly.
+
+The generic imported navigation tag originally targeted the whole vertical audit
+container. Review corrected this using AtomiX's existing self-owned menu pattern:
+a top-row button is rebuilt with localized accessibility text and retains access
+to the shared drawer when the language changes.
+
+No remaining correctness or security finding in the integration review.
+Verdict: Approve, subject to the recorded build/device validation below.
+
+Validation
+- Phrase donor JavaScript: all 16 golden vectors pass.
+- Node bridge: all 16 public keys, hex and Mx addresses match native TreeKey output;
+  all 96 keys prepared outside the wallet lock; public-only cache; seed/counter
+  changes, invalid derivation and failed node reads handled conservatively.
+- Selection: 96 keys by default, 160 with a different wallet, shared-key MAX merge,
+  untrusted/missing counters, incomplete/duplicate/conflicting sets.
+- Actual native screen: four languages, no EditText/phrase input, checkbox preserved,
+  160-key request, node/wallet changes reject results, incomplete results stay
+  incomplete, backgrounded screen ignores late callbacks.
+- 66 JVM/Robolectric tests pass: KeyUses 37, wallet public snapshots 10, node bridge
+  4, shared dual-family audit 10 and app navigation 5. No failures or errors.
+- Canonical importer reproduces all 22 source snapshots and provenance. Localization
+  validates 6,876 messages in all four languages. Direct-transport guard and
+  git diff --check pass.
+- Signed assemblePandamoniumRelease passes, including lintVital and final APK
+  verification of the exact Keets bundle, all 21 addons per ABI and Bare runtime.
+  Actual APK DEX contains KeyUses, the selection and node bridge, and shared audit
+  client. The KeyUses activity is non-exported.
+- Full lintPandamoniumRelease was run and fails on one pre-existing, unchanged
+  LockActivity.java:121 MissingSuperCall finding (Back deliberately backgrounds the
+  locked task). It also reports 358 warnings. This is not a clean full-lint run.
+- Certificate SHA256: eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f.
+  APK metadata: com.eurobuddha.pandamonium, 1.9.96-Pandamonium, code167.
+- Installed successfully on Fold R3GL805K7MB with install -r --user 0, preserving
+  app data. Normal launcher opened. Live audit validation is pending unlock.
+- Candidate: dist/minima-core-Pandamonium-1.9.96-candidate.apk (base repo dist).
+  SHA256: de719317ea9c2cecd2594d4fd8890fd20ac32d2c4c43e218e44ac6f5b5d1504e.
+  Generated APKs and signing credentials are not committed.
+
+Limitations
+A newly derived alternate-family key has no reliable stored counter; it remains
+unknown even when remote evidence arrives. A reuse finding still takes precedence.
+The public audit relies on archive coverage and default signed-by addresses; a clean
+response is not proof of future signing safety. No account seeds or signing counters
+were changed for device testing.

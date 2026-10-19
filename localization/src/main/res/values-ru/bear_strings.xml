@@ -8349,4 +8349,41 @@
         <item quantity="many">"%1$d обычных NFT убраны из коллекций. Откройте вкладку NFT."</item>
         <item quantity="other">"%1$d обычных NFT убраны из коллекций. Откройте вкладку NFT."</item>
     </plurals>
+    <string name="l10n_keyuses_run" formatted="false">"Проверить"</string>
+    <string name="l10n_keyuses_include_wallet" formatted="false">"Включить классические ключи minimaWallet"</string>
+    <string name="l10n_keyuses_subtitle" formatted="false">"Проверка ключей узла и обоих наборов из его seed: 64 классических и 32 блочных ключа. Можно добавить minimaWallet, в том числе с другим seed."</string>
+    <string name="l10n_keyuses_privacy" formatted="false">"На eurobuddha.com отправляются только публичные ключи и адреса для проверки. Сервер узнает выбранные адреса. Seed остаются на устройстве."</string>
+    <string name="l10n_keyuses_incomplete" formatted="false">"Некоторые счётчики или результаты недоступны. Для производных ключей без сохранённого счётчика указано «неизвестно», а не ноль. Обнаруженные повторные использования остаются значимыми."</string>
+    <string name="l10n_keyuses_partial" formatted="false">"Проверка требует внимания"</string>
+    <string name="l10n_keyuses_unavailable" formatted="false">"Не удалось подготовить публичные ключи. Проверьте, что узел запущен и разблокирован. Если выбран minimaWallet, настройте или разблокируйте его и повторите."</string>
+    <string name="l10n_keyuses_changed" formatted="false">"Узел или кошелёк изменился во время проверки. Повторите её."</string>
+    <!-- Arguments: done -->
+    <string name="l10n_keyuses_progress">"Получение публичных ключей… %1$s/96"</string>
+    <!-- Arguments: classic, block -->
+    <string name="l10n_keyuses_scope">"Область проверки: классических — %1$s, блочных — %2$s"</string>
+    <string name="l10n_keyuses_node" formatted="false">"Узел"</string>
+    <string name="l10n_keyuses_classic" formatted="false">"Seed узла · классические"</string>
+    <string name="l10n_keyuses_block" formatted="false">"Seed узла · блочные"</string>
+    <string name="l10n_keyuses_unknown" formatted="false">"Неизвестно"</string>
+    <string name="l10n_keyuses_address" formatted="false">"Адрес (нажмите для копирования)"</string>
+    <string name="l10n_keyuses_local_uses" formatted="false">"Локальный счётчик"</string>
+    <string name="l10n_keyuses_onchain" formatted="false">"Блоки расходов"</string>
+    <string name="l10n_keyuses_coins" formatted="false">"Потраченные монеты"</string>
+    <string name="l10n_keyuses_status" formatted="false">"Статус"</string>
+    <string name="l10n_keyuses_reused" formatted="false">"ПОВТОРНО"</string>
+    <string name="l10n_keyuses_risk_title" formatted="false">"Классический счётчик отстаёт от записанного использования"</string>
+    <string name="l10n_keyuses_risk_body" formatted="false">"В архиве больше блоков расходов, чем в сохранённом классическом счётчике. Проверьте эти ключи перед новой подписью. Позиции листьев блочных ключей не сравниваются с числом расходов."</string>
+    <string name="l10n_keyuses_reuse_title" formatted="false">"Обнаружено повторное использование одноразового ключа"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_keyuses_reuse_body">"Индекс подписей сообщает о повторном использовании одноразового ключа; максимальное число: %1$s. Проверьте затронутые адреса перед дальнейшим использованием."</string>
+    <string name="l10n_keyuses_causes" formatted="false">"Возможные причины"</string>
+    <string name="l10n_keyuses_causes_body" formatted="false">"Независимые подписанты с одним seed, старый счётчик или старый снимок кошелька могут привести к повтору. Проверка не меняет счётчики и не подписывает транзакции."</string>
+    <string name="l10n_keyuses_block_note" formatted="false">"Блочные ключи используют позицию листа, определяемую блоком. Оценка keyuses для восстановления классических ключей к ним не относится."</string>
+    <string name="l10n_keyuses_recommendation" formatted="false">"Оценка для восстановления классических ключей — проверьте перед использованием"</string>
+    <!-- Arguments: tip -->
+    <string name="l10n_keyuses_coverage">"Архив до блока %1$s. Блоки расходов могут недооценивать число подписей. Проверяются только стандартные адреса, без произвольных скриптов и мультиподписи. Отсутствие находок не доказывает безопасность ключа."</string>
+    <string name="l10n_keyuses_mismatch" formatted="false">"Адрес сервера отличается от вычисленного локально. Проверка неполная."</string>
+    <string name="l10n_keyuses_exhaustion" formatted="false">"Ключ близок к пределу подписей. Проверьте его перед новой подписью."</string>
+    <string name="l10n_keyuses_self_test" formatted="false">"Проверка адресов не пройдена. Эта сборка не может выполнить надёжный аудит."</string>
+    <string name="l10n_keyuses_explain" formatted="false">"Каждый одноразовый лист должен подписывать лишь один раз. Классические ключи используют счётчики, блочные — позиции по блокам. Проверка объединяет архивные расходы и подтверждённые подписью повторы для обоих типов."</string>
 </resources>

@@ -41611,5 +41611,203 @@
       "many": "{count} звичайних NFT вилучено з колекцій. Відкрийте вкладку NFT.",
       "other": "{count} звичайного NFT вилучено з колекцій. Відкрийте вкладку NFT."
     }
+  },
+  "keyuses.run": {
+    "en": "Run audit",
+    "zh-Hans": "运行审计",
+    "ru": "Проверить",
+    "uk": "Перевірити"
+  },
+  "keyuses.includeWallet": {
+    "en": "Include minimaWallet’s classic keys",
+    "zh-Hans": "包含 minimaWallet 的经典密钥",
+    "ru": "Включить классические ключи minimaWallet",
+    "uk": "Додати класичні ключі minimaWallet"
+  },
+  "keyuses.subtitle": {
+    "en": "Check the node’s keys and both sets derived from its seed: 64 classic and 32 block-based keys. Optionally include minimaWallet, including a different wallet seed.",
+    "zh-Hans": "检查节点密钥及从同一种子派生的两组密钥：64 个经典密钥和 32 个区块密钥。也可包含 minimaWallet，包括使用不同种子的钱包。",
+    "ru": "Проверка ключей узла и обоих наборов из его seed: 64 классических и 32 блочных ключа. Можно добавить minimaWallet, в том числе с другим seed.",
+    "uk": "Перевірка ключів вузла й обох наборів із його seed: 64 класичних і 32 блокових ключі. Можна додати minimaWallet, зокрема з іншим seed."
+  },
+  "keyuses.privacy": {
+    "en": "Only public keys and addresses are sent to eurobuddha.com for the audit. This reveals the selected addresses to that server. Seeds stay on this device.",
+    "zh-Hans": "审计仅向 eurobuddha.com 发送公钥和地址。该服务器将获知所选地址。种子始终保留在本设备上。",
+    "ru": "На eurobuddha.com отправляются только публичные ключи и адреса для проверки. Сервер узнает выбранные адреса. Seed остаются на устройстве.",
+    "uk": "На eurobuddha.com надсилаються лише публічні ключі й адреси для перевірки. Сервер дізнається вибрані адреси. Seed залишаються на пристрої."
+  },
+  "keyuses.incomplete": {
+    "en": "Some counters or audit results are unavailable. Derived keys without a stored counter are shown as unknown, not zero. Known reuse findings still apply.",
+    "zh-Hans": "部分计数器或审计结果不可用。没有已存储计数器的派生密钥显示为未知，而非零。已发现的重复使用仍然有效。",
+    "ru": "Некоторые счётчики или результаты недоступны. Для производных ключей без сохранённого счётчика указано «неизвестно», а не ноль. Обнаруженные повторные использования остаются значимыми.",
+    "uk": "Деякі лічильники або результати недоступні. Для похідних ключів без збереженого лічильника вказано «невідомо», а не нуль. Виявлені повторні використання залишаються значущими."
+  },
+  "keyuses.partial": {
+    "en": "Audit needs review",
+    "zh-Hans": "审计需要复核",
+    "ru": "Проверка требует внимания",
+    "uk": "Перевірка потребує уваги"
+  },
+  "keyuses.unavailable": {
+    "en": "Could not prepare the public keys. Check that the node is running and unlocked. If minimaWallet is selected, set it up or unlock it once, then retry.",
+    "zh-Hans": "无法准备公钥。请确认节点正在运行且已解锁。如选中 minimaWallet，请先完成设置或解锁一次，然后重试。",
+    "ru": "Не удалось подготовить публичные ключи. Проверьте, что узел запущен и разблокирован. Если выбран minimaWallet, настройте или разблокируйте его и повторите.",
+    "uk": "Не вдалося підготувати публічні ключі. Перевірте, що вузол запущено й розблоковано. Якщо вибрано minimaWallet, налаштуйте або розблокуйте його й повторіть."
+  },
+  "keyuses.changed": {
+    "en": "The node or wallet changed during the audit. Run it again.",
+    "zh-Hans": "审计期间节点或钱包发生了变化。请重新运行。",
+    "ru": "Узел или кошелёк изменился во время проверки. Повторите её.",
+    "uk": "Вузол або гаманець змінився під час перевірки. Повторіть її."
+  },
+  "keyuses.progress": {
+    "en": "Deriving public keys… {done}/96",
+    "zh-Hans": "正在派生公钥… {done}/96",
+    "ru": "Получение публичных ключей… {done}/96",
+    "uk": "Отримання публічних ключів… {done}/96"
+  },
+  "keyuses.scope": {
+    "en": "Checked scope: {classic} classic · {block} block-based keys",
+    "zh-Hans": "检查范围：{classic} 个经典密钥 · {block} 个区块密钥",
+    "ru": "Область проверки: классических — {classic}, блочных — {block}",
+    "uk": "Обсяг перевірки: класичних — {classic}, блокових — {block}"
+  },
+  "keyuses.node": {
+    "en": "Node",
+    "zh-Hans": "节点",
+    "ru": "Узел",
+    "uk": "Вузол"
+  },
+  "keyuses.classic": {
+    "en": "Node seed · classic",
+    "zh-Hans": "节点种子 · 经典",
+    "ru": "Seed узла · классические",
+    "uk": "Seed вузла · класичні"
+  },
+  "keyuses.block": {
+    "en": "Node seed · block-based",
+    "zh-Hans": "节点种子 · 区块",
+    "ru": "Seed узла · блочные",
+    "uk": "Seed вузла · блокові"
+  },
+  "keyuses.unknown": {
+    "en": "Unknown",
+    "zh-Hans": "未知",
+    "ru": "Неизвестно",
+    "uk": "Невідомо"
+  },
+  "keyuses.address": {
+    "en": "Address (tap to copy)",
+    "zh-Hans": "地址（点击复制）",
+    "ru": "Адрес (нажмите для копирования)",
+    "uk": "Адреса (натисніть, щоб скопіювати)"
+  },
+  "keyuses.localUses": {
+    "en": "Local uses",
+    "zh-Hans": "本地使用次数",
+    "ru": "Локальный счётчик",
+    "uk": "Локальний лічильник"
+  },
+  "keyuses.onchain": {
+    "en": "Spend blocks",
+    "zh-Hans": "支出区块数",
+    "ru": "Блоки расходов",
+    "uk": "Блоки витрат"
+  },
+  "keyuses.coins": {
+    "en": "Spent coins",
+    "zh-Hans": "已花费币",
+    "ru": "Потраченные монеты",
+    "uk": "Витрачені монети"
+  },
+  "keyuses.status": {
+    "en": "Status",
+    "zh-Hans": "状态",
+    "ru": "Статус",
+    "uk": "Стан"
+  },
+  "keyuses.reused": {
+    "en": "REUSED",
+    "zh-Hans": "已重复使用",
+    "ru": "ПОВТОРНО",
+    "uk": "ПОВТОРНО"
+  },
+  "keyuses.riskTitle": {
+    "en": "Classic counter is behind recorded usage",
+    "zh-Hans": "经典计数器落后于已记录的使用量",
+    "ru": "Классический счётчик отстаёт от записанного использования",
+    "uk": "Класичний лічильник відстає від записаного використання"
+  },
+  "keyuses.riskBody": {
+    "en": "The archive shows more spend blocks than the stored classic counter. Review these keys before signing again. Block-based leaf positions are not compared with spend counts.",
+    "zh-Hans": "档案显示的支出区块数超过已存储的经典计数器。再次签名前请复核这些密钥。区块密钥的叶位置不会与支出次数比较。",
+    "ru": "В архиве больше блоков расходов, чем в сохранённом классическом счётчике. Проверьте эти ключи перед новой подписью. Позиции листьев блочных ключей не сравниваются с числом расходов.",
+    "uk": "В архіві більше блоків витрат, ніж у збереженому класичному лічильнику. Перевірте ці ключі перед новим підписом. Позиції листків блокових ключів не порівнюються з кількістю витрат."
+  },
+  "keyuses.reuseTitle": {
+    "en": "One-time key reuse detected",
+    "zh-Hans": "检测到一次性密钥重复使用",
+    "ru": "Обнаружено повторное использование одноразового ключа",
+    "uk": "Виявлено повторне використання одноразового ключа"
+  },
+  "keyuses.reuseBody": {
+    "en": "The witness index reports repeated use of a one-time key; maximum reported depth: {value}. Review the affected addresses before further use.",
+    "zh-Hans": "见证索引报告了一次性密钥重复使用；报告的最大次数：{value}。继续使用前请复核受影响的地址。",
+    "ru": "Индекс подписей сообщает о повторном использовании одноразового ключа; максимальное число: {value}. Проверьте затронутые адреса перед дальнейшим использованием.",
+    "uk": "Індекс підписів повідомляє про повторне використання одноразового ключа; найбільша кількість: {value}. Перевірте відповідні адреси перед подальшим використанням."
+  },
+  "keyuses.causes": {
+    "en": "Common causes",
+    "zh-Hans": "常见原因",
+    "ru": "Возможные причины",
+    "uk": "Можливі причини"
+  },
+  "keyuses.causesBody": {
+    "en": "Independent signers using the same seed, restoring an old counter, or restoring an older wallet snapshot can reuse a one-time key. This audit never changes counters or signs transactions.",
+    "zh-Hans": "使用相同种子的独立签名器、恢复旧计数器或旧钱包快照都可能重复使用一次性密钥。本审计不会更改计数器或签署交易。",
+    "ru": "Независимые подписанты с одним seed, старый счётчик или старый снимок кошелька могут привести к повтору. Проверка не меняет счётчики и не подписывает транзакции.",
+    "uk": "Незалежні підписувачі з одним seed, старий лічильник або старий знімок гаманця можуть спричинити повтор. Перевірка не змінює лічильники й не підписує транзакції."
+  },
+  "keyuses.blockNote": {
+    "en": "Block-based keys use a block-derived leaf position. A classic keyuses recovery estimate does not apply to these keys.",
+    "zh-Hans": "区块密钥使用由区块确定的叶位置。经典 keyuses 恢复估值不适用于这些密钥。",
+    "ru": "Блочные ключи используют позицию листа, определяемую блоком. Оценка keyuses для восстановления классических ключей к ним не относится.",
+    "uk": "Блокові ключі використовують позицію листка, визначену блоком. Оцінка keyuses для відновлення класичних ключів до них не застосовується."
+  },
+  "keyuses.recommendation": {
+    "en": "Classic recovery estimate — review before use",
+    "zh-Hans": "经典恢复估值 — 使用前请复核",
+    "ru": "Оценка для восстановления классических ключей — проверьте перед использованием",
+    "uk": "Оцінка для відновлення класичних ключів — перевірте перед використанням"
+  },
+  "keyuses.coverage": {
+    "en": "Archive coverage to block {tip}. Spend blocks can undercount signatures. Only default addresses are checked; custom scripts and multisig usage are not included. A clear result is not proof that a key is safe.",
+    "zh-Hans": "档案覆盖至区块 {tip}。支出区块数可能少于签名次数。仅检查默认地址，不包括自定义脚本和多重签名的使用。未发现问题不代表密钥一定安全。",
+    "ru": "Архив до блока {tip}. Блоки расходов могут недооценивать число подписей. Проверяются только стандартные адреса, без произвольных скриптов и мультиподписи. Отсутствие находок не доказывает безопасность ключа.",
+    "uk": "Архів до блока {tip}. Блоки витрат можуть недооцінювати кількість підписів. Перевіряються лише стандартні адреси, без довільних скриптів і мультипідпису. Відсутність знахідок не доводить безпечність ключа."
+  },
+  "keyuses.mismatch": {
+    "en": "The server’s address differs from the locally derived address. Treat the audit as incomplete.",
+    "zh-Hans": "服务器地址与本地派生地址不同。此审计不完整。",
+    "ru": "Адрес сервера отличается от вычисленного локально. Проверка неполная.",
+    "uk": "Адреса сервера відрізняється від обчисленої локально. Перевірка неповна."
+  },
+  "keyuses.exhaustion": {
+    "en": "A key is near its signature capacity. Review it before signing again.",
+    "zh-Hans": "某个密钥接近签名容量上限。再次签名前请复核。",
+    "ru": "Ключ близок к пределу подписей. Проверьте его перед новой подписью.",
+    "uk": "Ключ близький до межі підписів. Перевірте його перед новим підписом."
+  },
+  "keyuses.selfTest": {
+    "en": "Address verification failed. This build cannot run a reliable audit.",
+    "zh-Hans": "地址验证失败。此版本无法进行可靠审计。",
+    "ru": "Проверка адресов не пройдена. Эта сборка не может выполнить надёжный аудит.",
+    "uk": "Перевірку адрес не пройдено. Ця збірка не може виконати надійний аудит."
+  },
+  "keyuses.explain": {
+    "en": "Each one-time signing leaf must sign only once. Classic keys use counters; block-based keys use block-derived positions. The audit combines archive spend counts with witnessed reuse reports for both families.",
+    "zh-Hans": "每个一次性签名叶只能签名一次。经典密钥使用计数器，区块密钥使用区块确定的位置。审计结合档案支出统计和见证重复使用报告来检查两类密钥。",
+    "ru": "Каждый одноразовый лист должен подписывать лишь один раз. Классические ключи используют счётчики, блочные — позиции по блокам. Проверка объединяет архивные расходы и подтверждённые подписью повторы для обоих типов.",
+    "uk": "Кожен одноразовий листок має підписувати лише раз. Класичні ключі використовують лічильники, блокові — позиції за блоками. Перевірка поєднує архівні витрати й підтверджені підписом повтори для обох типів."
   }
 }

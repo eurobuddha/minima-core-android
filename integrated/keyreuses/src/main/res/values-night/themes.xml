@@ -1,0 +1,7 @@
+<resources>
+    <style name="pm_keyreuses_Base.Theme.KeyUses" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@color/pm_keyreuses_ku_bg</item>
+        <item name="android:navigationBarColor">@color/pm_keyreuses_ku_bg</item>
+        <item name="android:windowBackground">@color/pm_keyreuses_ku_bg</item>
+    </style>
+</resources>

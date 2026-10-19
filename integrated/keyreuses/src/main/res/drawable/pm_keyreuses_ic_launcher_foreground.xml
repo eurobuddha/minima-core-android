@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Shield + key, ported from mds/keyuses/minidapp/icon.svg (64x64 viewBox).
+  The adaptive-icon safe zone is the middle 72dp of 108dp, so the dapp's 64-unit artwork is
+  scaled by 72/64 = 1.125 and offset by 18 to sit centred inside it.
+  The SVG's #f7931a -> #ff5e3a diagonal gradient is reproduced per-path.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <group android:translateX="18" android:translateY="18"
+           android:scaleX="1.125" android:scaleY="1.125">
+
+        <!-- shield -->
+        <path android:pathData="M32,9 L50,16 V32 C50,43 42,50 32,55 C22,50 14,43 14,32 V16 Z"
+              android:strokeWidth="3" android:strokeLineJoin="round">
+            <aapt:attr name="android:strokeColor">
+                <gradient android:type="linear"
+                          android:startX="14" android:startY="9"
+                          android:endX="50" android:endY="55"
+                          android:startColor="#F7931A" android:endColor="#FF5E3A" />
+            </aapt:attr>
+        </path>
+
+        <!-- key bow (circle cx=27 cy=28 r=6) -->
+        <path android:pathData="M21,28 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0"
+              android:strokeWidth="3">
+            <aapt:attr name="android:strokeColor">
+                <gradient android:type="linear"
+                          android:startX="21" android:startY="22"
+                          android:endX="33" android:endY="34"
+                          android:startColor="#F7931A" android:endColor="#FF5E3A" />
+            </aapt:attr>
+        </path>
+
+        <!-- key shaft + wards -->
+        <path android:pathData="M31,32 L41,42 M38,39 L42,35 M41,42 L37,46"
+              android:strokeWidth="3" android:strokeLineCap="round">
+            <aapt:attr name="android:strokeColor">
+                <gradient android:type="linear"
+                          android:startX="31" android:startY="32"
+                          android:endX="42" android:endY="46"
+                          android:startColor="#F7931A" android:endColor="#FF5E3A" />
+            </aapt:attr>
+        </path>
+    </group>
+</vector>

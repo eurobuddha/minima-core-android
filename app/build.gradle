@@ -129,8 +129,8 @@ android {
         // vc113: explicit English, Chinese, Russian and Ukrainian selection across all bears.
         // vc114: core notifications and retained main-screen controls follow the selected language.
         // vc118: current four-language catalogue and reviewed AtomiX receipt/consent fixes.
-        versionCode 166
-        versionName "1.9.95"
+        versionCode 167
+        versionName "1.9.96"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -285,6 +285,7 @@ dependencies {
     pandamoniumImplementation project(':integrated-wallet')
     pandamoniumImplementation project(':integrated-atelier')
     pandamoniumImplementation project(':integrated-salon')
+    pandamoniumImplementation project(':integrated-keyreuses')
 }
 
 // Verify the packaged bytes, including code/data sections after Android strips symbols.

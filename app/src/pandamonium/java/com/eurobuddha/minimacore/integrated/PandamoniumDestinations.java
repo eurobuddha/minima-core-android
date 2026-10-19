@@ -5,7 +5,7 @@ public final class PandamoniumDestinations {
     private PandamoniumDestinations() {}
     public static final String[] NAMES = {
         "Minima Core", "ETH Wallet", "AtomiX", "PandaPools", "Future Cash Next", "PandaDEX",
-        "Zero Edge Casino", "Minima Explorer", "Filez", "Minima Vestr", "Entropy", "Terminal IDE", "MinimaMail", "UTXO Wallet", "miniMall", "NFT Wallet", "minimaWallet", "Atelier", "The Salon"
+        "Zero Edge Casino", "Minima Explorer", "Filez", "Minima Vestr", "Entropy", "Terminal IDE", "MinimaMail", "UTXO Wallet", "miniMall", "NFT Wallet", "minimaWallet", "Atelier", "The Salon", "KeyUses"
     };
     // Existing launcher artwork, indexed by destination identity rather than display order.
     public static final int[] ICONS = {
@@ -27,7 +27,8 @@ public final class PandamoniumDestinations {
         com.eurobuddha.nftwallet.R.mipmap.pm_nftwallet_ic_launcher,
         com.eurobuddha.wallet.R.mipmap.pm_wallet_ic_launcher,
         com.eurobuddha.statenft.R.mipmap.pm_atelier_ic_launcher,
-        com.eurobuddha.salon.R.mipmap.pm_salon_ic_launcher
+        com.eurobuddha.salon.R.mipmap.pm_salon_ic_launcher,
+        com.eurobuddha.keyreuses.R.mipmap.pm_keyreuses_ic_launcher
     };
     public static final String[] CLASSES = {
         "com.eurobuddha.minimacore.main.MainActivity", "com.eurobuddha.ethwallet.MainActivity",
@@ -42,7 +43,8 @@ public final class PandamoniumDestinations {
         "com.eurobuddha.nftwallet.MainActivity",
         "com.eurobuddha.wallet.MainActivity",
         "com.eurobuddha.statenft.MainActivity",
-        "com.eurobuddha.salon.MainActivity"
+        "com.eurobuddha.salon.MainActivity",
+        "com.eurobuddha.keyreuses.MainActivity"
     };
     public static int indexFor(String activityClass) {
         for (int i = 0; i < CLASSES.length; i++) {

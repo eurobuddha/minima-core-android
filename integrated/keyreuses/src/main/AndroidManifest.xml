@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <queries>
+        <package android:name="com.eurobuddha.minimacore" />
+    </queries>
+    <application>
+        <activity android:name="com.eurobuddha.keyreuses.MainActivity" android:exported="false" android:theme="@style/pm_keyreuses_Theme.KeyUses" android:configChanges="locale|layoutDirection|screenLayout">
+            </activity>
+    </application>
+</manifest>

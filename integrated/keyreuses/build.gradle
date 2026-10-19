@@ -1,0 +1,33 @@
+// Imported native feature; see ../sources.lock.json and scripts/import-pandamonium.py.
+plugins { alias(libs.plugins.android.library) }
+android {
+    namespace 'com.eurobuddha.keyreuses'
+    compileSdk 36
+    defaultConfig {
+        minSdk 28
+        buildConfigField 'String', 'VERSION_NAME', '"0.1.4"'
+        buildConfigField 'int', 'VERSION_CODE', '104'
+    }
+    buildFeatures { buildConfig true }
+    testOptions { unitTests.includeAndroidResources = true; unitTests.returnDefaultValues = true }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+dependencies {
+    implementation project(':integrated-futurecash-next')
+    implementation project(':integrated-wallet')
+    testImplementation files('../../app/libs/minima.jar')
+    testImplementation 'com.h2database:h2:2.1.214'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    implementation project(':localization')
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    testImplementation libs.junit
+    implementation project(':minimaapi')
+    testImplementation 'org.json:json:20240303'
+}
