@@ -33,3 +33,12 @@ def adapt(root):
     p.write_text(s)
     p=folder/'MainActivity.java';s=p.read_text();old='if (!k.uid.isEmpty()) out.add(k);';assert old in s
     p.write_text(s.replace(old,'if (k.safeForCommands()) out.add(k);'))
+
+    # Preserve baseline side padding, as the existing listener does for bottom padding.
+    s=p.read_text()
+    old='        final int navBottom = navV.getPaddingBottom();'
+    assert s.count(old)==1
+    s=s.replace(old,'        final int navBottom = navV.getPaddingBottom();\n        final int navLeft = navV.getPaddingLeft();\n        final int navRight = navV.getPaddingRight();')
+    old='navV.setPadding(navV.getPaddingLeft() + b.left, navV.getPaddingTop(), navV.getPaddingRight() + b.right, navBottom + b.bottom);'
+    assert s.count(old)==1
+    p.write_text(s.replace(old,'navV.setPadding(navLeft + b.left, navV.getPaddingTop(), navRight + b.right, navBottom + b.bottom);'))

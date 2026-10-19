@@ -72,10 +72,12 @@ public class MainActivity extends AppCompatActivity {
         final View navV = findViewById(R.id.pm_vestr_bottomBar);
         final int headerTop = headerV.getPaddingTop();
         final int navBottom = navV.getPaddingBottom();
+        final int navLeft = navV.getPaddingLeft();
+        final int navRight = navV.getPaddingRight();
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
             androidx.core.graphics.Insets b = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
             headerV.setPadding(headerV.getPaddingLeft(), headerTop + b.top, headerV.getPaddingRight(), headerV.getPaddingBottom());
-            navV.setPadding(navV.getPaddingLeft() + b.left, navV.getPaddingTop(), navV.getPaddingRight() + b.right, navBottom + b.bottom);
+            navV.setPadding(navLeft + b.left, navV.getPaddingTop(), navRight + b.right, navBottom + b.bottom);
             return insets;
         });
         androidx.core.view.ViewCompat.requestApplyInsets(root);

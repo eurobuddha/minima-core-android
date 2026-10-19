@@ -330,3 +330,13 @@ standalone boot receivers were inspected and are already private; no speculative
 parity changes made. Host manifest is shared by all bear flavors; only Pandamonium
 APK built here. Physical reboot/OEM behavior and the full feature review remain
 open. No install/publication; public/device2.0.0 unchanged.
+
+Vestr inset parity —2.0.15/code210 and standalone0.4.8/code408
+Repeated side insets could collapse the three-tab navigation. Both apps now reuse
+their existing baseline-padding pattern for left/right. Actual host UI regression
+failed at96 vs1920 pixels before fix and passes afterwards.184 host tests and4 tests
+per standalone debug/release suite pass. Signed candidates, lint, importer, Keets,
+APK contents/certificates checked. See VESTR_INSETS_REVIEW_2026-10-19.txt.
+Correction to earlier device status:2.0.14 was installed on the Fold and core wallet
+startup observed; the Fold disconnected before minimaWallet Sweep verification.
+2.0.15 not installed/published. Public2.0.0 unchanged. Full review/parity remain open.

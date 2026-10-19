@@ -1,0 +1,45 @@
+Vestr side-inset review — 2026-10-19
+
+Scope
+Pandamonium 2.0.15/code210 and standalone Vestr 0.4.8/code408.
+Reused MainActivity's existing captured headerTop/navBottom padding pattern in both
+apps. Added navLeft/navRight captures and use them for each system-bar inset update.
+The canonical scripts/adapt-pandamonium-review-vestr.py applies the same correction
+when regenerating the integrated source. The two listener blocks match exactly.
+No transaction, node, seed or key-counter behavior changed.
+
+Evidence
+The actual integrated Activity/layout regression failed before the correction:
+expected left padding96, actual1920 after20 dispatches. NodeApi was mocked throughout.
+The correction passes repeated asymmetric insets, changed insets, zero-inset reset
+and all three tabs retaining usable width. No real node commands or transactions.
+184 Pandamonium debug host tests pass, zero failures/errors/skips. Standalone Vestr
+4 debug and4 release tests pass. Offline release builds pass. Dependency-aware host
+lint: zero errors/fatals,1820 warnings. Standalone lint: zero errors/fatals,54 warnings.
+Pinned importer verification, direct transport check and6984 messages/4 languages pass.
+Actual host APK Keets bundle,21 nested addons/runtime per ABI verified. DEX checks
+confirm Settings Sweep, confirmed-size rejection splitting and API28 exact conversion.
+APK ZIP integrity, version metadata and signing certificates checked for both files.
+
+Signed local candidates (not published)
+base/dist/pandamonium-2.0.15-candidate.apk —137146245 bytes
+SHA256 a06584be6ff283b5c944e704fe1eb36f266ff714deefb58442004016fad80f76
+vestr/dist/vestr-0.4.8-candidate.apk —12475667 bytes
+SHA256 c2baa23f6841bb7bafeeab7e8c67ee275161ecb4213cba0108cdda9caf50f8a1
+Both signing certificate SHA256:
+eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+
+Code review
+Summary: the callback now derives side padding from its initial values, matching
+its existing vertical-inset policy. No accumulating state or new dependency.
+Findings: no additional defect found in this narrow change.
+Verdict: approve this correction; this is not completion of the full app review.
+
+Device and remaining work
+2.0.14/code209 was previously installed on Fold R3GL805K7MB, data preserved; core
+wallet and running node were observed. The Fold disconnected before minimaWallet
+Sweep checks. On this checkpoint both ADB and macOS USB inventory fail to show the
+Fold despite reconnection messages.2.0.15 has not been installed. No transaction
+has been sent. Physical inset/rotation and wallet Sweep checks remain outstanding.
+Public release remains2.0.0. Full feature review and remaining standalone parity
+items in the main ledgers remain open. No standalone APK installed or published.
