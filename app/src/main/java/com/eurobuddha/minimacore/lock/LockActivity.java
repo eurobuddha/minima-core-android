@@ -41,6 +41,9 @@ public class LockActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lock);
+        getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
+            @Override public void handleOnBackPressed() { moveTaskToBack(true); }
+        });
 
         mPin   = findViewById(R.id.lock_pin);
         mError = findViewById(R.id.lock_error);
@@ -116,9 +119,4 @@ public class LockActivity extends AppCompatActivity {
         finish();
     }
 
-    /** Back must not bypass the lock — send the whole task to the background instead. */
-    @Override
-    public void onBackPressed() {
-        moveTaskToBack(true);
-    }
 }

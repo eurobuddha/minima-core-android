@@ -81,18 +81,17 @@ public class MinimaApplication extends Application {
 
             @Override
             public void onActivityStarted(Activity activity) {
-                //0 -> 1 means the app just came to the foreground. If that return crossed the
-                //auto-lock delay, re-lock and cover the now-visible screen with the lock. A
-                //background->foreground return does NOT re-run MainActivity.onCreate, so the
-                //onCreate gate cannot catch this; a cold start (never unlocked) returns false
-                //here and is left to that gate instead.
-                if (mStartedActivities == 0) {
-                    boolean justLocked =
-                            com.eurobuddha.minimacore.lock.AppLock.get().maybeRelock(MinimaApplication.this);
-                    if (justLocked && !(activity instanceof com.eurobuddha.minimacore.lock.LockActivity)) {
-                        activity.startActivity(new android.content.Intent(
-                                activity, com.eurobuddha.minimacore.lock.LockActivity.class));
-                    }
+                // A restored activity or notification can bypass MainActivity.onCreate.
+                // Always enforce the session lock, including a process that starts locked.
+                if (mStartedActivities == 0)
+                    com.eurobuddha.minimacore.lock.AppLock.get().maybeRelock(MinimaApplication.this);
+                if (!activity.isFinishing()
+                        && !(activity instanceof com.eurobuddha.minimacore.lock.LockActivity)
+                        && com.eurobuddha.minimacore.lock.AppLock.isEnabled(MinimaApplication.this)
+                        && !com.eurobuddha.minimacore.lock.AppLock.get().isUnlocked()) {
+                    activity.startActivity(new android.content.Intent(
+                            activity, com.eurobuddha.minimacore.lock.LockActivity.class)
+                            .addFlags(android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP));
                 }
                 mStartedActivities++;
             }
@@ -108,7 +107,8 @@ public class MinimaApplication extends Application {
                 //1 -> 0 means the app just went to the background: start the auto-lock clock.
                 if (--mStartedActivities <= 0) {
                     mStartedActivities = 0;
-                    com.eurobuddha.minimacore.lock.AppLock.get().markBackgrounded();
+                    if (!activity.isChangingConfigurations())
+                        com.eurobuddha.minimacore.lock.AppLock.get().markBackgrounded();
                 }
             }
             @Override

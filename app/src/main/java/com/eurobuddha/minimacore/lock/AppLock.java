@@ -59,8 +59,8 @@ public final class AppLock {
     /**
      * The app came back to the foreground: re-lock if the auto-lock delay has elapsed. Returns true
      * iff it just transitioned unlocked→locked (so the caller knows to show the lock screen). A
-     * cold start (never unlocked this process) returns false — the MainActivity onCreate gate owns
-     * that case.
+     * cold start (never unlocked this process) returns false; the application lifecycle gate
+     * independently checks the current locked state.
      */
     public boolean maybeRelock(Context zContext) {
         if (!mUnlocked) return false;
