@@ -63,3 +63,16 @@ Certificate SHA256: eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e
 Verdict: approve the bounded internal-alarm fix. No app installation or publication.
 Public/device2.0.0 remains unchanged. The full review and standalone parity remain
 active; this finding needs no change to the already-private standalone receivers.
+
+Device follow-up (after source checkpoint38386fc)
+Fold R3GL805K7MB connected as SM_F971B. adb install -r succeeded from the verified
+2.0.14 candidate, upgrading installed2.0.0/code195 to2.0.14/code209 with app data
+preserved. Package metadata confirms the installed version. StartActivity opened
+normally, already unlocked; the core wallet rendered and showed a current node
+block. Opened the integrated drawer and located minimaWallet. The Fold then
+vanished from adb before the wallet-entry tap could execute; a second inventory
+showed no devices. Sent the user a reconnect/idle prompt. No other phone used.
+This supersedes the earlier no-install statement. No new release published.
+Not yet verified on2.0.14: minimaWallet separate unlock/Sweep UI, Keets delivery,
+AtomiX flows, Terminal IDE logs, wider integrated navigation, reboot/OEM alarms.
+No transaction, seed or real signing-counter test was performed.
