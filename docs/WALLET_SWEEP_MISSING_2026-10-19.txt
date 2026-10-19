@@ -1,0 +1,50 @@
+minimaWallet missing Sweep — investigation 2026-10-19
+User asks where Sweep went in Settings. No wallet code changed this checkpoint.
+
+Confirmed source mismatch
+integrated/sources.lock.json pins wallet0.2.21 at7802aba475679ed9fe04dce9c480e834248d98a8.
+Its SettingsView has no Sweep section and the imported library has no SweepFlow.
+The standalone /Users/eurobuddha/Projects/minima/apks/wallet is0.2.26 atd8d0aec;
+SettingsView.java lines73–80 still show Settings > SWEEP > Sweep everything to a
+new address, immediately after Security and before Seed backup.
+Sweep arrived in standalone0.2.22; SweepFlow's latest commit is690e9bc (0.2.23).
+The pinned snapshot was deliberately retained on2026-10-16 when upstream changed;
+project memory query_20261016_234515 records deferred compatibility review.
+This is missing integration, not a relocated or conditionally hidden menu item.
+
+Reuse inspected
+Read all705lines of standalone SweepFlow.java and SweepPlanTest.java, Settings
+entry point, and relevant NftView pending helpers. Read integrated SettingsView,
+NftView retry/reservation/confirmation paths, MainActivity.runSigningWork and
+runAuthenticatedWalletWork, NodeLink.publish, wallet signing/retry adapters and
+pinned importer. Reuse the existing planner, byte/key/input chunk caps, exact
+coinexport resolution, TxnFactory whole NFT and pooled builders, destination and
+review UI. Preserve the integrated authenticated worker/session guards.
+Do not replace the integrated wallet with the moving standalone snapshot: it would
+lose existing safety, direct transport and four-language work.
+
+Required restoration work, still open
+Port SweepFlow from the existing source into a reproducible adapter/canonical source;
+restore Settings entry and translate its complete flow in all four languages.
+Run planner tests and mocked interaction/session/broadcast/receipt tests.
+The old standalone flow needs adaptation before enabling it in Pandamonium:
+- Signing currently happens in the input callback; use runSigningWork and capture
+  the original factory, vault/session, destination and immutable reviewed inputs.
+- Missing coins in coinsRelevant are treated as successful sweep confirmation;
+  malformed/missing response is effectively empty. Use actual transaction inclusion
+  evidence, not absence from an address scan.
+- After15minutes it clears pending coins and signs again without a new review;
+  time is not proof of failure. Retain unknown attempts and require evidence and
+  renewed approval before another signature.
+- Generic publication errors claim nothing broadcast and coins safe in wallet;
+  preserve unknown outcomes and durable reservations instead.
+- Review lifecycle, partial progress, oversized-batch splitting, duplicate callbacks,
+  restart and manual-send concurrency without signing real funds.
+No seed/counter changes, live transactions, installations or publication performed.
+
+Goal continuity
+Previous AtomiX checkpoint e812869 was progress. Ethereum unknown-send reservation
+review was interrupted by this user report; no pending Ethereum code edits exist.
+Full review and parity remain incomplete. Signed2.0.6 and public/device2.0.0 do not
+contain the standalone Sweep feature. Do not claim its restoration until implemented
+and validated.

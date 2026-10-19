@@ -259,3 +259,9 @@ AtomiX after demo. Preserve its namespace/transport and existing generation guar
 Sibling ETH Wallet/MinimaSwap/USDT Swap balance readers were inspected; broader
 pending-spend accounting remains open. Do not equate this checkpoint with completed
 standalone parity or a guarantee of reserved/escrowed maker funds.
+
+User-reported missing minimaWallet Sweep
+Confirmed imported wallet0.2.21 predates standalone0.2.22 Sweep. Standalone0.2.26
+retains Settings > Sweep; Pandamonium has no equivalent. Restoration is OPEN.
+Reuse/compatibility and safety findings: WALLET_SWEEP_MISSING_2026-10-19.txt.
+No Sweep restoration or new APK claimed by this investigation.

@@ -561,3 +561,9 @@ cumulative bid costs. Captured context remains guarded through delayed posting.
 ATOMIX_BID_BACKING_2026-10-19.txt. Durable unknown Ethereum spends are still an open
 reservation-accounting review item: RPC pending state alone cannot prove their
 absence. No replacement of the public/device2.0.0 demo release.
+
+User-reported missing minimaWallet Sweep
+Confirmed imported wallet0.2.21 predates standalone0.2.22 Sweep. Standalone0.2.26
+retains Settings > Sweep; Pandamonium has no equivalent. Restoration is OPEN.
+Reuse/compatibility and safety findings: WALLET_SWEEP_MISSING_2026-10-19.txt.
+No Sweep restoration or new APK claimed by this investigation.
