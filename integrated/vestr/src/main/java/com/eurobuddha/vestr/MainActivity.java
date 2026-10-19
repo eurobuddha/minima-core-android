@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
         List<Contract> out = new ArrayList<>();
         for (JSONObject c : contractCoins) {
             Contract k = Contract.from(c);
-            if (!k.uid.isEmpty()) out.add(k);
+            if (k.safeForCommands()) out.add(k);
         }
         return out;
     }

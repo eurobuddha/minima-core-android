@@ -42,6 +42,9 @@ public final class ShopMessages {
             case "Node result is unavailable. Outcome remains unknown.": return Language.msg(l10n_vestr_transport_result_unavailable);
             case "Node request cancelled before execution. Nothing was sent.": return Language.msg(l10n_vestr_transport_cancelled);
             case "Invalid node result. Outcome remains unknown.": return Language.msg(l10n_vestr_transport_invalid);
+            case "Empty node command.": return Language.msg(l10n_vestr_unsafe_contract);
+            case "Node command is too large.": return Language.msg(l10n_vestr_unsafe_contract);
+            case "Unsafe command data. Nothing was sent to the node.": return Language.msg(l10n_vestr_unsafe_contract);
             case "NOT_ENABLED": return Language.msg(l10n_mall_shop_node_unavailable);
             case "Node connection closed.": return Language.msg(l10n_vestr_transport_closed);
             case "box seed keypair failed": return Language.msg(l10n_mall_shop_box_key_failed);

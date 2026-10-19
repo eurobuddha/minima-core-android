@@ -8395,4 +8395,5 @@
     <!-- Arguments: value -->
     <string name="l10n_keyuses_used">"ИСПОЛЬЗОВАН %1$s"</string>
     <string name="l10n_keyuses_unused" formatted="false">"НЕ ИСПОЛЬЗОВАН"</string>
+    <string name="l10n_vestr_unsafe_contract" formatted="false">"Небезопасные или неверные данные контракта. Команда не отправлена."</string>
 </resources>

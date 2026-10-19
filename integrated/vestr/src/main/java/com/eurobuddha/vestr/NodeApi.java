@@ -78,6 +78,8 @@ public class NodeApi {
 
     public void cmd(String command, Cb cb) {
         if (mReleased) return;
+        String unsafe = CommandSafety.failure(command);
+        if (unsafe != null) { if (cb != null) cb.onError(unsafe); return; }
         final boolean[] done = {false};
         final Runnable[] ref = new Runnable[1];
         final Runnable timeout = () -> {

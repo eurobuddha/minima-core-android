@@ -27,6 +27,9 @@ public final class MailMessages {
             case "Node result is unavailable. Outcome remains unknown.": return Language.msg(l10n_vestr_transport_result_unavailable);
             case "Node request cancelled before execution. Nothing was sent.": return Language.msg(l10n_vestr_transport_cancelled);
             case "Invalid node result. Outcome remains unknown.": return Language.msg(l10n_vestr_transport_invalid);
+            case "Empty node command.": return Language.msg(l10n_vestr_unsafe_contract);
+            case "Node command is too large.": return Language.msg(l10n_vestr_unsafe_contract);
+            case "Unsafe command data. Nothing was sent to the node.": return Language.msg(l10n_vestr_unsafe_contract);
             case "NOT_ENABLED": return Language.msg(l10n_mail_node_retry);
             case "the node rejected the send": return Language.msg(l10n_mail_rejected_send);
             case "sign failed": return Language.msg(l10n_mail_sign_failed);

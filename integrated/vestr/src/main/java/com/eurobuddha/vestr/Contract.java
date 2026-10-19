@@ -49,6 +49,19 @@ public class Contract {
         return c;
     }
 
+    /** Same typed-field gate as PandaDEX's safeOrder; never interpolate raw unvalidated state. */
+    public boolean safeForCommands() {
+        if (!Util.isValidAddress(address) || !Util.isValidAddress(unlockAddr)
+                || coinid == null || !coinid.matches("(?i)0x[0-9a-f]{64}")
+                || tokenid == null || !tokenid.matches("(?i)0x(?:00|[0-9a-f]{64})")
+                || uid == null || !uid.matches("(?i)0x[0-9a-f]{64}")) return false;
+        for (int port = 1; port <= 8; port++) {
+            String value = state(raw, port);
+            if (!value.matches("[0-9]{1,40}(\\.[0-9]{1,40})?")) return false;
+        }
+        return amount != null && amount.signum() > 0 && total.signum() > 0;
+    }
+
     public boolean isMinima() { return Util.isMinima(tokenid); }
     public BigDecimal collected() { return total.subtract(amount).max(BigDecimal.ZERO); }
 

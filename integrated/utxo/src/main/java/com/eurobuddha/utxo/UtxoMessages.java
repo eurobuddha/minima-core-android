@@ -27,6 +27,9 @@ public final class UtxoMessages {
             case "Node result is unavailable. Outcome remains unknown.": return Language.msg(l10n_vestr_transport_result_unavailable);
             case "Node request cancelled before execution. Nothing was sent.": return Language.msg(l10n_vestr_transport_cancelled);
             case "Invalid node result. Outcome remains unknown.": return Language.msg(l10n_vestr_transport_invalid);
+            case "Empty node command.": return Language.msg(l10n_vestr_unsafe_contract);
+            case "Node command is too large.": return Language.msg(l10n_vestr_unsafe_contract);
+            case "Unsafe command data. Nothing was sent to the node.": return Language.msg(l10n_vestr_unsafe_contract);
             case "NOT_ENABLED": return Language.msg(l10n_explorer_node_retry);
             case "The embedded node is unavailable. Open Minima Core from the menu and check its status, then retry.": return Language.msg(l10n_explorer_node_retry);
             case "Building transaction…": return Language.msg(l10n_utxo_building);

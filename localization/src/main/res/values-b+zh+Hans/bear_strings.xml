@@ -8284,4 +8284,5 @@
     <!-- Arguments: value -->
     <string name="l10n_keyuses_used">"已使用 %1$s"</string>
     <string name="l10n_keyuses_unused" formatted="false">"未使用"</string>
+    <string name="l10n_vestr_unsafe_contract" formatted="false">"合约数据不安全或无效。未发送任何命令。"</string>
 </resources>
