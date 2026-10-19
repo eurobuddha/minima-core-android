@@ -52,3 +52,7 @@ against the committed pre-feature integrated baseline reproduced every Java byte
 This leaves the existing donor pin and paused parity work intact.
 
 Source: standalone 94ebaa1; Keets 79ee38c32fb82faf9ea4b0de91fe0e6103cf7731.
+
+Post-commit check: fresh detached worktree at aa00506 successfully restored all
+pinned artifacts offline, rebuilt the worklet offline, and matched every output
+checksum. Source commit aa00506 contains the Pandamonium implementation.

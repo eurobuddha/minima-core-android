@@ -1,11 +1,12 @@
 COMPLETION CHECKPOINT — supersedes the historical in-progress notes below.
 Implemented both variants. Standalone 0.11.38/1138 committed 94ebaa1.
-Pandamonium 2.0.22/217 source ready for commit. Keets 1.2.1 79ee38c pushed.
+Pandamonium 2.0.22/217 source committed aa00506. Keets 1.2.1 79ee38c pushed.
 Final checks: 41 standalone tests, 400 integrated Salon tests, lint, all three
 node flavor release builds, family signatures/version metadata, exact Keets APK
 payloads, 9 preparation + 19 artifact tests passed. Canonical adapter replay
 reproduced the current Salon Java bytes. Near-24-MiB Bare P2P fixture passed.
-Versioned APKs saved to Salon dist and base dist. See KEETS_RELEASE_ARTIFACTS_2.0.22.json.
+Fresh committed worktree offline restore AND worklet rebuild verified after commit.
+Standalone source pushed to origin/master. Versioned APKs saved to Salon dist and base dist. See KEETS_RELEASE_ARTIFACTS_2.0.22.json.
 No device installation, personal profile publishing, wallet actions or public APK
 release. Physical phone check remains a follow-up. User remains AFK; parity paused.
 Review and implementation notes: KEETS_CODE_REVIEW_2026-10-19.txt,
