@@ -286,3 +286,11 @@ Integrated UTXO 15 tests and standalone UTXO 6 tests pass. Host release lint,
 Standalone 0.4.35 signed candidate verified. No install/publication/live transfer.
 Verdict: approve this bounded repair. Full receipt matching, prepared journal and
 distribution recovery remain open in both variants; full 2.0.0 review continues.
+
+Shop image-view compatibility — 1.9.112 / code 183
+Standalone Shop lint found the custom square artwork ImageView bypassed AppCompat.
+Reused Studio's AppCompatImageView subclass, preserving measurement/crop/bindings,
+in both integrated and standalone Shop. Updated canonical importer adaptation.
+All changed code reviewed; integrated Shop42 tests, host release lint and all22
+snapshot/provenance checks pass. Standalone0.4.5 signed build/lint pass.
+Full review remains in progress; no release publication or device installation.

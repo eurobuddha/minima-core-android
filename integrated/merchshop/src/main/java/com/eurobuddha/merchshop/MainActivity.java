@@ -557,7 +557,7 @@ public class MainActivity extends AppCompatActivity {
             ilp.setMargins(dp(6), dp(6), dp(6), dp(6));
             inner.setLayoutParams(ilp);
 
-            final ImageView art = new ImageView(MainActivity.this) {
+            final ImageView art = new androidx.appcompat.widget.AppCompatImageView(MainActivity.this) {
                 @Override protected void onMeasure(int w, int hh) { super.onMeasure(w, w); }   // square
             };
             art.setScaleType(ImageView.ScaleType.CENTER_CROP);

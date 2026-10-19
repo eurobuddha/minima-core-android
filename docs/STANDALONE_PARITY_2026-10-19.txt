@@ -104,3 +104,15 @@ Live/missing/partial coin snapshots and elapsed time never mark an uncertain sen
 failed. Standalone6 tests, integrated15, lint0 errors105 warnings. Signed candidate
 verified in dist; no install/publication. Full receipt/distribution parity open.
 Salon0.11.37 checkpoint bf4f453 and host1.9.110 703b56c are pushed.
+
+MiniMall Inbox0.5.4/code504 fa93b54: retained per-order drafts/focus/composition,
+checked local saves and late callback navigation guards;9 reused regression tests.
+Inbox0.5.5/code505: readable dark dialogs, two-row status controls,48dp labelled
+icons and secure seed dialog. Both signed builds/lint pass (0 errors64 warnings).
+MiniMall Shop0.4.5/code405 7052f79:48dp quantity/icons, secondary contrast, secure
+seed dialog and Studio-compatible square image view; lint0 errors79 warnings.
+Both apps reuse Mail/Studio's optional-camera manifest declaration.
+Candidates retained in their dist folders; no install/publication. Nineteen repos
+now have repair checkpoints. Complete parity/full review remains unfinished.
+UTXO0.4.35 repair e57c450 is on origin/main. Accidental master branch was removed
+with an exact-commit lease after main was updated; no unrelated branch was changed.

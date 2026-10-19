@@ -51,6 +51,7 @@ def adapt(root):
             change(main, '.notify(2, b.build())', '.notify("pandamonium.mall.inbox", 2, b.build())', 2)
 
     shop = root/'merchshop/src/main/java/com/eurobuddha/merchshop'
+    change(shop/'MainActivity.java', 'final ImageView art = new ImageView(MainActivity.this) {', 'final ImageView art = new androidx.appcompat.widget.AppCompatImageView(MainActivity.this) {')
     change(shop/'ShopStore.java', '"shops"', '"pandamonium_mall_shops"')
     change(shop/'ShopStore.java', 'new File(dir, id + ".json")', 'fileFor(id)')
     change(shop/'ShopStore.java', '    public Catalog get(String shopId) { return read(new File(dir, shopId + ".json")); }', """    public Catalog get(String shopId) {
