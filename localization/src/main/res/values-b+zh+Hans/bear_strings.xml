@@ -8287,4 +8287,11 @@
     <string name="l10n_vestr_unsafe_contract" formatted="false">"合约数据不安全或无效。未发送任何命令。"</string>
     <string name="l10n_salon_restore_source_help" formatted="false">"从托管服务恢复页面内容。如果页面已迁移，可输入新的 HTTPS profile.json 地址。页面必须与您的 Salon 代币和用户名匹配。消息密钥、收款地址和托管登录信息将保留。"</string>
     <string name="l10n_salon_restore_source_https" formatted="false">"请输入有效的 HTTPS profile.json 地址，不含登录信息或片段标识。"</string>
+    <string name="l10n_atomix_send_address" formatted="false">"请输入有效的以太坊地址（0x 加 40 个十六进制字符）。"</string>
+    <string name="l10n_atomix_send_decimal" formatted="false">"请输入普通十进制金额。"</string>
+    <string name="l10n_atomix_send_positive" formatted="false">"请输入大于零的金额。"</string>
+    <string name="l10n_atomix_send_balance" formatted="false">"ETH 不足以支付该金额及网络手续费，请尝试“最大值”。"</string>
+    <string name="l10n_atomix_send_token_balance" formatted="false">"该金额超过钱包的 USDT 余额。"</string>
+    <string name="l10n_atomix_send_gas_balance" formatted="false">"发送 USDT 需要少量 ETH 支付手续费，请先向钱包充值 ETH。"</string>
+    <string name="l10n_atomix_send_fee_cap" formatted="false">"以太坊手续费超出安全范围。请检查 RPC 端点。"</string>
 </resources>

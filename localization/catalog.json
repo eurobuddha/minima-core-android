@@ -41857,5 +41857,47 @@
     "zh-Hans": "请输入有效的 HTTPS profile.json 地址，不含登录信息或片段标识。",
     "ru": "Введите корректный HTTPS-адрес profile.json без данных для входа и фрагмента.",
     "uk": "Введіть правильну HTTPS-адресу profile.json без даних для входу та фрагмента."
+  },
+  "atomixSend.address": {
+    "en": "Enter a valid Ethereum address (0x + 40 hex characters).",
+    "zh-Hans": "请输入有效的以太坊地址（0x 加 40 个十六进制字符）。",
+    "ru": "Введите действительный адрес Ethereum (0x и 40 шестнадцатеричных символов).",
+    "uk": "Введіть дійсну адресу Ethereum (0x і 40 шістнадцяткових символів)."
+  },
+  "atomixSend.decimal": {
+    "en": "Enter a plain decimal amount.",
+    "zh-Hans": "请输入普通十进制金额。",
+    "ru": "Введите сумму обычным десятичным числом.",
+    "uk": "Введіть суму звичайним десятковим числом."
+  },
+  "atomixSend.positive": {
+    "en": "Enter an amount above zero.",
+    "zh-Hans": "请输入大于零的金额。",
+    "ru": "Введите сумму больше нуля.",
+    "uk": "Введіть суму більшу за нуль."
+  },
+  "atomixSend.balance": {
+    "en": "Not enough ETH for that amount plus network gas — try Max.",
+    "zh-Hans": "ETH 不足以支付该金额及网络手续费，请尝试“最大值”。",
+    "ru": "Недостаточно ETH для суммы и комиссии сети — попробуйте «Максимум».",
+    "uk": "Недостатньо ETH для суми й комісії мережі — спробуйте «Максимум»."
+  },
+  "atomixSend.tokenBalance": {
+    "en": "That is more USDT than this wallet holds.",
+    "zh-Hans": "该金额超过钱包的 USDT 余额。",
+    "ru": "Эта сумма превышает баланс USDT в кошельке.",
+    "uk": "Ця сума перевищує баланс USDT у гаманці."
+  },
+  "atomixSend.gasBalance": {
+    "en": "Sending USDT needs a little ETH for gas — fund the wallet with ETH first.",
+    "zh-Hans": "发送 USDT 需要少量 ETH 支付手续费，请先向钱包充值 ETH。",
+    "ru": "Для отправки USDT нужен ETH на комиссию — сначала пополните кошелёк ETH.",
+    "uk": "Для надсилання USDT потрібен ETH на комісію — спочатку поповніть гаманець ETH."
+  },
+  "atomixSend.feeCap": {
+    "en": "Ethereum fee is outside the safe range. Review your RPC endpoint.",
+    "zh-Hans": "以太坊手续费超出安全范围。请检查 RPC 端点。",
+    "ru": "Комиссия Ethereum выходит за безопасные пределы. Проверьте RPC-сервер.",
+    "uk": "Комісія Ethereum виходить за безпечні межі. Перевірте RPC-сервер."
   }
 }

@@ -62,6 +62,15 @@ public final class AtomixMessages {
             case "— (node didn't answer)": return Language.msg(l10n_atomix_notice_node_no_answer);
             case "Could not create the trading identity. Retry when the node is ready.": return Language.msg(l10n_atomix_notice_identity_failed);
             case "Deal changed. Review the latest terms.": return Language.msg(l10n_atomix_otc_deal_changed);
+            case "Enter a valid Ethereum address (0x + 40 hex characters).": return Language.msg(l10n_atomix_send_address);
+            case "Enter a plain decimal amount.": return Language.msg(l10n_atomix_send_decimal);
+            case "Enter an amount above zero.": return Language.msg(l10n_atomix_send_positive);
+            case "Not enough ETH for that amount plus network gas — try Max.": return Language.msg(l10n_atomix_send_balance);
+            case "That is more USDT than this wallet holds.": return Language.msg(l10n_atomix_send_token_balance);
+            case "Sending USDT needs a little ETH for gas — fund the wallet with ETH first.": return Language.msg(l10n_atomix_send_gas_balance);
+            case "Ethereum fee is outside the safe range. Review your RPC endpoint.": return Language.msg(l10n_atomix_send_fee_cap);
+            case "Wallet session changed. Review again.": return Language.msg(l10n_wallet_review_again);
+            case "Market changed; refresh and try again.": return Language.msg(l10n_atomix_operation_market_changed);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {

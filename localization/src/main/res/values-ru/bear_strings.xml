@@ -8398,4 +8398,11 @@
     <string name="l10n_vestr_unsafe_contract" formatted="false">"Небезопасные или неверные данные контракта. Команда не отправлена."</string>
     <string name="l10n_salon_restore_source_help" formatted="false">"Восстановите содержимое страницы с хостинга. Если страница переехала, укажите новый HTTPS-адрес profile.json. Токен Salon и имя пользователя должны совпадать. Ключи сообщений, адрес для платежей и данные доступа к хостингу сохранятся."</string>
     <string name="l10n_salon_restore_source_https" formatted="false">"Введите корректный HTTPS-адрес profile.json без данных для входа и фрагмента."</string>
+    <string name="l10n_atomix_send_address" formatted="false">"Введите действительный адрес Ethereum (0x и 40 шестнадцатеричных символов)."</string>
+    <string name="l10n_atomix_send_decimal" formatted="false">"Введите сумму обычным десятичным числом."</string>
+    <string name="l10n_atomix_send_positive" formatted="false">"Введите сумму больше нуля."</string>
+    <string name="l10n_atomix_send_balance" formatted="false">"Недостаточно ETH для суммы и комиссии сети — попробуйте «Максимум»."</string>
+    <string name="l10n_atomix_send_token_balance" formatted="false">"Эта сумма превышает баланс USDT в кошельке."</string>
+    <string name="l10n_atomix_send_gas_balance" formatted="false">"Для отправки USDT нужен ETH на комиссию — сначала пополните кошелёк ETH."</string>
+    <string name="l10n_atomix_send_fee_cap" formatted="false">"Комиссия Ethereum выходит за безопасные пределы. Проверьте RPC-сервер."</string>
 </resources>

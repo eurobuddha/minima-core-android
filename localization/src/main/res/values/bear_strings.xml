@@ -8324,4 +8324,11 @@
     <string name="l10n_vestr_unsafe_contract" formatted="false">"Unsafe or invalid contract data. No command was sent."</string>
     <string name="l10n_salon_restore_source_help" formatted="false">"Restore page content from your hosting. You can enter a new HTTPS profile.json URL if the page moved. It must match your Salon token and handle. Your messaging keys, payment address and hosting logins are kept."</string>
     <string name="l10n_salon_restore_source_https" formatted="false">"Enter a valid HTTPS profile.json URL without login details or a fragment."</string>
+    <string name="l10n_atomix_send_address" formatted="false">"Enter a valid Ethereum address (0x + 40 hex characters)."</string>
+    <string name="l10n_atomix_send_decimal" formatted="false">"Enter a plain decimal amount."</string>
+    <string name="l10n_atomix_send_positive" formatted="false">"Enter an amount above zero."</string>
+    <string name="l10n_atomix_send_balance" formatted="false">"Not enough ETH for that amount plus network gas — try Max."</string>
+    <string name="l10n_atomix_send_token_balance" formatted="false">"That is more USDT than this wallet holds."</string>
+    <string name="l10n_atomix_send_gas_balance" formatted="false">"Sending USDT needs a little ETH for gas — fund the wallet with ETH first."</string>
+    <string name="l10n_atomix_send_fee_cap" formatted="false">"Ethereum fee is outside the safe range. Review your RPC endpoint."</string>
 </resources>

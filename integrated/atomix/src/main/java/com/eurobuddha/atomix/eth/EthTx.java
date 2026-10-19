@@ -45,6 +45,15 @@ public final class EthTx {
         if (!allowed) throw new IllegalStateException(com.eurobuddha.atomix.integratedcomms.NodeApi.ERR_COMMAND_CHANGED);
     }
 
+    // Reuse ETH Wallet's hard fee caps (1500 gwei / 1M gas), checked before signing.
+    public static final BigInteger MAX_GAS_PRICE = BigInteger.valueOf(1_500_000_000_000L);
+    public static final BigInteger MAX_GAS_LIMIT = BigInteger.valueOf(1_000_000);
+    public static void requireFees(BigInteger gasPrice, BigInteger gasLimit) {
+        if (gasPrice == null || gasPrice.signum() <= 0 || gasPrice.compareTo(MAX_GAS_PRICE) > 0
+                || gasLimit == null || gasLimit.signum() <= 0 || gasLimit.compareTo(MAX_GAS_LIMIT) > 0)
+            throw new IllegalArgumentException("Ethereum fee is outside the safe range. Review your RPC endpoint.");
+    }
+
     /** Forget all cached nonce state — call on a chain/endpoint switch so we cold-start from the new node. */
     public static void resetAll() { NONCE.clear(); }
 
@@ -58,17 +67,20 @@ public final class EthTx {
                               String to, String data, BigInteger value, BigInteger gasLimit,
                               java.util.function.BooleanSupplier authorized) throws Exception {
         requireAuthorized(authorized);
-        NonceState st = NONCE.computeIfAbsent(creds.getAddress(), k -> new NonceState());
-        // MA-5: fetch the gas price + base fee BEFORE the per-address lock — they are nonce-INDEPENDENT, and each
-        // is a full RPC round-trip (up to 9 fallbacks × ~38s). Holding them under the lock serialised every
-        // concurrent send for the same address behind ~2 extra network calls, so a market sweep's later locks
-        // could miss their Minima expiry. getTransactionCount and sendRawTransaction MUST stay inside the lock:
-        // the pending-vs-counter decision and the deferred nonce commit are the whole point of the serializer.
-        // The shared F5 formula (EthSend.effectiveGasPriceWei) also keeps the broadcast price identical to what
-        // the UI reserved (MA-6). baseFeePerGasOrZero returns 0 on failure, so the floor can only RAISE the price.
+        // Automated operations retain the existing fee formula; manual sends pass their reviewed price.
         BigInteger rawGp = EthRpc.hexToBig(rpc.callStr("eth_gasPrice", new JSONArray()));
         if (rawGp.signum() <= 0) rawGp = FALLBACK_GAS_PRICE;
         final BigInteger gasPrice = EthSend.effectiveGasPriceWei(rawGp, rpc.baseFeePerGasOrZero());
+        return send(rpc, creds, chainId, to, data, value, gasLimit, gasPrice, authorized);
+    }
+
+    /** Same explicit-price boundary used by ETH Wallet. Never recompute a reviewed fee. */
+    public static String send(EthRpc rpc, Credentials creds, long chainId,
+                              String to, String data, BigInteger value, BigInteger gasLimit, BigInteger gasPrice,
+                              java.util.function.BooleanSupplier authorized) throws Exception {
+        requireAuthorized(authorized);
+        requireFees(gasPrice, gasLimit);
+        NonceState st = NONCE.computeIfAbsent(creds.getAddress(), k -> new NonceState());
         synchronized (st) {
             requireAuthorized(authorized);
             BigInteger pending = rpc.getTransactionCount(creds.getAddress());

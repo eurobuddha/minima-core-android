@@ -9,6 +9,7 @@ android {
         buildConfigField 'int', 'VERSION_CODE', '172'
     }
     buildFeatures { buildConfig true }
+    testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = '2g' } }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11

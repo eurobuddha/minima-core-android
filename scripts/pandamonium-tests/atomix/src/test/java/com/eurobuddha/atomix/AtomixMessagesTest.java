@@ -15,7 +15,7 @@ public class AtomixMessagesTest {
  static int resource(String key)throws Exception{return R.string.class.getField("l10n_"+key.replaceAll("([a-z0-9])([A-Z])","$1_$2").replace('.','_').toLowerCase(Locale.ROOT)).getInt(null);}
  static JSONObject source()throws Exception{return new JSONObject(new String(Files.readAllBytes(Path.of("../../localization/atomix-messages.json")), java.nio.charset.StandardCharsets.UTF_8));}
  @Test public void everyDeclaredFixedMessageResolves()throws Exception{
-  JSONObject fixed=source().getJSONObject("fixed");assertEquals(45,fixed.length());
+  JSONObject fixed=source().getJSONObject("fixed");assertEquals(54,fixed.length());
   for(Iterator<String>it=fixed.keys();it.hasNext();){String raw=it.next();Object value=AtomixMessages.message(raw);assertTrue(raw,value instanceof Language.Message);assertEquals(resource(fixed.getString(raw)),field(value,"resource"));assertEquals(0,((Object[])field(value,"arguments")).length);}
  }
  @Test public void everyTemplatePreservesLiteralCaptures()throws Exception{
