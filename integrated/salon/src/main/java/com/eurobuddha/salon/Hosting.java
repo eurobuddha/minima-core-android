@@ -312,6 +312,8 @@ final class Hosting {
                     con.setReadTimeout(15000);
                     con.setInstanceFollowRedirects(false);
                     con.setRequestProperty("Range", "bytes=0-1");
+                    // A partial gzip stream cannot be decompressed by Android.
+                    con.setRequestProperty("Accept-Encoding", "identity");
                     int code = con.getResponseCode();
                     if (code == 301 || code == 302 || code == 303 || code == 307 || code == 308) {
                         String location = con.getHeaderField("Location");

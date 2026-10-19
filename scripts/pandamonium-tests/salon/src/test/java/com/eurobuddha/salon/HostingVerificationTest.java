@@ -37,6 +37,23 @@ public class HostingVerificationTest {
         for(Response r:seen){assertTrue(r.disconnected);assertFalse(r.getInstanceFollowRedirects());assertEquals("bytes=0-1",r.getRequestProperty("Range"));assertEquals(8000,r.getConnectTimeout());assertEquals(15000,r.getReadTimeout());}
         assertEquals(0,seen.get(0).reads);assertEquals(1,seen.get(1).reads);assertTrue(seen.get(1).closed);
     }
+    @Test public void partialCompressedResponseRequestsIdentityAtEveryHop()throws Exception{
+        List<Response> seen=new ArrayList<>();
+        Hosting.verifyOnce("https://8.8.8.8/start",null,u->{
+            Response r=new Response(u,seen.isEmpty()?302:206,"/file",new byte[]{'a','t'}){
+                @Override public InputStream getInputStream()throws IOException{
+                    // GitHub ranges the compressed representation when gzip is negotiated.
+                    if(!"identity".equals(getRequestProperty("Accept-Encoding")))
+                        return new java.util.zip.GZIPInputStream(new ByteArrayInputStream(new byte[]{0x1f,(byte)0x8b}));
+                    return super.getInputStream();
+                }
+            };
+            seen.add(r);return r;
+        });
+        assertEquals(2,seen.size());
+        for(Response r:seen){assertEquals("identity",r.getRequestProperty("Accept-Encoding"));assertTrue(r.disconnected);}
+        assertEquals(1,seen.get(1).reads);assertTrue(seen.get(1).closed);
+    }
     @Test public void redirectToUnconfiguredPrivateHostNeverConnects()throws Exception{
         for(String host:new String[]{"127.0.0.1","192.168.1.1","169.254.169.254","100.64.0.1","[fc00::1]"}){
             List<Response> seen=new ArrayList<>();

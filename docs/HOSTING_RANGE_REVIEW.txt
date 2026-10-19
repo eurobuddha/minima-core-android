@@ -1,0 +1,30 @@
+Hosting byte-range verification repair — 1.9.94/code165
+
+Summary
+On the Fold, GitHub uploads succeeded but verification failed with EOFException.
+A direct request reproduced HTTP 206, Content-Encoding: gzip and Content-Length: 2:
+the server returned only two bytes of the gzip representation. Android cannot
+decode that truncated stream. The existing verifier now requests identity encoding
+alongside Range: bytes=0-1 on every redirect hop, in both Atelier and Salon.
+
+Reuse
+The canonical scripts/adapt-pandamonium-hosting-verification.py remains the source.
+Its generated Hosting.java copies and the existing HostingVerificationTest suites
+were updated together. No uploader, credential schema or host/redirect policy changed.
+
+Code Review
+Reviewed all eight changed code/test/version files against the existing verifier,
+NetFetch policy and standalone hosting implementations. No findings. Approve.
+The regression models a truncated gzip header, requires identity encoding on both
+initial and redirected requests, and checks that the final stream is read and closed.
+
+Validation
+Both hosting suites pass: 26 tests, zero failures/errors/skips.
+Pinned importer verification passes for all source snapshots and provenance.
+Signed Pandamonium release build passes; final APK verification confirms the exact
+Keets bundle, all 21 native addon versions and Bare runtime. Original family
+certificate and package/version165/1.9.94 metadata verified. git diff --check passes.
+Fold installation and actual GitHub upload/read-back check follow this build.
+
+No server or GitHub credentials are stored in this repository. Live destination
+configuration is separate from the source change. No app-store publication.
