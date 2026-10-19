@@ -33,6 +33,7 @@ public final class EthereumTransactions {
     private static volatile EthereumTransactions shared;
     private final Store store;
     private final Map<String,Object> locks=new ConcurrentHashMap<>();
+    private final Map<String,java.util.concurrent.atomic.AtomicLong> revisions=new ConcurrentHashMap<>();
     private static final BigInteger MAX=BigInteger.ONE.shiftLeft(64).subtract(BigInteger.ONE);
     private static final BigInteger MAX_PRICE=BigInteger.valueOf(1_500_000_000_000L),MAX_GAS=BigInteger.valueOf(1_000_000);
     public EthereumTransactions(Store store) { this.store=Objects.requireNonNull(store); }
@@ -44,6 +45,38 @@ public final class EthereumTransactions {
         if(value==null)throw new IOException("Ethereum transaction storage is unavailable. Reopen Pandamonium.");
         return value;
     }
+    /** Immutable public intent for one nonce. Fee replacements have identical spending fields. */
+    public static final class PendingIntent {
+        public final BigInteger nonce,value,gas,price;
+        public final String to,data;
+        private PendingIntent(SignedRawTransaction tx){
+            nonce=tx.getNonce();value=tx.getValue();gas=tx.getGasLimit();price=tx.getGasPrice();
+            to=tx.getTo().toLowerCase(Locale.ROOT);data=Numeric.prependHexPrefix(tx.getData()).toLowerCase(Locale.ROOT);
+        }
+    }
+    /** Read-only funding view. No receipt is settled, nonce freed, signature made or RPC called. */
+    public static final class FundingSnapshot {
+        public final List<PendingIntent> intents;
+        private final java.util.concurrent.atomic.AtomicLong revision;
+        private final long captured;
+        private FundingSnapshot(List<PendingIntent> intents,java.util.concurrent.atomic.AtomicLong revision){
+            this.intents=Collections.unmodifiableList(intents);this.revision=revision;captured=revision.get();
+        }
+        /** Safe on UI/delayed-post callbacks: never waits for an RPC or SQLite lock. */
+        public boolean unchanged(){return captured==revision.get();}
+    }
+    public FundingSnapshot fundingSnapshot(long chain,String owner)throws Exception {
+        if(chain<=0||owner==null||!owner.matches("0x[0-9a-fA-F]{40}"))throw new IOException("Invalid Ethereum funding account");
+        String address=owner.toLowerCase(Locale.ROOT),key=chain+":"+address;
+        synchronized(locks.computeIfAbsent(key,k->new Object())){
+            List<PendingIntent> intents=new ArrayList<>();
+            for(Row row:load(key,chain,address))if(!"PREPARED".equals(row.phase))intents.add(new PendingIntent(row.latest()));
+            // Include previously settled rows: a lagging/reorganised chain view must not ignore them.
+            // The funding reader excludes only nonces already consumed at its exact balance block.
+            return new FundingSnapshot(intents,revisions.computeIfAbsent(key,k->new java.util.concurrent.atomic.AtomicLong()));
+        }
+    }
+
     /** Authorization throws the caller's existing localized session-change error. */
     public String send(Rpc rpc,Credentials credentials,long chain,String to,String data,BigInteger value,
                        BigInteger gas,BigInteger price,String operation,Runnable authorize) throws Exception {
@@ -59,6 +92,8 @@ public final class EthereumTransactions {
         String key=chain+":"+address;
         synchronized(locks.computeIfAbsent(key,k->new Object())) {
             authorize.run();
+            // Invalidate an advertised funding review as soon as a new send enters this account.
+            revisions.computeIfAbsent(key,k->new java.util.concurrent.atomic.AtomicLong()).incrementAndGet();
             if(!BigInteger.valueOf(chain).equals(rpc.chain()))throw new IOException("Ethereum RPC is connected to a different chain.");
             BigInteger pending=rpc.pending(address);nonce(pending,false);
             authorize.run();
@@ -228,7 +263,9 @@ public final class EthereumTransactions {
         return rows;
     }
     private void save(String key,List<Row> rows,long chain,String address)throws Exception {
-        JSONArray array=new JSONArray();for(Row row:rows)array.put(row.json());String data=array.toString();decode(data,chain,address);store.write(key,data);
+        JSONArray array=new JSONArray();for(Row row:rows)array.put(row.json());String data=array.toString();decode(data,chain,address);
+        revisions.computeIfAbsent(key,k->new java.util.concurrent.atomic.AtomicLong()).incrementAndGet();
+        store.write(key,data);
     }
     /** SQLite provides the same atomic acknowledged write boundary used by NFT/UTXO journals. */
     private static final class Database extends SQLiteOpenHelper implements Store {

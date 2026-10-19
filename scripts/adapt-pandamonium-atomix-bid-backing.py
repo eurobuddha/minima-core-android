@@ -3,6 +3,7 @@ from pathlib import Path
 
 def adapt(root):
     base=root/'atomix/src/main/java/com/eurobuddha/atomix'
+    (base/'eth/PendingTokenDebits.java').write_text((Path(__file__).with_name('pandamonium-sources')/'atomix/PendingTokenDebits.java').read_text())
     p=base/'swap/Order.java';s=p.read_text();marker='    // ---- (de)serialization'
     helper='''    /** Best-price prefix, as for asks; a bid spends amount * price USDT. */
     public void clampBidsToBalance(java.math.BigDecimal available) {
@@ -33,25 +34,38 @@ def adapt(root):
     assert s.count(needle)==1;s=s.replace(needle,needle+'\n        r.clampBidsToBalance(java.math.BigDecimal.valueOf(r.usdtAvail));');p.write_text(s)
 
     p=base/'eth/EthWallet.java';s=p.read_text();marker='    /** Format a raw integer amount'
-    helper='''    /** Read both mined and pending state; never treat missing/malformed ABI data as a balance. */
-    public static BigInteger erc20AvailableRaw(EthRpc rpc, EthNet network, String token, String owner) throws IOException {
+    helper='''    /** Account balance and nonce share one checked block; pending data can only lower funding. */
+    public static BigInteger erc20AvailableRaw(EthRpc rpc, EthNet network, String token, String owner,
+            com.eurobuddha.minimaapi.ethereum.EthereumTransactions.FundingSnapshot snapshot) throws IOException {
         if(rpc==null||network==null||owner==null||!owner.matches("0x[0-9a-fA-F]{40}")
-                ||token==null||!token.matches("0x[0-9a-fA-F]{40}"))throw new IOException("Invalid Ethereum balance context");
+                ||token==null||!token.matches("0x[0-9a-fA-F]{40}")||snapshot==null)throw new IOException("Invalid Ethereum balance context");
         if(!BigInteger.valueOf(network.chainId).equals(EthRpc.transactionCount(rpc.call("eth_chainId",new org.json.JSONArray()))))
             throw new IOException("Ethereum RPC is connected to a different chain");
+        Object rawBlock=rpc.call("eth_getBlockByNumber",new org.json.JSONArray().put("latest").put(false));
+        if(!(rawBlock instanceof JSONObject))throw new IOException("Missing Ethereum balance block");
+        JSONObject block=(JSONObject)rawBlock;
+        String height=block.optString("number"),hash=block.optString("hash");
+        EthRpc.transactionCount(height);
+        if(!hash.matches("0x[0-9a-fA-F]{64}")||new BigInteger(hash.substring(2),16).signum()==0)throw new IOException("Invalid Ethereum balance block");
+        BigInteger minedNonce=EthRpc.transactionCount(rpc.call("eth_getTransactionCount",new org.json.JSONArray().put(owner).put(height)));
+        BigInteger reserved=PendingTokenDebits.total(snapshot.intents,minedNonce,owner,token,network.htlc);
         Function fn=new Function("balanceOf",Collections.singletonList(new Address(owner)),Collections.singletonList(new TypeReference<Uint256>() {}));
         BigInteger available=null;
-        for(String block:new String[]{"latest","pending"}) {
+        for(String tag:new String[]{height,"pending"}) {
             Object result;
             try {
                 JSONObject tx=new JSONObject().put("to",token).put("data",FunctionEncoder.encode(fn));
-                result=rpc.call("eth_call",new org.json.JSONArray().put(tx).put(block));
+                result=rpc.call("eth_call",new org.json.JSONArray().put(tx).put(tag));
             }catch(org.json.JSONException invalid){throw new IOException("Invalid Ethereum balance request",invalid);}
-            // Same exact ABI-word check as EthHtlc.requireReturnWords.
             if(!(result instanceof String)||!((String)result).matches("0[xX][0-9a-fA-F]{64}"))throw new IOException("Invalid Ethereum balance reply");
             BigInteger balance=new BigInteger(((String)result).substring(2),16);
-            available=available==null?balance:available.min(balance);
+            // Deduct local reservations from mined state only. Pending may already include the debit.
+            available=available==null?balance.subtract(reserved).max(BigInteger.ZERO):available.min(balance);
         }
+        Object current=rpc.call("eth_getBlockByNumber",new org.json.JSONArray().put(height).put(false));
+        if(!(current instanceof JSONObject)||!hash.equalsIgnoreCase(((JSONObject)current).optString("hash"))
+                ||!height.equals(((JSONObject)current).optString("number"))||!snapshot.unchanged())
+            throw new IOException("Ethereum funding changed during review");
         return available;
     }
 
@@ -91,10 +105,12 @@ def adapt(root):
         final Credentials owner=wallet.creds();
         final String minimaKey=myMinimaPk;
         final com.eurobuddha.atomix.TradingContext market=order==null?null:order.market;
+        final java.util.concurrent.atomic.AtomicReference<com.eurobuddha.minimaapi.ethereum.EthereumTransactions.FundingSnapshot> funding=new java.util.concurrent.atomic.AtomicReference<>();
         java.util.function.BooleanSupplier current=()->order!=null&&market!=null&&market==com.eurobuddha.atomix.TradingContext.active()
                 &&generation==PublishGate.gen()&&!io.isShutdown()&&!halted()&&connection==rpc&&network==net
                 &&owner!=null&&owner==wallet.creds()&&owner.getAddress().equalsIgnoreCase(order.ethAddress)
-                &&java.util.Objects.equals(minimaKey,myMinimaPk)&&java.util.Objects.equals(minimaKey,order.minimaPublicKey);
+                &&java.util.Objects.equals(minimaKey,myMinimaPk)&&java.util.Objects.equals(minimaKey,order.minimaPublicKey)
+                &&(funding.get()==null||funding.get().unchanged());
         if(!current.getAsBoolean()){cb.onFailed(SwapOrderBook.MARKET_ERROR);return;}
         boolean bids=false;
         for(String symbol:order.pairs.keySet())if(!order.effectiveBids(symbol).isEmpty())bids=true;
@@ -108,7 +124,10 @@ def adapt(root):
             try {
                 EthNet.Token token=network==null?null:network.token("USDT");
                 if(token==null)throw new IllegalStateException();
-                available=new BigDecimal(EthWallet.erc20AvailableRaw(connection,network,token.address,owner.getAddress()),token.decimals);
+                com.eurobuddha.minimaapi.ethereum.EthereumTransactions.FundingSnapshot snapshot=
+                        com.eurobuddha.minimaapi.ethereum.EthereumTransactions.shared().fundingSnapshot(network.chainId,owner.getAddress());
+                funding.set(snapshot);
+                available=new BigDecimal(EthWallet.erc20AvailableRaw(connection,network,token.address,owner.getAddress(),snapshot),token.decimals);
             } catch(Exception unavailable){ui.post(()->cb.onFailed(SwapOrderBook.BALANCE_ERROR));return;}
             ui.post(()->{
                 if(!current.getAsBoolean()){cb.onFailed(SwapOrderBook.MARKET_ERROR);return;}

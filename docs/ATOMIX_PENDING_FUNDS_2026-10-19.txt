@@ -1,0 +1,84 @@
+AtomiX saved Ethereum spends and order funding — 2026-10-19
+
+Problem and repair
+A locally signed USDT transfer or HTLC lock can remain unknown to the RPC endpoint.
+Its latest and pending balance replies may both still show the funds. AtomiX could
+therefore refresh a bid using tokens already committed by a saved local send.
+
+AtomiX now reads a funding snapshot from the existing shared EthereumTransactions
+journal. The snapshot contains one immutable spending intent per nonce, regardless
+of how many fee replacements exist. It validates the saved signed bytes using the
+journal's existing decoder. It does not sign, send, settle or release transactions.
+PREPARED entries were never posted and are excluded. Previously settled entries
+remain available to the reader, which may be observing an older block after provider
+lag or a reorganisation.
+
+The balance and mined account nonce are read at the same explicit block number.
+The block hash is checked again after the reads. Saved nonces below that block's
+account nonce have already been consumed and are already reflected in its balance.
+Outstanding ERC20 transfers and configured HTLC locks are deducted once per nonce.
+Approvals, withdrawals and refunds do not invent incoming funds. Unsupported or
+malformed calldata stops the refresh with the existing localized error.
+
+Available tokens = min(max(0, block balance - outstanding local debits), pending balance).
+For example, a 5,000 USDT block balance and a saved 1,000 USDT transfer leave 4,000.
+If the RPC already reports 4,000 pending, the result remains 4,000, not 3,000.
+The existing exact cumulative price/quantity clamp then trims the advertised bids.
+
+A per-account revision changes when a send starts and when its journal is written.
+That revision is checked through the existing publication guards, including delayed
+posting. The guard reads an atomic counter; it cannot block the UI behind a sending
+thread's network or SQLite work. Another account does not invalidate this account.
+
+Reuse inspected
+minimaapi/.../ethereum/EthereumTransactions.java and its complete existing tests;
+integrated AtomiX EthWallet, EthTx, EthRpc, EthSend, EthHtlc, SwapEngine, Order,
+SwapOrderBook, the bid-backing adapter and BidBackingTest; corresponding standalone
+AtomiX/ETH Wallet implementations and relevant usdtSwap funding code.
+Reused the journal decoder, account lock and persistence boundary, existing ERC20
+and HTLC ABI encoders, strict RPC quantity/ABI-word checks, worker/captured-context
+publication path and exact bid-prefix clamp. No schema or dependency changes.
+The closest old helpers only read latest/pending balances; they cannot account for
+saved unknown sends. The new funding snapshot and small ABI decoder bridge that gap.
+
+Code review
+Summary: connects existing durable attempts to order funding without changing the
+signed swap protocol or generating transactions during an order refresh.
+Fixed: unknown-spend reuse, counting replacements more than once, subtracting a
+pending debit twice, mixed balance/nonce block reads, and stale delayed publication.
+Retained immutable intent fields, account/chain validation, acknowledged writes,
+all prior context guards and the original successful sender behavior.
+Verdict: approve this scoped repair. Full AtomiX and application review remain open.
+
+Validation
+747 tests passed: minimaapi50, AtomiX482, ETH Wallet35, Pandamonium host180.
+Nine new shared tests cover restart, replacements, account isolation, PREPARED
+entries, settlement/lag, corrupt storage, failed writes and nonblocking invalidation.
+Nine ABI tests use the real EthSend/EthHtlc encoders with mocked transmission.
+Seven new publisher tests cover unknown transfers, double counting, mined nonces,
+new sends during review/delayed posting, changed blocks, malformed block/nonce data
+and unsupported saved calldata. The original 11 bid-backing regressions still pass.
+All credentials are public synthetic fixtures. No real transactions or live RPC
+requests were sent. Initial new tests read a Java field name from wire JSON; fixed
+them to use the existing Order.fromJson parser, then reran the complete suites.
+Pinned imports reproduce exactly; direct transport and all6,978 messages in four
+languages verify. Offline release build and lint passed (0 errors,362 warnings).
+
+Signed local candidate
+Pandamonium2.0.8-Pandamonium/code203, com.eurobuddha.pandamonium.
+/Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.8-candidate.apk
+137140561 bytes
+SHA256 1d617db17ebe532b6ac29094b3a3402aca54285c45b39b432280ed463711ef77
+APK v2 certificate SHA256
+ eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Actual APK contains PendingTokenDebits, fundingSnapshot, FundingSnapshot and the
+prior Sweep port. ZIP integrity and exact Keets bundle/21addons/runtime checks pass.
+No installation/publication; device/public2.0.0 remains unchanged.
+
+Open work
+Orders remain snapshots of available funds. External devices or standalone apps
+sharing the key are outside this private journal, and later external spending can
+change backing. Failed reads leave existing advertisements until withdrawal/expiry.
+Gas affordability, allowances, journal retention/performance and broader Ethereum
+receipt/reorg handling remain review items. No live swap or Fold UI check was done
+for this candidate. Standalone parity remains deferred until after the demo.

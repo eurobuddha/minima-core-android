@@ -580,3 +580,12 @@ and exact on-chain confirmation. 188 wallet + 180 host JVM tests passed. See
 WALLET_SWEEP_PORT_2026-10-19.txt for source reuse, adaptations and remaining device /
 large-collection / standalone parity checks. This supersedes the earlier statement
 that only planner preparation exists; it does not claim the full app review complete.
+
+AtomiX local pending-funds follow-up — 2.0.8/code203
+Funding now accounts for the shared journal's saved ERC20 transfers/HTLC locks,
+once per nonce. Balance and account nonce share a checked block; pending balances
+are combined without double counting. New local sends invalidate delayed posting.
+747 targeted tests pass; signed candidate, pinned imports, Keets, certificate and
+lint verify. See ATOMIX_PENDING_FUNDS_2026-10-19.txt. Device/public2.0.0 unchanged.
+Gas/allowance, journal retention, wider receipt/reorg and standalone parity review
+remain open. This closes the local unknown-token-spend funding gap from2.0.6.

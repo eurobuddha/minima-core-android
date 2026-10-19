@@ -1,6 +1,7 @@
 package com.eurobuddha.atomix.swap;
 
 import android.os.Handler;
+import com.eurobuddha.minimaapi.ethereum.EthereumTransactions;
 import com.eurobuddha.atomix.TradingContext;
 import com.eurobuddha.atomix.eth.*;
 import com.eurobuddha.atomix.integratedcomms.*;
@@ -31,8 +32,19 @@ public class BidBackingTest {
         Handler ui=mock(Handler.class);ExecutorService worker=mock(ExecutorService.class);List<Runnable> queue=new ArrayList<>();
         LazySodium sodium=mock(LazySodium.class);CommsTransport.SendCb cb=mock(CommsTransport.SendCb.class);
         CommsIdentity identity=CommsIdentity.fromKeys(new byte[32],new byte[32],new byte[32],new byte[64]);
-        Credentials owner=Credentials.create("01");SwapEngine engine;Order o=order();NodeApi.Cb balance;String signed;
+        Credentials owner=Credentials.create("01");
+        final Map<String,String> records=new HashMap<>();
+        final EthereumTransactions journal=new EthereumTransactions(new EthereumTransactions.Store(){
+            public String read(String key){return records.getOrDefault(key,"[]");}
+            public void write(String key,String value){records.put(key,value);}
+        });
+        final Field shared=EthereumTransactions.class.getDeclaredField("shared");
+        final Object previous;
+        BigInteger minedNonce=BigInteger.ZERO;
+        String blockHash="0x"+"ab".repeat(32);
+        SwapEngine engine;Order o=order();NodeApi.Cb balance;String signed;
         Fixture()throws Exception {
+            shared.setAccessible(true);previous=shared.get(null);shared.set(null,journal);
             when(wallet.creds()).thenReturn(owner);o.ethAddress=owner.getAddress();o.minimaPublicKey="0xAA";
             when(ui.post(any())).thenAnswer(i->{((Runnable)i.getArgument(0)).run();return true;});
             engine=new SwapEngine(node,mock(MinimaHtlc.class),mock(SwapDb.class),wallet,ui,mock(SwapEngine.Notifier.class));
@@ -47,6 +59,8 @@ public class BidBackingTest {
             doAnswer(i->{
                 if("eth_chainId".equals(i.getArgument(0)))return "0x1";
                 JSONArray args=i.getArgument(1);
+                if("eth_getBlockByNumber".equals(i.getArgument(0)))return new JSONObject().put("number","0x64").put("hash",blockHash);
+                if("eth_getTransactionCount".equals(i.getArgument(0))){assertEquals("0x64",args.getString(1));return "0x"+minedNonce.toString(16);}
                 assertEquals("eth_call",i.getArgument(0));assertEquals(EthNet.MAINNET.token("USDT").address,args.getJSONObject(0).getString("to"));
                 String data=args.getJSONObject(0).getString("data");assertTrue(data.startsWith("0x70a08231"));assertTrue(data.endsWith(owner.getAddress().substring(2)));
                 return word("pending".equals(args.getString(1))?pending:latest);
@@ -65,7 +79,18 @@ public class BidBackingTest {
                 case "shutdown":when(worker.isShutdown()).thenReturn(true);break;
             }
         }
-        public void close(){engine.shutdown();}
+        void saveSend(String to,String data,String operation,boolean unknown)throws Exception {
+            EthereumTransactions.Rpc transport=new EthereumTransactions.Rpc(){
+                public BigInteger chain(){return BigInteger.ONE;}
+                public BigInteger pending(String address){return BigInteger.valueOf(4);}
+                public String broadcast(String raw)throws Exception{if(unknown)throw new java.io.IOException("lost response");return org.web3j.crypto.Hash.sha3(raw);}
+                public JSONObject receipt(String hash){return null;}
+                public JSONObject transaction(String hash){return null;}
+            };
+            try {journal.send(transport,owner,1,to,data,BigInteger.ZERO,BigInteger.valueOf(400000),BigInteger.valueOf(1000000000),operation,()->{});}
+            catch(EthereumTransactions.Uncertain expected){if(!unknown)throw expected;}
+        }
+        public void close(){engine.shutdown();try{shared.set(null,previous);}catch(Exception error){throw new AssertionError(error);}}
     }
     @Test public void exhaustedAndPendingSpentBidsCannotBeRefreshedFromCachedBalance()throws Exception {
         for(long[] funds:new long[][]{{0,0},{5_000_000_000L,0},{0,5_000_000_000L}})
@@ -78,7 +103,7 @@ public class BidBackingTest {
     @Test public void realFreshBalanceReplacesCacheAndPreservesFundedBid()throws Exception {
         try(Fixture f=new Fixture();MockedStatic<CommsTransport> t=mockStatic(CommsTransport.class)) {
             f.o.usdtAvail=0;f.start();f.run();f.zeroMinima();Order sent=Order.fromJson(new JSONObject(f.signed));
-            assertEquals(5000,sent.usdtAvail,0);assertEquals(1,sent.effectiveBids("USDT").size());verify(f.rpc,times(3)).call(anyString(),any());
+            assertEquals(5000,sent.usdtAvail,0);assertEquals(1,sent.effectiveBids("USDT").size());verify(f.rpc,times(6)).call(anyString(),any());
         }
     }
     @Test public void malformedOrWrongChainReplyCannotSignOrPublish()throws Exception {
@@ -140,4 +165,57 @@ public class BidBackingTest {
         Order o=order();String saved=Order.toConfigJson(o);o.clampBidsToBalance(BigDecimal.ZERO);
         Order restored=Order.fromConfigJson(saved);restored.clampBidsToBalance(new BigDecimal("5000"));assertEquals(1,restored.effectiveBids("USDT").size());
     }
+    @Test public void locallyUnknownTransferCannotBackARefreshedBid()throws Exception {
+        try(Fixture f=new Fixture();MockedStatic<CommsTransport> t=mockStatic(CommsTransport.class)){
+            f.saveSend(EthNet.MAINNET.token("USDT").address,EthSend.buildTransferData("0x"+"44".repeat(20),BigInteger.valueOf(5_000_000_000L)),null,true);
+            f.start();f.run();f.zeroMinima();assertEquals(0,Order.fromJson(new JSONObject(f.signed)).usdtAvail,0);assertFalse(Order.fromJson(new JSONObject(f.signed)).hasLiquidity());
+        }
+    }
+    @Test public void localDebitAndRpcPendingDebitAreNotCountedTwice()throws Exception {
+        try(Fixture f=new Fixture();MockedStatic<CommsTransport> t=mockStatic(CommsTransport.class)){
+            f.funds(5_000_000_000L,4_000_000_000L);f.o.pairs.get("USDT").bids.get(0).amount=4000;
+            f.saveSend(EthNet.MAINNET.token("USDT").address,EthSend.buildTransferData("0x"+"44".repeat(20),BigInteger.valueOf(1_000_000_000L)),null,true);
+            f.start();f.run();f.zeroMinima();assertEquals(4000,Order.fromJson(new JSONObject(f.signed)).usdtAvail,0);assertTrue(Order.fromJson(new JSONObject(f.signed)).hasLiquidity());
+        }
+    }
+    @Test public void minedNonceExcludesSpendsAlreadyReflectedInExactBlockBalance()throws Exception {
+        try(Fixture f=new Fixture();MockedStatic<CommsTransport> t=mockStatic(CommsTransport.class)){
+            f.funds(4_000_000_000L,4_000_000_000L);f.minedNonce=BigInteger.valueOf(5);f.o.pairs.get("USDT").bids.get(0).amount=4000;
+            f.saveSend(EthNet.MAINNET.token("USDT").address,EthSend.buildTransferData("0x"+"44".repeat(20),BigInteger.valueOf(1_000_000_000L)),null,true);
+            f.start();f.run();f.zeroMinima();assertEquals(4000,Order.fromJson(new JSONObject(f.signed)).usdtAvail,0);
+        }
+    }
+    @Test public void newLocalSendInvalidatesMinimaReadAndDelayedPostGuard()throws Exception {
+        for(boolean afterSigning:new boolean[]{false,true})
+        try(Fixture f=new Fixture();MockedStatic<CommsTransport> t=mockStatic(CommsTransport.class)){
+            final BooleanSupplier[] gate=new BooleanSupplier[1];
+            t.when(()->CommsTransport.postBlob(any(),anyString(),anyString(),anyString(),anyString(),any(),any(),any())).thenAnswer(i->{gate[0]=i.getArgument(6);return null;});
+            f.start();f.run();if(afterSigning)f.zeroMinima();
+            f.saveSend(EthNet.MAINNET.token("USDT").address,EthSend.buildTransferData("0x"+"44".repeat(20),BigInteger.ONE),null,false);
+            if(afterSigning){assertNotNull(gate[0]);assertFalse(gate[0].getAsBoolean());}
+            else{f.zeroMinima();assertNull(f.signed);verify(f.cb).onFailed(SwapOrderBook.MARKET_ERROR);}
+        }
+    }
+    @Test public void changedBalanceBlockCannotSignAnOrder()throws Exception {
+        try(Fixture f=new Fixture()){
+            doAnswer(i->{JSONArray params=i.getArgument(1);return new JSONObject().put("number","0x64").put("hash","latest".equals(params.getString(0))?f.blockHash:"0x"+"cd".repeat(32));}).when(f.rpc).call(eq("eth_getBlockByNumber"),any());
+            f.start();f.run();assertNull(f.balance);verify(f.cb).onFailed(SwapOrderBook.BALANCE_ERROR);
+        }
+    }
+    @Test public void unknownSavedCalldataCannotFallBackToCachedFunds()throws Exception {
+        try(Fixture f=new Fixture()){
+            f.saveSend("0x"+"44".repeat(20),"0x12345678",null,true);f.start();f.run();assertNull(f.balance);verify(f.cb).onFailed(SwapOrderBook.BALANCE_ERROR);
+        }
+    }
+
+    @Test public void malformedAnchoredBlockAndNonceCannotSignOrPublish()throws Exception {
+        for(Object block:new Object[]{null,"bad",new JSONObject(),new JSONObject().put("number","0x64").put("hash","0x"+"00".repeat(32)),new JSONObject().put("number",100).put("hash","0x"+"ab".repeat(32))})
+        try(Fixture f=new Fixture()){
+            doReturn(block).when(f.rpc).call(eq("eth_getBlockByNumber"),any());f.start();f.run();verify(f.cb).onFailed(SwapOrderBook.BALANCE_ERROR);verifyNoInteractions(f.node,f.sodium);
+        }
+        try(Fixture f=new Fixture()){
+            doReturn("0x10000000000000000").when(f.rpc).call(eq("eth_getTransactionCount"),any());f.start();f.run();verify(f.cb).onFailed(SwapOrderBook.BALANCE_ERROR);verifyNoInteractions(f.node,f.sodium);
+        }
+    }
+
 }
