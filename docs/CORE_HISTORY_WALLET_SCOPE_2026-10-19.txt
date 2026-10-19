@@ -1,0 +1,53 @@
+Core history wallet scope — Pandamonium2.0.21/code216
+
+Problem/evidence
+A real1000Minima Core->minimaWallet transfer appeared as Split/internal0 in Core
+History. MinimaWallet displayed the coin and Received+1000; user confirmed arrival
+and then confirmed the simple return Sweep succeeded. Large-TxPoW handling remains
+untested on the device. This repair changes history presentation/storage only.
+
+Reuse/provenance
+Read standalone wallet/app/src/main/java/com/eurobuddha/wallet/HistoryTx.java in full,
+standalone history HistoryEntry/HistoryDb/Ownership and HistorySyncTest, integrated
+equivalents/callers/render/export paths, and Minima core commands/search/history.java
+getTxnDetails. Node differences sum isAddressRelevant, which includes tracked
+foreign scripts. Core History trusted those values and used output/input counts
+to guess Split. HistoryDb CONFLICT_IGNORE also retained the original classification.
+Standalone minimaWallet already computes outputs-at-our-addresses minus inputs-at-
+our-addresses; reused this calculation against existing Core Ownership.
+
+Implementation
+HistoryEntry.reconcile recomputes per-token difference from Core-owned simple
+addresses, chooses matching foreign counterparty rather than first/change output,
+and only marks Split/Consolidation when every input/output belongs to Core and net
+is zero. Foreign tracked activity is never marked a Core split. State-field mine
+flags remain filtering metadata, not authority to count funds as Core-owned.
+Native stored coin amounts are exact, so existing1000 transfer records are repaired
+transactionally before list/search/CSV/JSON export. IDs, coin evidence and timestamps
+are retained. Node sync can refresh existing valid records without counting them as
+new; import dedup remains unchanged. Fresh token records preserve tokenamount display
+units. Legacy token rows without unit metadata are not guessed; a fresh node record
+is required to recalculate them. Missing ownership/malformed coin data cannot prove
+a split. Canonical adapter regenerates all source changes from the pinned snapshot.
+
+Validation
+Before-fix regression:5cases,4expected failures (tracked send, return receipt, change-
+first recipient and foreign split); genuine Core split passes. Initial test fixture
+compile error was corrected before collecting this red regression.
+After-fix suite17history+196host passed. Real SQLite tests cover persistent cached
+repair, sent search/export, import dedup, known-row refresh, invalid refresh refusal
+and genuine split after reopen. Scaled units and missing/malformed evidence covered.
+Final release build/lint/importer/artifact checks and device verification pending.
+
+Code review
+Complete changed parser/DB/sync/callers, adapter, tests inspected. Transactional cache
+marker is published after commit. No changes to transaction execution or key handling.
+Scoped verdict pending final release checks; full application review remains open.
+Standalone History parity is pending; its unrelated dirty graph work is preserved.
+
+Final release/test/lint passed;17history+196host tests,0failures/errors/skips.
+Lint0errors,1829warnings. Importer/transport/localization/Keets/certificate/ZIP
+checks pass. Scoped code-review verdict: Approve. Versioned candidate
+base/dist/pandamonium-2.0.21-candidate.apk SHA256
+28731e6ebb12b1993ac3d503667b3c8725ef3c4fcbfb9a51c582db64ba1c5f67.
+Installation and physical cached-history check next.

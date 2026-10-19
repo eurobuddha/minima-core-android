@@ -260,6 +260,7 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
         if (closed) return;
         final Ownership o = own;   // snapshot — published wholesale, never mutated
         io.execute(() -> {
+            db.reconcile(o);
             List<HistoryEntry> rows = db.list(MAX_ROWS, 0, currentSearch);
             // Hide-foreign filter: drop entries that touch none of the wallet's own addresses/coins
             // (pure contract/external activity a polluted node adopted). No-op until ownership is
@@ -524,6 +525,7 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
     private void doExport(Uri uri) {
         io.execute(() -> {
             try {
+                db.reconcile(own);
                 List<HistoryEntry> all = db.all();
                 JSONObject root = new JSONObject();
                 root.put("app", "minima-history"); root.put("version", 1);
@@ -572,6 +574,7 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
     private void doExportCsv(Uri uri) {
         io.execute(() -> {
             try {
+                db.reconcile(own);
                 List<HistoryEntry> all = db.all();
                 SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
                 StringBuilder sb = new StringBuilder("txpowid,block,datetime,direction,amount,token,counterparty,deltas\n");

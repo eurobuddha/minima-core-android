@@ -722,3 +722,22 @@ the sweep." Phone control belongs entirely to user; stop ADB UI interactions.
 Real Sweep success remains unverified until the user reports their result.
 Code commits7d53a66 and6c7b0be pushed; installed2.0.20/code215,419tests pass.
 Full application review and broader standalone parity remain IN PROGRESS.
+
+2026-10-19 user live transaction results
+User reports simple minimaWallet Sweep WORKED. This is a live simple-sweep pass,
+not a large-collection test: user explicitly lacked enough coins to test automatic
+large-TxPoW handling. Recursive size splitting/recovery remains device-untested.
+User also reports real trades succeeded in AtomiX, PandaPools and PandaDEX. Record
+these as user-confirmed trade-path successes, not exhaustive app/edge-case review.
+
+Core History classification incident
+User sent1000Minima from Core to minimaWallet and briefly saw no receipt. Read-only
+Fold UI then showed minimaWallet1000/1coin and Received+1000 at block2374784; user
+confirmed arrival. Core cached history calls the same transfer self/Split because
+node history differences cover all relevant/tracked addresses, including minimaWallet.
+User independently identified the tracked-address cause. Transaction:
+0x00000E39E4E9F51174D7D6EECC402776D6A6D233A04A1C662F0B9B1D87A65670.
+Core detail input1060.00000213467;1000to minimaWallet plus change. No agent send,
+sign, reset or counter mutation.2.0.21/code216 History correction now in progress.
+Reuses standalone minimaWallet HistoryTx own-address netting and existing History
+Ownership/DB. Cached native rows repaired without deleting transaction evidence.
