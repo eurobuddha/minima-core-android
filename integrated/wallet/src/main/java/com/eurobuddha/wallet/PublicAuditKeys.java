@@ -64,7 +64,7 @@ public final class PublicAuditKeys {
                         || !publicKeys.add(pk.toUpperCase(java.util.Locale.ROOT)))
                     throw new IllegalArgumentException("Invalid or duplicate public key");
                 int uses = counters.currentUses(index); // MAX across existing durable mirrors
-                rows.put(new JSONObject().put("publickey",pk).put("uses",trusted ? uses : -1)
+                rows.put(new JSONObject().put("index",index).put("publickey",pk).put("uses",trusted ? uses : -1)
                         .put("size",64).put("depth",3).put("maxuses",262144));
             }
             for (int i=0; i<WalletCore.NUM_BASE_KEYS; i++)

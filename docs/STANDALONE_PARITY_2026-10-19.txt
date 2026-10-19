@@ -12,7 +12,7 @@ App / version (code) / repair commit / JVM tests at latest checkpoint
 ETH Wallet       0.2.9 (209)   c1fb535 28 debug +28 release
 AtomiX           0.1.77 (177)  2aa2de8 308 debug +308 release
 PandaPools       0.9.67 (967)  2f39f65              303
-Future Cash Next 0.1.9 (109)   ee080af              49
+Future Cash Next 0.1.10(110)   bd7ede5 54 debug +54 release
 PandaDEX         0.4.23 (423)  fbe0645              712
 Casino           0.7.4 (704)   0218dd0              25
 Block Explorer   0.1.6 (106)   f0fe019              no JVM suite
@@ -118,9 +118,9 @@ Only Fold R3GL805K7MB may be used when it returns; no other phone is authorized.
 Reproducibility
 All22 staging sources are detached at exact integrated/sources.lock.json revisions.
 Atelier uses its pinned parent worktree plus Android subdirectory link. No lock
-revision was silently advanced. Main source checkpoint1.9.116/code187: AtomiX exhausted-maker funding repair.
+revision was silently advanced. Main source checkpoint1.9.117/code188: Pandamonium Future Cash wallet stakes.
 Latest all22 snapshot/provenance verification passes after the standalone ports.
-Language check:6893 messages in English, Chinese, Russian and Ukrainian passes.
+Language check:6904 messages in English, Chinese, Russian and Ukrainian passes.
 Transport check:all bundled clients use DirectNodeApi; no internal IPC relay,
 notification receiver, secondary process or whole-package reset remains.
 Main latest full signed APK is still1.9.101; do not label it2.0.0.
@@ -149,3 +149,11 @@ pushed checkpoint; unrelated graph work preserved. Reapply those14 files only,
 restore the saved adapter registration, bump the next main version, add complete
 history/migration/recovery tests, review and then commit. This WIP has not passed
 behavioral tests and is not release-ready. It is not full prepared-journal parity.
+
+Future Cash checkpoint: node + minimaWallet discovery/collection/rescue is explicitly
+Pandamonium-only. Standalone0.1.10/bd7ede5 receives covenant/lookup validation,
+coinage maturity, retired-risk refresh, strict vault status and foreground guardian
+repairs only.54 debug +54 release tests pass; signed local candidate verified.
+No standalone minimaWallet changes from this feature. Integrated96 Future Cash +159
+wallet tests and release lint pass; see FUTURE_CASH_WALLET_STAKES_2026-10-19.txt.
+No new Pandamonium APK built, device install or publication at this checkpoint.

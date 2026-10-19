@@ -8407,4 +8407,15 @@
     <string name="l10n_atomix_send_fee_cap" formatted="false">"Комісія Ethereum виходить за безпечні межі. Перевірте RPC-сервер."</string>
     <string name="l10n_atomix_market_funds_unverified" formatted="false">"Помилка публікації: не вдалося перевірити доступні кошти. Ордер не оновлено."</string>
     <string name="l10n_atomix_market_update_funds_unverified" formatted="false">"Помилка оновлення: не вдалося перевірити доступні кошти. Ордер не оновлено."</string>
+    <string name="l10n_future_source_node" formatted="false">"Вузол"</string>
+    <string name="l10n_future_source_wallet" formatted="false">"minimaWallet"</string>
+    <string name="l10n_future_source_both" formatted="false">"Вузол + minimaWallet"</string>
+    <string name="l10n_future_wallet_rescue_unlock" formatted="false">"Розблокуйте minimaWallet для порятунку виплат на адреси з повторно використаними ключами."</string>
+    <string name="l10n_future_error_stake_scan" formatted="false">"Не вдалося прочитати повний список платежів. Оновіть і повторіть."</string>
+    <string name="l10n_future_error_wallet_addresses" formatted="false">"Не вдалося прочитати адреси гаманця. Оновіть і повторіть."</string>
+    <string name="l10n_future_error_wallet_tracking" formatted="false">"Не вдалося відстежувати адреси minimaWallet. Оновіть і повторіть."</string>
+    <string name="l10n_future_error_wallet_export" formatted="false">"Не вдалося експортувати монету виплати. Оновіть і повторіть."</string>
+    <string name="l10n_future_error_wallet_rescue" formatted="false">"Не вдалося підготувати порятунок коштів minimaWallet. Розблокуйте гаманець, перевірте лічильники ключів і повторіть."</string>
+    <string name="l10n_future_scan_sources" formatted="false">"Скануються вузол і minimaWallet. Кошти надходять на початкову адресу виплати."</string>
+    <string name="l10n_future_scan_retry" formatted="false">"Оновити платежі"</string>
 </resources>

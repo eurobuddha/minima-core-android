@@ -136,6 +136,17 @@ public final class Tx {
         return run(node, "COL", steps);
     }
 
+    /** minimaWallet signed this through its own authenticated, durable counter path. */
+    public static Result importedSweep(Node node, String data) {
+        if (data==null || !data.matches("0x[0-9a-fA-F]+") || (data.length()&1)!=0)
+            return Result.err("Could not prepare minimaWallet rescue. Unlock it, check key uses, and retry.");
+        List<String> steps=new ArrayList<>();
+        steps.add("txnimport id:%ID% data:"+data);
+        steps.add("txnbasics id:%ID%");
+        steps.add("txnpost id:%ID% mine:true");
+        return run(node,"WSWP",steps);
+    }
+
     /**
      * Sweep: move a collected coin off its (reused) address to safety.
      *

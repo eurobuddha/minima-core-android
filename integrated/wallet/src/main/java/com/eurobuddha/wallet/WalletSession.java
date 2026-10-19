@@ -49,10 +49,10 @@ public final class WalletSession implements DefaultLifecycleObserver {
     public WalletWork work() { return mWork; }
 
     /** Last time the user was active (unlock / interaction). Frozen while backgrounded. */
-    private long mLastActivity;
+    private volatile long mLastActivity;
 
     /** Wall-clock at the last real app background ({@code ON_STOP}); 0 while foreground / never. */
-    private long mBackgroundedAt;
+    private volatile long mBackgroundedAt;
 
     private WalletSession(Context zApp) {
         mPrefs   = zApp.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -77,6 +77,9 @@ public final class WalletSession implements DefaultLifecycleObserver {
         }
         return sInstance;
     }
+
+    /** Never opens a vault or creates a signing session for background work. */
+    public static synchronized WalletSession current() { return sInstance; }
 
     // --- accessors -------------------------------------------------------------------------------
 

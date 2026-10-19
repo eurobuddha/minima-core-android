@@ -56,6 +56,7 @@ public final class Guardian {
 
     private boolean vaultLocked = false;
     private boolean lockNotified = false;
+    private boolean walletLocked = false;
     private boolean cannotRescueNotified = false;
 
     public interface Notifier {
@@ -84,24 +85,10 @@ public final class Guardian {
         return s1.matches("^[0-9]+$");
     }
 
-    /**
-     * Find this node's stakes.
-     *
-     * <p>Scans {@code coins relevant:true} ONLY, which is both cheaper and safer than it looks. We
-     * register the covenant with trackall:false, so core keeps a stake coin only when one of its
-     * state variables is an address this node tracks — i.e. only when port 2 pays out to US. Core's
-     * relevance filter IS the ownership filter, and it runs before the coin ever reaches this app.
-     * (Measured against the alternative on a live node: all 33 of that node's stakes were in the
-     * relevant set; the extra contract-address scan added only 14 stakes belonging to strangers.)
-     *
-     * <p>ownsAddress is still applied, and is still load-bearing: relevance is stamped when a block
-     * is PROCESSED and never re-evaluated, so any stake that arrived while a node had the covenant
-     * registered trackall:true stays in its relevant set for good.
-     */
-    private void detect(long tip, Set<String> ownDefault) {
+    /** Scan tracked stakes plus live-chain contracts for the node and minimaWallet public owners. */
+    private void detect(long tip, Wallet.AddressSets sets) {
         seenStakes.clear();
-        final JSONObject r = node.cmd("coins relevant:true");
-        final JSONArray arr = Node.arr(r);
+        final JSONArray arr = StakeScan.read(node, sets, StakeScan.contracts(wallet));
         for (int i = 0; i < arr.length(); i++) {
             final JSONObject c = arr.optJSONObject(i);
             if (c == null) continue;
@@ -110,7 +97,7 @@ public final class Guardian {
             if (!looksLikeFutureCash(c)) continue;
 
             final String payout = Node.state(c, FutureCashContract.ST_RECIPIENT);
-            if (!Wallet.owns(ownDefault, payout)) continue;   // only stakes paying out to US
+            if (!Wallet.owns(sets.ownDefault, payout)) continue;   // only stakes paying out to US
 
             seenStakes.put(coinid, c);
             final long matureBlock = parseLong(Node.state(c, FutureCashContract.ST_FUTUREBLOCK));
@@ -133,11 +120,11 @@ public final class Guardian {
     /* ================= collect ================= */
 
     private void collectMatured(long tip, boolean autoCollectSafe, boolean rescueEnabled,
-                                boolean auditFresh, boolean canSweep, Set<String> ownDefault) {
+                                boolean auditFresh, boolean canSweep, Wallet.AddressSets sets) {
         for (Store.CollectRow row : store.collectsWithStatus(Store.DETECTED)) {
             // Ownership is re-checked HERE, not just at detect time: a row already in the table would
             // otherwise stay actionable forever. Never post for a payout we don't own.
-            if (!Wallet.owns(ownDefault, row.payout)) {
+            if (!Wallet.owns(sets.ownDefault, row.payout)) {
                 store.deleteCollect(row.coinid);
                 continue;
             }
@@ -150,9 +137,10 @@ public final class Guardian {
             if (!matured(coin, tip)) continue;
 
             final boolean bareCollectSafe = !row.atRisk && auditFresh && autoCollectSafe;
-            final boolean collectToSweep = row.atRisk && rescueEnabled && canSweep;
+            final boolean collectToSweep = row.atRisk && rescueEnabled && canSweep && wallet.canSweep(row.payout,sets);
             if (!bareCollectSafe && !collectToSweep) continue;   // can't act safely yet — leave DETECTED
 
+            if (!wallet.walletUnchanged(sets)) return;
             final String posted = bareCollectSafe ? Store.COLLECT_POSTED_SAFE : Store.COLLECT_POSTED;
             // Atomic claim: if another pass got here first, this returns false and we do not post.
             if (!store.claimForPost(row.coinid, posted, tip)) continue;
@@ -215,7 +203,7 @@ public final class Guardian {
     private void detectCollectedForSweep(long tip) {
         final Set<String> claimed = new HashSet<>(store.allSweepCoinIds());
         for (Store.CollectRow row : store.collectsWithStatus(Store.COLLECTED)) {
-            final JSONObject r = node.cmd("coins relevant:true sendable:true address:" + row.payout);
+            final JSONObject r = node.cmd("coins address:" + row.payout + " checkmempool:true");
             final JSONArray arr = Node.arr(r);
             JSONObject found = null;
             for (int i = 0; i < arr.length(); i++) {
@@ -261,10 +249,9 @@ public final class Guardian {
         }
     }
 
-    private void sweepPending(long tip, String safe) {
+    private void sweepPending(long tip, String safe, Wallet.AddressSets sets) {
         for (Store.SweepRow row : store.sweepsWithStatus(Store.PENDING)) {
-            final String signKey = wallet.signKeyFor(row.address);
-            if (signKey == null) {
+            if (!wallet.canSweep(row.address,sets)) {
                 // No signable key for this address. Leave the row PENDING rather than burning an
                 // attempt on a transaction that cannot be signed — and say so once per pass, because
                 // this needs a human (usually: the address was retired on a node since reseeded, so
@@ -275,7 +262,7 @@ public final class Guardian {
             }
             if (!store.claimSweepForPost(row.coinid, tip)) continue;   // another pass owns it
 
-            final Tx.Result res = Tx.sweep(node, row.coinid, safe, row.amount, row.tokenid, signKey);
+            final Tx.Result res = wallet.sweep(row.coinid,row.address,safe,row.amount,row.tokenid,sets);
             if (res.ok) {
                 cfg.log(Cfg.LVL_INFO, "Sweeping " + row.amount + " | coin:" + row.coinid
                         + " | from:" + row.address + " | to:" + safe);
@@ -423,14 +410,27 @@ public final class Guardian {
         final String safe = cfg.get(Cfg.SAFE_ADDRESS, null);
 
         final Wallet.AddressSets sets = wallet.addressSets();
-        detect(tip, sets.ownDefault);
+        wallet.trackWallet(sets);
+        detect(tip, sets);
 
+        boolean walletBlocked=false;
+        for (JSONObject coin : seenStakes.values()) {
+            String payout=Node.state(coin,FutureCashContract.ST_RECIPIENT);
+            if (atRisk.contains(Wallet.canonAddr(payout)) && Wallet.owns(sets.walletOwned,payout)
+                    && !wallet.canSweep(payout,sets)) walletBlocked=true;
+        }
+        if (walletBlocked && !walletLocked) {
+            cfg.log(Cfg.LVL_WARN,"Unlock minimaWallet to rescue its reused-key payouts.");
+            notifier.notify("Future Cash: rescue is off","Unlock minimaWallet to rescue its reused-key payouts.");
+        }
+        walletLocked=walletBlocked;
         final Audit.Verdict verdict = audit.usable();
 
         // Rescue needs a usable safe AND an unlocked vault, both checked BEFORE collecting, so an
         // at-risk coin is only pulled onto its exposed address when a sweep can immediately follow.
         boolean canSweep = false;
         if (rescueEnabled && safe != null && wallet.safeUsable(safe, sets.allTracked, atRisk)) {
+            canSweep = true;
             vaultLocked = wallet.vaultLocked();
             if (vaultLocked) {
                 if (!lockNotified) {
@@ -472,12 +472,12 @@ public final class Guardian {
             cannotRescueNotified = false;
         }
 
-        collectMatured(tip, autoCollectSafe, rescueEnabled, verdict.ok, canSweep && !badSafe, sets.ownDefault);
+        collectMatured(tip, autoCollectSafe, rescueEnabled, verdict.ok, canSweep && !badSafe, sets);
         reconcileCollects(tip);
         detectCollectedForSweep(tip);
         if (canSweep) {
             detectStrandedForSweep();
-            sweepPending(tip, safe);
+            sweepPending(tip, safe, sets);
         }
         reconcileSweeps(tip, safe);
     }
@@ -489,7 +489,7 @@ public final class Guardian {
         public int watching, collecting, collectedSafe, collected, sweeping, swept, taken;
         public double readySafeN, readySafeA, readyRiskN, readyRiskA;
         public double pendRiskN, pendRiskSoonest, pendRiskA;
-        public boolean vaultLocked;
+        public boolean vaultLocked, walletLocked;
         public int atRiskKnown;
     }
 
@@ -509,18 +509,21 @@ public final class Guardian {
         final double[] pend = store.pendingAtRisk(tip);
         s.pendRiskN = pend[0]; s.pendRiskSoonest = pend[1]; s.pendRiskA = pend[2];
         s.vaultLocked = vaultLocked;
+        s.walletLocked = walletLocked;
         s.atRiskKnown = atRisk.size();
         return s;
     }
 
     /* ================= UI-facing actions ================= */
 
-    /** This node's stakes, for the Stakes tab. Relevant-only, same reasoning as detect(). */
-    public List<Stake> listStakes() {
+    /** Both wallets' stakes, using the same discovery and maturity rules as the guardian. */
+    public synchronized List<Stake> listStakes() {
+        reloadAtRisk();
         final List<Stake> out = new ArrayList<>();
         final long tip = tip();
         final Wallet.AddressSets sets = wallet.addressSets();
-        final JSONArray arr = Node.arr(node.cmd("coins relevant:true"));
+        wallet.trackWallet(sets);
+        final JSONArray arr = StakeScan.read(node,sets,StakeScan.contracts(wallet));
         final Set<String> seen = new HashSet<>();
         for (int i = 0; i < arr.length(); i++) {
             final JSONObject c = arr.optJSONObject(i);
@@ -537,8 +540,11 @@ public final class Guardian {
             st.amount = Node.outAmount(c);
             st.tokenid = c.optString("tokenid", "0x00");
             st.matureBlock = parseLong(Node.state(c, FutureCashContract.ST_FUTUREBLOCK));
-            st.ready = st.matureBlock <= tip;
+            st.ready = matured(c,tip);
             st.atRisk = atRisk.contains(Wallet.canonAddr(payout));
+            st.wallet = Wallet.owns(sets.walletOwned,payout);
+            st.node = Wallet.owns(sets.nodeOwned,payout);
+            st.rescueAvailable = !st.atRisk || wallet.canSweep(payout,sets);
             out.add(st);
         }
         // Lowest maturity block first, so anything ready to collect is at the top and the rest read
@@ -551,7 +557,7 @@ public final class Guardian {
     public static final class Stake {
         public String coinid, payout, amount, tokenid;
         public long matureBlock;
-        public boolean ready, atRisk;
+        public boolean ready, atRisk, wallet, node, rescueAvailable;
     }
 
     public long tip() {
@@ -599,10 +605,13 @@ public final class Guardian {
      * Collect ONE matured stake now. Same safety gates as the engine: refuses an at-risk payout
      * (the rescue path owns those) and refuses without a usable audit.
      */
-    public Wallet.Res collectNow(String coinid) {
+    public synchronized Wallet.Res collectNow(String coinid) {
         if (!Node.validHexAddr(coinid)) return Wallet.Res.err("Not a valid coin id.");
         final long tip = tip();
-        final JSONArray arr = Node.arr(node.cmd("coins coinid:" + coinid));
+        final JSONObject lookup=node.cmd("coins coinid:"+coinid);
+        if (!Node.ok(lookup) || lookup.optJSONArray("response")==null)
+            return Wallet.Res.err("Could not read the complete stake list. Refresh and retry.");
+        final JSONArray arr = Node.arr(lookup);
         JSONObject coin = null;
         for (int i = 0; i < arr.length(); i++) {
             final JSONObject c = arr.optJSONObject(i);
@@ -611,7 +620,7 @@ public final class Guardian {
             }
         }
         if (coin == null) return Wallet.Res.err("Stake not found — it may already be collected.");
-        if (!looksLikeFutureCash(coin)) return Wallet.Res.err("Not a FutureCash stake.");
+        if (!StakeScan.isStake(coin,StakeScan.contracts(wallet))) return Wallet.Res.err("Not a FutureCash stake.");
         if (!matured(coin, tip)) {
             return Wallet.Res.err("Not matured yet — unlocks at block "
                     + Node.state(coin, FutureCashContract.ST_FUTUREBLOCK) + " (now " + tip + ").");
@@ -621,12 +630,14 @@ public final class Guardian {
         if (!Wallet.owns(sets.ownDefault, payout)) {
             return Wallet.Res.err("That stake doesn't pay out to this node — it isn't yours to collect.");
         }
+        reloadAtRisk();
         if (atRisk.contains(Wallet.canonAddr(payout))) {
             return Wallet.Res.err("This stake pays out to an at-risk address — the Guardian rescues it "
                     + "with collect + sweep instead. Set up rescue on the Guardian tab.");
         }
         if (!audit.usable().ok) return Wallet.Res.err("Run a key audit first, then collect.");
 
+        if (!wallet.walletUnchanged(sets)) return Wallet.Res.err("minimaWallet changed during the audit. Run the audit again.");
         final Tx.Result res = Tx.collect(node, coinid, payout, Node.outAmount(coin),
                 coin.optString("tokenid", "0x00"));
         if (!res.ok) return Wallet.Res.err(res.error);
@@ -638,6 +649,7 @@ public final class Guardian {
     /** Refresh the in-memory at-risk set (after an audit completes on another thread). */
     public synchronized void reloadAtRisk() {
         atRisk.clear();
+        for (String retired : wallet.retiredAddresses()) atRisk.add(Wallet.canonAddr(retired));
         final JSONArray flagged = cfg.atRisk();
         for (int i = 0; i < flagged.length(); i++) {
             final String a = flagged.optString(i, "");

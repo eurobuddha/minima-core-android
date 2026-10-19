@@ -92,7 +92,13 @@
     "Safe address set (external) — reuse check UNVERIFIED, will re-check": "future.logExternalUnverified",
     "Safe destination = a fresh same-node address": "future.logSameNode",
     "Retired a reused default address — off the change rotation, kept watch-only": "future.logRetired",
-    "Couldn't sweep": "future.logCannotSweep"
+    "Couldn't sweep": "future.logCannotSweep",
+    "Unlock minimaWallet to rescue its reused-key payouts.": "future.walletRescueUnlock",
+    "Could not read the complete stake list. Refresh and retry.": "future.errorStakeScan",
+    "Could not read wallet addresses. Refresh and retry.": "future.errorWalletAddresses",
+    "Could not track minimaWallet addresses. Refresh and retry.": "future.errorWalletTracking",
+    "Could not export the payout coin. Refresh and retry.": "future.errorWalletExport",
+    "Could not prepare minimaWallet rescue. Unlock it, check key uses, and retry.": "future.errorWalletRescue"
   },
   "patterns": [
     {

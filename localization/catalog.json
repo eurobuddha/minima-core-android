@@ -41911,5 +41911,71 @@
     "zh-Hans": "更新失败：无法核实可用资金，订单未刷新。",
     "ru": "Ошибка обновления: не удалось проверить доступные средства. Ордер не обновлён.",
     "uk": "Помилка оновлення: не вдалося перевірити доступні кошти. Ордер не оновлено."
+  },
+  "future.sourceNode": {
+    "en": "Node",
+    "zh-Hans": "节点",
+    "ru": "Узел",
+    "uk": "Вузол"
+  },
+  "future.sourceWallet": {
+    "en": "minimaWallet",
+    "zh-Hans": "minimaWallet",
+    "ru": "minimaWallet",
+    "uk": "minimaWallet"
+  },
+  "future.sourceBoth": {
+    "en": "Node + minimaWallet",
+    "zh-Hans": "节点 + minimaWallet",
+    "ru": "Узел + minimaWallet",
+    "uk": "Вузол + minimaWallet"
+  },
+  "future.walletRescueUnlock": {
+    "en": "Unlock minimaWallet to rescue its reused-key payouts.",
+    "zh-Hans": "请解锁 minimaWallet，以转移重复使用密钥地址上的款项。",
+    "ru": "Разблокируйте minimaWallet для спасения выплат на адреса с повторно использованными ключами.",
+    "uk": "Розблокуйте minimaWallet для порятунку виплат на адреси з повторно використаними ключами."
+  },
+  "future.errorStakeScan": {
+    "en": "Could not read the complete stake list. Refresh and retry.",
+    "zh-Hans": "无法读取完整的锁定付款列表。请刷新后重试。",
+    "ru": "Не удалось прочитать полный список платежей. Обновите и повторите.",
+    "uk": "Не вдалося прочитати повний список платежів. Оновіть і повторіть."
+  },
+  "future.errorWalletAddresses": {
+    "en": "Could not read wallet addresses. Refresh and retry.",
+    "zh-Hans": "无法读取钱包地址。请刷新后重试。",
+    "ru": "Не удалось прочитать адреса кошелька. Обновите и повторите.",
+    "uk": "Не вдалося прочитати адреси гаманця. Оновіть і повторіть."
+  },
+  "future.errorWalletTracking": {
+    "en": "Could not track minimaWallet addresses. Refresh and retry.",
+    "zh-Hans": "无法跟踪 minimaWallet 地址。请刷新后重试。",
+    "ru": "Не удалось отслеживать адреса minimaWallet. Обновите и повторите.",
+    "uk": "Не вдалося відстежувати адреси minimaWallet. Оновіть і повторіть."
+  },
+  "future.errorWalletExport": {
+    "en": "Could not export the payout coin. Refresh and retry.",
+    "zh-Hans": "无法导出付款币的证明。请刷新后重试。",
+    "ru": "Не удалось экспортировать монету выплаты. Обновите и повторите.",
+    "uk": "Не вдалося експортувати монету виплати. Оновіть і повторіть."
+  },
+  "future.errorWalletRescue": {
+    "en": "Could not prepare minimaWallet rescue. Unlock it, check key uses, and retry.",
+    "zh-Hans": "无法准备 minimaWallet 资金转移。请解锁钱包，检查密钥使用次数后重试。",
+    "ru": "Не удалось подготовить спасение средств minimaWallet. Разблокируйте кошелёк, проверьте счётчики ключей и повторите.",
+    "uk": "Не вдалося підготувати порятунок коштів minimaWallet. Розблокуйте гаманець, перевірте лічильники ключів і повторіть."
+  },
+  "future.scanSources": {
+    "en": "Scans the node and minimaWallet. Collections return to the original payout address.",
+    "zh-Hans": "扫描节点和 minimaWallet。领取的款项将返回原付款地址。",
+    "ru": "Сканируются узел и minimaWallet. Средства поступают на исходный адрес выплаты.",
+    "uk": "Скануються вузол і minimaWallet. Кошти надходять на початкову адресу виплати."
+  },
+  "future.scanRetry": {
+    "en": "Refresh stakes",
+    "zh-Hans": "刷新锁定付款",
+    "ru": "Обновить платежи",
+    "uk": "Оновити платежі"
   }
 }

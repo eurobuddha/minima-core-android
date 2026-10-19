@@ -1,0 +1,99 @@
+Pandamonium Future Cash Next: node and minimaWallet stakes
+2026-10-19 — source checkpoint 1.9.117 / code188
+
+Scope
+The user explicitly confirmed this feature is ONLY for Pandamonium. Future Cash
+Next uses the node's addresses and the currently configured embedded minimaWallet
+public keys. Standalone Future Cash Next receives shared correctness repairs only;
+standalone minimaWallet is unchanged. No phrase-entry feature or external wallet
+IPC signing API is added. Final Pandamonium2.0.0 remains pending the full review.
+
+Reuse and implementation
+Inspected the complete relevant sources and callers in integrated/futurecash-next:
+Wallet.java, Guardian.java, Tx.java, Node.java, Audit.java, AuditRunner.java,
+AuditKeySet.java, MinimaAddress.java, Cfg.java and MainActivity.java; in integrated/
+wallet: PublicAuditKeys.java, EmbeddedWallet.java, WalletSession.java, WalletWork.java,
+SeedVault.java, WalletCore.java, AddressBook.java, NodeLink.java and TxnFactory.java.
+Compared the standalone futurecash-next and wallet implementations, their tests,
+legacy apks/futurecash CollectActivity and mds/futurecash-next guardian/UI. Verified
+coins, cointrack, scripts and newscript against core/minima-core node source.
+
+Reuse PublicAuditKeys' verified public descriptor and durable counters; derive
+addresses with the existing MinimaAddress implementation. Register missing wallet
+scripts through the same command as minimaWallet NodeLink. Preserve existing
+scripts. Search relevant coins plus known live-chain covenant addresses, filter
+actual owned payouts, deduplicate and track newly found proofs. Do not supply
+relevant:false: the current node treats the presence of relevant as enabling it.
+Never track the shared covenant globally or treat arbitrary watch scripts as owned.
+
+Collections retain the existing exact payout and covenant maturity rules. Normal
+collection is unsigned; it neither opens the wallet nor reserves a signing leaf.
+The list labels Node, minimaWallet or both and uses the guardian's block/coinage
+maturity check. English, Chinese, Russian and Ukrainian messages are included.
+
+Reused-key payouts require a ready signer before collection. Node-owned payouts
+reuse Tx.sweep; wallet-owned payouts reuse the existing authenticated WalletSession,
+WalletWork operation gate and SeedVault reserve-before-sign path. Verify the actual
+coinexport coin ID, token, amount, address and derived wallet key before signing.
+TxnFactory's existing transaction builder gains only a whole-coin storestate:false
+entrypoint; token descriptor and amount remain exact. Publish the signed transaction
+through existing Tx import/basics/post and cleanup, while retaining the wallet
+operation gate through publication. Background auto-lock can run afterward.
+The wallet's current public snapshot is rechecked before collection/signing; seed
+replacement, locked/busy/expired sessions and revoked authorization fail closed.
+
+Usage and limits
+Open/unlock minimaWallet once if its public metadata has not yet been created.
+Discovery and normal audited collection can then work while minimaWallet is locked.
+For reused-key rescue, unlock minimaWallet and configure the existing rescue/safe
+address controls. No automatic unlock, seed extraction or counter reset is added.
+Only the current configured wallet is scanned. Coins already pruned before this
+node tracked them still require the existing proof restoration process; a scan
+cannot recreate missing chain proofs. Collection and later rescue are separate
+on-chain steps, as before; signer readiness is not a guarantee of future uptime.
+Existing broader transaction evidence, retry and audit-persistence review remains
+open. This feature checkpoint is not full2.0.0 release approval.
+
+Code review
+Summary: the new bridge reuses existing ownership, transaction construction and
+wallet authorization. Discovery is explicit about failed/incomplete replies, and
+normal collection keeps its original payout. No live funds were used in validation.
+Findings fixed before commit:
+- MAJOR: relevant-only discovery missed historical classic-wallet stakes. Add
+  owned covenant discovery and preserve newly discovered proofs with cointrack.
+- MAJOR: a wallet operation could finish before posting, allowing deferred lock
+  to invalidate authorization. Hold WalletWork through the publish callback.
+- MAJOR: opening the UI stood down the guardian service without replacing its
+  reconcile pass. Foreground refresh now runs the enabled, configured guardian.
+- MAJOR: list/manual risk refresh omitted retired node keys. Preserve the existing
+  retired-key risk rule on every refresh, including before manual collection.
+- MAJOR: malformed/failed status could look like an unlocked vault. Require a
+  successful non-pending envelope and a typed locked value before signing readiness.
+- MINOR: the list's absolute-block-only maturity disagreed with coinage collection.
+  Both paths now use the existing covenant maturity method.
+Verdict: approve this bounded integration and shared fixes. Broad review remains open.
+
+Validation
+Main:96 integrated Future Cash tests +159 integrated wallet tests, all passing.
+Standalone:54 debug +54 release tests, all passing (363 executions across both repos).
+No failures, errors or skipped tests. Pandamonium and standalone release lint pass;
+standalone has0 errors/50 existing warnings. All22 pinned source imports/provenance
+reproduce exactly.6904 messages validate in4 languages. DirectNodeApi transport
+checks pass. No device install, real transaction, seed/counter change or publication.
+
+Regression coverage includes node-only and both-wallet discovery, foreign/script
+spoofs, coinage, malformed replies, missing metadata, seed replacement, script/proof
+tracking failures, locked-wallet rescue refusal, clean unsigned wallet collection,
+locked-node/unlocked-wallet rescue, shared address ownership, and retired-key risk.
+Signer tests check exact native/custom-token payout, one reserved leaf per signature,
+actual signature verification, malformed/mismatched proofs, revoked authorization,
+busy/expired sessions and deferred lock after publication, using synthetic wallets.
+
+Reproducibility
+Canonical overlay: scripts/adapt-pandamonium-future-wallet-stakes.py, invoked by
+scripts/adapt-pandamonium-direct.py. New canonical classes live under
+scripts/pandamonium-sources/{futurecash-next,wallet}; test overlays under
+scripts/pandamonium-tests. Existing pinned sources.lock.json revisions are retained.
+Run integrated-futurecash-next:testDebugUnitTest, integrated-wallet:testDebugUnitTest,
+app:lintPandamoniumRelease, import-pandamonium.py --verify, localization generation
+--check and verify-pandamonium-transport.py using the existing offline build setup.

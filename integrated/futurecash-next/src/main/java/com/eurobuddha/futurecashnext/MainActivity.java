@@ -304,22 +304,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** Pull fresh state on the worker, then redraw. Every blocking call belongs in here. */
+    private String stakeError;
     private void refresh() {
         submit(() -> {
+            try {
             final long t = guardian.tip();
+            if (t>0 && cfg.is(Cfg.GUARDIAN_ON,false) && cfg.rescueReady()) guardian.reconcile(t);
             final List<Guardian.Stake> s = guardian.listStakes();
             final Audit.Verdict v = new Audit(cfg, node).usable();   // may block on the node — worker only
             final Guardian.Status st = guardian.status(t);           // SQLite — worker only
             runOnUiThread(() -> {
+                stakeError=null;
                 tip = t; stakes = s; lastVerdict = v; lastStatus = st;
                 render();
             });
+            } catch (RuntimeException unavailable) {
+                runOnUiThread(() -> {
+                    stakeError=unavailable.getMessage();
+                    if (stakeError==null) stakeError="Could not read the complete stake list. Refresh and retry.";
+                    stakes=java.util.Collections.emptyList();
+                    render();
+                });
+            }
         });
     }
 
     private void render() {
         renderPairBanner();
         content.removeAllViews();
+        if (stakeError!=null) {
+            LinearLayout error=Ui.card(this,0);
+            error.addView(Ui.body(this,FutureMessages.message(stakeError)));
+            error.addView(Ui.ghost(this,Language.msg(l10n_future_scan_retry),v -> refresh()));
+            content.addView(error);
+            return;
+        }
         switch (tab) {
             case "lock": renderStakes(); break;
             case "activity": renderActivity(); break;
@@ -331,6 +350,11 @@ public class MainActivity extends AppCompatActivity {
     /* ================= Guardian tab ================= */
 
     private void renderGuardian() {
+        if (lastStatus!=null && lastStatus.walletLocked) {
+            LinearLayout warning=Ui.card(this,0);
+            warning.addView(Ui.body(this,Language.msg(l10n_future_wallet_rescue_unlock)));
+            content.addView(warning);
+        }
         content.addView(heroCard());
         content.addView(auditCard());
         content.addView(daemonCard());
@@ -803,6 +827,7 @@ public class MainActivity extends AppCompatActivity {
                     ready > 0 ? Design.SAFE() : Design.DIM()));
         }
         listCard.addView(head);
+        listCard.addView(Ui.body(this,Language.msg(l10n_future_scan_sources)));
 
         if (stakes.isEmpty()) {
             listCard.addView(Ui.body(this, Language.msg(l10n_future_no_stakes)));
@@ -825,6 +850,10 @@ public class MainActivity extends AppCompatActivity {
                 amtRow.addView(Ui.pill(this, Language.msg(l10n_future_reused_payout), Design.WARN()));
             }
             info.addView(amtRow);
+            info.addView(Ui.text(this, Language.msg(s.wallet ? (s.node ? l10n_future_source_both : l10n_future_source_wallet)
+                    : l10n_future_source_node), Design.DIM2(),11,false));
+            if (s.wallet && s.atRisk && !s.rescueAvailable)
+                info.addView(Ui.body(this,Language.msg(l10n_future_wallet_rescue_unlock)));
 
             info.addView(Ui.text(this, s.ready ? Language.msg(l10n_future_ready_to_collect)
                             : Language.msg(l10n_future_unlocks, Ui.maturesIn(s.matureBlock, tip)),

@@ -8333,4 +8333,15 @@
     <string name="l10n_atomix_send_fee_cap" formatted="false">"Ethereum fee is outside the safe range. Review your RPC endpoint."</string>
     <string name="l10n_atomix_market_funds_unverified" formatted="false">"Publish failed: Could not verify spendable funds. Order was not refreshed."</string>
     <string name="l10n_atomix_market_update_funds_unverified" formatted="false">"Update failed: Could not verify spendable funds. Order was not refreshed."</string>
+    <string name="l10n_future_source_node" formatted="false">"Node"</string>
+    <string name="l10n_future_source_wallet" formatted="false">"minimaWallet"</string>
+    <string name="l10n_future_source_both" formatted="false">"Node + minimaWallet"</string>
+    <string name="l10n_future_wallet_rescue_unlock" formatted="false">"Unlock minimaWallet to rescue its reused-key payouts."</string>
+    <string name="l10n_future_error_stake_scan" formatted="false">"Could not read the complete stake list. Refresh and retry."</string>
+    <string name="l10n_future_error_wallet_addresses" formatted="false">"Could not read wallet addresses. Refresh and retry."</string>
+    <string name="l10n_future_error_wallet_tracking" formatted="false">"Could not track minimaWallet addresses. Refresh and retry."</string>
+    <string name="l10n_future_error_wallet_export" formatted="false">"Could not export the payout coin. Refresh and retry."</string>
+    <string name="l10n_future_error_wallet_rescue" formatted="false">"Could not prepare minimaWallet rescue. Unlock it, check key uses, and retry."</string>
+    <string name="l10n_future_scan_sources" formatted="false">"Scans the node and minimaWallet. Collections return to the original payout address."</string>
+    <string name="l10n_future_scan_retry" formatted="false">"Refresh stakes"</string>
 </resources>

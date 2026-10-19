@@ -110,6 +110,12 @@ public final class FutureMessages {
             case "Safe destination = a fresh same-node address": return Language.msg(l10n_future_log_same_node);
             case "Retired a reused default address — off the change rotation, kept watch-only": return Language.msg(l10n_future_log_retired);
             case "Couldn't sweep": return Language.msg(l10n_future_log_cannot_sweep);
+            case "Unlock minimaWallet to rescue its reused-key payouts.": return Language.msg(l10n_future_wallet_rescue_unlock);
+            case "Could not read the complete stake list. Refresh and retry.": return Language.msg(l10n_future_error_stake_scan);
+            case "Could not read wallet addresses. Refresh and retry.": return Language.msg(l10n_future_error_wallet_addresses);
+            case "Could not track minimaWallet addresses. Refresh and retry.": return Language.msg(l10n_future_error_wallet_tracking);
+            case "Could not export the payout coin. Refresh and retry.": return Language.msg(l10n_future_error_wallet_export);
+            case "Could not prepare minimaWallet rescue. Unlock it, check key uses, and retry.": return Language.msg(l10n_future_error_wallet_rescue);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {

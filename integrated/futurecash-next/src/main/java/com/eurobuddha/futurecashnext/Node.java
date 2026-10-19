@@ -73,7 +73,7 @@ public final class Node {
 
     /** True when the node reported success (and did not park the call as a pending approval). */
     public static boolean ok(JSONObject r) {
-        return r != null && r.optBoolean("status", false) && !r.optBoolean("pending", false);
+        return r != null && Boolean.TRUE.equals(r.opt("status")) && !r.optBoolean("pending", false);
     }
 
     public static boolean pending(JSONObject r) {

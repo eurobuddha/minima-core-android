@@ -56,17 +56,26 @@ public final class Wallet {
 
     public static final class AddressSets {
         public final Set<String> ownDefault = new HashSet<>();   // canonAddr of addresses we can sign for
+        public final Set<String> nodeOwned = new HashSet<>();
+        public final Set<String> nodeScripts = new HashSet<>();
+        public final Set<String> walletOwned = new HashSet<>();
+        public final java.util.Map<String,MinimaAddress.Result> walletAddresses = new java.util.LinkedHashMap<>();
+        public String walletFingerprint;
         public final Set<String> allTracked = new HashSet<>();   // raw forms of everything the node tracks
     }
 
     public AddressSets addressSets() {
         final AddressSets sets = new AddressSets();
         final JSONObject r = node.cmd("scripts");
+        if (r == null || !Boolean.TRUE.equals(r.opt("status")) || Node.pending(r)
+                || r.optJSONArray("response") == null)
+            throw new IllegalStateException("Could not read wallet addresses. Refresh and retry.");
         final JSONArray arr = Node.arr(r);
         for (int i = 0; i < arr.length(); i++) {
             final JSONObject s = arr.optJSONObject(i);
             if (s == null) continue;
             final String addr = s.optString("address", ""), mx = s.optString("miniaddress", "");
+            if (!addr.isEmpty()) sets.nodeScripts.add(canonAddr(addr));
             if (!addr.isEmpty()) sets.allTracked.add(addr.toLowerCase());
             if (!mx.isEmpty()) sets.allTracked.add(mx);
             if (hasOwnKey(s)) {
@@ -74,7 +83,63 @@ public final class Wallet {
                 if (!mx.isEmpty()) sets.ownDefault.add(canonAddr(mx));
             }
         }
+        sets.nodeOwned.addAll(sets.ownDefault);
+        for (String retired : retiredAddresses()) sets.nodeOwned.add(canonAddr(retired));
+        sets.ownDefault.addAll(sets.nodeOwned);
+        final JSONArray keys = cfg.walletAuditKeys();
+        if (keys == null) throw new IllegalStateException("Could not read minimaWallet public audit keys. Unlock minimaWallet and retry.");
+        sets.walletFingerprint = Audit.usesFingerprint(keys);
+        for (int i=0;i<keys.length();i++) {
+            JSONObject key=keys.optJSONObject(i);
+            MinimaAddress.Result address=key==null?null:MinimaAddress.fromPublicKey(key.optString("publickey",""));
+            if (address == null) throw new IllegalStateException("Could not read minimaWallet public audit keys. Unlock minimaWallet and retry.");
+            sets.walletAddresses.put(address.hex,address);
+            sets.walletOwned.add(canonAddr(address.hex));
+            sets.walletOwned.add(canonAddr(address.mx));
+            sets.allTracked.add(address.hex.toLowerCase(java.util.Locale.ROOT));
+            sets.allTracked.add(address.mx);
+        }
+        sets.ownDefault.addAll(sets.walletOwned);
         return sets;
+    }
+
+    public boolean walletUnchanged(AddressSets sets) {
+        try { return sets.walletFingerprint.equals(Audit.usesFingerprint(cfg.walletAuditKeys())); }
+        catch (RuntimeException unavailable) { return false; }
+    }
+
+    /** Same watch-script registration used by minimaWallet NodeLink. Never replaces node-owned rows. */
+    public void trackWallet(AddressSets sets) {
+        for (MinimaAddress.Result address : sets.walletAddresses.values()) {
+            if (sets.nodeScripts.contains(canonAddr(address.hex))) continue;
+            if (!walletUnchanged(sets)) throw new IllegalStateException("minimaWallet changed during the audit. Run the audit again.");
+            JSONObject added=node.cmd("newscript trackall:true script:\"" + address.script + "\"");
+            if (added == null || !Boolean.TRUE.equals(added.opt("status")) || Node.pending(added))
+                throw new IllegalStateException("Could not track minimaWallet addresses. Refresh and retry.");
+        }
+    }
+
+    private boolean nodeCanSweep(String address, AddressSets sets) {
+        return owns(sets.nodeOwned,address) && !vaultLocked() && signKeyFor(address)!=null;
+    }
+    public boolean canSweep(String address, AddressSets sets) {
+        if (nodeCanSweep(address,sets)) return true;
+        return owns(sets.walletOwned,address) && walletUnchanged(sets) && cfg.walletCanSweep(address);
+    }
+
+    public Tx.Result sweep(String coin, String address, String destination, String amount, String token,
+                           AddressSets sets) {
+        if (!canSweep(address,sets)) return Tx.Result.err("Unlock minimaWallet to rescue its reused-key payouts.");
+        if (nodeCanSweep(address,sets)) return Tx.sweep(node,coin,destination,amount,token,signKeyFor(address));
+        JSONObject exported=node.cmd("coinexport coinid:"+coin);
+        JSONObject response=Node.obj(exported);
+        if (exported == null || !Boolean.TRUE.equals(exported.opt("status")) || Node.pending(exported) || response==null)
+            return Tx.Result.err("Could not export the payout coin. Refresh and retry.");
+        try {
+            return cfg.walletSweep(node,coin,address,amount,token,destination,response.optString("data",""));
+        } catch (RuntimeException unavailable) {
+            return Tx.Result.err("Could not prepare minimaWallet rescue. Unlock it, check key uses, and retry.");
+        }
     }
 
     public static boolean owns(Set<String> own, String addr) {
@@ -293,8 +358,9 @@ public final class Wallet {
     }
 
     public boolean vaultLocked() {
-        final JSONObject resp = Node.obj(node.cmd("status"));
-        return resp != null && resp.optBoolean("locked", false);
+        final JSONObject reply = node.cmd("status");
+        final JSONObject resp = Node.obj(reply);
+        return !Node.ok(reply) || resp == null || !(resp.opt("locked") instanceof Boolean) || resp.optBoolean("locked", true);
     }
 
     /* ================= retired addresses (Harden / Recover) ================= */

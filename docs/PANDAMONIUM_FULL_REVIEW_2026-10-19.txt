@@ -430,3 +430,17 @@ future balances. Withdrawal publication still needs its tiny native posting cost
 if unavailable the old on-chain quote can only expire or be superseded after funding.
 Fresh ERC20 bid-side funding and shared ETH nonce/uncertain-send recovery remain
 separate open full-review work. This checkpoint does not complete standalone parity.
+
+Future Cash node + minimaWallet feature — Pandamonium1.9.117/code188
+User confirmed Pandamonium-only scope. Reuses PublicAuditKeys/MinimaAddress,
+Guardian/Tx collection and WalletSession/WalletWork/SeedVault/TxnFactory signing.
+Discover currently configured wallet stakes in the live chain and retain owned
+proofs. Label source; keep original payout; require authenticated wallet signing
+for reused-key rescue. Fix contract validation, coinage display, foreground
+reconcile, retired-key risk refresh and failed-vault-status handling.
+See docs/FUTURE_CASH_WALLET_STAKES_2026-10-19.txt for full review, scope and limits.
+255 integrated tests plus108 standalone debug/release executions pass. Both release
+lint checks,22 pinned imports,6904 translations and direct transport checks pass.
+Standalone Future Cash0.1.10/code110 receives shared repairs only; no wallet bridge.
+Signed local candidate verified, not installed or published. Full2.0.0 review and
+standalone parity remain incomplete; existing saved UTXO work is still untouched.

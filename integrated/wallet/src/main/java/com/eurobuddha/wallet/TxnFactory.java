@@ -384,6 +384,13 @@ public class TxnFactory {
         return build(zInputs, recipients, 1, zTokenID, zBurn, zID);
     }
 
+    /** Whole collected coin to the rescue destination, matching Future Cash's storestate:false sweep. */
+    public BuiltTxn buildSweep(InputCoin coin, String destination, String id) {
+        ArrayList<Output> outputs=new ArrayList<>();
+        outputs.add(new Output(parseAddress(destination),coin.getAmount()));
+        return build(java.util.Collections.singletonList(coin),outputs,1,coin.getTokenID(),MiniNumber.ZERO,id,false);
+    }
+
     /**
      * SPLIT (send-to-self): split {@code zAmount} of {@code zTokenID} into {@code zN} equal output
      * coins (plus a remainder coin if the division is not exact) at our own primary address; any
@@ -502,6 +509,10 @@ public class TxnFactory {
 
     private BuiltTxn build(List<InputCoin> zInputs, ArrayList<Output> zRecipients, int zSplit,
                            MiniData zTokenID, MiniNumber zBurn, String zID) {
+        return build(zInputs,zRecipients,zSplit,zTokenID,zBurn,zID,true);
+    }
+    private BuiltTxn build(List<InputCoin> zInputs, ArrayList<Output> zRecipients, int zSplit,
+                           MiniData zTokenID, MiniNumber zBurn, String zID, boolean storeState) {
 
         if (zInputs == null || zInputs.isEmpty()) {
             throw new IllegalArgumentException("No input coins provided");
@@ -599,7 +610,7 @@ public class TxnFactory {
 
             MiniNumber currenttotal = MiniNumber.ZERO;
             for (int i = 0; i < zSplit; i++) {
-                Coin out = new Coin(Coin.COINID_OUTPUT, user.mAddress, splitamount, Token.TOKENID_MINIMA, true);
+                Coin out = new Coin(Coin.COINID_OUTPUT, user.mAddress, splitamount, Token.TOKENID_MINIMA, storeState);
                 if (!minima) {
                     out.resetTokenID(zTokenID);
                     out.setToken(token);
@@ -611,7 +622,7 @@ public class TxnFactory {
             //Rounding remainder (send.java's "left over" output).
             MiniNumber currentdiff = usertotal.sub(currenttotal);
             if (currentdiff.isMore(MiniNumber.ZERO)) {
-                Coin remain = new Coin(Coin.COINID_OUTPUT, user.mAddress, currentdiff, Token.TOKENID_MINIMA, true);
+                Coin remain = new Coin(Coin.COINID_OUTPUT, user.mAddress, currentdiff, Token.TOKENID_MINIMA, storeState);
                 if (!minima) {
                     remain.resetTokenID(zTokenID);
                     remain.setToken(token);

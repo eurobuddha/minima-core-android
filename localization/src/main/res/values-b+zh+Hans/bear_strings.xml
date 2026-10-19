@@ -8296,4 +8296,15 @@
     <string name="l10n_atomix_send_fee_cap" formatted="false">"以太坊手续费超出安全范围。请检查 RPC 端点。"</string>
     <string name="l10n_atomix_market_funds_unverified" formatted="false">"发布失败：无法核实可用资金，订单未刷新。"</string>
     <string name="l10n_atomix_market_update_funds_unverified" formatted="false">"更新失败：无法核实可用资金，订单未刷新。"</string>
+    <string name="l10n_future_source_node" formatted="false">"节点"</string>
+    <string name="l10n_future_source_wallet" formatted="false">"minimaWallet"</string>
+    <string name="l10n_future_source_both" formatted="false">"节点 + minimaWallet"</string>
+    <string name="l10n_future_wallet_rescue_unlock" formatted="false">"请解锁 minimaWallet，以转移重复使用密钥地址上的款项。"</string>
+    <string name="l10n_future_error_stake_scan" formatted="false">"无法读取完整的锁定付款列表。请刷新后重试。"</string>
+    <string name="l10n_future_error_wallet_addresses" formatted="false">"无法读取钱包地址。请刷新后重试。"</string>
+    <string name="l10n_future_error_wallet_tracking" formatted="false">"无法跟踪 minimaWallet 地址。请刷新后重试。"</string>
+    <string name="l10n_future_error_wallet_export" formatted="false">"无法导出付款币的证明。请刷新后重试。"</string>
+    <string name="l10n_future_error_wallet_rescue" formatted="false">"无法准备 minimaWallet 资金转移。请解锁钱包，检查密钥使用次数后重试。"</string>
+    <string name="l10n_future_scan_sources" formatted="false">"扫描节点和 minimaWallet。领取的款项将返回原付款地址。"</string>
+    <string name="l10n_future_scan_retry" formatted="false">"刷新锁定付款"</string>
 </resources>

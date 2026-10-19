@@ -54,6 +54,15 @@ public final class Cfg {
         return com.eurobuddha.wallet.PublicAuditKeys.snapshot(appContext);
     }
 
+    public boolean walletCanSweep(String address) {
+        return com.eurobuddha.wallet.FutureCashAccess.canSweep(appContext, address);
+    }
+    public Tx.Result walletSweep(Node node, String coin, String address, String amount, String token,
+                              String destination, String proof) {
+        return com.eurobuddha.wallet.FutureCashAccess.sweep(appContext, coin, address,
+                amount, token, destination, proof, data -> Tx.importedSweep(node,data));
+    }
+
     public Cfg(Context ctx) {
         appContext = ctx.getApplicationContext();
         // Guardian and UI both touch this from different threads; SharedPreferences is thread-safe
