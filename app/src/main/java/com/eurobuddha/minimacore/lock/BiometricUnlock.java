@@ -161,19 +161,19 @@ public final class BiometricUnlock {
      * user to re-enable and fall back to the typed PIN.
      */
     public static void unlock(FragmentActivity zActivity, UnlockCallback zCallback) {
-        SharedPreferences p = prefs(zActivity);
-        String ctB64 = p.getString(K_CT, null);
-        String ivB64 = p.getString(K_IV, null);
-        if (ctB64 == null || ivB64 == null) {
-            zCallback.onError(Language.text(zActivity, l10n_biometric_not_set_up), false);
-            return;
-        }
-
-        final byte[] ct = Base64.decode(ctB64, Base64.NO_WRAP);
-        final byte[] iv = Base64.decode(ivB64, Base64.NO_WRAP);
-
+        final byte[] ct;
         final Cipher cipher;
         try {
+            SharedPreferences p = prefs(zActivity);
+            String ctB64 = p.getString(K_CT, null);
+            String ivB64 = p.getString(K_IV, null);
+            if (ctB64 == null || ivB64 == null) {
+                zCallback.onError(Language.text(zActivity, l10n_biometric_not_set_up), false);
+                return;
+            }
+
+            ct = Base64.decode(ctB64, Base64.NO_WRAP);
+            final byte[] iv = Base64.decode(ivB64, Base64.NO_WRAP);
             SecretKey key = loadKey();
             if (key == null) {
                 clearStored(zActivity);

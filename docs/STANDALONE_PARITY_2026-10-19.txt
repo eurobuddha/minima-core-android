@@ -79,3 +79,14 @@ Sixteen standalone repositories have pushed repair checkpoints. This is partial
 parity; the remaining source comparisons above still apply. Casino/Explorer's
 small adapter ports are complete. All candidates remain local, signed/versioned,
 with hashes; no installation or publication. Full2.0.0 review remains open.
+
+KeyUses0.1.6/code106 d4f5988 ports the actual shared KeyAudit engine and strict
+AuditApi evidence parsing;49 tests, lint0 errors18 warnings. Missing evidence cannot
+be green; known public usage remains visible when local counters are unavailable.
+Retains public IPC inputs/no phrase entry; audits the key set reported by the node.
+The embedded-only96-key derivation path is not available to this standalone connector.
+minimaWallet0.2.26/code226 ports biometric stored-data error containment;52 tests,
+lint0 errors164 warnings. Preserves newer sweep/reset/passphrase recovery commits.
+Signed candidates verified locally. Seventeen repos now have repair checkpoints;
+remaining financial/hosting/identity parity and full review are still open.
+History0.3.12 repair commit8a404c7; matching host1.9.108 commit25e9f60.

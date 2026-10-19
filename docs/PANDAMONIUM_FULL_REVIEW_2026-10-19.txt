@@ -246,3 +246,16 @@ Both History suites10 tests, zero failures/errors/skips. Pandamonium release lin
 all22 importer snapshots/provenance, transport and6884-message/four-language catalog
 checks pass. Standalone0.3.12 signed candidate verified; no install/publication.
 Full app review and final2.0.0 build remain pending.
+
+Biometric persisted-data review repair —1.9.109/code180
+Confirmed malformed Base64 or wrong preference types escaped the secure-key error
+handler in host and wallet. Reads/decode now share the existing guarded key setup;
+error callbacks leave the typed fallback available. Host PIN/wallet passphrase,
+aliases, storage and integrated authorization/lifecycle gates remain distinct.
+Mocked malformed ciphertext/IV/preference-type regressions run in all three forms:
+host168 tests, integrated wallet150, standalone wallet52, zero failures/errors/skips.
+Pandamonium release lint and all22 importer snapshots/provenance pass. Standalone
+wallet0.2.26 build/signature/lint verified; unrelated newer wallet commits preserved.
+Changed source, adapter, callers and tests reviewed; approve this bounded repair.
+No physical biometric test, installation or release publication. Full review remains
+open, including ETH nonce allocation, UTXO evidence and Salon adoption retry.
