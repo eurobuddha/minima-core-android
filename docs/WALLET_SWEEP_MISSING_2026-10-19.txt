@@ -48,3 +48,30 @@ review was interrupted by this user report; no pending Ethereum code edits exist
 Full review and parity remain incomplete. Signed2.0.6 and public/device2.0.0 do not
 contain the standalone Sweep feature. Do not claim its restoration until implemented
 and validated.
+
+Preparation checkpoint — planner and whole-coin builder only
+Reused standalone SweepFlow's pure planner as SweepPlanner, including original
+chunking and byte estimates. Its reviewed coin list is detached from mutable caches.
+Pending IDs compare without case; duplicate IDs and malformed state fail closed.
+Native Minima carrying state is transferred whole instead of pooled, preserving it.
+TxnFactory.buildNftTransfer retains its existing guards and delegates its unchanged
+construction/signing body to buildWholeTransfer, which also permits native coins.
+The existing ownership and token-integrity checks remain before signing.
+The reproducible import adapter and canonical tests are included.
+
+Validation: 175 wallet JVM tests passed (14 planner, 2 whole-transfer tests among
+these). Fixtures use public synthetic seeds and in-memory counters; no live node
+submissions. Whole-transfer tests verify native state/amount/destination, signed
+transaction serialization round-trip, WOTS verification and wrong-owner rejection.
+All pinned imports reproduce; direct transport guard and 6,927 messages in four
+languages pass. Initial test assertion compared MiniString with String; corrected
+to compare the actual text, then reran the complete wallet suite successfully.
+
+Code review: approve this preparation only. Read changed planner, adapter, builder
+extraction and tests; corrected malformed-state handling and pending-ID casing.
+No Settings entry, Sweep executor, persistent send journal, confirmation tracking,
+retry flow or new translations have been enabled. Those remain required before
+restoration can be called complete. Existing planner size estimates remain estimates;
+the future executor must verify resolved inputs and handle publication uncertainty.
+No APK built, installed or published for this source-only checkpoint. App version
+remains 2.0.6; bump before building the next candidate. Device/public 2.0.0 unchanged.

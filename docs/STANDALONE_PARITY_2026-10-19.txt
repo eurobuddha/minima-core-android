@@ -265,3 +265,9 @@ Confirmed imported wallet0.2.21 predates standalone0.2.22 Sweep. Standalone0.2.2
 retains Settings > Sweep; Pandamonium has no equivalent. Restoration is OPEN.
 Reuse/compatibility and safety findings: WALLET_SWEEP_MISSING_2026-10-19.txt.
 No Sweep restoration or new APK claimed by this investigation.
+
+Sweep preparation: original planner ported with state preservation and reviewed-input
+copy; unchanged whole-NFT transfer builder shared for native state coins. 175 wallet
+JVM tests pass; pinned importer, direct transport and four-language validation pass.
+Settings/executor/recovery integration remains OPEN. No Sweep-capable APK produced.
+See WALLET_SWEEP_MISSING_2026-10-19.txt for scope and remaining safety work.
