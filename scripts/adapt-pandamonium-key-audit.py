@@ -182,14 +182,20 @@ def adapt(root):
     /* ---------- transport ---------- */""")
     change('AuditRunner.java', '                cb.accept(0);', '                cb.accept(-1); // No row is an unknown result, not a clean destination.')
 
+    change('Audit.java', '        if (!aok || at == 0) return new Verdict(false, at, at != 0 ? Mode.PARTIAL : Mode.NONE);',
+        """        if (!aok || at == 0) return new Verdict(false, at, at != 0 ? Mode.PARTIAL : Mode.NONE);
+        // Match AppLock: a backwards clock cannot make an old safety decision fresh.
+        if (at < 0 || age < 0) return new Verdict(false, at, Mode.STALE);""")
+
     change('Audit.java', '    public enum Mode {', '    static final String FINGERPRINT_VERSION = "dual-key-v1|";\n\n    public enum Mode {')
     change('Audit.java', 'return String.join("|", parts);', 'return FINGERPRINT_VERSION + String.join("|", parts);')
     change('Audit.java', '        if (age < FRESH_MS) return new Verdict(true, at, Mode.FRESH);', """        final String storedFingerprint = cfg.get(Cfg.AUDIT_USES, "");
         if (storedFingerprint == null || !storedFingerprint.startsWith(FINGERPRINT_VERSION))
             return new Verdict(false, at, Mode.STALE);
         if (age < FRESH_MS) return new Verdict(true, at, Mode.FRESH);""")
-    change('MainActivity.java', 'if (!force && at > 0 && System.currentTimeMillis() - at < 20 * 60_000L) return;', """if (!force && at > 0 && cfg.get(Cfg.AUDIT_USES, "").startsWith(Audit.FINGERPRINT_VERSION)
-                && System.currentTimeMillis() - at < 20 * 60_000L) return;""")
+    change('MainActivity.java', 'if (!force && at > 0 && System.currentTimeMillis() - at < 20 * 60_000L) return;', """final long age = System.currentTimeMillis() - at;
+        if (!force && at > 0 && age >= 0 && cfg.get(Cfg.AUDIT_USES, "").startsWith(Audit.FINGERPRINT_VERSION)
+                && age < 20 * 60_000L) return;""")
     change('KeyAudit.java', 'The value to put in {@code keyuses:} on the next resync (already includes the margin).',
         'Classic-only recovery estimate including the margin; zero if no classic keys were audited.')
     change('KeyAudit.java', '@param usage      /keyaudit rows (may be missing entries; missing == never spent)',

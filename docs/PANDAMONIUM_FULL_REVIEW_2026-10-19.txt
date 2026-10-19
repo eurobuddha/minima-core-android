@@ -100,3 +100,42 @@ errors or skipped tests. The final two recovery tests were included in Salon's
 383-test rerun. Importer/provenance verification, transport check, catalog check
 and git diff --check passed. Signed build and release lint still running.
 Verdict for this recovery change: Approve. Full application review remains open.
+
+Salon installed verification
+7bbadfa / 1.9.101 committed and pushed to fork. Signed candidate installed on
+Fold R3GL805K7MB only, preserving data. APK SHA-256:
+2654b4d573e78d2038cb1343f8c28bc800e72ab8e0aa65226062944bf9f73969.
+Certificate matches the family release certificate. APK Keets verification passed
+(exact bundle, 21 native addon versions/runtime per ABI). Release lint passed:
+0 errors, 358 existing warnings. Full signed build finished successfully.
+The initial ADB URL replacement left a suffix from the old URL; no successful
+recovery was claimed. The user corrected the URL and confirmed recovery worked.
+Read-only UI verification then showed recovered gallery/links and the same
+new-node payment address. No page publication or messaging-key import performed.
+Salon messaging keys are app-generated independently of the Minima seed. Restoring
+one is optional for page editing; required to retain the old messaging identity.
+
+Future Cash clock repair — 1.9.102 (validation pending)
+Reuse AppLock's negative elapsed-time rejection in Audit.usable. Negative/future
+persisted audit timestamps cannot authorize collection. The UI audit throttle also
+allows a fresh audit after a backwards clock change. Regression tests cover future
+and invalid timestamps without calling the node or performing transactions.
+
+Final release version directive
+User: "Once the review is complete and you fix all the errors and build a new
+version, let's bump it up to a release of 2.0.0."
+Final reviewed Pandamonium release must be 2.0.0, with aligned APK filename,
+app metadata and publication listings. Intermediate repair commits retain required
+individual version bumps. Publication remains GitHub fork, PandaApps, eurobuddha.com.
+
+Future Cash clock repair review
+Changed adapter, generated Audit/MainActivity and canonical/generated regression
+suite inspected. Clock reversal and invalid timestamp checks occur before any
+cached verdict authorizes collection; the UI can request a new audit. No transaction
+amount/destination or signing flow changed. Verdict: Approve.
+Full Future Cash suite: 73 tests, 0 failures, 0 errors, 0 skipped.
+
+Overnight release hold (user 2026-10-19)
+User is going to bed and disconnecting the Fold. Continue review, repairs and signed
+2.0.0 candidate preparation. Hold the final release push/publication for a Fold
+check in the morning. Do not interact with the other connected phone.

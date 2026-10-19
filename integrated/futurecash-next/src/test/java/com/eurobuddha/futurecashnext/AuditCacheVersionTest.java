@@ -28,4 +28,25 @@ public class AuditCacheVersionTest {
         assertEquals(Audit.Mode.FRESH, verdict.mode);
         verifyNoInteractions(node);
     }
+    @Test public void backwardsClockCannotAuthorizeCollectionOrReuseCachedAudit() {
+        Node node = mock(Node.class);
+        Cfg cfg = fresh(Audit.FINGERPRINT_VERSION + "0XABC:10:64:3:262144");
+        when(cfg.getLong(Cfg.AUDIT_AT)).thenReturn(System.currentTimeMillis() + Audit.MAX_MS);
+        Audit.Verdict verdict = new Audit(cfg, node).usable();
+        assertFalse(verdict.ok);
+        assertEquals(Audit.Mode.STALE, verdict.mode);
+        verifyNoInteractions(node);
+    }
+    @Test public void invalidPersistedTimestampCannotAuthorizeCollection() {
+        Node node = mock(Node.class);
+        for(long at:new long[]{-1,Long.MIN_VALUE,Long.MAX_VALUE}) {
+            Cfg cfg = fresh(Audit.FINGERPRINT_VERSION + "0XABC:10:64:3:262144");
+            when(cfg.getLong(Cfg.AUDIT_AT)).thenReturn(at);
+            Audit.Verdict verdict = new Audit(cfg, node).usable();
+            assertFalse(verdict.ok);
+            assertEquals(Audit.Mode.STALE, verdict.mode);
+        }
+        verifyNoInteractions(node);
+    }
+
 }

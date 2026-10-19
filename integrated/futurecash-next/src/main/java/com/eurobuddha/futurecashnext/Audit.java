@@ -83,6 +83,8 @@ public final class Audit {
         final long age = System.currentTimeMillis() - at;
 
         if (!aok || at == 0) return new Verdict(false, at, at != 0 ? Mode.PARTIAL : Mode.NONE);
+        // Match AppLock: a backwards clock cannot make an old safety decision fresh.
+        if (at < 0 || age < 0) return new Verdict(false, at, Mode.STALE);
         final String storedFingerprint = cfg.get(Cfg.AUDIT_USES, "");
         if (storedFingerprint == null || !storedFingerprint.startsWith(FINGERPRINT_VERSION))
             return new Verdict(false, at, Mode.STALE);

@@ -767,8 +767,9 @@ public class MainActivity extends AppCompatActivity {
         final long at = cfg.getLong(Cfg.AUDIT_AT);
         // Refresh once the verdict is nearing expiry, not on every open: the gate needs a verdict
         // under 30 minutes old, so auditing on every launch was load the service never needed.
-        if (!force && at > 0 && cfg.get(Cfg.AUDIT_USES, "").startsWith(Audit.FINGERPRINT_VERSION)
-                && System.currentTimeMillis() - at < 20 * 60_000L) return;
+        final long age = System.currentTimeMillis() - at;
+        if (!force && at > 0 && age >= 0 && cfg.get(Cfg.AUDIT_USES, "").startsWith(Audit.FINGERPRINT_VERSION)
+                && age < 20 * 60_000L) return;
         auditRunning = true;
         runOnUiThread(this::render);
         submit(() -> auditRunner.run(new AuditRunner.Cb() {
