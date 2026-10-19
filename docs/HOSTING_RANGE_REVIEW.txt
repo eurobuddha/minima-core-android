@@ -24,7 +24,8 @@ Pinned importer verification passes for all source snapshots and provenance.
 Signed Pandamonium release build passes; final APK verification confirms the exact
 Keets bundle, all 21 native addon versions and Bare runtime. Original family
 certificate and package/version165/1.9.94 metadata verified. git diff --check passes.
-Fold installation and actual GitHub upload/read-back check follow this build.
+Installed on the Fold with existing app data preserved. Actual GitHub probe
+upload/read-back passed in both Atelier and Salon on 1.9.94.
 
 No server or GitHub credentials are stored in this repository. Live destination
 configuration is separate from the source change. No app-store publication.

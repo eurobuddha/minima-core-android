@@ -46,10 +46,14 @@ def adapt(root):
     }
 
 '''
+        if app == 'salon':
+            helpers=helpers.replace('private void bindHostingSecret(', 'private android.text.TextWatcher bindHostingSecret(')
+            helpers=helpers.replace('input.addTextChangedListener(watch(value -> {', 'android.text.TextWatcher watcher = watch(value -> {')
+            helpers=helpers.replace('        }));\n    }', '        });\n        input.addTextChangedListener(watcher);\n        return watcher;\n    }')
         index=s.index(marker);s=s[:index]+helpers+s[index:]
         if app=='salon':
             change('private void cfgSecret(LinearLayout parent, JSONObject cfg, String key, String label) { EditText e = field(parent, label, Crypt.decrypt(cfg.optString(key, "")), true, "••••••"); e.addTextChangedListener(watch(s -> Hosting.put(cfg, key, Crypt.encrypt(s)))); }',
-                   'private void cfgSecret(LinearLayout parent, JSONObject cfg, String key, String label) { EditText e = field(parent, label, "", true, "••••••"); bindHostingSecret(e, cfg, key, true, false, false); }')
+                   (project/'scripts/pandamonium-sources/salon/HostingSecretField.java.inc').read_text().strip())
             change('EditText e = new EditText(this); e.setText(Crypt.decrypt(cfg.optString(key, "")));','EditText e = new EditText(this);')
             change('e.addTextChangedListener(watch(s -> Hosting.put(cfg, key, Crypt.encrypt(s))));','bindHostingSecret(e, cfg, key, true, false, false);')
             change('saveHost(p); go(Screen.HOSTING);','if (saveHost(p)) go(Screen.HOSTING);')
