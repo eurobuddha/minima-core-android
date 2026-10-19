@@ -369,3 +369,13 @@ SHA256 bc5429b2fad946fcf4f1ca871fbb3cc2c6521bfb41303e5ccd1c4d75c4dc1602.
 See docs/WALLET_SWEEP_UX_UNLOCK_2026-10-19.txt. No live signing or timing claim.
 Installation is the next step. Full review/parity stays IN PROGRESS; standalone0.2.27
 still has the older Sweep presentation and needs the applicable UX parity adaptation.
+
+2.0.18 handoff — latest installed checkpoint
+Commit a943c4066bf06c17c6b346d7220f86010e176482 pushed successfully to
+fork/feature/bear-languages-2026-10-16. adb install -r on Fold R3GL805K7MB returned
+Success; dumpsys verifies2.0.18-Pandamonium/code213. Data preserved. App was not
+launched or navigated after installation; wallet remains under user control.
+No automated real Sweep, signing, broadcast or counter/pending-data modification.
+User can now manually inspect and test the corrected Sweep. Unlock duration on the
+Fold and real transaction success remain unverified. First unlock may populate the
+new protected cache once. Full review/parity still IN PROGRESS.
