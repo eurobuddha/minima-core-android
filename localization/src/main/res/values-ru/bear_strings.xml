@@ -8534,4 +8534,14 @@
     <string name="l10n_sweep_edit_destination" formatted="false">"Изменить адрес"</string>
     <string name="l10n_core_wallet_refreshing" formatted="false">"Обновление баланса…"</string>
     <string name="l10n_core_wallet_refresh_failed" formatted="false">"Не удалось обновить баланс. Повторяем…"</string>
+    <string name="l10n_wallet_reset" formatted="false">"Сбросить minimaWallet…"</string>
+    <string name="l10n_wallet_reset_auth" formatted="false">"Введите пароль кошелька для сброса minimaWallet. Это затронет только этот кошелёк внутри Pandamonium."</string>
+    <string name="l10n_wallet_reset_hint" formatted="false">"Введите RESET для подтверждения"</string>
+    <string name="l10n_wallet_reset_confirm" formatted="false">"Удалить этот кошелёк?"</string>
+    <string name="l10n_wallet_reset_erase" formatted="false">"Удалить кошелёк"</string>
+    <string name="l10n_wallet_reset_body" formatted="false">"Будут удалены сохранённая сид-фраза и биометрическая разблокировка minimaWallet. Затем можно создать новый кошелёк или импортировать сид-фразу.\n\nСредства не переводятся. Для повторного доступа нужна сид-фраза или зашифрованная резервная копия. Если копии ещё нет, отмените сейчас.\n\nОсновной узел Minima Core и другие кошельки не изменятся. Записи использования подписей сохраняются для безопасного восстановления.\n\nВведите RESET для подтверждения."</string>
+    <string name="l10n_wallet_reset_pending" formatted="false">"Есть незавершённая транзакция. Разрешите её перед сбросом кошелька."</string>
+    <string name="l10n_wallet_reset_done" formatted="false">"Кошелёк удалён. Создайте или импортируйте сид-фразу."</string>
+    <!-- Arguments: reason -->
+    <string name="l10n_wallet_reset_failed">"Не удалось сбросить кошелёк: %1$s"</string>
 </resources>

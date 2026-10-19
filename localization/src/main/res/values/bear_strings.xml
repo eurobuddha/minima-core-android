@@ -8460,4 +8460,14 @@
     <string name="l10n_sweep_edit_destination" formatted="false">"Edit address"</string>
     <string name="l10n_core_wallet_refreshing" formatted="false">"Updating balance…"</string>
     <string name="l10n_core_wallet_refresh_failed" formatted="false">"Balance could not be refreshed. Retrying…"</string>
+    <string name="l10n_wallet_reset" formatted="false">"Reset minimaWallet…"</string>
+    <string name="l10n_wallet_reset_auth" formatted="false">"Enter your wallet passphrase to reset minimaWallet. This affects only this wallet inside Pandamonium."</string>
+    <string name="l10n_wallet_reset_hint" formatted="false">"Type RESET to confirm"</string>
+    <string name="l10n_wallet_reset_confirm" formatted="false">"Erase this wallet?"</string>
+    <string name="l10n_wallet_reset_erase" formatted="false">"Erase wallet"</string>
+    <string name="l10n_wallet_reset_body" formatted="false">"This removes the saved seed and biometric unlock for minimaWallet. You can then create a new wallet or import a seed.\n\nFunds are not moved. To access this wallet again, you need its seed phrase or an encrypted backup. If you still need a backup, cancel now.\n\nThe main Minima Core node and other wallets are unchanged. Signing-use records are kept for safe recovery.\n\nType RESET to confirm."</string>
+    <string name="l10n_wallet_reset_pending" formatted="false">"A transaction is still pending. Resolve it before resetting this wallet."</string>
+    <string name="l10n_wallet_reset_done" formatted="false">"Wallet erased. Set up a new or imported seed."</string>
+    <!-- Arguments: reason -->
+    <string name="l10n_wallet_reset_failed">"Could not reset wallet: %1$s"</string>
 </resources>

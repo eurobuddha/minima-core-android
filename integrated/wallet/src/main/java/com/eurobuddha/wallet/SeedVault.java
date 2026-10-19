@@ -80,6 +80,7 @@ public class SeedVault {
         boolean contains();
         String read();                 // null if none
         void write(String hex);        // durable; throws IllegalStateException on failure
+        default void delete() { throw new IllegalStateException("Vault deletion unavailable"); }
         default void writeAudited(String hex, VaultBlob blob, KeyUses counters) { write(hex); }
     }
 
@@ -133,6 +134,15 @@ public class SeedVault {
             if (!mPrefs.edit().putString(KEY_BLOB, hex).putString(PublicAuditKeys.RECORD, descriptor).commit())
                 throw new IllegalStateException("Failed to persist wallet vault and public audit keys");
         }
+        @Override public void delete() {
+            String previous = read();
+            String audit = mPrefs.getString(PublicAuditKeys.RECORD, null);
+            if (!mPrefs.edit().remove(KEY_BLOB).remove(PublicAuditKeys.RECORD).commit()) {
+                // SharedPreferences can change memory despite a failed disk commit.
+                mPrefs.edit().putString(KEY_BLOB, previous).putString(PublicAuditKeys.RECORD, audit).commit();
+                throw new IllegalStateException("Failed to erase wallet vault");
+            }
+        }
         @Override public void write(String zHex) {
             if (!mPrefs.edit().putString(KEY_BLOB, zHex).remove(PublicAuditKeys.RECORD).commit()) {
                 throw new IllegalStateException("Failed to persist wallet vault");
@@ -166,6 +176,13 @@ public class SeedVault {
     /** Whether the current keyuses record is trustworthy (drives the signing fail-safe). */
     public synchronized boolean isKeyUsesTrusted() {
         return mOpen && mTrusted;
+    }
+
+    /** Standalone wipe flow; shared seed-scoped counters must survive an integrated reset. */
+    public synchronized void wipe() {
+        requireOpen();
+        try { mStore.delete(); }
+        finally { lock(); } // Revoke old signing handles even if durable deletion fails.
     }
 
     /** Lock the session, wiping the in-memory seed + passphrase. */

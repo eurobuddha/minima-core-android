@@ -42553,5 +42553,59 @@
     "zh-Hans": "无法刷新余额。正在重试…",
     "ru": "Не удалось обновить баланс. Повторяем…",
     "uk": "Не вдалося оновити баланс. Повторюємо…"
+  },
+  "wallet.reset": {
+    "en": "Reset minimaWallet…",
+    "zh-Hans": "重置 minimaWallet…",
+    "ru": "Сбросить minimaWallet…",
+    "uk": "Скинути minimaWallet…"
+  },
+  "wallet.resetAuth": {
+    "en": "Enter your wallet passphrase to reset minimaWallet. This affects only this wallet inside Pandamonium.",
+    "zh-Hans": "输入钱包口令以重置 minimaWallet。此操作仅影响 Pandamonium 内的这个钱包。",
+    "ru": "Введите пароль кошелька для сброса minimaWallet. Это затронет только этот кошелёк внутри Pandamonium.",
+    "uk": "Введіть пароль гаманця для скидання minimaWallet. Це стосується лише цього гаманця в Pandamonium."
+  },
+  "wallet.resetHint": {
+    "en": "Type RESET to confirm",
+    "zh-Hans": "输入 RESET 以确认",
+    "ru": "Введите RESET для подтверждения",
+    "uk": "Введіть RESET для підтвердження"
+  },
+  "wallet.resetConfirm": {
+    "en": "Erase this wallet?",
+    "zh-Hans": "清除此钱包？",
+    "ru": "Удалить этот кошелёк?",
+    "uk": "Видалити цей гаманець?"
+  },
+  "wallet.resetErase": {
+    "en": "Erase wallet",
+    "zh-Hans": "清除钱包",
+    "ru": "Удалить кошелёк",
+    "uk": "Видалити гаманець"
+  },
+  "wallet.resetBody": {
+    "en": "This removes the saved seed and biometric unlock for minimaWallet. You can then create a new wallet or import a seed.\n\nFunds are not moved. To access this wallet again, you need its seed phrase or an encrypted backup. If you still need a backup, cancel now.\n\nThe main Minima Core node and other wallets are unchanged. Signing-use records are kept for safe recovery.\n\nType RESET to confirm.",
+    "zh-Hans": "此操作将删除 minimaWallet 保存的种子和生物识别解锁。之后您可以创建新钱包或导入种子。\n\n资金不会转移。要再次访问此钱包，您需要其种子短语或加密备份。如仍需备份，请立即取消。\n\n主 Minima Core 节点及其他钱包不受影响。签名使用记录将保留，以便安全恢复。\n\n输入 RESET 以确认。",
+    "ru": "Будут удалены сохранённая сид-фраза и биометрическая разблокировка minimaWallet. Затем можно создать новый кошелёк или импортировать сид-фразу.\n\nСредства не переводятся. Для повторного доступа нужна сид-фраза или зашифрованная резервная копия. Если копии ещё нет, отмените сейчас.\n\nОсновной узел Minima Core и другие кошельки не изменятся. Записи использования подписей сохраняются для безопасного восстановления.\n\nВведите RESET для подтверждения.",
+    "uk": "Буде видалено збережену сід-фразу та біометричне розблокування minimaWallet. Потім можна створити новий гаманець або імпортувати сід-фразу.\n\nКошти не переказуються. Для повторного доступу потрібна сід-фраза або зашифрована резервна копія. Якщо копії ще немає, скасуйте зараз.\n\nОсновний вузол Minima Core та інші гаманці не зміняться. Записи використання підписів зберігаються для безпечного відновлення.\n\nВведіть RESET для підтвердження."
+  },
+  "wallet.resetPending": {
+    "en": "A transaction is still pending. Resolve it before resetting this wallet.",
+    "zh-Hans": "仍有交易待处理。请先处理该交易再重置钱包。",
+    "ru": "Есть незавершённая транзакция. Разрешите её перед сбросом кошелька.",
+    "uk": "Є незавершена транзакція. Вирішіть її перед скиданням гаманця."
+  },
+  "wallet.resetDone": {
+    "en": "Wallet erased. Set up a new or imported seed.",
+    "zh-Hans": "钱包已清除。请创建新种子或导入种子。",
+    "ru": "Кошелёк удалён. Создайте или импортируйте сид-фразу.",
+    "uk": "Гаманець видалено. Створіть або імпортуйте сід-фразу."
+  },
+  "wallet.resetFailed": {
+    "en": "Could not reset wallet: {reason}",
+    "zh-Hans": "无法重置钱包：{reason}",
+    "ru": "Не удалось сбросить кошелёк: {reason}",
+    "uk": "Не вдалося скинути гаманець: {reason}"
   }
 }

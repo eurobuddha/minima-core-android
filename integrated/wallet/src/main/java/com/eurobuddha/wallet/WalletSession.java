@@ -133,6 +133,12 @@ public final class WalletSession implements DefaultLifecycleObserver {
         mBackgroundedAt = 0L;
     }
 
+    /** Reset only this vault. Other apps and previously used seed counters remain intact. */
+    public void resetWallet() {
+        mVault.wipe();
+        mBackgroundedAt = 0L;
+    }
+
     // --- ProcessLifecycleOwner (whole-app foreground/background) ----------------------------------
 
     @Override

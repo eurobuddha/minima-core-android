@@ -1,0 +1,48 @@
+Integrated minimaWallet reset — Pandamonium2.0.20/code215
+
+Scope explicitly confirmed by user: restore integrated minimaWallet reset only.
+Do not change/reset the main Minima Core node seed. Device seed-change testing is
+ONLY authorized for standalone minimaWallet. User reports standalone reset works
+perfectly after the0.2.27 update. No integrated reset/Sweep/signing will be performed.
+
+Reuse
+Standalone /Users/eurobuddha/Projects/minima/apks/wallet/app/src/main/java/com/
+eurobuddha/wallet/SettingsView.java resetWallet/confirmReset, WalletSession.resetWallet,
+SeedVault.wipe and SessionUxTest were read. Flow added in0.2.24, after integrated
+snapshot0.2.21 and formerly installed standalone0.2.23. This was missing parity.
+Integrated SettingsView.authenticate, MainActivity.runWalletWork/sessionAuthorization,
+WalletDialog, SeedVault.verifyPassphrase, SweepPending and existing test fixtures
+are reused. Canonical adapter scripts/adapt-pandamonium-wallet-reset.py reproduces
+all generated edits; two inc files hold the small UI/worker adaptation.
+
+Behavior
+Settings has Reset minimaWallet beside Sweep. Passphrase is verified on the existing
+worker without re-opening/re-deriving the seed. Final confirmation explains backup,
+no funds moved, and unchanged Core node/other wallets. Erase is disabled until RESET
+is typed exactly (outer spaces ignored, matching standalone). Cancel is available.
+Existing tracked dialogs and session generation checks reject stale screens. A
+corrupt vault cannot bypass authentication. Worker rechecks the vault generation
+and blocks pending or unreadable Sweep records and session-pending NFT sends.
+No pending records are cleared. The worker disables this wallet biometric credential,
+deletes only vault_blob_hex and its PublicAuditKeys descriptor, and returns to setup.
+Shared seed-scoped signing counters are preserved; reimport never lowers them.
+Deletion uses acknowledged commit; failed commit attempts to restore prior memory
+and locks/revokes the signing generation. No successful reset is claimed on failure.
+
+Validation/review
+Disposable real vault tests cover erase/recreate, old-handle revocation, counter
+preservation across two seeds/reimport, failed deletion and locked-vault refusal.
+Worker tests cover deferred execution/completion, revoked sessions, pending/corrupt
+journals and corrupt-vault authentication. Actual dialogs cover four languages,
+RESET enablement, cancellation, expired sessions and dispatch after confirmation.
+Android preferences test checks deletion scope and descriptor removal.
+Reviewed the complete changed methods, adapter, new tests and four translations.
+No unresolved blocking finding for this reset change. Full app review remains open.
+Final test counts, signed artifact and device checks to be recorded below.
+
+Final checks:226wallet+193host tests pass;0failures/errors/skips. Release lint
+0errors, 1829 warnings. Importer/transport/localization/Keets/signature/ZIP
+verification pass. Candidate base/dist/pandamonium-2.0.20-candidate.apk SHA256
+ff954d63c86fe4e19e2be4d59564453ff3656a75977b0d28e15e3bd5405e5ccf.
+Certificate eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f.
+Scoped code-review verdict: Approve. Installation/device checks next.

@@ -8534,4 +8534,14 @@
     <string name="l10n_sweep_edit_destination" formatted="false">"Змінити адресу"</string>
     <string name="l10n_core_wallet_refreshing" formatted="false">"Оновлення балансу…"</string>
     <string name="l10n_core_wallet_refresh_failed" formatted="false">"Не вдалося оновити баланс. Повторюємо…"</string>
+    <string name="l10n_wallet_reset" formatted="false">"Скинути minimaWallet…"</string>
+    <string name="l10n_wallet_reset_auth" formatted="false">"Введіть пароль гаманця для скидання minimaWallet. Це стосується лише цього гаманця в Pandamonium."</string>
+    <string name="l10n_wallet_reset_hint" formatted="false">"Введіть RESET для підтвердження"</string>
+    <string name="l10n_wallet_reset_confirm" formatted="false">"Видалити цей гаманець?"</string>
+    <string name="l10n_wallet_reset_erase" formatted="false">"Видалити гаманець"</string>
+    <string name="l10n_wallet_reset_body" formatted="false">"Буде видалено збережену сід-фразу та біометричне розблокування minimaWallet. Потім можна створити новий гаманець або імпортувати сід-фразу.\n\nКошти не переказуються. Для повторного доступу потрібна сід-фраза або зашифрована резервна копія. Якщо копії ще немає, скасуйте зараз.\n\nОсновний вузол Minima Core та інші гаманці не зміняться. Записи використання підписів зберігаються для безпечного відновлення.\n\nВведіть RESET для підтвердження."</string>
+    <string name="l10n_wallet_reset_pending" formatted="false">"Є незавершена транзакція. Вирішіть її перед скиданням гаманця."</string>
+    <string name="l10n_wallet_reset_done" formatted="false">"Гаманець видалено. Створіть або імпортуйте сід-фразу."</string>
+    <!-- Arguments: reason -->
+    <string name="l10n_wallet_reset_failed">"Не вдалося скинути гаманець: %1$s"</string>
 </resources>
