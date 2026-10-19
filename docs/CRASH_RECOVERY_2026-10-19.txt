@@ -121,3 +121,17 @@ Not installed: user requested integrated minimaWallet reset only; next checkpoin
 will restore that proven flow before installation. No Core node seed reset.
 User confirmed standalone0.2.27 reset works perfectly. No Sweep performed.
 See docs/WALLET_REFRESH_UNLOCK_2026-10-19.txt for evidence and remaining device checks.
+
+2.0.20 installed checkpoint — latest
+Commits7d53a66 (Core refresh2.0.19) and6c7b0be (integrated reset2.0.20) pushed to
+fork/feature/bear-languages-2026-10-16.419 tests pass (226wallet+193host), release
+build/lint pass (0errors,1829warnings), importer/transport/7009messages/Keets/signature
+verified. Candidate base/dist/pandamonium-2.0.20-candidate.apk SHA256
+ff954d63c86fe4e19e2be4d59564453ff3656a75977b0d28e15e3bd5405e5ccf.
+adb install -r succeeded on FoldR3GL805K7MB; observed2.0.20-Pandamonium/code215.
+Normal launcher opened app lock; requested user unlock for physical Core refresh,
+actual integrated unlock duration, and reset prompt/cancel checks. Do not reset
+integrated seed or Sweep. User authorized reset feature only for integrated wallet;
+Core node reset excluded. User-confirmed standalone reset works.
+See WALLET_RESET_2026-10-19.txt and WALLET_REFRESH_UNLOCK_2026-10-19.txt.
+Physical checks pending; full review/parity remains IN PROGRESS.
