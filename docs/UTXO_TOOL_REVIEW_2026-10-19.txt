@@ -1,0 +1,62 @@
+UTXO tool confirmation review — 2026-10-19
+Scope: integrated UTXO Split, Merge, Distribute, native Consolidate and Untrack.
+Local Pandamonium2.0.2/code197 candidate only. Demo Fold and stores remain2.0.0.
+
+Findings fixed
+MAJOR: tool dialogs and address callbacks retained mutable selected Coin objects
+and read the live selected token later. Changes after review could therefore alter
+or invalidate the request. Split/merge/distribution lacked a fresh selection check
+before constructing their transactions. Untrack also read mutable IDs on each
+successive command, rather than using the IDs accepted by the user.
+MINOR: old operation callbacks could clear a newer selection or overwrite a newer
+operation's status. Unknown results unnecessarily cleared selection.
+
+Reuse and minimum adaptation
+Read integrated UTXO WalletTools, SendView/TxnUtil, Coin, NodeApi, DistributeManager,
+TransactionFields, existing uncertain-write/reservation tests; inspected standalone
+UTXO/NFT counterparts and the integrated NFT implementation and tests.
+Reused NFT WalletTools.Review and six complete controller methods: runBuilder,
+doSplit, autoConsolidate, mergeSelected, doDistribute and untrackNext. All six
+match their donor after NftMessages/NftText/BurialEvidence helper-name substitutions
+for UTXO's existing equivalents. No new dependency or transaction algorithm.
+UTXO retains its native themed dialog construction; callbacks now pass the captured
+Review/status object. The existing durable journal and distribution recovery stay
+in place. No standalone source was edited during the demo deferral.
+Canonical adapter: scripts/adapt-pandamonium-utxo-tool-review.py.
+
+Reviewed behavior
+Review freezes public coin identity/economics/spendability and captures its token.
+Acceptance is single-use, rejects closed activities, validates inputs and compares
+the current selection. Async lookup checks run again before posting. Abandoned
+distribution lookup cancels its start reservation. Identical refreshed selections
+are accepted, while submitted values remain independent copies. Later outcomes
+preserve audit/history updates and cannot overwrite a newer review's status or
+clear a different selection. Untrack uses frozen IDs with a final ID syntax check.
+No real signing, transfer or cointrack command was used for validation.
+
+Validation and review verdict
+APPROVE this bounded repair. Generated code, adapter, all changed tests, callers,
+private signature changes, status ownership and reservation cleanup reviewed.
+194 UTXO tests pass, including20 added/reused controller, callback and native-dialog
+regressions; no failures, errors or skips. NFT ToolReviewTest and
+ToolStatusOwnershipTest were adapted to the established UTXO mocked transport
+fixture. Three real-dialog regressions were also run against the original source;
+all three failed on stale confirmation, changed selection during lookup and
+mutable Untrack IDs, and pass after repair. Transaction builders/transports mocked.
+Offline signed build and release lint pass (0 errors,362 existing warnings).
+23 pinned imports/provenance reproduce; direct transport verifier and actual APK
+Keets bundle/21addons/runtime per ABI checks pass. Version/package/signature checked.
+
+Local artifact
+/Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.2-candidate.apk
+SHA256 4d2b85d70933c0685c74b159e5e431e23bf25fd81f5003a5e63fee380080b1c3
+Bytes 137052349
+Certificate SHA256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+
+Remaining work
+Full Pandamonium/integrated review remains open, including general cached-history
+confirmation/reorg presentation and the other ledger items. Port these tool guards
+and the prior Send repair into standalone UTXO after the demo; preserve its IPC,
+English UI, journal and unrelated work. No device installation or public release
+for this checkpoint. Evidence: build/localization/utxo-tool-review-{before,tests,
+build,import}.log and utxo-tool-review-artifact.json.

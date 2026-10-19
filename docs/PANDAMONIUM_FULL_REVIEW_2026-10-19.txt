@@ -519,3 +519,12 @@ comparison reproduced seven behavior failures. Signed local candidate, lint,
 23 pinned imports, direct transport and actual APK Keets/signature checks passed.
 See UTXO_SEND_REVIEW_2026-10-19.txt. No install/publication; Fold and stores remain
 on2.0.0. WalletTools/cached-history and full application review remain open.
+
+Post-release UTXO tools — local2.0.2/code197
+Reused NFT frozen selection reviews, single-use confirmations and callback status
+ownership in UTXO Split/Merge/Distribute/Consolidate/Untrack, preserving native
+dialogs and the durable journal.194 tests pass; three native-dialog regressions
+failed on original code and pass after repair. Signed local candidate, lint,
+23 pinned imports, direct transport and actual APK Keets/signature verified.
+See UTXO_TOOL_REVIEW_2026-10-19.txt. No install/publication; demo remains2.0.0.
+Full application review and cached-history/reorg presentation remain open.

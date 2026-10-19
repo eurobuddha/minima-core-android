@@ -220,3 +220,12 @@ and TxnUtil, preserving IPC, English UI, journal and unrelated graph/build work.
 Use SendDraftReviewTest behavior coverage; no host localization dependency in the
 standalone adaptation. Integrated174 tests pass. Signed host2.0.1 candidate only;
 no standalone edit, install or publication at this checkpoint.
+
+After-demo UTXO tool parity
+Port the reviewed controllers and Review/status ownership from
+scripts/adapt-pandamonium-utxo-tool-review.py with ToolReviewTest,
+ToolStatusOwnershipTest and native ToolDialogReviewTest behavior coverage.
+Preserve UTXO's existing IPC, themed dialogs and English messages. The six donor
+controller bodies are exact NFT reuse after helper-name changes; shared selection
+snapshots are provided by the prior Send repair. Integrated194 tests pass; host
+local2.0.2 signed candidate verified. Standalone source still unchanged here.

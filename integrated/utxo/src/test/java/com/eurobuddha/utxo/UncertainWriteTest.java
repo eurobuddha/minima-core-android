@@ -44,7 +44,7 @@ public class UncertainWriteTest {
         void sign(){Coin c=new Coin();c.coinid="0x"+"11".repeat(32);c.tokenid="0x00";c.amount=c.rawAmount="10";c.confirmed=c.sendable=true;
             new TxnBuilder(act,Collections.singletonList(c),Collections.singletonList(new TxnBuilder.Out("0x"+"22".repeat(32),"10")),"0x00",done).record("public-attempt").run();}
         void consolidate()throws Exception {WalletTools tools=new WalletTools(act,mock(WalletTools.Status.class));
-            java.lang.reflect.Method method=WalletTools.class.getDeclaredMethod("autoConsolidate",String.class);method.setAccessible(true);method.invoke(tools,"0x00");}
+            java.lang.reflect.Method method=WalletTools.class.getDeclaredMethod("autoConsolidate",String.class,WalletTools.Status.class);method.setAccessible(true);method.invoke(tools,"0x00",mock(WalletTools.Status.class));}
         public void close(){node.onDestroy();clients.close();handlers.close();}
     }
     @Test public void missingMalformedAndOversizedSignRepliesNeverDeleteOrRetryAnExecutingPost(){

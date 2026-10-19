@@ -10,7 +10,7 @@ public class NativeReservationGuardTest {
         for(boolean unreadable:new boolean[]{false,true}) {
             MainActivity act=mock(MainActivity.class);HistoryDb history=mock(HistoryDb.class);NodeApi node=mock(NodeApi.class);when(act.history()).thenReturn(history);when(act.node()).thenReturn(node);
             if(unreadable)when(history.hasUnresolvedAttempt("0x00")).thenThrow(new IllegalStateException("public damaged fixture"));else when(history.hasUnresolvedAttempt("0x00")).thenReturn(true);
-            WalletTools.Status status=mock(WalletTools.Status.class);WalletTools tools=new WalletTools(act,status);Method merge=WalletTools.class.getDeclaredMethod("autoConsolidate",String.class);merge.setAccessible(true);merge.invoke(tools,"0x00");
+            WalletTools.Status status=mock(WalletTools.Status.class);WalletTools tools=new WalletTools(act,status);Method merge=WalletTools.class.getDeclaredMethod("autoConsolidate",String.class,WalletTools.Status.class);merge.setAccessible(true);merge.invoke(tools,"0x00",status);
             verify(status).show(any(CharSequence.class),eq(false));verifyNoInteractions(node);verify(history,never()).insertPosting(any());
         }
     }
