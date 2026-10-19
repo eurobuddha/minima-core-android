@@ -41845,5 +41845,17 @@
     "zh-Hans": "合约数据不安全或无效。未发送任何命令。",
     "ru": "Небезопасные или неверные данные контракта. Команда не отправлена.",
     "uk": "Небезпечні або неправильні дані контракту. Команду не надіслано."
+  },
+  "salonRestore.sourceHelp": {
+    "en": "Restore page content from your hosting. You can enter a new HTTPS profile.json URL if the page moved. It must match your Salon token and handle. Your messaging keys, payment address and hosting logins are kept.",
+    "zh-Hans": "从托管服务恢复页面内容。如果页面已迁移，可输入新的 HTTPS profile.json 地址。页面必须与您的 Salon 代币和用户名匹配。消息密钥、收款地址和托管登录信息将保留。",
+    "ru": "Восстановите содержимое страницы с хостинга. Если страница переехала, укажите новый HTTPS-адрес profile.json. Токен Salon и имя пользователя должны совпадать. Ключи сообщений, адрес для платежей и данные доступа к хостингу сохранятся.",
+    "uk": "Відновіть вміст сторінки з хостингу. Якщо сторінка переїхала, вкажіть нову HTTPS-адресу profile.json. Токен Salon та ім’я користувача мають збігатися. Ключі повідомлень, адреса для платежів і дані доступу до хостингу збережуться."
+  },
+  "salonRestore.sourceHttps": {
+    "en": "Enter a valid HTTPS profile.json URL without login details or a fragment.",
+    "zh-Hans": "请输入有效的 HTTPS profile.json 地址，不含登录信息或片段标识。",
+    "ru": "Введите корректный HTTPS-адрес profile.json без данных для входа и фрагмента.",
+    "uk": "Введіть правильну HTTPS-адресу profile.json без даних для входу та фрагмента."
   }
 }

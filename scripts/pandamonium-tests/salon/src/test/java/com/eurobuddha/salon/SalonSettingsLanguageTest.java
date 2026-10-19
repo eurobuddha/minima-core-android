@@ -95,4 +95,19 @@ public class SalonSettingsLanguageTest {
     @Test public void tipQrTranslatesCaptionWithoutChangingAddress()throws Exception{
         try(MockedStatic<Qr> qr=mockStatic(Qr.class)){qr.when(()->Qr.bitmap("MxOriginalTipAddress",640)).thenReturn(Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888));render();find(body,upper(l10n_salon_settings_tip_qr)).performClick();idle();android.app.Dialog d=ShadowDialog.getLatestDialog();for(String code:CODES){Language.select(activity,code);assertNotNull(find(d.getWindow().getDecorView(),Language.msg(l10n_salon_settings_tip_for,"Artist 中文").toString()));}qr.verify(()->Qr.bitmap("MxOriginalTipAddress",640));}
     }
+    @Test public void recoveryDialogRetainsUrlAndTranslatesWithoutChangingAccount()throws Exception {
+        String original="https://example.invalid/salon/profile.json";SalonStore.put(activity,"profileUrl",original);
+        String account=SalonStore.me(activity).toString();call("promptHostedRestore",new Class<?>[]{});
+        AlertDialog d=dialog();EditText url=input(d.getWindow().getDecorView());assertEquals(original,url.getText().toString());
+        url.setText(original+"?copy=2");url.setSelection(7);
+        for(String code:CODES) {
+            Language.select(activity,code);idle();assertSame(d,dialog());assertSame(url,input(d.getWindow().getDecorView()));
+            assertEquals(original+"?copy=2",url.getText().toString());assertEquals(7,url.getSelectionStart());
+            assertNotNull(find(d.getWindow().getDecorView(),Language.msg(l10n_salon_restore_source_help).toString()));
+            assertEquals(Language.msg(l10n_wallet_restore).toString(),d.getButton(-1).getText().toString());
+        }
+        SalonStore.put(activity,"name","new draft");d.getButton(-1).performClick();idle();
+        assertTrue(jobs.isEmpty());assertEquals("new draft",SalonStore.get(activity,"name"));
+        assertEquals(Language.msg(l10n_salon_restore_changed).toString(),ShadowToast.getTextOfLatestToast());
+    }
 }

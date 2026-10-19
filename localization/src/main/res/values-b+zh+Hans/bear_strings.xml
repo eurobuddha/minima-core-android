@@ -8285,4 +8285,6 @@
     <string name="l10n_keyuses_used">"已使用 %1$s"</string>
     <string name="l10n_keyuses_unused" formatted="false">"未使用"</string>
     <string name="l10n_vestr_unsafe_contract" formatted="false">"合约数据不安全或无效。未发送任何命令。"</string>
+    <string name="l10n_salon_restore_source_help" formatted="false">"从托管服务恢复页面内容。如果页面已迁移，可输入新的 HTTPS profile.json 地址。页面必须与您的 Salon 代币和用户名匹配。消息密钥、收款地址和托管登录信息将保留。"</string>
+    <string name="l10n_salon_restore_source_https" formatted="false">"请输入有效的 HTTPS profile.json 地址，不含登录信息或片段标识。"</string>
 </resources>

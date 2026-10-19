@@ -124,20 +124,39 @@ final class SalonStore {
 
     /** Restore content only, atomically with the owner/draft check and durable save. */
     static synchronized RestoreResult restoreHosted(Context c, String expected, JSONObject hosted) {
+        return restoreHostedAt(c, expected, hosted, null);
+    }
+
+    static boolean validRecoveryUrl(String value) {
+        try {
+            java.net.URI uri = new java.net.URI(value);
+            return "https".equalsIgnoreCase(uri.getScheme()) && uri.getHost() != null
+                    && uri.getUserInfo() == null && uri.getFragment() == null;
+        } catch (Exception invalid) { return false; }
+    }
+
+    /** A relocated page must explicitly identify this account; only public content and its URL move. */
+    static synchronized RestoreResult restoreHostedAt(Context c, String expected, JSONObject hosted, String newUrl) {
+        if (newUrl != null && !validRecoveryUrl(newUrl)) return RestoreResult.INVALID;
         SharedPreferences prefs = prefs(c);
         String previous = prefs.getString(KEY, "");
         try {
             JSONObject current = identityRecord(c);
             if (!expected.equals(publicationSnapshot(current))) return RestoreResult.CHANGED;
+            if (newUrl != null && (hosted == null || !current.optString("tokenid").matches("0x[0-9a-fA-F]{64}")
+                    || !(hosted.opt("tokenid") instanceof String)
+                    || !current.optString("tokenid").equalsIgnoreCase(hosted.optString("tokenid"))
+                    || current.optString("handle").isEmpty() || !(hosted.opt("handle") instanceof String)
+                    || !current.optString("handle").equals(hosted.optString("handle")))) return RestoreResult.INVALID;
             // Initial publication can precede minting, so a missing/empty token id is valid.
             for (String key : new String[]{"handle", "tokenid"}) {
                 Object value = hosted.opt(key);
                 if (value != null && (!(value instanceof String)
-                        || (!((String) value).isEmpty() && !value.equals(current.optString(key)))))
+                        || (!((String) value).isEmpty() && !("tokenid".equals(key) ? ((String)value).equalsIgnoreCase(current.optString(key)) : value.equals(current.optString(key))))))
                     return RestoreResult.INVALID;
             }
             boolean got = false;
-            for (String key : new String[]{"name", "bio", "about", "avatar", "banner", "webvalidate", "tipaddr"}) {
+            for (String key : new String[]{"name", "bio", "about", "avatar", "banner", "webvalidate"}) {
                 Object value = hosted.opt(key);
                 if (value == null) continue;
                 if (!(value instanceof String)) return RestoreResult.INVALID;
@@ -150,6 +169,7 @@ final class SalonStore {
                 if (((JSONArray) value).length() > 0) { current.put(key, value); got = true; }
             }
             if (!got) return RestoreResult.EMPTY;
+            if (newUrl != null) current.put("profileUrl", newUrl);
             if (prefs.edit().putString(KEY, current.toString()).commit()) return RestoreResult.APPLIED;
         } catch (Exception unavailable) { /* Do not report an unconfirmed restore. */ }
         // Match writeIdentity/savePublication: failed commit can still change memory.

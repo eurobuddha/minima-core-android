@@ -3479,9 +3479,9 @@ public class MainActivity extends AppCompatActivity {
     private static final class HostedRestore {
         final String snapshot, typed, url;
         final int epoch;
-        final boolean loud;
-        HostedRestore(String snapshot, String typed, String url, int epoch, boolean loud) {
-            this.snapshot = snapshot; this.typed = typed; this.url = url; this.epoch = epoch; this.loud = loud;
+        final boolean loud, relocate;
+        HostedRestore(String snapshot, String typed, String url, int epoch, boolean loud, boolean relocate) {
+            this.snapshot = snapshot; this.typed = typed; this.url = url; this.epoch = epoch; this.loud = loud; this.relocate = relocate;
         }
     }
     private HostedRestore hostedRestore;
@@ -3494,16 +3494,42 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception unavailable) { return false; }
     }
 
+    /** Recovery uses the existing content-only restore, with an explicitly selected source. */
+    private void promptHostedRestore() {
+        final String snapshot;
+        final int epoch = renderEpoch;
+        try { snapshot = SalonStore.publicationSnapshot(SalonStore.identityRecord(this)); }
+        catch (Exception unavailable) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_storage)); return; }
+        LinearLayout box = dialogBox();
+        box.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_source_help)));
+        EditText input = field(box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_url), SalonStore.get(this, "profileUrl"), false, "https://…/profile.json");
+        showDialog(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restore_page), box, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_restore), () -> {
+            try {
+                if (isFinishing() || isDestroyed() || epoch != renderEpoch
+                        || !snapshot.equals(SalonStore.publicationSnapshot(SalonStore.identityRecord(this)))) {
+                    toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_changed)); return;
+                }
+                String url = text(input).trim();
+                hydrateFromHosted(url, true, !url.equals(SalonStore.get(this, "profileUrl")));
+            } catch (Exception unavailable) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_storage)); }
+        });
+    }
+
     /** Hosted content never replaces identity/key fields or a newer local draft. */
     private void hydrateFromHosted(final String url, final boolean loud) {
+        hydrateFromHosted(url, loud, false);
+    }
+
+    private void hydrateFromHosted(final String url, final boolean loud, final boolean relocate) {
+        if (relocate && !SalonStore.validRecoveryUrl(url)) { if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_source_https)); return; }
         if (url == null || url.trim().isEmpty()) { if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_no_hosted_url)); return; }
         if (isFinishing() || isDestroyed()) return;
         if (hostedRestore != null) { if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_busy)); return; }
         final HostedRestore op;
         try {
             JSONObject record = SalonStore.identityRecord(this);
-            if (!url.equals(record.optString("profileUrl"))) { if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_changed)); return; }
-            op = new HostedRestore(SalonStore.publicationSnapshot(record), profileTyped(), url, renderEpoch, loud);
+            if (!relocate && !url.equals(record.optString("profileUrl"))) { if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_changed)); return; }
+            op = new HostedRestore(SalonStore.publicationSnapshot(record), profileTyped(), url, renderEpoch, loud, relocate);
         } catch (Exception unavailable) { if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_storage)); return; }
         hostedRestore = op;
         if (loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_restoring));
@@ -3525,7 +3551,9 @@ public class MainActivity extends AppCompatActivity {
         if (isFinishing() || isDestroyed()) return;
         if (!hostedRestoreCurrent(op)) { if (op.loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_restore_changed)); return; }
         if (profile == null) { if (op.loud) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_unreachable)); return; }
-        SalonStore.RestoreResult result = SalonStore.restoreHosted(this, op.snapshot, profile);
+        SalonStore.RestoreResult result = op.relocate
+                ? SalonStore.restoreHostedAt(this, op.snapshot, profile, op.url)
+                : SalonStore.restoreHosted(this, op.snapshot, profile);
         switch (result) {
             case APPLIED:
                 toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_restored));
@@ -3712,7 +3740,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 render();
             }), lp(0, 8, 0, 0));
-            idc.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restore_page), false, () -> hydrateFromHosted(SalonStore.get(this, "profileUrl"), true)), lp(0, 8, 0, 0));
+            idc.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restore_page), false, this::promptHostedRestore), lp(0, 8, 0, 0));
             idc.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_backup_key), false, this::backupMsgKey), lp(0, 8, 0, 0));
             idc.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_restore_key), false, this::restoreMsgKey), lp(0, 8, 0, 0));
             idc.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_settings_burn), false, this::burnSpares), lp(0, 8, 0, 0));

@@ -8322,4 +8322,6 @@
     <string name="l10n_keyuses_used">"USED %1$s"</string>
     <string name="l10n_keyuses_unused" formatted="false">"UNUSED"</string>
     <string name="l10n_vestr_unsafe_contract" formatted="false">"Unsafe or invalid contract data. No command was sent."</string>
+    <string name="l10n_salon_restore_source_help" formatted="false">"Restore page content from your hosting. You can enter a new HTTPS profile.json URL if the page moved. It must match your Salon token and handle. Your messaging keys, payment address and hosting logins are kept."</string>
+    <string name="l10n_salon_restore_source_https" formatted="false">"Enter a valid HTTPS profile.json URL without login details or a fragment."</string>
 </resources>

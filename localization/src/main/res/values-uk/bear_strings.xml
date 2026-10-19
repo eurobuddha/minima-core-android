@@ -8396,4 +8396,6 @@
     <string name="l10n_keyuses_used">"ВИКОРИСТАНО %1$s"</string>
     <string name="l10n_keyuses_unused" formatted="false">"НЕ ВИКОРИСТАНО"</string>
     <string name="l10n_vestr_unsafe_contract" formatted="false">"Небезпечні або неправильні дані контракту. Команду не надіслано."</string>
+    <string name="l10n_salon_restore_source_help" formatted="false">"Відновіть вміст сторінки з хостингу. Якщо сторінка переїхала, вкажіть нову HTTPS-адресу profile.json. Токен Salon та ім’я користувача мають збігатися. Ключі повідомлень, адреса для платежів і дані доступу до хостингу збережуться."</string>
+    <string name="l10n_salon_restore_source_https" formatted="false">"Введіть правильну HTTPS-адресу profile.json без даних для входу та фрагмента."</string>
 </resources>

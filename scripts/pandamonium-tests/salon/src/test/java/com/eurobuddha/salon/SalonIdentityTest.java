@@ -222,4 +222,59 @@ public class SalonIdentityTest {
     @Test public void corruptIdentityIsNeverReplacedByHostedContent() throws Exception {
         stored.set("{corrupt");assertEquals(SalonStore.RestoreResult.FAILED,SalonStore.restoreHosted(context,"",new JSONObject().put("name","hosted")));assertEquals("{corrupt",stored.get());
     }
+    private static final String RECOVERY_URL="https://example.invalid/salon/owner/profile.json";
+    private static final String TOKEN="0x"+"ab".repeat(32);
+    private JSONObject recoveryPage() throws Exception {
+        record("gcm:new-node-seed","new-node-public");
+        SalonStore.put(context,"handle","owner");SalonStore.put(context,"tokenid",TOKEN);
+        SalonStore.put(context,"profileUrl","http://old.example/profile.json");
+        SalonStore.put(context,"tipaddr","new-node-address");SalonStore.put(context,"mxaddr","new-node-mx");
+        return new JSONObject().put("tokenid",TOKEN).put("handle","owner").put("name","recovered")
+                .put("tipaddr","old-node-address").put("msgpk","old-public").put("msgseed","old-seed")
+                .put("mxaddr","old-mx").put("hosting_profiles",new org.json.JSONArray().put("untrusted"))
+                .put("gallery",new org.json.JSONArray().put(new JSONObject().put("url","https://example.invalid/image.png")))
+                .put("posts",new org.json.JSONArray().put(new JSONObject().put("body","original post")));
+    }
+    @Test public void relocatedContentKeepsNewNodeIdentityAndPaymentAddress() throws Exception {
+        JSONObject page=recoveryPage();page.put("tokenid","0x"+"AB".repeat(32));
+        String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));
+        assertEquals(SalonStore.RestoreResult.APPLIED,SalonStore.restoreHostedAt(context,expected,page,RECOVERY_URL));
+        JSONObject actual=SalonStore.identityRecord(context);
+        assertEquals("gcm:new-node-seed",actual.getString("msgseed"));assertEquals("new-node-public",actual.getString("msgpk"));
+        assertEquals("new-node-address",actual.getString("tipaddr"));assertEquals("new-node-mx",actual.getString("mxaddr"));
+        assertEquals(TOKEN,actual.getString("tokenid"));assertEquals(RECOVERY_URL,actual.getString("profileUrl"));
+        assertEquals("recovered",actual.getString("name"));assertEquals(1,actual.getJSONArray("gallery").length());
+        assertEquals(1,actual.getJSONArray("posts").length());assertFalse(actual.has("hosting_profiles"));assertEquals(1,commits.get());
+    }
+    @Test public void relocatedPageMustExplicitlyMatchTokenAndHandle() throws Exception {
+        for(String key:new String[]{"tokenid","handle"})for(Object value:new Object[]{null,"", "other",JSONObject.NULL}) {
+            JSONObject page=recoveryPage();if(value==null)page.remove(key);else page.put(key,value);
+            String previous=stored.get(),expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));
+            assertEquals(SalonStore.RestoreResult.INVALID,SalonStore.restoreHostedAt(context,expected,page,RECOVERY_URL));assertEquals(previous,stored.get());
+        }
+        assertEquals(0,commits.get());
+    }
+    @Test public void unsafeRecoveryUrlsNeverChangeStoredContent() throws Exception {
+        JSONObject page=recoveryPage();String previous=stored.get(),expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));
+        for(String url:new String[]{"http://example.invalid/profile.json","https://user:password@example.invalid/profile.json","https://example.invalid/profile.json#fragment","file:///page.json","not a url"}) {
+            assertEquals(SalonStore.RestoreResult.INVALID,SalonStore.restoreHostedAt(context,expected,page,url));assertEquals(previous,stored.get());
+        }
+        assertEquals(0,commits.get());
+    }
+    @Test public void relocatedRestoreRejectsStaleDraftAndRollsBackFailedCommit() throws Exception {
+        JSONObject page=recoveryPage();String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));
+        SalonStore.put(context,"bio","newer draft");String previous=stored.get();
+        assertEquals(SalonStore.RestoreResult.CHANGED,SalonStore.restoreHostedAt(context,expected,page,RECOVERY_URL));assertEquals(previous,stored.get());
+        expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));failCommit.set(true);
+        assertEquals(SalonStore.RestoreResult.FAILED,SalonStore.restoreHostedAt(context,expected,page,RECOVERY_URL));assertEquals(previous,stored.get());
+    }
+
+    @Test public void repeatingContentRestoreCannotRevertNewNodePaymentAddress() throws Exception {
+        JSONObject page=recoveryPage();String expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));
+        assertEquals(SalonStore.RestoreResult.APPLIED,SalonStore.restoreHostedAt(context,expected,page,RECOVERY_URL));
+        expected=SalonStore.publicationSnapshot(SalonStore.identityRecord(context));
+        assertEquals(SalonStore.RestoreResult.APPLIED,SalonStore.restoreHosted(context,expected,page));
+        assertEquals("new-node-address",SalonStore.get(context,"tipaddr"));
+    }
+
 }

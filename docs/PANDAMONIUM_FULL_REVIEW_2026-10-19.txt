@@ -1,0 +1,102 @@
+Pandamonium full application review — 2026-10-19
+STATUS: IN PROGRESS. Not a release approval.
+Baseline: 6b7881a, 1.9.97 / versionCode 168.
+Scope: host, 22 integrated modules, minimaapi, localization, maxima-core,
+bundled Minima/Keets dependencies, packaging and publication.
+Authorized destinations: fork GitHub, PandaApps and eurobuddha.com.
+No live fund-moving operations are part of review validation.
+
+Method
+Read graph and recent memories, repository instructions, source provenance,
+current code and tests. Run every module unit suite plus Pandamonium release lint.
+Review boundaries and feature paths; record exact evidence and limitations.
+Do not equate passing tests with a complete code or physical-device review.
+
+Findings under investigation (not yet fixed)
+1. MAJOR: application lock checks only unlocked -> locked transitions globally.
+   MinimaApplication.onActivityStarted leaves cold-restored integrated activities
+   and notification destinations accessible when the process starts locked.
+   Only core MainActivity calls LockActivity.redirectIfLocked.
+   Proven sources read: host AppLock/LockActivity/BiometricUnlock/VaultCrypto,
+   wallet MainActivity.onCreate/onResume and WalletSession, navigation Back callback.
+2. MAJOR: external IPC command/file permissions are snapshotted on receipt.
+   MinimaReceiver workers check node identity but do not re-read ReceiverDB
+   before running queued work. Disable/delete/admin revocation can be bypassed
+   by work queued before the change. Integrated DirectNodeApi.Request.begin has
+   the reusable final-authorization model.
+3. MAJOR: ETH Wallet identifies selected assets and balance entries by symbol.
+   TokenStore allows different contract addresses with the same symbol (including
+   ETH). MainActivity sends via tokenBySym, so the displayed card can select a
+   different contract or native ETH. Need address identity throughout UI/send.
+4. MAJOR: ETH Wallet and AtomiX derive the same ethbridge key but use independent
+   nonce logic. AtomiX EthTx has a per-address serializer; ETH Wallet reads pending
+   and sends with no shared allocator. Review cross-module reuse before adapting.
+5. MAJOR candidate: UTXO TxnBuilder accepts incomplete signing/post receipts and
+   falls back to its local handle as txpowid. Compare NFT TransactionEvidence,
+   TxnBuilder, HistoryDb and NodeApi before deciding minimal compatible reuse.
+6. Build: LockActivity.onBackPressed intentionally omits super, causing release
+   lint MissingSuperCall. Reuse the existing lifecycle-aware Back dispatcher;
+   Back must continue to background the locked task.
+
+Coverage ledger (ongoing, not all checked)
+Host: manifests, app lifecycle/lock, direct transport/events, external receiver,
+      backup command validation and file guards inspected. Startup/service,
+      core UI, resync, notifications and chat review in progress.
+Chat: KeetsWorklet, ChatDrainer, ChatDb inspected; remaining transport/media/UI open.
+ETH Wallet: key storage, derivation, RPC, asset selection and send paths inspected.
+AtomiX: identity/market, sign gate, write journal, ETH nonce allocator and Minima
+        validation boundaries inspected; settlement and UI review continuing.
+PandaDEX/PandaPools: command sessions, signing/input gates, submission evidence,
+        TxPost inspected; recovery/covenants and UI review continuing.
+UTXO/NFT Wallet: transaction and receipt comparison in progress.
+Atelier: art WebView and Filtr bridge inspected; hosting/minting/UI review open.
+Other modules and release pipeline remain open.
+
+Validation
+Full baseline finished: unit tasks passed; release lint found LockActivity MissingSuperCall.
+Log: build/localization/full-review-baseline.log. Lint rerun pending.
+Final verdict, findings resolution, complete coverage and release hashes pending.
+
+Review repair checkpoints
+- 8793d74 / 1.9.98: enforce app lock on cold-restored and notification screens;
+  lifecycle-aware Back callback fixes release lint issue. Targeted tests passed.
+- 16a69ad / 1.9.99: recheck queued external IPC permissions immediately before
+  executing command/file requests. Targeted revocation tests passed.
+- 26967b2 / 1.9.100: validate Vestr state fields and reject unsafe node command
+  separators before dispatch. Proven PandaDEX CommandSafety reused. Tests passed.
+All three commits pushed to fork; no release published.
+
+Urgent Salon recovery (user selected HTTPS copy)
+The Fold recognizes the eurobuddha identity token, but editor content was empty.
+The token's old plain-HTTP profile pointer is blocked by the host network policy.
+Two publicly readable profiles carry the same identity: HTTP has 5 gallery items
+and 3 posts; HTTPS has 9 gallery items, 17 posts, 5 showcased holdings and 2 links.
+The user selected https://eurobuddha.com/salon/eurobuddha/profile.json.
+1.9.101 reuses HostedRestore/SalonStore atomic persistence and checked HTTP fetch.
+Settings recovery accepts an alternate HTTPS source only when its token ID and
+handle match the local account. Local messaging keys, current payment address,
+and hosting logins are preserved. Restore writes content and source URL together;
+stale drafts, invalid content, and failed saves cannot report success.
+Recovery does not publish or transfer tokens. Device validation and test results
+will be recorded after the candidate is built.
+
+Additional confirmed findings still awaiting repair
+- UTXO receipt parsing and history reconciliation can report success using partial
+  receipts, a local handle, or only partial input/output matches. Distribution
+  can advance on a guessed change output. Reuse NFT evidence and durable intent
+  patterns; do not infer failure from a timeout or still-unspent input.
+- ETH Wallet sends need frozen account context as well as contract-based selection.
+- FutureCash Audit cache treats a negative age (clock moved backwards) as fresh.
+  Use existing fail-closed elapsed-time checks and regression coverage.
+Full application review remains in progress; this document is not release approval.
+
+Salon recovery review checkpoint — 1.9.101
+Reviewed changed adapter, source, generated activity/store, tests and all four
+translations. No unresolved finding in this recovery change. Existing checked
+transport and lifecycle/draft guards retained; identity checks precede persistence;
+failed commit rolls back memory; credentials are outside the content allowlist.
+Validation: Salon 383 tests, host 165, minimaapi 21, localization 12; zero failures,
+errors or skipped tests. The final two recovery tests were included in Salon's
+383-test rerun. Importer/provenance verification, transport check, catalog check
+and git diff --check passed. Signed build and release lint still running.
+Verdict for this recovery change: Approve. Full application review remains open.

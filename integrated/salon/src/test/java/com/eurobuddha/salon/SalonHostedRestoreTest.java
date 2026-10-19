@@ -103,4 +103,29 @@ public class SalonHostedRestoreTest {
             assertEquals("Literal 中文 Русский Українська",SalonStore.get(activity,"name"));
         }
     }
+    @Test public void alternateHttpsRecoveryUsesCheckedTransportAndMovesUrlOnlyAfterSave()throws Exception {
+        String url="https://example.invalid/salon/owner/profile.json",token="0x"+"ab".repeat(32);
+        SalonStore.put(activity,"tokenid",token);SalonStore.put(activity,"tipaddr","new-node-address");
+        JSONObject page=new JSONObject().put("tokenid",token).put("handle","owner").put("name","restored page").put("tipaddr","old-address");
+        java.net.HttpURLConnection connection=mock(java.net.HttpURLConnection.class);
+        when(connection.getResponseCode()).thenReturn(200);
+        when(connection.getInputStream()).thenAnswer(i->new java.io.ByteArrayInputStream(page.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        try(MockedStatic<ImageLoader> http=mockStatic(ImageLoader.class)) {
+            http.when(()->ImageLoader.openChecked(url,3)).thenReturn(connection);
+            call("hydrateFromHosted",new Class<?>[]{String.class,boolean.class,boolean.class},url,true,true);
+            assertEquals(URL,SalonStore.get(activity,"profileUrl"));job();
+            http.verify(()->ImageLoader.openChecked(url,3));
+            assertEquals(url,SalonStore.get(activity,"profileUrl"));assertEquals("restored page",SalonStore.get(activity,"name"));
+            assertEquals("new-node-address",SalonStore.get(activity,"tipaddr"));notice(l10n_salon_setup_restored);
+            verify(connection).disconnect();
+        }
+    }
+    @Test public void recoveryRejectsInsecureUrlBeforeSchedulingWorkInEveryLanguage()throws Exception {
+        for(String code:CODES) {
+            Language.select(activity,code);
+            call("hydrateFromHosted",new Class<?>[]{String.class,boolean.class,boolean.class},"http://example.invalid/page.json",true,true);
+            notice(l10n_salon_restore_source_https);assertTrue(jobs.isEmpty());assertEquals(URL,SalonStore.get(activity,"profileUrl"));
+        }
+    }
+
 }
