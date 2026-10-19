@@ -232,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
     private void onNode() {
         if(nodeUp!=wasNodeUp){nodeReadEpoch++;if(!nodeUp){pubkey="";reannouncedThisSession=false;}}
         if (nodeChip != null) Language.setText(nodeChip, nodeUp ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_connected) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_mail_node_not_ready));
+        if(nodeUp && screen==Screen.EDIT) resumePublication();
         if (!nodeUp) startPairingRetry();   // keep re-registering after a disconnect
         if (nodeUp && pubkey.isEmpty()) fetchPubkey();
         // One-time-per-session setup (relay TTL, mail key, first inbox scan).
@@ -1392,6 +1393,7 @@ public class MainActivity extends AppCompatActivity {
         videoRequest++;
         dismissVideo();
         proofRequests.close();
+        if(publicationCheck!=null) publicationCheck.stop();
         KeetsLink.release(node);
         if (node != null) node.onDestroy();   // release the DirectNodeApi receiver + cancel pending IPC timeouts
     }
@@ -1445,6 +1447,7 @@ public class MainActivity extends AppCompatActivity {
     private void go(Screen s) {
         if (screen != s) { cancelMediaRequests(); cancelPublication(); cancelHostedRestore(); cancelSpareBurn(); }
         if (screen == Screen.EDIT && s != Screen.EDIT) commitEditFields();   // preserve the draft when leaving Edit
+        if(s==Screen.EDIT && screen!=Screen.EDIT) publishStage=null;
         screen = s; render();
     }
 
@@ -1632,6 +1635,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hostProfile(TextView status, Runnable done) {
+        if(pendingPublication()) { publishSalon(status); return; }
         if (activeMediaUpload != null || profilePublish != null || announcement != null) { publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_busy)); return; }
         Hosting.Profile host = HostingStore.getDefault(this);
         if (host == null) { publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_host)); return; }
@@ -1641,6 +1645,7 @@ public class MainActivity extends AppCompatActivity {
                     profileTyped(), salonHtml(), host, buildProfileJson(), renderEpoch, status, done);
         } catch (Exception unavailable) { publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return; }
         profilePublish = op;
+        publishPreparing=true;updatePublishButton();
         publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_preparing));
         refreshPublicationEditions(op);
     }
@@ -1691,6 +1696,7 @@ public class MainActivity extends AppCompatActivity {
     private void finishPublication(ProfilePublish op, String url, Exception error) {
         if (profilePublish != op) return;
         profilePublish = null;
+        publishPreparing=false;updatePublishButton();
         if (!publicationCurrent(op)) {
             if (!isFinishing() && !isDestroyed()) toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_changed));
             return;
@@ -2586,14 +2592,16 @@ public class MainActivity extends AppCompatActivity {
         nftCard.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_add_holding), false, this::pickNftDialog), lp(0, 6, 0, 2));
         body.addView(nftCard, lp(0, 0, 0, 12));
 
+        if (!publishOwner.equals(SalonStore.get(this,"tokenid"))) publishStage=null;
         profStatus = Design.note(this, ""); body.addView(profStatus, lp(0, 4, 0, 0));
-        body.addView(btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_editor_publish), true, () -> {
+        body.addView(publishAction(() -> {
             SalonStore.put(this, "name", text(name)); SalonStore.put(this, "bio", text(bio));
             SalonStore.put(this, "about", text(about));
             SalonStore.put(this, "avatar", text(edAvatar)); SalonStore.put(this, "banner", text(edBanner));
             SalonStore.put(this, "webvalidate", text(edWebvalidate));
             hostProfile(profStatus, () -> publishSalon(profStatus));
         }), lp(0, 8, 0, 0));
+        resumePublication();
     }
 
     /** A modal edit belongs to the identity and collection draft visible when opened. */
@@ -2910,8 +2918,8 @@ public class MainActivity extends AppCompatActivity {
     private void openImage(String url) {
         if (url == null || url.isEmpty()) return;
         Dialog d = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-        ImageView iv = new ImageView(this); iv.setBackgroundColor(0xFF000000); iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        ImageLoader.loadFull(this, url, iv); iv.setOnClickListener(v -> d.dismiss());
+        ZoomImageView iv = new ZoomImageView(this); iv.setBackgroundColor(0xFF000000);
+        ImageLoader.loadFull(this, url, iv); iv.setTapListener(d::dismiss);
         d.setContentView(iv); d.show();
     }
 
@@ -3034,7 +3042,7 @@ public class MainActivity extends AppCompatActivity {
         final int[] idx = { Math.max(0, Math.min(start, items.size() - 1)) };
         final Dialog d = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         FrameLayout root = new FrameLayout(this); root.setBackgroundColor(0xFF000000);
-        final ImageView img = new ImageView(this); img.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        final ZoomImageView img = new ZoomImageView(this);
         root.addView(img, new FrameLayout.LayoutParams(-1, -1));
 
         LinearLayout top = new LinearLayout(this); top.setOrientation(LinearLayout.HORIZONTAL); top.setGravity(Gravity.CENTER_VERTICAL); top.setPadding(dp(16), dp(26), dp(16), dp(10));
@@ -3062,17 +3070,10 @@ public class MainActivity extends AppCompatActivity {
         prev.setOnClickListener(v -> { if (idx[0] > 0) { idx[0]--; bind[0].run(); } });
         next.setOnClickListener(v -> { if (idx[0] < items.size() - 1) { idx[0]++; bind[0].run(); } });
 
-        final android.view.GestureDetector gd = new android.view.GestureDetector(this, new android.view.GestureDetector.SimpleOnGestureListener() {
-            @Override public boolean onFling(android.view.MotionEvent e1, android.view.MotionEvent e2, float vx, float vy) {
-                if (e1 == null || e2 == null) return false; float dx = e2.getX() - e1.getX();
-                if (Math.abs(dx) > dp(56) && Math.abs(dx) > Math.abs(e2.getY() - e1.getY())) {
-                    if (dx < 0) { if (idx[0] < items.size() - 1) { idx[0]++; bind[0].run(); } } else { if (idx[0] > 0) { idx[0]--; bind[0].run(); } }
-                    return true;
-                }
-                return false;
-            }
+        img.setSwipeListener(nextImage -> {
+            int target=idx[0]+(nextImage?1:-1);
+            if(target>=0 && target<items.size()) { idx[0]=target;bind[0].run(); }
         });
-        img.setClickable(true); img.setOnTouchListener((v, ev) -> gd.onTouchEvent(ev));
         bind[0].run();
         d.setContentView(root); d.show();
     }
@@ -3597,30 +3598,96 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void publishSalon(TextView status) {
-        if (announcement != null) { publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_busy)); return; }
-        if (!nodeUp || !SalonStore.hasIdentity(this) || SalonStore.get(this, "profileUrl").isEmpty()) {
-            publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_need_node)); return;
-        }
-        final String owner;
-        try { owner = backupOwner(); } catch (Exception unavailable) { identityUnavailable(); return; }
-        final String url = SalonStore.get(this, "profileUrl");
-        final int epoch = renderEpoch;
-        final Object request = new Object();
-        announcement = request;
-        publicationStatus(status, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_announcing));
-        final SalonRegistry.Announced result = (ok, detail) -> runOnUiThread(() -> {
-            if (announcement != request) return;
-            announcement = null;
-            if (isFinishing() || isDestroyed()) return;
-            try { if (!owner.equals(backupOwner()) || !url.equals(SalonStore.get(this, "profileUrl"))) return; }
-            catch (Exception unavailable) { return; }
-            publicationStatus(epoch == renderEpoch ? status : null, Language.msg(ok
-                    ? com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_submitted
-                    : com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_unknown));
+    private SalonPublication publicationCheck;
+    private android.widget.ProgressBar publishSpinner;
+    private TextView publishButton;
+    private boolean publishPreparing;
+    private SalonPublication.Stage publishStage;
+    private String publishOwner = "";
+
+    private boolean pendingPublication() {
+        return SalonPublication.pending(this, SalonStore.get(this,"tokenid"));
+    }
+    private void showPublishState(SalonPublication.Stage stage) {
+        publishStage=stage;
+        CharSequence message=publishMessage(stage);
+        if (screen == Screen.EDIT && profStatus != null) Language.setText(profStatus,message);
+        else if (stage==SalonPublication.Stage.CONFIRMED || stage==SalonPublication.Stage.UNKNOWN) toast(message.toString());
+        updatePublishButton();
+    }
+    private void updatePublishButton() {
+        if (publishButton==null) return;
+        boolean busy=publishPreparing || (publicationCheck!=null && publicationCheck.active());
+        boolean pending=pendingPublication();
+        publishButton.setEnabled(!busy);
+        publishButton.setClickable(!busy);
+        if (publishSpinner!=null) publishSpinner.setVisibility(busy ? View.VISIBLE : View.GONE);
+        CharSequence label=busy ? (publishPreparing ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_preparing) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_confirming))
+                : pending ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_check) : publishStage==SalonPublication.Stage.CONFIRMED ? Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_view) : Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_save);
+        Language.setText(publishButton,Language.upper(label));
+    }
+    private View publishAction(Runnable save) {
+        FrameLayout frame=new FrameLayout(this);
+        publishButton=btn(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_save),true,()->{
+            if(publishPreparing || (publicationCheck!=null && publicationCheck.active())) return;
+            if(pendingPublication()) { publishSalon(profStatus); return; }
+            if(publishStage==SalonPublication.Stage.CONFIRMED) { go(Screen.HOME); return; }
+            save.run();
         });
-        try { SalonRegistry.announce(node, SalonStore.get(this, "tokenid"), url, SalonStore.get(this, "handle"), result); }
-        catch (RuntimeException unavailable) { result.done(false, ""); }
+        publishButton.setPadding(dp(42),dp(12),dp(42),dp(12));
+        frame.addView(publishButton,new FrameLayout.LayoutParams(-1,-2));
+        publishSpinner=new android.widget.ProgressBar(this);
+        publishSpinner.setIndeterminateTintList(android.content.res.ColorStateList.valueOf(Design.WHITE()));
+        FrameLayout.LayoutParams indicator=new FrameLayout.LayoutParams(dp(20),dp(20),Gravity.START|Gravity.CENTER_VERTICAL);
+        indicator.leftMargin=dp(14);frame.addView(publishSpinner,indicator);
+        updatePublishButton();
+        return frame;
+    }
+    private void resumePublication() {
+        if(pendingPublication() && nodeUp && (publicationCheck==null || !publicationCheck.active())) publishSalon(profStatus);
+        else updatePublishButton();
+    }
+    private void publishSalon(TextView status) {
+        if(publicationCheck!=null && publicationCheck.active()) return;
+        if(!nodeUp || node==null || !SalonStore.hasIdentity(this) || SalonStore.get(this,"profileUrl").isEmpty()) {
+            if(status!=null) { CharSequence message=Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_node); Language.setText(status,message); }
+            return;
+        }
+        final String token=SalonStore.get(this,"tokenid");
+        final String owner=SalonStore.get(this,"msgpk");
+        final String profileUrl=SalonStore.get(this,"profileUrl");
+        final String url=pendingPublication() ? SalonPublication.pendingUrl(this,token) : profileUrl;
+        final int publicationEpoch=renderEpoch;
+        final NodeApi requestedNode=node;
+        if(publicationCheck!=null) publicationCheck.stop();
+        publishOwner=token;
+        publicationCheck=new SalonPublication(this,node,token,url,SalonStore.get(this,"handle"),
+                ()->!isFinishing() && !isDestroyed() && node==requestedNode && nodeUp
+                        && token.equals(SalonStore.get(this,"tokenid")) && owner.equals(SalonStore.get(this,"msgpk"))
+                        && profileUrl.equals(SalonStore.get(this,"profileUrl")),
+                stage->{
+                    showPublishState(stage);
+                    if(stage==SalonPublication.Stage.CONFIRMED && screen==Screen.EDIT && publicationEpoch==renderEpoch) {
+                        mProfileCache.clear(); mRegistryCache=null;
+                        go(Screen.DISCOVER);
+                        scroll.post(()->scroll.scrollTo(0,0));
+                        toast(publishMessage(stage).toString());
+                    }
+                    if(status!=null && status!=profStatus) { CharSequence message=publishMessage(stage); Language.setText(status,message); }
+                });
+        publicationCheck.start(true);
+    }
+    private CharSequence publishMessage(SalonPublication.Stage stage) {
+        switch(stage) {
+            case CHECKING: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_checking);
+            case ANNOUNCING: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_announcing);
+            case WAITING: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_waiting);
+            case CONFIRMED: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_confirmed);
+            case UNKNOWN: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_unknown);
+            case FAILED: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_failed);
+            case REJECTED: return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_progress_rejected);
+            default: throw new IllegalArgumentException();
+        }
     }
 
     private static final class SpareBurn {

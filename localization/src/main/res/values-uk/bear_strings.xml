@@ -8561,4 +8561,17 @@
     <string name="l10n_salon_keets_starting" formatted="false">"Keets запускається. Повторіть трохи пізніше."</string>
     <string name="l10n_salon_keets_private" formatted="false">"Публічне сховище не використовується для приватних фото. Підключіть Maxima або виберіть інший хостинг."</string>
     <string name="l10n_salon_keets_timeout" formatted="false">"Keets не відповів. Переконайтеся, що вузол працює, і спробуйте ще раз."</string>
+    <string name="l10n_salon_progress_preparing" formatted="false">"Публікація…"</string>
+    <string name="l10n_salon_progress_confirming" formatted="false">"Підтвердження…"</string>
+    <string name="l10n_salon_progress_check" formatted="false">"Перевірити стан"</string>
+    <string name="l10n_salon_progress_view" formatted="false">"Опубліковано · Відкрити"</string>
+    <string name="l10n_salon_progress_save" formatted="false">"Зберегти й опублікувати"</string>
+    <string name="l10n_salon_progress_node" formatted="false">"Підключіть вузол для перевірки публікації."</string>
+    <string name="l10n_salon_progress_checking" formatted="false">"Сторінку збережено. Перевіряємо каталог Salon…"</string>
+    <string name="l10n_salon_progress_announcing" formatted="false">"Сторінку збережено. Надсилаємо запис до Salon один раз…"</string>
+    <string name="l10n_salon_progress_waiting" formatted="false">"Сторінку збережено. Чекаємо підтвердження блокчейну. Перевіряємо автоматично; можна залишити цю сторінку."</string>
+    <string name="l10n_salon_progress_confirmed" formatted="false">"Опубліковано. Сторінку збережено, запис у Salon підтверджено."</string>
+    <string name="l10n_salon_progress_unknown" formatted="false">"Підтвердження затримується. Перевірте стан знову — повторного надсилання не буде."</string>
+    <string name="l10n_salon_progress_failed" formatted="false">"Не вдалося зберегти стан. Нічого не надіслано."</string>
+    <string name="l10n_salon_progress_rejected" formatted="false">"Вузол відхилив оголошення. Сторінку збережено. Перевірте вузол і повторіть публікацію."</string>
 </resources>

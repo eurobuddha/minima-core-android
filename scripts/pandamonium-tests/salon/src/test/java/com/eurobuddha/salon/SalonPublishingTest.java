@@ -42,6 +42,7 @@ public class SalonPublishingTest {
         ((ExecutorService)field("io").get(activity)).shutdownNow();worker=mock(ExecutorService.class);set("io",worker);
         doAnswer(c->{jobs.add(c.getArgument(0));return null;}).when(worker).execute(any(Runnable.class));
         activity.getSharedPreferences("salon_identity",Context.MODE_PRIVATE).edit().clear().commit();
+        activity.getSharedPreferences("salon_publication",Context.MODE_PRIVATE).edit().clear().commit();
         activity.getSharedPreferences(HostingStore.PREFS,Context.MODE_PRIVATE).edit().clear().commit();
         SalonStore.put(activity,"handle","owner");SalonStore.put(activity,"tokenid","0xowner");SalonStore.put(activity,"name","Literal 中文 Русский Українська");
         host=Hosting.Profile.fresh(Hosting.TYPE_WEBDAV);Hosting.put(host.j,"def",true);HostingStore.upsert(activity,host);
@@ -105,20 +106,22 @@ public class SalonPublishingTest {
         SalonStore.put(activity,"tokenid","replacement");SalonStore.setArr(activity,"nfts",new JSONArray());reply.getValue().onError("unavailable");idle();
         assertEquals(0,SalonStore.arr(activity,"nfts").length());assertEquals("",SalonStore.get(activity,"profileUrl"));assertTrue(jobs.isEmpty());
     }
-    @Test public void announcementsAreSubmittedNotConfirmedAndIgnoreLateDuplicateCallbacks()throws Exception {
+    @Test public void announcementChecksDirectoryBeforeSendingAndKeepsGuardAfterAcknowledgement()throws Exception {
         set("nodeUp",true);NodeApi node=mock(NodeApi.class);set("node",node);SalonStore.put(activity,"profileUrl",URL);
+        List<NodeApi.Cb> reads=new ArrayList<>();doAnswer(c->{reads.add(c.getArgument(1));return null;}).when(node).cmd(anyString(),any());
         List<SalonRegistry.Announced> callbacks=new ArrayList<>();registry.when(()->SalonRegistry.announce(eq(node),anyString(),anyString(),anyString(),any())).thenAnswer(c->{callbacks.add(c.getArgument(4));return null;});
-        call("publishSalon",new Class<?>[]{TextView.class},status);languages(l10n_salon_publish_announcing);
+        call("publishSalon",new Class<?>[]{TextView.class},status);languages(l10n_salon_progress_checking);
+        reads.get(0).onResult(new JSONObject().put("status",true).put("response",new JSONArray()));languages(l10n_salon_progress_announcing);
+        callbacks.get(0).done(true,"");languages(l10n_salon_progress_waiting);
         call("publishSalon",new Class<?>[]{TextView.class},status);assertEquals(1,callbacks.size());
-        callbacks.get(0).done(true,"Published to the Salon.");idle();languages(l10n_salon_publish_submitted);
-        call("publishSalon",new Class<?>[]{TextView.class},status);callbacks.get(0).done(false,"late duplicate");idle();languages(l10n_salon_publish_announcing);
-        callbacks.get(1).done(false,"network failure");idle();languages(l10n_salon_publish_unknown);
+        assertTrue(SalonPublication.pending(activity,"0xowner"));
     }
     @Test public void announcementResultCannotUpdateReplacementIdentity()throws Exception {
         set("nodeUp",true);NodeApi node=mock(NodeApi.class);set("node",node);SalonStore.put(activity,"profileUrl",URL);
-        List<SalonRegistry.Announced> callbacks=new ArrayList<>();registry.when(()->SalonRegistry.announce(eq(node),anyString(),anyString(),anyString(),any())).thenAnswer(c->{callbacks.add(c.getArgument(4));return null;});
-        call("publishSalon",new Class<?>[]{TextView.class},status);SalonStore.put(activity,"tokenid","replacement");callbacks.get(0).done(true,"");idle();
-        assertNull(field("announcement").get(activity));languages(l10n_salon_publish_announcing);
+        ArgumentCaptor<NodeApi.Cb> callback=ArgumentCaptor.forClass(NodeApi.Cb.class);
+        call("publishSalon",new Class<?>[]{TextView.class},status);verify(node).cmd(anyString(),callback.capture());
+        SalonStore.put(activity,"tokenid","replacement");callback.getValue().onResult(new JSONObject().put("status",true).put("response",new JSONArray()));
+        registry.verifyNoInteractions();languages(l10n_salon_progress_checking);
     }
     private static TextView find(android.view.View view,String text) {
         if(view instanceof TextView && text.equals(((TextView)view).getText().toString())) return (TextView)view;
@@ -137,11 +140,20 @@ public class SalonPublishingTest {
             call("render",new Class<?>[]{});
             EditText name=(EditText)field("edName").get(activity);name.setText("Typed Українська 中文");name.setSelection(4);
             NodeApi node=mock(NodeApi.class);set("node",node);set("nodeUp",true);
+            List<NodeApi.Cb> reads=new ArrayList<>();doAnswer(c->{reads.add(c.getArgument(1));return null;}).when(node).cmd(anyString(),any());
             List<SalonRegistry.Announced> callbacks=new ArrayList<>();registry.when(()->SalonRegistry.announce(eq(node),anyString(),anyString(),anyString(),any())).thenAnswer(c->{callbacks.add(c.getArgument(4));return null;});
             TextView publish=find(body,Language.upper(Language.msg(l10n_salon_editor_publish)).toString());assertNotNull(publish);publish.performClick();
-            status=(TextView)field("profStatus").get(activity);languages(l10n_salon_publish_uploading);job();assertEquals(1,callbacks.size());languages(l10n_salon_publish_announcing);
+            status=(TextView)field("profStatus").get(activity);languages(l10n_salon_publish_uploading);job();reads.get(0).onResult(new JSONObject().put("status",true).put("response",new JSONArray()));assertEquals(1,callbacks.size());languages(l10n_salon_progress_announcing);
+            assertFalse(publish.isEnabled());assertFalse(publish.isClickable());
+            android.view.View spinner=(android.view.View)field("publishSpinner").get(activity);assertEquals(android.view.View.VISIBLE,spinner.getVisibility());assertSame(publish.getParent(),spinner.getParent());
             assertEquals("EDIT",field("screen").get(activity).toString());assertSame(name,field("edName").get(activity));assertEquals("Typed Українська 中文",name.getText().toString());assertEquals(4,name.getSelectionStart());
-            callbacks.get(0).done(false,"unavailable");idle();languages(l10n_salon_publish_unknown);assertEquals("EDIT",field("screen").get(activity).toString());
+            callbacks.get(0).done(true,"");idle();languages(l10n_salon_progress_waiting);assertEquals("EDIT",field("screen").get(activity).toString());
+            // Chain evidence, not acknowledgement, routes to Discover.
+            registry.when(()->SalonRegistry.hex(URL)).thenCallRealMethod();
+            JSONObject coin=new JSONObject().put("tokenid","0x00").put("state",new JSONObject().put("0","0xowner").put("1",SalonRegistry.hex(URL)));
+            reads.get(1).onResult(new JSONObject().put("status",true).put("response",new JSONArray().put(coin)));idle();
+            assertEquals("DISCOVER",field("screen").get(activity).toString());
+            assertEquals(android.view.View.GONE,spinner.getVisibility());
         }
     }
     @Test public void refreshedEditionsAreSavedOnlyAfterUploadAndLateDuplicateCannotMutateThem()throws Exception {

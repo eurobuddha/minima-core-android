@@ -42703,5 +42703,83 @@
     "zh-Hans": "Keets 未响应。请确认节点正在运行，然后重试。",
     "ru": "Keets не ответил. Убедитесь, что узел работает, и повторите попытку.",
     "uk": "Keets не відповів. Переконайтеся, що вузол працює, і спробуйте ще раз."
+  },
+  "salonProgress.preparing": {
+    "en": "Publishing…",
+    "zh-Hans": "正在发布…",
+    "ru": "Публикация…",
+    "uk": "Публікація…"
+  },
+  "salonProgress.confirming": {
+    "en": "Confirming…",
+    "zh-Hans": "正在确认…",
+    "ru": "Подтверждение…",
+    "uk": "Підтвердження…"
+  },
+  "salonProgress.check": {
+    "en": "Check status",
+    "zh-Hans": "检查状态",
+    "ru": "Проверить статус",
+    "uk": "Перевірити стан"
+  },
+  "salonProgress.view": {
+    "en": "Published · View page",
+    "zh-Hans": "已发布 · 查看主页",
+    "ru": "Опубликовано · Открыть",
+    "uk": "Опубліковано · Відкрити"
+  },
+  "salonProgress.save": {
+    "en": "Save & publish",
+    "zh-Hans": "保存并发布",
+    "ru": "Сохранить и опубликовать",
+    "uk": "Зберегти й опублікувати"
+  },
+  "salonProgress.node": {
+    "en": "Connect the node to check publication.",
+    "zh-Hans": "请连接节点以检查发布状态。",
+    "ru": "Подключите узел для проверки публикации.",
+    "uk": "Підключіть вузол для перевірки публікації."
+  },
+  "salonProgress.checking": {
+    "en": "Page saved. Checking your Salon listing…",
+    "zh-Hans": "主页已保存。正在检查 Salon 目录…",
+    "ru": "Страница сохранена. Проверяем каталог Salon…",
+    "uk": "Сторінку збережено. Перевіряємо каталог Salon…"
+  },
+  "salonProgress.announcing": {
+    "en": "Page saved. Submitting its Salon listing once…",
+    "zh-Hans": "主页已保存。正在提交一次 Salon 目录公告…",
+    "ru": "Страница сохранена. Отправляем запись в Salon один раз…",
+    "uk": "Сторінку збережено. Надсилаємо запис до Salon один раз…"
+  },
+  "salonProgress.waiting": {
+    "en": "Page saved. Waiting for blockchain confirmation. Checking automatically; you can leave this page.",
+    "zh-Hans": "主页已保存。等待区块链确认。正在自动检查；您可以离开此页面。",
+    "ru": "Страница сохранена. Ждём подтверждения блокчейна. Проверяем автоматически; можно уйти с этой страницы.",
+    "uk": "Сторінку збережено. Чекаємо підтвердження блокчейну. Перевіряємо автоматично; можна залишити цю сторінку."
+  },
+  "salonProgress.confirmed": {
+    "en": "Published. Your page is saved and its Salon listing is confirmed.",
+    "zh-Hans": "发布成功。主页已保存，Salon 目录已确认。",
+    "ru": "Опубликовано. Страница сохранена, запись в Salon подтверждена.",
+    "uk": "Опубліковано. Сторінку збережено, запис у Salon підтверджено."
+  },
+  "salonProgress.unknown": {
+    "en": "Confirmation is taking longer. Check status to look again; this will not submit another announcement.",
+    "zh-Hans": "确认时间较长。点击检查状态以重查；不会重复提交公告。",
+    "ru": "Подтверждение задерживается. Проверьте статус снова — повторной отправки не будет.",
+    "uk": "Підтвердження затримується. Перевірте стан знову — повторного надсилання не буде."
+  },
+  "salonProgress.failed": {
+    "en": "Could not save publication status. Nothing was submitted.",
+    "zh-Hans": "无法保存发布状态。未提交任何内容。",
+    "ru": "Не удалось сохранить статус. Ничего не отправлено.",
+    "uk": "Не вдалося зберегти стан. Нічого не надіслано."
+  },
+  "salonProgress.rejected": {
+    "en": "The node rejected the announcement. Your page is saved. Check the node, then try publishing again.",
+    "zh-Hans": "节点拒绝了公告。主页已保存。请检查节点后重试发布。",
+    "ru": "Узел отклонил объявление. Страница сохранена. Проверьте узел и повторите публикацию.",
+    "uk": "Вузол відхилив оголошення. Сторінку збережено. Перевірте вузол і повторіть публікацію."
   }
 }

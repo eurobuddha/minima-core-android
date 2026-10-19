@@ -8487,4 +8487,17 @@
     <string name="l10n_salon_keets_starting" formatted="false">"Keets is starting. Try again shortly."</string>
     <string name="l10n_salon_keets_private" formatted="false">"Public device hosting is not used for private photos. Connect Maxima or choose another host."</string>
     <string name="l10n_salon_keets_timeout" formatted="false">"Keets did not respond. Check that your node is running and try again."</string>
+    <string name="l10n_salon_progress_preparing" formatted="false">"Publishing…"</string>
+    <string name="l10n_salon_progress_confirming" formatted="false">"Confirming…"</string>
+    <string name="l10n_salon_progress_check" formatted="false">"Check status"</string>
+    <string name="l10n_salon_progress_view" formatted="false">"Published · View page"</string>
+    <string name="l10n_salon_progress_save" formatted="false">"Save &amp; publish"</string>
+    <string name="l10n_salon_progress_node" formatted="false">"Connect the node to check publication."</string>
+    <string name="l10n_salon_progress_checking" formatted="false">"Page saved. Checking your Salon listing…"</string>
+    <string name="l10n_salon_progress_announcing" formatted="false">"Page saved. Submitting its Salon listing once…"</string>
+    <string name="l10n_salon_progress_waiting" formatted="false">"Page saved. Waiting for blockchain confirmation. Checking automatically; you can leave this page."</string>
+    <string name="l10n_salon_progress_confirmed" formatted="false">"Published. Your page is saved and its Salon listing is confirmed."</string>
+    <string name="l10n_salon_progress_unknown" formatted="false">"Confirmation is taking longer. Check status to look again; this will not submit another announcement."</string>
+    <string name="l10n_salon_progress_failed" formatted="false">"Could not save publication status. Nothing was submitted."</string>
+    <string name="l10n_salon_progress_rejected" formatted="false">"The node rejected the announcement. Your page is saved. Check the node, then try publishing again."</string>
 </resources>

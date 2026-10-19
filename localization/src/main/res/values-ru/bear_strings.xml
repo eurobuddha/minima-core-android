@@ -8561,4 +8561,17 @@
     <string name="l10n_salon_keets_starting" formatted="false">"Keets запускается. Повторите чуть позже."</string>
     <string name="l10n_salon_keets_private" formatted="false">"Публичное хранилище не используется для личных фото. Подключите Maxima или выберите другой хостинг."</string>
     <string name="l10n_salon_keets_timeout" formatted="false">"Keets не ответил. Убедитесь, что узел работает, и повторите попытку."</string>
+    <string name="l10n_salon_progress_preparing" formatted="false">"Публикация…"</string>
+    <string name="l10n_salon_progress_confirming" formatted="false">"Подтверждение…"</string>
+    <string name="l10n_salon_progress_check" formatted="false">"Проверить статус"</string>
+    <string name="l10n_salon_progress_view" formatted="false">"Опубликовано · Открыть"</string>
+    <string name="l10n_salon_progress_save" formatted="false">"Сохранить и опубликовать"</string>
+    <string name="l10n_salon_progress_node" formatted="false">"Подключите узел для проверки публикации."</string>
+    <string name="l10n_salon_progress_checking" formatted="false">"Страница сохранена. Проверяем каталог Salon…"</string>
+    <string name="l10n_salon_progress_announcing" formatted="false">"Страница сохранена. Отправляем запись в Salon один раз…"</string>
+    <string name="l10n_salon_progress_waiting" formatted="false">"Страница сохранена. Ждём подтверждения блокчейна. Проверяем автоматически; можно уйти с этой страницы."</string>
+    <string name="l10n_salon_progress_confirmed" formatted="false">"Опубликовано. Страница сохранена, запись в Salon подтверждена."</string>
+    <string name="l10n_salon_progress_unknown" formatted="false">"Подтверждение задерживается. Проверьте статус снова — повторной отправки не будет."</string>
+    <string name="l10n_salon_progress_failed" formatted="false">"Не удалось сохранить статус. Ничего не отправлено."</string>
+    <string name="l10n_salon_progress_rejected" formatted="false">"Узел отклонил объявление. Страница сохранена. Проверьте узел и повторите публикацию."</string>
 </resources>
