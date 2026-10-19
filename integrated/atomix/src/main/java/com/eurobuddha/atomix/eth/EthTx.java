@@ -19,24 +19,6 @@ public final class EthTx {
 
     private static final BigInteger FALLBACK_GAS_PRICE = BigInteger.valueOf(1_000_000_000L); // 1 gwei (only used when eth_gasPrice returns ≤0)
 
-    // ── Per-address nonce serializer ──────────────────────────────────────────────────────────────────────
-    // A market sweep fires up to 6 ETH locks back-to-back, and the poll loop can issue a claim/refund/withdraw
-    // concurrently on the io pool. The RPC "pending" count lags a just-broadcast tx, so two sends would read the
-    // SAME nonce and collide — one silently dropped (the 0.10.0 bug that dropped the best leg). We hand out
-    // strictly-increasing nonces under a per-address lock, and SELF-HEAL a dropped own-tx by falling back to
-    // "pending" once it has sat stuck-behind us for STALE_MS (a plain advancing counter would leave a permanent
-    // nonce gap instead — the reason the naive 0.10.x counter was reverted). A false heal is fund-safe: it's an
-    // RBF of an in-flight nonce — if the original is fine it wins and the heal-send is rejected ("nonce too low")
-    // so send() throws and nothing is committed. Cross-process (Activity vs Service) handoff still relies on a
-    // fresh "pending" at cold start, which the FOREGROUND/SWEEP_ACTIVE single-actor guard already guarantees.
-    private static final long STALE_MS = 120_000L;
-    private static final Map<String, NonceState> NONCE = new ConcurrentHashMap<>();
-
-    private static final class NonceState {
-        BigInteger next;     // null = cold; never truncate an unsigned 64-bit RPC count
-        long syncAtMs = 0;   // last time "pending" was even-with / ahead-of our counter (in sync)
-    }
-
     /** Matches NodeApi's fail-closed BooleanSupplier contract. No signed transaction is sent on refusal. */
     public static void requireAuthorized(java.util.function.BooleanSupplier authorized) {
         boolean allowed;
@@ -54,8 +36,8 @@ public final class EthTx {
             throw new IllegalArgumentException("Ethereum fee is outside the safe range. Review your RPC endpoint.");
     }
 
-    /** Forget all cached nonce state — call on a chain/endpoint switch so we cold-start from the new node. */
-    public static void resetAll() { NONCE.clear(); }
+    /** Compatibility entry point. Connection changes cannot erase outstanding transactions. */
+    public static void resetAll() { /* Durable nonce ownership survives endpoint and account changes. */ }
 
     public static String send(EthRpc rpc, Credentials creds, long chainId,
                               String to, String data, BigInteger value, BigInteger gasLimit) throws Exception {
@@ -66,12 +48,17 @@ public final class EthTx {
     public static String send(EthRpc rpc, Credentials creds, long chainId,
                               String to, String data, BigInteger value, BigInteger gasLimit,
                               java.util.function.BooleanSupplier authorized) throws Exception {
+        return sendOperation(rpc,creds,chainId,to,data,value,gasLimit,authorized,"pending");
+    }
+
+    public static String sendOperation(EthRpc rpc,Credentials creds,long chainId,String to,String data,
+                                       BigInteger value,BigInteger gasLimit,java.util.function.BooleanSupplier authorized,String operation) throws Exception {
         requireAuthorized(authorized);
-        // Automated operations retain the existing fee formula; manual sends pass their reviewed price.
         BigInteger rawGp = EthRpc.hexToBig(rpc.callStr("eth_gasPrice", new JSONArray()));
         if (rawGp.signum() <= 0) rawGp = FALLBACK_GAS_PRICE;
-        final BigInteger gasPrice = EthSend.effectiveGasPriceWei(rawGp, rpc.baseFeePerGasOrZero());
-        return send(rpc, creds, chainId, to, data, value, gasLimit, gasPrice, authorized);
+        BigInteger gasPrice = EthSend.effectiveGasPriceWei(rawGp, rpc.baseFeePerGasOrZero());
+        requireFees(gasPrice,gasLimit);
+        return submit(rpc,creds,chainId,to,data,value,gasLimit,gasPrice,authorized,operation);
     }
 
     /** Same explicit-price boundary used by ETH Wallet. Never recompute a reviewed fee. */
@@ -80,34 +67,24 @@ public final class EthTx {
                               java.util.function.BooleanSupplier authorized) throws Exception {
         requireAuthorized(authorized);
         requireFees(gasPrice, gasLimit);
-        NonceState st = NONCE.computeIfAbsent(creds.getAddress(), k -> new NonceState());
-        synchronized (st) {
-            requireAuthorized(authorized);
-            BigInteger pending = rpc.getTransactionCount(creds.getAddress());
-            EthRpc.requireSendableNonce(pending);   // fresh "pending"
-            long now = System.currentTimeMillis();
-            BigInteger alloc, newNext;
-            long newSync;
-            if (st.next == null || pending.compareTo(st.next) >= 0) {              // cold | in-sync | external tx advanced us
-                alloc = pending; newNext = pending.add(BigInteger.ONE); newSync = now;
-            } else if (now - st.syncAtMs >= STALE_MS) {           // stuck behind too long → our tx dropped → HEAL
-                alloc = pending; newNext = pending.add(BigInteger.ONE); newSync = now;
-            } else {                                              // pending just lagging our broadcast → keep counting
-                alloc = st.next; newNext = st.next.add(BigInteger.ONE); newSync = st.syncAtMs;
-            }
+        return submit(rpc,creds,chainId,to,data,value,gasLimit,gasPrice,authorized,null);
+    }
 
-            requireAuthorized(authorized);
-            EthRpc.requireSendableNonce(alloc);
-            RawTransaction raw = RawTransaction.createTransaction(
-                    alloc, gasPrice, gasLimit, to,
-                    value == null ? BigInteger.ZERO : value, data);
-            byte[] signed = TransactionEncoder.signMessage(raw, chainId, creds);
-            requireAuthorized(authorized);
-            String txHash = rpc.sendRawTransaction(Numeric.toHexString(signed));
-            if (txHash == null || !txHash.startsWith("0x")) throw new Exception("send failed: " + txHash);
-
-            st.next = newNext; st.syncAtMs = newSync;   // commit only AFTER a successful broadcast
-            return txHash;
-        }
+    private static String submit(EthRpc rpc,Credentials creds,long chainId,String to,String data,BigInteger value,
+                                 BigInteger gas,BigInteger price,java.util.function.BooleanSupplier authorized,String operation) throws Exception {
+        requireAuthorized(authorized);
+        return com.eurobuddha.minimaapi.ethereum.EthereumTransactions.shared().send(
+                new com.eurobuddha.minimaapi.ethereum.EthereumTransactions.Rpc() {
+                    public BigInteger chain() throws Exception { return EthRpc.transactionCount(rpc.call("eth_chainId",new JSONArray())); }
+                    public BigInteger pending(String address) throws Exception { return rpc.getTransactionCount(address); }
+                    public String broadcast(String raw) throws Exception { return rpc.sendRawTransaction(raw); }
+                    public org.json.JSONObject receipt(String hash) throws Exception { return object(rpc.call("eth_getTransactionReceipt",new JSONArray().put(hash))); }
+                    public org.json.JSONObject transaction(String hash) throws Exception { return object(rpc.call("eth_getTransactionByHash",new JSONArray().put(hash))); }
+                },creds,chainId,to,data,value,gas,price,operation,()->requireAuthorized(authorized));
+    }
+    private static org.json.JSONObject object(Object value) throws java.io.IOException {
+        if(value==null||value==org.json.JSONObject.NULL)return null;
+        if(!(value instanceof org.json.JSONObject))throw new java.io.IOException("Invalid Ethereum transaction lookup");
+        return(org.json.JSONObject)value;
     }
 }

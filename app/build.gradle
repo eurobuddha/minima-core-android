@@ -129,8 +129,8 @@ android {
         // vc113: explicit English, Chinese, Russian and Ukrainian selection across all bears.
         // vc114: core notifications and retained main-screen controls follow the selected language.
         // vc118: current four-language catalogue and reviewed AtomiX receipt/consent fixes.
-        versionCode 193
-        versionName "1.9.122"
+        versionCode 194
+        versionName "2.0.0"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -202,6 +202,8 @@ android {
         }
     }
 
+    testOptions { unitTests.includeAndroidResources = true }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -256,6 +258,9 @@ dependencies {
     // The fork's node has NO Maxima - the app carries the clean-room core itself, like mininotes.
     implementation project(':maxima-core')
     testImplementation libs.junit
+    testPandamoniumImplementation 'org.robolectric:robolectric:4.14.1'
+    testPandamoniumImplementation 'org.json:json:20240303'
+    testPandamoniumImplementation 'org.web3j:crypto:4.9.8'
     testImplementation 'org.mockito:mockito-core:5.12.0'
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

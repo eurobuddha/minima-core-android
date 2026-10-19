@@ -94,6 +94,7 @@ public final class EthRpc {
             c.setRequestMethod("POST");
             c.setRequestProperty("Content-Type", "application/json");
             c.setDoOutput(true);
+            c.setInstanceFollowRedirects(false);
             c.setConnectTimeout(8000);    // a live CDN endpoint connects fast; a slow connect = dead node → fail over quickly
             c.setReadTimeout(30000);      // reads (eth_getLogs can be heavy) get longer
             try (OutputStream os = c.getOutputStream()) {
@@ -107,14 +108,21 @@ public final class EthRpc {
             if (!trimmed.startsWith("{")) {
                 throw new IOException(host(url) + " HTTP " + code + " non-JSON: " + snippet(trimmed));
             }
-            JSONObject resp = new JSONObject(trimmed);
+            if (code < 200 || code >= 300) throw new IOException(host(url) + " HTTP " + code);
+            org.json.JSONTokener parser = new org.json.JSONTokener(trimmed);
+            Object parsed = parser.nextValue();
+            if (!(parsed instanceof JSONObject) || parser.nextClean() != 0) throw new IOException("Invalid Ethereum RPC envelope");
+            JSONObject resp = (JSONObject)parsed;
+            if (!"2.0".equals(resp.opt("jsonrpc")) || !(resp.opt("id") instanceof Number)
+                    || !"1".equals(resp.opt("id").toString()) || resp.has("result") == resp.has("error"))
+                throw new IOException("Invalid Ethereum RPC envelope");
             if (resp.has("error")) {
                 JSONObject err = resp.optJSONObject("error");
                 throw new IOException(host(url) + ": " + (err == null ? snippet(trimmed) : err.optString("message", snippet(trimmed))));
             }
             Object result = resp.opt("result");
             // Validate inside the fallback loop too: an empty reply is not account nonce zero.
-            if ("eth_getTransactionCount".equals(method)) transactionCount(result);
+            if ("eth_getTransactionCount".equals(method) || "eth_chainId".equals(method)) transactionCount(result);
             if ("eth_getLogs".equals(method)) logArray(result);
             return result;
         } catch (JSONException e) {
@@ -246,7 +254,11 @@ public final class EthRpc {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             byte[] buf = new byte[4096];
             int n;
-            while ((n = in.read(buf)) > 0) bos.write(buf, 0, n);
+            // Same bounded reader as Salon RelayBlob; an RPC cannot exhaust the host heap.
+            while ((n = in.read(buf)) != -1) {
+                if (n > 4 * 1024 * 1024 - bos.size()) throw new IOException("Ethereum RPC response too large");
+                bos.write(buf, 0, n);
+            }
             return new String(bos.toByteArray(), StandardCharsets.UTF_8);   // NI-2: type-safe charset (minSdk 28 < API 33 for toString(Charset))
         }
     }

@@ -98,6 +98,7 @@ public final class PandamoniumHooks {
     }
 
     public static void initialize(android.content.Context context) {
+        com.eurobuddha.minimaapi.ethereum.EthereumTransactions.initialize(context);
         com.eurobuddha.wallet.MainActivity.installScreenshotPolicy(() ->
                 com.eurobuddha.minimacore.MinimaApplication.screenshotsAllowed(context));
         com.eurobuddha.minimaapi.direct.DirectNodeApi.install(new EmbeddedNodeTransport(context));

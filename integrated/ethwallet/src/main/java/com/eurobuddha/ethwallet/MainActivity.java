@@ -787,7 +787,11 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                             prefs.edit().putString("lastTx", tx).apply();
                             onUi(() -> { sentDialog(tx); refresh(); });
                         } catch (Exception e) {
-                            onUi(() -> toast(Language.msg(l10n_eth_wallet_send_failed, EthMessages.error(e))));
+                            if (e instanceof com.eurobuddha.minimaapi.ethereum.EthereumTransactions.Uncertain) {
+                                String hash = ((com.eurobuddha.minimaapi.ethereum.EthereumTransactions.Uncertain)e).hash;
+                                prefs.edit().putString("lastTx", hash).apply();
+                                onUi(() -> toast(Language.join(Language.msg(l10n_nft_transaction_unknown), "\n", hash)));
+                            } else onUi(() -> toast(Language.msg(l10n_eth_wallet_send_failed, EthMessages.error(e))));
                         }
                     });
                 })

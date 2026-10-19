@@ -1,4 +1,5 @@
 package com.eurobuddha.atomix;
+import com.eurobuddha.atomix.eth.JournalFixture;
 
 import android.app.Dialog;
 import android.os.Looper;
@@ -54,7 +55,7 @@ public class ManualSendContextTest {
         when(rpc.getBalance(anyString())).thenReturn(BigInteger.TEN.pow(18));
         when(rpc.ethCall(anyString(),anyString())).thenReturn("0x"+String.format("%064x",BigInteger.valueOf(50_000_000)));
         when(rpc.getTransactionCount(anyString())).thenReturn(BigInteger.valueOf(4));
-        when(rpc.sendRawTransaction(anyString())).thenReturn(HASH);EthTx.resetAll();
+        JournalFixture.install();JournalFixture.wire(rpc);EthTx.resetAll();
     }
     @After public void cleanup()throws Exception {Dialog d=ShadowDialog.getLatestDialog();if(d!=null)d.dismiss();idle();((ExecutorService)field("io").get(activity)).shutdownNow();jobs.clear();}
     @Test public void editedOrSwitchedMaxCannotOverwriteTheForm()throws Exception {
@@ -89,20 +90,23 @@ public class ManualSendContextTest {
         Dialog confirm=review(true,"0.1");String content=contentText(confirm.getWindow().getDecorView());assertTrue(content.contains(FIRST.getAddress()));assertTrue(content.contains(TO));assertTrue(content.contains("0.00002362"));
         when(rpc.callStr(eq("eth_gasPrice"),any())).thenReturn("0x77359400");
         when(rpc.sendRawTransaction(anyString())).thenAnswer(inv->{SignedRawTransaction raw=(SignedRawTransaction)TransactionDecoder.decode(inv.getArgument(0));
-            assertEquals(FIRST.getAddress(),raw.getFrom());assertEquals(TO,raw.getTo());assertEquals(BigInteger.TEN.pow(17),raw.getValue());assertEquals(REVIEWED,raw.getGasPrice());return HASH;});
+            assertEquals(FIRST.getAddress(),raw.getFrom());assertEquals(TO,raw.getTo());assertEquals(BigInteger.TEN.pow(17),raw.getValue());assertEquals(REVIEWED,raw.getGasPrice());return JournalFixture.accept(inv.getArgument(0));});
         positive(confirm).performClick();idle();job();verify(rpc,times(1)).callStr(eq("eth_gasPrice"),any());verify(rpc,times(1)).sendRawTransaction(anyString());
     }
     @Test public void reviewedTokenAmountAndContractRemainExact()throws Exception {
         Dialog confirm=review(false,"1.1234567");
         when(rpc.sendRawTransaction(anyString())).thenAnswer(inv->{RawTransaction raw=TransactionDecoder.decode(inv.getArgument(0));
             assertEquals(EthNet.MAINNET.tokens[0].address,raw.getTo());assertEquals(BigInteger.ZERO,raw.getValue());
-            assertEquals(EthSend.buildTransferData(TO,BigInteger.valueOf(1_123_456)).substring(2),raw.getData());assertEquals(REVIEWED,raw.getGasPrice());return HASH;});
+            assertEquals(EthSend.buildTransferData(TO,BigInteger.valueOf(1_123_456)).substring(2),raw.getData());assertEquals(REVIEWED,raw.getGasPrice());return JournalFixture.accept(inv.getArgument(0));});
         positive(confirm).performClick();idle();job();verify(rpc).sendRawTransaction(anyString());
     }
-    @Test public void rpcFailureMessageSurvivesContextCleanup()throws Exception {
+    @Test public void uncertainSubmissionMessageSurvivesContextCleanup()throws Exception {
         Dialog confirm=review(true,"0.1");when(rpc.sendRawTransaction(anyString())).thenThrow(new java.io.IOException("fixture RPC unavailable"));
         positive(confirm).performClick();idle();job();
-        assertTrue(org.robolectric.shadows.ShadowToast.getTextOfLatestToast().contains("fixture RPC unavailable"));
+        String shown=org.robolectric.shadows.ShadowToast.getTextOfLatestToast();
+        assertTrue(shown.contains(Language.text(activity,com.eurobuddha.minimacore.i18n.R.string.l10n_nft_transaction_unknown)));
+        assertTrue(shown.contains("0x"));
+        assertFalse(shown.startsWith("Send failed"));
     }
     @Test public void confirmationAndFeeErrorsFollowAllFourLanguages()throws Exception {
         Dialog confirm=review(true,"0.1");

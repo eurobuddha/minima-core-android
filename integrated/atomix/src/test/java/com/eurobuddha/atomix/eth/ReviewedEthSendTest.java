@@ -14,7 +14,7 @@ public class ReviewedEthSendTest {
     static final Credentials KEY=Credentials.create("01");
     static final String TO="0x"+"12".repeat(20),HASH="0x"+"34".repeat(32);
     EthRpc rpc;
-    @Before public void setup()throws Exception {EthTx.resetAll();rpc=mock(EthRpc.class);when(rpc.getTransactionCount(anyString())).thenReturn(BigInteger.ONE);when(rpc.sendRawTransaction(anyString())).thenReturn(HASH);}
+    @Before public void setup()throws Exception {EthTx.resetAll();rpc=mock(EthRpc.class);when(rpc.getTransactionCount(anyString())).thenReturn(BigInteger.ONE);JournalFixture.install();JournalFixture.wire(rpc);}
     String send(BigInteger price,BigInteger gas,java.util.function.BooleanSupplier guard)throws Exception {return EthTx.send(rpc,KEY,1L,TO,"",BigInteger.ONE,gas,price,guard);}
     @Test public void invalidFeeCannotTouchRpcOrEncoder()throws Exception {
         try(MockedStatic<TransactionEncoder> encoder=mockStatic(TransactionEncoder.class)) {
@@ -47,8 +47,8 @@ public class ReviewedEthSendTest {
         verify(rpc,never()).sendRawTransaction(anyString());
     }
     @Test public void explicitPriceIsNeverRequoted()throws Exception {
-        when(rpc.sendRawTransaction(anyString())).thenAnswer(inv->{assertEquals(BigInteger.valueOf(12345),TransactionDecoder.decode(inv.getArgument(0)).getGasPrice());return HASH;});
-        assertEquals(HASH,send(BigInteger.valueOf(12345),EthSend.GAS_ETH,()->true));
+        when(rpc.sendRawTransaction(anyString())).thenAnswer(inv->{assertEquals(BigInteger.valueOf(12345),TransactionDecoder.decode(inv.getArgument(0)).getGasPrice());return JournalFixture.accept(inv.getArgument(0));});
+        assertEquals(send(BigInteger.valueOf(12345),EthSend.GAS_ETH,()->true),JournalFixture.lastHash);
         verify(rpc,never()).callStr(anyString(),any());verify(rpc,never()).baseFeePerGasOrZero();
     }
 }

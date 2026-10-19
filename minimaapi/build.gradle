@@ -28,6 +28,7 @@ android {
 
 dependencies {
 
+    implementation 'org.web3j:crypto:4.9.8'
     implementation libs.appcompat
     implementation libs.material
     testImplementation libs.junit

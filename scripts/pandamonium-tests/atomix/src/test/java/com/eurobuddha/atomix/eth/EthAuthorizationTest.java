@@ -21,7 +21,7 @@ public class EthAuthorizationTest {
         when(rpc.callStr(eq("eth_gasPrice"),any(JSONArray.class))).thenReturn("0x3b9aca00");
         when(rpc.baseFeePerGasOrZero()).thenReturn(BigInteger.ZERO);
         when(rpc.getTransactionCount(anyString())).thenReturn(BigInteger.valueOf(4));
-        when(rpc.sendRawTransaction(anyString())).thenReturn(HASH);
+        JournalFixture.install();JournalFixture.wire(rpc);
     }
     String send(BooleanSupplier guard) throws Exception {
         return EthTx.send(rpc,FIXTURE,1,TO,"0x",BigInteger.ONE,BigInteger.valueOf(21000),guard);
@@ -53,21 +53,21 @@ public class EthAuthorizationTest {
                     .thenAnswer(i->{byte[] signed=(byte[])i.callRealMethod();allowed.set(false);return signed;});
             cancelled(()->send(allowed::get));verify(rpc,never()).sendRawTransaction(anyString());
         }
-        when(rpc.sendRawTransaction(anyString())).thenAnswer(i->{assertEquals(BigInteger.valueOf(4),TransactionDecoder.decode(i.getArgument(0)).getNonce());return HASH;});
-        assertEquals(HASH,send(()->true));
+        when(rpc.sendRawTransaction(anyString())).thenAnswer(i->{assertEquals(BigInteger.valueOf(4),TransactionDecoder.decode(i.getArgument(0)).getNonce());return JournalFixture.accept(i.getArgument(0));});
+        assertEquals(send(()->true),JournalFixture.lastHash);
     }
     @Test public void dispatchedReceiptSurvivesLaterInvalidationAndNonceAdvancesOnce() throws Exception {
         AtomicBoolean allowed=new AtomicBoolean(true);java.util.List<BigInteger> nonces=new java.util.ArrayList<>();
-        when(rpc.sendRawTransaction(anyString())).thenAnswer(i->{nonces.add(TransactionDecoder.decode(i.getArgument(0)).getNonce());allowed.set(false);return HASH;});
-        assertEquals(HASH,send(allowed::get));assertEquals(HASH,send(()->true));
-        assertEquals(java.util.Arrays.asList(BigInteger.valueOf(4),BigInteger.valueOf(5)),nonces);
+        when(rpc.sendRawTransaction(anyString())).thenAnswer(i->{nonces.add(TransactionDecoder.decode(i.getArgument(0)).getNonce());allowed.set(false);return JournalFixture.accept(i.getArgument(0));});
+        assertEquals(send(allowed::get),JournalFixture.lastHash);assertEquals(send(()->true),JournalFixture.lastHash);
+        assertEquals(java.util.Arrays.asList(BigInteger.valueOf(4),BigInteger.valueOf(4)),nonces);
     }
     @Test public void guardedHtlcApprovalsAndLocksShareTheBoundaryButRecoveryRemainsAvailable() throws Exception {
         EthHtlc h=new EthHtlc(rpc,FIXTURE,EthNet.MAINNET,()->false);String token=EthNet.MAINNET.token("USDT").address;
         cancelled(()->h.approve(token,BigInteger.ONE));
         cancelled(()->h.newContract(HASH,TO,HASH,BigInteger.valueOf(1900000000),token,BigInteger.ONE,BigInteger.ONE,false));
         verifyNoInteractions(rpc);
-        assertEquals(HASH,h.refund(HASH));assertEquals(HASH,h.withdraw(HASH,HASH));
+        assertEquals(h.refund(HASH),JournalFixture.lastHash);assertEquals(h.withdraw(HASH,HASH),JournalFixture.lastHash);
         verify(rpc,times(2)).sendRawTransaction(anyString());
     }
     @Test public void unchangedLockKeepsTheExistingCalldataAndFeePolicy() throws Exception {
@@ -75,7 +75,7 @@ public class EthAuthorizationTest {
         when(rpc.sendRawTransaction(anyString())).thenAnswer(i->{RawTransaction raw=TransactionDecoder.decode(i.getArgument(0));
             assertEquals(EthNet.MAINNET.htlc.toLowerCase(),raw.getTo().toLowerCase());assertEquals(EthHtlc.GAS_LOCK,raw.getGasLimit());
             assertEquals(EthSend.effectiveGasPriceWei(BigInteger.valueOf(1000000000),BigInteger.ZERO),raw.getGasPrice());
-            assertTrue(raw.getData().contains(TO.substring(2)));return HASH;});
-        assertEquals(HASH,h.newContract(HASH,TO,HASH,BigInteger.valueOf(1900000000),token,BigInteger.ONE,BigInteger.TEN,false));
+            assertTrue(raw.getData().contains(TO.substring(2)));return JournalFixture.accept(i.getArgument(0));});
+        assertEquals(h.newContract(HASH,TO,HASH,BigInteger.valueOf(1900000000),token,BigInteger.ONE,BigInteger.TEN,false),JournalFixture.lastHash);
     }
 }

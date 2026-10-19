@@ -3928,8 +3928,14 @@ public class MainActivity extends AppCompatActivity {
                         // hash to the clipboard so the user can look up their own send on a block explorer.
                         ui.post(() -> { copy(tx, Language.msg(l10n_atomix_ui_tx_copied)); fetchEthBalances(true); });
                     } catch (Exception e) {
-                        final CharSequence failure = context.current() ? AtomixMessages.error(e) : Language.msg(l10n_wallet_review_again);
-                        ui.post(() -> toast(Language.msg(l10n_atomix_ui_send_failed, failure)));
+                        if (e instanceof com.eurobuddha.minimaapi.ethereum.EthereumTransactions.Uncertain) {
+                            String hash = ((com.eurobuddha.minimaapi.ethereum.EthereumTransactions.Uncertain)e).hash;
+                            SwapLog.w("manual send outcome unknown tx=" + hash);
+                            ui.post(() -> toast(Language.join(Language.msg(l10n_nft_transaction_unknown), "\n", hash)));
+                        } else {
+                            final CharSequence failure = context.current() ? AtomixMessages.error(e) : Language.msg(l10n_wallet_review_again);
+                            ui.post(() -> toast(Language.msg(l10n_atomix_ui_send_failed, failure)));
+                        }
                     } finally { context.cancel(); }
                 }); })
                 .setOnDismissListener(ignored -> { if (!submitted.get()) context.cancel(); })

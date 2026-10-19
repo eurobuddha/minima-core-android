@@ -494,3 +494,12 @@ transport and actual APK Keets checks pass. No install or publication.
 See docs/UTXO_TRANSACTION_JOURNAL_2026-10-19.txt for review, artifact hashes and
 remaining work. Draft/confirmation guards, cached-history presentation and full
 application/standalone parity remain open; this is not final release approval.
+
+Demo priority and Ethereum repair — 2026-10-19
+User extended the demo deadline to 11:30 Europe/London and explicitly required
+AtomiX to remain fully functional. Ethereum signing was not disabled. Standalone
+parity is deferred until after the demo; preserve the original full-review goal.
+Shared durable nonce ownership/recovery, strict RPC replies and stable counter-leg
+retries now pass 703 relevant tests. See PANDAMONIUM_ETHEREUM_SUBMISSIONS_2026-10-19.txt.
+The earlier broad baseline passed 3217 tests. Final signed 2.0.0, Fold verification
+and publication remain pending at this checkpoint; the full review is still open.

@@ -619,4 +619,8 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     spec=importlib.util.spec_from_file_location('faucet_host',Path(__file__).with_name('adapt-pandamonium-faucet.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
+    # Shared durable Ethereum submission ownership, after all signer adaptations.
+    spec=importlib.util.spec_from_file_location('ethereum_submissions',Path(__file__).with_name('adapt-pandamonium-ethereum-submissions.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
 if __name__=='__main__': adapt(Path(sys.argv[1]))

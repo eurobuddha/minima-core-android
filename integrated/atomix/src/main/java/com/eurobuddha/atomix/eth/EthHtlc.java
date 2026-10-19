@@ -87,21 +87,21 @@ public final class EthHtlc {
                 new Uint256(requestAmount),
                 new Bool(otc)),
                 Collections.singletonList(new TypeReference<Bytes32>() {}));
-        return EthTx.send(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_LOCK, authorized);
+        return EthTx.sendOperation(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_LOCK, authorized,"lock:"+hashlock.toLowerCase(java.util.Locale.ROOT));
     }
 
     public String withdraw(String contractId, String preimage) throws Exception {
         Function f = new Function("withdraw",
                 Arrays.asList(new Bytes32(b32(contractId)), new Bytes32(b32(preimage))),
                 Collections.emptyList());
-        return EthTx.send(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_WITHDRAW);
+        return EthTx.sendOperation(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_WITHDRAW,()->true,"withdraw:"+contractId.toLowerCase(java.util.Locale.ROOT));
     }
 
     public String refund(String contractId) throws Exception {
         Function f = new Function("refund",
                 Collections.singletonList(new Bytes32(b32(contractId))),
                 Collections.emptyList());
-        return EthTx.send(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_REFUND);
+        return EthTx.sendOperation(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_REFUND,()->true,"refund:"+contractId.toLowerCase(java.util.Locale.ROOT));
     }
 
     /** contractId is deterministic: sha256(hashlock). Lets us locate a swap without scanning New events. */

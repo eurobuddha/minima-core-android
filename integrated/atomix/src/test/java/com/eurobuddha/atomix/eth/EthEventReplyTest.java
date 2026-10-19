@@ -98,7 +98,7 @@ public class EthEventReplyTest {
     @Test public void malformedLogRpcResponseUsesExistingFallback() throws Exception {
         try(MockedStatic<EthRpc> transport=mockStatic(EthRpc.class,CALLS_REAL_METHODS)) {
             java.net.HttpURLConnection bad=EthNonceTest.response("{\"result\":null}");
-            java.net.HttpURLConnection good=EthNonceTest.response("{\"result\":[]}");
+            java.net.HttpURLConnection good=EthNonceTest.response("{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":[]}");
             java.util.concurrent.atomic.AtomicInteger attempts=new java.util.concurrent.atomic.AtomicInteger();
             transport.when(()->EthRpc.openConnection(anyString())).thenAnswer(inv->{
                 int count=attempts.getAndIncrement();if(count>1)throw new AssertionError("Unexpected RPC attempt");return count==0?bad:good;

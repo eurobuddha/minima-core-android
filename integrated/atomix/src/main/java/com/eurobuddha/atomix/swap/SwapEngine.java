@@ -1078,7 +1078,11 @@ public final class SwapEngine {
             // past the taker's first leg, letting them refund their leg AND claim mine. So if the chain read
             // fails (or is grossly implausible) we THROW → the catch below aborts this lock and the responder
             // retries next cycle; we never lock the counter-leg on a guessed clock.
-            final long timelock = ethChainNowStrict() + CP_SECS;
+            final SwapDb.Swap existing = db.getSwap(hash);
+            final long chainNow = ethChainNowStrict();
+            final long timelock = existing != null && !existing.myLegIsMinima && existing.myTimelock > 0
+                    ? existing.myTimelock : chainNow + CP_SECS;
+            if (timelock <= chainNow) throw new java.io.IOException("Saved Ethereum counter-leg expired; no new lock was sent.");
             EthTx.requireAuthorized(authorized);
             // CR-1: record the swap row SYNCHRONOUSLY (this io thread) BEFORE the broadcast, and log EV_CPSENT
             // synchronously AFTER it — both were in ui.post()s that a destroyed main thread can DROP. Losing the

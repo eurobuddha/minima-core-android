@@ -1,0 +1,73 @@
+Pandamonium Ethereum submission review — 2026-10-19
+Scope: integrated ETH Wallet and AtomiX. Signing remains enabled.
+Standalone APK/MDS parity is deferred until after the 2.0.0 demo.
+
+Problem
+The two integrated apps derive the same Ethereum account but used independent
+nonce allocation. AtomiX also reset its allocation after two minutes and after
+endpoint changes. A lost reply or concurrent app send could reuse a nonce for a
+different operation. Neither app durably recorded the exact signed attempt before
+broadcasting, and a superficially plausible RPC hash could report success.
+
+Reuse and implementation
+Inspected both integrated and standalone EthTx/EthRpc/EthHtlc implementations,
+AtomiX SwapEngine and its financial context/fee tests, NFT's transaction-journal.inc,
+PandaDEX Pending, and Salon RelayBlob. Existing serializers were in-memory and
+could not provide restart or cross-app ownership. Reused account serialization,
+acknowledged SQLite pre-post persistence, existing web3j 4.9.8 signing, fee caps,
+caller authorization guards, exact intent validation and bounded HTTP reading.
+The minimum shared component is minimaapi/.../ethereum/EthereumTransactions.java.
+
+An account/chain lock serializes both clients. SQLite records the complete signed
+bytes and local hash before broadcast. No private key is stored in this journal.
+A crash before POSTING discards a PREPARED attempt; POSTING/ACCEPTED retain ownership.
+Unknown responses keep their nonce and exact signed bytes across restarts. A retry
+cannot turn them into a different payment, lock, refund or withdrawal. Pending
+count alone cannot prove settlement. Exact transaction lookups and complete receipt
+fields identify the saved attempt; a fabricated broadcast hash cannot report success.
+
+AtomiX lock/withdraw/refund identities survive polling and process restart. A fee
+replacement retains nonce, recipient, value, calldata and gas limit; the caller's
+existing approved/capped price is used, with at least a 10 percent bump. All signed
+versions remain recoverable, including an older version that wins the race.
+Counter-leg retries preserve their persisted timelock; expired locks are not newly
+submitted. Claims/refunds retain their existing recovery availability.
+
+Manual uncertain submissions show the existing four-language unknown-outcome
+message and exact hash, rather than reporting a definitive send failure. HTTP
+responses are bounded at 4 MiB, must have the matching JSON-RPC envelope, and must
+have a successful HTTP status. Redirects do not forward transaction bodies.
+ETH Wallet reuses AtomiX's HTTPS endpoint validation.
+
+Review
+MAJOR fixed: independent/time-reset nonce reuse; missing pre-post persistence;
+unverified returned hashes; returning the latest replacement hash when only the
+older attempt was found; recalculating a counter-leg's saved expiry; misleading
+failure UI after an unknown broadcast; unbounded/incorrect RPC envelopes.
+Changed source, adapters, callers, tests and build dependencies reviewed.
+Verdict: approve this scoped repair, subject to the final APK/device release gate.
+This is not a completed review of every Pandamonium feature.
+
+Validation
+703 tests, zero failures/errors/skips:
+- host 172, including both real client adapters against real SQLite across restart;
+- minimaapi 41, including 20 shared-journal tests;
+- AtomiX 455; ETH Wallet 35.
+Synthetic public key 1 and mocked RPC only. No live transactions, real wallet
+signatures, seed changes or key-counter changes used for testing.
+Logs: build/localization/ethereum-final-tests.log.
+The earlier release baseline passed 3217 tests before this repair.
+Source importer, language and direct-transport checks recorded separately in the
+2.0.0 release ledger. Final signed APK and Fold checks remain outstanding here.
+
+Limits and follow-up
+The journal coordinates clients inside Pandamonium's single app process. Separate
+standalone apps/devices with the same imported Ethereum key are not coordinated by
+this private database; standalone parity remains an explicit follow-up.
+Historical transactions sent before this journal existed cannot be reconstructed
+from unavailable signed bytes. Existing AtomiX on-chain contract discovery remains.
+Receipt lookup and recovery depend on RPC availability; unknown outcomes remain
+reserved instead of being treated as failed. Manual recovery runs on a subsequent
+send/retry; automatic swaps use their existing polling. No live mainnet swap was
+performed as part of verification. Full reorg/history UI coverage and the broader
+application review remain open and must not be advertised as complete.
