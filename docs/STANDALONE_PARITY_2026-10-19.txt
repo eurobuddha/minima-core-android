@@ -1,118 +1,126 @@
 Pandamonium -> standalone APK propagation ledger
-STATUS: IN PROGRESS. Neither complete parity nor final publication approval.
-User requested all applicable integrated bug repairs, including earlier user fixes.
-Scope is behavior and presentation; keep standalone IPC/storage/package identities.
-Final2.0.0 publication awaits the Fold. No other phone may be touched.
+Updated 2026-10-19. STATUS: IN PROGRESS; partial parity, not release approval.
 
-Pushed standalone checkpoints; signed candidates retained locally
-ETH Wallet0.2.8 f16ab10 (docs10b7ecd): contract identity, account/RPC review context,
-  delayed/duplicate node key responses and strict key validation.22 tests.
-Future Cash Next0.1.9 ee080af: dual-family/partial audit, risk retention/cache clock.
- 49 tests. Remaining transaction evidence comparison open.
-Vestr0.4.7 087f02e: state/command validation.4 tests. Other receipt comparison open.
-UTXO0.4.34 d9bd0bf: structured token metadata and compact coin labels.3 tests.
-  Receipt/history/distribution safety review remains open in both forms.
-NFT Wallet0.1.14 478f11a: metadata, compact labels and non-resizing tab arrows.
- 64 tests. Prepared send, history, mint, burial and distribution parity pending.
-Terminal IDE0.3.3 fec4b7d: bounded background output/log loading, full export,
-  lifecycle guards and command admission.14 tests. Other feature comparison open.
-MiniMall Studio0.3.7 8cd29e8 (refresh d2b0bf3/display2161a4f): metadata, refresh/edit
-  ownership, immutable unique-file exports and exact counts.24 tests.
-Salon0.11.36 2be4ad6 (visibility e644d79): password/PAT/JWT visibility plus
- serialized NFT metadata/edition images.18 tests. Identity/restore/hosting still open.
-Filez0.1.13 daf7ec9: matching dark dialogs/error contrast. No JVM tests exist.
-History0.3.11 df89bbf: copyable native-dialog detail contrast.2 existing tests.
-Entropy0.1.10 3e5c10d: label contrast, scrollable tabs, accessibility labels.5 tests.
-Mail0.5.12 af73667: popup anchor, secure backup dialog, light/dark contrast.6 tests.
-Atelier0.7.19 e5dc3b0: JSON metadata, viewer traits/request invalidation, narrow
- layouts and Android9 WebP upload compatibility.58 tests. Other ports remain.
-KeyUses0.1.5: family sections, separate numbering, narrow viewport/status placement.
- 33 tests. Public-key audit unchanged; complete engine parity still outstanding.
+All 22 integrated companion repositories now have pushed repair checkpoints and
+signed local candidates. This does not mean every integrated change is ported.
+The larger transaction, recovery and hosting comparisons below remain open.
+Final Pandamonium 2.0.0 awaits full review and the morning Fold check.
+No APK has been installed or published during this overnight propagation work.
 
-Candidates: apks/<repo>/dist/<app>-<version>-candidate.apk with SHA256 sidecar.
-Salon repository requires _artifacts/salon-0.11.36.apk; retained there instead.
-Atelier candidate is mds/statenft-suite/android/dist/atelier-0.7.19-candidate.apk.
+Current standalone checkpoints
+App / version (code) / repair commit / JVM tests at latest checkpoint
+ETH Wallet       0.2.8 (208)   f16ab10 [docs10b7ecd] 22
+AtomiX           0.1.73 (173)  881fe67              260 debug +260 release
+PandaPools       0.9.67 (967)  2f39f65              303
+Future Cash Next 0.1.9 (109)   ee080af              49
+PandaDEX         0.4.23 (423)  fbe0645              712
+Casino           0.7.4 (704)   0218dd0              25
+Block Explorer   0.1.6 (106)   f0fe019              no JVM suite
+Filez            0.1.13 (113)  daf7ec9              no JVM suite
+History          0.3.12 (312)  8a404c7              10
+Vestr            0.4.7 (407)   087f02e              4
+Entropy          0.1.10 (110)  3e5c10d              5
+Terminal IDE     0.3.3 (303)   fec4b7d              14
+Mail             0.5.12 (512)  af73667              6
+UTXO Wallet      0.4.35 (435)  e57c450              6
+MiniMall Shop    0.4.8 (408)   2605542              11
+MiniMall Studio  0.3.8 (308)   c5ec2fe              28
+MiniMall Inbox   0.5.6 (506)   930a1de              13
+NFT Wallet       0.1.15 (115)  b5c983f              70
+minimaWallet     0.2.26 (226)  d8d0aec              52
+Atelier          0.7.19 (719)  e5dc3b0              58
+Salon            0.11.37(1137) bf4f453              27
+KeyUses          0.1.6 (106)   d4f5988              49
+
+The exact scope, lint warnings, signing evidence and limitations are recorded in
+ each repo's docs/PANDAMONIUM_PARITY_2026-10-19.txt. Lint errors are zero at these
+ checkpoints; existing warnings remain. Passing tests do not complete the review.
+
+Repairs carried upstream so far
+- ETH Wallet: asset contract identity, frozen account/RPC review context, delayed
+  key-response ownership and strict key validation.
+- Future Cash Next: dual-family partial audit, risk retention and cache clock.
+- Vestr: state/command validation.
+- UTXO: structured metadata/compact labels; coin refresh and elapsed time cannot
+  turn an unknown send into a failed send. Full receipt handling remains open.
+- NFT Wallet: structured metadata, compact labels and stable tab arrows; strict
+  node replies, callback lifecycle and unknown transport outcome handling.
+- Terminal IDE: bounded background output/log loading, full export, lifecycle
+  guards and command admission.
+- Studio: metadata/image resolution, refresh/edit ownership, immutable unique-file
+  exports, exact counts and Android9 numeric compatibility.
+- Salon: secret-field visibility, metadata/edition images, automatic identity
+  adoption retry and request/owner guards, complete identity-balance parser.
+- Filez/Entropy/Mail/Casino/Block Explorer: applicable contrast, dialog, narrow
+  layout, accessibility and secure backup-dialog changes.
+- History: readable details; failed pages cannot be skipped, bounded retries and
+  cancellation, malformed-page rejection, retained-history rescan and truthful
+  incomplete status.
+- Atelier: metadata, image request invalidation, traits, narrow layouts and
+  Android9 WebP upload compatibility.
+- KeyUses: family sections, separate numbering, narrow status placement and actual
+  shared KeyAudit engine/strict AuditApi parsing. Public IPC inputs only; no seed
+  entry and no embedded-only 96-key derivation path.
+- minimaWallet: biometric stored-data decode/error containment. Preserves the
+  newer standalone sweep/reset/passphrase recovery commits throughd1cdcf4.
+- Inbox: per-order drafts/focus/composition, checked local saves and late callback
+  guards; readable dialogs, two-row status controls, labelled48dp icons, secure
+  seed dialog. Shared transport validation/dispatch repair below.
+- Shop:48dp quantity/icons, readable secondary text, secure seed dialog,
+  AppCompat artwork; checkout wallet refresh preserves form/IME/cart/shipping;
+  canonical import-folder containment and16MiB limits. Shared transport below.
+- PandaDEX: separate connection/block status row, accessible48dp theme control,
+  scrollable tabs with selected-tab reveal.
+- PandaPools:48dp style/scan/individual/combined targets, style description and
+  existing indentation-only lint error correction.
+- AtomiX: two-row header/wallet controls, accessible48dp actions, readable colour
+  values and private-key dialog/explicit Copy key privacy protections.
+- All three MiniMall apps: existing argument validation and main-handler command
+  setup/closed-connection rejection from adapt-pandamonium-malls.py. Standalone
+  MinimaAPI retained. Four reused tests per app; Inbox now uses the same real
+  org.json test dependency as its siblings.
+
+Remaining source comparisons/ports (not complete)
+- AtomiX/ETH Wallet: shared embedded ETH nonce allocation and unknown broadcast
+  protection; AtomiX financial context/input/evidence/recovery parity.
+- UTXO: full transaction receipt matching, prepared journal and distribution.
+  Existing resolve matching remains unsafe; the coin-refresh fix is only bounded.
+- NFT Wallet: durable prepared-send/history/mint/burial/distribution parity.
+- Shop/Inbox: immutable order/payment context, strict acknowledgement handling,
+  durable payment/delivery journal, storage and transaction evidence. Do not port
+  acknowledgement rejection alone into the old automatic retry path.
+- PandaPools/PandaDEX: financial context/consent, collection/evidence and reserve
+  reporting comparisons. No live-fund tests permitted overnight.
+- Atelier: hosting and asynchronous image/create/export/delivery/mint repairs.
+- Salon: complete claim lifecycle, atomic identity persistence, hosted restore,
+  hosting/publish/comms/outbox and backup parity. Preserve standalone crypto alias
+  and storage; the current port still uses its existing hydration entrypoint.
+- minimaWallet: remaining audit/startup/settings/signing/retry comparisons while
+  preserving newer standalone fixes.
+- Other apps: feature-by-feature review beyond the bounded ports above.
+- Host-only lock/navigation/embedded transport changes require applicability
+  review; do not import DirectNodeApi into standalone APKs.
+- Final2.0.0 signed host build, full review completion and Fold verification.
+
+Artifacts and branches
+Candidates normally live in apks/<repo>/dist/<app>-<version>-candidate.apk with
+SHA256 sidecars. Salon uses _artifacts/salon-0.11.37.apk. Atelier uses
+mds/statenft-suite/android/dist/atelier-0.7.19-candidate.apk.
 Actual APK package, versionCode/versionName and family signing certificate checked.
 Certificate SHA256:
 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
-Per-app checkpoint docs record lint warning counts and limitations.
-
-Remaining source comparisons/ports (none claimed complete)
-AtomiX: context, input/evidence and recovery repairs; shared ETH nonce issue open.
-PandaPools/PandaDEX: transaction/evidence and UI repairs; no live fund tests.
-Atelier: hosting and asynchronous image/create/export/delivery/mint repairs remain.
-MiniMall/Inbox: checkout/order/payment, durable delivery/storage, draft ownership.
-minimaWallet: audit, startup, settings, signing workers and retry repairs. Preserve
-  the four newer standalone commits throughd1cdcf4 before applying any port.
-KeyUses: complete/partial dual-family audit engine comparison. No public phrase entry.
-Casino and Block Explorer: adapters inspected; small accessibility/layout ports
-  still pending. Filez/History/Entropy/Mail presentation ports complete for their
-  language adapters; broader behavioral review remains open.
-Host-only app lock, embedded transport and navigation need applicability review;
-  never replace a standalone IPC connector with host-only DirectNodeApi imports.
+PandaPools remains on review/0.8.9; its main branch is older. UTXO is on main.
+An accidental UTXO master branch was removed with an exact-commit lease after main
+was updated. No unrelated branch or graph/debug/source work was altered.
+Generated binaries and credentials are excluded from all repair commits.
+Only Fold R3GL805K7MB may be used when it returns; no other phone is authorized.
 
 Reproducibility
-Touched source staging links converted to detached git worktrees at exact
-integrated/sources.lock.json revisions: ethwallet, futurecash-next, vestr, utxo,
-NFTwallet, merchstudio, terminalide, salon, filez, history, entropy, mail and Atelier
- (parent worktree plus Android subdirectory link). wallet/keyreuses already detached.
-No source lock revision was silently advanced. Full importer verification passes
-at the1.9.107 checkpoint. Remaining links must be detached before upstream edits.
-
-Main review findings still open include cross-module ETH nonce allocation and
-UTXO receipt/history/distribution evidence. Full feature review not yet complete.
-Do not rename a partial candidate2.0.0 or publish based only on passing unit tests.
-
-Additional verified checkpoints
-Casino0.7.4/code704 0218dd0: result overlay fits narrow screens, accessible48dp
- sound/currency controls and scrolling tabs.25 tests, lint0 errors67 warnings.
-BlockExplorer0.1.6/code106 f0fe019: theme button accessibility description.
- No JVM suite exists; signed build/lint pass (0 errors54 warnings).
-NFT Wallet0.1.15/code115 b5c983f: node Boolean-status gate/main-handler dispatch,
- closed-screen guards, unknown transport outcomes;70 tests, lint0 errors236 warnings.
- Existing transaction clients still need durable unknown-outcome parity.
-KeyUses0.1.5 checkpoint commit is0485da9; complete audit-engine parity remains open.
-History0.3.12/code312: never skip failed pages; bounded retries/cancellation,
- malformed-page rejection, truthful incomplete status, retained-history rescan.
- 10 tests, lint0 errors48 warnings. Shared repair in host1.9.108.
-Sixteen standalone repositories have pushed repair checkpoints. This is partial
-parity; the remaining source comparisons above still apply. Casino/Explorer's
-small adapter ports are complete. All candidates remain local, signed/versioned,
-with hashes; no installation or publication. Full2.0.0 review remains open.
-
-KeyUses0.1.6/code106 d4f5988 ports the actual shared KeyAudit engine and strict
-AuditApi evidence parsing;49 tests, lint0 errors18 warnings. Missing evidence cannot
-be green; known public usage remains visible when local counters are unavailable.
-Retains public IPC inputs/no phrase entry; audits the key set reported by the node.
-The embedded-only96-key derivation path is not available to this standalone connector.
-minimaWallet0.2.26/code226 ports biometric stored-data error containment;52 tests,
-lint0 errors164 warnings. Preserves newer sweep/reset/passphrase recovery commits.
-Signed candidates verified locally. Seventeen repos now have repair checkpoints;
-remaining financial/hosting/identity parity and full review are still open.
-History0.3.12 repair commit8a404c7; matching host1.9.108 commit25e9f60.
-
-Latest checkpoints
-Host1.9.109 f443999 and minimaWallet0.2.26 d8d0aec: biometric decode error containment.
-Salon0.11.37/code1137: retry failed automatic identity reads, request/owner guards,
-serialized identity balance parser;27 tests, lint0 errors107 warnings. Signed APK
-retained in _artifacts. Matching host1.9.110 passes385 integrated Salon tests.
-Full claim lifecycle, atomic identity persistence and hosted restore ports remain
-open; standalone still uses its existing storage/hydration entrypoint.
-
-UTXO 0.4.35/code435 ports the unknown-outcome repair shared with host1.9.111.
-Live/missing/partial coin snapshots and elapsed time never mark an uncertain send
-failed. Standalone6 tests, integrated15, lint0 errors105 warnings. Signed candidate
-verified in dist; no install/publication. Full receipt/distribution parity open.
-Salon0.11.37 checkpoint bf4f453 and host1.9.110 703b56c are pushed.
-
-MiniMall Inbox0.5.4/code504 fa93b54: retained per-order drafts/focus/composition,
-checked local saves and late callback navigation guards;9 reused regression tests.
-Inbox0.5.5/code505: readable dark dialogs, two-row status controls,48dp labelled
-icons and secure seed dialog. Both signed builds/lint pass (0 errors64 warnings).
-MiniMall Shop0.4.5/code405 7052f79:48dp quantity/icons, secondary contrast, secure
-seed dialog and Studio-compatible square image view; lint0 errors79 warnings.
-Both apps reuse Mail/Studio's optional-camera manifest declaration.
-Candidates retained in their dist folders; no install/publication. Nineteen repos
-now have repair checkpoints. Complete parity/full review remains unfinished.
-UTXO0.4.35 repair e57c450 is on origin/main. Accidental master branch was removed
-with an exact-commit lease after main was updated; no unrelated branch was changed.
+All22 staging sources are detached at exact integrated/sources.lock.json revisions.
+Atelier uses its pinned parent worktree plus Android subdirectory link. No lock
+revision was silently advanced. Main source checkpoint1.9.112/code183:207a88e.
+Latest all22 snapshot/provenance verification passes after the standalone ports.
+Language check:6884 messages in English, Chinese, Russian and Ukrainian passes.
+Transport check:all bundled clients use DirectNodeApi; no internal IPC relay,
+notification receiver, secondary process or whole-package reset remains.
+Main latest full signed APK is still1.9.101; do not label it2.0.0.

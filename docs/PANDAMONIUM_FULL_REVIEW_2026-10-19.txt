@@ -294,3 +294,13 @@ in both integrated and standalone Shop. Updated canonical importer adaptation.
 All changed code reviewed; integrated Shop42 tests, host release lint and all22
 snapshot/provenance checks pass. Standalone0.4.5 signed build/lint pass.
 Full review remains in progress; no release publication or device installation.
+
+Standalone propagation checkpoint — all22 repositories reached, partial parity
+Latest source1.9.112 remains unchanged. Shop checkout/storage, Inbox draft/UI,
+PandaDEX/Pools/AtomiX presentation and all MiniMall argument/main-handler guards
+are committed and pushed upstream with signed local candidates. Updated parity
+ledger lists each current version/commit/test count and remaining functional gaps.
+All22 importer snapshots/provenance,6884-message/four-language catalog and direct
+transport checks pass after replacing every live staging link with pinned sources.
+No installation/publication, no real transactions, no final2.0.0 build yet.
+Full feature review and the financial/hosting/recovery issues remain open.
