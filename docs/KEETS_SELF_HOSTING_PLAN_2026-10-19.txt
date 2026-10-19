@@ -1,0 +1,84 @@
+Keets self-hosting: Salon and Atelier — feasibility and staged plan
+2026-10-19
+
+Scope
+The user wants node owners to host their Salon profile and selected media on
+ their own phone through Keets, accepting device availability limitations, and
+asks whether Atelier can also use this. Both are technically feasible.
+Standalone parity remains explicitly paused. No app implementation, version
+bump, installation, publication, real message, or blockchain action occurred.
+The UI question (Keets-aware readers first versus ordinary-browser access) is
+pending. Do not silently assume a public HTTPS gateway meets self-hosting intent.
+
+Existing sources inspected
+Keets: /Users/eurobuddha/Projects/minima/keets/SERVICES.md,
+ sidecar/media.js, sidecar/api.js, test/services-test.sh.
+Node bridge: /Users/eurobuddha/Projects/minima/_worktrees/minima-core-keets-android/
+ src/org/minima/system/commands/network/keets.java.
+Pandamonium: app/src/main/java/com/eurobuddha/minimacore/chat/ChatImages.java
+ and ChatAudio.java; docs/KEETS_BUILD.md; integrated/salon/.../MaximaLink.java;
+ scripts/pandamonium-sources/salon/ProfileHosting.java and ProfilePublishing.java.inc.
+Standalone Salon: /Users/eurobuddha/Projects/minima/apks/salon/app/src/main/java/
+ com/eurobuddha/salon/MaximaHostUploader.java and RelayResolver.java.
+Atelier: searched Hosting.java, ImageLoader.java and StateNft.java under
+ /Users/eurobuddha/Projects/minima/mds/statenft-suite/android/app/src/main/java/
+ com/eurobuddha/statenft; read relevant metadata serialization.
+The remaining callers, SDK permissions, full candidate implementations and
+ tests must be read before implementing an adapter. This is a feasibility
+ checkpoint, not a claim that the implementation reuse gate is complete.
+
+Findings
+Keets already publishes and fetches Hyperdrive files, returns SHA-256 references,
+ and persists optional drive pins. Native chat already uses node command file
+ handoff. Reuse these transport components; no second file-sharing protocol.
+Salon already separates uploaders, profile publication and media resolution.
+ Its current recovery URL validator accepts HTTPS only, so adding an uploader
+ alone would leave restore and other readers incomplete.
+Keets URLs are not directly readable by ordinary browsers. A Keets-capable
+ reader or gateway is required. A public gateway is optional infrastructure,
+ not a prerequisite for app-to-app hosting.
+Keets publish currently overwrites paths and returns a hash of the new bytes.
+ Reusing a path for different bytes invalidates its old hash URL. Mutable
+ profile pointers and immutable/versioned media must be handled separately.
+Pins mirror entire drives. Selective profile mirroring is not implemented;
+ do not offer it or expose private data by assumption.
+Phone online is insufficient if the node/service is stopped or unreachable.
+ Copies held by reachable peers may serve content while the publisher is off;
+ availability is not guaranteed and deleting locally cannot recall peer copies.
+Atelier uses directory base plus edition index/extension, and its image reader
+ currently uses HTTP/IPFS. StateNft.tokenMetadata treats non-HTTP icons as
+ embedded art, so keets references need explicit handling there too.
+Existing minted tokens do not acquire compatible readers by adding a host type.
+
+Proposed sequence, subject to reader scope
+1. Salon: an explicit Host on this device destination; reuse existing profile
+ publication guards and uploader/resolver interfaces with the Keets transport.
+ Include profile JSON, selected images/video, discovery, preview, cache,
+ sharing and recovery. Keep existing hosting options and Maxima DM behavior.
+ Use a stable authenticated profile address and versioned/hash-checked media.
+ UI: availability explanation, storage usage, progress/cancel, clear offline
+ state with last known profile when available. No indefinite Working screen.
+ Confirm native command permissions and binary transfer for standalone Salon;
+ do not assume Pandamonium internal file access works across APK sandboxes.
+2. Validate with two isolated nodes: publish/fetch, edit profile, old media link
+ survival, corrupt content, malformed refs, unavailable peer, cancellation,
+ restart persistence, selected-public-files boundary, and restore. Verify
+ timeout/resource limits rather than trusting the existing nominal deadline.
+3. Atelier: reuse the same resolver, then support fixed artwork references and
+ edition addressing in metadata, upload verification and every supported
+ wallet/gallery reader. Explain availability to creators and collectors.
+ Optional owner/collector mirroring can improve availability but is not a
+ permanence guarantee. Do not automatically pin whole drives.
+4. Ordinary-browser access is a separate viewer/gateway requirement. Establish
+ whether this is required for the first release before presenting a page link
+ as universally accessible.
+
+Verification performed
+Ran the existing test/services-test.sh against fresh disposable local peers
+ using KEETS_TEST_DIR=/tmp/keets-salon-feasibility.odwrPM.
+PASS: unauthenticated API rejected; 100,000-byte media fetched byte-exact;
+ deliberately incorrect SHA-256 refused. Direct synthetic local messaging and
+ mailbox submission also passed. The unrelated offline mailbox retrieval
+ check failed after restart (empty inbox), so the overall suite exited 1.
+Do not report the entire suite as passed. No phone hosting UI/device end-to-end
+ test has been performed, and no app changes have been made.
