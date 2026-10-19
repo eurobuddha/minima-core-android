@@ -643,3 +643,10 @@ APK contents/certificates checked. See VESTR_INSETS_REVIEW_2026-10-19.txt.
 Correction to earlier device status:2.0.14 was installed on the Fold and core wallet
 startup observed; the Fold disconnected before minimaWallet Sweep verification.
 2.0.15 not installed/published. Public2.0.0 unchanged. Full review/parity remain open.
+
+2026-10-19 post-reboot Sweep destination checkpoint
+User requested strict Mx checks and a separate repeated-address confirmation.
+Implemented in Pandamonium2.0.16/code211 and standalone wallet0.2.27/code227.
+See WALLET_SWEEP_DESTINATION_2026-10-19.txt for scope, reuse, tests and limitations.
+Vestr2.0.15 physical rotation/tab checks now pass on Fold; restored original rotation.
+Full review/parity remains IN PROGRESS. No real transaction or candidate publication.

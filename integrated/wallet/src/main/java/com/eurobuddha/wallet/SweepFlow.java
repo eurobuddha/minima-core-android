@@ -132,10 +132,30 @@ public class SweepFlow {
                 .show();
     }
 
+    /** Validate Minima's checksum, a 32-byte address and its canonical Mx encoding.
+     * This cannot establish that another wallet holds the corresponding spending keys. */
+    static boolean isValidDestination(String destination) {
+        if (destination == null || destination.length() > 128
+                || !destination.matches("(?i)Mx[0-9a-z]+")) return false;
+        try {
+            MiniData address = org.minima.objects.Address.convertMinimaAddress(destination);
+            return address.getLength() == 32
+                    && org.minima.objects.Address.makeMinimaAddress(address).equalsIgnoreCase(destination);
+        } catch (RuntimeException invalid) {
+            return false;
+        }
+    }
+
+    static boolean destinationConfirmed(String destination, String confirmation) {
+        return isValidDestination(destination) && confirmation != null
+                && destination.equalsIgnoreCase(confirmation)
+                && isValidDestination(confirmation);
+    }
+
     private void review(final Plan zPlan, final String zDest) {
         if(!current()||running)return;
         try {
-            if (!Util.isValidAddress(zDest)) throw new IllegalArgumentException(t(l10n_sweep_invalid));
+            if (!isValidDestination(zDest)) throw new IllegalArgumentException(t(l10n_sweep_invalid));
 
             StringBuilder sb = new StringBuilder();
             sb.append(t(l10n_sweep_to)).append("\n").append(zDest).append("\n");
@@ -187,7 +207,7 @@ public class SweepFlow {
             new WalletDialog(act)
                     .setTitle(t(l10n_sweep_confirm))
                     .setView(wrap)
-                    .setPositiveButton(t(l10n_sweep_sign), (d, w) -> run(zPlan, zDest))
+                    .setPositiveButton(t(l10n_sweep_confirm_destination), (d, w) -> confirmDestination(zPlan, zDest))
                     .setNegativeButton(t(l10n_sweep_cancel), null)
                     .show();
         } catch (Exception e) {
@@ -199,7 +219,45 @@ public class SweepFlow {
     // Execute — sequential build+sign → publish, same contract as the collection send
     // ---------------------------------------------------------------------------------------------
 
-    private void run(final Plan zPlan, final String zDest) {
+    private void confirmDestination(final Plan zPlan, final String zDest) {
+        if(!current()||running)return;
+        if (!isValidDestination(zDest)) return;
+        final EditText confirmation = new EditText(act);
+        confirmation.setHint(t(l10n_sweep_repeat_address));
+        confirmation.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        confirmation.setTextColor(Design.text());
+        TextView note = new TextView(act);
+        note.setTextColor(Design.text());
+        note.setText(t(l10n_sweep_address_check) + "\n\n" + zDest);
+        note.setTextIsSelectable(true);
+        LinearLayout contents = new LinearLayout(act);
+        contents.setOrientation(LinearLayout.VERTICAL);
+        contents.setPadding(dp(20), dp(8), dp(20), dp(8));
+        contents.addView(note);
+        contents.addView(confirmation, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        ScrollView wrap = new ScrollView(act);
+        wrap.addView(contents);
+        final androidx.appcompat.app.AlertDialog dialog = new WalletDialog(act)
+                .setTitle(t(l10n_sweep_confirm_destination))
+                .setView(wrap)
+                .setPositiveButton(t(l10n_sweep_sign), (d, w) -> run(zPlan, zDest, confirmation.getText().toString().trim()))
+                .setNegativeButton(t(l10n_sweep_cancel), null)
+                .create();
+        dialog.show();
+        final android.widget.Button execute = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+        execute.setEnabled(false);
+        confirmation.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override public void afterTextChanged(android.text.Editable text) {
+                execute.setEnabled(destinationConfirmed(zDest, text.toString().trim()));
+            }
+        });
+    }
+
+    private void run(final Plan zPlan, final String zDest, final String confirmation) {
+        if (!destinationConfirmed(zDest, confirmation)) return;
         if(!current()||running)return;
         try {
             act.vault().assertSigningAllowed();

@@ -8394,13 +8394,13 @@
     <string name="l10n_sweep_confirmed" formatted="false">"All recorded sweep transactions are confirmed on-chain. Check the summary for skipped or failed batches."</string>
     <!-- Arguments: number -->
     <string name="l10n_sweep_waiting">"Waiting for confirmation of %1$s transactions. Signed transactions are saved; they will not be signed again automatically."</string>
-    <string name="l10n_sweep_destination" formatted="false">"Destination address (Mx… or 0x…)"</string>
+    <string name="l10n_sweep_destination" formatted="false">"Destination Mx address"</string>
     <!-- Arguments: number -->
     <string name="l10n_sweep_description">"Move all available Minima, tokens and NFTs, including their state, to one destination in %1$s transactions."</string>
     <string name="l10n_sweep_qr" formatted="false">"Scan QR"</string>
     <string name="l10n_sweep_review" formatted="false">"Review"</string>
     <string name="l10n_sweep_cancel" formatted="false">"Cancel"</string>
-    <string name="l10n_sweep_invalid" formatted="false">"Invalid destination address"</string>
+    <string name="l10n_sweep_invalid" formatted="false">"Enter a valid Mx address with a correct checksum. Raw 0x addresses are not accepted for Sweep."</string>
     <string name="l10n_sweep_to" formatted="false">"Sweep everything to:"</string>
     <!-- Arguments: key -->
     <string name="l10n_sweep_self">"This is your current wallet’s own address (key %1$s). The coins will return to this wallet."</string>
@@ -8438,4 +8438,7 @@
     <string name="l10n_sweep_split_b" formatted="false">"(split B)"</string>
     <string name="l10n_atomix_otc_submission_unknown" formatted="false">"Submission outcome is unknown. The saved swap will be checked; do not create a replacement deal."</string>
     <string name="l10n_atomix_otc_recovery_save_failed" formatted="false">"The swap lock was not submitted because recovery data could not be saved."</string>
+    <string name="l10n_sweep_confirm_destination" formatted="false">"Confirm destination…"</string>
+    <string name="l10n_sweep_repeat_address" formatted="false">"Enter the full Mx address again"</string>
+    <string name="l10n_sweep_address_check" formatted="false">"Compare this full address with the receiving wallet, then enter it again. The format and checksum are valid; this does not verify who controls the address. This will send your entire available balance and cannot be undone."</string>
 </resources>

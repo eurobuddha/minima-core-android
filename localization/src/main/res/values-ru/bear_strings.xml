@@ -8468,13 +8468,13 @@
     <string name="l10n_sweep_confirmed" formatted="false">"Все записанные транзакции подтверждены в блокчейне. Проверьте сводку: возможны пропущенные или неудачные группы."</string>
     <!-- Arguments: number -->
     <string name="l10n_sweep_waiting">"Ожидается подтверждение %1$s транзакций. Подписанные транзакции сохранены и не будут автоматически подписаны повторно."</string>
-    <string name="l10n_sweep_destination" formatted="false">"Адрес получателя (Mx… или 0x…)"</string>
+    <string name="l10n_sweep_destination" formatted="false">"Mx-адрес получателя"</string>
     <!-- Arguments: number -->
     <string name="l10n_sweep_description">"Перевести все доступные Minima, токены и NFT с их состоянием на один адрес за %1$s транзакций."</string>
     <string name="l10n_sweep_qr" formatted="false">"Сканировать QR"</string>
     <string name="l10n_sweep_review" formatted="false">"Проверить"</string>
     <string name="l10n_sweep_cancel" formatted="false">"Отмена"</string>
-    <string name="l10n_sweep_invalid" formatted="false">"Недопустимый адрес получателя"</string>
+    <string name="l10n_sweep_invalid" formatted="false">"Введите действительный Mx-адрес с правильной контрольной суммой. Для перевода всех средств адреса 0x не принимаются."</string>
     <string name="l10n_sweep_to" formatted="false">"Перевести всё на адрес:"</string>
     <!-- Arguments: key -->
     <string name="l10n_sweep_self">"Это адрес текущего кошелька (ключ %1$s). Монеты вернутся в этот кошелёк."</string>
@@ -8512,4 +8512,7 @@
     <string name="l10n_sweep_split_b" formatted="false">"(часть B)"</string>
     <string name="l10n_atomix_otc_submission_unknown" formatted="false">"Результат отправки неизвестен. Сохранённый обмен будет проверен; не создавайте новую сделку взамен."</string>
     <string name="l10n_atomix_otc_recovery_save_failed" formatted="false">"Блокировка средств для обмена не отправлена: не удалось сохранить данные восстановления."</string>
+    <string name="l10n_sweep_confirm_destination" formatted="false">"Подтвердить адрес…"</string>
+    <string name="l10n_sweep_repeat_address" formatted="false">"Введите полный Mx-адрес ещё раз"</string>
+    <string name="l10n_sweep_address_check" formatted="false">"Сверьте полный адрес с кошельком получателя и введите его ещё раз. Формат и контрольная сумма верны, но это не подтверждает, кто контролирует адрес. Будет переведён весь доступный баланс. Отменить перевод невозможно."</string>
 </resources>

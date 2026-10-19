@@ -42231,10 +42231,10 @@
     "uk": "Очікується підтвердження {number} транзакцій. Підписані транзакції збережено, автоматичного повторного підпису не буде."
   },
   "sweep.destination": {
-    "en": "Destination address (Mx… or 0x…)",
-    "zh-Hans": "目标地址（Mx… 或 0x…）",
-    "ru": "Адрес получателя (Mx… или 0x…)",
-    "uk": "Адреса одержувача (Mx… або 0x…)"
+    "en": "Destination Mx address",
+    "zh-Hans": "目标 Mx 地址",
+    "ru": "Mx-адрес получателя",
+    "uk": "Mx-адреса одержувача"
   },
   "sweep.description": {
     "en": "Move all available Minima, tokens and NFTs, including their state, to one destination in {number} transactions.",
@@ -42261,10 +42261,10 @@
     "uk": "Скасувати"
   },
   "sweep.invalid": {
-    "en": "Invalid destination address",
-    "zh-Hans": "目标地址无效",
-    "ru": "Недопустимый адрес получателя",
-    "uk": "Недійсна адреса одержувача"
+    "en": "Enter a valid Mx address with a correct checksum. Raw 0x addresses are not accepted for Sweep.",
+    "zh-Hans": "请输入校验和正确的有效 Mx 地址。全部转移不接受原始 0x 地址。",
+    "ru": "Введите действительный Mx-адрес с правильной контрольной суммой. Для перевода всех средств адреса 0x не принимаются.",
+    "uk": "Введіть дійсну Mx-адресу з правильною контрольною сумою. Для переказу всіх коштів адреси 0x не приймаються."
   },
   "sweep.to": {
     "en": "Sweep everything to:",
@@ -42457,5 +42457,23 @@
     "zh-Hans": "由于无法保存恢复数据，未提交兑换锁定交易。",
     "ru": "Блокировка средств для обмена не отправлена: не удалось сохранить данные восстановления.",
     "uk": "Блокування коштів для обміну не надіслано: не вдалося зберегти дані відновлення."
+  },
+  "sweep.confirmDestination": {
+    "en": "Confirm destination…",
+    "zh-Hans": "确认目标地址…",
+    "ru": "Подтвердить адрес…",
+    "uk": "Підтвердити адресу…"
+  },
+  "sweep.repeatAddress": {
+    "en": "Enter the full Mx address again",
+    "zh-Hans": "再次输入完整的 Mx 地址",
+    "ru": "Введите полный Mx-адрес ещё раз",
+    "uk": "Введіть повну Mx-адресу ще раз"
+  },
+  "sweep.addressCheck": {
+    "en": "Compare this full address with the receiving wallet, then enter it again. The format and checksum are valid; this does not verify who controls the address. This will send your entire available balance and cannot be undone.",
+    "zh-Hans": "请与收款钱包核对完整地址，然后再次输入。地址格式和校验和有效，但这并不能验证谁控制该地址。此操作将转出全部可用余额，且无法撤销。",
+    "ru": "Сверьте полный адрес с кошельком получателя и введите его ещё раз. Формат и контрольная сумма верны, но это не подтверждает, кто контролирует адрес. Будет переведён весь доступный баланс. Отменить перевод невозможно.",
+    "uk": "Звірте повну адресу з гаманцем одержувача та введіть її ще раз. Формат і контрольна сума правильні, але це не підтверджує, хто контролює адресу. Буде переказано весь доступний баланс. Скасувати переказ неможливо."
   }
 }

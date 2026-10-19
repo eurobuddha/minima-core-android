@@ -8357,13 +8357,13 @@
     <string name="l10n_sweep_confirmed" formatted="false">"所有记录的转移交易已获链上确认。请查看摘要中的跳过或失败批次。"</string>
     <!-- Arguments: number -->
     <string name="l10n_sweep_waiting">"正在等待 %1$s 笔交易确认。签名交易已保存，不会自动重新签名。"</string>
-    <string name="l10n_sweep_destination" formatted="false">"目标地址（Mx… 或 0x…）"</string>
+    <string name="l10n_sweep_destination" formatted="false">"目标 Mx 地址"</string>
     <!-- Arguments: number -->
     <string name="l10n_sweep_description">"将所有可用 Minima、代币和 NFT（包括状态）通过 %1$s 笔交易转移至同一地址。"</string>
     <string name="l10n_sweep_qr" formatted="false">"扫描二维码"</string>
     <string name="l10n_sweep_review" formatted="false">"核对"</string>
     <string name="l10n_sweep_cancel" formatted="false">"取消"</string>
-    <string name="l10n_sweep_invalid" formatted="false">"目标地址无效"</string>
+    <string name="l10n_sweep_invalid" formatted="false">"请输入校验和正确的有效 Mx 地址。全部转移不接受原始 0x 地址。"</string>
     <string name="l10n_sweep_to" formatted="false">"全部转移至："</string>
     <!-- Arguments: key -->
     <string name="l10n_sweep_self">"这是当前钱包自己的地址（密钥 %1$s）。币将返回此钱包。"</string>
@@ -8401,4 +8401,7 @@
     <string name="l10n_sweep_split_b" formatted="false">"（拆分 B）"</string>
     <string name="l10n_atomix_otc_submission_unknown" formatted="false">"提交结果未知。系统将检查已保存的兑换，请勿创建替代交易。"</string>
     <string name="l10n_atomix_otc_recovery_save_failed" formatted="false">"由于无法保存恢复数据，未提交兑换锁定交易。"</string>
+    <string name="l10n_sweep_confirm_destination" formatted="false">"确认目标地址…"</string>
+    <string name="l10n_sweep_repeat_address" formatted="false">"再次输入完整的 Mx 地址"</string>
+    <string name="l10n_sweep_address_check" formatted="false">"请与收款钱包核对完整地址，然后再次输入。地址格式和校验和有效，但这并不能验证谁控制该地址。此操作将转出全部可用余额，且无法撤销。"</string>
 </resources>

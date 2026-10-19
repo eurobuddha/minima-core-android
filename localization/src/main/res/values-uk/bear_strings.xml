@@ -8468,13 +8468,13 @@
     <string name="l10n_sweep_confirmed" formatted="false">"Усі записані транзакції підтверджено в блокчейні. Перевірте підсумок: можливі пропущені чи невдалі групи."</string>
     <!-- Arguments: number -->
     <string name="l10n_sweep_waiting">"Очікується підтвердження %1$s транзакцій. Підписані транзакції збережено, автоматичного повторного підпису не буде."</string>
-    <string name="l10n_sweep_destination" formatted="false">"Адреса одержувача (Mx… або 0x…)"</string>
+    <string name="l10n_sweep_destination" formatted="false">"Mx-адреса одержувача"</string>
     <!-- Arguments: number -->
     <string name="l10n_sweep_description">"Перевести всі доступні Minima, токени та NFT з їхнім станом на одну адресу за %1$s транзакцій."</string>
     <string name="l10n_sweep_qr" formatted="false">"Сканувати QR"</string>
     <string name="l10n_sweep_review" formatted="false">"Перевірити"</string>
     <string name="l10n_sweep_cancel" formatted="false">"Скасувати"</string>
-    <string name="l10n_sweep_invalid" formatted="false">"Недійсна адреса одержувача"</string>
+    <string name="l10n_sweep_invalid" formatted="false">"Введіть дійсну Mx-адресу з правильною контрольною сумою. Для переказу всіх коштів адреси 0x не приймаються."</string>
     <string name="l10n_sweep_to" formatted="false">"Перевести все на адресу:"</string>
     <!-- Arguments: key -->
     <string name="l10n_sweep_self">"Це адреса поточного гаманця (ключ %1$s). Монети повернуться в цей гаманець."</string>
@@ -8512,4 +8512,7 @@
     <string name="l10n_sweep_split_b" formatted="false">"(частина B)"</string>
     <string name="l10n_atomix_otc_submission_unknown" formatted="false">"Результат надсилання невідомий. Збережений обмін буде перевірено; не створюйте нову угоду на заміну."</string>
     <string name="l10n_atomix_otc_recovery_save_failed" formatted="false">"Блокування коштів для обміну не надіслано: не вдалося зберегти дані відновлення."</string>
+    <string name="l10n_sweep_confirm_destination" formatted="false">"Підтвердити адресу…"</string>
+    <string name="l10n_sweep_repeat_address" formatted="false">"Введіть повну Mx-адресу ще раз"</string>
+    <string name="l10n_sweep_address_check" formatted="false">"Звірте повну адресу з гаманцем одержувача та введіть її ще раз. Формат і контрольна сума правильні, але це не підтверджує, хто контролює адресу. Буде переказано весь доступний баланс. Скасувати переказ неможливо."</string>
 </resources>
