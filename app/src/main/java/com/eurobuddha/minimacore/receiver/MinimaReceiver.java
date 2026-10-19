@@ -207,6 +207,11 @@ public class MinimaReceiver extends BroadcastReceiver {
                     @Override
                     public void run() {
                         try{
+                            if (!stillAuthorized(frompackage, frompackageuid, minimauid, fadmin)) {
+                                sendResponse(appcontext, fpackage, fresponse, fminimauid,
+                                        getBasicMessage(false, false, false, "App permission changed before execution. Nothing was sent."));
+                                return;
+                            }
                             // A queued external request belongs to the node that accepted it.
                             if (com.eurobuddha.minimacore.BuildConfig.PANDAMONIUM
                                     && !com.eurobuddha.minimacore.integrated.EmbeddedNodeTransport.canExecute(acceptedNode)) {
@@ -291,6 +296,11 @@ public class MinimaReceiver extends BroadcastReceiver {
                     public void run() {
                         String result;
                         try{
+                            if (!stillAuthorized(frompackage, frompackageuid, minimauid, true)) {
+                                sendResponse(appcontext, fpackage, fresponse, fminimauid,
+                                        getBasicMessage(false, false, false, "App permission changed before the file action. Nothing was changed."));
+                                return;
+                            }
                             if (com.eurobuddha.minimacore.BuildConfig.PANDAMONIUM
                                     && !com.eurobuddha.minimacore.integrated.EmbeddedNodeTransport.canExecute(acceptedNode)) {
                                 sendResponse(appcontext, fpackage, fresponse, fminimauid,
@@ -321,6 +331,13 @@ public class MinimaReceiver extends BroadcastReceiver {
         }catch(Exception exc){
             MinimaAPILogger.log("ERROR MinimaReceive :"+exc.toString());
         }
+    }
+
+    /** Re-read authorization at dispatch; a queued request must never retain revoked access. */
+    private boolean stillAuthorized(String pkg, String appId, String nodeId, boolean requireAdmin) {
+        JSONObject current = mDatabase.selectApp(pkg, appId, nodeId);
+        return current != null && Integer.valueOf(1).equals(current.get("penabled"))
+                && (!requireAdmin || Integer.valueOf(1).equals(current.get("admin")));
     }
 
     /**
