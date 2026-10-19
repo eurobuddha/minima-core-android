@@ -1,0 +1,66 @@
+Pandamonium 2.0.0 demo release — 2026-10-19
+
+Scope
+User deadline: 11:30 Europe/London. Prioritize Pandamonium startup, integrated
+access, messaging and transaction safety; preserve full-review and standalone
+parity work for continuation. AtomiX Ethereum signing remains enabled.
+No live transactions, seed changes or key-counter changes were used for testing.
+
+Final candidate
+Package com.eurobuddha.pandamonium; version 2.0.0-Pandamonium; versionCode 195.
+Filename minima-core-Pandamonium-2.0.0.apk; 137052345 bytes.
+SHA-256 a21659bc8133dcd21f45538c8ccb632355229b123d7369ab381978a1066792b4
+Certificate SHA-256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Existing Minima Family RSA4096 certificate; APK v2 signature verified.
+Earlier signed code194 candidate is archived locally with a distinct filename.
+
+Review and validation
+3217 baseline tests passed. After shared Ethereum repair, 703 relevant host,
+shared API, AtomiX and ETH Wallet tests passed. See the Ethereum submission
+review for durable nonce ownership, unknown-response recovery and RPC evidence.
+44 MiniMall Shop tests passed after the device-discovered status-label repair.
+Release lint: zero errors, 362 warnings. Offline signed build succeeded.
+Actual APK: exact pinned Keets bundle plus 21 linked addons/runtime per ABI
+verified by mandatory build gate. All 21 drawer destinations and shared Ethereum
+journal class found in DEX. Default English and Chinese/Russian/Ukrainian resources
+are present. Source import reproduces all 23 snapshots against pinned checkouts;
+direct transport verifier passes. No internal IPC relay or extra app process.
+
+MiniMall status repair review — APPROVE
+Problem: home/storefront labels retained their initial unavailable/connecting
+text after asynchronous identity setup. Reuse the existing Shop checkout and
+Studio tagged-view update; refresh only tagged labels on pairing/identity events.
+Never rebuild pages, carts, checkout fields or Editables. Existing UI-thread
+callbacks and lifecycle checks are retained. Tests cover four languages, delayed
+identity, disconnect, page/field identity and unsent text/cursor preservation.
+Canonical adapter and generated source/tests match. No remaining finding in this
+small repair. Standalone Shop parity is recorded separately and deferred.
+
+Fold evidence before final Shop repair (code194)
+Fold R3GL805K7MB only. Signed update preserved data and matched the desktop APK
+hash. Core online and block height advancing; same process survived navigation;
+crash buffer empty. All 21 drawer destinations reached; minimaWallet stopped at
+its separate biometric prompt, so protected wallet contents were not checked.
+AtomiX swap book and wallet balances, ETH Wallet balances, NFT/UTXO wallets,
+Explorer blocks, PandaPools pool/balances and PandaDEX book loaded. Future Cash
+Next opened without its earlier audit ANR. Terminal IDE Logs opened and remained
+responsive. Filez, Vestr, Entropy, MinimaMail, Atelier, Salon, KeyUses and Faucet
+opened. Entropy remained at zero rolls; Faucet claim was not requested.
+MiniMall Studio showed 25 NFTs with readable labels/images/compact fallbacks;
+refresh worked. Inbox opened; existing delivery settings were left unchanged.
+Keets contacts/history loaded and peer bridging was observed. No fresh outbound
+message was sent by the agent. No trade, order, bet, mint or payment was submitted.
+
+Final candidate device check
+Code195 installed successfully on the same Fold. Startup reached the normal
+fingerprint/PIN prompt without a crash. Awaiting user unlock for final Shop,
+AtomiX, core/Keets and navigation rechecks; publication pending those checks.
+
+Open work / limits
+This is not completion of the full feature-by-feature review. Live mainnet
+transactions and end-to-end swap execution were intentionally not tested.
+Fresh outbound Keets delivery and protected minimaWallet contents need user
+participation. Complete manual four-language coverage, broader history/reorg
+presentation, UTXO draft/confirmation review and deeper integrated feature tests
+remain open. Standalone MDS/APK parity is deferred; consult STANDALONE_PARITY and
+PANDAMONIUM_FULL_REVIEW ledgers, preserving their prior evidence and pending work.

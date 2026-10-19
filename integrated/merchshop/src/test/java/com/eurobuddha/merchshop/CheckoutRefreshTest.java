@@ -90,4 +90,31 @@ public class CheckoutRefreshTest {
         assertSame(other,stack().peek());assertSame(wallet,checkout.findViewWithTag("checkoutWallet"));
         stack().pop();activity.finish();call("refreshCheckoutIfTop");assertSame(checkout,stack().peek());assertSame(wallet,checkout.findViewWithTag("checkoutWallet"));
     }
+
+    @Test public void connectionLabelTracksReadinessWithoutReplacingPagesOrDrafts()throws Exception {
+        ShopStore store=mock(ShopStore.class);when(store.all()).thenReturn(Collections.emptyList());set("store",store);
+        View home=(View)call("buildHome");stack().push(home);View draft=checkout(true,true);
+        EditText address=fields(draft).get(0);address.setText(RAW);address.setSelection(2);Editable original=address.getText();
+        View storefront=(View)call("buildStorefront");stack().push(storefront);
+        TextView a=home.findViewWithTag("shopConnectionStatus"),b=storefront.findViewWithTag("shopConnectionStatus");assertNotNull(a);assertNotNull(b);
+        for(String lang:new String[]{"en","zh-Hans","ru","uk"}) {
+            Language.select(activity,lang);set("crypto",null);set("paired",false);call("refreshConnectionStatus");
+            assertEquals(View.VISIBLE,a.getVisibility());assertEquals(Language.text(activity,com.eurobuddha.minimacore.i18n.R.string.l10n_mall_shop_node_unavailable),a.getText().toString());
+            set("paired",true);call("refreshConnectionStatus");assertEquals(Language.text(activity,com.eurobuddha.minimacore.i18n.R.string.l10n_mail_connecting),b.getText().toString());
+            set("crypto",mock(com.eurobuddha.merchshop.integratedcomms.CryptoProvider.class));call("refreshConnectionStatus");assertEquals(View.GONE,a.getVisibility());assertEquals(View.GONE,b.getVisibility());
+            assertSame(storefront,stack().peek());assertSame(original,address.getText());assertEquals(RAW,address.getText().toString());assertEquals(2,address.getSelectionStart());
+        }
+        verifyNoInteractions(node);
+    }
+    @Test public void identityCompletionHidesStaleOfflineLabelAndDisconnectRevealsIt()throws Exception {
+        ShopStore store=mock(ShopStore.class);when(store.all()).thenReturn(Collections.emptyList());set("store",store);set("paired",true);
+        View home=(View)call("buildHome");stack().push(home);TextView status=home.findViewWithTag("shopConnectionStatus");assertEquals(View.VISIBLE,status.getVisibility());
+        set("ls",mock(com.goterl.lazysodium.LazySodium.class));set("db",mock(com.eurobuddha.merchshop.integratedcomms.MerchDb.class));
+        Class<?> identity=com.eurobuddha.merchshop.integratedcomms.CommsIdentity.class;
+        Method method=MainActivity.class.getDeclaredMethod("adoptIdentity",identity);method.setAccessible(true);
+        method.invoke(activity,com.eurobuddha.merchshop.integratedcomms.CommsIdentity.fromKeys(new byte[32],new byte[32],new byte[32],new byte[64]));
+        assertEquals(View.GONE,status.getVisibility());assertSame(home,stack().peek());
+        set("pairingBanner",new View(activity));method=MainActivity.class.getDeclaredMethod("onPaired",boolean.class);method.setAccessible(true);method.invoke(activity,false);
+        assertEquals(View.VISIBLE,status.getVisibility());assertSame(home,stack().peek());verifyNoInteractions(node);
+    }
 }

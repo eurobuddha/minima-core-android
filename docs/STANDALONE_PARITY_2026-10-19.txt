@@ -207,3 +207,8 @@ MDS/APK parity resumes after the demo. Integrated Ethereum durable submission
 repair is documented in PANDAMONIUM_ETHEREUM_SUBMISSIONS_2026-10-19.txt; compare and
 adapt it into standalone clients without importing host-only initialization or
 assuming cross-package shared storage. No standalone source changed in this repair.
+
+After demo: propagate the MiniMall Shop status-label refresh from
+scripts/adapt-pandamonium-shop-checkout.py and CheckoutRefreshTest into standalone
+merchshop. Preserve form/Editable state; refresh pairing/identity labels only.
+Integrated 44 tests pass; no standalone code changed for this last repair.

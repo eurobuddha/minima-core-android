@@ -503,3 +503,8 @@ Shared durable nonce ownership/recovery, strict RPC replies and stable counter-l
 retries now pass 703 relevant tests. See PANDAMONIUM_ETHEREUM_SUBMISSIONS_2026-10-19.txt.
 The earlier broad baseline passed 3217 tests. Final signed 2.0.0, Fold verification
 and publication remain pending at this checkpoint; the full review is still open.
+
+2.0.0/code195 candidate: final MiniMall Shop connection label repair passed 44
+tests; signed offline build and pinned import verification passed. See
+PANDAMONIUM_2_0_0_RELEASE_2026-10-19.txt for scoped review, Fold evidence and limits.
+Full review remains open; final Fold unlock and publication pending.
