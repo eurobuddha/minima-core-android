@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application>
+        <activity android:name="com.eurobuddha.faucet.MainActivity" android:exported="false" android:theme="@style/pm_faucet_Theme.Faucet" android:configChanges="locale|layoutDirection|screenLayout">
+            </activity>
+    </application>
+</manifest>

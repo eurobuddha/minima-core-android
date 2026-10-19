@@ -41977,5 +41977,125 @@
     "zh-Hans": "刷新锁定付款",
     "ru": "Обновить платежи",
     "uk": "Оновити платежі"
+  },
+  "faucet.nodeNotReady": {
+    "en": "The node is not ready",
+    "zh-Hans": "节点尚未就绪",
+    "ru": "Узел не готов",
+    "uk": "Вузол не готовий"
+  },
+  "faucet.nodeHelp": {
+    "en": "Open Minima Core from the menu, check the node is running, then retry.",
+    "zh-Hans": "从菜单打开 Minima Core，确认节点正在运行后重试。",
+    "ru": "Откройте Minima Core в меню, проверьте работу узла и повторите попытку.",
+    "uk": "Відкрийте Minima Core в меню, перевірте роботу вузла й повторіть спробу."
+  },
+  "faucet.openNode": {
+    "en": "Open Minima Core",
+    "zh-Hans": "打开 Minima Core",
+    "ru": "Открыть Minima Core",
+    "uk": "Відкрити Minima Core"
+  },
+  "faucet.brand": {
+    "en": "MINIMA FAUCET",
+    "zh-Hans": "MINIMA 水龙头",
+    "ru": "КРАН MINIMA",
+    "uk": "КРАН MINIMA"
+  },
+  "faucet.heading": {
+    "en": "Get Free Minima",
+    "zh-Hans": "领取免费 Minima",
+    "ru": "Получить Minima бесплатно",
+    "uk": "Отримати Minima безкоштовно"
+  },
+  "faucet.intro": {
+    "en": "Receive 0.0001 Minima to try out the blockchain.",
+    "zh-Hans": "领取 0.0001 Minima，体验区块链。",
+    "ru": "Получите 0.0001 Minima, чтобы попробовать блокчейн.",
+    "uk": "Отримайте 0.0001 Minima, щоб спробувати блокчейн."
+  },
+  "faucet.address": {
+    "en": "Minima Address",
+    "zh-Hans": "Minima 地址",
+    "ru": "Адрес Minima",
+    "uk": "Адреса Minima"
+  },
+  "faucet.hint": {
+    "en": "Paste or fetch an address…",
+    "zh-Hans": "粘贴或获取地址…",
+    "ru": "Вставьте или получите адрес…",
+    "uk": "Вставте або отримайте адресу…"
+  },
+  "faucet.getAddress": {
+    "en": "Get My Address",
+    "zh-Hans": "获取我的地址",
+    "ru": "Получить мой адрес",
+    "uk": "Отримати мою адресу"
+  },
+  "faucet.request": {
+    "en": "Request Minima",
+    "zh-Hans": "申请 Minima",
+    "ru": "Запросить Minima",
+    "uk": "Запросити Minima"
+  },
+  "faucet.help": {
+    "en": "The faucet sends a tiny amount of Minima to your node so you can try creating custom tokens and testing transactions.",
+    "zh-Hans": "水龙头会向您的节点发送少量 Minima，供您尝试创建代币和测试交易。",
+    "ru": "Кран отправляет немного Minima на ваш узел, чтобы вы могли создавать токены и тестировать транзакции.",
+    "uk": "Кран надсилає трохи Minima на ваш вузол, щоб ви могли створювати токени й тестувати транзакції."
+  },
+  "faucet.footer": {
+    "en": "eurobuddha · Minima Ecosystem",
+    "zh-Hans": "eurobuddha · Minima 生态系统",
+    "ru": "eurobuddha · Экосистема Minima",
+    "uk": "eurobuddha · Екосистема Minima"
+  },
+  "faucet.fetching": {
+    "en": "Fetching…",
+    "zh-Hans": "正在获取…",
+    "ru": "Получение…",
+    "uk": "Отримання…"
+  },
+  "faucet.badAddress": {
+    "en": "Could not read address from response.",
+    "zh-Hans": "无法从响应中读取地址。",
+    "ru": "Не удалось прочитать адрес из ответа.",
+    "uk": "Не вдалося прочитати адресу з відповіді."
+  },
+  "faucet.nodeTimeout": {
+    "en": "The node did not respond. Check its status in Minima Core.",
+    "zh-Hans": "节点未响应。请在 Minima Core 中查看状态。",
+    "ru": "Узел не ответил. Проверьте его состояние в Minima Core.",
+    "uk": "Вузол не відповів. Перевірте його стан у Minima Core."
+  },
+  "faucet.enterAddress": {
+    "en": "Please enter a Minima address.",
+    "zh-Hans": "请输入 Minima 地址。",
+    "ru": "Введите адрес Minima.",
+    "uk": "Введіть адресу Minima."
+  },
+  "faucet.requesting": {
+    "en": "Requesting…",
+    "zh-Hans": "正在申请…",
+    "ru": "Отправка запроса…",
+    "uk": "Надсилання запиту…"
+  },
+  "faucet.failed": {
+    "en": "Failed to reach the faucet. Try again later.",
+    "zh-Hans": "无法连接水龙头。请稍后重试。",
+    "ru": "Не удалось связаться с краном. Повторите позже.",
+    "uk": "Не вдалося зв’язатися з краном. Спробуйте пізніше."
+  },
+  "faucet.unexpected": {
+    "en": "Unexpected response from faucet.",
+    "zh-Hans": "水龙头返回了意外响应。",
+    "ru": "Неожиданный ответ крана.",
+    "uk": "Неочікувана відповідь крана."
+  },
+  "faucet.response": {
+    "en": "Faucet: %1$s",
+    "zh-Hans": "水龙头：%1$s",
+    "ru": "Кран: %1$s",
+    "uk": "Кран: %1$s"
   }
 }

@@ -51,8 +51,16 @@ public class PandamoniumOrderTest {
         List<Integer> order = PandamoniumOrder.decode(prior);
         for (int i = 0; i < 19; i++) assertEquals(Integer.valueOf(i), order.get(i));
         assertEquals(order, PandamoniumOrder.decode(PandamoniumOrder.encode(order)));
-        assertEquals(20, PandamoniumDestinations.NAMES.length);
-        assertEquals(20, PandamoniumDestinations.ICONS.length);
+        assertEquals(21, PandamoniumDestinations.NAMES.length);
+        assertEquals(21, PandamoniumDestinations.ICONS.length);
     }
 
+    @Test public void faucetAppendsWithoutReorderingExistingSavedApps() {
+        assertEquals(20,PandamoniumDestinations.indexFor("com.eurobuddha.faucet.MainActivity"));
+        assertEquals("Minima Faucet",PandamoniumDestinations.NAMES[20]);
+        String saved=String.join(",",java.util.Arrays.copyOfRange(PandamoniumDestinations.CLASSES,1,20));
+        List<Integer> order=PandamoniumOrder.decode(saved);
+        for(int i=0;i<21;i++)assertEquals(Integer.valueOf(i),order.get(i));
+        assertEquals(order,PandamoniumOrder.decode(PandamoniumOrder.encode(order)));
+    }
 }

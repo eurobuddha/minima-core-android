@@ -118,12 +118,12 @@ Only Fold R3GL805K7MB may be used when it returns; no other phone is authorized.
 Reproducibility
 All22 staging sources are detached at exact integrated/sources.lock.json revisions.
 Atelier uses its pinned parent worktree plus Android subdirectory link. No lock
-revision was silently advanced. Main source checkpoint1.9.118/code189: Future Cash audit-completion ANR repair.
+revision was silently advanced. Main source checkpoint1.9.119/code190: Minima Faucet integrated.
 Latest all22 snapshot/provenance verification passes after the standalone ports.
-Language check:6904 messages in English, Chinese, Russian and Ukrainian passes.
+Language check:6924 messages in English, Chinese, Russian and Ukrainian passes.
 Transport check:all bundled clients use DirectNodeApi; no internal IPC relay,
 notification receiver, secondary process or whole-package reset remains.
-Main latest signed candidate is1.9.118, installed on Fold; do not label it2.0.0.
+Main latest signed candidate is1.9.119, installed on Fold; do not label it2.0.0.
 
 Nonce checkpoint: both ETH apps now reject malformed/missing nonce replies and
 exhausted counts; AtomiX preserves unsigned precision. Full nonce coordination and
@@ -163,3 +163,8 @@ successful audit. Fixed both copies with the existing background refresh path.
 Standalone0.1.11/a006491:57 debug +57 release tests pass, signed candidate verified.
 Host1.9.118 installed on Fold; awaiting unlock for live confirmation. No public
 release. See FUTURE_CASH_AUDIT_ANR_2026-10-19.txt for exact trace and regression.
+
+Faucet integration adds a23rd native library pinned at standalone0.2.5/9a8a056.
+The source reuse/direct transport/navigation/language adaptations are host-specific.
+Standalone Faucet itself has not been changed. See PANDAMONIUM_FAUCET_2026-10-19.txt.
+The user confirmed Future Cash1.9.118 works;1.9.119 retains the ANR repair.

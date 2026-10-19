@@ -8418,4 +8418,24 @@
     <string name="l10n_future_error_wallet_rescue" formatted="false">"Не удалось подготовить спасение средств minimaWallet. Разблокируйте кошелёк, проверьте счётчики ключей и повторите."</string>
     <string name="l10n_future_scan_sources" formatted="false">"Сканируются узел и minimaWallet. Средства поступают на исходный адрес выплаты."</string>
     <string name="l10n_future_scan_retry" formatted="false">"Обновить платежи"</string>
+    <string name="l10n_faucet_node_not_ready" formatted="false">"Узел не готов"</string>
+    <string name="l10n_faucet_node_help" formatted="false">"Откройте Minima Core в меню, проверьте работу узла и повторите попытку."</string>
+    <string name="l10n_faucet_open_node" formatted="false">"Открыть Minima Core"</string>
+    <string name="l10n_faucet_brand" formatted="false">"КРАН MINIMA"</string>
+    <string name="l10n_faucet_heading" formatted="false">"Получить Minima бесплатно"</string>
+    <string name="l10n_faucet_intro" formatted="false">"Получите 0.0001 Minima, чтобы попробовать блокчейн."</string>
+    <string name="l10n_faucet_address" formatted="false">"Адрес Minima"</string>
+    <string name="l10n_faucet_hint" formatted="false">"Вставьте или получите адрес…"</string>
+    <string name="l10n_faucet_get_address" formatted="false">"Получить мой адрес"</string>
+    <string name="l10n_faucet_request" formatted="false">"Запросить Minima"</string>
+    <string name="l10n_faucet_help" formatted="false">"Кран отправляет немного Minima на ваш узел, чтобы вы могли создавать токены и тестировать транзакции."</string>
+    <string name="l10n_faucet_footer" formatted="false">"eurobuddha · Экосистема Minima"</string>
+    <string name="l10n_faucet_fetching" formatted="false">"Получение…"</string>
+    <string name="l10n_faucet_bad_address" formatted="false">"Не удалось прочитать адрес из ответа."</string>
+    <string name="l10n_faucet_node_timeout" formatted="false">"Узел не ответил. Проверьте его состояние в Minima Core."</string>
+    <string name="l10n_faucet_enter_address" formatted="false">"Введите адрес Minima."</string>
+    <string name="l10n_faucet_requesting" formatted="false">"Отправка запроса…"</string>
+    <string name="l10n_faucet_failed" formatted="false">"Не удалось связаться с краном. Повторите позже."</string>
+    <string name="l10n_faucet_unexpected" formatted="false">"Неожиданный ответ крана."</string>
+    <string name="l10n_faucet_response" formatted="false">"Кран: %1$s"</string>
 </resources>

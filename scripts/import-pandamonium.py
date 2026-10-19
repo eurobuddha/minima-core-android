@@ -11,7 +11,7 @@ direct_adapt = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(direct_adapt)
 
 ROOT = Path(__file__).resolve().parents[1]
-APPS = ['ethwallet','atomix','pandapools','futurecash-next','pandadex','casino','blockexplorer','filez','history','vestr','entropy','terminalide','mail','utxo','merchshop','merchstudio','merchinbox','NFTwallet','wallet','atelier','salon','keyreuses']
+APPS = ['ethwallet','atomix','pandapools','futurecash-next','pandadex','casino','blockexplorer','filez','history','vestr','entropy','terminalide','mail','utxo','merchshop','merchstudio','merchinbox','NFTwallet','wallet','atelier','salon','keyreuses','faucet']
 HOST = 'com.eurobuddha.pandamonium'
 ANDROID = '{http://schemas.android.com/apk/res/android}'
 ET.register_namespace('android', ANDROID[1:-1])

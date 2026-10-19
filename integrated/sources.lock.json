@@ -1573,5 +1573,27 @@
       "src/test/java/com/eurobuddha/keyreuses/KeyAuditTest.java": "67a7ddd9184fa37dbc31407bcce4f8e89a2a1a3e882bdc1b28c4f2f2963f7de2"
     },
     "resource_prefix": "pm_keyreuses_"
+  },
+  "faucet": {
+    "source": "../faucet",
+    "revision": "9a8a05616b5df1b633595a2eb522f7810717934a",
+    "version": "0.2.5",
+    "namespace": "com.eurobuddha.faucet",
+    "files": {
+      "src/main/AndroidManifest.xml": "9acafda54391a856004aecdfd63dd776fecb31d1bbad8fa02db32f2b5cb4189a",
+      "src/main/java/com/eurobuddha/faucet/MainActivity.java": "4d63047367430196db7e84e70125f8a21cd9c9b3c8bba362acce4fb478db5d7c",
+      "src/main/res/drawable/ic_launcher_foreground.xml": "8f03e1bb70e6a0511d730cb2a6d1842dae4b1eee3830247a09d08b45b63b2e2c",
+      "src/main/res/drawable/ic_launcher_background.xml": "81fd9bcdd0270a98bca2f526f68b9045154e196b999bd0bb80b5d5398c54175f",
+      "src/main/res/layout/activity_main.xml": "d21d06331818fd6ec7756b33d1aedbfb8c073c42c0bf79f15e9c4e7b7c18f174",
+      "src/main/res/values-night/themes.xml": "768df16cde06d80df145bc3bfcb0c83a2130142acc8a6a8a80cb06499ebe4e67",
+      "src/main/res/values/colors.xml": "25db01edab8f22284f7c6d1f724a56f255b4cbc183519e3faac907cb9f9025ed",
+      "src/main/res/values/themes.xml": "fe4f7dfd939f1e11727dbb215737de21268b82a9d146c8796a5ea8d276c0ac71",
+      "src/main/res/values/strings.xml": "adec5db8e3baee58eb10cfc6f8b41cefd774f6ffd61aee09deb415fb78d31df6",
+      "src/main/res/xml/backup_rules.xml": "f219fafc9e64f5fb6dc1432155ed36d17066e8144cb0313dfa8666b7c8cd9098",
+      "src/main/res/xml/data_extraction_rules.xml": "96c9d5fac10360abe375b1635ef23c2382cec2859409b3efc0d0f75ee5f1a020",
+      "src/main/res/mipmap-anydpi/ic_launcher.xml": "88f7653499ef524126ea5018a99baf9cc3269e7e584d6205dfdd76db39f39cc0",
+      "src/main/res/mipmap-anydpi/ic_launcher_round.xml": "88f7653499ef524126ea5018a99baf9cc3269e7e584d6205dfdd76db39f39cc0"
+    },
+    "resource_prefix": "pm_faucet_"
   }
 }

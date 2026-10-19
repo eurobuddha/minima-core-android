@@ -1,0 +1,8 @@
+<resources>
+
+    <style name="pm_faucet_Base.Theme.Faucet" parent="Theme.Material3.DayNight.NoActionBar">
+
+    </style>
+
+    <style name="pm_faucet_Theme.Faucet" parent="pm_faucet_Base.Theme.Faucet" />
+</resources>

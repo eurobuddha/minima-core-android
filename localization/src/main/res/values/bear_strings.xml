@@ -8344,4 +8344,24 @@
     <string name="l10n_future_error_wallet_rescue" formatted="false">"Could not prepare minimaWallet rescue. Unlock it, check key uses, and retry."</string>
     <string name="l10n_future_scan_sources" formatted="false">"Scans the node and minimaWallet. Collections return to the original payout address."</string>
     <string name="l10n_future_scan_retry" formatted="false">"Refresh stakes"</string>
+    <string name="l10n_faucet_node_not_ready" formatted="false">"The node is not ready"</string>
+    <string name="l10n_faucet_node_help" formatted="false">"Open Minima Core from the menu, check the node is running, then retry."</string>
+    <string name="l10n_faucet_open_node" formatted="false">"Open Minima Core"</string>
+    <string name="l10n_faucet_brand" formatted="false">"MINIMA FAUCET"</string>
+    <string name="l10n_faucet_heading" formatted="false">"Get Free Minima"</string>
+    <string name="l10n_faucet_intro" formatted="false">"Receive 0.0001 Minima to try out the blockchain."</string>
+    <string name="l10n_faucet_address" formatted="false">"Minima Address"</string>
+    <string name="l10n_faucet_hint" formatted="false">"Paste or fetch an address…"</string>
+    <string name="l10n_faucet_get_address" formatted="false">"Get My Address"</string>
+    <string name="l10n_faucet_request" formatted="false">"Request Minima"</string>
+    <string name="l10n_faucet_help" formatted="false">"The faucet sends a tiny amount of Minima to your node so you can try creating custom tokens and testing transactions."</string>
+    <string name="l10n_faucet_footer" formatted="false">"eurobuddha · Minima Ecosystem"</string>
+    <string name="l10n_faucet_fetching" formatted="false">"Fetching…"</string>
+    <string name="l10n_faucet_bad_address" formatted="false">"Could not read address from response."</string>
+    <string name="l10n_faucet_node_timeout" formatted="false">"The node did not respond. Check its status in Minima Core."</string>
+    <string name="l10n_faucet_enter_address" formatted="false">"Please enter a Minima address."</string>
+    <string name="l10n_faucet_requesting" formatted="false">"Requesting…"</string>
+    <string name="l10n_faucet_failed" formatted="false">"Failed to reach the faucet. Try again later."</string>
+    <string name="l10n_faucet_unexpected" formatted="false">"Unexpected response from faucet."</string>
+    <string name="l10n_faucet_response" formatted="false">"Faucet: %1$s"</string>
 </resources>

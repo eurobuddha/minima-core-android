@@ -454,3 +454,11 @@ checks retained. Regression reproduced before repair;99 integrated +114 standalo
 executions and both release lints/builds pass. Imports, languages, transport and
 actual APK Keets contents verified. Signed1.9.118 installed on Fold; awaiting user
 unlock for functional check. See FUTURE_CASH_AUDIT_ANR_2026-10-19.txt. No publication.
+
+User confirmation: Future Cash Next1.9.118 is working on the Fold.
+Minima Faucet addition — Pandamonium1.9.119/code190
+Pinned standalone0.2.5/9a8a056, existing native UI/HTTPS flow, host direct getaddress,
+existing drawer and four-language controls.23 reproducible imports;6924 messages.
+5 Faucet +169 host tests, release lint and signed APK/Keets verification pass.
+Signed1.9.119 installed on Fold; Faucet screen/address field observed. No live claim or public
+publication. See PANDAMONIUM_FAUCET_2026-10-19.txt. Full2.0.0 review still incomplete.

@@ -9,6 +9,8 @@ for app in (ROOT/'integrated').iterdir():
     if not app.is_dir() or not (app/'src/main').exists():continue
     if "implementation project(':minimaapi')" not in (app/'build.gradle').read_text():errors.append(str(app)+': shared direct API dependency missing')
     clients=list((app/'src/main/java').rglob('NodeApi.java'))
+    # Faucet's original single-screen client owns its asynchronous API directly.
+    if app.name == 'faucet': clients=[app/'src/main/java/com/eurobuddha/faucet/MainActivity.java']
     if len(clients)!=1 or 'new DirectNodeApi(' not in clients[0].read_text():errors.append(str(app)+': direct client missing')
     for p in (app/'src/main/java').rglob('*.java'):
         text=p.read_text()

@@ -1,0 +1,66 @@
+Pandamonium Minima Faucet integration — 2026-10-19
+Version1.9.119/code190
+
+User requested the existing Minima Faucet in Pandamonium and confirmed Future Cash
+Next1.9.118 is now working on the Fold. Its audit ANR is therefore user-confirmed
+resolved; retain that repair. Full2.0.0 review remains incomplete.
+
+Proven source and integration
+Reuse apks/faucet/app/src/main/java/com/eurobuddha/faucet/MainActivity.java, its
+complete native layout, theme and launcher artwork, pinned at
+9a8a05616b5df1b633595a2eb522f7810717934a (standalone0.2.5).
+Read its complete implementation, manifest, resources, dependencies and README;
+there was no existing JVM test suite. Also inspected desktop/minimacore-desktop/
+main/faucet.js for its existing address-shape validation and64KiB response bound.
+
+Reuse scripts/import-pandamonium.py and adapt-pandamonium-direct.py. Add Faucet to
+sources.lock.json with source hashes; retain all22 previous pins unchanged.
+Canonical adaptation: scripts/adapt-pandamonium-faucet.py. The reproducible importer
+now covers23 integrated app libraries. No standalone Faucet source changes.
+
+Append Minima Faucet at navigation identity20, after KeyUses, preserving every
+existing identity, saved order and disabled-app preference. Reuse its existing icon
+and Pandamonium's drawer/toolbar. The activity is internal/non-exported and included
+only through pandamoniumImplementation; PandaBear and BlackBear do not bundle it.
+
+Use existing DirectNodeApi for asynchronous getaddress; no IPC registration or
+external node installation is needed. The existing HTTPS request flow and fixed
+https://eurobuddha.com/faucet/api/request endpoint are retained. Fetching an address
+does not request coins; the user must press Request Minima. No live claim was made
+in validation. The faucet server still controls availability, amounts and limits.
+
+All app-owned labels/statuses use the existing shared Language descriptors in
+English, Chinese, Russian and Ukrainian. External server response text remains
+verbatim inside a translated Faucet label. Keep the editable address on language
+changes. Native controls have48dp minimum height and the form remains scrollable.
+
+Review
+Reviewed the complete adapted screen, callbacks, HTTP path, XML, manifest, Gradle
+wiring, importer, translations, navigation and tests. Require successful non-pending
+node replies before replacing the address; ignore late callbacks after destroy or
+timeout; clear scheduled callbacks at destruction. Retain bounded connection/read
+timeouts, close streams/connections in all paths, bound UTF-8 output to64KiB and
+refuse redirects. HTTP errors cannot be displayed as a successful claim even if
+the body contains status:true. This reuses the native client plus the desktop's
+bounded-request safeguards without introducing an alternate faucet implementation.
+Verdict: approve this bounded integration. Backend claims are not live-tested.
+
+Validation
+5 Faucet callback/stream tests and169 Pandamonium host tests passed, no failures,
+errors or skipped tests. Cases cover direct address retrieval, failed/pending/
+malformed replies, late replies/timeouts on closed screens, UTF-8/bounded response
+reads, and appending Faucet without reordering existing saved apps.
+Release lint and signed assemblePandamoniumRelease pass. All23 imported source
+snapshots/provenance reproduce;6924 messages validate in4 languages; direct node
+transport check passes. Actual APK Keets bundle,21 addons and Bare runtime verified.
+APK ZIP, package/version, Faucet DEX class/manifest and family certificate verified.
+
+Fold
+Signed1.9.119 installed successfully on Fold R3GL805K7MB with existing data retained.
+No other device touched. After unlock, the Faucet screen was observed with its
+address field populated and both Get My Address / Request Minima controls visible.
+The phone changed back to Core during the check, so further UI automation stopped.
+No live faucet claim submitted and no public publication.
+Candidate /Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-1.9.119-candidate.apk
+SHA256 3be69f06f959665505eeca64407a213c97f88b77560f6253d7b6bc44e2b7a221
+Certificate SHA256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
