@@ -1,0 +1,56 @@
+Crash recovery checkpoint — 2026-10-19
+
+Active task
+Continue the full Pandamonium/integrated-app review, fixes and applicable standalone
+APK parity. Preserve existing work. Commit/push reviewed source checkpoints.
+Public destinations are the user's GitHub fork, PandaApps and eurobuddha.com.
+The 2.0.0 demo release was already published; the full review remains IN PROGRESS.
+Do not downgrade current intermediate candidates to 2.0.0 or claim full completion.
+Only Fold R3GL805K7MB is authorized for device checks. No real transactions,
+seed changes or signing-counter changes as tests. No Apple/Google store release.
+
+Recovered working sources
+Pandamonium: /Users/eurobuddha/Projects/minima/apks/base/build/multilingual-2026-10-16
+Branch: feature/bear-languages-2026-10-16, remote fork (eurobuddha/minima-core-android).
+The base repository root remains ui/full-redesign at 9def96e; do not replace it.
+Standalone Vestr: /Users/eurobuddha/Projects/minima/apks/vestr, main.
+The maxima workspace and its account-import checkout are older tasks, not the
+current interrupted Pandamonium review. Preserve their unrelated changes.
+
+Completed recovery actions
+- Read project memories, latest saved conversation and current review ledgers.
+- Confirmed the last local commits survived but their pushes were interrupted.
+- Reviewed eda523a88006484ac331fee876e5d9936fb59e90 and
+  8685e80c45c247d4de355c5efe546c7063110219; checked saved XML test evidence:
+  184 host tests and 8 standalone executions, zero failures/errors/skips.
+- Pushed eda523a to fork/feature/bear-languages-2026-10-16 and 8685e80 to
+  eurobuddha/minima-core-android-vestr main. Both push commands succeeded.
+- Reverified pandamonium-2.0.15-candidate.apk checksum and release certificate.
+- Reconnected ADB after the Mac reboot. Fold R3GL805K7MB was detected.
+- Installed 2.0.15/code210 over observed 2.0.14/code209 with adb install -r.
+  Result: Success. No clear/uninstall or data reset. Started normal StartActivity.
+- Fold is showing the normal fingerprint/PIN unlock prompt; requested user unlock.
+  Navigation, Sweep and physical Vestr inset checks have not yet run on 2.0.15.
+
+Artifact
+/Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.15-candidate.apk
+SHA256 a06584be6ff283b5c944e704fe1eb36f266ff714deefb58442004016fad80f76
+Certificate eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+No candidate publication or standalone installation in this recovery.
+
+Immediate continuation
+After unlock, reuse build/localization/fold-demo-navigation.py's guarded navigation
+with a NEW evidence directory, not its old 2.0.0 folder. Check minimaWallet Settings
+Sweep destination/review/cancel without invoking Sign, Start, Replay or transactions.
+Check Vestr tabs/insets using read-only UI; restore any temporary rotation setting.
+Keep any additional wallet authentication with the user; never read seed/key stores.
+Record exact device checks and limitations, then continue full feature review/parity.
+
+Authoritative ledgers
+- docs/PANDAMONIUM_FULL_REVIEW_2026-10-19.txt (latest dated entries supersede old status)
+- docs/STANDALONE_PARITY_2026-10-19.txt (same rule)
+- docs/VESTR_INSETS_REVIEW_2026-10-19.txt
+- docs/WALLET_SWEEP_PORT_2026-10-19.txt
+- docs/WALLET_SWEEP_SIZE_RECOVERY_2026-10-19.txt
+Do not infer complete parity from a signed candidate per repository: several
+financial-context/recovery/hosting and remaining feature comparisons are still open.
