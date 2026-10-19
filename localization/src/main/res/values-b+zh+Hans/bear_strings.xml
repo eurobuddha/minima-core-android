@@ -8242,7 +8242,7 @@
     <string name="l10n_keyuses_include_wallet" formatted="false">"包含 minimaWallet 的经典密钥"</string>
     <string name="l10n_keyuses_subtitle" formatted="false">"检查节点密钥及从同一种子派生的两组密钥：64 个经典密钥和 32 个区块密钥。也可包含 minimaWallet，包括使用不同种子的钱包。"</string>
     <string name="l10n_keyuses_privacy" formatted="false">"审计仅向 eurobuddha.com 发送公钥和地址。该服务器将获知所选地址。种子始终保留在本设备上。"</string>
-    <string name="l10n_keyuses_incomplete" formatted="false">"部分计数器或审计结果不可用。没有已存储计数器的派生密钥显示为未知，而非零。已发现的重复使用仍然有效。"</string>
+    <string name="l10n_keyuses_incomplete" formatted="false">"部分公开审计结果缺失或不一致。这些行仍标记为未知。已确认的重复使用结果仍然有效。"</string>
     <string name="l10n_keyuses_partial" formatted="false">"审计需要复核"</string>
     <string name="l10n_keyuses_unavailable" formatted="false">"无法准备公钥。请确认节点正在运行且已解锁。如选中 minimaWallet，请先完成设置或解锁一次，然后重试。"</string>
     <string name="l10n_keyuses_changed" formatted="false">"审计期间节点或钱包发生了变化。请重新运行。"</string>
@@ -8274,5 +8274,14 @@
     <string name="l10n_keyuses_mismatch" formatted="false">"服务器地址与本地派生地址不同。此审计不完整。"</string>
     <string name="l10n_keyuses_exhaustion" formatted="false">"某个密钥接近签名容量上限。再次签名前请复核。"</string>
     <string name="l10n_keyuses_self_test" formatted="false">"地址验证失败。此版本无法进行可靠审计。"</string>
-    <string name="l10n_keyuses_explain" formatted="false">"每个一次性签名叶只能签名一次。经典密钥使用计数器，区块密钥使用区块确定的位置。审计结合档案支出统计和见证重复使用报告来检查两类密钥。"</string>
+    <string name="l10n_keyuses_explain" formatted="false">"每个一次性签名叶只能签名一次。经典密钥使用计数器，区块密钥使用区块确定的位置。审计结合档案支出统计和见证重复使用报告来检查两类密钥。 已使用/未使用描述档案历史，并不验证本地签名计数器。本地使用次数中的破折号表示没有可用的已存储计数器。"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_keyuses_classic_section">"经典密钥 · 1–%1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_keyuses_block_section">"区块用作使用次数的密钥 · 1–%1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_keyuses_wallet_section">"minimaWallet 经典密钥 · 1–%1$d"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_keyuses_used">"已使用 %1$s"</string>
+    <string name="l10n_keyuses_unused" formatted="false">"未使用"</string>
 </resources>

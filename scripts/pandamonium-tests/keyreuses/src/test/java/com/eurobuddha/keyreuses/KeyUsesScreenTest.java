@@ -77,7 +77,53 @@ public class KeyUsesScreenTest {
                 drainUntil(()->{try{return field(screen,"lastResult")!=null;}catch(Exception e){throw new RuntimeException(e);}});
                 com.eurobuddha.futurecashnext.KeyAudit.Result result=(com.eurobuddha.futurecashnext.KeyAudit.Result)field(screen,"lastResult");
                 assertEquals(160,result.rows.size());assertFalse(result.complete);
-                Language.select(screen,"uk");assertSame(result,field(screen,"lastResult"));
+                for(String language:new String[]{"en","zh-Hans","ru","uk"}) {
+                    Language.select(screen,language);assertSame(result,field(screen,"lastResult"));
+                    View root=screen.findViewById(android.R.id.content);
+                    for(int group=0;group<3;group++) {
+                        ViewGroup section=root.findViewWithTag("keyuses.section."+group);
+                        int count=group==1?32:64;
+                        assertEquals(count+2,section.getChildCount());
+                        assertEquals(Copy.section(group,count),((TextView)section.getChildAt(0)).getText().toString());
+                    }
+                    assertChip(root,1,Copy.unknown(),Design.WARN);
+                    assertEquals("#64",((TextView)root.findViewWithTag("keyuses.number.64")).getText().toString());
+                    assertEquals("#1 · 128/4",((TextView)root.findViewWithTag("keyuses.number.65")).getText().toString());
+                    assertEquals("#32 · 128/4",((TextView)root.findViewWithTag("keyuses.number.96")).getText().toString());
+                    assertEquals("#1",((TextView)root.findViewWithTag("keyuses.number.97")).getText().toString());
+                    assertEquals("#64",((TextView)root.findViewWithTag("keyuses.number.160")).getText().toString());
+                }
+                cb.set(null);run(screen);drainUntil(()->cb.get()!=null);
+                AuditSelection chosen=(AuditSelection)field(screen,"selection");
+                List<com.eurobuddha.futurecashnext.KeyAudit.Usage> usage=new ArrayList<>();
+                List<com.eurobuddha.futurecashnext.KeyAudit.Reuse> reuse=new ArrayList<>();
+                for(int i=0;i<chosen.keys.size();i++) {
+                    long count=i==2?35:i==96?9:0;
+                    usage.add(new com.eurobuddha.futurecashnext.KeyAudit.Usage(chosen.publicKeys.get(i),chosen.hexAddresses.get(i),count,count));
+                    reuse.add(new com.eurobuddha.futurecashnext.KeyAudit.Reuse(chosen.hexAddresses.get(i),i<2,i==0?4:i==1?1:0));
+                }
+                cb.get().onResult(usage,reuse,123);
+                drainUntil(()->{try{return field(screen,"lastResult")!=null;}catch(Exception e){throw new RuntimeException(e);}});
+                for(String language:new String[]{"en","zh-Hans","ru","uk"}) {
+                    Language.select(screen,language);
+                    View root=screen.findViewById(android.R.id.content);
+                    assertChip(root,1,Copy.reused()+" ×4",Design.RISK);
+                    assertChip(root,2,Copy.reused()+" ×1",Design.WARN);
+                    assertChip(root,3,Copy.used("35"),Design.OK);
+                    assertChip(root,4,Copy.unused(),Design.OK);
+                    assertChip(root,65,Copy.unused(),Design.OK);
+                    assertChip(root,97,Copy.atRisk(),Design.RISK);
+                    noHorizontalScroll(root);
+                    // Exercise a narrow phone layout; the last numeric cell must remain inside the row.
+                    int width=Math.round(320*screen.getResources().getDisplayMetrics().density);
+                    root.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY));
+                    root.layout(0,0,width,800);
+                    View number=root.findViewWithTag("keyuses.number.65");
+                    ViewGroup address=(ViewGroup)number.getParent();ViewGroup row=(ViewGroup)address.getParent();
+                    assertEquals(4,row.getChildCount());assertTrue(address.getWidth()>0);
+                    assertTrue(row.getChildAt(3).getRight()<=row.getWidth());
+
+                }
                 // Backgrounded screens discard late responses and cannot restore stale results.
                 cb.set(null);run(screen);drainUntil(()->cb.get()!=null);
                 screen.onStop();cb.get().onResult(Collections.emptyList(),Collections.emptyList(),123);
@@ -85,5 +131,15 @@ public class KeyUsesScreenTest {
 
             }finally{controller.pause().stop().destroy();}
         } finally{Language.select(RuntimeEnvironment.getApplication(),"en");}
+    }
+    static void assertChip(View root,int index,String label,int colour) {
+        TextView chip=root.findViewWithTag("keyuses.status."+index);
+        TextView number=root.findViewWithTag("keyuses.number."+index);
+        assertEquals(label,chip.getText().toString());assertEquals(colour,chip.getCurrentTextColor());
+        assertSame(number.getParent(),chip.getParent());
+    }
+    static void noHorizontalScroll(View view) {
+        assertFalse(view instanceof HorizontalScrollView);
+        if(view instanceof ViewGroup)for(int i=0;i<((ViewGroup)view).getChildCount();i++)noHorizontalScroll(((ViewGroup)view).getChildAt(i));
     }
 }

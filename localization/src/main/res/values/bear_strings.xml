@@ -8279,7 +8279,7 @@
     <string name="l10n_keyuses_include_wallet" formatted="false">"Include minimaWallet’s classic keys"</string>
     <string name="l10n_keyuses_subtitle" formatted="false">"Check the node’s keys and both sets derived from its seed: 64 classic and 32 block-based keys. Optionally include minimaWallet, including a different wallet seed."</string>
     <string name="l10n_keyuses_privacy" formatted="false">"Only public keys and addresses are sent to eurobuddha.com for the audit. This reveals the selected addresses to that server. Seeds stay on this device."</string>
-    <string name="l10n_keyuses_incomplete" formatted="false">"Some counters or audit results are unavailable. Derived keys without a stored counter are shown as unknown, not zero. Known reuse findings still apply."</string>
+    <string name="l10n_keyuses_incomplete" formatted="false">"Some public audit results are missing or inconsistent. Those rows remain unknown. Confirmed reuse findings still apply."</string>
     <string name="l10n_keyuses_partial" formatted="false">"Audit needs review"</string>
     <string name="l10n_keyuses_unavailable" formatted="false">"Could not prepare the public keys. Check that the node is running and unlocked. If minimaWallet is selected, set it up or unlock it once, then retry."</string>
     <string name="l10n_keyuses_changed" formatted="false">"The node or wallet changed during the audit. Run it again."</string>
@@ -8311,5 +8311,14 @@
     <string name="l10n_keyuses_mismatch" formatted="false">"The server’s address differs from the locally derived address. Treat the audit as incomplete."</string>
     <string name="l10n_keyuses_exhaustion" formatted="false">"A key is near its signature capacity. Review it before signing again."</string>
     <string name="l10n_keyuses_self_test" formatted="false">"Address verification failed. This build cannot run a reliable audit."</string>
-    <string name="l10n_keyuses_explain" formatted="false">"Each one-time signing leaf must sign only once. Classic keys use counters; block-based keys use block-derived positions. The audit combines archive spend counts with witnessed reuse reports for both families."</string>
+    <string name="l10n_keyuses_explain" formatted="false">"Each one-time signing leaf must sign only once. Classic keys use counters; block-based keys use block-derived positions. The audit combines archive spend counts with witnessed reuse reports for both families. USED/UNUSED describes the archive history; it does not verify a local signing counter. A dash in Local uses means no stored counter is available."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_keyuses_classic_section">"Classic keys · 1–%1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_keyuses_block_section">"Blocks-as-keyuses keys · 1–%1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_keyuses_wallet_section">"minimaWallet classic keys · 1–%1$d"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_keyuses_used">"USED %1$s"</string>
+    <string name="l10n_keyuses_unused" formatted="false">"UNUSED"</string>
 </resources>

@@ -25,6 +25,7 @@ def adapt(root):
         }""", """        public final int maxUses;
         public final Family family;
         public final boolean valid;
+        public final boolean shapeValid;
 
         public LocalKey(String publicKey, int uses, int maxUses) {
             this(publicKey, uses, maxUses, 0, 0);
@@ -44,17 +45,20 @@ def adapt(root):
                 family = Family.UNKNOWN;
                 this.maxUses = 0;
             }
-            valid = family != Family.UNKNOWN && uses >= 0
-                    && (maxUses == 0 || maxUses == this.maxUses);
+            shapeValid = family != Family.UNKNOWN && (maxUses == 0 || maxUses == this.maxUses);
+            valid = shapeValid && uses >= 0;
         }""")
     change('KeyAudit.java', 'public enum Status { OK, AT_RISK, REUSED }', 'public enum Status { OK, AT_RISK, REUSED, UNKNOWN }')
     change('KeyAudit.java', """        public final int local;          // node's uses counter""", """        public final int local;          // classic counter or block-tree leaf position
         public final Family family;
-        public final boolean checked;""")
+        public final boolean checked;
+        /** Both public endpoints returned matching evidence, independent of a local counter. */
+        public final boolean publicChecked;""")
     change('KeyAudit.java', """            boolean risk, boolean reused, long reuseCount) {
-            this.index = index;""", """            boolean risk, boolean reused, long reuseCount, Family family, boolean checked) {
+            this.index = index;""", """            boolean risk, boolean reused, long reuseCount, Family family, boolean checked, boolean publicChecked) {
             this.family = family;
             this.checked = checked;
+            this.publicChecked = publicChecked;
             this.index = index;""")
     change('KeyAudit.java', """            if (risk) return Status.AT_RISK;
             return Status.OK;""", """            if (risk) return Status.AT_RISK;
@@ -64,6 +68,7 @@ def adapt(root):
         Result""", """        public final boolean exhaustion;
         /** Every requested key has a usable shape and explicit results from both endpoints. */
         public final boolean complete;
+        public final boolean publicComplete;
         public final int classicKeys, blockKeys, unknownKeys;
 
         Result""")
@@ -71,14 +76,17 @@ def adapt(root):
             this.rows = rows;""", """               boolean derivationMismatch, boolean exhaustion) {
             int classic = 0, block = 0, unknown = 0;
             boolean all = !rows.isEmpty() && !derivationMismatch;
+            boolean allPublic = all;
             for (Row row : rows) {
                 if (row.family == Family.CLASSIC) classic++;
                 else if (row.family == Family.BLOCK) block++;
                 else unknown++;
                 all &= row.checked;
+                allPublic &= row.publicChecked;
             }
             classicKeys = classic; blockKeys = block; unknownKeys = unknown;
             complete = all;
+            publicComplete = allPublic;
             this.rows = rows;""")
     change('KeyAudit.java', '            final boolean risk = sigs > local;', """            // Spend counts estimate a classic counter. They are not comparable
             // to a block-tree leaf position; witness-confirmed reuse applies to both.
@@ -87,6 +95,8 @@ def adapt(root):
                 recommended = Math.max(recommended, Math.max(sigs, local));""")
     change('KeyAudit.java', """                    risk, confirmedReuse, r == null ? 0 : r.reuseCount));""", """                    risk, confirmedReuse, r == null ? 0 : r.reuseCount, k.family,
                     k.valid && d != null && u != null && r != null
+                            && d.hex.equalsIgnoreCase(u.address),
+                    k.shapeValid && d != null && u != null && r != null
                             && d.hex.equalsIgnoreCase(u.address)));""")
     change('KeyAudit.java', """        return new Result(rows, verdict, worstReuse, recommended + KEYUSES_MARGIN,
                 mismatch, exhaustion);""", """        boolean hasClassic = false;

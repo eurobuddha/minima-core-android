@@ -198,13 +198,41 @@ public class MainActivity extends AppCompatActivity {
         return String.join(" · ",names);
     }
 
+    /** Group display rows without changing their audit identity or source mapping. */
+    private void renderKeySections(LinearLayout table, KeyAudit.Result result) {
+        for(int group=0;group<3;group++) {
+            java.util.List<KeyAudit.Row> rows=new ArrayList<>();
+            for(KeyAudit.Row auditRow:result.rows) {
+                int flags=selection.origins.get(auditRow.index-1);
+                int rowGroup=flags==AuditSelection.WALLET ? 2
+                        : auditRow.family==KeyAudit.Family.BLOCK ? 1 : 0;
+                if(rowGroup==group) rows.add(auditRow);
+            }
+            if(rows.isEmpty())continue;
+            LinearLayout section=new LinearLayout(this);
+            section.setOrientation(LinearLayout.VERTICAL);
+            section.setTag("keyuses.section."+group);
+            section.setLayoutParams(marginParams(0,group==0?0:24,0,0));
+            TextView heading=text(Copy.section(group,rows.size()),15f,Design.ACCENT,Typeface.BOLD);
+            heading.setBackground(Design.card(this,Design.ACCENT_SOFT,Design.BORDER,8));
+            heading.setPadding(dp(12),dp(14),dp(12),dp(14));
+            heading.setLayoutParams(marginParams(0,0,0,12));
+            androidx.core.view.ViewCompat.setAccessibilityHeading(heading,true);
+            section.addView(heading);
+            section.addView(headerRow());
+            int displayIndex=0;
+            for(KeyAudit.Row auditRow:rows) section.addView(row(auditRow,++displayIndex));
+            table.addView(section);
+        }
+    }
+
     /* ====================== rendering ====================== */
 
     private void renderResults(KeyAudit.Result r, long archiveTip) {
         lastResult=r; lastTip=archiveTip;
         resultsBox.removeAllViews();
 
-        if (!r.complete) resultsBox.addView(noticeCard(Copy.incomplete(), Design.WARN));
+        if (!r.publicComplete) resultsBox.addView(noticeCard(Copy.incomplete(), Design.WARN));
         resultsBox.addView(text(Copy.scope(r.classicKeys,r.blockKeys),12f,Design.DIM,Typeface.NORMAL));
         if (r.derivationMismatch) {
             resultsBox.addView(noticeCard(Copy.MISMATCH(), Design.RISK));
@@ -238,9 +266,9 @@ public class MainActivity extends AppCompatActivity {
                 body = Copy.RISK_BODY();
                 break;
             default:
-                color = r.complete ? Design.OK : Design.WARN;
-                title = r.complete ? Copy.OK_TITLE() : Copy.partialTitle();
-                body = r.complete ? Copy.OK_BODY() : Copy.incomplete();
+                color = r.publicComplete ? Design.OK : Design.WARN;
+                title = r.publicComplete ? Copy.OK_TITLE() : Copy.partialTitle();
+                body = r.publicComplete ? Copy.OK_BODY() : Copy.incomplete();
                 break;
         }
 
@@ -351,13 +379,9 @@ public class MainActivity extends AppCompatActivity {
         final LinearLayout table = new LinearLayout(this);
         table.setOrientation(LinearLayout.VERTICAL);
 
-        table.addView(headerRow());
-        for (KeyAudit.Row row : r.rows) table.addView(row(row));
+        renderKeySections(table,r);
 
-        final HorizontalScrollView hs = new HorizontalScrollView(this);
-        hs.setHorizontalScrollBarEnabled(false);
-        hs.addView(table);
-        card.addView(hs);
+        card.addView(table);
 
         final TextView cov = text(Copy.coverage(archiveTip), 10.5f, Design.DIM, Typeface.NORMAL);
         cov.setPadding(dp(2), dp(14), dp(2), 0);
@@ -376,7 +400,7 @@ public class MainActivity extends AppCompatActivity {
         row.addView(headerCell(Copy.localUses(), COL_USES, Gravity.END));
         row.addView(headerCell(Copy.onchain(), COL_SIGS, Gravity.END));
         row.addView(headerCell(Copy.coins(), COL_COINS, Gravity.END));
-        row.addView(headerCell(Copy.status(), COL_STATUS, Gravity.END));
+
 
         final LinearLayout wrap = new LinearLayout(this);
         wrap.setOrientation(LinearLayout.VERTICAL);
@@ -390,12 +414,12 @@ public class MainActivity extends AppCompatActivity {
         t.setLetterSpacing(0.06f);
         t.setAllCaps(true);
         t.setGravity(gravity);
-        t.setWidth(dp(widthDp));
+        t.setLayoutParams(new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT,widthDp));
         t.setPadding(dp(4), 0, dp(4), 0);
         return t;
     }
 
-    private View row(final KeyAudit.Row r) {
+    private View row(final KeyAudit.Row r, int displayIndex) {
         final LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(0, dp(9), 0, dp(9));
@@ -403,12 +427,12 @@ public class MainActivity extends AppCompatActivity {
         // address cell: "#N" then the Mx address, wrapping inside its column
         final LinearLayout addrCell = new LinearLayout(this);
         addrCell.setOrientation(LinearLayout.VERTICAL);
-        addrCell.setLayoutParams(new LinearLayout.LayoutParams(dp(COL_ADDR),
-                LinearLayout.LayoutParams.WRAP_CONTENT));
+        addrCell.setLayoutParams(new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT,COL_ADDR));
         addrCell.setPadding(dp(4), 0, dp(4), 0);
 
-        final TextView n = text("#" + r.index + (r.family == KeyAudit.Family.BLOCK ? " · 128/4" : ""),
+        final TextView n = text("#" + displayIndex + (r.family == KeyAudit.Family.BLOCK ? " · 128/4" : ""),
                 9.5f, Design.DIM_2, Typeface.NORMAL);
+        n.setTag("keyuses.number."+r.index);
         addrCell.addView(n);
         addrCell.addView(text(sourceLabel(r.index),9.5f,Design.DIM_2,Typeface.NORMAL));
 
@@ -431,7 +455,7 @@ public class MainActivity extends AppCompatActivity {
         // status chip
         final String label;
         final int fg, bg;
-        switch (r.status()) {
+        switch (r.reused ? KeyAudit.Status.REUSED : r.risk ? KeyAudit.Status.AT_RISK : r.publicChecked ? KeyAudit.Status.OK : KeyAudit.Status.UNKNOWN) {
             case REUSED:
                 final boolean red = r.reuseCount > KeyAudit.REUSE_RED_ABOVE;
                 fg = red ? Design.RISK : Design.WARN;
@@ -448,7 +472,7 @@ public class MainActivity extends AppCompatActivity {
             default:
                 fg = Design.OK;
                 bg = Design.OK_SOFT;
-                label = "OK";
+                label = r.sigs>0 ? Copy.used(num(r.sigs)) : Copy.unused();
                 break;
         }
 
@@ -457,13 +481,9 @@ public class MainActivity extends AppCompatActivity {
         chip.setPadding(dp(8), dp(3), dp(8), dp(3));
         chip.setGravity(Gravity.CENTER);
 
-        final LinearLayout chipCell = new LinearLayout(this);
-        chipCell.setLayoutParams(new LinearLayout.LayoutParams(dp(COL_STATUS),
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        chipCell.setGravity(Gravity.END);
-        chipCell.setPadding(dp(4), 0, dp(4), 0);
-        chipCell.addView(chip);
-        row.addView(chipCell);
+        chip.setTag("keyuses.status."+r.index);
+        n.setTextColor(fg);
+        addrCell.addView(chip,1);
 
         final LinearLayout wrap = new LinearLayout(this);
         wrap.setOrientation(LinearLayout.VERTICAL);
@@ -474,8 +494,10 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView numCell(String s, int widthDp) {
         final TextView t = text(s, 12f, Design.TEXT, Typeface.NORMAL);
+        t.setMaxLines(1);
+        t.setAutoSizeTextTypeUniformWithConfiguration(8,12,1,TypedValue.COMPLEX_UNIT_SP);
         t.setGravity(Gravity.END);
-        t.setWidth(dp(widthDp));
+        t.setLayoutParams(new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT,widthDp));
         t.setPadding(dp(4), 0, dp(4), 0);
         return t;
     }

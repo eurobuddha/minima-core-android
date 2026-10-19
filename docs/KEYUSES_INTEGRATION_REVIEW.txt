@@ -77,3 +77,56 @@ unknown even when remote evidence arrives. A reuse finding still takes precedenc
 The public audit relies on archive coverage and default signed-by addresses; a clean
 response is not proof of future signing safety. No account seeds or signing counters
 were changed for device testing.
+
+
+1.9.97 / code168 — display revision after Fold feedback
+
+The 1.9.96 live audit successfully returned classic spend history and the node's
+block-family counters. The owner identified three display issues: continuous
+numbering, off-screen status colours, and unknown labels despite available public
+history. Re-read mds/keyuses/phrase/index.html renderResults/renderRows (0.1.8) and
+the native donor row/status/card helpers before adapting the presentation.
+
+Changes
+- Separate highlighted Classic, Blocks-as-keyuses, and distinct minimaWallet
+  sections, numbering restarted within each section. Shared keys keep their source
+  labels and occur once. The audit identity/index is retained for data mapping.
+- Weighted columns fit the viewport without HorizontalScrollView. The original
+  status chip/colours move into the address cell. Numeric text sizes down within
+  a bounded range to keep counters visible on narrow phones.
+- Phrase-style USED n / UNUSED from public archive history, and original red/amber
+  REUSED counts. Unknown means missing/inconsistent public evidence. No stored
+  counter is invented for derived classic keys.
+- Shared KeyAudit adds publicChecked/publicComplete, factoring the existing shape
+  and endpoint/address checks. Existing valid/checked/complete semantics and all
+  Future Cash financial gates are unchanged. KeyUses uses public completeness for
+  its history display and retains local-counter heuristic warnings where available.
+- English, Chinese, Russian and Ukrainian text updated together.
+
+Review
+Checked the canonical adapters, generated screen/engine, catalogue and tests.
+Confirmed the group display number does not replace the audit row's source index;
+status severity still takes precedence; known reuse remains visible with incomplete
+other evidence. Public completeness requires both endpoints and address agreement.
+Missing local counters still prevent Future Cash's original complete gate.
+No remaining findings in this revision. Validation results follow after execution.
+
+1.9.97 validation
+- 108 tests pass: 37 KeyUses and all 71 Future Cash tests, zero failures/errors.
+  UI tests cover all four languages, each section's count/number reset, red and
+  amber reuse counts, green USED/UNUSED with no local counter, retained local-risk
+  warning, unknown missing evidence, no horizontal scroller and a 320dp layout.
+  Public-evidence regression proves that a missing local counter still fails
+  Future Cash's existing complete/checked gate. Missing or mismatched endpoints
+  cannot produce publicComplete.
+- Importer verifies all snapshots/provenance, 6,881 messages validate in four
+  languages, direct-transport guard and changed-file whitespace check pass.
+- Signed assemblePandamoniumRelease and final Keets APK verification pass; all
+  21 addons/runtime are preserved. Final APK DEX includes the new section/status
+  rendering and public-evidence fields. Family certificate unchanged.
+- APK metadata: 1.9.97-Pandamonium / code168.
+  dist/minima-core-Pandamonium-1.9.97-candidate.apk
+  SHA256 eae4bd45f489095d3f9e29b352f6b649cc49187b2a9a7f69d30cc9404f1a24fd.
+- The prior full-lint limitation remains: unchanged lock-screen MissingSuperCall.
+  No full-lint success is claimed. Live verification of this revision follows the
+  Fold's normal unlock after the in-place update.

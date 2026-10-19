@@ -110,4 +110,19 @@ public class DualKeyAuditTest {
         assertFalse(result.complete);
         assertEquals(KeyAudit.Status.UNKNOWN, result.rows.get(0).status());
     }
+    @Test public void publicHistoryDoesNotRequireOrInventLocalCounters() {
+        KeyAudit.Result result=join(Collections.singletonList(classic(-1)),
+                Collections.singletonList(usage(CLASSIC,35)),Collections.singletonList(reused(CLASSIC,false)));
+        assertTrue(result.publicComplete);assertTrue(result.rows.get(0).publicChecked);
+        assertFalse(result.complete);assertFalse(result.rows.get(0).checked);
+        assertFalse(result.rows.get(0).risk);assertEquals(-1,result.rows.get(0).local);
+        assertEquals(KeyAudit.Status.UNKNOWN,result.rows.get(0).status());
+        KeyAudit.Result missing=join(Collections.singletonList(classic(-1)),
+                Collections.singletonList(usage(CLASSIC,35)),Collections.emptyList());
+        assertFalse(missing.publicComplete);assertFalse(missing.rows.get(0).publicChecked);
+        KeyAudit.Result mismatch=join(Collections.singletonList(classic(-1)),
+                Collections.singletonList(new KeyAudit.Usage(CLASSIC,address(BLOCK).hex,35,35)),
+                Collections.singletonList(reused(CLASSIC,false)));
+        assertFalse(mismatch.publicComplete);assertFalse(mismatch.rows.get(0).publicChecked);
+    }
 }

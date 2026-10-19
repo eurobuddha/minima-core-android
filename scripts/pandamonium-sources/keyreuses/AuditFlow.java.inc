@@ -87,3 +87,31 @@
         if((flags&AuditSelection.WALLET)!=0)names.add("minimaWallet");
         return String.join(" · ",names);
     }
+
+    /** Group display rows without changing their audit identity or source mapping. */
+    private void renderKeySections(LinearLayout table, KeyAudit.Result result) {
+        for(int group=0;group<3;group++) {
+            java.util.List<KeyAudit.Row> rows=new ArrayList<>();
+            for(KeyAudit.Row auditRow:result.rows) {
+                int flags=selection.origins.get(auditRow.index-1);
+                int rowGroup=flags==AuditSelection.WALLET ? 2
+                        : auditRow.family==KeyAudit.Family.BLOCK ? 1 : 0;
+                if(rowGroup==group) rows.add(auditRow);
+            }
+            if(rows.isEmpty())continue;
+            LinearLayout section=new LinearLayout(this);
+            section.setOrientation(LinearLayout.VERTICAL);
+            section.setTag("keyuses.section."+group);
+            section.setLayoutParams(marginParams(0,group==0?0:24,0,0));
+            TextView heading=text(Copy.section(group,rows.size()),15f,Design.ACCENT,Typeface.BOLD);
+            heading.setBackground(Design.card(this,Design.ACCENT_SOFT,Design.BORDER,8));
+            heading.setPadding(dp(12),dp(14),dp(12),dp(14));
+            heading.setLayoutParams(marginParams(0,0,0,12));
+            androidx.core.view.ViewCompat.setAccessibilityHeading(heading,true);
+            section.addView(heading);
+            section.addView(headerRow());
+            int displayIndex=0;
+            for(KeyAudit.Row auditRow:rows) section.addView(row(auditRow,++displayIndex));
+            table.addView(section);
+        }
+    }

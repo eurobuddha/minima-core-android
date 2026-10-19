@@ -78,3 +78,13 @@ The screen follows the shared English, Chinese, Russian and Ukrainian selector.
 Builds continue to use checked-in source snapshots; sibling checkouts are needed
 only for importer regeneration/verification. See `docs/KEYUSES_INTEGRATION_REVIEW.txt`
 for derivation provenance and validation.
+
+Pandamonium 1.9.97 separates Classic (1–64), Blocks-as-keyuses (1–32), and
+additional minimaWallet keys, restarting the display numbering per section. All
+columns fit the viewport, and each key's warning is shown beside its address.
+As in `mds/keyuses/phrase/index.html:renderRows`, public history is labelled USED n
+or UNUSED, with red/orange REUSED counts. Explicit matching responses from both
+endpoints are required for a green history label. Unknown is reserved for missing
+or inconsistent evidence. The local counter remains separate (a dash when absent).
+Future Cash still requires its existing complete local-counter checks; the added
+public-evidence fields do not loosen those gates.

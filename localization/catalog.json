@@ -41637,10 +41637,10 @@
     "uk": "На eurobuddha.com надсилаються лише публічні ключі й адреси для перевірки. Сервер дізнається вибрані адреси. Seed залишаються на пристрої."
   },
   "keyuses.incomplete": {
-    "en": "Some counters or audit results are unavailable. Derived keys without a stored counter are shown as unknown, not zero. Known reuse findings still apply.",
-    "zh-Hans": "部分计数器或审计结果不可用。没有已存储计数器的派生密钥显示为未知，而非零。已发现的重复使用仍然有效。",
-    "ru": "Некоторые счётчики или результаты недоступны. Для производных ключей без сохранённого счётчика указано «неизвестно», а не ноль. Обнаруженные повторные использования остаются значимыми.",
-    "uk": "Деякі лічильники або результати недоступні. Для похідних ключів без збереженого лічильника вказано «невідомо», а не нуль. Виявлені повторні використання залишаються значущими."
+    "en": "Some public audit results are missing or inconsistent. Those rows remain unknown. Confirmed reuse findings still apply.",
+    "zh-Hans": "部分公开审计结果缺失或不一致。这些行仍标记为未知。已确认的重复使用结果仍然有效。",
+    "ru": "Некоторые публичные результаты отсутствуют или не согласуются. Эти строки остаются неизвестными. Подтверждённые повторы остаются значимыми.",
+    "uk": "Деякі публічні результати відсутні або не узгоджуються. Ці рядки залишаються невідомими. Підтверджені повтори залишаються значущими."
   },
   "keyuses.partial": {
     "en": "Audit needs review",
@@ -41805,9 +41805,39 @@
     "uk": "Перевірку адрес не пройдено. Ця збірка не може виконати надійний аудит."
   },
   "keyuses.explain": {
-    "en": "Each one-time signing leaf must sign only once. Classic keys use counters; block-based keys use block-derived positions. The audit combines archive spend counts with witnessed reuse reports for both families.",
-    "zh-Hans": "每个一次性签名叶只能签名一次。经典密钥使用计数器，区块密钥使用区块确定的位置。审计结合档案支出统计和见证重复使用报告来检查两类密钥。",
-    "ru": "Каждый одноразовый лист должен подписывать лишь один раз. Классические ключи используют счётчики, блочные — позиции по блокам. Проверка объединяет архивные расходы и подтверждённые подписью повторы для обоих типов.",
-    "uk": "Кожен одноразовий листок має підписувати лише раз. Класичні ключі використовують лічильники, блокові — позиції за блоками. Перевірка поєднує архівні витрати й підтверджені підписом повтори для обох типів."
+    "en": "Each one-time signing leaf must sign only once. Classic keys use counters; block-based keys use block-derived positions. The audit combines archive spend counts with witnessed reuse reports for both families. USED/UNUSED describes the archive history; it does not verify a local signing counter. A dash in Local uses means no stored counter is available.",
+    "zh-Hans": "每个一次性签名叶只能签名一次。经典密钥使用计数器，区块密钥使用区块确定的位置。审计结合档案支出统计和见证重复使用报告来检查两类密钥。 已使用/未使用描述档案历史，并不验证本地签名计数器。本地使用次数中的破折号表示没有可用的已存储计数器。",
+    "ru": "Каждый одноразовый лист должен подписывать лишь один раз. Классические ключи используют счётчики, блочные — позиции по блокам. Проверка объединяет архивные расходы и подтверждённые подписью повторы для обоих типов. ИСПОЛЬЗОВАН/НЕ ИСПОЛЬЗОВАН описывает архивную историю, а не проверку локального счётчика подписей. Тире в локальном счётчике означает отсутствие сохранённого значения.",
+    "uk": "Кожен одноразовий листок має підписувати лише раз. Класичні ключі використовують лічильники, блокові — позиції за блоками. Перевірка поєднує архівні витрати й підтверджені підписом повтори для обох типів. ВИКОРИСТАНО/НЕ ВИКОРИСТАНО описує архівну історію, а не перевірку локального лічильника підписів. Тире в локальному лічильнику означає відсутність збереженого значення."
+  },
+  "keyuses.classicSection": {
+    "en": "Classic keys · 1–{count}",
+    "zh-Hans": "经典密钥 · 1–{count}",
+    "ru": "Классические ключи · 1–{count}",
+    "uk": "Класичні ключі · 1–{count}"
+  },
+  "keyuses.blockSection": {
+    "en": "Blocks-as-keyuses keys · 1–{count}",
+    "zh-Hans": "区块用作使用次数的密钥 · 1–{count}",
+    "ru": "Ключи blocks-as-keyuses · 1–{count}",
+    "uk": "Ключі blocks-as-keyuses · 1–{count}"
+  },
+  "keyuses.walletSection": {
+    "en": "minimaWallet classic keys · 1–{count}",
+    "zh-Hans": "minimaWallet 经典密钥 · 1–{count}",
+    "ru": "Классические ключи minimaWallet · 1–{count}",
+    "uk": "Класичні ключі minimaWallet · 1–{count}"
+  },
+  "keyuses.used": {
+    "en": "USED {value}",
+    "zh-Hans": "已使用 {value}",
+    "ru": "ИСПОЛЬЗОВАН {value}",
+    "uk": "ВИКОРИСТАНО {value}"
+  },
+  "keyuses.unused": {
+    "en": "UNUSED",
+    "zh-Hans": "未使用",
+    "ru": "НЕ ИСПОЛЬЗОВАН",
+    "uk": "НЕ ВИКОРИСТАНО"
   }
 }

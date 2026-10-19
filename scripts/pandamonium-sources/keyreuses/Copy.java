@@ -71,4 +71,12 @@ final class Copy {
     static String recoCommand(long count) { return "keyuses:" + count; }
     static String atRisk() { return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_future_at_risk).toString().trim(); }
     static String partialTitle() { return partial(); }
+    static String section(int group,int count) {
+        int id=group==0 ? com.eurobuddha.minimacore.i18n.R.string.l10n_keyuses_classic_section
+                : group==1 ? com.eurobuddha.minimacore.i18n.R.string.l10n_keyuses_block_section
+                : com.eurobuddha.minimacore.i18n.R.string.l10n_keyuses_wallet_section;
+        return Language.msg(id,count).toString();
+    }
+    static String used(String value) { return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_keyuses_used,value).toString(); }
+    static String unused() { return Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_keyuses_unused).toString(); }
 }

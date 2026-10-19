@@ -50,6 +50,7 @@ public final class KeyAudit {
         public final int maxUses;
         public final Family family;
         public final boolean valid;
+        public final boolean shapeValid;
 
         public LocalKey(String publicKey, int uses, int maxUses) {
             this(publicKey, uses, maxUses, 0, 0);
@@ -69,8 +70,8 @@ public final class KeyAudit {
                 family = Family.UNKNOWN;
                 this.maxUses = 0;
             }
-            valid = family != Family.UNKNOWN && uses >= 0
-                    && (maxUses == 0 || maxUses == this.maxUses);
+            shapeValid = family != Family.UNKNOWN && (maxUses == 0 || maxUses == this.maxUses);
+            valid = shapeValid && uses >= 0;
         }
     }
 
@@ -139,6 +140,8 @@ public final class KeyAudit {
         public final int local;          // classic counter or block-tree leaf position
         public final Family family;
         public final boolean checked;
+        /** Both public endpoints returned matching evidence, independent of a local counter. */
+        public final boolean publicChecked;
         public final long sigs;          // on-chain signatures (spend blocks)
         public final long coins;         // spent coins (upper bound)
         public final boolean risk;       // heuristic: sigs > local
@@ -146,9 +149,10 @@ public final class KeyAudit {
         public final long reuseCount;
 
         Row(int index, String address, int local, long sigs, long coins,
-            boolean risk, boolean reused, long reuseCount, Family family, boolean checked) {
+            boolean risk, boolean reused, long reuseCount, Family family, boolean checked, boolean publicChecked) {
             this.family = family;
             this.checked = checked;
+            this.publicChecked = publicChecked;
             this.index = index;
             this.address = address;
             this.local = local;
@@ -178,20 +182,24 @@ public final class KeyAudit {
         public final boolean exhaustion;
         /** Every requested key has a usable shape and explicit results from both endpoints. */
         public final boolean complete;
+        public final boolean publicComplete;
         public final int classicKeys, blockKeys, unknownKeys;
 
         Result(List<Row> rows, Verdict verdict, long worstReuse, long recommendedKeyUses,
                boolean derivationMismatch, boolean exhaustion) {
             int classic = 0, block = 0, unknown = 0;
             boolean all = !rows.isEmpty() && !derivationMismatch;
+            boolean allPublic = all;
             for (Row row : rows) {
                 if (row.family == Family.CLASSIC) classic++;
                 else if (row.family == Family.BLOCK) block++;
                 else unknown++;
                 all &= row.checked;
+                allPublic &= row.publicChecked;
             }
             classicKeys = classic; blockKeys = block; unknownKeys = unknown;
             complete = all;
+            publicComplete = allPublic;
             this.rows = rows;
             this.verdict = verdict;
             this.worstReuse = worstReuse;
@@ -274,6 +282,8 @@ public final class KeyAudit {
             rows.add(new Row(i + 1, display, local, sigs, coins,
                     risk, confirmedReuse, r == null ? 0 : r.reuseCount, k.family,
                     k.valid && d != null && u != null && r != null
+                            && d.hex.equalsIgnoreCase(u.address),
+                    k.shapeValid && d != null && u != null && r != null
                             && d.hex.equalsIgnoreCase(u.address)));
         }
 

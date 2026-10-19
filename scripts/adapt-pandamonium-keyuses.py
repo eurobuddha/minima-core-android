@@ -35,6 +35,12 @@ import com.eurobuddha.minimacore.i18n.Language;''')
     s=s.replace('                color = Design.OK;\n                title = Copy.OK_TITLE;\n                body = Copy.OK_BODY;','                color = r.complete ? Design.OK : Design.WARN;\n                title = r.complete ? Copy.OK_TITLE : Copy.partialTitle();\n                body = r.complete ? Copy.OK_BODY : Copy.incomplete();')
     s=s.replace('if (r.classicCount > 0)', 'if (r.complete && r.classicKeys > 0 && r.recommendedKeyUses < 262144)').replace('r.blockCount','r.blockKeys')
     s=s.replace('r.blockScheme','r.family == KeyAudit.Family.BLOCK')
+    old='        table.addView(headerRow());\n        for (KeyAudit.Row row : r.rows) table.addView(row(row));'
+    assert old in s;s=s.replace(old,'        renderKeySections(table,r);')
+    s=s.replace('private View row(final KeyAudit.Row r)', 'private View row(final KeyAudit.Row r, int displayIndex)')
+    s=s.replace('text("#" + r.index +', 'text("#" + displayIndex +')
+    s=s.replace('        addrCell.addView(n);','        n.setTag("keyuses.number."+r.index);\n        addrCell.addView(n);')
+
     s=s.replace('        addrCell.addView(n);','        addrCell.addView(n);\n        addrCell.addView(text(sourceLabel(r.index),9.5f,Design.DIM_2,Typeface.NORMAL));')
     s=s.replace('num(r.local)', 'r.local < 0 ? "—" : num(r.local)')
     s=s.replace('            default:\n                fg = Design.OK;', '            case UNKNOWN:\n                fg=Design.WARN; bg=Design.WARN_SOFT; label=Copy.unknown(); break;\n            default:\n                fg = Design.OK;')
@@ -67,6 +73,30 @@ import com.eurobuddha.minimacore.i18n.Language;''')
                     + "derived safely. This build is broken — do not trust any result from it."'''
     assert old in s;s=s.replace(old,'Copy.selfTest()')
     s=s.replace('            showError(Copy.selfTest());','            errorText=Copy::selfTest; showError(errorText.get());')
+    # Fit every column to the viewport. Keep the status with the key/address.
+    old="""        final HorizontalScrollView hs = new HorizontalScrollView(this);
+        hs.setHorizontalScrollBarEnabled(false);
+        hs.addView(table);
+        card.addView(hs);"""
+    assert old in s;s=s.replace(old,'        card.addView(table);')
+    s=s.replace('        row.addView(headerCell(Copy.status(), COL_STATUS, Gravity.END));','')
+    s=s.replace('new LinearLayout.LayoutParams(dp(COL_ADDR),\n                LinearLayout.LayoutParams.WRAP_CONTENT)',
+                'new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT,COL_ADDR)')
+    s=s.replace('        t.setWidth(dp(widthDp));','        t.setLayoutParams(new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT,widthDp));')
+    s=s.replace('final TextView t = text(s, 12f, Design.TEXT, Typeface.NORMAL);',
+                'final TextView t = text(s, 12f, Design.TEXT, Typeface.NORMAL);\n        t.setMaxLines(1);\n        t.setAutoSizeTextTypeUniformWithConfiguration(8,12,1,TypedValue.COMPLEX_UNIT_SP);')
+    start=s.index('        final LinearLayout chipCell =');end=s.index('        final LinearLayout wrap =',start)
+    s=s[:start]+"""        chip.setTag("keyuses.status."+r.index);
+        n.setTextColor(fg);
+        addrCell.addView(chip,1);
+
+"""+s[end:]
+    s=s.replace('switch (r.status())', 'switch (r.reused ? KeyAudit.Status.REUSED : r.risk ? KeyAudit.Status.AT_RISK : r.publicChecked ? KeyAudit.Status.OK : KeyAudit.Status.UNKNOWN)')
+    s=s.replace('                label = "OK";', '                label = r.sigs>0 ? Copy.used(num(r.sigs)) : Copy.unused();')
+    s=s.replace('if (!r.complete) resultsBox', 'if (!r.publicComplete) resultsBox')
+    s=s.replace('r.complete ? Design.OK', 'r.publicComplete ? Design.OK')
+    s=s.replace('r.complete ? Copy.OK_TITLE()', 'r.publicComplete ? Copy.OK_TITLE()')
+    s=s.replace('r.complete ? Copy.OK_BODY()', 'r.publicComplete ? Copy.OK_BODY()')
     # Reuse AtomiX's self-owned menu: language rebuilds must retain navigation.
     s=s.replace('        wrap.addView(b);',"""        wrap.setTag("pandamonium.app.toolbar.self");
         TextView menu=text("\u2630",20f,Design.TEXT,Typeface.NORMAL);

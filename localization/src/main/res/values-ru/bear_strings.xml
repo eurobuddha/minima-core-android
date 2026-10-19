@@ -8353,7 +8353,7 @@
     <string name="l10n_keyuses_include_wallet" formatted="false">"Включить классические ключи minimaWallet"</string>
     <string name="l10n_keyuses_subtitle" formatted="false">"Проверка ключей узла и обоих наборов из его seed: 64 классических и 32 блочных ключа. Можно добавить minimaWallet, в том числе с другим seed."</string>
     <string name="l10n_keyuses_privacy" formatted="false">"На eurobuddha.com отправляются только публичные ключи и адреса для проверки. Сервер узнает выбранные адреса. Seed остаются на устройстве."</string>
-    <string name="l10n_keyuses_incomplete" formatted="false">"Некоторые счётчики или результаты недоступны. Для производных ключей без сохранённого счётчика указано «неизвестно», а не ноль. Обнаруженные повторные использования остаются значимыми."</string>
+    <string name="l10n_keyuses_incomplete" formatted="false">"Некоторые публичные результаты отсутствуют или не согласуются. Эти строки остаются неизвестными. Подтверждённые повторы остаются значимыми."</string>
     <string name="l10n_keyuses_partial" formatted="false">"Проверка требует внимания"</string>
     <string name="l10n_keyuses_unavailable" formatted="false">"Не удалось подготовить публичные ключи. Проверьте, что узел запущен и разблокирован. Если выбран minimaWallet, настройте или разблокируйте его и повторите."</string>
     <string name="l10n_keyuses_changed" formatted="false">"Узел или кошелёк изменился во время проверки. Повторите её."</string>
@@ -8385,5 +8385,14 @@
     <string name="l10n_keyuses_mismatch" formatted="false">"Адрес сервера отличается от вычисленного локально. Проверка неполная."</string>
     <string name="l10n_keyuses_exhaustion" formatted="false">"Ключ близок к пределу подписей. Проверьте его перед новой подписью."</string>
     <string name="l10n_keyuses_self_test" formatted="false">"Проверка адресов не пройдена. Эта сборка не может выполнить надёжный аудит."</string>
-    <string name="l10n_keyuses_explain" formatted="false">"Каждый одноразовый лист должен подписывать лишь один раз. Классические ключи используют счётчики, блочные — позиции по блокам. Проверка объединяет архивные расходы и подтверждённые подписью повторы для обоих типов."</string>
+    <string name="l10n_keyuses_explain" formatted="false">"Каждый одноразовый лист должен подписывать лишь один раз. Классические ключи используют счётчики, блочные — позиции по блокам. Проверка объединяет архивные расходы и подтверждённые подписью повторы для обоих типов. ИСПОЛЬЗОВАН/НЕ ИСПОЛЬЗОВАН описывает архивную историю, а не проверку локального счётчика подписей. Тире в локальном счётчике означает отсутствие сохранённого значения."</string>
+    <!-- Arguments: count -->
+    <string name="l10n_keyuses_classic_section">"Классические ключи · 1–%1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_keyuses_block_section">"Ключи blocks-as-keyuses · 1–%1$d"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_keyuses_wallet_section">"Классические ключи minimaWallet · 1–%1$d"</string>
+    <!-- Arguments: value -->
+    <string name="l10n_keyuses_used">"ИСПОЛЬЗОВАН %1$s"</string>
+    <string name="l10n_keyuses_unused" formatted="false">"НЕ ИСПОЛЬЗОВАН"</string>
 </resources>
