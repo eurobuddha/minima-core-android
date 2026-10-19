@@ -87,7 +87,7 @@ public class NodeTx {
                 o.put("coinid", c.optString("coinid", ""));
                 o.put("addr", c.optString("miniaddress", c.optString("address", "")));
                 o.put("address", c.optString("address", ""));   // 0x form too: local rows may record either
-                o.put("amount", c.optString("amount", c.optString("tokenamount", "")));
+                o.put("amount", Util.isMinima(c.optString("tokenid", "")) ? c.optString("amount", "") : c.optString("tokenamount", ""));
                 o.put("tokenid", c.optString("tokenid", "0x00"));
                 out.put(o);
             } catch (Exception ignored) {}

@@ -60,7 +60,7 @@ public class HistoryView extends BaseView {
         render();   // show whatever is already persisted, instantly + offline
     }
 
-    @Override public void refresh() { if (visible() && !fetching) render(); }
+    @Override public void refresh() { rowsDirty = true; if (visible() && !fetching) render(); }
     @Override public void onShown() { autoPages = 0; act.history().resolveOpenAgainstStored(); render(); fetch(true); }
     @Override public void onNewBlock() { if (visible()) fetch(false); }
     private boolean visible() { return act.currentTab() == MainActivity.TAB_HISTORY; }

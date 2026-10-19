@@ -168,3 +168,15 @@ Faucet integration adds a23rd native library pinned at standalone0.2.5/9a8a056.
 The source reuse/direct transport/navigation/language adaptations are host-specific.
 Standalone Faucet itself has not been changed. See PANDAMONIUM_FAUCET_2026-10-19.txt.
 The user confirmed Future Cash1.9.118 works;1.9.119 retains the ANR repair.
+
+UTXO complete history matching — Pandamonium1.9.120/code191; standalone0.4.36/code436
+Partial input/address overlap and cached history cannot settle attempts. Reuses
+NFT complete economics and fresh three-block inclusion checks. Atomic save,
+duplicate-claim rejection, pending-only recovery, migration preserving caches,
+late-callback guards and human token units covered by37 integrated +56 standalone
+test executions. Both release lints/builds pass;23 imports,6924 translations,
+direct transport, signatures and actual APK Keets pass. Local signed candidates
+prepared; no install/publication. Full review remains open, including prepared
+submission/distribution and general cached-history confirmation/reorg display.
+See docs/UTXO_HISTORY_CONFIRMATION_2026-10-19.txt. Saved WIP was evaluated and
+superseded by these reviewed sources; do not blindly reapply its old snapshots.

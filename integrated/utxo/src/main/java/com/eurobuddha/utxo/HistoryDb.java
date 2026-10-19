@@ -23,7 +23,7 @@ public class HistoryDb extends SQLiteOpenHelper {
     public static final String STATUS_UNKNOWN   = "unknown";   // txnsign timed out: may or may not have posted
 
     private static final String DB_NAME = "pandamonium_utxo_history.db";
-    private static final int    DB_VERSION = 6;     // v6: nodetx outputs carry both address forms (resolver output match)
+    private static final int    DB_VERSION = 7;     // v7: recheck legacy confirmations; preserve both history tables
     private static final String TABLE = "history";
 
     public HistoryDb(Context ctx) {
@@ -65,6 +65,12 @@ public class HistoryDb extends SQLiteOpenHelper {
         if (oldV < 6) db.execSQL("DROP TABLE IF EXISTS nodetx");
         // Preserve the local send-records (history) table; (re)create tables; add the v2 send columns.
         onCreate(db);
+        if (oldV < 7) {
+            // Earlier versions confirmed on partial overlap and could also infer a failed send.
+            // Preserve the evidence/display rows, but require fresh inclusion before claiming success.
+            db.execSQL("UPDATE history SET status='unknown', txnid=internalid WHERE status='confirmed' "
+                    + "OR (status='error' AND note LIKE 'Not posted: these coins were spent by a different transaction (%')");
+        }
         for (String col : new String[]{"inputs TEXT", "outputs TEXT", "changeaddr TEXT", "burn TEXT"}) {
             try { db.execSQL("ALTER TABLE " + TABLE + " ADD COLUMN " + col); } catch (Exception ignored) {}
         }
@@ -95,14 +101,14 @@ public class HistoryDb extends SQLiteOpenHelper {
         v.put("status", status);
         if (txnid != null) v.put("txnid", txnid);
         if (note != null) v.put("note", note);
-        getWritableDatabase().update(TABLE, v, "internalid=?", new String[]{internalid});
+        getWritableDatabase().update(TABLE, v, "internalid=? AND status<>?", new String[]{internalid,STATUS_CONFIRMED});
     }
 
     /** Record the inputs of a node-driven posting after the fact (consolidate), so the resolver can match it. */
     public void setInputs(String internalid, String inputsJson) {
         ContentValues v = new ContentValues();
         v.put("inputs", inputsJson);
-        getWritableDatabase().update(TABLE, v, "internalid=?", new String[]{internalid});
+        getWritableDatabase().update(TABLE, v, "internalid=? AND status<>?", new String[]{internalid,STATUS_CONFIRMED});
     }
 
     /** Remove a row (e.g. user dismisses a failed send). */
@@ -149,74 +155,59 @@ public class HistoryDb extends SQLiteOpenHelper {
     // ----- persisted on-chain history (nodetx) -----
 
     /** Insert a node history row; returns true if NEW (false if this txpowid was already stored). */
-    public boolean upsertNodeTx(NodeTx n) {
+    public boolean upsertNodeTx(NodeTx n) { return saveNodeTx(n, false); }
+
+    private boolean saveNodeTx(NodeTx n, boolean verified) {
         ContentValues v = new ContentValues();
         v.put("txpowid", n.txpowid); v.put("block", n.block); v.put("timemilli", n.timemilli);
         v.put("direction", n.direction); v.put("incoming", n.incoming ? 1 : 0);
         v.put("tokenid", n.tokenid); v.put("tokenname", n.tokenName); v.put("amount", n.amount);
         v.put("deltas", n.deltas); v.put("counterparty", n.counterparty);
         v.put("inputs", n.inputs); v.put("outputs", n.outputs);
-        long rid = getWritableDatabase().insertWithOnConflict("nodetx", null, v, SQLiteDatabase.CONFLICT_IGNORE);
-        if (rid != -1) resolve(n);
+        long rid = getWritableDatabase().insertWithOnConflict("nodetx", null, v, verified ? SQLiteDatabase.CONFLICT_REPLACE : SQLiteDatabase.CONFLICT_IGNORE);
         return rid != -1;
     }
 
-    /**
-     * The resolver. A freshly seen on-chain transaction that spent a local row's recorded input coinids
-     * is either THAT row's transaction (its recorded output addresses appear in the txpow → CONFIRMED,
-     * real txpowid stored) or a different transaction that re-spent the same coins (no output overlap →
-     * the local one can never post → ERROR). Inputs alone are not enough: a timed-out send that never
-     * posted, followed by a re-send of the same coins, used to get confirmed against the second txpow.
-     * Rows with no recorded outputs (node-driven consolidate) confirm on inputs alone.
-     * Returns true if any row changed.
-     */
-    public boolean resolve(NodeTx n) {
-        java.util.Set<String> spent = coinIds(n.inputs, "coinid");
-        if (spent.isEmpty()) return false;
-        java.util.Set<String> outAddrs = coinIds(n.outputs, "addr");
-        outAddrs.addAll(coinIds(n.outputs, "address"));
-        boolean any = false;
-        for (HistoryRow r : listOpen(500)) {
-            if (STATUS_ERROR.equals(r.status)) continue;          // an errored row never posted
-            java.util.Set<String> mine = coinIds(r.inputs, "coinid");
-            mine.retainAll(spent);
-            if (mine.isEmpty()) continue;
-            java.util.Set<String> want = coinIds(r.outputs, "address");
-            if (want.isEmpty()) {
-                update(r.internalid, STATUS_CONFIRMED, n.txpowid, "");
-                any = true;
-                continue;
-            }
-            boolean outMatch = false;
-            for (String a : want) if (containsIgnoreCase(outAddrs, a)) { outMatch = true; break; }
-            if (outMatch) update(r.internalid, STATUS_CONFIRMED, n.txpowid, "");
-            else update(r.internalid, STATUS_ERROR, null,
-                    "Not posted: these coins were spent by a different transaction (" + n.txpowid + ").");
-            any = true;
-        }
-        return any;
+    /** Legacy cache/presence hooks cannot prove chain inclusion. Recovery queries fresh evidence. */
+    public boolean resolve(NodeTx n) { return false; }
+    public boolean resolveOpenAgainstStored() { return false; }
+
+    /** Pending attempts only; display pagination must not hide evidence correlations. */
+    List<HistoryRow> listRecoverable() {
+        return query("SELECT id,internalid,txnid,status,recipient,amount,tokenid,tokenname,ts,note,"
+                + "inputs,outputs,changeaddr,burn FROM history WHERE status IN ('posting','posted','unknown') ORDER BY id DESC");
     }
 
-    /** Re-run the resolver for every open row against the txpows ALREADY stored, so a send whose txpow
-     *  was fetched on an earlier page (or before the row existed) settles without a fresh upsert. */
-    public boolean resolveOpenAgainstStored() {
-        boolean any = false;
-        for (HistoryRow r : listOpen(200)) {
-            if (STATUS_ERROR.equals(r.status)) continue;
-            for (String id : coinIds(r.inputs, "coinid")) {
-                Cursor c = getReadableDatabase().rawQuery(
-                        "SELECT txpowid,inputs,outputs FROM nodetx WHERE inputs LIKE ? LIMIT 1", new String[]{"%" + id + "%"});
-                try {
-                    if (c.moveToFirst()) {
-                        NodeTx n = new NodeTx();
-                        n.txpowid = c.getString(0); n.inputs = c.getString(1); n.outputs = c.getString(2);
-                        any |= resolve(n);
-                        break;
-                    }
-                } finally { c.close(); }
+    /** Recheck the current saved row and commit its matching history entry atomically. */
+    boolean confirmHistory(String internalid,org.json.JSONObject txpow,org.json.JSONObject detail,
+                           org.json.JSONObject inclusion) {
+        org.json.JSONObject proof=HistoryEvidence.inclusion(inclusion);
+        String txpowid=HistoryEvidence.id(txpow,"txpowid");
+        if(detail==null || detail.optJSONObject("difference")==null)return false;
+        SQLiteDatabase db=getWritableDatabase();db.beginTransaction();
+        try {
+            HistoryRow row=null;
+            int matching=0;
+            // Ambiguous duplicate attempts must stay unresolved, including across restarts.
+            for(HistoryRow candidate:listRecoverable()) {
+                if(HistoryRecovery.recoverable(candidate.status)&&HistoryEvidence.matches(candidate,txpow)) {
+                    matching++;
+                    if(internalid.equals(candidate.internalid))row=candidate;
+                }
             }
-        }
-        return any;
+            if(row==null||matching!=1)return false;
+            try(Cursor claimed=db.rawQuery("SELECT 1 FROM history WHERE status=? AND lower(txnid)=? LIMIT 1",
+                    new String[]{STATUS_CONFIRMED,txpowid})) {
+                if(claimed.moveToFirst())return false;
+            }
+            NodeTx found=NodeTx.from(txpow,detail);
+            found.block=Long.parseLong(proof.optString("block"));
+            if(!saveNodeTx(found,true))throw new IllegalStateException("Could not save verified history");
+            ContentValues values=new ContentValues();values.put("status",STATUS_CONFIRMED);
+            values.put("txnid",found.txpowid);values.put("note","");
+            if(db.update(TABLE,values,"internalid=? AND status=?",new String[]{internalid,row.status})!=1)return false;
+            db.setTransactionSuccessful();return true;
+        } finally { db.endTransaction(); }
     }
 
     /** True if any open row is still waiting on the chain (posted / posted?) — drives History's auto-paging. */

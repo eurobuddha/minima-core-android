@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
     private NodeApi node;
     private HistoryDb historyDb;
+    private HistoryRecovery historyRecovery;
 
     private BaseView[] views;
     private MainPager pager;
@@ -243,6 +244,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Resumes any persisted multi-batch Distribute job.
         distribute = new DistributeManager(this);
+        historyRecovery = new HistoryRecovery(node::cmd,historyDb,this::refreshHistory);
     }
 
     @Override
@@ -263,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
         languageMenus.clear();
         super.onDestroy();
         ui.removeCallbacks(reloadTask);
+        if (historyRecovery != null) historyRecovery.close();
         if (node != null) node.onDestroy();
         if (notifyReceiver != null) {
             try { DirectNodeEvents.unsubscribe(notifyReceiver); } catch (Exception ignored) {}
@@ -293,6 +296,7 @@ public class MainActivity extends AppCompatActivity {
                     Language.setText(blockNo, "#" + chainBlock);
                     // History self-fetches (bounded) only when it's the visible tab.
                     views[TAB_HISTORY].onNewBlock();
+                    if (historyRecovery != null) historyRecovery.poll(chainBlock);
                 }
             }
             @Override public void onError(String message) { handleErr(message); }

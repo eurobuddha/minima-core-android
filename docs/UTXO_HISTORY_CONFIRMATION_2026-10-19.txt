@@ -1,0 +1,67 @@
+UTXO history confirmation review — 2026-10-19
+Pandamonium 1.9.120/code191; standalone UTXO Wallet 0.4.36/code436.
+This is a reviewed source checkpoint, not full-app or 2.0.0 release approval.
+
+Confirmed problems
+MAJOR: HistoryDb.resolve confirmed an attempt with only one overlapping input and
+one matching destination, without amounts, multiplicity or chain inclusion. It
+could also mark an unknown attempt failed based on another transaction's overlap.
+MAJOR: token coin detail used raw MINIMA units even when tokenamount was present.
+
+Reuse and changes
+Inspected complete UTXO HistoryDb/Row/View, NodeTx, TxnBuilder, NodeApi and relevant
+MainActivity lifecycle/callers, standalone equivalents, NFT TransactionEvidence
+and its tests, NFT LocalHistory, and core history/txpow command implementation.
+Reuse NFT economic matching, strict envelope/identifier parsing, atomic status
+updates and minimum three-block inclusion checks. Legacy UTXO rows lack the full
+NFT journal, so the adapter checks their saved coin IDs, human amounts, token,
+all destinations, output multiplicity, scaling and native burn. Existing valid
+TxPoW identifiers constrain matches; ambiguous duplicates remain unresolved.
+
+HistoryRecovery issues only bounded history/txpow reads. It rechecks the current
+saved row before atomically saving its confirmed display record. Fresh node
+history supplies token deltas; inclusion supplies actual confirmation height.
+Close suppresses late callbacks. Existing cache entries cannot authorize success;
+late write callbacks cannot downgrade a verified row. A pending-only query avoids
+newer error rows hiding older unresolved attempts. Each tick reads up to four
+pages, with adaptive page shrinking. Unreadable entries remain unresolved and
+are retried on later complete scans.
+
+Database v7 preserves both v6 tables. Previously inferred confirmations/failures
+are reopened for validation; real preparation errors are retained. The saved WIP
+would have discarded cached history and could claim one receipt for multiple
+attempts; both issues were corrected before adoption. Fresh token breakdowns use
+human token units. Cached UI rows are invalidated after verified recovery.
+
+Validation and review
+37 integrated tests and28 standalone tests in EACH debug/release variant passed
+(93 executions; no failures, errors or skipped tests). Includes partial/duplicate
+receipts, scaling/amount mutations, known TxPoW identity, complete inclusion,
+real SQLite migration/restart/rollback, late callbacks, ambiguous claims, changed
+attempts,501 newer error rows, oversized responses and bounded paging.
+Pandamonium and standalone release lint: zero errors;358 and105 existing warnings.
+The original NFT TransactionEvidence suite also passes13 tests.
+Both signed release builds passed.23 pinned imports/provenance,6924 messages in
+four languages, direct transport check, ZIP integrity and version metadata pass.
+Actual host APK Keets verifier confirms exact bundle,21 addons and Bare runtime.
+Family signing certificate SHA256:
+eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+
+All changed sources, adapter, tests and callers reviewed. Verdict: approve this
+history-confirmation repair. No signing, transfers, seeds or counters used for
+testing. No APK installed or published for this checkpoint.
+
+Remaining full-review work
+This does not finish the UTXO prepared-send journal/strict submission receipts,
+consolidation or distribution review. Old rows without complete inputs/outputs,
+ambiguous attempts and evidence outside node retention remain unresolved. Downloaded
+node-history display cache is not itself proof of confirmation; its general
+presentation/reorg handling still requires review. Historical cached token amounts
+are retained until fresh verified evidence is available, rather than deleting
+user history. Broad standalone parity and final2.0.0/Fold/publication gates remain.
+
+Artifacts
+/Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-1.9.120-candidate.apk
+SHA256 e18908d4a809c55e64046bafab34a3ed436399ebac3cdc1df2eb99bbe0c7ea38
+/Users/eurobuddha/Projects/minima/apks/utxo/dist/utxo-wallet-0.4.36-candidate.apk
+SHA256 5dae8339fb123bab645f211e57f68667fda625d09977b4a89f4c85564fdf720e
