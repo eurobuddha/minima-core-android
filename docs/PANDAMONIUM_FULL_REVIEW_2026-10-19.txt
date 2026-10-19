@@ -272,3 +272,17 @@ Standalone0.11.37 ports retry/request ownership and the existing complete balanc
 parser. It retains its old storage/hydration path; full claim/hosting parity remains
 open. No mint, transfer, server upload, installation or publication performed.
 Verdict: approve this bounded retry repair. Full2.0.0 review is still in progress.
+
+UTXO unknown-outcome repair — 1.9.111 / code 182
+Coin-refresh reconciliation previously treated old, still-live inputs as proof
+that a timed-out send had failed. Removed that inference and the missing-input
+spent explanation. Reuses NFT Wallet's rule that unresolved sends require actual
+transaction evidence, not elapsed time or coin-list presence/absence. Existing
+entrypoint/caller and persisted records retained; no schema change.
+Reviewed complete HistoryDb/HistoryRow, callers, source adapter and regression tests.
+Real disposable SQLite fixtures cover live/missing/partial snapshots and restart.
+Integrated UTXO 15 tests and standalone UTXO 6 tests pass. Host release lint,
+22 importer snapshots/provenance, four-language catalog and transport checks pass.
+Standalone 0.4.35 signed candidate verified. No install/publication/live transfer.
+Verdict: approve this bounded repair. Full receipt matching, prepared journal and
+distribution recovery remain open in both variants; full 2.0.0 review continues.

@@ -9,6 +9,7 @@ android {
         buildConfigField 'int', 'VERSION_CODE', '433'
     }
     buildFeatures { buildConfig true }
+    testOptions { unitTests.includeAndroidResources = true; unitTests.returnDefaultValues = true }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -24,6 +25,7 @@ dependencies {
     implementation 'com.google.zxing:core:3.5.3'
     implementation 'com.caverock:androidsvg-aar:1.4'
     implementation project(':minimaapi')
+    testImplementation 'org.robolectric:robolectric:4.14.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20240303'
 }

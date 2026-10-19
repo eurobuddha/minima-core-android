@@ -98,3 +98,9 @@ serialized identity balance parser;27 tests, lint0 errors107 warnings. Signed AP
 retained in _artifacts. Matching host1.9.110 passes385 integrated Salon tests.
 Full claim lifecycle, atomic identity persistence and hosted restore ports remain
 open; standalone still uses its existing storage/hydration entrypoint.
+
+UTXO 0.4.35/code435 ports the unknown-outcome repair shared with host1.9.111.
+Live/missing/partial coin snapshots and elapsed time never mark an uncertain send
+failed. Standalone6 tests, integrated15, lint0 errors105 warnings. Signed candidate
+verified in dist; no install/publication. Full receipt/distribution parity open.
+Salon0.11.37 checkpoint bf4f453 and host1.9.110 703b56c are pushed.

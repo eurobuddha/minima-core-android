@@ -233,30 +233,12 @@ public class HistoryDb extends SQLiteOpenHelper {
     }
 
     /**
-     * Rows left UNKNOWN (the node didn't answer txnsign in time) are settled by the live coin set:
-     * inputs gone → SOMETHING spent them; the row stays "posted?" with a note and the resolver decides
-     * (same txpow → confirmed, different txpow → error) — never promoted to POSTED on inputs alone;
-     * inputs all still unspent after {@code staleMs} → it never posted (ERROR). Returns true on change.
+     * Compatibility entrypoint for coin refreshes. A coin list (including a partial one)
+     * cannot prove whether a timed-out transaction was submitted. Preserve its recorded
+     * outcome across elapsed time and restarts; settlement requires transaction evidence.
      */
     public boolean reconcileUnknown(java.util.Set<String> liveCoinIds, long staleMs) {
-        boolean any = false;
-        long now = System.currentTimeMillis();
-        for (HistoryRow r : listOpen(500)) {
-            if (!STATUS_UNKNOWN.equals(r.status)) continue;
-            java.util.Set<String> mine = coinIds(r.inputs, "coinid");
-            if (mine.isEmpty()) continue;
-            boolean anyLive = false, allLive = true;
-            for (String id : mine) { if (liveCoinIds.contains(id)) anyLive = true; else allLive = false; }
-            if (!anyLive) {
-                if (!"inputs spent — matching on-chain…".equals(r.note)) {
-                    update(r.internalid, STATUS_UNKNOWN, null, "inputs spent — matching on-chain…"); any = true;
-                }
-            }
-            else if (allLive && now - r.ts > staleMs) {
-                update(r.internalid, STATUS_ERROR, null, "The node didn't answer in time and the coins are still unspent — not posted."); any = true;
-            }
-        }
-        return any;
+        return false;
     }
 
     /** The values of {@code key} across a JSON array of coin objects (empty on null/garbage). */
