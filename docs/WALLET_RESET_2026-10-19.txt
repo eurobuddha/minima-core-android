@@ -60,3 +60,21 @@ integrated seed or Sweep. User authorized reset feature only for integrated wall
 Core node reset excluded. User-confirmed standalone reset works.
 See WALLET_RESET_2026-10-19.txt and WALLET_REFRESH_UNLOCK_2026-10-19.txt.
 Physical checks pending; full review/parity remains IN PROGRESS.
+
+Physical unlock and user handoff — latest2026-10-19
+User reported "opened fast" on installed2.0.20. Duration-only logcat confirms
+15:41:21 unlock_ms=96 and prepare_ms=2 on the actual funded integrated wallet.
+This closes the repeated-unlock timing check for this opening. Earlier isolated
+fixture had62/64ms cached opens and12162ms first64-key derivation.
+Core wallet entry was observed with current displayed balance; no tab-switch was
+needed after returning to its page. Continuous foreground/resume timing was not
+fully measured on-device because user resumed trading. Automated real-view tests
+cover missed-event refresh, failure retry, hidden late replies and host resume.
+Integrated reset prompt/cancel on-device remains untested; actual dialogs in all
+four languages and disposable-vault deletion tests pass. No installed integrated
+seed was reset, no agent signing/Sweep/broadcast/pending-counter mutation.
+User: "I'm just doing a couple of trades in Pandadex to test, and then I'll do
+the sweep." Phone control belongs entirely to user; stop ADB UI interactions.
+Real Sweep success remains unverified until the user reports their result.
+Code commits7d53a66 and6c7b0be pushed; installed2.0.20/code215,419tests pass.
+Full application review and broader standalone parity remain IN PROGRESS.
