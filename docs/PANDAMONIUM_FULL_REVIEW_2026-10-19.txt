@@ -197,3 +197,23 @@ signed release build pending. No live transactions or phone installation perform
 The pinned-source ETH Wallet/Future Cash paths now use detached worktrees at their
 recorded source revisions. This preserves reproducible integration verification as
 the upstream standalone working copies advance. No source lock was silently moved.
+
+Standalone propagation checkpoint (see STANDALONE_PARITY_2026-10-19.txt)
+Eight standalone repositories now have pushed repair checkpoints and signed local
+candidates: ETH Wallet, Future Cash Next, Vestr, UTXO, NFT Wallet, Terminal IDE,
+MiniMall Studio and Salon. This is partial parity, not release approval. Each repo
+has docs/PANDAMONIUM_PARITY_2026-10-19.txt listing exact scope, tests and artifacts.
+No APK was installed or published. Source updates preserve the pinned importer
+through detached worktrees at the recorded lock revisions. Other agents' graph,
+debug and source work has been preserved.
+
+Studio Android compatibility repair — 1.9.106 / code177
+Standalone lint exposed BigInteger.intValueExact requiring API31 while both host
+and companion support API28. Reused Future Cash AuditRunner's BigDecimal exact
+conversion for collection indices, metadata supply and export counts. Canonical
+sources, adapter and generated integration updated together. Integer bounds and
+fractional rejection unchanged. Full integrated Studio suite:25 tests, no failures,
+errors or skipped tests. All22 importer snapshots/provenance verify. Standalone
+Studio refresh passed18 tests with0 lint errors; export checkpoint in progress.
+Changed files reviewed: only exact conversion compatibility and version metadata.
+No open issue in this repair. Full application review and final2.0.0 remain pending.

@@ -1,0 +1,53 @@
+Pandamonium -> standalone APK propagation ledger
+STATUS: IN PROGRESS. Neither complete parity nor final publication approval.
+User requested all applicable integrated bug repairs, including earlier user fixes.
+Scope is behavior and presentation; keep standalone IPC/storage/package identities.
+Final2.0.0 publication awaits the Fold. No other phone may be touched.
+
+Pushed standalone checkpoints; signed candidates retained locally
+ETH Wallet0.2.8 f16ab10 (docs10b7ecd): contract identity, account/RPC review context,
+  delayed/duplicate node key responses and strict key validation.22 tests.
+Future Cash Next0.1.9 ee080af: dual-family/partial audit, risk retention/cache clock.
+ 49 tests. Remaining transaction evidence comparison open.
+Vestr0.4.7 087f02e: state/command validation.4 tests. Other receipt comparison open.
+UTXO0.4.34 d9bd0bf: structured token metadata and compact coin labels.3 tests.
+  Receipt/history/distribution safety review remains open in both forms.
+NFT Wallet0.1.14 478f11a: metadata, compact labels and non-resizing tab arrows.
+ 64 tests. Prepared send, history, mint, burial and distribution parity pending.
+Terminal IDE0.3.3 fec4b7d: bounded background output/log loading, full export,
+  lifecycle guards and command admission.14 tests. Other feature comparison open.
+MiniMall Studio0.3.6 d2b0bf3 (display2161a4f): metadata, refresh/edit ownership,
+  complete snapshot validation.18 tests.0.3.7 export port in progress.
+Salon0.11.35 e644d79: password/PAT/JWT visibility preserving selection and ciphertext.
+ 10 tests. Hosting secrets, identity, restore, media and publishing parity pending.
+
+Candidates: apks/<repo>/dist/<app>-<version>-candidate.apk with SHA256 sidecar.
+Salon repository requires _artifacts/salon-0.11.35.apk; retained there instead.
+Actual APK package, versionCode/versionName and family signing certificate checked.
+Certificate SHA256:
+eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Per-app checkpoint docs record lint warning counts and limitations.
+
+Remaining source comparisons/ports (none claimed complete)
+AtomiX: context, input/evidence and recovery repairs; shared ETH nonce issue open.
+PandaPools/PandaDEX: transaction/evidence and UI repairs; no live fund tests.
+Atelier: hosting, image/viewer, asynchronous create/export/delivery/mint repairs.
+MiniMall/Inbox: checkout/order/payment, durable delivery/storage, draft ownership.
+minimaWallet: audit, startup, settings, signing workers and retry repairs. Preserve
+  the four newer standalone commits throughd1cdcf4 before applying any port.
+KeyUses: viewport/status and dual-family audit comparison. No public phrase entry.
+Casino, Block Explorer, Filez, History, Entropy and Mail: complete behavioral/UI diff
+  review needed to identify applicable repairs embedded in language adapters.
+Host-only app lock, embedded transport and navigation need applicability review;
+  never replace a standalone IPC connector with host-only DirectNodeApi imports.
+
+Reproducibility
+Touched source staging links converted to detached git worktrees at exact
+integrated/sources.lock.json revisions: ethwallet, futurecash-next, vestr, utxo,
+NFTwallet, merchstudio, terminalide, salon. wallet was already detached.
+No source lock revision was silently advanced. Full importer verification passes
+at the1.9.106 checkpoint. Remaining links must be detached before upstream edits.
+
+Main review findings still open include cross-module ETH nonce allocation and
+UTXO receipt/history/distribution evidence. Full feature review not yet complete.
+Do not rename a partial candidate2.0.0 or publish based only on passing unit tests.

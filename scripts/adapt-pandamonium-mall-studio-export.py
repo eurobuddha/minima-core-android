@@ -56,7 +56,7 @@ def adapt(root):
         for (Object v : vals) {
             if (v == null || v == JSONObject.NULL || String.valueOf(v).trim().isEmpty()) continue;
             try {
-                int count = new java.math.BigDecimal(String.valueOf(v).trim()).toBigIntegerExact().intValueExact();
+                int count = new java.math.BigDecimal(String.valueOf(v).trim()).intValueExact();
                 return count > 0 ? count : 0;
             } catch (IllegalArgumentException | ArithmeticException invalid) { return 0; }
         }

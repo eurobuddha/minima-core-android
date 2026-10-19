@@ -2,7 +2,6 @@ package com.eurobuddha.merchstudio;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.TreeMap;
 /** Validate a complete node snapshot before mutating the editable catalog.
@@ -86,7 +85,7 @@ final class StudioData {
         String value=StateNft.stamped(coin);
         if(value==null||!value.matches("[0-9]+"))return -1;
         try {
-            int index=new BigInteger(value).intValueExact();
+            int index=new BigDecimal(value).intValueExact();
             return index>0 && (collectionSize<=0||index<=collectionSize) ? index : -1;
         } catch(ArithmeticException outsideRange){return -1;}
     }

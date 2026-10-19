@@ -45,7 +45,7 @@ final class ShopExport {
 
     /** miniMall's v3 reader and quantity controls use positive signed 32-bit counts. */
     static int count(BigInteger value) {
-        int n=value.intValueExact();
+        int n=new java.math.BigDecimal(value).intValueExact();
         if (n<=0) throw new ArithmeticException("Non-positive shop count");
         return n;
     }
