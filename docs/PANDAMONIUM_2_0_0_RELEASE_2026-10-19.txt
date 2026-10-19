@@ -61,14 +61,17 @@ IDE Logs remained responsive; original core Terminal opened from the menu below
 Logs, without executing any command. Core online at block2374319 with eight
 connections. Chat history/contacts loaded and Keets peer bridging observed.
 Same process21279 survived all final navigation checks; crash buffer empty.
-Fresh outbound delivery and minimaWallet biometric content checks requested from
-the user; no agent-originated message or transaction was sent. Publication pending.
+User replied "done" to the request to test Keets two-tick delivery and open/unlock
+minimaWallet. Record this as user-completed manual checks, not agent-observed
+receipt or wallet contents. No agent-originated message or transaction was sent.
+Publication in progress.
 
 Open work / limits
 This is not completion of the full feature-by-feature review. Live mainnet
 transactions and end-to-end swap execution were intentionally not tested.
-Fresh outbound Keets delivery and protected minimaWallet contents need user
-participation. Complete manual four-language coverage, broader history/reorg
+The user completed the requested Keets/minimaWallet manual checks; their detailed
+receipts/contents were not independently inspected. Complete manual four-language
+coverage, broader history/reorg
 presentation, UTXO draft/confirmation review and deeper integrated feature tests
 remain open. Standalone MDS/APK parity is deferred; consult STANDALONE_PARITY and
 PANDAMONIUM_FULL_REVIEW ledgers, preserving their prior evidence and pending work.
