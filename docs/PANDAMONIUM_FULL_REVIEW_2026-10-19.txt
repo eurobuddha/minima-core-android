@@ -509,4 +509,5 @@ tests; signed offline build and pinned import verification passed. See
 PANDAMONIUM_2_0_0_RELEASE_2026-10-19.txt for scoped review, Fold evidence and limits.
 Full review remains open. Final Fold startup, node, AtomiX, Shop, NFT navigation
 and both terminals now checked. User reports the requested messaging and
-minimaWallet checks done; publication in progress.
+minimaWallet checks done. Release published to GitHub, PandaApps and eurobuddha.com;
+public IPFS APK download hash also verified. Full review and parity remain open.

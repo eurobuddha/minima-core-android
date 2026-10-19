@@ -64,7 +64,7 @@ Same process21279 survived all final navigation checks; crash buffer empty.
 User replied "done" to the request to test Keets two-tick delivery and open/unlock
 minimaWallet. Record this as user-completed manual checks, not agent-observed
 receipt or wallet contents. No agent-originated message or transaction was sent.
-Publication in progress.
+Publication completed; verification is recorded below.
 
 Open work / limits
 This is not completion of the full feature-by-feature review. Live mainnet
@@ -75,3 +75,23 @@ coverage, broader history/reorg
 presentation, UTXO draft/confirmation review and deeper integrated feature tests
 remain open. Standalone MDS/APK parity is deferred; consult STANDALONE_PARITY and
 PANDAMONIUM_FULL_REVIEW ledgers, preserving their prior evidence and pending work.
+
+Publication completed
+GitHub: https://github.com/eurobuddha/minima-core-android/releases/tag/v2.0.0-Pandamonium
+Tag targets 2dd1486143fc8e3f9dfb1cd614a7248ce8ceae3e; public release, not prerelease.
+GitHub asset digest equals the locally signed and installed Fold APK digest.
+PandaApps/minimaCore App Store catalog commit:
+6d20fc382c95e0d0c89b8c76dc2a21517a786973 (eurobuddha/minima-core-apks main).
+Required full validator and pre-push gate: 53 entries, 52 binaries verified.
+Concurrent Minima AI Skill 1.1.0 update retained; only Pandamonium row changed.
+Public main catalog and https://eurobuddha.com/apks.json verified code195/hash.
+Website catalog replaced atomically from the immutable catalog commit with an
+existing-catalog backup, SHA-256 check and downgrade checks.
+Existing IPFS publisher completed using that same immutable catalog URL.
+Snapshot: bafybeicauxmy3mhvmh275mtp3hfvhc6wjp532e4i2xjsck4hufoa4lbt5u
+Public https://ipfs.eurobuddha.com/apks/apks.json verified code195/hash.
+Fresh full download of https://ipfs.eurobuddha.com/apks/minima-core-Pandamonium-2.0.0.apk
+verified 137052345 bytes and the exact release SHA-256 recorded above.
+Optional Filebase redundancy could not read its pin list; local pin, IPNS publish
+and public mirror succeeded. Historical pins/artifacts were preserved.
+No Apple App Store or Google Play publication was performed.
