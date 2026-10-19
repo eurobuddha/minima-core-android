@@ -545,3 +545,10 @@ Missing/malformed replies remain unverified; the display does not mutate journal
 reservations, balances or signing. Settlement still requires at least3 confirmations.
 Full review remains open: other apps' cached status, retention/caps, legacy data,
 remaining app feature paths and standalone parity. No demo APK replacement.
+
+Keets unnamed contacts — 2.0.5 checkpoint
+User-reported placeholder names did not adopt a later incoming sender name.
+Reused Parlons storeKeetsContact rule; added conditional DB update, recovery from
+saved incoming messages and list/title refresh behavior. See
+KEETS_CONTACT_NAME_2026-10-19.txt for evidence and protocol limits. This is a local
+candidate; public/device2.0.0 remains unchanged. Full review remains open.

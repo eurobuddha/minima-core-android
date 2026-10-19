@@ -24,7 +24,7 @@ public class ChatDb extends SQLiteOpenHelper {
     }
 
     private ChatDb(Context zContext) {
-        super(zContext, "keetchat.db", null, 2);
+        super(zContext, "keetchat.db", null, 3);
     }
 
     @Override
@@ -54,6 +54,14 @@ public class ChatDb extends SQLiteOpenHelper {
             for (String c : new String[]{"payaddr TEXT DEFAULT ''", "lastreceipt TEXT DEFAULT ''"}) {
                 try { db.execSQL("ALTER TABLE contacts ADD COLUMN " + c); } catch (Exception e) {}
             }
+        }
+        if (oldV < 3) {
+            // Repair unnamed contacts using names already received from that peer.
+            // Outgoing names belong to us. Never overwrite a user-named contact.
+            db.execSQL("UPDATE contacts SET name=COALESCE((SELECT trim(m.name) FROM messages m " +
+                    "WHERE m.pubkey=contacts.pubkey AND m.incoming=1 AND trim(m.name)<>'' " +
+                    "AND lower(trim(m.name))<>lower(contacts.pubkey) ORDER BY m.rowid DESC LIMIT 1),name) " +
+                    "WHERE trim(name)='' OR lower(trim(name))=lower(pubkey)");
         }
     }
 
@@ -156,13 +164,26 @@ public class ChatDb extends SQLiteOpenHelper {
         return n;
     }
 
-    /** Create the contact if unknown; sender's self-declared name, else the FULL pubkey. */
+    /** Reuse MaximaNode.storeKeetsContact: a received name can fill only an unnamed contact. */
     public void ensureContact(String zPubkey, String zSenderName) {
+        String name = zSenderName == null ? "" : zSenderName.trim();
         ContentValues v = new ContentValues();
         v.put("pubkey", zPubkey);
-        v.put("name", (zSenderName == null || zSenderName.equals("")) ? zPubkey : zSenderName);
+        v.put("name", name.isEmpty() ? zPubkey : name);
         v.put("added", System.currentTimeMillis());
-        getWritableDatabase().insertWithOnConflict("contacts", null, v, SQLiteDatabase.CONFLICT_IGNORE);
+        SQLiteDatabase db = getWritableDatabase();
+        db.insertWithOnConflict("contacts", null, v, SQLiteDatabase.CONFLICT_IGNORE);
+        if (!unnamedContact(zPubkey, name)) {
+            ContentValues renamed = new ContentValues();
+            renamed.put("name", name);
+            // Conditional SQL also preserves a local rename racing this inbox callback.
+            db.update("contacts", renamed, "pubkey=? AND (trim(name)='' OR lower(trim(name))=lower(?))",
+                    new String[]{zPubkey, zPubkey});
+        }
+    }
+
+    static boolean unnamedContact(String pubkey, String name) {
+        return name == null || name.trim().isEmpty() || name.trim().equalsIgnoreCase(pubkey);
     }
 
     public void putContact(String zPubkey, String zName) {

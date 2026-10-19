@@ -73,6 +73,8 @@ public class ChatThreadActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private ActivityResultLauncher<String> mPickImage;
     private final Runnable mOnNewMessage = () -> runOnUiThread(() -> {
+        if (isFinishing() || isDestroyed()) return;
+        refreshTitle();
         ChatDb.get(this).markThreadRead(mPubkey);
         sendReadReceipt();
         mAdapter.reload();
@@ -136,7 +138,7 @@ public class ChatThreadActivity extends AppCompatActivity {
 
     private void refreshTitle() {
         String name = ChatDb.get(this).contactName(mPubkey);
-        CharSequence title = name.startsWith("0x") ? Language.msg(l10n_chat_new_contact) : name;
+        CharSequence title = ChatDb.unnamedContact(mPubkey, name) ? Language.msg(l10n_chat_new_contact) : name;
         getSupportActionBar().setTitle(title);
         Language.toolbarTitle(mToolbar, title);
     }
@@ -154,7 +156,7 @@ public class ChatThreadActivity extends AppCompatActivity {
         if (id == R.id.chatmenu_rename) {
             EditText input = new EditText(this);
             String cur = ChatDb.get(this).contactName(mPubkey);
-            input.setText(cur.startsWith("0x") ? "" : cur);
+            input.setText(ChatDb.unnamedContact(mPubkey, cur) ? "" : cur);
             dialog()
                     .setTitle(Language.msg(l10n_chat_contact_name))
                     .setView(input)
@@ -215,6 +217,7 @@ public class ChatThreadActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (mPubkey == null || mAdapter == null) return;
+        refreshTitle();
         ChatDb.get(this).markThreadRead(mPubkey);
         sendReadReceipt();
         mAdapter.reload();

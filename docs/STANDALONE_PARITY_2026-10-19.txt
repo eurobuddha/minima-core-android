@@ -244,3 +244,11 @@ HistoryStatusViewTest to standalone UTXO/NFT. Preserve existing standalone trans
 native dialogs and economic records. Reuse strict observed inclusion but retain
 three-block settlement gate; no cached reorg result may reopen a journal attempt.
 See WALLET_HISTORY_STATUS_2026-10-19.txt for paths, checks and explicit limits.
+
+Keets contact names — 2.0.5 checkpoint
+Native ChatDb/ChatView/ChatThreadActivity changes are shared by all three bear
+flavors. Only Pandamonium candidate built here. Standalone MDS KeetChat
+/Users/eurobuddha/Projects/minima/mds/keetchat/service.js has insert-only
+ensureContact and needs equivalent placeholder adoption and saved-name recovery.
+Parlons MaximaNode.storeKeetsContact already supplies the proven adoption rule.
+Defer standalone MDS parity until after the demo. See KEETS_CONTACT_NAME_2026-10-19.txt.

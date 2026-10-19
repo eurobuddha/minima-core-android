@@ -1,0 +1,69 @@
+Keets unnamed contact repair — 2026-10-19
+Scope: shared native bear chat. Pandamonium2.0.5/code200 local candidate.
+Public/device demo release remains2.0.0.
+
+Problem
+An incoming message created a contact with its public key as the name when the
+sender had not chosen a display name. ChatDb.ensureContact used INSERT OR IGNORE
+on every later message, so a subsequently received name was never adopted.
+The list refreshed but kept reading the old placeholder. The conversation title
+also needed refreshing on inbox notifications and when returning to the activity.
+
+Reuse
+Read app/src/main/java/com/eurobuddha/minimacore/chat/{ChatDb,ChatDrainer,
+ChatSchema,ChatView,ChatThreadActivity,ChatUi}.java and their callers.
+Reused maxima-core/src/main/java/com/eurobuddha/maxima/core/MaximaNode.java
+storeKeetsContact's established rule: received names fill unnamed contacts only.
+Read its ChatEngine onKeetsInbound caller and the standalone implementation at
+/Users/eurobuddha/Projects/minima/mds/keetchat/service.js and chatschema.js.
+The standalone MDS ensureContact has the same insert-only limitation; its port is
+recorded for after the demo. No new protocol or dependency is needed for this fix.
+
+Repair
+Conditional SQLite updates fill blank/public-key placeholders while preserving
+custom and established names, payment addresses, receipt markers and history.
+Database version3 recovers placeholders from the latest valid incoming name
+already stored for the same peer. Outgoing messages never supply peer names.
+The migration updates existing contacts only and does not create orphan contacts.
+The conversation title refreshes on inbox notification and resume. Keets names
+such as 0xAlice are no longer confused with the peer's full hexadecimal identity.
+Parlons-specific contact display handling is retained.
+
+Protocol limit
+Saving a local display name currently writes preferences only. A subsequent
+normal outgoing message carries that name. This repair adopts the name when
+received; it does not introduce an immediate broadcast of profile edits. Already
+named contacts retain their name, matching the existing Parlons rule and preserving
+manual aliases. Profile broadcasts and tracking remote names separately from
+local aliases would be a separate feature.
+
+Code review
+Summary: bounded placeholder repair, reusing existing contact behavior with an
+upgrade path for already stored messages. No transport, acknowledgement, signing,
+seed or transaction changes.
+Findings: the first patch omitted title refresh on resume; fixed before commit.
+No remaining blocking findings in this change. Verdict: APPROVE.
+Full Pandamonium review remains incomplete. Separate chat review items include
+message-ID scoping across peers, atomic contact/message persistence, and bounds
+and application validation of decoded incoming content.
+
+Validation
+Seven initial real SQLite regressions reproduced three failures against the
+original implementation. Tests cover later name adoption, saved-name recovery,
+custom names, blank names, incoming/outgoing attribution, payment/receipt/history
+preservation, reopening and legacy upgrades. An eighth UI method test verifies
+that a legitimate hexadecimal-prefixed nickname appears in the contact list.
+Tests use disposable databases and mock UI only; no messages or transactions sent.
+Live peer-to-peer and Fold visual checks have not been performed for this repair.
+Final build, test count and signed APK verification are recorded below.
+
+Final verification
+180 host tests pass, including all8 contact-name regressions; no failures, errors
+or skips. Offline signed release build and lint pass;0 errors,362 warnings.
+Actual APK Keets bundle and21addons/runtime per ABI verified.
+Package com.eurobuddha.pandamonium,2.0.5-Pandamonium/code200 verified.
+APK v2 signature verifies with the existing RSA4096 family certificate.
+Path: /Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.5-candidate.apk
+SHA256 68ceae90e1e2469d683abe6fd7702e1d2ad0379be2bfc3f612d0b0a2610678fa
+Certificate SHA256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+No installation/publication or live transactions for this checkpoint.

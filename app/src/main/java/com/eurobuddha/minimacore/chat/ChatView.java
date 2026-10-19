@@ -69,7 +69,9 @@ public class ChatView extends BaseView {
     }
     private CharSequence displayName(ChatDb.Thread t) {
         if (t.name == null || t.name.isEmpty()) return Language.msg(l10n_chat_parlons_contact);
-        return t.name.startsWith("0x") ? Language.msg(l10n_chat_new_contact) : t.name;
+        boolean unnamed = com.eurobuddha.minimacore.maxchat.MaxChatThreads.isMax(t.pubkey)
+                ? t.name.startsWith("0x") : ChatDb.unnamedContact(t.pubkey, t.name);
+        return unnamed ? Language.msg(l10n_chat_new_contact) : t.name;
     }
     static CharSequence preview(ChatDb.Thread t) {
         if (com.eurobuddha.minimacore.maxchat.MaxChatThreads.isMax(t.pubkey)) {
