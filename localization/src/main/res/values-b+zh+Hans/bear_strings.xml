@@ -674,7 +674,7 @@
     <!-- Arguments: 0, 1, 2 -->
     <string name="l10n_wallet_error_key_exhausted">"密钥 %1$s 已用尽：已使用 %2$s / %3$s 次一次性签名"</string>
     <!-- Arguments: 0 -->
-    <string name="l10n_wallet_error_foreign_coin">"此币的地址不属于本钱包：%1$s"</string>
+    <string name="l10n_wallet_error_foreign_coin">"无法签署此输入币：此钱包不控制其来源地址：%1$s"</string>
     <!-- Arguments: 0 -->
     <string name="l10n_wallet_error_coin_parse">"无法解析币：%1$s"</string>
     <!-- Arguments: 0, 1 -->
@@ -8347,9 +8347,10 @@
     <!-- Arguments: number, total -->
     <string name="l10n_sweep_progress">"正在签名并广播交易 %1$s/%2$s…"</string>
     <string name="l10n_sweep_unknown" formatted="false">"结果未知；已保存签名交易。重试前请检查状态。"</string>
-    <string name="l10n_sweep_prepare_error" formatted="false">"无法准备此交易。本批次未尝试广播。"</string>
+    <!-- Arguments: reason -->
+    <string name="l10n_sweep_prepare_error">"钱包准备或签名失败：%1$s。本批次未发送至节点。"</string>
     <!-- Arguments: accepted, total -->
-    <string name="l10n_sweep_summary">"节点已接受 %1$s/%2$s 笔交易。"</string>
+    <string name="l10n_sweep_summary">"全部转移结果：%1$s/%2$s 笔交易已被接受用于广播。"</string>
     <string name="l10n_sweep_stopped" formatted="false">"已停止。剩余批次未签名或广播。"</string>
     <string name="l10n_sweep_confirming" formatted="false">"等待链上确认"</string>
     <string name="l10n_sweep_hide" formatted="false">"隐藏 — 可从转移页面再次检查"</string>
@@ -8375,7 +8376,7 @@
     <!-- Arguments: transactions, signatures -->
     <string name="l10n_sweep_signatures">"%1$s 笔交易，%2$s 次一次性签名。"</string>
     <!-- Arguments: key, used, maximum -->
-    <string name="l10n_sweep_key">"密钥 %1$s：下次签名 #%2$s，上限 %3$s"</string>
+    <string name="l10n_sweep_key">"发送钱包密钥 %1$s：下次签名 #%2$s，上限 %3$s"</string>
     <string name="l10n_sweep_warning" formatted="false">"交易逐笔发送，可在批次间停止。结果不明的交易保持待确认状态，不会自动重新签名。广播后转移不可撤销。 在广播前因过大而被拒绝的批次会自动拆分，并使用额外签名重试发送到同一地址。"</string>
     <string name="l10n_sweep_confirm" formatted="false">"确认转移 — 请仔细核对"</string>
     <string name="l10n_sweep_sign" formatted="false">"全部签名并广播"</string>
@@ -8389,7 +8390,7 @@
     <string name="l10n_sweep_coins" formatted="false">"币"</string>
     <string name="l10n_sweep_part" formatted="false">"部分"</string>
     <string name="l10n_sweep_pending_skip" formatted="false">"之前发送的交易正在等待确认"</string>
-    <string name="l10n_sweep_foreign_skip" formatted="false">"地址不属于此钱包"</string>
+    <string name="l10n_sweep_foreign_skip" formatted="false">"已跳过来源币：此钱包不持有其支出密钥"</string>
     <string name="l10n_sweep_locked_skip" formatted="false">"未盖章的锁定版本。请先在 NFT 钱包中盖章。"</string>
     <string name="l10n_sweep_large_item" formatted="false">"状态数据较大，节点可能拒绝此交易。"</string>
     <string name="l10n_sweep_native_state" formatted="false">"Minima（状态）"</string>
@@ -8404,4 +8405,6 @@
     <string name="l10n_sweep_confirm_destination" formatted="false">"确认目标地址…"</string>
     <string name="l10n_sweep_repeat_address" formatted="false">"再次输入完整的 Mx 地址"</string>
     <string name="l10n_sweep_address_check" formatted="false">"请与收款钱包核对完整地址，然后再次输入。地址格式和校验和有效，但这并不能验证谁控制该地址。此操作将转出全部可用余额，且无法撤销。"</string>
+    <!-- Arguments: reason -->
+    <string name="l10n_sweep_inputs_error">"无法准备钱包的输入币：%1$s。本批次未签名，也未发送至节点。"</string>
 </resources>

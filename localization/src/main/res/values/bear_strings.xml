@@ -685,7 +685,7 @@
     <!-- Arguments: 0, 1, 2 -->
     <string name="l10n_wallet_error_key_exhausted">"Key %1$s exhausted: %2$s / %3$s one-time signatures used"</string>
     <!-- Arguments: 0 -->
-    <string name="l10n_wallet_error_foreign_coin">"Coin address is not in our wallet: %1$s"</string>
+    <string name="l10n_wallet_error_foreign_coin">"Cannot sign this input coin: its source address is not controlled by this wallet: %1$s"</string>
     <!-- Arguments: 0 -->
     <string name="l10n_wallet_error_coin_parse">"Coin parse failed: %1$s"</string>
     <!-- Arguments: 0, 1 -->
@@ -8384,9 +8384,10 @@
     <!-- Arguments: number, total -->
     <string name="l10n_sweep_progress">"Signing and broadcasting transaction %1$s of %2$s…"</string>
     <string name="l10n_sweep_unknown" formatted="false">"Outcome unknown; the signed transaction is saved. Check its status before retrying."</string>
-    <string name="l10n_sweep_prepare_error" formatted="false">"Could not prepare this transaction. No broadcast was attempted for this batch."</string>
+    <!-- Arguments: reason -->
+    <string name="l10n_sweep_prepare_error">"Wallet preparation/signing failed: %1$s. This batch was not sent to the node."</string>
     <!-- Arguments: accepted, total -->
-    <string name="l10n_sweep_summary">"Node accepted %1$s of %2$s transactions."</string>
+    <string name="l10n_sweep_summary">"Sweep result: %1$s of %2$s transactions accepted for broadcast."</string>
     <string name="l10n_sweep_stopped" formatted="false">"Stopped. Remaining batches were not signed or broadcast."</string>
     <string name="l10n_sweep_confirming" formatted="false">"Confirming on-chain"</string>
     <string name="l10n_sweep_hide" formatted="false">"Hide — check again from Sweep"</string>
@@ -8412,7 +8413,7 @@
     <!-- Arguments: transactions, signatures -->
     <string name="l10n_sweep_signatures">"%1$s transactions, %2$s one-time signatures."</string>
     <!-- Arguments: key, used, maximum -->
-    <string name="l10n_sweep_key">"Key %1$s: next signature #%2$s of %3$s"</string>
+    <string name="l10n_sweep_key">"Source wallet key %1$s: next signature #%2$s of %3$s"</string>
     <string name="l10n_sweep_warning" formatted="false">"Transactions are sent one by one. You can stop between batches. Uncertain transactions remain pending and are not automatically signed again. Transfers are irreversible once broadcast. Batches rejected as too large before broadcast are automatically split and retried to the same destination, using additional signatures."</string>
     <string name="l10n_sweep_confirm" formatted="false">"Confirm sweep — review carefully"</string>
     <string name="l10n_sweep_sign" formatted="false">"Sign &amp; broadcast all"</string>
@@ -8426,7 +8427,7 @@
     <string name="l10n_sweep_coins" formatted="false">"coins"</string>
     <string name="l10n_sweep_part" formatted="false">"part"</string>
     <string name="l10n_sweep_pending_skip" formatted="false">"Already confirming from an earlier send"</string>
-    <string name="l10n_sweep_foreign_skip" formatted="false">"Address is not in this wallet"</string>
+    <string name="l10n_sweep_foreign_skip" formatted="false">"Skipped source coin: this wallet does not control its spending key"</string>
     <string name="l10n_sweep_locked_skip" formatted="false">"Unstamped locked edition. Stamp it in NFT Wallet first."</string>
     <string name="l10n_sweep_large_item" formatted="false">"Large state item; the node may reject its transaction."</string>
     <string name="l10n_sweep_native_state" formatted="false">"Minima (state)"</string>
@@ -8441,4 +8442,6 @@
     <string name="l10n_sweep_confirm_destination" formatted="false">"Confirm destination…"</string>
     <string name="l10n_sweep_repeat_address" formatted="false">"Enter the full Mx address again"</string>
     <string name="l10n_sweep_address_check" formatted="false">"Compare this full address with the receiving wallet, then enter it again. The format and checksum are valid; this does not verify who controls the address. This will send your entire available balance and cannot be undone."</string>
+    <!-- Arguments: reason -->
+    <string name="l10n_sweep_inputs_error">"Could not prepare the wallet’s input coins: %1$s. This batch was not signed or sent to the node."</string>
 </resources>

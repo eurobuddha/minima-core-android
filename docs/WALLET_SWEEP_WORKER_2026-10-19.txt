@@ -1,0 +1,68 @@
+Sweep worker correction — Pandamonium2.0.17/code212 —2026-10-19
+
+User report and evidence
+After taking manual control and executing Sweep on2.0.16, the user reported failure
+and misleading attribution to the node. Read-only Fold screenshot hierarchy saved at
+build/localization/fold-sweep-2.0.16/sweep-user-failure.xml showed:
+  Node accepted0 of1 transactions.
+  Minima: Could not prepare this transaction. No broadcast was attempted for this batch.
+No agent retry, signing, posting, seed/counter modification or pending-data deletion.
+A later UI read stopped at the app boundary when the user switched apps.
+
+Cause
+SweepFlow.current() wraps MainActivity.sessionAuthorization(), whose idle-UI policy
+requires !mSession.work().busy(). Sweep called current() from INSIDE runSigningWork's
+worker lambda. WalletWork deliberately holds busy=true during that operation, so
+Sweep threw before TxnFactory.buildSend/buildWholeTransfer. The error callback then
+replaced the actual exception with a generic preparation message. This fault belongs
+to the integrated adaptation; it is absent from standalone wallet's synchronous flow.
+It is not an invalid external destination and not a node transaction-building error.
+
+Reuse and minimal repair
+Read standalone wallet/app/src/main/java/com/eurobuddha/wallet/SweepFlow.java next/run
+and comms/NodeLink.java publish. Read the integrated MainActivity authenticated/signing
+worker, sessionAuthorization, resolveInputs and normal confirmSignAndPublish flow;
+WalletWork, SweepPlanner and existing Sweep/worker/message tests were inspected.
+Removed only the redundant idle-UI check inside the worker. Reused runSigningWork's
+existing captured-connection, vault-generation and signing gates, matching normal Send.
+Pre-scheduling and callback current() checks remain; counter snapshot, reservation,
+size recovery, pending transaction persistence and exact-byte replay are unchanged.
+Reused WalletMessages.error/message for meaningful local failure reasons. Input-coin
+resolution is now distinguished from local preparation/signing. The result heading
+states broadcast acceptance rather than suggesting the node builds the transaction.
+
+Source versus destination
+The source ownership lookup selects coins/keys that this wallet can spend. It is NOT
+a destination requirement. Destination key lookup only displays an own-wallet warning;
+no local key match is required to continue. Updated labels to explicitly say source
+coin/source wallet key. Mx/checksum validation and repeated-destination confirmation
+remain. The receiving address can be from another node/wallet with no local key entry.
+The user's exact additional wallet/key-check screen is not yet identified; an optional
+clarification was requested. Do not assume unrelated key-audit screens were corrected.
+
+Regression evidence
+New SweepWorkerTest reuses WalletAuthenticatedWorkTest's REAL Activity dispatcher and
+controlled queues with mocked vault, builder, store and transport. Before repair its
+ownBusyWorkerCanBuildThenReserveBeforePublishing fails: builder is never invoked;
+the stale connection/vault controls pass. After repair all5 tests pass, including
+build/reserve/publish ordering, revoked sessions and retained input/build error reasons.
+Earlier SweepFlow tests mocked the dispatcher and missed its real busy-state transition.
+A real-dialog regression proves an address absent from source-wallet keys proceeds
+through review to final confirmation; it cancels without signing.214 wallet and186
+host tests pass (400 total), zero failures/errors/skips. All6988 messages/4 languages,
+pinned importer regeneration and direct-node transport verification pass.
+No live transaction success has been claimed; the node and signing are mocked in tests.
+
+Code Review
+Summary: targeted repair of an integration self-rejection, retaining the established
+signing/session boundaries. Error reporting now identifies the local stage and reason.
+Findings: no blocking defect found in this change. Source ownership wording was vague
+and now explicitly labels inputs. Standalone does not contain the worker defect and
+needs no equivalent behavioral change; its last checkpoint remains0.2.27/6d3bfbe.
+Verdict: approve this correction; full review/parity remains IN PROGRESS.
+
+Signed candidate; not published
+/Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.17-candidate.apk
+SHA256 e9db14e4357f0476de3fb670b69b36f0fdff34e31f4bd712068ca433e363d5f3
+Certificate SHA256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Release build/lint pass: {'Warning': 1821}; no errors/fatals. APK ZIP and metadata verified.

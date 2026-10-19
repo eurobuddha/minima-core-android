@@ -303,7 +303,8 @@ public class SweepFlow {
                 if(!resolved.compareAndSet(false,true))return;
                 if(!current()){dialog.dismiss();return;}
                 act.runSigningWork(()->{
-                    if(!current())throw new IllegalStateException(t(l10n_wallet_session_changed));
+                    // runSigningWork validates the captured connection and vault on this worker.
+                    // current() is an idle-UI guard: it is false while our own job is busy.
                     java.util.Set<String> reserved=pending.coins();reserved.addAll(NftView.pendingCoinIds());
                     for(TxnFactory.InputCoin input:inputs)if(reserved.contains(input.getCoinID().to0xString().toLowerCase(java.util.Locale.ROOT)))throw new IllegalStateException(t(l10n_sweep_pending));
                     TxnFactory.BuiltTxn built;
@@ -352,9 +353,9 @@ public class SweepFlow {
                             failures.add(localLine(job.label)+": "+t(l10n_sweep_unknown));advance.run();
                         }
                     });
-                },error->{if(current()){failures.add(localLine(job.label)+": "+t(l10n_sweep_prepare_error));advance.run();}});
+                },error->{if(current()){failures.add(localLine(job.label)+": "+t(l10n_sweep_prepare_error,WalletMessages.error(error)));advance.run();}});
             }
-            public void onError(String error){if(resolved.compareAndSet(false,true)&&current()){failures.add(localLine(job.label)+": "+t(l10n_sweep_prepare_error));advance.run();}}
+            public void onError(String error){if(resolved.compareAndSet(false,true)&&current()){failures.add(localLine(job.label)+": "+t(l10n_sweep_inputs_error,WalletMessages.message(error)));advance.run();}}
         });
     }
 

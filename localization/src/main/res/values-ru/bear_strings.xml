@@ -707,7 +707,7 @@
     <!-- Arguments: 0, 1, 2 -->
     <string name="l10n_wallet_error_key_exhausted">"Ключ %1$s исчерпан: использовано %2$s из %3$s одноразовых подписей"</string>
     <!-- Arguments: 0 -->
-    <string name="l10n_wallet_error_foreign_coin">"Адрес монеты не принадлежит этому кошельку: %1$s"</string>
+    <string name="l10n_wallet_error_foreign_coin">"Невозможно подписать расходование входной монеты: кошелёк не контролирует её исходный адрес: %1$s"</string>
     <!-- Arguments: 0 -->
     <string name="l10n_wallet_error_coin_parse">"Не удалось разобрать монету: %1$s"</string>
     <!-- Arguments: 0, 1 -->
@@ -8458,9 +8458,10 @@
     <!-- Arguments: number, total -->
     <string name="l10n_sweep_progress">"Подпись и отправка транзакции %1$s из %2$s…"</string>
     <string name="l10n_sweep_unknown" formatted="false">"Результат неизвестен; подписанная транзакция сохранена. Проверьте статус перед повтором."</string>
-    <string name="l10n_sweep_prepare_error" formatted="false">"Не удалось подготовить транзакцию. Отправка этой группы не выполнялась."</string>
+    <!-- Arguments: reason -->
+    <string name="l10n_sweep_prepare_error">"Ошибка подготовки или подписи в кошельке: %1$s. Эта группа не отправлена узлу."</string>
     <!-- Arguments: accepted, total -->
-    <string name="l10n_sweep_summary">"Узел принял %1$s из %2$s транзакций."</string>
+    <string name="l10n_sweep_summary">"Результат перевода: %1$s из %2$s транзакций приняты для отправки в сеть."</string>
     <string name="l10n_sweep_stopped" formatted="false">"Остановлено. Оставшиеся группы не подписаны и не отправлены."</string>
     <string name="l10n_sweep_confirming" formatted="false">"Подтверждение в блокчейне"</string>
     <string name="l10n_sweep_hide" formatted="false">"Скрыть — проверить позже в разделе перевода"</string>
@@ -8486,7 +8487,7 @@
     <!-- Arguments: transactions, signatures -->
     <string name="l10n_sweep_signatures">"Транзакций: %1$s; одноразовых подписей: %2$s."</string>
     <!-- Arguments: key, used, maximum -->
-    <string name="l10n_sweep_key">"Ключ %1$s: следующая подпись №%2$s из %3$s"</string>
+    <string name="l10n_sweep_key">"Ключ кошелька-отправителя %1$s: следующая подпись №%2$s из %3$s"</string>
     <string name="l10n_sweep_warning" formatted="false">"Транзакции отправляются по одной. Между группами можно остановиться. Транзакции с неизвестным результатом остаются в ожидании без повторной подписи. После отправки перевод необратим. Группы, отклонённые до отправки из-за размера, автоматически разделяются и повторно отправляются на тот же адрес с дополнительными подписями."</string>
     <string name="l10n_sweep_confirm" formatted="false">"Подтвердить перевод — проверьте внимательно"</string>
     <string name="l10n_sweep_sign" formatted="false">"Подписать и отправить всё"</string>
@@ -8500,7 +8501,7 @@
     <string name="l10n_sweep_coins" formatted="false">"монет"</string>
     <string name="l10n_sweep_part" formatted="false">"часть"</string>
     <string name="l10n_sweep_pending_skip" formatted="false">"Ожидается подтверждение предыдущей отправки"</string>
-    <string name="l10n_sweep_foreign_skip" formatted="false">"Адрес не принадлежит этому кошельку"</string>
+    <string name="l10n_sweep_foreign_skip" formatted="false">"Входная монета пропущена: этот кошелёк не контролирует ключ для её расходования"</string>
     <string name="l10n_sweep_locked_skip" formatted="false">"Непроштампованный заблокированный экземпляр. Сначала проштампуйте его в NFT Wallet."</string>
     <string name="l10n_sweep_large_item" formatted="false">"Объект с большим состоянием; узел может отклонить транзакцию."</string>
     <string name="l10n_sweep_native_state" formatted="false">"Minima (состояние)"</string>
@@ -8515,4 +8516,6 @@
     <string name="l10n_sweep_confirm_destination" formatted="false">"Подтвердить адрес…"</string>
     <string name="l10n_sweep_repeat_address" formatted="false">"Введите полный Mx-адрес ещё раз"</string>
     <string name="l10n_sweep_address_check" formatted="false">"Сверьте полный адрес с кошельком получателя и введите его ещё раз. Формат и контрольная сумма верны, но это не подтверждает, кто контролирует адрес. Будет переведён весь доступный баланс. Отменить перевод невозможно."</string>
+    <!-- Arguments: reason -->
+    <string name="l10n_sweep_inputs_error">"Не удалось подготовить входные монеты кошелька: %1$s. Эта группа не подписана и не отправлена узлу."</string>
 </resources>

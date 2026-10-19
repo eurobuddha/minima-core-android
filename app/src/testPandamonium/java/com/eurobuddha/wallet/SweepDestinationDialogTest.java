@@ -62,4 +62,27 @@ public class SweepDestinationDialogTest {
             }
         } finally {Language.select(RuntimeEnvironment.getApplication(),"en");}
     }
+    @Test public void destinationOutsideSourceWalletCanReachFinalConfirmation()throws Exception {
+        Language.initialize(RuntimeEnvironment.getApplication(),()->false);
+        Language.select(RuntimeEnvironment.getApplication(),"en");
+        MainActivity activity=spy(Robolectric.buildActivity(MainActivity.class).get());
+        activity.setTheme(com.eurobuddha.wallet.R.style.pm_wallet_Theme_Utxo);
+        doReturn(null).when(activity).keyIndexForAddress(anyString());
+        SweepFlow flow=mock(SweepFlow.class,CALLS_REAL_METHODS);
+        put(flow,"act",activity);put(flow,"session",(java.util.function.BooleanSupplier)()->true);
+        Method review=SweepFlow.class.getDeclaredMethod("review",SweepPlanner.Plan.class,String.class);
+        review.setAccessible(true);review.invoke(flow,new SweepPlanner.Plan(),MX);
+        AlertDialog first=(AlertDialog)ShadowDialog.getLatestDialog();assertTrue(first.isShowing());
+        verify(activity).keyIndexForAddress(org.minima.objects.Address.convertMinimaAddress(MX).to0xString());
+        assertEquals("Confirm destination…",first.getButton(AlertDialog.BUTTON_POSITIVE).getText().toString());
+        first.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
+        AlertDialog confirmation=(AlertDialog)ShadowDialog.getLatestDialog();
+        assertNotSame(first,confirmation);assertTrue(confirmation.isShowing());
+        assertFalse(confirmation.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled());
+        confirmation.getButton(AlertDialog.BUTTON_NEGATIVE).performClick();
+        org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
+        verify(activity,never()).runSigningWork(any(),any(),any());
+    }
+
 }

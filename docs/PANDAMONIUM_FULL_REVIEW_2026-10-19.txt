@@ -650,3 +650,12 @@ Implemented in Pandamonium2.0.16/code211 and standalone wallet0.2.27/code227.
 See WALLET_SWEEP_DESTINATION_2026-10-19.txt for scope, reuse, tests and limitations.
 Vestr2.0.15 physical rotation/tab checks now pass on Fold; restored original rotation.
 Full review/parity remains IN PROGRESS. No real transaction or candidate publication.
+
+Sweep actual-worker regression —2.0.17/code212
+User's manual Sweep on2.0.16 failed before local building. The integrated Sweep's
+idle-UI guard was incorrectly called inside its own busy worker; removed that check
+and retained runSigningWork authentication.400 wallet/host tests pass, including a
+before-fix failing real-dispatcher regression and external destination UI acceptance.
+Local errors now preserve reasons; source-coin/key labels are explicit. Standalone
+lacks this worker defect and remains0.2.27. See WALLET_SWEEP_WORKER_2026-10-19.txt.
+No agent transaction or retry. Live successful Sweep still unverified. Full review open.

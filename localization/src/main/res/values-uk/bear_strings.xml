@@ -707,7 +707,7 @@
     <!-- Arguments: 0, 1, 2 -->
     <string name="l10n_wallet_error_key_exhausted">"Ключ %1$s вичерпано: використано %2$s із %3$s одноразових підписів"</string>
     <!-- Arguments: 0 -->
-    <string name="l10n_wallet_error_foreign_coin">"Адреса монети не належить цьому гаманцю: %1$s"</string>
+    <string name="l10n_wallet_error_foreign_coin">"Неможливо підписати витрату вхідної монети: гаманець не контролює її вихідну адресу: %1$s"</string>
     <!-- Arguments: 0 -->
     <string name="l10n_wallet_error_coin_parse">"Не вдалося розібрати монету: %1$s"</string>
     <!-- Arguments: 0, 1 -->
@@ -8458,9 +8458,10 @@
     <!-- Arguments: number, total -->
     <string name="l10n_sweep_progress">"Підпис і надсилання транзакції %1$s з %2$s…"</string>
     <string name="l10n_sweep_unknown" formatted="false">"Результат невідомий; підписану транзакцію збережено. Перевірте стан перед повтором."</string>
-    <string name="l10n_sweep_prepare_error" formatted="false">"Не вдалося підготувати транзакцію. Надсилання цієї групи не виконувалося."</string>
+    <!-- Arguments: reason -->
+    <string name="l10n_sweep_prepare_error">"Помилка підготовки або підпису в гаманці: %1$s. Цю групу не надіслано вузлу."</string>
     <!-- Arguments: accepted, total -->
-    <string name="l10n_sweep_summary">"Вузол прийняв %1$s з %2$s транзакцій."</string>
+    <string name="l10n_sweep_summary">"Результат переказу: %1$s із %2$s транзакцій прийнято для надсилання в мережу."</string>
     <string name="l10n_sweep_stopped" formatted="false">"Зупинено. Решту груп не підписано й не надіслано."</string>
     <string name="l10n_sweep_confirming" formatted="false">"Підтвердження в блокчейні"</string>
     <string name="l10n_sweep_hide" formatted="false">"Сховати — перевірити пізніше в розділі переказу"</string>
@@ -8486,7 +8487,7 @@
     <!-- Arguments: transactions, signatures -->
     <string name="l10n_sweep_signatures">"Транзакцій: %1$s; одноразових підписів: %2$s."</string>
     <!-- Arguments: key, used, maximum -->
-    <string name="l10n_sweep_key">"Ключ %1$s: наступний підпис №%2$s з %3$s"</string>
+    <string name="l10n_sweep_key">"Ключ гаманця-відправника %1$s: наступний підпис №%2$s з %3$s"</string>
     <string name="l10n_sweep_warning" formatted="false">"Транзакції надсилаються по одній. Між групами можна зупинитися. Транзакції з невідомим результатом залишаються в очікуванні без повторного підпису. Після надсилання переказ незворотний. Групи, відхилені до надсилання через розмір, автоматично діляться й повторно надсилаються на ту саму адресу з додатковими підписами."</string>
     <string name="l10n_sweep_confirm" formatted="false">"Підтвердити переказ — перевірте уважно"</string>
     <string name="l10n_sweep_sign" formatted="false">"Підписати й надіслати все"</string>
@@ -8500,7 +8501,7 @@
     <string name="l10n_sweep_coins" formatted="false">"монет"</string>
     <string name="l10n_sweep_part" formatted="false">"частина"</string>
     <string name="l10n_sweep_pending_skip" formatted="false">"Очікується підтвердження попереднього надсилання"</string>
-    <string name="l10n_sweep_foreign_skip" formatted="false">"Адреса не належить цьому гаманцю"</string>
+    <string name="l10n_sweep_foreign_skip" formatted="false">"Вхідну монету пропущено: цей гаманець не контролює ключ для її витрачання"</string>
     <string name="l10n_sweep_locked_skip" formatted="false">"Непроштампований заблокований примірник. Спершу проштампуйте його в NFT Wallet."</string>
     <string name="l10n_sweep_large_item" formatted="false">"Об’єкт із великим станом; вузол може відхилити транзакцію."</string>
     <string name="l10n_sweep_native_state" formatted="false">"Minima (стан)"</string>
@@ -8515,4 +8516,6 @@
     <string name="l10n_sweep_confirm_destination" formatted="false">"Підтвердити адресу…"</string>
     <string name="l10n_sweep_repeat_address" formatted="false">"Введіть повну Mx-адресу ще раз"</string>
     <string name="l10n_sweep_address_check" formatted="false">"Звірте повну адресу з гаманцем одержувача та введіть її ще раз. Формат і контрольна сума правильні, але це не підтверджує, хто контролює адресу. Буде переказано весь доступний баланс. Скасувати переказ неможливо."</string>
+    <!-- Arguments: reason -->
+    <string name="l10n_sweep_inputs_error">"Не вдалося підготувати вхідні монети гаманця: %1$s. Цю групу не підписано й не надіслано вузлу."</string>
 </resources>
