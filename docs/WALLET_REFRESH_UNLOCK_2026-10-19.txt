@@ -1,0 +1,64 @@
+Core wallet refresh and unlock measurements — Pandamonium 2.0.19/code214
+
+User holds all Sweep tests until the app works. Do not automatically sweep/sign/broadcast.
+User separately authorized changing the installed standalone minimaWallet seed only.
+
+Reuse and findings
+Read standalone wallet MainActivity, SettingsView, WalletSession, SeedVault,
+AddressBook and SessionUxTest under /Users/eurobuddha/Projects/minima/apks/wallet.
+Read integrated equivalents and NodeKeyUses/CachedPublicKeys/PublicAuditKeys.
+For Core refresh reuse existing MainAdapter.refreshPagerView, BalanceView refresh,
+CoalescingRefresh and visibility lifecycle; no new transport or polling executor.
+MainActivity resume previously did not refresh an already-active page. The visible
+10-second timer updated age/metadata only, so a missed balance event could persist
+until a tab switch. Exact historical introduction has not been established.
+
+Change
+Resume requests a fresh selected-page snapshot. Visible Core balance polls using
+existing executor, idle-only to avoid starving a slow read. Hidden/destroyed views
+invalidate snapshots and stop ticks. Reentry clears retained headline/token rows,
+shows Updating balance, and labels failures with retry status. Disconnection shows
+an unknown headline rather than a zero balance. Review caught and fixed duplicate
+disconnected timer scheduling. Four translations supplied. Unlock changes in this
+checkpoint are duration-only logging (unlock_ms and prepare_ms), with no secrets.
+
+Device measurements
+A separate shell-UID app_process used installed 2.0.18 classes and synthetic public
+fixtures with a temporary H2 Wallet under /data/local/tmp/pandamonium-unlock-profile.
+No real seed, vault, counters or application-private storage was opened by the probe.
+VaultCrypto decrypt: 56/56/57ms; full SeedVault/NodeKeyUses first open:12162ms,
+64 keys derived:12077ms; cached opens:62ms and64ms, zero keys derived.
+Logs: build/localization/unlock-bench/fold-baseline.log and fold-full-baseline.log.
+This validates the existing 2.0.18 cache on Android. It does not measure the funded
+wallet or real-node contention. Actual integrated unlock timing remains pending.
+
+Regression and review
+The real BalanceView missed-update regression failed before the fix (no queued
+refresh) and passes after. Tests cover visible polling, hidden late replies,
+reentry placeholder, failed-read recovery and slow-read non-starvation. Actual
+MainActivity resume is tested with FragmentActivity lifecycle isolated.
+220 wallet +191 host tests passed; 0 failures/errors/skips. Release build and lint
+passed; lint has 0 errors and1828 warnings. Importer, direct transport, localization
+(7000 messages), APK Keets and diff checks passed before final timer correction;
+final release/test/lint run and final APK checks will be recorded below.
+Code-review: changed source/adapters/tests/resources reviewed. No outstanding
+blocking finding for this scoped change. Full application review remains open.
+
+Standalone reset verification
+Installed standalone was0.2.23, before reset added in0.2.24. Data-preserving update
+to existing signed0.2.27/code227 succeeded on Fold R3GL805K7MB. APK SHA256:
+81fba5bf4d4e2bf835b9cd17885587951b47086ed7b88f6e8d12205c18bb0a28.
+User performed reset and explicitly reported: "reset works perfectly in the
+standalone minimaWallet". Agent did not press Erase or read seed/password input.
+Integrated import is pinned0.2.21 and lacks reset. User clarification requested
+whether to restore integrated minimaWallet reset only or also Core node reset.
+No integrated/main-node seed change authorized or performed. Any integrated port
+must preserve shared counters, unlike standalone clearAllForWalletReset.
+
+2.0.19 checkpoint: final tests/release/lint and APK verification passed. Signed
+base/dist/pandamonium-2.0.19-candidate.apk SHA256
+934856ef275de3e9a45cc1f00fad3d43b6578f77b220913ce5be8d713f61c483.
+Not installed: user requested integrated minimaWallet reset only; next checkpoint
+will restore that proven flow before installation. No Core node seed reset.
+User confirmed standalone0.2.27 reset works perfectly. No Sweep performed.
+See docs/WALLET_REFRESH_UNLOCK_2026-10-19.txt for evidence and remaining device checks.

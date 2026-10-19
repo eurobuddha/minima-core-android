@@ -696,7 +696,12 @@ def adapt_background_setup(java):
     change(p, '    /** Shared post-unlock step:', '''    private void unlockWallet(String passphrase) {
         final SeedVault vault = mVault;
         runWalletWork(() -> {
-            if (!vault.open(passphrase)) throw new IllegalArgumentException("Wrong wallet passphrase");
+            long started = System.nanoTime();
+            try {
+                if (!vault.open(passphrase)) throw new IllegalArgumentException("Wrong wallet passphrase");
+            } finally {
+                android.util.Log.i("WalletTiming", "unlock_ms=" + (System.nanoTime()-started)/1_000_000);
+            }
         }, this::onUnlocked);
     }
 

@@ -296,8 +296,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override protected void onResume() {
         super.onResume();
         // ViewPager restores its selected page after onStart during recreation.
-        if (BuildConfig.PANDAMONIUM && mMainAdapter != null)
+        if (BuildConfig.PANDAMONIUM && mMainAdapter != null) {
             mMainAdapter.setHostVisible(hostVisible, mMainPager.getCurrentItem());
+            // Returning from an overlay can resume an already-active page without onShown.
+            mMainAdapter.refreshPagerView(mMainPager.getCurrentItem());
+        }
     }
 
     @Override protected void onStop() {

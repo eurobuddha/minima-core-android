@@ -8532,4 +8532,6 @@
     <string name="l10n_sweep_review_warning" formatted="false">"Будут переведены все доступные активы, указанные выше. Завершённые переводы нельзя отменить."</string>
     <string name="l10n_sweep_review_next" formatted="false">"Пока ничего не отправлено. Далее подтвердите адрес получателя."</string>
     <string name="l10n_sweep_edit_destination" formatted="false">"Изменить адрес"</string>
+    <string name="l10n_core_wallet_refreshing" formatted="false">"Обновление баланса…"</string>
+    <string name="l10n_core_wallet_refresh_failed" formatted="false">"Не удалось обновить баланс. Повторяем…"</string>
 </resources>

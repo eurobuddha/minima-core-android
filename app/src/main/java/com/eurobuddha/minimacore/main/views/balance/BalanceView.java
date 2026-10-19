@@ -34,7 +34,7 @@ public class BalanceView extends BaseView {
     private final com.eurobuddha.minimacore.utils.CoalescingRefresh<JSONObject> refresh =
             new com.eurobuddha.minimacore.utils.CoalescingRefresh<>(MinimaCMD.readExecutor(),
                     main::post, () -> MinimaCMD.execute("balance"), this::applyBalance,
-                    error -> logger.log("Balance refresh failed: " + error));
+                    this::balanceFailed);
     private boolean destroyed;
 
     ListView mBalanceList;
@@ -45,6 +45,7 @@ public class BalanceView extends BaseView {
     WalletReorderAdapter mReorder;
 
     TextView mTotalBalance;
+    TextView mRefreshStatus;
 
     TextView mBreakdown;
 
@@ -62,14 +63,19 @@ public class BalanceView extends BaseView {
     CoinsDialog mOpenCoins = null;
 
     /**
-     * The tab only refreshes on tab select, so a user parked here would otherwise read
-     * "updated 3s ago" forever. Recompute the string (no node call) every 10s.
+     * Refresh while visible even if a balance event was missed during startup/resume.
+     * The idle-only read keeps slow snapshots from being perpetually discarded.
      */
     private final Runnable mTick = new Runnable() {
         @Override
         public void run() {
             if (destroyed || !isDisplayActive()) return;
             updateBreakdown();
+            if (MinimaCMD.checkMinimaStarted()) refresh.requestIfIdle();
+            else {
+                refreshView(); // Also schedules the next tick while disconnected.
+                return;
+            }
             if (mMainView.getGlobalVisibleRect(new android.graphics.Rect())) {
                 refreshVisibleMetadata();
             }
@@ -88,6 +94,7 @@ public class BalanceView extends BaseView {
         mRecycler    = getMainView().findViewById(R.id.wallet_balance_recycler);      // Pandamonium
 
         mTotalBalance = getMainView().findViewById(R.id.wallet_total_balance);
+        mRefreshStatus = getMainView().findViewById(R.id.wallet_refresh_status);
         mBreakdown    = getMainView().findViewById(R.id.wallet_balance_breakdown);
 
         //Pandamonium: the breakdown is collapsed behind an expand arrow in the header. These ids
@@ -252,21 +259,40 @@ public class BalanceView extends BaseView {
             //The placeholder has no sendable / coins - don't let the breakdown print nulls
             mLastBalanceUpdate = 0;
             refreshBalance(tempbal);
+            if (mTotalBalance != null) mTotalBalance.setText("—");
+            if (mRefreshStatus != null) {
+                Language.setText(mRefreshStatus, Language.msg(l10n_core_wallet_disconnected));
+                mRefreshStatus.setVisibility(View.VISIBLE);
+            }
 
             return;
         }
 
+        if (mRefreshStatus != null) {
+            Language.setText(mRefreshStatus, Language.msg(l10n_core_wallet_refreshing));
+            mRefreshStatus.setVisibility(View.VISIBLE);
+        }
         refresh.request();
+    }
+
+    private void balanceFailed(Exception error) {
+        logger.log("Balance refresh failed: " + error);
+        if (destroyed || !isDisplayActive()) return;
+        if (mRefreshStatus != null) {
+            Language.setText(mRefreshStatus, Language.msg(l10n_core_wallet_refresh_failed));
+            mRefreshStatus.setVisibility(View.VISIBLE);
+        }
     }
 
     private void applyBalance(JSONObject result) {
         if (destroyed || !isDisplayActive() || getActivity().isFinishing() || getActivity().isDestroyed()) return;
         if (!MinimaCMD.checkMinimaStarted()) { refreshView(); return; }
         Object balance = result == null ? null : result.get("response");
-        if (result == null || Boolean.FALSE.equals(result.get("status")) || !(balance instanceof JSONArray)) {
-            logger.log("Balance refresh failed");
+        if (result == null || !Boolean.TRUE.equals(result.get("status")) || !(balance instanceof JSONArray)) {
+            balanceFailed(new IllegalStateException("Incomplete balance response"));
             return;
         }
+        if (mRefreshStatus != null) mRefreshStatus.setVisibility(View.GONE);
         mLastBalanceUpdate = System.currentTimeMillis();
         refreshBalance((JSONArray) balance);
     }
@@ -342,7 +368,11 @@ public class BalanceView extends BaseView {
 
     @Override protected void onShown() {
         mBalanceAdapter.setDisplayActive(true);
-        updateBreakdown(); // Retained figures show their real age while reconciliation runs.
+        // Do not present retained figures as the current balance on foreground entry.
+        if (mTotalBalance != null) mTotalBalance.setText("—");
+        mBalanceAdapter.updateValues(new JSONArray());
+        if (mReorder != null) mReorder.notifyDataSetChanged();
+        updateBreakdown();
         refreshView();
     }
 

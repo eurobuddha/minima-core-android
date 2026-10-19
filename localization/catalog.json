@@ -42541,5 +42541,17 @@
     "zh-Hans": "修改地址",
     "ru": "Изменить адрес",
     "uk": "Змінити адресу"
+  },
+  "core.walletRefreshing": {
+    "en": "Updating balance…",
+    "zh-Hans": "正在更新余额…",
+    "ru": "Обновление баланса…",
+    "uk": "Оновлення балансу…"
+  },
+  "core.walletRefreshFailed": {
+    "en": "Balance could not be refreshed. Retrying…",
+    "zh-Hans": "无法刷新余额。正在重试…",
+    "ru": "Не удалось обновить баланс. Повторяем…",
+    "uk": "Не вдалося оновити баланс. Повторюємо…"
   }
 }

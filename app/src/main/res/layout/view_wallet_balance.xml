@@ -71,6 +71,16 @@
             android:textAppearance="@style/TextAppearance.MinimaCore.Eyebrow" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/wallet_refresh_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="6dp"
+        android:visibility="gone"
+        android:accessibilityLiveRegion="polite"
+        android:textAppearance="@style/TextAppearance.MinimaCore.Caption" />
+
     <!-- what makes up that number: confirmed / locked / unconfirmed / coin count / staleness.
          Collapsed by default; BalanceView toggles it from the header row above. -->
     <TextView

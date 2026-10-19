@@ -8421,4 +8421,6 @@
     <string name="l10n_sweep_review_warning" formatted="false">"此操作将转出以上列出的全部可用资产。已完成的转移无法撤销。"</string>
     <string name="l10n_sweep_review_next" formatted="false">"尚未发送任何资产。下一步请确认收款地址。"</string>
     <string name="l10n_sweep_edit_destination" formatted="false">"修改地址"</string>
+    <string name="l10n_core_wallet_refreshing" formatted="false">"正在更新余额…"</string>
+    <string name="l10n_core_wallet_refresh_failed" formatted="false">"无法刷新余额。正在重试…"</string>
 </resources>

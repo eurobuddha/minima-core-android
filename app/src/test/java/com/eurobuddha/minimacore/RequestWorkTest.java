@@ -143,4 +143,14 @@ public class RequestWorkTest {
             assertEquals(1, pool.getPoolSize()); assertEquals(1, pool.getQueue().size());
         } finally { release.countDown(); pool.shutdownNow(); }
     }
+    @Test public void periodicTicksCannotStarveASlowBalanceRead() {
+        Queue worker=new Queue(),ui=new Queue();List<Integer> rendered=new ArrayList<>();
+        CoalescingRefresh<Integer> refresh=new CoalescingRefresh<>(worker,ui,()->7,rendered::add,e->fail());
+        refresh.requestIfIdle();
+        for(int i=0;i<100;i++)refresh.requestIfIdle();
+        worker.next();ui.next();
+        assertEquals(Arrays.asList(7),rendered);assertTrue(worker.tasks.isEmpty());
+        refresh.requestIfIdle();assertEquals(1,worker.tasks.size());
+    }
+
 }

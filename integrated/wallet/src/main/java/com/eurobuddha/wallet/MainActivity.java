@@ -720,7 +720,12 @@ public class MainActivity extends AppCompatActivity {
     private void unlockWallet(String passphrase) {
         final SeedVault vault = mVault;
         runWalletWork(() -> {
-            if (!vault.open(passphrase)) throw new IllegalArgumentException("Wrong wallet passphrase");
+            long started = System.nanoTime();
+            try {
+                if (!vault.open(passphrase)) throw new IllegalArgumentException("Wrong wallet passphrase");
+            } finally {
+                android.util.Log.i("WalletTiming", "unlock_ms=" + (System.nanoTime()-started)/1_000_000);
+            }
         }, this::onUnlocked);
     }
 
@@ -772,7 +777,9 @@ public class MainActivity extends AppCompatActivity {
         final java.util.concurrent.atomic.AtomicReference<PreparedWallet> prepared = new java.util.concurrent.atomic.AtomicReference<>();
         runWalletWork(() -> {
             if (!authorized.getAsBoolean()) throw new SeedVault.SigningNotAllowedException("Wallet session changed");
+            long started = System.nanoTime();
             PreparedWallet value = new PreparedWallet(app, vault);
+            android.util.Log.i("WalletTiming", "prepare_ms=" + (System.nanoTime()-started)/1_000_000);
             if (!authorized.getAsBoolean()) throw new SeedVault.SigningNotAllowedException("Wallet session changed");
             prepared.set(value);
         }, () -> {

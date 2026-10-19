@@ -113,3 +113,11 @@ No automated real Sweep, signing, broadcast or counter/pending-data modification
 User can now manually inspect and test the corrected Sweep. Unlock duration on the
 Fold and real transaction success remain unverified. First unlock may populate the
 new protected cache once. Full review/parity still IN PROGRESS.
+
+2.0.19 checkpoint: final tests/release/lint and APK verification passed. Signed
+base/dist/pandamonium-2.0.19-candidate.apk SHA256
+934856ef275de3e9a45cc1f00fad3d43b6578f77b220913ce5be8d713f61c483.
+Not installed: user requested integrated minimaWallet reset only; next checkpoint
+will restore that proven flow before installation. No Core node seed reset.
+User confirmed standalone0.2.27 reset works perfectly. No Sweep performed.
+See docs/WALLET_REFRESH_UNLOCK_2026-10-19.txt for evidence and remaining device checks.

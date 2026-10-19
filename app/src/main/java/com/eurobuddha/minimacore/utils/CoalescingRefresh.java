@@ -20,6 +20,9 @@ public final class CoalescingRefresh<T> {
         this.render = render; this.failure = failure;
     }
 
+    /** Periodic reads must not obsolete a slow in-flight snapshot on every tick. */
+    public void requestIfIdle() { if (!running) request(); }
+
     public void request() {
         if (closed) return;
         if (running) { pending = true; return; }

@@ -8532,4 +8532,6 @@
     <string name="l10n_sweep_review_warning" formatted="false">"Буде переказано всі доступні активи, зазначені вище. Завершені перекази неможливо скасувати."</string>
     <string name="l10n_sweep_review_next" formatted="false">"Поки нічого не надіслано. Далі підтвердьте адресу одержувача."</string>
     <string name="l10n_sweep_edit_destination" formatted="false">"Змінити адресу"</string>
+    <string name="l10n_core_wallet_refreshing" formatted="false">"Оновлення балансу…"</string>
+    <string name="l10n_core_wallet_refresh_failed" formatted="false">"Не вдалося оновити баланс. Повторюємо…"</string>
 </resources>

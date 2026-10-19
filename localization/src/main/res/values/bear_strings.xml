@@ -8458,4 +8458,6 @@
     <string name="l10n_sweep_review_warning" formatted="false">"This moves all available assets shown above. Completed transfers cannot be undone."</string>
     <string name="l10n_sweep_review_next" formatted="false">"Nothing is sent yet. Next, confirm the receiving address."</string>
     <string name="l10n_sweep_edit_destination" formatted="false">"Edit address"</string>
+    <string name="l10n_core_wallet_refreshing" formatted="false">"Updating balance…"</string>
+    <string name="l10n_core_wallet_refresh_failed" formatted="false">"Balance could not be refreshed. Retrying…"</string>
 </resources>
