@@ -1023,6 +1023,32 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         }));
     }
 
+    private void showCreateChoices(StateNft.Meta m) {
+        JSONObject row=LocalStore.findById(this,m.localId);
+        JSONArray matches=row==null?null:row.optJSONArray("creatematches");
+        if(matches==null || matches.length()==0 || !m.tokenid.isEmpty() || !"CREATE".equals(m.phase)) return;
+        LinearLayout panel=lotCard();
+        panel.addView(Design.note(this,"These tokens match this collection’s artwork and creator. Choose one to finish. The others remain in your wallet until you bury them."));
+        final long generation=screenGeneration;
+        for(int i=0;i<matches.length();i++) {
+            final String tid=matches.optString(i);
+            TextView hash=Design.hash(this,tid); hash.setTextIsSelectable(true);
+            panel.addView(hash,lpm(0,10,0,4));
+            TextView choose=Design.button(this,"Finish this collection",false);
+            choose.setOnClickListener(v->{
+                if(!collectionCurrent(m,generation) || !choose.isEnabled()) return;
+                if(!LocalStore.chooseCreate(this,m.localId,tid)) { toast("Collection changed. Refresh and try again."); return; }
+                choose.setEnabled(false); toast("Checking the selected token before continuing…");
+                engageEngine(); MintEngine.resumeNow(this,node,msg->runOnUiThread(()->{
+                    if(!collectionCurrent(m,generation)) return;
+                    loadLocalCollections(); openMeta=findCollectionByLocalId(m.localId,m);lastDetailSig="";refreshDetail();
+                }));
+            });
+            panel.addView(choose,lpm(0,0,0,8));
+        }
+        body.addView(panel,lpm(0,0,0,12));
+    }
+
     private void renderDetail() {
         StateNft.Meta m = openMeta;
         if (m == null || screen != Screen.COLLECTION) return;
@@ -1118,6 +1144,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             beatRow.setOnClickListener(v -> renderEngineLog(() -> openCollection(mF)));
             body.addView(beatRow, lpm(0, 0, 0, 12));
         }
+        showCreateChoices(m);
         if ("NEEDIMAGES".equals(m.phase)) body.addView(recoveryPanel(m), lpm(0, 0, 0, 12));
 
         LinearLayout actions = horizontal(Gravity.CENTER_VERTICAL);
@@ -1472,7 +1499,14 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         warn.addView(Design.note(this, Language.msg(l10n_atelier_burial_custody)), lpm(0, 4, 0, 0));
         body.addView(warn, lpm(0, 0, 0, 14));
         body.addView(Design.kicker(this, Language.msg(l10n_atelier_burial_type_name)));
+        TextView tokenIdentity = Design.hash(this,m.tokenid);
+        tokenIdentity.setTextIsSelectable(true);
+        body.addView(tokenIdentity,lpm(0,0,0,12));
+        if (!Util.isValidHexId(m.tokenid) || Util.MINIMA_TOKENID.equals(m.tokenid)) {
+            body.addView(Design.note(this,"This mint has no linked token yet. Return to the collection and select an existing token before burying anything.")); return;
+        }
         EditText confirm = input(m.name);
+        confirm.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         confirm.setMinHeight(dp(50));
         body.addView(confirm, lpm(0, 6, 0, 8));
         TextView msg = Design.note(this, Language.msg("BURY".equals(m.phase) ? l10n_nft_burial_paused : l10n_atelier_burial_arm));
@@ -1480,7 +1514,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         TextView go = Design.button(this, Language.msg("BURY".equals(m.phase) ? l10n_nft_burial_check_retry : l10n_atelier_burial_submit), true);
         go.setOnClickListener(v -> {
             if (!burialScreenActive(generation) || !go.isEnabled()) return;
-            if (!m.name.equals(confirm.getText().toString().trim())) {
+            if (!m.name.trim().equalsIgnoreCase(confirm.getText().toString().trim())) {
                 Language.setText(msg, Language.msg(l10n_atelier_burial_wrong_name)); return;
             }
             go.setEnabled(false); confirm.setEnabled(false);

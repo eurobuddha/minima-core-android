@@ -61,4 +61,10 @@ public class AtelierBurialFlowTest {
     @Test public void oversizedFallbackPersistsStrippingIntentBeforeItsPost()throws Exception{submit();owns(coin(1));failed.accept("size too large");assertEquals(2,posts.size());JSONObject intent=LocalStore.burialJournal(activity,TOKEN).getJSONObject(0);assertFalse(BurialEvidence.preserves(intent));assertTrue(posts.get(1).stream().anyMatch(s->s.contains("storestate:false")));assertTrue(posts.get(1).stream().anyMatch(s->s.endsWith("publickey:"+ADDRESS)));accepted.accept(strippedPost(coin(1)));poll();prove(coin(1),true);owns();answer("block",object("status",true,"response",object("block",200)));assertEquals("BURIED",phase());}
     @Test public void fallbackWithoutCreatorKeyCannotPostAnotherTransaction(){meta.creatorPk="";submit();owns(coin(1));failed.accept("size too large");assertEquals(1,posts.size());assertEquals("BURY",phase());}
     @Test public void alteredJournalAndNavigationCannotCompleteOldConfirmation()throws Exception{submit();owns(coin(1));accepted.accept(posted(coin(1)));poll();prove(coin(1),false);JSONArray j=LocalStore.burialJournal(activity,TOKEN);j.put(BurialEvidence.intent(coin(2),TOKEN));LocalStore.saveBurialJournal(activity,TOKEN,j);owns();assertEquals("BURY",phase());assertFalse(reads.containsKey("block"));render();submit();owns();assertEquals("BURY",phase());}
+    @Test public void nameConfirmationIgnoresCaseAndWhitespaceButShowsExactToken()throws Exception {
+        meta.name=" Sculpture ";render();assertNotNull(find(body,TOKEN));input(body).setText("sculpture");button().performClick();assertTrue(reads.containsKey(owned()));assertTrue(posts.isEmpty());
+    }
+    @Test public void pendingMintHasNoBurialSubmitButton()throws Exception {
+        meta.tokenid="";render();assertNull(input(body));assertTrue(reads.isEmpty());assertTrue(posts.isEmpty());
+    }
 }
