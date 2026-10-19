@@ -46,29 +46,33 @@ public final class SwapOrderBook {
     }
     /** Keep the caller's generation through ladder preparation and the balance read. */
     public static void publishFresh(NodeApi node, LazySodium ls, CommsIdentity id, Order base, long generation, CommsTransport.SendCb cb) {
-        if (!current(base, generation)) { cb.onFailed(MARKET_ERROR); return; }
+        publishFresh(node,ls,id,base,generation,()->true,cb);
+    }
+    static void publishFresh(NodeApi node, LazySodium ls, CommsIdentity id, Order base, long generation,
+                             java.util.function.BooleanSupplier authorized, CommsTransport.SendCb cb) {
+        if (!current(base, generation) || !authorized.getAsBoolean()) { cb.onFailed(MARKET_ERROR); return; }
         final String token=TradingContext.active().tokenId;
         node.cmd("balance tokenid:" + token, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
-                if (!current(base, generation)) { cb.onFailed(MARKET_ERROR); return; }
+                if (!current(base, generation) || !authorized.getAsBoolean()) { cb.onFailed(MARKET_ERROR); return; }
                 final java.math.BigDecimal available;
                 try { available=spendableBalance(j,token); requireBoundedCoins(j,token,available); }
                 catch(RuntimeException invalid) { cb.onFailed(BALANCE_ERROR);return; }
-                if(available.signum()==0) { base.minimaAvail=0; base.clampAsksToBalance(available); publish(node, ls, id, base, generation, cb); return; }
+                if(available.signum()==0) { base.minimaAvail=0; base.clampAsksToBalance(available); publish(node, ls, id, base, generation, authorized, cb); return; }
                 node.cmd("coins relevant:true sendable:true tokenid:"+token+" coinage:1 checkmempool:true",new NodeApi.Cb() {
                     @Override public void onResult(JSONObject coins) {
-                        if (!current(base, generation)) { cb.onFailed(MARKET_ERROR);return; }
+                        if (!current(base, generation) || !authorized.getAsBoolean()) { cb.onFailed(MARKET_ERROR);return; }
                         try {
                             java.math.BigDecimal free=available.min(freeCoinBalance(coins,token));
                             if("0x00".equals(token))free=free.subtract(new java.math.BigDecimal(CommsTransport.MESSAGE_AMOUNT)).max(java.math.BigDecimal.ZERO);
                             base.minimaAvail=free.doubleValue();base.clampAsksToBalance(free);
                         } catch(RuntimeException invalid) { cb.onFailed(BALANCE_ERROR);return; }
-                        publish(node, ls, id, base, generation, cb);
+                        publish(node, ls, id, base, generation, authorized, cb);
                     }
-                    @Override public void onError(String message) { if (!current(base, generation)) { cb.onFailed(MARKET_ERROR);return; } cb.onFailed(BALANCE_ERROR); }
+                    @Override public void onError(String message) { if (!current(base, generation) || !authorized.getAsBoolean()) { cb.onFailed(MARKET_ERROR);return; } cb.onFailed(BALANCE_ERROR); }
                 });
             }
-            @Override public void onError(String m) { if (!current(base, generation)) { cb.onFailed(MARKET_ERROR); return; } cb.onFailed(BALANCE_ERROR); }
+            @Override public void onError(String m) { if (!current(base, generation) || !authorized.getAsBoolean()) { cb.onFailed(MARKET_ERROR); return; } cb.onFailed(BALANCE_ERROR); }
         });
     }
 
@@ -131,7 +135,11 @@ public final class SwapOrderBook {
         publish(node, ls, id, order, PublishGate.gen(), cb);
     }
     private static void publish(NodeApi node, LazySodium ls, CommsIdentity id, Order order, long generation, CommsTransport.SendCb cb) {
-        if (!current(order, generation)) { cb.onFailed(MARKET_ERROR); return; }
+        publish(node,ls,id,order,generation,()->true,cb);
+    }
+    private static void publish(NodeApi node, LazySodium ls, CommsIdentity id, Order order, long generation,
+                                java.util.function.BooleanSupplier authorized, CommsTransport.SendCb cb) {
+        if (!current(order, generation) || !authorized.getAsBoolean()) { cb.onFailed(MARKET_ERROR); return; }
         final String destination = order.market.orderBookAddr;
         try {
             order.ts = System.currentTimeMillis();
@@ -142,11 +150,11 @@ public final class SwapOrderBook {
             JSONObject extra = new JSONObject();
             extra.put("1", "0x" + Hex.to(id.signPk));
             extra.put("2", "0x" + Hex.to(sig));
-            if (!current(order, generation)) { cb.onFailed(MARKET_ERROR); return; }
+            if (!current(order, generation) || !authorized.getAsBoolean()) { cb.onFailed(MARKET_ERROR); return; }
             CommsTransport.postBlob(node, destination, CommsTransport.MESSAGE_AMOUNT, CommsTransport.NATIVE,
-                    Hex.to(msg), extra, () -> current(order, generation), new CommsTransport.SendCb() {
+                    Hex.to(msg), extra, () -> current(order, generation) && authorized.getAsBoolean(), new CommsTransport.SendCb() {
                         @Override public void onSent(String txpowid) {
-                            if (!current(order, generation)) { cb.onFailed(MARKET_ERROR); return; }
+                            if (!current(order, generation) || !authorized.getAsBoolean()) { cb.onFailed(MARKET_ERROR); return; }
                             cb.onSent(txpowid);
                         }
                         @Override public void onFailed(String message) { cb.onFailed(message); }

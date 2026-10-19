@@ -1,0 +1,89 @@
+AtomiX bid backing review — 2026-10-19
+Pandamonium2.0.6/code201 local checkpoint. Public/device demo remains2.0.0.
+Previous goal turn was progress: Keets repair c519e01, tests, signed2.0.5 and fork push.
+Full review and standalone parity remain active and incomplete.
+
+Finding and repair
+MAJOR: MainActivity built usdtAvail from displayed balances; SwapService loaded it
+from preferences. The final publisher only refreshed Minima-side funds. An exhausted
+USDT balance could therefore refresh a bid using old funds. Readers returned a bid
+ladder even when the signed payload's advertised USDT balance was zero.
+All four live publication paths (manual, automatic foreground/background, edit)
+now go through SwapEngine.publishFresh. Its existing executor reads balanceOf for
+the captured wallet owner, checks the Ethereum chain and exact ABI response, and
+uses the lower of latest and pending balances. Pending incoming funds alone cannot
+back an order. Malformed/unavailable reads fail with the existing localized error;
+they never reuse a cached amount. Ask-only orders and tombstones retain their
+existing paths without requiring an Ethereum RPC balance read.
+A bid consumes price * amount USDT. Exact BigDecimal accounting keeps only the
+best-price prefix fully covered by available funds. Empty ladders also clear the
+legacy scalar so it cannot resurrect a synthetic bid. Legacy scalars must cover
+the configured minimum. Received orders apply the same clamp against advertised
+funds. Saved configuration is untouched and can resume after funding returns.
+Edit success messages reflect the resulting order, including an empty withdrawal;
+feed-recovery notifications no longer claim liquidity for a depleted order.
+
+Reuse gate
+Graph query mapped AtomiX/SwapOrderBook/Order and their callers. Inspected current
+integrated Order, SwapOrderBook, SwapEngine publication/context code, MainActivity
+and SwapService callers, EthWallet, EthRpc, EthNet, EthHtlc ABI checks and related
+tests. Read corresponding standalone balance helpers in apks/atomix, apks/ethwallet,
+apks/usdtswap; searched apks/minimaswap and existing funding tests.
+Reused Order.clampAsksToBalance's exact cumulative prefix/scalar suppression,
+EthWallet.erc20BalanceRaw's balanceOf construction, EthHtlc.requireReturnWords'
+exact ABI-word validation, and SwapEngine's captured context/executor pattern.
+Existing helpers read latest only and tolerate malformed ABI as zero; none provides
+a strict pending-state publication read. erc20AvailableRaw is the small adaptation
+for that boundary; existing display/send helper behavior is unchanged.
+
+Context and transaction boundaries
+Capture credentials, RPC, network, Minima identity, market and generation before
+queueing. Check again before reads, at UI delivery, through Minima balance/coin
+callbacks, before signing, and in CommsTransport's delayed posting guard. Closing
+or changing the engine/wallet, editing/withdrawing, or switching markets invalidates
+the old operation. Existing Minima balance and pending-spend exclusion is retained.
+Only read calls were added. No Ethereum signing or settlement code changed.
+No test connects to a node or sends a real transaction.
+
+Code review
+Summary: closes stale bid publication and zero-backed reader gaps without changing
+wire schema, keys, saved market configuration or settlement behavior.
+Findings fixed during review: edit success and recovered-peg notifications originally
+used pre-validation liquidity; now check the resulting order. Initial fixture's RPC
+restubbing invoked its previous answer; corrected to doAnswer before final run.
+Verdict: APPROVE this bounded change, with the limits below explicitly retained.
+The full application review is not complete and this candidate is not published.
+
+Remaining safety review
+An order is a snapshot, not escrow. RPC pending state may omit a locally saved
+signed transaction whose broadcast outcome is unknown, or a transaction submitted
+through another endpoint. The shared EthereumTransactions journal preserves those
+attempts but this validator does not yet reserve their token amounts. Review and
+connect durable pending-spend accounting before claiming full buy-side reservation
+safety. Gas affordability and pending allowances also require separate coverage.
+Long provider failover can delay publication; no stale-balance fallback is allowed.
+Existing quotes require native postage to withdraw and can otherwise remain until
+their normal expiry. Remote makers' signed balances remain untrusted assertions.
+
+Validation
+Eleven new mocked tests exercise the real engine/publisher and signed payload:
+exhausted and pending-spent balances, pending-only incoming funds, cached-zero to
+fresh funding, malformed ABI/wrong chain, read errors, queued/staged wallet-market-
+network-key-generation changes, delayed posting authorization, ask-only paths,
+exact cumulative price accounting, legacy reader behavior and saved configuration.
+466 AtomiX tests and180 host tests pass, with no failures/errors/skips.
+Pinned source importer verifies exact source/provenance reproduction. Canonical
+adapter: scripts/adapt-pandamonium-atomix-bid-backing.py. Tests are preserved under
+scripts/pandamonium-tests/atomix and reproduced in integrated/atomix.
+Signed artifact verification follows below. No Fold installation or visual checks.
+
+Final artifact verification
+Offline signed release build and release lint pass:0 errors,362 warnings.
+ZIP integrity and new validator method presence in actual APK dex verified.
+Keets bundle,21addons/runtime per ABI,23imports, direct transport and6927 messages
+in all4languages verify. Package com.eurobuddha.pandamonium,2.0.6-Pandamonium/code201.
+APK v2 signature verifies against the established RSA4096 family certificate.
+Path: /Users/eurobuddha/Projects/minima/apks/base/dist/pandamonium-2.0.6-candidate.apk
+SHA256 b8af01238d0d34c4214bb4ac0b7a7da061f7d4a51386ab78e0c4574c7f9341c1
+Certificate SHA256 eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+No installation/publication or live transaction tests.

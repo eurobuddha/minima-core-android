@@ -131,6 +131,28 @@ public final class EthWallet {
         }
     }
 
+    /** Read both mined and pending state; never treat missing/malformed ABI data as a balance. */
+    public static BigInteger erc20AvailableRaw(EthRpc rpc, EthNet network, String token, String owner) throws IOException {
+        if(rpc==null||network==null||owner==null||!owner.matches("0x[0-9a-fA-F]{40}")
+                ||token==null||!token.matches("0x[0-9a-fA-F]{40}"))throw new IOException("Invalid Ethereum balance context");
+        if(!BigInteger.valueOf(network.chainId).equals(EthRpc.transactionCount(rpc.call("eth_chainId",new org.json.JSONArray()))))
+            throw new IOException("Ethereum RPC is connected to a different chain");
+        Function fn=new Function("balanceOf",Collections.singletonList(new Address(owner)),Collections.singletonList(new TypeReference<Uint256>() {}));
+        BigInteger available=null;
+        for(String block:new String[]{"latest","pending"}) {
+            Object result;
+            try {
+                JSONObject tx=new JSONObject().put("to",token).put("data",FunctionEncoder.encode(fn));
+                result=rpc.call("eth_call",new org.json.JSONArray().put(tx).put(block));
+            }catch(org.json.JSONException invalid){throw new IOException("Invalid Ethereum balance request",invalid);}
+            // Same exact ABI-word check as EthHtlc.requireReturnWords.
+            if(!(result instanceof String)||!((String)result).matches("0[xX][0-9a-fA-F]{64}"))throw new IOException("Invalid Ethereum balance reply");
+            BigInteger balance=new BigInteger(((String)result).substring(2),16);
+            available=available==null?balance:available.min(balance);
+        }
+        return available;
+    }
+
     /** Format a raw integer amount with the given decimals to a trimmed decimal string. */
     public static String format(BigInteger raw, int decimals, int maxFrac) {
         if (raw == null) return "0";

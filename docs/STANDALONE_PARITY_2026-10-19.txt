@@ -252,3 +252,10 @@ flavors. Only Pandamonium candidate built here. Standalone MDS KeetChat
 ensureContact and needs equivalent placeholder adoption and saved-name recovery.
 Parlons MaximaNode.storeKeetsContact already supplies the proven adoption rule.
 Defer standalone MDS parity until after the demo. See KEETS_CONTACT_NAME_2026-10-19.txt.
+
+AtomiX fresh bid backing — 2.0.6/code201
+Port scripts/adapt-pandamonium-atomix-bid-backing.py and BidBackingTest to standalone
+AtomiX after demo. Preserve its namespace/transport and existing generation guards.
+Sibling ETH Wallet/MinimaSwap/USDT Swap balance readers were inspected; broader
+pending-spend accounting remains open. Do not equate this checkpoint with completed
+standalone parity or a guarantee of reserved/escrowed maker funds.

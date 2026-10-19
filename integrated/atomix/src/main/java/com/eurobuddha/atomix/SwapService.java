@@ -440,7 +440,7 @@ public class SwapService extends Service {
                 updateFg(fgStateText());
                 return;
             }
-            SwapOrderBook.publishFresh(node, ls, identity, o, gen, new CommsTransport.SendCb() {
+            engine.publishFresh(ls, identity, o, gen, new CommsTransport.SendCb() {
             @Override public void onSent(String txpowid) {
                 if (gen != PublishGate.gen()) {   // a user edit/withdraw or peg-tombstone superseded this attempt
                     PublishGate.release(PublishGate.ORDER);
@@ -454,7 +454,7 @@ public class SwapService extends Service {
                 PublishGate.release(PublishGate.ORDER);
                 SwapLog.d("bg publish OK " + txpowid);
                 updateFg(fgStateText());
-                if (restored && peg == PriceOracle.PEG_APPLIED)
+                if (restored && peg == PriceOracle.PEG_APPLIED && o.hasLiquidity())
                     alert(PriceOracle.source() + " feed recovered", "Your pegged order is live again.");
             }
             @Override public void onFailed(String message) {

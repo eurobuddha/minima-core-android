@@ -552,3 +552,12 @@ Reused Parlons storeKeetsContact rule; added conditional DB update, recovery fro
 saved incoming messages and list/title refresh behavior. See
 KEETS_CONTACT_NAME_2026-10-19.txt for evidence and protocol limits. This is a local
 candidate; public/device2.0.0 remains unchanged. Full review remains open.
+
+AtomiX bid backing — 2.0.6/code201 checkpoint
+MAJOR: live publication reused cached USDT; readers retained zero-backed ladders.
+All four live publication paths now read latest/pending USDT and clamp exact
+cumulative bid costs. Captured context remains guarded through delayed posting.
+466 AtomiX +180 host tests pass; pinned imports verify. See
+ATOMIX_BID_BACKING_2026-10-19.txt. Durable unknown Ethereum spends are still an open
+reservation-accounting review item: RPC pending state alone cannot prove their
+absence. No replacement of the public/device2.0.0 demo release.
