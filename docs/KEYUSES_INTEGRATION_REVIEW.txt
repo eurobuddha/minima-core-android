@@ -53,8 +53,9 @@ Validation
 - 66 JVM/Robolectric tests pass: KeyUses 37, wallet public snapshots 10, node bridge
   4, shared dual-family audit 10 and app navigation 5. No failures or errors.
 - Canonical importer reproduces all 22 source snapshots and provenance. Localization
-  validates 6,876 messages in all four languages. Direct-transport guard and
-  git diff --check pass.
+  validates 6,876 messages in all four languages. Direct-transport guard passes.
+  The staged whitespace check reports one preserved donor whitespace-only line in
+  integrated/keyreuses/src/main/res/values/themes.xml:3; no functional finding.
 - Signed assemblePandamoniumRelease passes, including lintVital and final APK
   verification of the exact Keets bundle, all 21 addons per ABI and Bare runtime.
   Actual APK DEX contains KeyUses, the selection and node bridge, and shared audit
