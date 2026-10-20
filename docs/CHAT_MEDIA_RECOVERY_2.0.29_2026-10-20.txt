@@ -56,3 +56,14 @@ Host validation/install:
   startup verification. No user photo/message or transaction sent by the assistant.
 - Other connected phone untouched. Other two flavor builds are verification only.
 - Not store-published; branch integration with concurrent host work remains separate.
+
+Final device startup verification:
+Keets completed normal background startup behind the app lock; unlock was not
+required for this diagnostic. Fresh log window began20Oct14:38:40. At14:38:55 the
+API reported up on127.0.0.1:11006 and media reported up, with the same chat drive
+identity recorded before this update (0pins). No closed-store/fatal error appeared
+in this startup window. No phone fault injection or assistant photo send performed.
+Local Node/Bare fault-injection tests supply recovery evidence; device logs confirm
+normal startup of the installed verified bundle, not a new live failure reproduction.
+Host validation and device-startup review complete. Source and evidence pushed to
+fork/fix/chat-errors-2026-10-20; public stores remain on their previous release.
