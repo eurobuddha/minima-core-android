@@ -1,0 +1,51 @@
+Standalone companion parity — resumed2026-10-20
+
+User resumed parity and explicitly requires preservation of intentional standalone
+differences. Fix only applicable shared defects. No DirectNodeApi, embedded host
+lock, host lifecycle, cross-module private-store or privileged node-key behaviour
+is to be copied merely to make code match. Image-placeholder investigation was
+cancelled and is excluded. No live transactions or seed changes for parity tests.
+
+Inventory reconciled against current repository HEAD/version and the append-only
+2026-10-19 ledger.23 native companions (22 original plus Faucet).
+11 remain in the recorded comparison queue, not11 confirmed broken applications:
+minimaWallet,UTXO Wallet,NFT Wallet,ETH Wallet,AtomiX,PandaPools,PandaDEX,
+MiniMall Shop,MiniMall Inbox,Atelier,Salon.
+12 have no specifically outstanding port recorded: History,Vestr,Future Cash Next,
+KeyUses,MiniMall Studio,Terminal IDE,Filez,Entropy,Mail,Casino,Block Explorer,Faucet.
+That second category is not a claim of exhaustive defect-free review.
+KeetChat MDS contact-name parity is separate from this native-APK count.
+Provisional effort estimate given to user:2–4 working days including regressions;
+reassess as applicability checks close differences without source changes.
+
+Latest standalone versions observed
+ETH Wallet0.2.10/94e7cf3;AtomiX0.1.81/a5db5d7;PandaPools0.9.67/2f39f65;
+Future Cash Next0.1.11/a006491;PandaDEX0.4.23/fbe0645;Casino0.7.4/0218dd0;
+Block Explorer0.1.6/f0fe019;Filez0.1.13/daf7ec9;History0.3.13/7d5cd10;
+Vestr0.4.8/8685e80;Entropy0.1.10/3e5c10d;Terminal IDE0.3.3/fec4b7d;
+Mail0.5.12/af73667;UTXO0.4.38/5456e4d;Studio0.3.8/c5ec2fe;
+Inbox0.5.6/930a1de;NFT Wallet0.1.15/b5c983f;minimaWallet0.2.28/ff061e3;
+Salon0.11.41/7297519;KeyUses0.1.6/d4f5988;Faucet0.2.5/9a8a056;
+Atelier0.7.19/e5dc3b0. Shop advanced below.
+
+Completed this continuation
+MiniMall Shop0.4.9/code409,commit788b5be, pushed origin/master.
+Confirmed shared stale connection-label defect in standalone source. Reused
+adapt-pandamonium-shop-checkout.py::adapt_status and two donor regressions,
+changing only standalone English/comms imports. Both tests failed before repair;
+13debug+13release pass after. Release assembly/lint pass(0errors84warnings).
+Reviewed source/callers/tests/version; no blocking findings in this scoped repair.
+Candidate apks/merchshop/dist/minimall-shop-0.4.9-candidate.apk
+SHA256d3e8c129dca462ccead2a9d8d870c90d199a06a37aa51c662b4425c352740cc1
+Actual package/version/family signature/ZIP integrity verified. Not installed or
+published. Shop payment/order journal review remains open.
+
+Next applicable confirmed gap inspected
+Standalone minimaWallet SweepFlow.plan retains mutable coin/state references and
+pools native Minima state coins. Donor SweepPlanner.java and
+SweepPlannerTest/SweepWholeTransferTest read; TxnFactory,resolveInputs,Nft state
+parser,existing tests and invocation paths inspected. Reuse report sent to user.
+No wallet edit yet: user prioritized publishing all Pandamonium work.
+After publication resume planner/native-state parity, then durable unknown-outcome
+receipt/retry and strict size rejection. Do not import integrated unlock worker
+or reset changes; standalone unlock/reset were user-confirmed working.

@@ -1,0 +1,53 @@
+Pandamonium2.0.27 publication —2026-10-20
+
+User explicitly requested all Pandamonium work committed,pushed and published
+to GitHub and stores before continued companion parity.
+All app source changes through2.0.27 were already committed/pushed at
+e7c8fa41de04a163be747ba4fd8a7b54e08eb82c on
+fork/feature/bear-languages-2026-10-16. Remote branch verified. Only unrelated
+graph query timestamp was dirty; excluded. No app code changed for publication.
+
+Published unchanged signed artifact:
+base/dist/minima-core-Pandamonium-2.0.27.apk
+Package com.eurobuddha.pandamonium;2.0.27-Pandamonium/code222;137246205bytes.
+SHA256038e4fc716f7dc0f140946aea6ac168a9c72331902df266446f961d424cb7253
+Certificate eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+Actual package/version/signature/ZIP integrity verified. Exact match to Gradle
+release output. Keets verifier confirms exact bundle+21addons/runtime per ABI;
+transport guard passes. Existing final318Atelier regression checkpoint/build/lint
+results retained.2.0.27 timing notice has not been checked on physical Fold;
+2.0.26 was installed. Release notes explicitly distinguish these limits.
+
+GitHub public release(latest):
+https://github.com/eurobuddha/minima-core-android/releases/tag/v2.0.27-Pandamonium
+Tag points to exact full source SHA above. Public asset is uploaded,137246205bytes,
+and GitHub digest matches. Release includes all2.0.22–2.0.27 app changes.
+
+Shared PandaApps/minimaCore App Store catalogue:
+repo /Users/eurobuddha/Projects/minima/desktop/minima-core-apks
+commit e4c7c7275e48067da39e8fa304c30a3dc3ca781a pushed origin/main.
+Existing scripts/publish-app.py downloads/verifies actual APK identity and hash.
+Updated only Pandamonium row plus changelog. Full check.py and pre-push gate pass:
+53entries,52binaries. Public GitHub-main catalogue re-read:222/hashmatch.
+
+Website https://eurobuddha.com/apks.json atomically updated from immutable catalogue
+commit after SHA256,no-downgrade and unrelated-row equality checks. Backup retained:
+/var/www/html/apks.json.before-pandamonium-2.0.27-20261020T104040Z
+Catalogue SHA2563f8426278234ab48d72c23f86d5cc562b4fb05f4d57ea6fcdbe6276fccb4ab98
+Public website re-read:2.0.27/code222/hashmatch.
+
+IPFS: deployed /usr/local/bin/build_ipfs_store.sh matches inspected dappstore
+source SHA2565daba19575955bd4c4d14b19400e648fb4b1148b65e435b841f343f6de17ea5f.
+Ran existing publisher on hetzner with immutable APKS_JSON_URL.
+Snapshot bafybeih3ddwlclxahdfkifwvei2mcngfqwto5njswsvgrqzxx4omuv2x6y
+Recursive local pin and IPNS resolution verified. Both friendly public catalogue
+https://ipfs.eurobuddha.com/apks/apks.json and immutable snapshot catalogue serve
+2.0.27/code222/hashmatch. Independent public snapshot APK download confirms
+137246205bytes and exact SHA256 above. Publisher preserves historical artifacts
+and pins. Optional third-party redundancy not claimed.
+
+Publication complete for GitHub,PandaApps,minimaCore App Store,website and IPFS.
+No Apple/Google store submission. No device installation or blockchain transaction
+in this publication. Broad review and companion parity remain in progress;
+large-TxPoW Sweep handling remains device-untested.
+Continue companion work from docs/STANDALONE_PARITY_2026-10-20.txt.
