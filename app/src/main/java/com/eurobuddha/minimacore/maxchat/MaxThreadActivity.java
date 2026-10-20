@@ -24,6 +24,7 @@ import static com.eurobuddha.minimacore.i18n.R.string.*;
 
 import com.eurobuddha.minimacore.chat.ChatUi;
 import com.eurobuddha.minimacore.chat.ChatMessages;
+import com.eurobuddha.minimacore.chat.ChatFailureDialog;
 import com.eurobuddha.maxima.core.MaximaNode;
 import com.eurobuddha.maxima.core.chat.ChatEngine;
 import com.eurobuddha.maxima.core.chat.ChatMedia;
@@ -56,6 +57,11 @@ public class MaxThreadActivity extends AppCompatActivity {
         };
     }
 
+
+    private void showFailure(CharSequence message) {
+        if (isFinishing() || isDestroyed()) return;
+        ChatFailureDialog.show(this, dialog(), message);
+    }
 
     private SendDraft mSendDraft;
     private String mPeer;
@@ -130,8 +136,7 @@ public class MaxThreadActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         if (isFinishing() || isDestroyed()) return;
                         mSendDraft.failed(submission);
-                        Toast.makeText(this,
-                                Language.msg(l10n_chat_send_failed, ChatMessages.error(e)), Toast.LENGTH_LONG).show();
+                        showFailure(Language.msg(l10n_chat_send_failed, ChatMessages.error(e)));
                     });
                 }
                 runOnUiThread(() -> { if (!isFinishing() && !isDestroyed()) mAdapter.reload(); });
@@ -249,8 +254,7 @@ public class MaxThreadActivity extends AppCompatActivity {
                 // (it spawns its own send thread for the slow publish)
                 runOnUiThread(() -> sendMediaBytes(jpeg, "image/jpeg", ""));
             } catch (Exception e) {
-                runOnUiThread(() -> Toast.makeText(this,
-                        Language.msg(l10n_chat_photo_failed, ChatMessages.error(e)), Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> showFailure(Language.msg(l10n_chat_photo_failed, ChatMessages.error(e))));
             }
         }, "maxchat-photo").start();
     }
@@ -269,8 +273,7 @@ public class MaxThreadActivity extends AppCompatActivity {
             try {
                 chat.sendMedia(c, zBytes, zMime, zCaption);
             } catch (Exception e) {
-                runOnUiThread(() -> Toast.makeText(this,
-                        Language.msg(l10n_chat_send_failed, ChatMessages.error(e)), Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> showFailure(Language.msg(l10n_chat_send_failed, ChatMessages.error(e))));
             }
             runOnUiThread(mAdapter::reload);
         }, "maxchat-media-send").start();

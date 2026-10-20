@@ -68,6 +68,11 @@ public class ChatThreadActivity extends AppCompatActivity {
     }
 
 
+    private void showFailure(CharSequence message) {
+        if (isFinishing() || isDestroyed()) return;
+        ChatFailureDialog.show(this, dialog(), message);
+    }
+
     private String mPubkey;
     private MsgAdapter mAdapter;
     private Toolbar mToolbar;
@@ -285,7 +290,7 @@ public class ChatThreadActivity extends AppCompatActivity {
         MinimaCMD.runMinima("send address:" + zAddr + " amount:" + zAmt, zResult -> {
             boolean ok = (Boolean) zResult.getOrDefault("status", false);
             if (!ok) {
-                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_payment_failed, String.valueOf(zResult.get("error"))), Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> showFailure(Language.msg(l10n_chat_payment_failed, String.valueOf(zResult.get("error")))));
                 return;
             }
             String txid = "";
@@ -353,9 +358,13 @@ public class ChatThreadActivity extends AppCompatActivity {
                 String via = (Boolean) sr.getOrDefault("status", false)
                         ? (String) ((JSONObject) sr.get("response")).get("delivered") : "FAILED";
                 ChatDb.get(this).setVia(msgid, via);
-                runOnUiThread(() -> mAdapter.reload());
+                runOnUiThread(() -> {
+                    mAdapter.reload();
+                    if ("FAILED".equals(via)) showFailure(Language.msg(l10n_chat_send_failed,
+                            ChatMessages.message(String.valueOf(sr.get("error")))));
+                });
             } catch (Exception exc) {
-                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_photo_failed, ChatMessages.error(exc)), Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> showFailure(Language.msg(l10n_chat_photo_failed, ChatMessages.error(exc))));
             }
         }, "chat-image-send").start();
     }
@@ -441,9 +450,13 @@ public class ChatThreadActivity extends AppCompatActivity {
                 String via = (Boolean) sr.getOrDefault("status", false)
                         ? (String) ((JSONObject) sr.get("response")).get("delivered") : "FAILED";
                 ChatDb.get(this).setVia(msgid, via);
-                runOnUiThread(() -> mAdapter.reload());
+                runOnUiThread(() -> {
+                    mAdapter.reload();
+                    if ("FAILED".equals(via)) showFailure(Language.msg(l10n_chat_send_failed,
+                            ChatMessages.message(String.valueOf(sr.get("error")))));
+                });
             } catch (Exception exc) {
-                runOnUiThread(() -> Toast.makeText(this, Language.msg(l10n_chat_voice_failed, ChatMessages.error(exc)), Toast.LENGTH_LONG).show());
+                runOnUiThread(() -> showFailure(Language.msg(l10n_chat_voice_failed, ChatMessages.error(exc))));
             }
         }, "chat-voice-send").start();
     }
@@ -542,7 +555,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                     if (ok) via = (String) ((JSONObject) zResult.get("response")).get("delivered");
                     ChatDb.get(this).setVia(msgid, via);
                     mAdapter.reload();
-                    if (!ok) Toast.makeText(this, Language.msg(l10n_chat_not_sent), Toast.LENGTH_LONG).show();
+                    if (!ok) showFailure(Language.msg(l10n_chat_send_failed, ChatMessages.message(String.valueOf(zResult.get("error")))));
                 }));
     }
 

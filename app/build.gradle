@@ -129,7 +129,7 @@ android {
         // vc113: explicit English, Chinese, Russian and Ukrainian selection across all bears.
         // vc114: core notifications and retained main-screen controls follow the selected language.
         // vc118: current four-language catalogue and reviewed AtomiX receipt/consent fixes.
-        versionCode 225
+        versionCode 226
         versionName "2.0.30"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
