@@ -1,5 +1,7 @@
 # minima-core-android
 
+> ⚠️ **Personal fork — in development, use at your own risk.** This is an experimental, actively-developed personal fork of Minima Core, provided **AS IS**, without warranty of any kind (licensed under [Apache 2.0](LICENSE), same as upstream Minima). It is a non-custodial node that manages real keys and funds; back up your seed and only use it with funds you can afford to lose. Not an official Minima Global release, and not financial advice.
+
 Reviewed release artifacts: **Minima Core 1.9.10 (81)**. Latest verified Fold installation: **1.9.9 (80)**. The app name is Minima Core;
 PandaBear, BlackBear and Pandamonium are build names. Their Android IDs are
 `com.eurobuddha.minimacore`, `com.eurobuddha.minimablock` and `com.eurobuddha.pandamonium`.
