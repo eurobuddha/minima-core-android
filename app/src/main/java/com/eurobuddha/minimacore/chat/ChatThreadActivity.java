@@ -319,6 +319,10 @@ public class ChatThreadActivity extends AppCompatActivity {
                         String via = ok2 ? (String) ((JSONObject) zR2.get("response")).get("delivered") : "FAILED";
                         ChatDb.get(this).setVia(msgid, via);
                         mAdapter.reload();
+                        // The on-chain send already succeeded (txid stored); surface it if the keets
+                        // delivery of the payment receipt failed, like the image/voice/text paths do.
+                        if (!ok2) showFailure(Language.msg(l10n_chat_send_failed,
+                                ChatMessages.message(String.valueOf(zR2.get("error")))));
                     }));
         });
     }

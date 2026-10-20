@@ -773,7 +773,7 @@
     <string name="l10n_seed_sync_start_failed_body" formatted="false">"节点服务未能及时启动。请打开 Minima 并重新尝试恢复。"</string>
     <!-- Arguments: error -->
     <string name="l10n_seed_sync_resync_after_start">"%1$s\n\nMinima 启动后，请重新同步节点。"</string>
-    <string name="l10n_seed_sync_error" formatted="false">"错误"</string>
+    <string name="l10n_error" formatted="false">"错误"</string>
     <string name="l10n_backup_hub_help" formatted="false">"保存此节点的副本、还原副本，或从其他节点重建。"</string>
     <string name="l10n_backup_create" formatted="false">"创建备份"</string>
     <string name="l10n_backup_create_help" formatted="false">"创建此节点的加密 .bak 备份，然后在手机以外保存一份副本。"</string>
@@ -1157,7 +1157,6 @@
     <string name="l10n_chat_voice_failed">"语音消息发送失败：%1$s"</string>
     <string name="l10n_chat_voice_unavailable" formatted="false">"语音消息暂不可用"</string>
     <string name="l10n_chat_playback_failed" formatted="false">"播放失败"</string>
-    <string name="l10n_chat_not_sent" formatted="false">"未发送 — 请检查节点是否正在运行"</string>
     <string name="l10n_chat_payment_received" formatted="false">"已收到付款"</string>
     <string name="l10n_chat_payment_sent" formatted="false">"付款已发送"</string>
     <string name="l10n_chat_tap_txid" formatted="false">"点击查看交易 ID"</string>

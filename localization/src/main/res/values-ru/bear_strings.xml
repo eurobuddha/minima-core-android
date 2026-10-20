@@ -806,7 +806,7 @@
     <string name="l10n_seed_sync_start_failed_body" formatted="false">"Служба узла не запустилась вовремя. Откройте Minima и повторите восстановление."</string>
     <!-- Arguments: error -->
     <string name="l10n_seed_sync_resync_after_start">"%1$s\n\nПосле запуска Minima синхронизируйте узел."</string>
-    <string name="l10n_seed_sync_error" formatted="false">"Ошибка"</string>
+    <string name="l10n_error" formatted="false">"Ошибка"</string>
     <string name="l10n_backup_hub_help" formatted="false">"Сохраните копию узла, восстановите её или перестройте его данные с другого узла."</string>
     <string name="l10n_backup_create" formatted="false">"Создать резервную копию"</string>
     <string name="l10n_backup_create_help" formatted="false">"Создайте зашифрованную копию узла в формате .bak и сохраните её вне телефона."</string>
@@ -1193,7 +1193,6 @@
     <string name="l10n_chat_voice_failed">"Ошибка голосового сообщения: %1$s"</string>
     <string name="l10n_chat_voice_unavailable" formatted="false">"Голосовое сообщение пока недоступно"</string>
     <string name="l10n_chat_playback_failed" formatted="false">"Ошибка воспроизведения"</string>
-    <string name="l10n_chat_not_sent" formatted="false">"Не отправлено — проверьте, работает ли узел"</string>
     <string name="l10n_chat_payment_received" formatted="false">"Платёж получен"</string>
     <string name="l10n_chat_payment_sent" formatted="false">"Платёж отправлен"</string>
     <string name="l10n_chat_tap_txid" formatted="false">"нажмите для ID транзакции"</string>

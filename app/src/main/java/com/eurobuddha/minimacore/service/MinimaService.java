@@ -393,7 +393,9 @@ public class MinimaService extends Service {
         //(the other node may be shutting down). Probe the port THIS node will actually bind -
         //base 11001, overridden by a -port in extra params (last wins) - not a hardcoded 11001,
         //so a build on another port (e.g. BlackBear on 13001) doesn't warn about a different
-        //app's node on 11001. Checked off the main thread - even a localhost connect is network I/O.
+        //app's node on 11001. Last-wins matches core: ParamConfigurer's -port handler sets
+        //GeneralParams.MINIMA_PORT once per -port arg in parse order, so the last -port wins -
+        //same order as vars here. Checked off the main thread - even a localhost connect is network I/O.
         int effectivePort = 11001;
         for (int i = 0; i + 1 < vars.size(); i++)
             if ("-port".equals(vars.get(i))) {

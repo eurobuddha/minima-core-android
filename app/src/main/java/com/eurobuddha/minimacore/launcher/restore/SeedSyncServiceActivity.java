@@ -211,7 +211,7 @@ public class SeedSyncServiceActivity extends AppCompatActivity implements Servic
                         @Override
                         public void run() {
                             if (isFinishing() || isDestroyed()) return;
-                            logger.showDialog(SeedSyncServiceActivity.this, Language.msg(l10n_seed_sync_error), Language.msg(l10n_seed_sync_resync_after_start, error), new Runnable() {
+                            logger.showDialog(SeedSyncServiceActivity.this, Language.msg(l10n_error), Language.msg(l10n_seed_sync_resync_after_start, error), new Runnable() {
                                 @Override
                                 public void run() {
                                     //Start Main..

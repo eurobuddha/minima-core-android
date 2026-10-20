@@ -129,12 +129,15 @@ android {
         // vc113: explicit English, Chinese, Russian and Ukrainian selection across all bears.
         // vc114: core notifications and retained main-screen controls follow the selected language.
         // vc118: current four-language catalogue and reviewed AtomiX receipt/consent fixes.
-        versionCode 226
-        versionName "2.0.30"
+        versionCode 227
+        versionName "2.0.31"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
         // node-event feed History needs. True for block + pandamonium; false for classic.
+        // INVARIANT: any flavor with PANDAMONIUM=true MUST set PANDA_SHELL=true (the superapp
+        // host relies on the shell tab positions). A verifyPandaShellInvariant check below
+        // fails the build if that is ever violated.
         buildConfigField "boolean", "PANDA_SHELL", "false"
         // Brand line under the Node-screen "Minima Core" title ("" = none).
         buildConfigField "String", "SHELL_BRAND", "\"\""
@@ -175,6 +178,15 @@ android {
             buildConfigField "boolean", "PANDA_SHELL", "true"
         }
     }
+
+    // BlackBear (block) and Pandamonium share the Pandamonium-style shell code (e.g. the History
+    // tab) that classic/PandaBear does not ship. One source set, added to both flavors, avoids
+    // duplicating those files per flavor.
+    sourceSets {
+        block.java.srcDirs += 'src/pandaShell/java'
+        pandamonium.java.srcDirs += 'src/pandaShell/java'
+    }
+
     signingConfigs {
         // Minima family release key. Credentials come from ~/.gradle/gradle.properties
         // (outside every repo), so nothing secret is ever committed. On a machine without
@@ -219,6 +231,17 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+// INVARIANT: PANDAMONIUM ⇒ PANDA_SHELL. The superapp host's tab positions come from
+// PANDA_SHELL; a flavor that turned PANDAMONIUM on without it would silently misposition tabs.
+// Fail the build rather than ship that.
+android.productFlavors.all { f ->
+    def pm = f.buildConfigFields['PANDAMONIUM']?.value
+    def ps = f.buildConfigFields['PANDA_SHELL']?.value
+    if (pm == 'true' && ps != 'true') {
+        throw new GradleException("Flavor '${f.name}': PANDAMONIUM=true requires PANDA_SHELL=true")
     }
 }
 
@@ -270,8 +293,10 @@ dependencies {
     // The fork's node has NO Maxima - the app carries the clean-room core itself, like mininotes.
     implementation project(':maxima-core')
     testImplementation libs.junit
-    testPandamoniumImplementation 'org.robolectric:robolectric:4.14.1'
-    testPandamoniumImplementation 'org.json:json:20240303'
+    // Robolectric + json are shared so the (main-code) ChatFailureDialogTest runs for every
+    // flavor's unit tests, not just Pandamonium's. web3j stays Pandamonium-only (its tests need it).
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+    testImplementation 'org.json:json:20240303'
     testPandamoniumImplementation 'org.web3j:crypto:4.9.8'
     testImplementation 'org.mockito:mockito-core:5.12.0'
     androidTestImplementation libs.ext.junit

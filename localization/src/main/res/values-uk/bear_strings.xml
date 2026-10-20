@@ -806,7 +806,7 @@
     <string name="l10n_seed_sync_start_failed_body" formatted="false">"Служба вузла не запустилася вчасно. Відкрийте Minima та повторіть відновлення."</string>
     <!-- Arguments: error -->
     <string name="l10n_seed_sync_resync_after_start">"%1$s\n\nПісля запуску Minima синхронізуйте вузол."</string>
-    <string name="l10n_seed_sync_error" formatted="false">"Помилка"</string>
+    <string name="l10n_error" formatted="false">"Помилка"</string>
     <string name="l10n_backup_hub_help" formatted="false">"Збережіть копію вузла, відновіть її або перебудуйте його дані з іншого вузла."</string>
     <string name="l10n_backup_create" formatted="false">"Створити резервну копію"</string>
     <string name="l10n_backup_create_help" formatted="false">"Створіть зашифровану копію вузла у форматі .bak та збережіть її поза телефоном."</string>
@@ -1193,7 +1193,6 @@
     <string name="l10n_chat_voice_failed">"Помилка голосового повідомлення: %1$s"</string>
     <string name="l10n_chat_voice_unavailable" formatted="false">"Голосове повідомлення поки недоступне"</string>
     <string name="l10n_chat_playback_failed" formatted="false">"Помилка відтворення"</string>
-    <string name="l10n_chat_not_sent" formatted="false">"Не надіслано — перевірте, чи працює вузол"</string>
     <string name="l10n_chat_payment_received" formatted="false">"Платіж отримано"</string>
     <string name="l10n_chat_payment_sent" formatted="false">"Платіж надіслано"</string>
     <string name="l10n_chat_tap_txid" formatted="false">"натисніть для ID транзакції"</string>

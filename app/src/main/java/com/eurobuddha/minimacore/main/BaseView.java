@@ -38,6 +38,12 @@ public class BaseView {
         com.eurobuddha.minimacore.i18n.Language.apply(mMainView);
     }
 
+    /** For a view that supplies its OWN already-built content view - the subclass assigns
+     *  mMainView itself. Avoids inflating a layout the subclass would immediately discard. */
+    protected BaseView(Activity zActivity){
+        mActivity = zActivity;
+    }
+
     public Activity getActivity(){
         return mActivity;
     }

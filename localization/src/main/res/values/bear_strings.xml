@@ -784,7 +784,7 @@
     <string name="l10n_seed_sync_start_failed_body" formatted="false">"The node service did not come up in time. Open Minima and try the restore again."</string>
     <!-- Arguments: error -->
     <string name="l10n_seed_sync_resync_after_start">"%1$s\n\nResync your node when Minima starts."</string>
-    <string name="l10n_seed_sync_error" formatted="false">"Error"</string>
+    <string name="l10n_error" formatted="false">"Error"</string>
     <string name="l10n_backup_hub_help" formatted="false">"Save a copy of this node, put it back, or rebuild it from another node."</string>
     <string name="l10n_backup_create" formatted="false">"Create backup"</string>
     <string name="l10n_backup_create_help" formatted="false">"Write an encrypted .bak of this node, then save a copy off the phone."</string>
@@ -1169,7 +1169,6 @@
     <string name="l10n_chat_voice_failed">"Voice note failed: %1$s"</string>
     <string name="l10n_chat_voice_unavailable" formatted="false">"Voice note not available yet"</string>
     <string name="l10n_chat_playback_failed" formatted="false">"Playback failed"</string>
-    <string name="l10n_chat_not_sent" formatted="false">"Not sent — check the node is running"</string>
     <string name="l10n_chat_payment_received" formatted="false">"Payment received"</string>
     <string name="l10n_chat_payment_sent" formatted="false">"Payment sent"</string>
     <string name="l10n_chat_tap_txid" formatted="false">"tap for txid"</string>

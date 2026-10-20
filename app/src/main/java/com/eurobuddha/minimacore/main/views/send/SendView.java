@@ -111,7 +111,7 @@ public class SendView extends BaseView {
                 String address      = mAddress.getText().toString().trim();
 
                 if(amount.equals("") || address.equals("")){
-                    logger.showDialog(getActivity(),Language.msg(l10n_seed_sync_error),Language.msg(l10n_send_blank));
+                    logger.showDialog(getActivity(),Language.msg(l10n_error),Language.msg(l10n_send_blank));
                     return;
                 }
 
@@ -119,22 +119,22 @@ public class SendView extends BaseView {
                 //so a pasted "MxREAL burn:100" would otherwise inject a burn - and the confirm
                 //dialog was the only thing standing between that paste and lost funds.
                 if(!Format.isValidAddress(address)){
-                    logger.showDialog(getActivity(),Language.msg(l10n_seed_sync_error),Language.msg(l10n_send_invalid_address));
+                    logger.showDialog(getActivity(),Language.msg(l10n_error),Language.msg(l10n_send_invalid_address));
                     return;
                 }
                 if(!Format.isValidAmount(amount)){
-                    logger.showDialog(getActivity(),Language.msg(l10n_seed_sync_error),Language.msg(l10n_send_invalid_amount));
+                    logger.showDialog(getActivity(),Language.msg(l10n_error),Language.msg(l10n_send_invalid_amount));
                     return;
                 }
 
                 JSONObject token    = mTokenAdapter.getToken(mChosenToken);
                 if (token == null) {
-                    logger.showDialog(getActivity(), Language.msg(l10n_seed_sync_error), Language.msg(l10n_send_no_balance));
+                    logger.showDialog(getActivity(), Language.msg(l10n_error), Language.msg(l10n_send_no_balance));
                     return;
                 }
                 String tokenid = String.valueOf(token.get("tokenid"));
                 if (!Format.isValidTokenId(tokenid)) {
-                    logger.showDialog(getActivity(), Language.msg(l10n_seed_sync_error), Language.msg(l10n_send_invalid_token));
+                    logger.showDialog(getActivity(), Language.msg(l10n_error), Language.msg(l10n_send_invalid_token));
                     return;
                 }
                 CharSequence tokenname = TokenUtils.getTokenDisplayName(token);
