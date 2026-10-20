@@ -127,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         tb.setTitle("Minima Core");
 
         setSupportActionBar(tb);
+        // SKU brand line (e.g. "BlackBear") persists under the title, like Pandamonium's brand.
+        if (!BuildConfig.PANDAMONIUM && !BuildConfig.SHELL_BRAND.isEmpty() && getSupportActionBar() != null)
+            getSupportActionBar().setSubtitle(BuildConfig.SHELL_BRAND);
         KeyboardInsets.install(this, findViewById(R.id.main), tb,
                 findViewById(R.id.tabs), findViewById(R.id.main_footer));
 
@@ -158,14 +161,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         tabs.setupWithViewPager(mMainPager);
 
         // Tab labels and content share the adapter positions for this build.
-        tabs.getTabAt(MainAdapter.HOME_POSITION).setText(Language.text(this, BuildConfig.PANDAMONIUM ? l10n_tab_node : l10n_tab_home));
-        tabs.getTabAt(MainAdapter.HOME_POSITION).setIcon(BuildConfig.PANDAMONIUM
+        tabs.getTabAt(MainAdapter.HOME_POSITION).setText(Language.text(this, BuildConfig.PANDA_SHELL ? l10n_tab_node : l10n_tab_home));
+        tabs.getTabAt(MainAdapter.HOME_POSITION).setIcon(BuildConfig.PANDA_SHELL
                 ? R.drawable.ic_node : R.drawable.ic_drawer_home);
 
         tabs.getTabAt(MainAdapter.WALLET_POSITION).setText(Language.text(this, l10n_tab_wallet));
         tabs.getTabAt(MainAdapter.WALLET_POSITION).setIcon(R.drawable.ic_minima);
 
-        tabs.getTabAt(MainAdapter.UTILITY_POSITION).setText(Language.text(this, BuildConfig.PANDAMONIUM ? l10n_tab_history : l10n_tab_terminal));
+        tabs.getTabAt(MainAdapter.UTILITY_POSITION).setText(Language.text(this, BuildConfig.PANDA_SHELL ? l10n_tab_history : l10n_tab_terminal));
         tabs.getTabAt(MainAdapter.UTILITY_POSITION).setIcon(R.drawable.ic_edit_note);
 
         tabs.getTabAt(MainAdapter.APPS_POSITION).setText(Language.text(this, l10n_tab_apps));
@@ -219,13 +222,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         String title;
         switch (zPosition){
             case MainAdapter.WALLET_POSITION:  title = Language.text(this, l10n_tab_wallet);      break;
-            case MainAdapter.UTILITY_POSITION:  title = Language.text(this, BuildConfig.PANDAMONIUM ? l10n_tab_history : l10n_tab_terminal);    break;
+            case MainAdapter.UTILITY_POSITION:  title = Language.text(this, BuildConfig.PANDA_SHELL ? l10n_tab_history : l10n_tab_terminal);    break;
             case MainAdapter.APPS_POSITION:  title = Language.text(this, l10n_tab_apps);        break;
             case MainAdapter.CHAT_POSITION:  title = Language.text(this, l10n_tab_chat);        break;
             default: title = BuildConfig.PANDAMONIUM ? "" : "Minima Core"; break;
         }
         if(getSupportActionBar() != null){
             getSupportActionBar().setTitle(BuildConfig.PANDAMONIUM ? "" : title);
+            // Keep the SKU brand (e.g. "BlackBear") under the title as the user switches tabs.
+            if (!BuildConfig.PANDAMONIUM && !BuildConfig.SHELL_BRAND.isEmpty())
+                getSupportActionBar().setSubtitle(BuildConfig.SHELL_BRAND);
         }
     }
 
@@ -238,10 +244,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         TabLayout tabs = findViewById(R.id.tabs);
         if (tabs != null && tabs.getTabCount() == 5) {
             tabs.getTabAt(MainAdapter.HOME_POSITION).setText(Language.text(this,
-                    BuildConfig.PANDAMONIUM ? l10n_tab_node : l10n_tab_home));
+                    BuildConfig.PANDA_SHELL ? l10n_tab_node : l10n_tab_home));
             tabs.getTabAt(MainAdapter.WALLET_POSITION).setText(Language.text(this, l10n_tab_wallet));
             tabs.getTabAt(MainAdapter.UTILITY_POSITION).setText(Language.text(this,
-                    BuildConfig.PANDAMONIUM ? l10n_tab_history : l10n_tab_terminal));
+                    BuildConfig.PANDA_SHELL ? l10n_tab_history : l10n_tab_terminal));
             tabs.getTabAt(MainAdapter.APPS_POSITION).setText(Language.text(this, l10n_tab_apps));
             tabs.getTabAt(MainAdapter.CHAT_POSITION).setText(Language.text(this, l10n_tab_chat));
         }

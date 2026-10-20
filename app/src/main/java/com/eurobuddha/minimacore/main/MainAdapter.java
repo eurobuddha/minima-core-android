@@ -17,11 +17,11 @@ import com.eurobuddha.minimacore.utils.logger;
 public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
 
     // Named positions keep service refreshes and companion permissions tied to their views.
-    public static final int HOME_POSITION = BuildConfig.PANDAMONIUM ? 4 : 0;
-    public static final int WALLET_POSITION = BuildConfig.PANDAMONIUM ? 0 : 1;
-    public static final int UTILITY_POSITION = BuildConfig.PANDAMONIUM ? 1 : 2;
-    public static final int APPS_POSITION = BuildConfig.PANDAMONIUM ? 2 : 3;
-    public static final int CHAT_POSITION = BuildConfig.PANDAMONIUM ? 3 : 4;   // was Logs (now in the overflow menu)
+    public static final int HOME_POSITION = BuildConfig.PANDA_SHELL ? 4 : 0;
+    public static final int WALLET_POSITION = BuildConfig.PANDA_SHELL ? 0 : 1;
+    public static final int UTILITY_POSITION = BuildConfig.PANDA_SHELL ? 1 : 2;
+    public static final int APPS_POSITION = BuildConfig.PANDA_SHELL ? 2 : 3;
+    public static final int CHAT_POSITION = BuildConfig.PANDA_SHELL ? 3 : 4;   // was Logs (now in the overflow menu)
 
     MainActivity mActivity;
 

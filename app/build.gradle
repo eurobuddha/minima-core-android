@@ -129,10 +129,15 @@ android {
         // vc113: explicit English, Chinese, Russian and Ukrainian selection across all bears.
         // vc114: core notifications and retained main-screen controls follow the selected language.
         // vc118: current four-language catalogue and reviewed AtomiX receipt/consent fixes.
-        versionCode 222
-        versionName "2.0.27"
+        versionCode 223
+        versionName "2.0.28"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
+        // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
+        // node-event feed History needs. True for block + pandamonium; false for classic.
+        buildConfigField "boolean", "PANDA_SHELL", "false"
+        // Brand line under the Node-screen "Minima Core" title ("" = none).
+        buildConfigField "String", "SHELL_BRAND", "\"\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -157,6 +162,9 @@ android {
             applicationId "com.eurobuddha.minimablock"
             versionNameSuffix "-BlackBear"
             buildConfigField "boolean", "BLOCK_KEYUSES", "true"
+            // BlackBear mirrors Pandamonium's tab shell + History, minus the integrated DeFi apps.
+            buildConfigField "boolean", "PANDA_SHELL", "true"
+            buildConfigField "String", "SHELL_BRAND", "\"BlackBear\""
         }
         pandamonium {
             dimension "keymode"
@@ -164,6 +172,7 @@ android {
             versionNameSuffix "-Pandamonium"
             buildConfigField "boolean", "BLOCK_KEYUSES", "true"
             buildConfigField "boolean", "PANDAMONIUM", "true"
+            buildConfigField "boolean", "PANDA_SHELL", "true"
         }
     }
     signingConfigs {
@@ -281,6 +290,8 @@ dependencies {
     pandamoniumImplementation project(':integrated-blockexplorer')
     pandamoniumImplementation project(':integrated-filez')
     pandamoniumImplementation project(':integrated-history')
+    // BlackBear also ships History (its only integrated tab); no other integrated apps.
+    blockImplementation project(':integrated-history')
     pandamoniumImplementation project(':integrated-vestr')
     pandamoniumImplementation project(':integrated-entropy')
     pandamoniumImplementation project(':integrated-terminalide')

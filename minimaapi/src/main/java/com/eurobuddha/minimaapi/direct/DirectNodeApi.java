@@ -28,8 +28,11 @@ public final class DirectNodeApi {
     private static final long RETENTION_MS = 10 * 60_000L; // existing PandaDEX late-result window
 
     public DirectNodeApi(Context context, MinimaAPIListener registration) {
-        if (!"com.eurobuddha.pandamonium".equals(context.getPackageName()))
-            throw new IllegalArgumentException("Direct node access is only available inside Pandamonium");
+        // In-process node access is for trusted bundled code only: Pandamonium (integrated apps)
+        // and BlackBear (the History tab). Both ship the embedded node in their own package.
+        String pkg = context.getPackageName();
+        if (!"com.eurobuddha.pandamonium".equals(pkg) && !"com.eurobuddha.minimablock".equals(pkg))
+            throw new IllegalArgumentException("Direct node access is only available inside Pandamonium or BlackBear");
         main.post(() -> { if (!closed && registration != null) deliverSafely(registration, LocalJson.ready(backend != null && backend.ready())); });
     }
     public void Command(String command, MinimaAPIListener listener) {
