@@ -32,7 +32,7 @@ successful assemble command as a usable artifact.
 
 `scripts/keets-dependencies.lock.json` records:
 
-- Keets source commit `79ee38c32fb82faf9ea4b0de91fe0e6103cf7731`, its archive SHA-256,
+- Keets source commit `7ee2b657d27d2bceb5e1db72b106064365e92390`, its archive SHA-256,
   and its npm lockfile SHA-256. The source's complete dependency tree uses npm
   integrity hashes, verified by `npm ci`.
 - Node **24.8.0** and its bundled npm **11.6.0**, with official per-host archive hashes.
@@ -41,8 +41,9 @@ successful assemble command as a usable artifact.
 - Bare Kit **2.5.5**, with the GitHub release asset SHA-256. Its Android AAR is
   repacked deterministically without changing runtime files.
 - SHA-256 hashes for the resulting bundle, runtime AAR and all 21 required native
-  addon versions for each of the three ABIs. The native addons retain the Fold-tested Keets repair bytes. The 1.2.1
-  bundle adds bounded media reads and a separate public Salon drive.
+  addon versions for each of the three ABIs. The native addons retain the Fold-tested Keets repair bytes. The 1.2.3
+  bundle combines /info identity availability during media failure with recovery
+  of failed/closed media storage, retaining bounded reads and separate Salon hosting.
 
 Preparation reuses `fetch-bare-kit.sh` and `pack-keets-worklet.sh`. The packer still
 walks dependencies recursively: both versions of nested addons such as bare-signals,
