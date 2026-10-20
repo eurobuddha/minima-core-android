@@ -1,0 +1,142 @@
+Bears 2.0.30 convergence hand-off — 2026-10-20
+
+Canonical mainline
+Branch: main, tracking fork/main
+Only active worktree: /Users/eurobuddha/Projects/minima/apks/base
+Fork: https://github.com/eurobuddha/minima-core-android
+Build source commit: 3a9ffbfb712da6c75a944e1f04085cea15c3874e
+Subsequent hand-off commit changes documentation only; APK source is unchanged.
+Store/PandaApps/IPFS publication remains HELD for the owner's word.
+
+Convergence
+77fa1529 merges fix/chat-errors-2026-10-20. Its full readable/copyable chat error
+dialog, both Keets/Parlons callers, regression tests and diagnosis/install records
+are retained. The obsolete 2.0.29/d10f32a version and pin were superseded by 2.0.30
+and Keets 1.2.3. Chat verification tip 2c946c9c is included through that merge.
+3ca29c19 merges fix/bear-terminals-2026-10-18. Its terminal implementations, tests,
+Keets preparation/verifier code and documentation were already present; merge
+resolution retained the current implementation. All five terminal catalogue entries
+match; no adapter lines from that branch were missing in the current adapter.
+3a9ffbfb incorporates the prior main README disclaimer, preserving both histories.
+BlackBear branch d9eb4862 and verification tip 5557f110 were already ancestors.
+All requested branch/worktree tips passed an empty git log main..<tip> before removal.
+
+Preserved shell and transport changes
+The following files are byte-identical to the BlackBear shell commit b908df82:
+- app/src/block/java/com/eurobuddha/minimacore/integrated/HistoryTabView.java
+- app/src/block/java/com/eurobuddha/minimacore/integrated/PandamoniumHooks.java
+- app/src/main/java/com/eurobuddha/minimacore/main/MainActivity.java
+- app/src/main/java/com/eurobuddha/minimacore/main/MainAdapter.java
+- app/src/main/java/com/eurobuddha/minimacore/service/MinimaService.java
+- minimaapi/src/main/java/com/eurobuddha/minimaapi/direct/DirectNodeApi.java
+PANDA_SHELL remains enabled for block and pandamonium, disabled for classic.
+BlackBear keeps History/DirectNodeApi/DirectNodeEvents and external-only Apps.
+The effective -port check, widened package guard and BlackBear brand are retained.
+The mainline app/build.gradle keeps blockImplementation integrated-history.
+
+Version and Keets
+All three flavors are 2.0.30 with fresh versionCode226. The repository pre-commit
+version guard rejected adding the chat code at225;226 was unused in Git history.
+The requested versionName2.0.30 was retained. No published APK/code was replaced.
+Keets source is unchanged:1.2.3 at7ee2b657d27d2bceb5e1db72b106064365e92390.
+Source archive SHA256:7af5eecc088ff10161a95bae77993cb0ec5d6f8e771ad9a7991732b41cc76c08
+Bundle SHA256:b18c3cd09a76dce7980c81f932ef1fbb440c9d448c9cc451015d8b97ffea7fd4
+The settled Keets repository/sidecar was not edited. Both /info pubkey availability
+and media Corestore recovery remain in this existing pin.
+
+Build and validation
+Android Studio JBR21 via org.gradle.java.home/JAVA_HOME; offline Gradle.
+python3 scripts/prepare-keets.py --offline printed:
+  Keets: restoring verified cached inputs.
+  Keets: preparation and pinned checksums passed.
+assemblePandamoniumRelease, assembleClassicRelease and assembleBlockRelease passed,
+as did lint for all three flavors. Actual APK checks verify exact version/package,
+ZIP integrity, pinned assets/keets.bundle and the family signing certificate:
+eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+The assemble verifiers also checked all21required native addons/runtime perABI.
+Targeted app tests:22pass,0failures/errors/skips (ChatFailureDialog, ChatMessages,
+SendDraft, TerminalTranscript, MainResumeRefresh). Existing Keets tests:9preparation
+and19artifact tests pass. verify-pandamonium-transport.py passes.
+Lint errors:0; warnings:Pandamonium1836, PandaBear7000, BlackBear6987. Full dependency
+lint remains enabled; this hand-off does not claim to resolve those warnings.
+Independent full code review is still assigned to the next agent.
+
+Verified local release candidates
+PandaBear: 2.0.30/code226 — Keets1.2.3@7ee2b65
+  /Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-PandaBear-2.0.30-code226.apk
+  SHA256 2380c52642ad0b7f1b05d28f5eb42fd32be26514f824bedf5740b6846ac04f0a
+BlackBear: 2.0.30/code226 — Keets1.2.3@7ee2b65
+  /Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-BlackBear-2.0.30-code226.apk
+  SHA256 1ce9f983ca3845eb44dcf7d0e33c2fb5cf4c5ed0b83a6558516af289177e69f3
+Pandamonium: 2.0.30/code226 — Keets1.2.3@7ee2b65
+  /Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-2.0.30-code226.apk
+  SHA256 1d4d35c24f8112fe7d699f8d6b574c8ec4c0bdda96da68290771aa8f7cf5e18c
+
+Fold installation — ONLY R3GL805K7MB
+adb -s R3GL805K7MB install -r dist/minima-core-Pandamonium-2.0.30-code226.apk
+returned Success. dumpsys confirms Pandamonium2.0.30/code226, update time16:46:36.
+The hand-off's claim that BlackBear2.0.30 was installed did not match the device:
+it reports2.0.28/code223, update time15:43:22. Owner explicitly requested leaving
+BlackBear installed as-is; its version and timestamp remain unchanged. PandaBear
+was not installed. No data clear, seed change, message, trade or phone fault injection.
+S10+R58M307HEEN was never queried or touched. Interactive post-install testing is
+left for the owner/reviewing agent; package installation is verified.
+
+Removed worktrees (git worktree remove; no force)
+- build/multilingual-2026-10-16/build/keets-clean-checkout
+- build/blackbear-media-recovery-2026-10-20
+- build/blackbear-recovery-verification-2026-10-20
+- build/chat-errors-2026-10-20
+- build/chat-recovery-verification-2026-10-20
+- build/keets-clean-integration-2026-10-18
+- build/keets-clean-stable-2026-10-18
+- build/multilingual-2026-10-16
+- build/terminal-repair-2026-10-18
+
+Removed local branches (git branch -d)
+- feature/bear-languages-2026-10-16 (3a9ffbfb712da6c75a944e1f04085cea15c3874e)
+- fix/blackbear-media-recovery-2026-10-20 (d9eb48629dbdae5d077cbe831d0f3d524b4eabc9)
+- fix/chat-errors-2026-10-20 (935bc8017cb035d004e17d13d83f7fa7743bafdd)
+- fix/bear-terminals-2026-10-18 (44ae413e5b327ddd48fa8c95ed01986feb97685b)
+- ui/full-redesign (9def96e6801a9bef261611e45349f28a1eb6ae1c)
+- ui/minima-brand-restyle (b37fe5bbbbf51e49bf8edc386a896a7eab0d3c1d)
+- fix/ipc-commands-off-main-thread (f576d4551cf4cd6dd003b143e5d06676adca7228)
+
+Removed fork branches (atomic deletion, each protected by its observed tip lease)
+- feature/bear-languages-2026-10-16 (ac5b0b10b294aa49cd86309dd2d2c1406bd1e6a1)
+- fix/blackbear-media-recovery-2026-10-20 (d9eb48629dbdae5d077cbe831d0f3d524b4eabc9)
+- fix/chat-errors-2026-10-20 (935bc8017cb035d004e17d13d83f7fa7743bafdd)
+- fix/bear-terminals-2026-10-18 (44ae413e5b327ddd48fa8c95ed01986feb97685b)
+- ui/full-redesign (9def96e6801a9bef261611e45349f28a1eb6ae1c)
+- fix/ipc-commands-off-main-thread (f576d4551cf4cd6dd003b143e5d06676adca7228)
+- main-minimaapi (74cbc80ff039878d60d53b430d37a4e7225094d8)
+- main-receiver (8fb770d060da402e7ee0014359a4f5920909ee29)
+
+No named chat-recovery-verification branch existed; that was a detached worktree.
+The keets-clean-* validation locations were also detached worktrees.
+
+Preservation
+Historical APKs, review evidence, non-cache ignored files and the changed graph
+query stamp were archived and SHA256-verified before retirement. Archives/manifests:
+  build/convergence-archive-2026-10-20/index.json
+The nested keets-clean-checkout has its own complete archive/manifest in that index.
+Rebuildable Gradle/npm/compiler caches and checksum-pinned runtime inputs were not
+archived. Prior tracked history is reachable from main. No git add -A was used;
+ignored bundle/JNI/local.properties were never staged or published.
+
+Retained historical refs
+These unrelated older branches still have unique commits and were not deleted or
+silently merged under the current release convergence:
+- feat/ipc-file-bridge:3unique commits
+- feat/ipc-large-response:2unique commits
+- fix/extra-params-boot-leak:1unique commit
+- fix/h2-verifyerror-android:1unique commit
+They have no active worktrees. This leaves ONE active mainline/worktree, but not
+literally one Git branch total. Resolve these separately before any further deletion.
+The separate settled Keets repository remains master7ee2b65; its worktrees/refs
+were outside this Android worktree cleanup and were left alone.
+
+Open/held
+- Independent full code review and interactive Fold smoke test.
+- Store/PandaApps/IPFS release awaits owner approval.
+- The four unrelated historical refs above remain protected.

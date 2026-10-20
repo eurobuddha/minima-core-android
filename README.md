@@ -2,6 +2,15 @@
 
 > ⚠️ **Personal fork — in development, use at your own risk.** This is an experimental, actively-developed personal fork of Minima Core, provided **AS IS**, without warranty of any kind (licensed under [Apache 2.0](LICENSE), same as upstream Minima). It is a non-custodial node that manages real keys and funds; back up your seed and only use it with funds you can afford to lose. Not an official Minima Global release, and not financial advice.
 
+Current development mainline: **`main`**, in this repository root. The converged
+PandaBear, BlackBear and Pandamonium candidates are **2.0.30/code226**, all pinning
+**Keets 1.2.3 (`7ee2b65`)**. Pandamonium 2.0.30 is installed on the Fold; the owner
+requested leaving its BlackBear installation at 2.0.28. Store publication is held.
+See [the convergence hand-off](docs/CONVERGENCE_2.0.30_2026-10-20.txt) for artifact
+checksums, verification, merged/retired branches and remaining review work.
+
+## Historical identity and release notes
+
 Reviewed release artifacts: **Minima Core 1.9.10 (81)**. Latest verified Fold installation: **1.9.9 (80)**. The app name is Minima Core;
 PandaBear, BlackBear and Pandamonium are build names. Their Android IDs are
 `com.eurobuddha.minimacore`, `com.eurobuddha.minimablock` and `com.eurobuddha.pandamonium`.

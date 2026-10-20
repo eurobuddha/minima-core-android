@@ -1,0 +1,53 @@
+{
+  "source_commit": "3a9ffbfb712da6c75a944e1f04085cea15c3874e",
+  "keets_version": "1.2.3",
+  "keets_revision": "7ee2b657d27d2bceb5e1db72b106064365e92390",
+  "bundle_sha256": "b18c3cd09a76dce7980c81f932ef1fbb440c9d448c9cc451015d8b97ffea7fd4",
+  "flavors": {
+    "PandaBear": {
+      "version": "2.0.30",
+      "version_code": 226,
+      "package": "com.eurobuddha.minimacore",
+      "apk": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-PandaBear-2.0.30-code226.apk",
+      "sha256": "2380c52642ad0b7f1b05d28f5eb42fd32be26514f824bedf5740b6846ac04f0a",
+      "cert_sha256": "eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f",
+      "keets_bundle_sha256": "b18c3cd09a76dce7980c81f932ef1fbb440c9d448c9cc451015d8b97ffea7fd4",
+      "bytes": 98608578,
+      "lint": {
+        "Warning": 7000
+      }
+    },
+    "BlackBear": {
+      "version": "2.0.30",
+      "version_code": 226,
+      "package": "com.eurobuddha.minimablock",
+      "apk": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-BlackBear-2.0.30-code226.apk",
+      "sha256": "1ce9f983ca3845eb44dcf7d0e33c2fb5cf4c5ed0b83a6558516af289177e69f3",
+      "cert_sha256": "eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f",
+      "keets_bundle_sha256": "b18c3cd09a76dce7980c81f932ef1fbb440c9d448c9cc451015d8b97ffea7fd4",
+      "bytes": 98726724,
+      "lint": {
+        "Warning": 6987
+      }
+    },
+    "Pandamonium": {
+      "version": "2.0.30",
+      "version_code": 226,
+      "package": "com.eurobuddha.pandamonium",
+      "apk": "/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-2.0.30-code226.apk",
+      "sha256": "1d4d35c24f8112fe7d699f8d6b574c8ec4c0bdda96da68290771aa8f7cf5e18c",
+      "cert_sha256": "eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f",
+      "keets_bundle_sha256": "b18c3cd09a76dce7980c81f932ef1fbb440c9d448c9cc451015d8b97ffea7fd4",
+      "bytes": 137247169,
+      "lint": {
+        "Warning": 1836
+      }
+    }
+  },
+  "targeted_tests": {
+    "tests": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}
