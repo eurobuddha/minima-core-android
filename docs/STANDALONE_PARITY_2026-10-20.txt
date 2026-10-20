@@ -111,3 +111,30 @@ when adapting. Native dialogs and plain English must remain; do not copy Languag
 UtxoMessages/UtxoText or embedded-node error instructions into the standalone app.
 NFT broader controller/journal parity remains separate. Other comparison queue
 unchanged;11 of23 still have recorded work, not11 confirmed broken apps.
+
+Resumed necessary-only parity — UTXO0.4.41/code441 (2026-10-20)
+Commit dc0b5e7, pushed origin/main in eurobuddha/minima-core-android-utxo.
+The recorded UTXO Send/WalletTools review port is now complete. Reused the host
+Send reviewed-draft checks, change-address generation guard, TxnUtil snapshots,
+WalletTools frozen Review/six controllers and existing regression tests. Native
+standalone dialogs/English/IPC and transaction journal remain in place. No host
+Language helpers, token-name provenance metadata or embedded-node hint imported.
+
+Before repair:12 of13 applicable Send/native-dialog tests failed on actual behavior
+assertions. After:30 copied review cases plus4 change-address race cases, with
+214debug+214release passing overall (no failures/errors/skips). Original host's
+30 relevant tests also pass. Two older standalone fixtures received the donor's
+private-method signature updates; their reservation/uncertain-outcome assertions
+remain intact. Lint0errors,111warnings; offline signed build/package/version,
+family certificate and ZIP integrity verified. Scoped code review:Approve.
+Candidate apks/utxo/dist/utxo-wallet-0.4.41-candidate.apk
+SHA2566019fa52adbcbd4245360380edf8309d1efb3453697098baaaccd4fb8aa68e8d
+Not installed or published. No real transaction, seed change or device operation.
+Detailed evidence/review:utxo/docs/PANDAMONIUM_PARITY_2026-10-19.txt.
+
+This closes the specifically recorded UTXO review/controller port, not an exhaustive
+application audit. The broader11-app comparison queue has not yet been reclassified.
+Next:finish applicability comparison of UTXO's remaining recorded differences and
+continue NFT Wallet's controller/journal review, then the other outstanding app
+entries. Keep standalone unlock/reset and other deliberate platform differences.
+The cancelled NFT image-placeholder work remains excluded.
