@@ -1,0 +1,55 @@
+Pandamonium 2.0.28 / code223 — readable chat failures
+
+User reported an image upload failure whose toast truncated the diagnostic, then
+explicitly requested full readable output or tap-to-expand. Chat send failures
+now open a persistent scrollable/selectable dialog with Copy details and Close.
+Copy keeps the dialog open. Native Keets photo/voice/text/payment failures and
+Parlons photo/voice/text exceptions use the same helper. Keets message hand-off
+errors after upload now expose the response error as well as the failed-row state.
+No automatic retry or message resend was introduced. Short status toasts remain.
+
+Reuse: integrated/pandadex/.../MainActivity.java showActivityLog's selectable
+ScrollView, resolveInterruptedWrite's Copy details clipboard action, existing
+localization LanguageDialog and each chat Activity's tracked-dialog cleanup.
+Existing translated error wrappers/catalog labels are retained in all4languages.
+Compared standalone Parlons maxima/app/.../ui/Kit.java selectable/copy text helper.
+No new dependency, transport protocol or node/Keets storage modification.
+
+Isolated worktree base/build/chat-errors-2026-10-20, branch
+fix/chat-errors-2026-10-20, based on d21f4a7d. Concurrent BlackBear shell edits in
+build/multilingual-2026-10-16 deliberately excluded; only this task's edits were
+moved. Do not overwrite the concurrent work when integrating this branch.
+
+Validation:18 targeted tests passed (3 real dialog tests,7 ChatMessages,8 SendDraft).
+Long synthetic error retains final marker, exact full clipboard output, selectable
+scroll view, no timer or truncation, Copy remains open, Close works in4languages.
+Actual screen wrappers track/dismiss dialogs; finishing/destroyed host refuses UI.
+Lifecycle fixture reuses MainResumeRefreshTest's FragmentActivity shadow to avoid
+starting a real node. Initial fixture incorrectly destroyed an uncreated fragment
+host; corrected isolation, all tests pass. No test sent a chat or transaction.
+Signed release assemble and lint passed:0errors,1836warnings.7040messages validated
+in4languages. DirectNodeApi guard, exact packaged Keets bundle/21addons/runtime,
+APK signer, metadata and ZIP integrity passed. No transport dependency changed.
+
+Artifact:/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-2.0.28.apk
+SHA256:b16c912d4e6b3ddbd92350609d568c0f18b9835ca01417e6b7a3b14921a37c03
+Signer:eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+
+Device diagnostic (Fold R3GL805K7MB, installed2.0.26/code221 before update):
+Android logcat had lost the original error. In-app Logs retained repeated failures
+at13:37 and13:43–13:44 on20Oct2026:
+  java.lang.Exception: keets api POST /media/chat/img-<timestamp>.jpg
+  -> HTTP500 {"error":"The corestore is closed"}
+This proves the photo publish was refused before the message send. It does not
+prove why the underlying store closed. Local two-node synthetic media checks
+passed before device connection. Storage root cause remains under investigation;
+do not claim that the dialog change fixes it. No phone media was sent or deleted.
+
+Code review
+Summary: reviewed both send callers, shared dialog, lifecycle handling, localization,
+copy operation and tests. Full diagnostic stays local until an explicit Copy tap.
+Findings: no critical/major issue in the dialog change. Existing upstream media
+store failure remains open and is clearly distinguished from this UI repair.
+Verdict: approve the diagnostic UI change; no claim of a transport repair.
+
+Installation/device follow-up: pending at this checkpoint. Not store-published.
