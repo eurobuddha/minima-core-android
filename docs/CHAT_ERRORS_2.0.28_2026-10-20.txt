@@ -59,9 +59,14 @@ Installation/device follow-up:
   confirms2.0.28-Pandamonium/code223. Existing data preserved.
 - New startup at14:03:11 reports Keets API up and media up with the existing data
   directory and0pins. This confirms reopening after restart, not a durable repair.
-- App is at fingerprint lock; user asked to unlock for final read-only info check.
+- User unlocked and reported: "unlocked photos send correctly". Actual photo send
+  success verified by the user after update/restart; no assistant-sent message.
 - Original log capture additionally contains a05:06 Bare/V8 FatalOOM crash trace.
   Its relationship to the later closed store is unproven; do not assert causality.
 - Source commit64654ce0 pushed to fork/fix/chat-errors-2026-10-20.
 - Not store-published. This branch still needs integration with concurrent host
   work before any combined release; no BlackBear changes included here.
+
+Latest outcome: requested full-error UI installed and user confirms photo sends
+work again. The earlier corestore closure cause is still unproven; retain the
+readiness/restart distinction rather than claiming an unimplemented service fix.
