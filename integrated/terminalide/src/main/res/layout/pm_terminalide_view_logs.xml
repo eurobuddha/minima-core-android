@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
        android:layout_width="match_parent"
-       android:layout_height="wrap_content"
+       android:layout_height="match_parent"
        android:orientation="vertical"
        android:background="@color/pm_terminalide_ide_bg">
+
+   <!-- One small hint line (text set via Language in LogsView); the log body keeps the screen. -->
+   <TextView
+       android:id="@+id/pm_terminalide_logs_hint"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:paddingStart="8dp"
+       android:paddingEnd="8dp"
+       android:paddingTop="4dp"
+       android:textSize="10sp"
+       android:textColor="@color/pm_terminalide_ide_dim"
+       android:text="" />
 
    <ScrollView
        android:id="@+id/pm_terminalide_terminal_scroller"
        android:layout_width="match_parent"
-       android:layout_height="match_parent"
+       android:layout_height="0dp"
+       android:layout_weight="1"
        android:padding="8dp">
 
       <TextView

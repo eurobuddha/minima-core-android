@@ -317,7 +317,7 @@ public class TerminalView extends BaseView {
             row.setEllipsize(android.text.TextUtils.TruncateAt.END);
             row.setPadding(padH, padV, padH, padV);
             row.bind(() -> rowText(item));
-            row.setBackgroundColor(i == mSel ? 0x3382AAFF : 0x00000000);
+            row.setBackgroundColor(i == mSel ? 0x33FFFFFF : 0x00000000);   // monochrome: translucent white
             row.setOnClickListener(v -> accept(item));
             // Long-press a command row: its full help page, offline.
             if (item.kind == Suggest.KIND_COMMAND || HelpStore.has(mActivity, item.label)) {

@@ -1,8 +1,40 @@
 <resources>
     
+    <!-- Strictly monochrome, like a classic terminal (carried over from standalone 0.3.5): every
+         Material role is pure white on pure black; panels use the visually-black #141414. -->
     <style name="pm_terminalide_Base.Theme.Terminal" parent="Theme.Material3.Dark.NoActionBar">
-        
-        
+        <item name="colorPrimary">@color/pm_terminalide_white</item>
+        <item name="colorOnPrimary">@color/pm_terminalide_black</item>
+        <item name="colorPrimaryContainer">@color/pm_terminalide_white</item>
+        <item name="colorOnPrimaryContainer">@color/pm_terminalide_black</item>
+        <item name="colorSecondary">@color/pm_terminalide_white</item>
+        <item name="colorOnSecondary">@color/pm_terminalide_black</item>
+        <item name="colorSecondaryContainer">@color/pm_terminalide_ide_bg_light</item>
+        <item name="colorOnSecondaryContainer">@color/pm_terminalide_white</item>
+        <item name="colorTertiary">@color/pm_terminalide_white</item>
+        <item name="colorOnTertiary">@color/pm_terminalide_black</item>
+        <item name="colorTertiaryContainer">@color/pm_terminalide_ide_bg_light</item>
+        <item name="colorOnTertiaryContainer">@color/pm_terminalide_white</item>
+        <item name="colorError">@color/pm_terminalide_white</item>
+        <item name="colorOnError">@color/pm_terminalide_black</item>
+        <item name="colorErrorContainer">@color/pm_terminalide_ide_bg_light</item>
+        <item name="colorOnErrorContainer">@color/pm_terminalide_white</item>
+        <item name="colorSurface">@color/pm_terminalide_black</item>
+        <item name="colorOnSurface">@color/pm_terminalide_white</item>
+        <item name="colorSurfaceVariant">@color/pm_terminalide_ide_bg_light</item>
+        <item name="colorOnSurfaceVariant">@color/pm_terminalide_white</item>
+        <item name="colorSurfaceContainer">@color/pm_terminalide_ide_bg_light</item>
+        <item name="colorSurfaceContainerLow">@color/pm_terminalide_ide_bg_light</item>
+        <item name="colorSurfaceContainerHigh">@color/pm_terminalide_ide_bg_light</item>
+        <item name="colorSurfaceContainerHighest">@color/pm_terminalide_ide_bg_light</item>
+        <item name="colorOutline">@color/pm_terminalide_white</item>
+        <item name="colorOutlineVariant">@color/pm_terminalide_ide_bg_light</item>
+        <item name="android:colorBackground">@color/pm_terminalide_black</item>
+        <item name="colorOnBackground">@color/pm_terminalide_white</item>
+        <item name="android:windowBackground">@color/pm_terminalide_black</item>
+        <item name="android:statusBarColor">@color/pm_terminalide_black</item>
+        <item name="android:navigationBarColor">@color/pm_terminalide_black</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="pm_terminalide_Theme.Terminal" parent="pm_terminalide_Base.Theme.Terminal" />

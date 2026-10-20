@@ -1,10 +1,13 @@
 <resources>
     <color name="pm_terminalide_black">#FF000000</color>
     <color name="pm_terminalide_white">#FFFFFFFF</color>
-    <color name="pm_terminalide_ide_bg">#011627</color>
-    <color name="pm_terminalide_ide_bg_light">#0B2942</color>
-    <color name="pm_terminalide_ide_text">#D6DEEB</color>
-    <color name="pm_terminalide_ide_dim">#697098</color>
-    <color name="pm_terminalide_ide_accent">#82AAFF</color>
-    <color name="pm_terminalide_ide_warn">#F78C6C</color>
+    <!-- Strictly monochrome, like a classic terminal: pure white text on pure black (carried over
+         from standalone Terminal IDE 0.3.5). The one panel tone (input bar / dividers) is a
+         visually-black #141414 so the command field stays findable; every text colour is white. -->
+    <color name="pm_terminalide_ide_bg">#000000</color>
+    <color name="pm_terminalide_ide_bg_light">#141414</color>
+    <color name="pm_terminalide_ide_text">#FFFFFF</color>
+    <color name="pm_terminalide_ide_dim">#FFFFFF</color>
+    <color name="pm_terminalide_ide_accent">#FFFFFF</color>
+    <color name="pm_terminalide_ide_warn">#FFFFFF</color>
 </resources>

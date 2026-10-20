@@ -11,14 +11,17 @@ import java.util.regex.Pattern;
 /** Colorizes pretty-printed JSON node responses for the terminal. */
 public class OutputFormatter {
 
-    public static final int COL_CMD     = Color.parseColor("#82AAFF"); // command echo - blue
-    public static final int COL_KEY     = Color.parseColor("#7FDBCA"); // json keys - teal
-    public static final int COL_STRING  = Color.parseColor("#C3E88D"); // strings - green
-    public static final int COL_NUMBER  = Color.parseColor("#F78C6C"); // numbers - orange
-    public static final int COL_BOOL    = Color.parseColor("#FFCB6B"); // true/false/null - yellow
-    public static final int COL_ERROR   = Color.parseColor("#FF5370"); // errors - red
-    public static final int COL_PLAIN   = Color.parseColor("#D6DEEB"); // default text
-    public static final int COL_DIM     = Color.parseColor("#697098"); // punctuation / banner
+    // Strictly monochrome, like a classic terminal: everything is pure white on pure black
+    // (carried over from standalone Terminal IDE 0.3.5). The spans are kept (structure) but all
+    // resolve to white; errors are still unmistakable by their ✖ prefix.
+    public static final int COL_CMD     = Color.WHITE; // command echo
+    public static final int COL_KEY     = Color.WHITE; // json keys
+    public static final int COL_STRING  = Color.WHITE; // strings
+    public static final int COL_NUMBER  = Color.WHITE; // numbers
+    public static final int COL_BOOL    = Color.WHITE; // true/false/null
+    public static final int COL_ERROR   = Color.WHITE; // errors (✖ prefix carries the signal)
+    public static final int COL_PLAIN   = Color.WHITE; // default text
+    public static final int COL_DIM     = Color.WHITE; // punctuation / banner
 
     private static final Pattern JSON_TOKENS = Pattern.compile(
             "(\"(?:\\\\.|[^\"\\\\])*\")(\\s*:)?"      // 1=string 2=colon => key vs value
