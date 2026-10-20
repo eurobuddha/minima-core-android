@@ -1,0 +1,58 @@
+Pandamonium 2.0.29 / code224 — Keets media recovery
+
+User task: find/fix photo-send failure and determine whether Salon introduced it.
+Observed Fold error: Keets POST /media/chat/img-<timestamp>.jpg HTTP500,
+"The corestore is closed". Restart via 2.0.28 restored sends (user-confirmed).
+
+Cause established: Keets retained one permanently failed/closed Corestore, so all
+later media operations failed until process restart. A real storage-file lock,
+released after startup fails, reproduces this both before Salon (d5bab15) and in
+Salon's 79ee38c. Before Salon the later request repeats ELOCKED; after Salon the
+owned-drive retry reports Corestore closed. The underlying missing recovery dates
+to original media hosting (96a12fd). The initial Fold trigger was not retained in
+logs: do not claim its lock or earlier native OOM was proven causal.
+
+Fix: Keets1.2.2 commit d10f32afd81f48c1bf66c2b7a7bdf6231b2586d9, pushed to
+https://github.com/eurobuddha/keets/tree/fix/media-recovery-2026-10-20
+Reuses existing opening-promise, Corestore ready/close, namespace and Hyperdrive
+replication paths. Reopens the same directory after failure/closure, shares recovery
+between concurrent callers, discards stale handles, restores hosted/mirrored/pinned
+drive discovery and reconnects media streams. Original errors remain visible.
+Preserves files, drive keys and chat/Salon separation. No automatic message resend.
+No changes to wallet, node/message swarm, native dependencies, or memory limits.
+
+Validation evidence in Keets/MEDIA_RECOVERY_1.2.2.txt:
+11 storage/read-bound tests passed; seven real private-peer recovery checks passed
+on both Node and Bare1.34.1; existing media-only API suite passed. Synthetic media
+only. Four original storage regression cases failed before the fix.
+Android preparation/artifact regression suites:9+19tests passed. Reviewed source
+archive and npm lock hashes; only bundle bytes changed, every runtime/addon hash
+unchanged. Offline rebuilding from downloaded inputs and restoration in a fresh
+checkout passed. All-three-variant signed assemble/lint and chat tests recorded below.
+
+Isolation: Android fix/chat-errors-2026-10-20, isolated from ongoing BlackBear edits
+in build/multilingual-2026-10-16. Integrate this branch without overwriting that work.
+The actual pinned change is2c946c9c;2.0.28's full readable chat error dialogs remain.
+
+Code review
+Summary: immutable source pin and exact outputs verified, unchanged dependency tree,
+only bundle checksum differs. Recovery review is recorded with Keets source.
+Findings: no outstanding blocking findings. Device fault's original trigger remains
+unproven; this fixes the proven permanently failed storage state.
+Verdict: approve, subject to host build/install verification below.
+
+Host validation/install:
+- Fresh detached checkout2c946c9c, cached dependency restoration with --offline.
+- Offline assembleClassicRelease/assembleBlockRelease/assemblePandamoniumRelease,
+  lintPandamoniumRelease and18targeted chat tests all passed (1m12s).
+- Lint:0errors,1836existing warnings.18tests:3dialog/7ChatMessages/8SendDraft,
+  0failures/errors/skips. All3APKs verified exact bundle and21addons/runtime perABI.
+- Pandamonium APK ZIP check, release signer and224/2.0.29metadata passed.
+- APK:/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-Pandamonium-2.0.29.apk
+- SHA256:46322682850a952f373d3af4cb8bad5a9cb91c76dfc3d0786337cd6d5df4d613
+- Signer:eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+- adb install -r succeeded on Fold R3GL805K7MB. Package224/2.0.29-Pandamonium verified.
+- App launched; fingerprint lock displayed. Unlock requested for remaining Keets
+  startup verification. No user photo/message or transaction sent by the assistant.
+- Other connected phone untouched. Other two flavor builds are verification only.
+- Not store-published; branch integration with concurrent host work remains separate.
