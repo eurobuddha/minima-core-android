@@ -67,3 +67,14 @@ Local Node/Bare fault-injection tests supply recovery evidence; device logs conf
 normal startup of the installed verified bundle, not a new live failure reproduction.
 Host validation and device-startup review complete. Source and evidence pushed to
 fork/fix/chat-errors-2026-10-20; public stores remain on their previous release.
+
+Correction — BlackBear/PandaBear validation artifacts:
+The all-flavor build was a shared Keets packaging check, NOT a complete candidate
+for the BlackBear work being developed concurrently. Describing it as a verified
+BlackBear2.0.29 update was misleading. It omits that agent's current2.0.27 changes.
+The two validation-only flavor release directories have been moved out of standard
+APK outputs to chat-recovery-verification-2026-10-20/build/validation-only-keets-1.2.2,
+with versioned NOT-FOR-RELEASE filenames and an explicit warning. Neither was
+installed, store-published, or copied to dist. Active BlackBear source remains
+untouched. Its release must incorporate the Keets fix into that agent's current
+source and reconcile versions; do not substitute this branch's complete build.gradle.
