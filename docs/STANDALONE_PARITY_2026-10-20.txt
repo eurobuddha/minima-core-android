@@ -49,3 +49,65 @@ No wallet edit yet: user prioritized publishing all Pandamonium work.
 After publication resume planner/native-state parity, then durable unknown-outcome
 receipt/retry and strict size rejection. Do not import integrated unlock worker
 or reset changes; standalone unlock/reset were user-confirmed working.
+
+Resumed after community graphic — 2026-10-20
+User asked to continue prior parity where needed. Three standalone wallet repairs
+completed, preserving intentional standalone behavior. No phone/live transactions.
+
+minimaWallet0.2.29/code229: commit308088d, pushed origin/main.
+Reused canonical SweepPlanner validation/deep-copy/native-state logic and exact
+whole-transfer builder adaptation. Eight donor planner regressions plus two
+synthetic signature/round-trip tests and invalid-review UI containment. Nine
+focused tests failed before;74debug+74release pass after. Lint0errors166warnings,
+signed version/package/family certificate/ZIP verified.
+Candidate apks/wallet/dist/minima-wallet-0.2.29-candidate.apk
+SHA256 e9dd1303debf46143e278b4e3cc0407d8bb4d5c49b00dd46b7a510a1d83e4043
+Unlock/reset, local signing and standalone IPC unchanged. Durable pending/receipt,
+unknown-outcome confirmation/replay and structured size-refusal parity stay OPEN.
+
+UTXO0.4.39/code439: commit1e4d9fd, pushed origin/main.
+NFT Wallet0.1.16/code116: commitcedd160, pushed origin/main.
+Applied adapt-pandamonium-wallet-history-pages.py directly to standalone layouts.
+Copied13 HistoryPagingTest cases per app, adapting only standalone label assertions.
+Original UTXO11/13 and NFT10/13 failed. All168UTXO+83NFT tests per debug/release
+variant pass after. Raw offsets/reset, requested-height/rollback refresh, whole-page
+structural gate, empty-page older footer and oversized-only NFT retries now match.
+UTXO SHA256067ea4896d41cde0106779659515a2acee3a50b8b784f4fa32836c47ea15649b
+NFT SHA2564ca4ce5276b4e716be071920b4c2c9dbea139e13aa5d6596029859bb062eb4bf
+
+UTXO0.4.40/code440: commitc10dc67, pushed origin/main.
+NFT Wallet0.1.17/code117: commit667cba4, pushed origin/main.
+Reused HistoryChainCheck, history-status view changes and donor helper/UI tests.
+Saved rows explicitly distinguished from current inclusion; opening detail fetches
+fresh read-only evidence and shows a check time. UTXO retains its three-block
+settlement gate and stronger existing pending-reply guard. NFT standalone has no
+TransactionEvidence/LocalHistory yet: copied only the observation parser, whole-
+number/ID checks into its helper; no foreign journal/private store or receipt UI.
+Additional display-boundary tests require full32-byte block IDs and reject pending
+positive/negative replies. These conservative checks should be considered for the
+host donor on its next source update; host production source is unchanged here.
+All five applicable view regressions failed before wiring. Final full suites:
+UTXO180debug+180release,NFT94debug+94release; no failures/errors/skips.
+Lint0errors111UTXO/241NFTwarnings; signed versions/family certificate/ZIP verified.
+Candidates apks/utxo/dist/utxo-wallet-0.4.40-candidate.apk and
+apks/NFTwallet/dist/nft-wallet-0.1.17-candidate.apk.
+UTXO SHA256060df354f3cde24d597c1145a616444982bbf026ac05bde9b2c1724f8d21012e
+NFT SHA256140000f057dbc3694b7819ecac2cbccdbde26c09b8ae78ebd9690cfd34ad0685
+
+All scoped repairs reviewed; per-app append-only parity reports contain details.
+All candidates local only: no install or store publication. Existing graph artifacts
+and unrelated work preserved. Latest three-wallet suites total696 test executions.
+An initial generic two-repository push was rejected by automatic review for
+unproven source/destination trust. Read-only gh checks confirmed both existing
+origins are public eurobuddha repositories with connected-account ADMIN permission;
+explicit origin pushes were then accepted and completed. No ongoing approval block.
+
+Next recorded UTXO work: Send draft/review guards and WalletTools frozen selection,
+single-use confirmation and status ownership. Read canonical send/tool adapters,
+tests/review docs and initial standalone/donor sources; no Send/WalletTools edits.
+Standalone Send lacks the donor's earlier changeGeneration field, and standalone
+Coin has no host tokenNameProvided metadata. Preserve those intentional differences
+when adapting. Native dialogs and plain English must remain; do not copy Language,
+UtxoMessages/UtxoText or embedded-node error instructions into the standalone app.
+NFT broader controller/journal parity remains separate. Other comparison queue
+unchanged;11 of23 still have recorded work, not11 confirmed broken apps.
