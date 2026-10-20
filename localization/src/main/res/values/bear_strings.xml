@@ -8500,4 +8500,7 @@
     <string name="l10n_salon_progress_unknown" formatted="false">"Confirmation is taking longer. Check status to look again; this will not submit another announcement."</string>
     <string name="l10n_salon_progress_failed" formatted="false">"Could not save publication status. Nothing was submitted."</string>
     <string name="l10n_salon_progress_rejected" formatted="false">"The node rejected the announcement. Your page is saved. Check the node, then try publishing again."</string>
+    <string name="l10n_atelier_collection_mint_time_hint" formatted="false">"Allow roughly 3–5 minutes per item to finish minting. Block times and transaction processing can make it take longer. Keep your node running; an interrupted mint can resume."</string>
+    <!-- Arguments: count, minimum, maximum -->
+    <string name="l10n_atelier_collection_mint_time_total">"Estimated minting time for %1$d items: %2$s–%3$s minutes."</string>
 </resources>

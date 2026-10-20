@@ -100,4 +100,19 @@ public class AtelierCollectionLanguageTest {
             call("offerUploadedBaseRecovery",new Class<?>[]{String.class,String.class,String.class},"https://example.invalid/new-draft/",".png","provider error");job.get().run();idle();dialog=(AlertDialog)ShadowDialog.getLatestDialog();dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();idle();assertEquals("https://example.invalid/new-upload/",field("createBase").get(activity));assertEquals(".png",field("createExt").get(activity));assertEquals("Original description",field("createDesc").get(activity));verify(node,never()).cmd(anyString(),any(NodeApi.Cb.class));
         }
     }
+    @Test public void mintEstimateUpdatesWithSizeAndLanguageWithoutSendingCommands()throws Exception {
+        try(MockedStatic<ImageLoader> images=mockStatic(ImageLoader.class)) {
+            draft(false);render();EditText size=edits(body).get(2);
+            for(String count:new String[]{"2","12","20"}) {
+                size.setText(count);int n=Integer.parseInt(count);
+                for(String code:CODES) {
+                    Language.select(activity,code);layout();
+                    String message=Language.join(Language.msg(l10n_atelier_collection_mint_time_total,n,n*3,n*5),"\n",Language.msg(l10n_atelier_collection_mint_time_hint)).toString();
+                    assertNotNull(find(body,message));assertEquals(count,size.getText().toString());
+                }
+            }
+            size.setText("1");assertNotNull(find(body,Language.msg(l10n_atelier_collection_mint_time_hint).toString()));
+        }
+        verify(node,never()).cmd(anyString(),any(NodeApi.Cb.class));
+    }
 }

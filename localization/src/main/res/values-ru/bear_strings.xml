@@ -8574,4 +8574,7 @@
     <string name="l10n_salon_progress_unknown" formatted="false">"Подтверждение задерживается. Проверьте статус снова — повторной отправки не будет."</string>
     <string name="l10n_salon_progress_failed" formatted="false">"Не удалось сохранить статус. Ничего не отправлено."</string>
     <string name="l10n_salon_progress_rejected" formatted="false">"Узел отклонил объявление. Страница сохранена. Проверьте узел и повторите публикацию."</string>
+    <string name="l10n_atelier_collection_mint_time_hint" formatted="false">"На выпуск каждого экземпляра ориентировочно требуется 3–5 минут. Из-за времени блоков и обработки транзакций это может занять дольше. Оставьте узел включённым; прерванный выпуск можно продолжить."</string>
+    <!-- Arguments: count, minimum, maximum -->
+    <string name="l10n_atelier_collection_mint_time_total">"Ориентировочное время выпуска %1$d экземпляров: %2$s–%3$s минут."</string>
 </resources>

@@ -1730,7 +1730,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         bottomNav(1);
 
         body.addView(studioCard("№ 1", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_collection_title),
-                Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_collection_help),
+                Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_collection_help), "\n\n", Language.msg(l10n_atelier_collection_mint_time_hint)),
                 Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_engine), v -> renderCreateCollection()), lpm(0, 0, 0, 14));
         body.addView(studioCard("№ 2", Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_single_nft),
                 Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_single_help),
@@ -1827,7 +1827,14 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         EditText desc = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_wallet_description), Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_description_hint), createDesc);
         desc.addTextChangedListener(watch(sv -> createDesc = sv));
         EditText size = fieldInto(body, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_editions), "12", createSize);
-        size.addTextChangedListener(watch(sv -> createSize = sv));
+        TextView timeBySize=Design.note(this,collectionMintTime(createSize));
+        TextView timeBeforeMint=Design.note(this,collectionMintTime(createSize));
+        body.addView(timeBySize,lpm(0,4,0,12));
+        size.addTextChangedListener(watch(sv -> {
+            createSize=sv;
+            Language.setText(timeBySize,collectionMintTime(sv));
+            Language.setText(timeBeforeMint,collectionMintTime(sv));
+        }));
 
         body.addView(Design.kicker(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_image_source)), lpm(0, 8, 0, 6));
         LinearLayout mode = horizontal(Gravity.CENTER);
@@ -1931,11 +1938,19 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             body.addView(wvRow, lpm(0, 6, 0, 0));
         }
 
+        body.addView(timeBeforeMint,lpm(0,12,0,6));
         TextView go = Design.button(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_mint), true);
         go.setOnClickListener(v -> createCollection(name, desc, size, baseF[0], extF[0], iconF[0], extUrlF[0], webF[0]));
         go.setMinHeight(dp(54));
         body.addView(go, lpm(0, 10, 0, 8));
         body.addView(Design.note(this, Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_collection_engine_help)));
+    }
+
+    private CharSequence collectionMintTime(String raw) {
+        int count=parseIntSafe(raw);
+        CharSequence hint=Language.msg(l10n_atelier_collection_mint_time_hint);
+        if(count<2 || count>20) return hint;
+        return Language.join(Language.msg(l10n_atelier_collection_mint_time_total,count,count*3,count*5), "\n", hint);
     }
 
     private int clampSize(int n) { return Math.max(2, Math.min(20, n == 0 ? 12 : n)); }

@@ -8574,4 +8574,7 @@
     <string name="l10n_salon_progress_unknown" formatted="false">"Підтвердження затримується. Перевірте стан знову — повторного надсилання не буде."</string>
     <string name="l10n_salon_progress_failed" formatted="false">"Не вдалося зберегти стан. Нічого не надіслано."</string>
     <string name="l10n_salon_progress_rejected" formatted="false">"Вузол відхилив оголошення. Сторінку збережено. Перевірте вузол і повторіть публікацію."</string>
+    <string name="l10n_atelier_collection_mint_time_hint" formatted="false">"На створення кожного примірника орієнтовно потрібно 3–5 хвилин. Через час блоків і обробку транзакцій це може тривати довше. Залиште вузол увімкненим; перерваний випуск можна продовжити."</string>
+    <!-- Arguments: count, minimum, maximum -->
+    <string name="l10n_atelier_collection_mint_time_total">"Орієнтовний час створення %1$d примірників: %2$s–%3$s хвилин."</string>
 </resources>

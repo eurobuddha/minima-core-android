@@ -8463,4 +8463,7 @@
     <string name="l10n_salon_progress_unknown" formatted="false">"确认时间较长。点击检查状态以重查；不会重复提交公告。"</string>
     <string name="l10n_salon_progress_failed" formatted="false">"无法保存发布状态。未提交任何内容。"</string>
     <string name="l10n_salon_progress_rejected" formatted="false">"节点拒绝了公告。主页已保存。请检查节点后重试发布。"</string>
+    <string name="l10n_atelier_collection_mint_time_hint" formatted="false">"每件作品完成铸造预计需 3–5 分钟。出块时间和交易处理可能使等待更久。请保持节点运行；中断后可继续铸造。"</string>
+    <!-- Arguments: count, minimum, maximum -->
+    <string name="l10n_atelier_collection_mint_time_total">"%1$d 件作品的预计铸造时间：%2$s–%3$s 分钟。"</string>
 </resources>
