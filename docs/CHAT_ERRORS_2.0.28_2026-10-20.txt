@@ -52,4 +52,16 @@ Findings: no critical/major issue in the dialog change. Existing upstream media
 store failure remains open and is clearly distinguished from this UI repair.
 Verdict: approve the diagnostic UI change; no claim of a transport repair.
 
-Installation/device follow-up: pending at this checkpoint. Not store-published.
+Installation/device follow-up:
+- Before update, manually executed only the read-only keets action:info in Core
+  Terminal: status:false, HTTP500 The corestore is closed. No message sent.
+- adb install -r completed successfully on Fold R3GL805K7MB. Package metadata
+  confirms2.0.28-Pandamonium/code223. Existing data preserved.
+- New startup at14:03:11 reports Keets API up and media up with the existing data
+  directory and0pins. This confirms reopening after restart, not a durable repair.
+- App is at fingerprint lock; user asked to unlock for final read-only info check.
+- Original log capture additionally contains a05:06 Bare/V8 FatalOOM crash trace.
+  Its relationship to the later closed store is unproven; do not assert causality.
+- Source commit64654ce0 pushed to fork/fix/chat-errors-2026-10-20.
+- Not store-published. This branch still needs integration with concurrent host
+  work before any combined release; no BlackBear changes included here.
