@@ -1,0 +1,63 @@
+BlackBear2.0.30/code225 — media recovery on the latest2.0.28 base
+
+Explicit user request: implement recovery on BlackBear using2.0.28 as the base.
+Base:b908df82807683a05d0534b618d9ff7e623279ec, not the earlier Pandamonium branch.
+All2.0.28 UI/History/PANDA_SHELL/branding, effective node-port check, DirectNodeApi
+access and node-event wiring retained unchanged. No Java, resources or integrated
+application source differs from this base. Android production delta: version and
+immutable Keets source/output pin only. Documentation updated for provenance.
+
+Keets1.2.3:7ee2b657d27d2bceb5e1db72b106064365e92390.
+This extends718b752 (/info hardening) with the tested d10f32a media recovery.
+api.js remains byte-identical to the other agent's /info implementation; media.js
+remains byte-identical to the reviewed recovery fix. Both fixes coexist and all
+runtime/package/lock version fields report1.2.3. Dependencies unchanged.
+Shared Keets master fast-forwarded/pushed to this combined revision, retaining the
+other agent's commit. Unrelated graph work preserved.
+
+Reuse: existing media.js, recovery test fixtures and services-test.sh; existing
+scripts/prepare-keets.py/pack-keets-worklet.sh and checksum verification pipeline.
+No rewrite of host, transport, storage protocol or UI. New HTTP regression verifies
+/info identity availability during a real storage lock, upload rejection while
+locked, then successful upload and retained identities/content after lock release.
+
+Validation so far:
+-12Node storage/bounded-read tests passed, including new combined HTTP regression.
+-7real local-peer recovery checks on Node and7on Bare1.34.1 passed.
+-Existing media-only API services suite passed (synthetic media; no user messages).
+-9preparation+19artifact regression tests passed.
+-Only keets.bundle changed; all native addon/runtime hashes identical to2.0.28.
+-Offline rebuild from cached archives passed; fresh verification checkout5557f110
+  restored checked inputs offline. Host build results recorded below.
+
+Version2.0.30 avoids reusing the withdrawn, incomplete2.0.29BlackBear artifact.
+Only BlackBear is a deliverable for this task. Other flavors are built solely to
+satisfy shared-dependency packaging checks, not promoted as ready releases.
+The separate Pandamonium chat-dialog branch is not merged into this BlackBear base.
+Installed Pandamonium remains untouched. No phone install or store publication
+performed as part of this source/build task.
+
+Code review
+Summary: two already-tested Keets implementations combined without changing either;
+new API test proves they cooperate. Android base ancestry and unchanged2.0.28
+application source checked. Source/dependency/output checksums retained throughout.
+Findings: no blocking findings. Original Fold closure trigger remains unproven;
+recovery repairs the reproduced stuck state. Hardware retest is separate.
+Verdict: approve subject to host checks below.
+
+Host validation complete:
+- Fresh checkout5557f110 offline: assembleBlockRelease, lintBlockRelease,
+  testBlockReleaseUnitTest (7ChatMessages+2MainActivityLanguage) all passed.
+- All3flavor packaging checks passed; exact Keets bundle/21addons/runtime perABI.
+- Lint0errors/6987warnings; no changes to Android application code in this task.
+- BlackBear package com.eurobuddha.minimablock/code225/2.0.30-BlackBear.
+- Generated flags retain PANDA_SHELL=true, BLOCK_KEYUSES=true, PANDAMONIUM=false,
+  SHELL_BRAND=BlackBear. HistoryTabView verified present in signedAPK.
+- APK signature matches family release cert; ZIP integrity check passed.
+- Signer SHA256:eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+- APK:/Users/eurobuddha/Projects/minima/apks/base/dist/minima-core-BlackBear-2.0.30.apk
+- APK SHA256:2deb80871efc28af4adf151756f6b7440d5d424a5a6237a30d2bad2d680570db
+- Other flavor outputs moved outside standard release outputs to
+  blackbear-recovery-verification-2026-10-20/build/validation-only-other-flavors,
+  with versioned NOT-FOR-RELEASE names. Only BlackBear copied to dist.
+- No phone install or store publication. Source/build task and code review complete.
