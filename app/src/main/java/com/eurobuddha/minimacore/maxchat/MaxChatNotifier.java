@@ -31,6 +31,7 @@ final class MaxChatNotifier {
 
     static void onInbound(Context zCtx, MaximaNode zNode, ChatEngine.Entry zEntry) {
         try {
+            com.eurobuddha.minimacore.chat.Pssst.ensureAudible(zCtx);
             Contact c = zNode.contact(zEntry.sender);
             String who = c != null && !c.name.isEmpty() ? c.name : Language.text(zCtx, l10n_chat_parlons_contact);
             String what = ChatMedia.isMedia(zEntry.body) ? ChatPreview.text(zCtx, zEntry.body)

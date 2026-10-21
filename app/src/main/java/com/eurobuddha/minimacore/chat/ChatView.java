@@ -45,6 +45,7 @@ public class ChatView extends BaseView {
 
     private final View mEmpty;
     private final TextView mMyName;
+    private final TextView mNotifyOff;
     private final ThreadAdapter mAdapter;
     private Runnable mScanRequest = null;  // wired by MainActivity (launcher must register pre-STARTED)
     private EditText mPendingScanTarget = null;
@@ -90,6 +91,12 @@ public class ChatView extends BaseView {
 
         mEmpty = getMainView().findViewById(R.id.chat_empty_box);
         mMyName = getMainView().findViewById(R.id.chat_myname);
+        mNotifyOff = getMainView().findViewById(R.id.chat_notify_off);
+        mNotifyOff.setOnClickListener(v -> {
+            Intent it = new Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, mActivity.getPackageName());
+            try { mActivity.startActivity(it); } catch (Exception ignored) {}
+        });
         ListView list = getMainView().findViewById(R.id.chat_threads);
         mAdapter = new ThreadAdapter();
         list.setAdapter(mAdapter);
@@ -526,7 +533,22 @@ public class ChatView extends BaseView {
         }
         SharedPreferences prefs = mActivity.getSharedPreferences("main_prefs", Context.MODE_PRIVATE);
         mMyName.setText(prefs.getString("chat_name", ""));
+        mNotifyOff.setVisibility(notificationsBlocked() ? View.VISIBLE : View.GONE);
         mAdapter.reload();
+    }
+
+    /** True when the OS would drop a chat notification: app-level off, or the channel muted to NONE. */
+    private boolean notificationsBlocked() {
+        try {
+            android.app.NotificationManager nm = (android.app.NotificationManager)
+                    mActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (nm == null) return false;
+            if (!nm.areNotificationsEnabled()) return true;
+            android.app.NotificationChannel ch = nm.getNotificationChannel(ChatDrainer.CHANNEL_ID);
+            return ch != null && ch.getImportance() == android.app.NotificationManager.IMPORTANCE_NONE;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private class ThreadAdapter extends BaseAdapter {

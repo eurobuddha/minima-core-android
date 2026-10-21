@@ -48,6 +48,20 @@
                 android:textSize="13sp" />
         </LinearLayout>
 
+        <!-- Shown only when the OS is blocking this app's notifications; tap opens Settings -->
+        <TextView
+            android:id="@+id/chat_notify_off"
+            android:tag="l10n:text=l10n_chat_notifications_off"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:background="?attr/selectableItemBackground"
+            android:textColor="@color/core_text_mid"
+            android:textSize="13sp"
+            android:visibility="gone"
+            android:text="Notifications are off. Tap to turn them on." />
+
         <LinearLayout
             android:id="@+id/chat_empty_box"
             android:layout_width="match_parent"

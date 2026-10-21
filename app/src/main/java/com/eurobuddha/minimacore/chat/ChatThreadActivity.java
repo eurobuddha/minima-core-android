@@ -73,6 +73,9 @@ public class ChatThreadActivity extends AppCompatActivity {
         ChatFailureDialog.show(this, dialog(), message);
     }
 
+    /** Pubkey of the thread currently on screen, else null - ChatDrainer stays silent for it. */
+    static volatile String sForegroundPubkey = null;
+
     private String mPubkey;
     private MsgAdapter mAdapter;
     private Toolbar mToolbar;
@@ -222,6 +225,10 @@ public class ChatThreadActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (mPubkey == null || mAdapter == null) return;
+        sForegroundPubkey = mPubkey;
+        try {
+            ((android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel("keetchat", 3);
+        } catch (Exception ignored) {}
         refreshTitle();
         ChatDb.get(this).markThreadRead(mPubkey);
         sendReadReceipt();
@@ -232,6 +239,7 @@ public class ChatThreadActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        sForegroundPubkey = null;
         ChatDrainer.UI_LISTENERS.remove(mOnNewMessage);
     }
 

@@ -6683,6 +6683,7 @@
         <item quantity="other">"%1$d нового повідомлення"</item>
     </plurals>
     <string name="l10n_chat_tap_open" formatted="false">"Натисніть, щоб відкрити"</string>
+    <string name="l10n_chat_notifications_off" formatted="false">"Сповіщення вимкнено. Натисніть, щоб увімкнути."</string>
     <string name="l10n_chat_payment_preview" formatted="false">"💸 Платіж"</string>
     <string name="l10n_creative_studio" formatted="false">"Студія"</string>
     <string name="l10n_creative_manage" formatted="false">"Керування"</string>

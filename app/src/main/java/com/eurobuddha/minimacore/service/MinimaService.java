@@ -429,6 +429,9 @@ public class MinimaService extends Service {
                         boolean keetsOn = kp.getBoolean("keets_enabled", true);
                         new Handler(Looper.getMainLooper()).postDelayed(() -> {
                             if (!serviceDestroyed && !mHaveStartedShutdown) {
+                                //The ONE "Chat messages" channel serves keets AND Parlons
+                                //notifications, so it must exist even with keets disabled.
+                                com.eurobuddha.minimacore.chat.ChatDrainer.createChannel(MinimaService.this);
                                 if (keetsOn) {
                                     mKeetsWorklet.start(MinimaService.this);
                                     //Chat: the ONE drainer of the keets message inbox

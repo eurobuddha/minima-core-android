@@ -6683,6 +6683,7 @@
         <item quantity="other">"%1$d нового сообщения"</item>
     </plurals>
     <string name="l10n_chat_tap_open" formatted="false">"Нажмите, чтобы открыть"</string>
+    <string name="l10n_chat_notifications_off" formatted="false">"Уведомления выключены. Нажмите, чтобы включить."</string>
     <string name="l10n_chat_payment_preview" formatted="false">"💸 Платёж"</string>
     <string name="l10n_creative_studio" formatted="false">"Студия"</string>
     <string name="l10n_creative_manage" formatted="false">"Управление"</string>

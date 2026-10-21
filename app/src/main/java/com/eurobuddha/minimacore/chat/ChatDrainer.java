@@ -41,7 +41,10 @@ import java.util.Base64;
  */
 public class ChatDrainer {
 
-    public static final String CHANNEL_ID = "MinimaChatChannel";
+    /** Versioned: Android freezes a channel's sound after creation, so adding the
+     *  pssst sound (vc229) needed a new id. Superseded ids are deleted in createChannel. */
+    public static final String CHANNEL_ID = "MinimaChatChannel_v2";
+    private static final String CHANNEL_ID_V1 = "MinimaChatChannel";
     private static final long POLL_MS = 5000;
 
     /** UI refresh hooks — ChatView / ChatThreadActivity register while alive; run on a
@@ -59,14 +62,38 @@ public class ChatDrainer {
         if (mThread != null) return;
         mStop = false;
 
-        NotificationManager nm = (NotificationManager) zService.getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationChannel ch = new NotificationChannel(CHANNEL_ID, Language.text(zService, l10n_notification_chat), NotificationManager.IMPORTANCE_HIGH);
-        ch.setDescription(Language.text(zService, l10n_notification_chat_help));
-        nm.createNotificationChannel(ch);
+        createChannel(zService);
 
         mThread = new java.lang.Thread(() -> runLoop(zService), "keets-chat-drainer");
         mThread.setDaemon(true);
         mThread.start();
+    }
+
+    /** The "Chat messages" channel, shared with Parlons (MaxChatNotifier): HIGH, vibrates,
+     *  badges, and chirps the Parlons pssst (res/raw/pssst.wav). The sound URI is NAME-based
+     *  because a numeric resource id is only stable within one build and the channel keeps
+     *  the URI forever. Logs the permission/channel state once so a logcat can answer
+     *  "why no notification" without a debug build. */
+    public static void createChannel(Context zCtx) {
+        NotificationManager nm = (NotificationManager) zCtx.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (nm == null) return;
+        if (nm.getNotificationChannel(CHANNEL_ID) == null) {
+            NotificationChannel ch = new NotificationChannel(CHANNEL_ID, Language.text(zCtx, l10n_notification_chat), NotificationManager.IMPORTANCE_HIGH);
+            ch.setDescription(Language.text(zCtx, l10n_notification_chat_help));
+            ch.enableVibration(true);
+            ch.setShowBadge(true);
+            ch.setSound(android.net.Uri.parse("android.resource://" + zCtx.getPackageName() + "/raw/pssst"),
+                    new android.media.AudioAttributes.Builder()
+                            .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build());
+            nm.createNotificationChannel(ch);
+        }
+        try { nm.deleteNotificationChannel(CHANNEL_ID_V1); } catch (Exception ignored) {}
+        NotificationChannel now = nm.getNotificationChannel(CHANNEL_ID);
+        logger.log("[CHAT] notifications enabled=" + nm.areNotificationsEnabled()
+                + " channel importance=" + (now == null ? "none" : now.getImportance())
+                + " sound=" + (now == null ? "none" : now.getSound()));
     }
 
     public static synchronized void stop() {
@@ -91,6 +118,7 @@ public class ChatDrainer {
                 mLastErr = null;
                 JSONArray inbox = (JSONArray) res.get("response");
                 int fresh = 0;
+                boolean allOnScreen = true;   // every fresh message is from the thread being read
                 String lastFrom = null, lastName = null, lastBody = null;
                 for (Object o : inbox) {
                     JSONObject msg = (JSONObject) o;
@@ -167,6 +195,7 @@ public class ChatDrainer {
                     if (isNew) {
                         db.ensureContact(from, d.name);
                         fresh++;
+                        if (!from.equals(ChatThreadActivity.sForegroundPubkey)) allOnScreen = false;
                         lastFrom = from;
                         lastName = db.contactName(from);
                         lastBody = d.state.equals("image") ? Language.text(zService, l10n_media_photo)
@@ -181,7 +210,8 @@ public class ChatDrainer {
                     MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
                 }
                 if (fresh > 0) {
-                    notifyUser(zService, fresh, lastFrom, lastName, lastBody);
+                    //a message landing in the conversation you are looking at stays silent
+                    if (!allOnScreen) notifyUser(zService, fresh, lastFrom, lastName, lastBody);
                     for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
                 }
             } catch (Exception exc) {
@@ -223,6 +253,7 @@ public class ChatDrainer {
 
     private static void notifyUser(MinimaService zService, int zFresh, String zFrom, String zName, String zBody) {
         try {
+            Pssst.ensureAudible(zService);
             Intent it = new Intent(zService, ChatThreadActivity.class);
             it.putExtra("pubkey", zFrom);
             it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -239,6 +270,7 @@ public class ChatDrainer {
                     .build();
             NotificationManager nm = (NotificationManager) zService.getSystemService(Context.NOTIFICATION_SERVICE);
             nm.notify("keetchat", 3, n);
+            logger.log("[CHAT] notify posted from=" + zFrom + " fresh=" + zFresh);
         } catch (Exception exc) {
             logger.log("[CHAT] notify: " + exc);
         }

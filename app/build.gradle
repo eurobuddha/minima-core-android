@@ -129,8 +129,10 @@ android {
         // vc113: explicit English, Chinese, Russian and Ukrainian selection across all bears.
         // vc114: core notifications and retained main-screen controls follow the selected language.
         // vc118: current four-language catalogue and reviewed AtomiX receipt/consent fixes.
-        versionCode 228
-        versionName "2.0.32"
+        // vc229: KeetChat/Parlons notifications get the pssst sound, vibration, a
+        // versioned channel, in-thread suppression and a "notifications off" banner.
+        versionCode 229
+        versionName "2.0.33"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

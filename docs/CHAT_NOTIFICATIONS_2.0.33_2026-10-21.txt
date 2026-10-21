@@ -1,0 +1,51 @@
+KeetChat / Parlons notifications — Pandamonium 2.0.33 (versionCode 229), 2026-10-21
+
+Report: "no Android notification at all for KeetChat messages; want a Parlons-style beep".
+
+Fold R3GL805K7MB read-only diagnosis BEFORE the change (running 2.0.32-Pandamonium, code 228):
+- android.permission.POST_NOTIFICATIONS: granted=true (USER_SET)
+- appops POST_NOTIFICATION: default allow; app importance=DEFAULT, not blocked
+- channel MinimaChatChannel: importance=4 (HIGH), sound=content://settings/system/notification_sound,
+  mVibrationEnabled=false, not deleted
+- zen_mode=0; mode_ringer=1 (VIBRATE): STREAM_RING and STREAM_NOTIFICATION both Muted:true
+  -> a notification could not make a sound and, with channel vibration off, no haptic either.
+  Owner switched the Fold to sound mode during the session: mode_ringer=2, notification volume 11/15.
+- dumpsys notification retained history: zero records with tag=keetchat (no chat notification was
+  ever posted in the retained window). Logcat (process 24355, 2h old) carried no [CHAT] lines: the
+  drainer only logged on errors, so this is consistent with "no inbound message reached the
+  drainer", not proof of it. Node alive ("You found a block" 2377934, health OK).
+- Only two inbox drainers exist in the family: ChatDrainer (this app) and mds/keetchat/index.html
+  in RPC mode. An RPC page open against the Fold would take the messages first.
+
+What 2.0.33 changes (core app module, hand-edited; no adapter-generated file touched):
+1. ChatDrainer.createChannel(Context): channel id MinimaChatChannel_v2 (sound is frozen after a
+   channel is created, hence the new id; v1 is deleted), IMPORTANCE_HIGH, vibration on, badge on,
+   sound android.resource://<pkg>/raw/pssst (res/raw/pssst.wav copied byte-exact from Parlons,
+   sha256 ce3d5b223a545d472b183362bf04014badb99a680b047a93f13f6e8e3a7e82bb). The URI is
+   name-based; AAPT shortens the path inside the APK (res/Hg.wav) but keeps the name in
+   resources.arsc. MinimaService creates the channel before the keets gate, so Parlons
+   (MaxChatNotifier, same channel) has it even with keets disabled.
+2. Pssst.ensureAudible (ported from Parlons, no pref gate): raises the notification stream to
+   2/3 when it is below half, only in RINGER_MODE_NORMAL, never lowers it.
+3. ChatThreadActivity.sForegroundPubkey: no notification while that thread is on screen; opening
+   a thread cancels the "keetchat" notification.
+4. Chat tab banner "Notifications are off. Tap to turn them on." (four languages) when the app's
+   notifications are disabled or the chat channel is set to NONE; tap opens the app's system
+   notification settings.
+5. MainActivity requests POST_NOTIFICATIONS on its own (request 98) on Android 13+ instead of
+   inside the storage-permission batch that never completes there.
+6. Diagnostics: "[CHAT] notifications enabled=.. channel importance=.. sound=.." once at channel
+   creation and "[CHAT] notify posted from=<full pubkey> fresh=N" after every post.
+
+Verification:
+- Unit: ChatChannelTest 1/1 (channel v2 HIGH, vibrates, sound ends /raw/pssst, v1 gone, idempotent);
+  chat suites 8+3+7, LanguageTest 11, NotificationLabelsTest 1 — 0 failures.
+- assemblePandamoniumRelease + lintVitalPandamoniumRelease, assembleClassicRelease,
+  assembleBlockRelease: all pass. Dex of the Pandamonium APK contains MinimaChatChannel_v2 and the
+  two new log strings.
+- dist/minima-core-Pandamonium-2.0.33.apk
+  sha256 0191e19ad249850ecce9e3870e1966493809a657d0a58625dc0ebdcef3c28766 (sidecar checks OK)
+  family signer eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f
+- adb install -r on Fold R3GL805K7MB: Success; dumpsys versionName=2.0.33-Pandamonium code 229.
+- Live KeetChat message with the app in the background: NOT verified by the agent (needs a peer
+  to send one). Classic/Block flavors built only, not copied to dist, not installed.

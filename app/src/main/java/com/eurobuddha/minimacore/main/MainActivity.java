@@ -210,10 +210,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         //Get Files Permission
         String[] perms = new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.POST_NOTIFICATIONS
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
         };
         checkPermission(perms,99);
+
+        //Notifications (chat, node health) get their OWN prompt on Android 13+: the storage
+        //perms above are never granted there, so a combined request re-fires every launch
+        //and two taps on "Don't allow" silently lose the notification prompt for good.
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            checkPermission(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 98);
+        }
 
         checkBattery();
     }
