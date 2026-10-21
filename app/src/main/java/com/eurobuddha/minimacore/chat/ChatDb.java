@@ -164,7 +164,9 @@ public class ChatDb extends SQLiteOpenHelper {
         return n;
     }
 
-    /** Reuse MaximaNode.storeKeetsContact: a received name can fill only an unnamed contact. */
+    /** A received name fills an unnamed contact AND follows a contact whose name the app
+     *  itself learned from an earlier message (2.0.35+). A name the user typed never
+     *  changes: it matches neither the bare key nor any name the sender ever declared. */
     public void ensureContact(String zPubkey, String zSenderName) {
         String name = zSenderName == null ? "" : zSenderName.trim();
         ContentValues v = new ContentValues();
@@ -177,8 +179,10 @@ public class ChatDb extends SQLiteOpenHelper {
             ContentValues renamed = new ContentValues();
             renamed.put("name", name);
             // Conditional SQL also preserves a local rename racing this inbox callback.
-            db.update("contacts", renamed, "pubkey=? AND (trim(name)='' OR lower(trim(name))=lower(?))",
-                    new String[]{zPubkey, zPubkey});
+            db.update("contacts", renamed,
+                    "pubkey=? AND (trim(name)='' OR lower(trim(name))=lower(?)"
+                    + " OR lower(trim(name)) IN (SELECT lower(trim(name)) FROM messages WHERE pubkey=? AND incoming=1 AND trim(name)<>''))",
+                    new String[]{zPubkey, zPubkey, zPubkey});
         }
     }
 

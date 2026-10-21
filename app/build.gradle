@@ -132,8 +132,10 @@ android {
         // vc229: KeetChat/Parlons notifications get the pssst sound, vibration, a
         // versioned channel, in-thread suppression and a "notifications off" banner.
         // vc230: KeetChat gets its own channel and "keet" cheep; Parlons keeps pssst.
-        versionCode 230
-        versionName "2.0.34"
+        // vc231: delivered receipts (double tick when the peer stores it), contact names
+        // follow the sender until renamed by hand, keets sidecar 1.2.5 (mailbox push).
+        versionCode 231
+        versionName "2.0.35"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

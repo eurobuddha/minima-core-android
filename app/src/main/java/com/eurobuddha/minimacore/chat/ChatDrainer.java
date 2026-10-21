@@ -156,6 +156,13 @@ public class ChatDrainer {
                         for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
                         continue;
                     }
+                    if (d.state.equals("delivered")) {
+                        //the peer stored our message: single tick -> double tick (2.0.35+)
+                        if (!d.ref.equals("")) db.setVia(d.ref, "delivered");
+                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
+                        for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
+                        continue;
+                    }
                     if (d.state.equals("payaddr")) {
                         //contacts only: a control message must never create a contact,
                         //or any stranger can plant a payee row with their address
@@ -208,6 +215,7 @@ public class ChatDrainer {
                     boolean isNew = db.addMessage(m);
                     if (isNew) {
                         db.ensureContact(from, d.name);
+                        sendDelivered(from, m.msgid);
                         fresh++;
                         if (!from.equals(ChatThreadActivity.sForegroundPubkey)) allOnScreen = false;
                         lastFrom = from;
@@ -263,6 +271,19 @@ public class ChatDrainer {
             ev.put("data", data);
             zService.sendBroadcastNotify(ev, false);
         } catch (Exception e) { /* fan-out must never break the drain */ }
+    }
+
+    /** Tell the sender we stored their message (their single tick becomes a double tick).
+     *  Fire-and-forget: a failed receipt only leaves their tick single. */
+    private static void sendDelivered(String zTo, String zMsgId) {
+        try {
+            org.minima.utils.json.JSONObject r = ChatSchema.base("", "", "");
+            r.put("state", "delivered");
+            r.put("ref", zMsgId);
+            MinimaCMD.execute("keets action:send to:" + zTo + " datahex:" + ChatSchema.toDataHex(r.toString()));
+        } catch (Exception e) {
+            logger.log("[CHAT] delivered receipt: " + e);
+        }
     }
 
     private static void notifyUser(MinimaService zService, int zFresh, String zFrom, String zName, String zBody) {
