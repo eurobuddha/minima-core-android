@@ -98,3 +98,19 @@ being told it is Holepunch's asset, reaffirmed the choice.
   "Parlons messages". Test message sent 13:17:01 from the 12001 node (mailbox); fetched on the
   next 5-minute poll: 13:21:55 "[CHAT] notify posted from=0x837b3e45302f354a370febba000cd1d504e6847d390c83e514c2a0ac236fc63b fresh=1",
   NotificationRecord tag=keetchat on channel KeetChatChannel_v1.
+
+Desktop KeetChat follow-up (2026-10-21): root cause and resolution
+- minimaCore Desktop on the Parlons node kind hides its own Chat tab and does not run main/chat.js
+  (startLoop returns for kind "parlons"; renderer hides #chatTab). On that kind the Parlons Node jar
+  (maxima node/KeetsChatBridge) owns the keets inbox and files keets messages into the Parlons chat
+  store (/Users/eurobuddha/minimaCore12001/chat/*.tsv). The Fold's texts "Hello" and "Yes it's good"
+  and its read receipt are there; the voice note was dropped because parlons-node 0.2.125's
+  KeetsWire/ChatEngine had no "audio" state (unknown states are consumed and never stored).
+- Fixed upstream already: maxima 9b6592ee "keets bridge speaks voice notes (state:audio)", shipped
+  in Parlons Node 0.2.129 (2026-10-16) and minimaCore Desktop 0.18.15 (2026-10-16, all three
+  platforms live in the feed). The owner's Mac was still on 0.18.11 (parlons-node 0.2.125).
+- Verified the released DMG minimaCore-0.18.15-arm64-notarized.dmg: SHA256SUMS OK, Gatekeeper
+  "accepted, source=Notarized Developer ID", stapler OK, bundled parlons-node.jar sha256
+  b0c371da9ba2643953e2f03444cff60f20b91d064c236ddfd04e21cc59b145a3 = node-v0.2.129. No new
+  build or release was needed; a local 0.18.12 edit was reverted (0.18.12-0.18.15 already exist).
+- minimaDesk still pins parlons-node 0.2.125 (desktop/minimaDesk/package.json); untouched.
