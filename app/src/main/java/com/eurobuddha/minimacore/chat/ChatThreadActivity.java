@@ -279,7 +279,7 @@ public class ChatThreadActivity extends AppCompatActivity {
         Language.apply(v);
         ((TextView) v.findViewById(R.id.pay_to)).setText(payaddr);
         dialog()
-                .setTitle(Language.msg(l10n_chat_send_minima))
+                .setTitle(Language.msg(l10n_chat_send_payment))
                 .setView(v)
                 .setPositiveButton(Language.msg(l10n_wallet_send), (d, w) -> {
                     String amt = ((EditText) v.findViewById(R.id.pay_amount)).getText().toString().trim();
@@ -287,15 +287,20 @@ public class ChatThreadActivity extends AppCompatActivity {
                         Toast.makeText(this, Language.msg(l10n_chat_valid_amount), Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    doPayment(payaddr, amt);
+                    boolean usd = ((android.widget.RadioButton) v.findViewById(R.id.pay_mxusd)).isChecked();
+                    doPayment(payaddr, amt, usd ? MXUSD_TOKENID : "0x00", usd ? "MxUSD" : "Minima");
                 })
                 .setNegativeButton(Language.msg(l10n_common_cancel), null)
                 .show();
     }
 
-    private void doPayment(String zAddr, String zAmt) {
-        Toast.makeText(this, Language.msg(l10n_chat_sending_amount, zAmt), Toast.LENGTH_SHORT).show();
-        MinimaCMD.runMinima("send address:" + zAddr + " amount:" + zAmt, zResult -> {
+    /** MxUSD, the Minima dollar-pegged token - the one id, whatever a bridge calls it. */
+    static final String MXUSD_TOKENID = "0x7D39745FBD29049BE29850B55A18BF550E4D442F930F86266E34193D89042A90";
+
+    private void doPayment(String zAddr, String zAmt, String zTokenId, String zTokName) {
+        Toast.makeText(this, Language.msg(l10n_chat_sending_amount_token, zAmt, zTokName), Toast.LENGTH_SHORT).show();
+        String cmd = "send address:" + zAddr + " amount:" + zAmt + ("0x00".equals(zTokenId) ? "" : " tokenid:" + zTokenId);
+        MinimaCMD.runMinima(cmd, zResult -> {
             boolean ok = (Boolean) zResult.getOrDefault("status", false);
             if (!ok) {
                 runOnUiThread(() -> showFailure(Language.msg(l10n_chat_payment_failed, String.valueOf(zResult.get("error")))));
@@ -308,7 +313,8 @@ public class ChatThreadActivity extends AppCompatActivity {
             org.minima.utils.json.JSONObject pm = ChatSchema.base(prefs.getString("chat_name", ""), "", "");
             pm.put("state", "payment");
             pm.put("amt", zAmt);
-            pm.put("tokname", "Minima");
+            pm.put("tok", zTokenId);
+            pm.put("tokname", zTokName);
             pm.put("txid", txid);
             pm.put("addr", zAddr);
             String payload = pm.toString();
@@ -316,7 +322,7 @@ public class ChatThreadActivity extends AppCompatActivity {
 
             ChatDb.Msg m = new ChatDb.Msg();
             m.msgid = msgid; m.pubkey = mPubkey; m.incoming = false;
-            m.body = ""; m.state = "payment"; m.amt = zAmt; m.tokname = "Minima"; m.txid = txid;
+            m.body = ""; m.state = "payment"; m.amt = zAmt; m.tokname = zTokName; m.txid = txid;
             m.ts = System.currentTimeMillis(); m.via = ""; m.read = true;
             ChatDb.get(this).addMessage(m);
             runOnUiThread(() -> mAdapter.reload());

@@ -140,8 +140,9 @@ android {
         // inbox poll 5 s -> 1.5 s: a message shows within ~2 s of reaching the phone.
         // vc234: notify and refresh the UI the instant a message is stored; acks and
         // receipts follow afterwards (node commands serialise, 8 s stalls seen on 2.0.37).
-        versionCode 234
-        versionName "2.0.38"
+        // vc235: in-chat payments can be MxUSD as well as Minima (the wire always carried the token).
+        versionCode 235
+        versionName "2.0.39"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

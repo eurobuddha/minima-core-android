@@ -21,22 +21,48 @@
         android:textSize="12sp"
         android:textIsSelectable="true" />
 
-    <EditText
-        android:id="@+id/pay_amount"
-        android:tag="l10n:hint=l10n_chat_amount_minima"
+    <TextView
+        android:tag="l10n:text=l10n_chat_pay_currency"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:hint="Amount (Minima)"
+        android:text="CURRENCY"
+        android:textSize="11sp"
+        android:alpha="0.7" />
+    <RadioGroup
+        android:id="@+id/pay_currency"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/pay_minima"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Minima" />
+        <RadioButton
+            android:id="@+id/pay_mxusd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:text="MxUSD" />
+    </RadioGroup>
+    <EditText
+        android:id="@+id/pay_amount"
+        android:tag="l10n:hint=l10n_chat_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:hint="Amount"
         android:inputType="numberDecimal"
         android:maxLines="1" />
 
     <TextView
-        android:tag="l10n:text=l10n_chat_real_funds"
+        android:tag="l10n:text=l10n_chat_real_funds_any"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="This sends real Minima from this node's wallet."
+        android:text="This sends real funds from this node's wallet."
         android:textSize="12sp"
         android:alpha="0.7" />
 </LinearLayout>

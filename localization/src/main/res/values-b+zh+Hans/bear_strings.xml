@@ -1188,6 +1188,11 @@
     <string name="l10n_chat_to_pay_address" formatted="false">"发送至对方收款地址"</string>
     <string name="l10n_chat_amount_minima" formatted="false">"金额（Minima）"</string>
     <string name="l10n_chat_real_funds" formatted="false">"这将从此节点的钱包中发送真实的 Minima。"</string>
+    <string name="l10n_chat_send_payment" formatted="false">"发送付款"</string>
+    <string name="l10n_chat_pay_currency" formatted="false">"货币"</string>
+    <string name="l10n_chat_amount" formatted="false">"金额"</string>
+    <string name="l10n_chat_real_funds_any" formatted="false">"这将从此节点的钱包中发送真实资金。"</string>
+    <string name="l10n_chat_sending_amount_token">"正在发送 %1$s %2$s…"</string>
     <string name="l10n_chat_photo" formatted="false">"照片"</string>
     <string name="l10n_chat_photo_load_error" formatted="false">"无法加载此照片。\n首次加载时，发送方或镜像节点必须在线。"</string>
     <string name="l10n_chat_rename_contact" formatted="false">"重命名联系人"</string>

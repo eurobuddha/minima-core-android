@@ -1224,6 +1224,11 @@
     <string name="l10n_chat_to_pay_address" formatted="false">"НА ПЛАТЁЖНЫЙ АДРЕС КОНТАКТА"</string>
     <string name="l10n_chat_amount_minima" formatted="false">"Сумма (Minima)"</string>
     <string name="l10n_chat_real_funds" formatted="false">"Будут отправлены настоящие Minima из кошелька этого узла."</string>
+    <string name="l10n_chat_send_payment" formatted="false">"Отправить платёж"</string>
+    <string name="l10n_chat_pay_currency" formatted="false">"ВАЛЮТА"</string>
+    <string name="l10n_chat_amount" formatted="false">"Сумма"</string>
+    <string name="l10n_chat_real_funds_any" formatted="false">"Будут отправлены настоящие средства из кошелька этого узла."</string>
+    <string name="l10n_chat_sending_amount_token">"Отправка %1$s %2$s…"</string>
     <string name="l10n_chat_photo" formatted="false">"Фото"</string>
     <string name="l10n_chat_photo_load_error" formatted="false">"Не удалось загрузить фото.\nПри первой загрузке отправитель или зеркало должны быть в сети."</string>
     <string name="l10n_chat_rename_contact" formatted="false">"Переименовать контакт"</string>

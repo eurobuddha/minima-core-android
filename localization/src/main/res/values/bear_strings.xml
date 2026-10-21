@@ -1200,6 +1200,11 @@
     <string name="l10n_chat_to_pay_address" formatted="false">"TO THEIR PAY ADDRESS"</string>
     <string name="l10n_chat_amount_minima" formatted="false">"Amount (Minima)"</string>
     <string name="l10n_chat_real_funds" formatted="false">"This sends real Minima from this node\'s wallet."</string>
+    <string name="l10n_chat_send_payment" formatted="false">"Send payment"</string>
+    <string name="l10n_chat_pay_currency" formatted="false">"CURRENCY"</string>
+    <string name="l10n_chat_amount" formatted="false">"Amount"</string>
+    <string name="l10n_chat_real_funds_any" formatted="false">"This sends real funds from this node\'s wallet."</string>
+    <string name="l10n_chat_sending_amount_token">"Sending %1$s %2$s…"</string>
     <string name="l10n_chat_photo" formatted="false">"Photo"</string>
     <string name="l10n_chat_photo_load_error" formatted="false">"Couldn\'t load this photo.\nThe sender (or a mirror) must be online the first time."</string>
     <string name="l10n_chat_rename_contact" formatted="false">"Rename contact"</string>
