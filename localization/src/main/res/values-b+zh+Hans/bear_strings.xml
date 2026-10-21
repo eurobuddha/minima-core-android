@@ -19,7 +19,9 @@
     <string name="l10n_notification_node" formatted="false">"Minima 节点前台服务"</string>
     <string name="l10n_notification_health" formatted="false">"Minima 节点健康状态"</string>
     <string name="l10n_notification_health_help" formatted="false">"节点需要重新同步时通知您"</string>
-    <string name="l10n_notification_chat" formatted="false">"聊天消息"</string>
+    <string name="l10n_notification_chat" formatted="false">"KeetChat 消息"</string>
+    <string name="l10n_notification_parlons" formatted="false">"Parlons 消息"</string>
+    <string name="l10n_notification_parlons_help" formatted="false">"收到的 Parlons 消息"</string>
     <string name="l10n_tab_home" formatted="false">"首页"</string>
     <string name="l10n_tab_node" formatted="false">"节点"</string>
     <string name="l10n_tab_wallet" formatted="false">"钱包"</string>

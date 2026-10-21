@@ -15,7 +15,8 @@ public final class NotificationLabels {
         update(context, manager, "salon_activity", R.string.l10n_creative_salon_channel, 0);
         update(context, manager, "MinimaServiceChannel", R.string.l10n_notification_node, 0);
         update(context, manager, "MinimaHealthChannel", R.string.l10n_notification_health, R.string.l10n_notification_health_help);
-        update(context, manager, "MinimaChatChannel_v2", R.string.l10n_notification_chat, R.string.l10n_notification_chat_help);
+        update(context, manager, "KeetChatChannel_v1", R.string.l10n_notification_chat, R.string.l10n_notification_chat_help);
+        update(context, manager, "MinimaChatChannel_v2", R.string.l10n_notification_parlons, R.string.l10n_notification_parlons_help);
         update(context, manager, "fcnext_fg", R.string.l10n_future_guardian, R.string.l10n_future_notice_watching);
         update(context, manager, "fcnext_alert", R.string.l10n_future_notice_alerts, R.string.l10n_future_notice_alerts_help);
         update(context, manager, "casino_fg", R.string.l10n_casino_background_channel, 0);

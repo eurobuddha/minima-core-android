@@ -19,7 +19,9 @@
     <string name="l10n_notification_node" formatted="false">"Фоновая служба узла Minima"</string>
     <string name="l10n_notification_health" formatted="false">"Состояние узла Minima"</string>
     <string name="l10n_notification_health_help" formatted="false">"Сообщает, когда узлу нужна повторная синхронизация"</string>
-    <string name="l10n_notification_chat" formatted="false">"Сообщения чата"</string>
+    <string name="l10n_notification_chat" formatted="false">"Сообщения KeetChat"</string>
+    <string name="l10n_notification_parlons" formatted="false">"Сообщения Parlons"</string>
+    <string name="l10n_notification_parlons_help" formatted="false">"Входящие сообщения Parlons"</string>
     <string name="l10n_tab_home" formatted="false">"Главная"</string>
     <string name="l10n_tab_node" formatted="false">"Узел"</string>
     <string name="l10n_tab_wallet" formatted="false">"Кошелёк"</string>

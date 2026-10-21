@@ -64,3 +64,31 @@ Live verification AFTER install (Fold in sound mode, Pandamonium in the backgrou
 - Unrelated peer 0x72796652ef2321d03664984a4a934c86cf104dc0ccc414102342d89306cd4da3 also
   messaged the Fold directly at 12:02:47 and 12:04:42; each produced a "[CHAT] notify posted".
 - Not machine-verifiable: that the pssst was audible. Owner's ears are the final check.
+
+2.0.34 (versionCode 230), 2026-10-21 — KeetChat gets its own sound
+Owner heard the 2.0.33 alert live (pssst) and asked for a distinct KeetChat sound. Synthesised
+cheeps (whistle sweeps, formant "keet", the owner's own voice note pitched up 2-3 octaves) were
+all rejected. Owner then chose the official Keet desktop default notification sound and, after
+being told it is Holepunch's asset, reaffirmed the choice.
+- Source: https://static.keet.io/downloads/latest/Keet.dmg (Keet.app, Electron) ->
+  Contents/Resources/app/.webpack/renderer/main_window/assets/sounds/notifications/keet.mp3,
+  labelled "Keet (Default)" in the app's settings code. 0.312 s, 3966 bytes,
+  sha256 70ecb13360fffe5bf13afdec3ef4631fe4651592f8cec62de05f3d50d224c191 -> app/src/main/res/raw/keet.mp3.
+- Two channels now (a channel has exactly one sound): KeetChatChannel_v1 = "KeetChat messages"
+  with raw/keet (ChatDrainer.CHANNEL_ID); MinimaChatChannel_v2 = "Parlons messages" with
+  raw/pssst (ChatDrainer.PARLONS_CHANNEL_ID, used by MaxChatNotifier). ChatDrainer.ensureChannel
+  creates each once and refreshes only name/description afterwards. NotificationLabels follows.
+  New strings l10n_notification_parlons(_help) in en/zh-Hans/ru/uk; l10n_notification_chat is now
+  "KeetChat messages".
+- Tests: ChatChannelTest asserts both channels, HIGH, vibration, /raw/keet vs /raw/pssst, v1 id
+  gone; chat suites 8+3+7, LanguageTest 11, NotificationLabelsTest 1: 0 failures. All three
+  flavors assemble; vital lint passes.
+- dist/minima-core-Pandamonium-2.0.34.apk sha256
+  d852be52e75d6f833980234b2b9b6f66b6d50ad7449947cdb130e54f4dfd1f2b, family signer
+  eca1383c9d27683a281fbe6355356267877dc2dd14d963d7cc289ca0700e517f; APK carries res/Xa.mp3 (keet)
+  and res/Hg.wav (pssst) with both names in resources.arsc. Installed on Fold R3GL805K7MB.
+- Voice-note retrieval note: the owner's Fold voice note was fetched read-only from the Fold's
+  public keets media drive (5a6ad23dfb71c29a6417c2e64b16f067a6e39b67f64a513004beaac0b7d4f2d5,
+  /chat/vn-1792582201387.ogg) with a standalone Hyperdrive listing script, because minimaCore
+  Desktop's KeetChat drainer acked it out of the 12001 inbox without storing it (its chat.json has
+  0 messages). That desktop defect is open and separate from this change.

@@ -16,7 +16,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-/** The chat channel must be HIGH, vibrate, carry the pssst sound, and retire the v1 id. */
+/** KeetChat channel: HIGH, vibrates, keet sound. Parlons channel: pssst. v1 id retired. */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34, application = Application.class)
 public class ChatChannelTest {
@@ -37,13 +37,19 @@ public class ChatChannelTest {
 
         NotificationChannel ch = nm.getNotificationChannel(ChatDrainer.CHANNEL_ID);
         assertNotNull(ch);
-        assertEquals("MinimaChatChannel_v2", ChatDrainer.CHANNEL_ID);
+        assertEquals("KeetChatChannel_v1", ChatDrainer.CHANNEL_ID);
         assertEquals(NotificationManager.IMPORTANCE_HIGH, ch.getImportance());
         assertTrue(ch.shouldVibrate());
         assertNotNull(ch.getSound());
-        assertTrue(ch.getSound().toString(), ch.getSound().toString().endsWith("/raw/pssst"));
+        assertTrue(ch.getSound().toString(), ch.getSound().toString().endsWith("/raw/keet"));
         assertTrue(ch.getSound().toString().startsWith("android.resource://" + ctx.getPackageName() + "/"));
         assertNull(nm.getNotificationChannel("MinimaChatChannel"));
+
+        NotificationChannel parlons = nm.getNotificationChannel(ChatDrainer.PARLONS_CHANNEL_ID);
+        assertNotNull(parlons);
+        assertEquals(NotificationManager.IMPORTANCE_HIGH, parlons.getImportance());
+        assertTrue(parlons.getSound().toString(), parlons.getSound().toString().endsWith("/raw/pssst"));
+        assertNotEquals(ch.getId(), parlons.getId());
 
         // idempotent: a second call keeps the channel and never throws
         ChatDrainer.createChannel(ctx);

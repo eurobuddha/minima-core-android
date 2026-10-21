@@ -19,7 +19,9 @@
     <string name="l10n_notification_node" formatted="false">"Фонова служба вузла Minima"</string>
     <string name="l10n_notification_health" formatted="false">"Стан вузла Minima"</string>
     <string name="l10n_notification_health_help" formatted="false">"Повідомляє, коли вузол потребує повторної синхронізації"</string>
-    <string name="l10n_notification_chat" formatted="false">"Повідомлення чату"</string>
+    <string name="l10n_notification_chat" formatted="false">"Повідомлення KeetChat"</string>
+    <string name="l10n_notification_parlons" formatted="false">"Повідомлення Parlons"</string>
+    <string name="l10n_notification_parlons_help" formatted="false">"Вхідні повідомлення Parlons"</string>
     <string name="l10n_tab_home" formatted="false">"Головна"</string>
     <string name="l10n_tab_node" formatted="false">"Вузол"</string>
     <string name="l10n_tab_wallet" formatted="false">"Гаманець"</string>

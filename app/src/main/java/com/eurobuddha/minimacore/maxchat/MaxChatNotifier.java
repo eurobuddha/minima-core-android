@@ -20,8 +20,8 @@ import com.eurobuddha.maxima.core.chat.ChatPay;
 import com.eurobuddha.maxima.core.contacts.Contact;
 
 /**
- * One notification per inbound Parlons message, on the same channel as the
- * keets chat so the user has ONE "Chat messages" switch to flip. Taps open
+ * One notification per inbound Parlons message, on its own channel (the Parlons
+ * pssst; KeetChat has the keet cheep - one sound per channel). Taps open
  * the Chat tab; thread deep-links come with the thread UI.
  */
 final class MaxChatNotifier {
@@ -48,7 +48,7 @@ final class MaxChatNotifier {
             PendingIntent pi = PendingIntent.getActivity(zCtx, 7, it,
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-            Notification n = new NotificationCompat.Builder(zCtx, ChatDrainer.CHANNEL_ID)
+            Notification n = new NotificationCompat.Builder(zCtx, ChatDrainer.PARLONS_CHANNEL_ID)
                     .setContentTitle(who)
                     .setContentText(what)
                     .setSmallIcon(R.drawable.ic_minima)

@@ -41,9 +41,12 @@ import java.util.Base64;
  */
 public class ChatDrainer {
 
-    /** Versioned: Android freezes a channel's sound after creation, so adding the
-     *  pssst sound (vc229) needed a new id. Superseded ids are deleted in createChannel. */
-    public static final String CHANNEL_ID = "MinimaChatChannel_v2";
+    /** KeetChat channel: the "keet" cheep (res/raw/keet.wav). Android freezes a channel's
+     *  sound after creation, so a sound change always means a new id; superseded ids are
+     *  deleted in createChannel. */
+    public static final String CHANNEL_ID = "KeetChatChannel_v1";
+    /** Parlons channel (MaxChatNotifier): the Parlons pssst (res/raw/pssst.wav). */
+    public static final String PARLONS_CHANNEL_ID = "MinimaChatChannel_v2";
     private static final String CHANNEL_ID_V1 = "MinimaChatChannel";
     private static final long POLL_MS = 5000;
 
@@ -69,31 +72,42 @@ public class ChatDrainer {
         mThread.start();
     }
 
-    /** The "Chat messages" channel, shared with Parlons (MaxChatNotifier): HIGH, vibrates,
-     *  badges, and chirps the Parlons pssst (res/raw/pssst.wav). The sound URI is NAME-based
+    /** The two chat channels: KeetChat (keet cheep) and Parlons (pssst) - two channels because a
+     *  channel has exactly one sound. Both HIGH, vibrate, badge. Sound URIs are NAME-based
      *  because a numeric resource id is only stable within one build and the channel keeps
      *  the URI forever. Logs the permission/channel state once so a logcat can answer
      *  "why no notification" without a debug build. */
     public static void createChannel(Context zCtx) {
         NotificationManager nm = (NotificationManager) zCtx.getSystemService(Context.NOTIFICATION_SERVICE);
         if (nm == null) return;
-        if (nm.getNotificationChannel(CHANNEL_ID) == null) {
-            NotificationChannel ch = new NotificationChannel(CHANNEL_ID, Language.text(zCtx, l10n_notification_chat), NotificationManager.IMPORTANCE_HIGH);
-            ch.setDescription(Language.text(zCtx, l10n_notification_chat_help));
-            ch.enableVibration(true);
-            ch.setShowBadge(true);
-            ch.setSound(android.net.Uri.parse("android.resource://" + zCtx.getPackageName() + "/raw/pssst"),
-                    new android.media.AudioAttributes.Builder()
-                            .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
-                            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                            .build());
-            nm.createNotificationChannel(ch);
-        }
+        ensureChannel(zCtx, nm, CHANNEL_ID, l10n_notification_chat, l10n_notification_chat_help, "keet");
+        ensureChannel(zCtx, nm, PARLONS_CHANNEL_ID, l10n_notification_parlons, l10n_notification_parlons_help, "pssst");
         try { nm.deleteNotificationChannel(CHANNEL_ID_V1); } catch (Exception ignored) {}
         NotificationChannel now = nm.getNotificationChannel(CHANNEL_ID);
         logger.log("[CHAT] notifications enabled=" + nm.areNotificationsEnabled()
                 + " channel importance=" + (now == null ? "none" : now.getImportance())
                 + " sound=" + (now == null ? "none" : now.getSound()));
+    }
+
+    private static void ensureChannel(Context zCtx, NotificationManager zNm, String zId, int zName, int zHelp, String zRawSound) {
+        NotificationChannel ch = zNm.getNotificationChannel(zId);
+        if (ch != null) {
+            //labels follow the selected language; sound/importance stay the user's
+            ch.setName(Language.text(zCtx, zName));
+            ch.setDescription(Language.text(zCtx, zHelp));
+            zNm.createNotificationChannel(ch);
+            return;
+        }
+        ch = new NotificationChannel(zId, Language.text(zCtx, zName), NotificationManager.IMPORTANCE_HIGH);
+        ch.setDescription(Language.text(zCtx, zHelp));
+        ch.enableVibration(true);
+        ch.setShowBadge(true);
+        ch.setSound(android.net.Uri.parse("android.resource://" + zCtx.getPackageName() + "/raw/" + zRawSound),
+                new android.media.AudioAttributes.Builder()
+                        .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build());
+        zNm.createNotificationChannel(ch);
     }
 
     public static synchronized void stop() {

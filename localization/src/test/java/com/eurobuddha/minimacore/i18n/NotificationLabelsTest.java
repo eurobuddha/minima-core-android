@@ -21,7 +21,7 @@ public class NotificationLabelsTest {
         when(context.createConfigurationContext(any(Configuration.class))).thenReturn(context);
         when(resources.getString(R.string.l10n_notification_chat)).thenReturn("Сообщения");
         when(resources.getString(R.string.l10n_notification_chat_help)).thenReturn("Входящие сообщения KeetChat");
-        when(manager.getNotificationChannel("MinimaChatChannel_v2")).thenReturn(channel);
+        when(manager.getNotificationChannel("KeetChatChannel_v1")).thenReturn(channel);
         when(channel.getName()).thenReturn("Messages");
         NotificationLabels.update(context);
         verify(channel).setName("Сообщения");
