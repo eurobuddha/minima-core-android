@@ -88,9 +88,14 @@ public final class EmbeddedNodeTransport implements DirectNodeApi.Backend {
         }); } catch (java.util.concurrent.RejectedExecutionException busy) { reply.accept(LocalJson.failure("Node file queue is full. Nothing was changed.")); }
     }
     /** Existing core UI mutations use the same queue as integrated/external clients. */
+    /** keets commands are HTTP calls to the sidecar - they touch no node database, and a
+     *  receipt dial can take seconds, so they must never hold the command queue (2.0.38). */
+    public static boolean sidecarCall(String command) {
+        return command != null && (command.equals("keets") || command.startsWith("keets "));
+    }
     public static org.minima.utils.json.JSONObject executeCore(String command) throws Exception {
         Main node = Main.getInstance();
-        if (sharedRead(command) || Boolean.TRUE.equals(executing.get())) return node.runSingleMinimaCMD(command);
+        if (sharedRead(command) || sidecarCall(command) || Boolean.TRUE.equals(executing.get())) return node.runSingleMinimaCMD(command);
         invalidateReads();
         return COMMANDS.submit(() -> {
             if (!canExecute(node)) throw new IllegalStateException("Node stopped before execution");

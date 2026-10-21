@@ -138,8 +138,10 @@ android {
         // sender must never delay the inbound notification (14 s seen on 2.0.35).
         // vc233: keets sidecar 1.2.6 (direct dial races the mailbox, 1.5 s grace) and the chat
         // inbox poll 5 s -> 1.5 s: a message shows within ~2 s of reaching the phone.
-        versionCode 233
-        versionName "2.0.37"
+        // vc234: notify and refresh the UI the instant a message is stored; acks and
+        // receipts follow afterwards (node commands serialise, 8 s stalls seen on 2.0.37).
+        versionCode 234
+        versionName "2.0.38"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

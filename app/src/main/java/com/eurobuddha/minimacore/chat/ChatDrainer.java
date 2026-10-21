@@ -141,6 +141,7 @@ public class ChatDrainer {
                 JSONArray inbox = (JSONArray) res.get("response");
                 int fresh = 0;
                 boolean allOnScreen = true;   // every fresh message is from the thread being read
+                java.util.ArrayList<String> toAck = new java.util.ArrayList<>();   // stored messages, acked AFTER notify
                 String lastFrom = null, lastName = null, lastBody = null;
                 for (Object o : inbox) {
                     JSONObject msg = (JSONObject) o;
@@ -236,14 +237,17 @@ public class ChatDrainer {
                         // companion fan-out — the Android twin of the MDS KEETS event
                         fanout(zService, msg, d, from);
                     }
-                    // ack ONLY after the durable store write
-                    MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
+                    // ack ONLY after the durable store write - and only after the user has
+                    // been told (below): node commands serialise behind the receipt dial,
+                    // and a stored-but-unacked message simply dedupes on the next poll.
+                    toAck.add("" + msg.get("id"));
                 }
                 if (fresh > 0) {
                     //a message landing in the conversation you are looking at stays silent
                     if (!allOnScreen) notifyUser(zService, fresh, lastFrom, lastName, lastBody);
                     for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
                 }
+                for (String id : toAck) MinimaCMD.execute("keets action:ack id:" + id);
             } catch (Exception exc) {
                 logger.log("[CHAT] drainer: " + exc);
             }
