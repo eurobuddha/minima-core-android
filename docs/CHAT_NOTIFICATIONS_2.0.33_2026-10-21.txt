@@ -137,3 +137,31 @@ try LAN addresses by default, so the Android side's local-address exchange is th
 - minimaCore Desktop 0.18.18 (a3a0166): vendored sidecar synced to 1.2.5 (adds media-read.js),
   main/chat.js sends/handles delivered receipts, chat-store flags auto-learned names (follow until
   a user rename). Release chain running at time of writing.
+
+Round 4 (2026-10-21, 15:40-16:05): the remaining seconds
+Owner's measurements after round 3: desktop -> Fold "two ticks instantly, lands 35 s later";
+Fold -> desktop "12 s to send, then 2 s". Both traced:
+- 35 s on the phone: Pandamonium's EmbeddedNodeTransport runs every non-read node command
+  through a ONE-thread queue. The drainer's inline receipt dial (2.0.35) and then the async
+  receipt's `keets action:send` (2.0.36) held that queue for the dial duration, so the drainer's
+  own `keets action:inbox`/`ack` - and therefore the notification - waited behind it (8-30 s).
+  2.0.36 made receipts async; 2.0.38 lets keets commands bypass the queue
+  (EmbeddedNodeTransport.sidecarCall: they are HTTP calls to the sidecar) and notifies/refreshes
+  BEFORE acking. 2.0.37 cut the inbox poll 5 s -> 1.5 s.
+- 12 s to send from the Fold: the sidecar waited the full direct-dial timeout before the mailbox.
+  keets sidecar 1.2.6 (60db109): send() races the direct dial against the recipient's primary
+  mailbox after a 1.5 s grace (0 grace for a peer that failed within 10 min); receivers dedupe by
+  message id. services-test.sh widened to accept either path after a restart.
+- Bundled everywhere: Pandamonium 2.0.37 (bundle re-pinned to 60db109), minimaCore Desktop
+  0.18.19 (vendored sidecar 1.2.6, inbox poll 1.5 s) - published on all three platforms.
+Measured on 2.0.38 + 0.18.19 (Fold on the second Wi-Fi):
+- desktop -> Fold: sent 16:03:34.216 (direct, dial 0.7 s), Fold sidecar 16:03:34.832,
+  notification posted 16:03:35.267 => 1.05 s end to end.
+- Fold -> desktop: typed 16:00:42-43 via adb, desktop node 16:00:45 via mailbox-push, stored
+  16:00:45 => ~2 s (direct still fails Fold->desktop on that Wi-Fi; the push covers it).
+Operational notes learned the hard way:
+- `adb install -r` kills the app; the node service does NOT restart on its own (companion
+  services do). Relaunch with `monkey -p com.eurobuddha.pandamonium -c android.intent.category.LAUNCHER 1`.
+- `open -a minimaCore` launched a stray build from dist/local-unsigned (Parlons Node 0.2.122,
+  keets bridge ON = a second inbox drainer). Always `open /Applications/minimaCore.app`.
+- The Fold's contact for the desktop was renamed by the owner to "keetDesktooBuddha".
