@@ -48,7 +48,7 @@ public class ChatDrainer {
     /** Parlons channel (MaxChatNotifier): the Parlons pssst (res/raw/pssst.wav). */
     public static final String PARLONS_CHANNEL_ID = "MinimaChatChannel_v2";
     private static final String CHANNEL_ID_V1 = "MinimaChatChannel";
-    private static final long POLL_MS = 5000;
+    private static final long POLL_MS = 1500;   // loopback node command; the sidecar pushes, we must not lag it
 
     /** UI refresh hooks — ChatView / ChatThreadActivity register while alive; run on a
      *  background thread, so listeners post to main themselves. */
