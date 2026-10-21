@@ -134,8 +134,10 @@ android {
         // vc230: KeetChat gets its own channel and "keet" cheep; Parlons keeps pssst.
         // vc231: delivered receipts (double tick when the peer stores it), contact names
         // follow the sender until renamed by hand, keets sidecar 1.2.5 (mailbox push).
-        versionCode 231
-        versionName "2.0.35"
+        // vc232: delivered receipts go out on their own thread - a slow dial back to the
+        // sender must never delay the inbound notification (14 s seen on 2.0.35).
+        versionCode 232
+        versionName "2.0.36"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

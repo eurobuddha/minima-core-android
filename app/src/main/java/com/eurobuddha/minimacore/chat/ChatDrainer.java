@@ -60,6 +60,14 @@ public class ChatDrainer {
     private static String mLastErr = null;
     //payaddr auto-responder guard: a peer gets one address reply per 10 minutes
     private static final java.util.HashMap<String, Long> mPayAddrReplied = new java.util.HashMap<>();
+    /** Receipts dial the peer (up to the sidecar's 15 s dial timeout) - never on the drainer
+     *  thread, or a slow peer would delay the notification for the message we just stored. */
+    private static final java.util.concurrent.ExecutorService RECEIPTS =
+            java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+                java.lang.Thread t = new java.lang.Thread(r, "keets-chat-receipts");
+                t.setDaemon(true);
+                return t;
+            });
 
     public static synchronized void start(MinimaService zService) {
         if (mThread != null) return;
@@ -276,14 +284,18 @@ public class ChatDrainer {
     /** Tell the sender we stored their message (their single tick becomes a double tick).
      *  Fire-and-forget: a failed receipt only leaves their tick single. */
     private static void sendDelivered(String zTo, String zMsgId) {
-        try {
-            org.minima.utils.json.JSONObject r = ChatSchema.base("", "", "");
-            r.put("state", "delivered");
-            r.put("ref", zMsgId);
-            MinimaCMD.execute("keets action:send to:" + zTo + " datahex:" + ChatSchema.toDataHex(r.toString()));
-        } catch (Exception e) {
-            logger.log("[CHAT] delivered receipt: " + e);
-        }
+        RECEIPTS.execute(() -> {
+            try {
+                org.minima.utils.json.JSONObject r = ChatSchema.base("", "", "");
+                r.put("state", "delivered");
+                r.put("ref", zMsgId);
+                JSONObject res = MinimaCMD.execute("keets action:send to:" + zTo + " datahex:" + ChatSchema.toDataHex(r.toString()));
+                logger.log("[CHAT] delivered receipt for " + zMsgId + " -> " + zTo + " via "
+                        + ((Boolean) res.getOrDefault("status", false) ? ((JSONObject) res.get("response")).get("delivered") : "FAILED " + res.get("error")));
+            } catch (Exception e) {
+                logger.log("[CHAT] delivered receipt: " + e);
+            }
+        });
     }
 
     private static void notifyUser(MinimaService zService, int zFresh, String zFrom, String zName, String zBody) {
