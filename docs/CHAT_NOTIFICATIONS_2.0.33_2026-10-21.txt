@@ -114,3 +114,26 @@ Desktop KeetChat follow-up (2026-10-21): root cause and resolution
   b0c371da9ba2643953e2f03444cff60f20b91d064c236ddfd04e21cc59b145a3 = node-v0.2.129. No new
   build or release was needed; a local 0.18.12 edit was reverted (0.18.12-0.18.15 already exist).
 - minimaDesk still pins parlons-node 0.2.125 (desktop/minimaDesk/package.json); untouched.
+
+Round 3 (2026-10-21 afternoon): instant delivery, honest ticks, names that follow
+Measured on one desk (Mac + Fold behind the same router, same public IP 31.125.188.214):
+desktop -> Fold direct dial failed every time (4-15 s), fell back to a mailbox, and the Fold
+polled its mailbox every 5 minutes -> 72 s, 4 min 48 s, 3 min 26 s. Fold -> desktop was direct
+and instant (the Mac has a router port mapping). With the Fold on a second Wi-Fi (different LAN,
+same public IP) desktop -> Fold went direct in 4.3 s: the failure is same-LAN only; HyperDHT does
+try LAN addresses by default, so the Android side's local-address exchange is the open question.
+- keets sidecar 1.2.5 (keets a1463de): mailbox.js accepts fetch sub:true and keeps the connection
+  as a live subscription, pushing each later store at once; messages.js picks a PRIMARY mailbox
+  per recipient from its pubkey (sorted list) so sender and receiver meet, keeps one subscription
+  (reconnect 5 s -> 60 s backoff), poll fallback 5 min -> 45 s. test/mailbox-push-test.js (push in
+  0 ms locally) + services-test.sh pass. Deployed to all six fleet mailboxes (sally, eurobuddha,
+  maxima, openproject, vigilance, megammr) — restarted, "mailbox up", identical file hash.
+- Pandamonium 2.0.35 / code 231 (624866a2): keets.bundle rebuilt from 1.2.5 (lock re-pinned,
+  bundle 93014546bb95643ef77a431dbe2e84a7dc5045f801d8c897e73d7c9072a88a86); ChatDrainer sends a
+  state:"delivered" receipt after storing and applies the peer's (setVia "delivered" -> double
+  tick); ChatDb.ensureContact lets an auto-learned name follow the sender's declared name until
+  the user renames (why the Fold kept showing the desktop as "eurobuddhAiPhone": the first declared
+  name stuck). Installed on the Fold; its sidecar subscribed to mailbox a5335d9c… (openproject).
+- minimaCore Desktop 0.18.18 (a3a0166): vendored sidecar synced to 1.2.5 (adds media-read.js),
+  main/chat.js sends/handles delivered receipts, chat-store flags auto-learned names (follow until
+  a user rename). Release chain running at time of writing.
