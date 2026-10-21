@@ -92,3 +92,9 @@ being told it is Holepunch's asset, reaffirmed the choice.
   /chat/vn-1792582201387.ogg) with a standalone Hyperdrive listing script, because minimaCore
   Desktop's KeetChat drainer acked it out of the 12001 inbox without storing it (its chat.json has
   0 messages). That desktop defect is open and separate from this change.
+- Live 2.0.34 verification on the Fold: service back at 13:16:45 with
+  "[CHAT] notifications enabled=true channel importance=4 sound=android.resource://com.eurobuddha.pandamonium/raw/keet";
+  dumpsys shows KeetChatChannel_v1 "KeetChat messages" (raw/keet) and MinimaChatChannel_v2
+  "Parlons messages". Test message sent 13:17:01 from the 12001 node (mailbox); fetched on the
+  next 5-minute poll: 13:21:55 "[CHAT] notify posted from=0x837b3e45302f354a370febba000cd1d504e6847d390c83e514c2a0ac236fc63b fresh=1",
+  NotificationRecord tag=keetchat on channel KeetChatChannel_v1.
