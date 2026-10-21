@@ -49,3 +49,18 @@ Verification:
 - adb install -r on Fold R3GL805K7MB: Success; dumpsys versionName=2.0.33-Pandamonium code 229.
 - Live KeetChat message with the app in the background: NOT verified by the agent (needs a peer
   to send one). Classic/Block flavors built only, not copied to dist, not installed.
+
+Live verification AFTER install (Fold in sound mode, Pandamonium in the background):
+- 12:00:53 sent from the minimaCore Desktop node (port 12001, RPC 12005, keets pubkey
+  0x837b3e45302f354a370febba000cd1d504e6847d390c83e514c2a0ac236fc63b) with
+  `keets action:send to:0xf0b090272c36908e3ead8e3654ad0fe56ee09cee12150195460912465c900957 datahex:<maxima_chat_v1 JSON>`,
+  message id kc-1792580453701-6813; sidecar reply delivered:mailbox. The 15001 and 4442 test
+  nodes have no keets command, so no new temporary node was started.
+- The sidecar fetches its mailbox every 5 minutes (keets/sidecar/messages.js POLL = 5 min, first
+  fetch 10 s after start): 12:04:41 "keets msg received from:0x837b… via:mailbox bytes:192";
+  12:04:42 "[CHAT] notify posted from=0x837b3e45302f354a370febba000cd1d504e6847d390c83e514c2a0ac236fc63b fresh=2".
+- dumpsys notification: NotificationRecord tag=keetchat id=3 channel=MinimaChatChannel_v2
+  importance=4 (sound rides the channel: android.resource://com.eurobuddha.pandamonium/raw/pssst).
+- Unrelated peer 0x72796652ef2321d03664984a4a934c86cf104dc0ccc414102342d89306cd4da3 also
+  messaged the Fold directly at 12:02:47 and 12:04:42; each produced a "[CHAT] notify posted".
+- Not machine-verifiable: that the pssst was audible. Owner's ears are the final check.
