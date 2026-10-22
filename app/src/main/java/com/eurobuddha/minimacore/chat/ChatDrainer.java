@@ -49,6 +49,45 @@ public class ChatDrainer {
     public static final String PARLONS_CHANNEL_ID = "MinimaChatChannel_v2";
     private static final String CHANNEL_ID_V1 = "MinimaChatChannel";
     private static final long POLL_MS = 1500;   // loopback node command; the sidecar pushes, we must not lag it
+    static final long POLL_SCREEN_OFF_MS = 30_000;
+    static final long POLL_IDLE_MS = 5 * 60_000;
+    static final long SCREEN_OFF_FAST_MS = 60_000;      // first minute after screen-off stays instant
+    static final long SCREEN_OFF_MEDIUM_MS = 10 * 60_000;
+
+    /** Wakes the poll loop early when the battery policy changes (screen on, profile switch). */
+    private static final Object WAKE = new Object();
+    private static final com.eurobuddha.minimacore.service.BatteryPolicy.Listener POLICY = () -> {
+        synchronized (WAKE) { WAKE.notifyAll(); }
+    };
+
+    /**
+     * How long to wait before the next inbox poll. The sidecar stores pushed mail in its inbox
+     * at once, so a longer poll only delays the NOTIFICATION, never loses a message.
+     * Instant, or the app/screen in use: 1.5 s (the owner's 1-2 s delivery). Balanced with the
+     * screen off: 1.5 s for the first minute, 30 s until 10 min, then 5 min. Saver: 30 s with the
+     * screen on but the app in the background, 5 min with the screen off.
+     */
+    static long nextPollMs(com.eurobuddha.minimacore.service.BatteryPolicy.Profile zProfile,
+                           boolean zAppVisible, boolean zScreenOn, long zScreenOffMs) {
+        if (zProfile == com.eurobuddha.minimacore.service.BatteryPolicy.Profile.INSTANT || zAppVisible) return POLL_MS;
+        if (zProfile == com.eurobuddha.minimacore.service.BatteryPolicy.Profile.SAVER)
+            return zScreenOn ? POLL_SCREEN_OFF_MS : POLL_IDLE_MS;
+        if (zScreenOn || zScreenOffMs < SCREEN_OFF_FAST_MS) return POLL_MS;
+        return zScreenOffMs < SCREEN_OFF_MEDIUM_MS ? POLL_SCREEN_OFF_MS : POLL_IDLE_MS;
+    }
+
+    private static boolean waitNextPoll() {
+        long ms = nextPollMs(com.eurobuddha.minimacore.service.BatteryPolicy.effective(),
+                com.eurobuddha.minimacore.service.BatteryPolicy.appVisible(),
+                com.eurobuddha.minimacore.service.BatteryPolicy.screenOn(),
+                com.eurobuddha.minimacore.service.BatteryPolicy.screenOffMillis());
+        try {
+            synchronized (WAKE) { WAKE.wait(ms); }
+            return true;
+        } catch (InterruptedException e) {
+            return false;
+        }
+    }
 
     /** UI refresh hooks — ChatView / ChatThreadActivity register while alive; run on a
      *  background thread, so listeners post to main themselves. */
@@ -75,6 +114,7 @@ public class ChatDrainer {
 
         createChannel(zService);
 
+        com.eurobuddha.minimacore.service.BatteryPolicy.addListener(POLICY);
         mThread = new java.lang.Thread(() -> runLoop(zService), "keets-chat-drainer");
         mThread.setDaemon(true);
         mThread.start();
@@ -120,13 +160,14 @@ public class ChatDrainer {
 
     public static synchronized void stop() {
         mStop = true;
+        com.eurobuddha.minimacore.service.BatteryPolicy.removeListener(POLICY);
         if (mThread != null) { mThread.interrupt(); mThread = null; }
     }
 
     private static void runLoop(MinimaService zService) {
         ChatDb db = ChatDb.get(zService);
         while (!mStop) {
-            try { java.lang.Thread.sleep(POLL_MS); } catch (InterruptedException e) { break; }
+            if (!waitNextPoll()) break;
             if (!MinimaCMD.checkMinimaStarted()) continue;
             try {
                 JSONObject res = MinimaCMD.execute("keets action:inbox");
