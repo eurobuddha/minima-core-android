@@ -20,8 +20,6 @@
     <string name="l10n_notification_health" formatted="false">"Стан вузла Minima"</string>
     <string name="l10n_notification_health_help" formatted="false">"Повідомляє, коли вузол потребує повторної синхронізації"</string>
     <string name="l10n_notification_chat" formatted="false">"Повідомлення KeetChat"</string>
-    <string name="l10n_notification_parlons" formatted="false">"Повідомлення Parlons"</string>
-    <string name="l10n_notification_parlons_help" formatted="false">"Вхідні повідомлення Parlons"</string>
     <string name="l10n_tab_home" formatted="false">"Головна"</string>
     <string name="l10n_tab_node" formatted="false">"Вузол"</string>
     <string name="l10n_tab_wallet" formatted="false">"Гаманець"</string>
@@ -808,7 +806,7 @@
     <string name="l10n_seed_sync_start_failed_body" formatted="false">"Служба вузла не запустилася вчасно. Відкрийте Minima та повторіть відновлення."</string>
     <!-- Arguments: error -->
     <string name="l10n_seed_sync_resync_after_start">"%1$s\n\nПісля запуску Minima синхронізуйте вузол."</string>
-    <string name="l10n_error" formatted="false">"Помилка"</string>
+    <string name="l10n_seed_sync_error" formatted="false">"Помилка"</string>
     <string name="l10n_backup_hub_help" formatted="false">"Збережіть копію вузла, відновіть її або перебудуйте його дані з іншого вузла."</string>
     <string name="l10n_backup_create" formatted="false">"Створити резервну копію"</string>
     <string name="l10n_backup_create_help" formatted="false">"Створіть зашифровану копію вузла у форматі .bak та збережіть її поза телефоном."</string>
@@ -1195,6 +1193,7 @@
     <string name="l10n_chat_voice_failed">"Помилка голосового повідомлення: %1$s"</string>
     <string name="l10n_chat_voice_unavailable" formatted="false">"Голосове повідомлення поки недоступне"</string>
     <string name="l10n_chat_playback_failed" formatted="false">"Помилка відтворення"</string>
+    <string name="l10n_chat_not_sent" formatted="false">"Не надіслано — перевірте, чи працює вузол"</string>
     <string name="l10n_chat_payment_received" formatted="false">"Платіж отримано"</string>
     <string name="l10n_chat_payment_sent" formatted="false">"Платіж надіслано"</string>
     <string name="l10n_chat_tap_txid" formatted="false">"натисніть для ID транзакції"</string>
@@ -1224,11 +1223,6 @@
     <string name="l10n_chat_to_pay_address" formatted="false">"НА ПЛАТІЖНУ АДРЕСУ КОНТАКТУ"</string>
     <string name="l10n_chat_amount_minima" formatted="false">"Сума (Minima)"</string>
     <string name="l10n_chat_real_funds" formatted="false">"Буде надіслано справжні Minima з гаманця цього вузла."</string>
-    <string name="l10n_chat_send_payment" formatted="false">"Надіслати платіж"</string>
-    <string name="l10n_chat_pay_currency" formatted="false">"ВАЛЮТА"</string>
-    <string name="l10n_chat_amount" formatted="false">"Сума"</string>
-    <string name="l10n_chat_real_funds_any" formatted="false">"Буде надіслано справжні кошти з гаманця цього вузла."</string>
-    <string name="l10n_chat_sending_amount_token">"Надсилання %1$s %2$s…"</string>
     <string name="l10n_chat_photo" formatted="false">"Фото"</string>
     <string name="l10n_chat_photo_load_error" formatted="false">"Не вдалося завантажити фото.\nПід час першого завантаження відправник або дзеркало мають бути в мережі."</string>
     <string name="l10n_chat_rename_contact" formatted="false">"Перейменувати контакт"</string>
@@ -6690,7 +6684,6 @@
         <item quantity="other">"%1$d нового повідомлення"</item>
     </plurals>
     <string name="l10n_chat_tap_open" formatted="false">"Натисніть, щоб відкрити"</string>
-    <string name="l10n_chat_notifications_off" formatted="false">"Сповіщення вимкнено. Натисніть, щоб увімкнути."</string>
     <string name="l10n_chat_payment_preview" formatted="false">"💸 Платіж"</string>
     <string name="l10n_creative_studio" formatted="false">"Студія"</string>
     <string name="l10n_creative_manage" formatted="false">"Керування"</string>
@@ -8584,4 +8577,22 @@
     <string name="l10n_atelier_collection_mint_time_hint" formatted="false">"На створення кожного примірника орієнтовно потрібно 3–5 хвилин. Через час блоків і обробку транзакцій це може тривати довше. Залиште вузол увімкненим; перерваний випуск можна продовжити."</string>
     <!-- Arguments: count, minimum, maximum -->
     <string name="l10n_atelier_collection_mint_time_total">"Орієнтовний час створення %1$d примірників: %2$s–%3$s хвилин."</string>
+    <string name="l10n_notification_parlons" formatted="false">"Повідомлення Parlons"</string>
+    <string name="l10n_notification_parlons_help" formatted="false">"Вхідні повідомлення Parlons"</string>
+    <string name="l10n_common_error" formatted="false">"Помилка"</string>
+    <string name="l10n_chat_send_payment" formatted="false">"Надіслати платіж"</string>
+    <string name="l10n_chat_pay_currency" formatted="false">"ВАЛЮТА"</string>
+    <string name="l10n_chat_amount" formatted="false">"Сума"</string>
+    <string name="l10n_chat_real_funds_any" formatted="false">"Буде надіслано справжні кошти з гаманця цього вузла."</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_chat_sending_amount_token">"Надсилання %1$s %2$s…"</string>
+    <string name="l10n_chat_notifications_off" formatted="false">"Сповіщення вимкнено. Натисніть, щоб увімкнути."</string>
+    <string name="l10n_menu_battery" formatted="false">"Батарея"</string>
+    <string name="l10n_battery_title" formatted="false">"Профіль батареї"</string>
+    <string name="l10n_battery_instant" formatted="false">"Миттєво — повідомлення завжди надходять за кілька секунд. Найбільше витрачає батарею."</string>
+    <string name="l10n_battery_balanced" formatted="false">"Збалансовано — миттєво, поки ви користуєтеся застосунком; коли екран вимкнено, сповіщення чату можуть затримуватися на кілька хвилин."</string>
+    <string name="l10n_battery_saver" formatted="false">"Економія — найбільша економія; повідомлення надходять, коли ви вмикаєте телефон."</string>
+    <string name="l10n_battery_full_on_charger" formatted="false">"Повна швидкість під час заряджання"</string>
+    <string name="l10n_battery_chain_note" formatted="false">"У всіх профілях вузол і далі перевіряє блоки та надсилає ваші транзакції."</string>
+    <string name="l10n_battery_never_sleep" formatted="false">"Samsung: ніколи не присипляти"</string>
 </resources>

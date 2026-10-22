@@ -20,8 +20,6 @@
     <string name="l10n_notification_health" formatted="false">"Minima 节点健康状态"</string>
     <string name="l10n_notification_health_help" formatted="false">"节点需要重新同步时通知您"</string>
     <string name="l10n_notification_chat" formatted="false">"KeetChat 消息"</string>
-    <string name="l10n_notification_parlons" formatted="false">"Parlons 消息"</string>
-    <string name="l10n_notification_parlons_help" formatted="false">"收到的 Parlons 消息"</string>
     <string name="l10n_tab_home" formatted="false">"首页"</string>
     <string name="l10n_tab_node" formatted="false">"节点"</string>
     <string name="l10n_tab_wallet" formatted="false">"钱包"</string>
@@ -775,7 +773,7 @@
     <string name="l10n_seed_sync_start_failed_body" formatted="false">"节点服务未能及时启动。请打开 Minima 并重新尝试恢复。"</string>
     <!-- Arguments: error -->
     <string name="l10n_seed_sync_resync_after_start">"%1$s\n\nMinima 启动后，请重新同步节点。"</string>
-    <string name="l10n_error" formatted="false">"错误"</string>
+    <string name="l10n_seed_sync_error" formatted="false">"错误"</string>
     <string name="l10n_backup_hub_help" formatted="false">"保存此节点的副本、还原副本，或从其他节点重建。"</string>
     <string name="l10n_backup_create" formatted="false">"创建备份"</string>
     <string name="l10n_backup_create_help" formatted="false">"创建此节点的加密 .bak 备份，然后在手机以外保存一份副本。"</string>
@@ -1159,6 +1157,7 @@
     <string name="l10n_chat_voice_failed">"语音消息发送失败：%1$s"</string>
     <string name="l10n_chat_voice_unavailable" formatted="false">"语音消息暂不可用"</string>
     <string name="l10n_chat_playback_failed" formatted="false">"播放失败"</string>
+    <string name="l10n_chat_not_sent" formatted="false">"未发送 — 请检查节点是否正在运行"</string>
     <string name="l10n_chat_payment_received" formatted="false">"已收到付款"</string>
     <string name="l10n_chat_payment_sent" formatted="false">"付款已发送"</string>
     <string name="l10n_chat_tap_txid" formatted="false">"点击查看交易 ID"</string>
@@ -1188,11 +1187,6 @@
     <string name="l10n_chat_to_pay_address" formatted="false">"发送至对方收款地址"</string>
     <string name="l10n_chat_amount_minima" formatted="false">"金额（Minima）"</string>
     <string name="l10n_chat_real_funds" formatted="false">"这将从此节点的钱包中发送真实的 Minima。"</string>
-    <string name="l10n_chat_send_payment" formatted="false">"发送付款"</string>
-    <string name="l10n_chat_pay_currency" formatted="false">"货币"</string>
-    <string name="l10n_chat_amount" formatted="false">"金额"</string>
-    <string name="l10n_chat_real_funds_any" formatted="false">"这将从此节点的钱包中发送真实资金。"</string>
-    <string name="l10n_chat_sending_amount_token">"正在发送 %1$s %2$s…"</string>
     <string name="l10n_chat_photo" formatted="false">"照片"</string>
     <string name="l10n_chat_photo_load_error" formatted="false">"无法加载此照片。\n首次加载时，发送方或镜像节点必须在线。"</string>
     <string name="l10n_chat_rename_contact" formatted="false">"重命名联系人"</string>
@@ -6594,7 +6588,6 @@
         <item quantity="other">"%1$d 条新消息"</item>
     </plurals>
     <string name="l10n_chat_tap_open" formatted="false">"点按打开"</string>
-    <string name="l10n_chat_notifications_off" formatted="false">"通知已关闭。点按以开启。"</string>
     <string name="l10n_chat_payment_preview" formatted="false">"💸 付款"</string>
     <string name="l10n_creative_studio" formatted="false">"工作室"</string>
     <string name="l10n_creative_manage" formatted="false">"管理"</string>
@@ -8473,4 +8466,22 @@
     <string name="l10n_atelier_collection_mint_time_hint" formatted="false">"每件作品完成铸造预计需 3–5 分钟。出块时间和交易处理可能使等待更久。请保持节点运行；中断后可继续铸造。"</string>
     <!-- Arguments: count, minimum, maximum -->
     <string name="l10n_atelier_collection_mint_time_total">"%1$d 件作品的预计铸造时间：%2$s–%3$s 分钟。"</string>
+    <string name="l10n_notification_parlons" formatted="false">"Parlons 消息"</string>
+    <string name="l10n_notification_parlons_help" formatted="false">"收到的 Parlons 消息"</string>
+    <string name="l10n_common_error" formatted="false">"错误"</string>
+    <string name="l10n_chat_send_payment" formatted="false">"发送付款"</string>
+    <string name="l10n_chat_pay_currency" formatted="false">"货币"</string>
+    <string name="l10n_chat_amount" formatted="false">"金额"</string>
+    <string name="l10n_chat_real_funds_any" formatted="false">"这将从此节点的钱包中发送真实资金。"</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_chat_sending_amount_token">"正在发送 %1$s %2$s…"</string>
+    <string name="l10n_chat_notifications_off" formatted="false">"通知已关闭。点按以开启。"</string>
+    <string name="l10n_menu_battery" formatted="false">"电池"</string>
+    <string name="l10n_battery_title" formatted="false">"电池模式"</string>
+    <string name="l10n_battery_instant" formatted="false">"即时 — 聊天消息始终在几秒内送达。耗电最多。"</string>
+    <string name="l10n_battery_balanced" formatted="false">"均衡 — 使用应用时即时送达；屏幕关闭时，聊天提醒可能延迟几分钟。"</string>
+    <string name="l10n_battery_saver" formatted="false">"省电 — 最省电；唤醒手机时才收到聊天消息。"</string>
+    <string name="l10n_battery_full_on_charger" formatted="false">"充电时全速运行"</string>
+    <string name="l10n_battery_chain_note" formatted="false">"所有模式都会继续验证区块并发送您的交易。"</string>
+    <string name="l10n_battery_never_sleep" formatted="false">"三星：永不休眠"</string>
 </resources>

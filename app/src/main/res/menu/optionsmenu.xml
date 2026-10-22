@@ -65,6 +65,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/mainmenu_battery"
+        android:orderInCategory="100"
+        android:title="@string/l10n_menu_battery"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/mainmenu_language"
         android:orderInCategory="100"
         android:title="@string/l10n_language_title"

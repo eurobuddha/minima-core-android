@@ -108,10 +108,10 @@
     "uk": "Повідомляє, коли вузол потребує повторної синхронізації"
   },
   "notification.chat": {
-    "en": "Chat messages",
-    "zh-Hans": "聊天消息",
-    "ru": "Сообщения чата",
-    "uk": "Повідомлення чату"
+    "en": "KeetChat messages",
+    "zh-Hans": "KeetChat 消息",
+    "ru": "Сообщения KeetChat",
+    "uk": "Повідомлення KeetChat"
   },
   "tab.home": {
     "en": "Home",
@@ -42793,5 +42793,107 @@
     "zh-Hans": "{count} 件作品的预计铸造时间：{minimum}–{maximum} 分钟。",
     "ru": "Ориентировочное время выпуска {count} экземпляров: {minimum}–{maximum} минут.",
     "uk": "Орієнтовний час створення {count} примірників: {minimum}–{maximum} хвилин."
+  },
+  "notification.parlons": {
+    "en": "Parlons messages",
+    "zh-Hans": "Parlons 消息",
+    "ru": "Сообщения Parlons",
+    "uk": "Повідомлення Parlons"
+  },
+  "notification.parlonsHelp": {
+    "en": "Incoming Parlons messages",
+    "zh-Hans": "收到的 Parlons 消息",
+    "ru": "Входящие сообщения Parlons",
+    "uk": "Вхідні повідомлення Parlons"
+  },
+  "common.error": {
+    "en": "Error",
+    "zh-Hans": "错误",
+    "ru": "Ошибка",
+    "uk": "Помилка"
+  },
+  "chat.sendPayment": {
+    "en": "Send payment",
+    "zh-Hans": "发送付款",
+    "ru": "Отправить платёж",
+    "uk": "Надіслати платіж"
+  },
+  "chat.payCurrency": {
+    "en": "CURRENCY",
+    "zh-Hans": "货币",
+    "ru": "ВАЛЮТА",
+    "uk": "ВАЛЮТА"
+  },
+  "chat.amount": {
+    "en": "Amount",
+    "zh-Hans": "金额",
+    "ru": "Сумма",
+    "uk": "Сума"
+  },
+  "chat.realFundsAny": {
+    "en": "This sends real funds from this node's wallet.",
+    "zh-Hans": "这将从此节点的钱包中发送真实资金。",
+    "ru": "Будут отправлены настоящие средства из кошелька этого узла.",
+    "uk": "Буде надіслано справжні кошти з гаманця цього вузла."
+  },
+  "chat.sendingAmountToken": {
+    "en": "Sending {amount} {token}…",
+    "zh-Hans": "正在发送 {amount} {token}…",
+    "ru": "Отправка {amount} {token}…",
+    "uk": "Надсилання {amount} {token}…"
+  },
+  "chat.notificationsOff": {
+    "en": "Notifications are off. Tap to turn them on.",
+    "zh-Hans": "通知已关闭。点按以开启。",
+    "ru": "Уведомления выключены. Нажмите, чтобы включить.",
+    "uk": "Сповіщення вимкнено. Натисніть, щоб увімкнути."
+  },
+  "menu.battery": {
+    "en": "Battery",
+    "zh-Hans": "电池",
+    "ru": "Батарея",
+    "uk": "Батарея"
+  },
+  "battery.title": {
+    "en": "Battery profile",
+    "zh-Hans": "电池模式",
+    "ru": "Профиль батареи",
+    "uk": "Профіль батареї"
+  },
+  "battery.instant": {
+    "en": "Instant — chat arrives within seconds at all times. Uses the most battery.",
+    "zh-Hans": "即时 — 聊天消息始终在几秒内送达。耗电最多。",
+    "ru": "Мгновенно — сообщения всегда приходят за секунды. Больше всего расходует батарею.",
+    "uk": "Миттєво — повідомлення завжди надходять за кілька секунд. Найбільше витрачає батарею."
+  },
+  "battery.balanced": {
+    "en": "Balanced — instant while you use the app; with the screen off, chat alerts can take up to a few minutes.",
+    "zh-Hans": "均衡 — 使用应用时即时送达；屏幕关闭时，聊天提醒可能延迟几分钟。",
+    "ru": "Сбалансированно — мгновенно, пока вы пользуетесь приложением; при выключенном экране уведомления чата могут задерживаться на несколько минут.",
+    "uk": "Збалансовано — миттєво, поки ви користуєтеся застосунком; коли екран вимкнено, сповіщення чату можуть затримуватися на кілька хвилин."
+  },
+  "battery.saver": {
+    "en": "Saver — the most battery saved; chat arrives when you wake the phone.",
+    "zh-Hans": "省电 — 最省电；唤醒手机时才收到聊天消息。",
+    "ru": "Экономия — максимальная экономия; сообщения приходят, когда вы включаете телефон.",
+    "uk": "Економія — найбільша економія; повідомлення надходять, коли ви вмикаєте телефон."
+  },
+  "battery.fullOnCharger": {
+    "en": "Full speed while charging",
+    "zh-Hans": "充电时全速运行",
+    "ru": "Полная скорость при зарядке",
+    "uk": "Повна швидкість під час заряджання"
+  },
+  "battery.chainNote": {
+    "en": "Every profile keeps validating blocks and posting your transactions.",
+    "zh-Hans": "所有模式都会继续验证区块并发送您的交易。",
+    "ru": "Во всех профилях узел продолжает проверять блоки и отправлять ваши транзакции.",
+    "uk": "У всіх профілях вузол і далі перевіряє блоки та надсилає ваші транзакції."
+  },
+  "battery.neverSleep": {
+    "en": "Samsung: never sleep",
+    "zh-Hans": "三星：永不休眠",
+    "ru": "Samsung: не усыплять",
+    "uk": "Samsung: ніколи не присипляти"
   }
 }

@@ -20,8 +20,6 @@
     <string name="l10n_notification_health" formatted="false">"Minima node health"</string>
     <string name="l10n_notification_health_help" formatted="false">"Tells you when the node needs a resync"</string>
     <string name="l10n_notification_chat" formatted="false">"KeetChat messages"</string>
-    <string name="l10n_notification_parlons" formatted="false">"Parlons messages"</string>
-    <string name="l10n_notification_parlons_help" formatted="false">"Incoming Parlons messages"</string>
     <string name="l10n_tab_home" formatted="false">"Home"</string>
     <string name="l10n_tab_node" formatted="false">"Node"</string>
     <string name="l10n_tab_wallet" formatted="false">"Wallet"</string>
@@ -786,7 +784,7 @@
     <string name="l10n_seed_sync_start_failed_body" formatted="false">"The node service did not come up in time. Open Minima and try the restore again."</string>
     <!-- Arguments: error -->
     <string name="l10n_seed_sync_resync_after_start">"%1$s\n\nResync your node when Minima starts."</string>
-    <string name="l10n_error" formatted="false">"Error"</string>
+    <string name="l10n_seed_sync_error" formatted="false">"Error"</string>
     <string name="l10n_backup_hub_help" formatted="false">"Save a copy of this node, put it back, or rebuild it from another node."</string>
     <string name="l10n_backup_create" formatted="false">"Create backup"</string>
     <string name="l10n_backup_create_help" formatted="false">"Write an encrypted .bak of this node, then save a copy off the phone."</string>
@@ -1171,6 +1169,7 @@
     <string name="l10n_chat_voice_failed">"Voice note failed: %1$s"</string>
     <string name="l10n_chat_voice_unavailable" formatted="false">"Voice note not available yet"</string>
     <string name="l10n_chat_playback_failed" formatted="false">"Playback failed"</string>
+    <string name="l10n_chat_not_sent" formatted="false">"Not sent — check the node is running"</string>
     <string name="l10n_chat_payment_received" formatted="false">"Payment received"</string>
     <string name="l10n_chat_payment_sent" formatted="false">"Payment sent"</string>
     <string name="l10n_chat_tap_txid" formatted="false">"tap for txid"</string>
@@ -1200,11 +1199,6 @@
     <string name="l10n_chat_to_pay_address" formatted="false">"TO THEIR PAY ADDRESS"</string>
     <string name="l10n_chat_amount_minima" formatted="false">"Amount (Minima)"</string>
     <string name="l10n_chat_real_funds" formatted="false">"This sends real Minima from this node\'s wallet."</string>
-    <string name="l10n_chat_send_payment" formatted="false">"Send payment"</string>
-    <string name="l10n_chat_pay_currency" formatted="false">"CURRENCY"</string>
-    <string name="l10n_chat_amount" formatted="false">"Amount"</string>
-    <string name="l10n_chat_real_funds_any" formatted="false">"This sends real funds from this node\'s wallet."</string>
-    <string name="l10n_chat_sending_amount_token">"Sending %1$s %2$s…"</string>
     <string name="l10n_chat_photo" formatted="false">"Photo"</string>
     <string name="l10n_chat_photo_load_error" formatted="false">"Couldn\'t load this photo.\nThe sender (or a mirror) must be online the first time."</string>
     <string name="l10n_chat_rename_contact" formatted="false">"Rename contact"</string>
@@ -6626,7 +6620,6 @@
         <item quantity="other">"%1$d new messages"</item>
     </plurals>
     <string name="l10n_chat_tap_open" formatted="false">"Tap to open"</string>
-    <string name="l10n_chat_notifications_off" formatted="false">"Notifications are off. Tap to turn them on."</string>
     <string name="l10n_chat_payment_preview" formatted="false">"💸 Payment"</string>
     <string name="l10n_creative_studio" formatted="false">"Studio"</string>
     <string name="l10n_creative_manage" formatted="false">"Manage"</string>
@@ -8510,4 +8503,22 @@
     <string name="l10n_atelier_collection_mint_time_hint" formatted="false">"Allow roughly 3–5 minutes per item to finish minting. Block times and transaction processing can make it take longer. Keep your node running; an interrupted mint can resume."</string>
     <!-- Arguments: count, minimum, maximum -->
     <string name="l10n_atelier_collection_mint_time_total">"Estimated minting time for %1$d items: %2$s–%3$s minutes."</string>
+    <string name="l10n_notification_parlons" formatted="false">"Parlons messages"</string>
+    <string name="l10n_notification_parlons_help" formatted="false">"Incoming Parlons messages"</string>
+    <string name="l10n_common_error" formatted="false">"Error"</string>
+    <string name="l10n_chat_send_payment" formatted="false">"Send payment"</string>
+    <string name="l10n_chat_pay_currency" formatted="false">"CURRENCY"</string>
+    <string name="l10n_chat_amount" formatted="false">"Amount"</string>
+    <string name="l10n_chat_real_funds_any" formatted="false">"This sends real funds from this node\'s wallet."</string>
+    <!-- Arguments: amount, token -->
+    <string name="l10n_chat_sending_amount_token">"Sending %1$s %2$s…"</string>
+    <string name="l10n_chat_notifications_off" formatted="false">"Notifications are off. Tap to turn them on."</string>
+    <string name="l10n_menu_battery" formatted="false">"Battery"</string>
+    <string name="l10n_battery_title" formatted="false">"Battery profile"</string>
+    <string name="l10n_battery_instant" formatted="false">"Instant — chat arrives within seconds at all times. Uses the most battery."</string>
+    <string name="l10n_battery_balanced" formatted="false">"Balanced — instant while you use the app; with the screen off, chat alerts can take up to a few minutes."</string>
+    <string name="l10n_battery_saver" formatted="false">"Saver — the most battery saved; chat arrives when you wake the phone."</string>
+    <string name="l10n_battery_full_on_charger" formatted="false">"Full speed while charging"</string>
+    <string name="l10n_battery_chain_note" formatted="false">"Every profile keeps validating blocks and posting your transactions."</string>
+    <string name="l10n_battery_never_sleep" formatted="false">"Samsung: never sleep"</string>
 </resources>

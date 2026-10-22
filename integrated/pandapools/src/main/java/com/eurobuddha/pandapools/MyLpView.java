@@ -880,7 +880,7 @@ public class MyLpView extends BaseView {
                         .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                         .show();
             }
-            @Override public void onError(String m) { info(Language.msg(l10n_error), Language.msg(l10n_pools_create_balance_error, PoolsMessages.message(m))); }
+            @Override public void onError(String m) { info(Language.msg(l10n_common_error), Language.msg(l10n_pools_create_balance_error, PoolsMessages.message(m))); }
         });
     }
 

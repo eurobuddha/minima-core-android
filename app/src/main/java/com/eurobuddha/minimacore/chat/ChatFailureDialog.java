@@ -26,7 +26,7 @@ public final class ChatFailureDialog {
         text.setPadding(padding, padding / 2, padding, padding / 2);
         ScrollView scroll = new ScrollView(builder.getContext());
         scroll.addView(text);
-        AlertDialog dialog = builder.setTitle(Language.msg(l10n_error))
+        AlertDialog dialog = builder.setTitle(Language.msg(l10n_common_error))
                 .setView(scroll)
                 .setPositiveButton(Language.msg(l10n_language_close), null)
                 .setNeutralButton(Language.msg(l10n_dex_copy_details), null)

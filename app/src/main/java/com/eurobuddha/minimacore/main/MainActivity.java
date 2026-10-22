@@ -371,6 +371,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         menu.findItem(R.id.mainmenu_wipeminima).setTitle(Language.text(this, l10n_menu_reset));
         menu.findItem(R.id.mainmenu_screenshots).setTitle(Language.text(this, l10n_menu_screenshots));
         menu.findItem(R.id.mainmenu_language).setTitle(Language.text(this, l10n_language_title));
+        menu.findItem(R.id.mainmenu_battery).setTitle(Language.text(this, l10n_menu_battery));
         //Reflect the persisted screenshot preference in the checkbox
         MenuItem ss = menu.findItem(R.id.mainmenu_screenshots);
         if(ss != null){
@@ -382,6 +383,65 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             lock.setVisible(com.eurobuddha.minimacore.lock.AppLock.isEnabled(this));
         }
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    /** Battery profile picker (three-dot menu). Every profile keeps validating blocks and posting txns. */
+    private void showBatteryDialog() {
+        com.eurobuddha.minimacore.service.BatteryPolicy.load(this);
+        int pad = (int) (20 * getResources().getDisplayMetrics().density);
+        android.widget.LinearLayout box = new android.widget.LinearLayout(this);
+        box.setOrientation(android.widget.LinearLayout.VERTICAL);
+        box.setPadding(pad, pad / 2, pad, 0);
+        android.widget.RadioGroup group = new android.widget.RadioGroup(this);
+        com.eurobuddha.minimacore.service.BatteryPolicy.Profile[] profiles =
+                com.eurobuddha.minimacore.service.BatteryPolicy.Profile.values();
+        int[] labels = {l10n_battery_instant, l10n_battery_balanced, l10n_battery_saver};
+        for (int i = 0; i < profiles.length; i++) {
+            android.widget.RadioButton rb = new android.widget.RadioButton(this);
+            rb.setId(android.view.View.generateViewId());
+            rb.setText(Language.text(this, labels[i]));
+            rb.setTag(profiles[i]);
+            rb.setPadding(0, pad / 4, 0, pad / 4);
+            group.addView(rb);
+            if (profiles[i] == com.eurobuddha.minimacore.service.BatteryPolicy.profile()) rb.setChecked(true);
+        }
+        box.addView(group);
+        android.widget.CheckBox charger = new android.widget.CheckBox(this);
+        charger.setText(Language.text(this, l10n_battery_full_on_charger));
+        charger.setChecked(com.eurobuddha.minimacore.service.BatteryPolicy.fullOnCharger());
+        box.addView(charger);
+        android.widget.TextView note = new android.widget.TextView(this);
+        note.setText(Language.text(this, l10n_battery_chain_note));
+        note.setPadding(0, pad / 2, 0, 0);
+        box.addView(note);
+        AlertDialog.Builder b = new AlertDialog.Builder(this)
+                .setTitle(Language.text(this, l10n_battery_title))
+                .setView(box)
+                .setNegativeButton(Language.text(this, l10n_common_cancel), null)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    android.view.View sel = group.findViewById(group.getCheckedRadioButtonId());
+                    if (sel != null) com.eurobuddha.minimacore.service.BatteryPolicy.setProfile(this,
+                            (com.eurobuddha.minimacore.service.BatteryPolicy.Profile) sel.getTag());
+                    com.eurobuddha.minimacore.service.BatteryPolicy.setFullOnCharger(this, charger.isChecked());
+                });
+        if ("samsung".equalsIgnoreCase(android.os.Build.MANUFACTURER)) {
+            b.setNeutralButton(Language.text(this, l10n_battery_never_sleep), (d, w) -> openSamsungNeverSleep());
+        }
+        b.show();
+    }
+
+    /** Samsung's "Never sleeping apps" list; falls back to this app's battery settings. */
+    private void openSamsungNeverSleep() {
+        try {
+            startActivity(new Intent("com.samsung.android.sm.ACTION_OPEN_CHECKABLE_LISTACTIVITY")
+                    .setPackage("com.samsung.android.lool")
+                    .putExtra("activity_type", 2));
+        } catch (Exception e) {
+            try {
+                startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        android.net.Uri.parse("package:" + getPackageName())));
+            } catch (Exception ignored) { }
+        }
     }
 
     public void toggleScreenshots(MenuItem zItem){
@@ -408,6 +468,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
             case R.id.mainmenu_language :
                 Language.choose(this, false);
+                return true;
+
+            case R.id.mainmenu_battery :
+                showBatteryDialog();
                 return true;
 
             case R.id.mainmenu_screenshots :

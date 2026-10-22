@@ -15,7 +15,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Build;
@@ -91,6 +90,7 @@ public class MinimaService extends Service {
 
     //The Battery receiver
     BroadcastReceiver mBatteryReceiver;
+    BroadcastReceiver mScreenReceiver;
 
     //Minima Main Starter
     public static Minima minima;
@@ -111,7 +111,6 @@ public class MinimaService extends Service {
     public static final String CHANNEL_ID = "MinimaServiceChannel";
 
     PowerManager.WakeLock mWakeLock;
-    WifiManager.WifiLock mWifiLock;
 
     //So we start with a seed
     String mSeed = null;
@@ -150,12 +149,9 @@ public class MinimaService extends Service {
             mWakeLock.acquire();
         }
 
-        //WiFi..
-        WifiManager wifi = (WifiManager) getSystemService(WIFI_SERVICE);
-        mWifiLock = wifi.createWifiLock(WifiManager.WIFI_MODE_FULL, "Minima::MiniWiFi");
-        if(!mWifiLock.isHeld()){
-            mWifiLock.acquire();
-        }
+        //No WifiLock: WIFI_MODE_FULL is a no-op on current Android (AOSP WifiManager) and the
+        //foreground service already keeps network access through Doze.
+        BatteryPolicy.load(this);
 
         //Start Minima
         minima = new Minima();
@@ -664,7 +660,10 @@ public class MinimaService extends Service {
 
         //Release the wakelocks..
         if(mWakeLock != null && mWakeLock.isHeld()) mWakeLock.release();
-        if(mWifiLock != null && mWifiLock.isHeld()) mWifiLock.release();
+
+        if(mScreenReceiver != null){
+            try { unregisterReceiver(mScreenReceiver); } catch (Exception ignored) { }
+        }
 
         //Remove the receiver
         if(mBatteryReceiver != null){
@@ -703,6 +702,7 @@ public class MinimaService extends Service {
         mBatteryReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
                 int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+                if (plugged >= 0) BatteryPolicy.setPlugged(plugged != 0);
 
                 //Make sure has started up..
                 if(getMinima().getMain() == null){
@@ -735,6 +735,18 @@ public class MinimaService extends Service {
                 }
             }
         };
+        //Screen on/off paces optional work (chat polling, keets) via BatteryPolicy.
+        mScreenReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                BatteryPolicy.setScreenOn(Intent.ACTION_SCREEN_ON.equals(intent.getAction()));
+            }
+        };
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        BatteryPolicy.setScreenOn(pm == null || pm.isInteractive());
+        IntentFilter screen = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        screen.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(mScreenReceiver, screen);
+
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
         //Seen an error here

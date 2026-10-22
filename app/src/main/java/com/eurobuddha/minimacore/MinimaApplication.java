@@ -94,6 +94,7 @@ public class MinimaApplication extends Application {
                             .addFlags(android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP));
                 }
                 mStartedActivities++;
+                com.eurobuddha.minimacore.service.BatteryPolicy.setAppVisible(true);
             }
             @Override
             public void onActivityResumed(Activity activity) {
@@ -107,6 +108,7 @@ public class MinimaApplication extends Application {
                 //1 -> 0 means the app just went to the background: start the auto-lock clock.
                 if (--mStartedActivities <= 0) {
                     mStartedActivities = 0;
+                    com.eurobuddha.minimacore.service.BatteryPolicy.setAppVisible(false);
                     if (!activity.isChangingConfigurations())
                         com.eurobuddha.minimacore.lock.AppLock.get().markBackgrounded();
                 }
