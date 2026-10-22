@@ -5,8 +5,8 @@ android {
     compileSdk 36
     defaultConfig {
         minSdk 28
-        buildConfigField 'String', 'VERSION_NAME', '"0.1.72"'
-        buildConfigField 'int', 'VERSION_CODE', '172'
+        buildConfigField 'String', 'VERSION_NAME', '"0.1.73"'
+        buildConfigField 'int', 'VERSION_CODE', '173'
     }
     buildFeatures { buildConfig true }
     testOptions { unitTests.includeAndroidResources = true; unitTests.all { maxHeapSize = '2g' } }
