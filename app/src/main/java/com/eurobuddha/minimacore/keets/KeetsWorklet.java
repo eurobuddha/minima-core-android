@@ -23,9 +23,55 @@ import to.holepunch.bare.kit.Worklet;
  * travels as a worklet argument: worklet args live in process memory, not in a
  * /proc cmdline, so this is as private as the desktop's env var.
  */
-public class KeetsWorklet {
+public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPolicy.Listener {
+
+    /** Saver suspends the sidecar this long after the screen goes off. */
+    static final long SUSPEND_AFTER_SCREEN_OFF_MS = 5 * 60_000;
 
     private Worklet mWorklet;
+    private boolean mSuspended;
+    private final android.os.Handler mHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final Runnable mRecheck = this::applyPolicy;
+
+    /**
+     * Whether the battery policy wants the sidecar suspended. Only Saver suspends, and only
+     * once the screen has been off for 5 minutes with the app not in use; the mailbox keeps
+     * any message meanwhile and the sidecar fetches it on resume (screen on).
+     */
+    static boolean shouldSuspend(com.eurobuddha.minimacore.service.BatteryPolicy.Profile zProfile,
+                                 boolean zScreenOn, boolean zAppVisible, long zScreenOffMs) {
+        return zProfile == com.eurobuddha.minimacore.service.BatteryPolicy.Profile.SAVER
+                && !zScreenOn && !zAppVisible && zScreenOffMs >= SUSPEND_AFTER_SCREEN_OFF_MS;
+    }
+
+    @Override public void onBatteryPolicyChanged() {
+        mHandler.post(mRecheck);
+    }
+
+    private synchronized void applyPolicy() {
+        mHandler.removeCallbacks(mRecheck);
+        if (mWorklet == null) return;
+        boolean want = shouldSuspend(com.eurobuddha.minimacore.service.BatteryPolicy.effective(),
+                com.eurobuddha.minimacore.service.BatteryPolicy.screenOn(),
+                com.eurobuddha.minimacore.service.BatteryPolicy.appVisible(),
+                com.eurobuddha.minimacore.service.BatteryPolicy.screenOffMillis());
+        if (want && !mSuspended) {
+            try { mWorklet.suspend(); mSuspended = true; logger.log("KEETS worklet suspended (battery saver, screen off)"); }
+            catch (Throwable t) { logger.log("KEETS suspend failed : " + t); }
+        } else if (!want && mSuspended) {
+            try { mWorklet.resume(); mSuspended = false; logger.log("KEETS worklet resumed"); }
+            catch (Throwable t) { logger.log("KEETS resume failed : " + t); }
+        }
+        // screen off but not yet long enough: look again when the 5 minutes are up
+        if (!want && !com.eurobuddha.minimacore.service.BatteryPolicy.screenOn()
+                && com.eurobuddha.minimacore.service.BatteryPolicy.effective()
+                   == com.eurobuddha.minimacore.service.BatteryPolicy.Profile.SAVER) {
+            long left = SUSPEND_AFTER_SCREEN_OFF_MS - com.eurobuddha.minimacore.service.BatteryPolicy.screenOffMillis();
+            mHandler.postDelayed(mRecheck, Math.max(1000, left));
+        }
+    }
+
+    public synchronized boolean isSuspended() { return mSuspended; }
 
     public synchronized void start(Context zContext) {
         if (mWorklet != null) return;
@@ -54,6 +100,9 @@ public class KeetsWorklet {
                     args.toArray(new String[0]));
             logger.log("KEETS worklet started port:" + GeneralParams.MINIMA_PORT
                     + " datadir:" + GeneralParams.DATA_FOLDER);
+            mSuspended = false;
+            com.eurobuddha.minimacore.service.BatteryPolicy.addListener(this);
+            mHandler.post(mRecheck);
         } catch (Throwable t) {
             // UnsatisfiedLinkError (missing ABI), missing asset, anything — the node must
             // keep running classic-only rather than die with the worklet.
@@ -63,6 +112,8 @@ public class KeetsWorklet {
     }
 
     public synchronized void terminate() {
+        com.eurobuddha.minimacore.service.BatteryPolicy.removeListener(this);
+        mHandler.removeCallbacks(mRecheck);
         if (mWorklet == null) return;
         try { mWorklet.terminate(); } catch (Throwable ignored) { }
         mWorklet = null;
