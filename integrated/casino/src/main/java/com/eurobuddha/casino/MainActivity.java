@@ -219,6 +219,13 @@ public class MainActivity extends AppCompatActivity {
     @Override protected void onPause() {
         super.onPause();
         FOREGROUND = false;         // hand auto-processing back to the background service
+        // Leaving the screen: a just-posted create/take is not on chain yet, so keep the watcher for
+        // a while; start it now if there is anything to settle.
+        if (pendingType != PEND_NONE) CasinoService.markPending(this);
+        if (CasinoService.hasWork(this)) {
+            try { ContextCompat.startForegroundService(this, new Intent(this, CasinoService.class)); } catch (Exception ignored) {}
+            try { AutoProcessWorker.schedule(this); } catch (Exception ignored) {}
+        }
     }
 
     @Override protected void onDestroy() {
@@ -557,6 +564,7 @@ public class MainActivity extends AppCompatActivity {
     private void snapshotMine() {
         prevMineBets.clear();
         for (Bet b : bets) if (b.isMine(myKeys)) prevMineBets.put(b.coinid(), b);
+        if (identityReady && !myKeys.isEmpty()) CasinoService.recordMine(this, !prevMineBets.isEmpty());
     }
 
     /** A phase-2 bet of mine that disappeared was resolved by the other side — surface the result. */
@@ -717,6 +725,7 @@ public class MainActivity extends AppCompatActivity {
     // ===== service =====
     private void maybeStartService() {
         if (serviceStarted || !identityReady) return;
+        if (!CasinoService.hasWork(this)) return;   // no bet of mine: no watcher
         serviceStarted = true;
         try { ContextCompat.startForegroundService(this, new Intent(this, CasinoService.class)); }
         catch (Exception ignored) {}

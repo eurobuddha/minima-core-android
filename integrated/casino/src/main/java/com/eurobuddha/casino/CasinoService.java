@@ -64,6 +64,9 @@ public class CasinoService extends Service {
         super.onCreate();
         createChannels();
         if (!startForegroundCompat()) { stopSelf(); return; }
+        // No bet of mine on chain and none just posted: stop at once (after startForeground, which a
+        // startForegroundService caller requires) and cancel the fallback job.
+        if (!hasWork(this)) { stopIdle(); return; }
         Language.addListener(languageChanged);
 
         secrets = new SecretStore(this);
@@ -172,9 +175,13 @@ public class CasinoService extends Service {
                     Bet b = new Bet(Coin.from(c));
                     if (b.isValid()) bets.add(b);
                 }
+                boolean mine = false;
+                for (Bet b : bets) if (b.isMine(myKeys)) { mine = true; break; }
+                recordMine(CasinoService.this, mine);
                 auto.process(bets, new HashSet<>(myKeys), lastBlock, listener);
                 TimeoutAlerts.update(CasinoService.this, new TimeoutClaims(bets, myKeys, lastBlock));
                 sweepForeignTracking();   // shed any foreign coins the node adopted since last block
+                if (!mine && !hasWork(CasinoService.this)) stopIdle();
             }
             @Override public void onError(String m) {}
         });
@@ -317,6 +324,46 @@ public class CasinoService extends Service {
         foregroundActive = false;
         try { stopForeground(STOP_FOREGROUND_REMOVE); } catch (Exception ignored) {}
         stopSelf();
+    }
+
+    private static final String BG_PREFS = "casino_bg";
+    private static final String KEY_MINE = "live_mine";
+    private static final String KEY_PENDING_UNTIL = "pending_until";
+    /** A posted create/take is not on chain yet: keep watching this long after leaving the screen. */
+    static final long PENDING_GRACE_MS = 15 * 60_000;
+
+    /** What the last successful scan of the casino contract's coins found: any bet of mine (house or player). */
+    static void recordMine(android.content.Context ctx, boolean mine) {
+        try { ctx.getSharedPreferences(BG_PREFS, MODE_PRIVATE).edit().putString(KEY_MINE, mine ? "1" : "0").apply(); }
+        catch (Exception ignored) {}
+    }
+
+    /** A create or take was just posted from the screen. */
+    static void markPending(android.content.Context ctx) {
+        try { ctx.getSharedPreferences(BG_PREFS, MODE_PRIVATE).edit()
+                .putLong(KEY_PENDING_UNTIL, System.currentTimeMillis() + PENDING_GRACE_MS).apply(); }
+        catch (Exception ignored) {}
+    }
+
+    /**
+     * Work the watcher protects: a bet of mine as house (offer renewal, secret reveal before the
+     * deadline) or as player (auto-resolve), or a create/take posted in the last 15 minutes. An
+     * unknown state (no scan yet, e.g. right after this update) and unreadable state count as work.
+     */
+    public static boolean hasWork(android.content.Context ctx) {
+        try {
+            android.content.SharedPreferences p = ctx.getSharedPreferences(BG_PREFS, MODE_PRIVATE);
+            if (System.currentTimeMillis() < p.getLong(KEY_PENDING_UNTIL, 0)) return true;
+            return !"0".equals(p.getString(KEY_MINE, ""));
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    /** No work: cancel the fallback job and stop. */
+    private void stopIdle() {
+        AutoProcessWorker.cancel(getApplicationContext());
+        stopGracefully();
     }
 
     private void notifyAlert(String title, String body) {

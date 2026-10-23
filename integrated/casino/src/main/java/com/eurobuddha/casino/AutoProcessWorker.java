@@ -29,11 +29,16 @@ public class AutoProcessWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        if (!CasinoService.hasWork(getApplicationContext())) { cancel(getApplicationContext()); return Result.success(); }
         try {
             ContextCompat.startForegroundService(getApplicationContext(),
                     new Intent(getApplicationContext(), CasinoService.class));
         } catch (Exception ignored) {}
         return Result.success();
+    }
+
+    public static void cancel(Context ctx) {
+        try { WorkManager.getInstance(ctx).cancelUniqueWork(UNIQUE); } catch (Exception ignored) {}
     }
 
     /** Schedule the ~15-minute fallback (WorkManager's minimum period). */
