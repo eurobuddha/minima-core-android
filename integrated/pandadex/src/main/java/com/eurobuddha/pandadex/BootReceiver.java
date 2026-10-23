@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 public class BootReceiver extends BroadcastReceiver {
 
     @Override public void onReceive(Context ctx, Intent intent) {
+        if (!DexKeepAliveService.hasWork(ctx)) return;   // nothing on the book: no watcher
         try { DexWatchWorker.schedule(ctx); } catch (Exception ignored) {}
         HeartbeatReceiver.schedule(ctx);
         try {

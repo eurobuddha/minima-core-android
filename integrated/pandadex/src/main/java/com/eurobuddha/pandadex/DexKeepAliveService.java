@@ -2,6 +2,7 @@ package com.eurobuddha.pandadex;
 import com.eurobuddha.minimacore.i18n.Language;
 import static com.eurobuddha.minimacore.i18n.R.string.*;
 
+import android.content.Context;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -62,6 +63,9 @@ public class DexKeepAliveService extends Service {
         super.onCreate();
         createChannel();
         if (!startForegroundCompat()) { stopSelf(); return; }
+        // No open order, maker ladder or unresolved receipt: stop at once (after startForeground, which
+        // a startForegroundService caller requires) and cancel every re-arm.
+        if (!hasWork(this)) { stopIdle(); return; }
         Language.addListener(languageChanged);
         node = new NodeApi(getApplicationContext(), this::onPaired);
         db = new DexDb(getApplicationContext());
@@ -187,6 +191,7 @@ public class DexKeepAliveService extends Service {
                 tape.ingest(orders, false, chainBlock, settler);
             } catch (RuntimeException e) { return; }
             if (!keySet.ready()) return;               // never renew on a blind key set
+            recordLiveOrders(db, orders, keySet);
             makerCfg.reload();   // the maker's rungs are its own to renew — see driveMaker
             processor.process(orders, keySet.keys(), keySet.addrs(),
                     maker.ownedOrderIds(), chainBlock, new DexProcessor.Listener() {
@@ -200,7 +205,57 @@ public class DexKeepAliveService extends Service {
                 }
             });
             driveMaker(orders);
+            if (!hasWork(getApplicationContext())) stopIdle();
         });
+    }
+
+    static final String META_LIVE_ORDERS = "has_live_orders";
+
+    /**
+     * Remember whether a complete scan saw one of MY orders, so boot, the heartbeat and the worker
+     * can answer "is there anything to keep alive" without a chain scan. Only a NON-EMPTY book can
+     * clear it: an empty reply may be a transport failure, and doubt must keep the watcher running.
+     */
+    static void recordLiveOrders(DexDb zDb, java.util.Map<String, Order5> zOrders, KeySet zKeys) {
+        try {
+            for (Order5 o : zOrders.values()) {
+                if (zKeys.owns(o)) { zDb.putMeta(META_LIVE_ORDERS, "1"); return; }
+            }
+            if (!zOrders.isEmpty()) zDb.putMeta(META_LIVE_ORDERS, "0");
+        } catch (RuntimeException ignored) { }
+    }
+
+    /**
+     * Work the watcher protects: an armed or recorded maker ladder (a pegged ladder must withdraw when
+     * the feed dies), unresolved place/cancel/edit receipts, or GTC orders of mine on the book. An
+     * unknown order state (no complete scan yet) and unreadable state both count as work.
+     */
+    public static boolean hasWork(Context ctx) {
+        try {
+            MakerConfig cfg = new MakerConfig(ctx);
+            if (cfg.armed || cfg.hasRecordedOrders()) return true;
+            if (!new Pending(ctx).rows().isEmpty()) return true;
+            DexDb d = new DexDb(ctx);
+            try { return !"0".equals(d.meta(META_LIVE_ORDERS, "")); } finally { d.close(); }
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    /** No work: cancel the heartbeat, the worker and the relaunch alarm, then stop. */
+    private void stopIdle() {
+        Context ctx = getApplicationContext();
+        HeartbeatReceiver.cancel(ctx);
+        DexWatchWorker.cancel(ctx);
+        try {
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+            PendingIntent pi = PendingIntent.getForegroundService(ctx, 21,
+                    new Intent(ctx, DexKeepAliveService.class),
+                    PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
+            if (pi != null) { if (am != null) am.cancel(pi); pi.cancel(); }
+        } catch (Exception ignored) {}
+        try { stopForeground(STOP_FOREGROUND_REMOVE); } catch (Exception ignored) {}
+        stopSelf();
     }
 
     /**
@@ -262,6 +317,7 @@ public class DexKeepAliveService extends Service {
     }
 
     @Override public void onTaskRemoved(Intent rootIntent) {
+        if (!hasWork(getApplicationContext())) { super.onTaskRemoved(rootIntent); return; }
         try { DexWatchWorker.schedule(getApplicationContext()); } catch (Exception ignored) {}
         try { HeartbeatReceiver.schedule(getApplicationContext()); } catch (Exception ignored) {}
         try {

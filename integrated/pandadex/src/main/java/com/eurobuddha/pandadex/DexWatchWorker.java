@@ -27,11 +27,16 @@ public class DexWatchWorker extends Worker {
     public DexWatchWorker(@NonNull Context ctx, @NonNull WorkerParameters params) { super(ctx, params); }
 
     @NonNull @Override public Result doWork() {
+        if (!DexKeepAliveService.hasWork(getApplicationContext())) { cancel(getApplicationContext()); return Result.success(); }
         try {
             ContextCompat.startForegroundService(getApplicationContext(),
                     new Intent(getApplicationContext(), DexKeepAliveService.class));
         } catch (Exception ignored) {}
         return Result.success();
+    }
+
+    public static void cancel(Context ctx) {
+        try { WorkManager.getInstance(ctx).cancelUniqueWork(UNIQUE); } catch (Exception ignored) {}
     }
 
     /** Schedule the ~15-minute fallback (WorkManager's minimum period). */

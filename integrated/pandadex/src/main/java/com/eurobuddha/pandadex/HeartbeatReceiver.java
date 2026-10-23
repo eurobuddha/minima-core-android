@@ -23,11 +23,23 @@ public class HeartbeatReceiver extends BroadcastReceiver {
     private static final int REQUEST_CODE = 71;            // fixed + FLAG_UPDATE_CURRENT → rescheduling is idempotent
 
     @Override public void onReceive(Context ctx, Intent intent) {
+        if (!DexKeepAliveService.hasWork(ctx)) { cancel(ctx); return; }   // nothing on the book: end the chain
         schedule(ctx);   // chain the next one FIRST — a crash below must not end the heartbeat
         try {
             ContextCompat.startForegroundService(ctx,
                     new Intent(ctx, DexKeepAliveService.class).setAction(DexKeepAliveService.ACTION_HEARTBEAT));
         } catch (Exception ignored) { /* worker/alarm relaunch retries */ }
+    }
+
+    /** Stop the heartbeat chain (same request code and component as {@link #schedule}). */
+    public static void cancel(Context ctx) {
+        try {
+            AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+            PendingIntent pi = PendingIntent.getBroadcast(ctx, REQUEST_CODE,
+                    new Intent(ctx, HeartbeatReceiver.class),
+                    PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
+            if (pi != null) { if (am != null) am.cancel(pi); pi.cancel(); }
+        } catch (Exception ignored) {}
     }
 
     /** (Re)schedule the next heartbeat ~15 min out. Safe to call from anywhere, any number of times. */

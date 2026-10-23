@@ -363,6 +363,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void maybeStartKeepAlive() {
         if (keepAliveAsked) return;
+        if (!DexKeepAliveService.hasWork(this)) return;   // a pure browser: no watcher, no prompts
         keepAliveAsked = true;
         try {
             if (android.os.Build.VERSION.SDK_INT >= 33
@@ -2116,6 +2117,14 @@ public class MainActivity extends AppCompatActivity {
         FOREGROUND = false;
         ui.removeCallbacks(pollTask);
         ui.removeCallbacks(uiTick);
+        // Leaving the screen: record what this visit's book showed, and if there is anything to keep
+        // alive (an order placed, a maker armed), start the watcher now. No prompts here.
+        try { if (ready()) DexKeepAliveService.recordLiveOrders(db, book(), keySet); } catch (RuntimeException ignored) {}
+        if (DexKeepAliveService.hasWork(this)) {
+            try { DexWatchWorker.schedule(this); } catch (Exception ignored) {}
+            HeartbeatReceiver.schedule(this);
+            try { ContextCompat.startForegroundService(this, new Intent(this, DexKeepAliveService.class)); } catch (Exception ignored) {}
+        }
     }
 
     @Override protected void onDestroy() {
