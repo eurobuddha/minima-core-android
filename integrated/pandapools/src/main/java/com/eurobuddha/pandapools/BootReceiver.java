@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 public class BootReceiver extends BroadcastReceiver {
 
     @Override public void onReceive(Context ctx, Intent intent) {
+        if (!PoolKeepAliveService.hasWork(ctx)) return;   // never start a watcher for a node with no pools
         try { PoolWatchWorker.schedule(ctx); } catch (Exception ignored) {}
         HeartbeatReceiver.schedule(ctx);
         try {

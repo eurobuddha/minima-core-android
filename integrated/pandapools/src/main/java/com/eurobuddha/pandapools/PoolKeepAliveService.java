@@ -56,6 +56,9 @@ public class PoolKeepAliveService extends Service {
         // If the OS refuses the foreground service (e.g. a residual dataSync time-budget on Android 14), bail
         // gracefully instead of crashing — the worker/alarm relaunch will retry.
         if (!startForegroundCompat()) { stopSelf(); return; }
+        // No pool and nothing being collected: a pure swapper has nothing to keep alive. Stop at once
+        // (after startForeground, which a startForegroundService caller requires) and cancel every re-arm.
+        if (!hasWork(this)) { stopGracefully(); return; }
         Language.addListener(languageChanged);
         node = new NodeApi(getApplicationContext(), null);   // applicationContext → callbacks always deliver (no Activity)
         HeartbeatReceiver.schedule(this);
@@ -105,7 +108,7 @@ public class PoolKeepAliveService extends Service {
     private void keepAlivePass() {
         long now = System.currentTimeMillis();
         if (now - lastPassMs < PASS_GAP_MS) return;                        // overlap guard
-        if (OwnPoolStore.all(getApplicationContext()).isEmpty()) return;   // LP nodes only (own ≥1 pool) — no wakelock/work otherwise
+        if (!hasWork(getApplicationContext())) { stopGracefully(); return; }   // LP nodes / pending collects only
         lastPassMs = now;
         acquireTimedWakelock();   // only now that we're actually doing work — let a Doze-woken pass finish before re-suspend
         try {
@@ -123,6 +126,34 @@ public class PoolKeepAliveService extends Service {
         } catch (Throwable ignored) {}
     }
 
+    /**
+     * Real keep-alive work exists: an own pool (retired ones too: a close or migrate that never landed is
+     * still live and must not age out of the cascade) or withdrawn funds still being collected.
+     */
+    public static boolean hasWork(Context ctx) {
+        try {
+            return !OwnPoolStore.all(ctx).isEmpty() || !PendingCollect.all(ctx).isEmpty();
+        } catch (Throwable t) {
+            return true;   // unreadable state: keep watching rather than risk stranding funds
+        }
+    }
+
+    /** Nothing to keep alive: cancel the heartbeat, the worker and the relaunch alarm, then stop. */
+    private void stopGracefully() {
+        Context ctx = getApplicationContext();
+        HeartbeatReceiver.cancel(ctx);
+        PoolWatchWorker.cancel(ctx);
+        try {
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+            PendingIntent pi = PendingIntent.getForegroundService(ctx, 21,
+                    new Intent(ctx, PoolKeepAliveService.class),
+                    PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
+            if (pi != null) { if (am != null) am.cancel(pi); pi.cancel(); }
+        } catch (Exception ignored) {}
+        try { stopForeground(STOP_FOREGROUND_REMOVE); } catch (Exception ignored) {}
+        stopSelf();
+    }
+
     /** Timed partial wakelock so a Doze-woken heartbeat can finish one keep-alive pipeline; auto-releases, can't leak. */
     private void acquireTimedWakelock() {
         try {
@@ -136,6 +167,7 @@ public class PoolKeepAliveService extends Service {
 
     /** The user swiped the app off recents — keep watching: reschedule the worker + heartbeat + a Doze-proof relaunch. */
     @Override public void onTaskRemoved(Intent rootIntent) {
+        if (!hasWork(getApplicationContext())) { super.onTaskRemoved(rootIntent); return; }
         try { PoolWatchWorker.schedule(getApplicationContext()); } catch (Exception ignored) {}
         try { HeartbeatReceiver.schedule(getApplicationContext()); } catch (Exception ignored) {}
         try {

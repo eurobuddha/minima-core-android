@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
      * the first pool is created — before that, OwnPoolStore is empty and this is a no-op.
      */
     public void ensureKeepAlive() {
-        if (OwnPoolStore.all(this).isEmpty()) return;   // not an LP node → nothing to keep alive
+        if (!PoolKeepAliveService.hasWork(this)) return;   // no pool, nothing being collected → nothing to keep alive
         ensureNotificationPermission();
         try { androidx.core.content.ContextCompat.startForegroundService(this, new Intent(this, PoolKeepAliveService.class)); } catch (Exception ignored) {}
         try { PoolWatchWorker.schedule(this); } catch (Exception ignored) {}
@@ -559,6 +559,13 @@ public class MainActivity extends AppCompatActivity {
         // battery/network or hammer the node while hidden.
         stopPolling();
         if (views != null) for (BaseView v : views) v.onStop();
+        // Leaving the screen: if this visit created work (a pool, a pending collect), the background
+        // keep-alive must be running before the app goes away. No permission prompts here.
+        if (PoolKeepAliveService.hasWork(this)) {
+            try { androidx.core.content.ContextCompat.startForegroundService(this, new Intent(this, PoolKeepAliveService.class)); } catch (Exception ignored) {}
+            try { PoolWatchWorker.schedule(this); } catch (Exception ignored) {}
+            try { HeartbeatReceiver.schedule(this); } catch (Exception ignored) {}
+        }
     }
 
     @Override protected void onResume() {
