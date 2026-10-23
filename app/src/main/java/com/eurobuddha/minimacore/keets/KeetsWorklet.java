@@ -25,6 +25,9 @@ import to.holepunch.bare.kit.Worklet;
  */
 public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPolicy.Listener {
 
+    /** V8 heap limit for the keets worklet. */
+    static final int WORKLET_MEMORY_LIMIT = 128 * 1024 * 1024;
+
     /** Saver suspends the sidecar this long after the screen goes off. */
     static final long SUSPEND_AFTER_SCREEN_OFF_MS = 5 * 60_000;
 
@@ -94,7 +97,12 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
                 args.add("--topic"); args.add("minima-testnet-keets-v1");
             }
 
-            Worklet.Options opts = new Worklet.Options().memoryLimit(32 * 1024 * 1024);
+            // 32 MB killed the whole app every ~85-90 min (2.0.40 on the Fold, 16 crashes in a row:
+            // v8 FatalProcessOutOfMemory on the bare-worklet thread). Under Bare the sidecar's
+            // steady working set is ~17 MB heap in use, ~20 MB reserved, ~18 MB buffers (measured
+            // 2026-10-23), before the phone's contacts, peers and media drive. A V8 OOM aborts the
+            // process, node included, so leave real headroom.
+            Worklet.Options opts = new Worklet.Options().memoryLimit(WORKLET_MEMORY_LIMIT);
             mWorklet = new Worklet(opts);
             mWorklet.start("/keets.bundle", zContext.getAssets().open("keets.bundle"),
                     args.toArray(new String[0]));
