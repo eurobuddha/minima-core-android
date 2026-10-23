@@ -27,6 +27,7 @@ public class SwapWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        if (!SwapService.hasWork(getApplicationContext())) { cancel(getApplicationContext()); return Result.success(); }
         try {
             ContextCompat.startForegroundService(getApplicationContext(),
                     new Intent(getApplicationContext(), SwapService.class));
@@ -38,6 +39,10 @@ public class SwapWorker extends Worker {
             SwapLog.w("SwapWorker FGS start failed: " + e.getClass().getSimpleName() + ": " + e.getMessage());
             return Result.retry();
         }
+    }
+
+    public static void cancel(Context ctx) {
+        try { WorkManager.getInstance(ctx).cancelUniqueWork(UNIQUE); } catch (Exception ignored) {}
     }
 
     /** Schedule the ~15-minute fallback (WorkManager's minimum period). */

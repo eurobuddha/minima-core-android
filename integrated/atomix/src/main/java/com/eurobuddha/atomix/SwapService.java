@@ -111,6 +111,9 @@ public class SwapService extends Service {
         // If the OS refuses the foreground service (e.g. a residual dataSync time-budget on Android 14),
         // bail gracefully instead of crashing — WorkManager/AlarmManager relaunch will retry.
         if (!startForegroundCompat()) { stopSelf(); return; }
+        // Nothing in flight and no live market or offer: stop at once (after startForeground, which a
+        // startForegroundService caller requires) and cancel every re-arm.
+        if (!hasWork(this)) { stopIdle(); return; }
         Language.addListener(languageChanged);
 
         prefs = getSharedPreferences("atomix", MODE_PRIVATE);
@@ -169,6 +172,7 @@ public class SwapService extends Service {
 
     /** The user swiped the app off recents — keep watching: reschedule the worker + AlarmManager relaunch. */
     @Override public void onTaskRemoved(Intent rootIntent) {
+        if (!hasWork(getApplicationContext())) { super.onTaskRemoved(rootIntent); return; }
         try { SwapWorker.schedule(getApplicationContext()); } catch (Exception ignored) {}
         try { HeartbeatReceiver.schedule(getApplicationContext()); } catch (Exception ignored) {}
         try {
@@ -303,6 +307,10 @@ public class SwapService extends Service {
         long now = System.currentTimeMillis();
         if (now - lastTickPassMs < 30_000) return;   // heartbeat + loop overlap guard
         lastTickPassMs = now;
+        // Two idle passes in a row (~3 min) before stopping: a just-cancelled order keeps the
+        // watcher long enough for its book tombstone to go out.
+        if (hasWork(this)) idlePasses = 0;
+        else if (++idlePasses >= 2) { stopIdle(); return; }
         if (!paired) {
             maybeReRegister();
             maybeOfflineAlert();
@@ -747,5 +755,46 @@ public class SwapService extends Service {
         foregroundActive = false;
         try { stopForeground(STOP_FOREGROUND_REMOVE); } catch (Exception ignored) {}
         stopSelf();
+    }
+
+    private int idlePasses;
+
+    /**
+     * Work the watcher protects: a live order market or OTC offer (takers must be answered), a peg
+     * withdrawal whose tombstone is not confirmed yet, a sweep, any swap not COMPLETE/REFUNDED (ERROR
+     * included: its Minima leg may still need a refund) and any OTC deal still in progress.
+     * Unreadable state counts as work.
+     */
+    public static boolean hasWork(android.content.Context ctx) {
+        try {
+            android.content.SharedPreferences p = ctx.getSharedPreferences("atomix", MODE_PRIVATE);
+            if (p.getBoolean("auto_publish", false) || p.getBoolean("otc_auto", false)
+                    || p.getBoolean("otc_enable", false)) return true;
+            if (p.getBoolean(PriceOracle.P_WITHDRAWN, false) && !p.getBoolean(PriceOracle.P_TOMBSTONED, false)) return true;
+            if (MainActivity.SWEEP_ACTIVE) return true;
+            SwapDb sdb = new SwapDb(ctx);
+            try { if (sdb.hasUnsettled()) return true; } finally { sdb.close(); }
+            OtcDb odb = new OtcDb(ctx);
+            try { return odb.hasOpenDeal(); } finally { odb.close(); }
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    /** No work: cancel the heartbeat, the worker and the relaunch alarm, then stop. */
+    private void stopIdle() {
+        SwapLog.d("svc idle — no swap, market or offer: stopping");
+        android.content.Context ctx = getApplicationContext();
+        HeartbeatReceiver.cancel(ctx);
+        SwapWorker.cancel(ctx);
+        try {
+            android.app.AlarmManager am = (android.app.AlarmManager) getSystemService(ALARM_SERVICE);
+            android.app.PendingIntent pi = android.app.PendingIntent.getForegroundService(ctx, 11,
+                    new Intent(ctx, SwapService.class),
+                    android.app.PendingIntent.FLAG_ONE_SHOT | android.app.PendingIntent.FLAG_IMMUTABLE
+                            | android.app.PendingIntent.FLAG_NO_CREATE);
+            if (pi != null) { if (am != null) am.cancel(pi); pi.cancel(); }
+        } catch (Exception ignored) {}
+        stopGracefully();
     }
 }

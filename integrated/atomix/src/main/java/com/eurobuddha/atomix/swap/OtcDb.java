@@ -171,6 +171,15 @@ public final class OtcDb {
 
     public synchronized void close() { helper.close(); }
 
+    /** A deal that is still being negotiated or executed. */
+    public synchronized boolean hasOpenDeal() {
+        try (Cursor c = helper.getReadableDatabase().rawQuery(
+                "SELECT 1 FROM otc_deals WHERE status IN (?,?,?,?) LIMIT 1",
+                new String[]{ST_PROPOSED, ST_COUNTERED, ST_AGREED, ST_EXECUTING})) {
+            return c.moveToFirst();
+        }
+    }
+
     public synchronized List<Deal> allDeals() {
         List<Deal> out = new ArrayList<>();
         try (Cursor c = helper.getReadableDatabase().rawQuery("SELECT * FROM otc_deals ORDER BY updated DESC", null)) {

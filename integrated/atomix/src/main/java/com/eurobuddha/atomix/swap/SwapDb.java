@@ -298,6 +298,18 @@ public final class SwapDb {
         return out;
     }
 
+    /** Any swap whose funds may still need the watcher: everything except COMPLETE and REFUNDED.
+     *  ERROR is included on purpose: an ERROR swap's Minima leg can still be refunded or confirmed. */
+    public synchronized boolean hasUnsettled() {
+        try (Cursor c = helper.getReadableDatabase().rawQuery(
+                "SELECT 1 FROM swaps WHERE status NOT IN (?,?) LIMIT 1",
+                new String[]{ST_COMPLETE, ST_REFUNDED})) {
+            return c.moveToFirst();
+        }
+    }
+
+    public synchronized void close() { helper.close(); }
+
     /** Hashes of swaps not yet finished — the set the watcher is still interested in (for secret matching). */
     public synchronized Set<String> activeHashes() {
         Set<String> out = new HashSet<>();

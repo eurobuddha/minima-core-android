@@ -342,6 +342,13 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         FOREGROUND = false;    // hand off to the background SwapService
         stopWatcher();
+        // Leaving the screen: if this visit created work (an order, an OTC offer, a swap), the watcher
+        // must be running before the app goes away. No battery prompt here.
+        if (SwapService.hasWork(this)) {
+            try { androidx.core.content.ContextCompat.startForegroundService(this, new android.content.Intent(this, SwapService.class)); } catch (Exception ignored) {}
+            try { SwapWorker.schedule(this); } catch (Exception ignored) {}
+            try { HeartbeatReceiver.schedule(this); } catch (Exception ignored) {}
+        }
         if (pegTickRef != null) ui.removeCallbacks(pegTickRef);   // MI-12: stop the 2s peg-preview poll while backgrounded
         stopCcyGlow();   // never breathe a pill nobody is looking at
     }
@@ -655,6 +662,7 @@ public class MainActivity extends AppCompatActivity {
     /** Start the background watcher so swaps progress with the app closed (once, when ready). */
     private void startSwapService() {
         if (serviceStarted) return;
+        if (!SwapService.hasWork(this)) return;   // nothing in flight: no service, no battery prompt
         serviceStarted = true;
         try { androidx.core.content.ContextCompat.startForegroundService(this, new android.content.Intent(this, SwapService.class)); }
         catch (Exception ignored) {}

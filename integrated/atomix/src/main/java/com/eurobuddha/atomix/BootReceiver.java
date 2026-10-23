@@ -21,6 +21,7 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override public void onReceive(Context ctx, Intent intent) {
         SwapLog.d("boot/update: " + (intent == null ? "?" : intent.getAction()));
+        if (!SwapService.hasWork(ctx)) return;   // no swap, market or offer: nothing to watch
         try { SwapWorker.schedule(ctx); }
         catch (Exception e) { SwapLog.w("boot worker schedule failed: " + e.getClass().getSimpleName() + ": " + e.getMessage()); }   // MI-13: the 15-min fallback silently absent otherwise
         HeartbeatReceiver.schedule(ctx);
