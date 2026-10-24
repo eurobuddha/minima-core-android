@@ -48,7 +48,9 @@ public class KeetsWorklet {
                 args.add("--topic"); args.add("minima-testnet-keets-v1");
             }
 
-            Worklet.Options opts = new Worklet.Options().memoryLimit(32 * 1024 * 1024);
+            // 32 MB killed the whole app every ~85-90 min (v8 FatalProcessOutOfMemory on the
+            // bare-worklet thread, 16 crashes in a row on 2.0.40). Give the sidecar real headroom.
+            Worklet.Options opts = new Worklet.Options().memoryLimit(128 * 1024 * 1024);
             mWorklet = new Worklet(opts);
             mWorklet.start("/keets.bundle", zContext.getAssets().open("keets.bundle"),
                     args.toArray(new String[0]));
