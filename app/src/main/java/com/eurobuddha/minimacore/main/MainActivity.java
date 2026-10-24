@@ -406,6 +406,23 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             if (profiles[i] == com.eurobuddha.minimacore.service.BatteryPolicy.profile()) rb.setChecked(true);
         }
         box.addView(group);
+        android.widget.TextView dhtTitle = new android.widget.TextView(this);
+        dhtTitle.setText(Language.text(this, l10n_battery_dht_relay));
+        dhtTitle.setPadding(0, pad / 2, 0, 0);
+        dhtTitle.setTypeface(null, android.graphics.Typeface.BOLD);
+        box.addView(dhtTitle);
+        android.widget.RadioGroup dhtGroup = new android.widget.RadioGroup(this);
+        android.widget.RadioButton dhtAlways = new android.widget.RadioButton(this);
+        dhtAlways.setId(android.view.View.generateViewId());
+        dhtAlways.setText(Language.text(this, l10n_battery_dht_always));
+        android.widget.RadioButton dhtPlugged = new android.widget.RadioButton(this);
+        dhtPlugged.setId(android.view.View.generateViewId());
+        dhtPlugged.setText(Language.text(this, l10n_battery_dht_plugged));
+        dhtGroup.addView(dhtAlways);
+        dhtGroup.addView(dhtPlugged);
+        (com.eurobuddha.minimacore.service.BatteryPolicy.dhtRelay()
+                == com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay.PLUGGED ? dhtPlugged : dhtAlways).setChecked(true);
+        box.addView(dhtGroup);
         android.widget.CheckBox charger = new android.widget.CheckBox(this);
         charger.setText(Language.text(this, l10n_battery_full_on_charger));
         charger.setChecked(com.eurobuddha.minimacore.service.BatteryPolicy.fullOnCharger());
@@ -423,6 +440,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     if (sel != null) com.eurobuddha.minimacore.service.BatteryPolicy.setProfile(this,
                             (com.eurobuddha.minimacore.service.BatteryPolicy.Profile) sel.getTag());
                     com.eurobuddha.minimacore.service.BatteryPolicy.setFullOnCharger(this, charger.isChecked());
+                    com.eurobuddha.minimacore.service.BatteryPolicy.setDhtRelay(this, dhtPlugged.isChecked()
+                            ? com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay.PLUGGED
+                            : com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay.ALWAYS);
                 });
         if ("samsung".equalsIgnoreCase(android.os.Build.MANUFACTURER)) {
             b.setNeutralButton(Language.text(this, l10n_battery_never_sleep), (d, w) -> openSamsungNeverSleep());

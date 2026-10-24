@@ -8484,4 +8484,7 @@
     <string name="l10n_battery_full_on_charger" formatted="false">"充电时全速运行"</string>
     <string name="l10n_battery_chain_note" formatted="false">"所有模式都会继续验证区块并发送您的交易。"</string>
     <string name="l10n_battery_never_sleep" formatted="false">"三星：永不休眠"</string>
+    <string name="l10n_battery_dht_relay" formatted="false">"DHT 中继"</string>
+    <string name="l10n_battery_dht_always" formatted="false">"始终开启 — 此手机始终帮助路由 keets 网络（推荐）"</string>
+    <string name="l10n_battery_dht_plugged" formatted="false">"充电时开启 — 充电时为网络路由；使用电池时只为自身连接"</string>
 </resources>

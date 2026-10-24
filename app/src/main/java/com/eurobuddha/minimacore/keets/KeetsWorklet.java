@@ -33,6 +33,12 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
 
     private Worklet mWorklet;
     private boolean mSuspended;
+    private Context mContext;
+    private String mDhtMode = "routing";
+    /** A plug/unplug that changes the DHT mode restarts the sidecar, at most once per settle period
+     *  (a loose cable must not cause a restart storm). */
+    static final long DHT_MODE_SETTLE_MS = 30_000;
+    private final Runnable mDhtModeRecheck = this::applyDhtMode;
     private final android.os.Handler mHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private final Runnable mRecheck = this::applyPolicy;
 
@@ -49,6 +55,20 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
 
     @Override public void onBatteryPolicyChanged() {
         mHandler.post(mRecheck);
+        mHandler.removeCallbacks(mDhtModeRecheck);
+        mHandler.postDelayed(mDhtModeRecheck, DHT_MODE_SETTLE_MS);
+    }
+
+    /** Restart the sidecar when the wanted DHT mode differs from the running one (plug change or a
+     *  new relay choice). A restart takes seconds; mail waits in the mailbox meanwhile. */
+    private synchronized void applyDhtMode() {
+        if (mWorklet == null || mContext == null) return;
+        String want = com.eurobuddha.minimacore.service.BatteryPolicy.dhtMode();
+        if (want.equals(mDhtMode)) return;
+        logger.log("KEETS dht mode " + mDhtMode + " -> " + want + ": restarting the worklet");
+        Context ctx = mContext;
+        terminate();
+        start(ctx);
     }
 
     private synchronized void applyPolicy() {
@@ -90,6 +110,8 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
             args.add("--datadir");  args.add(GeneralParams.DATA_FOLDER);
             args.add("--maxconns"); args.add(String.valueOf(GeneralParams.KEETS_MAX_CONNS));
             args.add("--token");    args.add(KeetsManager.getTokenHex());
+            mDhtMode = com.eurobuddha.minimacore.service.BatteryPolicy.dhtMode();
+            args.add("--dht-mode"); args.add(mDhtMode);
             if (!GeneralParams.KEETS_BOOTSTRAP.equals("")) {
                 args.add("--bootstrap"); args.add(GeneralParams.KEETS_BOOTSTRAP);
             }
@@ -106,8 +128,9 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
             mWorklet = new Worklet(opts);
             mWorklet.start("/keets.bundle", zContext.getAssets().open("keets.bundle"),
                     args.toArray(new String[0]));
+            mContext = zContext.getApplicationContext();
             logger.log("KEETS worklet started port:" + GeneralParams.MINIMA_PORT
-                    + " datadir:" + GeneralParams.DATA_FOLDER);
+                    + " datadir:" + GeneralParams.DATA_FOLDER + " dht:" + mDhtMode);
             mSuspended = false;
             com.eurobuddha.minimacore.service.BatteryPolicy.addListener(this);
             mHandler.post(mRecheck);
@@ -122,6 +145,7 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
     public synchronized void terminate() {
         com.eurobuddha.minimacore.service.BatteryPolicy.removeListener(this);
         mHandler.removeCallbacks(mRecheck);
+        mHandler.removeCallbacks(mDhtModeRecheck);
         if (mWorklet == null) return;
         try { mWorklet.terminate(); } catch (Throwable ignored) { }
         mWorklet = null;

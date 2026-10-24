@@ -8595,4 +8595,7 @@
     <string name="l10n_battery_full_on_charger" formatted="false">"Повна швидкість під час заряджання"</string>
     <string name="l10n_battery_chain_note" formatted="false">"У всіх профілях вузол і далі перевіряє блоки та надсилає ваші транзакції."</string>
     <string name="l10n_battery_never_sleep" formatted="false">"Samsung: ніколи не присипляти"</string>
+    <string name="l10n_battery_dht_relay" formatted="false">"Ретранслятор DHT"</string>
+    <string name="l10n_battery_dht_always" formatted="false">"Завжди увімкнено — цей телефон завжди допомагає маршрутизувати мережу keets (рекомендовано)"</string>
+    <string name="l10n_battery_dht_plugged" formatted="false">"Під час заряджання — маршрутизує для мережі під час заряджання; від батареї підключається лише для себе"</string>
 </resources>

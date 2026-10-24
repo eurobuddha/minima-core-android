@@ -42895,5 +42895,23 @@
     "zh-Hans": "三星：永不休眠",
     "ru": "Samsung: не усыплять",
     "uk": "Samsung: ніколи не присипляти"
+  },
+  "battery.dhtRelay": {
+    "en": "DHT relay",
+    "zh-Hans": "DHT 中继",
+    "ru": "Ретранслятор DHT",
+    "uk": "Ретранслятор DHT"
+  },
+  "battery.dhtAlways": {
+    "en": "Always on — this phone helps route the keets network at all times (recommended)",
+    "zh-Hans": "始终开启 — 此手机始终帮助路由 keets 网络（推荐）",
+    "ru": "Всегда включён — этот телефон всегда помогает маршрутизировать сеть keets (рекомендуется)",
+    "uk": "Завжди увімкнено — цей телефон завжди допомагає маршрутизувати мережу keets (рекомендовано)"
+  },
+  "battery.dhtPlugged": {
+    "en": "On when plugged in — routes for the network while charging; on battery it only connects for itself",
+    "zh-Hans": "充电时开启 — 充电时为网络路由；使用电池时只为自身连接",
+    "ru": "При зарядке — маршрутизирует для сети во время зарядки; от батареи подключается только для себя",
+    "uk": "Під час заряджання — маршрутизує для мережі під час заряджання; від батареї підключається лише для себе"
   }
 }

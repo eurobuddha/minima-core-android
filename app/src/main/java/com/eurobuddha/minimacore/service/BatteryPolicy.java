@@ -21,12 +21,17 @@ public final class BatteryPolicy {
 
     public interface Listener { void onBatteryPolicyChanged(); }
 
+    /** The keets DHT's routing duty. There is deliberately no "off": phones support the network. */
+    public enum DhtRelay { ALWAYS, PLUGGED }
+
     static final String PREFS = "main_prefs";
     static final String KEY_PROFILE = "battery_profile";
     static final String KEY_FULL_ON_CHARGER = "battery_full_on_charger";
+    static final String KEY_DHT_RELAY = "battery_dht_relay";
 
     private static volatile Profile sProfile = Profile.BALANCED;
     private static volatile boolean sFullOnCharger = true;
+    private static volatile DhtRelay sDhtRelay = DhtRelay.ALWAYS;
     private static volatile boolean sScreenOn = true;
     private static volatile boolean sPlugged = false;
     private static volatile boolean sAppVisible = false;
@@ -41,6 +46,23 @@ public final class BatteryPolicy {
         SharedPreferences p = zCtx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         sProfile = parse(p.getString(KEY_PROFILE, Profile.BALANCED.name()));
         sFullOnCharger = p.getBoolean(KEY_FULL_ON_CHARGER, true);
+        try { sDhtRelay = DhtRelay.valueOf(p.getString(KEY_DHT_RELAY, DhtRelay.ALWAYS.name())); }
+        catch (Exception e) { sDhtRelay = DhtRelay.ALWAYS; }
+    }
+
+    public static void setDhtRelay(Context zCtx, DhtRelay zRelay) {
+        sDhtRelay = zRelay;
+        zCtx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY_DHT_RELAY, zRelay.name()).apply();
+        fire();
+    }
+
+    public static DhtRelay dhtRelay() { return sDhtRelay; }
+
+    /** The sidecar's --dht-mode right now: "routing" unless the owner chose relay-when-plugged and we are on battery. */
+    public static String dhtMode() { return dhtMode(sDhtRelay, sPlugged); }
+
+    static String dhtMode(DhtRelay zRelay, boolean zPlugged) {
+        return zRelay == DhtRelay.PLUGGED && !zPlugged ? "client" : "routing";
     }
 
     static Profile parse(String zName) {

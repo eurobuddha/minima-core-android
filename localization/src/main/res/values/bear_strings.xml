@@ -8521,4 +8521,7 @@
     <string name="l10n_battery_full_on_charger" formatted="false">"Full speed while charging"</string>
     <string name="l10n_battery_chain_note" formatted="false">"Every profile keeps validating blocks and posting your transactions."</string>
     <string name="l10n_battery_never_sleep" formatted="false">"Samsung: never sleep"</string>
+    <string name="l10n_battery_dht_relay" formatted="false">"DHT relay"</string>
+    <string name="l10n_battery_dht_always" formatted="false">"Always on — this phone helps route the keets network at all times (recommended)"</string>
+    <string name="l10n_battery_dht_plugged" formatted="false">"On when plugged in — routes for the network while charging; on battery it only connects for itself"</string>
 </resources>

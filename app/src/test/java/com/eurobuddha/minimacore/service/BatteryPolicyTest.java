@@ -29,4 +29,12 @@ public class BatteryPolicyTest {
         BatteryPolicy.setScreenOn(true);
         assertEquals(0, BatteryPolicy.screenOffMillis());
     }
+
+    @Test public void dhtRoutesUnlessRelayWhenPluggedIsOnBattery() {
+        assertEquals("routing", BatteryPolicy.dhtMode(BatteryPolicy.DhtRelay.ALWAYS, false));
+        assertEquals("routing", BatteryPolicy.dhtMode(BatteryPolicy.DhtRelay.ALWAYS, true));
+        assertEquals("routing", BatteryPolicy.dhtMode(BatteryPolicy.DhtRelay.PLUGGED, true));
+        assertEquals("client", BatteryPolicy.dhtMode(BatteryPolicy.DhtRelay.PLUGGED, false));
+    }
+
 }
