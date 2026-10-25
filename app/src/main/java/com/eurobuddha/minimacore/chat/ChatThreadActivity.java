@@ -682,6 +682,7 @@ public class ChatThreadActivity extends AppCompatActivity {
             } else if ("image".equals(m.state) && m.ref != null && !m.ref.equals("")) {
                 body.setVisibility(m.body.equals("") ? View.GONE : View.VISIBLE);
                 Language.setText(body, m.body);
+                linkify(body);
                 image.setVisibility(View.VISIBLE);
                 image.setImageResource(android.R.drawable.stat_sys_download);
                 final String ref = m.ref;
@@ -713,6 +714,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                         .show());
             } else {
                 Language.setText(body, m.body);
+                linkify(body);
                 if (m.ref != null && !m.ref.equals("")) {
                     attach.setVisibility(View.VISIBLE);
                     Language.setText(attach, Language.msg(l10n_chat_attachment_copy));
@@ -724,6 +726,11 @@ public class ChatThreadActivity extends AppCompatActivity {
                         Toast.makeText(ChatThreadActivity.this, Language.msg(l10n_chat_link_copied), Toast.LENGTH_SHORT).show();
                     });
                 }
+            }
+
+            if (!"payment".equals(m.state) && !"audio".equals(m.state)) {
+                // keep the bubble's long-press (copy / delete) working on top of tappable links
+                body.setOnLongClickListener(v -> bubble.performLongClick());
             }
 
             //ticks: 🕓 sending · ✓ at mailbox · ✓✓ delivered · blue ✓✓ read by them
@@ -754,5 +761,12 @@ public class ChatThreadActivity extends AppCompatActivity {
             });
             return row;
         }
-    }
+    
+        /** http(s) links in a message become tappable and open in the browser; the text itself is
+         *  untouched, so copy still copies exactly what was sent. */
+        private void linkify(TextView zBody) {
+            android.text.util.Linkify.addLinks(zBody, android.text.util.Linkify.WEB_URLS);
+            zBody.setLinkTextColor(zBody.getCurrentTextColor());
+        }
+}
 }
