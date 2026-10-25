@@ -66,8 +66,9 @@ public final class PandamoniumHooks {
     // A frozen app's services, boot and alarm receivers are DISABLED as components (Android
     // itself refuses to start them), its WorkManager jobs are cancelled, and its process-start
     // event subscriptions are dropped. Opening one of its screens thaws it for that visit;
-    // when its last screen stops it re-freezes, unless it now holds money in flight, in which
-    // case it stays awake until a later close or app start finds it settled. Independent of
+    // a visible app opened that way returns to On for good; a hidden one re-freezes when its last
+    // screen stops, unless it now holds money in flight (then it stays awake until a later close
+    // or app start finds it settled). Independent of
     // the drawer's Visible/Hidden switch and of the battery profile.
 
     private static java.util.Set<Integer> idSet(android.content.SharedPreferences nav, String key) {
@@ -265,10 +266,17 @@ public final class PandamoniumHooks {
         });
     }
 
-    /** Opening a frozen app's screen thaws it for the visit, before its own code starts anything. */
+    /**
+     * Opening a frozen app's screen, before its own code starts anything: a visible app goes back
+     * to On for good (the owner's rule); a hidden one opened some other way wakes for this visit only
+     * and re-freezes when its last screen stops.
+     */
     private static void thawFor(Activity a) {
         int id = idForClass(a.getClass().getName());
-        if (id > 0 && isFrozen(a, id)) applyFrozen(a.getApplicationContext(), id, false);
+        if (id <= 0 || !isFrozen(a, id)) return;
+        android.content.Context ctx = a.getApplicationContext();
+        if (!idSet(nav(ctx), KEY_DISABLED).contains(id)) setIntegratedFrozen(ctx, id, false);
+        else applyFrozen(ctx, id, false);
     }
 
     /** All of our integrated apps with their on/off state, for the Apps tab. */
