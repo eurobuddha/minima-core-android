@@ -52,21 +52,32 @@ public class IntegratedAppsAdapter extends BaseAdapter {
         ImageView icon = row.findViewById(R.id.int_app_icon);
         TextView name  = row.findViewById(R.id.int_app_name);
         TextView state = row.findViewById(R.id.int_app_state);
-        MaterialSwitch sw = row.findViewById(R.id.int_app_switch);
+        MaterialSwitch hide = row.findViewById(R.id.int_app_switch);
+        MaterialSwitch freeze = row.findViewById(R.id.int_app_freeze);
 
         icon.setImageDrawable(app.icon);
         name.setText(app.name);
-        Language.setText(state, Language.msg(app.locked ? l10n_apps_always_on
-                : app.enabled ? l10n_apps_in_drawer : l10n_apps_hidden));
+        CharSequence shown = Language.text(mContext, app.locked ? l10n_apps_always_on
+                : app.enabled ? l10n_apps_in_drawer : l10n_apps_hidden);
+        state.setText(app.frozen ? shown + " · " + Language.text(mContext, l10n_apps_frozen) : shown);
 
-        // Clear the listener before setChecked so recycled rows don't fire a toggle.
-        sw.setOnCheckedChangeListener(null);
-        sw.setChecked(app.enabled);
-        sw.setEnabled(!app.locked);
+        // Clear listeners before setChecked so recycled rows don't fire a toggle.
+        hide.setOnCheckedChangeListener(null);
+        freeze.setOnCheckedChangeListener(null);
+        hide.setChecked(!app.enabled);
+        freeze.setChecked(app.frozen);
+        hide.setEnabled(!app.locked);
+        freeze.setEnabled(!app.locked);
         if (!app.locked) {
-            sw.setOnCheckedChangeListener((btn, checked) -> {
-                PandamoniumHooks.setIntegratedEnabled(mContext, app.id, checked);
+            hide.setOnCheckedChangeListener((btn, checked) -> {
+                PandamoniumHooks.setIntegratedEnabled(mContext, app.id, !checked);
                 // Rebuild from the saved state so the model and every row stay in sync.
+                setItems(PandamoniumHooks.integratedApps(mContext));
+            });
+            freeze.setOnCheckedChangeListener((btn, checked) -> {
+                CharSequence refused = PandamoniumHooks.setIntegratedFrozen(mContext, app.id, checked);
+                if (refused != null) android.widget.Toast.makeText(mContext, refused.toString(),
+                        android.widget.Toast.LENGTH_LONG).show();
                 setItems(PandamoniumHooks.integratedApps(mContext));
             });
         }

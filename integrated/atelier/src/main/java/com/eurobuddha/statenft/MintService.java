@@ -74,7 +74,7 @@ public class MintService extends Service {
         }
     }
 
-    static boolean hasWork(Context c) {
+    public static boolean hasWork(Context c) {
         JSONArray rows = LocalStore.load(c);
         for (int i = 0; i < rows.length(); i++) {
             JSONObject r = rows.optJSONObject(i);

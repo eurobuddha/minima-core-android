@@ -8487,4 +8487,9 @@
     <string name="l10n_battery_dht_relay" formatted="false">"DHT 中继"</string>
     <string name="l10n_battery_dht_always" formatted="false">"始终开启 — 此手机始终帮助路由 keets 网络（推荐）"</string>
     <string name="l10n_battery_dht_plugged" formatted="false">"充电时开启 — 充电时为网络路由；使用电池时只为自身连接"</string>
+    <string name="l10n_apps_hide" formatted="false">"隐藏"</string>
+    <string name="l10n_apps_freeze" formatted="false">"冻结"</string>
+    <string name="l10n_apps_frozen" formatted="false">"深度冻结"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_apps_freeze_refused">"%1$s 仍在监控进行中的资金（兑换、订单、资金池、投注、守护或铸造）。结算后即可冻结。"</string>
 </resources>

@@ -8598,4 +8598,9 @@
     <string name="l10n_battery_dht_relay" formatted="false">"Ретранслятор DHT"</string>
     <string name="l10n_battery_dht_always" formatted="false">"Завжди увімкнено — цей телефон завжди допомагає маршрутизувати мережу keets (рекомендовано)"</string>
     <string name="l10n_battery_dht_plugged" formatted="false">"Під час заряджання — маршрутизує для мережі під час заряджання; від батареї підключається лише для себе"</string>
+    <string name="l10n_apps_hide" formatted="false">"Сховати"</string>
+    <string name="l10n_apps_freeze" formatted="false">"Заморозити"</string>
+    <string name="l10n_apps_frozen" formatted="false">"Глибоко заморожено"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_apps_freeze_refused">"%1$s досі стежить за незавершеними коштами (обмін, ордер, пул, ставка, страж або мінт). Заморозити можна після їх завершення."</string>
 </resources>

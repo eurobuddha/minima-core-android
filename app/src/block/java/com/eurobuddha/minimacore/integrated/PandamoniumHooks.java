@@ -19,4 +19,5 @@ public final class PandamoniumHooks {
         return java.util.Collections.emptyList();
     }
     public static void setIntegratedEnabled(android.content.Context ctx, int id, boolean enabled) {}
+    public static CharSequence setIntegratedFrozen(android.content.Context ctx, int id, boolean frozen) { return null; }
 }

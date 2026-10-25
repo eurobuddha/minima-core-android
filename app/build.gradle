@@ -141,8 +141,8 @@ android {
         // vc234: notify and refresh the UI the instant a message is stored; acks and
         // receipts follow afterwards (node commands serialise, 8 s stalls seen on 2.0.37).
         // vc235: in-chat payments can be MxUSD as well as Minima (the wire always carried the token).
-        versionCode 248
-        versionName "2.0.52"
+        versionCode 249
+        versionName "2.0.53"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
@@ -318,6 +318,7 @@ dependencies {
 // Feature code is linked only into Pandamonium; classic and block keep their existing contents.
 dependencies {
     pandamoniumImplementation 'androidx.drawerlayout:drawerlayout:1.2.0'
+    pandamoniumImplementation 'androidx.work:work-runtime:2.9.1'   // already in the APK via the integrated apps; the deep freeze cancels their jobs
     pandamoniumImplementation project(':integrated-ethwallet')
     pandamoniumImplementation project(':integrated-atomix')
     pandamoniumImplementation project(':integrated-pandapools')

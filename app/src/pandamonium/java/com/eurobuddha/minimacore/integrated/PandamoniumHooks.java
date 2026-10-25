@@ -38,6 +38,8 @@ public final class PandamoniumHooks {
 
     private static final String NAV_PREFS = "pandamonium_navigation";
     private static final String KEY_DISABLED = "app_disabled";
+    private static final String KEY_FROZEN = "app_frozen";
+    private static final String KEY_FREEZE_INIT = "freeze_initialized";
 
     private PandamoniumHooks() {}
     public static boolean requiresSecureScreen(android.app.Activity activity) {
@@ -59,6 +61,216 @@ public final class PandamoniumHooks {
         return out;
     }
 
+    // ---- deep freeze: no background work at all until the app is opened ------
+    //
+    // A frozen app's services, boot and alarm receivers are DISABLED as components (Android
+    // itself refuses to start them), its WorkManager jobs are cancelled, and its process-start
+    // event subscriptions are dropped. Opening one of its screens thaws it for that visit;
+    // when its last screen stops it re-freezes, unless it now holds money in flight, in which
+    // case it stays awake until a later close or app start finds it settled. Independent of
+    // the drawer's Visible/Hidden switch and of the battery profile.
+
+    private static java.util.Set<Integer> idSet(android.content.SharedPreferences nav, String key) {
+        java.util.Set<Integer> out = new java.util.HashSet<>();
+        String saved = nav.getString(key, "");
+        if (saved != null && !saved.isEmpty()) for (String name : saved.split(",")) {
+            int idx = PandamoniumDestinations.indexFor(name);
+            if (idx > 0) out.add(idx);
+        }
+        return out;
+    }
+
+    private static void saveIdSet(android.content.SharedPreferences nav, String key, java.util.Set<Integer> ids) {
+        java.util.List<String> names = new java.util.ArrayList<>();
+        for (int d : ids) if (d > 0 && d < PandamoniumDestinations.CLASSES.length) names.add(PandamoniumDestinations.CLASSES[d]);
+        nav.edit().putString(key, String.join(",", names)).apply();
+    }
+
+    private static android.content.SharedPreferences nav(android.content.Context ctx) {
+        return ctx.getSharedPreferences(NAV_PREFS, android.content.Context.MODE_PRIVATE);
+    }
+
+    /** The Java packages whose components belong to integrated app {@code id}. */
+    static String[] packagesFor(int id) {
+        String cls = PandamoniumDestinations.CLASSES[id];
+        if (cls.equals("com.eurobuddha.minimacore.integrated.MallActivity"))
+            return new String[]{"com.eurobuddha.merchshop", "com.eurobuddha.merchstudio", "com.eurobuddha.merchinbox"};
+        return new String[]{cls.substring(0, cls.lastIndexOf('.'))};
+    }
+
+    static boolean belongs(String className, String[] packages) {
+        if (className == null) return false;
+        for (String pkg : packages) if (className.startsWith(pkg + ".")) return true;
+        return false;
+    }
+
+    /** Which integrated app an activity class belongs to, or -1 (the host and unknown screens). */
+    static int idForClass(String className) {
+        int direct = PandamoniumDestinations.indexFor(className);
+        if (direct > 0) return direct;
+        for (int i = 1; i < PandamoniumDestinations.CLASSES.length; i++) if (belongs(className, packagesFor(i))) return i;
+        return -1;
+    }
+
+    /** Money the app's background watcher must keep protecting: such an app is never frozen. */
+    public static boolean hasMoneyInFlight(android.content.Context ctx, int id) {
+        try {
+            switch (PandamoniumDestinations.CLASSES[id]) {
+                case "com.eurobuddha.atomix.MainActivity": return com.eurobuddha.atomix.SwapService.hasWork(ctx);
+                case "com.eurobuddha.pandadex.MainActivity": return com.eurobuddha.pandadex.DexKeepAliveService.hasWork(ctx);
+                case "com.eurobuddha.pandapools.MainActivity": return com.eurobuddha.pandapools.PoolKeepAliveService.hasWork(ctx);
+                case "com.eurobuddha.casino.MainActivity": return com.eurobuddha.casino.CasinoService.hasWork(ctx);
+                case "com.eurobuddha.futurecashnext.MainActivity":
+                    return new com.eurobuddha.futurecashnext.Cfg(ctx).is(com.eurobuddha.futurecashnext.Cfg.GUARDIAN_ON, false);
+                case "com.eurobuddha.nftwallet.MainActivity": return com.eurobuddha.nftwallet.MintDriver.hasWork(ctx);
+                case "com.eurobuddha.statenft.MainActivity": return com.eurobuddha.statenft.MintService.hasWork(ctx);
+                default: return false;
+            }
+        } catch (Throwable t) {
+            return true;   // unreadable state: never freeze funds
+        }
+    }
+
+    public static boolean isFrozen(android.content.Context ctx, int id) {
+        return id > 0 && idSet(nav(ctx), KEY_FROZEN).contains(id);
+    }
+
+    /** Freeze or unfreeze an integrated app. Returns null on success, or why it was refused. */
+    public static CharSequence setIntegratedFrozen(android.content.Context ctx, int id, boolean frozen) {
+        if (id <= 0) return null;                           // the host is never frozen
+        if (frozen && hasMoneyInFlight(ctx, id)) {
+            return com.eurobuddha.minimacore.i18n.Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_apps_freeze_refused,
+                    PandamoniumDestinations.NAMES[id]);
+        }
+        android.content.SharedPreferences nav = nav(ctx);
+        java.util.Set<Integer> set = idSet(nav, KEY_FROZEN);
+        if (frozen) set.add(id); else set.remove(id);
+        saveIdSet(nav, KEY_FROZEN, set);
+        if (!frozen || sOpen.getOrDefault(id, 0) == 0) applyFrozen(ctx, id, frozen);
+        return null;
+    }
+
+    /** Enable or disable the app's background components; on freeze also stop and cancel them. */
+    static void applyFrozen(android.content.Context ctx, int id, boolean frozen) {
+        String[] pkgs = packagesFor(id);
+        android.content.pm.PackageManager pm = ctx.getPackageManager();
+        String self = ctx.getPackageName();
+        try {
+            android.content.pm.PackageInfo pi = pm.getPackageInfo(self, android.content.pm.PackageManager.GET_SERVICES
+                    | android.content.pm.PackageManager.GET_RECEIVERS
+                    | android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS);
+            java.util.List<String> names = new java.util.ArrayList<>();
+            java.util.List<String> services = new java.util.ArrayList<>();
+            if (pi.services != null) for (android.content.pm.ServiceInfo si : pi.services) if (belongs(si.name, pkgs)) { names.add(si.name); services.add(si.name); }
+            if (pi.receivers != null) for (android.content.pm.ActivityInfo ri : pi.receivers) if (belongs(ri.name, pkgs)) names.add(ri.name);
+            int want = frozen ? android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                    : android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DEFAULT;
+            if (frozen) for (String svc : services) {
+                try { ctx.stopService(new android.content.Intent().setClassName(self, svc)); } catch (Exception ignored) {}
+            }
+            for (String n : names) {
+                android.content.ComponentName cn = new android.content.ComponentName(self, n);
+                if (pm.getComponentEnabledSetting(cn) != want)
+                    pm.setComponentEnabledSetting(cn, want, android.content.pm.PackageManager.DONT_KILL_APP);
+            }
+        } catch (Exception e) {
+            android.util.Log.w(TAG, "freeze " + id + ": " + e);
+        }
+        if (frozen) cancelWork(ctx, pkgs);
+        syncSubscriptions(ctx);
+    }
+
+    /** WorkManager tags every request with its worker's class name: cancel the app's jobs by that. */
+    private static void cancelWork(android.content.Context ctx, String[] pkgs) {
+        com.eurobuddha.minimacore.utils.BackgroundWork.pool(1, 4).execute(() -> {
+            try {
+                androidx.work.WorkManager wm = androidx.work.WorkManager.getInstance(ctx);
+                java.util.List<androidx.work.WorkInfo> infos = wm.getWorkInfos(androidx.work.WorkQuery.fromStates(
+                        androidx.work.WorkInfo.State.ENQUEUED, androidx.work.WorkInfo.State.RUNNING,
+                        androidx.work.WorkInfo.State.BLOCKED)).get();
+                for (androidx.work.WorkInfo info : infos) for (String tag : info.getTags())
+                    if (belongs(tag, pkgs)) { wm.cancelWorkById(info.getId()); break; }
+            } catch (Exception e) {
+                android.util.Log.w(TAG, "freeze work cancel: " + e);
+            }
+        });
+    }
+
+    // Process-start subscriptions of Terminal IDE (every node log line into SQLite) and the Salon.
+    private static com.eurobuddha.minimaapi.direct.DirectNodeEvents.Listener sTerminalLog, sSalonEvents;
+    private static boolean sTerminalOn, sSalonOn;
+    private static final java.util.Map<Integer, Integer> sOpen = new java.util.HashMap<>();
+
+    private static synchronized void syncSubscriptions(android.content.Context ctx) {
+        int term = PandamoniumDestinations.indexFor("com.eurobuddha.terminalide.MainActivity");
+        int salon = PandamoniumDestinations.indexFor("com.eurobuddha.salon.MainActivity");
+        boolean termWant = !isFrozen(ctx, term) || sOpen.getOrDefault(term, 0) > 0;
+        boolean salonWant = !isFrozen(ctx, salon) || sOpen.getOrDefault(salon, 0) > 0;
+        if (termWant != sTerminalOn) {
+            if (termWant) {
+                if (sTerminalLog == null) sTerminalLog = new com.eurobuddha.terminalide.receiver.MinimaNotifyReceiver(ctx);
+                com.eurobuddha.minimaapi.direct.DirectNodeEvents.subscribe(sTerminalLog,
+                        com.eurobuddha.minimacore.utils.BackgroundWork.pool(1, 8), "MINIMALOG");
+            } else if (sTerminalLog != null) com.eurobuddha.minimaapi.direct.DirectNodeEvents.unsubscribe(sTerminalLog);
+            sTerminalOn = termWant;
+        }
+        if (salonWant != sSalonOn) {
+            if (salonWant) {
+                if (sSalonEvents == null) sSalonEvents = new com.eurobuddha.salon.SalonNotifyReceiver(ctx);
+                com.eurobuddha.minimaapi.direct.DirectNodeEvents.subscribe(sSalonEvents,
+                        com.eurobuddha.minimacore.utils.BackgroundWork.pool(1, 8), "NEWBLOCK", "NEWCOIN", "NOTIFYCOIN");
+            } else if (sSalonEvents != null) com.eurobuddha.minimaapi.direct.DirectNodeEvents.unsubscribe(sSalonEvents);
+            sSalonOn = salonWant;
+        }
+    }
+
+    /** Process start: new installs begin with every integrated app frozen (owner decision,
+     *  2026-10-22); then make the component state match the saved choices. Opening thaws. */
+    private static void initFreeze(android.app.Application app) {
+        android.content.SharedPreferences nav = nav(app);
+        if (!nav.getBoolean(KEY_FREEZE_INIT, false)) {
+            try {
+                android.content.pm.PackageInfo pi = app.getPackageManager().getPackageInfo(app.getPackageName(), 0);
+                if (pi.firstInstallTime == pi.lastUpdateTime) {
+                    java.util.Set<Integer> all = new java.util.HashSet<>();
+                    for (int i = 1; i < PandamoniumDestinations.CLASSES.length; i++) all.add(i);
+                    saveIdSet(nav, KEY_FROZEN, all);
+                }
+            } catch (Exception ignored) {}
+            nav.edit().putBoolean(KEY_FREEZE_INIT, true).apply();
+        }
+        for (int id : idSet(nav, KEY_FROZEN)) if (!hasMoneyInFlight(app, id)) applyFrozen(app, id, true);
+        syncSubscriptions(app);
+        app.registerActivityLifecycleCallbacks(new android.app.Application.ActivityLifecycleCallbacks() {
+            @Override public void onActivityPreCreated(Activity a, android.os.Bundle b) { thawFor(a); }
+            @Override public void onActivityCreated(Activity a, android.os.Bundle b) { }
+            @Override public void onActivityStarted(Activity a) {
+                int id = idForClass(a.getClass().getName());
+                if (id > 0) synchronized (PandamoniumHooks.class) { sOpen.merge(id, 1, Integer::sum); }
+                thawFor(a);
+            }
+            @Override public void onActivityResumed(Activity a) { }
+            @Override public void onActivityPaused(Activity a) { }
+            @Override public void onActivityStopped(Activity a) {
+                int id = idForClass(a.getClass().getName());
+                if (id <= 0) return;
+                int left;
+                synchronized (PandamoniumHooks.class) { left = Math.max(0, sOpen.getOrDefault(id, 1) - 1); sOpen.put(id, left); }
+                if (left == 0 && isFrozen(a, id) && !a.isChangingConfigurations() && !hasMoneyInFlight(a, id)) {
+                    applyFrozen(a.getApplicationContext(), id, true);
+                }
+            }
+            @Override public void onActivitySaveInstanceState(Activity a, android.os.Bundle b) { }
+            @Override public void onActivityDestroyed(Activity a) { }
+        });
+    }
+
+    /** Opening a frozen app's screen thaws it for the visit, before its own code starts anything. */
+    private static void thawFor(Activity a) {
+        int id = idForClass(a.getClass().getName());
+        if (id > 0 && isFrozen(a, id)) applyFrozen(a.getApplicationContext(), id, false);
+    }
+
     /** All of our integrated apps with their on/off state, for the Apps tab. */
     public static java.util.List<IntegratedApp> integratedApps(android.content.Context ctx) {
         android.content.SharedPreferences nav =
@@ -70,7 +282,8 @@ public final class PandamoniumHooks {
                     .getDrawable(ctx, PandamoniumDestinations.ICONS[i]);
             boolean locked = (i == 0);                       // Minima Core — the host
             boolean enabled = locked || !disabled.contains(i);
-            out.add(new IntegratedApp(i, PandamoniumDestinations.NAMES[i], icon, enabled, locked));
+            boolean frozen = !locked && isFrozen(ctx, i);
+            out.add(new IntegratedApp(i, PandamoniumDestinations.NAMES[i], icon, enabled, locked, frozen));
         }
         return out;
     }
@@ -114,13 +327,10 @@ public final class PandamoniumHooks {
                 com.eurobuddha.minimacore.utils.BackgroundWork.pool(2, 16), action -> main.post(action));
         com.eurobuddha.minimacore.maxchat.MaxChat.APPLICATION_LISTENERS.add(com.eurobuddha.salon.MaximaLink::onMessage);
         com.eurobuddha.minimacore.maxchat.MaxChat.UI_LISTENERS.add(com.eurobuddha.salon.MaximaLink::refresh);
-        com.eurobuddha.minimaapi.direct.DirectNodeEvents.subscribe(
-                new com.eurobuddha.terminalide.receiver.MinimaNotifyReceiver(context),
-                com.eurobuddha.minimacore.utils.BackgroundWork.pool(1, 8), "MINIMALOG");
-        com.eurobuddha.minimaapi.direct.DirectNodeEvents.subscribe(
-                new com.eurobuddha.salon.SalonNotifyReceiver(context),
-                com.eurobuddha.minimacore.utils.BackgroundWork.pool(1, 8),
-                "NEWBLOCK", "NEWCOIN", "NOTIFYCOIN");
+        // Terminal IDE's log store and the Salon's event watcher follow each app's freeze state.
+        if (context.getApplicationContext() instanceof android.app.Application)
+            initFreeze((android.app.Application) context.getApplicationContext());
+        else syncSubscriptions(context);
     }
 
     public static void install(Activity raw) {

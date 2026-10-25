@@ -11,8 +11,12 @@ public final class IntegratedApp {
     public final Drawable icon;
     public final boolean enabled; // false = hidden from the app drawer
     public final boolean locked;  // the host (Minima Core) — always on
+    public final boolean frozen;  // deep frozen: no background work until opened
 
     public IntegratedApp(int zId, String zName, Drawable zIcon, boolean zEnabled, boolean zLocked) {
-        id = zId; name = zName; icon = zIcon; enabled = zEnabled; locked = zLocked;
+        this(zId, zName, zIcon, zEnabled, zLocked, false);
+    }
+    public IntegratedApp(int zId, String zName, Drawable zIcon, boolean zEnabled, boolean zLocked, boolean zFrozen) {
+        id = zId; name = zName; icon = zIcon; enabled = zEnabled; locked = zLocked; frozen = zFrozen;
     }
 }
