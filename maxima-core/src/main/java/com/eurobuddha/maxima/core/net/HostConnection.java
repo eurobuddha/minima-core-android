@@ -307,13 +307,23 @@ public final class HostConnection implements Closeable {
      *
      * @param zTimeoutMs overall budget for reaching the attached state
      */
+    /** Host hooks around each relay socket's connect, on the connecting thread (Android uses them
+     *  to traffic-tag the socket; this core stays free of Android). Null = nothing. */
+    public static volatile Runnable BEFORE_CONNECT, AFTER_CONNECT;
+
     public void attach(int zTimeoutMs) throws Exception {
         synchronized (this) {
             if (mClosed) throw new IllegalStateException("connection closed");
             if (mSocket != null) throw new IllegalStateException("connection already started");
             mSocket = new Socket();
         }
-        mSocket.connect(DialAlias.resolve(mHost, mPort), zTimeoutMs);
+        Runnable before = BEFORE_CONNECT, after = AFTER_CONNECT;
+        if (before != null) before.run();
+        try {
+            mSocket.connect(DialAlias.resolve(mHost, mPort), zTimeoutMs);
+        } finally {
+            if (after != null) after.run();
+        }
         mSocket.setSoTimeout(zTimeoutMs);
         mSocket.setTcpNoDelay(true);
         mSocket.setKeepAlive(true);

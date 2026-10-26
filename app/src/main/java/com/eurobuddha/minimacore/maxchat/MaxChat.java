@@ -75,12 +75,19 @@ public final class MaxChat {
         return sMedia;
     }
 
+    /** Android traffic tag for the Parlons relay sockets ("MA"), so netstats reports them apart. */
+    public static final int TRAFFIC_TAG = 0x4D41;
+
     /**
      * Boot the transport off the caller's thread. Safe to call repeatedly -
      * one node per process. The engine exists (and loads history) before the
      * network is up, so the Chat tab can render immediately.
      */
     public static synchronized void start(Context zCtx) {
+        com.eurobuddha.maxima.core.net.HostConnection.BEFORE_CONNECT =
+                () -> android.net.TrafficStats.setThreadStatsTag(TRAFFIC_TAG);
+        com.eurobuddha.maxima.core.net.HostConnection.AFTER_CONNECT =
+                android.net.TrafficStats::clearThreadStatsTag;
         if (sNode != null || sStarting) {
             return;
         }

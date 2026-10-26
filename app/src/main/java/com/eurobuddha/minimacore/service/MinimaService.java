@@ -430,6 +430,7 @@ public class MinimaService extends Service {
                                 com.eurobuddha.minimacore.chat.ChatDrainer.createChannel(MinimaService.this);
                                 if (keetsOn) {
                                     mKeetsWorklet.start(MinimaService.this);
+                                    TrafficLog.start();
                                     //Chat: the ONE drainer of the keets message inbox
                                     com.eurobuddha.minimacore.chat.ChatDrainer.start(MinimaService.this);
                                 }
@@ -622,6 +623,7 @@ public class MinimaService extends Service {
         //Stop the keets worklet before the node quits
         com.eurobuddha.minimacore.chat.ChatDrainer.stop();
         com.eurobuddha.minimacore.maxchat.MaxChat.stop();
+        TrafficLog.stop();
         mKeetsWorklet.terminate();
 
         //QUIT nicely..
