@@ -37,13 +37,50 @@ public class MinimaAPI {
             RECEIVER_MINIMA_ID      = prefs.getString("minima_uid", "");
         }
 
-        //Now get the sent ID
+        //Now get the sent ID - keyed by whichever core sent it
         try {
-            String minimaid = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID);
+            String minimaid = zIntent.getStringExtra(MinimaAPIMessages.key(prefixOrBears(zIntent), "REGISTER_MINIMAID"));
             return minimaid != null && !minimaid.isEmpty() && minimaid.equals(RECEIVER_MINIMA_ID);
         } catch (RuntimeException malformedExtras) {
             return false;
         }
+    }
+
+    /** The NOTIFY payload of a core's NOTIFY broadcast (bears or official). */
+    public static String notifyData(Intent zIntent){
+        if (zIntent == null) return null;
+        try {
+            return zIntent.getStringExtra(MinimaAPIMessages.key(prefixOrBears(zIntent), "NOTIFY_DATA"));
+        } catch (RuntimeException malformedExtras) {
+            return null;
+        }
+    }
+
+    /** Listen for NOTIFY from every core (bears and official) - use instead of new IntentFilter(MINIMA_API_NOTIFY). */
+    public static IntentFilter notifyFilter(){
+        IntentFilter filter = new IntentFilter();
+        for (String prefix : MinimaAPIMessages.PREFIXES) filter.addAction(MinimaAPIMessages.key(prefix, "NOTIFY"));
+        return filter;
+    }
+
+    /** True for any core's NOTIFY action. */
+    public static boolean isNotify(String zAction){
+        String prefix = MinimaAPIMessages.prefixOfAction(zAction);
+        return prefix != null && MinimaAPIMessages.key(prefix, "NOTIFY").equals(zAction);
+    }
+
+    /** Launch intent for whichever Minima Core is installed (bears first, then official), or null. */
+    public static Intent launchNode(Context zContext){
+        for (String[] node : MinimaAPIMessages.NODES) {
+            Intent launch = zContext.getPackageManager().getLaunchIntentForPackage(node[0]);
+            if (launch != null) return launch;
+        }
+        return null;
+    }
+
+    private static String prefixOrBears(Intent zIntent){
+        String prefix = MinimaAPIMessages.prefixOfAction(zIntent.getAction());
+        return prefix == null ? MinimaAPIMessages.MINIMA_BASE_CLASS : prefix;
     }
 
     //Details used by the CMD receiver
@@ -60,8 +97,10 @@ public class MinimaAPI {
     private boolean discovering;
     private boolean ambiguous;
     private int discoveryGeneration;
-    public static final String BLOCK_PACKAGE = "com.eurobuddha.minimablock";
-    public static final String PANDAMONIUM_PACKAGE = "com.eurobuddha.pandamonium";
+    public static final String BLOCK_PACKAGE = MinimaAPIMessages.BLOCK_PACKAGE;
+    public static final String PANDAMONIUM_PACKAGE = MinimaAPIMessages.PANDAMONIUM_PACKAGE;
+    //A core that predates the FILE bridge never answers it - fail the request instead of hanging
+    static final long FILE_REPLY_TIMEOUT_MS = 15000;
     Context mContext;
 
     Hashtable<String, MinimaAPIListener> mResponseHandlers = new Hashtable<>();
@@ -99,7 +138,9 @@ public class MinimaAPI {
         mMinimaAPIReceiver = new MinimaAPIReceive(this);
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction(MinimaAPIMessages.MINIMA_API_RESPONSE);
+        for (String prefix : MinimaAPIMessages.PREFIXES) {
+            filter.addAction(MinimaAPIMessages.key(prefix, "RESPONSE"));
+        }
 
         zContext.registerReceiver(mMinimaAPIReceiver, filter, Context.RECEIVER_EXPORTED);
 
@@ -136,12 +177,15 @@ public class MinimaAPI {
         if (destroyed || zIntent == null) return;
         final String responseid, uristr, result;
         try {
-            String minimaid = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID);
+            //Each core keys its reply extras with its own prefix
+            String prefix = MinimaAPIMessages.prefixOfAction(zIntent.getAction());
+            if (prefix == null || !MinimaAPIMessages.key(prefix, "RESPONSE").equals(zIntent.getAction())) return;
+            String minimaid = zIntent.getStringExtra(MinimaAPIMessages.key(prefix, "REGISTER_MINIMAID"));
             if (minimaid == null || minimaid.isEmpty() || !minimaid.equals(MINIMA_ID)) return;
-            responseid = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID);
+            responseid = zIntent.getStringExtra(MinimaAPIMessages.key(prefix, "RESPONSE_ID"));
             if (responseid == null || responseid.isEmpty() || !mResponseHandlers.containsKey(responseid)) return;
-            uristr = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_URI);
-            result = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_RESULT);
+            uristr = zIntent.getStringExtra(MinimaAPIMessages.key(prefix, "RESPONSE_URI"));
+            result = zIntent.getStringExtra(MinimaAPIMessages.key(prefix, "RESPONSE_RESULT"));
             if (uristr == null && (result == null || result.isEmpty())) return;
             if (uristr != null && (!"content".equals(Uri.parse(uristr).getScheme())
                     || Uri.parse(uristr).getAuthority() == null)) return;
@@ -217,13 +261,13 @@ public class MinimaAPI {
         }
     }
 
-    private void addResponseHandler(Intent zIntent, MinimaAPIListener zListener){
+    private String addResponseHandler(Intent zIntent, String zTarget, MinimaAPIListener zListener){
 
         //Create a random string
         String randomid = getRandomString();
 
         //Add this to the message
-        zIntent.putExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID, randomid);
+        zIntent.putExtra(MinimaAPIMessages.key(MinimaAPIMessages.prefixOf(zTarget), "RESPONSE_ID"), randomid);
 
         if(MinimaAPI.LOGGING_ENABLED){
             MinimaAPILogger.log("MinimaAPI - ADD respID:"+randomid);
@@ -231,23 +275,27 @@ public class MinimaAPI {
 
         //Add to the table..
         mResponseHandlers.put(randomid, zListener);
+        return randomid;
     }
 
-    private Intent getBaseIntent(String zType){
+    /** An intent for zName (REGISTER, CMD, FILE..) in the dialect of the target core. */
+    private Intent getBaseIntent(String zName, String zTarget){
+        String prefix = MinimaAPIMessages.prefixOf(zTarget);
+
         //Create Intent
-        Intent intent = new Intent(zType);
+        Intent intent = new Intent(MinimaAPIMessages.key(prefix, zName));
 
         //ALWAYS say who you are..
-        intent.putExtra(MinimaAPIMessages.MINIMA_API_PACKAGE_CLASS, mPackage);
+        intent.putExtra(MinimaAPIMessages.key(prefix, "PACKAGE_CLASS"), mPackage);
 
         //Add the PRIVATE app uid
-        intent.putExtra(MinimaAPIMessages.MINIMA_API_APP_UID, MY_APP_ID);
+        intent.putExtra(MinimaAPIMessages.key(prefix, "APP_UID"), MY_APP_ID);
 
         //Add the PRIVATE Minima uid
-        intent.putExtra(MinimaAPIMessages.MINIMA_API_REGISTER_MINIMAID, MINIMA_ID);
+        intent.putExtra(MinimaAPIMessages.key(prefix, "REGISTER_MINIMAID"), MINIMA_ID);
 
-        //Set to send ONLY to the Minima Core APK
-        intent.setPackage(nodePackage == null ? MinimaAPIMessages.MINIMA_BASE_CLASS : nodePackage);
+        //Set to send ONLY to that Minima Core APK
+        intent.setPackage(zTarget);
 
         return intent;
     }
@@ -257,15 +305,14 @@ public class MinimaAPI {
         registrations.clear();
         final int generation = ++discoveryGeneration;
         final java.util.List<String> requestIds = new java.util.ArrayList<>();
-        for (String target : new String[]{MinimaAPIMessages.MINIMA_BASE_CLASS, BLOCK_PACKAGE, PANDAMONIUM_PACKAGE}) {
-            Intent intent = getBaseIntent(MinimaAPIMessages.MINIMA_API_REGISTER);
-            intent.setPackage(target);
-            addResponseHandler(intent, reply -> main.post(() -> {
+        for (String[] node : MinimaAPIMessages.NODES) {
+            final String target = node[0];
+            Intent intent = getBaseIntent("REGISTER", target);
+            requestIds.add(addResponseHandler(intent, target, reply -> main.post(() -> {
                 if (destroyed || !discovering || generation != discoveryGeneration
                         || !reply.optBoolean("status", false)) return;
                 registrations.put(target, reply);
-            }));
-            requestIds.add(intent.getStringExtra(MinimaAPIMessages.MINIMA_API_RESPONSE_ID));
+            })));
             mContext.sendBroadcast(intent);
         }
         main.postDelayed(() -> {
@@ -285,7 +332,7 @@ public class MinimaAPI {
     private JSONObject routingFailure() {
         return failure(ambiguous
                 ? "Multiple Minima Core builds are running. Keep one running and reopen this companion. No command was sent."
-                : "No Minima node replied. Start Minima Core (PandaBear, BlackBear or Pandamonium) and try again. No command was sent.");
+                : "No Minima node replied. Start Minima Core (PandaBear, BlackBear, Pandamonium or the official Minima Core) and try again. No command was sent.");
     }
 
     private void withNode(Runnable request, MinimaAPIListener listener) {
@@ -305,17 +352,19 @@ public class MinimaAPI {
     private void sendCommand(String zCommand, MinimaAPIListener zListener){
         if (destroyed) return;
 
+        String prefix = MinimaAPIMessages.prefixOf(nodePackage);
+
         //Create the register Intent
-        Intent intent = getBaseIntent(MinimaAPIMessages.MINIMA_API_CMD);
+        Intent intent = getBaseIntent("CMD", nodePackage);
 
         //What you expect from Minima responses
-        intent.putExtra(MinimaAPIMessages.MINIMA_API_CMD_ACTION, zCommand);
+        intent.putExtra(MinimaAPIMessages.key(prefix, "CMD_ACTION"), zCommand);
 
         //We can consume oversized results as a content:// file (old nodes ignore this)
-        intent.putExtra(MinimaAPIMessages.MINIMA_API_CMD_FILERESP, true);
+        intent.putExtra(MinimaAPIMessages.key(prefix, "CMD_FILERESP"), true);
 
         //Create the Reponse UID
-        addResponseHandler(intent, zListener);
+        addResponseHandler(intent, nodePackage, zListener);
 
         //And broadcast
         mContext.sendBroadcast(intent);
@@ -336,17 +385,19 @@ public class MinimaAPI {
     private void sendFileCommand(String zAction, String zPath, String zNewPath, Uri zUri, MinimaAPIListener zListener){
         if (destroyed) return;
 
-        Intent intent = getBaseIntent(MinimaAPIMessages.MINIMA_API_FILE);
+        String prefix = MinimaAPIMessages.prefixOf(nodePackage);
 
-        intent.putExtra(MinimaAPIMessages.MINIMA_API_FILE_ACTION, zAction);
-        intent.putExtra(MinimaAPIMessages.MINIMA_API_FILE_PATH, zPath);
+        Intent intent = getBaseIntent("FILE", nodePackage);
+
+        intent.putExtra(MinimaAPIMessages.key(prefix, "FILE_ACTION"), zAction);
+        intent.putExtra(MinimaAPIMessages.key(prefix, "FILE_PATH"), zPath);
 
         if(zNewPath != null){
-            intent.putExtra(MinimaAPIMessages.MINIMA_API_FILE_NEWPATH, zNewPath);
+            intent.putExtra(MinimaAPIMessages.key(prefix, "FILE_NEWPATH"), zNewPath);
         }
 
         if(zUri != null){
-            intent.putExtra(MinimaAPIMessages.MINIMA_API_FILE_URI, zUri.toString());
+            intent.putExtra(MinimaAPIMessages.key(prefix, "FILE_URI"), zUri.toString());
 
             //Belt and braces - the caller should ALSO grantUriPermission to the node package,
             //but a ClipData grant travels with the Intent on newer Android
@@ -355,10 +406,20 @@ public class MinimaAPI {
         }
 
         //Oversized results (huge directory listings) may come back as a content:// file
-        intent.putExtra(MinimaAPIMessages.MINIMA_API_CMD_FILERESP, true);
+        intent.putExtra(MinimaAPIMessages.key(prefix, "CMD_FILERESP"), true);
 
-        addResponseHandler(intent, zListener);
+        final String responseid = addResponseHandler(intent, nodePackage, zListener);
 
         mContext.sendBroadcast(intent);
+
+        //The bears always answer FILE. Another core may not have the bridge (yet) - never hang the caller.
+        if (!MinimaAPIMessages.MINIMA_BASE_CLASS.equals(prefix)) {
+            main.postDelayed(() -> {
+                MinimaAPIListener waiting = mResponseHandlers.remove(responseid);
+                if (waiting != null && !destroyed) {
+                    waiting.response(failure("This Minima Core did not answer the file request - it may not support file access."));
+                }
+            }, FILE_REPLY_TIMEOUT_MS);
+        }
     }
 }
