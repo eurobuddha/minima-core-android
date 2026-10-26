@@ -8487,6 +8487,7 @@
     <string name="l10n_battery_dht_relay" formatted="false">"DHT 中继"</string>
     <string name="l10n_battery_dht_always" formatted="false">"始终开启 — 此手机始终帮助路由 keets 网络（推荐）"</string>
     <string name="l10n_battery_dht_plugged" formatted="false">"充电时开启 — 充电时为网络路由；使用电池时只为自身连接"</string>
+    <string name="l10n_battery_dht_wifi" formatted="false">"Wi-Fi 或充电时开启 — 连接 Wi-Fi 或充电时为网络路由；使用移动数据时只为自身连接"</string>
     <string name="l10n_apps_hide" formatted="false">"隐藏"</string>
     <string name="l10n_apps_freeze" formatted="false">"冻结"</string>
     <string name="l10n_apps_frozen" formatted="false">"深度冻结"</string>

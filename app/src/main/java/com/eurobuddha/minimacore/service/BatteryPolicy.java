@@ -22,7 +22,7 @@ public final class BatteryPolicy {
     public interface Listener { void onBatteryPolicyChanged(); }
 
     /** The keets DHT's routing duty. There is deliberately no "off": phones support the network. */
-    public enum DhtRelay { ALWAYS, PLUGGED }
+    public enum DhtRelay { ALWAYS, WIFI_OR_PLUGGED, PLUGGED }
 
     static final String PREFS = "main_prefs";
     static final String KEY_PROFILE = "battery_profile";
@@ -34,6 +34,7 @@ public final class BatteryPolicy {
     private static volatile DhtRelay sDhtRelay = DhtRelay.ALWAYS;
     private static volatile boolean sScreenOn = true;
     private static volatile boolean sPlugged = false;
+    private static volatile boolean sWifi = true;
     private static volatile boolean sAppVisible = false;
     private static volatile long sScreenOffSince = 0;
     private static final CopyOnWriteArrayList<Listener> LISTENERS = new CopyOnWriteArrayList<>();
@@ -58,11 +59,17 @@ public final class BatteryPolicy {
 
     public static DhtRelay dhtRelay() { return sDhtRelay; }
 
-    /** The sidecar's --dht-mode right now: "routing" unless the owner chose relay-when-plugged and we are on battery. */
-    public static String dhtMode() { return dhtMode(sDhtRelay, sPlugged); }
+    /** The sidecar's --dht-mode right now: "routing" unless the chosen relay condition is not met. */
+    public static String dhtMode() { return dhtMode(sDhtRelay, sPlugged, sWifi); }
 
-    static String dhtMode(DhtRelay zRelay, boolean zPlugged) {
-        return zRelay == DhtRelay.PLUGGED && !zPlugged ? "client" : "routing";
+    /** zWifi = the default network is Wi-Fi or Ethernet (not mobile data, where DHT traffic keeps the
+     *  cellular radio at full power: 186 mAh in 2 h on the Fold, 2026-10-26). */
+    static String dhtMode(DhtRelay zRelay, boolean zPlugged, boolean zWifi) {
+        switch (zRelay) {
+            case PLUGGED: return zPlugged ? "routing" : "client";
+            case WIFI_OR_PLUGGED: return zPlugged || zWifi ? "routing" : "client";
+            default: return "routing";
+        }
     }
 
     /** Whether the node's CPU wakelock should be held right now. Released only when nothing needs the
@@ -128,6 +135,12 @@ public final class BatteryPolicy {
     public static void setPlugged(boolean zPlugged) {
         if (zPlugged == sPlugged) return;
         sPlugged = zPlugged;
+        fire();
+    }
+
+    public static void setWifi(boolean zWifi) {
+        if (zWifi == sWifi) return;
+        sWifi = zWifi;
         fire();
     }
 

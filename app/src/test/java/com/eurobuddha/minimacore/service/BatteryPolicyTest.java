@@ -30,11 +30,14 @@ public class BatteryPolicyTest {
         assertEquals(0, BatteryPolicy.screenOffMillis());
     }
 
-    @Test public void dhtRoutesUnlessRelayWhenPluggedIsOnBattery() {
-        assertEquals("routing", BatteryPolicy.dhtMode(BatteryPolicy.DhtRelay.ALWAYS, false));
-        assertEquals("routing", BatteryPolicy.dhtMode(BatteryPolicy.DhtRelay.ALWAYS, true));
-        assertEquals("routing", BatteryPolicy.dhtMode(BatteryPolicy.DhtRelay.PLUGGED, true));
-        assertEquals("client", BatteryPolicy.dhtMode(BatteryPolicy.DhtRelay.PLUGGED, false));
+    @Test public void dhtRoutesOnlyWhenTheChosenRelayConditionHolds() {
+        BatteryPolicy.DhtRelay A = BatteryPolicy.DhtRelay.ALWAYS, P = BatteryPolicy.DhtRelay.PLUGGED,
+                W = BatteryPolicy.DhtRelay.WIFI_OR_PLUGGED;
+        for (boolean plugged : new boolean[]{false, true}) for (boolean wifi : new boolean[]{false, true}) {
+            assertEquals("routing", BatteryPolicy.dhtMode(A, plugged, wifi));
+            assertEquals(plugged ? "routing" : "client", BatteryPolicy.dhtMode(P, plugged, wifi));
+            assertEquals(plugged || wifi ? "routing" : "client", BatteryPolicy.dhtMode(W, plugged, wifi));
+        }
     }
 
     @Test public void nodeSleepsOnlyWhenScreenOffNotInstantAndDhtNotRelaying() {

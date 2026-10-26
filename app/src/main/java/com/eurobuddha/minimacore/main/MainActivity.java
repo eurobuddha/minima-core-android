@@ -418,10 +418,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         android.widget.RadioButton dhtPlugged = new android.widget.RadioButton(this);
         dhtPlugged.setId(android.view.View.generateViewId());
         dhtPlugged.setText(Language.text(this, l10n_battery_dht_plugged));
+        android.widget.RadioButton dhtWifi = new android.widget.RadioButton(this);
+        dhtWifi.setId(android.view.View.generateViewId());
+        dhtWifi.setText(Language.text(this, l10n_battery_dht_wifi));
         dhtGroup.addView(dhtAlways);
+        dhtGroup.addView(dhtWifi);
         dhtGroup.addView(dhtPlugged);
-        (com.eurobuddha.minimacore.service.BatteryPolicy.dhtRelay()
-                == com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay.PLUGGED ? dhtPlugged : dhtAlways).setChecked(true);
+        com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay relayNow = com.eurobuddha.minimacore.service.BatteryPolicy.dhtRelay();
+        (relayNow == com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay.PLUGGED ? dhtPlugged
+                : relayNow == com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay.WIFI_OR_PLUGGED ? dhtWifi : dhtAlways).setChecked(true);
         box.addView(dhtGroup);
         android.widget.CheckBox charger = new android.widget.CheckBox(this);
         charger.setText(Language.text(this, l10n_battery_full_on_charger));
@@ -442,6 +447,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     com.eurobuddha.minimacore.service.BatteryPolicy.setFullOnCharger(this, charger.isChecked());
                     com.eurobuddha.minimacore.service.BatteryPolicy.setDhtRelay(this, dhtPlugged.isChecked()
                             ? com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay.PLUGGED
+                            : dhtWifi.isChecked() ? com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay.WIFI_OR_PLUGGED
                             : com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay.ALWAYS);
                 });
         if ("samsung".equalsIgnoreCase(android.os.Build.MANUFACTURER)) {

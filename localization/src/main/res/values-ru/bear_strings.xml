@@ -8598,6 +8598,7 @@
     <string name="l10n_battery_dht_relay" formatted="false">"Ретранслятор DHT"</string>
     <string name="l10n_battery_dht_always" formatted="false">"Всегда включён — этот телефон всегда помогает маршрутизировать сеть keets (рекомендуется)"</string>
     <string name="l10n_battery_dht_plugged" formatted="false">"При зарядке — маршрутизирует для сети во время зарядки; от батареи подключается только для себя"</string>
+    <string name="l10n_battery_dht_wifi" formatted="false">"По Wi-Fi или при зарядке — маршрутизирует для сети по Wi-Fi или во время зарядки; по мобильной сети подключается только для себя"</string>
     <string name="l10n_apps_hide" formatted="false">"Скрыть"</string>
     <string name="l10n_apps_freeze" formatted="false">"Заморозить"</string>
     <string name="l10n_apps_frozen" formatted="false">"Глубоко заморожено"</string>

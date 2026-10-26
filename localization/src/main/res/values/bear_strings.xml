@@ -8524,6 +8524,7 @@
     <string name="l10n_battery_dht_relay" formatted="false">"DHT relay"</string>
     <string name="l10n_battery_dht_always" formatted="false">"Always on — this phone helps route the keets network at all times (recommended)"</string>
     <string name="l10n_battery_dht_plugged" formatted="false">"On when plugged in — routes for the network while charging; on battery it only connects for itself"</string>
+    <string name="l10n_battery_dht_wifi" formatted="false">"On Wi-Fi or when plugged in — routes for the network on Wi-Fi or while charging; on mobile data it only connects for itself"</string>
     <string name="l10n_apps_hide" formatted="false">"Hide"</string>
     <string name="l10n_apps_freeze" formatted="false">"Freeze"</string>
     <string name="l10n_apps_frozen" formatted="false">"Deep frozen"</string>

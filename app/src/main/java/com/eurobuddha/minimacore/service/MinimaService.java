@@ -90,6 +90,7 @@ public class MinimaService extends Service {
 
     //The Battery receiver
     BroadcastReceiver mBatteryReceiver;
+    android.net.ConnectivityManager.NetworkCallback mNetCallback;
     BroadcastReceiver mScreenReceiver;
 
     //Minima Main Starter
@@ -669,6 +670,10 @@ public class MinimaService extends Service {
         if(mBatteryReceiver != null){
             unregisterReceiver(mBatteryReceiver);
         }
+        if(mNetCallback != null){
+            try { getSystemService(android.net.ConnectivityManager.class).unregisterNetworkCallback(mNetCallback); }
+            catch (Exception ignored) { }
+        }
 
         logger.log("Minima Service onDestroy finish");
         if(mServiceListener != null){
@@ -746,6 +751,18 @@ public class MinimaService extends Service {
         IntentFilter screen = new IntentFilter(Intent.ACTION_SCREEN_ON);
         screen.addAction(Intent.ACTION_SCREEN_OFF);
         registerReceiver(mScreenReceiver, screen);
+
+        //Wi-Fi vs mobile data drives the "DHT relay on Wi-Fi or when plugged in" choice.
+        android.net.ConnectivityManager cm = getSystemService(android.net.ConnectivityManager.class);
+        mNetCallback = new android.net.ConnectivityManager.NetworkCallback() {
+            @Override public void onCapabilitiesChanged(android.net.Network n, android.net.NetworkCapabilities c) {
+                BatteryPolicy.setWifi(c.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI)
+                        || c.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET));
+            }
+            @Override public void onLost(android.net.Network n) { BatteryPolicy.setWifi(false); }
+        };
+        try { cm.registerDefaultNetworkCallback(mNetCallback); }
+        catch (Exception exc) { MinimaLogger.log("ERROR adding network listener : " + exc); mNetCallback = null; }
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
