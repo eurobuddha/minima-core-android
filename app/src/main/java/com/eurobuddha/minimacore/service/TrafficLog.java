@@ -59,7 +59,8 @@ public final class TrafficLog {
                 org.json.JSONObject dht = new org.json.JSONObject(body).optJSONObject("dht");
                 if (dht == null) return "n/a";
                 return "mode=" + dht.optString("mode") + " routing=" + dht.optBoolean("routing")
-                        + " traffic=" + dht.optJSONObject("traffic");
+                        + " traffic=" + dht.optJSONObject("traffic")
+                        + " diag=" + dht.optJSONObject("diag");
             }
         } catch (Exception e) {
             return "unavailable (" + e.getClass().getSimpleName() + ")";
