@@ -159,6 +159,7 @@ public class ChatDrainer {
     }
 
     public static synchronized void stop() {
+        ChatFileDelivery.close();
         mStop = true;
         com.eurobuddha.minimacore.service.BatteryPolicy.removeListener(POLICY);
         if (mThread != null) { mThread.interrupt(); mThread = null; }
@@ -166,6 +167,7 @@ public class ChatDrainer {
 
     private static void runLoop(MinimaService zService) {
         ChatDb db = ChatDb.get(zService);
+        ChatFileDelivery.get(zService);
         while (!mStop) {
             if (!waitNextPoll()) break;
             if (!MinimaCMD.checkMinimaStarted()) continue;
@@ -192,6 +194,13 @@ public class ChatDrainer {
                     catch (Exception e) { raw = "" + msg.get("message"); }
                     ChatSchema.Decoded d = ChatSchema.decode(raw);
 
+                    // File controls retain transport-authenticated sender and fan out to Parlons.
+                    if (d.state.equals("file-control")) {
+                        ChatFileDelivery.get(zService).inbound(from,d.body);
+                        fanout(zService,msg,d,from);
+                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
+                        continue;
+                    }
                     //Control messages: consumed, never stored or notified
                     if (d.state.equals("read")) {
                         //prefer the referenced message's own timestamp (peer clocks drift)

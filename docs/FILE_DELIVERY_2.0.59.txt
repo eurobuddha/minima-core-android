@@ -1,0 +1,33 @@
+KeetChat verified file delivery — 2.0.59 (code 255), 2026-10-26
+
+Shared receipt controller from maxima/core FileDelivery; vendored chat codecs
+are synchronized with the existing Parlons large-file interoperability code.
+The app-lifetime manager routes authenticated file-control messages silently
+and retains companion fanout. Completion is recorded after full verification;
+receipts retry until acknowledged. Sender and receiver stop serving when their
+completion handshake allows it; Keep sharing and Share again remain available.
+An open sheet obtains the current receipt manager after a node restart.
+
+Keets 1.2.12 is pinned to 204df9d94cf4f423dacf699d41a83c3493aa99c7.
+Only the bundle hash changed; all native/runtime hashes stayed unchanged.
+Private transfers use separate stores so stop closes actual serving. Paused
+files remain paused across restarts. Explicit removal clears the stopped cache
+and frees a slot within the existing 128-transfer bound. Legacy shared-drive
+files must be sent again to gain independent serving controls.
+
+Validation: 4 existing ChatFiles tests passed; Classic/PandaBear, Block/BlackBear
+and Pandamonium release APKs built offline and passed the exact bundled-code,
+21 required addons per ABI, runtime and APK signature checks. Isolated offline
+preparation reproduced every pinned hash; artifact tests 19/19, preparation tests
+9/9. The Node and Bare private-DHT fixture passed stop/restart/re-share/cache
+removal checks. Real 100 MiB interop passed both directions with interruption,
+resume and matching SHA-256. See maxima/docs/FILE-DELIVERY-2026-10-26.txt for
+shared receipt tests and the Parlons payment selection fix.
+
+Code Review
+Summary: Reuses authenticated chat and bounded media access; file bytes remain
+P2P. Review fixes covered real transport reopening, controller lifetime, bounded
+cache removal and Bare promise handling. No unresolved blocking findings.
+Verdict: Approve for device testing. No production wallet, device, node or store
+was changed by these builds. Completion status is shown in the transfer sheet;
+this change does not add operating-system completion notifications.

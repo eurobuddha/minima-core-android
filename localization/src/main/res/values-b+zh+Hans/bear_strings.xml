@@ -8492,4 +8492,10 @@
     <string name="l10n_apps_frozen" formatted="false">"深度冻结"</string>
     <!-- Arguments: name -->
     <string name="l10n_apps_freeze_refused">"%1$s 仍在监控进行中的资金（兑换、订单、资金池、投注、守护或铸造）。结算后即可冻结。"</string>
+    <string name="l10n_files_keep_sharing" formatted="false">"继续分享"</string>
+    <string name="l10n_files_share_again" formatted="false">"重新分享"</string>
+    <string name="l10n_files_downloaded_stopped" formatted="false">"已下载并验证 · 已停止分享"</string>
+    <string name="l10n_files_downloaded_sharing" formatted="false">"已下载并验证 · 正在分享"</string>
+    <string name="l10n_files_confirmation_unavailable" formatted="false">"暂无下载确认"</string>
+    <string name="l10n_files_awaiting_download" formatted="false">"等待下载验证"</string>
 </resources>

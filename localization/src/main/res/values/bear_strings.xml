@@ -8529,4 +8529,10 @@
     <string name="l10n_apps_frozen" formatted="false">"Deep frozen"</string>
     <!-- Arguments: name -->
     <string name="l10n_apps_freeze_refused">"%1$s is still watching funds in flight (a swap, order, pool, bet, guardian or mint). It can be frozen once they settle."</string>
+    <string name="l10n_files_keep_sharing" formatted="false">"Keep sharing"</string>
+    <string name="l10n_files_share_again" formatted="false">"Share again"</string>
+    <string name="l10n_files_downloaded_stopped" formatted="false">"Downloaded and verified · sharing stopped"</string>
+    <string name="l10n_files_downloaded_sharing" formatted="false">"Downloaded and verified · sharing"</string>
+    <string name="l10n_files_confirmation_unavailable" formatted="false">"Download confirmation unavailable"</string>
+    <string name="l10n_files_awaiting_download" formatted="false">"Waiting for verified download"</string>
 </resources>

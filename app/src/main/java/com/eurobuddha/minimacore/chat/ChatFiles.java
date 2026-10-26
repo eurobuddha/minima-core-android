@@ -30,6 +30,7 @@ final class ChatFiles implements AutoCloseable {
     private final Runnable refresh;
     private final Path root;
     private final ChatKeetsTransport transport;
+    private ChatFileDelivery delivery(){return ChatFileDelivery.get(activity);}
     private final ExecutorService jobs=Executors.newSingleThreadExecutor();
     private final ExecutorService catalog=Executors.newSingleThreadExecutor();
     private final Set<AlertDialog> dialogs=new HashSet<>();
@@ -47,7 +48,7 @@ final class ChatFiles implements AutoCloseable {
         final AtomicBoolean paused=new AtomicBoolean(true);
         Transfer(ChatFile f,Path d,String p,boolean m){file=f;dir=d;peer=p;mine=m;msgid="kf-"+f.id;ts=System.currentTimeMillis();}
     }
-    ChatFiles(Activity a,String p,Runnable r){activity=a;peer=p;refresh=r;root=a.getFilesDir().toPath().resolve("chat-files");transport=new ChatKeetsTransport(a);}
+    ChatFiles(Activity a,String p,Runnable r){activity=a;peer=p;refresh=r;root=a.getFilesDir().toPath().resolve("chat-files");transport=new ChatKeetsTransport(a);ChatFileDelivery.get(a);}
     private String text(int id){return Language.text(activity,id);}
     void pick(){activity.startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("*/*").addCategory(Intent.CATEGORY_OPENABLE),PICK);}
     boolean result(int request,int result,Intent data){
@@ -127,18 +128,26 @@ final class ChatFiles implements AutoCloseable {
         TextView info=new TextView(activity);box.addView(info);
         ProgressBar progress=new ProgressBar(activity,null,android.R.attr.progressBarStyleHorizontal);progress.setMax(100);box.addView(progress);
         Button action=new Button(activity);box.addView(action);Button save=new Button(activity);Language.setText(save,Language.msg(R.string.chat_files_save));box.addView(save);
+        CheckBox keep=new CheckBox(activity);Language.setText(keep,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_files_keep_sharing));keep.setVisibility(t.mine?android.view.View.VISIBLE:android.view.View.GONE);box.addView(keep);
+        keep.setChecked("true".equals(delivery().status(t.file.id).get("keepSharing")));
+        keep.setOnClickListener(v->{boolean selected=keep.isChecked();jobs.execute(()->{try{delivery().keep(t.file.id,selected);if(selected)transport.sharing(t.file,true);}catch(Exception e){error(e);}});});
+        Button again=new Button(activity);Language.setText(again,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_files_share_again));again.setVisibility(t.mine?android.view.View.VISIBLE:android.view.View.GONE);box.addView(again);
+        again.setOnClickListener(v->jobs.execute(()->{try{delivery().keep(t.file.id,true);transport.sharing(t.file,true);post(()->keep.setChecked(true));}catch(Exception e){error(e);}}));
         Button remove=new Button(activity);Language.setText(remove,Language.msg(R.string.chat_files_remove));box.addView(remove);
         AlertDialog dialog=track(new LanguageDialog(activity).setTitle(t.file.name).setView(box).setNegativeButton(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_language_close),null).show());
         android.os.Handler handler=new android.os.Handler(android.os.Looper.getMainLooper());Runnable[] tick=new Runnable[1];
         tick[0]=()->{if(closed||!dialog.isShowing())return;boolean done=ready(t);
             info.setText((t.error.isEmpty()?text(done?R.string.chat_files_ready:t.running?R.string.chat_files_working:R.string.chat_files_help):t.error)+"\n"+String.format(java.util.Locale.ROOT,"%.1f / %.1f MB",t.done/1048576.0,t.file.size/1048576.0));
+            Map<String,String> receipt=delivery().status(t.file.id);
+            if(t.mine&&receipt.containsKey("delivery"))info.append("\n"+deliveryText(receipt.get("delivery"))+(receipt.containsKey("deliveryError")?"\n"+receipt.get("deliveryError"):""));
+            again.setEnabled("true".equals(receipt.get("sharingStopped")));
             progress.setProgress((int)(100*t.done/Math.max(1,t.file.size)));save.setEnabled(done);remove.setEnabled(!t.running);
             Language.setText(action,Language.msg(t.running?R.string.chat_files_pause:t.mine?R.string.chat_files_send:R.string.chat_files_download));action.setEnabled(!(done&&(!t.mine||t.sent)));
             handler.postDelayed(tick[0],400);
         };tick[0].run();
         action.setOnClickListener(v->{if(t.running)t.paused.set(true);else run(t);});
         save.setOnClickListener(v->{saving=t;activity.startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT).setType(t.file.mime).addCategory(Intent.CATEGORY_OPENABLE).putExtra(Intent.EXTRA_TITLE,t.file.name),SAVE);});
-        remove.setOnClickListener(v->{if(!t.running){jobs.execute(()->{synchronized(disk(t)){erase(t.dir);active.remove(t);}});dialog.dismiss();}});
+        remove.setOnClickListener(v->{if(!t.running){jobs.execute(()->{synchronized(disk(t)){try{if(t.file.isKeets())transport.forget(t.file);delivery().forget(t.file.id);erase(t.dir);active.remove(t);}catch(Exception e){error(e);}}});dialog.dismiss();}});
     }
     private synchronized void continuePrepared(Transfer t){
         t.running=false;
@@ -164,6 +173,7 @@ final class ChatFiles implements AutoCloseable {
                 java.util.function.BooleanSupplier cancelled=()->closed||t.paused.get();
                 if(t.mine){
                     if(!t.file.isKeets()){t.done=0;t.file=KeetsFiles.publish(transport,t.dir.resolve("payload.bin"),t.file,cancelled,n->t.done=n);write(t);}
+                    delivery().register(t.file,t.dir,t.mine,t.peer);
                     if(!ready(t))FileCrypto.decrypt(t.dir.resolve("payload.bin"),t.dir.resolve("verified.bin"),t.file,cancelled);
                     if(cancelled.getAsBoolean())throw new InterruptedIOException(text(R.string.chat_files_paused));
                     if(!t.sent){
@@ -174,12 +184,26 @@ final class ChatFiles implements AutoCloseable {
                         try{transport.send(t.peer,wire.toString());ChatDb.get(activity).setVia(t.msgid,transport.via);t.sent=true;write(t);}
                         catch(Exception e){ChatDb.get(activity).setVia(t.msgid,"FAILED");throw e;}
                     }
-                }else if(!ready(t))KeetsFiles.download(transport,t.file,t.dir,cancelled,n->t.done=n);
+                }else {
+                    delivery().register(t.file,t.dir,t.mine,t.peer);
+                    if(!ready(t))KeetsFiles.download(transport,t.file,t.dir,cancelled,n->t.done=n);
+                    delivery().verified(t.file.id);
+                }
                 t.done=t.file.size;
             }catch(Exception e){t.error=e.getMessage()==null?text(R.string.chat_files_failed):e.getMessage();}
             finally{t.running=false;t.paused.set(true);active.remove(t);post(refresh);}
             }
         });
+    }
+    private String deliveryText(String state){
+        int id;
+        switch(state){
+            case "Downloaded and verified · sharing stopped":id=com.eurobuddha.minimacore.i18n.R.string.l10n_files_downloaded_stopped;break;
+            case "Downloaded and verified · sharing":id=com.eurobuddha.minimacore.i18n.R.string.l10n_files_downloaded_sharing;break;
+            case "Waiting for verified download":id=com.eurobuddha.minimacore.i18n.R.string.l10n_files_awaiting_download;break;
+            default:id=com.eurobuddha.minimacore.i18n.R.string.l10n_files_confirmation_unavailable;
+        }
+        return Language.text(activity,id);
     }
     private void export(Uri uri,Transfer t){jobs.execute(()->{
         try(Awake awake=new Awake(activity)){

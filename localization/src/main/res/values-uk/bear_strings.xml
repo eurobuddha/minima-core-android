@@ -8603,4 +8603,10 @@
     <string name="l10n_apps_frozen" formatted="false">"Глибоко заморожено"</string>
     <!-- Arguments: name -->
     <string name="l10n_apps_freeze_refused">"%1$s досі стежить за незавершеними коштами (обмін, ордер, пул, ставка, страж або мінт). Заморозити можна після їх завершення."</string>
+    <string name="l10n_files_keep_sharing" formatted="false">"Продовжувати роздачу"</string>
+    <string name="l10n_files_share_again" formatted="false">"Роздавати знову"</string>
+    <string name="l10n_files_downloaded_stopped" formatted="false">"Завантажено й перевірено · роздачу зупинено"</string>
+    <string name="l10n_files_downloaded_sharing" formatted="false">"Завантажено й перевірено · роздається"</string>
+    <string name="l10n_files_confirmation_unavailable" formatted="false">"Підтвердження завантаження недоступне"</string>
+    <string name="l10n_files_awaiting_download" formatted="false">"Очікування перевіреного завантаження"</string>
 </resources>

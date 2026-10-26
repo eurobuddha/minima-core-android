@@ -729,6 +729,8 @@ public final class ChatEngine {
         mKeets = zKeets;
     }
 
+    public KeetsTransport keetsTransport() { return mKeets; }
+
     /**
      * Whether an inbound keets message from an unknown pubkey creates the
      * contact. True (default) where Parlons is the host's only chat UI
@@ -1032,6 +1034,19 @@ public final class ChatEngine {
             return c.minimaAddress;
         }
         return "";
+    }
+
+    public interface FileControls { void inbound(String peer,String control)throws Exception; }
+    private volatile FileControls fileControls;
+    public void setFileControls(FileControls listener){fileControls=listener;}
+    public boolean sendFileControl(String peer,String control){
+        Contact c=mNode.contact(peer);if(c==null||control.length()>1024)return false;
+        ChatMessage m=new ChatMessage();m.type=ChatMessage.TYPE_FILE_CONTROL;m.body=control;
+        return deliver(c,m);
+    }
+    private void fileControl(String peer,String body){
+        FileControls f=fileControls;
+        if(f!=null&&mNode.contact(peer)!=null&&body.length()<=1024)try{f.inbound(peer,body);}catch(Exception ignored){}
     }
 
     /** Tell a contact our wallet receive address so they can pay us. Silent -
@@ -1346,6 +1361,8 @@ public final class ChatEngine {
         }
 
         switch (cm.type) {
+            case ChatMessage.TYPE_FILE_CONTROL:
+                fileControl(from, cm.body);return true;
             case ChatMessage.TYPE_CALL:
                 // Signaling only: no history entry, no receipt, no notification.
                 CallSignals cs = mCallSignals;
@@ -1394,6 +1411,10 @@ public final class ChatEngine {
                     || zMsg.type == ChatMessage.TYPE_CALL) {
                 return true;
             }
+            if (zMsg.type == ChatMessage.TYPE_TEXT && ChatFile.isFile(zMsg.body)) {
+                // Never turn an unsupported/private file into a successful caption-only photo.
+                return kt.send(pk, KeetsWire.encode(zMsg, mNode.name()));
+            }
             if (zMsg.type == ChatMessage.TYPE_TEXT && ChatMedia.isMedia(zMsg.body)) {
                 byte[] bytes = mediaBytes(zMsg.body);
                 String caption = ChatMedia.caption(zMsg.body);
@@ -1414,17 +1435,10 @@ public final class ChatEngine {
                         String url = kt.publish("/parlons/img-" + id + ext, bytes);
                         return kt.send(pk, KeetsWire.image(zMsg.id, mNode.name(), zMsg.time, url, caption));
                     } catch (Exception publishFailed) {
-                        // e.g. media too large for an IPC transport - fall
-                        // through to the caption, like the classic bridge
+                        return false; // retain the attachment for retry; never report a caption as delivery
                     }
                 }
-                String kind = isAudio ? "[voice note]" : "[photo]";
-                // an audio caption is "M:SS|waveformhex" - the peer should see
-                // the duration, never the raw waveform hex
-                String shown = isAudio ? caption.split("\\|")[0] : caption;
-                ChatMessage fb = ChatMessage.text(zMsg.id,
-                        shown.isEmpty() ? kind : shown + " " + kind, zMsg.time);
-                return kt.send(pk, KeetsWire.encode(fb, mNode.name()));
+                return false;
             }
             String wire = KeetsWire.encode(zMsg, mNode.name());
             if (wire == null) {
@@ -1502,6 +1516,8 @@ public final class ChatEngine {
             return true;   // unknown state: consumed, never stored
         }
         switch (cm.type) {
+            case ChatMessage.TYPE_FILE_CONTROL:
+                fileControl(from, cm.body);return true;
             case ChatMessage.TYPE_TEXT:
                 mNode.storeKeetsContact(from, k.name);
                 handleText(from, cm);

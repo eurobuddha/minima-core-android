@@ -33,6 +33,17 @@ final class ChatKeetsTransport implements KeetsTransport {
         }finally{tmp.delete();}
     }
     public byte[] fetch(String url)throws Exception{return fetch(url,8*1024*1024);}
+    public void forget(com.eurobuddha.maxima.core.chat.ChatFile file)throws Exception {sharing(file,false);media.forget(file);}
+    public void sharing(com.eurobuddha.maxima.core.chat.ChatFile file,boolean enabled)throws Exception {
+        try {
+            if(media==null){
+                JSONObject info=result("keets action:info");
+                if(!Boolean.TRUE.equals(info.get("boundedMedia")))throw new IOException("Update your Keets node to receive files");
+                media=KeetsMediaClient.local(Integer.parseInt(String.valueOf(info.get("apiport"))),String.valueOf(result("status").get("data")));
+            }
+            media.sharing(file,enabled);
+        }catch(Exception e){media=null;throw e;}
+    }
     public byte[] fetch(String url,int max)throws Exception {
         try {
             if(media==null){
