@@ -312,6 +312,9 @@ public class MainActivity extends AppCompatActivity {
         minima = new MinimaHtlc(node);
         minima.setActiveToken(TradingContext.active().tokenId);   // publish/liquidity in the selected currency
         engine = new SwapEngine(node, minima, db, wallet, ui, notifier);
+        engine.setNoticeSink((to, h, st, why, market) -> {
+            if (crypto != null && identity != null) SwapTake.notice(node, crypto, to, identity.publicId(), h, st, why, market, SwapTake.QUIET);
+        });
         otcDb = new OtcDb(this);
         engine.setOtcDb(otcDb);
         otc = new OtcController(node, otcDb, engine, new OtcController.Ui() {
@@ -948,16 +951,18 @@ public class MainActivity extends AppCompatActivity {
             String to = j.optString("to", ""), from = j.optString("from", ""), hash = j.optString("hash", "");
             if (hash.isEmpty() || !identity.publicId().equals(to)) return false;       // not for me
             if (opened.fromPublicId == null || !opened.fromPublicId.equals(from)) return false;  // sender mismatch
-            return addIncoming(hash);
+            if (j.has("notice")) return engine != null && engine.onMakerNotice(hash, from, j.optString("notice"), j.optString("reason"));
+            return addIncoming(hash, from);
         } catch (Exception e) { return false; }
     }
 
     /** Record a buyer's hashlock (engine discovers their USDT lock via getContract) + persist for resume. */
-    private boolean addIncoming(String hash) {
+    private boolean addIncoming(String hash) { return addIncoming(hash, null); }
+    private boolean addIncoming(String hash, String from) {
         java.util.Set<String> set = incomingHashlocks();
         boolean isNew = set.add(hash);
         if (isNew) prefs.edit().putString("incoming_hashlocks", android.text.TextUtils.join(",", set)).apply();
-        if (engine != null) engine.addIncomingHashlock(hash);
+        if (engine != null) engine.addIncomingHashlock(hash, from);
         if (isNew) {   // make the handshake visible — the buyer wants to know it landed
             // Act NOW — don't wait for the next ~90s poll. Stand down only mid-SELL-sweep (same as watchTick),
             // since that path also selects mxUSDT coins and a concurrent responder lock could double-select.
@@ -1736,6 +1741,7 @@ public class MainActivity extends AppCompatActivity {
                         if (sweepRun == null) { orderStatus = "✓ Buy started, but the maker's contact key is missing — they may not see it."; render(); }
                         return;
                     }
+                    if (engine != null) engine.noteTakeSent(hash, maker.commsPublicId);
                     SwapTake.send(node, crypto, maker.commsPublicId, identity.publicId(), hash, maker.market(), new CommsTransport.SendCb() {
                         @Override public void onSent(String txpowid) { if (sweepRun == null) { orderStatus = "✓ Buy started — maker notified, watching."; render(); } }
                         @Override public void onFailed(String message) { if (sweepRun == null) { orderStatus = "Buy locked, but maker notify failed: " + message; render(); } }
@@ -3398,6 +3404,22 @@ public class MainActivity extends AppCompatActivity {
             c.addView(e);
         }
 
+        // 0.1.84: deadlines, the maker's own reason, the refund tx and a manual refund — never a black box again
+        if ("INITIATOR".equals(s.role) && db != null) {
+            SwapEngine.StatusView v = SwapEngine.statusView(s, db.getEvents(s.hash), System.currentTimeMillis() / 1000L,
+                    engine == null ? 0 : engine.lastMinimaBlock());
+            if (!v.notice.isEmpty()) c.addView(cardLine((v.noticeFinal ? "Maker declined: " : "Maker: ") + v.notice, v.noticeFinal ? Design.RED() : Design.TEXT(), false));
+            if (!v.deadline.isEmpty()) c.addView(cardLine(v.deadline, Design.DIM(), false));
+            if (!v.refundTx.isEmpty()) c.addView(cardLine("Refund tx " + v.refundTx, Design.DIM2(), true));
+            if (!v.refundLabel.isEmpty()) {
+                TextView rb = Design.pill(this, v.refundLabel, v.refundOpen ? Design.ACCENT() : Design.SURFACE2(), v.refundOpen ? Design.BG() : Design.DIM());
+                LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                rlp.topMargin = dp(8); rb.setLayoutParams(rlp);
+                rb.setOnClickListener(x -> { if (engine != null) engine.refundNow(s.hash, msg -> { toast(msg); render(); }); });
+                c.addView(rb);
+            }
+        }
+
         // a manual "Check now" that runs a live on-chain inspection AND advances the swap
         if (!SwapDb.ST_COMPLETE.equals(s.status) && !SwapDb.ST_REFUNDED.equals(s.status)) {
             TextView check = Design.pill(this, Language.msg(l10n_atomix_history_check), Design.SURFACE2(), Design.TEXT());
@@ -3409,10 +3431,18 @@ public class MainActivity extends AppCompatActivity {
         return c;
     }
 
+    private TextView cardLine(String text, int color, boolean selectable) {
+        TextView t = new TextView(this);
+        t.setText(text); t.setTextColor(color); t.setTextSize(12.5f); t.setTypeface(Design.sans());
+        t.setPadding(0, dp(4), 0, 0); t.setTextIsSelectable(selectable);
+        return t;
+    }
+
     /** First logged reject/error reason for a swap, or null. */
     private String swapErrorNote(String hash) {
         if (db == null) return null;
         for (SwapDb.Event e : db.getEvents(hash)) {
+            if (SwapDb.EV_MAKER_NOTICE.equals(e.event) || SwapDb.EV_TAKE_SENT.equals(e.event) || SwapDb.EV_REFUND_SENT.equals(e.event)) continue;   // shown on their own line
             String n = e.note == null ? "" : e.note.toLowerCase();
             if (n.contains("mismatch") || n.contains("invalid") || n.contains("incorrect")
                     || n.contains("too close") || n.contains("fail")) return e.note;

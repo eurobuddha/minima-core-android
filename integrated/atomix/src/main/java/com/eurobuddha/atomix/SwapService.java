@@ -128,6 +128,9 @@ public class SwapService extends Service {
         minima = new MinimaHtlc(node);
         minima.setActiveToken(TradingContext.active().tokenId);   // publish/liquidity in the selected currency
         engine = new SwapEngine(node, minima, db, wallet, h, notifier);
+        engine.setNoticeSink((to, hh, st, why, market) -> {
+            if (crypto != null && identity != null) SwapTake.notice(node, crypto, to, identity.publicId(), hh, st, why, market, SwapTake.QUIET);
+        });
         otcDb = new OtcDb(this);
         engine.setOtcDb(otcDb);
         otc = new OtcController(node, otcDb, engine, new OtcController.Ui() {
@@ -388,10 +391,11 @@ public class SwapService extends Service {
             String to = j.optString("to", ""), from = j.optString("from", ""), hash = j.optString("hash", "");
             if (hash.isEmpty() || !identity.publicId().equals(to)) return false;
             if (opened.fromPublicId == null || !opened.fromPublicId.equals(from)) return false;
+            if (j.has("notice")) return engine.onMakerNotice(hash, from, j.optString("notice"), j.optString("reason"));
             java.util.Set<String> set = incomingHashlocks();
             boolean isNew = set.add(hash);
             if (isNew) prefs.edit().putString("incoming_hashlocks", android.text.TextUtils.join(",", set)).apply();
-            engine.addIncomingHashlock(hash);
+            engine.addIncomingHashlock(hash, from);
             if (isNew && !MainActivity.SWEEP_ACTIVE) engine.checkBuyNow(hash);   // act now — don't wait for the next 90s poll
             if (isNew) alert("Buy request received", "A buyer wants your " + TradingContext.active().coinLabel + " — finding their USDT lock, then locking.");
             return isNew;
