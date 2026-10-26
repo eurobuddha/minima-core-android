@@ -247,9 +247,17 @@ public class ChatDrainer {
                     //Unknown states: a future control type must never become a
                     //garbage chat row (the keetchat 0.2.1 lesson) - ack + consume
                     if (!d.state.equals("") && !d.state.equals("image")
-                            && !d.state.equals("audio") && !d.state.equals("payment")) {
+                            && !d.state.equals("audio") && !d.state.equals("payment") && !d.state.equals("file")) {
                         MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
                         continue;
+                    }
+
+                    if(d.state.equals("file")) {
+                        try {
+                            com.eurobuddha.maxima.core.chat.ChatFile file=com.eurobuddha.maxima.core.chat.ChatFile.parse(d.ref);
+                            com.eurobuddha.maxima.files.KeetsFiles.validate(file);
+                            d.body=file.name;
+                        }catch(Exception invalid){MinimaCMD.execute("keets action:ack id:"+msg.get("id"));continue;}
                     }
 
                     ChatDb.Msg m = new ChatDb.Msg();

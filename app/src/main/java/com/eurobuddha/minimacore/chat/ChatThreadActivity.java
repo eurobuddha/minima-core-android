@@ -78,6 +78,7 @@ public class ChatThreadActivity extends AppCompatActivity {
 
     private String mPubkey;
     private MsgAdapter mAdapter;
+    private ChatFiles mFiles;
     private Toolbar mToolbar;
     private ActivityResultLauncher<String> mPickImage;
     private final Runnable mOnNewMessage = () -> runOnUiThread(() -> {
@@ -109,15 +110,18 @@ public class ChatThreadActivity extends AppCompatActivity {
 
         ListView list = findViewById(R.id.chat_msgs);
         mAdapter = new MsgAdapter();
+        mFiles = new ChatFiles(this,mPubkey,()->mAdapter.reload());
         list.setAdapter(mAdapter);
 
         ImageButton attach = findViewById(R.id.chat_attach);
         attach.setOnClickListener(v -> dialog()
-                .setItems(new CharSequence[]{Language.msg(l10n_media_photo), Language.msg(l10n_media_voice), Language.msg(l10n_chat_pay_action), Language.msg(l10n_chat_request_pay)}, (d, which) -> {
+                .setItems(new CharSequence[]{Language.msg(l10n_media_photo), Language.msg(l10n_media_voice), Language.msg(l10n_chat_pay_action), Language.msg(l10n_chat_request_pay), Language.msg(R.string.chat_files_attach), Language.msg(R.string.chat_files_title)}, (d, which) -> {
                     if (which == 0) mPickImage.launch("image/*");
                     else if (which == 1) startVoiceNote();
                     else if (which == 2) startPayment();
-                    else requestPayAddr(true);
+                    else if (which == 3) requestPayAddr(true);
+                    else if (which == 4) mFiles.pick();
+                    else mFiles.transfers();
                 }).show());
 
         EditText input = findViewById(R.id.chat_input);
@@ -542,6 +546,7 @@ public class ChatThreadActivity extends AppCompatActivity {
     protected void onDestroy() {
         for (AlertDialog value : new java.util.ArrayList<>(dialogs)) value.dismiss();
         dialogs.clear();
+        if(mFiles!=null)mFiles.close();
         stopAudio();
         if (mActiveRecorder != null) {
             // the dialog's dismiss listener never fires on activity death -
@@ -550,6 +555,11 @@ public class ChatThreadActivity extends AppCompatActivity {
             mActiveRecorder = null;
         }
         super.onDestroy();
+    }
+
+    @Override protected void onActivityResult(int request,int result,Intent data) {
+        super.onActivityResult(request,result,data);
+        if(mFiles!=null)mFiles.result(request,result,data);
     }
 
     private void sendMessage(String zText) {
@@ -650,7 +660,12 @@ public class ChatThreadActivity extends AppCompatActivity {
             audio.setVisibility(View.GONE);
             body.setVisibility(View.VISIBLE);
 
-            if ("audio".equals(m.state) && m.ref != null && !m.ref.equals("")) {
+            if ("file".equals(m.state)) {
+                body.setText("📎 " + m.body);
+                attach.setVisibility(View.VISIBLE);
+                Language.setText(attach,Language.msg(R.string.chat_files_open));
+                attach.setOnClickListener(v -> mFiles.showOffer(m.ref));
+            } else if ("audio".equals(m.state) && m.ref != null && !m.ref.equals("")) {
                 // body is "M:SS|waveformhex" (the Parlons caption convention)
                 String dur = m.body;
                 String waveHex = "";
