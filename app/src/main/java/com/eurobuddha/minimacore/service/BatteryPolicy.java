@@ -65,6 +65,19 @@ public final class BatteryPolicy {
         return zRelay == DhtRelay.PLUGGED && !zPlugged ? "client" : "routing";
     }
 
+    /** Whether the node's CPU wakelock should be held right now. Released only when nothing needs the
+     *  CPU: Balanced/Saver in force, screen off, and the DHT not relaying (relay "when plugged in" on
+     *  battery) - a relaying DHT node must stay awake, and no profile may stop it. Mining an own
+     *  transaction holds its own lock (NodeWake). */
+    public static boolean nodeAwake() { return nodeAwake(effective(), sScreenOn, dhtMode()); }
+
+    static boolean nodeAwake(Profile zEffective, boolean zScreenOn, String zDhtMode) {
+        return zEffective == Profile.INSTANT || zScreenOn || "routing".equals(zDhtMode);
+    }
+
+    /** While the wakelock is released, how often the node is woken for a catch-up window. */
+    public static long nodeWindowEveryMs() { return sProfile == Profile.SAVER ? 20 * 60_000L : 10 * 60_000L; }
+
     static Profile parse(String zName) {
         try {
             return Profile.valueOf(zName);

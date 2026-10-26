@@ -110,7 +110,7 @@ public class MinimaService extends Service {
 
     public static final String CHANNEL_ID = "MinimaServiceChannel";
 
-    PowerManager.WakeLock mWakeLock;
+    NodeWake mNodeWake;
 
     //So we start with a seed
     String mSeed = null;
@@ -142,16 +142,12 @@ public class MinimaService extends Service {
         //through its dwell and re-trigger. NodeHealth.reset() had no caller before this.
         NodeHealthMonitor.health().reset();
 
-        //Power
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"Minima::MiniPower");
-        if(!mWakeLock.isHeld()) {
-            mWakeLock.acquire();
-        }
-
+        //Power: the CPU wakelock follows the battery policy (NodeWake), it is no longer permanent.
         //No WifiLock: WIFI_MODE_FULL is a no-op on current Android (AOSP WifiManager) and the
         //foreground service already keeps network access through Doze.
         BatteryPolicy.load(this);
+        mNodeWake = new NodeWake(this);
+        mNodeWake.start();
 
         //Start Minima
         minima = new Minima();
@@ -203,7 +199,9 @@ public class MinimaService extends Service {
                     //admin app that does not want logs ever becomes a problem.
                     sendBroadcastNotify(broadmessage, event.equals("MINIMALOG"));
 
-                    if(event.equals("NEWBLOCK")) {
+                    if(event.equals("MINING")) {
+                        mNodeWake.mining(Boolean.TRUE.equals(data.get("mining")));
+                    }else if(event.equals("NEWBLOCK")) {
 
                         //Get the TxPoW
                         mTxPowJSON = (JSONObject) data.get("txpow");
@@ -661,7 +659,7 @@ public class MinimaService extends Service {
         Toast.makeText(this, Language.text(this, l10n_core_stopped), Toast.LENGTH_SHORT).show();
 
         //Release the wakelocks..
-        if(mWakeLock != null && mWakeLock.isHeld()) mWakeLock.release();
+        if(mNodeWake != null) mNodeWake.stop();
 
         if(mScreenReceiver != null){
             try { unregisterReceiver(mScreenReceiver); } catch (Exception ignored) { }

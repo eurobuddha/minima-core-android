@@ -37,4 +37,13 @@ public class BatteryPolicyTest {
         assertEquals("client", BatteryPolicy.dhtMode(BatteryPolicy.DhtRelay.PLUGGED, false));
     }
 
+    @Test public void nodeSleepsOnlyWhenScreenOffNotInstantAndDhtNotRelaying() {
+        BatteryPolicy.Profile B = BatteryPolicy.Profile.BALANCED, S = BatteryPolicy.Profile.SAVER;
+        assertTrue(!BatteryPolicy.nodeAwake(B, false, "client"));
+        assertTrue(!BatteryPolicy.nodeAwake(S, false, "client"));
+        assertTrue(BatteryPolicy.nodeAwake(B, false, "routing"));   // DHT relay always on: stays awake
+        assertTrue(BatteryPolicy.nodeAwake(S, true, "client"));     // screen on
+        assertTrue(BatteryPolicy.nodeAwake(BatteryPolicy.Profile.INSTANT, false, "client"));
+    }
+
 }
