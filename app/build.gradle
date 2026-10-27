@@ -149,8 +149,11 @@ android {
         // 10-min refresh re-dialed the sender); the file sheet shows the sidecar's own reason.
         // vc265: keets 1.3.3 - stopping a transfer from before per-transfer storage no longer
         // fails every 5 s forever (the delivery tick's stop loop seen on the Fold); Remove works.
-        versionCode 265
-        versionName "2.0.69"
+        // vc266: keets 1.3.4 (the fetch's topic refresh no longer runs ahead of the media deadline);
+        // file-delivery hello/complete re-sends back off 15 s -> 10 min while the peer is silent
+        // (three sealed mailbox messages every 15 s per pending file on the Fold); review pass.
+        versionCode 266
+        versionName "2.0.70"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
