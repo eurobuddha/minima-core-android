@@ -31,12 +31,20 @@ Validation
   and runtime validation. Versioned installers are in dist/; hashes in
   build/photo-lock-fix/artifacts.json. No native dependency was upgraded.
 - Fold updated in place to 2.0.65-Pandamonium (261). New PID 23040 successfully
-  opened the original media drive; no ELOCKED in that startup. UI confirmation is
-  gated by the owner's fingerprint unlock; no authentication bypass attempted.
+  opened the original media drive; no ELOCKED in that startup.
+- Physical in-app node restart retained PID 23040: media closure acknowledged at
+  14:35:58; replacement worklet reopened the original drive at 14:36:23, without
+  ELOCKED. No media identity or stored data was reset.
+- After that restart, the Fold terminal successfully published a synthetic 68-byte
+  PNG at /chat/lock-regression-2.0.65.png and fetched identical bytes through the
+  Keets media API. SHA256:
+  6af484b8a73288a07fec730818a6de8bebce88aa915b52f66a8769bfb865f434
+  No message was sent to a contact. Real contact-to-contact retry remains for
+  the user; the automated private-DHT transfer fixture passed as above.
 
 Code review
 Reviewed sidecar media/index/lifecycle, Android ownership/timeout behavior, source
 pins and tests. Fixed a concurrent open-vs-shutdown race found during review.
 Corrected the root package-lock version without changing dependency versions.
-No remaining blocking code findings. Physical same-process restart and photo UI
-checks remain to be completed after the owner unlocks the app.
+No remaining blocking code findings. Physical same-process restart and local
+media POST/GET checks passed on the Fold as recorded above.
