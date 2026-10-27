@@ -1,0 +1,51 @@
+Code Review — Keets media-lock repair, 2026-10-27
+
+Summary
+Reviewed Android 0d1ea75a (2.0.64) through the 2.0.66 working changes, plus the
+entire bundled Keets delta from 7b2a52f (1.2.15) to 9cbf9a1 (1.3.1).
+Inspected each changed source/test/config file and callers: MinimaService,
+BatteryPolicy, media read/API, private sharing, Bare Kit push/terminate, and
+pinned build preparation/verification. Graph query confirmed service/policy links.
+The storage-close handshake preserves existing keys, private-transfer state,
+chat/Salon separation, API authentication and native dependency versions.
+No file protocol, encryption, 100 MB chunking, receipt or payment code changed.
+
+Findings
+MAJOR — Timeout could leave media permanently unavailable (fixed)
+2.0.65 KeetsWorklet.stopNow removed policy callbacks, sent close-media-v1 and
+waited five seconds. A slow close could finish after that timeout, leaving the
+worker alive with closed media and no automatic recovery. A new service's start
+could similarly be dropped while waiting for the previous owner.
+Fix: WorkletLifecycle serializes ownership on the existing lifecycle executor,
+retries unconfirmed closure after five seconds, and only starts the latest wanted
+service after acknowledgement. Old retries cannot resurrect a stopped/replaced
+service. Failed starts retain ownership until their close is confirmed. Native
+termination still requires the exact acknowledgement; no force-close fallback.
+Six deterministic lifecycle tests cover these paths, including duplicate start.
+
+Validation
+- Complete app Pandamonium debug JVM/Robolectric suite: 220 tests, zero failures,
+  errors or skipped tests (45 suites). Includes chat files/messages, failure UI,
+  policy, WorkletShutdown and the six new WorkletLifecycle cases.
+- Keets real storage/API/bounds: 15 tests passed.
+- Pinned Bare 1.34.1 fixture reproduces ELOCKED after abrupt thread termination
+  and proves closing storage permits a replacement thread in the same process.
+- Bare local-DHT private-sharing fixture passed P2P fetch, independent stop,
+  unaffected photos/other files, stopped historical-byte refusal, restart,
+  Share again, and bounded cache removal.
+- Local sidecar serve/mailbox fixture passed offline delivery and ack deletion;
+  standalone mailbox push fixture passed delivery, sender verification and ack.
+- Artifact tests 19/19 and preparation tests 9/9 passed.
+- All three 2.0.66/code262 signed release APKs built offline; exact pinned bundle,
+  21 native addons per ABI and runtime checks passed. Family signer verified.
+  Artifact hashes: build/keets-review-2.0.66/artifacts.json.
+- Fold 2.0.65 same-process close/reopen and local PNG POST/GET passed previously;
+  user subsequently confirmed a real photo send. Their incoming transfer cannot
+  be retested until the sender updates from 2.0.64. This is not claimed as a new
+  two-person end-to-end test of 2.0.66.
+
+Verdict: Approve
+One blocking recovery finding corrected; no unresolved blocking findings in the
+reviewed changes. Tests cannot guarantee absence of every regression. No native
+runtime upgrades, production transactions, fleet runtime changes or data resets.
+2.0.66 supersedes the Fold-only 2.0.65 candidate for public distribution.

@@ -9,7 +9,7 @@ import org.minima.system.params.GeneralParams;
 
 import java.util.ArrayList;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -27,17 +27,19 @@ import to.holepunch.bare.kit.Worklet;
  * travels as a worklet argument: worklet args live in process memory, not in a
  * /proc cmdline, so this is as private as the desktop's env var.
  */
-public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPolicy.Listener {
+public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPolicy.Listener, WorkletLifecycle.Owner {
 
     /** V8 heap limit for the keets worklet. */
     static final int WORKLET_MEMORY_LIMIT = 128 * 1024 * 1024;
 
     // Shared across service instances: an old service must release its storage
     // before a replacement service can start another worklet in the same process.
-    private static final ExecutorService LIFECYCLE = Executors.newSingleThreadExecutor();
-    private static KeetsWorklet sOwner;
+    private static final ScheduledExecutorService LIFECYCLE = Executors.newSingleThreadScheduledExecutor();
+    private static final WorkletLifecycle OWNERS = new WorkletLifecycle(
+            retry -> LIFECYCLE.schedule(retry, 5, TimeUnit.SECONDS));
     private Worklet mWorklet;
     private Context mContext;
+    private Context mRequestedContext;
     private String mDhtMode = "routing";
     /** A plug/unplug that changes the DHT mode restarts the sidecar, at most once per settle period
      *  (a loose cable must not cause a restart storm). */
@@ -59,26 +61,22 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
         String want = com.eurobuddha.minimacore.service.BatteryPolicy.dhtMode();
         if (want.equals(mDhtMode)) return;
         logger.log("KEETS dht mode " + mDhtMode + " -> " + want + ": restarting the worklet");
-        Context ctx = mContext;
-        if (stopNow()) startNow(ctx);
+        OWNERS.restart(this);
     }
 
     public void start(Context zContext) {
         Context app = zContext.getApplicationContext();
-        LIFECYCLE.execute(() -> startNow(app));
+        LIFECYCLE.execute(() -> { mRequestedContext = app; OWNERS.start(this); });
     }
 
-    private void startNow(Context zContext) {
-        if (mWorklet != null) return;
-        if (sOwner != null && sOwner != this && !sOwner.stopNow()) {
-            logger.log("KEETS start deferred: previous worklet has not released storage");
-            return;
-        }
+    @Override public boolean startWorklet() {
+        Context zContext = mRequestedContext;
+        if (mWorklet != null) return true;
         // bare-kit's native runtime declares minSdk 29 (we override the manifest merge) —
         // on Android 9 the node simply runs classic-only.
         if (android.os.Build.VERSION.SDK_INT < 29) {
             logger.log("KEETS worklet needs Android 10+ .. classic transports only");
-            return;
+            return false;
         }
         try {
             ArrayList<String> args = new ArrayList<>();
@@ -102,26 +100,26 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
             // process, node included, so leave real headroom.
             Worklet.Options opts = new Worklet.Options().memoryLimit(WORKLET_MEMORY_LIMIT);
             mWorklet = new Worklet(opts);
-            sOwner = this;
             mWorklet.start("/keets.bundle", zContext.getAssets().open("keets.bundle"),
                     args.toArray(new String[0]));
             mContext = zContext.getApplicationContext();
             logger.log("KEETS worklet started port:" + GeneralParams.MINIMA_PORT
                     + " datadir:" + GeneralParams.DATA_FOLDER + " dht:" + mDhtMode);
             com.eurobuddha.minimacore.service.BatteryPolicy.addListener(this);
+            return true;
         } catch (Throwable t) {
             // UnsatisfiedLinkError (missing ABI), missing asset, anything — the node must
             // keep running classic-only rather than die with the worklet.
             logger.log("KEETS worklet failed to start : " + t);
-            if (mWorklet != null) stopNow();
+            return false;
         }
     }
 
     public void terminate() {
-        LIFECYCLE.execute(this::stopNow);
+        LIFECYCLE.execute(() -> OWNERS.stop(this));
     }
 
-    private boolean stopNow() {
+    @Override public boolean closeWorklet() {
         com.eurobuddha.minimacore.service.BatteryPolicy.removeListener(this);
         mHandler.removeCallbacks(mDhtModeRecheck);
         if (mWorklet == null) return true;
@@ -131,12 +129,11 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
                     () -> mWorklet.terminate());
             mWorklet = null;
             mContext = null;
-            if (sOwner == this) sOwner = null;
             logger.log("KEETS media storage closed; worklet terminated");
             return true;
         } catch (Throwable error) {
             // Never start a second owner after a timeout or failed close. A later
-            // start retries this owner's shutdown; no files or identities are removed.
+            // lifecycle retry confirms this owner's shutdown; no files or identities are removed.
             logger.log("KEETS storage shutdown not confirmed; restart deferred: " + error);
             return false;
         }
