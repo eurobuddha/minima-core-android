@@ -141,8 +141,11 @@ android {
         // vc234: notify and refresh the UI the instant a message is stored; acks and
         // receipts follow afterwards (node commands serialise, 8 s stalls seen on 2.0.37).
         // vc235: in-chat payments can be MxUSD as well as Minima (the wire always carried the token).
-        versionCode 262
-        versionName "2.0.66"
+        // vc263: the keets worklet gets the signed dynamic mailbox list (minima.jar from
+        // keets-android 4f7f479f83: KeetsMailboxList, -keetsmailboxurl). A new fleet mailbox
+        // joins by re-signing eurobuddha.com/keets/mailboxes.json - no app release needed.
+        versionCode 263
+        versionName "2.0.67"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

@@ -92,6 +92,18 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
             if (GeneralParams.TEST_PARAMS) {
                 args.add("--topic"); args.add("minima-testnet-keets-v1");
             }
+            // The signed mailbox list (eurobuddha.com/keets/mailboxes.json, verified against the
+            // key baked in GeneralParams, cached in data/keets). "" = the sidecar's baked defaults.
+            // Never lets a list problem stop the worklet.
+            try {
+                String mailboxes = org.minima.system.network.keets.KeetsMailboxList.load(
+                        new java.io.File(GeneralParams.DATA_FOLDER));
+                if (!mailboxes.isEmpty()) {
+                    args.add("--mailboxes"); args.add(mailboxes);
+                }
+            } catch (Throwable t) {
+                logger.log("KEETS mailbox list skipped : " + t);
+            }
 
             // 32 MB killed the whole app every ~85-90 min (2.0.40 on the Fold, 16 crashes in a row:
             // v8 FatalProcessOutOfMemory on the bare-worklet thread). Under Bare the sidecar's
