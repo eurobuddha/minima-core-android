@@ -8,6 +8,10 @@ import org.minima.system.network.keets.KeetsManager;
 import org.minima.system.params.GeneralParams;
 
 import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import to.holepunch.bare.kit.Worklet;
 
@@ -28,13 +32,17 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
     /** V8 heap limit for the keets worklet. */
     static final int WORKLET_MEMORY_LIMIT = 128 * 1024 * 1024;
 
+    // Shared across service instances: an old service must release its storage
+    // before a replacement service can start another worklet in the same process.
+    private static final ExecutorService LIFECYCLE = Executors.newSingleThreadExecutor();
+    private static KeetsWorklet sOwner;
     private Worklet mWorklet;
     private Context mContext;
     private String mDhtMode = "routing";
     /** A plug/unplug that changes the DHT mode restarts the sidecar, at most once per settle period
      *  (a loose cable must not cause a restart storm). */
     static final long DHT_MODE_SETTLE_MS = 30_000;
-    private final Runnable mDhtModeRecheck = this::applyDhtMode;
+    private final Runnable mDhtModeRecheck = () -> LIFECYCLE.execute(this::applyDhtMode);
     private final android.os.Handler mHandler = new android.os.Handler(android.os.Looper.getMainLooper());
 
     /** Only the DHT relay setting (and the charger, for "when plugged in") touches the sidecar:
@@ -46,18 +54,26 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
 
     /** Restart the sidecar when the wanted DHT mode differs from the running one (plug change or a
      *  new relay choice). A restart takes seconds; mail waits in the mailbox meanwhile. */
-    private synchronized void applyDhtMode() {
+    private void applyDhtMode() {
         if (mWorklet == null || mContext == null) return;
         String want = com.eurobuddha.minimacore.service.BatteryPolicy.dhtMode();
         if (want.equals(mDhtMode)) return;
         logger.log("KEETS dht mode " + mDhtMode + " -> " + want + ": restarting the worklet");
         Context ctx = mContext;
-        terminate();
-        start(ctx);
+        if (stopNow()) startNow(ctx);
     }
 
-    public synchronized void start(Context zContext) {
+    public void start(Context zContext) {
+        Context app = zContext.getApplicationContext();
+        LIFECYCLE.execute(() -> startNow(app));
+    }
+
+    private void startNow(Context zContext) {
         if (mWorklet != null) return;
+        if (sOwner != null && sOwner != this && !sOwner.stopNow()) {
+            logger.log("KEETS start deferred: previous worklet has not released storage");
+            return;
+        }
         // bare-kit's native runtime declares minSdk 29 (we override the manifest merge) —
         // on Android 9 the node simply runs classic-only.
         if (android.os.Build.VERSION.SDK_INT < 29) {
@@ -86,6 +102,7 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
             // process, node included, so leave real headroom.
             Worklet.Options opts = new Worklet.Options().memoryLimit(WORKLET_MEMORY_LIMIT);
             mWorklet = new Worklet(opts);
+            sOwner = this;
             mWorklet.start("/keets.bundle", zContext.getAssets().open("keets.bundle"),
                     args.toArray(new String[0]));
             mContext = zContext.getApplicationContext();
@@ -96,16 +113,32 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
             // UnsatisfiedLinkError (missing ABI), missing asset, anything — the node must
             // keep running classic-only rather than die with the worklet.
             logger.log("KEETS worklet failed to start : " + t);
-            mWorklet = null;
+            if (mWorklet != null) stopNow();
         }
     }
 
-    public synchronized void terminate() {
+    public void terminate() {
+        LIFECYCLE.execute(this::stopNow);
+    }
+
+    private boolean stopNow() {
         com.eurobuddha.minimacore.service.BatteryPolicy.removeListener(this);
         mHandler.removeCallbacks(mDhtModeRecheck);
-        if (mWorklet == null) return;
-        try { mWorklet.terminate(); } catch (Throwable ignored) { }
-        mWorklet = null;
-        logger.log("KEETS worklet terminated");
+        if (mWorklet == null) return true;
+        try {
+            WorkletShutdown.close(
+                    () -> mWorklet.push("close-media-v1", StandardCharsets.UTF_8, 5, TimeUnit.SECONDS),
+                    () -> mWorklet.terminate());
+            mWorklet = null;
+            mContext = null;
+            if (sOwner == this) sOwner = null;
+            logger.log("KEETS media storage closed; worklet terminated");
+            return true;
+        } catch (Throwable error) {
+            // Never start a second owner after a timeout or failed close. A later
+            // start retries this owner's shutdown; no files or identities are removed.
+            logger.log("KEETS storage shutdown not confirmed; restart deferred: " + error);
+            return false;
+        }
     }
 }

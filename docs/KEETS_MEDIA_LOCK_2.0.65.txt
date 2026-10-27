@@ -1,0 +1,42 @@
+Pandamonium / PandaBear / BlackBear 2.0.65 (261) — 2026-10-27
+
+Regression: terminating Bare's worklet thread without closing its Corestores
+leaves filesystem locks held by the Android process. A new worklet then reports
+ELOCKED for photo uploads and receiving files. The Fold's in-app restart retained
+PID 31884; the newly started worklet immediately failed to open media storage.
+
+Proof: the pinned Bare 1.34.1 / Corestore reproduction opens a store on a worker,
+terminates and joins the worker, then fails reopening it on the same process with
+ELOCKED. Closing the store before termination allows the same reopen to succeed.
+Keets test/worklet-lock-worker.js and test/worklet-lock-test.js preserve this proof.
+
+Fix: Keets 1.3.1 parent-only push IPC closes the media swarm and all chat/private
+Corestores, drains pending opens and prevents new media opens during shutdown.
+Android waits for media-closed-v1 before terminating the worklet. A shared lifecycle
+executor serializes service instances and runs the wait off the UI thread. A failed
+or timed-out close never authorizes a second storage owner. Existing media keys,
+photos, private-transfer pause flags, messages and wallet data are preserved.
+
+Pinned Keets source: 9cbf9a1cd7946882d42791f6d35c7b4a606538e4
+Bundle SHA256: a27b2b7a7388f011582ddb6e4a8d99f554677c448600de32a1dd3584493b59e7
+All pinned native addons and Bare runtime hashes are unchanged.
+
+Validation
+- 15 real storage/API/bounds tests passed, including shutdown vs opening transfer,
+  failed acknowledgement, retained photos/private files and same-process reopen.
+- Bare private-DHT fixture passed photos, independent transfer stop, stopped-history
+  refusal, paused restart, Share again and explicit cache removal.
+- Android WorkletShutdownTest: 2 passed; BatteryPolicyTest: 5 passed.
+- All three signed release APKs built offline and passed exact bundle, 21 addons
+  and runtime validation. Versioned installers are in dist/; hashes in
+  build/photo-lock-fix/artifacts.json. No native dependency was upgraded.
+- Fold updated in place to 2.0.65-Pandamonium (261). New PID 23040 successfully
+  opened the original media drive; no ELOCKED in that startup. UI confirmation is
+  gated by the owner's fingerprint unlock; no authentication bypass attempted.
+
+Code review
+Reviewed sidecar media/index/lifecycle, Android ownership/timeout behavior, source
+pins and tests. Fixed a concurrent open-vs-shutdown race found during review.
+Corrected the root package-lock version without changing dependency versions.
+No remaining blocking code findings. Physical same-process restart and photo UI
+checks remain to be completed after the owner unlocks the app.
