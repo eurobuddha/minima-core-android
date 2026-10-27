@@ -144,8 +144,11 @@ android {
         // vc263: the keets worklet gets the signed dynamic mailbox list (minima.jar from
         // keets-android 4f7f479f83: KeetsMailboxList, -keetsmailboxurl). A new fleet mailbox
         // joins by re-signing eurobuddha.com/keets/mailboxes.json - no app release needed.
-        versionCode 263
-        versionName "2.0.67"
+        // vc264: keets 1.3.2 - a media fetch re-dials a contact the swarm had given up on (file
+        // transfers sat at "transferring" for 25 min on the Fold, then flew once the topic's
+        // 10-min refresh re-dialed the sender); the file sheet shows the sidecar's own reason.
+        versionCode 264
+        versionName "2.0.68"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
