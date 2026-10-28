@@ -153,8 +153,8 @@ android {
         // file-delivery hello/complete re-sends back off 15 s -> 10 min while the peer is silent
         // (three sealed mailbox messages every 15 s per pending file on the Fold); review pass.
         // 2.1.0: the owner's minor bump for the keets file-transfer repair (2.0.68-2.0.70 work).
-        versionCode 266
-        versionName "2.1.0"
+        versionCode 267
+        versionName "2.1.1"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
@@ -180,6 +180,9 @@ android {
             // Existing app, existing users, legacy 64x3 keys. applicationId stays the
             // defaultConfig com.eurobuddha.minimacore.
             buildConfigField "boolean", "BLOCK_KEYUSES", "false"
+            // Node P2P port. Each bear listens on its own port so two bears on one phone (or one
+            // Wi-Fi) never collide; keets' loopback API is port+5. Overridable by -port in extra params.
+            buildConfigField "int", "NODE_PORT", "13001"
         }
         block {
             dimension "keymode"
@@ -192,6 +195,7 @@ android {
             // BlackBear mirrors Pandamonium's tab shell + History, minus the integrated DeFi apps.
             buildConfigField "boolean", "PANDA_SHELL", "true"
             buildConfigField "String", "SHELL_BRAND", "\"BlackBear\""
+            buildConfigField "int", "NODE_PORT", "21001"
         }
         pandamonium {
             dimension "keymode"
@@ -200,6 +204,7 @@ android {
             buildConfigField "boolean", "BLOCK_KEYUSES", "true"
             buildConfigField "boolean", "PANDAMONIUM", "true"
             buildConfigField "boolean", "PANDA_SHELL", "true"
+            buildConfigField "int", "NODE_PORT", "25001"
         }
     }
 

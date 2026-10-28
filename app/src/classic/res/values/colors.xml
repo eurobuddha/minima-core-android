@@ -1,0 +1,4 @@
+<resources>
+    <!-- PandaBear launcher icon: white pupils. -->
+    <color name="launcher_pupil">#FFFFFF</color>
+</resources>

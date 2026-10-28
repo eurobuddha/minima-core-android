@@ -294,7 +294,7 @@ public class MinimaService extends Service {
         vars.add(getFilesDir().getAbsolutePath());
 
         vars.add("-port");
-        vars.add("11001");
+        vars.add(String.valueOf(BuildConfig.NODE_PORT));
 
         //Server or client - user-set toggle (ParamsActivity). Exactly ONE of the pair is
         //passed: -server and -isclient both write IS_ACCEPTING_IN_LINKS and the winner
@@ -386,12 +386,12 @@ public class MinimaService extends Service {
         //Another Minima node already on our port? Say so - without this the losing node just
         //dies with a bind error the user never sees. Informational only: the start proceeds
         //(the other node may be shutting down). Probe the port THIS node will actually bind -
-        //base 11001, overridden by a -port in extra params (last wins) - not a hardcoded 11001,
-        //so a build on another port (e.g. BlackBear on 13001) doesn't warn about a different
-        //app's node on 11001. Last-wins matches core: ParamConfigurer's -port handler sets
+        //the flavour's NODE_PORT (PandaBear 13001, BlackBear 21001, Pandamonium 25001), overridden
+        //by a -port in extra params (last wins) - so a bear never warns about another bear's
+        //node. Last-wins matches core: ParamConfigurer's -port handler sets
         //GeneralParams.MINIMA_PORT once per -port arg in parse order, so the last -port wins -
         //same order as vars here. Checked off the main thread - even a localhost connect is network I/O.
-        int effectivePort = 11001;
+        int effectivePort = BuildConfig.NODE_PORT;
         for (int i = 0; i + 1 < vars.size(); i++)
             if ("-port".equals(vars.get(i))) {
                 try { effectivePort = Integer.parseInt(vars.get(i + 1)); } catch (NumberFormatException ignore) {}

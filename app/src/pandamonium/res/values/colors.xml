@@ -1,0 +1,4 @@
+<resources>
+    <!-- Pandamonium launcher icon: orange pupils (the PandaPools accent). -->
+    <color name="launcher_pupil">#F7931A</color>
+</resources>
