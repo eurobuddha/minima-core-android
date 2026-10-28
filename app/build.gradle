@@ -153,8 +153,8 @@ android {
         // file-delivery hello/complete re-sends back off 15 s -> 10 min while the peer is silent
         // (three sealed mailbox messages every 15 s per pending file on the Fold); review pass.
         // 2.1.0: the owner's minor bump for the keets file-transfer repair (2.0.68-2.0.70 work).
-        versionCode 267
-        versionName "2.1.1"
+        versionCode 268
+        versionName "2.1.2"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
