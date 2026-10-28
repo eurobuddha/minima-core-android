@@ -929,6 +929,9 @@
     <string name="l10n_params_rpc_copied" formatted="false">"已复制 RPC 密码"</string>
     <string name="l10n_params_auto_resync" formatted="false">"节点异常时自动重新同步"</string>
     <string name="l10n_params_auto_resync_body" formatted="false">"Minima 每小时检查自身数据库。关闭时，会在需要重新同步时通知您。开启时，会自行重建链，每天最多一次，且不会在有交易等待打包时进行。无论哪种设置，您的钱包和助记词都不会被更改。"</string>
+    <string name="l10n_params_keets" formatted="false">"Keets 传输（-keets）"</string>
+    <string name="l10n_params_keets_body" formatted="false">"开启：KeetChat 与点对点 keets 传输，与之前相同。关闭：无 Hyperswarm 边车、无 DHT、无\"聊天\"标签页，节点仅使用经典 Minima 传输，耗电和内存更少。您的聊天记录和 keets 身份保留在手机上，重新开启后恢复。重启后生效。"</string>
+    <string name="l10n_chat_keets_off" formatted="false">"keets 传输已关闭 - 请在启动参数中开启后再使用聊天"</string>
     <string name="l10n_params_extra" formatted="false">"额外参数（高级）"</string>
     <string name="l10n_params_extra_body" formatted="false">"启动时传递给节点的标志，以空格分隔。此处不允许清除／种子标志（-clean、-genesis、-solo、-seed、-anyseed、-dbpassword）以及由应用管理的标志（-data、-basefolder、-conf、-server、-isclient）。"</string>
     <string name="l10n_params_save_restart" formatted="false">"保存并重启节点"</string>

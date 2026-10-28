@@ -17,11 +17,18 @@ import com.eurobuddha.minimacore.utils.logger;
 public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
 
     // Named positions keep service refreshes and companion permissions tied to their views.
-    public static final int HOME_POSITION = BuildConfig.PANDA_SHELL ? 4 : 0;
+    // Chat is the only optional tab (Keets transport switch, 2.2.0): layout() sets the positions
+    // for the shell being built, before any reader; the defaults are the keets-on layout.
+    public static int HOME_POSITION = BuildConfig.PANDA_SHELL ? 4 : 0;
     public static final int WALLET_POSITION = BuildConfig.PANDA_SHELL ? 0 : 1;
     public static final int UTILITY_POSITION = BuildConfig.PANDA_SHELL ? 1 : 2;
     public static final int APPS_POSITION = BuildConfig.PANDA_SHELL ? 2 : 3;
-    public static final int CHAT_POSITION = BuildConfig.PANDA_SHELL ? 3 : 4;   // was Logs (now in the overflow menu)
+    public static int CHAT_POSITION = BuildConfig.PANDA_SHELL ? 3 : 4;   // was Logs (now in the overflow menu); -1 = no Chat tab
+
+    static void layout(boolean chat) {
+        CHAT_POSITION = StartupMode.chatPosition(BuildConfig.PANDA_SHELL, chat);
+        HOME_POSITION = StartupMode.homePosition(BuildConfig.PANDA_SHELL, chat);
+    }
 
     MainActivity mActivity;
 
@@ -60,13 +67,16 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
         // Reuse the same screens. Pandamonium starts with Wallet and puts Node after Chat;
         // the other builds keep Home / Wallet / Terminal / Apps / Chat. Logs moved to the
         // toolbar overflow menu (LogsActivity) when Chat took its tab slot (1.9.20).
-        mAllViews = new BaseView[5];
+        boolean chat = StartupMode.keetsEnabled(
+                mActivity.getSharedPreferences("main_prefs", android.content.Context.MODE_PRIVATE));
+        layout(chat);
+        mAllViews = new BaseView[chat ? 5 : 4];
 
         mAllViews[HOME_POSITION] = new HomeView(mActivity);
         mAllViews[WALLET_POSITION] = new BalanceView(mActivity);
         mAllViews[UTILITY_POSITION] = com.eurobuddha.minimacore.integrated.PandamoniumHooks.createUtilityTab(mActivity);
         mAllViews[APPS_POSITION] = new AppsView(mActivity);
-        mAllViews[CHAT_POSITION] = new ChatView(mActivity);
+        if (chat) mAllViews[CHAT_POSITION] = new ChatView(mActivity);
     }
 
     public void refreshPagerView(int zPosition){
@@ -78,8 +88,9 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
         return (AppsView) mAllViews[APPS_POSITION];
     }
 
+    /** null when the keets transport is off (no Chat tab). */
     public BaseView getChatView(){
-        return mAllViews[CHAT_POSITION];
+        return CHAT_POSITION < 0 ? null : mAllViews[CHAT_POSITION];
     }
 
     //Refresh the node dashboard..
@@ -89,7 +100,7 @@ public class MainAdapter extends androidx.viewpager.widget.PagerAdapter {
 
     @Override
     public int getCount() {
-        return 5;
+        return mAllViews.length;
     }
 
     @Override

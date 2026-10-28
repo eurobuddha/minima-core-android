@@ -962,6 +962,9 @@
     <string name="l10n_params_rpc_copied" formatted="false">"Пароль RPC скопирован"</string>
     <string name="l10n_params_auto_resync" formatted="false">"Автосинхронизация при неполадках"</string>
     <string name="l10n_params_auto_resync_body" formatted="false">"Minima проверяет свою базу каждый час. Если выключено, уведомляет о необходимости синхронизации. Если включено, перестраивает цепочку самостоятельно, не чаще раза в сутки и никогда при наличии транзакции, ожидающей включения в блок. В обоих случаях кошелёк и сид-фраза не меняются."</string>
+    <string name="l10n_params_keets" formatted="false">"Транспорт Keets (-keets)"</string>
+    <string name="l10n_params_keets_body" formatted="false">"Вкл.: KeetChat и одноранговый транспорт keets, как прежде. Выкл.: без сайдкара Hyperswarm, без DHT и без вкладки Чат - узел работает только через классический транспорт Minima и расходует меньше батареи и памяти. Ваши чаты и идентичность keets остаются на телефоне и возвращаются при включении. Применяется после перезапуска."</string>
+    <string name="l10n_chat_keets_off" formatted="false">"Транспорт keets выключен - включите его в параметрах запуска, чтобы пользоваться чатом"</string>
     <string name="l10n_params_extra" formatted="false">"Дополнительные аргументы (для опытных)"</string>
     <string name="l10n_params_extra_body" formatted="false">"Флаги через пробел, передаваемые узлу при запуске. Здесь запрещены флаги очистки/сид-фразы (-clean, -genesis, -solo, -seed, -anyseed, -dbpassword) и флаги, управляемые приложением (-data, -basefolder, -conf, -server, -isclient)."</string>
     <string name="l10n_params_save_restart" formatted="false">"Сохранить и перезапустить узел"</string>

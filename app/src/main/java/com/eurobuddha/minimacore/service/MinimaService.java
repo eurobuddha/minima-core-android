@@ -313,7 +313,7 @@ public class MinimaService extends Service {
         //know the transport exists — the `keets` command refuses without -keets, which
         //starved the chat drainer (proven on the Fold 2026-10-13). KeetsManager with no
         //-keetssidecar path spawns nothing, and its MDS poller is gated off.
-        if (pref.getBoolean("keets_enabled", true)) {
+        if (com.eurobuddha.minimacore.main.StartupMode.keetsEnabled(pref)) {
             vars.add("-keets");
         }
 
@@ -354,10 +354,11 @@ public class MinimaService extends Service {
 
         //Remove the wipe flags.. and USE the stripped string this boot too (previously the
         //original string was tokenized, so a -clean slipped through on the boot it was set)
-        String newprefs = prefstring
+        //(and the flags the Keets transport switch owns - a stored -keets would override "off")
+        String newprefs = com.eurobuddha.minimacore.main.StartupMode.withoutKeetsSwitchFlags(prefstring
                 .replaceAll("-clean","")
                 .replaceAll("-genesis","")
-                .replaceAll("-solo","")
+                .replaceAll("-solo",""))
                 .trim().replaceAll("\\s+"," ");
         if (BuildConfig.PANDAMONIUM) {
             newprefs = com.eurobuddha.minimacore.main.StartupMode.withoutManagedArguments(newprefs);
@@ -421,7 +422,7 @@ public class MinimaService extends Service {
                         //node so GeneralParams and the per-boot token exist; delayed so the
                         //NIO server is listening before the first bridged stream arrives.
                         SharedPreferences kp = getSharedPreferences("main_prefs", MODE_PRIVATE);
-                        boolean keetsOn = kp.getBoolean("keets_enabled", true);
+                        boolean keetsOn = com.eurobuddha.minimacore.main.StartupMode.keetsEnabled(kp);
                         new Handler(Looper.getMainLooper()).postDelayed(() -> {
                             if (!serviceDestroyed && !mHaveStartedShutdown) {
                                 //The ONE "Chat messages" channel serves keets AND Parlons
@@ -432,11 +433,11 @@ public class MinimaService extends Service {
                                     TrafficLog.start();
                                     //Chat: the ONE drainer of the keets message inbox
                                     com.eurobuddha.minimacore.chat.ChatDrainer.start(MinimaService.this);
+                                    //Parlons contacts in the same Chat tab: the app's own Maxima
+                                    //client. Transport-independent, but the owner's call (2.2.0):
+                                    //keets off = no Chat tab at all, so its relay sockets stop too.
+                                    com.eurobuddha.minimacore.maxchat.MaxChat.start(MinimaService.this);
                                 }
-                                //Parlons contacts in the same Chat tab: the app's own
-                                //Maxima client - independent of the keets transport, so
-                                //disabling keets must not kill MAX# chat.
-                                com.eurobuddha.minimacore.maxchat.MaxChat.start(MinimaService.this);
                             }
                         }, 15000);
                     }

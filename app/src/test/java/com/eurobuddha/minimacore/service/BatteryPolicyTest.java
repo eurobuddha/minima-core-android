@@ -49,4 +49,12 @@ public class BatteryPolicyTest {
         assertTrue(BatteryPolicy.nodeAwake(BatteryPolicy.Profile.INSTANT, false, "client"));
     }
 
+    @Test public void keetsOffNeverRoutes() {
+        for (BatteryPolicy.DhtRelay r : BatteryPolicy.DhtRelay.values())
+            for (boolean plugged : new boolean[]{false, true}) for (boolean wifi : new boolean[]{false, true}) {
+                assertEquals("client", BatteryPolicy.dhtMode(false, r, plugged, wifi));
+                assertEquals(BatteryPolicy.dhtMode(r, plugged, wifi), BatteryPolicy.dhtMode(true, r, plugged, wifi));
+            }
+    }
+
 }

@@ -32,6 +32,7 @@ public final class BatteryPolicy {
     private static volatile Profile sProfile = Profile.BALANCED;
     private static volatile boolean sFullOnCharger = true;
     private static volatile DhtRelay sDhtRelay = DhtRelay.ALWAYS;
+    private static volatile boolean sKeets = true;
     private static volatile boolean sScreenOn = true;
     private static volatile boolean sPlugged = false;
     private static volatile boolean sWifi = true;
@@ -49,7 +50,11 @@ public final class BatteryPolicy {
         sFullOnCharger = p.getBoolean(KEY_FULL_ON_CHARGER, true);
         try { sDhtRelay = DhtRelay.valueOf(p.getString(KEY_DHT_RELAY, DhtRelay.ALWAYS.name())); }
         catch (Exception e) { sDhtRelay = DhtRelay.ALWAYS; }
+        sKeets = com.eurobuddha.minimacore.main.StartupMode.keetsEnabled(p);
     }
+
+    /** The Keets transport switch (Startup Params). Off: there is no DHT, so nothing relays. */
+    public static boolean keets() { return sKeets; }
 
     public static void setDhtRelay(Context zCtx, DhtRelay zRelay) {
         sDhtRelay = zRelay;
@@ -60,7 +65,11 @@ public final class BatteryPolicy {
     public static DhtRelay dhtRelay() { return sDhtRelay; }
 
     /** The sidecar's --dht-mode right now: "routing" unless the chosen relay condition is not met. */
-    public static String dhtMode() { return dhtMode(sDhtRelay, sPlugged, sWifi); }
+    public static String dhtMode() { return dhtMode(sKeets, sDhtRelay, sPlugged, sWifi); }
+
+    static String dhtMode(boolean zKeets, DhtRelay zRelay, boolean zPlugged, boolean zWifi) {
+        return zKeets ? dhtMode(zRelay, zPlugged, zWifi) : "client";
+    }
 
     /** zWifi = the default network is Wi-Fi or Ethernet (not mobile data, where DHT traffic keeps the
      *  cellular radio at full power: 186 mAh in 2 h on the Fold, 2026-10-26). */

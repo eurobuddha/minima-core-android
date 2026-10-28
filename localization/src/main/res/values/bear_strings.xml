@@ -940,6 +940,9 @@
     <string name="l10n_params_rpc_copied" formatted="false">"RPC password copied"</string>
     <string name="l10n_params_auto_resync" formatted="false">"Resync automatically when unhealthy"</string>
     <string name="l10n_params_auto_resync_body" formatted="false">"Minima checks its own database hourly. Off, it tells you when a resync is needed. On, it rebuilds the chain itself, at most once a day and never while a transaction is waiting to be mined. Your wallet and seed phrase are never touched either way."</string>
+    <string name="l10n_params_keets" formatted="false">"Keets transport (-keets)"</string>
+    <string name="l10n_params_keets_body" formatted="false">"On: KeetChat and the peer-to-peer keets transport, as before. Off: no Hyperswarm sidecar, no DHT and no Chat tab - the node runs on the classic Minima transport only and uses less battery and RAM. Your chats and keets identity stay on the phone and return when you switch it back on. Applies after a restart."</string>
+    <string name="l10n_chat_keets_off" formatted="false">"The keets transport is off - turn it on in Startup Params to use Chat"</string>
     <string name="l10n_params_extra" formatted="false">"Extra arguments (advanced)"</string>
     <string name="l10n_params_extra_body" formatted="false">"Space-separated flags passed to the node at boot. Wipe/seed flags (-clean, -genesis, -solo, -seed, -anyseed, -dbpassword) and app-managed flags (-data, -basefolder, -conf, -server, -isclient) are not allowed here."</string>
     <string name="l10n_params_save_restart" formatted="false">"Save &amp; Restart Node"</string>

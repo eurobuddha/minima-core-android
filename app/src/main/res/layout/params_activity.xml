@@ -163,6 +163,23 @@
                 android:textSize="12sp"
                 android:textColor="@color/core_text_mid" />
 
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/params_switch_keets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Keets transport (-keets)" android:tag="l10n:text=l10n_params_keets"
+                android:textAppearance="@style/TextAppearance.MinimaCore.Body"
+                android:textColor="@color/core_text" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="On: KeetChat and the peer-to-peer keets transport, as before. Off: no Hyperswarm sidecar, no DHT and no Chat tab - the node runs on the classic Minima transport only and uses less battery and RAM. Your chats and keets identity stay on the phone and return when you switch it back on. Applies after a restart." android:tag="l10n:text=l10n_params_keets_body"
+                android:textAppearance="@style/TextAppearance.MinimaCore.Body"
+                android:textSize="12sp"
+                android:textColor="@color/core_text_mid" />
+
             <TextView style="@style/FormLabel" android:text="Extra arguments (advanced)" android:tag="l10n:text=l10n_params_extra" />
 
             <EditText

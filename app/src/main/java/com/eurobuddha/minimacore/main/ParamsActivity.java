@@ -54,9 +54,12 @@ public class ParamsActivity extends AppCompatActivity {
     private static final String[] BLOCKED_FLAGS = {
             "-clean", "-genesis", "-solo", "-seed", "-anyseed", "-dbpassword", "-blockaskeyuses",
             "-data", "-basefolder", "-conf", "-daemon", "-noshutdownhook",
-            "-server", "-isclient"
+            "-server", "-isclient",
+            //the Keets transport switch owns these (a typed -keets would re-enable a switched-off transport)
+            "-keets", "-keetssidecar", "-keetssidecarargs"
     };
 
+    SwitchMaterial mKeetsSwitch;
     SwitchMaterial mServerSwitch;
     SwitchMaterial mMegaSwitch;
     SwitchMaterial mRpcSwitch;
@@ -82,6 +85,7 @@ public class ParamsActivity extends AppCompatActivity {
         mMegaSwitch   = findViewById(R.id.params_switch_megammr);
         mRpcSwitch    = findViewById(R.id.params_switch_rpc);
         mAutoResyncSwitch = findViewById(R.id.params_switch_autoresync);
+        mKeetsSwitch  = findViewById(R.id.params_switch_keets);
         mClassicSwitch = findViewById(R.id.params_switch_classic);
         findViewById(R.id.params_classic_row).setVisibility(BuildConfig.PANDAMONIUM ? View.VISIBLE : View.GONE);
         mExtraInput   = findViewById(R.id.params_extra);
@@ -93,6 +97,7 @@ public class ParamsActivity extends AppCompatActivity {
         mMegaSwitch.setChecked(prefs.getBoolean(PREF_PARAM_MEGAMMR, false));
         mRpcSwitch.setChecked(prefs.getBoolean(PREF_PARAM_RPC, false));
         mAutoResyncSwitch.setChecked(prefs.getBoolean(PREF_AUTORESYNC, false));
+        mKeetsSwitch.setChecked(StartupMode.keetsEnabled(prefs));
         String extra = prefs.getString(PREF_EXTRA_PARAMS, "");
         mExtraInput.setText(BuildConfig.PANDAMONIUM ? StartupMode.withoutManagedArguments(extra) : extra);
 
@@ -204,6 +209,7 @@ public class ParamsActivity extends AppCompatActivity {
         editor.putBoolean(PREF_PARAM_MEGAMMR, mMegaSwitch.isChecked());
         editor.putBoolean(PREF_PARAM_RPC,     mRpcSwitch.isChecked());
         editor.putBoolean(PREF_AUTORESYNC,    mAutoResyncSwitch.isChecked());
+        editor.putBoolean(StartupMode.PREF_KEETS, mKeetsSwitch.isChecked());
         if (BuildConfig.PANDAMONIUM) editor.putBoolean(StartupMode.PREF_CLASSIC_MODE, mClassicSwitch.isChecked());
         editor.putString(PREF_EXTRA_PARAMS, extra);
         if (!editor.commit()) {

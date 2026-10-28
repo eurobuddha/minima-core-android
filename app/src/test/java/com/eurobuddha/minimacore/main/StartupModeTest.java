@@ -16,6 +16,25 @@ public class StartupModeTest {
         assertFalse(StartupMode.usesBlockKeys(false, false, false));
     }
 
+    @Test public void chatTabIsTheOnlyOptionalSlot() {
+        assertEquals(3, StartupMode.chatPosition(true, true));
+        assertEquals(4, StartupMode.chatPosition(false, true));
+        assertEquals(-1, StartupMode.chatPosition(true, false));
+        assertEquals(-1, StartupMode.chatPosition(false, false));
+        assertEquals(4, StartupMode.homePosition(true, true));
+        assertEquals(3, StartupMode.homePosition(true, false));   // Node slides into Chat's slot
+        assertEquals(0, StartupMode.homePosition(false, true));
+        assertEquals(0, StartupMode.homePosition(false, false));
+    }
+
+    @Test public void keetsSwitchStripsOnlyItsOwnFlagsWholeToken() {
+        assertEquals("-keetsbootstrap h:49737  -keetsmaxconns 8 -port 25001",
+                StartupMode.withoutKeetsSwitchFlags("-keetsbootstrap h:49737 -keets -keetsmaxconns 8 -port 25001"));
+        assertEquals(" /p  -megammr", StartupMode.withoutKeetsSwitchFlags("-keetssidecar /p -keetssidecarargs -megammr"));
+        assertEquals("", StartupMode.withoutKeetsSwitchFlags("-keets"));
+        assertEquals("-keetsconnect x", StartupMode.withoutKeetsSwitchFlags("-keetsconnect x"));
+    }
+
     @Test public void nodeParserAppliesBothProfilesAcrossRepeatedRestarts() {
         try {
             for (boolean block : new boolean[]{true, false, true, false}) {

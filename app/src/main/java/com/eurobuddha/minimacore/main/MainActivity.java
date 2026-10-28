@@ -139,15 +139,19 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         mMainAdapter = new MainAdapter(this);
 
-        //Chat QR scanner: launchers must register before STARTED (SendActivity pattern)
+        //Chat QR scanner: launchers must register before STARTED (SendActivity pattern).
+        //No Chat tab (keets transport off) = no ChatView: register anyway, wire nothing.
         androidx.activity.result.ActivityResultLauncher<com.journeyapps.barcodescanner.ScanOptions> chatScan =
                 registerForActivityResult(new com.journeyapps.barcodescanner.ScanContract(), result -> {
-                    if (result != null && result.getContents() != null) {
-                        ((com.eurobuddha.minimacore.chat.ChatView) mMainAdapter.getChatView())
-                                .onScanResult(result.getContents());
+                    com.eurobuddha.minimacore.chat.ChatView chat =
+                            (com.eurobuddha.minimacore.chat.ChatView) mMainAdapter.getChatView();
+                    if (chat != null && result != null && result.getContents() != null) {
+                        chat.onScanResult(result.getContents());
                     }
                 });
-        ((com.eurobuddha.minimacore.chat.ChatView) mMainAdapter.getChatView()).setOnScanRequest(() ->
+        com.eurobuddha.minimacore.chat.ChatView chatView =
+                (com.eurobuddha.minimacore.chat.ChatView) mMainAdapter.getChatView();
+        if (chatView != null) chatView.setOnScanRequest(() ->
                 chatScan.launch(new com.journeyapps.barcodescanner.ScanOptions()
                         .setDesiredBarcodeFormats(com.journeyapps.barcodescanner.ScanOptions.QR_CODE)
                         .setPrompt(Language.text(this, l10n_core_scan_keets))
@@ -174,8 +178,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         tabs.getTabAt(MainAdapter.APPS_POSITION).setText(Language.text(this, l10n_tab_apps));
         tabs.getTabAt(MainAdapter.APPS_POSITION).setIcon(R.drawable.ic_dapps);
 
-        tabs.getTabAt(MainAdapter.CHAT_POSITION).setText(Language.text(this, l10n_tab_chat));
-        tabs.getTabAt(MainAdapter.CHAT_POSITION).setIcon(R.drawable.ic_chat);
+        if (MainAdapter.CHAT_POSITION >= 0) {
+            tabs.getTabAt(MainAdapter.CHAT_POSITION).setText(Language.text(this, l10n_tab_chat));
+            tabs.getTabAt(MainAdapter.CHAT_POSITION).setIcon(R.drawable.ic_chat);
+        }
 
         //Slightly smaller tab icons. TabLayout has no icon-size attribute, so inset each icon to
         //shrink the glyph (~24dp -> ~18dp).
@@ -226,13 +232,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     public void setToolbarTitle(int zPosition){
         String title;
-        switch (zPosition){
-            case MainAdapter.WALLET_POSITION:  title = Language.text(this, l10n_tab_wallet);      break;
-            case MainAdapter.UTILITY_POSITION:  title = Language.text(this, BuildConfig.PANDA_SHELL ? l10n_tab_history : l10n_tab_terminal);    break;
-            case MainAdapter.APPS_POSITION:  title = Language.text(this, l10n_tab_apps);        break;
-            case MainAdapter.CHAT_POSITION:  title = Language.text(this, l10n_tab_chat);        break;
-            default: title = BuildConfig.PANDAMONIUM ? "" : "Minima Core"; break;
-        }
+        if (zPosition == MainAdapter.WALLET_POSITION)        title = Language.text(this, l10n_tab_wallet);
+        else if (zPosition == MainAdapter.UTILITY_POSITION)  title = Language.text(this, BuildConfig.PANDA_SHELL ? l10n_tab_history : l10n_tab_terminal);
+        else if (zPosition == MainAdapter.APPS_POSITION)     title = Language.text(this, l10n_tab_apps);
+        else if (zPosition == MainAdapter.CHAT_POSITION)     title = Language.text(this, l10n_tab_chat);
+        else title = BuildConfig.PANDAMONIUM ? "" : "Minima Core";
         if(getSupportActionBar() != null){
             getSupportActionBar().setTitle(BuildConfig.PANDAMONIUM ? "" : title);
             // Keep the SKU brand (e.g. "BlackBear") under the title as the user switches tabs.
@@ -248,14 +252,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         if (mMainAdapter != null) mMainAdapter.languageChanged();
         // Relabel retained tabs without selecting a page or restarting display work.
         TabLayout tabs = findViewById(R.id.tabs);
-        if (tabs != null && tabs.getTabCount() == 5) {
+        if (tabs != null && mMainAdapter != null && tabs.getTabCount() == mMainAdapter.getCount()) {
             tabs.getTabAt(MainAdapter.HOME_POSITION).setText(Language.text(this,
                     BuildConfig.PANDA_SHELL ? l10n_tab_node : l10n_tab_home));
             tabs.getTabAt(MainAdapter.WALLET_POSITION).setText(Language.text(this, l10n_tab_wallet));
             tabs.getTabAt(MainAdapter.UTILITY_POSITION).setText(Language.text(this,
                     BuildConfig.PANDA_SHELL ? l10n_tab_history : l10n_tab_terminal));
             tabs.getTabAt(MainAdapter.APPS_POSITION).setText(Language.text(this, l10n_tab_apps));
-            tabs.getTabAt(MainAdapter.CHAT_POSITION).setText(Language.text(this, l10n_tab_chat));
+            if (MainAdapter.CHAT_POSITION >= 0)
+                tabs.getTabAt(MainAdapter.CHAT_POSITION).setText(Language.text(this, l10n_tab_chat));
         }
         if (mMainPager != null) setToolbarTitle(mMainPager.getCurrentItem());
         invalidateOptionsMenu();
@@ -410,7 +415,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         dhtTitle.setText(Language.text(this, l10n_battery_dht_relay));
         dhtTitle.setPadding(0, pad / 2, 0, 0);
         dhtTitle.setTypeface(null, android.graphics.Typeface.BOLD);
-        box.addView(dhtTitle);
+        //No DHT with the keets transport off: the relay rows are built (so OK keeps the saved
+        //choice for when keets returns) but not shown.
+        boolean keets = com.eurobuddha.minimacore.service.BatteryPolicy.keets();
+        if (keets) box.addView(dhtTitle);
         android.widget.RadioGroup dhtGroup = new android.widget.RadioGroup(this);
         android.widget.RadioButton dhtAlways = new android.widget.RadioButton(this);
         dhtAlways.setId(android.view.View.generateViewId());
@@ -427,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay relayNow = com.eurobuddha.minimacore.service.BatteryPolicy.dhtRelay();
         (relayNow == com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay.PLUGGED ? dhtPlugged
                 : relayNow == com.eurobuddha.minimacore.service.BatteryPolicy.DhtRelay.WIFI_OR_PLUGGED ? dhtWifi : dhtAlways).setChecked(true);
-        box.addView(dhtGroup);
+        if (keets) box.addView(dhtGroup);
         android.widget.CheckBox charger = new android.widget.CheckBox(this);
         charger.setText(Language.text(this, l10n_battery_full_on_charger));
         charger.setChecked(com.eurobuddha.minimacore.service.BatteryPolicy.fullOnCharger());
@@ -739,6 +747,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     mMainPager.postDelayed(new Runnable() {
                         @Override
                         public void run() {
+                            //The Keets transport switch changes the tab shell (Chat tab or not),
+                            //which only onCreate builds: recreate() rebuilds it and starts the service.
+                            boolean keetsNow = com.eurobuddha.minimacore.main.StartupMode.keetsEnabled(
+                                    getSharedPreferences("main_prefs", MODE_PRIVATE));
+                            if ((MainAdapter.CHAT_POSITION >= 0) != keetsNow) {
+                                recreate();
+                                return;
+                            }
                             startMinimaService();
                             Toast.makeText(MainActivity.this,
                                     Language.msg(l10n_core_restart_params), Toast.LENGTH_LONG).show();

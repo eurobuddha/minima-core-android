@@ -962,6 +962,9 @@
     <string name="l10n_params_rpc_copied" formatted="false">"Пароль RPC скопійовано"</string>
     <string name="l10n_params_auto_resync" formatted="false">"Автосинхронізація за несправностей"</string>
     <string name="l10n_params_auto_resync_body" formatted="false">"Minima перевіряє свою базу щогодини. Якщо вимкнено, повідомляє про потребу синхронізації. Якщо ввімкнено, перебудовує ланцюжок самостійно, не частіше разу на добу й ніколи за наявності транзакції, що очікує включення до блока. В обох випадках гаманець і сід-фраза не змінюються."</string>
+    <string name="l10n_params_keets" formatted="false">"Транспорт Keets (-keets)"</string>
+    <string name="l10n_params_keets_body" formatted="false">"Увімк.: KeetChat і одноранговий транспорт keets, як раніше. Вимк.: без сайдкара Hyperswarm, без DHT і без вкладки Чат - вузол працює лише через класичний транспорт Minima та витрачає менше батареї й пам\'яті. Ваші чати та ідентичність keets залишаються на телефоні й повертаються після ввімкнення. Застосовується після перезапуску."</string>
+    <string name="l10n_chat_keets_off" formatted="false">"Транспорт keets вимкнено - увімкніть його в параметрах запуску, щоб користуватися чатом"</string>
     <string name="l10n_params_extra" formatted="false">"Додаткові аргументи (для досвідчених)"</string>
     <string name="l10n_params_extra_body" formatted="false">"Прапорці через пробіл, що передаються вузлу під час запуску. Тут заборонено прапорці очищення/сід-фрази (-clean, -genesis, -solo, -seed, -anyseed, -dbpassword) і прапорці, якими керує застосунок (-data, -basefolder, -conf, -server, -isclient)."</string>
     <string name="l10n_params_save_restart" formatted="false">"Зберегти й перезапустити вузол"</string>

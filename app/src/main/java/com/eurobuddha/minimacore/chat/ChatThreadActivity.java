@@ -97,6 +97,13 @@ public class ChatThreadActivity extends AppCompatActivity {
 
         mPubkey = getIntent().getStringExtra("pubkey");
         if (mPubkey == null) { finish(); return; }
+        //Keets transport off (Startup Params): nothing here can send or fetch. Reached only via a
+        //stale notification or a saved shortcut - the Chat tab itself is gone.
+        if (!com.eurobuddha.minimacore.main.StartupMode.keetsEnabled(getSharedPreferences("main_prefs", MODE_PRIVATE))) {
+            Toast.makeText(this, Language.msg(l10n_chat_keets_off), Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
         mPickImage = registerForActivityResult(new ActivityResultContracts.GetContent(),
                 uri -> { if (uri != null) sendImage(uri); });
