@@ -154,8 +154,10 @@ android {
         // (three sealed mailbox messages every 15 s per pending file on the Fold); review pass.
         // 2.1.0: the owner's minor bump for the keets file-transfer repair (2.0.68-2.0.70 work).
         // 2.2.0: Keets transport switch (Startup Params) - off = classic Minima transport, no Chat tab.
-        versionCode 270
-        versionName "2.2.0"
+        // 2.2.1: SECURITY - IPC trust on first use: a package that once proved its identity (API 34+
+        // shareIdentity) must always prove it, so a spoofer holding leaked pairing ids is dropped.
+        versionCode 271
+        versionName "2.2.1"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

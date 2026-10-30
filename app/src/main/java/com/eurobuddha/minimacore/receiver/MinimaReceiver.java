@@ -123,6 +123,18 @@ public class MinimaReceiver extends BroadcastReceiver {
                     logger.log("IPC sender "+real+" claimed to be "+frompackage+" - dropped");
                     return;
                 }
+                //Security review 30 Oct: getSentFromPackage() is null unless the sender opts in, so a spoofer that
+                //simply does not opt in passed the check above. Trust on first use: once a package has PROVEN its
+                //identity here, every later broadcast claiming that package must prove it too.
+                if(frompackage != null){
+                    android.content.SharedPreferences ids = zContext.getSharedPreferences("ipc_identity", Context.MODE_PRIVATE);
+                    if(real != null){
+                        if(!ids.getBoolean(frompackage, false)) ids.edit().putBoolean(frompackage, true).apply();
+                    }else if(ids.getBoolean(frompackage, false)){
+                        logger.log("IPC broadcast claiming "+frompackage+" did not prove its identity (it always has before) - dropped");
+                        return;
+                    }
+                }
             }
 
             //Get the App
