@@ -15,6 +15,7 @@ public class CollectConfirmationTest {
     Context context; NodeApi node; SharedPreferences prefs;
     Map<String,Object> values;
     List<String> commands; List<NodeApi.Cb> callbacks;
+    List<String> preflight;
     boolean commitSucceeds;
     static final String ADDRESS=id('a'), TX=id('b'), MINED=id('c');
     static String id(char c) { return "0x"+String.valueOf(c).repeat(64); }
@@ -31,7 +32,10 @@ public class CollectConfirmationTest {
     static JSONObject page(JSONObject... txs) {JSONArray list=new JSONArray();for(JSONObject tx:txs)list.put(tx);return object("status",true,"response",object("txpows",list));}
     static JSONObject inclusion() {return object("status",true,"response",object("found",true,"blockid",id('d'),"block","100","tip","103","confirmations","3"));}
     @Before public void setup() {
+        // Each fixture is a fresh process; production deliberately has no reset/unlock API.
+        try{for(String field:new String[]{"POSTED","QUEUED","RESERVED"}){java.lang.reflect.Field f=CoinLock.class.getDeclaredField(field);f.setAccessible(true);Object v=f.get(null);if(v instanceof Map)((Map<?,?>)v).clear();else ((Set<?>)v).clear();}}catch(Exception e){throw new AssertionError(e);}
         context=mock(Context.class);node=mock(NodeApi.class);prefs=mock(SharedPreferences.class);
+        when(context.getApplicationContext()).thenReturn(context);preflight=new ArrayList<>();
         values=new HashMap<>();commands=new ArrayList<>();callbacks=new ArrayList<>();commitSucceeds=true;
         when(context.getSharedPreferences(anyString(),anyInt())).thenReturn(prefs);when(node.context()).thenReturn(context);
         when(prefs.getString(anyString(),nullable(String.class))).thenAnswer(i->values.getOrDefault(i.getArgument(0),i.getArgument(1)));
@@ -46,7 +50,12 @@ public class CollectConfirmationTest {
             when(edit.commit()).thenAnswer(c->{apply.run();return commitSucceeds;});
             doAnswer(c->{apply.run();return null;}).when(edit).apply();return edit;
         });
-        doAnswer(i->{commands.add(i.getArgument(0));callbacks.add(i.getArgument(1));return null;})
+        doAnswer(i->{String command=i.getArgument(0);
+            if(command.startsWith("coins checkmempool:true coinid:")){
+                preflight.add(command);String coinid=command.substring("coins checkmempool:true coinid:".length());
+                ((NodeApi.Cb)i.getArgument(1)).onResult(object("status",true,"response",new JSONArray().put(object("coinid",coinid,"spent",false))));return null;
+            }
+            commands.add(command);callbacks.add(i.getArgument(1));return null;})
                 .when(node).cmd(anyString(),any(NodeApi.Cb.class));
     }
     void answer(JSONObject value){assertFalse("No pending node callback",callbacks.isEmpty());callbacks.remove(0).onResult(value);}
@@ -141,6 +150,7 @@ public class CollectConfirmationTest {
                 public void onPosted(String id){fail("uncertain outcome must not report posted");}
                 public void onFailed(String error){failures.add(error);}
             });
+            assertEquals(2,preflight.size());assertTrue(preflight.get(0).endsWith(pool.coinidM));assertTrue(preflight.get(1).endsWith(pool.coinidT));
             assertEquals(1,commands.size());assertTrue(commands.get(0).startsWith("txnlist id:ppclose_"));
             String handle=commands.get(0).substring("txnlist id:".length()).split(" ")[0];
             assertNull(PendingCollect.get(context,ADDRESS));

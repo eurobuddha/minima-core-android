@@ -929,9 +929,6 @@
     <string name="l10n_params_rpc_copied" formatted="false">"已复制 RPC 密码"</string>
     <string name="l10n_params_auto_resync" formatted="false">"节点异常时自动重新同步"</string>
     <string name="l10n_params_auto_resync_body" formatted="false">"Minima 每小时检查自身数据库。关闭时，会在需要重新同步时通知您。开启时，会自行重建链，每天最多一次，且不会在有交易等待打包时进行。无论哪种设置，您的钱包和助记词都不会被更改。"</string>
-    <string name="l10n_params_keets" formatted="false">"Keets 传输（-keets）"</string>
-    <string name="l10n_params_keets_body" formatted="false">"开启：KeetChat 与点对点 keets 传输，与之前相同。关闭：无 Hyperswarm 边车、无 DHT、无\"聊天\"标签页，节点仅使用经典 Minima 传输，耗电和内存更少。您的聊天记录和 keets 身份保留在手机上，重新开启后恢复。重启后生效。"</string>
-    <string name="l10n_chat_keets_off" formatted="false">"keets 传输已关闭 - 请在启动参数中开启后再使用聊天"</string>
     <string name="l10n_params_extra" formatted="false">"额外参数（高级）"</string>
     <string name="l10n_params_extra_body" formatted="false">"启动时传递给节点的标志，以空格分隔。此处不允许清除／种子标志（-clean、-genesis、-solo、-seed、-anyseed、-dbpassword）以及由应用管理的标志（-data、-basefolder、-conf、-server、-isclient）。"</string>
     <string name="l10n_params_save_restart" formatted="false">"保存并重启节点"</string>
@@ -5429,9 +5426,9 @@
     <string name="l10n_pools_lp_showing_closed" formatted="false">"已重新显示关闭的池。"</string>
     <string name="l10n_pools_lp_saved_missing" formatted="false">"已保存的池 · 未找到储备"</string>
     <!-- Arguments: ownership, pause -->
-    <string name="l10n_pools_lp_missing_note">"此节点目前无法看到池的两种储备币。池已关闭或节点仍在同步时，都可能出现此情况。\n\n%1$s%2$s"</string>
+    <string name="l10n_pools_lp_missing_note">"使用此池前，请检查储备和所有者密钥。\n\n%1$s%2$s"</string>
     <string name="l10n_pools_lp_key_here" formatted="false">"此池的所有者密钥在本设备上。"</string>
-    <string name="l10n_pools_lp_key_missing" formatted="false">"此池的所有者密钥不在本设备上。请恢复对应的 MinimaCore 钱包备份。"</string>
+    <string name="l10n_pools_lp_key_missing" formatted="false">"所有者密钥尚未加载。请在原钱包上恢复池文件以找回密钥。"</string>
     <string name="l10n_pools_lp_pause_suffix" formatted="false">" 此池的所有者签名已暂停，详见下方。"</string>
     <string name="l10n_pools_lp_check_reserves" formatted="false">"检查储备"</string>
     <string name="l10n_pools_lp_put_away" formatted="false">"池已关闭 — 隐藏"</string>
@@ -5465,7 +5462,7 @@
     <string name="l10n_pools_lp_backup_needed" formatted="false">"未记录已验证的池备份"</string>
     <string name="l10n_pools_lp_backup_changed" formatted="false">"请检查池备份"</string>
     <!-- Arguments: count -->
-    <string name="l10n_pools_lp_backup_missing_body">"已保存的池：%1$d。本设备未记录已验证的池备份。请保存 PandaPools 配方文件，并保留最新的完整 MinimaCore 钱包备份。PandaPools 不会将这些合约上传到云备份，也无法检查您是否在其他位置保存了钱包备份。"</string>
+    <string name="l10n_pools_lp_backup_missing_body">"已保存的池：%1$d。本设备未记录已验证的池备份。请将池文件保存到手机以外的位置，并妥善保管原钱包助记词。"</string>
     <string name="l10n_pools_lp_backup_changed_body" formatted="false">"自上次已验证的导出以来，已保存的池集合发生了变化。请保存新文件以包含当前配方。"</string>
     <string name="l10n_pools_lp_backup_now" formatted="false">"立即备份"</string>
     <string name="l10n_pools_lp_add_proofs" formatted="false">"向池文件添加币证明"</string>
@@ -5503,7 +5500,7 @@
     <string name="l10n_pools_lp_backup_verified_status" formatted="false">"备份已保存并验证 ✓"</string>
     <string name="l10n_pools_lp_backup_verified_title" formatted="false">"备份已保存并验证"</string>
     <!-- Arguments: count, proofs -->
-    <string name="l10n_pools_lp_backup_verified_body">"通过读回文件已检查的池合约数：%1$d。\n\n%2$s\n\n请将此配方文件与最新的完整 MinimaCore 钱包备份一起保存在本手机之外。配方包含合约和密钥标识，但不含私钥，也无法确定哪些一次性签名已被使用。助记词、旧备份或猜测的计数器都不能证明签名状态安全。\n\n恢复时，先在 MinimaCore 中恢复对应的最新钱包备份，再在 PandaPools 中恢复这些配方。请停止该钱包其他所有副本的签名操作。恢复的配方会暂停所有者签名，直到您确认当前钱包签名状态。提现前请检查实时储备。"</string>
+    <string name="l10n_pools_lp_backup_verified_body">"已检查池合约：%1$d。\n\n%2$s\n\n请妥善保存池文件、原钱包助记词和最新的完整节点备份。此诊断会检查储备并查找匹配密钥，但恢复的池保持暂停。"</string>
     <string name="l10n_pools_lp_backup_proofs_missing" formatted="false">"导出时部分储备证明不可用或发生变化。恢复可能需要可用的归档或新证明。仅有配方无法重建链上证明。"</string>
     <string name="l10n_pools_lp_backup_proofs_expire" formatted="false">"文件中的币证明可能过期。请保留配方文件；恢复时还可能需要可用的归档或新证明。"</string>
     <string name="l10n_pools_recovery_collect" formatted="false">"将已提现资金收集到钱包"</string>
@@ -5541,8 +5538,8 @@
     <!-- Arguments: count -->
     <string name="l10n_pools_recovery_checked">"已检查的池：%1$d。"</string>
     <string name="l10n_pools_recovery_check_title" formatted="false">"备份检查"</string>
-    <string name="l10n_pools_recovery_restore_withdraw" formatted="false">"恢复并提现"</string>
-    <string name="l10n_pools_recovery_restore_warning" formatted="false">"此操作会导入池配方、检查储备，然后尝试为符合条件的池提现，不再另行确认。提现会使用所有者一次性签名。继续前，请停止此钱包其他副本的签名操作。\n\n检查会拒绝已知的计数器回退、缺失的记录计数、不可读取的储备，以及新近到可能表明另一个钱包仍在运行的储备。这些检查不能证明签名状态是最新的，也无法检测在其他位置生成的所有签名。\n\n若只想查看文件而不做更改，请使用“检查备份文件”。若要继续运行池，请取消，恢复对应的最新完整 MinimaCore 钱包备份，并核实签名状态。较旧的储备可能需要可用的归档或新证明。"</string>
+    <string name="l10n_pools_recovery_restore_withdraw" formatted="false">"运行恢复诊断"</string>
+    <string name="l10n_pools_recovery_restore_warning" formatted="false">"请使用原钱包。此诊断会检查池储备，并在按区块计数的节点上查找匹配的所有者密钥，可能生成缺失的地址。\n\n两种密钥模式下，恢复的池均保持暂停。不会签名、提现或启用自动刷新。请复制结果以便获取支持。"</string>
     <string name="l10n_pools_recovery_restore_cancelled" formatted="false">"恢复已取消。"</string>
     <string name="l10n_pools_recovery_restoring" formatted="false">"正在恢复池…"</string>
     <!-- Arguments: detail -->
@@ -5565,7 +5562,7 @@
     <string name="l10n_pools_recovery_partial_title" formatted="false">"恢复完成 · 部分池需要处理"</string>
     <string name="l10n_pools_recovery_withdraw_note" formatted="false">"已提交的请求仍需要链上确认，并从所有者收款地址收集资金。在视为资金已到账前，请检查“活动”和余额。\n\n恢复的配方会保持自动刷新暂停，直到确认当前钱包签名状态。较旧的储备可能需要归档恢复。检查无法证明其他钱包副本上没有使用过未被观察到的一次性签名。"</string>
     <string name="l10n_pools_recovery_guide_title" formatted="false">"池恢复方式"</string>
-    <string name="l10n_pools_recovery_guide_body" formatted="false">"请同时保留最新的 MinimaCore 钱包备份和 PandaPools 配方文件。钱包备份保存密钥与签名状态；配方记录池合约。\n\n先在 MinimaCore 中恢复对应钱包，再在此恢复配方。花费资金前请检查实时储备。仅有助记词或配方无法确定哪些一次性签名已被使用。PandaPools 不会自动重建缺失的所有者密钥。请勿同时运行同一钱包的两个恢复副本并让两者都签名。\n\n配方备份中的币证明会过期。若无法找到实时储备，恢复储备功能会检查备份证明、此节点的 MegaMMR 及您配置的归档连接。接收节点会在导入前验证证明。本地查询为空并不能证明资金已花费。恢复需要可用的归档或新证明；仅有配方无法重建链上证明。\n\n恢复的配方会暂停所有者签名，包括自动刷新，直到您确认当前钱包签名状态。提现前请检查两种储备金额和签名状态。"</string>
+    <string name="l10n_pools_recovery_guide_body" formatted="false">"此诊断可查找匹配的区块模式所有者密钥并检查储备，但不会恢复签名控制。两种密钥模式下，恢复的池均保持暂停。请将结果提供给支持人员。\n\n匹配的密钥和当前链高度无法证明哪些一次性签名已被使用。请妥善保存池文件、助记词及最新的完整节点备份。"</string>
     <!-- Arguments: id -->
     <string name="l10n_pools_recovery_withdrawal_submitted">"提现已提交：%1$s"</string>
     <string name="l10n_pools_create_checking_price" formatted="false">"正在查询市场价格…"</string>
@@ -5574,11 +5571,11 @@
     <string name="l10n_pools_create_obligations_heading" formatted="false">"此池需要您做到两件事"</string>
     <!-- Arguments: blocks -->
     <string name="l10n_pools_create_keep_running">"1. 请确保 PandaPools 能定期运行。\n\n储备币约每 %1$s 个区块需要刷新一次。PandaPools 能运行时会自动尝试刷新。若未刷新，其他钱包可能无法找到此池。较旧的币可能需要 MegaMMR 归档中的最新证明才能恢复。"</string>
-    <string name="l10n_pools_create_keep_backups" formatted="false">"2. 请同时保留池配方和最新的完整 MinimaCore 钱包备份。\n\n钱包备份保存密钥和签名状态；配方记录池合约。仅有助记词或配方无法确定哪些一次性签名已被使用。\n\n请将这两份文件保存在本手机之外。恢复还可能需要最新的币证明或可用的归档。不要从同一钱包的两个恢复副本进行签名。"</string>
+    <string name="l10n_pools_create_keep_backups" formatted="false">"2. 保存池文件，并妥善保管钱包助记词和最新的完整节点备份。此诊断不会恢复签名控制。"</string>
     <string name="l10n_pools_create_fix_battery" formatted="false">"设置"</string>
     <string name="l10n_pools_create_battery_exempt" formatted="false">"电池优化：已豁免。允许后台运行，但 Android 仍可能中断它。"</string>
     <string name="l10n_pools_create_battery_restricted" formatted="false">"⚠ 电池优化可能中断 PandaPools，导致应用关闭时无法自动刷新。"</string>
-    <string name="l10n_pools_create_backup_acknowledgement" formatted="false">"我已了解：必须保持应用能够运行，并同时保留池文件和最新的钱包备份。"</string>
+    <string name="l10n_pools_create_backup_acknowledgement" formatted="false">"我明白：保持应用运行，保存池文件并妥善保管钱包助记词。"</string>
     <string name="l10n_pools_create_battery_acknowledgement" formatted="false">"我已了解 Android 可能阻止 PandaPools 刷新此池，我会每天至少打开一次应用。"</string>
     <string name="l10n_pools_create_before_title" formatted="false">"创建池之前"</string>
     <string name="l10n_pools_create_acknowledge_required" formatted="false">"请勾选复选框以确认您已了解。"</string>
@@ -8502,4 +8499,14 @@
     <string name="l10n_files_downloaded_sharing" formatted="false">"已下载并验证 · 正在分享"</string>
     <string name="l10n_files_confirmation_unavailable" formatted="false">"暂无下载确认"</string>
     <string name="l10n_files_awaiting_download" formatted="false">"等待下载验证"</string>
+    <string name="l10n_pools_recovery_choose_backup" formatted="false">"选择池备份"</string>
+    <string name="l10n_pools_recovery_restored_title" formatted="false">"恢复诊断"</string>
+    <string name="l10n_pools_lp_owner_missing_title" formatted="false">"已保存的池 · 缺少所有者密钥"</string>
+    <!-- Arguments: ready, total -->
+    <string name="l10n_pools_recovery_ready_count">"%2$s 个池中有 %1$s 个已匹配密钥并验证储备。签名保持暂停。"</string>
+    <!-- Arguments: ready, total -->
+    <string name="l10n_pools_recovery_ready_body">"%2$s 个池中有 %1$s 个已验证储备并匹配所有者密钥。签名保持暂停。未发送恢复签名或提现。"</string>
+    <string name="l10n_params_keets" formatted="false">"Keets 传输（-keets）"</string>
+    <string name="l10n_params_keets_body" formatted="false">"开启：KeetChat 与点对点 keets 传输，与之前相同。关闭：无 Hyperswarm 边车、无 DHT、无\"聊天\"标签页，节点仅使用经典 Minima 传输，耗电和内存更少。您的聊天记录和 keets 身份保留在手机上，重新开启后恢复。重启后生效。"</string>
+    <string name="l10n_chat_keets_off" formatted="false">"keets 传输已关闭 - 请在启动参数中开启后再使用聊天"</string>
 </resources>

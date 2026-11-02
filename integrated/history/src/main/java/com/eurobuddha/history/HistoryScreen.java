@@ -293,14 +293,24 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
 
     // ---- detail dialog ----
 
+    private void showChainStatus(LinearLayout parent,String id) {
+        TextView evidence=new TextView(this);evidence.setText("Checking chain inclusion…");evidence.setTextSize(13f);parent.addView(evidence);
+        if(id==null||!id.matches("(?i)0x[0-9a-f]{64}")){evidence.setText("Unverified");return;}
+        node.cmd("txpow onchain:"+id,new NodeApi.Cb(){
+            public void onResult(JSONObject r){if(closed)return;evidence.setText(HistoryChainStatus.describe(r));}
+            public void onError(String m){if(closed)return;evidence.setText("Unverified — node check unavailable");}
+        });
+    }
+
     private void showDetail(HistoryEntry e) {
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(20), dp(12), dp(20), dp(12));
 
-        kv(box, Language.msg(l10n_history_direction), directionLabel(e.direction));
+        kv(box, Language.msg(l10n_history_direction), HistoryChainStatus.direction(e.direction));
         kv(box, Language.msg(l10n_history_amount), (e.incoming ? "+" : e.direction.equals("sent") ? "−" : "") + Util.tidyAmount(e.amount) + " " + e.tokenName);
-        kv(box, Language.msg(l10n_history_block), String.valueOf(e.block));
+        kv(box, "Created at height (not confirmation)", String.valueOf(e.block));
+        showChainStatus(box,e.txpowid);
         kv(box, Language.msg(l10n_history_date_time), Language.stamp(e.timemilli, "yMMMdHms"));
         copyRow(box, Language.msg(l10n_history_txpow), e.txpowid);
         if (!Util.isMinima(e.tokenid)) copyRow(box, Language.msg(l10n_history_token), e.tokenid);
@@ -475,7 +485,7 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
             CharSequence tag = ck == Ownership.Kind.UNKNOWN ? "" : Language.join(Ownership.label(ck), "  ·  ");
             CharSequence cp = e.counterparty.isEmpty() ? "" : Language.join(Util.shorten(e.counterparty), "  ·  ", tag);
             Language.setText(h.line2, Language.join(reshuffle ? Language.join(e.reshuffleLabel(), "  ·  ") : cp, relative(e.timemilli)));
-            Language.setText(h.right, "#" + e.block);
+            Language.setText(h.right, "Unverified");
             h.itemView.setOnClickListener(v -> showDetail(e));
         }
 
@@ -577,16 +587,16 @@ public final class HistoryScreen extends android.view.ContextThemeWrapper {
                 db.reconcile(own);
                 List<HistoryEntry> all = db.all();
                 SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
-                StringBuilder sb = new StringBuilder("txpowid,block,datetime,direction,amount,token,counterparty,deltas\n");
+                StringBuilder sb = new StringBuilder("txpowid,created_height,datetime,direction,amount,token,counterparty,inclusion_status,deltas\n");
                 for (HistoryEntry e : all) {
                     String signed = ("received".equals(e.direction) ? "" : "sent".equals(e.direction) ? "-" : "") + e.amount;
                     sb.append(csv(e.txpowid)).append(',')
                       .append(e.block).append(',')
                       .append(csv(fmt.format(new Date(e.timemilli)))).append(',')
-                      .append(csv(e.direction)).append(',')
+                      .append(csv(HistoryChainStatus.direction(e.direction))).append(',')
                       .append(csv(signed)).append(',')
                       .append(csv(e.tokenName)).append(',')
-                      .append(csv(e.counterparty)).append(',')
+                      .append(csv(e.counterparty)).append(',').append("unverified,")
                       .append(csv(e.deltas)).append('\n');
                 }
                 try (OutputStream os = getContentResolver().openOutputStream(uri)) {

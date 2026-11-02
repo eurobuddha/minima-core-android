@@ -315,7 +315,7 @@ public class MyLpView extends BaseView {
         LinearLayout card = dialogBox();
         Ui.card(card);
         boolean held = p.signingStateUnverified || OwnPoolStore.confirmationFailed(p.opk);
-        card.addView(text(Language.msg(l10n_pools_lp_saved_missing), Design.dim(), 16, true));
+        card.addView(text(mine(p) ? Language.msg(l10n_pools_lp_saved_missing) : Language.msg(l10n_pools_lp_owner_missing_title), Design.dim(), 16, true));
         identifiers(card, p);
         TextView note = new TextView(act);
         Language.setText(note, Language.msg(l10n_pools_lp_missing_note, mine(p) ? Language.msg(l10n_pools_lp_key_here) : Language.msg(l10n_pools_lp_key_missing), held ? Language.msg(l10n_pools_lp_pause_suffix) : ""));
@@ -880,7 +880,7 @@ public class MyLpView extends BaseView {
                         .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                         .show();
             }
-            @Override public void onError(String m) { info(Language.msg(l10n_common_error), Language.msg(l10n_pools_create_balance_error, PoolsMessages.message(m))); }
+            @Override public void onError(String m) { info(Language.msg(l10n_seed_sync_error), Language.msg(l10n_pools_create_balance_error, PoolsMessages.message(m))); }
         });
     }
 
@@ -1207,7 +1207,7 @@ public class MyLpView extends BaseView {
                     OwnPoolStore.setRetired(act, p.address, true);
                     ActivityLog.record(act, ActivityLog.MIGRATE, "Migrate MINIMA / " + p.tokenLabel() + " pool  ·  new size "
                             + trim(pool.reserveM) + " MINIMA + " + trim(pool.reserveT) + " " + p.tokenLabel(), txpowid, act.chainBlock());
-                    act.runOnUiThread(() -> { busy = false; status(Language.msg(l10n_pools_liquidity_migrate_submitted, txpowid), txpowid); act.pools().refresh(); });
+                    act.runOnUiThread(() -> { busy = false; status(Language.msg(l10n_pools_liquidity_migrate_submitted, txpowid), txpowid); act.pools().refresh(); forceBackupAfterCreate(pool); });
                 }
                 @Override public void onFailed(String message) {
                     ActivityLog.recordFailed(act, ActivityLog.MIGRATE, "Migrate MINIMA / " + p.tokenLabel() + " pool", message);
@@ -1449,7 +1449,7 @@ public class MyLpView extends BaseView {
         // changing anything, so nobody has to commit to a restore just to find out whether their file is good.
         CharSequence[] items = { Language.msg(l10n_pools_recovery_collect), Language.msg(l10n_pools_recovery_backup),
                 Language.msg(l10n_pools_recovery_check), Language.msg(l10n_pools_recovery_restore),
-                Language.msg(l10n_pools_recovery_archive), Language.msg(l10n_pools_lp_confirm_signing), Language.msg(l10n_pools_recovery_how) };
+                Language.msg(l10n_pools_recovery_archive), Language.msg(l10n_pools_lp_confirm_signing), Language.msg(l10n_pools_recovery_how), "Recover & withdraw (one-time exit)", "Recover on existing wallet" };
         act.languageDialog()
                 .setTitle(Language.msg(l10n_pools_recovery_title))
                 .setItems(items, (d, w) -> {
@@ -1459,22 +1459,16 @@ public class MyLpView extends BaseView {
                     else if (w == 3) doRestore();
                     else if (w == 4) archiveConnection();
                     else if (w == 5) confirmSigningState();
-                    else showRecoveryGuide();
+                    else if (w == 6) showRecoveryGuide();
+                    else if (w == 7) recoverAndWithdraw();
+                    else if (w == 8) recoverExistingWallet();
                 })
                 .setNegativeButton(Language.msg(l10n_language_close), null)
                 .show();
     }
 
     private void archiveConnection() {
-        EditText input = new EditText(act);
-        input.setSingleLine(true); input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-        input.setText(ArchiveNode.setting(act));
-        act.languageDialog().setTitle(Language.msg(l10n_pools_recovery_archive))
-                .setMessage(Language.msg(l10n_pools_recovery_archive_help))
-                .setView(input).setPositiveButton(Language.msg(l10n_common_save), (d, w) -> {
-                    if (ArchiveNode.save(act, input.getText().toString())) status(Language.msg(l10n_pools_recovery_archive_saved));
-                    else status(Language.msg(l10n_pools_recovery_archive_invalid));
-                }).setNegativeButton(Language.msg(l10n_pools_cancel), null).show();
+        copyableReport("Recovery archive", "eurobuddha.com:9001\n\nPandaPools requests fresh reserve proofs from this archive only. Each proof must pass validation on this node before it is imported. No seed or wallet signing state is sent.\n\nA pool older than the cascade does not by itself require a full resync. If current proofs cannot be validated, recovery reports the failure. Register the pool recipe before any full resync and preserve the existing wallet and its signing state.");
     }
 
     /** The recovery menu's entry point: no pool in hand, so it still has to ask which key. */
@@ -1492,6 +1486,10 @@ public class MyLpView extends BaseView {
     /** Confirm ONE key — the one on the card the user tapped. A card that names a key must not then open a
      *  picker listing every key: that is how someone attests to the wrong one. */
     private void confirmSigningState(String key) {
+        if (BuildConfig.VERSION_NAME.endsWith("-diagnostic") || BuildConfig.VERSION_NAME.endsWith("-recovery")) {
+            info(Language.msg(l10n_pools_recovery_signing_paused), "This build keeps normal restored-pool signing paused. Use Recover & withdraw for the bounded one-time exit.");
+            return;
+        }
         if (act.node() == null) { info(Language.msg(l10n_pools_recovery_signing_paused), Language.msg(l10n_pools_recovery_connect_wallet)); return; }
         if (key == null || key.isEmpty()) { confirmSigningState(); return; }
         act.languageDialog().setTitle(Language.msg(l10n_pools_recovery_confirm_state))
@@ -1511,35 +1509,9 @@ public class MyLpView extends BaseView {
     }
 
     private void doBackup() {
-        status(Language.msg(l10n_pools_lp_preparing_backup));
-        final java.util.List<Pool> owned = OwnPoolStore.all(act);
-        recovery.backup(act, new ArrayList<>(myPools), act.chainBlock(), new Recovery.BackupCb() {
-            @Override public void onBackup(String json) {
-                act.pickSaveFile("pandapools-backup.json", uri -> {
-                    if (uri == null) { status(Language.msg(l10n_pools_lp_backup_cancelled)); return; }
-                    if (!writeUri(uri, json)) { status(Language.msg(l10n_pools_lp_backup_write_failed)); return; }
-                    // A write that did not throw is NOT evidence the file is usable. Read it back and prove it
-                    // can recover every pool: a truncated or partially-written backup otherwise fails for the
-                    // first time during a real recovery, which is the worst possible moment to discover it.
-                    String readBack = readUri(uri);
-                    int written = json.getBytes(java.nio.charset.StandardCharsets.UTF_8).length;
-                    String problem = BackupState.verifyExport(readBack, owned, written);
-                    if (problem != null) {
-                        status(Language.msg(l10n_pools_lp_backup_unverified, PoolsMessages.message(problem)));
-                        info(Language.msg(l10n_pools_lp_backup_verify_failed),
-                                Language.msg(l10n_pools_lp_backup_readback_failed, PoolsMessages.message(problem)));
-                        return;
-                    }
-                    BackupState.recordVerifiedExport(act, owned);
-                    clearProoflessWithProofs(readBack);   // any pool whose entry now carries proofs is done
-                    status(Language.msg(l10n_pools_lp_backup_verified_status));
-                    info(Language.msg(l10n_pools_lp_backup_verified_title),
-                            Language.msg(l10n_pools_lp_backup_verified_body, owned.size(), json.contains("proof_warning") ? Language.msg(l10n_pools_lp_backup_proofs_missing) : Language.msg(l10n_pools_lp_backup_proofs_expire)));
-                    act.pools().refresh();   // re-render so the "not backed up" banner clears
-                });
-            }
-            @Override public void onError(String msg) { status(PoolsMessages.message(msg)); }
-        });
+        if (busy) return;
+        busy = true;
+        CombinedBackupUi.backup(act, recovery, new ArrayList<>(myPools), this::status, () -> busy = false);
     }
 
     /**
@@ -1555,17 +1527,8 @@ public class MyLpView extends BaseView {
      * warnings on the one screen where they must not.
      */
     private void forceBackupAfterCreate(Pool pool) {
-        final String addr = pool == null ? "" : pool.address;
-        markProofless(addr);
-        androidx.appcompat.app.AlertDialog dlg = act.languageDialog()
-                .setTitle(Language.msg(l10n_pools_recovery_save_now))
-                .setMessage(Language.msg(l10n_pools_recovery_save_now_body, addr))
-                .setCancelable(false)
-                .setPositiveButton(Language.msg(l10n_pools_recovery_save_file), (d, w) -> doBackup())
-                .create();
-        dlg.show();
-        TextView body = dlg.findViewById(android.R.id.message);
-        if (body != null) body.setTextIsSelectable(true);
+        markProofless(pool == null ? "" : pool.address);
+        doBackup();
     }
 
     /** Remember that this pool's exported recipe has no coin proofs yet, so we can offer a re-export once the
@@ -1583,8 +1546,7 @@ public class MyLpView extends BaseView {
     private void doCheckBackup() {
         act.pickOpenFile(uri -> {
             if (uri == null) { status(Language.msg(l10n_pools_recovery_check_cancelled)); return; }
-            String json = readUri(uri);
-            if (json == null || json.isEmpty()) { status(Language.msg(l10n_pools_recovery_file_unreadable)); return; }
+            CombinedBackupUi.inspect(act,uri,json->{
             NodeApi n = act.node();
             if (n == null) { status(Language.msg(l10n_pools_recovery_connect_check)); return; }
             if (busy) return;
@@ -1601,6 +1563,7 @@ public class MyLpView extends BaseView {
                     });
                 }
             });
+            },this::status);
         });
     }
 
@@ -1624,12 +1587,10 @@ public class MyLpView extends BaseView {
     }
 
     private void doRestore() {
-        // The one place a user can still back out, so it carries the whole warning. Restore no longer only
-        // inspects: it withdraws. "Check a backup file" is the look-only path and is named in the message.
         act.languageDialog()
                 .setTitle(Language.msg(l10n_pools_recovery_restore_withdraw))
                 .setMessage(Language.msg(l10n_pools_recovery_restore_warning))
-                .setPositiveButton(Language.msg(l10n_pools_recovery_restore_withdraw), (d, w) -> pickRestoreFile())
+                .setPositiveButton(Language.msg(l10n_pools_recovery_choose_backup), (d, w) -> pickRestoreFile())
                 .setNegativeButton(Language.msg(l10n_pools_cancel), null)
                 .show();
     }
@@ -1637,34 +1598,77 @@ public class MyLpView extends BaseView {
     private void pickRestoreFile() {
         act.pickOpenFile(uri -> {
             if (uri == null) { status(Language.msg(l10n_pools_recovery_restore_cancelled)); return; }
-            String json = readUri(uri);
-            if (json == null || json.isEmpty()) { status(Language.msg(l10n_pools_recovery_file_unreadable)); return; }
-            restoreJson(json, true);
+            CombinedBackupUi.open(act, uri, json -> restoreJson(json, true), this::status);
         });
     }
 
-    /** {@code withdraw} true only for a restore from a FILE. The per-pool "Recover reserves" card feeds the same
-     *  method with a one-pool synthetic backup, and must stay a read-only reserve check — it would otherwise
-     *  silently become a Withdraw button. */
+    private void recoverExistingWallet() {
+        if (busy) return;
+        act.languageDialog().setTitle("Recover on existing wallet")
+                .setMessage("Use this when this node still has the original wallet keys and their current signing state, including after a chain resync that preserved the wallet. A seed-only restore does not meet that condition. Stop every other copy of the wallet first.\n\nChoose the pool backup. PandaPools will register its recipes, fetch missing reserve proofs from eurobuddha.com:9001, check existing owner keys and counters, then attempt one withdrawal and confirmed collection for each eligible pool. Missing data or uncertain transactions stop with a report. No keys will be regenerated.\n\nContinue only if you confirm that this wallet's signing state has been preserved. PandaPools cannot prove that from the seed or pool backup alone.")
+                .setPositiveButton("Confirm wallet & choose backup", (d, which) -> act.pickOpenFile(uri -> {
+                    if (uri == null) return;
+                    CombinedBackupUi.open(act,uri,json->restoreJson(json,true,true,true),this::status);
+                })).setNegativeButton(Language.msg(l10n_pools_cancel), null).show();
+    }
+
+    private void recoverAndWithdraw() {
+        if (busy) return;
+        act.languageDialog().setTitle("Recover & withdraw")
+                .setMessage("Use this only after stopping every other copy of this wallet. The original seed must already be restored locally on this node; never share it here.\n\n"
+                        + "This attempts one withdrawal per verified pool to its fixed owner payout address, waits for confirmation, then attempts one transfer into this node's wallet.\n\n"
+                        + "The seed does not prove previous signature use. Reusing a signing slot can expose funds even on a throwaway node. Normal pool signing stays paused. Uncertain attempts stop for review.\n\n"
+                        + "By continuing you confirm the other copies are stopped and accept that remaining risk.")
+                .setPositiveButton("Accept risk & choose backup", (d, which) -> act.pickOpenFile(uri -> {
+                    if (uri == null) return;
+                    CombinedBackupUi.open(act,uri,json->restoreJson(json,true,true),this::status);
+                })).setNegativeButton(Language.msg(l10n_pools_cancel), null).show();
+    }
+
+    /** Diagnostic file restore discovers keys; neither this nor a reserve check can withdraw. */
     private void restoreJson(String json) { restoreJson(json, false); }
 
-    private void restoreJson(String json, boolean withdraw) {
+    private void restoreJson(String json, boolean withdraw) { restoreJson(json, withdraw, false); }
+
+    private void restoreJson(String json, boolean withdraw, boolean acceptedExit) {
+        restoreJson(json, withdraw, acceptedExit, false);
+    }
+
+    private void restoreJson(String json, boolean withdraw, boolean acceptedExit, boolean existingOnly) {
             if (busy) return;
             busy = true;
             status(Language.msg(l10n_pools_recovery_restoring));
             final Language.TextBuilder log = new Language.TextBuilder();
             final List<Pool> verified = new ArrayList<>();
-            recovery.restore(act, json, act.chainBlock(), new Recovery.RestoreCb() {
+            recovery.restore(act, json, act.chainBlock(), withdraw, existingOnly, new Recovery.RestoreCb() {
+                private BlockOwnerRecovery.Result owners;
+                @Override public void onOwnerRecovery(BlockOwnerRecovery.Result result) { owners = result; }
                 @Override public void onProgress(String line) { CharSequence translated = PoolsMessages.report(line); log.append(translated).append('\n'); status(Language.msg(l10n_pools_recovery_restore_progress, translated)); }
                 @Override public void onVerified(Pool p) { verified.add(p); }
                 @Override public void onDone(int restored, int total) {
                     if (total == 0) {
                         busy = false;
                         status(Language.msg(l10n_pools_recovery_not_backup));
-                        info(Language.msg(l10n_pools_recovery_nothing), Language.msg(l10n_pools_recovery_pick_backup));
+                        copyableReport(Language.msg(l10n_pools_recovery_nothing), Language.join(Language.msg(l10n_pools_recovery_pick_backup), "\n\n", log.build()).toString());
                         return;
                     }
-                    if (!withdraw || verified.isEmpty()) {
+                    if (acceptedExit && owners != null) {
+                        List<Pool> eligible = new ArrayList<>();
+                        for (Pool p : verified) if (owners.matched(p)) eligible.add(p);
+                        autoWithdraw(eligible, log, restored, total, existingOnly);
+                        return;
+                    }
+                    if (withdraw && owners != null) {
+                        int running = 0;
+                        for (Pool p : verified) if (owners.matched(p)) running++;
+                        busy = false;
+                        status(Language.msg(l10n_pools_recovery_ready_count, running, total));
+                        copyableReport(Language.msg(l10n_pools_recovery_restored_title),
+                                Language.join(Language.msg(l10n_pools_recovery_ready_body, running, total), "\n\n", log.build()).toString());
+                        loadKeys(); act.pools().refresh();
+                        return;
+                    }
+                    if (!withdraw || owners == null || verified.isEmpty()) {
                         busy = false;
                         status(Language.msg(l10n_pools_recovery_reserve_checked, restored, total));
                         info(restored == total ? Language.msg(l10n_pools_recovery_reserve_verified) : Language.msg(l10n_pools_recovery_needs_attention), Language.join(Language.msg(l10n_pools_recovery_reserve_count, restored, total), "\n\n", log.build(), "\n\n", withdraw ? Language.msg(l10n_pools_recovery_none_withdrawn) : Language.msg(l10n_pools_recovery_check_only)));
@@ -1672,24 +1676,18 @@ public class MyLpView extends BaseView {
                         act.pools().refresh();
                         return;
                     }
-                    autoWithdraw(verified, log, restored, total);
+                    // An unmatched or unsupported wallet never receives an exit exception.
+                    busy = false;
                 }
             });
     }
 
-    /**
-     * Withdraw the pools a file restore just verified.
-     *
-     * A restored recipe is signing-quarantined, and keep-fresh skips quarantined pools — so a restored pool
-     * cannot refresh, ages past the cascade and strands. Leaving it live is not the safe option; it is the slow
-     * one. So Restore finishes the job, and the alternative (confirming the wallet's signing state to keep the
-     * pool alive) stays available as the deliberate expert path.
-     */
-    private void autoWithdraw(List<Pool> verified, Language.TextBuilder log, int restored, int total) {
+    /** Run only after the explicit one-time-exit confirmation and exact owner/reserve matching. */
+    private void autoWithdraw(List<Pool> verified, Language.TextBuilder log, int restored, int total, boolean existingOnly) {
         status(Language.msg(l10n_pools_recovery_withdrawing));
         NodeApi n = act.node();
         if (n == null) { busy = false; status(Language.msg(l10n_pools_recovery_connect_withdraw)); return; }
-        new RestoreExit(act, n).run(verified, act.chainBlock(), new RestoreExit.Cb() {
+        new RestoreExit(act, n, existingOnly).run(verified, act.chainBlock(), new RestoreExit.Cb() {
             @Override public void onProgress(String line) {
                 log.append(PoolsMessages.message(line)).append('\n');
                 act.runOnUiThread(() -> status(PoolsMessages.message(line)));
@@ -1697,17 +1695,30 @@ public class MyLpView extends BaseView {
             @Override public void onDone(int withdrawn, int skipped) {
                 act.runOnUiThread(() -> {
                     busy = false;
-                    int notSubmitted = Math.max(skipped, verified.size() - withdrawn);
+                    int notSubmitted = Math.max(skipped, total - withdrawn);
+                    if (withdrawn > 0) resumeRecoveryCollection(24);
                     status(Language.msg(l10n_pools_recovery_withdraw_counts, withdrawn, notSubmitted));
-                    info(notSubmitted == 0 ? Language.msg(l10n_pools_recovery_submitted_title) : Language.msg(l10n_pools_recovery_partial_title),
+                    copyableReport(notSubmitted == 0 ? Language.msg(l10n_pools_recovery_submitted_title) : Language.msg(l10n_pools_recovery_partial_title),
                             Language.join(Language.msg(l10n_pools_recovery_reserve_count, restored, total), "\n\n",
                                     Language.msg(l10n_pools_recovery_withdraw_counts, withdrawn, notSubmitted), "\n\n", log.build(),
-                                    "\n\n", Language.msg(l10n_pools_recovery_withdraw_note)));
+                                    "\n\n", Language.msg(l10n_pools_recovery_withdraw_note)).toString());
                     loadKeys();
                     act.pools().refresh();
                 });
             }
         });
+    }
+
+    private void resumeRecoveryCollection(int remaining) {
+        if (remaining <= 0) return; // keep-alive service continues after leaving the screen
+        act.ui().postDelayed(() -> {
+            NodeApi node = act.node();
+            if (node == null) return;
+            new CollectSweeper(act, node).run((cleared, pending, stranded) -> {
+                if (cleared > 0) status("Recovery collection confirmed. Check your wallet balance.");
+                if (pending > 0) resumeRecoveryCollection(remaining - 1);
+            });
+        }, 20000);
     }
 
     private void showRecoveryGuide() {

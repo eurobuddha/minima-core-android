@@ -962,9 +962,6 @@
     <string name="l10n_params_rpc_copied" formatted="false">"Пароль RPC скопирован"</string>
     <string name="l10n_params_auto_resync" formatted="false">"Автосинхронизация при неполадках"</string>
     <string name="l10n_params_auto_resync_body" formatted="false">"Minima проверяет свою базу каждый час. Если выключено, уведомляет о необходимости синхронизации. Если включено, перестраивает цепочку самостоятельно, не чаще раза в сутки и никогда при наличии транзакции, ожидающей включения в блок. В обоих случаях кошелёк и сид-фраза не меняются."</string>
-    <string name="l10n_params_keets" formatted="false">"Транспорт Keets (-keets)"</string>
-    <string name="l10n_params_keets_body" formatted="false">"Вкл.: KeetChat и одноранговый транспорт keets, как прежде. Выкл.: без сайдкара Hyperswarm, без DHT и без вкладки Чат - узел работает только через классический транспорт Minima и расходует меньше батареи и памяти. Ваши чаты и идентичность keets остаются на телефоне и возвращаются при включении. Применяется после перезапуска."</string>
-    <string name="l10n_chat_keets_off" formatted="false">"Транспорт keets выключен - включите его в параметрах запуска, чтобы пользоваться чатом"</string>
     <string name="l10n_params_extra" formatted="false">"Дополнительные аргументы (для опытных)"</string>
     <string name="l10n_params_extra_body" formatted="false">"Флаги через пробел, передаваемые узлу при запуске. Здесь запрещены флаги очистки/сид-фразы (-clean, -genesis, -solo, -seed, -anyseed, -dbpassword) и флаги, управляемые приложением (-data, -basefolder, -conf, -server, -isclient)."</string>
     <string name="l10n_params_save_restart" formatted="false">"Сохранить и перезапустить узел"</string>
@@ -5522,9 +5519,9 @@
     <string name="l10n_pools_lp_showing_closed" formatted="false">"Закрытые пулы снова отображаются."</string>
     <string name="l10n_pools_lp_saved_missing" formatted="false">"Сохранённый пул · резервы не найдены"</string>
     <!-- Arguments: ownership, pause -->
-    <string name="l10n_pools_lp_missing_note">"Узел сейчас не видит обе резервные монеты пула. Так бывает у закрытого пула или на узле, который ещё синхронизируется.\n\n%1$s%2$s"</string>
+    <string name="l10n_pools_lp_missing_note">"Перед использованием пула проверьте резервы и ключ владельца.\n\n%1$s%2$s"</string>
     <string name="l10n_pools_lp_key_here" formatted="false">"Ключ владельца этого пула есть на устройстве."</string>
-    <string name="l10n_pools_lp_key_missing" formatted="false">"Ключа владельца этого пула НЕТ на устройстве. Восстановите соответствующую резервную копию кошелька MinimaCore."</string>
+    <string name="l10n_pools_lp_key_missing" formatted="false">"Ключ владельца не загружен. Восстановите файл пула в исходном кошельке."</string>
     <string name="l10n_pools_lp_pause_suffix" formatted="false">" Подписание владельцем приостановлено — см. ниже."</string>
     <string name="l10n_pools_lp_check_reserves" formatted="false">"Проверить резервы"</string>
     <string name="l10n_pools_lp_put_away" formatted="false">"Пул закрыт — скрыть"</string>
@@ -5558,7 +5555,7 @@
     <string name="l10n_pools_lp_backup_needed" formatted="false">"Нет записи о проверенной копии пулов"</string>
     <string name="l10n_pools_lp_backup_changed" formatted="false">"Проверьте резервную копию пулов"</string>
     <!-- Arguments: count -->
-    <string name="l10n_pools_lp_backup_missing_body">"Сохранённых пулов: %1$d. На устройстве нет записи о проверенной копии пулов. Сохраните файл рецептов PandaPools и актуальную полную копию кошелька MinimaCore. PandaPools не загружает эти контракты в облако и не может проверить наличие копии кошелька в другом месте."</string>
+    <string name="l10n_pools_lp_backup_missing_body">"Сохранено пулов: %1$d. На устройстве нет записи о проверенной копии пулов. Сохраните файл вне телефона и храните исходную сид-фразу в безопасности."</string>
     <string name="l10n_pools_lp_backup_changed_body" formatted="false">"Набор сохранённых пулов изменился после последнего проверенного экспорта. Сохраните новый файл с текущими рецептами."</string>
     <string name="l10n_pools_lp_backup_now" formatted="false">"Сделать копию"</string>
     <string name="l10n_pools_lp_add_proofs" formatted="false">"Добавить доказательства монет в файл пула"</string>
@@ -5596,7 +5593,7 @@
     <string name="l10n_pools_lp_backup_verified_status" formatted="false">"Копия сохранена и проверена ✓"</string>
     <string name="l10n_pools_lp_backup_verified_title" formatted="false">"Копия сохранена и проверена"</string>
     <!-- Arguments: count, proofs -->
-    <string name="l10n_pools_lp_backup_verified_body">"Контрактов пула проверено чтением файла: %1$d.\n\n%2$s\n\nХраните этот файл рецептов вместе с актуальной полной копией кошелька MinimaCore вне телефона. Рецепт содержит контракты и идентификаторы ключей, но не закрытые ключи. Он не устанавливает, какие одноразовые подписи уже использованы. Сид-фраза, старая копия или предположительный счётчик не доказывают безопасное состояние подписания.\n\nДля восстановления загрузите соответствующую актуальную копию кошелька в MinimaCore, затем рецепты в PandaPools. Остановите подписание на всех других копиях кошелька. Восстановленные рецепты приостанавливают подписание владельцем до подтверждения текущего состояния кошелька. Проверьте текущие резервы перед выводом."</string>
+    <string name="l10n_pools_lp_backup_verified_body">"Проверено контрактов: %1$d.\n\n%2$s\n\nХраните файл пула, исходную сид-фразу и актуальную полную копию узла. Диагностика проверяет резервы и ищет ключи, но оставляет восстановленные пулы на паузе."</string>
     <string name="l10n_pools_lp_backup_proofs_missing" formatted="false">"Некоторые доказательства резервов были недоступны или изменились при экспорте. Для восстановления могут понадобиться доступный архив или свежие доказательства. Один рецепт не восстанавливает доказательства блокчейна."</string>
     <string name="l10n_pools_lp_backup_proofs_expire" formatted="false">"Доказательства монет в файле могут устареть. Сохраните рецепты; для восстановления также могут понадобиться доступный архив или свежие доказательства."</string>
     <string name="l10n_pools_recovery_collect" formatted="false">"Собрать выведенные средства в кошелёк"</string>
@@ -5634,8 +5631,8 @@
     <!-- Arguments: count -->
     <string name="l10n_pools_recovery_checked">"Проверено пулов: %1$d."</string>
     <string name="l10n_pools_recovery_check_title" formatted="false">"Проверка копии"</string>
-    <string name="l10n_pools_recovery_restore_withdraw" formatted="false">"Восстановить и вывести"</string>
-    <string name="l10n_pools_recovery_restore_warning" formatted="false">"Будут импортированы рецепты пулов, проверены резервы и предприняты попытки вывода из подходящих пулов без повторного запроса. Вывод использует одноразовые подписи владельца. Перед продолжением остановите подписание на других копиях кошелька.\n\nПроверки отклоняют известный откат счётчика, отсутствие записанного счётчика, нечитаемые резервы и слишком свежие резервы, указывающие на возможную работу другого кошелька. Они не доказывают актуальность состояния подписания и не обнаруживают все подписи, сделанные в другом месте.\n\nДля просмотра без изменений используйте «Проверить файл копии». Чтобы сохранить пул работающим, отмените операцию, восстановите соответствующую актуальную полную копию кошелька MinimaCore и проверьте состояние подписания. Старым резервам может понадобиться доступный архив или свежие доказательства."</string>
+    <string name="l10n_pools_recovery_restore_withdraw" formatted="false">"Запустить диагностику восстановления"</string>
+    <string name="l10n_pools_recovery_restore_warning" formatted="false">"Используйте исходный кошелёк. Диагностика проверяет резервы и ищет ключи владельца на узлах с индексом по блокам. Могут быть созданы недостающие адреса.\n\nВосстановленные пулы остаются на паузе в обоих режимах. Подписание, вывод и автоматическое обновление не запускаются. Скопируйте результат для поддержки."</string>
     <string name="l10n_pools_recovery_restore_cancelled" formatted="false">"Восстановление отменено."</string>
     <string name="l10n_pools_recovery_restoring" formatted="false">"Восстановление пулов…"</string>
     <!-- Arguments: detail -->
@@ -5658,7 +5655,7 @@
     <string name="l10n_pools_recovery_partial_title" formatted="false">"Восстановление завершено · некоторые пулы требуют внимания"</string>
     <string name="l10n_pools_recovery_withdraw_note" formatted="false">"Отправленные запросы ещё требуют подтверждения в блокчейне и сбора средств с адреса выплаты владельца. Проверьте «Операции» и балансы, прежде чем считать средства полученными.\n\nВосстановленные рецепты сохраняют автообновление на паузе до подтверждения текущего состояния подписания. Старым резервам может понадобиться восстановление из архива. Проверки не доказывают, что другая копия кошелька не использовала невидимые одноразовые подписи."</string>
     <string name="l10n_pools_recovery_guide_title" formatted="false">"Как работает восстановление пулов"</string>
-    <string name="l10n_pools_recovery_guide_body" formatted="false">"Храните актуальную копию кошелька MinimaCore и файл рецептов PandaPools. Копия кошелька сохраняет ключи и состояние подписания; рецепт записывает контракты пулов.\n\nВосстановите соответствующий кошелёк в MinimaCore, затем рецепты здесь. Проверьте текущие резервы перед расходованием средств. Сид-фраза или рецепт сами по себе не устанавливают, какие одноразовые подписи использованы. PandaPools не создаёт отсутствующие ключи владельца автоматически. Не запускайте две восстановленные копии одного кошелька для подписания с обеих.\n\nДоказательства монет в копиях рецептов устаревают. Если текущие резервы не найдены, восстановление проверяет доказательства из копии, MegaMMR этого узла и настроенный архив. Принимающий узел проверяет доказательства перед импортом. Пустой локальный результат не доказывает расходование средств. Для восстановления нужен доступный архив или свежие доказательства; один рецепт не восстанавливает доказательства блокчейна.\n\nВосстановленные рецепты приостанавливают подписание владельцем, включая автообновление, до подтверждения текущего состояния подписания. Перед выводом проверьте оба резерва и статус подписания."</string>
+    <string name="l10n_pools_recovery_guide_body" formatted="false">"Диагностика находит подходящие ключи владельца в блочном режиме и проверяет резервы. Управление подписанием не восстанавливается. Пулы остаются на паузе в обоих режимах. Передайте результат поддержке.\n\nСовпадение ключа и текущая высота цепи не устанавливают, какие одноразовые подписи уже использованы. Храните файл пула, сид-фразу и актуальную полную копию узла."</string>
     <!-- Arguments: id -->
     <string name="l10n_pools_recovery_withdrawal_submitted">"Вывод отправлен: %1$s"</string>
     <string name="l10n_pools_create_checking_price" formatted="false">"Проверка рыночной цены…"</string>
@@ -5667,11 +5664,11 @@
     <string name="l10n_pools_create_obligations_heading" formatted="false">"Два условия для работы пула"</string>
     <!-- Arguments: blocks -->
     <string name="l10n_pools_create_keep_running">"1. Обеспечьте регулярную работу PandaPools.\n\nМонеты резервов требуют обновления примерно каждые %1$s блоков. PandaPools пытается делать это автоматически, пока может работать. Без обновления другие кошельки могут перестать находить пул. Для восстановления старых монет могут понадобиться свежие доказательства из архива MegaMMR."</string>
-    <string name="l10n_pools_create_keep_backups" formatted="false">"2. Храните рецепт пула и актуальную полную резервную копию кошелька MinimaCore.\n\nКопия кошелька сохраняет ключи и состояние подписания; рецепт содержит контракты пула. Одна сид-фраза или рецепт не позволяют установить, какие одноразовые подписи уже использованы.\n\nХраните оба файла вне телефона. Для восстановления также могут понадобиться актуальные доказательства монет или доступный архив. Не подписывайте из двух восстановленных копий одного кошелька."</string>
+    <string name="l10n_pools_create_keep_backups" formatted="false">"2. Сохраните файл пула, сид-фразу и актуальную полную копию узла. Эта диагностика не восстанавливает управление подписанием."</string>
     <string name="l10n_pools_create_fix_battery" formatted="false">"Настроить"</string>
     <string name="l10n_pools_create_battery_exempt" formatted="false">"Оптимизация батареи: исключение включено. Фоновая работа разрешена, но Android всё ещё может её прервать."</string>
     <string name="l10n_pools_create_battery_restricted" formatted="false">"⚠ Оптимизация батареи может прерывать PandaPools и мешать автоматическому обновлению, когда приложение закрыто."</string>
-    <string name="l10n_pools_create_backup_acknowledgement" formatted="false">"Я понимаю: приложение должно работать, и мне нужны файл пула и актуальная резервная копия кошелька."</string>
+    <string name="l10n_pools_create_backup_acknowledgement" formatted="false">"Я понимаю: приложение должно работать, файл пула нужно сохранить, а сид-фразу — хранить в безопасности."</string>
     <string name="l10n_pools_create_battery_acknowledgement" formatted="false">"Я понимаю, что Android может мешать обновлению пула, и буду открывать PandaPools хотя бы раз в день."</string>
     <string name="l10n_pools_create_before_title" formatted="false">"Перед созданием пула"</string>
     <string name="l10n_pools_create_acknowledge_required" formatted="false">"Отметьте флажок, чтобы подтвердить, что вы понимаете условия."</string>
@@ -8613,4 +8610,14 @@
     <string name="l10n_files_downloaded_sharing" formatted="false">"Загружено и проверено · раздача"</string>
     <string name="l10n_files_confirmation_unavailable" formatted="false">"Подтверждение загрузки недоступно"</string>
     <string name="l10n_files_awaiting_download" formatted="false">"Ожидание проверенной загрузки"</string>
+    <string name="l10n_pools_recovery_choose_backup" formatted="false">"Выбрать копию пулов"</string>
+    <string name="l10n_pools_recovery_restored_title" formatted="false">"Диагностика восстановления"</string>
+    <string name="l10n_pools_lp_owner_missing_title" formatted="false">"Сохранённый пул · нет ключа владельца"</string>
+    <!-- Arguments: ready, total -->
+    <string name="l10n_pools_recovery_ready_count">"У %1$s из %2$s пулов найдены ключи и проверены резервы. Подписание приостановлено."</string>
+    <!-- Arguments: ready, total -->
+    <string name="l10n_pools_recovery_ready_body">"У %1$s из %2$s пулов проверены резервы и найдены ключи владельца. Подписание остаётся на паузе. Подписи восстановления и вывод средств не отправлялись."</string>
+    <string name="l10n_params_keets" formatted="false">"Транспорт Keets (-keets)"</string>
+    <string name="l10n_params_keets_body" formatted="false">"Вкл.: KeetChat и одноранговый транспорт keets, как прежде. Выкл.: без сайдкара Hyperswarm, без DHT и без вкладки Чат - узел работает только через классический транспорт Minima и расходует меньше батареи и памяти. Ваши чаты и идентичность keets остаются на телефоне и возвращаются при включении. Применяется после перезапуска."</string>
+    <string name="l10n_chat_keets_off" formatted="false">"Транспорт keets выключен - включите его в параметрах запуска, чтобы пользоваться чатом"</string>
 </resources>

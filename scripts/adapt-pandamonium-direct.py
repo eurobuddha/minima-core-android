@@ -47,6 +47,8 @@ def adapt(root):
         s=re.sub(r'import (?:com.eurobuddha.minimaapi|com.eurobuddha.pandadex.integratedsdk).MinimaAPI;', 'import com.eurobuddha.minimaapi.direct.DirectNodeApi;',s)
         s=re.sub(r'\bMinimaAPI\b','DirectNodeApi',s)
         s=re.sub(r'\bNodeTransport\b','DirectNodeApi',s)
+        # Standalone node discovery opens the host itself in the embedded edition.
+        s=s.replace('DirectNodeApi.launchNode(this)', 'getPackageManager().getLaunchIntentForPackage(getPackageName())')
         s=s.replace('which auto-registers this app with the node','which connects to the embedded node')
         s=s.replace('// Constructing DirectNodeApi auto-sends the REGISTER broadcast; the reply tells us\n        // whether the user has enabled this app in Minima Core -> Apps yet.', '// Embedded readiness callback; no registration or app permission handshake.')
         s=s.replace("Minima Core didn't respond. Is it installed, running and enabled?", 'The embedded node did not respond. Check its status in Minima Core.')
@@ -665,6 +667,18 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
     spec=importlib.util.spec_from_file_location('integrated_lint',Path(__file__).with_name('adapt-pandamonium-lint.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('pools_bounded_recovery',Path(__file__).with_name('adapt-pandamonium-pools-bounded-recovery.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('pools_archive_recovery',Path(__file__).with_name('adapt-pandamonium-pools-archive-recovery.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('pools_combined_backup',Path(__file__).with_name('adapt-pandamonium-pools-combined-backup.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
+    spec=importlib.util.spec_from_file_location('dex_posted_inputs',Path(__file__).with_name('adapt-pandamonium-dex-posted-inputs.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
 if __name__=='__main__': adapt(Path(sys.argv[1]))

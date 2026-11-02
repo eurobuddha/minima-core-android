@@ -81,7 +81,7 @@ final class ReserveRecovery {
     private void nextSource(boolean wasLocal) {
         if (wasLocal && archive != null) { tryArchive(archive, false); return; }
         finish(false, "Reserves are not fully visible on this node. The recipe is retained. "
-                + "Use a synced MegaMMR archive or a fresh pool backup from one; an empty local lookup does not prove the funds are gone.\n"
+                + "Use a synced MegaMMR archive or a fresh pool backup from one; an empty local lookup does not prove the funds are gone.\nRecovery tried the local node and eurobuddha.com:9001. An empty lookup does not prove the funds are gone. If fresh proofs fail local validation, let the node sync and retry. If its chain state needs rebuilding, retain the registered pool recipe and resync from eurobuddha.com:9001 while preserving the wallet. A resync does not recover missing signing history.\n"
                 + String.join("\n", notes));
     }
 
@@ -112,12 +112,15 @@ final class ReserveRecovery {
                         || !PoolRefresher.reserveCoin(pool, coin)
                         || !token.equalsIgnoreCase(coin.optString("tokenid"))
                         || (expectedId != null && !expectedId.equalsIgnoreCase(coin.optString("coinid")))) {
-                    notes.add("Node rejected or could not verify the " + token + " proof for this pool."); next.run(); return;
+                    notes.add("Node rejected or could not verify the " + token + " proof for this pool."); notes.add("PROOF_NOT_VERIFIED: check node sync, proof freshness and the registered pool identity."); next.run(); return;
                 }
                 if ("0x00".equals(token)) hintM = coin.optString("coinid"); else hintT = coin.optString("coinid");
                 call(local, "coinimport track:true data:" + data, new NodeApi.Cb() {
                     public void onResult(JSONObject result) {
-                        if (!TxPost.truthy(result, "status")) notes.add("Coin import failed for " + coin.optString("coinid") + ".");
+                        if (!TxPost.truthy(result, "status")) {
+                            notes.add("Coin import failed for " + coin.optString("coinid") + ".");
+                            notes.add("Coin import: " + JSONObject.quote("PROOF_IMPORT_FAILED: " + result.optString("error", "No node reason returned.")));
+                        }
                         next.run(); // final live read decides; 'already relevant' may legitimately reject an import
                     }
                     public void onError(String m) { notes.add("Coin import: " + JSONObject.quote(m)); next.run(); }

@@ -115,7 +115,7 @@ public final class TxPost {
                     + FundingCoins.MAX_INPUTS + ". Consolidate coins or use fewer pools. Nothing was posted.");
             return;
         }
-        if (!CoinLock.claimInputs(inputIds)) {
+        if (!CoinLock.loadPosted(node.context()) || !CoinLock.claimInputs(inputIds)) {
             done.fail("An input is already in another queued transaction, or appears twice. Wait for Activity to update and retry.");
             return;
         }
@@ -125,7 +125,10 @@ public final class TxPost {
         });
         submit(() -> OwnerKeyRecovery.ensure(node.context(), node, guardedKeys, cmdsThroughBasics, blocked -> {
             if (!blocked.isEmpty()) { gatedDone.fail("Nothing was posted.\n\n" + OwnerKeyRecovery.worst(blocked).message()); return; }
-            runChain(node, txid, cmdsThroughBasics, beforePost, gatedDone);
+            CoinLock.checkAvailable(node::cmd,inputIds,0,available->{
+                if(!available){gatedDone.fail("An input is spent, pending in another transaction, or unreadable. Refresh and verify reserves before retrying. Nothing was signed.");return;}
+                runChain(node, txid, cmdsThroughBasics, beforePost, gatedDone);
+            });
         }));
     }
 
@@ -139,9 +142,11 @@ public final class TxPost {
                     node.cmd("txndelete id:" + txid, NOOP);
                     done.fail(invalid); return;
                 }
-                Runnable post = () -> node.cmd("txnpost id:" + txid, new NodeApi.Cb() {
+                Runnable post = () -> {
+                    if (!CoinLock.rememberPosting(Cmd.inputCoinIds(cmdsThroughBasics),txid)) { node.cmd("txndelete id:"+txid,NOOP);done.fail("Input is already submitted or reservation could not be saved. Nothing was posted.");return; }
+                    node.cmd("txnpost id:" + txid, new NodeApi.Cb() {
                     @Override public void onResult(JSONObject j) {
-                        if (j.optBoolean("status", false)) {
+                        if (Boolean.TRUE.equals(j.opt("status")) && !Boolean.TRUE.equals(j.opt("pending"))) {
                             node.cmd("txndelete id:" + txid, NOOP);
                             String postedId = Util.extractTxpowid(j, txid);
                             ActivityLog.rememberSubmission(node.context(), j, postedId);
@@ -154,6 +159,7 @@ public final class TxPost {
                         done.fail(m);
                     }
                 });
+                };
                 if (beforePost == null) post.run();
                 else beforePost.prepare(post, message -> {
                     node.cmd("txndelete id:" + txid, NOOP);

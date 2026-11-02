@@ -459,6 +459,11 @@ public final class PoolsMessages {
             case "\"Node reply missing or awaiting approval.\"": return Language.msg(l10n_pools_reserve_pending);
             case "Node command failed.": return Language.msg(l10n_pools_reserve_command_failed);
             case "\"Node command failed.\"": return Language.msg(l10n_pools_reserve_command_failed);
+            case "Restore your pools": return Language.msg(l10n_pools_recovery_restore_withdraw);
+            case "Choose pool backup": return Language.msg(l10n_pools_recovery_choose_backup);
+            case "Pools restored": return Language.msg(l10n_pools_recovery_restored_title);
+            case "Saved pool · owner key missing": return Language.msg(l10n_pools_lp_owner_missing_title);
+            case "Recovery diagnostic": return Language.msg(l10n_pools_recovery_restored_title);
             default: break;
         }
         for(int i=0;i<PATTERNS.length;i++) {
@@ -504,7 +509,7 @@ public final class PoolsMessages {
         java.util.regex.Pattern.compile("\\ \\ ✓\\ the\\ owner\\ key's\\ derivation\\ index\\ is\\ recorded\\ \\((-?[0-9]+)\\)"),
         java.util.regex.Pattern.compile("the\\ owner\\ key\\ has\\ spent\\ all\\ ((?s:.*))\\ of\\ its\\ one\\-time\\ signatures\\."),
         java.util.regex.Pattern.compile("this\\ node\\ reports\\ (-?[0-9]+)\\ signatures\\ used\\ but\\ the\\ recipe\\ recorded\\ (-?[0-9]+)\\.\\ Signing\\ would\\ reuse\\ one\\.\\ Restore\\ the\\ newest\\ matching\\ wallet\\ backup\\."),
-        java.util.regex.Pattern.compile("these\\ reserves\\ were\\ recreated\\ (-?[0-9]+)\\ blocks\\ ago\\.\\ Only\\ this\\ pool's\\ owner\\ key\\ can\\ do\\ that,\\ so\\ another\\ device\\ is\\ still\\ running\\ this\\ wallet\\.\\ Nothing\\ was\\ posted\\ —\\ signing\\ here\\ while\\ that\\ device\\ is\\ also\\ signing\\ could\\ expose\\ the\\ key\\.\\ Stop\\ the\\ other\\ device,\\ then\\ use\\ Withdraw\\ on\\ this\\ pool's\\ card\\."),
+        java.util.regex.Pattern.compile("these\\ reserves\\ were\\ recreated\\ (-?[0-9]+)\\ blocks\\ ago,\\ possibly\\ by\\ swaps\\ or\\ another\\ device\\.\\ Stop\\ the\\ other\\ device\\ before\\ recovery\\.\\ This\\ bounded\\ recovery\\ requires\\ older\\ reserves\\."),
         java.util.regex.Pattern.compile("Withdrawing\\ the\\ first\\ (-?[0-9]+)\\ of\\ (-?[0-9]+)\\ pools\\ now;\\ the\\ rest\\ keep\\ their\\ recipes\\ and\\ can\\ be\\ withdrawn\\ from\\ MY\\ LP\\."),
         java.util.regex.Pattern.compile("the\\ owner\\ key\\ could\\ not\\ be\\ read:\\ ((?s:.*))"),
         java.util.regex.Pattern.compile("Withdrawing\\ ((?s:.*))\\ …"),

@@ -48,8 +48,11 @@ def adapt(root):
  part=change(part,'body.setText(report);','Language.setText(body, PoolsMessages.report(report));')
  part=change(part,'.setNeutralButton("Copy",','.setNeutralButton(Language.msg(l10n_wallet_copy),')
  part=change(part,'Ui.copyable(body, "backup check", report);\n                    body.performClick();','Ui.copy(body, "backup check", body.getText().toString());')
- a=part.index('.setMessage("Restoring will rebuild');b=part.index('\n                .setPositiveButton',a)
+ a=part.index('.setMessage("Use the original wallet');b=part.index('\n                .setPositiveButton',a)
  part=part[:a]+'.setMessage('+msg('RestoreWarning')+')'+part[b:]
+ part=change(part,'running + " of " + total + " pool(s) have matching keys and verified reserves. Signing paused."',msg('ReadyCount','running','total'))
+ a=part.index('                                running + " of " + total + " pool(s) have verified reserves');b=part.index('\n                        loadKeys();',a)
+ part=part[:a]+'                                Language.join('+msg('ReadyBody','running','total')+', "\\n\\n", PoolsMessages.report(log.toString().trim())).toString());'+part[b:]
  part=change(part,'status("Restoring… " + line)','status('+msg('RestoreProgress','PoolsMessages.message(line)')+')')
  part=change(part,'act.runOnUiThread(() -> status(line));','act.runOnUiThread(() -> status(PoolsMessages.message(line)));',2)
  part=change(part,'"That file isn\'t a readable PandaPools backup — pick the "\n                                + "pandapools-backup.json you saved from Back up."',msg('PickBackup'))

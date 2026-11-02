@@ -23,4 +23,9 @@ def adapt(root):
         pattern=r'(?m)^([ \t]*)(Intent (?:launch|i) = getPackageManager\(\).getLaunchIntentForPackage\([^\n]+\);)\n((?:[ \t]*if \((?:launch|i) == null\)[^\n]+\n)+)'
         def indent(m):
             return m[1]+m[2]+'\n'+''.join(m[1]+line.strip()+'\n' for line in m[3].splitlines())
-        s,n=re.subn(pattern,indent,s);assert n==1,(app,n);p.write_text(s)
+        s,n=re.subn(pattern,indent,s)
+        if app == 'pandapools' and n == 0:
+            assert s.count('Intent i = getPackageManager().getLaunchIntentForPackage(getPackageName());') == 1
+        else:
+            assert n == 1, (app,n)
+        p.write_text(s)

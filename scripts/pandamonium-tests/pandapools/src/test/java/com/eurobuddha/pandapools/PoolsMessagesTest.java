@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 public class PoolsMessagesTest {
  @Test public void declaredApplicationLabelsResolveToTheirOwnResources()throws Exception {
-  JSONObject spec=new JSONObject(new String(java.nio.file.Files.readAllBytes(Path.of("../../localization/pools-messages.json")),java.nio.charset.StandardCharsets.UTF_8)).getJSONObject("fixed");assertEquals(353,spec.length());Field f=Language.Message.class.getDeclaredField("resource");f.setAccessible(true);
+  JSONObject spec=new JSONObject(new String(java.nio.file.Files.readAllBytes(Path.of("../../localization/pools-messages.json")),java.nio.charset.StandardCharsets.UTF_8)).getJSONObject("fixed");assertEquals(358,spec.length());Field f=Language.Message.class.getDeclaredField("resource");f.setAccessible(true);
   for(Iterator<String>i=spec.keys();i.hasNext();){String raw=i.next();Object result=PoolsMessages.message(raw);assertTrue(raw,result instanceof Language.Message);String id="l10n_"+spec.getString(raw).replaceAll("([a-z0-9])([A-Z])","$1_$2").replace('.','_').toLowerCase(Locale.ROOT);assertEquals(raw,R.string.class.getField(id).getInt(null),f.get(result));}
  }
  @Test public void unknownIdentifiersAndDiagnosticsRemainLiteral(){

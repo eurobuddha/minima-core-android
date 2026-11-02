@@ -39,11 +39,8 @@ def adapt(root):
             }''')
  head=change(head,'new AlertDialog.Builder(act)','act.languageDialog()')
  head=change(head,'b.toString().trim()','b.build()')
- old='''"This node cannot currently see both of this pool's reserve coins. That is what a pool that has been closed looks like, and also what one looks like on a node that is still catching up.\\n\\n"
-                + (mine(p) ? "The owner key for it is on this device."
-                           : "The owner key for it is NOT on this device. Restore the matching MinimaCore wallet backup.")
-                + (held ? " Owner signing is paused for it — see below." : "")'''
- head=change(head,old,msg('MissingNote','mine(p) ? '+msg('KeyHere')+' : '+msg('KeyMissing'),'held ? '+msg('PauseSuffix')+' : ""'))
+ a=head.index('        note.setText(', head.index('boolean held = p.signingStateUnverified'));b=head.index('\n        card.addView(note);',a)
+ head=head[:a]+'        note.setText('+msg('MissingNote','mine(p) ? '+msg('KeyHere')+' : '+msg('KeyMissing'),'held ? '+msg('PauseSuffix')+' : ""')+');'+head[b:]
  head=change(head,'"MINIMA / " + pendingLabel + "   ·   confirming…"',msg('ConfirmingPair','pendingLabel'))
  head=change(head,'''String st = el <= 3 ? ("Writing on-chain — block " + el + " of ~3")
                             : ("Writing on-chain — " + el + " blocks (taking a little longer than usual)");''','CharSequence st = el <= 3 ? '+msg('WritingBlock','el')+' : '+msg('WritingLong','el')+';')

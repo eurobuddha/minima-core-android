@@ -27189,10 +27189,10 @@
     "uk": "Збережений пул · резерви не знайдено"
   },
   "pools.lpMissingNote": {
-    "en": "This node cannot currently see both of this pool's reserve coins. That is what a pool that has been closed looks like, and also what one looks like on a node that is still catching up.\n\n{ownership}{pause}",
-    "zh-Hans": "此节点目前无法看到池的两种储备币。池已关闭或节点仍在同步时，都可能出现此情况。\n\n{ownership}{pause}",
-    "ru": "Узел сейчас не видит обе резервные монеты пула. Так бывает у закрытого пула или на узле, который ещё синхронизируется.\n\n{ownership}{pause}",
-    "uk": "Вузол зараз не бачить обидві резервні монети пулу. Так буває із закритим пулом або на вузлі, який ще синхронізується.\n\n{ownership}{pause}"
+    "en": "Check the reserves and owner key before using this pool.\n\n{ownership}{pause}",
+    "zh-Hans": "使用此池前，请检查储备和所有者密钥。\n\n{ownership}{pause}",
+    "ru": "Перед использованием пула проверьте резервы и ключ владельца.\n\n{ownership}{pause}",
+    "uk": "Перед використанням пулу перевірте резерви та ключ власника.\n\n{ownership}{pause}"
   },
   "pools.lpKeyHere": {
     "en": "The owner key for it is on this device.",
@@ -27201,10 +27201,10 @@
     "uk": "Ключ власника цього пулу є на пристрої."
   },
   "pools.lpKeyMissing": {
-    "en": "The owner key for it is NOT on this device. Restore the matching MinimaCore wallet backup.",
-    "zh-Hans": "此池的所有者密钥不在本设备上。请恢复对应的 MinimaCore 钱包备份。",
-    "ru": "Ключа владельца этого пула НЕТ на устройстве. Восстановите соответствующую резервную копию кошелька MinimaCore.",
-    "uk": "Ключа власника цього пулу НЕМАЄ на пристрої. Відновіть відповідну резервну копію гаманця MinimaCore."
+    "en": "The owner key is not loaded. Restore your pool file on the original wallet to recover it.",
+    "zh-Hans": "所有者密钥尚未加载。请在原钱包上恢复池文件以找回密钥。",
+    "ru": "Ключ владельца не загружен. Восстановите файл пула в исходном кошельке.",
+    "uk": "Ключ власника не завантажено. Відновіть файл пулу в початковому гаманці."
   },
   "pools.lpPauseSuffix": {
     "en": " Owner signing is paused for it — see below.",
@@ -27369,10 +27369,10 @@
     "uk": "Перевірте резервну копію пулів"
   },
   "pools.lpBackupMissingBody": {
-    "en": "Saved pools: {count}. This device has no recorded, verified pool backup. Save a PandaPools recipe file and keep a current complete MinimaCore wallet backup. PandaPools does not upload these contracts to cloud backup. It cannot check whether you have a wallet backup elsewhere.",
-    "zh-Hans": "已保存的池：{count}。本设备未记录已验证的池备份。请保存 PandaPools 配方文件，并保留最新的完整 MinimaCore 钱包备份。PandaPools 不会将这些合约上传到云备份，也无法检查您是否在其他位置保存了钱包备份。",
-    "ru": "Сохранённых пулов: {count}. На устройстве нет записи о проверенной копии пулов. Сохраните файл рецептов PandaPools и актуальную полную копию кошелька MinimaCore. PandaPools не загружает эти контракты в облако и не может проверить наличие копии кошелька в другом месте.",
-    "uk": "Збережених пулів: {count}. На пристрої немає запису про перевірену копію пулів. Збережіть файл рецептів PandaPools і актуальну повну копію гаманця MinimaCore. PandaPools не завантажує ці контракти до хмари й не може перевірити наявність копії гаманця в іншому місці."
+    "en": "Saved pools: {count}. No verified pool backup is recorded on this device. Save the pool file off this phone and keep your original wallet seed safe.",
+    "zh-Hans": "已保存的池：{count}。本设备未记录已验证的池备份。请将池文件保存到手机以外的位置，并妥善保管原钱包助记词。",
+    "ru": "Сохранено пулов: {count}. На устройстве нет записи о проверенной копии пулов. Сохраните файл вне телефона и храните исходную сид-фразу в безопасности.",
+    "uk": "Збережено пулів: {count}. На пристрої немає запису про перевірену копію пулів. Збережіть файл поза телефоном і тримайте початкову seed-фразу в безпеці."
   },
   "pools.lpBackupChangedBody": {
     "en": "The saved pool set has changed since the last verified export. Save a fresh file to cover the current recipes.",
@@ -27561,10 +27561,10 @@
     "uk": "Копію збережено й перевірено"
   },
   "pools.lpBackupVerifiedBody": {
-    "en": "Pool contracts checked by reading the file back: {count}.\n\n{proofs}\n\nKeep this recipe file together with a current complete MinimaCore wallet backup, somewhere off this phone. The recipe contains contracts and key identifiers, but no private keys. It does not establish which one-time signatures have been used. A seed, old backup, or guessed counter cannot establish safe signing state.\n\nTo recover, restore the matching current wallet backup in MinimaCore, then restore these recipes in PandaPools. Stop every other copy of that wallet from signing. Restored recipes pause owner signing until you confirm the current wallet signing state. Check live reserves before withdrawing.",
-    "zh-Hans": "通过读回文件已检查的池合约数：{count}。\n\n{proofs}\n\n请将此配方文件与最新的完整 MinimaCore 钱包备份一起保存在本手机之外。配方包含合约和密钥标识，但不含私钥，也无法确定哪些一次性签名已被使用。助记词、旧备份或猜测的计数器都不能证明签名状态安全。\n\n恢复时，先在 MinimaCore 中恢复对应的最新钱包备份，再在 PandaPools 中恢复这些配方。请停止该钱包其他所有副本的签名操作。恢复的配方会暂停所有者签名，直到您确认当前钱包签名状态。提现前请检查实时储备。",
-    "ru": "Контрактов пула проверено чтением файла: {count}.\n\n{proofs}\n\nХраните этот файл рецептов вместе с актуальной полной копией кошелька MinimaCore вне телефона. Рецепт содержит контракты и идентификаторы ключей, но не закрытые ключи. Он не устанавливает, какие одноразовые подписи уже использованы. Сид-фраза, старая копия или предположительный счётчик не доказывают безопасное состояние подписания.\n\nДля восстановления загрузите соответствующую актуальную копию кошелька в MinimaCore, затем рецепты в PandaPools. Остановите подписание на всех других копиях кошелька. Восстановленные рецепты приостанавливают подписание владельцем до подтверждения текущего состояния кошелька. Проверьте текущие резервы перед выводом.",
-    "uk": "Контрактів пулу перевірено читанням файлу: {count}.\n\n{proofs}\n\nЗберігайте цей файл рецептів разом з актуальною повною копією гаманця MinimaCore поза телефоном. Рецепт містить контракти та ідентифікатори ключів, але не приватні ключі. Він не встановлює, які одноразові підписи вже використано. Сід-фраза, стара копія або припущений лічильник не доводять безпечного стану підписання.\n\nДля відновлення завантажте відповідну актуальну копію гаманця до MinimaCore, потім рецепти до PandaPools. Зупиніть підписання на всіх інших копіях гаманця. Відновлені рецепти призупиняють підписання власником до підтвердження поточного стану гаманця. Перевірте поточні резерви перед виведенням."
+    "en": "Pool contracts checked: {count}.\n\n{proofs}\n\nKeep your pool file, original wallet seed, and a current complete node backup safe. This diagnostic checks reserves and locates matching owner keys but leaves restored pools paused.",
+    "zh-Hans": "已检查池合约：{count}。\n\n{proofs}\n\n请妥善保存池文件、原钱包助记词和最新的完整节点备份。此诊断会检查储备并查找匹配密钥，但恢复的池保持暂停。",
+    "ru": "Проверено контрактов: {count}.\n\n{proofs}\n\nХраните файл пула, исходную сид-фразу и актуальную полную копию узла. Диагностика проверяет резервы и ищет ключи, но оставляет восстановленные пулы на паузе.",
+    "uk": "Перевірено контрактів: {count}.\n\n{proofs}\n\nЗберігайте файл пулу, початкову seed-фразу й актуальну повну копію вузла. Діагностика перевіряє резерви та шукає ключі, але залишає відновлені пули на паузі."
   },
   "pools.lpBackupProofsMissing": {
     "en": "Some reserve proofs were unavailable or changed during export. Recovery may require an available archive or fresh proofs. A recipe alone cannot reconstruct chain proofs.",
@@ -27771,16 +27771,16 @@
     "uk": "Перевірка копії"
   },
   "pools.recoveryRestoreWithdraw": {
-    "en": "Restore and withdraw",
-    "zh-Hans": "恢复并提现",
-    "ru": "Восстановить и вывести",
-    "uk": "Відновити й вивести"
+    "en": "Run recovery diagnostic",
+    "zh-Hans": "运行恢复诊断",
+    "ru": "Запустить диагностику восстановления",
+    "uk": "Запустити діагностику відновлення"
   },
   "pools.recoveryRestoreWarning": {
-    "en": "This imports pool recipes, checks reserves, and then attempts withdrawals for eligible pools without asking again. Withdrawals use one-time owner signatures. Stop other copies of this wallet from signing before proceeding.\n\nThe checks reject known counter regressions, missing recorded counts, unreadable reserves, and reserves recent enough to suggest another active wallet. They cannot prove the latest signing state or detect every signature made elsewhere.\n\nTo inspect a file without changing anything, use “Check a backup file”. To keep a pool running, cancel, restore the matching current complete MinimaCore wallet backup, and verify its signing state. Older reserves may need an available archive or fresh proofs.",
-    "zh-Hans": "此操作会导入池配方、检查储备，然后尝试为符合条件的池提现，不再另行确认。提现会使用所有者一次性签名。继续前，请停止此钱包其他副本的签名操作。\n\n检查会拒绝已知的计数器回退、缺失的记录计数、不可读取的储备，以及新近到可能表明另一个钱包仍在运行的储备。这些检查不能证明签名状态是最新的，也无法检测在其他位置生成的所有签名。\n\n若只想查看文件而不做更改，请使用“检查备份文件”。若要继续运行池，请取消，恢复对应的最新完整 MinimaCore 钱包备份，并核实签名状态。较旧的储备可能需要可用的归档或新证明。",
-    "ru": "Будут импортированы рецепты пулов, проверены резервы и предприняты попытки вывода из подходящих пулов без повторного запроса. Вывод использует одноразовые подписи владельца. Перед продолжением остановите подписание на других копиях кошелька.\n\nПроверки отклоняют известный откат счётчика, отсутствие записанного счётчика, нечитаемые резервы и слишком свежие резервы, указывающие на возможную работу другого кошелька. Они не доказывают актуальность состояния подписания и не обнаруживают все подписи, сделанные в другом месте.\n\nДля просмотра без изменений используйте «Проверить файл копии». Чтобы сохранить пул работающим, отмените операцию, восстановите соответствующую актуальную полную копию кошелька MinimaCore и проверьте состояние подписания. Старым резервам может понадобиться доступный архив или свежие доказательства.",
-    "uk": "Буде імпортовано рецепти пулів, перевірено резерви та здійснено спроби виведення з придатних пулів без повторного запиту. Виведення використовує одноразові підписи власника. Перед продовженням зупиніть підписання на інших копіях гаманця.\n\nПеревірки відхиляють відомий відкат лічильника, відсутність записаного лічильника, нечитабельні резерви та надто свіжі резерви, що вказують на можливу роботу іншого гаманця. Вони не доводять актуальності стану підписання й не виявляють усіх підписів, зроблених в іншому місці.\n\nДля перегляду без змін скористайтеся «Перевірити файл копії». Щоб зберегти пул працюючим, скасуйте операцію, відновіть відповідну актуальну повну копію гаманця MinimaCore й перевірте стан підписання. Старим резервам може знадобитися доступний архів або свіжі докази."
+    "en": "Use the original wallet. This diagnostic checks pool reserves and finds matching owner keys on block-based nodes. It may generate missing addresses.\n\nRestored pools remain paused in both key modes. It does not sign, withdraw, or enable automatic refresh. Copy the result for support.",
+    "zh-Hans": "请使用原钱包。此诊断会检查池储备，并在按区块计数的节点上查找匹配的所有者密钥，可能生成缺失的地址。\n\n两种密钥模式下，恢复的池均保持暂停。不会签名、提现或启用自动刷新。请复制结果以便获取支持。",
+    "ru": "Используйте исходный кошелёк. Диагностика проверяет резервы и ищет ключи владельца на узлах с индексом по блокам. Могут быть созданы недостающие адреса.\n\nВосстановленные пулы остаются на паузе в обоих режимах. Подписание, вывод и автоматическое обновление не запускаются. Скопируйте результат для поддержки.",
+    "uk": "Використовуйте початковий гаманець. Діагностика перевіряє резерви та шукає ключі власника на вузлах з індексом за блоками. Можуть бути створені відсутні адреси.\n\nВідновлені пули залишаються на паузі в обох режимах. Підписання, виведення й автоматичне оновлення не запускаються. Скопіюйте результат для підтримки."
   },
   "pools.recoveryRestoreCancelled": {
     "en": "Restore cancelled.",
@@ -27891,10 +27891,10 @@
     "uk": "Як працює відновлення пулів"
   },
   "pools.recoveryGuideBody": {
-    "en": "Keep both a current MinimaCore wallet backup and your PandaPools recipe file. The wallet backup preserves keys and signing state; the recipe records the pool contracts.\n\nRestore the matching wallet in MinimaCore, then restore the recipes here. Check live reserves before spending. A seed or recipe alone does not establish which one-time signatures were used. PandaPools will not automatically recreate missing owner keys. Do not run two restored copies of the same wallet and sign from both.\n\nCoin proofs in recipe backups expire. If live reserves are missing, Recover reserves checks the backup proofs, this node’s MegaMMR, and your configured archive connection. The receiving node validates proofs before import. An empty local lookup does not prove the funds were spent. Recovery needs an available archive or fresh proofs; a recipe alone cannot reconstruct chain proofs.\n\nRestored recipes pause owner signing, including automatic refresh, until you confirm current wallet signing state. Check both reserve amounts and signing status before withdrawing.",
-    "zh-Hans": "请同时保留最新的 MinimaCore 钱包备份和 PandaPools 配方文件。钱包备份保存密钥与签名状态；配方记录池合约。\n\n先在 MinimaCore 中恢复对应钱包，再在此恢复配方。花费资金前请检查实时储备。仅有助记词或配方无法确定哪些一次性签名已被使用。PandaPools 不会自动重建缺失的所有者密钥。请勿同时运行同一钱包的两个恢复副本并让两者都签名。\n\n配方备份中的币证明会过期。若无法找到实时储备，恢复储备功能会检查备份证明、此节点的 MegaMMR 及您配置的归档连接。接收节点会在导入前验证证明。本地查询为空并不能证明资金已花费。恢复需要可用的归档或新证明；仅有配方无法重建链上证明。\n\n恢复的配方会暂停所有者签名，包括自动刷新，直到您确认当前钱包签名状态。提现前请检查两种储备金额和签名状态。",
-    "ru": "Храните актуальную копию кошелька MinimaCore и файл рецептов PandaPools. Копия кошелька сохраняет ключи и состояние подписания; рецепт записывает контракты пулов.\n\nВосстановите соответствующий кошелёк в MinimaCore, затем рецепты здесь. Проверьте текущие резервы перед расходованием средств. Сид-фраза или рецепт сами по себе не устанавливают, какие одноразовые подписи использованы. PandaPools не создаёт отсутствующие ключи владельца автоматически. Не запускайте две восстановленные копии одного кошелька для подписания с обеих.\n\nДоказательства монет в копиях рецептов устаревают. Если текущие резервы не найдены, восстановление проверяет доказательства из копии, MegaMMR этого узла и настроенный архив. Принимающий узел проверяет доказательства перед импортом. Пустой локальный результат не доказывает расходование средств. Для восстановления нужен доступный архив или свежие доказательства; один рецепт не восстанавливает доказательства блокчейна.\n\nВосстановленные рецепты приостанавливают подписание владельцем, включая автообновление, до подтверждения текущего состояния подписания. Перед выводом проверьте оба резерва и статус подписания.",
-    "uk": "Зберігайте актуальну копію гаманця MinimaCore та файл рецептів PandaPools. Копія гаманця зберігає ключі й стан підписання; рецепт записує контракти пулів.\n\nВідновіть відповідний гаманець у MinimaCore, потім рецепти тут. Перевірте поточні резерви перед витрачанням коштів. Сід-фраза або рецепт самі по собі не встановлюють, які одноразові підписи використано. PandaPools не створює відсутні ключі власника автоматично. Не запускайте дві відновлені копії одного гаманця для підписання з обох.\n\nДокази монет у копіях рецептів застарівають. Якщо поточні резерви не знайдено, відновлення перевіряє докази з копії, MegaMMR цього вузла та налаштований архів. Вузол-одержувач перевіряє докази перед імпортом. Порожній локальний результат не доводить витрачання коштів. Для відновлення потрібен доступний архів або свіжі докази; сам рецепт не відновлює докази блокчейну.\n\nВідновлені рецепти призупиняють підписання власником, включно з автооновленням, до підтвердження поточного стану підписання. Перед виведенням перевірте обидва резерви та статус підписання."
+    "en": "This diagnostic can find matching block-based owner keys and check reserves. It does not restore signing controls. Restored pools remain paused in both key modes. Share the result with support.\n\nA matching key and a current chain tip do not establish which one-time signatures were previously used. Keep your pool file, seed, and a current complete node backup safe.",
+    "zh-Hans": "此诊断可查找匹配的区块模式所有者密钥并检查储备，但不会恢复签名控制。两种密钥模式下，恢复的池均保持暂停。请将结果提供给支持人员。\n\n匹配的密钥和当前链高度无法证明哪些一次性签名已被使用。请妥善保存池文件、助记词及最新的完整节点备份。",
+    "ru": "Диагностика находит подходящие ключи владельца в блочном режиме и проверяет резервы. Управление подписанием не восстанавливается. Пулы остаются на паузе в обоих режимах. Передайте результат поддержке.\n\nСовпадение ключа и текущая высота цепи не устанавливают, какие одноразовые подписи уже использованы. Храните файл пула, сид-фразу и актуальную полную копию узла.",
+    "uk": "Діагностика знаходить відповідні ключі власника в блоковому режимі та перевіряє резерви. Керування підписанням не відновлюється. Пули залишаються на паузі в обох режимах. Передайте результат підтримці.\n\nЗбіг ключа й поточна висота ланцюга не встановлюють, які одноразові підписи вже використано. Зберігайте файл пулу, seed-фразу й актуальну повну копію вузла."
   },
   "pools.recoveryWithdrawalSubmitted": {
     "en": "Withdrawal submitted: {id}",
@@ -27927,10 +27927,10 @@
     "uk": "1. Забезпечте регулярну роботу PandaPools.\n\nМонети резервів потребують оновлення приблизно кожні {blocks} блоків. PandaPools намагається робити це автоматично, поки може працювати. Без оновлення інші гаманці можуть перестати знаходити пул. Для відновлення старих монет можуть знадобитися свіжі докази з архіву MegaMMR."
   },
   "pools.createKeepBackups": {
-    "en": "2. Keep both the pool recipe and a current complete MinimaCore wallet backup.\n\nThe wallet backup preserves keys and signing state; the recipe records the pool contracts. A seed phrase or recipe alone does not establish which one-time signatures have been used.\n\nKeep both files off this phone. Recovery may also need current coin proofs or an available archive. Do not sign from two restored copies of the same wallet.",
-    "zh-Hans": "2. 请同时保留池配方和最新的完整 MinimaCore 钱包备份。\n\n钱包备份保存密钥和签名状态；配方记录池合约。仅有助记词或配方无法确定哪些一次性签名已被使用。\n\n请将这两份文件保存在本手机之外。恢复还可能需要最新的币证明或可用的归档。不要从同一钱包的两个恢复副本进行签名。",
-    "ru": "2. Храните рецепт пула и актуальную полную резервную копию кошелька MinimaCore.\n\nКопия кошелька сохраняет ключи и состояние подписания; рецепт содержит контракты пула. Одна сид-фраза или рецепт не позволяют установить, какие одноразовые подписи уже использованы.\n\nХраните оба файла вне телефона. Для восстановления также могут понадобиться актуальные доказательства монет или доступный архив. Не подписывайте из двух восстановленных копий одного кошелька.",
-    "uk": "2. Зберігайте рецепт пулу й актуальну повну резервну копію гаманця MinimaCore.\n\nКопія гаманця зберігає ключі та стан підписання; рецепт містить контракти пулу. Сама seed-фраза або рецепт не дають змоги встановити, які одноразові підписи вже використано.\n\nЗберігайте обидва файли поза телефоном. Для відновлення також можуть знадобитися актуальні докази монет або доступний архів. Не підписуйте з двох відновлених копій одного гаманця."
+    "en": "2. Save the pool file and keep your wallet seed and a current complete node backup safe. This diagnostic does not restore signing controls.",
+    "zh-Hans": "2. 保存池文件，并妥善保管钱包助记词和最新的完整节点备份。此诊断不会恢复签名控制。",
+    "ru": "2. Сохраните файл пула, сид-фразу и актуальную полную копию узла. Эта диагностика не восстанавливает управление подписанием.",
+    "uk": "2. Збережіть файл пулу, seed-фразу й актуальну повну копію вузла. Ця діагностика не відновлює керування підписанням."
   },
   "pools.createFixBattery": {
     "en": "Fix this",
@@ -27951,10 +27951,10 @@
     "uk": "⚠ Оптимізація батареї може переривати PandaPools і заважати автоматичному оновленню, коли застосунок закрито."
   },
   "pools.createBackupAcknowledgement": {
-    "en": "I understand: I must keep this app running, and I need both the pool file and a current wallet backup.",
-    "zh-Hans": "我已了解：必须保持应用能够运行，并同时保留池文件和最新的钱包备份。",
-    "ru": "Я понимаю: приложение должно работать, и мне нужны файл пула и актуальная резервная копия кошелька.",
-    "uk": "Я розумію: застосунок має працювати, і мені потрібні файл пулу й актуальна резервна копія гаманця."
+    "en": "I understand: keep this app running, save the pool file and keep my wallet seed safe.",
+    "zh-Hans": "我明白：保持应用运行，保存池文件并妥善保管钱包助记词。",
+    "ru": "Я понимаю: приложение должно работать, файл пула нужно сохранить, а сид-фразу — хранить в безопасности.",
+    "uk": "Я розумію: застосунок має працювати, файл пулу потрібно зберегти, а seed-фразу — тримати в безпеці."
   },
   "pools.createBatteryAcknowledgement": {
     "en": "I understand Android may stop PandaPools refreshing this pool, and I will open the app at least once a day.",
@@ -42979,5 +42979,53 @@
     "zh-Hans": "等待下载验证",
     "ru": "Ожидание проверенной загрузки",
     "uk": "Очікування перевіреного завантаження"
+  },
+  "pools.recoveryChooseBackup": {
+    "en": "Choose pool backup",
+    "zh-Hans": "选择池备份",
+    "ru": "Выбрать копию пулов",
+    "uk": "Вибрати копію пулів"
+  },
+  "pools.recoveryRestoredTitle": {
+    "en": "Recovery diagnostic",
+    "zh-Hans": "恢复诊断",
+    "ru": "Диагностика восстановления",
+    "uk": "Діагностика відновлення"
+  },
+  "pools.lpOwnerMissingTitle": {
+    "en": "Saved pool · owner key missing",
+    "zh-Hans": "已保存的池 · 缺少所有者密钥",
+    "ru": "Сохранённый пул · нет ключа владельца",
+    "uk": "Збережений пул · немає ключа власника"
+  },
+  "pools.recoveryReadyCount": {
+    "en": "{ready} of {total} pool(s) have matching keys and verified reserves. Signing paused.",
+    "zh-Hans": "{total} 个池中有 {ready} 个已匹配密钥并验证储备。签名保持暂停。",
+    "ru": "У {ready} из {total} пулов найдены ключи и проверены резервы. Подписание приостановлено.",
+    "uk": "У {ready} із {total} пулів знайдено ключі та перевірено резерви. Підписання призупинено."
+  },
+  "pools.recoveryReadyBody": {
+    "en": "{ready} of {total} pool(s) have verified reserves and matching owner keys. Signing remains paused. No recovery signature or withdrawal was sent.",
+    "zh-Hans": "{total} 个池中有 {ready} 个已验证储备并匹配所有者密钥。签名保持暂停。未发送恢复签名或提现。",
+    "ru": "У {ready} из {total} пулов проверены резервы и найдены ключи владельца. Подписание остаётся на паузе. Подписи восстановления и вывод средств не отправлялись.",
+    "uk": "У {ready} із {total} пулів перевірено резерви та знайдено ключі власника. Підписання залишається на паузі. Підписи відновлення й виведення коштів не надсилалися."
+  },
+  "params.keets": {
+    "en": "Keets transport (-keets)",
+    "zh-Hans": "Keets 传输（-keets）",
+    "ru": "Транспорт Keets (-keets)",
+    "uk": "Транспорт Keets (-keets)"
+  },
+  "params.keetsBody": {
+    "en": "On: KeetChat and the peer-to-peer keets transport, as before. Off: no Hyperswarm sidecar, no DHT and no Chat tab - the node runs on the classic Minima transport only and uses less battery and RAM. Your chats and keets identity stay on the phone and return when you switch it back on. Applies after a restart.",
+    "zh-Hans": "开启：KeetChat 与点对点 keets 传输，与之前相同。关闭：无 Hyperswarm 边车、无 DHT、无\"聊天\"标签页，节点仅使用经典 Minima 传输，耗电和内存更少。您的聊天记录和 keets 身份保留在手机上，重新开启后恢复。重启后生效。",
+    "ru": "Вкл.: KeetChat и одноранговый транспорт keets, как прежде. Выкл.: без сайдкара Hyperswarm, без DHT и без вкладки Чат - узел работает только через классический транспорт Minima и расходует меньше батареи и памяти. Ваши чаты и идентичность keets остаются на телефоне и возвращаются при включении. Применяется после перезапуска.",
+    "uk": "Увімк.: KeetChat і одноранговий транспорт keets, як раніше. Вимк.: без сайдкара Hyperswarm, без DHT і без вкладки Чат - вузол працює лише через класичний транспорт Minima та витрачає менше батареї й пам'яті. Ваші чати та ідентичність keets залишаються на телефоні й повертаються після ввімкнення. Застосовується після перезапуску."
+  },
+  "chat.keetsOff": {
+    "en": "The keets transport is off - turn it on in Startup Params to use Chat",
+    "zh-Hans": "keets 传输已关闭 - 请在启动参数中开启后再使用聊天",
+    "ru": "Транспорт keets выключен - включите его в параметрах запуска, чтобы пользоваться чатом",
+    "uk": "Транспорт keets вимкнено - увімкніть його в параметрах запуску, щоб користуватися чатом"
   }
 }

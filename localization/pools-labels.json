@@ -445,5 +445,7 @@
   "liquidityCollectFailure": "pools.liquidityCollectFailure",
   "liquidityCollectPartial": "pools.liquidityCollectPartial",
   "liquidityReannounceSubmitted": "pools.liquidityReannounceSubmitted",
-  "liquidityRefreshSubmitted": "pools.liquidityRefreshSubmitted"
+  "liquidityRefreshSubmitted": "pools.liquidityRefreshSubmitted",
+  "recoveryReadyCount": "pools.recoveryReadyCount",
+  "recoveryReadyBody": "pools.recoveryReadyBody"
 }

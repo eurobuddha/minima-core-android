@@ -55,8 +55,7 @@ import static com.eurobuddha.minimacore.i18n.R.plurals.*;
            's = Language.join(s, " · ", Language.msg(l10n_history_synced_block, chainBlock));')
     change('s += " · " + relative(Long.parseLong(last));',
            's = Language.join(s, " · ", relative(Long.parseLong(last)));')
-    change('Language.msg(l10n_history_direction), e.direction',
-           'Language.msg(l10n_history_direction), directionLabel(e.direction)')
+    assert 'Language.msg(l10n_history_direction), HistoryChainStatus.direction(e.direction)' in s, 'History direction evidence drift'
     change('new SimpleDateFormat("dd MMM yyyy  HH:mm:ss", Locale.ENGLISH).format(new Date(e.timemilli))',
            'Language.stamp(e.timemilli, "yMMMdHms")')
     change('new AlertDialog.Builder(this)', 'new LanguageDialog(this)')

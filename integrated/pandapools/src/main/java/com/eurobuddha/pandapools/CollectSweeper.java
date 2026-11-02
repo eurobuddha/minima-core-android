@@ -85,6 +85,9 @@ final class CollectSweeper {
                     // Re-read after confirmation; never clear from an earlier balance snapshot.
                     readRemaining(oadr, latest -> {
                         if (latest != null && latest == 0 && PendingCollect.clear(ctx, e)) {
+                            Pool recovered = ExitStore.recoveryPool(ctx, oadr);
+                            if (recovered != null) ExitStore.set(ctx, recovered.address, recovered.opk,
+                                    ExitStore.State.DONE, "Confirmed collection; payout address empty.", "", 0);
                             tally[0]++;
                             step(queue, i + 1, tally, cb);
                         } else pendingEmpty(e, queue, i, tally, cb);

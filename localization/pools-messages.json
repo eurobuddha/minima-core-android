@@ -352,7 +352,12 @@
     "Node reply missing or awaiting approval.": "pools.reservePending",
     "\"Node reply missing or awaiting approval.\"": "pools.reservePending",
     "Node command failed.": "pools.reserveCommandFailed",
-    "\"Node command failed.\"": "pools.reserveCommandFailed"
+    "\"Node command failed.\"": "pools.reserveCommandFailed",
+    "Restore your pools": "pools.recoveryRestoreWithdraw",
+    "Choose pool backup": "pools.recoveryChooseBackup",
+    "Pools restored": "pools.recoveryRestoredTitle",
+    "Saved pool · owner key missing": "pools.lpOwnerMissingTitle",
+    "Recovery diagnostic": "pools.recoveryRestoredTitle"
   },
   "patterns": [
     {

@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         Language.description(findViewById(R.id.pm_pandapools_designToggle), Language.msg(l10n_pools_style_description));
 
         // Register the SAF pickers early — registerForActivityResult must run before the Activity is started.
-        saveDocLauncher = registerForActivityResult(new ActivityResultContracts.CreateDocument("application/json"), uri -> {
+        saveDocLauncher = registerForActivityResult(new ActivityResultContracts.CreateDocument("application/octet-stream"), uri -> {
             Consumer<Uri> cb = pendingSave; pendingSave = null;
             if (cb != null) cb.accept(uri);
         });

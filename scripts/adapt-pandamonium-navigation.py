@@ -172,6 +172,7 @@ def adapt(root):
     }
 ''')
     s=s.replace('MainActivity.this','HistoryScreen.this')
+    s=s.replace('if(isFinishing() || isDestroyed())return;', 'if(closed)return;')
     s=s.replace('    @Override\n    protected void onCreate(Bundle b) {\n        super.onCreate(b);\n        setContentView(R.layout.pm_history_activity_main);', '    private void create() {\n        screen = android.view.LayoutInflater.from(this).inflate(R.layout.pm_history_activity_main, null, false);')
     s=s.replace('        applyInsets();','        // The core tab owns system/keyboard insets.')
     s=s.replace('new NodeApi(this, this::onPaired)', 'new NodeApi(host, this::onPaired)')

@@ -20,5 +20,5 @@ def adapt(root):
  s=change(s,'private void autoWithdraw(List<Pool> verified, StringBuilder log,','private void autoWithdraw(List<Pool> verified, Language.TextBuilder log,')
  s=change(s,'log.append(line).append(\'\\n\'); status(Language.msg(l10n_pools_recovery_restore_progress, PoolsMessages.message(line)));','CharSequence translated = PoolsMessages.report(line); log.append(translated).append(\'\\n\'); status(Language.msg(l10n_pools_recovery_restore_progress, translated));')
  s=change(s,'log.append(line).append(\'\\n\');','log.append(PoolsMessages.message(line)).append(\'\\n\');')
- s=change(s,'PoolsMessages.report(log.toString().trim())','log.build()',2)
+ s=change(s,'PoolsMessages.report(log.toString().trim())','log.build()',3)
  p.write_text(s)

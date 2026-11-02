@@ -30,6 +30,7 @@
     "I understand I'm setting the opening price with no market to check it against.": "pools.createManualAcknowledgement",
     "Enter both amounts.": "pools.createEnterBoth",
     "Amounts too large (x × y must be < 2^64).": "pools.createAmountsLarge",
-    "Tick the box to confirm you're setting the price.": "pools.createManualRequired"
+    "Tick the box to confirm you're setting the price.": "pools.createManualRequired",
+    "I understand: I must keep this app running, save the pool file and keep my wallet seed safe.": "pools.createBackupAcknowledgement"
   }
 }

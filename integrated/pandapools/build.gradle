@@ -5,8 +5,9 @@ android {
     compileSdk 36
     defaultConfig {
         minSdk 28
-        buildConfigField 'String', 'VERSION_NAME', '"0.9.66"'
-        buildConfigField 'int', 'VERSION_CODE', '966'
+        targetSdk 35 // Match the embedding app when lint checks manifest permissions.
+        buildConfigField 'String', 'VERSION_NAME', '"0.9.74"'
+        buildConfigField 'int', 'VERSION_CODE', '974'
     }
     buildFeatures { buildConfig true }
     compileOptions {
@@ -15,6 +16,8 @@ android {
     }
 }
 dependencies {
+    compileOnly files('../../app/libs/minima.jar')
+    testImplementation files('../../app/libs/minima.jar')
     testImplementation 'org.mockito:mockito-core:5.12.0'
     implementation project(':localization')
     // Shared Maxima codec classes now come from the vendored transport core
