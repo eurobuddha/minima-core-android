@@ -6,7 +6,7 @@ android {
     defaultConfig {
         minSdk 28
         targetSdk 35 // Match the embedding app when lint checks manifest permissions.
-        buildConfigField 'String', 'VERSION_NAME', '"0.9.74"'
+        buildConfigField 'String', 'VERSION_NAME', '"0.9.76"'
         buildConfigField 'int', 'VERSION_CODE', '974'
     }
     buildFeatures { buildConfig true }
