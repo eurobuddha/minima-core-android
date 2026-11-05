@@ -34,6 +34,7 @@ public class MinimaApplication extends Application {
         boolean sensitive = activity instanceof com.eurobuddha.minimacore.main.backup.VaultActivity
                 || activity instanceof com.eurobuddha.minimacore.main.backup.BackupCreateActivity
                 || activity instanceof com.eurobuddha.minimacore.main.backup.RestoreFileActivity
+                || activity instanceof com.eurobuddha.minimacore.main.backup.ChatBackupActivity
                 || com.eurobuddha.minimacore.integrated.PandamoniumHooks.requiresSecureScreen(activity);
         boolean allowed = screenshotsAllowed(this);
         if (sensitive || !allowed) activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);

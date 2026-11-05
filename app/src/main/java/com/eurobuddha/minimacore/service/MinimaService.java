@@ -416,6 +416,9 @@ public class MinimaService extends Service {
                 //Sequence startup after the probe; otherwise it can detect our own node.
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (!serviceDestroyed && !mHaveStartedShutdown) {
+                        //A staged chat backup lands before the node, the keets worklet or
+                        //MaxChat read the identities it replaces.
+                        com.eurobuddha.minimacore.main.backup.ChatBackup.applyPending(MinimaService.this);
                         minima.mainStarter(vars.toArray(new String[0]));
 
                         //keets: phone dialable by pubkey over HyperDHT. Started after the

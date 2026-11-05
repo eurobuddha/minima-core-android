@@ -8546,4 +8546,23 @@
     <string name="l10n_params_keets" formatted="false">"Keets transport (-keets)"</string>
     <string name="l10n_params_keets_body" formatted="false">"On: KeetChat and the peer-to-peer keets transport, as before. Off: no Hyperswarm sidecar, no DHT and no Chat tab - the node runs on the classic Minima transport only and uses less battery and RAM. Your chats and keets identity stay on the phone and return when you switch it back on. Applies after a restart."</string>
     <string name="l10n_chat_keets_off" formatted="false">"The keets transport is off - turn it on in Startup Params to use Chat"</string>
+    <string name="l10n_chatbak_title" formatted="false">"Chat backup"</string>
+    <string name="l10n_chatbak_help" formatted="false">"Save or restore your keets and MAX# chat addresses, contacts and messages."</string>
+    <string name="l10n_chatbak_export" formatted="false">"Save chat backup"</string>
+    <string name="l10n_chatbak_intro" formatted="false">"One encrypted file with your keets chat address, your MAX# address, every chat contact and every message. Photos, voice notes and files are not included."</string>
+    <string name="l10n_chatbak_password_hint" formatted="false">"at least 8 characters"</string>
+    <string name="l10n_chatbak_password_short" formatted="false">"Use at least 8 characters."</string>
+    <string name="l10n_chatbak_warning" formatted="false">"Anyone with this file and its password can read your chats and speak as you. Without the password the file cannot be opened."</string>
+    <string name="l10n_chatbak_saving" formatted="false">"Encrypting and saving…"</string>
+    <string name="l10n_chatbak_saved">"Chat backup saved: %1$s contacts, %2$s messages."</string>
+    <string name="l10n_chatbak_failed">"Chat backup failed: %1$s"</string>
+    <string name="l10n_chatbak_restore" formatted="false">"Restore chat backup"</string>
+    <string name="l10n_chatbak_restore_intro" formatted="false">"Enter the backup\'s password, then choose the file. This phone takes over the chat addresses in the backup and the node restarts to load them."</string>
+    <string name="l10n_chatbak_choose" formatted="false">"Choose backup file"</string>
+    <string name="l10n_chatbak_opening" formatted="false">"Opening the backup…"</string>
+    <string name="l10n_chatbak_bad_password" formatted="false">"Wrong password, or this is not a chat backup."</string>
+    <string name="l10n_chatbak_confirm_title" formatted="false">"Replace this phone\'s chat identity?"</string>
+    <string name="l10n_chatbak_confirm_body">"Keets address in the backup:\n%1$s\n\nMAX# address in the backup:\n%2$s\n\nThis phone\'s keets address now:\n%3$s\n\n• This phone\'s current keets and MAX# addresses are REPLACED. They are gone unless you saved a chat backup of them.\n• %4$s contacts and %5$s messages are added; chats already here are kept.\n• Stop the node on the old phone first. Two nodes on one address take each other\'s messages.\n• The node restarts.\n\nType RESTORE to confirm."</string>
+    <string name="l10n_chatbak_none" formatted="false">"(none)"</string>
+    <string name="l10n_chatbak_restart_later" formatted="false">"Ready. The backup loads the next time the node starts."</string>
 </resources>

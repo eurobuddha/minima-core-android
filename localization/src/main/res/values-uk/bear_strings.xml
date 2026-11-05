@@ -8620,4 +8620,23 @@
     <string name="l10n_params_keets" formatted="false">"Транспорт Keets (-keets)"</string>
     <string name="l10n_params_keets_body" formatted="false">"Увімк.: KeetChat і одноранговий транспорт keets, як раніше. Вимк.: без сайдкара Hyperswarm, без DHT і без вкладки Чат - вузол працює лише через класичний транспорт Minima та витрачає менше батареї й пам\'яті. Ваші чати та ідентичність keets залишаються на телефоні й повертаються після ввімкнення. Застосовується після перезапуску."</string>
     <string name="l10n_chat_keets_off" formatted="false">"Транспорт keets вимкнено - увімкніть його в параметрах запуску, щоб користуватися чатом"</string>
+    <string name="l10n_chatbak_title" formatted="false">"Резервна копія чату"</string>
+    <string name="l10n_chatbak_help" formatted="false">"Зберегти або відновити адреси чату keets і MAX#, контакти й повідомлення."</string>
+    <string name="l10n_chatbak_export" formatted="false">"Зберегти копію чату"</string>
+    <string name="l10n_chatbak_intro" formatted="false">"Один зашифрований файл з вашою адресою чату keets, адресою MAX#, усіма контактами й усіма повідомленнями. Фото, голосові повідомлення та файли не входять."</string>
+    <string name="l10n_chatbak_password_hint" formatted="false">"щонайменше 8 символів"</string>
+    <string name="l10n_chatbak_password_short" formatted="false">"Використайте щонайменше 8 символів."</string>
+    <string name="l10n_chatbak_warning" formatted="false">"Будь-хто з цим файлом і паролем може читати ваші чати й писати від вашого імені. Без пароля файл не відкрити."</string>
+    <string name="l10n_chatbak_saving" formatted="false">"Шифрування та збереження…"</string>
+    <string name="l10n_chatbak_saved">"Копію чату збережено: контактів %1$s, повідомлень %2$s."</string>
+    <string name="l10n_chatbak_failed">"Помилка копії чату: %1$s"</string>
+    <string name="l10n_chatbak_restore" formatted="false">"Відновити копію чату"</string>
+    <string name="l10n_chatbak_restore_intro" formatted="false">"Введіть пароль копії, потім виберіть файл. Цей телефон отримає адреси чату з копії, а вузол перезапуститься, щоб завантажити їх."</string>
+    <string name="l10n_chatbak_choose" formatted="false">"Вибрати файл копії"</string>
+    <string name="l10n_chatbak_opening" formatted="false">"Відкриття копії…"</string>
+    <string name="l10n_chatbak_bad_password" formatted="false">"Неправильний пароль, або це не копія чату."</string>
+    <string name="l10n_chatbak_confirm_title" formatted="false">"Замінити особу чату на цьому телефоні?"</string>
+    <string name="l10n_chatbak_confirm_body">"Адреса keets у копії:\n%1$s\n\nАдреса MAX# у копії:\n%2$s\n\nПоточна адреса keets цього телефона:\n%3$s\n\n• Поточні адреси keets і MAX# цього телефона буде ЗАМІНЕНО. Вони зникнуть, якщо ви не зберегли їхню копію чату.\n• Буде додано контакти (%4$s) і повідомлення (%5$s); наявні чати залишаться.\n• Спершу зупиніть вузол на старому телефоні. Два вузли з однією адресою перехоплюють повідомлення одне одного.\n• Вузол перезапуститься.\n\nВведіть RESTORE для підтвердження."</string>
+    <string name="l10n_chatbak_none" formatted="false">"(немає)"</string>
+    <string name="l10n_chatbak_restart_later" formatted="false">"Готово. Копія завантажиться під час наступного запуску вузла."</string>
 </resources>

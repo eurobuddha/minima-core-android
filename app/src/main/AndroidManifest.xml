@@ -105,6 +105,7 @@
         <activity android:configChanges="locale|layoutDirection|screenLayout" android:name=".main.backup.BackupCreateActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:configChanges="locale|layoutDirection|screenLayout" android:name=".main.backup.RestoreFileActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:configChanges="locale|layoutDirection|screenLayout" android:name=".main.backup.VaultActivity" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:configChanges="locale|layoutDirection|screenLayout" android:name=".main.backup.ChatBackupActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:configChanges="locale|layoutDirection|screenLayout" android:name=".main.views.send.SendActivity" android:windowSoftInputMode="adjustResize"></activity>
         <activity android:configChanges="locale|layoutDirection|screenLayout" android:name=".main.views.receive.ReceiveActivity" android:windowSoftInputMode="adjustResize"></activity>
 

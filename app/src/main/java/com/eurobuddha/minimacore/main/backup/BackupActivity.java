@@ -61,6 +61,10 @@ public class BackupActivity extends AppCompatActivity {
                 Language.msg(l10n_backup_restore_help),
                 v -> startActivity(new Intent(this, RestoreFileActivity.class)));
 
+        addRow(Language.msg(l10n_chatbak_title),
+                Language.msg(l10n_chatbak_help),
+                v -> startActivity(new Intent(this, ChatBackupActivity.class)));
+
         addRow(Language.msg(l10n_resync_title),
                 Language.msg(l10n_backup_resync_help),
                 v -> startActivity(new Intent(this, SeedSyncActivity.class)));

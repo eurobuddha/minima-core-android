@@ -8509,4 +8509,23 @@
     <string name="l10n_params_keets" formatted="false">"Keets 传输（-keets）"</string>
     <string name="l10n_params_keets_body" formatted="false">"开启：KeetChat 与点对点 keets 传输，与之前相同。关闭：无 Hyperswarm 边车、无 DHT、无\"聊天\"标签页，节点仅使用经典 Minima 传输，耗电和内存更少。您的聊天记录和 keets 身份保留在手机上，重新开启后恢复。重启后生效。"</string>
     <string name="l10n_chat_keets_off" formatted="false">"keets 传输已关闭 - 请在启动参数中开启后再使用聊天"</string>
+    <string name="l10n_chatbak_title" formatted="false">"聊天备份"</string>
+    <string name="l10n_chatbak_help" formatted="false">"保存或恢复您的 keets 和 MAX# 聊天地址、联系人和消息。"</string>
+    <string name="l10n_chatbak_export" formatted="false">"保存聊天备份"</string>
+    <string name="l10n_chatbak_intro" formatted="false">"一个加密文件，包含您的 keets 聊天地址、MAX# 地址、所有聊天联系人和所有消息。不包括照片、语音消息和文件。"</string>
+    <string name="l10n_chatbak_password_hint" formatted="false">"至少 8 个字符"</string>
+    <string name="l10n_chatbak_password_short" formatted="false">"请至少使用 8 个字符。"</string>
+    <string name="l10n_chatbak_warning" formatted="false">"任何持有此文件及其密码的人都能阅读您的聊天并以您的身份发言。没有密码无法打开此文件。"</string>
+    <string name="l10n_chatbak_saving" formatted="false">"正在加密并保存…"</string>
+    <string name="l10n_chatbak_saved">"聊天备份已保存：%1$s 个联系人，%2$s 条消息。"</string>
+    <string name="l10n_chatbak_failed">"聊天备份失败：%1$s"</string>
+    <string name="l10n_chatbak_restore" formatted="false">"恢复聊天备份"</string>
+    <string name="l10n_chatbak_restore_intro" formatted="false">"输入备份的密码，然后选择文件。本手机将接管备份中的聊天地址，节点会重启以加载它们。"</string>
+    <string name="l10n_chatbak_choose" formatted="false">"选择备份文件"</string>
+    <string name="l10n_chatbak_opening" formatted="false">"正在打开备份…"</string>
+    <string name="l10n_chatbak_bad_password" formatted="false">"密码错误，或这不是聊天备份。"</string>
+    <string name="l10n_chatbak_confirm_title" formatted="false">"替换本手机的聊天身份？"</string>
+    <string name="l10n_chatbak_confirm_body">"备份中的 keets 地址：\n%1$s\n\n备份中的 MAX# 地址：\n%2$s\n\n本手机当前的 keets 地址：\n%3$s\n\n• 本手机当前的 keets 和 MAX# 地址将被替换。除非您已为其保存聊天备份，否则将永久丢失。\n• 将添加 %4$s 个联系人和 %5$s 条消息；现有聊天会保留。\n• 请先停止旧手机上的节点。两个节点使用同一地址会互相截取消息。\n• 节点将重启。\n\n输入 RESTORE 以确认。"</string>
+    <string name="l10n_chatbak_none" formatted="false">"（无）"</string>
+    <string name="l10n_chatbak_restart_later" formatted="false">"已就绪。备份将在节点下次启动时加载。"</string>
 </resources>

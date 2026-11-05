@@ -41,7 +41,10 @@ import java.util.ArrayList;
  */
 public class ChatView extends BaseView {
 
-    private static String mMyPub = null;   // cached (stable per datadir)
+    private static String mMyPub = null;   // cached (stable per datadir until a chat backup is restored)
+
+    /** A restored chat backup replaced the keets keypair: ask the sidecar again. */
+    public static void forgetMyPub() { mMyPub = null; }
 
     private final View mEmpty;
     private final TextView mMyName;
