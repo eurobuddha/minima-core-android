@@ -121,7 +121,7 @@ public final class DexHistory {
     }
     static final String DISCOVERY_CURSOR = "V5_HISTORY_DISCOVERY";
 
-    /** Discover included V5 order spends even if no running book scan ever saw their inputs. */
+    /** Discover included order spends (V6 or V5) even if no running book scan ever saw their inputs. */
     void discover(Discovery discovery, Runnable complete) {
         try { if (poolMarket != null) poolMarket.begin(); }
         catch (RuntimeException failure) {
@@ -140,7 +140,7 @@ public final class DexHistory {
     }
 
     static Order5 historicalOrder(JSONObject input) {
-        if (!paysTo(input, DexContract.ADDR_V5) && !paysTo(input, DexContract.ADDR_V5_MX)) return null;
+        if (!DexContract.atOrderAddr(input)) return null;
         Order5 order = Order5.from(input);
         return order != null && order.fillable() ? order : null;
     }
@@ -354,7 +354,7 @@ public final class DexHistory {
         if (spend == null || spend.confirmations < 0 || index < 0
                 || index >= spend.outputs.length()) return null;
         JSONObject output = spend.outputs.optJSONObject(index);
-        if (!TxValidation.truthy(output, "storestate") || !paysTo(output, DexContract.ADDR_V5)) return null;
+        if (!TxValidation.truthy(output, "storestate") || !DexContract.atOrderAddr(output)) return null;
         try {
             JSONObject coin = new JSONObject(output.toString());
             coin.put("state", spend.transactionState);
@@ -367,7 +367,7 @@ public final class DexHistory {
         if (spend == null || original == null || spend.input == null
                 || !original.coinid.equalsIgnoreCase(spend.input.optString("coinid", ""))) return null;
         Order5 next = successorAtInput(spend);
-        if (next == null || !original.ownerPk.equalsIgnoreCase(next.ownerPk)
+        if (next == null || !original.addr.equals(next.addr) || !original.ownerPk.equalsIgnoreCase(next.ownerPk)
                 || !original.wantAddr.equalsIgnoreCase(next.wantAddr)
                 || !original.wantTok.equalsIgnoreCase(next.wantTok)
                 || !original.lockedTok.equalsIgnoreCase(next.lockedTok)

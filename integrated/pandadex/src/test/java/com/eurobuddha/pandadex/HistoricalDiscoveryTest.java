@@ -54,7 +54,8 @@ public class HistoricalDiscoveryTest {
         JSONObject raw=new JSONObject(TransactionHardeningTest.orderCoin().toString())
                 .put("coinid",String.format("0x%08x",i+1000))
                 .put("address",candidate?DexContract.ADDR_V5:"0xdead");
-        Order5 order=Order5.from(raw);
+        // the fixture's payout fields only; a coin at 0xdead is (correctly) not an order, so parse a covenant copy
+        Order5 order=Order5.from(new JSONObject(raw.toString()).put("address",DexContract.ADDR_V5));
         return new TestJson().put("txpowid",String.format("0x%08x",i+1))
                 .put("body",new TestJson().put("txn",new TestJson().put("inputs",new JSONArray().put(raw))
                         .put("outputs",new JSONArray().put(new TestJson().put("address",order.wantAddr)

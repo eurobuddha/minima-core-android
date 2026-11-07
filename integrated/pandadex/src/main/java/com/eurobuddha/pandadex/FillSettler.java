@@ -251,7 +251,7 @@ public final class FillSettler implements FillTape.Sink {
         if (spend == null || spend.confirmations < 0 || order == null || spend.inputIndex < 0) return null;
         org.json.JSONObject pay = spend.outputs.optJSONObject(spend.inputIndex);
         org.json.JSONObject rem = spend.outputs.optJSONObject(spend.inputIndex + 1);
-        if (!DexHistory.paysTo(pay, order.wantAddr) || !DexHistory.paysTo(rem, DexContract.ADDR_V5)
+        if (!DexHistory.paysTo(pay, order.wantAddr) || !DexContract.atOrderAddr(rem)
                 || !DexHistory.sameToken(pay.optString("tokenid"), order.wantTok)
                 || !DexHistory.sameToken(rem.optString("tokenid"), order.lockedTok)) return null;
         BigDecimal left = DexHistory.value(rem);

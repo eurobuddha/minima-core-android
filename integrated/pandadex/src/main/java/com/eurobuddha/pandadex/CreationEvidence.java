@@ -73,7 +73,7 @@ final class CreationEvidence {
                     || !FundingCoins.hex(token) || !FundingCoins.hex(payout)) return null;
             if (first.outputs.length() != (change.signum() > 0 ? 2 : 1)) return null;
             JSONObject output = first.outputs.optJSONObject(0);
-            if (!TxValidation.truthy(output, "storestate") || !DexHistory.paysTo(output, DexContract.ADDR_V5)
+            if (!TxValidation.truthy(output, "storestate") || !DexContract.atOrderAddr(output)
                     || !DexHistory.sameToken(token, output.optString("tokenid", ""))
                     || FundingCoins.coinValue(output).compareTo(lock) != 0) return null;
             if (change.signum() > 0) {

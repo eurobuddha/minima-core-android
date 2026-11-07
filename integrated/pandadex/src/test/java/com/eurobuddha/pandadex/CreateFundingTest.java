@@ -16,7 +16,7 @@ public class CreateFundingTest {
         List<String> commands = DexTxn.createOrderSteps("test", "0x00", new BigDecimal("100"), "0xbb", state(),
                 Arrays.asList(coin("0x00","75"),new TestJson().put("coinid","0xee").put("tokenid","0x00").put("amount","50")));
         assertEquals(2, commands.stream().filter(c -> c.startsWith("txninput ")).count());
-        assertTrue(commands.contains("txnoutput id:test amount:100 address:"+DexContract.ADDR_V5+" storestate:true"));
+        assertTrue(commands.contains("txnoutput id:test amount:100 address:"+DexContract.ADDR_V6+" storestate:true"));
         assertTrue(commands.contains("txnoutput id:test amount:25 address:0xbb storestate:false"));
         assertEquals(9, commands.stream().filter(c -> c.startsWith("txnstate ")).count());
         assertEquals("txnsign id:test publickey:auto",commands.get(commands.size()-1));

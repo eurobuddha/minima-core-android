@@ -176,7 +176,7 @@ public class DexTxn {   // non-final so tests can stub the three order actions
         if (total.compareTo(lock) < 0) throw new IllegalArgumentException("Insufficient order funding");
         String tok = Util.isMinima(token) ? "" : " tokenid:" + token;
         steps.add("txnoutput id:" + txid + " amount:" + lock.toPlainString()
-                + " address:" + DexContract.ADDR_V5 + tok + " storestate:true");
+                + " address:" + DexContract.ADDR_V6 + tok + " storestate:true");
         BigDecimal change = total.subtract(lock);
         if (change.signum() > 0) steps.add("txnoutput id:" + txid + " amount:" + change.toPlainString()
                 + " address:" + payout + tok + " storestate:false");
@@ -291,11 +291,7 @@ public class DexTxn {   // non-final so tests can stub the three order actions
                         + ("0x00".equals(p[2]) ? "" : " tokenid:" + p[2]) + " storestate:false");
             }
             if (fPartial != null) {
-                Order5 o = fPartial.order;
-                steps.add("txnoutput id:" + txid + " amount:" + fRem.toPlainString()
-                        + " address:" + DexContract.ADDR_V5
-                        + ("0x00".equals(o.lockedTok) ? "" : " tokenid:" + o.lockedTok)
-                        + " storestate:true");
+                steps.add(covenantOutput(txid, fPartial.order, fRem));
             }
             // taker proceeds: the locked asset of each consumed order
             BigDecimal proceeds = BigDecimal.ZERO;
@@ -451,11 +447,7 @@ public class DexTxn {   // non-final so tests can stub the three order actions
                     + (Util.MINIMA_TOKENID.equals(p[2]) ? "" : " tokenid:" + p[2]) + " storestate:false");
         }
         if (prep.partial != null) {
-            Order5 o = prep.partial.order;
-            steps.add("txnoutput id:" + txid + " amount:" + prep.partialRem.toPlainString()
-                    + " address:" + DexContract.ADDR_V5
-                    + (Util.MINIMA_TOKENID.equals(o.lockedTok) ? "" : " tokenid:" + o.lockedTok)
-                    + " storestate:true");
+            steps.add(covenantOutput(txid, prep.partial.order, prep.partialRem));
         }
         String proceedsTok = takerBuys ? Util.MINIMA_TOKENID : DexContract.USDT_ID;
         BigDecimal proceeds = takerBuys ? plan.totalMinima : plan.totalUsdt;
@@ -626,7 +618,7 @@ public class DexTxn {   // non-final so tests can stub the three order actions
     }
 
     /** Atomic in-place re-lock: GTC renew (newWant null) or edit (newWant set). ONE txn —
-     *  the coin never leaves the book (the V5 owner branch; proven in Phase B chunk D). */
+     *  the coin never leaves the book (the owner branch, same in V5 and V6; proven in Phase B chunk D). */
     public void relock(Order5 o, BigDecimal newWant, Result cb) {
         final CommandSession.Snapshot commands = commandSession.snapshot();
         if (!safeOrder(o)) { cb.onFailed("Invalid order data. Nothing was signed."); return; }
@@ -638,12 +630,27 @@ public class DexTxn {   // non-final so tests can stub the three order actions
             cb.onFailed("Invalid replacement amount. Nothing was signed."); return;
         }
         String txid = "relock_" + System.nanoTime();
+        List<String> steps = relockSteps(txid, o, want);
+        Result journal;
+        try {
+            if(db==null)throw new IllegalStateException("Receipt storage unavailable");
+            journal=db.pendingReceipts().relockResult(o,want,chainBlock,cb);
+        }catch(RuntimeException failure){cb.onFailed("Could not prepare relock receipt. Nothing was signed.");return;}
+        postGated(commands,txid,steps,new ArrayList<>(),journal);
+    }
+
+    /** A coin put back at the covenant (partial-fill remainder, owner relock) goes to THE ORDER'S OWN address: the
+     *  covenant demands @ADDRESS, so a V5 order stays at V5 and a V6 order at V6. */
+    static String covenantOutput(String txid, Order5 o, BigDecimal amount) {
+        return "txnoutput id:" + txid + " amount:" + amount.toPlainString() + " address:" + o.addr
+                + (Util.MINIMA_TOKENID.equals(o.lockedTok) ? "" : " tokenid:" + o.lockedTok) + " storestate:true";
+    }
+
+    static List<String> relockSteps(String txid, Order5 o, BigDecimal want) {
         List<String> steps = new ArrayList<>();
         steps.add("txncreate id:" + txid);
         steps.add("txninput id:" + txid + " coinid:" + o.coinid);
-        steps.add("txnoutput id:" + txid + " amount:" + o.locked.toPlainString()
-                + " address:" + DexContract.ADDR_V5
-                + ("0x00".equals(o.lockedTok) ? "" : " tokenid:" + o.lockedTok) + " storestate:true");
+        steps.add(covenantOutput(txid, o, o.locked));
         steps.add(stateStep(txid, 0, o.ownerPk));
         steps.add(stateStep(txid, 1, o.wantAddr));
         steps.add(stateStep(txid, 2, want.toPlainString()));
@@ -656,12 +663,7 @@ public class DexTxn {   // non-final so tests can stub the three order actions
         steps.add(stateStep(txid, 8, o.minRem.toPlainString()));
         steps.add("txnsign id:" + txid + " publickey:" + o.ownerPk);
         steps.add("txnbasics id:" + txid);
-        Result journal;
-        try {
-            if(db==null)throw new IllegalStateException("Receipt storage unavailable");
-            journal=db.pendingReceipts().relockResult(o,want,chainBlock,cb);
-        }catch(RuntimeException failure){cb.onFailed("Could not prepare relock receipt. Nothing was signed.");return;}
-        postGated(commands,txid,steps,new ArrayList<>(),journal);
+        return steps;
     }
 
     /** Third-party sweep of an expired order back to its maker (book hygiene; COINAGE path). */
