@@ -300,6 +300,17 @@ public class MinimaAPI {
         return intent;
     }
 
+    /** Security review 2026-11-07 (M-2): a node hands a NEW registration a one-time code, delivered only to this package.
+     *  Echo it back so the node marks this registration VERIFIED; a spoofer claiming this package never sees the code. */
+    private void confirmIfAsked(String zTarget, JSONObject zReply){
+        String code = zReply == null ? "" : zReply.optString("confirm", "");
+        if (destroyed || code.isEmpty() || zReply.optBoolean("verified", false)) return;
+        Intent confirm = getBaseIntent("REGISTER", zTarget);
+        confirm.putExtra(MinimaAPIMessages.key(MinimaAPIMessages.prefixOf(zTarget), "CONFIRM"), code);
+        addResponseHandler(confirm, zTarget, r -> {});
+        mContext.sendBroadcast(confirm);
+    }
+
     private void Register(MinimaAPIListener zListener){
         discovering = true;
         registrations.clear();
@@ -309,6 +320,7 @@ public class MinimaAPI {
             final String target = node[0];
             Intent intent = getBaseIntent("REGISTER", target);
             requestIds.add(addResponseHandler(intent, target, reply -> main.post(() -> {
+                confirmIfAsked(target, reply);
                 if (destroyed || !discovering || generation != discoveryGeneration
                         || !reply.optBoolean("status", false)) return;
                 registrations.put(target, reply);

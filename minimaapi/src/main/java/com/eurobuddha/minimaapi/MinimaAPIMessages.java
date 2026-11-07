@@ -19,6 +19,10 @@ public class MinimaAPIMessages {
     //Optional sender proof on ANY Android version: an immutable PendingIntent the sender created itself. Its
     //getCreatorPackage() is set by the platform and cannot be forged (security review 2026-11-07).
     public static final String MINIMA_API_PROOF                 = MINIMA_BASE_CLASS +".PROOF";
+    //Security review 2026-11-07 (M-2): a NEW registration gets a one-time code in its REGISTER reply, which the node sends
+    //only to the package it names (setPackage). The companion echoes it back in a second REGISTER under this extra; only
+    //then is the row VERIFIED. A spoofer claiming the package never sees the code.
+    public static final String MINIMA_API_CONFIRM               = MINIMA_BASE_CLASS +".CONFIRM";
 
     //Send a command to run
     public static final String MINIMA_API_CMD                   = MINIMA_BASE_CLASS +".CMD";

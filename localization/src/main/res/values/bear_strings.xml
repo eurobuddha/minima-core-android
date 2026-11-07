@@ -8565,4 +8565,8 @@
     <string name="l10n_chatbak_confirm_body">"Keets address in the backup:\n%1$s\n\nMAX# address in the backup:\n%2$s\n\nThis phone\'s keets address now:\n%3$s\n\n• This phone\'s current keets and MAX# addresses are REPLACED. They are gone unless you saved a chat backup of them.\n• %4$s contacts and %5$s messages are added; chats already here are kept.\n• Stop the node on the old phone first. Two nodes on one address take each other\'s messages.\n• The node restarts.\n\nType RESTORE to confirm."</string>
     <string name="l10n_chatbak_none" formatted="false">"(none)"</string>
     <string name="l10n_chatbak_restart_later" formatted="false">"Ready. The backup loads the next time the node starts."</string>
+    <string name="l10n_apps_unverified_title" formatted="false">"Not verified"</string>
+    <string name="l10n_apps_unverified_body">"This app has not yet proven it is %1$s. Update it to its latest version and open it once: it then verifies itself. Enable it unverified only if you installed it yourself just now."</string>
+    <string name="l10n_apps_twin_refused" formatted="false">"Another, verified entry for this app already exists. This entry did not prove its identity and cannot be enabled. Delete it."</string>
+    <string name="l10n_apps_enable_anyway" formatted="false">"Enable anyway"</string>
 </resources>

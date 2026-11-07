@@ -8528,4 +8528,8 @@
     <string name="l10n_chatbak_confirm_body">"备份中的 keets 地址：\n%1$s\n\n备份中的 MAX# 地址：\n%2$s\n\n本手机当前的 keets 地址：\n%3$s\n\n• 本手机当前的 keets 和 MAX# 地址将被替换。除非您已为其保存聊天备份，否则将永久丢失。\n• 将添加 %4$s 个联系人和 %5$s 条消息；现有聊天会保留。\n• 请先停止旧手机上的节点。两个节点使用同一地址会互相截取消息。\n• 节点将重启。\n\n输入 RESTORE 以确认。"</string>
     <string name="l10n_chatbak_none" formatted="false">"（无）"</string>
     <string name="l10n_chatbak_restart_later" formatted="false">"已就绪。备份将在节点下次启动时加载。"</string>
+    <string name="l10n_apps_unverified_title" formatted="false">"未验证"</string>
+    <string name="l10n_apps_unverified_body">"此应用尚未证明它是 %1$s。请将其更新到最新版本并打开一次，它会自动完成验证。只有在您刚刚亲自安装它时，才可在未验证状态下启用。"</string>
+    <string name="l10n_apps_twin_refused" formatted="false">"此应用已有另一个已验证的条目。此条目未证明其身份，无法启用。请将其删除。"</string>
+    <string name="l10n_apps_enable_anyway" formatted="false">"仍然启用"</string>
 </resources>

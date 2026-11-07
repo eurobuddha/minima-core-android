@@ -115,9 +115,32 @@ public class AppsView extends BaseView {
             cb.setChecked(true);
         }
 
+        //Security review 2026-11-07 (M-2): a row that has not proven its identity (one-time code) cannot be enabled when a
+        //VERIFIED row for the same package exists - that is the spoof - and needs an explicit confirmation otherwise.
+        final boolean verified = !zApp.containsKey("verified") || ((int)zApp.get("verified")) == 1;
+        final boolean twin     = !verified && mAppsAdapter.getDatabase().hasVerifiedTwin(packageclass, packageid);
         cb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (cb.isChecked() && twin) {
+                    cb.setChecked(false);
+                    new LanguageDialog(getActivity()).setTitle(Language.msg(l10n_apps_unverified_title))
+                            .setMessage(Language.msg(l10n_apps_twin_refused))
+                            .setPositiveButton(Language.msg(android.R.string.ok), null).show();
+                    return;
+                }
+                if (cb.isChecked() && !verified) {
+                    cb.setChecked(false);
+                    new LanguageDialog(getActivity()).setTitle(Language.msg(l10n_apps_unverified_title))
+                            .setMessage(Language.msg(l10n_apps_unverified_body, packageclass))
+                            .setPositiveButton(Language.msg(l10n_apps_enable_anyway), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface d, int w) {
+                                    cb.setChecked(true);
+                                    mAppsAdapter.getDatabase().setEnabled(packageclass, packageid, true);
+                                }})
+                            .setNegativeButton(Language.msg(android.R.string.cancel), null).show();
+                    return;
+                }
                 mAppsAdapter.getDatabase().setEnabled(packageclass, packageid, cb.isChecked());
             }
         });
@@ -130,6 +153,13 @@ public class AppsView extends BaseView {
         admincb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (admincb.isChecked() && twin) {   // M-2: never ADMIN for an unverified twin
+                    admincb.setChecked(false);
+                    new LanguageDialog(getActivity()).setTitle(Language.msg(l10n_apps_unverified_title))
+                            .setMessage(Language.msg(l10n_apps_twin_refused))
+                            .setPositiveButton(Language.msg(android.R.string.ok), null).show();
+                    return;
+                }
                 mAppsAdapter.getDatabase().setAdmin(packageclass, packageid, admincb.isChecked());
             }
         });

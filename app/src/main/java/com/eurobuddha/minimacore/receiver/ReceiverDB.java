@@ -11,14 +11,14 @@ import org.minima.utils.json.JSONObject;
 
 public class ReceiverDB extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;   // 2: verified + nonce (security review 2026-11-07, M-2)
     public static final String DATABASE_NAME = "receive.db";
 
     //The Handle to the DB
     SQLiteDatabase mDB;
 
     //All the Columns
-    String[] ALL_COLUMNS = new String[] {"_id","package", "packageid", "minimaid", "penabled", "admin", "lastused"};
+    String[] ALL_COLUMNS = new String[] {"_id","package", "packageid", "minimaid", "penabled", "admin", "lastused", "verified", "nonce"};
 
     // Database creation sql statement
     private static final String DATABASE_CREATE_APPLICATIONS = "create table if not exists applications ( " +
@@ -28,7 +28,9 @@ public class ReceiverDB extends SQLiteOpenHelper {
             "minimaid text not null," +
             "penabled integer not null," +
             "admin integer not null," +
-            "lastused integer not null" +
+            "lastused integer not null," +
+            "verified integer not null default 0," +
+            "nonce text not null default ''" +
             ");";
 
     public ReceiverDB(Context context) {
@@ -50,6 +52,13 @@ public class ReceiverDB extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        //1 -> 2 adds the columns IN PLACE. Wiping would unpair every companion. Rows paired before this release count as
+        //verified (they predate the attack this closes); only NEW registrations must prove themselves.
+        if (oldVersion == 1 && newVersion >= 2) {
+            db.execSQL("ALTER TABLE applications ADD COLUMN verified integer not null default 1");
+            db.execSQL("ALTER TABLE applications ADD COLUMN nonce text not null default ''");
+            return;
+        }
         wipeDB();
     }
     @Override
@@ -57,7 +66,12 @@ public class ReceiverDB extends SQLiteOpenHelper {
         wipeDB();
     }
 
-    public void insertApp(String zPackageName, String zPackageID, String zMinimaID){
+    /** Insert an UNVERIFIED row and return its one-time code (sent only to that package in the REGISTER reply). */
+    public String insertApp(String zPackageName, String zPackageID, String zMinimaID){
+        byte[] raw = new byte[32];
+        new java.security.SecureRandom().nextBytes(raw);
+        StringBuilder nonce = new StringBuilder();
+        for (byte b : raw) nonce.append(String.format("%02x", b));
 
         ContentValues values = new ContentValues();
         values.put("package", zPackageName);
@@ -66,8 +80,33 @@ public class ReceiverDB extends SQLiteOpenHelper {
         values.put("penabled", 0);
         values.put("admin", 0);
         values.put("lastused", System.currentTimeMillis());
+        values.put("verified", 0);
+        values.put("nonce", nonce.toString());
 
         mDB.insert("applications", null, values);
+        return nonce.toString();
+    }
+
+    /** The companion echoed its one-time code: mark that exact row verified. False if no such unverified row/code. */
+    public boolean verify(String zPackageName, String zPackageID, String zMinimaID, String zNonce){
+        JSONObject app = selectApp(zPackageName, zPackageID, zMinimaID);
+        if (app == null || zNonce == null || zNonce.isEmpty()) return false;
+        if ((int) app.get("verified") == 1) return true;
+        String want = (String) app.get("nonce");
+        if (want == null || want.isEmpty() || !java.security.MessageDigest.isEqual(want.getBytes(), zNonce.getBytes())) return false;
+        ContentValues cv = new ContentValues();
+        cv.put("verified", 1);
+        cv.put("nonce", "");
+        mDB.update("applications", cv, "package=? AND packageid=? AND minimaid=?", new String[]{zPackageName, zPackageID, zMinimaID});
+        return true;
+    }
+
+    /** Does a VERIFIED row exist for this package other than the given one? (Then an unverified twin is a spoof.) */
+    public boolean hasVerifiedTwin(String zPackageName, String zPackageID){
+        Cursor c = mDB.query("applications", new String[]{"_id"}, "package=? AND packageid<>? AND verified=1",
+                new String[]{zPackageName, zPackageID}, null, null, null);
+        if (c == null) return false;
+        try { return c.moveToFirst(); } finally { c.close(); }
     }
 
     private JSONObject convertCursor(Cursor zCursor){
@@ -80,6 +119,8 @@ public class ReceiverDB extends SQLiteOpenHelper {
         app.put("penabled", zCursor.getInt(4));
         app.put("admin", zCursor.getInt(5));
         app.put("lastused", zCursor.getLong(6));
+        app.put("verified", zCursor.getInt(7));
+        app.put("nonce", zCursor.getString(8));
 
         return app;
     }

@@ -150,24 +150,32 @@ public class MinimaReceiver extends BroadcastReceiver {
             //Check the message type
             if (Objects.equals(zIntent.getAction(), MinimaAPIMessages.MINIMA_API_REGISTER)) {
 
+                //Security review 2026-11-07 (M-2): a NEW row gets a one-time code in this reply. sendResponse() delivers
+                //ONLY to the package named (setPackage), so a spoofer claiming that package never sees it. The real
+                //companion echoes it (CONFIRM extra) and the row becomes VERIFIED. An unverified twin of a verified row
+                //cannot be enabled (Apps screen) nor run commands (below).
+                String confirm = zIntent.getStringExtra(MinimaAPIMessages.MINIMA_API_CONFIRM);
+
                 //CHECK AND ADD to DB
                 if(app == null){
 
                     //Add to the database..
-                    mDatabase.insertApp(frompackage, frompackageuid, minimauid);
+                    String nonce = mDatabase.insertApp(frompackage, frompackageuid, minimauid);
 
                     //Send response..
-                    String basicmessage = getBasicMessage(true, false, false,"Registered OK!");
-                    sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
+                    sendResponse(zContext, frompackage, responseid, minimauid, getRegisterMessage(false, false, "Registered OK!", false, nonce));
 
                 }else{
 
-                    boolean enabled = (int)app.get("penabled")==1;
-                    boolean admin   = (int)app.get("admin")==1;
+                    boolean enabled  = (int)app.get("penabled")==1;
+                    boolean admin    = (int)app.get("admin")==1;
+                    boolean verified = isVerified(app);
+                    if(!verified && confirm != null) verified = mDatabase.verify(frompackage, frompackageuid, minimauid, confirm);
 
-                    //Send response..
-                    String basicmessage = getBasicMessage(true, enabled, admin, "Already registered..");
-                    sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
+                    //Send response.. (still unverified: hand the code out again - it only ever reaches the real package)
+                    sendResponse(zContext, frompackage, responseid, minimauid,
+                            getRegisterMessage(enabled, admin, verified ? "Already registered.." : "Registered - not yet verified",
+                                    verified, verified ? null : (String)app.get("nonce")));
                 }
 
             } else if (Objects.equals(zIntent.getAction(), MinimaAPIMessages.MINIMA_API_CMD)) {
@@ -185,6 +193,13 @@ public class MinimaReceiver extends BroadcastReceiver {
                 if(!enabled){
                     String basicmessage = getBasicMessage(false, enabled, admin, "Package NOT enabled in Minima-Core!");
                     sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
+                    return;
+                }
+
+                //Security review 2026-11-07 (M-2): an unverified twin of a verified registration is a spoof - never run it
+                if(!isVerified(app) && mDatabase.hasVerifiedTwin(frompackage, frompackageuid)){
+                    sendResponse(zContext, frompackage, responseid, minimauid,
+                            getBasicMessage(false, false, false, "This registration did not prove it is "+frompackage+" - refused. Delete it in Minima Core -> Apps."));
                     return;
                 }
 
@@ -289,6 +304,12 @@ public class MinimaReceiver extends BroadcastReceiver {
                 }
 
                 //File access can exfiltrate a backup - ADMIN only
+                //Security review 2026-11-07 (M-2): never for an unverified twin of a verified registration
+                if(!isVerified(app) && mDatabase.hasVerifiedTwin(frompackage, frompackageuid)){
+                    sendResponse(zContext, frompackage, responseid, minimauid,
+                            getBasicMessage(false, false, false, "This registration did not prove it is "+frompackage+" - refused. Delete it in Minima Core -> Apps."));
+                    return;
+                }
                 if(!admin){
                     String basicmessage = getBasicMessage(false, enabled, admin, "File access needs ADMIN - enable it for this app in Minima Core -> Apps");
                     sendResponse(zContext, frompackage, responseid, minimauid, basicmessage);
@@ -766,6 +787,23 @@ public class MinimaReceiver extends BroadcastReceiver {
 
         //And broadcast
         zContext.sendBroadcast(intent);
+    }
+
+    /** A row read from the pre-2 schema (no column) predates the one-time code and is grandfathered as verified. */
+    static boolean isVerified(JSONObject zApp){
+        Object v = zApp == null ? null : zApp.get("verified");
+        return v == null || ((Number) v).intValue() == 1;
+    }
+
+    private String getRegisterMessage(boolean zEnabled, boolean zAdmin, String zMessage, boolean zVerified, String zConfirm){
+        JSONObject ret = new JSONObject();
+        ret.put("status",true);
+        ret.put("enabled",zEnabled);
+        ret.put("admin",zAdmin);
+        ret.put("verified",zVerified);
+        if(zConfirm != null && !zConfirm.isEmpty()) ret.put("confirm",zConfirm);
+        ret.put("response",zMessage);
+        return ret.toString();
     }
 
     private String getBasicMessage(boolean zStatus, boolean zEnabled, boolean zAdmin, String zMessage){
