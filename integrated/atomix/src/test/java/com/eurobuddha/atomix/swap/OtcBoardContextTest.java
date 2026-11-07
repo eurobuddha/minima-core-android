@@ -64,7 +64,7 @@ public class OtcBoardContextTest {
         for (TradingContext market : TradingContext.values()) for (boolean notification : new boolean[]{true, false}) {
             Scan s = new Scan(market); s.registered(notification); s.received(coin(1, true));
             assertEquals(Arrays.asList("coinnotify action:add address:" + market.otcBoardAddr,
-                "coins simplestate:true order:desc depth:" + OtcBook.SCAN_DEPTH + " address:" + market.otcBoardAddr), s.commands);
+                "coins order:desc depth:" + OtcBook.SCAN_DEPTH + " address:" + market.otcBoardAddr), s.commands);
             assertEquals(1, s.deliveries); assertNull(s.error);
             assertSame(market, s.offers.values().iterator().next().market);
         }

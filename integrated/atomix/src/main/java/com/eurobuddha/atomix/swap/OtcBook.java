@@ -71,7 +71,7 @@ public final class OtcBook {
 
     private static void doScan(NodeApi node, LazySodium ls, TradingContext market, Consumer<Map<String, OtcOffer>> ok, Consumer<String> err) {
         if (market != TradingContext.active()) { err.accept(OtcController.MARKET_ERROR); return; }
-        node.cmd("coins simplestate:true order:desc depth:" + SCAN_DEPTH + " address:" + market.otcBoardAddr, new NodeApi.Cb() {
+        node.cmd("coins order:desc depth:" + SCAN_DEPTH + " address:" + market.otcBoardAddr, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 if (market != TradingContext.active()) { err.accept(OtcController.MARKET_ERROR); return; }
                 Object resp = j.opt("response");
