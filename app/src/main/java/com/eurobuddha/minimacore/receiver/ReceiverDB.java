@@ -57,11 +57,13 @@ public class ReceiverDB extends SQLiteOpenHelper {
         if (oldVersion == 1 && newVersion >= 2) {
             db.execSQL("ALTER TABLE applications ADD COLUMN verified integer not null default 1");
             db.execSQL("ALTER TABLE applications ADD COLUMN nonce text not null default ''");
-            //Only ONE row per package is grandfathered: the most recently used (highest _id on a tie). Any other row for
-            //that package may be a spoof registered before this release, so it starts unverified like a new one.
-            db.execSQL("UPDATE applications SET verified=0 WHERE _id NOT IN ("
-                    + "SELECT MAX(a._id) FROM applications a WHERE a.lastused = "
-                    + "(SELECT MAX(b.lastused) FROM applications b WHERE b.package = a.package) GROUP BY a.package)");
+            //Only ONE row per package is grandfathered, and only one the USER enabled: enabled first, then ADMIN, then most
+            //recently used (registering stamps lastused, so a spoof registered just before the upgrade must not win on
+            //recency alone). A never-enabled row is never grandfathered. Every other row starts unverified.
+            db.execSQL("UPDATE applications SET verified=0 WHERE penabled=0 OR _id NOT IN ("
+                    + "SELECT (SELECT b._id FROM applications b WHERE b.package=a.package "
+                    + "ORDER BY b.penabled DESC, b.admin DESC, b.lastused DESC, b._id DESC LIMIT 1) "
+                    + "FROM applications a GROUP BY a.package)");
             return;
         }
         wipeDB();
@@ -198,6 +200,15 @@ public class ReceiverDB extends SQLiteOpenHelper {
         }
 
         mDB.update("applications", cv, "package=? AND packageid=?", new String[]{zPackageName, zPackageID});
+    }
+
+    /** An unverified twin that was refused is switched off for good, so it can never resume silently once the verified
+     *  row goes idle (the user must re-enable it, through the warning). */
+    public void disableRow(String zPackageName, String zPackageID){
+        ContentValues cv = new ContentValues();
+        cv.put("penabled", 0);
+        cv.put("admin", 0);
+        mDB.update("applications", cv, "package=? AND packageid=? AND verified=0", new String[]{zPackageName, zPackageID});
     }
 
     public void updateLastUsed(String zPackageName, String zPackageID){

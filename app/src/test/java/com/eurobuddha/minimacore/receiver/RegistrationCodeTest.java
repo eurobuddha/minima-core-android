@@ -60,6 +60,7 @@ public class RegistrationCodeTest {
         when(r.mDatabase.hasVerifiedTwin("com.eurobuddha.dexicon", "app-uid")).thenReturn(true);
         r.onReceive(context(), intent(MinimaAPIMessages.MINIMA_API_CMD, null));
         verify(r.mCmdExecutor, never()).execute(any());
+        verify(r.mDatabase).disableRow("com.eurobuddha.dexicon", "app-uid");
         assertTrue(reply(r).contains("did not prove"));
     }
 }

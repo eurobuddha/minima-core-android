@@ -198,8 +198,9 @@ public class MinimaReceiver extends BroadcastReceiver {
 
                 //Security review 2026-11-07 (M-2): an unverified twin of a verified registration is a spoof - never run it
                 if(!isVerified(app) && mDatabase.hasVerifiedTwin(frompackage, frompackageuid)){
+                    mDatabase.disableRow(frompackage, frompackageuid);
                     sendResponse(zContext, frompackage, responseid, minimauid,
-                            getBasicMessage(false, false, false, "This registration did not prove it is "+frompackage+" - refused. Delete it in Minima Core -> Apps."));
+                            getBasicMessage(false, false, false, "This registration did not prove it is "+frompackage+" while a verified one is in use - refused and switched off. If you reinstalled the app yourself, delete the OLDER entry in Minima Core -> Apps."));
                     return;
                 }
 
@@ -306,8 +307,9 @@ public class MinimaReceiver extends BroadcastReceiver {
                 //File access can exfiltrate a backup - ADMIN only
                 //Security review 2026-11-07 (M-2): never for an unverified twin of a verified registration
                 if(!isVerified(app) && mDatabase.hasVerifiedTwin(frompackage, frompackageuid)){
+                    mDatabase.disableRow(frompackage, frompackageuid);
                     sendResponse(zContext, frompackage, responseid, minimauid,
-                            getBasicMessage(false, false, false, "This registration did not prove it is "+frompackage+" - refused. Delete it in Minima Core -> Apps."));
+                            getBasicMessage(false, false, false, "This registration did not prove it is "+frompackage+" while a verified one is in use - refused and switched off. If you reinstalled the app yourself, delete the OLDER entry in Minima Core -> Apps."));
                     return;
                 }
                 if(!admin){
