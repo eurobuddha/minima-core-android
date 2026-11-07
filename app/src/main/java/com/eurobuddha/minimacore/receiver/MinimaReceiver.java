@@ -123,8 +123,9 @@ public class MinimaReceiver extends BroadcastReceiver {
             //once a package has proven itself, every later broadcast claiming it must prove it too. Companions that never
             //send a proof behave exactly as before.
             {
-                String real = android.os.Build.VERSION.SDK_INT >= 34 ? getSentFromPackage() : null;
-                if(real == null) real = proofCreator(zIntent);
+                //API 34+: ONLY the platform's own answer counts (a PendingIntent can be replayed by an app that saw one of the
+                //companion's notifications, which would let a spoofer pass where getSentFromPackage() alone drops it).
+                String real = android.os.Build.VERSION.SDK_INT >= 34 ? getSentFromPackage() : proofCreator(zIntent);
                 if(real != null && frompackage != null && !real.equals(frompackage)){
                     logger.log("IPC sender "+real+" claimed to be "+frompackage+" - dropped");
                     return;
