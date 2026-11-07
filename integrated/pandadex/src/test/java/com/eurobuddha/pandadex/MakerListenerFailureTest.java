@@ -23,7 +23,7 @@ public class MakerListenerFailureTest {
         public void onCancelSent(Order5 o){failIf("cancel");}
         public void onRelockSent(Order5 o,BigDecimal p){failIf("relock");}
     };}
-    static Order5 order(){return Order5.from(TransactionHardeningTest.orderCoin());}
+    static Order5 order(){try{return Order5.from(TransactionHardeningTest.orderCoin().put("address",DexContract.ADDR_V6));}catch(org.json.JSONException e){throw new RuntimeException(e);}}
     @Test public void asynchronousCreateDisplayFailureCannotStrandEngineOrQueuedWork(){
         MakerConfig c=config();MakerEngineTest.StubTxn tx=new MakerEngineTest.StubTxn();tx.deferCreates=true;
         MakerEngine engine=new MakerEngine(c,tx);AtomicInteger idle=new AtomicInteger();
@@ -56,7 +56,7 @@ public class MakerListenerFailureTest {
         MakerConfig c=config();c.armed=false;MakerEngineTest.StubTxn tx=new MakerEngineTest.StubTxn();tx.deferCancels=true;
         MakerEngine engine=new MakerEngine(c,tx);List<Order5> orders=new ArrayList<>();
         for(int i=0;i<SweepPlanner.MAX_ORDERS+1;i++){
-            org.json.JSONObject raw=TransactionHardeningTest.orderCoin().put("coinid",String.format("0x%04x",i+1));
+            org.json.JSONObject raw=TransactionHardeningTest.orderCoin().put("coinid",String.format("0x%04x",i+1)).put("address",DexContract.ADDR_V6);
             raw.getJSONObject("state").put("4",String.format("0x%04x",i+100));orders.add(Order5.from(raw));
         }
         AtomicInteger idle=new AtomicInteger();engine.cancelAllLadder(orders,0,200,throwing("cancel"));engine.runWhenIdle(idle::incrementAndGet);

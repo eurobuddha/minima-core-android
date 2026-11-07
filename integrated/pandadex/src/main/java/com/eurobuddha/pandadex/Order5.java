@@ -18,6 +18,9 @@ public final class Order5 {
     /** The covenant this coin sits at (DexContract.ADDR_V6 or ADDR_V5, canonical 0x form): a partial fill puts the
      *  remainder back HERE and an owner relock keeps it here, so V5 orders keep working after new ones move to V6. */
     public final String addr;
+    /** True when this coin sits at the V6 covenant. A V5 coin can only be relocked AT V5 (the owner branch keeps
+     *  @ADDRESS), where a partial filler can freeze its remainder, so V5 orders are sent home, never renewed. */
+    public boolean onV6() { return addr != null && addr.equalsIgnoreCase(DexContract.ADDR_V6); }
     public final String ownerPk;      // port 0
     public final String wantAddr;     // port 1
     public final BigDecimal wantAmt;  // port 2

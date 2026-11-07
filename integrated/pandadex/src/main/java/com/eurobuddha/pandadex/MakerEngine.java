@@ -450,6 +450,8 @@ public final class MakerEngine {
                     // atomic reprice: the funds never leave the book, so a rung can never be
                     // dropped by a failed re-post the way a cancel-then-recreate could
                     Order5 o = a.order;
+                    // review 7 Nov: a V5 rung can only be repriced AT V5 (freezable) - cancel it; the ladder re-places it at V6
+                    if (!o.onV6()) { txn.cancel(o, once); break; }
                     BigDecimal newWant = o.sell
                             ? PriceMath.up(o.locked.multiply(a.slot.price, PriceMath.MC), PriceMath.USDT_DP)
                             : PriceMath.down(o.locked.divide(a.slot.price, PriceMath.MINIMA_DP,

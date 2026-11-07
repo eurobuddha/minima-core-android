@@ -6,7 +6,8 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class DexProcessorRecoveryTest {
-    static Order5 order(){return Order5.from(TransactionHardeningTest.orderCoin());}
+    static Order5 order(){return Order5.from(v6(TransactionHardeningTest.orderCoin()));}
+    static JSONObject v6(JSONObject c){try{return c.put("address",DexContract.ADDR_V6);}catch(JSONException e){throw new RuntimeException(e);}}
     static long due(){return order().created+DexContract.RENEW_AT;}
     static long expired(){return order().created+DexContract.EXPIRY_BLOCKS+1;}
     static final class Notices implements DexProcessor.Listener {
@@ -18,6 +19,7 @@ public class DexProcessorRecoveryTest {
         final Pending journal;int renews,refunds;String mode="unknown";Result held;
         Txn(Pending p){super(null,null);journal=p;}
         public void relock(Order5 o,BigDecimal want,Result cb){renews++;dispatch(journal.relockResult(o,o.wantAmt,due(),cb));}
+        int cancels;public void cancel(Order5 o,Result cb){cancels++;cb.onPosted("0xcc");}
         public void collectExpired(Order5 o,Result cb){refunds++;dispatch(journal.cancellationResult(Collections.singletonList(o),expired(),cb));}
         void dispatch(Result receipt){
             held=receipt;assertTrue(receipt.onPrepared("upkeep_"+(renews+refunds)));
@@ -35,6 +37,12 @@ public class DexProcessorRecoveryTest {
         void run(long block){run(Collections.singletonMap(order().coinid,order()),block);}
         void run(Map<String,Order5> book,long block){processor.process(book,Collections.singleton(order().ownerPk),Collections.singleton(order().wantAddr),Collections.emptySet(),block,notices);}
         void restart(){markers.visible.clear();markers.visible.putAll(markers.disk);processor=new DexProcessor(markers.prefs(),new Pending(receipts),tx);}
+    }
+    /** Review 7 Nov: a V5 coin can only be relocked AT V5, where a partial filler can freeze it - renewal sends it home. */
+    @Test public void aDueV5OrderIsSentHomeNeverRenewedAtV5(){
+        Fixture f=new Fixture();Order5 v5=Order5.from(TransactionHardeningTest.orderCoin());assertFalse(v5.onV6());
+        f.run(Collections.singletonMap(v5.coinid,v5),due());
+        assertEquals(0,f.tx.renews);assertEquals(1,f.tx.cancels);assertTrue(f.notices.paused.get(0).contains("returned to your wallet"));
     }
     @Test public void lostRenewalReplyPreventsRetryPastSixBlocksAndAfterRestart(){
         Fixture f=new Fixture();f.run(due());assertEquals(1,f.tx.renews);assertEquals("UNKNOWN",f.pending.rows().get(0).phase);
@@ -79,7 +87,7 @@ public class DexProcessorRecoveryTest {
     }
     @Test public void otherCoinsCanRenewWithExistingLimitsAndBothOwnershipFactors()throws Exception{
         Fixture f=new Fixture();Map<String,Order5> book=new LinkedHashMap<>();
-        for(int i=0;i<4;i++){JSONObject raw=TransactionHardeningTest.orderCoin().put("coinid","0xa"+i);raw.getJSONObject("state").put("4","0xc"+i);Order5 o=Order5.from(raw);book.put(o.coinid,o);}
+        for(int i=0;i<4;i++){JSONObject raw=v6(TransactionHardeningTest.orderCoin()).put("coinid","0xa"+i);raw.getJSONObject("state").put("4","0xc"+i);Order5 o=Order5.from(raw);book.put(o.coinid,o);}
         f.run(book,due());assertEquals(2,f.tx.renews);
         Fixture g=new Fixture();g.processor.process(book,Collections.singleton(order().ownerPk),Collections.emptySet(),Collections.emptySet(),due(),g.notices);
         assertEquals(0,g.tx.renews);

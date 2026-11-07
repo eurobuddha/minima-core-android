@@ -741,6 +741,7 @@ public class MakerEngineTest {
             BigDecimal locked = new BigDecimal(minima);
             org.json.JSONObject c = new org.json.JSONObject();
             c.put("coinid", coinid);
+            c.put("address", DexContract.ADDR_V6);
             c.put("amount", locked.toPlainString());
             c.put("tokenid", "0x00");
             c.put("created", 10);

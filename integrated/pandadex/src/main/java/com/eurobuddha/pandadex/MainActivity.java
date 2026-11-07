@@ -1958,6 +1958,7 @@ public class MainActivity extends AppCompatActivity {
                 .setView(in)
                 .setPositiveButton(DexMessages.message("Update"), (d, w) -> {
                     if (!currentPairing(connection) || !ready() || !keySet.owns(o)) { toast("Connection or ownership changed. Reopen this order before editing."); return; }
+                    if (!o.onV6()) { toast("This order is on the old order contract, which a partial fill can freeze. Cancel it and place it again."); return; }
                     BigDecimal np = Util.dec(in.getText().toString());
                     if (np.signum() <= 0) { toast("Bad price"); return; }
                     BigDecimal newWant = o.sell
