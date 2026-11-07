@@ -117,8 +117,14 @@ public class MinimaReceiver extends BroadcastReceiver {
             //the only real check. Where the platform can say who ACTUALLY sent the broadcast
             //(API 34+), a package that claims to be someone else is a spoof and is dropped -
             //a leaked token then also needs the victim's signing key, not just its name.
-            if(android.os.Build.VERSION.SDK_INT >= 34){
-                String real = getSentFromPackage();
+            //Security review 2026-11-07: below API 34 the platform cannot name the sender, so a fake "Dexicon" row could be
+            //registered and handed ADMIN. A companion may now attach an immutable PendingIntent it created; its creator
+            //package is platform-set and unforgeable. Either proof feeds the SAME trust-on-first-use rule on every API level:
+            //once a package has proven itself, every later broadcast claiming it must prove it too. Companions that never
+            //send a proof behave exactly as before.
+            {
+                String real = android.os.Build.VERSION.SDK_INT >= 34 ? getSentFromPackage() : null;
+                if(real == null) real = proofCreator(zIntent);
                 if(real != null && frompackage != null && !real.equals(frompackage)){
                     logger.log("IPC sender "+real+" claimed to be "+frompackage+" - dropped");
                     return;
@@ -126,8 +132,8 @@ public class MinimaReceiver extends BroadcastReceiver {
                 //Security review 30 Oct: getSentFromPackage() is null unless the sender opts in, so a spoofer that
                 //simply does not opt in passed the check above. Trust on first use: once a package has PROVEN its
                 //identity here, every later broadcast claiming that package must prove it too.
-                if(frompackage != null){
-                    android.content.SharedPreferences ids = zContext.getSharedPreferences("ipc_identity", Context.MODE_PRIVATE);
+                android.content.SharedPreferences ids = frompackage == null ? null : zContext.getSharedPreferences("ipc_identity", Context.MODE_PRIVATE);
+                if(ids != null){
                     if(real != null){
                         if(!ids.getBoolean(frompackage, false)) ids.edit().putBoolean(frompackage, true).apply();
                     }else if(ids.getBoolean(frompackage, false)){
@@ -346,6 +352,14 @@ public class MinimaReceiver extends BroadcastReceiver {
     }
 
     /** Re-read authorization at dispatch; a queued request must never retain revoked access. */
+    /** The package that created the PendingIntent in the PROOF extra, or null when there is none. */
+    private static String proofCreator(Intent zIntent){
+        try{
+            android.app.PendingIntent pi = zIntent.getParcelableExtra(MinimaAPIMessages.MINIMA_API_PROOF);
+            return pi == null ? null : pi.getCreatorPackage();
+        }catch(Exception e){ return null; }
+    }
+
     private boolean stillAuthorized(String pkg, String appId, String nodeId, boolean requireAdmin) {
         JSONObject current = mDatabase.selectApp(pkg, appId, nodeId);
         return current != null && Integer.valueOf(1).equals(current.get("penabled"))

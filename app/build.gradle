@@ -156,8 +156,8 @@ android {
         // 2.2.0: Keets transport switch (Startup Params) - off = classic Minima transport, no Chat tab.
         // 2.2.1: SECURITY - IPC trust on first use: a package that once proved its identity (API 34+
         // shareIdentity) must always prove it, so a spoofer holding leaked pairing ids is dropped.
-        versionCode 280
-        versionName "2.2.10"
+        versionCode 281
+        versionName "2.2.11"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

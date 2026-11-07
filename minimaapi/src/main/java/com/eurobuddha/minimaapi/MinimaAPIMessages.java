@@ -16,6 +16,9 @@ public class MinimaAPIMessages {
     public static final String MINIMA_API_PACKAGE_CLASS         = MINIMA_BASE_CLASS +".PACKAGE_CLASS";
     public static final String MINIMA_API_APP_UID               = MINIMA_BASE_CLASS +".APP_UID";
     public static final String MINIMA_API_REGISTER_MINIMAID     = MINIMA_BASE_CLASS +".REGISTER_MINIMAID";
+    //Optional sender proof on ANY Android version: an immutable PendingIntent the sender created itself. Its
+    //getCreatorPackage() is set by the platform and cannot be forged (security review 2026-11-07).
+    public static final String MINIMA_API_PROOF                 = MINIMA_BASE_CLASS +".PROOF";
 
     //Send a command to run
     public static final String MINIMA_API_CMD                   = MINIMA_BASE_CLASS +".CMD";
