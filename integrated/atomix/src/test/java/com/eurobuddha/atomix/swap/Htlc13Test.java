@@ -58,9 +58,11 @@ public class Htlc13Test {
 
     @Test public void v13IsV12PlusTheLengthCheckOnly() {
         String v12 = MinimaHtlc.HTLC_SCRIPT.replace("LET version=1.2 ", "");
-        String v13 = MinimaHtlc.HTLC_SCRIPT_V13.replace("LET version=1.3 ", "").replace("ASSERT LEN(secret) EQ 32 ", "");
+        String v13 = MinimaHtlc.HTLC_SCRIPT_V13.replace("LET version=1.3 ", "").replace("ASSERT HEX(secret) EQ secret ASSERT LEN(secret) EQ 32 ", "");
         assertEquals(v12, v13);
         assertTrue(MinimaHtlc.HTLC_SCRIPT_V13.indexOf("ASSERT LEN(secret) EQ 32") < MinimaHtlc.HTLC_SCRIPT_V13.indexOf("SHA2(secret)"));
+        // AtomiX 0.2.7: LEN counts a STRING's characters, SHA2 its UTF-8 bytes — the HEX type check must come first
+        assertTrue(MinimaHtlc.HTLC_SCRIPT_V13.contains("ASSERT HEX(secret) EQ secret ASSERT LEN(secret) EQ 32 "));
         assertTrue("the refund branch runs before the new check",
                 MinimaHtlc.HTLC_SCRIPT_V13.indexOf("SIGNEDBY(owner) AND (@BLOCK GT timelock)") < MinimaHtlc.HTLC_SCRIPT_V13.indexOf("LEN(secret)"));
     }
