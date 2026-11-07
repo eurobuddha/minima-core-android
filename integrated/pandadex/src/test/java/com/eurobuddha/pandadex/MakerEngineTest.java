@@ -561,6 +561,25 @@ public class MakerEngineTest {
         assertEquals(Arrays.asList("RELOCK 0xC1"), txn.calls);
     }
 
+    /** Review 7 Nov: a V5 rung can only be repriced AT V5, where a partial filler can freeze it. The reprice becomes a
+     *  REAL cancel (slot forgotten, order tombstoned, maker still armed), and the ladder re-places the rung at V6. */
+    @Test public void aV5RungDueForRepriceIsCancelledAsACancelNotBookedAsAReprice() throws Exception {
+        cfg.armed = true;
+        cfg.pegged = false;
+        cfg.repricePct = new BigDecimal("0.25");
+        cfg.asks.add(new MakerLadder.Level(new BigDecimal("0.0501"), new BigDecimal("100")));
+        cfg.rememberSlot("A1", "0xORDER1", new BigDecimal("100"), 100);
+        Order5 v6 = order("0xC1", "0xORDER1", "0.0500", "100");
+        org.json.JSONObject raw = new org.json.JSONObject(v6.sourceJson()); raw.remove("address");
+        Order5 v5 = Order5.from(raw);
+        assertFalse(v5.onV6());
+        engine.onBook(bookOf(v5), MY_KEYS, 100, m -> {});
+        assertEquals(Arrays.asList("CANCEL 0xC1"), txn.calls);
+        assertTrue("the maker stays armed", cfg.armed);
+        assertNull("the slot no longer points at the cancelled order", cfg.orderIdFor("A1"));
+        assertTrue("the cancelled order is tombstoned", cfg.cancelTombstones.containsKey("0xORDER1"));
+    }
+
     @Test public void aRelockInFlightIsNotRelockedAgain() {
         // the old coin stays visible at its old price until the relock mines — without a
         // settling window every cycle would re-relock it and burn proof-of-work forever

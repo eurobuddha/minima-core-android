@@ -365,7 +365,12 @@ public final class MakerEngine {
             return;
         }
         working = true;
-        MakerLadder.Action a = actions.get(idx);
+        MakerLadder.Action a0 = actions.get(idx);
+        // review 7 Nov: a V5 rung can only be repriced AT V5 (freezable). Turn the reprice into a real CANCEL - so the slot
+        // is forgotten and the order tombstoned, as for any cancel - and the ladder re-places the rung at V6 next pass.
+        if (a0.kind == MakerLadder.Kind.RELOCK && a0.order != null && !a0.order.onV6())
+            a0 = new MakerLadder.Action(MakerLadder.Kind.CANCEL, null, a0.order, "V5 rung retired; re-placed at V6");
+        final MakerLadder.Action a = a0;
         if(!quoteGuard.allows(cfg,a)) {
             lastCycleMs=-1; // Let the next book update replan or withdraw a stale ladder.
             run(actions,actions.size(),mid,posted,chainBlock,l,quoteGuard);
@@ -450,8 +455,6 @@ public final class MakerEngine {
                     // atomic reprice: the funds never leave the book, so a rung can never be
                     // dropped by a failed re-post the way a cancel-then-recreate could
                     Order5 o = a.order;
-                    // review 7 Nov: a V5 rung can only be repriced AT V5 (freezable) - cancel it; the ladder re-places it at V6
-                    if (!o.onV6()) { txn.cancel(o, once); break; }
                     BigDecimal newWant = o.sell
                             ? PriceMath.up(o.locked.multiply(a.slot.price, PriceMath.MC), PriceMath.USDT_DP)
                             : PriceMath.down(o.locked.divide(a.slot.price, PriceMath.MINIMA_DP,

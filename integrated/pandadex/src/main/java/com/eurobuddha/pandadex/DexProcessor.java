@@ -126,9 +126,12 @@ public final class DexProcessor {
                     pause(l, "Order upkeep paused: tracking could not be saved. Nothing further was sent; preserve app data.");
                     return;
                 }
-                if (!o.onV6()) {   // review 7 Nov: renewing would keep it at V5 for good - send it home instead
+                if (!o.onV6() || !o.fillable()) {   // review 7 Nov: V5 renews only at V5 (freezable); unfillable = dead liquidity - send it home
+                    final boolean old = !o.onV6();
                     txn.cancel(o, new DexTxn.Result() {
-                        @Override public void onPosted(String txpowid) { if (l != null) l.onPaused("An order on the old order contract was returned to your wallet instead of renewed. Place it again: new orders use the protected contract."); }
+                        @Override public void onPosted(String txpowid) { if (l != null) l.onPaused(old
+                                ? "An order on the old order contract was returned to your wallet instead of renewed. Place it again: new orders use the protected contract."
+                                : "An order that can no longer be filled was returned to your wallet instead of renewed. Place it again if you still want it."); }
                         @Override public void onFailed(String message) { failed(o, message, l); }
                     });
                     continue;
