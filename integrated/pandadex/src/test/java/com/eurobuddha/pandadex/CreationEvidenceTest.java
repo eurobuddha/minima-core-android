@@ -136,8 +136,11 @@ public class CreationEvidenceTest {
         // inclusion proof. The fake history node supplies inclusion for this parser-only test.
         java.nio.file.Path fixtures=java.nio.file.Paths.get("src/test/resources/creation-evidence");
         for(String side:new String[]{"False","True"}) {
-            JSONObject request=new JSONObject(new String(java.nio.file.Files.readAllBytes(fixtures.resolve("java-create-"+side+".json")), java.nio.charset.StandardCharsets.UTF_8));
-            JSONObject tx=new JSONObject(new String(java.nio.file.Files.readAllBytes(fixtures.resolve("java-create-posted-"+side+".json")), java.nio.charset.StandardCharsets.UTF_8));
+            // The disposable chain used a test token; orders must now be a MINIMA/MxUSD pair (an order no path can spend is
+            // not parsed), so map that test token onto MxUSD, like the covenant address below.
+            String testTok="0x6443E15423F45F1700B1DC0AA4F77BBDF18A4535FD688043D1E2E7B7BA268D95";
+            JSONObject request=new JSONObject(new String(java.nio.file.Files.readAllBytes(fixtures.resolve("java-create-"+side+".json")), java.nio.charset.StandardCharsets.UTF_8).replace(testTok,DexContract.USDT_ID));
+            JSONObject tx=new JSONObject(new String(java.nio.file.Files.readAllBytes(fixtures.resolve("java-create-posted-"+side+".json")), java.nio.charset.StandardCharsets.UTF_8).replace(testTok,DexContract.USDT_ID));
             String[] state=new String[9];for(int i=0;i<9;i++) state[i]=request.getJSONArray("state").getString(i);
             Pending.Row row=CreationEvidence.prepare(side.equals("True"),new BigDecimal("100"),new BigDecimal("0.00575"),
                     request.getString("token"),new BigDecimal(request.getString("lock")),request.getString("payout"),state,

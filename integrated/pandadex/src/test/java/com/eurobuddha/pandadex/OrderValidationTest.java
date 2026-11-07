@@ -58,12 +58,12 @@ public class OrderValidationTest {
         // renders as an absurdly cheap ask, gets picked first, and would make the app emit a
         // MINIMA payment it never funded → validamounts false → every sweep dies
         Order5 o = order("0xC2", true, "100", "0x00", "0.575", "0x00", GOOD_ADDR, "1");
-        assertFalse(o.fillable());
+        assertTrue("never takeable", o == null || !o.fillable());
     }
 
     @Test public void buyWantingUsdtIsRejected() {
         Order5 o = order("0xC3", false, "0.5", DexContract.USDT_ID, "100", DexContract.USDT_ID, GOOD_ADDR, "1");
-        assertFalse(o.fillable());
+        assertTrue("never takeable", o == null || !o.fillable());
     }
 
     @Test public void payoutToTheBookAddressIsRejected() {
@@ -71,7 +71,7 @@ public class OrderValidationTest {
         // input into the partial branch against an output built as a full-fill payment
         Order5 o = order("0xC4", true, "100", "0x00", "0.575", DexContract.USDT_ID,
                 DexContract.ADDR_V5, "1");
-        assertFalse(o.fillable());
+        assertTrue("never takeable", o == null || !o.fillable());
     }
 
     @Test public void malformedPayoutAddressIsRejected() {
@@ -93,7 +93,8 @@ public class OrderValidationTest {
     @Test public void hostileOrderCannotEnterASweep() {
         List<Order5> book = new ArrayList<>();
         // the poison is the CHEAPEST ask, so an unguarded planner takes it first
-        book.add(order("0xBAD", true, "100", "0x00", "0.0001", "0x00", GOOD_ADDR, "1"));
+        Order5 bad = order("0xBAD", true, "100", "0x00", "0.0001", "0x00", GOOD_ADDR, "1");
+        if (bad != null) book.add(bad);   // a never-spendable coin is not even parsed now
         book.add(goodSell());
         SweepPlanner.Plan p = SweepPlanner.plan(book, true, new BigDecimal("50"), null, 200);
         assertEquals(1, p.takes.size());

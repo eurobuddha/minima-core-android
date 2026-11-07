@@ -54,7 +54,7 @@ public class V6CovenantTest {
         // a payout address at EITHER covenant is unfillable
         for (String a : DexContract.BOOK_ADDRS) {
             JSONObject c = coin("0x08", DexContract.ADDR_V6); c.getJSONObject("state").put("1", a);
-            assertFalse(Order5.from(c).fillable());
+            Order5 o = Order5.from(c); assertTrue("never takeable", o == null || !o.fillable());
         }
         assertTrue(Order5.from(coin("0x09", DexContract.ADDR_V6)).fillable());
     }

@@ -54,7 +54,8 @@ public class TransactionHardeningTest {
     @Test public void tokenValuesAndStateNumbersCannotDefaultOrExpandWithoutBound() throws Exception {
         JSONObject c=orderCoin().put("tokenid", DexContract.USDT_ID);
         assertNull(Order5.from(c));
-        c.put("tokenamount", "2"); assertNotNull(Order5.from(c));
+        c.put("tokenamount", "2"); assertNull("a sell locking MxUSD is the wrong pair: not an order", Order5.from(c));
+        c.getJSONObject("state").put("5", "0").put("3", "0x00"); assertNotNull("the same coin as a buy (MxUSD locked, MINIMA wanted) parses", Order5.from(c));
         for (String value : Arrays.asList("1e-2147483647", "1e2147483647", "1,000", "garbage")) {
             c=orderCoin(); c.getJSONObject("state").put("2", value); assertNull(value, Order5.from(c));
         }

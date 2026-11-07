@@ -20,4 +20,16 @@ public class DuplicatePortOrderTest {
         assertNotNull(o);
         assertEquals(0, o.wantAmt.compareTo(new java.math.BigDecimal("50")));
     }
+
+    /** Review 7 Nov: a planted coin with a foreign token can never be spent; it must not parse as an order (it would tie up
+     *  the owner's renewal slots with doomed cancels). */
+    @Test public void aNeverSpendableCoinIsNotAnOrder() throws Exception {
+        String[][] v = {{"0","0x0A0A"},{"1","0xBB11223344556677889900AABBCCDDEEFF00112233445566778899AABBCCDDEE"},{"2","50"},
+                {"3","0x00"},{"4","0xAB12"},{"5","0"},{"6","0.5"},{"7","1"},{"8","1"}};
+        JSONArray st = new JSONArray();
+        for (String[] e : v) st.put(new JSONObject().put("port", Integer.parseInt(e[0])).put("data", e[1]));
+        JSONObject c = new JSONObject().put("coinid", "0x02").put("tokenid", "0x" + "66".repeat(32)).put("tokenamount", "25")
+                .put("created", 10).put("state", st);
+        assertNull(Order5.from(c));
+    }
 }

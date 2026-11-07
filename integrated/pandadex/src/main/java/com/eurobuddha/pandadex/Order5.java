@@ -97,6 +97,13 @@ public final class Order5 {
             if (minRem == null) return null;
             long created = ChainEvidence.positiveLong(coin, "created");
             String wantTok = st[3] == null ? "0x00" : st[3];
+            // review 7 Nov (port of pandadex-mds 0.4.27): a coin no path can ever spend - wrong token pair (the covenant's
+            // first line refuses it), a payout at a covenant, a negative floor - is not an order. Keeping it let anyone plant
+            // dust under a victim's public key + payout address and tie up the renewal slots with doomed cancels. Only the
+            // precision case stays (fillable() false) so its owner can still cancel it.
+            String expWant = sell ? DexContract.USDT_ID : "0x00", expLocked = sell ? "0x00" : DexContract.USDT_ID;
+            if (!expWant.equalsIgnoreCase(wantTok) || !expLocked.equalsIgnoreCase(tokenid)
+                    || DexContract.isOrderAddr(st[1]) || minRem.signum() < 0) return null;
             Order5 order = new Order5(coinid, addr, st[0], st[1], want, wantTok, st[4], sell, gtc, minRem,
                     locked, tokenid, created);
             order.sourceJson = coin.toString();
