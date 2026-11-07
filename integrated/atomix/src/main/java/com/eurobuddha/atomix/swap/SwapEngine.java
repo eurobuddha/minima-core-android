@@ -1206,6 +1206,8 @@ public final class SwapEngine {
         // BYTES exactly, but the ETH leg coerces it to 32 bytes (EthHtlc.b32 keeps the last 32), so a 0x00‖H lock got
         // an ETH counter-leg on H that the taker could withdraw while my Minima claim could never match. 32 bytes only.
         if (!hash.matches("0x[0-9A-Fa-f]{64}")) return;
+        // AtomiX 0.2.9 port: never answer (USDT counter-leg) or sign a claim against a lock its own script cannot run
+        if (!MinimaHtlc.lockSpendable(coin)) { logMismatchOnce(hash, "minima", "lock state is not spendable by its script (owner/timelock/ports) — ignored"); return; }
         int timelock = parseInt(MinimaHtlc.stateAt(coin, 3));
         String reqTokenAddr = stripReqToken(MinimaHtlc.stateAt(coin, 2));   // ERC20 the maker wants back
         String secret = db.getSecret(hash);

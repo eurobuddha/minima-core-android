@@ -82,7 +82,7 @@ public class MinimaReceiptTest {
     @Test public void refundSubmissionDoesNotWritePermanentCompletionGuard() throws Exception {
         when(db.getEvents(HASH)).thenReturn(Collections.emptyList());
         JSONObject coin = new JSONObject().put("coinid", TX).put("tokenid", "0x00").put("amount", "1")
-                .put("state", new JSONObject().put("0", "0xAB").put("3", "100").put("5", HASH));
+                .put("state", new JSONObject().put("0", "0xAB").put("1", "1").put("2", "[minima]").put("3", "100").put("4", "0x0C").put("5", HASH).put("6", "0x01"));
         doAnswer(i -> { ((MinimaHtlc.PostCb)i.getArgument(1)).ok(TX); return null; }).when(minima).refund(any(), any());
         engine.checkExpiredMinima(coin, 200);
         verify(db).logEvent(HASH, SwapDb.EV_MINIMA_REFUND_SUBMITTED, "0x00", "1", TX);
@@ -97,7 +97,7 @@ public class MinimaReceiptTest {
         when(db.getSecret(HASH)).thenReturn("0xAB");
         swap.buyToken = "MINIMA";
         JSONObject coin = new JSONObject().put("coinid", TX).put("tokenid", "0x00").put("amount", "1")
-                .put("state", new JSONObject().put("0", "0xAB").put("3", "1000").put("5", HASH));
+                .put("state", new JSONObject().put("0", "0xAB").put("1", "1").put("2", "[minima]").put("3", "1000").put("4", "0x0C").put("5", HASH).put("6", "0x01"));
         doAnswer(i -> { ((MinimaHtlc.PostCb)i.getArgument(3)).ok(TX); return null; }).when(minima).claim(any(), any(), any(), any());
         engine.checkCanSwapCoin(coin, 200);
         verify(db).logEvent(HASH, SwapDb.EV_MINIMA_CLAIM_SUBMITTED, "0x00", "1", TX);

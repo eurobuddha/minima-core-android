@@ -801,6 +801,18 @@ public final class MinimaHtlc {
         @Override public void onResult(JSONObject j) {} @Override public void onError(String m) {} }); }
 
     /** Read a coin state port. State may be a simplestate object {"4":…} or an array [{port,data}]. */
+    /** SECURITY (review 7 Nov, 0.2.9): can the HTLC script run at all on this lock? Its prelude reads ports 0-6 and does
+     *  {@code IF SIGNEDBY(owner) AND (@BLOCK GT timelock)} on EVERY path; KISS does not short-circuit AND, aborts on an
+     *  absent port, SIGNEDBY throws on a non-HEX key and GT throws on a non-NUMBER timelock. A counterparty can lock with
+     *  owner "5", "[0x..]" or timelock "0x1E8480" (plain send state:{..}): the lock then can be neither claimed nor
+     *  refunded, and a maker that answered it with USDT loses the USDT once the taker withdraws (proven with runscript).
+     *  KISS types a value from its text, so these checks on the text are exactly what the script will see. */
+    static boolean lockSpendable(JSONObject coin) {
+        for (int p = 0; p <= 6; p++) if (stateAt(coin, p).isEmpty()) return false;
+        return stateAt(coin, 0).matches("0x[0-9A-Fa-f]+") && stateAt(coin, 3).matches("[0-9]+")
+            && stateAt(coin, 4).matches("0x[0-9A-Fa-f]+") && stateAt(coin, 5).matches("0x[0-9A-Fa-f]{64}");
+    }
+
     /** SECURITY (AtomiX 0.2.8 port): fund-deciding scans ask for the state ARRAY; this returns the FIRST entry of a
      *  port, which is what KISS reads. A transaction can carry a port twice and simplestate keeps the LAST. */
     static String stateAt(JSONObject coin, int port) {
