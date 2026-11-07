@@ -8530,6 +8530,6 @@
     <string name="l10n_chatbak_restart_later" formatted="false">"已就绪。备份将在节点下次启动时加载。"</string>
     <string name="l10n_apps_unverified_title" formatted="false">"未验证"</string>
     <string name="l10n_apps_unverified_body">"此应用尚未证明它是 %1$s。请将其更新到最新版本并打开一次，它会自动完成验证。只有在您刚刚亲自安装它时，才可在未验证状态下启用。"</string>
-    <string name="l10n_apps_twin_refused" formatted="false">"此应用已有另一个已验证的条目。此条目未证明其身份，无法启用。请将其删除。"</string>
+    <string name="l10n_apps_twin_refused" formatted="false">"此应用的另一个已验证条目在过去一天内仍在使用，而此条目尚未证明其身份，因此无法启用。如果您亲自重新安装了此应用，请删除较旧的条目（或等待一天）。否则请删除此条目。"</string>
     <string name="l10n_apps_enable_anyway" formatted="false">"仍然启用"</string>
 </resources>

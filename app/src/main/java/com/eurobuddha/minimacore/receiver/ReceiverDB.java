@@ -57,6 +57,11 @@ public class ReceiverDB extends SQLiteOpenHelper {
         if (oldVersion == 1 && newVersion >= 2) {
             db.execSQL("ALTER TABLE applications ADD COLUMN verified integer not null default 1");
             db.execSQL("ALTER TABLE applications ADD COLUMN nonce text not null default ''");
+            //Only ONE row per package is grandfathered: the most recently used (highest _id on a tie). Any other row for
+            //that package may be a spoof registered before this release, so it starts unverified like a new one.
+            db.execSQL("UPDATE applications SET verified=0 WHERE _id NOT IN ("
+                    + "SELECT MAX(a._id) FROM applications a WHERE a.lastused = "
+                    + "(SELECT MAX(b.lastused) FROM applications b WHERE b.package = a.package) GROUP BY a.package)");
             return;
         }
         wipeDB();
@@ -101,10 +106,17 @@ public class ReceiverDB extends SQLiteOpenHelper {
         return true;
     }
 
-    /** Does a VERIFIED row exist for this package other than the given one? (Then an unverified twin is a spoof.) */
+    /** A verified registration in use within this window blocks an unverified twin. A genuine reinstall of a companion not
+     *  yet rebuilt with the one-time code leaves its old row idle, so after this long the new row can be enabled (with the
+     *  warning); a spoof aimed at a companion that is actually running stays blocked. */
+    public static final long TWIN_ACTIVE_MS = 24L * 60 * 60 * 1000;
+
+    /** Does a VERIFIED row for this package, other than the given one, exist AND has it been used within TWIN_ACTIVE_MS?
+     *  Then an unverified twin is treated as a spoof. */
     public boolean hasVerifiedTwin(String zPackageName, String zPackageID){
-        Cursor c = mDB.query("applications", new String[]{"_id"}, "package=? AND packageid<>? AND verified=1",
-                new String[]{zPackageName, zPackageID}, null, null, null);
+        String since = String.valueOf(System.currentTimeMillis() - TWIN_ACTIVE_MS);
+        Cursor c = mDB.query("applications", new String[]{"_id"}, "package=? AND packageid<>? AND verified=1 AND lastused>=?",
+                new String[]{zPackageName, zPackageID, since}, null, null, null);
         if (c == null) return false;
         try { return c.moveToFirst(); } finally { c.close(); }
     }

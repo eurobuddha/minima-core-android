@@ -21,7 +21,12 @@ public class ReceiverDBUpgradeTest {
         SQLiteDatabase v1 = SQLiteDatabase.openOrCreateDatabase(ctx.getDatabasePath(ReceiverDB.DATABASE_NAME), null);
         v1.execSQL("create table applications ( _id integer primary key, package text not null, packageid text not null, "
                 + "minimaid text not null, penabled integer not null, admin integer not null, lastused integer not null)");
-        v1.execSQL("insert into applications (package,packageid,minimaid,penabled,admin,lastused) values ('com.eurobuddha.dexicon','old','node',1,1,0)");
+        long now = System.currentTimeMillis();
+        v1.execSQL("insert into applications (package,packageid,minimaid,penabled,admin,lastused) values ('com.eurobuddha.dexicon','old','node',1,1," + now + ")");
+        // a pre-existing spoof row for the same package, used EARLIER: it must not be grandfathered
+        v1.execSQL("insert into applications (package,packageid,minimaid,penabled,admin,lastused) values ('com.eurobuddha.dexicon','spoof','x',0,0," + (now - 1000) + ")");
+        // an idle verified companion (not used for 2 days): a genuine reinstall of it must not be blocked
+        v1.execSQL("insert into applications (package,packageid,minimaid,penabled,admin,lastused) values ('com.eurobuddha.wallet','w-old','node',1,1," + (now - 2L*24*60*60*1000) + ")");
         v1.setVersion(1); v1.close();
 
         ReceiverDB db = new ReceiverDB(ctx);
@@ -29,6 +34,11 @@ public class ReceiverDBUpgradeTest {
         assertNotNull("the existing pairing survives the upgrade", kept);
         assertEquals(1, ((Number) kept.get("penabled")).intValue());
         assertEquals("and is grandfathered as verified", 1, ((Number) kept.get("verified")).intValue());
+
+        assertEquals("only the most recently used row of a package is grandfathered", 0,
+                ((Number) db.selectApp("com.eurobuddha.dexicon", "spoof", "x").get("verified")).intValue());
+        db.insertApp("com.eurobuddha.wallet", "w-new", "node");
+        assertFalse("an idle verified row does not block a reinstall", db.hasVerifiedTwin("com.eurobuddha.wallet", "w-new"));
 
         String code = db.insertApp("com.eurobuddha.dexicon", "fake", "node2");
         assertEquals(64, code.length());

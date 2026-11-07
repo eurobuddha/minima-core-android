@@ -160,6 +160,18 @@ public class AppsView extends BaseView {
                             .setPositiveButton(Language.msg(android.R.string.ok), null).show();
                     return;
                 }
+                if (admincb.isChecked() && !verified) {   // M-2: ADMIN for an unverified row needs the same explicit warning
+                    admincb.setChecked(false);
+                    new LanguageDialog(getActivity()).setTitle(Language.msg(l10n_apps_unverified_title))
+                            .setMessage(Language.msg(l10n_apps_unverified_body, packageclass))
+                            .setPositiveButton(Language.msg(l10n_apps_enable_anyway), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface d, int w) {
+                                    admincb.setChecked(true);
+                                    mAppsAdapter.getDatabase().setAdmin(packageclass, packageid, true);
+                                }})
+                            .setNegativeButton(Language.msg(android.R.string.cancel), null).show();
+                    return;
+                }
                 mAppsAdapter.getDatabase().setAdmin(packageclass, packageid, admincb.isChecked());
             }
         });

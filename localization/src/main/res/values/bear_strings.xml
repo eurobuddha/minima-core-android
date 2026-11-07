@@ -8567,6 +8567,6 @@
     <string name="l10n_chatbak_restart_later" formatted="false">"Ready. The backup loads the next time the node starts."</string>
     <string name="l10n_apps_unverified_title" formatted="false">"Not verified"</string>
     <string name="l10n_apps_unverified_body">"This app has not yet proven it is %1$s. Update it to its latest version and open it once: it then verifies itself. Enable it unverified only if you installed it yourself just now."</string>
-    <string name="l10n_apps_twin_refused" formatted="false">"Another, verified entry for this app already exists. This entry did not prove its identity and cannot be enabled. Delete it."</string>
+    <string name="l10n_apps_twin_refused" formatted="false">"Another, verified entry for this app was in use within the last day, and this entry has not proven its identity, so it cannot be enabled. If you reinstalled the app yourself, delete the OLDER entry (or wait a day). Otherwise delete this one."</string>
     <string name="l10n_apps_enable_anyway" formatted="false">"Enable anyway"</string>
 </resources>
