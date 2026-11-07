@@ -372,7 +372,9 @@ public class PoolManager {
                 if (limit == null) {
                     cb.onFailed("Owner address has " + count + " coins. Recovery collection is paused because this node cannot safely list that group."); return;
                 }
-                forwardSmallAddress(oadr, limit.isEmpty() ? recovery : null, limit.isEmpty() ? count : -1, limit, cb);
+                if (limit.isEmpty()) { forwardSmallAddress(oadr, recovery, count, "", false, cb); return; }
+                // Batch (D-3-1, port of PandaPools 0.9.89): one owned token at a time; coins carrying state are forwarded too
+                forwardSmallAddress(oadr, null, -1, " tokenid:" + batchToken(oadr) + limit, true, cb);
             }
             public void onError(String error) { cb.onFailed(error); }
         });
@@ -389,7 +391,19 @@ public class PoolManager {
         return recovery ? null : " max:" + MAX_FORWARD_BATCH;
     }
 
-    private void forwardSmallAddress(String oadr, Pool recovery, int expected, String limit, ForwardResult cb) {
+    private static final java.util.concurrent.atomic.AtomicInteger BATCH_TURN = new java.util.concurrent.atomic.AtomicInteger();
+
+    /** The owned tokens a payout address can hold - MINIMA and each own pool's token - taken in turn, one per pass. */
+    String batchToken(String oadr) {
+        List<String> toks = new ArrayList<>();
+        toks.add("0x00");
+        for (Pool p : OwnPoolStore.all(node.context()))
+            if (oadr.equalsIgnoreCase(p.oadr) && FundingCoins.hex(p.tok) && !toks.contains(p.tok.toLowerCase(java.util.Locale.ROOT)))
+                toks.add(p.tok.toLowerCase(java.util.Locale.ROOT));
+        return toks.get(Math.floorMod(BATCH_TURN.getAndIncrement(), toks.size()));
+    }
+
+    private void forwardSmallAddress(String oadr, Pool recovery, int expected, String limit, boolean allowState, ForwardResult cb) {
         node.cmd("coins relevant:true sendable:true checkmempool:true coinage:3 address:" + oadr + limit, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 JSONArray arr = FundingCoins.rows(j);
@@ -407,8 +421,8 @@ public class PoolManager {
                     try { coin = FundingCoins.fundingCoin(c); }
                     catch (IllegalArgumentException invalid) { cb.onFailed(invalid.getMessage()); return; }
                     Object state = c.opt("state");
-                    if ((state instanceof JSONArray && ((JSONArray)state).length() > 0)
-                            || (state instanceof JSONObject && ((JSONObject)state).length() > 0)) continue;
+                    if (!allowState && ((state instanceof JSONArray && ((JSONArray)state).length() > 0)
+                            || (state instanceof JSONObject && ((JSONObject)state).length() > 0))) continue;
                     String tid = coin.tokenid.toLowerCase(java.util.Locale.ROOT), cid = coin.coinid;
                     if (!FundingCoins.hex(cid) || !oadr.equalsIgnoreCase(coin.address)) {
                         cb.onFailed("Unexpected owner-address coin."); return;
