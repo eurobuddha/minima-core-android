@@ -65,6 +65,9 @@ public final class SwapOrderBook {
                         try {
                             java.math.BigDecimal free=available.min(freeCoinBalance(coins,token));
                             if("0x00".equals(token))free=free.subtract(new java.math.BigDecimal(CommsTransport.MESSAGE_AMOUNT)).max(java.math.BigDecimal.ZERO);
+                            // review 7 Nov (R3-3, HTLC v1.3): USDT-paid takes are answered only for v1.3 takers, so the ask
+                            // balance goes out as bal.m13 — older clients see no asks instead of locking USDT into a decline
+                            base.asksNeedHtlc13=SwapEngine.ETH_FIRST_PAUSED;
                             base.minimaAvail=free.doubleValue();base.clampAsksToBalance(free);
                         } catch(RuntimeException invalid) { cb.onFailed(BALANCE_ERROR);return; }
                         publish(node, ls, id, base, generation, authorized, cb);

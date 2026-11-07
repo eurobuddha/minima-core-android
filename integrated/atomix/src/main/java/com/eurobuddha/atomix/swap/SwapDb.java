@@ -33,6 +33,7 @@ public final class SwapDb {
     public static final String EV_COLLECT  = "CPTXN_COLLECT";  // I claimed/withdrew a leg (or a terminal error)
     public static final String EV_EXPIRED  = "CPTXN_EXPIRED";  // I refunded an expired leg / saw a secret revealed
     public static final String EV_MINIMA_CLAIM_SUBMITTED = "MINIMA_CLAIM_SUBMITTED";
+    public static final String EV_SECRET_OUT = "SECRET_REVEALED";   // initiator: my secret went out in a claim/withdraw (the reveal-margin no longer applies)
     public static final String EV_MINIMA_REFUND_SUBMITTED = "MINIMA_REFUND_SUBMITTED";
     // Counterparty amount/token MISMATCH — its OWN event (backport from atomix-mds 0.1.3). It must NEVER be
     // EV_COLLECT: the claim gates on haveCollect, so a mismatch logged as COLLECT let ANY third party poison a

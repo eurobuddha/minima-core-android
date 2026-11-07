@@ -38,8 +38,8 @@ public class ResponderContextTest {
             when(ui.post(any())).thenAnswer(i->{queued.add(i.getArgument(0));return true;});
             when(minima.activeToken()).thenReturn(market.tokenId);when(wallet.address()).thenReturn("0x"+"CD".repeat(20));
             doAnswer(i->{reads.add(i.getArgument(0));errors.add(i.getArgument(1));return null;}).when(minima).myFreeCoins(any(),any());
-            doAnswer(i->{guards.add(i.getArgument(10));posts.add(i.getArgument(11));return null;}).when(minima)
-                .lockFromCoins(anyList(),anyString(),anyString(),anyString(),anyString(),anyString(),anyString(),anyString(),anyInt(),anyString(),any(),any());
+            doAnswer(i->{guards.add(i.getArgument(10));posts.add(i.getArgument(12));return null;}).when(minima)
+                .lockFromCoins(anyList(),anyString(),anyString(),anyString(),anyString(),anyString(),anyString(),anyString(),anyInt(),anyString(),any(),anyBoolean(),any());
             doAnswer(i->{rows.add(i.getArgument(0));return null;}).when(db).upsertSwap(any());
             engine=new SwapEngine(mock(NodeApi.class),minima,db,wallet,ui,notifier);engine.setNetwork(mock(EthRpc.class),EthNet.MAINNET);
             Order.Pair pair=new Order.Pair();pair.enable=true;pair.buy=1;order.pairs.put("USDT",pair);engine.setMyOrder(order);

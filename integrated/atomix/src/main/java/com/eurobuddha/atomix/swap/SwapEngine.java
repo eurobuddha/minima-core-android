@@ -55,6 +55,19 @@ public final class SwapEngine {
     public static final long CP_SECS_CHECK              = TIMELOCK_SECS / 2;                 // 3600
     public static final int  CP_BLOCKS                  = (TIMELOCK_BLOCKS / 2) / 2;         // 36
     public static final long CP_SECS                    = (TIMELOCK_SECS / 2) / 2;           // 1800
+    /** SECURITY (review 7 Nov): never reveal the secret into a counter-leg whose refund opens sooner than this — the
+     *  owner could race the reveal with a refund and use the secret on my first leg. An honest counter-leg is seen with
+     *  ~CP_SECS / ~CP_BLOCKS left, far above these. */
+    public static final long REVEAL_MIN_SECS            = 10 * 60;                           // 600
+    public static final int  REVEAL_MIN_BLOCKS          = 12;                                // ~10 min
+    /** SECURITY (review 7 Nov, CRITICAL): HTLC v1.2 checks SHA2(secret) EQ hash on a secret of ANY length, while the vault's
+     *  withdraw(bytes32,bytes32) takes exactly 32 bytes. On an ETH-first take the TAKER makes the secret: a 40-byte one
+     *  claims my Minima counter-leg, and my USDT withdraw can never match it (the taker then refunds). Until a v1.3 script
+     *  asserts LEN(secret) EQ 32, a maker does not lock a Minima counter-leg against a USDT lock. Swaps already in flight
+     *  (a row exists) are untouched. HTLC v1.3 (0.2.6): while true, a USDT-paid take IS answered when the taker's handshake
+     *  says it understands v1.3 — and then only with a lock at the v1.3 address; asks go out as bal.m13 so older clients
+     *  never see them. False (tests only) restores the pre-review behaviour for takers without the capability. */
+    public static volatile boolean ETH_FIRST_PAUSED    = true;   // volatile, not final: tests of the normal publish path turn it off
     private static final int  NOTIFY_SCAN_DEPTH         = 256;                               // bounded notify scan
     private static final int  HTLC_SCAN_DEPTH           = 256;                               // bounded HTLC coin scan
     /** REFUND discovery only. The node's `coins depth:` is a walk-back over BLOCKS from the tip
@@ -431,6 +444,12 @@ public final class SwapEngine {
     /** A taker told us (via the sealed handshake) the hashlock of a USDT lock addressed to us. We discover it
      *  by deterministic contractId via getContract (free-RPC-safe) instead of eth_getLogs, then respond. */
     public void addIncomingHashlock(String hash) { addIncomingHashlock(hash, null); }
+
+    /** Hashes whose taker handshake said it understands HTLC v1.3 (see {@link SwapTake#HTLC}). Static: the fg and bg
+     *  engines share one decision, like CP_LOCKING. Hosts fill it from the handshake and from the persisted pref. */
+    static final java.util.Set<String> HTLC13_TAKERS = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    public static void takerUnderstands13(String hash) { if (MinimaHtlc.isHex(hash)) HTLC13_TAKERS.add(MinimaHtlc.normKey(hash)); }
+    static boolean takerHas13(String hash) { return hash != null && HTLC13_TAKERS.contains(MinimaHtlc.normKey(hash)); }
     /** {@code fromPublicId} = the taker's comms id from the sealed handshake: where a decline notice goes back to. */
     public void addIncomingHashlock(String hash, String fromPublicId) {
         if (hash == null || hash.isEmpty()) return;
@@ -1183,11 +1202,22 @@ public final class SwapEngine {
         final long generation = PublishGate.gen();
         String hash = MinimaHtlc.stateAt(coin, 5);
         if (hash.isEmpty()) return;
+        // SECURITY (review 7 Nov, CRITICAL): the hashlock is counterparty-chosen. KISS `SHA2(secret) EQ hash` compares
+        // BYTES exactly, but the ETH leg coerces it to 32 bytes (EthHtlc.b32 keeps the last 32), so a 0x00‖H lock got
+        // an ETH counter-leg on H that the taker could withdraw while my Minima claim could never match. 32 bytes only.
+        if (!hash.matches("0x[0-9A-Fa-f]{64}")) return;
         int timelock = parseInt(MinimaHtlc.stateAt(coin, 3));
         String reqTokenAddr = stripReqToken(MinimaHtlc.stateAt(coin, 2));   // ERC20 the maker wants back
         String secret = db.getSecret(hash);
 
         if (secret != null) {
+            // SECURITY (review 7 Nov): claiming reveals my secret. If this coin's refund opens within REVEAL_MIN_BLOCKS,
+            // its owner can race my claim with a refund and then use the revealed secret on MY first leg. Too close =
+            // don't reveal; my own first leg refunds at its timelock instead (no trade, no loss).
+            if (iMadeTheSecret(hash) && timelock - block < REVEAL_MIN_BLOCKS) {
+                logMismatchOnce(hash, "minima", "counter-leg refund opens in " + (timelock - block) + " blocks — not revealing the secret");
+                return;
+            }
             // I know the secret → claim this coin (reveals it via the notify coin).
             // FUND-SAFETY (backport from atomix-mds): the coin locked to me MUST be the currency I'm buying — a
             // taker's reqToken is the currency-agnostic literal 'minima', so amountTokenOk can't catch a maker
@@ -1214,6 +1244,7 @@ public final class SwapEngine {
             SwapLog.d("claim MINIMA leg " + hash + " amount=" + MinimaHtlc.coinAmount(coin));
             minima.claim(coin, hash, secret, new MinimaHtlc.PostCb() {
                 @Override public void ok(String txpowid) {
+                    markSecretOut(hash);   // R3-1: only once the claim was really posted — a retry is then never blocked by the margin
                     db.logEvent(hash, SwapDb.EV_MINIMA_CLAIM_SUBMITTED, coin.optString("tokenid", "0x00"), MinimaHtlc.coinAmount(coin), txpowid);
                     notifier.onSwapsChanged();
                     SwapLog.d("claim SUBMITTED " + hash + " tx=" + txpowid + " — awaiting confirmation");
@@ -1542,6 +1573,8 @@ public final class SwapEngine {
                     return;
                 }
             }
+            if (!revealWindowOk(hash, gc.timelock)) return;       // SECURITY (review 7 Nov): never reveal into a closing window
+            if (iMadeTheSecret(hash) && !secondEndpointAgrees(eth, contractId, gc)) return;   // …nor on one RPC's word
             broadcastEthWithdraw(eth, contractId, hash, secret);   // retryable; confirmed next cycle via gc.withdrawn
         } else if (iAmSender) {
             if (gc.withdrawn) {
@@ -1576,6 +1609,7 @@ public final class SwapEngine {
             db.setSwapStatus(hash, SwapDb.ST_CLAIMING);
             ui.post(notifier::onSwapsChanged);
             eth.withdraw(contractId, secret);      // ack only; success is confirmed on-chain, not here
+            markSecretOut(hash);                   // R3-1: only once it was really broadcast — a retry is then never blocked by the margin
         } catch (Exception e) {
             // pre-mine failure (RPC/nonce/gas) → nothing committed; the next cycle retries after the window.
             // LOGGED: a swap can sit in CLAIMING for hours on repeated failures here — silence made that
@@ -1703,6 +1737,55 @@ public final class SwapEngine {
     // clock the vault actually enforces; a slow DEVICE clock inflated the taker's apparent remaining window and
     // eroded the 2× safety margin. Cached ~30s (the guard runs per contract per poll); device-clock fallback on
     // an RPC failure — never worse than the old behavior. NOT for lock timelocks (those use ethChainNowStrict).
+    /** SECURITY (review 7 Nov, CRITICAL): withdraw() puts my secret in public calldata — even a withdraw that reverts. A
+     *  counter-leg whose refund opens within REVEAL_MIN_SECS (a maker can lock with timelock ≈ now) can be refunded
+     *  ahead of my withdraw, and the maker then claims MY first leg with the secret. Too close = don't reveal; my own
+     *  first leg refunds at its timelock (no trade, no loss). Chain time only: an RPC failure skips this cycle. */
+    boolean revealWindowOk(String hash, long counterLegTimelock) throws java.io.IOException {
+        if (!iMadeTheSecret(hash)) return true;   // a responder collects with a secret the initiator ALREADY revealed: nothing leaks, and a late collect must never be blocked
+        long left = counterLegTimelock - ethChainNowStrict();
+        if (left >= REVEAL_MIN_SECS) return true;
+        logMismatchOnce(hash, "eth", "counter-leg refund opens in " + left + "s — not revealing the secret");
+        return false;
+    }
+
+    /** SECURITY (review 7 Nov, known-open "single ETH RPC"): a lying endpoint could invent a counterparty lock and make
+     *  me reveal my secret (even a reverted withdraw publishes it) or take on a liability. Before either, the SAME
+     *  contract must read identically on a second, independent keyless endpoint. No second answer = skip this cycle. */
+    boolean secondEndpointAgrees(EthHtlc eth, String contractId, EthHtlc.Contract seen) {
+        // R4-3/R4-4: TWO distinct, explicitly named endpoints must each return the identical contract — independent of
+        // which endpoint served the first read (the sticky primary may have failed over), and one stale or lying node
+        // cannot block an honest reveal: it is simply outvoted by the next ones. Up to five are asked.
+        int agree = 0, asked = 0;
+        for (String ep : EthRpc.fallbacks()) {
+            if (asked++ >= 5) break;
+            try {
+                EthHtlc.Contract c = eth.getContractOn(ep, contractId);
+                if (c != null && sameContract(seen, c) && ++agree >= 2) return true;
+            } catch (Exception unreachable) { /* try the next endpoint */ }
+        }
+        SwapLog.w("contract " + contractId + ": " + agree + " of " + Math.min(asked, 5) + " endpoints confirmed it — not acting this cycle");
+        return false;
+    }
+    static boolean sameContract(EthHtlc.Contract a, EthHtlc.Contract b) {
+        return eqI(a.owner, b.owner) && eqI(a.receiver, b.receiver) && eqI(a.tokenContract, b.tokenContract) && eqI(a.hashlock, b.hashlock)
+                && java.util.Objects.equals(a.amount, b.amount) && java.util.Objects.equals(a.requestAmount, b.requestAmount)
+                && a.timelock == b.timelock && a.withdrawn == b.withdrawn && a.refunded == b.refunded;
+    }
+    private static boolean eqI(String x, String y) { return x != null && y != null && x.equalsIgnoreCase(y); }
+
+    /** True while this swap's secret is mine and has never gone out: I initiated it (I generated the secret) and no
+     *  claim/withdraw of mine has carried it yet. Once one has (review 7 Nov R2-1), it is public and a retry — e.g. a
+     *  claim that did not mine — must never be blocked, or the counterparty refunds and uses the secret on my first leg. */
+    private boolean iMadeTheSecret(String hash) {
+        SwapDb.Swap sw = db.getSwap(hash);
+        return sw != null && "INITIATOR".equals(sw.role) && !db.hasEvent(hash, SwapDb.EV_SECRET_OUT);
+    }
+    private void markSecretOut(String hash) {
+        SwapDb.Swap sw = db.getSwap(hash);
+        if (sw != null && "INITIATOR".equals(sw.role) && !db.hasEvent(hash, SwapDb.EV_SECRET_OUT)) db.logEvent(hash, SwapDb.EV_SECRET_OUT, "", "", "");
+    }
+
     private long ethNowCache = 0, ethNowCacheAt = 0;
     private long ethNowSoft() {
         long dev = nowUnix();
@@ -1729,6 +1812,8 @@ public final class SwapEngine {
                 }
             }
             if (!eth.canCollect(c.contractId)) return;   // already withdrawn/refunded on-chain
+            if (!revealWindowOk(hash, c.timelock)) return;   // SECURITY (review 7 Nov): never reveal into a closing window
+            if (iMadeTheSecret(hash) && !secondEndpointAgrees(eth, c.contractId, c)) return;   // …nor on one RPC's word
             // F1: retryable broadcast; the terminal status is confirmed by checkEthContractFor via gc.withdrawn,
             // never on this ack (a dropped withdraw must not read as COMPLETE).
             broadcastEthWithdraw(eth, c.contractId, hash, secret);
@@ -1738,6 +1823,11 @@ public final class SwapEngine {
         // I don't know the secret → I'm an ERC20→mxUSDT responder; lock the mxUSDT counter-leg.
         if (io.isShutdown() || halted()) return;   // stopped host/key mismatch: no new liability
         if (db.haveSentCounterParty(hash)) return;
+        // HTLC v1.3 (review 7 Nov): a USDT-paid take is answered only with a v1.3 lock, and only for a taker that said it can
+        // claim one. The v1.2 script cannot require a 32-byte secret, so a v1.2 counter-leg could be claimed with a secret
+        // the Ethereum vault refuses — the maker would lose its Minima side and never collect the USDT.
+        if (ETH_FIRST_PAUSED && db.getSwap(hash) == null && !takerHas13(hash)) { declineNote(hash, "your AtomiX is too old for this maker: update it to buy with USDT (HTLC v1.3)"); return; }
+        if (db.getSwap(hash) == null && !secondEndpointAgrees(eth, c.contractId, c)) return;   // a new liability never rests on one RPC's word
         // Persistent dedup (survives a restart / a lost txnpost response that the in-memory CP_LOCKING can't):
         // lockMinimaCounterLeg records the swap row BEFORE broadcast, so a row here means this hash is already
         // being (or was) locked — never re-lock it (the mxUSDT leg has no on-chain hash-uniqueness).
@@ -1858,7 +1948,7 @@ public final class SwapEngine {
                 }
                 notifier.onSwapsChanged();
                 minima.lockFromCoins(pickIds, totalSel, reqMinimaHuman, reqMinimaHuman, "minima", receiverPubkey,
-                        myEth(), hash, timelock, "FALSE", attempt::authorized, new MinimaHtlc.PostCb() {
+                        myEth(), hash, timelock, "FALSE", attempt::authorized, takerHas13(hash), new MinimaHtlc.PostCb() {
                     @Override public void ok(String txpowid) {
                         db.logEvent(hash, SwapDb.EV_CPSENT, "minima", reqMinimaHuman, txpowid);
                         notifier.notify("Locked your " + attempt.market.coinLabel, "Waiting for the counterparty to reveal the secret");
@@ -1906,6 +1996,7 @@ public final class SwapEngine {
     boolean acceptTakerSellMinima(JSONObject coin, String reqTokenAddr) {
         Order.Pair p = pairFor(reqTokenAddr);
         if (p == null || !p.enable) return false;
+        if (PriceOracle.jumpPending() || PriceOracle.pegOutdated()) return false;   // review 7 Nov: my peg may be priced off an outdated MEXC mid
         BigDecimal recvMinima = dec(MinimaHtlc.coinAmount(coin));   // mxUSDT the taker locked, I receive
         BigDecimal giveUsdt = dec(MinimaHtlc.stateAt(coin, 1));       // USDT they requested, I'd pay
         if (recvMinima.signum() <= 0) return false;
@@ -1930,6 +2021,7 @@ public final class SwapEngine {
     boolean acceptTakerBuyMinima(EthHtlc.Contract c) {
         Order.Pair p = pairFor(c.tokenContract);
         if (p == null || !p.enable) return false;
+        if (PriceOracle.jumpPending() || PriceOracle.pegOutdated()) return false;   // review 7 Nov: my peg may be priced off an outdated MEXC mid
         BigDecimal giveMinima = dec(EthWallet.format(c.requestAmount, 18, 18));            // mxUSDT I'd give
         BigDecimal recvUsdt = dec(EthWallet.format(c.amount, decimalsOf(c.tokenContract), 18)); // USDT I'd receive
         if (giveMinima.signum() <= 0) return false;

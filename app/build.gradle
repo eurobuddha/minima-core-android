@@ -160,8 +160,11 @@ android {
         // security/txn-write-gate-android-2026-11-07): a non-ADMIN companion can no longer list, export
         // or edit transaction rows, or txnimport over an existing id. apks/wallet's path (txnimport new id ->
         // txnbasics -> txnpost) is unchanged.
-        versionCode 283
-        versionName "2.2.13"
+        // 2.2.14: SECURITY - Pandamonium's built-in AtomiX and PandaPools get the 7 Nov review fixes: 32-byte hashlocks,
+        // the reveal window + secret-out marker, two ETH endpoints must agree, the MEXC peg guards, HTLC v1.3 for USDT-paid
+        // takes (both addresses scanned; asks as bal.m13); PandaPools collection/recovery/backup/interrupted-write fixes.
+        versionCode 284
+        versionName "2.2.14"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

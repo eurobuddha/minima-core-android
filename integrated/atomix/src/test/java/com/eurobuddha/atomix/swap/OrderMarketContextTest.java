@@ -16,8 +16,8 @@ import static org.mockito.ArgumentMatchers.*;
 /** Reuses OTC callback fixtures and the existing synthetic signed order format. */
 public class OrderMarketContextTest {
     private TradingContext saved;
-    @Before public void save() { saved = TradingContext.active(); }
-    @After public void restore() { TradingContext.setActive(saved, null); }
+    @Before public void save() { saved = TradingContext.active(); SwapEngine.ETH_FIRST_PAUSED = false; }   // the normal publish path (asks advertised)
+    @After public void restore() { TradingContext.setActive(saved, null); SwapEngine.ETH_FIRST_PAUSED = true; }
     private static Order local() {
         Order o = new Order(); o.minimaPublicKey = "0x1234"; o.ethAddress = "0x" + "12".repeat(20);
         o.commsPublicId = "peer"; o.minimaAvail = 5; o.usdtAvail = 10;

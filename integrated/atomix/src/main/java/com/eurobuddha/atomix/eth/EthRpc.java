@@ -65,6 +65,38 @@ public final class EthRpc {
 
     public String url() { return url; }
 
+    /** The built-in keyless endpoints, in order — independent providers, for a read that must not trust one node. */
+    public static java.util.List<String> fallbacks() { return java.util.Arrays.asList(FALLBACKS.clone()); }
+
+    /** One call on exactly {@code endpoint} — no fallback, no sticky switch. For evidence that names its source. */
+    public Object callOn(String endpoint, String method, JSONArray params) throws IOException {
+        return callOnce(endpoint, method, params);
+    }
+
+    /** eth_call on exactly {@code endpoint} (see {@link #callOn}). */
+    public String ethCallOn(String endpoint, String to, String data) throws IOException {
+        return ethCallOn(endpoint, to, data, "latest");
+    }
+
+    /** eth_call on exactly {@code endpoint} at {@code block} (a hex block number, or "latest"). */
+    public String ethCallOn(String endpoint, String to, String data, String block) throws IOException {
+        try {
+            Object r = callOn(endpoint, "eth_call", new JSONArray().put(new JSONObject().put("to", to).put("data", data)).put(block));
+            return r == null ? null : r.toString();
+        } catch (JSONException e) {
+            throw new IOException("ETH eth_call build error: " + e.getMessage());
+        }
+    }
+
+    /** {block number, timestamp (unix secs)} of the latest block as {@code endpoint} sees it. */
+    public long[] latestBlockOn(String endpoint) throws IOException {
+        Object r = callOn(endpoint, "eth_getBlockByNumber", new JSONArray().put("latest").put(false));
+        if (!(r instanceof JSONObject)) throw new IOException(host(endpoint) + ": no block header");
+        String n = ((JSONObject) r).optString("number", ""), ts = ((JSONObject) r).optString("timestamp", "");
+        if (n.isEmpty() || ts.isEmpty()) throw new IOException(host(endpoint) + ": incomplete block header");
+        return new long[]{hexToBig(n).longValue(), hexToBig(ts).longValue()};
+    }
+
     /**
      * Raw JSON-RPC call with endpoint fallback. Tries the active endpoint, then each fallback, on any
      * transport/parse failure (e.g. a 521/HTML body); the first that answers becomes the active one.
@@ -174,7 +206,7 @@ public final class EthRpc {
     }
 
     /** RPC QUANTITY is distinct from padded ABI DATA. EIP-2681 bounds account nonces to 64 bits. */
-    static BigInteger transactionCount(Object result) throws IOException {
+    public static BigInteger transactionCount(Object result) throws IOException {
         if (!(result instanceof String) || !((String) result).matches("0x(?:0|[1-9a-fA-F][0-9a-fA-F]{0,15})")) {
             throw new IOException("Invalid Ethereum transaction count from RPC");
         }

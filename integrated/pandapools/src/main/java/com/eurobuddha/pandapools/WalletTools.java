@@ -80,7 +80,13 @@ final class WalletTools {
         act.languageDialog(Design.isDark() ? androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert : androidx.appcompat.R.style.Theme_AppCompat_Light_Dialog_Alert).setTitle(Language.msg(l10n_pools_resolve_write))
                 .setMessage(Language.msg(l10n_pools_interrupted_review))
                 .setNegativeButton(Language.msg(l10n_atomix_recovery_keep), null)
-                .setPositiveButton(Language.msg(l10n_pools_restarted_checked), (d, w) -> { message(recoveryNode.acknowledgeInterruptedWrite(reviewedWrite) ? Language.msg(l10n_pools_safety_pause_cleared) : Language.msg(l10n_pools_keep_write_paused)); }).show();
+                .setPositiveButton(Language.msg(l10n_pools_restarted_checked), (d, w) -> {
+                    if (!recoveryNode.acknowledgeInterruptedWrite(reviewedWrite)) { message(Language.msg(l10n_pools_keep_write_paused)); return; }
+                    // review 7 Nov (R2-3, PandaPools 0.9.84/0.9.87): free inputs an uncertain post held, where the node proves they
+                    // were never posted (still unspent, not in the mempool). Load the shared store first: it also holds resting claims.
+                    CoinLock.loadPosted(act);
+                    CoinLock.releaseProvablyUnposted(recoveryNode::cmd, n -> act.runOnUiThread(() -> message(Language.msg(l10n_pools_safety_pause_cleared))));
+                }).show();
     }
     private static String nodeError(JSONObject j) { return j.optString("error", j.optString("message", "No coins could be combined.")); }
     private void message(CharSequence text) {
