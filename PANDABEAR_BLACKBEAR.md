@@ -22,7 +22,7 @@ To move from PandaBear to BlackBear:
 3. Stop BlackBear, run PandaBear, and send funds to the recorded BlackBear address. Confirm receipt when running BlackBear.
 4. Re-pair companion apps with the destination node. AtomiX needs a valid identity in that wallet; counterparties need the new maker key when it changes.
 
-Run **one node at a time**. Both Android apps use port 11001. Installing both is supported; running both together is not the migration procedure.
+Run **one node at a time**. Since 2.1.1 each Bear listens on its own port (PandaBear 13001, BlackBear 21001, Pandamonium 25001), so the ports no longer collide; even so, installing both is supported, but running both together is not the migration procedure.
 
 ## Signing counters and recovery
 
