@@ -331,8 +331,10 @@ public class MinimaAPI {
             if (destroyed || generation != discoveryGeneration) return;
             for (String id : requestIds) mResponseHandlers.remove(id);
             discovering = false;
-            ambiguous = registrations.size() > 1;
-            nodePackage = registrations.size() == 1 ? registrations.keySet().iterator().next() : null;
+            lastReplied = java.util.Collections.unmodifiableSet(new java.util.LinkedHashSet<>(registrations.keySet()));
+            nodePackage = choose(registrations, readPreferredNode(mContext));
+            ambiguous = nodePackage == null && registrations.size() > 1;
+            if (nodePackage != null) pinnedNode = nodePackage;
             JSONObject result = nodePackage == null ? routingFailure() : registrations.get(nodePackage);
             java.util.List<Runnable> waiting = new java.util.ArrayList<>(awaitingNode);
             awaitingNode.clear();
@@ -341,9 +343,49 @@ public class MinimaAPI {
         }, 1500);
     }
 
+    /**
+     * Which answering node this app talks to (10 Nov 2026: with BlackBear AND the Play Store Minima Core running, every
+     * companion refused every command, and the ETH Wallet showed "Node returned an invalid Ethereum key").
+     * 1. one node answered: that one;  2. the node the user chose (preferred_node), if it answered;
+     * 3. the ONE node on which this app is enabled;  else null (ambiguous: the user must choose or disable one).
+     */
+    static String choose(java.util.Map<String, JSONObject> replies, String preferred) {
+        if (replies.size() == 1) return replies.keySet().iterator().next();
+        if (preferred != null && replies.containsKey(preferred)) return preferred;
+        String enabled = null;
+        for (java.util.Map.Entry<String, JSONObject> e : replies.entrySet()) {
+            if (!e.getValue().optBoolean("enabled", false)) continue;
+            if (enabled != null) return null;   // enabled on two nodes: the user must choose
+            enabled = e.getKey();
+        }
+        return enabled;
+    }
+
+    /** The node package the last discovery pinned (the one this app talks to); null until one has. */
+    public static volatile String pinnedNode;
+    /** The node packages that answered the last discovery. */
+    public static volatile java.util.Set<String> lastReplied = java.util.Collections.emptySet();
+    /** The node the USER chose when several answer, kept in a file (read fresh at every discovery). */
+    public static String readPreferredNode(Context c) {
+        try {
+            java.io.File f = new java.io.File(c.getApplicationContext().getFilesDir(), "preferred_node");
+            if (!f.exists()) return null;
+            String s = new String(java.nio.file.Files.readAllBytes(f.toPath()), java.nio.charset.StandardCharsets.UTF_8).trim();
+            for (String[] node : MinimaAPIMessages.NODES) if (node[0].equals(s)) return s;
+        } catch (Exception ignored) { }
+        return null;
+    }
+    public static boolean writePreferredNode(Context c, String pkg) {
+        try { java.nio.file.Files.write(new java.io.File(c.getApplicationContext().getFilesDir(), "preferred_node").toPath(),
+                (pkg == null ? "" : pkg).getBytes(java.nio.charset.StandardCharsets.UTF_8)); return true; }
+        catch (Exception e) { return false; }
+    }
+
     private JSONObject routingFailure() {
         return failure(ambiguous
-                ? "Multiple Minima Core builds are running. Keep one running and reopen this companion. No command was sent."
+                ? "More than one Minima node app answered (" + String.join(", ", registrations.keySet()) + ") and this app is "
+                        + "enabled in all or none of them. Enable it in ONE node's Apps screen (and disable it in the others), "
+                        + "then reopen this app. No command was sent."
                 : "No Minima node replied. Start Minima Core (PandaBear, BlackBear, Pandamonium or the official Minima Core) and try again. No command was sent.");
     }
 
