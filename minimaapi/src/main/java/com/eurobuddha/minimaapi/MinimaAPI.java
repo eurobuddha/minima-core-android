@@ -201,7 +201,7 @@ public class MinimaAPI {
                     String payload;
                     try { payload = readResponseUri(uristr); }
                     catch (Exception exc) {
-                        payload = failure("Failed to read large response: " + exc).toString();
+                        payload = unknownOutcome("Failed to read large response: " + exc).toString();
                     }
                     deliverResult(responseid, payload);
                 });
@@ -233,13 +233,26 @@ public class MinimaAPI {
             String part = zIntent.getStringExtra(MinimaAPIMessages.key(prefix, "RESPONSE_RESULT"));
             try { whole = chunks.add(responseid, size, pos, part, System.currentTimeMillis()); }
             catch (ChunkAssembler.Refused refused) {
-                deliverResult(responseid, failure("Node reply could not be reassembled: " + refused.getMessage()).toString());
+                // the node DID run the command: an unknown outcome, never a "failed" a caller could resend on
+                deliverResult(responseid, unknownOutcome("Node reply could not be reassembled: " + refused.getMessage()).toString());
                 return;
             }
         } catch (RuntimeException malformedExtras) {
             return;
         }
-        if (whole != null) deliverResult(responseid, whole);
+        if (whole == null) return;
+        if (whole.length() <= 65536) { deliverResult(responseid, whole); return; }
+        try { mFileExecutor.execute(() -> deliverResult(responseid, whole)); }   // parse a big reply off the main thread
+        catch (java.util.concurrent.RejectedExecutionException destroyedMeanwhile) { /* owner destroyed */ }
+    }
+
+    /** A transport problem after the node may have acted: no "status", so no caller reads it as a refusal and resends
+     *  (same shape as AtomiX's MinimaAPIResponse.failure). */
+    private static JSONObject unknownOutcome(String message) {
+        JSONObject result = new JSONObject();
+        try { result.put("transporterror", message + " The outcome is unknown: check before retrying."); }
+        catch (JSONException impossible) { throw new IllegalStateException(impossible); }
+        return result;
     }
 
     private static JSONObject failure(String message) {
