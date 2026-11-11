@@ -140,6 +140,7 @@ public class MinimaAPI {
         IntentFilter filter = new IntentFilter();
         for (String prefix : MinimaAPIMessages.PREFIXES) {
             filter.addAction(MinimaAPIMessages.key(prefix, "RESPONSE"));
+            filter.addAction(MinimaAPIMessages.key(prefix, "RESPONSE_CHUNKED"));   // Minima Core 1.8+: replies over 64K
         }
 
         zContext.registerReceiver(mMinimaAPIReceiver, filter, Context.RECEIVER_EXPORTED);
@@ -165,6 +166,7 @@ public class MinimaAPI {
         main.removeCallbacksAndMessages(null);
         awaitingNode.clear();
         mResponseHandlers.clear();
+        chunks.clear();
         try{
             mContext.unregisterReceiver(mMinimaAPIReceiver);
         }catch(Exception exc){}
@@ -211,6 +213,35 @@ public class MinimaAPI {
         }
     }
 
+    /** Minima Core 1.8+ sends a reply over 64K in pieces; they are put back together here (bounded, see the class). */
+    final ChunkAssembler chunks = new ChunkAssembler();
+
+    /** One piece of a chunked reply. Same checks as a whole reply — this core's pairing secret and a request we are still
+     *  waiting for — then the joined reply goes through deliverResult exactly like an inline one (delivered once). */
+    public void ResponseChunkReceived(Intent zIntent) {
+        if (destroyed || zIntent == null) return;
+        final String responseid, whole;
+        try {
+            String prefix = MinimaAPIMessages.prefixOfAction(zIntent.getAction());
+            if (prefix == null || !MinimaAPIMessages.key(prefix, "RESPONSE_CHUNKED").equals(zIntent.getAction())) return;
+            String minimaid = zIntent.getStringExtra(MinimaAPIMessages.key(prefix, "REGISTER_MINIMAID"));
+            if (minimaid == null || minimaid.isEmpty() || !minimaid.equals(MINIMA_ID)) return;
+            responseid = zIntent.getStringExtra(MinimaAPIMessages.key(prefix, "RESPONSE_ID"));
+            if (responseid == null || responseid.isEmpty() || !mResponseHandlers.containsKey(responseid)) return;
+            int size = zIntent.getIntExtra(MinimaAPIMessages.key(prefix, "RESPONSE_CHUNKED_SIZE"), -1);
+            int pos = zIntent.getIntExtra(MinimaAPIMessages.key(prefix, "RESPONSE_CHUNKED_POS"), -1);
+            String part = zIntent.getStringExtra(MinimaAPIMessages.key(prefix, "RESPONSE_RESULT"));
+            try { whole = chunks.add(responseid, size, pos, part, System.currentTimeMillis()); }
+            catch (ChunkAssembler.Refused refused) {
+                deliverResult(responseid, failure("Node reply could not be reassembled: " + refused.getMessage()).toString());
+                return;
+            }
+        } catch (RuntimeException malformedExtras) {
+            return;
+        }
+        if (whole != null) deliverResult(responseid, whole);
+    }
+
     private static JSONObject failure(String message) {
         JSONObject result = new JSONObject();
         try { result.put("status", false); result.put("error", message); }
@@ -237,6 +268,7 @@ public class MinimaAPI {
     private void deliverResult(String zResponseID, String zResult){
 
         if (destroyed || zResponseID == null || zResult == null) return;
+        chunks.forget(zResponseID);
         //Convert the Result to a JSON
         JSONObject json;
         try {
