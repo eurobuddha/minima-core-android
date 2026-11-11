@@ -163,8 +163,10 @@ android {
         // 2.2.14: SECURITY - Pandamonium's built-in AtomiX and PandaPools get the 7 Nov review fixes: 32-byte hashlocks,
         // the reveal window + secret-out marker, two ETH endpoints must agree, the MEXC peg guards, HTLC v1.3 for USDT-paid
         // takes (both addresses scanned; asks as bal.m13); PandaPools collection/recovery/backup/interrupted-write fixes.
-        versionCode 298
-        versionName "2.2.28"
+        // 2.2.29: built-in AtomiX locks name the receiver's address at port 253 (AtomiX 0.2.32): the receiver's node tracks
+        // the lock and sees its claim or refund, so a Trading Account receiver is never left with a phantom balance.
+        versionCode 299
+        versionName "2.2.29"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

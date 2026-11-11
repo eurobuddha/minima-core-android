@@ -43,9 +43,13 @@ public class GuardedCounterLegTest {
         try(PublishQueueTest.Host host=new PublishQueueTest.Host()) {
             List<SignGate.Release> hold=new ArrayList<>();SignGate.submit(hold::add);
             AtomicBoolean allowed=new AtomicBoolean(true);MinimaHtlc.PostCb cb=mock(MinimaHtlc.PostCb.class);
-            lock(htlc(host,TradingContext.MINIMA),allowed,cb);assertTrue(host.commands.isEmpty());
+            lock(htlc(host,TradingContext.MINIMA),allowed,cb);
+            // the only command before the gate is the read-only receiver-address lookup (port 253); nothing is built or signed
+            assertEquals(1,host.commands.size());assertTrue(host.commands.get(0).startsWith("runscript "));
+            assertTrue(host.requests.get(0).begin());host.requests.get(0).accept(reply(host.commands.get(0)));
+            assertEquals(1,host.commands.size());
             allowed.set(false);hold.get(0).free();
-            assertTrue(host.commands.stream().allMatch(c->c.startsWith("txndelete ")));
+            assertTrue(host.commands.subList(1,host.commands.size()).stream().allMatch(c->c.startsWith("txndelete ")));
             verify(cb).err(NodeApi.ERR_COMMAND_CHANGED);verify(cb,never()).ok(anyString());
             List<Boolean> next=new ArrayList<>();SignGate.submit(r->{next.add(true);r.free();});assertEquals(1,next.size());
         }
