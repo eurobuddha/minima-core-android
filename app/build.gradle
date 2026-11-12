@@ -165,8 +165,13 @@ android {
         // takes (both addresses scanned; asks as bal.m13); PandaPools collection/recovery/backup/interrupted-write fixes.
         // 2.2.29: built-in AtomiX locks name the receiver's address at port 253 (AtomiX 0.2.32): the receiver's node tracks
         // the lock and sees its claim or refund, so a Trading Account receiver is never left with a phantom balance.
-        versionCode 299
-        versionName "2.2.29"
+        // 2.2.30: the node's balance command no longer crashes on a coin restored without its token details
+        // (a MegaMMR resync can do this): the details are filled from the chain, or the coin is counted without them.
+        // Seen 12 Nov on the S10+: PandaPools could not count or re-publish its pool after the resync. All three Bears
+        // (one shared minima.jar): core branch security/txn-write-gate-android-2026-11-07 83cabd09c37, only balance.class
+        // rebuilt (--release 8) into the 2.2.29 jar.
+        versionCode 300
+        versionName "2.2.30"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
