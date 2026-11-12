@@ -170,8 +170,12 @@ android {
         // Seen 12 Nov on the S10+: PandaPools could not count or re-publish its pool after the resync. All three Bears
         // (one shared minima.jar): core branch security/txn-write-gate-android-2026-11-07 83cabd09c37, only balance.class
         // rebuilt (--release 8) into the 2.2.29 jar.
-        versionCode 300
-        versionName "2.2.30"
+        // 2.2.31: completes 2.2.30. balance also read the token script from the coin's own (missing) details, and the
+        // node's token lookup cached a null for such a coin, after which every token lookup threw until a restart.
+        // Both fixed (balance + TxPoWSearcher, core security/txn-write-gate-android-2026-11-07 49d667d6eb4), proven on a -test
+        // node with the token details stripped from the node's own coins.
+        versionCode 301
+        versionName "2.2.31"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
