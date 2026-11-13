@@ -178,8 +178,12 @@ android {
         // Vault rebuild from seed): one box per word (WordEntry, vendored from Dexicon by scripts/vendor-wordentry.sh), and
         // "My phrase is not 24 list words" (any-phrase, restore only) where the node can take one. Boxes hand the node
         // Minima's own UPPERCASE form, so a first-run restore opens the original wallet even under -anyseed.
-        versionCode 302
-        versionName "2.2.32"
+        // 2.2.33: seed entry review fixes - node-context any-phrase may be list words (old first-run wallets were hashed as
+        // typed; old Vault took 12-21 words) and then asks "Minima's form or exactly as typed"; near-miss word phrases,
+        // a leading "-" and [ ] { } refused; paste never drops words; no spill-over after auto-complete; first-run screens
+        // always FLAG_SECURE; Vault errors as toasts. WordEntry from Dexicon 0.3.50.
+        versionCode 303
+        versionName "2.2.33"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

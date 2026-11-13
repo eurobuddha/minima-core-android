@@ -206,7 +206,7 @@ public final class ResyncJob {
 
     static ResyncJob seedResyncAny(String host, String phrase, int keyUses, boolean blockMode) {
         String p = phrase == null ? "" : phrase.trim();
-        if (!validHost(host) || com.eurobuddha.account.WordEntry.anyPhraseProblem(p, true) != null
+        if (!validHost(host) || com.eurobuddha.account.WordEntry.anyPhraseProblem(p, true, true) != null
                 || keyUses < MIN_KEY_USES || keyUses > maxKeyUses(blockMode)) return null;
         return new ResyncJob(Kind.SEED_RESYNC, true, false,
                 "megammrsync action:resync host:" + host

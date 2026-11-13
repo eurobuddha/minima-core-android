@@ -35,6 +35,9 @@ public class MinimaApplication extends Application {
                 || activity instanceof com.eurobuddha.minimacore.main.backup.BackupCreateActivity
                 || activity instanceof com.eurobuddha.minimacore.main.backup.RestoreFileActivity
                 || activity instanceof com.eurobuddha.minimacore.main.backup.ChatBackupActivity
+                // seed boxes (review L4, 13 Nov 2026): never capturable, whatever the screenshot setting
+                || activity instanceof com.eurobuddha.minimacore.launcher.restore.RestoreWalletSyncActivity
+                || activity instanceof com.eurobuddha.minimacore.launcher.newwallet.NewWalletRestoreActivity
                 || com.eurobuddha.minimacore.integrated.PandamoniumHooks.requiresSecureScreen(activity);
         boolean allowed = screenshotsAllowed(this);
         if (sensitive || !allowed) activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);

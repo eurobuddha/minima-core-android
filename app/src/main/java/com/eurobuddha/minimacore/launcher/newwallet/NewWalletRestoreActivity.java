@@ -45,20 +45,21 @@ public class NewWalletRestoreActivity extends AppCompatActivity {
 
         // Guided boxes (one per word) + "My phrase is not 24 list words" - SeedEntry / WordEntry, 13 Nov 2026.
         mWords = com.eurobuddha.minimacore.main.SeedEntry.replace(this, mSeedInput,
-                findViewById(R.id.restorewallet_button_check), true, false);
+                findViewById(R.id.restorewallet_button_check));
 
         Button proceedbutton = findViewById(R.id.restorewallet_button_proceed);
         proceedbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Boxes -> Minima's own form; any-phrase -> as typed; list words typed in any-phrase -> the user chooses
+                // (SeedEntry.resolve). The node starts with -anyseed, so this exact string is what it hashes.
+                com.eurobuddha.minimacore.main.SeedEntry.resolve(NewWalletRestoreActivity.this, mWords, (seed, asTyped) -> proceed(seed));
+            }
+        });
+    }
 
-                //Get the seed: boxes -> Minima's own form (UPPERCASE), any-phrase -> as made. The node starts with
-                //-anyseed, so this exact string is what it hashes.
-                String seed = com.eurobuddha.minimacore.main.SeedEntry.nodePhrase(mWords);
-                if(seed == null){
-                    logger.showDialog(NewWalletRestoreActivity.this,Language.msg(l10n_onboarding_seed_error),mWords.problem());
-                    return;
-                }
+    private void proceed(String seed) {
+
 
 //                //Get the Node
 //                String seed = mSeedInput.getText().toString().trim();
@@ -67,23 +68,21 @@ public class NewWalletRestoreActivity extends AppCompatActivity {
 //                    return;
 //                }
 
-                //Set the prefs..
-                SharedPreferences prefs = getSharedPreferences("main_prefs", MODE_PRIVATE);
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("SEED_SET", true);
-                editor.putString("SEED", seed);
-                editor.commit();
+        //Set the prefs..
+        SharedPreferences prefs = getSharedPreferences("main_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("SEED_SET", true);
+        editor.putString("SEED", seed);
+        editor.commit();
 
-                //Jump to restore wallet..
-                Intent myIntent = new Intent(NewWalletRestoreActivity.this, StartServiceActivity.class);
-                NewWalletRestoreActivity.this.startActivity(myIntent);
+        //Jump to restore wallet..
+        Intent myIntent = new Intent(NewWalletRestoreActivity.this, StartServiceActivity.class);
+        NewWalletRestoreActivity.this.startActivity(myIntent);
 
-                //Close the main Launcher
-                LauncherActivity.LAUNCHER_ACTIVITY.finish();
+        //Close the main Launcher
+        LauncherActivity.LAUNCHER_ACTIVITY.finish();
 
-                finish();
-            }
-        });
+        finish();
     }
 
     public void setSeedText(String zSeed){

@@ -56,60 +56,59 @@ public class RestoreWalletSyncActivity extends AppCompatActivity {
 
         // Guided boxes (one per word) + "My phrase is not 24 list words" - SeedEntry / WordEntry, 13 Nov 2026.
         mWords = com.eurobuddha.minimacore.main.SeedEntry.replace(this, mSeedInput,
-                findViewById(R.id.restorewallet_button_check), true, false);
+                findViewById(R.id.restorewallet_button_check));
 
         Button proceedbutton = findViewById(R.id.restorewallet_button_proceed);
         proceedbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //Get the seed: boxes -> Minima's own form (UPPERCASE), any-phrase -> as made. The node starts with
-                //-anyseed, so this exact string is what it hashes.
-                String seed = com.eurobuddha.minimacore.main.SeedEntry.nodePhrase(mWords);
-                if(seed == null){
-                    showDialog(Language.msg(l10n_onboarding_seed_error), mWords.problem());
-                    return;
-                }
-
-                String keyusesstr = mKeyUsesInput.getText().toString().trim();
-                int keyuses;
-                try{
-                    keyuses = Integer.parseInt(keyusesstr);
-                }catch(NumberFormatException exc){
-                    showDialog(Language.msg(l10n_restore_key_uses), Language.msg(l10n_restore_key_uses_integer));
-                    return;
-                }
-                //Same floor as the in-app seed rebuild: keyuses:0 says no key was ever used, and
-                //a reused Winternitz index exposes the private key.
-                int maxKeyUses = ResyncJob.maxKeyUses(com.eurobuddha.minimacore.main.StartupMode.usesBlockKeys(
-                        getSharedPreferences("main_prefs", MODE_PRIVATE)));
-                if(keyuses < ResyncJob.MIN_KEY_USES || keyuses > maxKeyUses){
-                    showDialog(Language.msg(l10n_restore_key_uses), Language.msg(l10n_restore_key_uses_range,
-                            ResyncJob.MIN_KEY_USES, maxKeyUses));
-                    return;
-                }
-
-                String megammr = mMegaNode.getText().toString().trim();
-
-                //Set the prefs..
-                SharedPreferences prefs = getSharedPreferences("main_prefs", MODE_PRIVATE);
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("SEED_SET", true);
-                editor.putString("SEED", seed);
-                editor.putInt("KEYUSES", keyuses);
-                editor.putString("default_peers", megammr);
-                editor.commit();
-
-                //Jump to restore wallet..
-                Intent myIntent = new Intent(RestoreWalletSyncActivity.this, SeedSyncServiceActivity.class);
-                RestoreWalletSyncActivity.this.startActivity(myIntent);
-
-                //Close the main Laumcher
-                LauncherActivity.LAUNCHER_ACTIVITY.finish();
-
-                finish();
+                // Boxes -> Minima's own form; any-phrase -> as typed; list words typed in any-phrase -> the user chooses
+                // (SeedEntry.resolve). The node starts with -anyseed, so this exact string is what it hashes.
+                com.eurobuddha.minimacore.main.SeedEntry.resolve(RestoreWalletSyncActivity.this, mWords, (seed, asTyped) -> proceed(seed));
             }
         });
+    }
+
+    private void proceed(String seed) {
+
+
+        String keyusesstr = mKeyUsesInput.getText().toString().trim();
+        int keyuses;
+        try{
+            keyuses = Integer.parseInt(keyusesstr);
+        }catch(NumberFormatException exc){
+            showDialog(Language.msg(l10n_restore_key_uses), Language.msg(l10n_restore_key_uses_integer));
+            return;
+        }
+        //Same floor as the in-app seed rebuild: keyuses:0 says no key was ever used, and
+        //a reused Winternitz index exposes the private key.
+        int maxKeyUses = ResyncJob.maxKeyUses(com.eurobuddha.minimacore.main.StartupMode.usesBlockKeys(
+                getSharedPreferences("main_prefs", MODE_PRIVATE)));
+        if(keyuses < ResyncJob.MIN_KEY_USES || keyuses > maxKeyUses){
+            showDialog(Language.msg(l10n_restore_key_uses), Language.msg(l10n_restore_key_uses_range,
+                    ResyncJob.MIN_KEY_USES, maxKeyUses));
+            return;
+        }
+
+        String megammr = mMegaNode.getText().toString().trim();
+
+        //Set the prefs..
+        SharedPreferences prefs = getSharedPreferences("main_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("SEED_SET", true);
+        editor.putString("SEED", seed);
+        editor.putInt("KEYUSES", keyuses);
+        editor.putString("default_peers", megammr);
+        editor.commit();
+
+        //Jump to restore wallet..
+        Intent myIntent = new Intent(RestoreWalletSyncActivity.this, SeedSyncServiceActivity.class);
+        RestoreWalletSyncActivity.this.startActivity(myIntent);
+
+        //Close the main Laumcher
+        LauncherActivity.LAUNCHER_ACTIVITY.finish();
+
+        finish();
     }
 
     public void setSeedText(String zSeed){

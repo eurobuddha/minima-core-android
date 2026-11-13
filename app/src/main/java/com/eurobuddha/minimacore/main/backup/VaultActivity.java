@@ -309,8 +309,9 @@ public class VaultActivity extends AppCompatActivity {
     }
 
     private void askPhrase(CharSequence title, CharSequence message, CharSequence confirmText, PhraseAction action) {
-        // One box per word (SeedEntry / WordEntry, 13 Nov 2026). vault restorekeys always cleans the words, so no any-phrase.
-        com.eurobuddha.account.WordEntry words = new com.eurobuddha.account.WordEntry(this, 0, null, null);
+        // One box per word (SeedEntry / WordEntry, 13 Nov 2026). vault restorekeys always cleans the words itself, so
+        // any-phrase here is for the old 12-21 word lengths (review M5); anything not made of list words is refused.
+        com.eurobuddha.account.WordEntry words = com.eurobuddha.minimacore.main.SeedEntry.create(this);
         androidx.appcompat.app.AlertDialog d = new LanguageDialog(this)
                 .setTitle(title)
                 .setMessage(message)
@@ -323,12 +324,14 @@ public class VaultActivity extends AppCompatActivity {
             String typed = words.phrase();
             if (typed == null) { android.widget.Toast.makeText(this, words.problem(), android.widget.Toast.LENGTH_LONG).show(); return; }
             String tidy = ResyncJob.tidyPhrase(typed);
-            if (!ResyncJob.validPhrase(tidy)) { setStatus(Language.msg(l10n_vault_invalid_phrase)); return; }
+            if (!ResyncJob.validPhrase(tidy)) { toast(Language.msg(l10n_vault_invalid_phrase)); return; }
             d.dismiss();
             action.run(tidy);
         }));
         d.show();
     }
+
+    private void toast(CharSequence m) { android.widget.Toast.makeText(this, m, android.widget.Toast.LENGTH_LONG).show(); }
 
     /** The boxes scroll inside a dialog (24 of them do not fit on a small screen). */
     private View scroll(View v) {
@@ -379,7 +382,7 @@ public class VaultActivity extends AppCompatActivity {
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         // One box per word, or "My phrase is not 24 list words" (megammrsync anyphrase:true) - 13 Nov 2026.
-        com.eurobuddha.account.WordEntry words = new com.eurobuddha.account.WordEntry(this, 0, null, null).enableAnyPhrase(true);
+        com.eurobuddha.account.WordEntry words = com.eurobuddha.minimacore.main.SeedEntry.create(this);
         EditText host = field(InputType.TYPE_CLASS_TEXT, "host:port");
         host.setText(Peers.getDefaultPeers(this));
         EditText uses = field(InputType.TYPE_CLASS_NUMBER,
@@ -398,30 +401,32 @@ public class VaultActivity extends AppCompatActivity {
                 .create();
         secureWords(d);
         d.setOnShowListener(x -> d.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String phraseText = words.phrase();
-            if (phraseText == null) { android.widget.Toast.makeText(this, words.problem(), android.widget.Toast.LENGTH_LONG).show(); return; }
             String hostText = host.getText().toString().trim();
             int keyUses;
             try {
                 keyUses = Integer.parseInt(uses.getText().toString().trim());
             } catch (NumberFormatException exc) {
-                setStatus(Language.msg(l10n_restore_key_uses_integer));
+                toast(Language.msg(l10n_restore_key_uses_integer));
                 return;
             }
-            ResyncJob job = words.isAnyPhrase() ? ResyncJob.seedResyncAny(hostText, phraseText, keyUses)
-                    : ResyncJob.seedResync(hostText, phraseText, keyUses);
-            if (job == null) {
-                setStatus(Language.msg(l10n_vault_check_rebuild, ResyncJob.MIN_KEY_USES, ResyncJob.maxKeyUses(org.minima.system.params.GeneralParams.USE_BLOCK_AS_KEYUSES)));
-                return;
-            }
-            d.dismiss();
-            ResyncLauncher.Result result = ResyncLauncher.begin(this, job);
-            if (!result.started) {
-                setStatus(SeedSyncActivity.launchError(result.error));
-                return;
-            }
-            startActivity(new Intent(this, SeedSyncActivity.class));
-            finish();
+            // Boxes -> Minima's form; any-phrase -> as typed (anyphrase:true); list words typed as any-phrase -> the user
+            // chooses (SeedEntry.resolve). Errors are toasts: the status line is behind this dialog (review L5).
+            com.eurobuddha.minimacore.main.SeedEntry.resolve(this, words, (phrase, asTyped) -> {
+                ResyncJob job = asTyped ? ResyncJob.seedResyncAny(hostText, phrase, keyUses)
+                        : ResyncJob.seedResync(hostText, phrase, keyUses);
+                if (job == null) {
+                    toast(Language.msg(l10n_vault_check_rebuild, ResyncJob.MIN_KEY_USES, ResyncJob.maxKeyUses(org.minima.system.params.GeneralParams.USE_BLOCK_AS_KEYUSES)));
+                    return;
+                }
+                d.dismiss();
+                ResyncLauncher.Result result = ResyncLauncher.begin(this, job);
+                if (!result.started) {
+                    setStatus(SeedSyncActivity.launchError(result.error));
+                    return;
+                }
+                startActivity(new Intent(this, SeedSyncActivity.class));
+                finish();
+            });
         }));
         d.show();
     }
