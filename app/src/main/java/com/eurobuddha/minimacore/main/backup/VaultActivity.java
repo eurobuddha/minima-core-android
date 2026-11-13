@@ -309,22 +309,41 @@ public class VaultActivity extends AppCompatActivity {
     }
 
     private void askPhrase(CharSequence title, CharSequence message, CharSequence confirmText, PhraseAction action) {
-        EditText input = field(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE,
-                Language.msg(l10n_vault_phrase_hint));
-        new LanguageDialog(this)
+        // One box per word (SeedEntry / WordEntry, 13 Nov 2026). vault restorekeys always cleans the words, so no any-phrase.
+        com.eurobuddha.account.WordEntry words = new com.eurobuddha.account.WordEntry(this, 0, null, null);
+        androidx.appcompat.app.AlertDialog d = new LanguageDialog(this)
                 .setTitle(title)
                 .setMessage(message)
-                .setView(input)
-                .setPositiveButton(confirmText, (d, w) -> {
-                    String words = ResyncJob.tidyPhrase(input.getText().toString());
-                    if (!ResyncJob.validPhrase(words)) {
-                        setStatus(Language.msg(l10n_vault_invalid_phrase));
-                        return;
-                    }
-                    action.run(words);
-                })
+                .setView(scroll(words.view))
+                .setPositiveButton(confirmText, null)
                 .setNegativeButton(Language.msg(l10n_common_cancel), null)
-                .show();
+                .create();
+        secureWords(d);
+        d.setOnShowListener(x -> d.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String typed = words.phrase();
+            if (typed == null) { android.widget.Toast.makeText(this, words.problem(), android.widget.Toast.LENGTH_LONG).show(); return; }
+            String tidy = ResyncJob.tidyPhrase(typed);
+            if (!ResyncJob.validPhrase(tidy)) { setStatus(Language.msg(l10n_vault_invalid_phrase)); return; }
+            d.dismiss();
+            action.run(tidy);
+        }));
+        d.show();
+    }
+
+    /** The boxes scroll inside a dialog (24 of them do not fit on a small screen). */
+    private View scroll(View v) {
+        android.widget.ScrollView sv = new android.widget.ScrollView(this);
+        int pad = Math.round(20 * getResources().getDisplayMetrics().density);
+        sv.setPadding(pad, pad / 2, pad, 0);
+        sv.addView(v);
+        return sv;
+    }
+
+    /** No screenshots or recordings of typed words; the keyboard resizes the dialog instead of covering the boxes. */
+    private static void secureWords(androidx.appcompat.app.AlertDialog d) {
+        if (d.getWindow() == null) return;
+        d.getWindow().setFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE, android.view.WindowManager.LayoutParams.FLAG_SECURE);
+        d.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
     }
 
     /**
@@ -359,46 +378,52 @@ public class VaultActivity extends AppCompatActivity {
     private void confirmSeedRebuild() {
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
-        EditText words = field(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE,
-                Language.msg(l10n_vault_phrase_hint));
+        // One box per word, or "My phrase is not 24 list words" (megammrsync anyphrase:true) - 13 Nov 2026.
+        com.eurobuddha.account.WordEntry words = new com.eurobuddha.account.WordEntry(this, 0, null, null).enableAnyPhrase(true);
         EditText host = field(InputType.TYPE_CLASS_TEXT, "host:port");
         host.setText(Peers.getDefaultPeers(this));
         EditText uses = field(InputType.TYPE_CLASS_NUMBER,
                 Language.msg(l10n_vault_uses_hint, ResyncJob.MIN_KEY_USES));
         uses.setText("2000");
-        box.addView(words);
+        box.addView(words.view);
         box.addView(host);
         box.addView(uses);
 
-        new LanguageDialog(this)
+        androidx.appcompat.app.AlertDialog d = new LanguageDialog(this)
                 .setTitle(Language.msg(l10n_vault_rebuild_title))
                 .setMessage(Language.msg(l10n_vault_rebuild_warning))
-                .setView(box)
-                .setPositiveButton(Language.msg(l10n_vault_rebuild), (d, w) -> {
-                    String phraseText = ResyncJob.tidyPhrase(words.getText().toString());
-                    String hostText = host.getText().toString().trim();
-                    int keyUses;
-                    try {
-                        keyUses = Integer.parseInt(uses.getText().toString().trim());
-                    } catch (NumberFormatException exc) {
-                        setStatus(Language.msg(l10n_restore_key_uses_integer));
-                        return;
-                    }
-                    ResyncJob job = ResyncJob.seedResync(hostText, phraseText, keyUses);
-                    if (job == null) {
-                        setStatus(Language.msg(l10n_vault_check_rebuild, ResyncJob.MIN_KEY_USES, ResyncJob.maxKeyUses(org.minima.system.params.GeneralParams.USE_BLOCK_AS_KEYUSES)));
-                        return;
-                    }
-                    ResyncLauncher.Result result = ResyncLauncher.begin(this, job);
-                    if (!result.started) {
-                        setStatus(SeedSyncActivity.launchError(result.error));
-                        return;
-                    }
-                    startActivity(new Intent(this, SeedSyncActivity.class));
-                    finish();
-                })
+                .setView(scroll(box))
+                .setPositiveButton(Language.msg(l10n_vault_rebuild), null)
                 .setNegativeButton(Language.msg(l10n_common_cancel), null)
-                .show();
+                .create();
+        secureWords(d);
+        d.setOnShowListener(x -> d.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String phraseText = words.phrase();
+            if (phraseText == null) { android.widget.Toast.makeText(this, words.problem(), android.widget.Toast.LENGTH_LONG).show(); return; }
+            String hostText = host.getText().toString().trim();
+            int keyUses;
+            try {
+                keyUses = Integer.parseInt(uses.getText().toString().trim());
+            } catch (NumberFormatException exc) {
+                setStatus(Language.msg(l10n_restore_key_uses_integer));
+                return;
+            }
+            ResyncJob job = words.isAnyPhrase() ? ResyncJob.seedResyncAny(hostText, phraseText, keyUses)
+                    : ResyncJob.seedResync(hostText, phraseText, keyUses);
+            if (job == null) {
+                setStatus(Language.msg(l10n_vault_check_rebuild, ResyncJob.MIN_KEY_USES, ResyncJob.maxKeyUses(org.minima.system.params.GeneralParams.USE_BLOCK_AS_KEYUSES)));
+                return;
+            }
+            d.dismiss();
+            ResyncLauncher.Result result = ResyncLauncher.begin(this, job);
+            if (!result.started) {
+                setStatus(SeedSyncActivity.launchError(result.error));
+                return;
+            }
+            startActivity(new Intent(this, SeedSyncActivity.class));
+            finish();
+        }));
+        d.show();
     }
 
     // ---- running a vault command ----

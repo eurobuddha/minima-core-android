@@ -174,8 +174,12 @@ android {
         // node's token lookup cached a null for such a coin, after which every token lookup threw until a restart.
         // Both fixed (balance + TxPoWSearcher, core security/txn-write-gate-android-2026-11-07 49d667d6eb4), proven on a -test
         // node with the token details stripped from the node's own coins.
-        versionCode 301
-        versionName "2.2.31"
+        // 2.2.32: guided seed entry on every seed screen (first-run Restore, New wallet -> use my seed, Vault restore keys,
+        // Vault rebuild from seed): one box per word (WordEntry, vendored from Dexicon by scripts/vendor-wordentry.sh), and
+        // "My phrase is not 24 list words" (any-phrase, restore only) where the node can take one. Boxes hand the node
+        // Minima's own UPPERCASE form, so a first-run restore opens the original wallet even under -anyseed.
+        versionCode 302
+        versionName "2.2.32"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

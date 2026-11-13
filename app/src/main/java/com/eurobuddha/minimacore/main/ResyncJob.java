@@ -194,6 +194,28 @@ public final class ResyncJob {
                 "Rebuilding this wallet from your seed phrase, resyncing from " + host);
     }
 
+    /**
+     * The same rebuild from a free-form phrase (anyphrase:true: the node hashes it as made instead of cleaning it to list
+     * words). Owner 13 Nov 2026: any-phrase is for RESTORING a wallet made with exactly that phrase. The phrase must pass
+     * WordEntry.anyPhraseProblem(..., true): no " ; : (the command parser splits, strips or rewrites them - every other
+     * character, double spaces included, reaches the node unchanged), not 24 list words, 16+ characters.
+     */
+    public static ResyncJob seedResyncAny(String host, String phrase, int keyUses) {
+        return seedResyncAny(host, phrase, keyUses, GeneralParams.USE_BLOCK_AS_KEYUSES);
+    }
+
+    static ResyncJob seedResyncAny(String host, String phrase, int keyUses, boolean blockMode) {
+        String p = phrase == null ? "" : phrase.trim();
+        if (!validHost(host) || com.eurobuddha.account.WordEntry.anyPhraseProblem(p, true) != null
+                || keyUses < MIN_KEY_USES || keyUses > maxKeyUses(blockMode)) return null;
+        return new ResyncJob(Kind.SEED_RESYNC, true, false,
+                "megammrsync action:resync host:" + host
+                        + " phrase:\"" + p + "\" anyphrase:true keyuses:" + keyUses,
+                host,
+                "Seed restore",
+                "Rebuilding this wallet from your own phrase, resyncing from " + host);
+    }
+
     // ---- accessors ----
 
     public Kind kind() { return kind; }

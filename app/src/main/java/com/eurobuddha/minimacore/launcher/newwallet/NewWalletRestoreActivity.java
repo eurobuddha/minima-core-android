@@ -27,6 +27,7 @@ import com.eurobuddha.minimacore.utils.logger;
 public class NewWalletRestoreActivity extends AppCompatActivity {
 
     EditText mSeedInput;
+    com.eurobuddha.account.WordEntry mWords;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,38 +43,20 @@ public class NewWalletRestoreActivity extends AppCompatActivity {
 
         mSeedInput = findViewById(R.id.restorewallet_seed);
 
-        Button checkbutton = findViewById(R.id.restorewallet_button_check);
-        checkbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String seed = mSeedInput.getText().toString().trim();
-                if(seed.equals("")){
-                    logger.showDialog(NewWalletRestoreActivity.this,Language.msg(l10n_onboarding_seed_error),Language.msg(l10n_onboarding_empty_seed));
-                    return;
-                }
-
-                //Check it..
-                try{
-                    String newseed = BIP39.cleanSeedPhrase(seed);
-                    setSeedText(newseed);
-                }catch (IllegalArgumentException exc){
-                    logger.showDialog(NewWalletRestoreActivity.this,Language.msg(l10n_onboarding_seed_error),Language.msg(l10n_onboarding_invalid_word));
-                    return;
-                }
-
-                logger.showDialog(NewWalletRestoreActivity.this,Language.msg(l10n_onboarding_seed_phrase),Language.msg(l10n_onboarding_valid_seed));
-            }
-        });
+        // Guided boxes (one per word) + "My phrase is not 24 list words" - SeedEntry / WordEntry, 13 Nov 2026.
+        mWords = com.eurobuddha.minimacore.main.SeedEntry.replace(this, mSeedInput,
+                findViewById(R.id.restorewallet_button_check), true, false);
 
         Button proceedbutton = findViewById(R.id.restorewallet_button_proceed);
         proceedbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //Get the seed
-                String seed = mSeedInput.getText().toString().trim();
-                if(seed.equals("")){
-                    logger.showDialog(NewWalletRestoreActivity.this,Language.msg(l10n_onboarding_seed_error),Language.msg(l10n_onboarding_empty_seed));
+                //Get the seed: boxes -> Minima's own form (UPPERCASE), any-phrase -> as made. The node starts with
+                //-anyseed, so this exact string is what it hashes.
+                String seed = com.eurobuddha.minimacore.main.SeedEntry.nodePhrase(mWords);
+                if(seed == null){
+                    logger.showDialog(NewWalletRestoreActivity.this,Language.msg(l10n_onboarding_seed_error),mWords.problem());
                     return;
                 }
 
