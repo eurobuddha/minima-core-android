@@ -83,7 +83,7 @@ final class NodeBackupCapture {
                         public void onResult(JSONObject result){
                             if(!TxPost.truthy(result,"status")){fail("NODE_FILE_ACCESS: enable this app's Admin file access in Minima Core, then retry.");return;}
                             Uri uri=Uri.parse(result.optString("uri",""));
-                            if(!"content".equals(uri.getScheme())){fail("NODE_BACKUP_FILE: node did not provide a readable backup file.");return;}
+                            if(!"content".equals(uri.getScheme())&&!ownFile(context,uri)){fail("NODE_BACKUP_FILE: node did not provide a readable backup file.");return;}
                             long expected=result.optLong("size",-1);
                             if(expected<32||expected>PoolBackupBundle.MAX_NODE){fail("NODE_BACKUP_SIZE: node backup is empty or exceeds 128 MiB.");return;}
                             verifyWallet(uri,expected);
@@ -132,5 +132,13 @@ final class NodeBackupCapture {
             if(!requested){node.onDestroy();return;}
             node.file("delete",name,null,null,new NodeApi.Cb(){public void onResult(JSONObject ignored){node.onDestroy();}public void onError(String ignored){node.onDestroy();}});
         }
+    }
+
+    /** Pandamonium: the in-process node returns its own file:// path (the node IS this app) - never another app's file. */
+    static boolean ownFile(Context c, Uri u) {
+        try {
+            return "file".equals(u.getScheme()) && u.getPath() != null && new File(u.getPath()).getCanonicalPath()
+                    .startsWith(c.getFilesDir().getCanonicalPath() + File.separator);
+        } catch (Exception e) { return false; }
     }
 }

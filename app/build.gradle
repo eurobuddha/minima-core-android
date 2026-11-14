@@ -199,8 +199,10 @@ android {
         // frozen = maker / keep-alive / receivers / pool worker disabled (refused while trading is open), Off = tab hidden.
         // 2.2.40: Dexicon in Pandamonium's language (简体中文 / Русский / Українська): 2,800 texts and templates
         // (scripts/dexicon-strings.py, dexicon-l10n-build.py; 654 reused from Pandamonium's own translations). Dexicon 0.3.59.
-        versionCode 310
-        versionName "2.2.40"
+        // 2.2.41: the pool + node backup after creating a pool failed (NODE_BACKUP_FILE): the in-process node returns its own
+        // file:// path, Dexicon accepted only content://. Accepted now, only inside this app's files folder.
+        versionCode 311
+        versionName "2.2.41"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
