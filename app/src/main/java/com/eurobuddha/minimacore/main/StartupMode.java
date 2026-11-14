@@ -43,11 +43,20 @@ public final class StartupMode {
         return blockDefault && !(pandamonium && classic);
     }
 
-    public static void addArguments(List<String> args, boolean blockMode) {
-        if (blockMode) {
-            args.add("-blockaskeyuses");
-            args.add("-lowram");
-        }
+    /** Low-RAM SQL coin/block storage: every build except Pandamonium's Classic mode (which removes both
+     *  flags). Storage only - chaintree.db keeps full coin state and both SQL stores are rebuilt from it on
+     *  every boot, so an existing node can switch either way. PandaBear keeps classic keys. */
+    public static boolean usesLowRam(SharedPreferences prefs) {
+        return usesLowRam(BuildConfig.PANDAMONIUM, usesBlockKeys(prefs));
+    }
+
+    static boolean usesLowRam(boolean pandamonium, boolean blockMode) {
+        return blockMode || !pandamonium;
+    }
+
+    public static void addArguments(List<String> args, boolean blockMode, boolean lowRam) {
+        if (blockMode) args.add("-blockaskeyuses");
+        if (lowRam) args.add("-lowram");
     }
 
     public static boolean isManagedArgument(String arg) {

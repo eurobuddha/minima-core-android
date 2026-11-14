@@ -184,8 +184,11 @@ android {
         // always FLAG_SECURE; Vault errors as toasts. WordEntry from Dexicon 0.3.50.
         // 2.2.34 (Pandamonium): one integrated Dexicon tab on the host node wallet (Dexicon 0.3.53 in host-node mode,
         // in-process DirectNodeApi) replaces the built-in AtomiX, PandaPools and PandaDEX. Bears unchanged.
-        versionCode 304
-        versionName "2.2.34"
+        // 2.2.36 (PandaBear): -lowram by default - classic 64x3 keys and per-key counter unchanged, SQL coin/block
+        // storage on. Storage only: chaintree.db keeps full coin state, both SQL stores rebuild from it each boot.
+        // Pandamonium Classic mode still drops both flags.
+        versionCode 306
+        versionName "2.2.36"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

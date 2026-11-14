@@ -318,9 +318,11 @@ public class MinimaService extends Service {
         }
 
         // Pandamonium can opt into classic mode; other flavors retain their fixed policy.
+        // -lowram on every build except Pandamonium Classic mode (PandaBear: classic keys + low RAM).
         // Minima.main resets GeneralParams before applying these arguments on every restart.
         com.eurobuddha.minimacore.main.StartupMode.addArguments(vars,
-                com.eurobuddha.minimacore.main.StartupMode.usesBlockKeys(pref));
+                com.eurobuddha.minimacore.main.StartupMode.usesBlockKeys(pref),
+                com.eurobuddha.minimacore.main.StartupMode.usesLowRam(pref));
 
         //User-set toggles (ParamsActivity)
         if(pref.getBoolean("PARAM_MEGAMMR", false)){

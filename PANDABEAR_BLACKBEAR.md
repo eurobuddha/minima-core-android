@@ -1,6 +1,6 @@
 # PandaBear and BlackBear: which Minima node should I use?
 
-**PandaBear uses classic wallet keys. BlackBear forces block-as-key-uses and low-RAM storage.** Both run on the same Minima network and include our companion-app, signing-safety and reliability fixes.
+**PandaBear uses classic wallet keys. BlackBear forces block-as-key-uses. Both use low-RAM storage (PandaBear since 2.2.36).** Both run on the same Minima network and include our companion-app, signing-safety and reliability fixes.
 
 | | PandaBear | BlackBear |
 | --- | --- | --- |
@@ -9,7 +9,7 @@
 | Key tree | 64 × 64 × 64: 262,144 leaves per key | 128 × 128 × 128 × 128: 268,435,456 leaves per key |
 | Best fit | Keep using your existing classic wallet and addresses | Start a new wallet in the newer mode |
 | Installation | The 1.9.10 build is a separate Android identity from earlier PandaBear releases | The 1.9.10 build is a separate Android identity from earlier BlackBear releases |
-| Storage mode | Existing classic configuration | Low-RAM SQL coin/block storage enabled by default |
+| Storage mode | Low-RAM SQL coin/block storage enabled by default (since 2.2.36) | Low-RAM SQL coin/block storage enabled by default |
 
 ## The important difference: wallet addresses
 

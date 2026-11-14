@@ -16,6 +16,13 @@ public class StartupModeTest {
         assertFalse(StartupMode.usesBlockKeys(false, false, false));
     }
 
+    @Test public void lowRamEverywhereExceptPandamoniumClassic() {
+        assertTrue(StartupMode.usesLowRam(false, false));   // PandaBear: classic keys, low RAM
+        assertTrue(StartupMode.usesLowRam(false, true));    // BlackBear
+        assertTrue(StartupMode.usesLowRam(true, true));     // Pandamonium default
+        assertFalse(StartupMode.usesLowRam(true, false));   // Pandamonium Classic mode drops both flags
+    }
+
     @Test public void chatTabIsTheOnlyOptionalSlot() {
         assertEquals(3, StartupMode.chatPosition(true, true));
         assertEquals(4, StartupMode.chatPosition(false, true));
@@ -37,16 +44,19 @@ public class StartupModeTest {
 
     @Test public void nodeParserAppliesBothProfilesAcrossRepeatedRestarts() {
         try {
-            for (boolean block : new boolean[]{true, false, true, false}) {
+            // {block, lowram}: BlackBear/Pandamonium, Pandamonium Classic, PandaBear - repeated
+            boolean[][] profiles = {{true, true}, {false, false}, {false, true}, {true, true}, {false, true}, {false, false}};
+            for (boolean[] p : profiles) {
+                boolean block = p[0], lowRam = p[1];
                 // This is the reset Minima.main performs on each Android service restart.
                 GeneralParams.resetDefaults();
                 ArrayList<String> args = new ArrayList<>();
-                StartupMode.addArguments(args, block);
-                assertEquals(block ? 2 : 0, args.size());
+                StartupMode.addArguments(args, block, lowRam);
+                assertEquals((block ? 1 : 0) + (lowRam ? 1 : 0), args.size());
                 assertTrue(ParamConfigurer.checkParams(args.toArray(new String[0])));
                 assertEquals(block, GeneralParams.USE_BLOCK_AS_KEYUSES);
-                assertEquals(block, GeneralParams.USE_SQL_COINDB);
-                assertEquals(block, GeneralParams.USE_SQL_TXBLOCKDB);
+                assertEquals(lowRam, GeneralParams.USE_SQL_COINDB);
+                assertEquals(lowRam, GeneralParams.USE_SQL_TXBLOCKDB);
             }
         } finally { GeneralParams.resetDefaults(); }
     }
