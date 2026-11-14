@@ -588,6 +588,15 @@ public final class PandamoniumHooks {
             androidx.work.WorkManager wm = androidx.work.WorkManager.getInstance(context);
             for (String job : new String[]{"atomix_watch", "pandapools_watch", "pandadex_watch"}) wm.cancelUniqueWork(job);
         } catch (RuntimeException ignored) { /* WorkManager not initialised yet: nothing was scheduled */ }
+        // The old built-ins' notifications were tagged "pandamonium.atomix.*" / "pandamonium.pandapools"; their Activities are
+        // gone, so a tap would do nothing - clear them (Dexicon re-raises anything still true).
+        try {
+            android.app.NotificationManager nm = context.getSystemService(android.app.NotificationManager.class);
+            if (nm != null) for (android.service.notification.StatusBarNotification n : nm.getActiveNotifications()) {
+                String tag = n.getTag();
+                if (tag != null && (tag.startsWith("pandamonium.atomix") || tag.equals("pandamonium.pandapools"))) nm.cancel(tag, n.getId());
+            }
+        } catch (RuntimeException ignored) { /* best effort */ }
     }
 
     private static void installMenu(AppCompatActivity activity, ViewGroup original,

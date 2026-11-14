@@ -61,7 +61,6 @@ public class BaseView {
     public void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {}
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {}
     public void onNewIntent(android.content.Intent intent) {}
-    public void onSaveState(android.os.Bundle out) {}
     public void onConfigurationChanged(android.content.res.Configuration config) {}
 
     /** Relabel retained controls without refreshing data or changing the selected page. */

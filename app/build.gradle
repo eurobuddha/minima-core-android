@@ -184,8 +184,11 @@ android {
         // always FLAG_SECURE; Vault errors as toasts. WordEntry from Dexicon 0.3.50.
         // 2.2.34 (Pandamonium): one integrated Dexicon tab on the host node wallet (Dexicon 0.3.53 in host-node mode,
         // in-process DirectNodeApi) replaces the built-in AtomiX, PandaPools and PandaDEX. Bears unchanged.
-        versionCode 304
-        versionName "2.2.34"
+        // 2.2.35 (Pandamonium): review fixes - Fold unfold/rotation no longer recreates the Activity (would tear down a trade
+        // in the Dexicon tab); tab created on first open and resumed only while shown; one node-event subscription; Dexicon
+        // 0.3.54 (tagged notifications, no background work until opened); ETH Wallet shows addresses in full.
+        versionCode 305
+        versionName "2.2.35"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

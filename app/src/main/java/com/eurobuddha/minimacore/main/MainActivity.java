@@ -245,11 +245,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 setEnabled(true);
             }
         });
-        openTradingTabFor(getIntent());
+        // Only on a fresh start: a recreated Activity keeps its launch intent and must not re-follow an old notification.
+        if (savedInstanceState == null) openTradingTabFor(getIntent());
     }
 
     // ---- Pandamonium 2.2.34: the Dexicon tab is a whole screen; it gets this Activity's results, permission answers,
-    //      new intents (a Dexicon notification opens the tab) and saved state. Other builds have no such tab. ----
+    //      new intents (a Dexicon notification opens the tab) and configuration changes. Other builds have no such tab. ----
     private BaseView tradingView() { return mMainAdapter == null ? null : mMainAdapter.getTradingView(); }
 
     private void openTradingTabFor(android.content.Intent intent) {
@@ -275,12 +276,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         super.onRequestPermissionsResult(requestCode, permissions, results);
         BaseView t = tradingView();
         if (t != null) t.onRequestPermissionsResult(requestCode, permissions, results);
-    }
-
-    @Override protected void onSaveInstanceState(Bundle out) {
-        super.onSaveInstanceState(out);
-        BaseView t = tradingView();
-        if (t != null) t.onSaveState(out);
     }
 
     public void setToolbarTitle(int zPosition){

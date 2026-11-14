@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <application>
+        <!-- 2.2.34 review H1: the Dexicon tab lives inside this Activity. A recreate (rotation, Fold unfold) would destroy its
+             screen mid-trade (pending second leg, picker results, busy state). uiMode stays out: values-night re-themes the host. -->
+        <activity android:name="com.eurobuddha.minimacore.main.MainActivity"
+            tools:replace="android:configChanges"
+            android:configChanges="locale|layoutDirection|screenLayout|orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation" />
         <activity android:name="com.eurobuddha.minimacore.integrated.MallActivity"
             android:exported="false"
             android:configChanges="locale|layoutDirection|screenLayout" />

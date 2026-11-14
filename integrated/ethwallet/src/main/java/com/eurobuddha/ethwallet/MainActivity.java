@@ -269,8 +269,8 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         Language.setText(warn, Language.msg(l10n_eth_wallet_address_warning));
         warn.setTextColor(Design.RED); warn.setTextSize(14f); warn.setPadding(0, 0, 0, dp(10));
         box.addView(warn);
-        box.addView(kvLine(Language.msg(l10n_eth_wallet_was), shortAddr(was)));
-        box.addView(kvLine(Language.msg(l10n_eth_wallet_now), shortAddr(now)));
+        box.addView(kvLine(Language.msg(l10n_eth_wallet_was), fullAddr(was)));
+        box.addView(kvLine(Language.msg(l10n_eth_wallet_now), fullAddr(now)));
         TextView note = new TextView(this);
         Language.setText(note, Language.msg(l10n_eth_wallet_address_warning_body));
         note.setTextColor(Design.DIM); note.setTextSize(12.5f);
@@ -343,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
                         // store — otherwise the next launch would look for a key that isn't there.
                         if (vault().saveKey(wallet.privateKeyHex())) {
                             prefs.edit().putString("source", "import").apply();
-                            toast(Language.msg(l10n_eth_wallet_imported, shortAddr(wallet.address())));
+                            toast(Language.msg(l10n_eth_wallet_imported, fullAddr(wallet.address())));
                         } else {
                             toast(Language.msg(l10n_eth_wallet_session_only));
                         }
@@ -412,8 +412,8 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         LinearLayout addrCard = card();
         TextView at = new TextView(this); Language.setText(at, Language.msg(l10n_eth_wallet_your_address));
         at.setTextColor(Design.DIM); at.setTextSize(12.5f);
-        TextView av = new TextView(this); Language.setText(av, shortAddr(ethAddr));
-        av.setTextColor(Design.TEXT); av.setTextSize(16f); av.setPadding(0, dp(3), 0, 0);
+        TextView av = new TextView(this); Language.setText(av, fullAddr(ethAddr));
+        av.setTextColor(Design.TEXT); av.setTextSize(14f); av.setPadding(0, dp(3), 0, 0);
         addrCard.addView(at); addrCard.addView(av);
         addrCard.setOnClickListener(v -> receiveDialog());
         col.addView(addrCard);
@@ -431,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         for (EthNet.Token tk : tokens.tokens()) {
             String bal = tokenBals.containsKey(tokenKey(tk)) ? tokenBals.get(tokenKey(tk)) : "…";
             final EthNet.Token ftk = tk;
-            col.addView(assetRow(tk.symbol, tokenIconUrl(tk.address), shortAddr(tk.address), bal + " " + tk.symbol,
+            col.addView(assetRow(tk.symbol, tokenIconUrl(tk.address), fullAddr(tk.address), bal + " " + tk.symbol,
                     () -> sendDialog(ftk), () -> tokenMenu(ftk)));
         }
 
@@ -1120,10 +1120,8 @@ public class MainActivity extends AppCompatActivity implements NodeApi.PairingLi
         try { return new java.net.URL(rpc.url()).getHost(); } catch (Exception e) { return Language.msg(l10n_eth_wallet_rpc); }
     }
 
-    private static String shortAddr(String a) {
-        if (a == null) return "—";
-        return a.length() > 14 ? a.substring(0, 8) + "…" + a.substring(a.length() - 6) : a;
-    }
+    /** Identifiers are shown IN FULL (owner rule: a shortened address cannot be copied, checked or pasted anywhere). */
+    private static String fullAddr(String a) { return a == null ? "—" : a; }
     private static String cleanAddr(String s) {
         if (s == null) return "";
         s = s.trim();
