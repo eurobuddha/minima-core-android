@@ -37,15 +37,15 @@ public class PoolsView extends BaseView {
     };
 
     public PoolsView(MainActivity a) {
-        super(a, R.layout.pm_dexicon_view_pools);
+        super(a, com.eurobuddha.dexicon.R.layout.pm_dexicon_view_pools);
         a.pools().subscribe(poolListener);
-        TextView refresh = find(R.id.pm_dexicon_poolsRefresh);
+        TextView refresh = find(com.eurobuddha.dexicon.R.id.pm_dexicon_poolsRefresh);
         refresh.setTextColor(Design.accent());
         refresh.setOnClickListener(v -> refresh());
-        ((TextView) find(R.id.pm_dexicon_poolsSummary)).setTextColor(Design.dim());
-        ((TextView) find(R.id.pm_dexicon_poolsStatus)).setTextColor(Design.dim());
-        indivTab = find(R.id.pm_dexicon_poolsIndivTab);
-        combinedTab = find(R.id.pm_dexicon_poolsCombinedTab);
+        ((TextView) find(com.eurobuddha.dexicon.R.id.pm_dexicon_poolsSummary)).setTextColor(Design.dim());
+        ((TextView) find(com.eurobuddha.dexicon.R.id.pm_dexicon_poolsStatus)).setTextColor(Design.dim());
+        indivTab = find(com.eurobuddha.dexicon.R.id.pm_dexicon_poolsIndivTab);
+        combinedTab = find(com.eurobuddha.dexicon.R.id.pm_dexicon_poolsCombinedTab);
         indivTab.setOnClickListener(v -> setMode(false));
         combinedTab.setOnClickListener(v -> setMode(true));
         styleTabs();
@@ -69,9 +69,9 @@ public class PoolsView extends BaseView {
 
     private void render(List<Pool> pools) {
         lastPools = pools;
-        LinearLayout list = find(R.id.pm_dexicon_poolList);
+        LinearLayout list = find(com.eurobuddha.dexicon.R.id.pm_dexicon_poolList);
         list.removeAllViews();
-        TextView summary = find(R.id.pm_dexicon_poolsSummary);
+        TextView summary = find(com.eurobuddha.dexicon.R.id.pm_dexicon_poolsSummary);
         if (pools.isEmpty()) {
             summary.setText("no active pools");
             status("No live pools found in the registry yet. Create one to seed liquidity.");
@@ -81,7 +81,7 @@ public class PoolsView extends BaseView {
         summary.setText(pools.size() + (pools.size() == 1 ? " pool" : " pools")
                 + " · " + trim(aggMinima) + " MINIMA aggregate depth");
         status("");
-        find(R.id.pm_dexicon_poolsStatus).setVisibility(View.GONE);
+        find(com.eurobuddha.dexicon.R.id.pm_dexicon_poolsStatus).setVisibility(View.GONE);
         if (combined) { renderCombined(list, pools); return; }
         for (Pool p : pools) list.addView(poolCard(p));
     }
@@ -180,7 +180,7 @@ public class PoolsView extends BaseView {
     }
 
     private void status(String s) {
-        TextView st = find(R.id.pm_dexicon_poolsStatus);
+        TextView st = find(com.eurobuddha.dexicon.R.id.pm_dexicon_poolsStatus);
         st.setVisibility(s.isEmpty() ? View.GONE : View.VISIBLE);
         st.setText(s);
     }

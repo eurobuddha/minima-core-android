@@ -39,7 +39,7 @@ public final class AssetsTab extends LinearLayout {
         android.view.ViewGroup scroll = (android.view.ViewGroup) wallet.getRoot();
         walletBox = scroll.getChildAt(0);
         scroll.removeView(walletBox);
-        act.consolidateMxUsdIn((android.view.ViewGroup) walletBox.findViewById(com.eurobuddha.pandapools.R.id.pm_dexicon_balancesContainer));   // "Consolidate MxUSD coins" under its MINIMA one
+        act.consolidateMxUsdIn((android.view.ViewGroup) walletBox.findViewById(com.eurobuddha.dexicon.R.id.pm_dexicon_balancesContainer));   // "Consolidate MxUSD coins" under its MINIMA one
         setOrientation(VERTICAL);
         int pad = Design.dp(act, 12);
         setPadding(pad, pad, pad, pad);

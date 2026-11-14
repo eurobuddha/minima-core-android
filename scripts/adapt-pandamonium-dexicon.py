@@ -43,8 +43,20 @@ def adapt(root):
 
     # 1b. Library-module fixes. The pandapools.R shim maps PandaPools' resource names onto Dexicon's: the importer
     #     prefixed every reference (R.id.x -> R.id.pm_dexicon_x), so the shim's own field names take the prefix too.
+    #     A library build STRIPS every class named R from its packaged code (the app generates them), so the shim compiles
+    #     and passes unit tests yet is missing from the APK - opening the tab crashed (NoClassDefFoundError
+    #     com.eurobuddha.pandapools.R$layout, 2.2.36 on the Fold). Point every reference at Dexicon's real generated R
+    #     (same, already-prefixed names) and drop the shim.
     shim = main / 'com/eurobuddha/pandapools/R.java'
-    shim.write_text(re.sub(r'public static final int (\w+) =', r'public static final int pm_dexicon_\1 =', shim.read_text()))
+    shim.unlink()
+    for p in main.rglob('*.java'):
+        t = p.read_text()
+        u = t.replace('com.eurobuddha.pandapools.R.', 'com.eurobuddha.dexicon.R.')
+        if p.parent.name == 'pandapools' and 'com/eurobuddha/pandapools' in p.as_posix():
+            u = re.sub(r'(?<![\w.])R\.(layout|id|raw|drawable|string|color|style|dimen|xml|menu|anim|mipmap)\.',
+                       r'com.eurobuddha.dexicon.R.\1.', u)
+        if u != t: p.write_text(u)
+    assert not list(app.rglob('R.java')), 'a hand-written R class is stripped from a library build'
     # A library has no APPLICATION_ID: the app is Pandamonium.
     for p in main.rglob('*.java'):
         t = p.read_text()

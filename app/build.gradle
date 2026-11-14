@@ -191,8 +191,10 @@ android {
         // reseed, shared-ETH-key warning); old built-in AtomiX settings migrated; wipe / seed rebuild warn while Dexicon has
         // open positions (TradingGuard, all flavours); bcprov-jdk15on forced to 1.69 (family rule); DirectLink + DoorHost
         // withdrawal/switch tests run in the module.
-        versionCode 306
-        versionName "2.2.36"
+        // 2.2.37: opening the Dexicon tab crashed (NoClassDefFoundError com.eurobuddha.pandapools.R$layout): a library build
+        // strips hand-written R classes; the adapter now points PandaPools' views at Dexicon's generated R.
+        versionCode 307
+        versionName "2.2.37"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

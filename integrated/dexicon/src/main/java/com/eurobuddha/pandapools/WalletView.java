@@ -55,8 +55,8 @@ public class WalletView extends BaseView {
     private PandaAddrBook addrBook;
 
     public WalletView(MainActivity a) {
-        super(a, R.layout.pm_dexicon_view_balances);
-        container = find(R.id.pm_dexicon_balancesContainer);
+        super(a, com.eurobuddha.dexicon.R.layout.pm_dexicon_view_balances);
+        container = find(com.eurobuddha.dexicon.R.id.pm_dexicon_balancesContainer);
         root.setBackgroundColor(Design.bg());
         loadAddress();
         refresh();
@@ -479,7 +479,7 @@ public class WalletView extends BaseView {
         iv.setAdjustViewBounds(true);
         iv.setBackgroundColor(0xFF000000);
         iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        ImageLoader.loadFull(act, url, iv, R.drawable.pm_dexicon_ic_coin_placeholder);
+        ImageLoader.loadFull(act, url, iv, com.eurobuddha.dexicon.R.drawable.pm_dexicon_ic_coin_placeholder);
         AlertDialog dlg = new AlertDialog.Builder(act).setView(iv).create();
         iv.setOnClickListener(v -> dlg.dismiss());
         dlg.show();
@@ -512,7 +512,7 @@ public class WalletView extends BaseView {
     /** The real Minima mark, rasterised from the bundled official SVG (native Minima carries no on-chain icon). */
     private Bitmap renderMinimaLogo(int px) {
         try {
-            java.io.InputStream is = act.getResources().openRawResource(R.raw.pm_dexicon_minima_icon);
+            java.io.InputStream is = act.getResources().openRawResource(com.eurobuddha.dexicon.R.raw.pm_dexicon_minima_icon);
             com.caverock.androidsvg.SVG svg = com.caverock.androidsvg.SVG.getFromInputStream(is);
             is.close();
             float dw = svg.getDocumentWidth(), dh = svg.getDocumentHeight();

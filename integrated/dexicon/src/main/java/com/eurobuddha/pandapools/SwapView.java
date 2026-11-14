@@ -56,26 +56,26 @@ public class SwapView extends BaseView {
     private final Runnable marketRepaint = this::renderMarket;
 
     public SwapView(MainActivity a) {
-        super(a, R.layout.pm_dexicon_view_swap);
+        super(a, com.eurobuddha.dexicon.R.layout.pm_dexicon_view_swap);
         a.pools().subscribe(poolListener);
         txn = new PoolTxn(a.node());
 
-        poolLine   = find(R.id.pm_dexicon_swapPool);
-        balanceLine = find(R.id.pm_dexicon_swapBalance);
-        marketLine = find(R.id.pm_dexicon_swapMarket);
-        amount     = find(R.id.pm_dexicon_swapAmount);
-        fromTok    = find(R.id.pm_dexicon_swapFromTok);
-        toTok      = find(R.id.pm_dexicon_swapToTok);
-        fromLabel  = find(R.id.pm_dexicon_swapFromLabel);
-        out        = find(R.id.pm_dexicon_swapOut);
-        quotePanel = find(R.id.pm_dexicon_swapQuote);
-        swapActivity = find(R.id.pm_dexicon_swapActivity);
-        swapBtn    = find(R.id.pm_dexicon_swapBtn);
-        status     = find(R.id.pm_dexicon_swapStatus);
-        flip       = find(R.id.pm_dexicon_swapFlip);
+        poolLine   = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapPool);
+        balanceLine = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapBalance);
+        marketLine = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapMarket);
+        amount     = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapAmount);
+        fromTok    = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapFromTok);
+        toTok      = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapToTok);
+        fromLabel  = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapFromLabel);
+        out        = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapOut);
+        quotePanel = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapQuote);
+        swapActivity = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapActivity);
+        swapBtn    = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapBtn);
+        status     = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapStatus);
+        flip       = find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapFlip);
 
-        Ui.panel(find(R.id.pm_dexicon_swapFromCard));
-        Ui.panel(find(R.id.pm_dexicon_swapToCard));
+        Ui.panel(find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapFromCard));
+        Ui.panel(find(com.eurobuddha.dexicon.R.id.pm_dexicon_swapToCard));
         Ui.primaryButton(swapBtn);
 
         poolLine.setTextColor(Design.dim());

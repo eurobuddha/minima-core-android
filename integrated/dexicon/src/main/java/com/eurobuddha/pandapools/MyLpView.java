@@ -70,34 +70,34 @@ public class MyLpView extends BaseView {
     private boolean stopped = false;   // true while backgrounded — blocks the fast pending-poll from re-arming
 
     public MyLpView(MainActivity a) {
-        super(a, R.layout.pm_dexicon_view_mylp);
+        super(a, com.eurobuddha.dexicon.R.layout.pm_dexicon_view_mylp);
         a.pools().subscribe(poolListener);
         mgr = new PoolManager(a.node());
         recovery = new Recovery(a.node());
         reannouncer = new ReAnnouncer(a.node());
         refresher = new PoolRefresher(a.node());
 
-        Ui.card(find(R.id.pm_dexicon_lpSummaryCard));
-        TextView create = find(R.id.pm_dexicon_lpCreateBtn);
+        Ui.card(find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpSummaryCard));
+        TextView create = find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpCreateBtn);
         Ui.primaryButton(create);
         create.setOnClickListener(v -> showCreateDialog());
-        TextView recoveryBtn = find(R.id.pm_dexicon_lpRecoveryBtn);
+        TextView recoveryBtn = find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpRecoveryBtn);
         Ui.outlineButton(recoveryBtn);
         recoveryBtn.setTextColor(Design.accent());
         recoveryBtn.setOnClickListener(v -> showRecoveryDialog());
-        TextView statementBtn = find(R.id.pm_dexicon_lpStatementBtn);
+        TextView statementBtn = find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpStatementBtn);
         Ui.outlineButton(statementBtn);
         statementBtn.setTextColor(Design.accent());
         statementBtn.setOnClickListener(v -> showStatementDialog());
-        TextView calcBtn = find(R.id.pm_dexicon_lpCalcBtn);
+        TextView calcBtn = find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpCalcBtn);
         Ui.outlineButton(calcBtn);
         calcBtn.setTextColor(Design.accent());
         calcBtn.setOnClickListener(v -> PoolCalcDialog.show(act, null));
 
-        ((TextView) find(R.id.pm_dexicon_lpSummaryLabel)).setTextColor(Design.dim());
-        ((TextView) find(R.id.pm_dexicon_lpSummaryValue)).setTextColor(Design.heading());
-        ((TextView) find(R.id.pm_dexicon_lpSummarySub)).setTextColor(Design.dim());
-        ((TextView) find(R.id.pm_dexicon_lpStatus)).setTextColor(Design.dim());
+        ((TextView) find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpSummaryLabel)).setTextColor(Design.dim());
+        ((TextView) find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpSummaryValue)).setTextColor(Design.heading());
+        ((TextView) find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpSummarySub)).setTextColor(Design.dim());
+        ((TextView) find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpStatus)).setTextColor(Design.dim());
 
         loadKeys();
     }
@@ -197,9 +197,9 @@ public class MyLpView extends BaseView {
             }
         }
 
-        LinearLayout list = find(R.id.pm_dexicon_lpList);
+        LinearLayout list = find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpList);
         list.removeAllViews();
-        TextView value = find(R.id.pm_dexicon_lpSummaryValue), sub = find(R.id.pm_dexicon_lpSummarySub);
+        TextView value = find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpSummaryValue), sub = find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpSummarySub);
 
         // A create still confirming → a persistent amber card at the top (never "No pools yet" while pending).
         if (pendingCreate != null) list.addView(confirmingCard());
@@ -1873,7 +1873,7 @@ public class MyLpView extends BaseView {
      *  TxPoW id in a confirmation is the one thing a user needs to paste into an explorer, so it is printed
      *  whole (the row wraps) and one tap puts the complete value on the clipboard. */
     private void status(String s, String copyValue) {
-        TextView st = find(R.id.pm_dexicon_lpStatus);
+        TextView st = find(com.eurobuddha.dexicon.R.id.pm_dexicon_lpStatus);
         st.setVisibility(s.isEmpty() ? View.GONE : View.VISIBLE);
         st.setText(s);
         if (copyValue == null || copyValue.isEmpty()) { st.setOnClickListener(null); st.setClickable(false); }

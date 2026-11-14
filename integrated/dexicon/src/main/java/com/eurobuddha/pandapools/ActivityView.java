@@ -72,13 +72,13 @@ public class ActivityView extends BaseView {
     };
 
     public ActivityView(MainActivity a) {
-        super(a, R.layout.pm_dexicon_view_activity);
+        super(a, com.eurobuddha.dexicon.R.layout.pm_dexicon_view_activity);
         addrBook    = new PandaAddrBook(a);   // before subscribe() — the pool listener uses it
-        container   = find(R.id.pm_dexicon_actContainer);
-        personalTab = find(R.id.pm_dexicon_actPersonal);
-        globalTab   = find(R.id.pm_dexicon_actGlobal);
-        refreshTv   = find(R.id.pm_dexicon_actRefresh);
-        statusTv    = find(R.id.pm_dexicon_actStatus);
+        container   = find(com.eurobuddha.dexicon.R.id.pm_dexicon_actContainer);
+        personalTab = find(com.eurobuddha.dexicon.R.id.pm_dexicon_actPersonal);
+        globalTab   = find(com.eurobuddha.dexicon.R.id.pm_dexicon_actGlobal);
+        refreshTv   = find(com.eurobuddha.dexicon.R.id.pm_dexicon_actRefresh);
+        statusTv    = find(com.eurobuddha.dexicon.R.id.pm_dexicon_actStatus);
         a.pools().subscribe(poolListener);
         sync = new HistorySync(a, a.history(), syncListener);
         addrBook.seed();
