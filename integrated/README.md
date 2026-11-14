@@ -15,7 +15,11 @@ PandaPools and PandaDEX. The tab bar reads Wallet · Dexicon · History · Apps 
   update its lock entry, then run `python3 scripts/adapt-pandamonium-dexicon.py`.
 - `minimaapi`'s `EthereumTransactions` is Dexicon's superset (re-price, cancel); same `pandamonium_eth_submissions.db`.
 - `PandamoniumHooks.settleDexiconUpgrade` resets Dexicon's component states and cancels the old built-ins' WorkManager jobs.
-- Old `atomix.db` / PandaPools prefs carry over by name; `pandadex.db` is left on disk untouched.
+- Old `atomix.db` / PandaPools prefs carry over by name; the built-in AtomiX prefs (`atomix`) are copied once into
+  `dexicon_doors`; the node's own PandaDEX resting orders are listed in Dexicon's Assets room ("Return all to my wallet").
+- Downgrade limit: `pandamonium_eth_submissions.db` may hold a mined Ethereum *cancel* (Dexicon re-price/cancel). 2.2.33's
+  ETH Wallet decoder does not know that receipt and stops sending. Android refuses a lower versionCode anyway; never force
+  one (`adb install -d`) over 2.2.34+.
 - `import-pandamonium.py --verify` was already failing before 2.2.34 (sibling sources moved on; `adapt-pandamonium-safety.py`
   "substring not found"). The Dexicon snapshot is reproducible on its own as above; the full re-verify is not re-proven.
 
