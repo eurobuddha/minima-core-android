@@ -53,8 +53,8 @@ public class PandamoniumOrderTest {
         List<Integer> order = PandamoniumOrder.decode(prior);
         for (int i = 0; i < 16; i++) assertEquals(Integer.valueOf(i), order.get(i));
         assertEquals(order, PandamoniumOrder.decode(PandamoniumOrder.encode(order)));
-        assertEquals(18, PandamoniumDestinations.NAMES.length);
-        assertEquals(18, PandamoniumDestinations.ICONS.length);
+        assertEquals(19, PandamoniumDestinations.NAMES.length);
+        assertEquals(19, PandamoniumDestinations.ICONS.length);
     }
 
     @Test public void faucetAppendsWithoutReorderingExistingSavedApps() {
@@ -62,7 +62,15 @@ public class PandamoniumOrderTest {
         assertEquals("Minima Faucet",PandamoniumDestinations.NAMES[17]);
         String saved=String.join(",",java.util.Arrays.copyOfRange(PandamoniumDestinations.CLASSES,1,17));
         List<Integer> order=PandamoniumOrder.decode(saved);
-        for(int i=0;i<18;i++)assertEquals(Integer.valueOf(i),order.get(i));
+        for(int i=0;i<19;i++)assertEquals(Integer.valueOf(i),order.get(i));
         assertEquals(order,PandamoniumOrder.decode(PandamoniumOrder.encode(order)));
+    }
+
+    @Test public void dexiconAppendsAsAnAppListEntryForItsTab() {
+        assertEquals(18, PandamoniumDestinations.indexFor(PandamoniumDestinations.DEXICON));
+        assertEquals("Dexicon", PandamoniumDestinations.NAMES[18]);
+        String saved = String.join(",", java.util.Arrays.copyOfRange(PandamoniumDestinations.CLASSES, 1, 18));
+        List<Integer> order = PandamoniumOrder.decode(saved);
+        for (int i = 0; i < 19; i++) assertEquals("earlier saved orders keep their places", Integer.valueOf(i), order.get(i));
     }
 }

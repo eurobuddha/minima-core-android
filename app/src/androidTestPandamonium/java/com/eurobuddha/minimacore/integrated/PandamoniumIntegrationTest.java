@@ -257,6 +257,7 @@ public class PandamoniumIntegrationTest {
         ui(() -> ((com.eurobuddha.minimacore.MinimaApplication)retainedCore.getApplication()).setScreenshotsAllowed(false));
         for (int i=1; i<=PandamoniumDestinations.CLASSES.length; i++) {
             int destination = i % PandamoniumDestinations.CLASSES.length;
+            if (PandamoniumDestinations.DEXICON.equals(PandamoniumDestinations.CLASSES[destination])) continue;   // opens the tab, not an Activity
             // A first-launch Android permission sheet can temporarily pause the app.
             Activity active = current();
             if (active == null) {
@@ -326,6 +327,7 @@ public class PandamoniumIntegrationTest {
         // resumed window too, rather than holding a stale destroyed instance as proof of capture policy.
         for (int i = 1; i <= PandamoniumDestinations.CLASSES.length; i++) {
             String name = PandamoniumDestinations.CLASSES[i % PandamoniumDestinations.CLASSES.length];
+            if (PandamoniumDestinations.DEXICON.equals(name)) continue;
             Activity origin = current();
             ui(() -> origin.startActivity(new Intent().setClassName(ctx.getPackageName(), name)
                     .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)));

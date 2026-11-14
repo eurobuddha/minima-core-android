@@ -94,6 +94,8 @@ public final class PandamoniumHooks {
     /** The Java packages whose components belong to integrated app {@code id}. */
     static String[] packagesFor(int id) {
         String cls = PandamoniumDestinations.CLASSES[id];
+        if (cls.equals(PandamoniumDestinations.DEXICON))   // its maker, keep-alive, boot/heartbeat receivers and pool worker
+            return new String[]{"com.eurobuddha.dexicon", "com.eurobuddha.pandapools"};
         if (cls.equals("com.eurobuddha.minimacore.integrated.MallActivity"))
             return new String[]{"com.eurobuddha.merchshop", "com.eurobuddha.merchstudio", "com.eurobuddha.merchinbox"};
         return new String[]{cls.substring(0, cls.lastIndexOf('.'))};
@@ -122,6 +124,11 @@ public final class PandamoniumHooks {
                     return new com.eurobuddha.futurecashnext.Cfg(ctx).is(com.eurobuddha.futurecashnext.Cfg.GUARDIAN_ON, false);
                 case "com.eurobuddha.nftwallet.MainActivity": return com.eurobuddha.nftwallet.MintDriver.hasWork(ctx);
                 case "com.eurobuddha.statenft.MainActivity": return com.eurobuddha.statenft.MintService.hasWork(ctx);
+                case PandamoniumDestinations.DEXICON: {   // open swaps / orders / pools, or a market or OTC offer published
+                    android.content.SharedPreferences doors = ctx.getSharedPreferences("dexicon_doors", android.content.Context.MODE_PRIVATE);
+                    return com.eurobuddha.dexicon.account.LegacyPositions.describeAny(ctx) != null
+                            || doors.getBoolean("auto_publish", false) || doors.getBoolean("otc_auto", false);
+                }
                 default: return false;
             }
         } catch (Throwable t) {
@@ -274,6 +281,18 @@ public final class PandamoniumHooks {
         android.content.Context ctx = a.getApplicationContext();
         if (!idSet(nav(ctx), KEY_DISABLED).contains(id)) setIntegratedFrozen(ctx, id, false);
         else applyFrozen(ctx, id, false);
+    }
+
+    /** The Dexicon tab is shown unless Dexicon is switched Off (hidden) in the Apps tab. */
+    public static boolean tradingTabVisible(android.content.Context ctx) {
+        int id = PandamoniumDestinations.indexFor(PandamoniumDestinations.DEXICON);
+        return id > 0 && !disabledSet(nav(ctx)).contains(id);
+    }
+
+    /** Opening the Dexicon tab thaws a frozen Dexicon for good (a visible app opened returns to On - the owner's rule). */
+    public static void thawTradingTab(android.content.Context ctx) {
+        int id = PandamoniumDestinations.indexFor(PandamoniumDestinations.DEXICON);
+        if (id > 0 && isFrozen(ctx, id)) setIntegratedFrozen(ctx.getApplicationContext(), id, false);
     }
 
     /** All of our integrated apps with their on/off state, for the Apps tab. */
@@ -457,6 +476,12 @@ public final class PandamoniumHooks {
                         return;
                     }
                     Intent intent = new Intent();
+                    if (PandamoniumDestinations.DEXICON.equals(PandamoniumDestinations.CLASSES[destination])) {
+                        intent.setClass(activity, com.eurobuddha.minimacore.main.MainActivity.class).putExtra("pandamonium_tab", "dexicon");
+                        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        activity.startActivity(intent);
+                        return;
+                    }
                     intent.setClassName(activity.getPackageName(), PandamoniumDestinations.CLASSES[destination]);
                     intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     activity.startActivity(intent);
@@ -580,6 +605,10 @@ public final class PandamoniumHooks {
      * manifest default at each start. The removed apps' WorkManager jobs name classes that no longer exist: cancelled.
      */
     static void settleDexiconUpgrade(android.content.Context context) {
+        // ONCE: from 2.2.39 Dexicon can be frozen, and a reset on every start would undo that.
+        android.content.SharedPreferences once = nav(context);
+        if (once.getBoolean("dexicon_settled", false)) return;
+        once.edit().putBoolean("dexicon_settled", true).apply();
         android.content.pm.PackageManager pm = context.getPackageManager();
         for (String cls : new String[]{"com.eurobuddha.dexicon.maker.MakerService", "com.eurobuddha.pandapools.PoolKeepAliveService",
                 "com.eurobuddha.dexicon.maker.HeartbeatReceiver", "com.eurobuddha.dexicon.maker.BootReceiver",

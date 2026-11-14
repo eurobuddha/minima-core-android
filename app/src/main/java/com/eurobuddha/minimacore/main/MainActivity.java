@@ -202,6 +202,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                // Pandamonium: an Off (hidden) Dexicon is skipped by a swipe, in the swipe's direction.
+                refreshTradingTab();
+                int at = tab.getPosition();
+                if (at == MainAdapter.DEXICON_POSITION
+                        && !com.eurobuddha.minimacore.integrated.PandamoniumHooks.tradingTabVisible(MainActivity.this)) {
+                    mMainPager.setCurrentItem(lastTab > at ? at - 1 : at + 1, true);
+                    return;
+                }
+                lastTab = at;
                 //Refresh View
                 mMainAdapter.selectPage(tab.getPosition());
 
@@ -268,8 +277,21 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     private BaseView tradingView() { return mMainAdapter == null ? null : mMainAdapter.getTradingView(); }
 
+    /** Dexicon switched Off in the Apps tab: its tab disappears (and is skipped when swiping); On brings it back. */
+    private int lastTab;
+
+    private void refreshTradingTab() {
+        if (MainAdapter.DEXICON_POSITION < 0 || mMainPager == null) return;
+        TabLayout tabs = findViewById(R.id.tabs);
+        TabLayout.Tab tab = tabs == null ? null : tabs.getTabAt(MainAdapter.DEXICON_POSITION);
+        boolean show = com.eurobuddha.minimacore.integrated.PandamoniumHooks.tradingTabVisible(this);
+        if (tab != null) tab.view.setVisibility(show ? android.view.View.VISIBLE : android.view.View.GONE);
+        if (!show && mMainPager.getCurrentItem() == MainAdapter.DEXICON_POSITION) showWallet();
+    }
+
     private void openTradingTabFor(android.content.Intent intent) {
         BaseView t = tradingView();
+        if (t != null && !com.eurobuddha.minimacore.integrated.PandamoniumHooks.tradingTabVisible(this)) return;
         if (t == null || intent == null || !"dexicon".equals(intent.getStringExtra("pandamonium_tab"))) return;
         if (mMainPager != null) mMainPager.setCurrentItem(MainAdapter.DEXICON_POSITION, false);
         t.onNewIntent(intent);
@@ -377,6 +399,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     @Override protected void onResume() {
         super.onResume();
+        refreshTradingTab();   // Dexicon may have been switched Off / On in the Apps tab
         // ViewPager restores its selected page after onStart during recreation.
         if (BuildConfig.PANDAMONIUM && mMainAdapter != null) {
             mMainAdapter.setHostVisible(hostVisible, mMainPager.getCurrentItem());

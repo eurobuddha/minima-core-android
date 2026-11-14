@@ -195,8 +195,10 @@ android {
         // strips hand-written R classes; the adapter now points PandaPools' views at Dexicon's generated R.
         // 2.2.38: full-screen Dexicon tab (top bar, tabs, footer hidden; Back or ✕ -> Wallet) and no double system-bar gap
         // (Dexicon 0.3.58 leaves the bar padding to the host). Owner on the Fold: "it needs more space".
-        versionCode 308
-        versionName "2.2.38"
+        // 2.2.39: Dexicon also in the app list (opens the tab) with freeze and Off/hide like every app (owner, 14 Nov):
+        // frozen = maker / keep-alive / receivers / pool worker disabled (refused while trading is open), Off = tab hidden.
+        versionCode 309
+        versionName "2.2.39"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

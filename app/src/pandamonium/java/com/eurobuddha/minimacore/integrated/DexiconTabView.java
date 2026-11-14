@@ -54,7 +54,7 @@ final class DexiconTabView extends com.eurobuddha.minimacore.main.BaseView
         if (!start && screenStarted) { screenStarted = false; screen.stop(); }
     }
 
-    @Override protected void onShown() { host.setFullScreen(true); screen(); sync(); }
+    @Override protected void onShown() { PandamoniumHooks.thawTradingTab(host); host.setFullScreen(true); screen(); sync(); }
     @Override protected void onHidden() { host.setFullScreen(false); sync(); }
 
     // ---- Screen.Host ----

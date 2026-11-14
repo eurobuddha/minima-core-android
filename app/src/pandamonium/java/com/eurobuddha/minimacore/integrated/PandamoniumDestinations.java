@@ -3,10 +3,13 @@ package com.eurobuddha.minimacore.integrated;
 /** Explicit allowlist: navigation never launches an external package or untrusted class name. */
 public final class PandamoniumDestinations {
     private PandamoniumDestinations() {}
+    /** The Dexicon tab's screen: an app-list entry that opens the tab (never started as an Activity). */
+    public static final String DEXICON = "com.eurobuddha.dexicon.MainActivity";
     public static final String[] NAMES = {
-        // 2.2.34: AtomiX, PandaPools and PandaDEX are gone - trading is the Dexicon TAB (not a drawer destination).
+        // 2.2.34: AtomiX, PandaPools and PandaDEX are gone. 2.2.39: Dexicon is the trading TAB and also an app-list entry
+        // (opens the tab; freeze / hide like any app - owner, 14 Nov). Its "class" is the tab's screen, never launched.
         "Minima Core", "ETH Wallet", "Future Cash Next",
-        "Zero Edge Casino", "Minima Explorer", "Filez", "Minima Vestr", "Entropy", "Terminal IDE", "MinimaMail", "UTXO Wallet", "miniMall", "NFT Wallet", "minimaWallet", "Atelier", "The Salon", "KeyUses", "Minima Faucet"
+        "Zero Edge Casino", "Minima Explorer", "Filez", "Minima Vestr", "Entropy", "Terminal IDE", "MinimaMail", "UTXO Wallet", "miniMall", "NFT Wallet", "minimaWallet", "Atelier", "The Salon", "KeyUses", "Minima Faucet", "Dexicon"
     };
     // Existing launcher artwork, indexed by destination identity rather than display order.
     public static final int[] ICONS = {
@@ -27,7 +30,8 @@ public final class PandamoniumDestinations {
         com.eurobuddha.statenft.R.mipmap.pm_atelier_ic_launcher,
         com.eurobuddha.salon.R.mipmap.pm_salon_ic_launcher,
         com.eurobuddha.keyreuses.R.mipmap.pm_keyreuses_ic_launcher,
-        com.eurobuddha.faucet.R.mipmap.pm_faucet_ic_launcher
+        com.eurobuddha.faucet.R.mipmap.pm_faucet_ic_launcher,
+        com.eurobuddha.dexicon.R.mipmap.pm_dexicon_ic_launcher
     };
     public static final String[] CLASSES = {
         "com.eurobuddha.minimacore.main.MainActivity", "com.eurobuddha.ethwallet.MainActivity",
@@ -43,7 +47,7 @@ public final class PandamoniumDestinations {
         "com.eurobuddha.statenft.MainActivity",
         "com.eurobuddha.salon.MainActivity",
         "com.eurobuddha.keyreuses.MainActivity",
-        "com.eurobuddha.faucet.MainActivity"
+        "com.eurobuddha.faucet.MainActivity", DEXICON
     };
     public static int indexFor(String activityClass) {
         for (int i = 0; i < CLASSES.length; i++) {
