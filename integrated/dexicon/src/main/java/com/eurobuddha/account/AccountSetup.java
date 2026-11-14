@@ -88,33 +88,33 @@ public final class AccountSetup {
                 + "these funds, and " + app() + " needs no ADMIN rights.\n\nMove funds in from your Minima wallet with "
                 + "RECEIVE; send them back any time."
                 + (tradedBefore ? "\n\n⚠ " + notice : ""), false);
-        AlertDialog main = dialog(a).setTitle("Your Trading Account").setView(pad(a, body)).setCancelable(false)
-                .setPositiveButton("Create new", (d, w) -> create(a, done))
-                .setNeutralButton("Restore 24 words", (d, w) -> restore(a, done))
+        AlertDialog main = dialog(a).setTitle(com.eurobuddha.dexicon.HostMode.tr("Your Trading Account")).setView(com.eurobuddha.dexicon.HostMode.translated(pad(a, body))).setCancelable(false)
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Create new"), (d, w) -> create(a, done))
+                .setNeutralButton(com.eurobuddha.dexicon.HostMode.tr("Restore 24 words"), (d, w) -> restore(a, done))
                 // Words only for a NEW account (owner, 11 Nov 2026): 24 words outside the node work on every node (Minima
                 // Core and the Bears have different seeds), and no app on the node can derive them — a node-seed account
                 // needs ADMIN to make and any app that can run `seedrandom` with this modifier gets its keys. An account
                 // already made from the node seed is still restored that way (lostVault / carriedPoolsDialog below).
                 .show();
         if (tradedBefore) {
-            dialog(a).setTitle("Before you continue").setCancelable(false)
-                    .setMessage("Is there anything in that old wallet you still need to move out first? "
-                            + "You can come back to this step any time.")
-                    .setPositiveButton("No — continue", null)
-                    .setNegativeButton("Yes — move it first", (d, w) -> { main.dismiss(); deferred = true; }).show();
+            dialog(a).setTitle(com.eurobuddha.dexicon.HostMode.tr("Before you continue")).setCancelable(false)
+                    .setMessage(com.eurobuddha.dexicon.HostMode.tr("Is there anything in that old wallet you still need to move out first? "
+                            + "You can come back to this step any time."))
+                    .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("No — continue"), null)
+                    .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Yes — move it first"), (d, w) -> { main.dismiss(); deferred = true; }).show();
         }
     }
 
     /** Another family app is on this phone: no account is created or restored here until it is gone (one holder of the
      *  account at a time — two apps signing with the same keys would reuse one-time leaves). */
     private static void blocked(Activity a, Transport node, Done done, boolean ro, String open, String other) {
-        dialog(a).setTitle("AtomiX + PandaPools, or Dexicon").setCancelable(false)
-                .setView(pad(a, text(a, other + " is installed on this phone. A phone runs either Dexicon, or AtomiX and "
+        dialog(a).setTitle(com.eurobuddha.dexicon.HostMode.tr("AtomiX + PandaPools, or Dexicon")).setCancelable(false)
+                .setView(com.eurobuddha.dexicon.HostMode.translated(pad(a, text(a, other + " is installed on this phone. A phone runs either Dexicon, or AtomiX and "
                         + "PandaPools together — not both (and never two builds of the same app).\n\nIn " + other + ": finish or "
                         + "hand over anything open, then uninstall it fully (an app removed with its data kept still counts). "
-                        + "Then come back here and " + (ro ? "restore your account." : "create or restore your account."), false)))
-                .setPositiveButton("Check again", (d, w) -> show0(a, node, done, ro, open))
-                .setNegativeButton("Close", (d, w) -> a.finish()).show();
+                        + "Then come back here and " + (ro ? "restore your account." : "create or restore your account."), false))))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Check again"), (d, w) -> show0(a, node, done, ro, open))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Close"), (d, w) -> a.finish()).show();
     }
 
     private static void restoreOnlyDialog(Activity a, Transport n, Done done, String open) {
@@ -122,16 +122,16 @@ public final class AccountSetup {
         if (v.lostMode().isEmpty() && v.knownFingerprints().isEmpty()) { carriedPoolsDialog(a, n, done, open); return; }
         boolean nodeMode = AccountVault.MODE_NODE.equals(v.lostMode());
         boolean nothingOpen = open == null || "funds".equals(open);
-        AlertDialog.Builder b = dialog(a).setTitle("Restore your Trading Account").setCancelable(false)
-                .setView(pad(a, text(a, "This phone's Trading Account can no longer be unlocked" + (nothingOpen ? "" : ", and it still has " + open)
+        AlertDialog.Builder b = dialog(a).setTitle(com.eurobuddha.dexicon.HostMode.tr("Restore your Trading Account")).setCancelable(false)
+                .setView(com.eurobuddha.dexicon.HostMode.translated(pad(a, text(a, "This phone's Trading Account can no longer be unlocked" + (nothingOpen ? "" : ", and it still has " + open)
                         + ". Restore THE SAME account: " + (nodeMode ? "it came from your node's seed — use Use node seed." : "its 24 words.")
-                        + " (The locked copy is kept.)", false)))
-                .setPositiveButton(nodeMode ? "Use node seed" : "Restore 24 words", (d, w) -> { if (nodeMode) fromNode(a, n, done); else restore(a, done); });
-        if (nothingOpen) b.setNegativeButton("Lost the words?", (d, w) -> dialog(a).setTitle("Start a NEW account?")
-                .setMessage("Anything still at the old Trading Account's addresses stays there, reachable ONLY with its own words "
-                        + "(restore them on a fresh install). Start a new, empty account anyway?").setCancelable(false)
-                .setPositiveButton("Start new", (x, y) -> create(a, done))
-                .setNegativeButton("Back", (x, y) -> back(a, done)).show());
+                        + " (The locked copy is kept.)", false))))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr(nodeMode ? "Use node seed" : "Restore 24 words"), (d, w) -> { if (nodeMode) fromNode(a, n, done); else restore(a, done); });
+        if (nothingOpen) b.setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Lost the words?"), (d, w) -> dialog(a).setTitle(com.eurobuddha.dexicon.HostMode.tr("Start a NEW account?"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("Anything still at the old Trading Account's addresses stays there, reachable ONLY with its own words "
+                        + "(restore them on a fresh install). Start a new, empty account anyway?")).setCancelable(false)
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Start new"), (x, y) -> create(a, done))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Back"), (x, y) -> back(a, done)).show());
         b.show();
     }
 
@@ -139,18 +139,18 @@ public final class AccountSetup {
      *  the account): restore THAT account — by its words or the node seed, as it was made — or leave it for later. */
     private static void carriedPoolsDialog(Activity a, Transport n, Done done, String open) {
         boolean node = AccountVault.MODE_NODE.equals(ownersMode), phrase = !ownersMode.isEmpty() && !node;
-        AlertDialog.Builder b = dialog(a).setTitle("Restore the account these pools belong to").setCancelable(false)
-                .setView(pad(a, text(a, (open == null ? "These pools" : "These " + open) + " were made with a Trading Account "
+        AlertDialog.Builder b = dialog(a).setTitle(com.eurobuddha.dexicon.HostMode.tr("Restore the account these pools belong to")).setCancelable(false)
+                .setView(com.eurobuddha.dexicon.HostMode.translated(pad(a, text(a, (open == null ? "These pools" : "These " + open) + " were made with a Trading Account "
                         + "that is not on this phone. Only THAT account can close them or collect from them: restore it "
                         + (node ? "from your node's seed (Use node seed)." : phrase ? "from its 24 words." : "from its 24 words, or with "
                         + "Use node seed if it came from your node.")
                         + (owners.isEmpty() ? " These pools record no account fingerprint, so the restore cannot be checked: use "
                                 + "exactly the account that made them." : " A different account is refused.")
                         + "\n\nFirst finish or close these pools in the app on your old phone, or uninstall it there: two phones "
-                        + "must never sign for one account.", false)))
-                .setNegativeButton("Later", null);
-        if (!node) b.setPositiveButton("Restore 24 words", (d, w) -> restore(a, done));
-        if (!phrase) b.setNeutralButton("Use node seed", (d, w) -> fromNode(a, n, done));
+                        + "must never sign for one account.", false))))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Later"), null);
+        if (!node) b.setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Restore 24 words"), (d, w) -> restore(a, done));
+        if (!phrase) b.setNeutralButton(com.eurobuddha.dexicon.HostMode.tr("Use node seed"), (d, w) -> fromNode(a, n, done));
         b.show();
     }
 
@@ -179,13 +179,13 @@ public final class AccountSetup {
         box.addView(words);
         CheckBox ok = new CheckBox(a); ok.setText("I have written down all 24 words"); { Look l = Account.config().look; if (l != null) ok.setTextColor(l.text()); }
         box.addView(ok);
-        AlertDialog d = dialog(a).setTitle("New Trading Account").setView(pad(a, box))
-                .setCancelable(false).setPositiveButton("Create", null).setNegativeButton("Back", (x, w) -> back(a, done)).create();
+        AlertDialog d = dialog(a).setTitle(com.eurobuddha.dexicon.HostMode.tr("New Trading Account")).setView(com.eurobuddha.dexicon.HostMode.translated(pad(a, box)))
+                .setCancelable(false).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Create"), null).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Back"), (x, w) -> back(a, done)).create();
         secure(d);
         d.setOnShowListener(x -> d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            if (!ok.isChecked()) { Toast.makeText(a, "Write the words down first.", Toast.LENGTH_LONG).show(); return; }
+            if (!ok.isChecked()) { Toast.makeText(a, com.eurobuddha.dexicon.HostMode.tr("Write the words down first."), Toast.LENGTH_LONG).show(); return; }
             try { new AccountVault(a).storeNewPhrase(phrase); restoreOnly = false; restoreOpen = null; d.dismiss(); done.ready(); }
-            catch (Exception e) { Toast.makeText(a, "Could not save: " + e.getMessage(), Toast.LENGTH_LONG).show(); }
+            catch (Exception e) { Toast.makeText(a, com.eurobuddha.dexicon.HostMode.tr("Could not save: " + e.getMessage()), Toast.LENGTH_LONG).show(); }
         }));
         d.show();
     }
@@ -201,48 +201,48 @@ public final class AccountSetup {
         box.addView(text(a, "Type each word in its box. A box completes itself as soon as the word is certain; tap a "
                 + "suggestion for short words. You can also paste all 24 words into box 1.", false));
         box.addView(words.view);
-        AlertDialog d = dialog(a).setTitle("Restore Trading Account").setView(pad(a, box))
-                .setCancelable(false).setPositiveButton("Restore", null).setNegativeButton("Back", (x, w) -> back(a, done)).create();
+        AlertDialog d = dialog(a).setTitle(com.eurobuddha.dexicon.HostMode.tr("Restore Trading Account")).setView(com.eurobuddha.dexicon.HostMode.translated(pad(a, box)))
+                .setCancelable(false).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Restore"), null).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Back"), (x, w) -> back(a, done)).create();
         secure(d);
         if (d.getWindow() != null) d.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         d.setOnShowListener(x -> d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             try {
                 String typed = words.phrase();
-                if (typed == null) { Toast.makeText(a, words.problem(), Toast.LENGTH_LONG).show(); return; }
+                if (typed == null) { Toast.makeText(a, com.eurobuddha.dexicon.HostMode.tr(words.problem()), Toast.LENGTH_LONG).show(); return; }
                 boolean any = words.isAnyPhrase();
                 String p = any ? typed : AccountVault.cleanPhrase(typed);
                 String wrong = wrongAccount(a, any ? Account.fingerprintOfAnyPhrase(p) : Account.fingerprintOfPhrase(p));
-                if (wrong != null) { Toast.makeText(a, wrong, Toast.LENGTH_LONG).show(); return; }
+                if (wrong != null) { Toast.makeText(a, com.eurobuddha.dexicon.HostMode.tr(wrong), Toast.LENGTH_LONG).show(); return; }
                 if (any) new AccountVault(a).storeRestoredAnyPhrase(p); else new AccountVault(a).storeRestoredPhrase(p);
                 d.dismiss(); done.ready();
-            } catch (Exception e) { Toast.makeText(a, e.getMessage(), Toast.LENGTH_LONG).show(); }
+            } catch (Exception e) { Toast.makeText(a, com.eurobuddha.dexicon.HostMode.tr(e.getMessage()), Toast.LENGTH_LONG).show(); }
         }));
         d.show();
     }
 
     private static void fromNode(Activity a, Transport node, Done done) {
         if (node == null) { back(a, done); return; }
-        dialog(a).setTitle("Derive from your node's seed")
-                .setView(pad(a, text(a, app() + " will read ONE value derived from your node's seed. That needs ADMIN once: "
+        dialog(a).setTitle(com.eurobuddha.dexicon.HostMode.tr("Derive from your node's seed"))
+                .setView(com.eurobuddha.dexicon.HostMode.translated(pad(a, text(a, app() + " will read ONE value derived from your node's seed. That needs ADMIN once: "
                         + "give " + app() + " ADMIN in Minima Core → Apps, tap Derive, then switch ADMIN off again.\n\n"
                         + "Your node's 24 words will then also restore this account. Note: on Minima Core any app you have "
-                        + "enabled could compute the same value, so a new phrase (Create new) is the safer choice.", false)))
+                        + "enabled could compute the same value, so a new phrase (Create new) is the safer choice.", false))))
                 .setCancelable(false)
-                .setPositiveButton("Derive", (d, w) -> { node.reRegister(); new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> node.cmdDirect("seedrandom modifier:" + AccountKeys.DOMAIN, null, 0, new Transport.Reply() {
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Derive"), (d, w) -> { node.reRegister(); new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> node.cmdDirect("seedrandom modifier:" + AccountKeys.DOMAIN, null, 0, new Transport.Reply() {
                     public void onResult(JSONObject j) {
                         JSONObject r = j.optJSONObject("response");
                         String hex = r == null ? "" : r.optString("seedrandom", "");
                         try {
                             if (!hex.matches("0x[0-9a-fA-F]{64}")) throw new IllegalArgumentException(j.optString("error", "no derived seed"));
                             String wrong = wrongAccount(a, Account.fingerprintOfBase(hex));
-                            if (wrong != null) { Toast.makeText(a, wrong, Toast.LENGTH_LONG).show(); back(a, done); return; }
+                            if (wrong != null) { Toast.makeText(a, com.eurobuddha.dexicon.HostMode.tr(wrong), Toast.LENGTH_LONG).show(); back(a, done); return; }
                             new AccountVault(a).storeNodeBase(hex); done.ready();
                         }
-                        catch (Exception e) { Toast.makeText(a, app() + " needs ADMIN for this step: " + e.getMessage(), Toast.LENGTH_LONG).show(); back(a, done); }
+                        catch (Exception e) { Toast.makeText(a, com.eurobuddha.dexicon.HostMode.tr(app() + " needs ADMIN for this step: " + e.getMessage()), Toast.LENGTH_LONG).show(); back(a, done); }
                     }
-                    public void onError(String m) { Toast.makeText(a, app() + " needs ADMIN for this step: " + m, Toast.LENGTH_LONG).show(); back(a, done); }
+                    public void onError(String m) { Toast.makeText(a, com.eurobuddha.dexicon.HostMode.tr(app() + " needs ADMIN for this step: " + m), Toast.LENGTH_LONG).show(); back(a, done); }
                 }), 2500); })
-                .setNegativeButton("Back", (d, w) -> back(a, done)).show();
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Back"), (d, w) -> back(a, done)).show();
     }
 
 
@@ -252,13 +252,13 @@ public final class AccountSetup {
             AccountVault vault = new AccountVault(a);
             String p = vault.revealPhrase();
             boolean any = AccountVault.MODE_ANY.equals(vault.mode());
-            if (p == null) { Toast.makeText(a, "This account comes from your node's seed: your node's 24 words restore it.", Toast.LENGTH_LONG).show(); return; }
+            if (p == null) { Toast.makeText(a, com.eurobuddha.dexicon.HostMode.tr("This account comes from your node's seed: your node's 24 words restore it."), Toast.LENGTH_LONG).show(); return; }
             // No Copy: the 24 words never go on a clipboard any other app can read. Write them down.
-            AlertDialog d = dialog(a).setTitle(any ? "Trading Account phrase" : "Trading Account words").setView(pad(a, text(a, (any ? p : numbered(p)), true)))
-                    .setPositiveButton("Done", null).create();
+            AlertDialog d = dialog(a).setTitle(com.eurobuddha.dexicon.HostMode.tr(any ? "Trading Account phrase" : "Trading Account words")).setView(com.eurobuddha.dexicon.HostMode.translated(pad(a, text(a, (any ? p : numbered(p)), true))))
+                    .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Done"), null).create();
             secure(d);
             d.show();
-        } catch (Exception e) { Toast.makeText(a, e.getMessage(), Toast.LENGTH_LONG).show(); }
+        } catch (Exception e) { Toast.makeText(a, com.eurobuddha.dexicon.HostMode.tr(e.getMessage()), Toast.LENGTH_LONG).show(); }
     }
 
     /** No screenshots, screen recordings or recents thumbnails of the words. */

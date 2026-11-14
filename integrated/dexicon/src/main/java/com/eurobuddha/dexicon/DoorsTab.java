@@ -416,12 +416,12 @@ public final class DoorsTab extends LinearLayout {
         TextView h = t("The most above the best price you'll pay per " + coin() + " when a buy fills across deeper levels (0.1–50 %).", Design.DIM(), 12.5f, Design.sans());
         h.setPadding(0, 0, 0, Design.dp(act, 10)); box.addView(h);
         EditText e = input("%", true); e.setTextSize(16f); e.setText(pct(slippage() * 100)); box.addView(e);
-        act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Max slippage").setView(box)
-                .setPositiveButton("Set", (d, w) -> {
+        act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Max slippage")).setView(com.eurobuddha.dexicon.HostMode.translated(box))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Set"), (d, w) -> {
                     try { setSlippage(Double.parseDouble(e.getText().toString().trim())); }
                     catch (NumberFormatException ex) { act.toast("Enter a percentage, e.g. 3"); }
                 })
-                .setNegativeButton("Cancel", null).show());
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null).show());
     }
 
     private void paintTop() {
@@ -583,8 +583,8 @@ public final class DoorsTab extends LinearLayout {
         note.setPadding(0, Design.dp(act, 8), 0, Design.dp(act, 2)); box.addView(note);
         android.widget.ScrollView sv = new android.widget.ScrollView(act); sv.addView(box);
 
-        act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(s ? "Review — Sell " + c : "Review — Buy " + c).setView(sv)
-                .setPositiveButton("Start swap", (d, w) -> {
+        act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr(s ? "Review — Sell " + c : "Review — Buy " + c)).setView(com.eurobuddha.dexicon.HostMode.translated(sv))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Start swap"), (d, w) -> {
                     String err = host.take(market, plan, dest, new DoorHost.Progress() {
                         @Override public void stage(String st) { act.setStage(st); }
                         @Override public void done(String m, boolean error) { act.setStage(""); act.toast(m); if (error) Notifier.alert(act, "AtomiX swap stopped", m); act.repaint(); }
@@ -593,7 +593,7 @@ public final class DoorsTab extends LinearLayout {
                     else { syncing = true; send.setText(""); recv.setText(""); syncing = false; act.ensureKeepAlive(); }
                     render();
                 })
-                .setNegativeButton("Cancel", null).show());
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null).show());
     }
 
     // ------------------------------------------------------------------ halted: AtomiX renderMismatchBlocker
@@ -639,15 +639,15 @@ public final class DoorsTab extends LinearLayout {
         // Host-node mode: the in-app reinstall (DoorHost.startFreshIdentity) - only after the rescue above, never with an
         // unsettled swap. Standalone keeps clear-storage / reinstall below.
         if (HostMode.on()) c.addView(rescuePill("↻  Start fresh with the node's current keys", Design.RED(), 0xFFFFFFFF, () -> act.track(new AlertDialog.Builder(act, Design.dialogTheme())
-                .setTitle("Start fresh")
-                .setMessage("This is " + HostMode.host() + "'s reinstall for Dexicon: it forgets the orphaned swap identity"
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Start fresh"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("This is " + HostMode.host() + "'s reinstall for Dexicon: it forgets the orphaned swap identity"
                         + (IdentityWatch.ethMismatch() ? " and the stale ETH key - it is never stored and cannot be rebuilt, so export it and sweep its funds FIRST" : "")
                         + ", then trades with your node's current keys. Swap history, claim secrets, pools and orders are kept.\n\n"
-                        + "Only possible once every swap is claimed or refunded.")
-                .setPositiveButton("Start fresh", (x, y) -> {
+                        + "Only possible once every swap is claimed or refunded."))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Start fresh"), (x, y) -> {
                     String refused = com.eurobuddha.dexicon.doors.DoorHost.get(act).startFreshIdentity();
                     act.toast(refused == null ? "Dexicon now uses your node's current keys" : refused);
-                }).setNegativeButton("Cancel", null).show())));
+                }).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null).show())));
     }
     private TextView rescuePill(String label, int bg, int fg, Runnable r) {
         TextView p = Design.pill(act, label, bg, fg);
@@ -802,11 +802,11 @@ public final class DoorsTab extends LinearLayout {
             SwapDb.Swap s = byId.get(id);
             if (s == null) return;
             if (SwapVisibility.isTerminal(s)) { host.dismiss(s.hash); act.repaint(); return; }
-            act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Hide this swap?")
-                    .setMessage("This only removes the card from Swap and Activity. If any funds were locked on-chain they still auto-refund at the timelock — hiding doesn't touch them. "
-                            + ("RESPONDER".equals(s.role) ? "It stays in History with Check now; your own lock returns by itself after its timelock." : "It stays in History, with Check now and Refund now."))
-                    .setPositiveButton("Hide", (d, w) -> { host.dismiss(s.hash); act.repaint(); })
-                    .setNegativeButton("Cancel", null).show());
+            act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Hide this swap?"))
+                    .setMessage(com.eurobuddha.dexicon.HostMode.tr("This only removes the card from Swap and Activity. If any funds were locked on-chain they still auto-refund at the timelock — hiding doesn't touch them. "
+                            + ("RESPONDER".equals(s.role) ? "It stays in History with Check now; your own lock returns by itself after its timelock." : "It stays in History, with Check now and Refund now.")))
+                    .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Hide"), (d, w) -> { host.dismiss(s.hash); act.repaint(); })
+                    .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null).show());
         }
 
         @Override public void check(String id) { SwapDb.Swap s = byId.get(id); if (s != null) checkNow(act, host, s.hash); }
@@ -822,9 +822,9 @@ public final class DoorsTab extends LinearLayout {
                 t.setTextIsSelectable(true);
                 int p = Design.dp(act, 20); t.setPadding(p, Design.dp(act, 12), p, Design.dp(act, 4));
                 android.widget.ScrollView sv = new android.widget.ScrollView(act); sv.addView(t);
-                act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Swap status").setView(sv)
-                        .setPositiveButton("Check again", (d, w) -> checkNow(act, host, hash))
-                        .setNegativeButton("Close", null).show());
+                act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Swap status")).setView(com.eurobuddha.dexicon.HostMode.translated(sv))
+                        .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Check again"), (d, w) -> checkNow(act, host, hash))
+                        .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Close"), null).show());
                 act.repaint();
             });
         }

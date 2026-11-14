@@ -24,6 +24,7 @@ final class DexiconTabView extends com.eurobuddha.minimacore.main.BaseView
     private final FrameLayout slot;
     private com.eurobuddha.dexicon.MainActivity screen;   // null until first shown
     private boolean hostStarted, hostResumed, screenStarted, screenResumed;
+    private final Runnable relabel = () -> slot().invalidate();
 
     DexiconTabView(com.eurobuddha.minimacore.main.MainActivity activity) {
         super(activity);   // no-inflate: the Dexicon screen builds its own views into the slot
@@ -31,6 +32,10 @@ final class DexiconTabView extends com.eurobuddha.minimacore.main.BaseView
         slot = new FrameLayout(activity);
         mMainView = slot;
         com.eurobuddha.dexicon.HostMode.setExit(activity::showWallet);   // Dexicon's header ✕
+        // Every label in the tab in Pandamonium's language, on every redraw (Dexicon re-sets English as it updates);
+        // a language change redraws it.
+        slot.getViewTreeObserver().addOnPreDrawListener(() -> { com.eurobuddha.dexicon.HostMode.translateTree(slot); return true; });
+        com.eurobuddha.minimacore.i18n.Language.addListener(relabel);
         activity.getLifecycle().addObserver(new DefaultLifecycleObserver() {
             @Override public void onStart(LifecycleOwner owner) { hostStarted = true; sync(); }
             @Override public void onResume(LifecycleOwner owner) { hostResumed = true; sync(); }
@@ -80,5 +85,8 @@ final class DexiconTabView extends com.eurobuddha.minimacore.main.BaseView
     @Override public void onConfigurationChanged(android.content.res.Configuration config) {
         if (screen != null) screen.configurationChanged(config);
     }
-    @Override public void onActivityDestroy() { if (screen != null) screen.destroy(); }
+    @Override public void onActivityDestroy() {
+        com.eurobuddha.minimacore.i18n.Language.removeListener(relabel);
+        if (screen != null) screen.destroy();
+    }
 }

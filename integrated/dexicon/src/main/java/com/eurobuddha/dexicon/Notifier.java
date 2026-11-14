@@ -30,8 +30,8 @@ public final class Notifier {
             if (nm == null) return;
             PendingIntent pi = PendingIntent.getActivity(c, 31, com.eurobuddha.dexicon.HostMode.screenIntent(c), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             Notification n = new NotificationCompat.Builder(c, CH_ALERT)
-                    .setContentTitle(title).setContentText(body)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
+                    .setContentTitle(com.eurobuddha.dexicon.HostMode.tr(title)).setContentText(com.eurobuddha.dexicon.HostMode.tr(body))
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(com.eurobuddha.dexicon.HostMode.tr(body)))
                     .setSmallIcon(android.R.drawable.stat_sys_upload_done)
                     .setContentIntent(pi).setAutoCancel(true).build();
             nm.notify(TAG, nextId++, n);   // tagged: a host app's untagged ids (e.g. 3101) never collide

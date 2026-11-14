@@ -127,8 +127,8 @@ public class MainActivity extends com.eurobuddha.dexicon.ui.Screen {
     public void requestBatteryExemptionNow() {
         try { startActivity(new Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName()))); }
         catch (Exception unavailable) {
-            android.widget.Toast.makeText(this, "This device has no battery-optimisation screen. Exclude Dexicon from battery "
-                    + "optimisation in Android Settings → Apps → Dexicon.", android.widget.Toast.LENGTH_LONG).show();
+            android.widget.Toast.makeText(this, com.eurobuddha.dexicon.HostMode.tr("This device has no battery-optimisation screen. Exclude Dexicon from battery "
+                    + "optimisation in Android Settings → Apps → Dexicon."), android.widget.Toast.LENGTH_LONG).show();
         }
     }
     public void ensureNotificationPermissionNow() {

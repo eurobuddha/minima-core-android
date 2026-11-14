@@ -73,9 +73,9 @@ public final class RelaysTab extends LinearLayout {
                 + "3. Uninstall Dexicon fully.\n4. Only then install AtomiX or PandaPools, and "
                 + (nodeMode ? "choose Use node seed (ADMIN once): " : "restore the same 24 words: ")
                 + "the same account, address and funds.\n\nNever run two of these apps on one account at the same time.";
-        new android.app.AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Move your Trading Account")
-                .setMessage((open == null ? "Nothing is open in Dexicon.\n\n" : "Still open in Dexicon: " + open + ". Finish these first.\n\n") + steps)
-                .setPositiveButton("OK", null).show();
+        new android.app.AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Move your Trading Account"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr((open == null ? "Nothing is open in Dexicon.\n\n" : "Still open in Dexicon: " + open + ". Finish these first.\n\n") + steps))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null).show();
     }
 
     /** TRADING ACCOUNT (the keys Dexicon signs with) + NODE (which installed node to use when several answer). */

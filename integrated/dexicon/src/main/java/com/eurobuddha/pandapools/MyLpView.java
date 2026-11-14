@@ -298,12 +298,12 @@ public class MyLpView extends BaseView {
             StringBuilder b = new StringBuilder();
             for (Pool p : gone) b.append("Pool: ").append(p.address)
                     .append(p.opk == null || p.opk.isEmpty() ? "" : "\nOwner key: " + p.opk).append("\n\n");
-            new AlertDialog.Builder(act).setTitle("Closed pools").setMessage(b.toString().trim())
-                    .setNeutralButton("Bring back", (d, w) -> {
+            new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr("Closed pools")).setMessage(com.eurobuddha.dexicon.HostMode.tr(b.toString().trim()))
+                    .setNeutralButton(com.eurobuddha.dexicon.HostMode.tr("Bring back"), (d, w) -> {
                         for (Pool p : gone) OwnPoolStore.setRetired(act, p.address, false);
                         status("Closed pools are showing again."); act.pools().refresh();
                     })
-                    .setPositiveButton("Close", null).show();
+                    .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Close"), null).show();
         });
         card.addView(show);
         return card;
@@ -838,10 +838,10 @@ public class MyLpView extends BaseView {
         box.addView(manual);
 
         final AlertDialog dlg = new AlertDialog.Builder(act)
-                .setTitle("Before you create a pool")
-                .setView(wrapScroll(box))
-                .setPositiveButton("Continue", null)
-                .setNegativeButton("Cancel", null)
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Before you create a pool"))
+                .setView(com.eurobuddha.dexicon.HostMode.translated(wrapScroll(box)))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Continue"), null)
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .create();
         dlg.setOnShowListener(d -> {
             refreshBatt.run();
@@ -900,12 +900,12 @@ public class MyLpView extends BaseView {
                     return;
                 }
                 new AlertDialog.Builder(act)
-                        .setTitle("Pool MINIMA with…")
-                        .setItems(labels, (d, w) -> {
+                        .setTitle(com.eurobuddha.dexicon.HostMode.tr("Pool MINIMA with…"))
+                        .setItems(com.eurobuddha.dexicon.HostMode.tr(labels), (d, w) -> {
                             String[] t = toks.get(w);
                             dispatchCreate(t[0], Integer.parseInt(t[2]), t[3], Util.decOr(t[4], BigDecimal.ZERO), mAvail);
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                         .show();
             }
             @Override public void onError(String m) { info("Error", "Could not read your balance: " + m); }
@@ -956,11 +956,11 @@ public class MyLpView extends BaseView {
         watch(usdtAmt, update);
 
         final AlertDialog dlg = new AlertDialog.Builder(act)
-                .setTitle("Create MINIMA / " + tokenName + " pool")
-                .setView(box)
-                .setPositiveButton("Create", null)     // wired in onShow so invalid input doesn't dismiss
-                .setNeutralButton("↻ Price", null)
-                .setNegativeButton("Cancel", null)
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Create MINIMA / " + tokenName + " pool"))
+                .setView(com.eurobuddha.dexicon.HostMode.translated(box))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Create"), null)     // wired in onShow so invalid input doesn't dismiss
+                .setNeutralButton(com.eurobuddha.dexicon.HostMode.tr("↻ Price"), null)
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .create();
 
         final PriceOracle.Cb fetchCb = new PriceOracle.Cb() {
@@ -1006,10 +1006,10 @@ public class MyLpView extends BaseView {
                 + priceLine + "\n\n"
                 + "The 0.5% swap fee goes to liquidity providers.";
         new AlertDialog.Builder(act)
-                .setTitle("Create this pool?")
-                .setMessage(msg)
-                .setPositiveButton("Create", (d, w) -> doCreate(tokenid, decimals, tokenName, minima, usdt))
-                .setNegativeButton("Back", null)
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Create this pool?"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr(msg))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Create"), (d, w) -> doCreate(tokenid, decimals, tokenName, minima, usdt))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Back"), null)
                 .show();
     }
 
@@ -1047,10 +1047,10 @@ public class MyLpView extends BaseView {
         watch(mAmt, update); watch(tAmt, update); update.run();
 
         final AlertDialog dlg = new AlertDialog.Builder(act)
-                .setTitle("Create MINIMA / " + tokenName + " pool")
-                .setView(box)
-                .setPositiveButton("Create", null)
-                .setNegativeButton("Cancel", null)
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Create MINIMA / " + tokenName + " pool"))
+                .setView(com.eurobuddha.dexicon.HostMode.translated(box))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Create"), null)
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .create();
         dlg.setOnShowListener(d -> dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             BigDecimal x = parse(mAmt.getText().toString());
@@ -1123,14 +1123,14 @@ public class MyLpView extends BaseView {
             }
         });
         new AlertDialog.Builder(act)
-                .setTitle("Add liquidity")
-                .setView(box)
-                .setPositiveButton("Add", (d, w) -> {
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Add liquidity"))
+                .setView(com.eurobuddha.dexicon.HostMode.translated(box))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Add"), (d, w) -> {
                     BigDecimal m = parse(mAmt.getText().toString());
                     if (m == null || m.signum() <= 0) { toast("Enter the MINIMA amount to add."); return; }
                     doDeposit(p, m, tSide[0]);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .show();
     }
 
@@ -1176,15 +1176,15 @@ public class MyLpView extends BaseView {
         EditText tAmt = field(box, "New " + p.tokenLabel() + " reserve", trim(p.reserveT));
         mAmt.setText(trim(p.reserveM)); tAmt.setText(trim(p.reserveT));
         new AlertDialog.Builder(act)
-                .setTitle("Migrate pool")
-                .setView(box)
-                .setPositiveButton("Migrate", (d, w) -> {
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Migrate pool"))
+                .setView(com.eurobuddha.dexicon.HostMode.translated(box))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Migrate"), (d, w) -> {
                     BigDecimal x = parse(mAmt.getText().toString());
                     BigDecimal y = parse(tAmt.getText().toString());
                     if (x == null || y == null) { toast("Enter the new reserves."); return; }
                     doMigrate(p, x, y);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .show();
     }
 
@@ -1261,11 +1261,11 @@ public class MyLpView extends BaseView {
 
     private void confirmClose(Pool p) {
         new AlertDialog.Builder(act)
-                .setTitle("Withdraw all liquidity?")
-                .setMessage("This closes the MINIMA / " + p.tokenLabel() + " pool and sweeps "
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Withdraw all liquidity?"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("This closes the MINIMA / " + p.tokenLabel() + " pool and sweeps "
                         + trim(p.reserveM) + " MINIMA + " + trim(p.reserveT) + " " + p.tokenLabel()
-                        + " (including earned fees) back to your wallet.")
-                .setPositiveButton("Withdraw", (d, w) -> {
+                        + " (including earned fees) back to your wallet."))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Withdraw"), (d, w) -> {
                     busy = true; status("Closing pool…");
                     final String closeOadr = p.oadr;
                     ensureOwner(java.util.Collections.singletonList(p.opk), blocked -> {
@@ -1318,7 +1318,7 @@ public class MyLpView extends BaseView {
                         attempt[0].run();
                     });
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .show();
     }
 
@@ -1426,7 +1426,7 @@ public class MyLpView extends BaseView {
      */
     private void showStatementDialog() {
         if (myPools.isEmpty()) {
-            Toast.makeText(act, "No pools to report on yet.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(act, com.eurobuddha.dexicon.HostMode.tr("No pools to report on yet."), Toast.LENGTH_SHORT).show();
             return;
         }
         LinearLayout box = dialogBox();
@@ -1437,11 +1437,11 @@ public class MyLpView extends BaseView {
                 Design.text(), 13, false);
         box.addView(t);
         new AlertDialog.Builder(act)
-                .setTitle("Export statement")
-                .setView(box)
-                .setPositiveButton("Save file…", (d, w) -> runStatement(false))
-                .setNeutralButton("Share…", (d, w) -> runStatement(true))
-                .setNegativeButton("Cancel", null)
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Export statement"))
+                .setView(com.eurobuddha.dexicon.HostMode.translated(box))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Save file…"), (d, w) -> runStatement(false))
+                .setNeutralButton(com.eurobuddha.dexicon.HostMode.tr("Share…"), (d, w) -> runStatement(true))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .show();
     }
 
@@ -1466,14 +1466,14 @@ public class MyLpView extends BaseView {
         act.pickSaveCsv(filename, uri -> {
             if (uri == null) return;                       // cancelled
             boolean ok = ExportWriter.writeTo(act, uri, csv);
-            Toast.makeText(act, ok ? "Saved  ·  " + ExportWriter.describe(report) : "Could not write the file",
+            Toast.makeText(act, com.eurobuddha.dexicon.HostMode.tr(ok ? "Saved  ·  " + ExportWriter.describe(report) : "Could not write the file"),
                     Toast.LENGTH_LONG).show();
         });
     }
 
     private void shareStatement(String csv, String filename, PoolStatement.Report report) {
         java.io.File f = ExportWriter.stageForShare(act, filename, csv);
-        if (f == null) { Toast.makeText(act, "Could not prepare the file", Toast.LENGTH_LONG).show(); return; }
+        if (f == null) { Toast.makeText(act, com.eurobuddha.dexicon.HostMode.tr("Could not prepare the file"), Toast.LENGTH_LONG).show(); return; }
         try {
             android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(
                     act, act.getPackageName() + ".dexicon.fileprovider", f);
@@ -1485,7 +1485,7 @@ public class MyLpView extends BaseView {
             i.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
             act.startActivity(android.content.Intent.createChooser(i, "Send statement"));
         } catch (Exception e) {
-            Toast.makeText(act, "Could not share the file", Toast.LENGTH_LONG).show();
+            Toast.makeText(act, com.eurobuddha.dexicon.HostMode.tr("Could not share the file"), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1497,8 +1497,8 @@ public class MyLpView extends BaseView {
                 "Archive connection", "Confirm wallet signing state", "How recovery works",
                 "Recover & withdraw (one-time exit)", "Recover on existing wallet" };
         new AlertDialog.Builder(act)
-                .setTitle("Pool recovery")
-                .setItems(items, (d, w) -> {
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Pool recovery"))
+                .setItems(com.eurobuddha.dexicon.HostMode.tr(items), (d, w) -> {
                     if (w == 0) doCollect();
                     else if (w == 1) doBackup();
                     else if (w == 2) doCheckBackup();
@@ -1509,7 +1509,7 @@ public class MyLpView extends BaseView {
                     else if (w == 7) recoverAndWithdraw();
                     else if (w == 8) recoverExistingWallet();
                 })
-                .setNegativeButton("Close", null)
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Close"), null)
                 .show();
     }
 
@@ -1524,9 +1524,9 @@ public class MyLpView extends BaseView {
         for (Pool p : OwnPoolStore.all(act)) if ((p.signingStateUnverified || OwnPoolStore.confirmationFailed(p.opk)) && !keys.contains(p.opk)) keys.add(p.opk);
         if (keys.isEmpty()) { info("Wallet signing state", "No restored owner keys are awaiting confirmation."); return; }
         if (keys.size() == 1) { confirmSigningState(keys.get(0)); return; }
-        new AlertDialog.Builder(act).setTitle("Select restored owner key")
-                .setItems(keys.toArray(new String[0]), (d, i) -> confirmSigningState(keys.get(i)))
-                .setNegativeButton("Close", null).show();
+        new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr("Select restored owner key"))
+                .setItems(com.eurobuddha.dexicon.HostMode.tr(keys.toArray(new String[0])), (d, i) -> confirmSigningState(keys.get(i)))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Close"), null).show();
     }
 
     /** Confirm ONE key — the one on the card the user tapped. A card that names a key must not then open a
@@ -1538,10 +1538,10 @@ public class MyLpView extends BaseView {
         }
         if (act.node() == null) { info("Signing remains paused", "Connect the node before checking its wallet state."); return; }
         if (key == null || key.isEmpty()) { confirmSigningState(); return; }
-        new AlertDialog.Builder(act).setTitle("Confirm current wallet signing state")
-                .setMessage(key + "\n\nOnly continue if this node holds the latest complete wallet signing state and every other copy of this wallet has stopped signing. A seed, old backup, or counter above the recipe's recorded count cannot prove this.\n\nConfirming enables owner actions and automatic pool refresh for this key.")
-                .setNegativeButton("Keep signing paused", null)
-                .setPositiveButton("I have verified this", (dd, w) -> {
+        new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr("Confirm current wallet signing state"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr(key + "\n\nOnly continue if this node holds the latest complete wallet signing state and every other copy of this wallet has stopped signing. A seed, old backup, or counter above the recipe's recorded count cannot prove this.\n\nConfirming enables owner actions and automatic pool refresh for this key."))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Keep signing paused"), null)
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("I have verified this"), (dd, w) -> {
                     act.node().cmd("keys action:list publickey:" + key, new NodeApi.Cb() {
                         public void onResult(JSONObject j) {
                             Integer uses = KeyUses.extractUses(j, key);
@@ -1625,9 +1625,9 @@ public class MyLpView extends BaseView {
         body.setPadding(pad, pad, pad, pad);
         android.widget.ScrollView scroll = new android.widget.ScrollView(act);
         scroll.addView(body);
-        new AlertDialog.Builder(act).setTitle(title).setView(scroll)
-                .setPositiveButton("OK", null)
-                .setNeutralButton("Copy", (d, w) -> {
+        new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr(title)).setView(com.eurobuddha.dexicon.HostMode.translated(scroll))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null)
+                .setNeutralButton(com.eurobuddha.dexicon.HostMode.tr("Copy"), (d, w) -> {
                     Ui.copyable(body, "backup check", report);
                     body.performClick();
                 }).show();
@@ -1635,15 +1635,15 @@ public class MyLpView extends BaseView {
 
     private void doRestore() {
         new AlertDialog.Builder(act)
-                .setTitle("Restore your pools")
-                .setMessage("This check-only option verifies pool reserves and finds "
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Restore your pools"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("This check-only option verifies pool reserves and finds "
                         + "matching owner keys on block-based nodes. It may generate missing addresses.\n\n"
                         + "Signing remains paused. It does not sign, withdraw pools, or enable automatic refresh "
                         + "for restored pools, in either key mode.\n\n"
                         + "Save or copy the result for support. A matching key alone does not prove which "
-                        + "one-time signing indexes were previously used.")
-                .setPositiveButton("Choose pool backup", (d, w) -> pickRestoreFile())
-                .setNegativeButton("Cancel", null)
+                        + "one-time signing indexes were previously used."))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Choose pool backup"), (d, w) -> pickRestoreFile())
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .show();
     }
 
@@ -1656,25 +1656,25 @@ public class MyLpView extends BaseView {
 
     private void recoverExistingWallet() {
         if (busy) return;
-        new AlertDialog.Builder(act).setTitle("Recover on existing wallet")
-                .setMessage("Use this when this node still has the original wallet keys and their current signing state, including after a chain resync that preserved the wallet. A seed-only restore does not meet that condition. Stop every other copy of the wallet first.\n\nChoose the pool backup. PandaPools will register its recipes, fetch missing reserve proofs from eurobuddha.com:9001, check existing owner keys and counters, then attempt one withdrawal and confirmed collection for each eligible pool. Missing data or uncertain transactions stop with a report. No keys will be regenerated.\n\nContinue only if you confirm that this wallet's signing state has been preserved. PandaPools cannot prove that from the seed or pool backup alone.")
-                .setPositiveButton("Confirm wallet & choose backup", (d, which) -> act.pickOpenFile(uri -> {
+        new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr("Recover on existing wallet"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("Use this when this node still has the original wallet keys and their current signing state, including after a chain resync that preserved the wallet. A seed-only restore does not meet that condition. Stop every other copy of the wallet first.\n\nChoose the pool backup. PandaPools will register its recipes, fetch missing reserve proofs from eurobuddha.com:9001, check existing owner keys and counters, then attempt one withdrawal and confirmed collection for each eligible pool. Missing data or uncertain transactions stop with a report. No keys will be regenerated.\n\nContinue only if you confirm that this wallet's signing state has been preserved. PandaPools cannot prove that from the seed or pool backup alone."))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Confirm wallet & choose backup"), (d, which) -> act.pickOpenFile(uri -> {
                     if (uri == null) return;
                     CombinedBackupUi.open(act,uri,json->restoreJson(json,true,true,true),this::status);
-                })).setNegativeButton("Cancel", null).show();
+                })).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null).show();
     }
 
     private void recoverAndWithdraw() {
         if (busy) return;
-        new AlertDialog.Builder(act).setTitle("Recover & withdraw")
-                .setMessage("Use this only after stopping every other copy of this wallet. The original seed must already be restored locally on this node; never share it here.\n\n"
+        new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr("Recover & withdraw"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("Use this only after stopping every other copy of this wallet. The original seed must already be restored locally on this node; never share it here.\n\n"
                         + "This attempts one withdrawal per verified pool to its fixed owner payout address, waits for confirmation, then attempts one transfer into this node's wallet.\n\n"
                         + "The seed does not prove previous signature use. Reusing a signing slot can expose funds even on a throwaway node. Normal pool signing stays paused. Uncertain attempts stop for review.\n\n"
-                        + "By continuing you confirm the other copies are stopped and accept that remaining risk.")
-                .setPositiveButton("Accept risk & choose backup", (d, which) -> act.pickOpenFile(uri -> {
+                        + "By continuing you confirm the other copies are stopped and accept that remaining risk."))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Accept risk & choose backup"), (d, which) -> act.pickOpenFile(uri -> {
                     if (uri == null) return;
                     CombinedBackupUi.open(act,uri,json->restoreJson(json,true,true),this::status);
-                })).setNegativeButton("Cancel", null).show();
+                })).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null).show();
     }
 
     /** Diagnostic file restore discovers keys; neither this nor a reserve check can withdraw. */
@@ -1881,7 +1881,7 @@ public class MyLpView extends BaseView {
     }
     private void toast(String s) { status(s); }
     private void info(String title, String msg) {
-        AlertDialog dialog = new AlertDialog.Builder(act).setTitle(title).setMessage(msg).setPositiveButton("OK", null).show();
+        AlertDialog dialog = new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr(title)).setMessage(com.eurobuddha.dexicon.HostMode.tr(msg)).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null).show();
         TextView message = dialog.findViewById(android.R.id.message);
         if (message != null) message.setTextIsSelectable(true);
     }

@@ -257,8 +257,8 @@ public final class MarketTab extends LinearLayout {
             cp.setOnClickListener(v -> act.copy("Counterparty key", maker.signerPk));
             box.addView(cp);
         }
-        final AlertDialog d = act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(sell ? "Sell " + c : "Buy " + c).setView(box)
-                .setPositiveButton("Start swap", null).setNegativeButton("Cancel", null).show());
+        final AlertDialog d = act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr(sell ? "Sell " + c : "Buy " + c)).setView(com.eurobuddha.dexicon.HostMode.translated(box))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Start swap"), null).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null).show());
         d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String raw = amt.getText().toString().trim();
             if (!DoorPlan.positiveSwapAmount(raw)) { bad(out, "Enter a valid " + c + " amount"); return; }
@@ -498,8 +498,8 @@ public final class MarketTab extends LinearLayout {
 
         ScrollView sv = new ScrollView(act); sv.addView(box);
         final AlertDialog editor = act.track(new AlertDialog.Builder(act, Design.dialogTheme())
-                .setTitle("My market / ladder · " + c).setView(sv)
-                .setPositiveButton("Save", null).setNegativeButton("Cancel", null)
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("My market / ladder · " + c)).setView(com.eurobuddha.dexicon.HostMode.translated(sv))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Save"), null).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .setOnDismissListener(d -> { open[0] = false; removeCallbacks(tick[0]); act.repaint(); })
                 .show());
         editor.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {

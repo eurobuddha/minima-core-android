@@ -21,6 +21,55 @@ def replace_once(path, old, new):
     path.write_text(text.replace(old, new))
 
 
+
+# ---- host language: route the texts Dexicon shows outside its tab's views through HostMode.tr ----
+WRAP = {  # method -> (argument index, wrapper)
+    'setTitle': (0, 'tr'), 'setMessage': (0, 'tr'), 'setPositiveButton': (0, 'tr'), 'setNegativeButton': (0, 'tr'),
+    'setNeutralButton': (0, 'tr'), 'setItems': (0, 'tr'), 'setContentTitle': (0, 'tr'), 'setContentText': (0, 'tr'),
+    'bigText': (0, 'tr'), 'setTicker': (0, 'tr'), 'makeText': (1, 'tr'), 'setView': (0, 'translated'),
+}
+
+
+def _args(src, start):
+    """Spans [(a, b)] of the top-level arguments of the call whose '(' is at start, and the ')' index."""
+    depth, i, a, spans = 0, start + 1, start + 1, []
+    while i < len(src):
+        c = src[i]
+        if src.startswith('//', i):
+            i = src.index('\n', i); continue
+        if src.startswith('/*', i):
+            i = src.index('*/', i) + 2; continue
+        if c == '"':
+            i += 1
+            while src[i] != '"': i += 2 if src[i] == '\\' else 1
+        elif c == "'":
+            i += 1
+            while src[i] != "'": i += 2 if src[i] == '\\' else 1
+        elif c in '([{': depth += 1
+        elif c in ')]}':
+            if depth == 0: spans.append((a, i)); return spans, i
+            depth -= 1
+        elif c == ',' and depth == 0: spans.append((a, i)); a = i + 1
+        i += 1
+    raise ValueError('unbalanced call')
+
+
+def wrap_texts(src):
+    out, pos = [], 0
+    for m in re.finditer(r'\.(' + '|'.join(WRAP) + r')\(', src):
+        if m.start() < pos: continue
+        idx, fn = WRAP[m.group(1)]
+        spans, _ = _args(src, m.end() - 1)
+        if idx >= len(spans): continue
+        a, b = spans[idx]
+        arg = src[a:b].strip()
+        if not arg or arg.startswith('com.eurobuddha.dexicon.HostMode.') or re.fullmatch(r'(android\.)?R\.[\w.]+|\d+|null', arg): continue
+        lead = src[a:b][:len(src[a:b]) - len(src[a:b].lstrip())]
+        out.append(src[pos:a] + lead + 'com.eurobuddha.dexicon.HostMode.' + fn + '(' + arg + ')')
+        pos = b
+    out.append(src[pos:])
+    return ''.join(out)
+
 def adapt(root):
     app = root / 'dexicon'
     if not app.exists():
@@ -57,6 +106,10 @@ def adapt(root):
                        r'com.eurobuddha.dexicon.R.\1.', u)
         if u != t: p.write_text(u)
     assert not list(app.rglob('R.java')), 'a hand-written R class is stripped from a library build'
+    for p in main.rglob('*.java'):
+        if p.name == 'HostMode.java' or '/minimaapi/' in p.as_posix(): continue
+        t = p.read_text(); u = wrap_texts(t)
+        if u != t: p.write_text(u)
     # A library has no APPLICATION_ID: the app is Pandamonium.
     for p in main.rglob('*.java'):
         t = p.read_text()
@@ -76,8 +129,8 @@ def adapt(root):
         return f != null ? f.open(ctx, registration) : new NodeTransport(ctx, registration);''',
                  '''        return new DirectLink(ctx, registration);   // Pandamonium: the embedded node, in-process''')
     replace_once(host, '    private static volatile String hostName = "";', '    private static volatile String hostName = "Pandamonium";')
-    replace_once(host, '    public static void reset() { factory = null; hostName = ""; exitAction = null; }',
-                 '    public static void reset() { factory = null; hostName = "Pandamonium"; exitAction = null; }')
+    replace_once(host, '    public static void reset() { factory = null; hostName = ""; exitAction = null; translator = null; }',
+                 '    public static void reset() { factory = null; hostName = "Pandamonium"; exitAction = null; translator = null; }')
     replace_once(host, '    /** Test seam. */', """    /** Pandamonium: a notification opens the HOST on its Dexicon tab - never a second Dexicon screen. Extras (e.g. the
      *  pools page) reach the tab's screen through the host's onNewIntent. */
     public static android.content.Intent screenIntent(Context c) {

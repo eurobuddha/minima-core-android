@@ -294,16 +294,16 @@ public class ActivityView extends BaseView {
         card.addView(sub);
         if (e.verifiedAt > 0) card.addView(line("Checked " + relative(e.verifiedAt), Design.dim(), 11f, false));
         card.setOnClickListener(v -> new androidx.appcompat.app.AlertDialog.Builder(act)
-                .setTitle(e.statusText(cb))
-                .setMessage("TxPoW: " + (e.txpowid == null ? "Unavailable" : e.txpowid)
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr(e.statusText(cb)))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("TxPoW: " + (e.txpowid == null ? "Unavailable" : e.txpowid)
                         + (e.originalTxpowid != null && !e.originalTxpowid.equalsIgnoreCase(e.txpowid)
                         ? "\n\nOriginal submission ID: " + e.originalTxpowid : "")
                         + "\n\n" + (history != null ? "Transaction time: " : "Submitted: ") + absolute(eventTime)
                         + "\n\nTransaction: " + (e.transactionId.isEmpty() ? "Not saved by the older build" : e.transactionId)
                         + (e.verifiedAt > 0 ? "\n\nLast node check: " + new java.util.Date(e.verifiedAt) : "")
                         + (e.transactionId.isEmpty() && e.verifiedDepth < 0
-                        ? "\n\nHistory sync checks this older receipt against mined transaction headers. A match requires its exact cryptographic hash; amounts and times alone are insufficient." : ""))
-                .setPositiveButton("OK", null).show());
+                        ? "\n\nHistory sync checks this older receipt against mined transaction headers. A match requires its exact cryptographic hash; amounts and times alone are insufficient." : "")))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null).show());
         return card;
     }
 
@@ -422,7 +422,7 @@ public class ActivityView extends BaseView {
         addBreakdown(box, "Outputs", n.outputs);
         ScrollView sv = new ScrollView(act);
         sv.addView(box);
-        new AlertDialog.Builder(act).setTitle("Transaction").setView(sv).setPositiveButton("Close", null).show();
+        new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr("Transaction")).setView(com.eurobuddha.dexicon.HostMode.translated(sv)).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Close"), null).show();
     }
 
     private void kv(LinearLayout p, String k, String v) {

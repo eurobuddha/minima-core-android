@@ -44,12 +44,12 @@ final class WalletTools {
     void showConsolidate(String token, String name) {
         if (!FundingCoins.hex(token)) { message("Invalid token ID."); return; }
         new androidx.appcompat.app.AlertDialog.Builder(act, Design.isDark() ? androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert : androidx.appcompat.R.style.Theme_AppCompat_Light_Dialog_Alert)
-                .setTitle("Consolidate " + name)
-                .setMessage("Combine your " + name + " wallet coins automatically?\n\n"
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Consolidate " + name))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("Combine your " + name + " wallet coins automatically?\n\n"
                         + "MinimaCore selects the coins using its standard consolidation command. No burn fee.\n\n"
-                        + "consolidate tokenid:" + token)
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Consolidate", (d, w) -> autoConsolidate(token, name)).show();
+                        + "consolidate tokenid:" + token))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Consolidate"), (d, w) -> autoConsolidate(token, name)).show();
     }
 
     /** UTXO WalletTools.autoConsolidate, enclosed in PandaPools' shared signing gate. */
@@ -87,11 +87,11 @@ final class WalletTools {
         if (some.isEmpty()) { message("Nothing sendable to withdraw right now."); return; }
         String[] names = new String[some.size()];
         for (int i = 0; i < names.length; i++) names[i] = label(some.get(i)) + "  (" + some.get(i).sendable + " sendable)";
-        new androidx.appcompat.app.AlertDialog.Builder(act, theme()).setTitle("Withdraw which token?")
-                .setItems(names, (d, i) -> act.node().cmdDirect("getaddress", null, 0, new com.eurobuddha.dexicon.integratedaccount.Transport.Reply() {
+        new androidx.appcompat.app.AlertDialog.Builder(act, theme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Withdraw which token?"))
+                .setItems(com.eurobuddha.dexicon.HostMode.tr(names), (d, i) -> act.node().cmdDirect("getaddress", null, 0, new com.eurobuddha.dexicon.integratedaccount.Transport.Reply() {
                     public void onResult(JSONObject j) { JSONObject r = j.optJSONObject("response"); withdrawForm(some.get(i), r == null ? "" : r.optString("miniaddress", "")); }
                     public void onError(String m) { withdrawForm(some.get(i), ""); }
-                })).setNegativeButton("Cancel", null).show();
+                })).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null).show();
     }
 
     private void withdrawForm(TokenBalance b, String nodeAddr) {
@@ -104,10 +104,10 @@ final class WalletTools {
         android.widget.EditText to = new android.widget.EditText(act);
         to.setHint("Minima address (Mx…)"); to.setText(nodeAddr); to.setTypeface(android.graphics.Typeface.MONOSPACE);
         box.addView(amt); box.addView(to);
-        new androidx.appcompat.app.AlertDialog.Builder(act, theme()).setTitle("Withdraw " + b.name).setView(box)
-                .setMessage(nodeAddr.isEmpty() ? null : "Pre-filled with your node's own wallet address.")
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Review", (d, w) -> {
+        new androidx.appcompat.app.AlertDialog.Builder(act, theme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Withdraw " + b.name)).setView(com.eurobuddha.dexicon.HostMode.translated(box))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr(nodeAddr.isEmpty() ? null : "Pre-filled with your node's own wallet address."))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Review"), (d, w) -> {
                     java.math.BigDecimal a, max;
                     String typed = amt.getText().toString().trim();
                     if (!typed.matches("[0-9]+(\\.[0-9]+)?")) { message("Enter the amount as plain digits, e.g. 10 or 0.5."); return; }
@@ -117,10 +117,10 @@ final class WalletTools {
                     if (a.signum() <= 0 || a.compareTo(max) > 0) { message("The amount must be above 0 and at most " + b.sendable + "."); return; }
                     if (!validMx(addr)) { message("That is not a valid Minima address (Mx…)."); return; }
                     String amount = a.stripTrailingZeros().toPlainString();
-                    new androidx.appcompat.app.AlertDialog.Builder(act, theme()).setTitle("Withdraw " + amount + " " + label(b) + "?")
-                            .setMessage("To:\n" + addr + "\n\nSigned by your Trading Account and posted through your node.")
-                            .setNegativeButton("Cancel", null)
-                            .setPositiveButton("Withdraw", (x, y) -> withdraw(b.tokenid, label(b), amount, addr)).show();
+                    new androidx.appcompat.app.AlertDialog.Builder(act, theme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Withdraw " + amount + " " + label(b) + "?"))
+                            .setMessage(com.eurobuddha.dexicon.HostMode.tr("To:\n" + addr + "\n\nSigned by your Trading Account and posted through your node."))
+                            .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
+                            .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Withdraw"), (x, y) -> withdraw(b.tokenid, label(b), amount, addr)).show();
                 }).show();
     }
 
@@ -158,11 +158,11 @@ final class WalletTools {
     void resolveInterruptedWrite() {
         if (!act.node().hasInterruptedWrite()) { message("There is no interrupted write to resolve."); return; }
         final String reviewed = act.node().interruptedWriteId();
-        new androidx.appcompat.app.AlertDialog.Builder(act, Design.isDark() ? androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert : androidx.appcompat.R.style.Theme_AppCompat_Light_Dialog_Alert).setTitle("Resolve interrupted write")
-                .setMessage("A node write lost its reply. It may have completed. First restart MinimaCore to stop any old command, "
-                        + "then check your transactions and balances. Clearing this safety pause does not undo or retry any transaction.")
-                .setNegativeButton("Keep paused", null)
-                .setPositiveButton("I restarted and checked", (d, w) -> {
+        new androidx.appcompat.app.AlertDialog.Builder(act, Design.isDark() ? androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert : androidx.appcompat.R.style.Theme_AppCompat_Light_Dialog_Alert).setTitle(com.eurobuddha.dexicon.HostMode.tr("Resolve interrupted write"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("A node write lost its reply. It may have completed. First restart MinimaCore to stop any old command, "
+                        + "then check your transactions and balances. Clearing this safety pause does not undo or retry any transaction."))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Keep paused"), null)
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("I restarted and checked"), (d, w) -> {
                     if (!act.node().acknowledgeInterruptedWrite(reviewed)) { message("A write is still active or the safety state could not be saved. Keep paused."); return; }
                     // review 7 Nov (R2-3): free inputs an uncertain post held, where the node proves they were never posted. Load
                     // the shared store first: it also holds a host's resting-order claims (Dexicon), not only this process's
@@ -174,6 +174,6 @@ final class WalletTools {
     }
     private static String nodeError(JSONObject j) { return j.optString("error", j.optString("message", "No coins could be combined.")); }
     private void message(String text) {
-        if (!act.isFinishing() && !act.isDestroyed()) new androidx.appcompat.app.AlertDialog.Builder(act, Design.isDark() ? androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert : androidx.appcompat.R.style.Theme_AppCompat_Light_Dialog_Alert).setTitle("Wallet").setMessage(text).setPositiveButton("OK", null).show();
+        if (!act.isFinishing() && !act.isDestroyed()) new androidx.appcompat.app.AlertDialog.Builder(act, Design.isDark() ? androidx.appcompat.R.style.Theme_AppCompat_Dialog_Alert : androidx.appcompat.R.style.Theme_AppCompat_Light_Dialog_Alert).setTitle(com.eurobuddha.dexicon.HostMode.tr("Wallet")).setMessage(com.eurobuddha.dexicon.HostMode.tr(text)).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null).show();
     }
 }

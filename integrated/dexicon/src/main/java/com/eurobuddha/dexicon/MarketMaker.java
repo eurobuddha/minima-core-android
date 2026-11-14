@@ -63,10 +63,10 @@ final class MarketMaker {
         btns.addView(set, new LinearLayout.LayoutParams(0, -2, 1f));
         if (c.enabled) {
             TextView stop = button(act, "STOP", Design.SURFACE2(), Design.RED());
-            stop.setOnClickListener(v -> new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Stop the market maker?")
-                    .setMessage("Every ladder order is cancelled on the relays within seconds. Your settings are kept.")
-                    .setPositiveButton("Stop", (d, w) -> { Ladder.Config x = load(act); x.enabled = false; save(act, x); act.toast("Stopping — ladder orders are being cancelled"); act.repaint(); })
-                    .setNegativeButton("Back", null).show());
+            stop.setOnClickListener(v -> new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Stop the market maker?"))
+                    .setMessage(com.eurobuddha.dexicon.HostMode.tr("Every ladder order is cancelled on the relays within seconds. Your settings are kept."))
+                    .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Stop"), (d, w) -> { Ladder.Config x = load(act); x.enabled = false; save(act, x); act.toast("Stopping — ladder orders are being cancelled"); act.repaint(); })
+                    .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Back"), null).show());
             LinearLayout.LayoutParams sl = new LinearLayout.LayoutParams(0, -2, 1f); sl.leftMargin = Design.dp(act, 8);
             btns.addView(stop, sl);
         }
@@ -86,8 +86,8 @@ final class MarketMaker {
         body.setTextIsSelectable(true);
         int pad = Design.dp(act, 18); body.setPadding(pad, Design.dp(act, 8), pad, Design.dp(act, 8));
         android.widget.ScrollView sv = new android.widget.ScrollView(act); sv.addView(body);
-        AlertDialog d = new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Review a stuck cross").setView(sv)
-                .setNegativeButton("Close", null).setPositiveButton("Release", null).show();
+        AlertDialog d = new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Review a stuck cross")).setView(com.eurobuddha.dexicon.HostMode.translated(sv))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Close"), null).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Release"), null).show();
         d.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         com.eurobuddha.dexicon.maker.AutoCross.FundingCommand cmd = com.eurobuddha.dexicon.maker.AutoCross.of(act.nodeApi());
         com.eurobuddha.dexicon.maker.AutoCross.review(cmd, act.db(), r -> act.runOnUiThread(() -> {
@@ -168,9 +168,9 @@ final class MarketMaker {
             final android.widget.CheckBox again = new android.widget.CheckBox(act); again.setText("Don't show again"); again.setTextColor(Design.DIM());
             v.addView(again);
             ScrollView ws = new ScrollView(act); ws.addView(v);
-            new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Turn on auto-cross?").setView(ws)
-                    .setPositiveButton("Turn on", (x, w) -> { if (again.isChecked()) act.db().setMeta(CROSS_ACK, "1"); })
-                    .setNegativeButton("Keep off", (x, w) -> ax.setChecked(false))
+            new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Turn on auto-cross?")).setView(com.eurobuddha.dexicon.HostMode.translated(ws))
+                    .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Turn on"), (x, w) -> { if (again.isChecked()) act.db().setMeta(CROSS_ACK, "1"); })
+                    .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Keep off"), (x, w) -> ax.setChecked(false))
                     .setOnCancelListener(x -> ax.setChecked(false)).show();
         });
         final TextView pv = text(act, "", Design.TEXT(), 11f, false); pv.setPadding(0, Design.dp(act, 10), 0, 0); box.addView(pv);
@@ -243,8 +243,8 @@ final class MarketMaker {
         });
 
         ScrollView sv = new ScrollView(act); sv.addView(box);
-        AlertDialog d = new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Market maker — FAST ladder").setView(sv)
-                .setPositiveButton("Save", null).setNegativeButton("Cancel", null).create();
+        AlertDialog d = new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Market maker — FAST ladder")).setView(com.eurobuddha.dexicon.HostMode.translated(sv))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Save"), null).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null).create();
         d.setOnDismissListener(x -> open[0] = false);
         d.setOnShowListener(x -> d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             read.run();

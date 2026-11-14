@@ -75,9 +75,9 @@ final class WalletActions {
         TextView note = text("Same address on all EVM networks — fund it with " + host.net.label + " ETH and USDT. A little ETH pays the gas for swaps and sends.", Design.DIM2(), 12f);
         note.setGravity(Gravity.CENTER); note.setPadding(0, dp(14), 0, 0);
         box.addView(note);
-        act.track(dialog().setTitle("Receive / Fund · " + host.net.label).setView(wrap(box))
-                .setPositiveButton("Copy address", (d, w) -> act.copy("Ethereum address", addr))
-                .setNegativeButton("Close", null).show());
+        act.track(dialog().setTitle(com.eurobuddha.dexicon.HostMode.tr("Receive / Fund · " + host.net.label)).setView(com.eurobuddha.dexicon.HostMode.translated(wrap(box)))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Copy address"), (d, w) -> act.copy("Ethereum address", addr))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Close"), null).show());
     }
 
     // ---- manual send (AtomiX ManualSendContext: the owner, connection and network captured once, re-checked at every step) ----
@@ -170,8 +170,8 @@ final class WalletActions {
         box.addView(warn);
 
         // Review is attached after show, so an invalid form shows its error WITHOUT dismissing the dialog (AtomiX).
-        final AlertDialog d = dialog().setTitle("Send from this wallet").setView(wrap(box))
-                .setPositiveButton("Review", null).setNegativeButton("Cancel", null)
+        final AlertDialog d = dialog().setTitle(com.eurobuddha.dexicon.HostMode.tr("Send from this wallet")).setView(com.eurobuddha.dexicon.HostMode.translated(wrap(box)))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Review"), null).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .setOnDismissListener(ignored -> { if (!reviewing.get()) c.cancel(); })
                 .show();
         act.track(d);
@@ -212,9 +212,9 @@ final class WalletActions {
         if (!c.current()) { act.toast("Wallet session changed. Review again."); return; }
         final AtomicBoolean submitted = new AtomicBoolean();
         String sym = eth ? "ETH" : "USDT";
-        act.track(dialog().setTitle("Review — Send " + sym)
-                .setMessage("From  " + c.owner.getAddress() + "\n\nSend  " + amt + " " + sym + "\nTo  " + to + "\n\nNetwork fee  ≈ " + feeEth + " ETH\nThis cannot be undone.")
-                .setPositiveButton("Send now", (dd, w) -> {
+        act.track(dialog().setTitle(com.eurobuddha.dexicon.HostMode.tr("Review — Send " + sym))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("From  " + c.owner.getAddress() + "\n\nSend  " + amt + " " + sym + "\nTo  " + to + "\n\nNetwork fee  ≈ " + feeEth + " ETH\nThis cannot be undone."))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Send now"), (dd, w) -> {
                     if (!c.current() || !submitted.compareAndSet(false, true)) { act.toast("Wallet session changed. Review again."); return; }
                     run(c, () -> {
                         try {
@@ -235,7 +235,7 @@ final class WalletActions {
                     });
                 })
                 .setOnDismissListener(ignored -> { if (!submitted.get()) c.cancel(); })
-                .setNegativeButton("Back", (dd, w) -> send(prefillTo))   // the rescue's recipient survives Back
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Back"), (dd, w) -> send(prefillTo))   // the rescue's recipient survives Back
                 .show());
     }
 
@@ -243,10 +243,10 @@ final class WalletActions {
 
     void exportKey() {
         if (!host.wallet().ready()) { act.toast("ETH wallet not ready yet"); return; }
-        act.track(dialog().setTitle("Export ETH private key")
-                .setMessage("This key controls your ETH funds. Anyone who sees it can take them. It is also derived from your Minima node seed. Never share it or type it into a website.")
-                .setPositiveButton("Reveal key", (d, w) -> reveal())
-                .setNegativeButton("Cancel", null).show());
+        act.track(dialog().setTitle(com.eurobuddha.dexicon.HostMode.tr("Export ETH private key"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("This key controls your ETH funds. Anyone who sees it can take them. It is also derived from your Minima node seed. Never share it or type it into a website."))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Reveal key"), (d, w) -> reveal())
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null).show());
     }
 
     private void reveal() {
@@ -259,8 +259,8 @@ final class WalletActions {
         // not selectable: the system copy bar would skip the sensitive-clip flag — "Copy key" is the one way to copy it
         TextView key = text(pk, Design.TEXT(), 13f); key.setTypeface(Design.mono());
         box.addView(key);
-        AlertDialog secret = dialog().setTitle("ETH private key").setView(wrap(box))
-                .setPositiveButton("Copy key", (d, w) -> copySecret(pk)).setNegativeButton("Close", null).create();
+        AlertDialog secret = dialog().setTitle(com.eurobuddha.dexicon.HostMode.tr("ETH private key")).setView(com.eurobuddha.dexicon.HostMode.translated(wrap(box)))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Copy key"), (d, w) -> copySecret(pk)).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Close"), null).create();
         if (secret.getWindow() != null) secret.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE);   // no screenshots
         secret.show();
         act.track(secret);

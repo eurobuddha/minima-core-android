@@ -167,9 +167,9 @@ final class CombinedBackupUi {
     }
     private static void offerRestore(MainActivity act,PoolBackupBundle.Opened opened,Consumer<String> recipes,Consumer<String> status) {
         if(act.isFinishing()||act.isDestroyed()){opened.nodeFile.delete();return;}
-        new AlertDialog.Builder(act).setTitle("Encrypted backup verified")
-            .setMessage("This file contains pool recipes and a complete node backup.\n\nIf this is still the original wallet, recover the pools on it. Replacing the node with an older backup can roll back signing state; do that only when the original wallet is unavailable. Signing stays paused until current state is established.")
-            .setPositiveButton("Recover pools",(d,w)->{
+        new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr("Encrypted backup verified"))
+            .setMessage(com.eurobuddha.dexicon.HostMode.tr("This file contains pool recipes and a complete node backup.\n\nIf this is still the original wallet, recover the pools on it. Replacing the node with an older backup can roll back signing state; do that only when the original wallet is unavailable. Signing stays paused until current state is established."))
+            .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Recover pools"),(d,w)->{
                 NodeApi node=act.node();
                 if(node==null){opened.nodeFile.delete();status.accept("NODE_UNAVAILABLE: connect to your wallet first.");return;}
                 node.cmd("keys",new NodeApi.Cb(){
@@ -181,8 +181,8 @@ final class CombinedBackupUi {
                     public void onError(String ignored){opened.nodeFile.delete();status.accept("WALLET_UNREADABLE: could not confirm this wallet. Nothing restored.");}
                 });
             })
-            .setNeutralButton("Node backup",(d,w)->exportNode(act,opened,status))
-            .setNegativeButton("Cancel",(d,w)->opened.nodeFile.delete()).setCancelable(false).show();
+            .setNeutralButton(com.eurobuddha.dexicon.HostMode.tr("Node backup"),(d,w)->exportNode(act,opened,status))
+            .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"),(d,w)->opened.nodeFile.delete()).setCancelable(false).show();
     }
     private static void exportNode(MainActivity act,PoolBackupBundle.Opened opened,Consumer<String> status) {
         // A separate node app owns its restart lifecycle. Never issue a destructive command through ordinary IPC.
@@ -202,7 +202,7 @@ final class CombinedBackupUi {
                         if(act.isFinishing()||act.isDestroyed())return;
                         TextView text=new TextView(act);text.setTextIsSelectable(true);int pad=Ui.dp(act,20);text.setPadding(pad,pad,pad,pad);
                         text.setText("Import the saved .bak through Minima Core → Restore backup. Use this native backup password:\n\n"+opened.nodePassword()+"\n\nFor an old backup, select MegaMMR resync with eurobuddha.com:9001. This replaces the node wallet; preserve any existing wallet first. After the node is ready, reopen your .ppbackup here and choose Recover pools. Signing remains paused until its current state is confirmed.");
-                        AlertDialog dialog=new AlertDialog.Builder(act).setTitle("Node backup saved and checked").setView(text).setPositiveButton("Done",null).create();
+                        AlertDialog dialog=new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr("Node backup saved and checked")).setView(com.eurobuddha.dexicon.HostMode.translated(text)).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Done"),null).create();
                         dialog.setOnDismissListener(d->text.setText(""));dialog.show();if(dialog.getWindow()!=null)dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
                         status.accept("Node backup exported. Restore it through the node's backup screen, then recover the pool recipes here.");
                     });
@@ -221,9 +221,9 @@ final class CombinedBackupUi {
         boolean wasSecure=(act.getWindow().getAttributes().flags&WindowManager.LayoutParams.FLAG_SECURE)!=0;
         act.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         final boolean[] accepted={false};
-        AlertDialog dialog=new AlertDialog.Builder(act).setTitle(creating?"Required encrypted backup":"Open encrypted backup")
-                .setView(body).setPositiveButton(creating?"Create backup":"Open backup",null)
-                .setNegativeButton("Cancel",(d,w)->{}).setCancelable(false).create();
+        AlertDialog dialog=new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr(creating?"Required encrypted backup":"Open encrypted backup"))
+                .setView(com.eurobuddha.dexicon.HostMode.translated(body)).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr(creating?"Create backup":"Open backup"),null)
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"),(d,w)->{}).setCancelable(false).create();
         dialog.setOnShowListener(ignored->dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
             String pass=first.getText().toString();
             if(creating&&!PoolBackupBundle.validPassword(pass)){first.setError("Use at least 12 characters (maximum 1024 UTF-8 bytes).");return;}
@@ -239,5 +239,5 @@ final class CombinedBackupUi {
         input.setImportantForAutofill(android.view.View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);
         input.setImeOptions(android.view.inputmethod.EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
     }
-    static void show(MainActivity act,String title,String message){if(!act.isFinishing()&&!act.isDestroyed())new AlertDialog.Builder(act).setTitle(title).setMessage(message).setPositiveButton("OK",null).show();}
+    static void show(MainActivity act,String title,String message){if(!act.isFinishing()&&!act.isDestroyed())new AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr(title)).setMessage(com.eurobuddha.dexicon.HostMode.tr(message)).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"),null).show();}
 }

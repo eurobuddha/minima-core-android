@@ -24,12 +24,12 @@ final class WalletTools {
     static void consolidate(MainActivity act, String tokenid, String name, int coins) {
         if (!act.paired()) { act.toast(HostMode.text("Pair with your node first", "The node is not ready yet")); return; }
         if (coins < 2) { message(act, "Nothing to consolidate", "Your " + name + " is already in " + coins + (coins == 1 ? " coin." : " coins.")); return; }
-        new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Consolidate " + name)
-                .setMessage("Combine your " + coins + " " + name + " wallet coins into fewer, larger ones?\n\n"
+        new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Consolidate " + name))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("Combine your " + coins + " " + name + " wallet coins into fewer, larger ones?\n\n"
                         + "Your node picks the coins with its standard consolidation command. Nothing leaves your wallet and there is no fee.\n\n"
-                        + "consolidate tokenid:" + tokenid)
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Consolidate", (d, w) -> com.eurobuddha.pandapools.DexiconPools.guardNodePickedSpend(act.nodeApi(), tokenid, error -> {
+                        + "consolidate tokenid:" + tokenid))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Consolidate"), (d, w) -> com.eurobuddha.pandapools.DexiconPools.guardNodePickedSpend(act.nodeApi(), tokenid, error -> {
                     // the one node-picked-spend guard: never let the node pick a pool owner coin it must not sign
                     if (error != null) message(act, "Nothing consolidated", error);
                     else run(act, tokenid, "consolidate tokenid:" + tokenid, "Consolidate " + name, walletRow("consolidate", "", name, ""));
@@ -43,11 +43,11 @@ final class WalletTools {
         if (sendable == null || sendable.signum() <= 0) { message(act, "Nothing to split", "No sendable " + name + " right now."); return; }
         String amt = sendable.stripTrailingZeros().toPlainString();
         String cmd = "send address:" + addr + " amount:" + amt + (Tokens.isMinima(tokenid) ? "" : " tokenid:" + tokenid) + " split:" + SPLIT_COUNT;
-        new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Split " + name + " into " + SPLIT_COUNT + " coins")
-                .setMessage("Send all " + amt + " sendable " + name + " to yourself as " + SPLIT_COUNT + " equal coins, so several orders and trades "
-                        + "can each have their own coin.\n\nThe coins stay in your wallet; they are spendable again once the send confirms.\n\n" + cmd)
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Split", (d, w) -> com.eurobuddha.pandapools.DexiconPools.guardNodePickedSpend(act.nodeApi(), tokenid, error -> {
+        new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Split " + name + " into " + SPLIT_COUNT + " coins"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("Send all " + amt + " sendable " + name + " to yourself as " + SPLIT_COUNT + " equal coins, so several orders and trades "
+                        + "can each have their own coin.\n\nThe coins stay in your wallet; they are spendable again once the send confirms.\n\n" + cmd))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Split"), (d, w) -> com.eurobuddha.pandapools.DexiconPools.guardNodePickedSpend(act.nodeApi(), tokenid, error -> {
                     // a self-send lets the node pick the coins too: the same guard applies
                     if (error != null) message(act, "Nothing split", error);
                     else run(act, tokenid, cmd, "Split " + name, walletRow("split", amt, name, ""));
@@ -88,11 +88,11 @@ final class WalletTools {
         String limit = own == null ? ""
                 : "\n\nYour Minima Core wallet itself can send up to " + own + " " + name + ". Its total also counts this Trading "
                 + "Account's coins (it watches them for Dexicon), but it can only send its own — ask for more and its Send fails.";
-        AlertDialog d = new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Deposit " + name)
-                .setMessage("Send " + name + " to your Trading Account from any Minima wallet (Minima Core › Send):\n\n" + addr
-                        + "\n\nIt is available to trade after 3 confirmations." + limit)
-                .setPositiveButton("Copy address", (x, w) -> act.copy("Trading Account address", addr))
-                .setNegativeButton("Close", null).create();
+        AlertDialog d = new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Deposit " + name))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("Send " + name + " to your Trading Account from any Minima wallet (Minima Core › Send):\n\n" + addr
+                        + "\n\nIt is available to trade after 3 confirmations." + limit))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Copy address"), (x, w) -> act.copy("Trading Account address", addr))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Close"), null).create();
         d.show();
         android.widget.TextView tv = d.findViewById(android.R.id.message);
         if (tv != null) tv.setTextIsSelectable(true);
@@ -119,19 +119,19 @@ final class WalletTools {
                 android.widget.TextView note = new android.widget.TextView(act);
                 note.setText(nodeAddr.isEmpty() ? "" : "Pre-filled with your node's own wallet address."); note.setTextColor(Design.DIM());
                 box.addView(note);
-                new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Withdraw " + name).setView(box)
-                        .setNegativeButton("Cancel", null)
-                        .setPositiveButton("Review", (d, w) -> {
+                new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Withdraw " + name)).setView(com.eurobuddha.dexicon.HostMode.translated(box))
+                        .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
+                        .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Review"), (d, w) -> {
                             BigDecimal a; try { a = new BigDecimal(amt.getText().toString().trim()); } catch (Exception e) { act.toast("Enter an amount"); return; }
                             String addr = to.getText().toString().trim();
                             if (a.signum() <= 0 || a.compareTo(sendable) > 0) { act.toast("Amount must be between 0 and " + sendable.stripTrailingZeros().toPlainString()); return; }
                             // Mx only: its checksum catches a pasted token/coin/txpow id, which a bare 0x string would burn to
                             if (!validMx(addr)) { act.toast("That is not a valid Minima address (Mx…)"); return; }
                             String cmd = "send address:" + addr + " amount:" + a.stripTrailingZeros().toPlainString() + (Tokens.isMinima(tokenid) ? "" : " tokenid:" + tokenid);
-                            AlertDialog c = new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Withdraw " + a.stripTrailingZeros().toPlainString() + " " + name + "?")
-                                    .setMessage("To:\n" + addr + "\n\nSigned by your Trading Account and posted through your node.")
-                                    .setNegativeButton("Cancel", null)
-                                    .setPositiveButton("Withdraw", (x, y) -> com.eurobuddha.pandapools.DexiconPools.guardNodePickedSpend(act.nodeApi(), tokenid, error -> {
+                            AlertDialog c = new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Withdraw " + a.stripTrailingZeros().toPlainString() + " " + name + "?"))
+                                    .setMessage(com.eurobuddha.dexicon.HostMode.tr("To:\n" + addr + "\n\nSigned by your Trading Account and posted through your node."))
+                                    .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
+                                    .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Withdraw"), (x, y) -> com.eurobuddha.pandapools.DexiconPools.guardNodePickedSpend(act.nodeApi(), tokenid, error -> {
                                         // send picks the coins: never a pool owner coin it must not sign (same guard as Split)
                                         if (error != null) message(act, "Nothing withdrawn", error);
                                         else run(act, tokenid, cmd, "Withdraw " + name, walletRow("withdraw", a.stripTrailingZeros().toPlainString(), name, addr));
@@ -215,7 +215,7 @@ final class WalletTools {
 
     private static void message(MainActivity act, String title, String text) {
         if (act.isFinishing() || act.isDestroyed()) return;
-        AlertDialog d = new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(title).setMessage(text).setPositiveButton("OK", null).create();
+        AlertDialog d = new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr(title)).setMessage(com.eurobuddha.dexicon.HostMode.tr(text)).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null).create();
         d.show();
         android.widget.TextView tv = d.findViewById(android.R.id.message);
         if (tv != null) tv.setTextIsSelectable(true);   // the full txpowid can be copied

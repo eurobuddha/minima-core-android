@@ -275,16 +275,16 @@ public class MainActivity extends com.eurobuddha.pandapools.MainActivity {
             ui.removeCallbacks(retryOffer);
             if (++lockedTries <= 6) { toast("Your Trading Account is temporarily locked — Dexicon retries in a moment."); ui.postDelayed(retryOffer, 5_000); return; }
             offering = true;
-            track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle("Trading Account locked")
-                    .setMessage("This phone's keystore will not unlock your Trading Account. You can restore it from its 24 words "
-                            + "(the locked copy is kept, never deleted).")
-                    .setPositiveButton("Restore", (d, w) -> {
+            track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Trading Account locked"))
+                    .setMessage(com.eurobuddha.dexicon.HostMode.tr("This phone's keystore will not unlock your Trading Account. You can restore it from its 24 words "
+                            + "(the locked copy is kept, never deleted)."))
+                    .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Restore"), (d, w) -> {
                         com.eurobuddha.dexicon.integratedaccount.Account.quarantineForRestore(this);
                         // straight to RESTORE of the SAME account (fingerprint-checked) — never "Create new" over it
                         String open = com.eurobuddha.dexicon.account.LegacyPositions.describeAny(this);
                         com.eurobuddha.dexicon.integratedaccount.AccountSetup.show(activity(), node, this::onAccountReady, true, open == null ? "funds" : open);
                     })
-                    .setNegativeButton("Later", (d, w) -> { offering = false; lockedTries = 0; }).show());
+                    .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Later"), (d, w) -> { offering = false; lockedTries = 0; }).show());
             return;
         }
         offering = true;
@@ -314,17 +314,17 @@ public class MainActivity extends com.eurobuddha.pandapools.MainActivity {
                 lastProofSaid = said;
                 TextView t = new TextView(this); t.setText(said); t.setTextIsSelectable(true);   // full pool addresses, copyable
                 int pp = Design.dp(this, 20); t.setPadding(pp, pp / 2, pp, 0);
-                track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle("Closed pools not proven empty").setView(t)
-                        .setPositiveButton("OK", null).show());
+                track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Closed pools not proven empty")).setView(com.eurobuddha.dexicon.HostMode.translated(t))
+                        .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null).show());
             }
         });
         if (legacyNoticeShown) return;
         legacyNoticeShown = true;
-        track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle("Finish these first")
-                .setMessage("This Dexicon still has " + legacy + " made with your node's own keys. They settle exactly as before "
+        track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Finish these first"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("This Dexicon still has " + legacy + " made with your node's own keys. They settle exactly as before "
                         + "(Dexicon needs ADMIN in your node until they are done). Once they are finished, Dexicon moves to its own "
-                        + "Trading Account and no longer needs ADMIN.")
-                .setPositiveButton("OK", null).show());
+                        + "Trading Account and no longer needs ADMIN."))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null).show());
     }
 
     /** The Trading Account was just created: pair again (no ADMIN needed now) and wake the maker service. */
@@ -462,7 +462,7 @@ public class MainActivity extends com.eurobuddha.pandapools.MainActivity {
     List<MyOrder> myOrders() { return db.myOrders(); }
     boolean isMine(Envelope e) { return me != null && e.signPk.equalsIgnoreCase(me.signPkHex()); }
 
-    public void toast(String s) { Toast.makeText(this, here(s), Toast.LENGTH_SHORT).show(); }
+    public void toast(String s) { Toast.makeText(this, com.eurobuddha.dexicon.HostMode.tr(HostMode.tr(here(s))), Toast.LENGTH_SHORT).show(); }
     /** The vendored PandaDEX layer (verbatim) tells you to consolidate "in MinimaCore"; Dexicon has it on ASSETS. */
     static String here(String s) {
         return s == null ? null : s.replace("the wallet screen's CONSOLIDATE", "ASSETS › CONSOLIDATE")
@@ -731,9 +731,9 @@ public class MainActivity extends com.eurobuddha.pandapools.MainActivity {
         if (!both && rest.signum() > 0) sb.append("\nThe remaining ").append(PriceMath.fmt(rest)).append(" MINIMA is NOT traded or rested by this transaction — place it again once it confirms.\n");
         sb.append("\nOne atomic transaction, signed by your node; final after one block.");
         track(new AlertDialog.Builder(this, Design.dialogTheme())
-                .setTitle(both ? (buy ? "Confirm sweep buy · FAST + " : "Confirm sweep sell · FAST + ") + routeName(plan) : buy ? "Confirm buy · BOOK/POOL" : "Confirm sell · BOOK/POOL")
-                .setMessage(sb.toString())
-                .setPositiveButton("Execute", (d, w) -> {
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr(both ? (buy ? "Confirm sweep buy · FAST + " : "Confirm sweep sell · FAST + ") + routeName(plan) : buy ? "Confirm buy · BOOK/POOL" : "Confirm sell · BOOK/POOL"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr(sb.toString()))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Execute"), (d, w) -> {
                     if (both && run != null) { toast("A FAST trade is still running — wait for it to finish"); return; }
                     if (both) {
                         // owner 7 Nov: FAST first (instant), then on-chain — the on-chain path already waits for confirming
@@ -744,7 +744,7 @@ public class MainActivity extends com.eurobuddha.pandapools.MainActivity {
                         executeTake(buy, price, fastQ);
                     } else { pendingBoth = null; executeComposite(plan, buy, amount, price, 0); }
                 })
-                .setNegativeButton("Back", null)
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Back"), null)
                 .show());
     }
 
@@ -992,13 +992,13 @@ public class MainActivity extends com.eurobuddha.pandapools.MainActivity {
         EditText price = new EditText(this); price.setHint("Price (MxUSD per MINIMA)"); price.setText(o.price);
         EditText amount = new EditText(this); amount.setHint("Amount (MINIMA)"); amount.setText(o.remaining);
         box.addView(price); box.addView(amount);
-        track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle("Edit order").setView(box)
-                .setPositiveButton("Update", (d, w) -> {
+        track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Edit order")).setView(com.eurobuddha.dexicon.HostMode.translated(box))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Update"), (d, w) -> {
                     if (gateRefuses()) return;
                     busy = true; repaint();
                     if (engine == null) { busy = false; toast("Not paired — try again once PAIRED"); repaint(); return; }
                     engine.edit(o.orderId, price.getText().toString().trim(), amount.getText().toString().trim(), (err, x) -> { busy = false; setStage(err != null ? "Edit failed: " + err : "Order updated"); repaint(); });
-                }).setNegativeButton("Back", null).show());
+                }).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Back"), null).show());
     }
 
     private interface CoinsCb { void done(String err, List<Coin> coins); }
@@ -1398,8 +1398,8 @@ public class MainActivity extends com.eurobuddha.pandapools.MainActivity {
     }
 
     private void confirm(String title, String body, Runnable yes) {
-        track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle(title).setMessage(body)
-                .setPositiveButton("Confirm", (d, w) -> yes.run()).setNegativeButton("Back", null).show());
+        track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr(title)).setMessage(com.eurobuddha.dexicon.HostMode.tr(body))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Confirm"), (d, w) -> yes.run()).setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Back"), null).show());
     }
 
     // ---- chrome ----
@@ -1614,12 +1614,12 @@ public class MainActivity extends com.eurobuddha.pandapools.MainActivity {
         final com.eurobuddha.atomix.TradingContext target = host.market().other();
         String to = com.eurobuddha.dexicon.doors.DoorPlan.coin(target), from = com.eurobuddha.dexicon.doors.DoorPlan.coin(host.market());
         track(new AlertDialog.Builder(this, Design.dialogTheme())
-                .setTitle("Switch to " + to + "?")
-                .setMessage("AtomiX publishes and market-makes in ONE currency at a time. Switching to " + to
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Switch to " + to + "?"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("AtomiX publishes and market-makes in ONE currency at a time. Switching to " + to
                         + " re-themes ① and moves your swaps, order/market-making and OTC to the " + to + " book.\n\nYour current "
                         + from + " orders simply stop being maintained (a live market is withdrawn from the book). Any in-flight swaps in "
-                        + "either currency keep settling safely in the background — switching never strands them.")
-                .setPositiveButton("Switch to " + to, (d, w) -> {
+                        + "either currency keep settling safely in the background — switching never strands them."))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Switch to " + to), (d, w) -> {
                     if (host.makerLive()) setStage("Withdrawing your " + from + " market…");   // AtomiX shows the wait too
                     String err = host.switchMarket(target, () -> {
                         dismissDialogs();   // an editor / offer opened for the leaving market must not save into the new one
@@ -1627,7 +1627,7 @@ public class MainActivity extends com.eurobuddha.pandapools.MainActivity {
                     });
                     if (err != null) { setStage(""); toast(err); }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .show());
     }
 
@@ -1977,7 +1977,7 @@ public class MainActivity extends com.eurobuddha.pandapools.MainActivity {
     }
 
     private void explain(String title, String body) {
-        new AlertDialog.Builder(this, Design.dialogTheme()).setTitle(title).setMessage(body).setPositiveButton("OK", null).show();
+        new AlertDialog.Builder(this, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr(title)).setMessage(com.eurobuddha.dexicon.HostMode.tr(body)).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null).show();
     }
 
     @Override protected void onPause() { super.onPause(); FOREGROUND = false; stopCcyGlow(); }

@@ -153,9 +153,9 @@ final class StrandingWatch {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder b = new NotificationCompat.Builder(ctx, CH_STRAND)
-                .setContentTitle(title)
-                .setContentText(body)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(body + "\n\n" + p.address))
+                .setContentTitle(com.eurobuddha.dexicon.HostMode.tr(title))
+                .setContentText(com.eurobuddha.dexicon.HostMode.tr(body))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(com.eurobuddha.dexicon.HostMode.tr(body + "\n\n" + p.address)))
                 .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)

@@ -108,7 +108,7 @@ public final class Ui {
             android.content.ClipboardManager cm =
                     (android.content.ClipboardManager) c.getSystemService(Context.CLIPBOARD_SERVICE);
             if (cm != null) cm.setPrimaryClip(android.content.ClipData.newPlainText(label, fullValue));
-            android.widget.Toast.makeText(c, "Copied " + label, android.widget.Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(c, com.eurobuddha.dexicon.HostMode.tr("Copied " + label), android.widget.Toast.LENGTH_SHORT).show();
         });
     }
 

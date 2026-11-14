@@ -33,15 +33,15 @@ final class AtomixConsolidate {
             int cap = MinimaHtlc.maxSafeCoinRows(token);
             int runs = (int) Math.max(0L, ((long) b.coins - cap + 17L) / 18L);
             String label = DoorPlan.coin(host.market());
-            act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle("Consolidate " + label)
-                    .setMessage(b.coins + " wallet coins · read limit " + cap + ".\n\n"
+            act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr("Consolidate " + label))
+                    .setMessage(com.eurobuddha.dexicon.HostMode.tr(b.coins + " wallet coins · read limit " + cap + ".\n\n"
                             + (runs > 0 ? "At least about " + runs + " runs to reach the limit. " : "Your wallet is within the read limit. ")
                             + "Each run asks the node to merge up to 20 spendable coins into 2, with at most 5 signing addresses. Locked coins cannot be merged.\n\n"
                             + "Run once signs one self-send on your node and consumes one-time signing keys. Preview does not sign. "
-                            + "Wait for new coins to age 3 blocks before running again. No automatic repeats.")
-                    .setNeutralButton("Preview", (d, w) -> once(act, token, true))
-                    .setPositiveButton("Run once", (d, w) -> once(act, token, false))
-                    .setNegativeButton("Cancel", null).show());
+                            + "Wait for new coins to age 3 blocks before running again. No automatic repeats."))
+                    .setNeutralButton(com.eurobuddha.dexicon.HostMode.tr("Preview"), (d, w) -> once(act, token, true))
+                    .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Run once"), (d, w) -> once(act, token, false))
+                    .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null).show());
         }, e -> text(act, "Consolidate", e));
     }
 
@@ -91,6 +91,6 @@ final class AtomixConsolidate {
         t.setTextIsSelectable(true);
         int p = Design.dp(act, 20); t.setPadding(p, Design.dp(act, 12), p, Design.dp(act, 4));
         android.widget.ScrollView sv = new android.widget.ScrollView(act); sv.addView(t);
-        act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(title).setView(sv).setPositiveButton("OK", null).show());
+        act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr(title)).setView(com.eurobuddha.dexicon.HostMode.translated(sv)).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null).show());
     }
 }

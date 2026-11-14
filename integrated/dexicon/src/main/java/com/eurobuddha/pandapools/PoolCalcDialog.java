@@ -167,9 +167,9 @@ public final class PoolCalcDialog {
         scroll.addView(box);
         render();
         new AlertDialog.Builder(ctx)
-                .setTitle("Pool calculator")
-                .setView(scroll)
-                .setPositiveButton("Done", null)
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Pool calculator"))
+                .setView(com.eurobuddha.dexicon.HostMode.translated(scroll))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Done"), null)
                 .show();
     }
 

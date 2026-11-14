@@ -545,27 +545,27 @@ public final class DexiconPools {
             pools.append("\nPool: ").append(p.address);
         }
         if (keys.isEmpty() || act.node() == null || BuildConfig.VERSION_NAME.endsWith("-diagnostic")) { done.run(); return; }
-        new android.app.AlertDialog.Builder(act).setTitle("Dexicon keeps your pools now")
-                .setMessage("PandaPools has stopped keeping them. Restored pools start with owner signing paused, so Dexicon cannot renew "
+        new android.app.AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr("Dexicon keeps your pools now"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("PandaPools has stopped keeping them. Restored pools start with owner signing paused, so Dexicon cannot renew "
                         + "their reserves until you confirm this wallet's signing state.\n\nOnly continue if this node holds the latest complete "
                         + "wallet signing state and every other copy of this wallet has stopped signing (PandaPools has: it handed these over). "
                         + "A seed, old backup, or counter above the recipe's recorded count cannot prove this.\n\nConfirming enables owner "
-                        + "actions and automatic pool refresh for:\n" + String.join("\n", keys) + "\n" + pools)
-                .setNegativeButton("Keep signing paused", (d, w) -> {
-                    new android.app.AlertDialog.Builder(act).setTitle("Signing remains paused")
-                            .setMessage("Confirm later on ② My pools → Back up / restore pools → Confirm wallet signing state. Until then "
-                                    + "nothing renews these pools.").setPositiveButton("OK", null).show();
+                        + "actions and automatic pool refresh for:\n" + String.join("\n", keys) + "\n" + pools))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Keep signing paused"), (d, w) -> {
+                    new android.app.AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr("Signing remains paused"))
+                            .setMessage(com.eurobuddha.dexicon.HostMode.tr("Confirm later on ② My pools → Back up / restore pools → Confirm wallet signing state. Until then "
+                                    + "nothing renews these pools.")).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null).show();
                     done.run();
                 })
-                .setPositiveButton("I have verified this", (d, w) -> confirmKeys(act, keys, 0, new StringBuilder(), done))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("I have verified this"), (d, w) -> confirmKeys(act, keys, 0, new StringBuilder(), done))
                 .setCancelable(false).show();
     }
 
     private static void confirmKeys(MainActivity act, List<String> keys, int i, StringBuilder failed, Runnable done) {
         if (i >= keys.size()) {
-            if (failed.length() > 0) new android.app.AlertDialog.Builder(act).setTitle("Signing remains paused")
-                    .setMessage("The owner key is missing, exhausted, below a recorded count, or the confirmation could not be saved:\n" + failed)
-                    .setPositiveButton("OK", null).show();
+            if (failed.length() > 0) new android.app.AlertDialog.Builder(act).setTitle(com.eurobuddha.dexicon.HostMode.tr("Signing remains paused"))
+                    .setMessage(com.eurobuddha.dexicon.HostMode.tr("The owner key is missing, exhausted, below a recorded count, or the confirmation could not be saved:\n" + failed))
+                    .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("OK"), null).show();
             if (act.pools() != null) act.pools().refresh();
             done.run();
             return;

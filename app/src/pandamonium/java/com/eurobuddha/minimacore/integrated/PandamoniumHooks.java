@@ -352,6 +352,8 @@ public final class PandamoniumHooks {
         com.eurobuddha.minimacore.maxchat.MaxChat.APPLICATION_LISTENERS.add(com.eurobuddha.salon.MaximaLink::onMessage);
         com.eurobuddha.minimacore.maxchat.MaxChat.UI_LISTENERS.add(com.eurobuddha.salon.MaximaLink::refresh);
         settleDexiconUpgrade(context);
+        // Dexicon speaks Pandamonium's language (tab, dialogs, toasts and its notifications - even before the tab opens).
+        com.eurobuddha.dexicon.HostMode.setTranslator(new DexiconTranslations(context));
         // Terminal IDE's log store and the Salon's event watcher follow each app's freeze state.
         if (context.getApplicationContext() instanceof android.app.Application)
             initFreeze((android.app.Application) context.getApplicationContext());

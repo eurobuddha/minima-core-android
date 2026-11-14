@@ -215,14 +215,14 @@ public final class OtcTab extends LinearLayout {
         EditText amtE = input(); amtE.setText(amount); box.addView(amtE);
         box.addView(Ui.label(act, "Price (USDT per " + ccy() + ")"));
         EditText prE = input(); prE.setText(price); box.addView(prE);
-        act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(title).setView(box)
-                .setPositiveButton(ok, (dg, w) -> {
+        act.track(new AlertDialog.Builder(act, Design.dialogTheme()).setTitle(com.eurobuddha.dexicon.HostMode.tr(title)).setView(com.eurobuddha.dexicon.HostMode.translated(box))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr(ok), (dg, w) -> {
                     if (refuse() || host.market() != m) { if (host.market() != m) act.toast("The market was switched — nothing was sent."); return; }
                     double a = MarketTab.parseD(amtE.getText().toString(), 0), pr = MarketTab.parseD(prE.getText().toString(), 0);
                     if (!(a > 0) || !(pr > 0) || !Double.isFinite(a) || !Double.isFinite(pr) || !OtcController.validTerms(DoorHost.plain(a), DoorHost.sig(pr))) { act.toast("Enter amount + price"); return; }
                     send.accept(a, pr);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .setOnDismissListener(dg -> act.repaint())
                 .show());
     }

@@ -647,8 +647,8 @@ public class MakerService extends Service {
                 android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE);
         String body = "Your Minima node isn't running — your published AtomiX market will drop off the book. Tap to open it.";
         try {
-            nm.notify(OFFLINE_ID, new NotificationCompat.Builder(this, CH_OFFLINE).setContentTitle("Market offline").setContentText(body)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(body)).setSmallIcon(android.R.drawable.stat_notify_error)
+            nm.notify(OFFLINE_ID, new NotificationCompat.Builder(this, CH_OFFLINE).setContentTitle(com.eurobuddha.dexicon.HostMode.tr("Market offline")).setContentText(com.eurobuddha.dexicon.HostMode.tr(body))
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(com.eurobuddha.dexicon.HostMode.tr(body))).setSmallIcon(android.R.drawable.stat_notify_error)
                     .setPriority(NotificationCompat.PRIORITY_HIGH).setContentIntent(pi).setAutoCancel(true).build());
         } catch (SecurityException noPermission) { /* notifications off: the in-app status still says so */ }
         log("market offline alert (unpaired " + (now - unpairedSince) / 60_000 + " min)");
@@ -686,8 +686,8 @@ public class MakerService extends Service {
         String body = "No reply from MEXC or CoinGecko for " + down / 60_000 + " min, so your pegged ladder is withdrawn. This is "
                 + "usually this phone's own connection dropping packets. Tap to turn Wi-Fi off and on.";
         try {
-            nm.notify(NET_ID, new NotificationCompat.Builder(this, CH_NET).setContentTitle("No price: check this phone's Wi-Fi").setContentText(body)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(body)).setSmallIcon(android.R.drawable.stat_notify_error)
+            nm.notify(NET_ID, new NotificationCompat.Builder(this, CH_NET).setContentTitle(com.eurobuddha.dexicon.HostMode.tr("No price: check this phone's Wi-Fi")).setContentText(com.eurobuddha.dexicon.HostMode.tr(body))
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(com.eurobuddha.dexicon.HostMode.tr(body))).setSmallIcon(android.R.drawable.stat_notify_error)
                     .setPriority(NotificationCompat.PRIORITY_HIGH).setContentIntent(pi).setAutoCancel(true).build());
         } catch (SecurityException noPermission) { /* notifications off: the maker dialog still shows the error */ }
         log("net alert: price feed unreachable " + down / 60_000 + " min");
@@ -712,8 +712,8 @@ public class MakerService extends Service {
     private Notification fgNotification(String text) {
         PendingIntent pi = PendingIntent.getActivity(this, 24, com.eurobuddha.dexicon.HostMode.screenIntent(this), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         return new NotificationCompat.Builder(this, CH_FG)
-                .setContentTitle("Dexicon maker")
-                .setContentText(text)
+                .setContentTitle(com.eurobuddha.dexicon.HostMode.tr("Dexicon maker"))
+                .setContentText(com.eurobuddha.dexicon.HostMode.tr(text))
                 .setSmallIcon(android.R.drawable.stat_sys_upload_done)
                 .setContentIntent(pi)
                 .setOngoing(true)

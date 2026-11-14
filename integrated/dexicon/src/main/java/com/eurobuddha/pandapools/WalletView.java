@@ -369,7 +369,7 @@ public class WalletView extends BaseView {
         if (notEmpty(b.meta.externalUrl)) box.addView(linkRow("Website", b.meta.externalUrl));
         if (notEmpty(b.meta.webvalidate)) box.addView(linkRow("Web validation", b.meta.webvalidate));
 
-        new AlertDialog.Builder(act).setView(sv).setPositiveButton("Close", null).show();
+        new AlertDialog.Builder(act).setView(com.eurobuddha.dexicon.HostMode.translated(sv)).setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Close"), null).show();
     }
 
     // ---- coin list (AtomiX's coin dump, tagged for PandaPools) ----
@@ -480,7 +480,7 @@ public class WalletView extends BaseView {
         iv.setBackgroundColor(0xFF000000);
         iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
         ImageLoader.loadFull(act, url, iv, com.eurobuddha.dexicon.R.drawable.pm_dexicon_ic_coin_placeholder);
-        AlertDialog dlg = new AlertDialog.Builder(act).setView(iv).create();
+        AlertDialog dlg = new AlertDialog.Builder(act).setView(com.eurobuddha.dexicon.HostMode.translated(iv)).create();
         iv.setOnClickListener(v -> dlg.dismiss());
         dlg.show();
     }

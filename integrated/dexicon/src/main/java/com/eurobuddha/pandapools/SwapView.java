@@ -301,12 +301,12 @@ public class SwapView extends BaseView {
         String recv = trim(r.totalOut) + " " + (dir ? pairLabel : "MINIMA");
         String routed = r.poolsUsed > 1 ? "\nRouted across " + r.poolsUsed + " pools in one transaction." : "";
         new AlertDialog.Builder(act)
-                .setTitle("Confirm swap")
-                .setMessage("Pay  " + pay + "\nReceive  " + recv + "\n\nPrice impact " + impact(r) + "%." + routed
+                .setTitle(com.eurobuddha.dexicon.HostMode.tr("Confirm swap"))
+                .setMessage(com.eurobuddha.dexicon.HostMode.tr("Pay  " + pay + "\nReceive  " + recv + "\n\nPrice impact " + impact(r) + "%." + routed
                         + "\n\nThis posts a real on-chain transaction — if a pool moves before it confirms the "
-                        + "swap is rejected (you keep your funds).")
-                .setPositiveButton("Swap", (d, w) -> doSwap(r, dir))
-                .setNegativeButton("Cancel", null)
+                        + "swap is rejected (you keep your funds)."))
+                .setPositiveButton(com.eurobuddha.dexicon.HostMode.tr("Swap"), (d, w) -> doSwap(r, dir))
+                .setNegativeButton(com.eurobuddha.dexicon.HostMode.tr("Cancel"), null)
                 .show();
     }
 

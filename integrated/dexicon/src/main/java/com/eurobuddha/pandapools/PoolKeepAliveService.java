@@ -31,7 +31,7 @@ public class PoolKeepAliveService extends Service {
         try {
             NotificationManager nm = getSystemService(NotificationManager.class);
             if (Build.VERSION.SDK_INT >= 26 && nm != null) nm.createNotificationChannel(new NotificationChannel(CH, "Pool re-publish", NotificationManager.IMPORTANCE_LOW));
-            Notification n = new NotificationCompat.Builder(this, CH).setContentTitle("Dexicon").setContentText("Re-publishing your pool…")
+            Notification n = new NotificationCompat.Builder(this, CH).setContentTitle(com.eurobuddha.dexicon.HostMode.tr("Dexicon")).setContentText(com.eurobuddha.dexicon.HostMode.tr("Re-publishing your pool…"))
                     .setSmallIcon(android.R.drawable.stat_sys_upload).build();
             if (Build.VERSION.SDK_INT >= 34) startForeground(FG_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
             else if (Build.VERSION.SDK_INT >= 29) startForeground(FG_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
