@@ -5,6 +5,10 @@ public final class PandamoniumHooks {
     public static com.eurobuddha.minimacore.main.BaseView createUtilityTab(com.eurobuddha.minimacore.main.MainActivity activity) {
         return new com.eurobuddha.minimacore.main.views.terminal.TerminalView(activity);
     }
+    /** Only Pandamonium has a trading tab (2.2.34: Dexicon on the embedded node wallet). */
+    public static com.eurobuddha.minimacore.main.BaseView createTradingTab(com.eurobuddha.minimacore.main.MainActivity activity) {
+        return null;
+    }
     public static void initialize(android.content.Context context) {}
     public static void install(android.app.Activity activity) {}
     // No integrated-app drawer in this build — the Apps tab shows External only.

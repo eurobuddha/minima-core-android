@@ -12,36 +12,9 @@ def adapt(root):
     creative_apps = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(creative_apps)
     creative_apps.prepare(root)
-    # Reproduce 1.9.32's shared codec dependency; importing old copies would
-    # reintroduce duplicate classes. Refuse to discard a copy that has diverged.
-    shared = Path(__file__).resolve().parents[1] / 'maxima-core/src/main/java/com/eurobuddha/maxima/core'
-    copies = root / 'pandapools/src/main/java/com/eurobuddha/maxima/core'
-    for relative in ('msg/Magic.java', 'msg/TxHeader.java', 'codec/MiniData.java',
-                     'codec/MiniByte.java', 'codec/Hex.java', 'codec/Reads.java',
-                     'codec/MiniNumber.java', 'codec/Streamable.java'):
-        duplicate = copies / relative
-        assert duplicate.read_bytes() == (shared / relative).read_bytes(), ('Shared codec drift', relative)
-        duplicate.unlink()
-    gradle = root / 'pandapools/build.gradle'
-    source = gradle.read_text()
-    assert source.count('dependencies {') == 1, 'PandaPools dependencies drift'
-    gradle.write_text(source.replace('dependencies {', """dependencies {
-    // Shared Maxima codec classes now come from the vendored transport core
-    // (they were byte-identical copies; D8 refuses the duplicate).
-    implementation project(':maxima-core')""", 1))
-    for name in ('pandapools','pandadex'):
-        for filename in ('NodeTransport.java','NodeTransportService.java'):
-            for p in (root/name/'src/main/java').rglob(filename): p.unlink()
-        for p in (root/name/'src/test').rglob('NodeTransportTest.java'): p.unlink()
-    # Discovery belongs to the standalone SDK; the embedded copy uses DirectNodeApi.
-    for p in (root/'pandadex/src/test').rglob('NodeRoutingTest.java'): p.unlink()
-    # Keep the strict JSON parser: MakerConfig uses it for durable financial records.
-    for p in (root/'pandadex/src/main/java/com/eurobuddha/minimaapi').glob('*.java'):
-        if p.name!='MinimaAPIResponse.java': p.unlink()
-    p=root/'pandadex/src/test/java/com/eurobuddha/minimaapi/MinimaAPIResponseTest.java'
-    s=p.read_text(); s=re.sub(r'    @Test public void pairingIdsAcceptExistingCaseButNotPartialCorruption\(\) \{.*?\n    \}', '',s,flags=re.S);p.write_text(s)
     for p in root.glob('*/src/main/java/**/*.java'):
         if p.name=='MinimaNotifyReceiver.java': continue
+        if p.relative_to(root).parts[0]=='dexicon': continue  # adapted by adapt-pandamonium-dexicon.py
         s=p.read_text()
         s=s.replace('com.eurobuddha.pandadex.integratedsdk.MinimaAPIListener','com.eurobuddha.minimaapi.MinimaAPIListener')
         s=re.sub(r'import (?:com.eurobuddha.minimaapi|com.eurobuddha.pandadex.integratedsdk).MinimaAPI;', 'import com.eurobuddha.minimaapi.direct.DirectNodeApi;',s)
@@ -152,7 +125,6 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     import importlib.util
     spec=importlib.util.spec_from_file_location('integrated_ui',Path(__file__).with_name('adapt-pandamonium-ui.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt_ui(root)
-    p=root/'pandadex/build.gradle';s=p.read_text();s=s.replace('dependencies {', "dependencies {\n    implementation project(':minimaapi')");p.write_text(s)
     spec=importlib.util.spec_from_file_location('integrated_safety',Path(__file__).with_name('adapt-pandamonium-safety.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
     spec=importlib.util.spec_from_file_location('integrated_key_audit',Path(__file__).with_name('adapt-pandamonium-key-audit.py'))
@@ -335,58 +307,6 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
     spec=importlib.util.spec_from_file_location('mall_studio_export',Path(__file__).with_name('adapt-pandamonium-mall-studio-export.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
-    spec=importlib.util.spec_from_file_location('atomix_languages',Path(__file__).with_name('adapt-pandamonium-atomix-languages.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_notices',Path(__file__).with_name('adapt-pandamonium-atomix-notices.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_otc',Path(__file__).with_name('adapt-pandamonium-atomix-otc.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_currency',Path(__file__).with_name('adapt-pandamonium-atomix-currency.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_amounts',Path(__file__).with_name('adapt-pandamonium-atomix-amounts.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_order_context',Path(__file__).with_name('adapt-pandamonium-atomix-order-context.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_publish_queue',Path(__file__).with_name('adapt-pandamonium-atomix-publish-queue.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_send_receipt',Path(__file__).with_name('adapt-pandamonium-atomix-send-receipt.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_chain_evidence',Path(__file__).with_name('adapt-pandamonium-atomix-chain-evidence.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_consent',Path(__file__).with_name('adapt-pandamonium-atomix-consent.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_first_leg',Path(__file__).with_name('adapt-pandamonium-atomix-first-leg.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_responder',Path(__file__).with_name('adapt-pandamonium-atomix-responder.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_eth_context',Path(__file__).with_name('adapt-pandamonium-atomix-eth-context.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_market',Path(__file__).with_name('adapt-pandamonium-atomix-market.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_market_inputs',Path(__file__).with_name('adapt-pandamonium-atomix-market-inputs.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_history',Path(__file__).with_name('adapt-pandamonium-atomix-history.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_swap',Path(__file__).with_name('adapt-pandamonium-atomix-swap.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_operation',Path(__file__).with_name('adapt-pandamonium-atomix-operation.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_recovery',Path(__file__).with_name('adapt-pandamonium-atomix-recovery.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_report',Path(__file__).with_name('adapt-pandamonium-atomix-report.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-    spec=importlib.util.spec_from_file_location('atomix_swap_inputs',Path(__file__).with_name('adapt-pandamonium-atomix-swap-inputs.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
-    spec=importlib.util.spec_from_file_location('pools_languages',Path(__file__).with_name('adapt-pandamonium-pools-languages.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
-    spec=importlib.util.spec_from_file_location('pools_collection',Path(__file__).with_name('adapt-pandamonium-pools-collection.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
-    spec=importlib.util.spec_from_file_location('dex_languages',Path(__file__).with_name('adapt-pandamonium-dex-languages.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
     spec=importlib.util.spec_from_file_location('service_languages',Path(__file__).with_name('adapt-pandamonium-service-languages.py'))
@@ -608,15 +528,6 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     spec=importlib.util.spec_from_file_location('review_eth_nonce',Path(__file__).with_name('adapt-pandamonium-review-eth-nonce.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
-    spec=importlib.util.spec_from_file_location('review_eth_logs',Path(__file__).with_name('adapt-pandamonium-review-eth-logs.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
-    spec=importlib.util.spec_from_file_location('review_atomix_send',Path(__file__).with_name('adapt-pandamonium-review-atomix-send.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
-    spec=importlib.util.spec_from_file_location('review_atomix_backing',Path(__file__).with_name('adapt-pandamonium-review-atomix-backing.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
     spec=importlib.util.spec_from_file_location('future_wallet_stakes',Path(__file__).with_name('adapt-pandamonium-future-wallet-stakes.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
@@ -637,9 +548,6 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
     spec=importlib.util.spec_from_file_location('wallet_history_status',Path(__file__).with_name('adapt-pandamonium-wallet-history-status.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
-    spec=importlib.util.spec_from_file_location('atomix_bid_backing',Path(__file__).with_name('adapt-pandamonium-atomix-bid-backing.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
     spec=importlib.util.spec_from_file_location('wallet_sweep',Path(__file__).with_name('adapt-pandamonium-wallet-sweep.py'))
@@ -668,17 +576,8 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
 
     spec=importlib.util.spec_from_file_location('integrated_lint',Path(__file__).with_name('adapt-pandamonium-lint.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
-    spec=importlib.util.spec_from_file_location('pools_bounded_recovery',Path(__file__).with_name('adapt-pandamonium-pools-bounded-recovery.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
-    spec=importlib.util.spec_from_file_location('pools_archive_recovery',Path(__file__).with_name('adapt-pandamonium-pools-archive-recovery.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
-    spec=importlib.util.spec_from_file_location('pools_combined_backup',Path(__file__).with_name('adapt-pandamonium-pools-combined-backup.py'))
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
-
-    spec=importlib.util.spec_from_file_location('dex_posted_inputs',Path(__file__).with_name('adapt-pandamonium-dex-posted-inputs.py'))
+    # 2.2.34: the Dexicon tab (host-node mode, DirectLink) replaces the built-in AtomiX, PandaPools and PandaDEX.
+    spec=importlib.util.spec_from_file_location('dexicon_host',Path(__file__).with_name('adapt-pandamonium-dexicon.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
 if __name__=='__main__': adapt(Path(sys.argv[1]))

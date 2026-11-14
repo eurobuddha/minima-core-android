@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
+    <queries>
+        <package android:name="com.eurobuddha.minimacore" />
+        <package android:name="com.eurobuddha.minimablock" />
+        <package android:name="com.eurobuddha.pandamonium" />
+        <package android:name="org.minima.core" />
+        <package android:name="org.minimarex.minimacore" />
+        <package android:name="com.eurobuddha.atomix" />
+        <package android:name="com.eurobuddha.pandapools" />
+        <package android:name="com.eurobuddha.dexicon" />
+        <package android:name="com.eurobuddha.dexicon.stock" />
+        <package android:name="com.eurobuddha.atomix.stock" />
+        <package android:name="com.eurobuddha.pandapools.stock" />
+    </queries>
+    <application>
+        <meta-data android:name="com.eurobuddha.account.leafSlot" android:value="0" />
+        <service android:name="com.eurobuddha.dexicon.maker.MakerService" android:exported="false" android:stopWithTask="false" android:foregroundServiceType="specialUse|dataSync">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Polls the Dexicon relay inbox, co-signs fills of the user's own resting orders and keeps the user's liquidity pools alive while the app is closed" />
+        </service>
+        <service android:name="com.eurobuddha.pandapools.PoolKeepAliveService" android:exported="false" android:foregroundServiceType="specialUse|dataSync">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Hands a pool re-publish request from a notification to the Dexicon keep-alive service" />
+        </service>
+        <provider android:name="com.eurobuddha.dexicon.IntegratedFileProvider" android:authorities="${applicationId}.dexicon.fileprovider" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/pm_dexicon_file_paths" />
+        </provider>
+        <receiver android:name="com.eurobuddha.dexicon.maker.HeartbeatReceiver" android:exported="false" />
+        <receiver android:name="com.eurobuddha.dexicon.maker.BootReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

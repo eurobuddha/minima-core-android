@@ -29,60 +29,6 @@ def adapt_mail_freshness(root):
     p.write_text(s)
 
 
-def adapt_atomix_toolbar(root):
-    """Preserve the shipped 1.9.32 menu fix when recreating the pinned snapshot."""
-    p = root / 'atomix/src/main/java/com/eurobuddha/atomix/MainActivity.java'
-    s = p.read_text()
-    old = r"""    private void buildHeader(LinearLayout col) {
-        LinearLayout header = new LinearLayout(this);
-        header.setOrientation(LinearLayout.HORIZONTAL);
-        header.setGravity(Gravity.CENTER_VERTICAL);
-
-        TextView brand = new TextView(this);
-        brand.setText("AtomiX");
-        brand.setTextColor(Design.TEXT()); brand.setTextSize(21f); brand.setTypeface(Design.sansBold()); brand.setLetterSpacing(-0.01f);
-        header.addView(brand, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));"""
-    new = r"""    private void buildHeader(LinearLayout col) {
-        LinearLayout header = new LinearLayout(this);
-        header.setOrientation(LinearLayout.HORIZONTAL);
-        header.setGravity(Gravity.CENTER_VERTICAL);
-        boolean hosted = "com.eurobuddha.pandamonium".equals(getPackageName());
-        if (hosted) {
-            // render() rebuilds this whole tree every ~30s, so the HOST's one-shot
-            // menu insertion dies with the first rebuild (proven on the Fold: the
-            // hamburger vanished). The tag below tells the host to stand down and
-            // this header draws its own hamburger on every rebuild instead.
-            header.setTag("pandamonium.app.toolbar.self");
-            TextView burger = new TextView(this);
-            burger.setText("\u2630");
-            burger.setTextColor(Design.TEXT());
-            burger.setTextSize(20f);
-            burger.setGravity(Gravity.CENTER);
-            burger.setContentDescription("Open Minima Core menu");
-            Design.pressable(burger);
-            burger.setOnClickListener(v -> {
-                View shell = getWindow().getDecorView()
-                        .findViewWithTag("pandamonium.navigation.shell");
-                if (shell instanceof androidx.drawerlayout.widget.DrawerLayout) {
-                    ((androidx.drawerlayout.widget.DrawerLayout) shell)
-                            .openDrawer(Gravity.LEFT);
-                }
-            });
-            header.addView(burger, new LinearLayout.LayoutParams(dp(44), dp(44)));
-        }
-
-        TextView brand = new TextView(this);
-        brand.setText("AtomiX");
-        brand.setTextColor(Design.TEXT()); brand.setTextSize(21f); brand.setTypeface(Design.sansBold()); brand.setLetterSpacing(-0.01f);
-        if (hosted) {
-            // Hamburger left, title centred in the remaining span.
-            brand.setGravity(Gravity.CENTER);
-        }
-        header.addView(brand, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));"""
-    assert s.count(old) == 1, 'AtomiX toolbar adaptation drift'
-    p.write_text(s.replace(old, new, 1))
-
-
 def adapt_wallet_screen_host(root):
     """Reuse the wallet tab container pattern so screen replacement retains host navigation."""
     p = root / "wallet/src/main/java/com/eurobuddha/wallet/MainActivity.java"
@@ -126,19 +72,9 @@ def adapt_languages(root):
         assert source.count('dependencies {') == 1, ('Dependencies drift', gradle)
         assert dependency not in source, ('Language adaptation applied twice', gradle)
         gradle.write_text(source.replace('dependencies {', 'dependencies {\n' + dependency, 1))
-    # AtomiX rebuilds its own menu button; bind every replacement button as well.
-    path = root / 'atomix/src/main/java/com/eurobuddha/atomix/MainActivity.java'
-    source = path.read_text()
-    old = 'burger.setContentDescription("Open Minima Core menu");'
-    assert source.count(old) == 1, 'AtomiX language menu adaptation drift'
-    path.write_text(source.replace(old,
-        'com.eurobuddha.minimacore.i18n.Language.description(burger, '
-        'com.eurobuddha.minimacore.i18n.Language.msg('
-        'com.eurobuddha.minimacore.i18n.R.string.l10n_drawer_open));', 1))
 
 def adapt(root):
     adapt_mail_freshness(root)
-    adapt_atomix_toolbar(root)
     adapt_wallet_screen_host(root)
     # Native header rows retain their own controls; navigation is inserted at their left edge.
     for folder in root.iterdir():
@@ -147,9 +83,6 @@ def adapt(root):
         tree=ET.parse(layout); top=tree.getroot(); header=list(top)[0]
         header.set(A+'tag','pandamonium.app.toolbar')
         ET.indent(tree,space='    ');tree.write(layout,encoding='unicode',xml_declaration=True)
-    dex=root/'pandadex/src/main/java/com/eurobuddha/pandadex/MainActivity.java'
-    s=dex.read_text().replace('        headerChrome = header;', '        headerChrome = header;\n        header.setTag("pandamonium.app.toolbar");')
-    dex.write_text(s)
 
     folder=root/'history/src/main/java/com/eurobuddha/history'
     p=folder/'MainActivity.java';s=p.read_text()

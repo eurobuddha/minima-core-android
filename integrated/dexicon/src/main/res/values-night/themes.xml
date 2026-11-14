@@ -1,0 +1,4 @@
+<resources>
+    <style name="pm_dexicon_Base.Theme.Dexicon" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
+</resources>

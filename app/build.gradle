@@ -182,8 +182,10 @@ android {
         // typed; old Vault took 12-21 words) and then asks "Minima's form or exactly as typed"; near-miss word phrases,
         // a leading "-" and [ ] { } refused; paste never drops words; no spill-over after auto-complete; first-run screens
         // always FLAG_SECURE; Vault errors as toasts. WordEntry from Dexicon 0.3.50.
-        versionCode 303
-        versionName "2.2.33"
+        // 2.2.34 (Pandamonium): one integrated Dexicon tab on the host node wallet (Dexicon 0.3.53 in host-node mode,
+        // in-process DirectNodeApi) replaces the built-in AtomiX, PandaPools and PandaDEX. Bears unchanged.
+        versionCode 304
+        versionName "2.2.34"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
@@ -366,10 +368,9 @@ dependencies {
     pandamoniumImplementation 'androidx.drawerlayout:drawerlayout:1.2.0'
     pandamoniumImplementation 'androidx.work:work-runtime:2.9.1'   // already in the APK via the integrated apps; the deep freeze cancels their jobs
     pandamoniumImplementation project(':integrated-ethwallet')
-    pandamoniumImplementation project(':integrated-atomix')
-    pandamoniumImplementation project(':integrated-pandapools')
+    // 2.2.34: one Dexicon tab on the host node wallet replaces the built-in AtomiX, PandaPools and PandaDEX.
+    pandamoniumImplementation project(':integrated-dexicon')
     pandamoniumImplementation project(':integrated-futurecash-next')
-    pandamoniumImplementation project(':integrated-pandadex')
     pandamoniumImplementation project(':integrated-casino')
     pandamoniumImplementation project(':integrated-blockexplorer')
     pandamoniumImplementation project(':integrated-filez')

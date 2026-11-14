@@ -1,3 +1,5 @@
+// From apks/atomix 0.2.32 (via Dexicon 0.3.52), 2.2.34: AtomiX's ETH fee re-price, cancel and canonical operation keys.
+// ETH Wallet and the Dexicon tab sign from the SAME node-derived ETH address, so they share this one nonce journal.
 package com.eurobuddha.minimaapi.ethereum;
 
 import android.content.Context;
@@ -103,7 +105,7 @@ public final class EthereumTransactions {
             String intent=intent(destination,payload,amount,gas);
             Row target=null;
             for(Row row:rows) {
-                boolean sameOperation=operation!=null&&operation.equals(row.operation)&&(!"pending".equals(operation)||intent.equals(row.intent));
+                boolean sameOperation=operation!=null&&opKey(operation).equals(opKey(row.operation))&&(!"pending".equals(operation)||intent.equals(row.intent));
                 // A refreshed gas estimate does not turn an unknown payment into a new payment.
                 boolean repeatUnknown=operation==null&&"POSTING".equals(row.phase)
                         &&intent(destination,payload,amount,row.latest().getGasLimit()).equals(row.intent);
@@ -124,6 +126,7 @@ public final class EthereumTransactions {
                 }
             }
             if(target!=null) {
+                if(!target.cancel.isEmpty())throw new Uncertain(target.latestHash());   // cancelled: never re-sign the operation
                 SignedRawTransaction saved=target.latest();
                 // Retain the original gas limit and payment. A retry may not exceed either
                 // fee field just reviewed, even when replaying an already signed attempt.
@@ -171,10 +174,71 @@ public final class EthereumTransactions {
             return broadcast(rpc,row,key,rows,chain,address);
         }
     }
+    /** Fee bump for a saved operation that is still unmined (8 Nov: a maker's USDT lock sat at 0.6 gwei while the base
+     *  fee spiked 50x). Re-signs the row's OWN latest bytes - same nonce, recipient, value, calldata, gas limit - at
+     *  {@code price}, so it can never become a different payment. Only when {@code price} is at least 110% of the last
+     *  attempt (nodes refuse a smaller replacement); every earlier version stays in the row, so whichever one mines
+     *  settles it. Returns the new hash, or null when there is nothing to bump: no such row, already settled, or the
+     *  price has not risen enough. */
+    public String reprice(Rpc rpc,Credentials credentials,long chain,String operation,BigInteger price,Runnable authorize) throws Exception {
+        authorize.run();
+        String address=credentials.getAddress().toLowerCase(Locale.ROOT);
+        if(chain<=0||operation==null||operation.isEmpty()||"pending".equals(operation)||price==null||price.signum()<=0||price.compareTo(MAX_PRICE)>0)
+            throw new IOException("Invalid Ethereum fee replacement.");
+        String key=chain+":"+address;
+        synchronized(locks.computeIfAbsent(key,k->new Object())) {
+            if(!BigInteger.valueOf(chain).equals(rpc.chain()))throw new IOException("Ethereum RPC is connected to a different chain.");
+            List<Row> rows=load(key,chain,address);
+            Row target=null;
+            for(Row row:rows)if(opKey(operation).equals(opKey(row.operation))&&active(row))target=row;
+            if(target==null||!target.cancel.isEmpty())return null;
+            if(settle(rpc,target,address)){save(key,rows,chain,address);return null;}
+            SignedRawTransaction last=target.latest();
+            if(price.compareTo(last.getGasPrice().multiply(BigInteger.valueOf(110)).add(BigInteger.valueOf(99)).divide(BigInteger.valueOf(100)))<0)return null;
+            authorize.run();
+            String signed=sign(credentials,chain,target.nonce,last.getTo().toLowerCase(Locale.ROOT),
+                    Numeric.prependHexPrefix(last.getData()).toLowerCase(Locale.ROOT),last.getValue(),last.getGasLimit(),price);
+            target.versions.add(signed);target.phase="POSTING";save(key,rows,chain,address);
+            authorize.run();
+            return broadcast(rpc,target,key,rows,chain,address);
+        }
+    }
+    /** Cancel a saved operation that is still unmined (8 Nov: a lock stuck past its own deadline can do nothing but cost a
+     *  refund, and it blocks every later send of the account). Signs a 0-value, no-data transfer to MY OWN address at the
+     *  same nonce, priced at least 110% of the last attempt so nodes accept it as the replacement. Every earlier version
+     *  stays in the row: whichever mines settles it (the operation's own receipt -> CONFIRMED/REVERTED; the cancel ->
+     *  REVERTED). Returns the cancel's hash (re-broadcast if already signed), or null when the operation already settled
+     *  or there is no such unmined operation. */
+    public String cancel(Rpc rpc,Credentials credentials,long chain,String operation,BigInteger price,Runnable authorize) throws Exception {
+        authorize.run();
+        String address=credentials.getAddress().toLowerCase(Locale.ROOT);
+        if(chain<=0||operation==null||operation.isEmpty()||"pending".equals(operation)||price==null||price.signum()<=0)
+            throw new IOException("Invalid Ethereum cancel.");
+        String key=chain+":"+address;
+        synchronized(locks.computeIfAbsent(key,k->new Object())) {
+            if(!BigInteger.valueOf(chain).equals(rpc.chain()))throw new IOException("Ethereum RPC is connected to a different chain.");
+            List<Row> rows=load(key,chain,address);
+            Row target=null;
+            for(Row row:rows)if(opKey(operation).equals(opKey(row.operation))&&active(row))target=row;
+            if(target==null)return null;
+            if(settle(rpc,target,address)){save(key,rows,chain,address);return null;}
+            if(target.cancel.isEmpty()) {
+                BigInteger floor=target.latest().getGasPrice().multiply(BigInteger.valueOf(110)).add(BigInteger.valueOf(99)).divide(BigInteger.valueOf(100));
+                BigInteger use=price.max(floor);
+                if(use.compareTo(MAX_PRICE)>0)throw new IOException("Ethereum cancel fee is outside the safe range.");
+                authorize.run();
+                target.cancel=sign(credentials,chain,target.nonce,address,"0x",BigInteger.ZERO,CANCEL_GAS,use);
+                target.phase="POSTING";save(key,rows,chain,address);
+            }
+            authorize.run();
+            return broadcast(rpc,target,key,rows,chain,address);
+        }
+    }
+    private static final BigInteger CANCEL_GAS=BigInteger.valueOf(21000);
     private String broadcast(Rpc rpc,Row row,String key,List<Row> rows,long chain,String address) throws Exception {
         String hash=row.latestHash();
         try {
-            String returned=rpc.broadcast(row.versions.get(row.versions.size()-1));
+            String returned=rpc.broadcast(row.current());
             if(!hash.equalsIgnoreCase(returned))throw new IOException("Unexpected Ethereum transaction hash");
         } catch(Exception failed) {
             // An 'already known' or lost ACK may still describe our exact signed transaction.
@@ -187,6 +251,14 @@ public final class EthereumTransactions {
         return hash;
     }
     private static boolean active(Row row){return "POSTING".equals(row.phase)||"ACCEPTED".equals(row.phase);}
+    /** 9 Nov (live cancel test): a lock was SAVED as "lock:0x4995..." (the hashlock as Minima's hash command gives it) but
+     *  looked up as "lock:4995..." (SwapDb's normalised hash), so re-price and cancel never found it. Operation keys are
+     *  compared in one canonical form: lowercase, with a 0x right after the "kind:" prefix removed. */
+    static String opKey(String op){
+        if(op==null)return "";
+        String o=op.trim().toLowerCase(Locale.ROOT);int c=o.indexOf(':');
+        return c>=0&&o.startsWith("0x",c+1)?o.substring(0,c+1)+o.substring(c+3):o;
+    }
     private static String sign(Credentials key,long chain,BigInteger nonce,String to,String data,BigInteger amount,BigInteger gas,BigInteger price) {
         return Numeric.toHexString(TransactionEncoder.signMessage(RawTransaction.createTransaction(nonce,price,gas,to,amount,data),chain,key));
     }
@@ -203,7 +275,7 @@ public final class EthereumTransactions {
     private static boolean hex(Object value,int bytes){return value instanceof String&&((String)value).matches("0x[0-9a-fA-F]{"+(bytes*2)+"}");}
     /** Match an exact locally hashed transaction; a pending count alone is not its receipt. */
     private static String known(Rpc rpc,Row row,String address) {
-        for(String raw:row.versions)try {
+        for(String raw:row.attempts())try {
             String hash=Hash.sha3(raw);JSONObject tx=rpc.transaction(hash);if(tx==null)continue;
             SignedRawTransaction signed=(SignedRawTransaction)TransactionDecoder.decode(raw);
             if(hash.equalsIgnoreCase(tx.optString("hash"))&&address.equalsIgnoreCase(tx.optString("from"))
@@ -216,7 +288,7 @@ public final class EthereumTransactions {
         return null;
     }
     private static boolean settle(Rpc rpc,Row row,String address)throws Exception {
-        for(String raw:row.versions) {
+        for(String raw:row.attempts()) {
             String hash=Hash.sha3(raw);JSONObject receipt;
             try { receipt=rpc.receipt(hash); } catch(Exception unavailable) { throw new Uncertain(row.latestHash()); }
             if(receipt==null)continue;
@@ -226,16 +298,22 @@ public final class EthereumTransactions {
                     ||quantity(receipt.opt("blockNumber")).signum()<0)throw new IOException("Invalid Ethereum transaction receipt");
             BigInteger status=quantity(receipt.opt("status"));
             if(!status.equals(BigInteger.ZERO)&&!status.equals(BigInteger.ONE))throw new IOException("Invalid Ethereum receipt status");
-            row.confirmed=hash;row.phase=status.signum()==1?"CONFIRMED":"REVERTED";return true;
+            // A mined cancel used the nonce for nothing: the operation never happened, exactly as a revert.
+            row.confirmed=hash;row.phase=status.signum()==1&&!raw.equals(row.cancel)?"CONFIRMED":"REVERTED";return true;
         }
         // Reorg or lagging endpoint: retain nonce ownership and recover only the original bytes.
         return false;
     }
     private static final class Row {
-        BigInteger nonce;String operation="",intent="",phase="",confirmed="";List<String> versions=new ArrayList<>();
+        BigInteger nonce;String operation="",intent="",phase="",confirmed="",cancel="";List<String> versions=new ArrayList<>();
         SignedRawTransaction latest(){return(SignedRawTransaction)TransactionDecoder.decode(versions.get(versions.size()-1));}
-        String latestHash(){return Hash.sha3(versions.get(versions.size()-1));}
-        JSONObject json()throws JSONException{return new JSONObject().put("nonce",nonce.toString()).put("operation",operation).put("intent",intent).put("phase",phase).put("confirmed",confirmed).put("versions",new JSONArray(versions));}
+        /** What this nonce should carry now: the cancel once one was signed, else the newest version. */
+        String current(){return cancel.isEmpty()?versions.get(versions.size()-1):cancel;}
+        String latestHash(){return Hash.sha3(current());}
+        /** Every signed attempt at this nonce: each version, then the cancel. Any of them may be the one that mines. */
+        List<String> attempts(){List<String> all=new ArrayList<>(versions);if(!cancel.isEmpty())all.add(cancel);return all;}
+        JSONObject json()throws JSONException{JSONObject o=new JSONObject().put("nonce",nonce.toString()).put("operation",operation).put("intent",intent).put("phase",phase).put("confirmed",confirmed).put("versions",new JSONArray(versions));
+            if(!cancel.isEmpty())o.put("cancel",cancel);return o;}
     }
     private List<Row> load(String key,long chain,String address)throws Exception {
         String source=store.read(key);return decode(source==null?"[]":source,chain,address);
@@ -266,7 +344,19 @@ public final class EthereumTransactions {
                         ||tx.getGasLimit().signum()<=0||tx.getGasLimit().compareTo(MAX_GAS)>0)throw new IOException("Inconsistent Ethereum journal entry");
                 previous=tx.getGasPrice();row.versions.add(raw);
             }
-            if(!row.confirmed.isEmpty()&&!row.versions.stream().anyMatch(raw->Hash.sha3(raw).equals(row.confirmed)))throw new IOException("Unknown saved Ethereum receipt hash");
+            Object cancelled=value.opt("cancel");
+            if(cancelled!=null) {
+                if(!(cancelled instanceof String)||!((String)cancelled).matches("0x(?:[0-9a-f]{2})+")||((String)cancelled).length()>1000)throw new IOException("Invalid saved Ethereum cancel");
+                RawTransaction decoded=TransactionDecoder.decode((String)cancelled);
+                if(!(decoded instanceof SignedRawTransaction))throw new IOException("Unsigned Ethereum journal cancel");
+                SignedRawTransaction tx=(SignedRawTransaction)decoded;
+                if(!Long.valueOf(chain).equals(tx.getChainId())||!address.equalsIgnoreCase(tx.getFrom())||!row.nonce.equals(tx.getNonce())
+                        ||!address.equalsIgnoreCase(tx.getTo())||tx.getValue().signum()!=0||!Numeric.cleanHexPrefix(tx.getData()==null?"":tx.getData()).isEmpty()
+                        ||!CANCEL_GAS.equals(tx.getGasLimit())||tx.getGasPrice().compareTo(previous)<=0||tx.getGasPrice().compareTo(MAX_PRICE)>0)
+                    throw new IOException("Inconsistent Ethereum journal cancel");
+                row.cancel=(String)cancelled;
+            }
+            if(!row.confirmed.isEmpty()&&!row.attempts().stream().anyMatch(raw->Hash.sha3(raw).equals(row.confirmed)))throw new IOException("Unknown saved Ethereum receipt hash");
             if(("CONFIRMED".equals(row.phase)||"REVERTED".equals(row.phase))!=!row.confirmed.isEmpty())throw new IOException("Missing saved Ethereum settlement");
             rows.add(row);
         }

@@ -117,9 +117,6 @@ public final class PandamoniumHooks {
     public static boolean hasMoneyInFlight(android.content.Context ctx, int id) {
         try {
             switch (PandamoniumDestinations.CLASSES[id]) {
-                case "com.eurobuddha.atomix.MainActivity": return com.eurobuddha.atomix.SwapService.hasWork(ctx);
-                case "com.eurobuddha.pandadex.MainActivity": return com.eurobuddha.pandadex.DexKeepAliveService.hasWork(ctx);
-                case "com.eurobuddha.pandapools.MainActivity": return com.eurobuddha.pandapools.PoolKeepAliveService.hasWork(ctx);
                 case "com.eurobuddha.casino.MainActivity": return com.eurobuddha.casino.CasinoService.hasWork(ctx);
                 case "com.eurobuddha.futurecashnext.MainActivity":
                     return new com.eurobuddha.futurecashnext.Cfg(ctx).is(com.eurobuddha.futurecashnext.Cfg.GUARDIAN_ON, false);
@@ -335,6 +332,7 @@ public final class PandamoniumHooks {
                 com.eurobuddha.minimacore.utils.BackgroundWork.pool(2, 16), action -> main.post(action));
         com.eurobuddha.minimacore.maxchat.MaxChat.APPLICATION_LISTENERS.add(com.eurobuddha.salon.MaximaLink::onMessage);
         com.eurobuddha.minimacore.maxchat.MaxChat.UI_LISTENERS.add(com.eurobuddha.salon.MaximaLink::refresh);
+        settleDexiconUpgrade(context);
         // Terminal IDE's log store and the Salon's event watcher follow each app's freeze state.
         if (context.getApplicationContext() instanceof android.app.Application)
             initFreeze((android.app.Application) context.getApplicationContext());
@@ -559,6 +557,37 @@ public final class PandamoniumHooks {
     public static com.eurobuddha.minimacore.main.BaseView createUtilityTab(
             com.eurobuddha.minimacore.main.MainActivity activity) {
         return new HistoryTabView(activity);
+    }
+
+    /** 2.2.34: the Dexicon tab - trading on the embedded node's own wallet (replaces AtomiX, PandaPools and PandaDEX). */
+    public static com.eurobuddha.minimacore.main.BaseView createTradingTab(
+            com.eurobuddha.minimacore.main.MainActivity activity) {
+        return new DexiconTabView(activity);
+    }
+
+    /**
+     * 2.2.34 upgrade from the built-in AtomiX / PandaPools / PandaDEX. Android keeps a component's enabled state across an
+     * update: the old deep freeze disabled every service and receiver of a frozen app, and Dexicon's vendored PandaPools
+     * keeps the SAME component name (com.eurobuddha.pandapools.PoolKeepAliveService) - a frozen PandaPools would leave the
+     * Dexicon pool keep-alive silently off. Dexicon is a tab, never frozen: every one of its components goes back to its
+     * manifest default at each start. The removed apps' WorkManager jobs name classes that no longer exist: cancelled.
+     */
+    static void settleDexiconUpgrade(android.content.Context context) {
+        android.content.pm.PackageManager pm = context.getPackageManager();
+        for (String cls : new String[]{"com.eurobuddha.dexicon.maker.MakerService", "com.eurobuddha.pandapools.PoolKeepAliveService",
+                "com.eurobuddha.dexicon.maker.HeartbeatReceiver", "com.eurobuddha.dexicon.maker.BootReceiver",
+                "com.eurobuddha.dexicon.IntegratedFileProvider"}) {
+            try {
+                android.content.ComponentName c = new android.content.ComponentName(context, cls);
+                if (pm.getComponentEnabledSetting(c) != android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
+                    pm.setComponentEnabledSetting(c, android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
+                            android.content.pm.PackageManager.DONT_KILL_APP);
+            } catch (RuntimeException ignored) { /* not in this build */ }
+        }
+        try {
+            androidx.work.WorkManager wm = androidx.work.WorkManager.getInstance(context);
+            for (String job : new String[]{"atomix_watch", "pandapools_watch", "pandadex_watch"}) wm.cancelUniqueWork(job);
+        } catch (RuntimeException ignored) { /* WorkManager not initialised yet: nothing was scheduled */ }
     }
 
     private static void installMenu(AppCompatActivity activity, ViewGroup original,

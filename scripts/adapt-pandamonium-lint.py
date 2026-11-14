@@ -18,7 +18,7 @@ def adapt(root):
         'ImageView iv = new ImageView(this) {',
         'ImageView iv = new androidx.appcompat.widget.AppCompatImageView(this) {')
     # An earlier package-name adapter inserted these fallback lines with fixed indentation.
-    for app in ['terminalide','pandapools']:
+    for app in ['terminalide']:
         p=root/app/'src/main/java/com/eurobuddha'/app/'MainActivity.java';s=p.read_text()
         pattern=r'(?m)^([ \t]*)(Intent (?:launch|i) = getPackageManager\(\).getLaunchIntentForPackage\([^\n]+\);)\n((?:[ \t]*if \((?:launch|i) == null\)[^\n]+\n)+)'
         def indent(m):

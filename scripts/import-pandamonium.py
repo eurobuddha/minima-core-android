@@ -11,7 +11,8 @@ direct_adapt = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(direct_adapt)
 
 ROOT = Path(__file__).resolve().parents[1]
-APPS = ['ethwallet','atomix','pandapools','futurecash-next','pandadex','casino','blockexplorer','filez','history','vestr','entropy','terminalide','mail','utxo','merchshop','merchstudio','merchinbox','NFTwallet','wallet','atelier','salon','keyreuses','faucet']
+# 2.2.34 (owner, 14 Nov 2026): one Dexicon tab on the host node wallet replaces the built-in AtomiX, PandaPools and PandaDEX.
+APPS = ['ethwallet','dexicon','futurecash-next','casino','blockexplorer','filez','history','vestr','entropy','terminalide','mail','utxo','merchshop','merchstudio','merchinbox','NFTwallet','wallet','atelier','salon','keyreuses','faucet']
 HOST = 'com.eurobuddha.pandamonium'
 ANDROID = '{http://schemas.android.com/apk/res/android}'
 ET.register_namespace('android', ANDROID[1:-1])
@@ -57,6 +58,12 @@ def import_app(name, target_root=None):
         if java:
             # ETH Wallet and AtomiX both ship com.eurobuddha.comms helpers with different implementations.
             text = text.replace('com.eurobuddha.comms',namespace+'.integratedcomms')
+            # Dexicon carries the Trading Account module and a Maxima codec copy: the Bears app vendors its own
+            # com.eurobuddha.account.WordEntry and maxima-core holds a different codec, so both move into Dexicon's
+            # namespace (as com.eurobuddha.comms does) - in host-node mode the account module is never used.
+            if name == 'dexicon':
+                text = text.replace('com.eurobuddha.account', namespace+'.integratedaccount')
+                text = text.replace('com.eurobuddha.maxima.core', namespace+'.integratedmaxima')
             # Preserve PandaDEX's bounded SDK, with its own class namespace.
             if name == 'pandadex':
                 text = text.replace('com.eurobuddha.minimaapi',namespace+'.integratedsdk')

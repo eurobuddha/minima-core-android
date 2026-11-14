@@ -51,14 +51,6 @@ def adapt_services(root):
     for app,name,old,new in (
         ('casino','CasinoService','nm.notify(alertId++, n)','nm.notify("pandamonium.casino", alertId++, n)'),
         ('futurecash-next','Notifier','nm.notify(alertId++, n)','nm.notify("pandamonium.futurecashnext", alertId.getAndIncrement(), n)'),
-        ('atomix','MainActivity','nm.notify(notifId.incrementAndGet(),','nm.notify("pandamonium.atomix.ui", notifId.incrementAndGet(),'),
-        ('atomix','SwapService','nm.notify(OFFLINE_ID,','nm.notify("pandamonium.atomix.service", OFFLINE_ID,'),
-        ('atomix','SwapService','nm.cancel(OFFLINE_ID)','nm.cancel("pandamonium.atomix.service", OFFLINE_ID)'),
-        ('atomix','SwapService','nm.notify(id,','nm.notify("pandamonium.atomix.service", id,'),
-        ('atomix','SwapService','nm.cancel(id)','nm.cancel("pandamonium.atomix.service", id)'),
-        ('pandapools','StrandingWatch','nm.notify(idFor(p.address),','nm.notify("pandamonium.pandapools", idFor(p.address),'),
-        ('pandapools','StrandingWatch','nm.cancel(idFor(address))','nm.cancel("pandamonium.pandapools", idFor(address))'),
-        ('pandapools','PoolKeepAliveService','nm.cancel(StrandingWatch.idFor(pool.address))','nm.cancel("pandamonium.pandapools", StrandingWatch.idFor(pool.address))'),
     ): change(java(app,name),old,new)
     change(java('futurecash-next','Notifier'), 'private static int alertId = 3100;', 'private static final java.util.concurrent.atomic.AtomicInteger alertId = new java.util.concurrent.atomic.AtomicInteger(3100);')
 
@@ -140,11 +132,6 @@ def adapt(root):
         catch (RuntimeException unavailable) { return null; }''')
     s=s.replace('        return prefs.contains(key);', '        return get(key) != null;');p.write_text(s)
     # Preserve the existing authorization predicate across the additional shared worker queue.
-    change(java('pandadex','NodeApi'), 'mApi.Command(command, new MinimaAPIListener()', 'mApi.Command(command, authorized, new MinimaAPIListener()')
-    change(java('pandadex','NodeApi'), 'private static Object connectionGeneration', 'private static volatile Object connectionGeneration')
-    change(java('pandadex','CommandSession'), 'private Object generation', 'private volatile Object generation')
-    change(java('pandadex','CommandSession'), 'private Object boundConnection', 'private volatile Object boundConnection')
-    change(java('pandadex','NodeApi'), '\n                            + " chars=" + (zResponse == null ? 0 : zResponse.toString().length())', '')
     adapt_services(root)
     for app in ('futurecash-next','ethwallet','casino','vestr'):
         p=root/app/'build.gradle'

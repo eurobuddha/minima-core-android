@@ -4,12 +4,9 @@ Run after all individual app adapters; retain the financial and scheduling metho
 from pathlib import Path
 
 SERVICES = {
-    'atomix': ('atomix', 'SwapService'),
     'futurecash-next': ('futurecashnext', 'GuardianService'),
     'casino': ('casino', 'CasinoService'),
     'NFTwallet': ('nftwallet', 'MintService'),
-    'pandapools': ('pandapools', 'PoolKeepAliveService'),
-    'pandadex': ('pandadex', 'DexKeepAliveService'),
 }
 
 def adapt(root):
@@ -23,7 +20,7 @@ def adapt(root):
         if 'import com.eurobuddha.minimacore.i18n.Language;' not in s:
             change(f'package com.eurobuddha.{package};', f'package com.eurobuddha.{package};\nimport com.eurobuddha.minimacore.i18n.Language;')
         change(f'public class {name} extends Service {{', f'public class {name} extends Service {{\n\n    private final Runnable languageChanged = this::refreshLanguageNotification;')
-        # All six use this successful foreground-promotion gate. No listener for a refused start.
+        # All use this successful foreground-promotion gate. No listener for a refused start.
         gate = '        if (!startForegroundCompat()) { stopSelf(); return; }'
         change(gate, gate + '\n        Language.addListener(languageChanged);')
         change('    @Override public void onDestroy() {', '    @Override public void onDestroy() {\n        Language.removeListener(languageChanged);')

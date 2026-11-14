@@ -4,17 +4,15 @@ package com.eurobuddha.minimacore.integrated;
 public final class PandamoniumDestinations {
     private PandamoniumDestinations() {}
     public static final String[] NAMES = {
-        "Minima Core", "ETH Wallet", "AtomiX", "PandaPools", "Future Cash Next", "PandaDEX",
+        // 2.2.34: AtomiX, PandaPools and PandaDEX are gone - trading is the Dexicon TAB (not a drawer destination).
+        "Minima Core", "ETH Wallet", "Future Cash Next",
         "Zero Edge Casino", "Minima Explorer", "Filez", "Minima Vestr", "Entropy", "Terminal IDE", "MinimaMail", "UTXO Wallet", "miniMall", "NFT Wallet", "minimaWallet", "Atelier", "The Salon", "KeyUses", "Minima Faucet"
     };
     // Existing launcher artwork, indexed by destination identity rather than display order.
     public static final int[] ICONS = {
         com.eurobuddha.minimacore.R.drawable.ic_minima,
         com.eurobuddha.ethwallet.R.mipmap.pm_ethwallet_ic_launcher,
-        com.eurobuddha.atomix.R.mipmap.pm_atomix_ic_launcher,
-        com.eurobuddha.pandapools.R.mipmap.pm_pandapools_ic_launcher,
         com.eurobuddha.futurecashnext.R.mipmap.pm_futurecash_next_ic_launcher,
-        com.eurobuddha.pandadex.R.mipmap.pm_pandadex_ic_launcher,
         com.eurobuddha.casino.R.mipmap.pm_casino_ic_launcher,
         com.eurobuddha.blockexplorer.R.mipmap.pm_blockexplorer_ic_launcher,
         com.eurobuddha.filez.R.mipmap.pm_filez_ic_launcher,
@@ -33,8 +31,7 @@ public final class PandamoniumDestinations {
     };
     public static final String[] CLASSES = {
         "com.eurobuddha.minimacore.main.MainActivity", "com.eurobuddha.ethwallet.MainActivity",
-        "com.eurobuddha.atomix.MainActivity", "com.eurobuddha.pandapools.MainActivity",
-        "com.eurobuddha.futurecashnext.MainActivity", "com.eurobuddha.pandadex.MainActivity",
+        "com.eurobuddha.futurecashnext.MainActivity",
         "com.eurobuddha.casino.MainActivity", "com.eurobuddha.blockexplorer.MainActivity",
         "com.eurobuddha.filez.MainActivity",
         "com.eurobuddha.vestr.MainActivity",

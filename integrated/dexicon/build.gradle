@@ -1,0 +1,48 @@
+// Imported native feature; see ../sources.lock.json and scripts/import-pandamonium.py.
+plugins { alias(libs.plugins.android.library) }
+android {
+    namespace 'com.eurobuddha.dexicon'
+    compileSdk 36
+    defaultConfig {
+        minSdk 28
+        buildConfigField 'String', 'VERSION_NAME', '"0.3.53"'
+        buildConfigField 'int', 'VERSION_CODE', '353'
+    }
+    buildFeatures { buildConfig true }
+    testOptions {
+        unitTests {
+            returnDefaultValues = false
+            includeAndroidResources = true
+            all { maxHeapSize = '2g' }
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+dependencies {
+    // The embedded node's jar is provided by the host app (app/libs/minima.jar).
+    compileOnly files('../../app/libs/minima.jar')
+    testImplementation files('../../app/libs/minima.jar')
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    implementation 'com.goterl:lazysodium-android:5.1.0@aar'
+    implementation 'net.java.dev.jna:jna:5.13.0@aar'
+    implementation 'org.web3j:crypto:4.9.8'
+    implementation 'org.web3j:abi:4.9.8'
+    implementation 'org.web3j:rlp:4.9.8'
+    implementation 'org.web3j:utils:4.9.8'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.69'   // resolves with the app (1.70, see adapt-pandamonium-dexicon.py)
+    implementation 'com.caverock:androidsvg-aar:1.4'
+    implementation 'com.google.zxing:core:3.5.3'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+    testImplementation 'com.goterl:lazysodium-java:5.1.4'
+    testImplementation 'net.java.dev.jna:jna:5.13.0'
+    implementation project(':minimaapi')
+}

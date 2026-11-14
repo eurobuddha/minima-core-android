@@ -54,6 +54,16 @@ public class BaseView {
 
     public void refreshView(){}
 
+    // A page that hosts a whole screen (Pandamonium's Dexicon tab, 2.2.34) gets the host Activity's back presses, results,
+    // permission answers and new intents. Every other page ignores them.
+    /** Back pressed while this page is shown: true = handled here. */
+    public boolean onBack() { return false; }
+    public void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {}
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {}
+    public void onNewIntent(android.content.Intent intent) {}
+    public void onSaveState(android.os.Bundle out) {}
+    public void onConfigurationChanged(android.content.res.Configuration config) {}
+
     /** Relabel retained controls without refreshing data or changing the selected page. */
     public void languageChanged() {}
 

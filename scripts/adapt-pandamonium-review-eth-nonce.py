@@ -58,5 +58,5 @@ def adapt_app(folder):
 
 
 def adapt(root):
-    for app in ('atomix', 'ethwallet'):
+    for app in ('ethwallet',):
         adapt_app(root / app / 'src/main/java/com/eurobuddha' / app / 'eth')

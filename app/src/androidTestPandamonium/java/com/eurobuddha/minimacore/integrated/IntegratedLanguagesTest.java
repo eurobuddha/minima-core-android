@@ -63,7 +63,8 @@ public class IntegratedLanguagesTest {
     @Test public void everyIntegratedActivityRetainsViewsOnLanguageChanges() throws Exception {
         PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_ACTIVITIES);
         java.util.Set<String> covered = new java.util.HashSet<>();
-        String[] modules = {"ethwallet", "atomix", "pandapools", "futurecashnext", "pandadex", "casino",
+        // 2.2.34: AtomiX, PandaPools and PandaDEX left with the Dexicon tab (a tab, not a drawer Activity).
+        String[] modules = {"ethwallet", "futurecashnext", "casino",
                 "blockexplorer", "filez", "history", "vestr", "entropy", "terminalide", "mail", "utxo", "merchshop", "merchstudio", "merchinbox", "nftwallet", "wallet"};
         for (ActivityInfo activity : info.activities) for (String module : modules) {
             if (!activity.name.startsWith("com.eurobuddha." + module + ".")) continue;

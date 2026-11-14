@@ -212,8 +212,8 @@ public class NavigationRegressionTest {
         assertEquals("true",InstrumentationRegistry.getArguments().getString("pandamoniumDisposable"));
         assertTrue("Emulator only",android.os.Build.FINGERPRINT.contains("generic") || android.os.Build.MODEL.contains("sdk"));
         for (String label : PandamoniumDestinations.NAMES) assertNotEquals("Minima History", label);
-        assertEquals("Minima Vestr", PandamoniumDestinations.NAMES[9]);
-        assertEquals("com.eurobuddha.vestr.MainActivity", PandamoniumDestinations.CLASSES[9]);
+        assertEquals("Minima Vestr", PandamoniumDestinations.NAMES[6]);   // 2.2.34: AtomiX, PandaPools, PandaDEX removed
+        assertEquals("com.eurobuddha.vestr.MainActivity", PandamoniumDestinations.CLASSES[6]);
         android.content.Context ctx=InstrumentationRegistry.getInstrumentation().getTargetContext();
         android.content.SharedPreferences prefs=ctx.getSharedPreferences("main_prefs", android.content.Context.MODE_PRIVATE);
         if (!prefs.getBoolean("SEED_SET",false)) {

@@ -1,8 +1,27 @@
 # Pandamonium native apps
 
+## Dexicon tab (Pandamonium 2.2.34)
+
+Owner, 14 Nov 2026: one integrated Dexicon tab, on the host node's own wallet, replaces the built-in AtomiX,
+PandaPools and PandaDEX. The tab bar reads Wallet · Dexicon · History · Apps · Chat · Node.
+
+- `integrated/dexicon` is Dexicon (stock line, 0.3.53+) in **host-node mode**: `HostMode.on()` is always true, every
+  command goes to the node through `DirectLink` → `DirectNodeApi` (no Trading Account, no gate, no uninstall/clear-storage
+  rescue). The node signs everything and picks every one-time key, so there is no cross-app key reuse.
+- `app/src/pandamonium/.../integrated/DexiconTabView.java` hosts `com.eurobuddha.dexicon.MainActivity` (a `ui.Screen`)
+  inside the tab; the host `MainActivity` forwards back, results, permissions, new intents and configuration changes.
+- `scripts/adapt-pandamonium-dexicon.py` makes the snapshot (called last by `adapt-pandamonium-direct.py`; the generic
+  transport rewrite skips `dexicon/`). To refresh only Dexicon: remove `integrated/dexicon`, `import_app('dexicon')`,
+  update its lock entry, then run `python3 scripts/adapt-pandamonium-dexicon.py`.
+- `minimaapi`'s `EthereumTransactions` is Dexicon's superset (re-price, cancel); same `pandamonium_eth_submissions.db`.
+- `PandamoniumHooks.settleDexiconUpgrade` resets Dexicon's component states and cancels the old built-ins' WorkManager jobs.
+- Old `atomix.db` / PandaPools prefs carry over by name; `pandadex.db` is left on disk untouched.
+- `import-pandamonium.py --verify` was already failing before 2.2.34 (sibling sources moved on; `adapt-pandamonium-safety.py`
+  "substring not found"). The Dexicon snapshot is reproducible on its own as above; the full re-verify is not re-proven.
+
 These twenty-two Android library snapshots are compiled only into the `pandamonium` flavor. The standalone apps remain in their sibling repositories. `sources.lock.json` records each source revision, app version and original file hashes (including any uncommitted source changes present at import).
 
-Pandamonium opens on Wallet, with tabs ordered Wallet / History / Apps / Logs / Node. Node is the former Home dashboard. History occupies the core utility tab. The sidebar contains ETH Wallet, AtomiX, PandaPools, Future Cash Next, PandaDEX, Zero Edge Casino, Minima Explorer, Filez, Minima Vestr, Entropy, Terminal IDE and MinimaMail. The user confirmed that the requested “Vesta” is the existing Minima Vestr app. On the Core screen, centred Minima Core / Pandamonium branding shares one toolbar row with the left drawer button and right overflow menu. Long-hold an app in the drawer to drag it vertically; the order persists across screens and restarts. Core home remains first. Sidebar rows show each app's bundled launcher icon, bound to its destination so icons follow the saved order. Embedded app headers retain their own controls.
+Pandamonium opens on Wallet, with tabs ordered Wallet / History / Apps / Logs / Node. Node is the former Home dashboard. History occupies the core utility tab. The sidebar contains ETH Wallet, Future Cash Next, Zero Edge Casino, Minima Explorer, Filez, Minima Vestr, Entropy, Terminal IDE and MinimaMail. The user confirmed that the requested “Vesta” is the existing Minima Vestr app. On the Core screen, centred Minima Core / Pandamonium branding shares one toolbar row with the left drawer button and right overflow menu. Long-hold an app in the drawer to drag it vertically; the order persists across screens and restarts. Core home remains first. Sidebar rows show each app's bundled launcher icon, bound to its destination so icons follow the saved order. Embedded app headers retain their own controls.
 
 `scripts/import-pandamonium.py` records provenance and adapts Android packaging: resource prefixes, private activities, distinct export providers, notification IDs, encrypted-vault aliases and duplicated helper namespaces. `adapt-pandamonium-direct.py` and `adapt-pandamonium-ui.py` then replace the standalone node transports and setup/recovery guidance. Financial protocols, signing queues, pending-write records and recovery checks are retained. PandaDEX also retains its strict persisted-JSON parser; its separate broadcast SDK and relay are removed.
 

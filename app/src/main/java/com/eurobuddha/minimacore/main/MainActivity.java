@@ -178,6 +178,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         tabs.getTabAt(MainAdapter.APPS_POSITION).setText(Language.text(this, l10n_tab_apps));
         tabs.getTabAt(MainAdapter.APPS_POSITION).setIcon(R.drawable.ic_dapps);
 
+        // Pandamonium 2.2.34: Dexicon, trading on this node's own wallet (a name, not translated).
+        if (MainAdapter.DEXICON_POSITION >= 0) {
+            tabs.getTabAt(MainAdapter.DEXICON_POSITION).setText("Dexicon");
+            tabs.getTabAt(MainAdapter.DEXICON_POSITION).setIcon(R.drawable.ic_transfer);
+        }
+
         if (MainAdapter.CHAT_POSITION >= 0) {
             tabs.getTabAt(MainAdapter.CHAT_POSITION).setText(Language.text(this, l10n_tab_chat));
             tabs.getTabAt(MainAdapter.CHAT_POSITION).setIcon(R.drawable.ic_chat);
@@ -228,6 +234,53 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         }
 
         checkBattery();
+
+        // Pandamonium 2.2.34: back on the Dexicon tab goes to Dexicon first (its rooms, pages and dialogs), as in its own app.
+        if (MainAdapter.DEXICON_POSITION >= 0) getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
+            @Override public void handleOnBackPressed() {
+                BaseView t = tradingView();
+                if (t != null && mMainPager != null && mMainPager.getCurrentItem() == MainAdapter.DEXICON_POSITION && t.onBack()) return;
+                setEnabled(false);
+                getOnBackPressedDispatcher().onBackPressed();
+                setEnabled(true);
+            }
+        });
+        openTradingTabFor(getIntent());
+    }
+
+    // ---- Pandamonium 2.2.34: the Dexicon tab is a whole screen; it gets this Activity's results, permission answers,
+    //      new intents (a Dexicon notification opens the tab) and saved state. Other builds have no such tab. ----
+    private BaseView tradingView() { return mMainAdapter == null ? null : mMainAdapter.getTradingView(); }
+
+    private void openTradingTabFor(android.content.Intent intent) {
+        BaseView t = tradingView();
+        if (t == null || intent == null || !"dexicon".equals(intent.getStringExtra("pandamonium_tab"))) return;
+        if (mMainPager != null) mMainPager.setCurrentItem(MainAdapter.DEXICON_POSITION, false);
+        t.onNewIntent(intent);
+    }
+
+    @Override protected void onNewIntent(android.content.Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        openTradingTabFor(intent);
+    }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        BaseView t = tradingView();
+        if (t != null) t.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
+        super.onRequestPermissionsResult(requestCode, permissions, results);
+        BaseView t = tradingView();
+        if (t != null) t.onRequestPermissionsResult(requestCode, permissions, results);
+    }
+
+    @Override protected void onSaveInstanceState(Bundle out) {
+        super.onSaveInstanceState(out);
+        BaseView t = tradingView();
+        if (t != null) t.onSaveState(out);
     }
 
     public void setToolbarTitle(int zPosition){
@@ -250,6 +303,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         Language.configurationChanged(this);
         refreshShutdownLabels();
         if (mMainAdapter != null) mMainAdapter.languageChanged();
+        BaseView trading = tradingView();
+        if (trading != null) trading.onConfigurationChanged(config);
         // Relabel retained tabs without selecting a page or restarting display work.
         TabLayout tabs = findViewById(R.id.tabs);
         if (tabs != null && mMainAdapter != null && tabs.getTabCount() == mMainAdapter.getCount()) {

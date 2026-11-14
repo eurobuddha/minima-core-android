@@ -1,0 +1,1943 @@
+package com.eurobuddha.dexicon;
+
+import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+
+import com.eurobuddha.dexicon.envelope.Envelope;
+import com.eurobuddha.dexicon.envelope.Envelopes;
+import com.eurobuddha.dexicon.fill.Coin;
+import com.eurobuddha.dexicon.fill.FillPlan;
+import com.eurobuddha.dexicon.fill.FillTxn;
+import com.eurobuddha.dexicon.fill.Tokens;
+import com.eurobuddha.dexicon.identity.DexIdentity;
+import com.eurobuddha.dexicon.identity.SeedSource;
+import com.eurobuddha.dexicon.identity.Sodium;
+import com.eurobuddha.dexicon.maker.MakerEngine;
+import com.eurobuddha.dexicon.maker.MakerService;
+import com.eurobuddha.dexicon.maker.MyOrder;
+import com.eurobuddha.dexicon.relay.HttpTransport;
+import com.eurobuddha.dexicon.relay.RelayClient;
+import com.eurobuddha.dexicon.relay.RelayStore;
+import com.eurobuddha.dexicon.resting.BookRepository;
+import com.eurobuddha.dexicon.resting.CompositeRouter;
+import com.eurobuddha.dexicon.resting.DexContract;
+import com.eurobuddha.dexicon.resting.DexTxn;
+import com.eurobuddha.dexicon.resting.Order5;
+import com.eurobuddha.dexicon.resting.Pool;
+import com.eurobuddha.dexicon.resting.PoolLiquidityRepository;
+import com.eurobuddha.dexicon.resting.PoolRouter;
+import com.eurobuddha.dexicon.resting.PriceMath;
+import com.eurobuddha.dexicon.resting.SourcePick;
+import com.eurobuddha.dexicon.resting.SweepPlanner;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+ * Dexicon host (PandaDEX MainActivity shape): first paint from SQLite before the node exists, our own 30 s balance
+ * clock, a continuous relay long-poll for the book while foreground, immediate repaint after every action, only the
+ * visible tab renders. The maker side lives in {@link MakerService}; this Activity is the TAKER and the order desk.
+ */
+public class MainActivity extends com.eurobuddha.pandapools.MainActivity {
+
+    /** A screen, not an Activity (0.3.52): {@link DexiconActivity} hosts it standalone; another app can host it in a tab. */
+    public MainActivity(Host host) { super(host); }
+
+    public static volatile boolean FOREGROUND = false;
+    private static final long POLL_MS = 30_000;
+    public static final int TAB_TRADE = 0, TAB_ACTIVITY = 1, TAB_ORDERS = 2, TAB_HISTORY = 3, TAB_ASSETS = 4, TAB_DOORS = 5, TAB_RELAYS = 6, TAB_POOLS = 7, TAB_MARKET = 8, TAB_OTC = 9, TAB_PSWAP = 10, TAB_PMINE = 11, TAB_PWALLET = 12, TAB_PACT = 13;
+    /** Three rooms, picked in a one-line switcher at the top: ① MxUSD (AtomiX) · ② Pools (PandaPools) · ③ Exchange.
+     *  ONE bottom bar, AtomiX's own style (icon over label): in ① and ③ the room's three pages plus ACTIVITY / ASSETS /
+     *  SETTINGS shared by both; in ② PandaPools' own five tabs alone (owner, 4 Nov). */
+    static final String[] ROOMS = {"① MxUSD", "② Pools", "③ Exchange"};   // ① is AtomiX (owner, 4 Nov: named MxUSD)
+    /** ② is PandaPools (owner, 4 Nov: "keep the new app feel, true to PandaPools"): its five pages, its own screens, as
+     *  tabs on Dexicon's bottom bar — the way ① carries AtomiX's. */
+    static final int[][] ROOM_PAGES = {{TAB_DOORS, TAB_MARKET, TAB_OTC}, {TAB_PSWAP, TAB_POOLS, TAB_PMINE, TAB_PWALLET, TAB_PACT}, {TAB_TRADE, TAB_ORDERS, TAB_HISTORY}};
+    /** PandaPools' own tab titles (MainActivity: { "SWAP", "POOLS", "MY LP", "WALLET", "ACTIVITY" }). */
+    static final String[] POOL_TITLES = {"SWAP", "POOLS", "MY LP", "WALLET", "ACTIVITY"};
+    private static final int[] SHARED = {TAB_ACTIVITY, TAB_ASSETS, TAB_RELAYS};
+    static final String[] TAB_NAMES = {"Trade", "Activity", "Orders", "History", "Assets", "Swap", "Settings", "Pools", "Market", "OTC", "Swap", "My LP", "Wallet", "Activity"};
+    private static final int[] TAB_ICONS = {R.drawable.pm_dexicon_ic_tab_trade, R.drawable.pm_dexicon_ic_tab_activity, R.drawable.pm_dexicon_ic_tab_orders, R.drawable.pm_dexicon_ic_tab_history,
+            R.drawable.pm_dexicon_ic_tab_wallet, R.drawable.pm_dexicon_ic_tab_swap, R.drawable.pm_dexicon_ic_tab_settings, R.drawable.pm_dexicon_ic_tab_pools, R.drawable.pm_dexicon_ic_tab_market,
+            R.drawable.pm_dexicon_ic_tab_otc, R.drawable.pm_dexicon_ic_tab_swap, R.drawable.pm_dexicon_ic_tab_mypools, R.drawable.pm_dexicon_ic_tab_wallet, R.drawable.pm_dexicon_ic_tab_activity};
+
+    private final Handler ui = new Handler(Looper.getMainLooper());
+    // A late node reply (the account outlives this screen) may arrive after onDestroy shut these down: drop it, never crash
+    // (10 Nov: RejectedExecutionException from an identity reply right after the node app came to the front).
+    private final ExecutorService net = screenExecutor("dexicon-ui-net");
+    /** PandaDEX TradeView quoteExec: composite routing is CPU work, never on the UI thread. */
+    private final ExecutorService quoteExec = screenExecutor("dexicon-quote");
+    private static ExecutorService screenExecutor(String name) {
+        return new java.util.concurrent.ThreadPoolExecutor(1, 1, 0L, java.util.concurrent.TimeUnit.MILLISECONDS,
+                new java.util.concurrent.LinkedBlockingQueue<>(), r -> { Thread t = new Thread(r, name); t.setDaemon(true); return t; },
+                new java.util.concurrent.ThreadPoolExecutor.DiscardPolicy());
+    }
+
+    // RESTING layer (vendored PandaDEX 0.4.23): V5 covenant book + PandaPools, taken through DexTxn.fillComposite.
+    private BookRepository restingRepo;
+    private PoolLiquidityRepository poolRepo;
+    private DexTxn restingTxn;
+    private boolean v5Ready, v5Registering;
+
+    private NodeApi node;
+    private DexDb db;
+    private RelayClient relay;
+    private DexIdentity me;
+    private MakerEngine engine;
+    private boolean paired, pairingKnown, deriving, bookPolling, busy, closed;
+    private long chainBlock;
+    private String receiveAddr = "", receiveMx = "";   // hex = the resting-layer payout; Mx = what the user sees and shares (PandaDEX: miniaddress, falling back to hex)
+    private BigDecimal minimaSendable = BigDecimal.ZERO, mxusdSendable = BigDecimal.ZERO, minimaConfirmed = BigDecimal.ZERO, mxusdConfirmed = BigDecimal.ZERO;
+    /** The node's own "unconfirmed" (received, not yet confirmed) per coin — what a wallet shows as arriving. */
+    private BigDecimal minimaUnconfirmed = BigDecimal.ZERO, mxusdUnconfirmed = BigDecimal.ZERO;
+    private long balanceAtMs;
+    private String stage = "";
+    /** The ACTIVITY row the TRADE stage line follows live (null = plain stage text only). */
+    private String liveActId;
+    private BroadcastReceiver changedReceiver, nodeReceiver;
+    private ActivityResultLauncher<String> saveCsv;
+    private String pendingCsv;
+    /** One trading app per phone: the gate replaces every trading screen while AtomiX / PandaPools is present. */
+    private View chromeRoot;
+    private GateView gate;
+    private Boolean gateShown;
+    private ActivityResultLauncher<Intent> handover;
+    /** The hand-over asked for (persisted across process death: the answer can come back to a new process). */
+    String handoverPkg, handoverName;
+    private boolean handoverRemove;
+    private long handoverAt;
+    /** Bumped each time the gate shuts: an automatic retry captured before it never fires after it. */
+    private int gateGen;
+    /** Open trade / market dialogs: dismissed when the gate shuts or the market switches under them. */
+    private final List<android.app.Dialog> dialogs = new ArrayList<>();
+
+    private TradeView trade;
+    private ActivityTab activityTab;
+    private OrdersTab ordersTab;
+    private HistoryTab historyTab;
+    private AssetsTab assetsTab;
+    private RelaysTab relaysTab;
+    private DoorsTab doorsTab;
+    /** ② = PandaPools' own five screens (vendored), hosted as they are. */
+    private com.eurobuddha.pandapools.SwapView pSwap;
+    private com.eurobuddha.pandapools.PoolsView pPools;
+    private com.eurobuddha.pandapools.MyLpView pMyLp;
+    private com.eurobuddha.pandapools.WalletView pWallet;
+    private com.eurobuddha.pandapools.ActivityView pAct;
+    private MarketTab marketTab;
+    private OtcTab otcTab;
+    private LinearLayout content;          // the visible page(s): one, or two side by side on a wide screen
+    private android.view.ViewGroup[] panes;
+    private LinearLayout tabBar, rail;
+    private final LinearLayout[] tabCell = new LinearLayout[TAB_NAMES.length];
+    private final android.widget.ImageView[] tabIcon = new android.widget.ImageView[TAB_NAMES.length];
+    private final TextView[] tabBtn = new TextView[TAB_NAMES.length];
+    private final TextView[] roomBtn = new TextView[3];
+    private int room = 0;
+    private final int[] roomLast = {TAB_DOORS, TAB_PSWAP, TAB_TRADE};   // ② opens on SWAP, as PandaPools does
+    private TextView pairPill, blockPill, stageTv, ccyPill;
+    /** The ⇄ pill's glow (AtomiX startCcyGlow): an Animator is not a Handler callback, so it is cancelled explicitly. */
+    private android.animation.ValueAnimator ccyGlowAnim;
+    private int tab = TAB_DOORS, tab2 = -1;   // every launch opens on ① (owner, 4 Nov 2026)   // tab2: the right-hand page when two are open side by side (wide only)
+    private int tabsDown; private int heldTab = -1; private boolean pairMade;
+
+    private final Runnable pollTask = new Runnable() {
+        @Override public void run() {
+            if (paired) { readBalances(); readBlock(); }
+            // Not yet enabled in Minima Core → Apps: ask again every tick, so enabling it there pairs this screen
+            // without a restart (the maker service already re-registers; the Activity did not — seen on-device 2026-10-21).
+            else if (node != null && pairingKnown) { node.reRegister(); repaintHeader(); }
+            ui.postDelayed(this, paired ? POLL_MS : 3_000);   // unpaired: notice the node's Apps toggle within seconds
+        }
+    };
+
+    /** Seconds-level clock for live rows ("waiting for the maker (12s)"): the header every second while a trade is
+     *  followed, the ACTIVITY tab every 5 s while it is open. Block-level changes arrive via ACTION_CHANGED. */
+    private int liveTicks;
+    private final Runnable liveTask = new Runnable() {
+        @Override public void run() {
+            if (FOREGROUND) {
+                if (liveActId != null) repaintHeader();
+                followTake();
+                if (run != null && trade != null) trade.paintCtaPublic();
+                if ((tab == TAB_ACTIVITY || tab2 == TAB_ACTIVITY) && ++liveTicks % 5 == 0) activityTab.render();
+            }
+            ui.postDelayed(this, 1000);
+        }
+    };
+
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Design.load(this);
+        nightModeFollowsDesign();
+        if (windowChangesAllowed()) androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        db = new DexDb(this);
+        relay = new RelayClient(new HttpTransport());
+        applySettings();
+        saveCsv = registerForActivityResult(new ActivityResultContracts.CreateDocument("text/csv"), uri -> {
+            if (uri == null || pendingCsv == null) return;
+            try (java.io.OutputStream o = getContentResolver().openOutputStream(uri)) { o.write(pendingCsv.getBytes(java.nio.charset.StandardCharsets.UTF_8)); toast("CSV saved"); }
+            catch (Exception e) { toast("Could not save: " + e.getMessage()); }
+            pendingCsv = null;
+        });
+        handover = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), r -> onHandover(r.getResultCode(), r.getData()));
+        if (savedInstanceState != null) {
+            handoverPkg = TradingGate.gatedApp(savedInstanceState.getString("ho_pkg"));
+            handoverName = savedInstanceState.getString("ho_name"); handoverRemove = savedInstanceState.getBoolean("ho_remove");
+            handoverAt = savedInstanceState.getLong("ho_at");
+        }
+        com.eurobuddha.dexicon.doors.DoorHost.get(this).applyLaunchRule();   // MxUSD every launch, unless MINIMA is live (Q1)
+        // The node first: ② Pools' vendored PandaPools screens capture the pool engine (on this ONE connection) when built.
+        node = new NodeApi(this, enabled -> {
+            paired = enabled; pairingKnown = true;
+            if (enabled) onPaired();
+            repaint();
+            applyGate();   // the "Checking your node…" screen says what is needed while unpaired
+        });
+        offerAccount();
+        restingRepo = new BookRepository(node);
+        poolRepo = new PoolLiquidityRepository(node);
+        restingTxn = new DexTxn(node);
+        restingRepo.subscribe((orders, syncing) -> repaint());
+        poolRepo.subscribe((pools, syncing) -> repaint());
+        initPools(node);
+        chromeRoot = buildChrome();
+        selectTab(tab);
+        if (getIntent() != null && getIntent().getIntExtra(EXTRA_POOLS_PAGE, -1) >= 0) goToTab(getIntent().getIntExtra(EXTRA_POOLS_PAGE, -1));   // a pool notification
+        applyGate();
+
+        changedReceiver = new BroadcastReceiver() { @Override public void onReceive(Context c, Intent i) { applyGate(); followTake(); settleStage(); repaint(); retryIfDue(); restIfDue(); warmWallet(); } };
+        ContextCompat.registerReceiver(this, changedReceiver, new IntentFilter(MakerService.ACTION_CHANGED), ContextCompat.RECEIVER_NOT_EXPORTED);
+        nodeReceiver = new BroadcastReceiver() { @Override public void onReceive(Context c, Intent i) { if (paired) { readBalances(); readBlock(); } } };
+        ContextCompat.registerReceiver(this, nodeReceiver, new IntentFilter("com.eurobuddha.dexicon.NODE_EVENT"), ContextCompat.RECEIVER_NOT_EXPORTED);
+        if (android.os.Build.VERSION.SDK_INT >= 33 && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED)
+            requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 91);
+        try { ContextCompat.startForegroundService(this, new Intent(this, MakerService.class)); } catch (Exception ignored) {}
+        ui.postDelayed(pollTask, 3_000);
+        ui.postDelayed(liveTask, 1000);
+    }
+
+    /** AtomiX: Back from any other page returns to Swap; from Swap it leaves as usual (the host's default). */
+    @Override public boolean back() {
+        if (!Boolean.TRUE.equals(gateShown) && (tab != TAB_DOORS || tab2 >= 0)) { selectTab(TAB_DOORS); return true; }
+        return false;
+    }
+
+    NodeApi dexNode() { return node; }
+
+    /** Relay list + dev token override are shared prefs; re-read whenever they may have changed. */
+    void applySettings() {
+        relay.setRelays(RelayStore.load(this));
+        Tokens.setMxUsd(RelayStore.mxusdOverride(this));
+    }
+
+    /** First run: set up the Trading Account — unless an earlier Dexicon still has node-key positions here, which settle
+     *  the old way first (owner, 9 Nov: finish before upgrading). */
+    private boolean offering, legacyNoticeShown;
+    private static String lastProofSaid = "";
+    private int lockedTries;
+    private final Runnable retryOffer = this::offerAccount;
+    private void offerAccount() {
+        if (HostMode.on()) return;   // host-node mode: the node's own wallet trades - there is no Trading Account to set up
+        // AtomiX / PandaPools on this phone: the hand-over GateView owns that (its guarded Hand over / Remove, the pool
+        // backup move) — never cover it with the account's "one app at a time" dialog. Re-offered when the gate lifts.
+        if (TradingGate.conflict(this)) return;
+        if (offering || com.eurobuddha.dexicon.integratedaccount.Account.get(this, node) != null) { lockedTries = 0; return; }
+        if (com.eurobuddha.dexicon.integratedaccount.Account.exists(this)) {   // vault present but the keystore is busy: retry, delete nothing
+            ui.removeCallbacks(retryOffer);
+            if (++lockedTries <= 6) { toast("Your Trading Account is temporarily locked — Dexicon retries in a moment."); ui.postDelayed(retryOffer, 5_000); return; }
+            offering = true;
+            track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle("Trading Account locked")
+                    .setMessage("This phone's keystore will not unlock your Trading Account. You can restore it from its 24 words "
+                            + "(the locked copy is kept, never deleted).")
+                    .setPositiveButton("Restore", (d, w) -> {
+                        com.eurobuddha.dexicon.integratedaccount.Account.quarantineForRestore(this);
+                        // straight to RESTORE of the SAME account (fingerprint-checked) — never "Create new" over it
+                        String open = com.eurobuddha.dexicon.account.LegacyPositions.describeAny(this);
+                        com.eurobuddha.dexicon.integratedaccount.AccountSetup.show(activity(), node, this::onAccountReady, true, open == null ? "funds" : open);
+                    })
+                    .setNegativeButton("Later", (d, w) -> { offering = false; lockedTries = 0; }).show());
+            return;
+        }
+        offering = true;
+        if (com.eurobuddha.dexicon.integratedaccount.Account.everCreated(this)) {
+            // The account existed here and was lost: its positions are locked to ITS keys — only the same words can settle
+            // them, so a brand-new account is not offered while any remain.
+            String open = com.eurobuddha.dexicon.account.LegacyPositions.describeAny(this);
+            com.eurobuddha.dexicon.integratedaccount.AccountSetup.show(activity(), node, this::onAccountReady, true, open == null ? "funds" : open);
+            return;
+        }
+        int acctPools = com.eurobuddha.dexicon.account.LegacyPositions.accountPools(this);
+        if (acctPools > 0) {   // pools made under a Trading Account (e.g. carried by a device transfer): only its words settle them
+            com.eurobuddha.dexicon.integratedaccount.AccountSetup.showForPools(activity(), node, this::onAccountReady, acctPools + (acctPools == 1 ? " pool" : " pools"),
+                    com.eurobuddha.dexicon.account.LegacyPositions.accountPoolOwners(this), com.eurobuddha.dexicon.account.LegacyPositions.accountPoolMode(this));
+            return;
+        }
+        String legacy = com.eurobuddha.dexicon.account.LegacyPositions.describe(this);
+        if (legacy == null) { com.eurobuddha.dexicon.integratedaccount.AccountSetup.show(activity(), node, this::onAccountReady, false, null); return; }
+        offering = false;
+        // closed node-key pools may be all that is left: prove them empty, then look again — and say why if they are not
+        com.eurobuddha.pandapools.DexiconPools.proveClosedPools(this, node(), failed -> {
+            if (isFinishing() || isDestroyed()) return;
+            com.eurobuddha.dexicon.account.LegacyPositions.invalidate();
+            if (com.eurobuddha.dexicon.account.LegacyPositions.describe(this) == null) { offerAccount(); return; }
+            String said = String.join("\n\n", failed);
+            if (!failed.isEmpty() && !said.equals(lastProofSaid)) {   // the same answer is not shown again
+                lastProofSaid = said;
+                TextView t = new TextView(this); t.setText(said); t.setTextIsSelectable(true);   // full pool addresses, copyable
+                int pp = Design.dp(this, 20); t.setPadding(pp, pp / 2, pp, 0);
+                track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle("Closed pools not proven empty").setView(t)
+                        .setPositiveButton("OK", null).show());
+            }
+        });
+        if (legacyNoticeShown) return;
+        legacyNoticeShown = true;
+        track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle("Finish these first")
+                .setMessage("This Dexicon still has " + legacy + " made with your node's own keys. They settle exactly as before "
+                        + "(Dexicon needs ADMIN in your node until they are done). Once they are finished, Dexicon moves to its own "
+                        + "Trading Account and no longer needs ADMIN.")
+                .setPositiveButton("OK", null).show());
+    }
+
+    /** The Trading Account was just created: pair again (no ADMIN needed now) and wake the maker service. */
+    private void onAccountReady() {
+        offering = false;
+        // The old AtomiX swap identity was a NODE key: forget it (no legacy position remains — offerAccount checked), so
+        // IdentityWatch adopts the account's key instead of halting as "orphaned". Then restart once so every engine
+        // (doors, maker, pools) boots on the Trading Account.
+        getSharedPreferences("dexicon_doors", MODE_PRIVATE).edit().remove("swap_addr").remove("swap_pk").commit();
+        com.eurobuddha.atomix.IdentityWatch.forceNext();
+        toast("Trading Account ready — Dexicon restarts once.");
+        stopService(new Intent(this, MakerService.class));
+        // Pandamonium: no Trading Account, so no restart after its setup (host-node mode never offers one).
+    }
+
+    private void onPaired() {
+        TradingGate.checkMiniHub(this, node, this::applyGate);
+        ensureKeepAlive();   // weekly battery-exemption ask for pool hosts and AtomiX makers (no-op otherwise)
+        poolsPaired();   // ② Pools: PandaPools' boot (sentinel untrack, re-track my pools, foreign-tracking hygiene)
+        readBalances(); readBlock();
+        if (me == null) deriveIdentity();
+        refreshResting();
+    }
+
+    /** BOOK/POOL use the mainnet MxUSD id baked into the V5 covenant and the pool scan; a dev dollar-token
+     *  override (Settings) means there is no such liquidity on this chain, so the layer stays off. */
+    boolean restingOn() { return Tokens.MXUSD_MAINNET.equalsIgnoreCase(Tokens.MXUSD()); }
+
+    /** PandaDEX MainActivity order: verify + register the V5 covenant (trackall:false) once, then scan book and pools.
+     *  Both repositories are single-flight and throttled (4 s book, 8 s pools), so calling this per block is safe. */
+    private void refreshResting() {
+        if (!paired || !restingOn() || restingRepo == null) return;
+        if (!v5Ready) {
+            if (v5Registering) return;
+            v5Registering = true;
+            DexContract.ensureScript(node, new DexContract.Ready() {
+                @Override public void ok() { v5Registering = false; v5Ready = true; refreshResting(); }
+                @Override public void failed(String why) { v5Registering = false; setStage("BOOK layer unavailable: " + why); }
+            });
+            return;
+        }
+        restingRepo.refresh();
+        poolRepo.refresh();
+    }
+
+    Map<String, Order5> restingBook() { return restingRepo == null || !restingOn() ? java.util.Collections.emptyMap() : restingRepo.book(); }
+    /** PandaDEX MainActivity.pools(): only a current scan is tradeable liquidity. */
+    List<Pool> restingPools() { return poolRepo == null || !restingOn() || !poolRepo.current() ? java.util.Collections.emptyList() : poolRepo.pools(); }
+
+    private void deriveIdentity() {
+        if (deriving) return;
+        if (!HostMode.on() && !com.eurobuddha.dexicon.integratedaccount.Account.exists(this) && !com.eurobuddha.dexicon.account.LegacyPositions.exist(this)) return;   // AccountSetup first (host mode: the node's seed)
+        deriving = true;
+        SeedSource.derive(node, SeedSource.DEX, new SeedSource.Cb() {   // one-way: the node's phrase never enters the app
+            public void got(String seed) {
+                net.execute(() -> {
+                    try {
+                        DexIdentity id = DexIdentity.fromSeed(Sodium.get(), seed);
+                        ui.post(() -> { me = id; engine = new MakerEngine(MainActivity.this, node, db, relay, me); deriving = false; repaint(); });
+                    } catch (Exception e) { ui.post(() -> { deriving = false; setStage("Identity derivation failed: " + e.getMessage()); }); }
+                });
+            }
+            public void failed(String m) { deriving = false; setStage(NodeApi.ERR_NOT_ENABLED.equals(m) ? "Enable Dexicon in Minima Core → Apps" : NodeApi.ERR_NOT_ADMIN.equals(m) ? "Dexicon needs ADMIN in Minima Core → Apps. Nothing runs without it." : "Identity: " + m + ". Unlock and reopen."); }
+        });
+    }
+
+    private void readBlock() {
+        node.cmd("block", new NodeApi.Cb() {
+            public void onResult(JSONObject j) {
+                JSONObject r = j.optJSONObject("response");
+                long was = chainBlock;
+                try { chainBlock = Long.parseLong(r.optString("block", "0")); } catch (Exception ignored) {}
+                Tokens.noteBlock(chainBlock); Tokens.setMxUsd(RelayStore.mxusdOverride(MainActivity.this));   // the override only on a proven test chain
+                restingRepo.setChainBlock(chainBlock); restingTxn.setChainBlock(chainBlock);
+                poolsBlock(chainBlock);   // ② Pools: confirmations + one shared pool scan per new block (PandaPools pollBlock)
+                if (chainBlock != was) { refreshResting(); warmMakers(); warmWallet(); if (tab == TAB_ASSETS) assetsTab.newBlock(); }   // book + pools follow the chain, once per new block
+                repaintHeader();
+            }
+            public void onError(String m) {}
+        });
+    }
+
+    private void readBalances() {
+        node.cmd("balance", new NodeApi.Cb() {
+            public void onResult(JSONObject j) {
+                for (JSONObject b : NodeApi.rows(j)) {
+                    String tok = b.optString("tokenid", "");
+                    if (Tokens.isMinima(tok)) { minimaSendable = Util.dec(b.optString("sendable", "0")); minimaConfirmed = Util.dec(b.optString("confirmed", "0")); minimaUnconfirmed = Util.dec(b.optString("unconfirmed", "0")); minimaCoins = b.optInt("coins", 0); }
+                    else if (Tokens.isMxUsd(tok)) { mxusdSendable = Util.dec(b.optString("sendable", "0")); mxusdConfirmed = Util.dec(b.optString("confirmed", "0")); mxusdUnconfirmed = Util.dec(b.optString("unconfirmed", "0")); mxusdCoins = b.optInt("coins", 0); }
+                }
+                balanceAtMs = System.currentTimeMillis();
+                repaint();
+            }
+            public void onError(String m) {}
+        });
+        if (receiveAddr.isEmpty()) node.cmd("getaddress", new NodeApi.Cb() {
+            public void onResult(JSONObject j) { JSONObject r = j.optJSONObject("response"); if (r != null) { receiveAddr = r.optString("address", ""); receiveMx = r.optString("miniaddress", receiveAddr); } restingTxn.setPayout(receiveAddr); repaint(); }
+            public void onError(String m) {}
+        });
+    }
+
+    // ---- book long-poll (foreground only) ----
+    private void bookLoop() {
+        if (closed || !FOREGROUND || bookPolling) return;
+        if (relay.relays().isEmpty()) { ui.postDelayed(this::bookLoop, 3000); return; }
+        bookPolling = true;
+        net.execute(() -> {
+            int changed = relay.pollBook(25);
+            ui.post(() -> { bookPolling = false; if (closed) return; repaint(); if (changed > 0) warmMakers(); ui.postDelayed(this::bookLoop, changed < 0 ? 2000 : 0); });
+        });
+    }
+
+    // ---- accessors for the tabs ----
+    DexDb db() { return db; }
+    RelayClient relay() { return relay; }
+    DexIdentity identity() { return me; }
+    long tip() { return chainBlock; }
+    boolean isBusy() { return busy; }
+    boolean paired() { return paired; }
+    int minimaCoins, mxusdCoins;   // wallet coin counts from `balance` (ASSETS › consolidate / split)
+    NodeApi nodeApi() { return node; }
+    void refreshBalances() { if (node != null) readBalances(); }
+    String receiveAddress() { return receiveMx.isEmpty() ? receiveAddr : receiveMx; }
+    /** The account's receive address in 0x form ("" until read). */
+    String receiveHex() { return receiveAddr; }
+    BigDecimal minimaSendable() { return minimaSendable; }
+    BigDecimal mxusdSendable() { return mxusdSendable; }
+    BigDecimal minimaConfirmed() { return minimaConfirmed; }
+    BigDecimal minimaUnconfirmed() { return minimaUnconfirmed; }
+    BigDecimal mxusdUnconfirmed() { return mxusdUnconfirmed; }
+    BigDecimal mxusdConfirmed() { return mxusdConfirmed; }
+    long balanceAtMs() { return balanceAtMs; }
+    List<Envelope> book() { return relay.orders(null); }
+    List<MyOrder> myOrders() { return db.myOrders(); }
+    boolean isMine(Envelope e) { return me != null && e.signPk.equalsIgnoreCase(me.signPkHex()); }
+
+    public void toast(String s) { Toast.makeText(this, here(s), Toast.LENGTH_SHORT).show(); }
+    /** The vendored PandaDEX layer (verbatim) tells you to consolidate "in MinimaCore"; Dexicon has it on ASSETS. */
+    static String here(String s) {
+        return s == null ? null : s.replace("the wallet screen's CONSOLIDATE", "ASSETS › CONSOLIDATE")
+                .replace("consolidate this token in MinimaCore", "consolidate this token on ASSETS › CONSOLIDATE")
+                .replace("Use MinimaCore consolidation", "Use ASSETS › CONSOLIDATE").replace("Consolidate funding", "Consolidate on ASSETS")
+                .replace("consolidate coins and retry", "consolidate on ASSETS and retry");
+    }
+    void setStage(String s) { stage = s == null ? "" : here(s); repaintHeader(); }
+    public void copy(String label, String value) {
+        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        if (cm == null || value == null || value.isEmpty()) return;
+        cm.setPrimaryClip(ClipData.newPlainText(label, value));   // the COMPLETE value, never an abbreviation
+        toast(label + " copied");
+    }
+
+    /** The node app (its Apps screen holds Dexicon's toggle). */
+    void openNodeApp() {
+        String pkg = NodeApi.nodeApp(this)[0];
+        android.content.Intent open = pkg.isEmpty() ? null : getPackageManager().getLaunchIntentForPackage(pkg);
+        if (open != null) startActivity(open); else toast("Install or start your Minima node app first");
+    }
+
+    /** One trading app per phone: every confirmed or automatic trade asks here first (MakerEngine asks again). */
+    boolean gateRefuses() {
+        if (!TradingGate.blocked(this)) return false;
+        toast("Trading is off: one trading app per phone (see the first screen)");
+        return true;
+    }
+
+    /** Shows {@code d} and remembers it, so the gate or a market switch can close it under the user. */
+    public <T extends android.app.Dialog> T track(T d) {
+        for (java.util.Iterator<android.app.Dialog> it = dialogs.iterator(); it.hasNext(); ) if (!it.next().isShowing()) it.remove();
+        dialogs.add(d);
+        return d;
+    }
+    public void dismissDialogs() { for (android.app.Dialog d : dialogs) if (d.isShowing()) d.dismiss(); dialogs.clear(); }
+
+    // ---- order desk ----
+
+    /** Best FAST order on the opposite side that a limit at {@code price} crosses (never mine, never unbacked). */
+    private Envelope bestFastCross(boolean buy, BigDecimal price) {
+        for (Envelope e : relay.orders(buy ? "sell" : "buy")) {
+            if (isMine(e) || e.coins.isEmpty()) continue;
+            BigDecimal p = new BigDecimal(e.price);
+            if (buy ? p.compareTo(price) <= 0 : p.compareTo(price) >= 0) return e;
+        }
+        return null;
+    }
+
+    /**
+     * BUY/SELL from the panel. A crossing order takes the best SINGLE source for the first level (see
+     * {@link SourcePick}): a FAST relay order through the two-party co-signed take, or BOOK/POOL liquidity through
+     * PandaDEX's composite transaction (quoted off the UI thread, exactly as PandaDEX TradeView.submit). Nothing
+     * crosses → the order rests on the relays as a FAST order.
+     */
+    /** Owner 7 Nov: which liquidity a button uses — FAST (relay orders only) or POOL (on-chain BOOK + pools only). */
+    public static final int SRC_FAST = 0, SRC_POOL = 1, SRC_BOTH = 2;
+
+    void placeOrder(boolean buy, BigDecimal price, BigDecimal amount, String shownRoute, int source) {
+        if (gateRefuses()) return;
+        if (me == null || engine == null) { toast("Identity not ready — is Dexicon enabled in Minima Core?"); return; }
+        if (busy) { toast("A transaction is in progress"); return; }
+        if (source != SRC_BOTH) pendingBoth = null;
+        final Envelope best = source == SRC_POOL ? null : bestFastCross(buy, price);
+        final List<Order5> orders = source == SRC_FAST ? new ArrayList<>() : new ArrayList<>(restingBook().values());
+        final List<Pool> pools = source == SRC_FAST ? new ArrayList<>() : new ArrayList<>(restingPools());
+        final long block = chainBlock;
+        final BigDecimal fastOffered = offered(buy, price);
+        busy = true; setStage("Calculating quote…"); repaint();
+        quoteExec.execute(() -> {
+            final Decision d = source == SRC_BOTH ? decideBoth(buy, price, amount, best, fastOffered, orders, pools, block)
+                                                  : decide(buy, price, amount, best, orders, pools, block);
+            ui.post(() -> {
+                if (closed) return;
+                busy = false; setStage(""); repaint();
+                if (d.error != null) { toast(d.error); return; }
+                // owner 7 Nov: the button names the route; the click never takes a route the button did not show
+                if (shownRoute != null && !shownRoute.equals(d.route)) { toast("The best route just changed to " + d.route + " — the button shows it now. Tap again to trade."); return; }
+                if ("BOTH".equals(d.route)) confirmBoth(d, buy, price);
+                else if (source == SRC_BOTH) toast("FAST and on-chain no longer both cross this price — nothing was traded");
+                else if (d.full != null) confirmComposite(d.full, buy, amount, price, best);
+                else if (source == SRC_POOL) toast("No BOOK or POOL liquidity crosses this price — nothing was traded");
+                else placeFast(buy, price, amount, best);
+            });
+        });
+    }
+
+    /** One click's route: FAST (sweep the relay orders), BOOK / POOL / BOOK+POOL (on-chain composite) or REST (nothing
+     *  crosses). Pure; runs on quoteExec. The CTA label and the click both use it, so they always agree. */
+    static final class Decision {
+        final String route; final CompositeRouter.Plan full; final String error;
+        /** BOTH only: MINIMA the on-chain part fills, and the most the FAST sweep that follows may take. */
+        final BigDecimal chainQ, fastQ;
+        Decision(String route, CompositeRouter.Plan full, String error) { this(route, full, error, BigDecimal.ZERO, BigDecimal.ZERO); }
+        Decision(String route, CompositeRouter.Plan full, String error, BigDecimal chainQ, BigDecimal fastQ) {
+            this.route = route; this.full = full; this.error = error; this.chainQ = chainQ; this.fastQ = fastQ;
+        }
+    }
+
+    /**
+     * Owner 7 Nov, the sweep of BOTH: how one click splits {@code amount} between on-chain BOOK/POOL and FAST, all inside
+     * the limit. On-chain takes every MINIMA it has at or better than the best FAST price ({@code restingCheap}) plus
+     * whatever the crossing FAST orders cannot cover; FAST takes the middle, up to what it offers. Pure. The two parts
+     * never add up to more than {@code amount}, and on-chain never more than it holds at the limit.
+     * Returns {chainQ, fastQ}.
+     */
+    static BigDecimal[] split(BigDecimal amount, BigDecimal restingCheap, BigDecimal fastOffered, BigDecimal restingAtLimit) {
+        BigDecimal cheap = amount.min(restingCheap).max(BigDecimal.ZERO);
+        BigDecimal fastQ = fastOffered.min(amount.subtract(cheap)).max(BigDecimal.ZERO);
+        BigDecimal over = amount.subtract(cheap).subtract(fastQ).max(BigDecimal.ZERO);
+        BigDecimal chainQ = cheap.add(over).min(restingAtLimit).max(BigDecimal.ZERO);
+        return new BigDecimal[]{chainQ, fastQ};
+    }
+
+    /** Average MxUSD per MINIMA over both parts of a sweep (on-chain totals + the FAST part at its own average); null when unknown. */
+    static BigDecimal sweepAvg(BigDecimal chainMinima, BigDecimal chainMxusd, BigDecimal fastQ, BigDecimal fastAvg) {
+        if (fastAvg == null) return null;
+        BigDecimal q = chainMinima.add(fastQ);
+        return q.signum() == 0 ? null : chainMxusd.add(fastQ.multiply(fastAvg)).divide(q, 8, java.math.RoundingMode.HALF_UP);
+    }
+
+    static Decision decideBoth(boolean buy, BigDecimal price, BigDecimal amount, Envelope best, BigDecimal fastOffered,
+                               List<Order5> orders, List<Pool> pools, long block) {
+        if (best == null || fastOffered.signum() <= 0 || (orders.isEmpty() && pools.isEmpty())) return new Decision("NONE", null, null);
+        try {
+            CompositeRouter.Plan cheap = CompositeRouter.plan(orders, pools, buy, amount, new BigDecimal(best.price), block);
+            CompositeRouter.Plan atLimit = CompositeRouter.plan(orders, pools, buy, amount, price, block);
+            BigDecimal[] q = split(amount, cheap == null || cheap.isEmpty() ? BigDecimal.ZERO : cheap.totalMinima, fastOffered,
+                    atLimit == null || atLimit.isEmpty() ? BigDecimal.ZERO : atLimit.totalMinima);
+            if (q[0].signum() <= 0 || q[1].signum() <= 0) return new Decision("NONE", null, null);
+            CompositeRouter.Plan chain = CompositeRouter.plan(orders, pools, buy, q[0], price, block);
+            if (chain == null || chain.isEmpty()) return new Decision("NONE", null, null);
+            return new Decision("BOTH", chain, null, chain.totalMinima, q[1]);
+        } catch (RuntimeException invalid) { return new Decision(null, null, "Could not calculate this quote. Refresh and check the amounts."); }
+    }
+
+    /** The FAST half of a BOTH click, run once its on-chain half is posted (its coins then in the mempool). Expires so a
+     *  later, unrelated on-chain trade can never set it off; any other click clears it. */
+    private Runnable pendingBoth; private long pendingBothUntil;
+    /** Inputs of my posted on-chain trades: never offered to a FAST take (they are spent in the mempool). */
+    private final java.util.Set<String> postedIns = new java.util.HashSet<>();
+
+    private void confirmBoth(Decision d, boolean buy, BigDecimal price) {
+        confirmComposite(d.full, buy, d.chainQ, price, null, d.fastQ);
+    }
+    static Decision decide(boolean buy, BigDecimal price, BigDecimal amount, Envelope best, List<Order5> orders, List<Pool> pools, long block) {
+        String fast = best != null ? "FAST" : "REST";
+        if (orders.isEmpty() && pools.isEmpty()) return new Decision(fast, null, null);
+        BigDecimal fastQty = best == null ? null : amount.min(new BigDecimal(best.amount));
+        CompositeRouter.Plan full, head;
+        try {
+            full = CompositeRouter.plan(orders, pools, buy, amount, price, block);
+            head = fastQty == null ? full : CompositeRouter.plan(orders, pools, buy, fastQty, price, block);
+        } catch (RuntimeException invalid) { return new Decision(null, null, "Could not calculate this quote. Refresh and check the amounts."); }
+        if (SourcePick.restingFirst(head, fastQty, best == null ? null : new BigDecimal(best.price), buy)) return new Decision(routeName(full), full, null);
+        return new Decision(fast, null, null);
+    }
+    static String routeName(CompositeRouter.Plan plan) {
+        return plan.orderMinima.signum() > 0 && plan.poolMinima.signum() > 0 ? "BOOK+POOL" : plan.poolMinima.signum() > 0 ? "POOL" : "BOOK";
+    }
+
+    // Each button's quote, worked out off the UI thread whenever the inputs or the liquidity change; null while
+    // the first quote for a source is running (later re-quotes keep the previous one — a stale click is refused).
+    private final String[] routeKey = {"", "", ""}, routeReadyKey = {"", "", ""};
+    private final Decision[] routeDec = new Decision[3];
+    Decision routeFor(boolean buy, BigDecimal price, BigDecimal amount, int source) {
+        final Envelope best = source == SRC_POOL ? null : bestFastCross(buy, price);
+        final List<Order5> orders = source == SRC_FAST ? new ArrayList<>() : new ArrayList<>(restingBook().values());
+        final List<Pool> pools = source == SRC_FAST ? new ArrayList<>() : new ArrayList<>(restingPools());
+        final long block = chainBlock;
+        final BigDecimal fastOffered = source == SRC_POOL ? BigDecimal.ZERO : offered(buy, price);
+        StringBuilder k = new StringBuilder().append(fastOffered.toPlainString()).append('|').append(buy).append('|').append(price.toPlainString()).append('|').append(amount.toPlainString()).append('|').append(block);
+        if (best != null) k.append('|').append(best.orderId).append(':').append(best.seq).append(':').append(best.amount);
+        for (Order5 o : orders) k.append('|').append(o.coinid);
+        for (Pool pl : pools) k.append('|').append(pl.coinidM).append(':').append(pl.coinidT);
+        final String key = k.toString();
+        if (key.equals(routeReadyKey[source])) return routeDec[source];
+        if (!key.equals(routeKey[source])) {
+            routeKey[source] = key;
+            quoteExec.execute(() -> {
+                final Decision d = source == SRC_BOTH ? decideBoth(buy, price, amount, best, fastOffered, orders, pools, block)
+                                                      : decide(buy, price, amount, best, orders, pools, block);
+                ui.post(() -> {
+                    if (closed || !key.equals(routeKey[source])) return;
+                    routeReadyKey[source] = key; routeDec[source] = d;
+                    if (trade != null) trade.paintCtaPublic();
+                });
+            });
+        }
+        return routeReadyKey[source].isEmpty() ? null : routeDec[source];
+    }
+
+    /** Volume-weighted price of the crossing FAST orders (best first) that {@code amount} would take, or null. */
+    BigDecimal fastAvg(boolean buy, BigDecimal price, BigDecimal amount) {
+        BigDecimal left = amount, qty = BigDecimal.ZERO, cost = BigDecimal.ZERO;
+        for (Envelope e : relay.orders(buy ? "sell" : "buy")) {
+            if (left.signum() <= 0) break;
+            if (isMine(e) || e.coins.isEmpty()) continue;
+            BigDecimal p = new BigDecimal(e.price);
+            if (buy ? p.compareTo(price) > 0 : p.compareTo(price) < 0) continue;
+            BigDecimal q = left.min(new BigDecimal(e.amount));
+            qty = qty.add(q); cost = cost.add(q.multiply(p)); left = left.subtract(q);
+        }
+        return qty.signum() == 0 ? null : cost.divide(qty, 8, java.math.RoundingMode.HALF_UP);
+    }
+
+    /** The FAST path: a crossing fast order is taken at once (one click, no dialog), else the order rests as a fast order. */
+    private void placeFast(boolean buy, BigDecimal price, BigDecimal amount, Envelope best) {
+        if (best != null) { executeTake(buy, price, amount); return; }
+        confirm((buy ? "Buy " : "Sell ") + Util.fmt(amount) + " MINIMA @ " + Util.fmt(price) + " MxUSD",
+                "Rests on the relays as your order. Your wallet coins back it; the maker engine co-signs fills while the phone is in your pocket.",
+                () -> {
+                    if (gateRefuses()) return;
+                    if (engine == null) { toast("Not paired — try again once PAIRED"); return; }
+                    busy = true; setStage("Publishing order…"); repaint();
+                    engine.create(buy ? "buy" : "sell", price.toPlainString(), amount.toPlainString(), (err, o) -> {
+                        busy = false;
+                        setStage(err != null ? "Order failed: " + err : "Order published — id " + o.orderId);
+                        repaint();
+                    });
+                });
+    }
+
+    /** PandaDEX MainActivity.confirmComposite: list every BOOK and POOL part, effective and worst price, then DexTxn. */
+    private void confirmComposite(CompositeRouter.Plan plan, boolean buy, BigDecimal amount, BigDecimal price, Envelope fastBest) {
+        confirmComposite(plan, buy, amount, price, fastBest, null);
+    }
+    /** {@code fastQ} non-null = a BOTH sweep: this on-chain part first, then a FAST sweep of at most {@code fastQ}. */
+    private void confirmComposite(CompositeRouter.Plan plan, boolean buy, BigDecimal amount, BigDecimal price, Envelope fastBest, BigDecimal fastQ) {
+        final boolean both = fastQ != null;
+        BigDecimal rest = amount.subtract(plan.totalMinima).max(BigDecimal.ZERO);
+        StringBuilder sb = new StringBuilder();
+        if (both) sb.append("SWEEP ").append(PriceMath.fmt(plan.totalMinima.add(fastQ))).append(" MINIMA, up to ").append(PriceMath.fmtPrice(price))
+                .append(", in two parts:\n  1. up to ").append(PriceMath.fmt(fastQ)).append(" from FAST orders now, best price first — instant\n  2. then ")
+                .append(PriceMath.fmt(plan.totalMinima)).append(" on-chain (below), re-quoted at your limit the moment part 1 ends\n");
+        if (both) {
+            BigDecimal avg = sweepAvg(plan.totalMinima, plan.totalMxusd, fastQ, fastAvg(buy, price, fastQ));
+            if (avg != null) sb.append("Average over both parts ≈ ").append(PriceMath.fmtPrice(avg)).append(" MxUSD per MINIMA (")
+                    .append(PriceMath.fmt(plan.totalMxusd.add(fastQ.multiply(fastAvg(buy, price, fastQ))))).append(" MxUSD)\n");
+            sb.append("\nPART 2 — ");
+        }
+        sb.append(buy ? "Buying " : "Selling ").append(PriceMath.fmt(plan.totalMinima)).append(" MINIMA now from on-chain liquidity\n");
+        sb.append("Effective ").append(PriceMath.fmtPrice(plan.effectivePrice)).append("  ·  ").append(PriceMath.fmt(plan.totalMxusd)).append(" MxUSD\n");
+        if (plan.orderMinima.signum() > 0) {
+            sb.append("BOOK ").append(PriceMath.fmt(plan.orderMinima)).append(" MINIMA / ").append(PriceMath.fmt(plan.orderMxusd)).append(" MxUSD across ")
+              .append(plan.orderTakes.size()).append(plan.orderTakes.size() == 1 ? " order\n" : " orders\n");
+        }
+        if (plan.poolMinima.signum() > 0) {
+            sb.append("POOL ").append(PriceMath.fmt(plan.poolMinima)).append(" MINIMA / ").append(PriceMath.fmt(plan.poolMxusd)).append(" MxUSD across ")
+              .append(plan.poolCount()).append(plan.poolCount() == 1 ? " pool\n" : " pools\n");
+            String impact = poolImpact(plan);
+            if (!impact.isEmpty()) sb.append("Price impact ").append(impact).append("\n");
+        }
+        if (plan.worstMarginalPrice.signum() > 0) sb.append("Worst marginal ").append(PriceMath.fmtPrice(plan.worstMarginalPrice)).append("\n");
+        for (SweepPlanner.Take t : plan.orderTakes) {
+            sb.append("  • BOOK ").append(PriceMath.fmt(t.minima)).append(" @ ").append(PriceMath.fmtPrice(t.order.price())).append(t.partial ? "  (partial)" : "")
+              .append("\n     order coin ").append(t.order.coinid).append("\n");
+        }
+        if (plan.poolRoute != null) for (PoolRouter.Alloc a : plan.poolRoute.allocs) {
+            BigDecimal m = buy ? a.quote.outAmount : a.quote.inAmount, u = buy ? a.quote.inAmount : a.quote.outAmount;
+            sb.append("  • POOL ").append(PriceMath.fmt(m)).append(" MINIMA / ").append(PriceMath.fmt(u)).append(" MxUSD")
+              .append("\n     pool ").append(a.pool.address).append("\n");
+        }
+        if (fastBest != null) sb.append("\nBeats the best FAST ").append(buy ? "ask" : "bid").append(" @ ").append(fastBest.price).append(" for this size; FAST is not used in this trade.\n");
+        if (both) sb.append("\nPART 1 — FAST: up to ").append(PriceMath.fmt(fastQ)).append(" MINIMA, one maker after another, no further dialog; progress shows in the trade log. Part 2 never uses part 1's coins; if its own coins are still confirming it waits for them by itself.\n");
+        if (!both && rest.signum() > 0) sb.append("\nThe remaining ").append(PriceMath.fmt(rest)).append(" MINIMA is NOT traded or rested by this transaction — place it again once it confirms.\n");
+        sb.append("\nOne atomic transaction, signed by your node; final after one block.");
+        track(new AlertDialog.Builder(this, Design.dialogTheme())
+                .setTitle(both ? (buy ? "Confirm sweep buy · FAST + " : "Confirm sweep sell · FAST + ") + routeName(plan) : buy ? "Confirm buy · BOOK/POOL" : "Confirm sell · BOOK/POOL")
+                .setMessage(sb.toString())
+                .setPositiveButton("Execute", (d, w) -> {
+                    if (both && run != null) { toast("A FAST trade is still running — wait for it to finish"); return; }
+                    if (both) {
+                        // owner 7 Nov: FAST first (instant), then on-chain — the on-chain path already waits for confirming
+                        // coins and retries by itself (autoFund); the FAST path cannot.
+                        final BigDecimal chainQ = amount;
+                        pendingBoth = () -> bothPart2(buy, price, chainQ);
+                        pendingBothUntil = System.currentTimeMillis() + 10 * 60_000L;
+                        executeTake(buy, price, fastQ);
+                    } else { pendingBoth = null; executeComposite(plan, buy, amount, price, 0); }
+                })
+                .setNegativeButton("Back", null)
+                .show());
+    }
+
+    private void executeComposite(CompositeRouter.Plan plan, boolean buy, BigDecimal amount, BigDecimal price, int retry) {
+        if (gateRefuses()) { setStage(""); return; }
+        if (busy) { toast("A transaction is in progress"); return; }
+        busy = true;
+        final String route = routeName(plan);
+        final String actId = ActivityLog.newId("slow_");
+        final JSONObject[] posted = {new JSONObject()};
+        try {
+            ActivityLog.add(db, new JSONObject().put("id", actId).put("route", route).put("role", "taker").put("side", buy ? "buy" : "sell")
+                    .put("amount", PriceMath.fmt(plan.totalMinima)).put("price", plan.effectivePrice.toPlainString()).put("mxusd", PriceMath.fmt(plan.totalMxusd))
+                    .put("ts", System.currentTimeMillis()).put("stage", ActivityLog.BUILDING).put("reason", "Selecting wallet coins…"));
+        } catch (Exception ignored) {}
+        liveActId = actId;
+        setStage((buy ? "Buy" : "Sell") + " accepted · selecting wallet coins for " + plan.poolCount() + " pool(s) and " + plan.orderTakes.size() + " book order(s)");
+        repaint();
+        restingTxn.fillComposite(plan, buy, new DexTxn.Result() {
+            @Override public void onProgress(String message) {
+                ActivityLog.update(db, actId, a -> a.put("reason", message));
+                setStage("");
+            }
+            @Override public void onPostReply(JSONObject reply) { posted[0] = ActivityLog.fromPostReply(reply, restingTxn.hexAddr()); }
+            @Override public void onPosted(String txpowid) {
+                busy = false;
+                JSONObject ids = posted[0];
+                ActivityLog.update(db, actId, a -> a.put("stage", ActivityLog.POSTED).put("reason", "").put("txpowid", txpowid)
+                        .put("txnid", ids.optString("txnid")).put("outs", ids.optJSONArray("outs") == null ? new JSONArray() : ids.optJSONArray("outs"))
+                        .put("ins", ids.optJSONArray("ins") == null ? new JSONArray() : ids.optJSONArray("ins"))
+                        .put("postBlock", chainBlock).put("tip", chainBlock).put("postedMs", System.currentTimeMillis()));
+                JSONArray insArr = ids.optJSONArray("ins");
+                for (int i = 0; insArr != null && i < insArr.length(); i++) postedIns.add(insArr.optString(i).toLowerCase(java.util.Locale.ROOT));
+                walletCache.clear();   // the next FAST take re-reads the wallet: these inputs are spent in the mempool
+                // BOOK/POOL fills join HISTORY and the CSV like FAST fills; MakerService.settleFills settles them by output coin.
+                try {
+                    db.saveFill(new JSONObject().put("role", "taker").put("orderId", "").put("side", buy ? "buy" : "sell")
+                            .put("price", plan.effectivePrice.toPlainString()).put("filled", PriceMath.fmt(plan.totalMinima))
+                            .put("gave", PriceMath.fmt(buy ? plan.totalMxusd : plan.totalMinima)).put("got", PriceMath.fmt(buy ? plan.totalMinima : plan.totalMxusd))
+                            .put("txpowid", txpowid).put("coins", ids.optJSONArray("outs") == null ? new JSONArray() : ids.optJSONArray("outs"))
+                            .put("counterparty", route).put("ts", MakerEngine.now()).put("status", "settling"));
+                } catch (Exception ignored) {}
+                setStage("");
+                refreshResting(); readBalances(); repaint();
+            }
+            @Override public void onFailed(String message) {
+                busy = false;
+                ActivityLog.update(db, actId, a -> a.put("stage", ActivityLog.FAILED).put("reason", message));
+                setStage("");
+                refreshResting(); repaint();
+                // A DEX does the wallet work itself: a funding failure is recovered (wait for coins to confirm, or
+                // consolidate the token) and the SAME trade is re-planned within the same limit and retried once.
+                // owner 8 Nov (a SWEEP's part 2 failed twice): retry 0 = first try, 1 = after waiting for coins to confirm,
+                // 2 = after a consolidate. A wait can leave the wallet still too fragmented for 8 inputs, so a failure
+                // after a wait goes on to consolidate; a failure after a consolidate is final.
+                if (retry < 2 && message != null && (message.startsWith("Wallet has") || message.contains("Too many transaction inputs")
+                        || message.contains("needs more than") || message.contains("TxPoW size") || message.contains("too large")))
+                    autoFund(buy, amount, price, buy ? Tokens.MXUSD() : Tokens.MINIMA, buy ? plan.totalMxusd : plan.totalMinima, message, retry);
+                else {
+                    toast(message);
+                }
+            }
+        });
+    }
+
+    /** Recover a pool/book trade's funding by itself, then retry it once (owner 2026-10-22: "Where is the automation?"):
+     *  coins still confirming → wait for them; enough sendable but in too many / unusable coins → `consolidate` (the
+     *  family's PandaPools/UTXO tool) and wait for it; genuinely short → say so plainly. Waits at most 10 blocks.
+     *  At most two recoveries: a wait, then (if the wallet is still too fragmented for 8 inputs) a consolidate. */
+    private void autoFund(boolean buy, BigDecimal amount, BigDecimal price, String token, BigDecimal need, String why, int retry) {
+        String name = Tokens.isMinima(token) ? "MINIMA" : "MxUSD";
+        node.cmd("balance tokenid:" + token, new NodeApi.Cb() {
+            public void onResult(JSONObject j) {
+                BigDecimal sendable = BigDecimal.ZERO, total = BigDecimal.ZERO; int coins = 0;
+                for (JSONObject b : NodeApi.rows(j)) if (token.equalsIgnoreCase(b.optString("tokenid"))) {
+                    sendable = Util.dec(b.optString("sendable", "0")); coins = b.optInt("coins", 0);
+                    total = Util.dec(b.optString("confirmed", "0")).add(Util.dec(b.optString("unconfirmed", "0")));
+                }
+                if (total.compareTo(need) < 0) { toast("Not enough " + name + ": this trade needs " + PriceMath.fmt(need) + ", your wallet holds " + PriceMath.fmt(total)); return; }
+                if (sendable.compareTo(need) < 0) {
+                    setStage("Waiting for your " + name + " to confirm (" + PriceMath.fmt(sendable) + " of " + PriceMath.fmt(need) + " spendable) — the trade retries by itself");
+                    waitThenRetry(buy, amount, price, token, need, chainBlock, false, retry + 1);   // a second wait is the last try
+                    return;
+                }
+                final int before = coins;
+                setStage("Your " + name + " is spread over " + coins + " coins — consolidating it, then the trade retries by itself");
+                // the one node-picked-spend guard (as ASSETS › CONSOLIDATE): the node picks the coins
+                com.eurobuddha.pandapools.DexiconPools.guardNodePickedSpend(node, token, blocked -> {
+                    if (blocked != null) { setStage(""); explain("Nothing consolidated", blocked + "\n\n" + why); return; }
+                    SignGate.submit(release -> {
+                        // AtomiX's wallet lock at the front of the signing queue, never held while waiting behind other signers
+                        Runnable unlock = WalletLock.take(token);   // never merge a coin an AtomiX swap is locking
+                        if (unlock == null) { release.free(); setStage(""); explain("Nothing consolidated", WalletLock.BUSY + "\n\n" + why); return; }
+                        node.cmdR("consolidate tokenid:" + token, new NodeApi.Cb() {
+                            public void onResult(JSONObject x) { release.free(); unlock.run(); waitThenRetry(buy, amount, price, token, need, chainBlock, true, 2); }
+                            public void onError(String m) { release.free(); unlock.run(); setStage(""); toast("Could not consolidate " + name + ": " + m + " — " + why); }
+                        });
+                    });
+                });
+            }
+            public void onError(String m) { toast(why); }
+        });
+    }
+
+    /** Poll once a block (≤ 10) until the token is spendable again (and, after a consolidation, settled), then re-plan the
+     *  same trade at the same limit and execute it — no second confirmation: the user already confirmed this trade. */
+    private void waitThenRetry(boolean buy, BigDecimal amount, BigDecimal price, String token, BigDecimal need, long startBlock, boolean consolidated, int nextRetry) {
+        final int gen = gateGen;
+        ui.postDelayed(() -> {
+            if (closed) return;
+            if (gen != gateGen || TradingGate.blocked(this)) { setStage(""); return; }   // the gate shut while it waited: nothing re-executes
+            if (chainBlock - startBlock > 10) { setStage(""); toast("Gave up waiting for the wallet after 10 blocks — try the trade again"); return; }
+            node.cmd("balance tokenid:" + token, new NodeApi.Cb() {
+                public void onResult(JSONObject j) {
+                    BigDecimal sendable = BigDecimal.ZERO, unconf = BigDecimal.ZERO;
+                    for (JSONObject b : NodeApi.rows(j)) if (token.equalsIgnoreCase(b.optString("tokenid"))) { sendable = Util.dec(b.optString("sendable", "0")); unconf = Util.dec(b.optString("unconfirmed", "0")); }
+                    boolean ready = sendable.compareTo(need) >= 0 && (!consolidated || unconf.signum() == 0);
+                    if (!ready || busy) { waitThenRetry(buy, amount, price, token, need, startBlock, consolidated, nextRetry); return; }
+                    final List<Order5> orders = new ArrayList<>(restingBook().values());
+                    final List<Pool> pools = new ArrayList<>(restingPools());
+                    CompositeRouter.Plan again;
+                    try { again = CompositeRouter.plan(orders, pools, buy, amount, price, chainBlock); } catch (RuntimeException e) { again = null; }
+                    if (again == null || again.isEmpty()) { setStage(""); toast("The liquidity moved past your limit while the wallet settled — nothing was traded"); return; }
+                    setStage("Wallet ready — retrying your " + (buy ? "buy" : "sell"));
+                    executeComposite(again, buy, amount, price, nextRetry);
+                }
+                public void onError(String m) { waitThenRetry(buy, amount, price, token, need, startBlock, consolidated, nextRetry); }
+            });
+        }, 15_000);
+    }
+
+    /** PandaDEX MainActivity.poolImpact. */
+    private static String poolImpact(CompositeRouter.Plan plan) {
+        if (plan == null || plan.poolRoute == null || !plan.poolRoute.ok
+                || plan.poolRoute.spotBefore.signum() <= 0 || plan.effectivePrice.signum() <= 0) return "";
+        BigDecimal pct = plan.effectivePrice.subtract(plan.poolRoute.spotBefore).abs()
+                .multiply(new BigDecimal("100"), PriceMath.MC)
+                .divide(plan.poolRoute.spotBefore, 2, java.math.RoundingMode.HALF_UP);
+        return pct.toPlainString() + "%";
+    }
+
+    /** Mirror of the MiniDapp's retryNextLevel: a take from the order form that lost the race re-plans the same limit
+     *  against the next best fast level (never the same order twice) and asks once more. */
+    /** The service answers takes; the screen only said "waiting for the maker" — and kept saying it after the fill
+     *  landed (seen on-device 2026-10-21). When no take is pending any more, name the newest fill instead. */
+    void settleStage() {
+        if (!stage.startsWith("Take sent")) return;   // pre-0.1.9 text; takes are now followed live via liveActId
+        if (!db.pendings().isEmpty()) return;
+        java.util.List<org.json.JSONObject> fills = db.fills(1);
+        String last = db.meta("last_refusal", "");
+        if (!fills.isEmpty() && fills.get(0).optLong("ts", 0) * 1000 > System.currentTimeMillis() - 600_000L)
+            setStage("Filled " + fills.get(0).optString("filled") + " MINIMA @ " + fills.get(0).optString("price") + " — " + fills.get(0).optString("status", "settling") + " (HISTORY)");
+        else if (!last.isEmpty()) setStage("Maker refused: " + last);
+        else setStage("");
+    }
+
+    /** Mirror of the MiniDapp: a crossing order that was only partly filled by the best resting order rests the
+     *  remainder as a fast order of our own, once the maker has co-signed (rest_due is set by the service on `taken`). */
+    void restIfDue() {
+        String due = db.meta("rest_due", "");
+        if (due.isEmpty() || engine == null || busy) return;
+        db.setMeta("rest_due", "");
+        if (TradingGate.blocked(this)) { db.setMeta("retry", ""); return; }   // never rest a remainder while the gate is shut
+        JSONObject r; try { r = new JSONObject(db.meta("retry", "{}")); } catch (Exception e) { return; }
+        BigDecimal rest; try { rest = new BigDecimal(r.optString("rest", "0")); } catch (Exception e) { return; }
+        org.json.JSONArray tried = r.optJSONArray("tried");
+        boolean ours = false; for (int i = 0; tried != null && i < tried.length(); i++) if (due.equals(tried.optString(i))) ours = true;
+        if (!ours || rest.signum() <= 0) return;
+        db.setMeta("retry", "");
+        boolean buy = r.optBoolean("buy"); String price = r.optString("price");
+        busy = true; setStage("Resting the remaining " + rest.toPlainString() + " MINIMA @ " + price + " as your order…"); repaint();
+        engine.create(buy ? "buy" : "sell", price, rest.toPlainString(), (err, o) -> {
+            busy = false;
+            setStage(err != null ? "Remainder not rested: " + err : "Remaining " + rest.toPlainString() + " MINIMA rests as order " + o.orderId);
+            repaint();
+        });
+    }
+
+    /** The service flags a lost race with retry_due. A live one-click run moves on by itself (followTake); a take
+     *  orphaned by an app restart is only reported — nothing trades without a click. */
+    void retryIfDue() {
+        String due = db.meta("retry_due", "");
+        if (due.isEmpty()) return;
+        db.setMeta("retry_due", "");
+        if (run == null) setStage("Your take of order " + due + " lost the race (" + db.meta("last_refusal", "taken") + "). Nothing was traded.");
+    }
+
+    void cancelOrder(MyOrder o) {
+        if (engine == null) { toast("Not paired yet — enable Dexicon in your node app (Apps), unlock it, then try again"); return; }
+        confirm("Cancel order " + o.orderId + "?", (o.side.equals("sell") ? "SELL " : "BUY ") + Util.fmt(Util.dec(o.remaining)) + " MINIMA @ " + o.price, () -> {
+            busy = true; repaint();
+            if (engine == null) { busy = false; toast("Not paired — try again once PAIRED"); repaint(); return; }
+            engine.cancel(o.orderId, (err, x) -> { busy = false; setStage(err != null ? "Cancel failed: " + err : "Order cancelled"); repaint(); });
+        });
+    }
+
+    void editOrder(MyOrder o) {
+        if (engine == null) { toast("Not paired yet — enable Dexicon in your node app (Apps), unlock it, then try again"); return; }
+        LinearLayout box = new LinearLayout(this); box.setOrientation(LinearLayout.VERTICAL);
+        int p = Design.dp(this, 16); box.setPadding(p, p, p, 0);
+        EditText price = new EditText(this); price.setHint("Price (MxUSD per MINIMA)"); price.setText(o.price);
+        EditText amount = new EditText(this); amount.setHint("Amount (MINIMA)"); amount.setText(o.remaining);
+        box.addView(price); box.addView(amount);
+        track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle("Edit order").setView(box)
+                .setPositiveButton("Update", (d, w) -> {
+                    if (gateRefuses()) return;
+                    busy = true; repaint();
+                    if (engine == null) { busy = false; toast("Not paired — try again once PAIRED"); repaint(); return; }
+                    engine.edit(o.orderId, price.getText().toString().trim(), amount.getText().toString().trim(), (err, x) -> { busy = false; setStage(err != null ? "Edit failed: " + err : "Order updated"); repaint(); });
+                }).setNegativeButton("Back", null).show());
+    }
+
+    private interface CoinsCb { void done(String err, List<Coin> coins); }
+    private void fetchCoins(List<String> ids, int i, List<Coin> out, CoinsCb cb) {
+        if (i >= ids.size()) { cb.done(null, out); return; }
+        String id = ids.get(i);
+        node.cmdR("coins coinid:" + id, new NodeApi.Cb() {
+            public void onResult(JSONObject j) {
+                List<JSONObject> rows = NodeApi.rows(j);
+                if (rows.isEmpty() || rows.get(0).optString("coinid", "").isEmpty()) { cb.done("Maker coin " + id + " not found (spent or not yet visible)", null); return; }
+                Coin c = Coin.of(rows.get(0));
+                if (c.spent) { cb.done("Maker coin " + id + " is already spent", null); return; }
+                out.add(c); fetchCoins(ids, i + 1, out, cb);
+            }
+            public void onError(String m) { cb.done("Cannot fetch maker coin " + id + ": " + m, null); }
+        });
+    }
+
+    // ---- the one-click FAST take (MinimaXT's startTrade): coins fetched ahead, the button locks, a step log ----
+    private final java.util.Map<String, Coin> makerCoinCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private final java.util.Map<String, List<Coin>> walletCache = new java.util.HashMap<>();
+    private String cachedAddr;
+    private boolean warmingMakers;
+    private final StringBuilder takeLog = new StringBuilder();
+    private String followAct, followStatus;
+    /** Owner 7 Nov, the sweep: one click takes crossing FAST orders best-first until {@code amount} is covered. {@code left}
+     *  drops by each take SENT, answered or not — an unanswered take may still be co-signed within its 5-minute void
+     *  window, so it counts as possibly filled and the run can never buy more than the amount. Nothing rests. */
+    private static final class TakeRun {
+        final long t0 = System.currentTimeMillis(); boolean buy; BigDecimal price, amount, left, got = BigDecimal.ZERO, unanswered = BigDecimal.ZERO;
+        final java.util.Set<String> tried = new java.util.HashSet<>(); String act, orderId; Envelope order; BigDecimal taking = BigDecimal.ZERO;
+    }
+    /** At most this many orders per click: each take signs with a key use. */
+    static final int SWEEP_MAX_ORDERS = 12;
+    /** A maker that has not co-signed by now is counted as possibly filled and the sweep moves on. */
+    static final long SWEEP_WAIT_MS = 30_000;
+    private TakeRun run;
+
+    boolean taking() { return run != null; }
+    /** MakerSpeed averages, read once per book paint. */
+    java.util.Map<String, Long> makerSpeeds() { return MakerSpeed.load(db); }
+    long takingSecs() { return run == null ? 0 : (System.currentTimeMillis() - run.t0) / 1000; }
+    String takeLog() { return takeLog.toString(); }
+    Envelope fastCross(boolean buy, BigDecimal price) { return bestFastCross(buy, price); }
+    /** Exact MINIMA the crossing FAST orders offer at {@code price} (not mine, backed) — what one sweep click can take. */
+    BigDecimal offered(boolean buy, BigDecimal price) {
+        BigDecimal t = BigDecimal.ZERO;
+        for (Envelope e : relay.orders(buy ? "sell" : "buy")) {
+            if (isMine(e) || e.coins.isEmpty()) continue;
+            BigDecimal p = new BigDecimal(e.price);
+            if (buy ? p.compareTo(price) <= 0 : p.compareTo(price) >= 0) t = t.add(new BigDecimal(e.amount));
+        }
+        return t;
+    }
+
+    private void logStep(String msg) {
+        String t = run != null ? String.format(java.util.Locale.ROOT, "+%.1fs  ", (System.currentTimeMillis() - run.t0) / 1000.0)
+                               : new java.text.SimpleDateFormat("HH:mm:ss  ", java.util.Locale.ROOT).format(new java.util.Date());
+        takeLog.append(t).append(msg).append('\n');
+        if (trade != null) trade.paintLog();
+    }
+
+    /** Wallet coins of both tokens + the receive address, ready before any click. */
+    void warmWallet() {
+        if (node == null || !paired) return;
+        for (String tok : new String[]{Tokens.MINIMA, Tokens.MXUSD()})
+            MakerEngine.walletCoins(node, tok, (e, coins) -> { if (e == null) walletCache.put(tok, coins); });
+        node.cmd("getaddress", new NodeApi.Cb() {
+            public void onResult(JSONObject j) { JSONObject r = j.optJSONObject("response"); if (r != null && !r.optString("address", "").isEmpty()) cachedAddr = r.optString("address"); }
+            public void onError(String m) {}
+        });
+    }
+
+    /** The backing coins of the best few FAST orders on each side, fetched in the background; spent ones dropped. */
+    void warmMakers() {
+        if (node == null || !paired || warmingMakers) return;
+        List<String> ids = new ArrayList<>();
+        for (String side : new String[]{"sell", "buy"}) {
+            int n = 0;
+            for (Envelope e : relay.orders(side)) {
+                if (isMine(e) || e.coins.isEmpty()) continue;
+                for (String id : e.coins) if (!ids.contains(id)) ids.add(id);
+                if (++n >= 6) break;
+            }
+        }
+        warmingMakers = true;
+        warmStep(ids, 0);
+    }
+    private void warmStep(List<String> ids, int i) {
+        if (i >= ids.size() || closed) { warmingMakers = false; return; }
+        String id = ids.get(i);
+        node.cmdR("coins coinid:" + id, new NodeApi.Cb() {
+            public void onResult(JSONObject j) {
+                List<JSONObject> rows = NodeApi.rows(j);
+                Coin c = rows.isEmpty() ? null : Coin.of(rows.get(0));
+                if (c == null || c.coinid.isEmpty() || c.spent) makerCoinCache.remove(id); else makerCoinCache.put(id, c);
+                warmStep(ids, i + 1);
+            }
+            public void onError(String m) { warmStep(ids, i + 1); }
+        });
+    }
+
+    /** THE click: walk every crossing FAST order best-first; a refusal moves to the next one by itself. */
+    private void executeTake(boolean buy, BigDecimal price, BigDecimal amount) {
+        if (run != null) return;
+        takeLog.setLength(0); followAct = null;
+        run = new TakeRun(); run.buy = buy; run.price = price; run.amount = amount; run.left = amount;
+        logStep((buy ? "BUY " : "SELL ") + amount.toPlainString() + " MINIMA @ " + price.toPlainString() + " (limit)");
+        repaint();
+        nextOrder();
+    }
+
+    private void nextOrder() {
+        TakeRun r = run; if (r == null) return;
+        if (TradingGate.blocked(this)) { logStep("Stopped: trading is off (one trading app per phone). Nothing more was sent."); finishSweep(); return; }
+        if (r.left.signum() <= 0) { finishSweep(); return; }
+        if (r.tried.size() >= SWEEP_MAX_ORDERS) { logStep("Stopped after " + SWEEP_MAX_ORDERS + " orders (the per-click limit)."); finishSweep(); return; }
+        List<Envelope> hits = new ArrayList<>();
+        for (Envelope e : relay.orders(r.buy ? "sell" : "buy")) {
+            if (isMine(e) || e.coins.isEmpty() || r.tried.contains(e.orderId)) continue;
+            BigDecimal p = new BigDecimal(e.price);
+            if (r.buy ? p.compareTo(r.price) <= 0 : p.compareTo(r.price) >= 0) hits.add(e);
+        }
+        if (hits.isEmpty()) {
+            if (r.tried.isEmpty()) { logStep("Nothing crosses any more. Place the order again to rest it."); endRun(); return; }
+            logStep("No other FAST order crosses " + r.price.toPlainString() + ".");
+            finishSweep(); return;
+        }
+        // best price first, always; among orders at the SAME price, the maker that has co-signed my takes fastest first
+        final java.util.Map<String, Long> speed = MakerSpeed.load(db);
+        final boolean buyR = r.buy;
+        java.util.Collections.sort(hits, (x, y) -> {
+            int c = new BigDecimal(x.price).compareTo(new BigDecimal(y.price));
+            if (c != 0) return buyR ? c : -c;
+            return Long.compare(MakerSpeed.avg(speed, x.signPk), MakerSpeed.avg(speed, y.signPk));
+        });
+        if (r.tried.isEmpty()) logStep("Found " + hits.size() + " FAST order" + (hits.size() == 1 ? "" : "s") + " at or better than your price");
+        tryOrder(hits.get(0));
+    }
+
+    private void tryOrder(Envelope o) {
+        TakeRun r = run;
+        // PandaDEX's min-remainder floor: never leave under 1 MINIMA on the maker's order — shrink the take to leave
+        // exactly 1 (what you asked beyond that rests as yours); an order that can't be part-taken is skipped
+        BigDecimal now = FillPlan.floorTake(r.left.min(new BigDecimal(o.amount)), new BigDecimal(o.amount));
+        r.tried.add(o.orderId);
+        // security review 7 Nov: pending takes are keyed by order id — a second take of the same order would overwrite
+        // the first record and that signed half would never be voided
+        if (db.pending(o.orderId) != null) { logStep("Order " + o.orderId + ": your earlier take of it is still settling — next order"); nextOrder(); return; }
+        if (now.signum() <= 0) { logStep("Order " + o.orderId + ": a partial take would leave under " + FillPlan.MIN_REM.toPlainString() + " MINIMA — next order"); nextOrder(); return; }
+        if (now.compareTo(r.left.min(new BigDecimal(o.amount))) < 0) logStep("  taking " + now.toPlainString() + " so " + FillPlan.MIN_REM.toPlainString() + " MINIMA stays on the maker's order (minimum remainder)");
+        logStep("Order " + o.orderId + " @ " + o.price + " · " + o.amount + " MINIMA · maker " + o.address);
+        List<Coin> have = new ArrayList<>(); List<String> miss = new ArrayList<>();
+        for (String id : o.coins) { Coin c = makerCoinCache.get(id); if (c != null) have.add(c); else miss.add(id); }
+        fetchCoins(miss, 0, new ArrayList<>(), (err, got) -> {
+            if (run != r) return;
+            if (err != null) { logStep("  maker coins: " + err + " — next order"); nextOrder(); return; }
+            for (Coin c : got) makerCoinCache.put(c.coinid, c);
+            List<Coin> mc = new ArrayList<>(have); mc.addAll(got);
+            logStep("  maker coins " + (miss.isEmpty() ? "ready" : "fetched") + " (" + mc.size() + ")");
+            boolean sell = "sell".equals(o.side);
+            String tok = sell ? Tokens.MXUSD() : Tokens.MINIMA;
+            withWallet(tok, (e2, myCoins, addr) -> {
+                if (run != r) return;
+                if (e2 != null) { logStep("  " + e2); finishSweep(); return; }
+                FillPlan.Plan plan;
+                try { plan = FillPlan.plan(new FillPlan.Order(o.side, o.price, o.amount, o.address, o.coins, o.scripts), now.toPlainString(), mc, myCoins, addr); }
+                catch (RuntimeException e) { logStep("  " + e.getMessage() + " — next order"); nextOrder(); return; }
+                logStep("  you give " + plan.takerGives + (sell ? " MxUSD" : " MINIMA") + ", you get " + plan.makerGives + (sell ? " MINIMA" : " MxUSD"));
+                try { db.setMeta("retry", new JSONObject().put("buy", r.buy).put("price", r.price.toPlainString()).put("amount", r.amount.toPlainString()).put("rest", "0").put("tried", new JSONArray().put(o.orderId)).toString()); } catch (Exception ignored) {}
+                sendTake(o, plan);
+            });
+        });
+    }
+
+    private interface WalletCb { void done(String err, List<Coin> coins, String addr); }
+    /** My coins inside takes still waiting on a maker: not in the mempool until the maker posts, so the node still
+     *  lists them — a second take (the next order of a sweep) must not sign them again. */
+    private java.util.Set<String> pendingTakeCoins() {
+        java.util.Set<String> s = new java.util.HashSet<>();
+        for (JSONObject p : db.pendings()) { JSONArray m = p.optJSONArray("mine"); for (int i = 0; m != null && i < m.length(); i++) s.add(m.optString(i).toLowerCase(java.util.Locale.ROOT)); }
+        return s;
+    }
+    private static List<Coin> without(List<Coin> coins, java.util.Set<String> ids) {
+        if (ids.isEmpty()) return coins;
+        List<Coin> out = new ArrayList<>(); for (Coin c : coins) if (!ids.contains(c.coinid.toLowerCase(java.util.Locale.ROOT))) out.add(c);
+        return out;
+    }
+    private void withWallet(String tok, WalletCb cb0) {
+        final java.util.Set<String> held = pendingTakeCoins();
+        held.addAll(postedIns);
+        WalletCb cb = (e, coins, addr) -> cb0.done(e, coins == null ? null : without(coins, held), addr);
+        List<Coin> c = walletCache.get(tok);
+        if (c != null && cachedAddr != null) { cb.done(null, c, cachedAddr); return; }
+        MakerEngine.walletCoins(node, tok, (e, coins) -> {
+            if (e != null) { cb.done("Cannot read your coins: " + e, null, null); return; }
+            walletCache.put(tok, coins);
+            node.cmd("getaddress", new NodeApi.Cb() {
+                public void onResult(JSONObject j) { JSONObject x = j.optJSONObject("response"); cachedAddr = x == null ? null : x.optString("address", null); if (cachedAddr == null || cachedAddr.isEmpty()) cb.done("getaddress failed", null, null); else cb.done(null, coins, cachedAddr); }
+                public void onError(String m) { cb.done("getaddress failed: " + m, null, null); }
+            });
+        });
+    }
+
+    /** Build + sign my side, seal the take to the maker, publish to every relay. */
+    private void sendTake(Envelope order, FillPlan.Plan plan) {
+        final TakeRun r = run;
+        if (r == null) return;
+        if (TradingGate.blocked(this)) { logStep("Stopped: trading is off (one trading app per phone). Nothing was sent."); finishSweep(); return; }
+        busy = true;
+        final String actId = ActivityLog.newId("fast_");
+        final long t = System.currentTimeMillis();
+        boolean takerBuys = "sell".equals(order.side);
+        r.act = actId; r.orderId = order.orderId; r.order = order; r.taking = BigDecimal.ZERO;   // set once signed: nothing is counted for a take never sent
+        try {
+            ActivityLog.add(db, new JSONObject().put("id", actId).put("route", "FAST").put("role", "taker").put("side", takerBuys ? "buy" : "sell")
+                    .put("amount", plan.filled).put("price", order.price).put("mxusd", takerBuys ? plan.takerGives : plan.makerGives)
+                    .put("orderId", order.orderId).put("counterparty", order.address).put("ins", new JSONArray(plan.inputs))
+                    .put("ts", System.currentTimeMillis()).put("stage", ActivityLog.BUILDING).put("reason", "Building and signing your side…"));
+        } catch (Exception ignored) {}
+        liveActId = actId;
+        logStep("  signing your side…");
+        FillTxn.build(node, plan, (err, hex) -> {
+            // review 7 Nov (L): the sweep ended (gate shut, …) while this was signing — never send it, never touch a later run
+            if (run != r) { if (run == null) busy = false; ActivityLog.update(db, actId, a -> a.put("stage", ActivityLog.FAILED).put("reason", "not sent: the trade was stopped")); return; }
+            if (err != null) { busy = false; ActivityLog.update(db, actId, a -> a.put("stage", ActivityLog.FAILED).put("reason", "build failed: " + err)); logStep("  build failed: " + err); finishSweep(); return; }
+            logStep(String.format(java.util.Locale.ROOT, "  signed in %.1fs", (System.currentTimeMillis() - t) / 1000.0));
+            r.taking = new BigDecimal(plan.filled); r.left = r.left.subtract(r.taking);   // counted from here: it can be co-signed
+            walletCache.remove(takerBuys ? Tokens.MXUSD() : Tokens.MINIMA); warmWallet();   // those coins are in flight now
+            try {
+                JSONObject inner = new JSONObject().put("k", "take").put("orderId", order.orderId).put("txn", hex).put("taker", me.publicId());
+                String blob = me.seal(order.pubId, inner.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                String msg = Envelopes.msg(me, order.pubId, blob, MakerEngine.now() + 300);
+                JSONObject pt = new JSONObject().put("order", new JSONObject(order.raw)).put("plan", planJson(plan)).put("sent", System.currentTimeMillis()).put("act", actId)
+                        .put("maker", order.pubId).put("outs", new JSONArray()).put("mine", mineIns(plan, order));
+                db.savePending(order.orderId, pt);
+                // my own record of the outputs (the maker's signature adds witness only, so these ids are final): never the maker's word
+                node.cmdR("txnview data:" + hex, new NodeApi.Cb() {
+                    public void onResult(JSONObject v) {
+                        JSONObject r = v.optJSONObject("response"), t = r == null ? null : r.optJSONObject("transaction");
+                        JSONArray outs = t == null ? null : t.optJSONArray("outputs"), ids = new JSONArray();
+                        if (outs != null) for (int i = 0; i < outs.length(); i++) { JSONObject c = outs.optJSONObject(i); String id = c == null ? "" : c.optString("coinid", ""); if (id.matches("0x[0-9A-Fa-f]{64}")) ids.put(id); }
+                        JSONObject cur = db.pending(order.orderId);
+                        if (cur != null) try { db.savePending(order.orderId, cur.put("outs", ids)); } catch (Exception ignored) {}
+                    }
+                    public void onError(String m) {}
+                });
+                net.execute(() -> {
+                    List<RelayClient.PublishResult> results = relay.publish(msg);
+                    int ok = 0; for (RelayClient.PublishResult x : results) if (x.ok) ok++;
+                    final int okCount = ok, total = results.size(); final String firstErr = results.isEmpty() ? "no relays" : results.get(0).error;
+                    ui.post(() -> {
+                        // review 7 Nov (M1/L1): the slowest relay can return long after a fast maker answered and the
+                        // sweep moved on — a late callback must never touch the NEXT take or a later run
+                        final boolean current = run == r && actId.equals(r.act);
+                        if (current) busy = false;
+                        if (okCount == 0) {
+                            // security review 7 Nov: a relay that says "failed" may still have passed my signed half on —
+                            // the take stays pending so the void pass spends my coin back to me after VOID_AFTER_MS
+                            ActivityLog.update(db, actId, a -> { if (ActivityLog.BUILDING.equals(a.optString("stage")) || ActivityLog.SENT.equals(a.optString("stage"))) a.put("stage", ActivityLog.FAILED).put("reason", "no relay accepted the take: " + firstErr); });
+                            if (!current) return;
+                            r.unanswered = r.unanswered.add(r.taking);   // a relay that said "failed" may still have passed it on
+                            logStep("  no relay accepted the take: " + firstErr); finishSweep(); return;
+                        }
+                        ActivityLog.update(db, actId, a -> {   // a fast maker can answer (via another relay) before the slowest publish returns
+                            a.put("relays", okCount).put("sentMs", pt.optLong("sent"));
+                            if (ActivityLog.BUILDING.equals(a.optString("stage"))) a.put("stage", ActivityLog.SENT).put("reason", "");
+                        });
+                        if (!current) return;
+                        logStep("  sent to " + okCount + "/" + total + " relays · waiting for the maker's node to co-sign…");
+                        followTake();
+                        ui.postDelayed(() -> {
+                            if (run == r && actId.equals(r.act) && db.pending(order.orderId) != null) {
+                                r.unanswered = r.unanswered.add(r.taking);
+                                MakerSpeed.record(db, order.signPk, SWEEP_WAIT_MS);
+                                logStep("  no answer in " + SWEEP_WAIT_MS / 1000 + "s — counted as possibly filled (if it is not co-signed within 5 minutes your node voids it); next order");
+                                r.act = null; nextOrder();
+                            }
+                        }, SWEEP_WAIT_MS);
+                        repaint();
+                    });
+                });
+            } catch (Exception e) { busy = false; r.left = r.left.add(r.taking); ActivityLog.update(db, actId, a -> a.put("stage", ActivityLog.FAILED).put("reason", "take failed: " + e.getMessage())); logStep("  take failed: " + e.getMessage()); finishSweep(); }
+        });
+    }
+
+    /** Reads the service's answer off the ACTIVITY row (co-signed / refused) and, after a co-sign, writes the block and
+     *  confirmations into the same log. Runs on every service broadcast and every second. */
+    void followTake() {
+        if (db == null) return;
+        TakeRun r = run;
+        if (r != null && r.act != null) {
+            JSONObject a = db.activity(r.act);
+            String st = a == null ? "" : a.optString("stage");
+            if (ActivityLog.COSIGNED.equals(st)) {
+                logStep(String.format(java.util.Locale.ROOT, "  maker co-signed in %.1fs · %s MINIMA @ %s · txpow %s", a.optLong("cosignMs") / 1000.0, a.optString("amount"), a.optString("price"), a.optString("txpowid")));
+                r.got = r.got.add(r.taking);
+                if (r.order != null) MakerSpeed.record(db, r.order.signPk, a.optLong("cosignMs"));
+                followAct = r.act; followStatus = null;
+                r.act = null; nextOrder();
+            } else if (ActivityLog.REFUSED.equals(st)) {
+                String why = a.optString("reason");
+                for (String id : r.order.coins) makerCoinCache.remove(id);
+                db.setMeta("retry_due", "");
+                // review 7 Nov (H1): "refused" is the maker's word, not proof — it could have posted my signed half anyway.
+                // Until the void spends my coin back the take may still fill, so it stays counted: never re-bought.
+                r.unanswered = r.unanswered.add(r.taking);
+                logStep("  maker refused: " + why + (why.matches(MakerService.MOVE_ON) ? " — counted as possibly filled until voided; next order" : ""));
+                if (why.matches(MakerService.MOVE_ON)) { r.act = null; nextOrder(); } else finishSweep();
+            } else if (ActivityLog.FAILED.equals(st) || ActivityLog.LOST.equals(st)) {
+                r.unanswered = r.unanswered.add(r.taking);   // same rule: not co-signed is not proof of not filled
+                logStep("  " + a.optString("reason")); finishSweep();
+            }
+        }
+        if (run == null && followAct != null) {
+            JSONObject a = db.activity(followAct);
+            if (a == null) { followAct = null; return; }
+            String s = ActivityLog.statusText(a, chainBlock, System.currentTimeMillis());
+            if (followStatus == null) followStatus = s;          // the co-sign line is already in the log
+            else if (!s.equals(followStatus)) { followStatus = s; logStep(s); }
+            if (ActivityLog.settled(a, chainBlock) || ActivityLog.failedTerminal(a)) followAct = null;
+        }
+    }
+
+    private void endRun() {
+        run = null; busy = false; repaint();
+        Runnable both = pendingBoth; pendingBoth = null;   // a SWEEP's on-chain part follows its FAST part, however that ended
+        if (both != null && System.currentTimeMillis() < pendingBothUntil) ui.post(both);
+    }
+
+    /** A SWEEP's part 2: re-quote the on-chain share at the same limit NOW (the pools may have moved during part 1) and
+     *  run it through the usual confirmed-coins / consolidate retry. Never more than the share part 1 was planned beside;
+     *  coins still held by part 1's takes are reserved so the on-chain trade can never spend one. */
+    private void bothPart2(boolean buy, BigDecimal price, BigDecimal chainQ) {
+        final List<Order5> orders = new ArrayList<>(restingBook().values());
+        final List<Pool> pools = new ArrayList<>(restingPools());
+        final long block = chainBlock;
+        List<JSONObject> held = new ArrayList<>();
+        for (String id : pendingTakeCoins()) { try { held.add(new JSONObject().put("coinid", id)); } catch (Exception ignored) {} }
+        com.eurobuddha.dexicon.resting.CoinLock.reserve(held);
+        busy = true; setStage("Sweep part 2 · quoting on-chain"); repaint();
+        quoteExec.execute(() -> {
+            CompositeRouter.Plan p2;
+            try { p2 = CompositeRouter.plan(orders, pools, buy, chainQ, price, block); } catch (RuntimeException e) { p2 = null; }
+            final CompositeRouter.Plan plan = p2;
+            ui.post(() -> {
+                if (closed) return;
+                busy = false; setStage("");
+                if (plan == null || plan.isEmpty()) { logStep("Part 2: on-chain liquidity moved past your limit — nothing more was traded."); repaint(); return; }
+                logStep("Part 2: on-chain " + PriceMath.fmt(plan.totalMinima) + " MINIMA via " + routeName(plan) + " @ avg " + PriceMath.fmtPrice(plan.effectivePrice) + " — see ACTIVITY");
+                executeComposite(plan, buy, chainQ, price, 0);
+            });
+        });
+    }
+
+    /** The sweep's last line: what was co-signed, what may still be, and that nothing rests. */
+    private void finishSweep() {
+        TakeRun r = run; if (r == null) return;
+        String c = r.got.stripTrailingZeros().toPlainString();
+        if (r.got.signum() > 0) logStep("TRADE DONE: " + c + " of " + r.amount.toPlainString() + " MINIMA co-signed — settling, final after one block.");
+        if (r.unanswered.signum() > 0) logStep(r.unanswered.stripTrailingZeros().toPlainString() + " MINIMA still waiting on makers (filled if they co-sign within 5 minutes, else voided).");
+        BigDecimal open = r.amount.subtract(r.got).subtract(r.unanswered);
+        if (open.signum() > 0 && (r.got.signum() > 0 || r.unanswered.signum() > 0)) logStep(open.stripTrailingZeros().toPlainString() + " MINIMA not traded; nothing was placed as an order.");
+        else if (r.got.signum() == 0 && r.unanswered.signum() == 0) logStep("Nothing was traded and no order was placed.");
+        // review 7 Nov (M4): the field keeps only what is surely untraded, so a second click can never re-buy a take that
+        // may still be co-signed
+        if (pendingBoth != null && trade != null) trade.setAmount(BigDecimal.ZERO);   // a SWEEP: part 2 follows; never leave a re-buyable amount
+        else if ((r.got.signum() > 0 || r.unanswered.signum() > 0) && trade != null) trade.setAmount(open.max(BigDecimal.ZERO));
+        endRun();
+    }
+
+    /** My own coins in a take (its inputs the maker did not advertise) — the service spends one to void a stale take. */
+    private static JSONArray mineIns(FillPlan.Plan p, Envelope order) {
+        JSONArray out = new JSONArray();
+        for (String id : p.inputs) { boolean theirs = false; for (String m : order.coins) if (m.equalsIgnoreCase(id)) theirs = true; if (!theirs) out.put(id); }
+        return out;
+    }
+
+    private static JSONObject planJson(FillPlan.Plan p) throws Exception {
+        return new JSONObject().put("filled", p.filled).put("takerGives", p.takerGives).put("makerGives", p.makerGives).put("payToken", p.payToken).put("recvToken", p.recvToken).put("inputs", new JSONArray(p.inputs));
+    }
+
+    void exportCsv() {
+        pendingCsv = TradeExport.csv(db.fills(5000));
+        saveCsv.launch("dexicon-fills-" + System.currentTimeMillis() / 1000 + ".csv");
+    }
+
+    /** AtomiX's "⬇ Export CSV": every AtomiX swap, maker and taker, in AtomiX's own columns (dexHistory reads them). */
+    void exportAtomixCsv() {
+        com.eurobuddha.dexicon.doors.DoorHost h = com.eurobuddha.dexicon.doors.DoorHost.get(this);
+        java.util.List<com.eurobuddha.atomix.swap.SwapDb.Swap> all = h.swaps();
+        if (all.isEmpty()) { toast("No swaps to export"); return; }
+        net.execute(() -> {   // one events read per swap: built off the main thread, as AtomiX's doExportCsv is
+            String csv = AtomixCsv.csv(all, h::events);
+            ui.post(() -> { if (closed) return; pendingCsv = csv; saveCsv.launch(AtomixCsv.FILE); });
+        });
+    }
+
+    private void confirm(String title, String body, Runnable yes) {
+        track(new AlertDialog.Builder(this, Design.dialogTheme()).setTitle(title).setMessage(body)
+                .setPositiveButton("Confirm", (d, w) -> yes.run()).setNegativeButton("Back", null).show());
+    }
+
+    // ---- chrome ----
+
+    private View buildChrome() {
+        int pad = Design.dp(this, 12);
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setBackgroundColor(Design.BG());
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            androidx.core.graphics.Insets bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars() | androidx.core.view.WindowInsetsCompat.Type.displayCutout());
+            androidx.core.graphics.Insets ime = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime());
+            v.setPadding(bars.left, bars.top, bars.right, Math.max(bars.bottom, ime.bottom));
+            return insets;
+        });
+
+        LinearLayout header = new LinearLayout(this);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        header.setPadding(pad, pad, pad, Design.dp(this, 6));
+        TextView logo = new TextView(this);
+        logo.setText("◆ DEXICON"); logo.setTextColor(Design.TEXT()); logo.setTypeface(Design.monoBold()); logo.setTextSize(15f);
+        header.addView(logo, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        TextView verPill = Design.pill(this, "v" + BuildConfig.VERSION_NAME, Design.SURFACE2(), Design.DIM2());
+        LinearLayout.LayoutParams vp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        vp.rightMargin = Design.dp(this, 6);
+        header.addView(verPill, vp);
+        TextView themePill = Design.pill(this, Design.isDark() ? "☀" : "☾", Design.SURFACE2(), Design.DIM());
+        themePill.setMinWidth(Design.dp(this, 48)); themePill.setMinHeight(Design.dp(this, 48));
+        themePill.setOnClickListener(v -> { if (poolsBusy()) { toast("Finish your pool transaction first, then switch theme."); return; } stopCcyGlow(); Design.toggle(this); nightModeFollowsDesign(); if (trade != null) trade.close(); chromeRoot = buildChrome(); setContentView(chromeRoot); showPages(tab, tab2); });
+        Design.pressable(themePill);
+        header.addView(themePill);
+        root.addView(header);
+
+        LinearLayout nodeRow = new LinearLayout(this);
+        nodeRow.setGravity(Gravity.CENTER_VERTICAL);
+        nodeRow.setPadding(pad, 0, pad, Design.dp(this, 6));
+        pairPill = Design.pill(this, "CONNECTING…", Design.SURFACE2(), Design.DIM());
+        pairPill.setOnClickListener(v -> { if (!paired) openNodeApp(); });   // not paired: one tap to the node app (its Apps screen holds the toggle)
+        nodeRow.addView(pairPill, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        // The AtomiX currency switch (apks/atomix buildHeader): names the ACTIVE market; tap to switch, long-press cycles the glow.
+        ccyPill = Design.pill(this, "", Design.SURFACE2(), Design.TEXT());
+        ccyPill.setTextSize(12f); ccyPill.setTypeface(Design.sansBold());
+        ccyPill.setMinHeight(Design.dp(this, 48));
+        ccyPill.setOnClickListener(v -> switchCurrencyDialog());
+        ccyPill.setOnLongClickListener(v -> {
+            Design.Glow g = Design.cycleGlow(this);
+            toast("Pill glow: " + g.name().toLowerCase(java.util.Locale.ROOT));
+            startCcyGlow();
+            return true;
+        });
+        Design.pressable(ccyPill);
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        cp.leftMargin = Design.dp(this, 6);
+        nodeRow.addView(ccyPill, cp);
+        blockPill = Design.pill(this, "# —", Design.SURFACE2(), Design.DIM());
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        bp.leftMargin = Design.dp(this, 6);
+        nodeRow.addView(blockPill, bp);
+        root.addView(nodeRow);
+
+        // One slim segmented row (was two-line 48 dp pills plus a second row of page pills): the room, nothing else.
+        rail = new LinearLayout(this);
+        rail.setPadding(pad, 0, pad, Design.dp(this, 6));
+        for (int r = 0; r < 3; r++) {
+            final int rr = r;
+            TextView b = new TextView(this);
+            b.setText(roomLabel(r)); b.setTextSize(12f); b.setTypeface(Design.sansBold()); b.setGravity(Gravity.CENTER);
+            b.setMaxLines(1); b.setMinHeight(Design.dp(this, 36)); b.setPadding(Design.dp(this, 4), 0, Design.dp(this, 4), 0);
+            androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(b, 8, 12, 1, android.util.TypedValue.COMPLEX_UNIT_SP);
+            // two-finger side by side includes ① and ②: a room button pairs as its room's current page
+            b.setOnClickListener(v -> { if (!pairMade) selectTab(roomLast[rr]); });
+            Design.pressable(b, (v, e) -> pairTouch(e, roomLast[rr]));
+            LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+            if (r > 0) rp.leftMargin = Design.dp(this, 6);
+            rail.addView(b, rp);
+            roomBtn[r] = b;
+        }
+        root.addView(rail);
+
+        content = new LinearLayout(this);
+        root.addView(content, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
+
+        trade = new TradeView(this); activityTab = new ActivityTab(this); ordersTab = new OrdersTab(this); historyTab = new HistoryTab(this); doorsTab = new DoorsTab(this); relaysTab = new RelaysTab(this); poolsDestroy(); assetsTab = new AssetsTab(this, new com.eurobuddha.pandapools.WalletView(this)) /* not tracked: refreshed only while ASSETS shows; ② Wallet is the tracked one */; pSwap = track(new com.eurobuddha.pandapools.SwapView(this)); pPools = track(new com.eurobuddha.pandapools.PoolsView(this)); pMyLp = track(new com.eurobuddha.pandapools.MyLpView(this)); pWallet = track(new com.eurobuddha.pandapools.WalletView(this)); consolidateMxUsdIn((android.view.ViewGroup) pWallet.getRoot().findViewById(R.id.pm_dexicon_balancesContainer)); pAct = track(new com.eurobuddha.pandapools.ActivityView(this)); marketTab = new MarketTab(this); otcTab = new OtcTab(this);
+        View[] tv = tabViews();
+        panes = new android.view.ViewGroup[tv.length];   // each page scrolls on its own, so two side by side never drag each other
+        for (int i = 0; i < tv.length; i++) {
+            if (roomOf(i) == 1) {   // PandaPools' screens scroll themselves (their own NestedScrollView / list): hosted as they are
+                FrameLayout host = new FrameLayout(this);
+                host.addView(tv[i], new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+                panes[i] = host;
+                continue;
+            }
+            ScrollView pane = new ScrollView(this);
+            panes[i] = pane;
+            pane.addView(tv[i], new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT));
+            // A focused input pulls its ScrollView back to it on every relayout (a live swap list repainting below it made
+            // the page jump, owner 4 Nov). The pane itself can hold focus, and an input scrolled off screen hands it over.
+            pane.setFocusableInTouchMode(true);
+            pane.setDescendantFocusability(android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+            pane.setOnScrollChangeListener((v, x, y, ox, oy) -> {
+                View f = pane.findFocus();
+                if (f instanceof android.widget.EditText && !f.getGlobalVisibleRect(new android.graphics.Rect())) {
+                    ((android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(f.getWindowToken(), 0);
+                    pane.requestFocus();
+                }
+            });
+        }
+
+        stageTv = new TextView(this);
+        stageTv.setTextSize(10f); stageTv.setTypeface(Design.mono()); stageTv.setTextColor(Design.TEXT());
+        stageTv.setPadding(pad, Design.dp(this, 6), pad, Design.dp(this, 6));
+        stageTv.setBackgroundColor(Design.SURFACE2());
+        stageTv.setVisibility(View.GONE);
+        // Tap → ACTIVITY while a trade is being followed live; long-press always copies the full line.
+        stageTv.setOnClickListener(v -> { if (liveActId != null) selectTab(TAB_ACTIVITY); else copy("Status", stageTv.getText().toString()); });
+        stageTv.setOnLongClickListener(v -> { copy("Status", stageTv.getText().toString()); return true; });
+        root.addView(stageTv);
+
+        // AtomiX's bottom bar (apks/atomix buildTabBar): icon over label, a soft accent tile on the selected tab. The
+        // room's three pages first, then the three shared pages; other rooms' pages are hidden, so it always shows six.
+        tabBar = new LinearLayout(this);
+        tabBar.setBackgroundColor(Design.SURFACE());
+        tabBar.setPadding(Design.dp(this, 6), Design.dp(this, 7), Design.dp(this, 6), Design.dp(this, 9));
+        java.util.List<Integer> order = new java.util.ArrayList<>();
+        for (int[] pages : ROOM_PAGES) for (int t : pages) order.add(t);
+        for (int t : SHARED) order.add(t);
+        for (int idx : order) {
+            LinearLayout cell = new LinearLayout(this);
+            cell.setOrientation(LinearLayout.VERTICAL); cell.setGravity(Gravity.CENTER);
+            cell.setPadding(0, Design.dp(this, 6), 0, Design.dp(this, 5)); cell.setMinimumHeight(Design.dp(this, 48));
+            android.widget.ImageView ic = new android.widget.ImageView(this);
+            ic.setImageResource(TAB_ICONS[idx]);
+            cell.addView(ic, new LinearLayout.LayoutParams(Design.dp(this, 22), Design.dp(this, 22)));
+            TextView t = new TextView(this);
+            t.setText(TAB_NAMES[idx]); t.setTextSize(10.5f); t.setTypeface(Design.sans()); t.setGravity(Gravity.CENTER); t.setMaxLines(1);
+            t.setPadding(0, Design.dp(this, 4), 0, 0);
+            // the Fold's cover screen with six tabs: labels shrink to fit rather than wrap
+            androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(t, 7, 11, 1, android.util.TypedValue.COMPLEX_UNIT_SP);
+            cell.addView(t, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            cell.setContentDescription(TAB_NAMES[idx]);
+            // Wide screen (owner 2026-10-26): one tap = that page alone; a second finger on another tab while one is held
+            // (or both tapped together) = the two pages side by side, first touched on the left.
+            cell.setOnClickListener(v -> { if (!pairMade) selectTab(idx); });
+            Design.pressable(cell, (v, e) -> pairTouch(e, idx));   // the press feel AND the pairing (pressable owns the touch listener)
+            tabCell[idx] = cell; tabIcon[idx] = ic; tabBtn[idx] = t;
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+            lp.leftMargin = Design.dp(this, 3); lp.rightMargin = Design.dp(this, 3);
+            tabBar.addView(cell, lp);
+        }
+        root.addView(tabBar);
+        paintCcy();
+        return root;
+    }
+
+    /** Hold one page button and touch another: the two pages side by side (wide screens), first touched on the left. */
+    private boolean pairTouch(android.view.MotionEvent e, int idx) {
+        int a = e.getActionMasked();
+        if (a == android.view.MotionEvent.ACTION_DOWN) {
+            if (tabsDown == 0) pairMade = false;
+            tabsDown++;
+            if (heldTab >= 0 && heldTab != idx && com.eurobuddha.dexicon.ui.Wide.on(this)) { pairMade = true; showPages(heldTab, idx); }
+            else if (heldTab < 0) heldTab = idx;
+        } else if (a == android.view.MotionEvent.ACTION_UP || a == android.view.MotionEvent.ACTION_CANCEL) {
+            tabsDown = Math.max(0, tabsDown - 1);
+            if (heldTab == idx || tabsDown == 0) heldTab = -1;
+        }
+        return false;
+    }
+
+    // ---- the one active AtomiX market (⇄ pill) ----
+
+    String roomLabel(int r) {
+        return ROOMS[r];
+    }
+
+    /** Label, accessibility text, room subtitle and glow for the active market. */
+    private void paintCcy() {
+        if (ccyPill == null) return;
+        com.eurobuddha.atomix.TradingContext m = com.eurobuddha.dexicon.doors.DoorHost.get(this).market();
+        String c = com.eurobuddha.dexicon.doors.DoorPlan.coin(m), o = com.eurobuddha.dexicon.doors.DoorPlan.coin(m.other());
+        ccyPill.setText("⇄  " + c);
+        ccyPill.setContentDescription("Trading " + c + ". Tap to switch to " + o + ".");
+        if (roomBtn[0] != null) roomBtn[0].setText(roomLabel(0));
+        startCcyGlow();
+    }
+
+    /** (Re)start the pill's glow, cancelling any previous one (AtomiX startCcyGlow). Never animates a hidden pill. */
+    private void startCcyGlow() {
+        stopCcyGlow();
+        if (ccyPill == null || !FOREGROUND || Boolean.TRUE.equals(gateShown) || room != 0) return;   // never under the gate; AtomiX's room only
+        com.eurobuddha.atomix.TradingContext m = com.eurobuddha.dexicon.doors.DoorHost.get(this).market();
+        ccyGlowAnim = Design.glow(ccyPill, Design.ccyRing(this, DoorsTab.soft(m), m.other().accent, m == com.eurobuddha.atomix.TradingContext.MINIMA), Design.glowLevel(this));
+    }
+
+    private void stopCcyGlow() { if (ccyGlowAnim != null) { ccyGlowAnim.cancel(); ccyGlowAnim = null; } }
+
+    /** AtomiX switchCurrencyDialog, worded for Dexicon's ① room. */
+    private void switchCurrencyDialog() {
+        com.eurobuddha.dexicon.doors.DoorHost host = com.eurobuddha.dexicon.doors.DoorHost.get(this);
+        final com.eurobuddha.atomix.TradingContext target = host.market().other();
+        String to = com.eurobuddha.dexicon.doors.DoorPlan.coin(target), from = com.eurobuddha.dexicon.doors.DoorPlan.coin(host.market());
+        track(new AlertDialog.Builder(this, Design.dialogTheme())
+                .setTitle("Switch to " + to + "?")
+                .setMessage("AtomiX publishes and market-makes in ONE currency at a time. Switching to " + to
+                        + " re-themes ① and moves your swaps, order/market-making and OTC to the " + to + " book.\n\nYour current "
+                        + from + " orders simply stop being maintained (a live market is withdrawn from the book). Any in-flight swaps in "
+                        + "either currency keep settling safely in the background — switching never strands them.")
+                .setPositiveButton("Switch to " + to, (d, w) -> {
+                    if (host.makerLive()) setStage("Withdrawing your " + from + " market…");   // AtomiX shows the wait too
+                    String err = host.switchMarket(target, () -> {
+                        dismissDialogs();   // an editor / offer opened for the leaving market must not save into the new one
+                        setStage(""); paintCcy(); repaint(); toast("Now on the " + to + " market");
+                    });
+                    if (err != null) { setStage(""); toast(err); }
+                })
+                .setNegativeButton("Cancel", null)
+                .show());
+    }
+
+    /** Switch to a tab (e.g. ATOMIX → "Finished swaps are in History ›"). */
+    public void showTab(int idx) { selectTab(idx); }
+
+    private void selectTab(int idx) { showPages(idx, -1); }
+
+    /** Show page {@code left} alone, or with {@code right} beside it (wide screens only). */
+    void showPages(int left, int right) {
+        if (right == left || !com.eurobuddha.dexicon.ui.Wide.on(this)) right = -1;
+        if (roomOf(left) == 1 || roomOf(right) == 1) right = -1;   // PandaPools is one page at a time
+        tab = left; tab2 = right;
+        content.removeAllViews();
+        int gap = Design.dp(this, 1);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f);
+        content.addView(panes[left], lp);
+        if (right >= 0) {
+            LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f);
+            rp.leftMargin = gap;
+            content.addView(panes[right], rp);
+        }
+        View[] views = tabViews();
+        for (int i = 0; i < views.length; i++) views[i].setVisibility(i == left || i == right ? View.VISIBLE : View.GONE);
+        trade.setSolo(right < 0);
+        for (int t : new int[]{left, right}) poolPageShown(t);   // a ② page coming into view refreshes like a PandaPools tab
+        int r = roomOf(left);
+        if (r >= 0) { room = r; roomLast[r] = left; }
+        // the ⇄ pill is AtomiX's currency switch: it shows (and glows) in ① only — never over PandaPools or the exchange
+        if (ccyPill != null) {
+            ccyPill.setVisibility(room == 0 ? View.VISIBLE : View.GONE);
+            if (room == 0) startCcyGlow(); else stopCcyGlow();
+        }
+
+        for (int i = 0; i < tabCell.length; i++) {
+            if (tabCell[i] == null) continue;
+            boolean on = i == left || i == right;
+            tabCell[i].setBackground(Design.roundBg(this, on ? Design.ACCENT_SOFT() : 0x00000000, 14));
+            tabIcon[i].setColorFilter(on ? Design.TEXT() : Design.DIM());
+            tabBtn[i].setTextColor(on ? Design.TEXT() : Design.DIM());
+            tabBtn[i].setTypeface(on ? Design.sansBold() : Design.sans());
+            tabCell[i].setSelected(on);
+            // ② is PandaPools' five tabs alone (its own Wallet and Activity); ① and ③ add the shared three
+            if (!isShared(i)) tabCell[i].setVisibility(roomOf(i) == room ? View.VISIBLE : View.GONE);
+            else tabCell[i].setVisibility(room == 1 ? View.GONE : View.VISIBLE);
+        }
+        for (int i = 0; i < 3; i++) {
+            boolean on = i == room;
+            roomBtn[i].setTextColor(on ? Design.ON_ACCENT() : Design.DIM());
+            roomBtn[i].setBackground(on ? Design.roundBg(this, Design.ACCENT(), 10) : Design.stroked(this, Design.SURFACE2(), 10));
+        }
+        repaint();
+    }
+
+    /** Folding the phone closes the second page. */
+    @Override public void onConfigurationChanged(android.content.res.Configuration c) {
+        super.onConfigurationChanged(c);
+        if (tabBar != null && tab2 >= 0 && !com.eurobuddha.dexicon.ui.Wide.on(this)) selectTab(tab);
+    }
+
+    private View[] tabViews() { return new View[]{trade, activityTab, ordersTab, historyTab, assetsTab, doorsTab, relaysTab, pPools.getRoot(), marketTab, otcTab, pSwap.getRoot(), pMyLp.getRoot(), pWallet.getRoot(), pAct.getRoot()}; }
+
+    /** A vendored PandaPools screen joins this Activity's pool-screen fan-out (new block, stop, destroy). */
+    private <V extends com.eurobuddha.pandapools.BaseView> V track(V v) { poolViews.add(v); return v; }
+
+    /** PandaPools' own tab numbers (the vendored screens ask for and jump to these), as Dexicon's ② pages. */
+    private static final int PP_SWAP = com.eurobuddha.pandapools.MainActivity.TAB_SWAP, PP_POOLS = com.eurobuddha.pandapools.MainActivity.TAB_POOLS,
+            PP_MYLP = com.eurobuddha.pandapools.MainActivity.TAB_MYLP, PP_ACTIVITY = com.eurobuddha.pandapools.MainActivity.TAB_ACTIVITY,
+            PP_WALLET = com.eurobuddha.pandapools.MainActivity.TAB_WALLET;
+
+    /** PandaPools asks which of ITS tabs is showing (ActivityView refreshes only while it is) — ② is its five pages, 1:1. */
+    @Override public int currentTab() {
+        switch (tab) {
+            case TAB_PSWAP: return PP_SWAP;
+            case TAB_POOLS: return PP_POOLS;
+            case TAB_PMINE: return PP_MYLP;
+            case TAB_PWALLET: return PP_WALLET;
+            case TAB_PACT: return PP_ACTIVITY;
+            default: return -1;
+        }
+    }
+
+    @Override public void goToTab(int index) {
+        if (index == PP_SWAP) selectTab(TAB_PSWAP);
+        else if (index == PP_POOLS) selectTab(TAB_POOLS);
+        else if (index == PP_MYLP) selectTab(TAB_PMINE);
+        else if (index == PP_WALLET) selectTab(TAB_PWALLET);
+        else if (index == PP_ACTIVITY) selectTab(TAB_PACT);
+    }
+
+    @Override protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        int page = intent == null ? -1 : intent.getIntExtra(EXTRA_POOLS_PAGE, -1);
+        if (page >= 0 && tabBar != null) goToTab(page);
+    }
+
+    static boolean isShared(int t) { for (int s : SHARED) if (s == t) return true; return false; }
+    static int roomOf(int t) { for (int r = 0; r < ROOM_PAGES.length; r++) for (int p : ROOM_PAGES[r]) if (p == t) return r; return -1; }
+
+    /** The live line for the followed ACTIVITY row; null once it has been settled for two minutes. */
+    private String liveLine() {
+        if (liveActId == null || db == null) return null;
+        JSONObject a = db.activity(liveActId);
+        if (a == null) { liveActId = null; return null; }
+        long now = System.currentTimeMillis();
+        if (ActivityLog.settled(a, chainBlock)) {
+            if (!a.has("settledMs")) ActivityLog.update(db, liveActId, x -> x.put("settledMs", now));
+            else if (now - a.optLong("settledMs") > 120_000) { liveActId = null; return null; }
+        }
+        return (a.optString("side").equals("buy") ? "BUY " : "SELL ") + a.optString("amount") + " MINIMA · " + a.optString("route") + " · "
+                + ActivityLog.statusText(a, chainBlock, now) + "   ▸ ACTIVITY";
+    }
+
+    void repaintHeader() {
+        if (pairPill == null) return;
+        String nodeName = NodeApi.nodeApp(this)[1];
+        String ps = !pairingKnown ? "CONNECTING TO " + nodeName.toUpperCase(java.util.Locale.ROOT) + "…"
+                : !paired ? (node != null && node.needsAdmin() ? "GIVE DEXICON ADMIN IN " + nodeName.toUpperCase(java.util.Locale.ROOT) + " → APPS  ▸"
+                           : node != null && node.answered() ? "ENABLE DEXICON IN " + nodeName.toUpperCase(java.util.Locale.ROOT) + " → APPS  ▸"
+                                                            : "WAITING FOR " + nodeName.toUpperCase(java.util.Locale.ROOT) + " — OPEN / UNLOCK IT  ▸")
+                : me == null ? "PAIRED · deriving identity" : "PAIRED";
+        pairPill.setText(ps);
+        pairPill.setTextColor(paired ? Design.IN() : Design.DIM());
+        blockPill.setText("# " + (chainBlock > 0 ? String.valueOf(chainBlock) : "—"));
+        String live = liveLine();
+        String line = live == null ? stage : stage.isEmpty() ? live : stage + "\n" + live;
+        stageTv.setText(line);
+        stageTv.setVisibility(line.isEmpty() ? View.GONE : View.VISIBLE);
+    }
+
+    public void repaint() {
+        if (closed || trade == null) return;
+        repaintHeader();
+        render(tab);
+        if (tab2 >= 0) render(tab2);
+    }
+
+    private void render(int t) {
+        switch (t) {
+            case TAB_TRADE: trade.render(); break;
+            case TAB_ACTIVITY: activityTab.render(); break;
+            case TAB_ORDERS: ordersTab.render(); break;
+            case TAB_HISTORY: historyTab.render(); break;
+            case TAB_ASSETS: assetsTab.render(); break;
+            case TAB_DOORS: doorsTab.render(); break;
+            case TAB_POOLS: case TAB_PSWAP: case TAB_PMINE: case TAB_PWALLET: case TAB_PACT: break;   // PandaPools' screens paint themselves
+            case TAB_MARKET: marketTab.render(); break;
+            case TAB_OTC: otcTab.render(); break;
+            default: relaysTab.render();
+        }
+    }
+
+    /** PandaPools MainActivity.onCreate: AlertDialog chrome follows the SYSTEM day/night unless the Activity's local night
+     *  mode is bound to the palette — on a light phone with Dexicon dark, the vendored pool dialogs (create, add,
+     *  migrate, backup password) painted white with white text. Dexicon handles uiMode itself (manifest), so no recreate. */
+    private void nightModeFollowsDesign() {
+        if (windowChangesAllowed()) getDelegate().setLocalNightMode(Design.isDark() ? androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES : androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO);
+    }
+
+    static final String CONSOLIDATE_MINIMA = "Consolidate MINIMA coins", CONSOLIDATE_MXUSD = "Consolidate MxUSD coins";
+
+    /** "Consolidate MxUSD coins" inside PandaPools' wallet box, directly under its "Consolidate MINIMA coins" and styled exactly
+     *  like it (owner, 4 Nov). WalletView is vendored and rebuilds its box on every render, so the link is added each time
+     *  the box is (re)attached. It runs the node's own `consolidate tokenid:<MxUSD>` through Dexicon's consolidate (confirm,
+     *  pool owner-coin guard, AtomiX's wallet lock, the signing queue): MxUSD AtomiX delivered before 0.2.36 carries swap
+     *  state, and one consolidate makes it plain, spendable by a pool. */
+    void consolidateMxUsdIn(android.view.ViewGroup container) {
+        if (container == null) return;
+        container.setOnHierarchyChangeListener(new android.view.ViewGroup.OnHierarchyChangeListener() {
+            @Override public void onChildViewAdded(View parent, View child) { addMxUsdLink(child); }
+            @Override public void onChildViewRemoved(View parent, View child) {}
+        });
+        for (int i = 0; i < container.getChildCount(); i++) addMxUsdLink(container.getChildAt(i));
+    }
+
+    private void addMxUsdLink(View box) {
+        if (!(box instanceof android.view.ViewGroup)) return;
+        android.view.ViewGroup g = (android.view.ViewGroup) box;
+        TextView minima = null;
+        for (int i = 0; i < g.getChildCount(); i++) {
+            View v = g.getChildAt(i);
+            if (v instanceof TextView && CONSOLIDATE_MXUSD.contentEquals(((TextView) v).getText())) return;   // already there
+            if (v instanceof TextView && CONSOLIDATE_MINIMA.contentEquals(((TextView) v).getText())) minima = (TextView) v;
+        }
+        if (minima == null) return;
+        TextView t = new TextView(this);   // the MINIMA link's own look: size, font, colour, padding
+        t.setText(CONSOLIDATE_MXUSD);
+        t.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, minima.getTextSize());
+        t.setTypeface(minima.getTypeface()); t.setTextColor(minima.getTextColors());
+        t.setPadding(minima.getPaddingLeft(), minima.getPaddingTop(), minima.getPaddingRight(), minima.getPaddingBottom());
+        t.setLetterSpacing(minima.getLetterSpacing());
+        t.setOnClickListener(v -> WalletTools.consolidate(this, Tokens.MXUSD(), "MxUSD", mxusdCoins));
+        g.addView(t, g.indexOfChild(minima) + 1, minima.getLayoutParams() == null ? null : new android.view.ViewGroup.LayoutParams(minima.getLayoutParams()));
+    }
+
+    /** PandaPools' onPageSelected: the page coming into view refreshes (views[position].onShown()). */
+    private void poolPageShown(int t) {
+        if (t == TAB_ASSETS) assetsTab.shown();   // the wallet on Dexicon's ASSETS
+        if (t == TAB_PSWAP) pSwap.onShown();
+        if (t == TAB_POOLS) pPools.onShown();
+        if (t == TAB_PMINE) pMyLp.onShown();
+        if (t == TAB_PWALLET) pWallet.onShown();
+        if (t == TAB_PACT) pAct.onShown();
+    }
+
+    @Override protected void onResume() {
+        if (node != null && !offering) ui.post(this::offerAccount);   // the last legacy position may have just settled
+        super.onResume();
+        // PandaPools re-shows its visible tab on resume: onStop stopped the pool views, and coming back from the forced
+        // backup's file picker must restart My pools' fast "confirming" poll, not wait for a page switch.
+        if (chromeRoot != null) { poolPageShown(tab); if (tab2 >= 0) poolPageShown(tab2); }
+        FOREGROUND = true;
+        startCcyGlow();   // the pill survived the pause; re-arm exactly one animator on it
+        if (node != null && !paired) node.reRegister();   // back from the node app's Apps screen: re-ask at once
+        applySettings();
+        // who keeps each pool, as of now — read off the main thread; the gate / ② My pools repaint with the answer
+        com.eurobuddha.pandapools.DexiconPools.readCustodyAsync(this, () -> { if (!isFinishing() && !isDestroyed()) { if (gate != null) gate.render(); repaint(); } });
+        recheckGate();
+        bookLoop();
+        repaint();
+    }
+
+    // ---- one trading app per phone ----
+
+    /** Shows the gate instead of the trading screens while AtomiX or PandaPools is present (or the node's MiniHub has
+     *  not been read yet), and the screens once both are gone. Shutting stops every trade this screen could still fire. */
+    void applyGate() {
+        if (closed || chromeRoot == null) return;
+        boolean blocked = TradingGate.blocked(this);
+        if (lastBlocked == null || lastBlocked != blocked) {   // the gate moved: the DOORS responder guard and a live ① market follow NOW
+            lastBlocked = blocked;
+            try { com.eurobuddha.dexicon.doors.DoorHost.get(this).gateChanged(); } catch (RuntimeException e) { android.util.Log.w("Dexicon", "gate → doors: " + e); }
+        }
+        if (blocked) {
+            if (!Boolean.TRUE.equals(gateShown)) { haltTrading(); gate = new GateView(this); setContentView(gate); gateShown = true; }
+            gate.render();
+        } else if (!Boolean.FALSE.equals(gateShown)) {
+            boolean lifted = Boolean.TRUE.equals(gateShown);
+            gate = null; gateShown = false;
+            setContentView(chromeRoot);
+            startCcyGlow();
+            repaint();
+            if (lifted) offerAccount();   // the other app is gone: the Trading Account can be set up now
+        }
+    }
+
+    /** The gate shut: end a one-click run, forget a pending remainder or retry, close confirm / edit dialogs. */
+    private void haltTrading() {
+        gateGen++;
+        // review 7 Nov (L): end a sweep the normal way, so a take still waiting counts as possibly filled and the amount
+        // field keeps only what is surely untraded (a full amount left there invites a second, over-buying click)
+        if (run != null) { if (run.act != null) { run.unanswered = run.unanswered.add(run.taking); run.act = null; } finishSweep(); }
+        if (db != null) { db.setMeta("rest_due", ""); db.setMeta("retry", ""); db.setMeta("retry_due", ""); }
+        dismissDialogs();
+        stopCcyGlow();
+    }
+
+    private Boolean lastBlocked;
+
+    /** Apply what is known NOW (an app just installed / removed), then re-read the MiniHub and apply again. */
+    void recheckGate() { applyGate(); if (node != null && paired) TradingGate.checkMiniHub(this, node, this::applyGate); }
+
+    /** Opens the app's own "Hand over to Dexicon" step; it answers only to Dexicon (it checks the calling package).
+     *  {@code remove}: on a FRESH yes for the installed version, uninstall at once — nothing is stored to replay. */
+    void startHandover(String pkg, String name, boolean remove) {
+        long now = System.currentTimeMillis();
+        if (handoverPkg != null && now - handoverAt < 60_000) return;   // a double tap opens it once
+        handoverPkg = pkg; handoverName = name; handoverRemove = remove; handoverAt = now;
+        Intent ask = new Intent(TradingGate.ACTION_HANDOVER).setPackage(pkg);
+        // PandaPools hands a live pool over only once Dexicon holds its recipe: name every covenant address held here, in full.
+        if (TradingGate.PANDAPOOLS.equals(pkg)) ask.putExtra(com.eurobuddha.pandapools.DexiconPools.EXTRA_DEXICON_POOLS, com.eurobuddha.pandapools.DexiconPools.heldAddresses(this));
+        try { handover.launch(ask); }
+        catch (android.content.ActivityNotFoundException e) {
+            handoverPkg = null;
+            explain(name + " needs an update", "This version of " + name + " has no \"Hand over to Dexicon\" step yet. Update " + name + " from the store, then try again.");
+        }
+    }
+
+    void onHandover(int code, Intent d) {
+        String pkg = handoverPkg, name = handoverName;
+        boolean remove = handoverRemove;
+        handoverPkg = null; handoverName = null; handoverRemove = false;
+        if (pkg == null) { pkg = TradingGate.gatedApp(d == null ? null : d.getStringExtra("app")); remove = false; }   // lost: answer names it
+        if (pkg == null) { applyGate(); return; }
+        if (name == null) name = TradingGate.ATOMIX.equals(pkg) ? "AtomiX" : "PandaPools";
+        long ver = TradingGate.versionOf(this, pkg);
+        if (TradingGate.validHandover(code == RESULT_OK, d, pkg, ver) && TradingGate.sameSigner(this, pkg)) {
+            TradingGate.noteAnswer(this, pkg, ver);
+            if (TradingGate.PANDAPOOLS.equals(pkg)) poolsHandedOver(d.getStringArrayExtra(com.eurobuddha.pandapools.DexiconPools.EXTRA_POOLS));
+            if (remove) toast("Remove " + name + " from Android Settings › Apps.");   // Pandamonium never deletes packages
+            else toast(name + " handed over. You can remove it now.");
+        } else {
+            TradingGate.noteAnswer(this, pkg, -2);   // the card follows the LAST answer
+            String why = d == null ? null : d.getStringExtra("reason");
+            why = why == null || why.isEmpty() ? name + " did not confirm the hand-over, so nothing changed." : why;
+            if (TradingGate.PANDAPOOLS.equals(pkg)) {
+                // Custody comes only from PandaPools' own provider: re-read it (off the main thread) and say which pools
+                // PandaPools keeps now.
+                final String said = why, who = name;
+                com.eurobuddha.pandapools.DexiconPools.readCustodyAsync(this, () -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    List<String> there = com.eurobuddha.pandapools.DexiconPools.keptElsewhereNow(this);
+                    explain(who + " is not ready to remove", there.isEmpty() ? said : said + "\n\nDexicon leaves " + (there.size() == 1 ? "this pool" : "these pools")
+                            + " to PandaPools for now:\n" + String.join("\n", there));
+                });
+            } else explain(name + " is not ready to remove", why);
+        }
+        applyGate();
+    }
+
+    // ---- ② moving a live pool from standalone PandaPools ----
+
+    /** The gate's PandaPools card: last restore result (full addresses, selectable). */
+    String poolRestoreStatus = "";
+
+    /** "Restore your PandaPools backup here": PandaPools' own verify + restore. A pool PandaPools still keeps is left to it. */
+    void restorePandaPoolsBackup() {
+        pickOpenFile(uri -> {
+            if (uri == null) return;
+            com.eurobuddha.pandapools.DexiconPools.restoreBackup(this, uri, line -> { poolRestoreStatus = line; if (gate != null) gate.render(); },
+                    (restored, total, addresses, report) -> {
+                        poolRestoreStatus = total == 0 ? report : restored + " of " + total + " pool(s) restored with verified reserves. PandaPools keeps "
+                                + "them until you hand over; Dexicon starts keeping each one only once PandaPools says it has stopped.\n\n" + report;
+                        if (gate != null) gate.render();
+                        repaint();
+                    });
+        });
+    }
+
+    /** PandaPools said OK. Custody is NOT taken from the answer — only from PandaPools' provider, re-read now. Of the named
+     *  pools, those PandaPools no longer keeps come back with signing paused (PandaPools' rule); the user attests the
+     *  wallet's signing state once, here, before keep-fresh signs for them. */
+    private void poolsHandedOver(String[] pools) {
+        if (pools == null || pools.length == 0) return;
+        com.eurobuddha.pandapools.DexiconPools.readCustodyAsync(this, () -> {   // the provider read runs off the main thread
+            if (isFinishing() || isDestroyed()) return;
+            List<String> mine = new ArrayList<>();
+            for (String p : pools) if (p != null && !com.eurobuddha.pandapools.DexiconPools.keptElsewhere(this, p)) mine.add(p);
+            if (mine.isEmpty()) return;
+            com.eurobuddha.pandapools.DexiconPools.offerSigningConfirmation(this, mine, this::repaint);
+        });
+    }
+
+    @Override protected void onSaveInstanceState(Bundle out) {
+        super.onSaveInstanceState(out);
+        out.putString("ho_pkg", handoverPkg); out.putString("ho_name", handoverName); out.putBoolean("ho_remove", handoverRemove); out.putLong("ho_at", handoverAt);
+    }
+
+    private void explain(String title, String body) {
+        new AlertDialog.Builder(this, Design.dialogTheme()).setTitle(title).setMessage(body).setPositiveButton("OK", null).show();
+    }
+
+    @Override protected void onPause() { super.onPause(); FOREGROUND = false; stopCcyGlow(); }
+
+    @Override protected void onStop() { super.onStop(); poolsStop(); }   // PandaPools: backgrounded → views cancel their polls   // never animate a pill nobody sees
+
+    @Override protected void onDestroy() {
+        closed = true;
+        ui.removeCallbacksAndMessages(null);
+        stopCcyGlow(); ccyPill = null;
+        if (changedReceiver != null) try { unregisterReceiver(changedReceiver); } catch (Exception ignored) {}
+        if (nodeReceiver != null) try { unregisterReceiver(nodeReceiver); } catch (Exception ignored) {}
+        if (trade != null) trade.close();
+        if (restingRepo != null) restingRepo.close();
+        poolsClose();
+        if (node != null) node.onDestroy();
+        net.shutdownNow();
+        quoteExec.shutdownNow();
+        super.onDestroy();
+    }
+}

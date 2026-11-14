@@ -2,7 +2,7 @@
 from pathlib import Path
 
 def adapt(root):
-    for app in ['ethwallet','atomix']:
+    for app in ['ethwallet']:
         folder=root/app/'src/main/java/com/eurobuddha'/app/'eth'
         p=folder/'EthTx.java';s=p.read_text()
         if app=='atomix':
@@ -55,14 +55,8 @@ def adapt(root):
     }
 '''
         s=s[:s.rindex('}')]+body+'}\n';p.write_text(s)
-    p=root/'atomix/src/main/java/com/eurobuddha/atomix/eth/EthHtlc.java';s=p.read_text()
-    s=s.replace('return EthTx.send(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_LOCK, authorized);','return EthTx.sendOperation(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_LOCK, authorized,"lock:"+hashlock.toLowerCase(java.util.Locale.ROOT));')
-    s=s.replace('return EthTx.send(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_WITHDRAW);','return EthTx.sendOperation(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_WITHDRAW,()->true,"withdraw:"+contractId.toLowerCase(java.util.Locale.ROOT));')
-    s=s.replace('return EthTx.send(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_REFUND);','return EthTx.sendOperation(rpc, creds, net.chainId, net.htlc, FunctionEncoder.encode(f), null, GAS_REFUND,()->true,"refund:"+contractId.toLowerCase(java.util.Locale.ROOT));')
-    p.write_text(s)
-
     # Keep an ambiguous submission visibly distinct from a rejected, safe-to-retry send.
-    for app in ['ethwallet','atomix']:
+    for app in ['ethwallet']:
         p=root/app/'src/main/java/com/eurobuddha'/app/'MainActivity.java';s=p.read_text()
         if app=='ethwallet':
             old='onUi(() -> toast(Language.msg(l10n_eth_wallet_send_failed, EthMessages.error(e))));'
@@ -72,14 +66,7 @@ def adapt(root):
             new='if (e instanceof com.eurobuddha.minimaapi.ethereum.EthereumTransactions.Uncertain) {\n                            String hash = ((com.eurobuddha.minimaapi.ethereum.EthereumTransactions.Uncertain)e).hash;\n                            SwapLog.w("manual send outcome unknown tx=" + hash);\n                            ui.post(() -> toast(Language.join(Language.msg(l10n_nft_transaction_unknown), "\\n", hash)));\n                        } else {\n                            final CharSequence failure = context.current() ? AtomixMessages.error(e) : Language.msg(l10n_wallet_review_again);\n                            ui.post(() -> toast(Language.msg(l10n_atomix_ui_send_failed, failure)));\n                        }'
         if old not in s: raise RuntimeError('Missing Ethereum send failure boundary: '+app)
         p.write_text(s.replace(old,new))
-    # A retry must retain the timelock persisted before its first broadcast.
-    p=root/'atomix/src/main/java/com/eurobuddha/atomix/swap/SwapEngine.java';s=p.read_text()
-    old='final long timelock = ethChainNowStrict() + CP_SECS;'
-    new='final SwapDb.Swap existing = db.getSwap(hash);\n            final long chainNow = ethChainNowStrict();\n            final long timelock = existing != null && !existing.myLegIsMinima && existing.myTimelock > 0\n                    ? existing.myTimelock : chainNow + CP_SECS;\n            if (timelock <= chainNow) throw new java.io.IOException("Saved Ethereum counter-leg expired; no new lock was sent.");'
-    if old not in s: raise RuntimeError('Missing Ethereum counter-leg timelock boundary')
-    p.write_text(s.replace(old,new))
-
-    for app in ['ethwallet','atomix']:
+    for app in ['ethwallet']:
         p=root/app/'src/main/java/com/eurobuddha'/app/'eth/EthRpc.java';s=p.read_text()
         old='JSONObject resp = new JSONObject(trimmed);'
         new='if (code < 200 || code >= 300) throw new IOException(host(url) + " HTTP " + code);\n            org.json.JSONTokener parser = new org.json.JSONTokener(trimmed);\n            Object parsed = parser.nextValue();\n            if (!(parsed instanceof JSONObject) || parser.nextClean() != 0) throw new IOException("Invalid Ethereum RPC envelope");\n            JSONObject resp = (JSONObject)parsed;\n            if (!"2.0".equals(resp.opt("jsonrpc")) || !(resp.opt("id") instanceof Number)\n                    || !"1".equals(resp.opt("id").toString()) || resp.has("result") == resp.has("error"))\n                throw new IOException("Invalid Ethereum RPC envelope");'

@@ -6,6 +6,10 @@ public final class PandamoniumHooks {
         // BlackBear's utility tab is History (Terminal lives in the overflow menu).
         return new HistoryTabView(activity);
     }
+    /** Only Pandamonium has a trading tab (2.2.34: Dexicon on the embedded node wallet). */
+    public static com.eurobuddha.minimacore.main.BaseView createTradingTab(com.eurobuddha.minimacore.main.MainActivity activity) {
+        return null;
+    }
     public static void initialize(android.content.Context context) {
         // History talks to the embedded node via DirectNodeApi and listens on DirectNodeEvents.
         // No integrated-app host, wallet or salon here — only the node API History needs.
