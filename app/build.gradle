@@ -193,8 +193,10 @@ android {
         // withdrawal/switch tests run in the module.
         // 2.2.37: opening the Dexicon tab crashed (NoClassDefFoundError com.eurobuddha.pandapools.R$layout): a library build
         // strips hand-written R classes; the adapter now points PandaPools' views at Dexicon's generated R.
-        versionCode 307
-        versionName "2.2.37"
+        // 2.2.38: full-screen Dexicon tab (top bar, tabs, footer hidden; Back or ✕ -> Wallet) and no double system-bar gap
+        // (Dexicon 0.3.58 leaves the bar padding to the host). Owner on the Fold: "it needs more space".
+        versionCode 308
+        versionName "2.2.38"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

@@ -76,8 +76,8 @@ def adapt(root):
         return f != null ? f.open(ctx, registration) : new NodeTransport(ctx, registration);''',
                  '''        return new DirectLink(ctx, registration);   // Pandamonium: the embedded node, in-process''')
     replace_once(host, '    private static volatile String hostName = "";', '    private static volatile String hostName = "Pandamonium";')
-    replace_once(host, '    public static void reset() { factory = null; hostName = ""; }',
-                 '    public static void reset() { factory = null; hostName = "Pandamonium"; }')
+    replace_once(host, '    public static void reset() { factory = null; hostName = ""; exitAction = null; }',
+                 '    public static void reset() { factory = null; hostName = "Pandamonium"; exitAction = null; }')
     replace_once(host, '    /** Test seam. */', """    /** Pandamonium: a notification opens the HOST on its Dexicon tab - never a second Dexicon screen. Extras (e.g. the
      *  pools page) reach the tab's screen through the host's onNewIntent. */
     public static android.content.Intent screenIntent(Context c) {

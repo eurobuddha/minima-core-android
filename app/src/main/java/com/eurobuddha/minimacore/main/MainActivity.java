@@ -251,6 +251,21 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     // ---- Pandamonium 2.2.34: the Dexicon tab is a whole screen; it gets this Activity's results, permission answers,
     //      new intents (a Dexicon notification opens the tab) and configuration changes. Other builds have no such tab. ----
+    /** Pandamonium: the Dexicon tab is full screen - no top bar, tab row, dividers or footer (owner, 14 Nov: "it needs
+     *  more space"). Back, or Dexicon's ✕, returns to Wallet with them restored. */
+    public void setFullScreen(boolean on) {
+        if (mMainPager == null) return;
+        int v = on ? android.view.View.GONE : android.view.View.VISIBLE;
+        findViewById(R.id.toolbar).setVisibility(v);
+        android.view.ViewGroup column = (android.view.ViewGroup) mMainPager.getParent();
+        int at = column.indexOfChild(mMainPager);
+        if (at > 0) column.getChildAt(at - 1).setVisibility(v);                          // divider under the tabs
+        if (at + 1 < column.getChildCount()) column.getChildAt(at + 1).setVisibility(v); // divider above the footer
+        com.eurobuddha.minimacore.utils.KeyboardInsets.hideChrome(findViewById(R.id.main), on);
+    }
+
+    public void showWallet() { if (mMainPager != null) mMainPager.setCurrentItem(MainAdapter.WALLET_POSITION, false); }
+
     private BaseView tradingView() { return mMainAdapter == null ? null : mMainAdapter.getTradingView(); }
 
     private void openTradingTabFor(android.content.Intent intent) {

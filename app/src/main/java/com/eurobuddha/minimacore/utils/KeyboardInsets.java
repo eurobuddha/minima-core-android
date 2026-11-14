@@ -19,6 +19,10 @@ import com.eurobuddha.minimacore.R;
 public final class KeyboardInsets {
     private KeyboardInsets() {}
 
+    private static volatile boolean chromeHidden;
+    /** Pandamonium's full-screen Dexicon tab: keep the tab row and footer hidden (the keyboard pass below would re-show them). */
+    public static void hideChrome(View root, boolean hidden) { chromeHidden = hidden; ViewCompat.requestApplyInsets(root); }
+
     public static void install(AppCompatActivity activity, View root, Toolbar toolbar, View... compactChrome) {
         View hide = LayoutInflater.from(activity).inflate(R.layout.keyboard_dismiss, toolbar, false);
         toolbar.addView(hide);
@@ -53,7 +57,7 @@ public final class KeyboardInsets {
             // zero height for the command field. Dismissing the IME restores them.
             boolean compact = keyboardVisible && v.getResources().getConfiguration().orientation
                     == Configuration.ORIENTATION_LANDSCAPE;
-            for (View chrome : compactChrome) chrome.setVisibility(compact ? View.GONE : View.VISIBLE);
+            for (View chrome : compactChrome) chrome.setVisibility(compact || chromeHidden ? View.GONE : View.VISIBLE);
             return insets;
         });
         ViewCompat.requestApplyInsets(root);

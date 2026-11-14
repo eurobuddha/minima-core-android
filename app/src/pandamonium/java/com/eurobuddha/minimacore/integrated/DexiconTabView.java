@@ -30,6 +30,7 @@ final class DexiconTabView extends com.eurobuddha.minimacore.main.BaseView
         host = activity;
         slot = new FrameLayout(activity);
         mMainView = slot;
+        com.eurobuddha.dexicon.HostMode.setExit(activity::showWallet);   // Dexicon's header ✕
         activity.getLifecycle().addObserver(new DefaultLifecycleObserver() {
             @Override public void onStart(LifecycleOwner owner) { hostStarted = true; sync(); }
             @Override public void onResume(LifecycleOwner owner) { hostResumed = true; sync(); }
@@ -53,8 +54,8 @@ final class DexiconTabView extends com.eurobuddha.minimacore.main.BaseView
         if (!start && screenStarted) { screenStarted = false; screen.stop(); }
     }
 
-    @Override protected void onShown() { screen(); sync(); }
-    @Override protected void onHidden() { sync(); }
+    @Override protected void onShown() { host.setFullScreen(true); screen(); sync(); }
+    @Override protected void onHidden() { host.setFullScreen(false); sync(); }
 
     // ---- Screen.Host ----
     @Override public AppCompatActivity activity() { return host; }
@@ -63,7 +64,12 @@ final class DexiconTabView extends com.eurobuddha.minimacore.main.BaseView
     @Override public void finishScreen() { /* a tab is never closed by its screen */ }
 
     // ---- the core Activity's callbacks, forwarded (only once the screen exists; a notification creates it) ----
-    @Override public boolean onBack() { return screen != null && screen.back(); }
+    /** Back: Dexicon's own (dialogs, pages) first, else leave full screen for Wallet. */
+    @Override public boolean onBack() {
+        if (screen != null && screen.back()) return true;
+        host.showWallet();
+        return true;
+    }
     @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (screen != null) screen.activityResult(requestCode, resultCode, data);
     }

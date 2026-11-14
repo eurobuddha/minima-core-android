@@ -63,6 +63,11 @@ public final class HostMode {
         if (on()) c.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean("opened", true).apply();
     }
 
+    private static volatile Runnable exitAction;
+    /** The host's "leave Dexicon" (Pandamonium: back to its Wallet, bars restored); Dexicon's header shows a ✕ for it. */
+    public static void setExit(Runnable leave) { exitAction = leave; }
+    public static Runnable exit() { return on() ? exitAction : null; }
+
     /** Standalone wording, or the host's (no pairing, no Apps screen: the node is the host itself). */
     public static String text(String standalone, String host) { return on() ? host : standalone; }
 
@@ -78,5 +83,5 @@ public final class HostMode {
     }
 
     /** Test seam. */
-    public static void reset() { factory = null; hostName = "Pandamonium"; }
+    public static void reset() { factory = null; hostName = "Pandamonium"; exitAction = null; }
 }

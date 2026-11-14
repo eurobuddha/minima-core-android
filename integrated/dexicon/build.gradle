@@ -5,8 +5,8 @@ android {
     compileSdk 36
     defaultConfig {
         minSdk 28
-        buildConfigField 'String', 'VERSION_NAME', '"0.3.56"'
-        buildConfigField 'int', 'VERSION_CODE', '356'
+        buildConfigField 'String', 'VERSION_NAME', '"0.3.58"'
+        buildConfigField 'int', 'VERSION_CODE', '358'
     }
     buildFeatures { buildConfig true }
     testOptions {
