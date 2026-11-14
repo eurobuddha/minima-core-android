@@ -725,7 +725,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         boolean stopped = stopService(minimaintent);
     }
 
-    public void wipeMinima(){
+    public void wipeMinima(){ TradingGuard.run(this, this::wipeMinimaConfirmed); }
+
+    private void wipeMinimaConfirmed(){
 
         languageDialog()
                 .setTitle(Language.msg(l10n_core_reset_title))

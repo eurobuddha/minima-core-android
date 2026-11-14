@@ -559,6 +559,13 @@ public final class PandamoniumHooks {
         return new HistoryTabView(activity);
     }
 
+    /** Dexicon's open positions on the node's keys (unsettled swaps, live orders, owned pools), or null. A wipe or a seed
+     *  rebuild would strand them: only these keys can claim, refund or withdraw (apks/atomix CLAUDE.md: drain first). */
+    public static String tradingInFlight(android.content.Context context) {
+        try { return com.eurobuddha.dexicon.account.LegacyPositions.describeAny(context); }
+        catch (RuntimeException unreadable) { return "Dexicon's trading records could not be read"; }
+    }
+
     /** 2.2.34: the Dexicon tab - trading on the embedded node's own wallet (replaces AtomiX, PandaPools and PandaDEX). */
     public static com.eurobuddha.minimacore.main.BaseView createTradingTab(
             com.eurobuddha.minimacore.main.MainActivity activity) {
@@ -588,6 +595,27 @@ public final class PandamoniumHooks {
             androidx.work.WorkManager wm = androidx.work.WorkManager.getInstance(context);
             for (String job : new String[]{"atomix_watch", "pandapools_watch", "pandadex_watch"}) wm.cancelUniqueWork(job);
         } catch (RuntimeException ignored) { /* WorkManager not initialised yet: nothing was scheduled */ }
+        // The old built-in AtomiX kept its swap identity, market, OTC and pending-withdrawal state in prefs "atomix" under the
+        // SAME keys Dexicon reads from "dexicon_doors" (same engine lineage). Carry them over once, so orders and OTC offers
+        // already published under the old identity keep being served and withdrawn - never over anything Dexicon has.
+        try {
+            android.content.SharedPreferences old = context.getSharedPreferences("atomix", android.content.Context.MODE_PRIVATE);
+            android.content.SharedPreferences doors = context.getSharedPreferences("dexicon_doors", android.content.Context.MODE_PRIVATE);
+            if (!doors.getBoolean("migrated_builtin_atomix", false)) {
+                android.content.SharedPreferences.Editor e = doors.edit();
+                if (!doors.contains("swap_pk")) for (java.util.Map.Entry<String, ?> kv : old.getAll().entrySet()) {
+                    if (doors.contains(kv.getKey())) continue;
+                    Object v = kv.getValue();
+                    if (v instanceof String) e.putString(kv.getKey(), (String) v);
+                    else if (v instanceof Boolean) e.putBoolean(kv.getKey(), (Boolean) v);
+                    else if (v instanceof Integer) e.putInt(kv.getKey(), (Integer) v);
+                    else if (v instanceof Long) e.putLong(kv.getKey(), (Long) v);
+                    else if (v instanceof Float) e.putFloat(kv.getKey(), (Float) v);
+                    else if (v instanceof java.util.Set) { @SuppressWarnings("unchecked") java.util.Set<String> set = (java.util.Set<String>) v; e.putStringSet(kv.getKey(), set); }
+                }
+                e.putBoolean("migrated_builtin_atomix", true).commit();
+            }
+        } catch (RuntimeException ignored) { /* best effort: Dexicon then picks a fresh identity, as on a new install */ }
         // The old built-ins' notifications were tagged "pandamonium.atomix.*" / "pandamonium.pandapools"; their Activities are
         // gone, so a tap would do nothing - clear them (Dexicon re-raises anything still true).
         try {

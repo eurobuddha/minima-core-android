@@ -78,5 +78,5 @@ public final class HostMode {
     }
 
     /** Test seam. */
-    static void reset() { factory = null; hostName = "Pandamonium"; }
+    public static void reset() { factory = null; hostName = "Pandamonium"; }
 }

@@ -18,6 +18,7 @@
         <package android:name="org.minimarex.minimacore" />
         <package android:name="com.eurobuddha.atomix" />
         <package android:name="com.eurobuddha.pandapools" />
+        <package android:name="com.eurobuddha.ethwallet" />
         <package android:name="com.eurobuddha.dexicon" />
         <package android:name="com.eurobuddha.dexicon.stock" />
         <package android:name="com.eurobuddha.atomix.stock" />

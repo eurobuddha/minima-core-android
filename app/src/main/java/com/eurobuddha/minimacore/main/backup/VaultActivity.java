@@ -207,7 +207,7 @@ public class VaultActivity extends AppCompatActivity {
 
             addAction(Language.msg(l10n_vault_wipe_keys),
                     Language.msg(l10n_vault_wipe_help),
-                    v -> confirmWipe());
+                    v -> com.eurobuddha.minimacore.main.TradingGuard.run(this, this::confirmWipe));
         }
 
         addAction(Language.msg(l10n_vault_restore_keys),
@@ -219,7 +219,7 @@ public class VaultActivity extends AppCompatActivity {
 
         addAction(Language.msg(l10n_vault_rebuild_wallet),
                 Language.msg(l10n_vault_rebuild_help),
-                v -> confirmSeedRebuild());
+                v -> com.eurobuddha.minimacore.main.TradingGuard.run(this, this::confirmSeedRebuild));
     }
 
     private void addAction(CharSequence title, CharSequence subtitle, View.OnClickListener onClick) {
