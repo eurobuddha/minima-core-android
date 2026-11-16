@@ -201,8 +201,10 @@ android {
         // (scripts/dexicon-strings.py, dexicon-l10n-build.py; 654 reused from Pandamonium's own translations). Dexicon 0.3.59.
         // 2.2.41: the pool + node backup after creating a pool failed (NODE_BACKUP_FILE): the in-process node returns its own
         // file:// path, Dexicon accepted only content://. Accepted now, only inside this app's files folder.
-        versionCode 311
-        versionName "2.2.41"
+        // 2.2.42: Dexicon 0.3.60 (AtomiX 0.2.35): no identity halt on an incomplete `keys` list or on a single read -
+        // a "not owned" / differing ETH verdict is re-read once and halts only when both complete reads agree.
+        versionCode 312
+        versionName "2.2.42"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
