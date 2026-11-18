@@ -4,6 +4,7 @@ import com.eurobuddha.minimacore.i18n.LanguageDialog;
 import androidx.appcompat.widget.PopupMenu;
 import static com.eurobuddha.minimacore.i18n.R.string.*;
 
+import com.eurobuddha.minimaapi.direct.DirectNodeApi;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import com.eurobuddha.minimaapi.direct.DirectNodeEvents;
@@ -44,6 +45,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -141,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
     private CommsIdentity identity;
     private IdentityStore identityStore;
     private boolean identityBusy;
-    private AlertDialog identityPrompt;
+    private boolean coreOpenedForSetup;
+    private TextView setupMessage;
     private CommsScanner scanner;
     private String myId, myName = "", myPayaddr = "";
     private boolean paired = false;
@@ -184,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MailAddress.init(this);
         ls = Sodium.get();
         db = new CommsDb(this);
         Design.load(db.getMeta("theme", "light"));
@@ -257,6 +261,11 @@ public class MainActivity extends AppCompatActivity {
         // Subscribed only while this screen is visible.
 
         // Freshness display starts with the visible Activity.
+        if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
+            String key = MailAddress.directKey(getIntent().getDataString());
+            if (key == null) toast("Invalid Mail contact link.");
+            else addContactDialog(getIntent().getDataString());
+        }
     }
 
     private boolean freshnessVisible;
@@ -268,6 +277,14 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    @Override protected void onRestart() {
+        super.onRestart();
+        if (coreOpenedForSetup) {
+            coreOpenedForSetup = false;
+            recreate(); // Re-register with Core to pick up the current Enabled and Admin settings.
+        }
+    }
+
     @Override protected void onDestroy() {
         freshnessVisible = false;
         for (AlertDialog value : new java.util.ArrayList<>(languageDialogs)) value.dismiss();
@@ -275,7 +292,6 @@ public class MainActivity extends AppCompatActivity {
         for (PopupMenu value : new java.util.ArrayList<>(languageMenus.keySet())) value.dismiss();
         languageMenus.clear();
         super.onDestroy();
-        if (identityPrompt != null) identityPrompt.dismiss();
         ui.removeCallbacks(freshTick);
         if (notifyReceiver != null) try { DirectNodeEvents.unsubscribe(notifyReceiver); } catch (Exception ignored) {}
         if (node != null) node.onDestroy();
@@ -283,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override public void onBackPressed() {
-        if (drawer.isDrawerOpen(androidx.core.view.GravityCompat.START)) { drawer.closeDrawer(androidx.core.view.GravityCompat.START); return; }
+        if (drawer.isDrawerOpen(GravityCompat.START)) { drawer.closeDrawer(GravityCompat.START); return; }
         if (stack.size() > 1) pop();
         else if (folder != Folder.INBOX) showFolder(Folder.INBOX);
         else super.onBackPressed();
@@ -363,8 +379,8 @@ public class MainActivity extends AppCompatActivity {
         Language.setText(brand, bs);
         brand.setTextColor(Design.TEXT); brand.setTextSize(16f); brand.setTypeface(Typeface.DEFAULT_BOLD);
         TextView me = new TextView(this);
-        Language.setText(me, myId == null ? Language.msg(l10n_mail_connecting) : Language.msg(l10n_mail_you_key, shortKey(myId)));
-        me.setTextColor(Design.DIM); me.setTextSize(11f); me.setTypeface(Typeface.MONOSPACE);
+        Language.setText(me, myId == null ? Language.msg(l10n_mail_connecting) : Language.msg(l10n_mail_you_key, MailAddress.phrase(myId)));
+        me.setTextColor(Design.TEXT); me.setTextSize(14f);
         me.setPadding(0, dp(3), 0, 0);
         // NB: no click handler on the header — it sits under the hamburger's screen position, so a
         // double-tap on the hamburger would silently navigate. Language.msg(l10n_mail_your_key) below covers the shortcut.
@@ -390,7 +406,7 @@ public class MainActivity extends AppCompatActivity {
         navPanel.addView(spacer, new LinearLayout.LayoutParams(1, 0, 1f));
         TextView ver = new TextView(this);
         Language.setText(ver, "Minima Mail v" + BuildConfig.VERSION_NAME);
-        ver.setTextColor(Design.DIM2); ver.setTextSize(10.5f);
+        ver.setTextColor(Design.DIM); ver.setTextSize(10.5f);
         ver.setPadding(dp(18), dp(6), dp(18), dp(10));
         navPanel.addView(ver);
     }
@@ -429,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
             ((ViewGroup.MarginLayoutParams) mlp).rightMargin = dp(12);
             row.setLayoutParams(mlp);
         }
-        row.setOnClickListener(v -> { drawer.closeDrawer(androidx.core.view.GravityCompat.START); showFolder(target); });
+        row.setOnClickListener(v -> { drawer.closeDrawer(GravityCompat.START); showFolder(target); });
         return row;
     }
 
@@ -442,13 +458,14 @@ public class MainActivity extends AppCompatActivity {
 
     // ---- pairing + identity ----
 
-    private void onPaired(boolean enabled) {
+    private void onPaired(boolean enabled, boolean admin) {
         paired = enabled;
-        pairingBanner.setVisibility(enabled ? View.GONE : View.VISIBLE);
+        if (!enabled || !admin) showSetupMessage(Language.msg(l10n_mail_node_retry));
+        else pairingBanner.setVisibility(View.GONE);
         if (enabled) {
             if (chainBlock == 0) fetchBlock();
             fetchMyPayaddr();
-            if (crypto == null) setupIdentity(); else requestScan();
+            if (crypto == null) setupIdentity(admin); else requestScan();
         }
     }
 
@@ -478,7 +495,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setupIdentity() {
+    private void setupIdentity(boolean admin) {
         if (identityBusy || identity != null || isFinishing() || isDestroyed()) return;
         identityBusy = true;
         io.execute(() -> {
@@ -490,7 +507,8 @@ public class MainActivity extends AppCompatActivity {
                     if (saved != null) {
                         identityBusy = false;
                         adoptIdentity(saved); refreshFolderIfVisible(); requestScan();
-                    } else requestNodeIdentity();
+                    } else if (paired && admin) requestNodeIdentity();
+                    else identityBusy = false;
                 });
             } catch (Exception unreadable) {
                 ui.post(() -> {
@@ -506,36 +524,59 @@ public class MainActivity extends AppCompatActivity {
         node.cmd("vault action:seed", new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 if (isFinishing() || isDestroyed()) return;
-                JSONObject r = j.optJSONObject("response");
-                String ikm = r == null || !j.optBoolean("status", false) || r.optBoolean("locked", false)
-                        ? "" : r.optString("seed", r.optString("phrase", ""));
-                if (ikm.isEmpty()) askForSeed(); else deriveIdentity(ikm);
+                try {
+                    deriveIdentity(NodeIdentitySeed.take(j));
+                } catch (IllegalStateException unavailable) {
+                    identityBusy = false;
+                    showSetupMessage(unavailable.getMessage());
+                }
             }
             @Override public void onError(String m) {
-                if (isFinishing() || isDestroyed()) return;
-                if (NodeApi.ERR_NOT_ENABLED.equals(m)) { identityBusy = false; pairingBanner.setVisibility(View.VISIBLE); return; }
-                askForSeed();
+                identityBusy = false;
+                if (!NodeApi.ERR_NOT_ENABLED.equals(m))
+                    showSetupMessage("Mail could not reach your node. Start Minima Core and try again.");
             }
         });
     }
 
-    private void deriveIdentity(final String ikm) {
+    private void deriveIdentity(byte[] seed) {
         io.execute(() -> {
             try {
-                byte[] seed = ikm.startsWith("0x") ? Hex.from(ikm) : ikm.getBytes(StandardCharsets.UTF_8);
-                CommsIdentity id = CommsIdentity.fromSeed(ls, seed);
-                java.util.Arrays.fill(seed, (byte)0);
-                if (identityStore == null) identityStore = new IdentityStore(this);
-                identityStore.save(id);
-                ui.post(() -> { identityBusy = false; if (isFinishing() || isDestroyed()) return; adoptIdentity(id); refreshFolderIfVisible(); requestScan(); });
-            } catch (Exception e) { ui.post(() -> { identityBusy = false; if (!isFinishing() && !isDestroyed()) toast(Language.msg(l10n_mail_identity_save_failed)); }); }
+                // A backup restore may have finished while the vault request was in flight.
+                CommsIdentity saved = identityStore.load();
+                final CommsIdentity id;
+                if (saved != null) id = saved;
+                else {
+                    id = CommsIdentity.fromSeed(ls, seed);
+                    identityStore.save(id);
+                }
+                ui.post(() -> {
+                    identityBusy = false;
+                    if (isFinishing() || isDestroyed()) return;
+                    adoptIdentity(id);
+                    refreshFolderIfVisible();
+                    requestScan();
+                });
+            } catch (Exception failed) {
+                ui.post(() -> {
+                    identityBusy = false;
+                    if (!isFinishing() && !isDestroyed())
+                        showSetupMessage(Language.msg(l10n_mail_identity_save_failed));
+                });
+            } finally {
+                java.util.Arrays.fill(seed, (byte) 0);
+            }
         });
     }
 
-    private void adoptIdentity(CommsIdentity id) {
+    @androidx.annotation.VisibleForTesting(otherwise = androidx.annotation.VisibleForTesting.PRIVATE)
+    void adoptIdentity(CommsIdentity id) {
+        if (myId != null && !myId.equals(id.publicId()) && AddressRenewal.enabled(this, myId))
+            AddressRenewal.disable(this, myId);
         identity = id;
         crypto = new LocalEcCryptoProvider(ls, id);
         myId = id.publicId();
+        rebuildNav();
         scanner = new CommsScanner(node, crypto, db, myId, new CommsScanner.Listener() {
             @Override public void onDone(boolean ok, int newCount) { onScanDone(ok, newCount); }
             @Override public void onContactPayaddrUpdated(String publicId) {
@@ -568,6 +609,10 @@ public class MainActivity extends AppCompatActivity {
     private String acceptKeyShare(String shared) {
         if (shared == null) return "";
         shared = shared.trim();
+        if (shared.contains("minimamail:")) {
+            String key = MailAddress.directKey(shared);
+            return key == null ? "" : key;
+        }
         int bar = shared.indexOf('|');
         if (bar > 0) {
             String key = shared.substring(0, bar).trim();
@@ -576,22 +621,6 @@ public class MainActivity extends AppCompatActivity {
             return key;
         }
         return shared;
-    }
-
-    private void askForSeed() {
-        if (isFinishing() || isDestroyed() || (identityPrompt != null && identityPrompt.isShowing())) return;
-        final EditText in = input(Language.msg(l10n_mail_seed_hint));
-        in.setMinLines(3);
-        identityPrompt = languageDialog()
-                .setTitle(Language.msg(l10n_mail_create_identity))
-                .setMessage(Language.msg(l10n_mail_identity_help))
-                .setView(in)
-                .setPositiveButton(Language.msg(l10n_mail_create), (d, w) -> { String s = in.getText().toString().trim(); if (!s.isEmpty()) { identityBusy = true; deriveIdentity(s); } else identityBusy = false; })
-                .setNegativeButton(Language.msg(l10n_mail_restore_instead), (d, w) -> { identityBusy = false; importLauncher.launch(new String[]{"application/json", "*/*"}); })
-                .create();
-        identityPrompt.setOnCancelListener(d -> identityBusy = false);
-        identityPrompt.show();
-        identityPrompt.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE);
     }
 
     // ---- scanning ----
@@ -635,7 +664,7 @@ public class MainActivity extends AppCompatActivity {
         bar.setPadding(dp(14), dp(3), dp(14), dp(7));
         View dot = new View(this);
         GradientDrawable g = new GradientDrawable(); g.setShape(GradientDrawable.OVAL);
-        g.setColor(paired ? Design.GREEN : Design.DIM2);
+        g.setColor(paired ? Design.GREEN : Design.DIM);
         dot.setBackground(g);
         LinearLayout.LayoutParams dlp = new LinearLayout.LayoutParams(dp(6), dp(6));
         dlp.rightMargin = dp(6);
@@ -699,7 +728,7 @@ public class MainActivity extends AppCompatActivity {
 
         final TextView empty = new TextView(this);
         Language.setText(empty, archivedView ? Language.msg(l10n_mail_no_archived) : Language.msg(l10n_mail_no_mail));
-        empty.setTextColor(Design.DIM2); empty.setGravity(Gravity.CENTER); empty.setTextSize(13f);
+        empty.setTextColor(Design.DIM); empty.setGravity(Gravity.CENTER); empty.setTextSize(13f);
         empty.setPadding(dp(24), dp(64), dp(24), 0); empty.setVisibility(View.GONE);
 
         io.execute(() -> {                                  // load off the UI thread
@@ -792,17 +821,17 @@ public class MainActivity extends AppCompatActivity {
             nm.setTextColor(unread ? Design.TEXT : Design.DIM);
             nm.setTextSize(14.5f);
             nm.setTypeface(unread ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
-            nm.setMaxLines(1);
+            if (!name.equals(other)) nm.setMaxLines(1);   // a raw key (unnamed sender) wraps in full
             nm.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
             TextView time = new TextView(MainActivity.this);
-            Language.setText(time, rel(t.date)); time.setTextColor(Design.DIM2); time.setTextSize(11f);
+            Language.setText(time, rel(t.date)); time.setTextColor(Design.DIM); time.setTextSize(11f);
             l1.addView(nm); l1.addView(time);
 
             TextView subj = new TextView(MainActivity.this);
             boolean noSubject = t.subject == null || t.subject.isEmpty();
             Language.setText(subj, noSubject ? Language.msg(l10n_mail_no_subject) : t.subject);
             subj.setTextColor(unread ? Design.TEXT : Design.DIM);
-            if (noSubject) { subj.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC)); subj.setTextColor(Design.DIM2); }
+            if (noSubject) { subj.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC)); subj.setTextColor(Design.DIM); }
             else subj.setTypeface(unread ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
             subj.setTextSize(12.5f); subj.setMaxLines(1);
 
@@ -879,12 +908,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void showThreadActions(MailMessage t, final boolean archivedView) {
         final String hashref = t.hashref;
-        CharSequence[] items = {archivedView ? Language.msg(l10n_mail_unarchive) : Language.msg(l10n_mail_archive), Language.msg(l10n_mail_delete)};
+        final String other = myId != null && myId.equals(t.frompublickey) ? t.topublickey : t.frompublickey;
+        CharSequence[] items = {archivedView ? Language.msg(l10n_mail_unarchive) : Language.msg(l10n_mail_archive), "Copy key", Language.msg(l10n_mail_delete)};
         languageDialog().setItems(items, (d, w) -> {
             if (w == 0) {
                 io.execute(() -> db.setArchived(hashref, !archivedView));
                 toast(archivedView ? Language.msg(l10n_mail_unarchived) : Language.msg(l10n_mail_archived));
                 refreshFolderIfVisible();
+            } else if (w == 1) {
+                copy(other, Language.msg(l10n_mail_mail_key)); toast(Language.msg(l10n_mail_key_copied));
             } else {
                 languageDialog().setMessage(Language.msg(l10n_mail_delete_thread_question))
                         .setPositiveButton(Language.msg(l10n_mail_delete), (dd, ww) -> { io.execute(() -> db.deleteThread(hashref)); refreshFolderIfVisible(); })
@@ -917,7 +949,7 @@ public class MainActivity extends AppCompatActivity {
         final TextView empty = new TextView(this);
         Language.setText(empty, outboxView ? Language.msg(l10n_mail_empty_outbox)
                 : Language.msg(l10n_mail_empty_sent));
-        empty.setTextColor(Design.DIM2); empty.setGravity(Gravity.CENTER); empty.setTextSize(13f);
+        empty.setTextColor(Design.DIM); empty.setGravity(Gravity.CENTER); empty.setTextSize(13f);
         empty.setPadding(dp(24), dp(64), dp(24), 0); empty.setVisibility(View.GONE);
 
         final List<MailMessage> data = new ArrayList<>();
@@ -939,15 +971,20 @@ public class MainActivity extends AppCompatActivity {
 
                 LinearLayout l1 = new LinearLayout(MainActivity.this);
                 TextView to = new TextView(MainActivity.this);
-                CharSequence subj = (m.subject == null || m.subject.isEmpty()) ? Language.msg(l10n_mail_no_subject) : m.subject;
-                Language.setText(to, Language.msg(l10n_mail_to_subject, nameFor(m.topublickey), subj));
+                CharSequence toName = nameFor(m.topublickey);
+                Language.setText(to, "To " + toName);
                 to.setTextColor(Design.TEXT); to.setTextSize(13f); to.setTypeface(Typeface.DEFAULT_BOLD);
-                to.setMaxLines(1);
+                if (!toName.equals(m.topublickey)) to.setMaxLines(1);   // a raw key (unnamed recipient) wraps in full
                 to.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
                 TextView time = new TextView(MainActivity.this);
-                Language.setText(time, rel(m.date)); time.setTextColor(Design.DIM2); time.setTextSize(10.5f);
+                Language.setText(time, rel(m.date)); time.setTextColor(Design.DIM); time.setTextSize(10.5f);
                 l1.addView(to); l1.addView(time);
                 cell.addView(l1);
+
+                TextView subj = new TextView(MainActivity.this);
+                Language.setText(subj, (m.subject == null || m.subject.isEmpty()) ? Language.msg(l10n_mail_no_subject) : m.subject);
+                subj.setTextColor(Design.TEXT); subj.setTextSize(12.5f); subj.setMaxLines(1);
+                cell.addView(subj);
 
                 TextView snip = new TextView(MainActivity.this);
                 Language.setText(snip, previewText(m));
@@ -1042,14 +1079,18 @@ public class MainActivity extends AppCompatActivity {
         tcol.setOrientation(LinearLayout.VERTICAL);
         tcol.setPadding(dp(10), 0, 0, 0);
         tcol.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        CharSequence otherName = nameFor(otherKey);
+        boolean unnamed = otherName.equals(otherKey);
         TextView nm = new TextView(this);
-        Language.setText(nm, subject.isEmpty() ? nameFor(otherKey) : subject);
+        // unnamed + no subject: the full key is shown (and copyable) in `sub` below — don't clip it here too
+        Language.setText(nm, subject.isEmpty() ? (unnamed ? "Conversation" : otherName) : subject);
         nm.setTextColor(Design.TEXT); nm.setTextSize(15f); nm.setTypeface(Typeface.DEFAULT_BOLD);
         nm.setMaxLines(1);
         TextView sub = new TextView(this);
-        Language.setText(sub, subject.isEmpty() ? shortKey(otherKey) : Language.join(nameFor(otherKey), " · ", shortKey(otherKey)));
+        Language.setText(sub, subject.isEmpty() || unnamed ? otherKey : otherName + " · " + otherKey);
         sub.setTextColor(Design.DIM); sub.setTextSize(10.5f); sub.setTypeface(Typeface.MONOSPACE);
-        sub.setMaxLines(1);
+        sub.setContentDescription("Mail key, tap to copy");
+        sub.setOnClickListener(v -> { copy(otherKey, Language.msg(l10n_mail_mail_key)); toast(Language.msg(l10n_mail_key_copied)); });
         tcol.addView(nm); tcol.addView(sub);
         head.addView(tcol);
         head.addView(iconBtn(R.drawable.pm_mail_ic_dots, v -> conversationMenu(v, otherKey, hashref)));
@@ -1094,7 +1135,7 @@ public class MainActivity extends AppCompatActivity {
         bar.addView(attach);
         final EditText box = new EditText(this);
         Language.hint(box, Language.msg(l10n_mail_reply));
-        box.setHintTextColor(Design.DIM2);
+        box.setHintTextColor(Design.DIM);
         box.setTextColor(Design.TEXT);
         box.setTextSize(15f);
         box.setMaxLines(4);
@@ -1164,7 +1205,7 @@ public class MainActivity extends AppCompatActivity {
             if (r.dateHeader != null) {
                 TextView chip = new TextView(MainActivity.this);
                 Language.setText(chip, r.dateHeader);
-                chip.setTextColor(Design.DIM2);
+                chip.setTextColor(Design.DIM);
                 chip.setTextSize(11f);
                 chip.setGravity(Gravity.CENTER);
                 chip.setPadding(0, dp(10), 0, dp(8));
@@ -1190,22 +1231,22 @@ public class MainActivity extends AppCompatActivity {
 
                 TextView time = new TextView(MainActivity.this);
                 Language.setText(time, clock(r.m.date));
-                time.setTextColor(Design.DIM2);
+                time.setTextColor(Design.DIM);
                 time.setTextSize(10f);
                 f.addView(time);
 
                 if (!r.m.incoming) {
-                    int ic = 0; int tint = 0; CharSequence label = null; int labelColor = Design.DIM2;
+                    int ic = 0; int tint = 0; CharSequence label = null; int labelColor = Design.DIM;
                     if ("posting".equals(r.m.status)) { ic = R.drawable.pm_mail_ic_ring; tint = Design.ACCENT; label = Language.msg(l10n_mail_posting); labelColor = Design.ACCENT_TEXT; }
                     else if ("failed".equals(r.m.status)) { ic = R.drawable.pm_mail_ic_close; tint = Design.RED; label = Language.msg(l10n_mail_failed_retry); labelColor = Design.RED; }
                     else if ("confirmed".equals(r.m.status)) { ic = R.drawable.pm_mail_ic_check; tint = Design.GREEN; label = Language.msg(l10n_mail_confirmed); }
                     else if ("sent".equals(r.m.status)) {
-                        ic = R.drawable.pm_mail_ic_chain; tint = Design.DIM2;
+                        ic = R.drawable.pm_mail_ic_chain; tint = Design.DIM;
                         label = Language.join(Language.msg(l10n_mail_on_chain), r.m.sentblock > 0 ? Language.join(" · ", Language.msg(l10n_mail_block, r.m.sentblock)) : "");
                     }
                     if (label != null) {
                         TextView dotSep = new TextView(MainActivity.this);
-                        Language.setText(dotSep, " · "); dotSep.setTextColor(Design.DIM2); dotSep.setTextSize(10f);
+                        Language.setText(dotSep, " · "); dotSep.setTextColor(Design.DIM); dotSep.setTextSize(10f);
                         f.addView(dotSep);
                         f.addView(icon(ic, tint, 11));
                         TextView st = new TextView(MainActivity.this);
@@ -1277,13 +1318,16 @@ public class MainActivity extends AppCompatActivity {
 
         // To
         LinearLayout toRow = fieldRow(Language.msg(l10n_mail_to));
-        Language.hint(to, Language.msg(l10n_mail_to_hint));
+        Language.hint(to, Language.msg(l10n_mail_address_input));
         styleFieldInput(to, true);
         toRow.addView(to, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         toRow.addView(fieldChip(R.drawable.pm_mail_ic_scan, Language.msg(l10n_mail_scan), v -> startScan(to)));
         toRow.addView(fieldChip(R.drawable.pm_mail_ic_contacts, null, v -> pickContact(to)));
         if (prefillKey != null) Language.setText(to, prefillKey);
         col.addView(toRow);
+        TextView enterWords = textButton(Language.msg(l10n_mail_enter_words));
+        enterWords.setOnClickListener(v -> enterAddressWords(to));
+        col.addView(enterWords);
         col.addView(hairline());
 
         // Subject
@@ -1298,7 +1342,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Body
         Language.hint(body, Language.msg(l10n_mail_write_hint));
-        body.setHintTextColor(Design.DIM2);
+        body.setHintTextColor(Design.DIM);
         body.setTextColor(Design.TEXT);
         body.setTextSize(14.5f);
         body.setGravity(Gravity.TOP);
@@ -1313,18 +1357,14 @@ public class MainActivity extends AppCompatActivity {
         attachRow.setOrientation(LinearLayout.HORIZONTAL);
         attachRow.setPadding(dp(14), dp(10), dp(14), dp(10));
         LinearLayout photo = attachChip(R.drawable.pm_mail_ic_photo, Language.msg(l10n_mail_photo));
-        photo.setOnClickListener(v -> {
-            String k = acceptKeyShare(to.getText().toString());
-            if (!CommsIdentity.isValidPublicId(k)) { toast(Language.msg(l10n_mail_valid_key_first)); return; }
+        photo.setOnClickListener(v -> resolveRecipient(to, k -> {
             imagePickContact = k; imagePickSubject = subject.getText().toString().trim();
             imagePicker.launch("image/*");
-        });
+        }));
         LinearLayout funds = attachChip(R.drawable.pm_mail_ic_coin, Language.msg(l10n_mail_send_funds));
-        funds.setOnClickListener(v -> {
-            String k = acceptKeyShare(to.getText().toString());
-            if (!CommsIdentity.isValidPublicId(k)) { toast(Language.msg(l10n_mail_valid_key_first)); return; }
+        funds.setOnClickListener(v -> resolveRecipient(to, k -> {
             showSendFundsSheet(k, subject.getText().toString().trim());
-        });
+        }));
         attachRow.addView(photo);
         View gap = new View(this);
         attachRow.addView(gap, new LinearLayout.LayoutParams(dp(10), 1));
@@ -1345,14 +1385,12 @@ public class MainActivity extends AppCompatActivity {
         hint.addView(ht, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         col.addView(hint);
 
-        sendBtn.setOnClickListener(v -> {
-            String k = acceptKeyShare(to.getText().toString());
+        sendBtn.setOnClickListener(v -> resolveRecipient(to, k -> {
             String subj = subject.getText().toString().trim();
             String text = body.getText().toString();
-            if (!CommsIdentity.isValidPublicId(k)) { toast(Language.msg(l10n_mail_valid_key)); return; }
             if (text.trim().isEmpty()) { toast(Language.msg(l10n_mail_write_first)); return; }
             doSend(sendBtn, k, subj, text, () -> { pop(); openConversation(k, subj); });
-        });
+        }));
 
         return col;
     }
@@ -1370,7 +1408,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void styleFieldInput(EditText e, boolean mono) {
-        e.setHintTextColor(Design.DIM2);
+        e.setHintTextColor(Design.DIM);
         e.setTextColor(Design.TEXT);
         e.setTextSize(mono ? 12.5f : 14f);
         if (mono) e.setTypeface(Typeface.MONOSPACE);
@@ -1441,13 +1479,34 @@ public class MainActivity extends AppCompatActivity {
                 mid.setPadding(dp(12), 0, 0, 0);
                 mid.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
                 TextView nm = new TextView(MainActivity.this); Language.setText(nm, name); nm.setTextColor(Design.TEXT); nm.setTextSize(15f); nm.setTypeface(Typeface.DEFAULT_BOLD);
-                TextView kv = new TextView(MainActivity.this); Language.setText(kv, shortKey(key)); kv.setTextColor(Design.DIM); kv.setTextSize(12f); kv.setTypeface(Typeface.MONOSPACE);
+                TextView kv = new TextView(MainActivity.this); Language.setText(kv, key); kv.setTextColor(Design.DIM); kv.setTextSize(12f); kv.setTypeface(Typeface.MONOSPACE);
                 mid.addView(nm); mid.addView(kv); row.addView(mid);
                 row.setOnClickListener(v -> push(buildCompose(key, null)));
                 row.setOnLongClickListener(v -> {
-                    languageDialog().setMessage(Language.msg(l10n_mail_delete_contact, name))
-                            .setPositiveButton(Language.msg(l10n_mail_delete), (d, w) -> io.execute(() -> { db.deleteContact(id); ui.post(() -> { contactNames = null; refreshFolderIfVisible(); }); }))
-                            .setNegativeButton(Language.msg(l10n_mail_cancel), null).show();
+                    AlertDialog.Builder actions = languageDialog().setTitle(name)
+                            .setPositiveButton("Delete contact", (d, w) -> {
+                                if (!key.equals(myId)) AddressRenewal.disable(MainActivity.this, key);
+                                io.execute(() -> { db.deleteContact(id); db.setMeta("card:" + key, "");
+                                    ui.post(() -> { contactNames = null; refreshFolderIfVisible(); }); });
+                            }).setNegativeButton(Language.msg(l10n_mail_cancel), null);
+                    MailAddress.Card card = MailAddress.link(db.getMeta("card:" + key, ""));
+                    if (MailAddress.isKey(key) && !key.equalsIgnoreCase(myId))
+                        actions.setNeutralButton(AddressRenewal.enabled(MainActivity.this,key) ? Language.msg(l10n_mail_stop_relay) : Language.msg(l10n_mail_relay_address),
+                                (d,w) -> {
+                                    if (AddressRenewal.enabled(MainActivity.this,key)) {
+                                        AddressRenewal.disable(MainActivity.this, key); toast(Language.msg(l10n_mail_relay_stopped)); return;
+                                    }
+                                    if (card != null) { changePublication(card); return; }
+                                    MailBeacon.find(node, MailAddress.phrase(key), MailBeacon.DISCOVERY, (found, error) -> {
+                                        if (found == null || !key.equalsIgnoreCase(found.key)) {
+                                            toast(error == null ? Language.msg(l10n_mail_ask_publish) : error);
+                                            return;
+                                        }
+                                        db.setMeta("card:" + key, found.link());
+                                        changePublication(found);
+                                    });
+                                });
+                    actions.show();
                     return true;
                 });
             }
@@ -1466,6 +1525,7 @@ public class MainActivity extends AppCompatActivity {
         form.setGravity(Gravity.CENTER_HORIZONTAL);
 
         form.addView(avatar(myId, myName, 72));
+        if (myId != null) addAddressControls(form);
 
         if (myId != null) {
             Bitmap qr = QrUtil.qr(keyShare(), dp(200));
@@ -1486,7 +1546,7 @@ public class MainActivity extends AppCompatActivity {
         keyLabel.setTextColor(Design.DIM); keyLabel.setTextSize(12f); keyLabel.setPadding(0, dp(14), 0, dp(6));
         form.addView(keyLabel);
         TextView key = new TextView(this);
-        Language.setText(key, myId == null ? Language.msg(l10n_mail_connecting) : shortKey(myId));
+        Language.setText(key, myId == null ? Language.msg(l10n_mail_connecting) : myId);
         key.setTextColor(Design.TEXT); key.setTextSize(13f); key.setTypeface(Typeface.MONOSPACE);
         form.addView(key);
         TextView copy = accentButton(Language.msg(l10n_mail_copy_key));
@@ -1501,7 +1561,7 @@ public class MainActivity extends AppCompatActivity {
             ral.setTextColor(Design.DIM); ral.setTextSize(12f); ral.setPadding(0, dp(16), 0, dp(4));
             form.addView(ral);
             TextView ra = new TextView(this);
-            Language.setText(ra, shortKey(myPayaddr));
+            Language.setText(ra, myPayaddr);
             ra.setTextColor(Design.TEXT); ra.setTextSize(12f); ra.setTypeface(Typeface.MONOSPACE);
             ra.setOnClickListener(v -> { copy(myPayaddr, Language.msg(l10n_mail_receiving_address)); toast(Language.msg(l10n_mail_address_copied)); });
             form.addView(ra);
@@ -1588,7 +1648,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView settingsGroup(CharSequence s) {
         TextView t = new TextView(this);
         Language.setText(t, Language.upper(s));
-        t.setTextColor(Design.DIM2); t.setTextSize(10.5f); t.setTypeface(Typeface.DEFAULT_BOLD);
+        t.setTextColor(Design.DIM); t.setTextSize(10.5f); t.setTypeface(Typeface.DEFAULT_BOLD);
         t.setLetterSpacing(0.08f);
         t.setPadding(dp(16), dp(18), dp(16), dp(6));
         return t;
@@ -1616,7 +1676,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ImageView chev() {
-        ImageView iv = icon(R.drawable.pm_mail_ic_chev, Design.DIM2, 14);
+        ImageView iv = icon(R.drawable.pm_mail_ic_chev, Design.DIM, 14);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(14), dp(14));
         lp.leftMargin = dp(8);
         iv.setLayoutParams(lp);
@@ -1788,15 +1848,15 @@ public class MainActivity extends AppCompatActivity {
             TextView hint = new TextView(this);
             Language.setText(hint, known != null ? Language.msg(l10n_mail_autofilled)
                     : Language.msg(l10n_mail_autofill_hint));
-            hint.setTextColor(Design.DIM2); hint.setTextSize(11f); hint.setPadding(0, dp(4), 0, 0);
+            hint.setTextColor(Design.DIM); hint.setTextSize(11f); hint.setPadding(0, dp(4), 0, 0);
             box.addView(hint);
             TextView scanAddr = textButton(Language.msg(l10n_mail_scan_address));
             scanAddr.setOnClickListener(v -> startAddrScan(addr));
             box.addView(scanAddr);
             if (myPayaddr.isEmpty()) fetchMyPayaddr();
             TextView mine = new TextView(this);
-            Language.setText(mine, Language.msg(l10n_mail_you_receive, myPayaddr.isEmpty() ? Language.msg(l10n_mail_getting_address) : shortKey(myPayaddr)));
-            mine.setTextColor(Design.DIM2); mine.setTextSize(10f); mine.setPadding(0, dp(8), 0, 0);
+            Language.setText(mine, Language.msg(l10n_mail_you_receive, myPayaddr.isEmpty() ? Language.msg(l10n_mail_getting_address) : myPayaddr));
+            mine.setTextColor(Design.DIM); mine.setTextSize(10f); mine.setPadding(0, dp(8), 0, 0);
             box.addView(mine);
             box.addView(label(Language.msg(l10n_mail_note)));
             final EditText memo = input(Language.msg(l10n_mail_note_hint));
@@ -1917,7 +1977,7 @@ public class MainActivity extends AppCompatActivity {
     private void payResult(boolean ok, CharSequence message, String txid) {
         AlertDialog.Builder b = languageDialog()
                 .setTitle(ok ? Language.msg(l10n_mail_payment_sent) : Language.msg(l10n_mail_payment_failed))
-                .setMessage(Language.join(message, ok && txid != null && !txid.isEmpty() ? Language.join("\n\n", Language.msg(l10n_mail_tx, shortKey(txid))) : ""))
+                .setMessage(Language.join(message, ok && txid != null && !txid.isEmpty() ? Language.join("\n\n", Language.msg(l10n_mail_tx, txid)) : ""))
                 .setPositiveButton(Language.msg(l10n_mail_ok), null);
         if (ok && txid != null && !txid.isEmpty()) b.setNeutralButton(Language.msg(l10n_mail_copy_tx), (d, w) -> { copy(txid, Language.msg(l10n_mail_tx_id)); toast(Language.msg(l10n_mail_copied)); });
         b.show();
@@ -2071,8 +2131,8 @@ public class MainActivity extends AppCompatActivity {
                     try { if (new java.math.BigDecimal(conf).signum() <= 0) continue; } catch (Exception e) { continue; }
                     String name;
                     Object tok = t.opt("token");
-                    if (tok instanceof JSONObject) name = ((JSONObject) tok).optString("name", shortKey(tid));
-                    else name = (tok == null) ? shortKey(tid) : tok.toString();
+                    if (tok instanceof JSONObject) name = ((JSONObject) tok).optString("name", tid);
+                    else name = (tok == null) ? tid : tok.toString();
                     if ("0x00".equals(tid)) name = "Minima";
                     out.add(new String[]{tid, name, conf});
                 }
@@ -2117,8 +2177,8 @@ public class MainActivity extends AppCompatActivity {
                     if (export) doExport(uri, pass); else doImport(uri, pass);
                 })
                 .setNegativeButton(Language.msg(l10n_mail_cancel), null).create();
-        secureBackup.show();
         secureBackup.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE);
+        secureBackup.show();
     }
 
     private void doExport(Uri uri, String pass) {
@@ -2205,8 +2265,12 @@ public class MainActivity extends AppCompatActivity {
     private void addContactDialog(String prefillKey) {
         LinearLayout box = pad(column());
         final EditText name = input(Language.msg(l10n_mail_name));
-        final EditText key = input(Language.msg(l10n_mail_their_key_hint));
-        if (prefillKey != null) Language.setText(key, prefillKey);
+        final EditText key = input(Language.msg(l10n_mail_address_input));
+        if (prefillKey != null) {
+            String linked = MailAddress.directKey(prefillKey);
+            Language.setText(key, linked == null ? prefillKey : linked);
+            if (linked != null) box.addView(label(MailAddress.phrase(linked)));
+        }
         LinearLayout scan = new LinearLayout(this);
         scan.setOrientation(LinearLayout.HORIZONTAL);
         scan.setGravity(Gravity.CENTER_VERTICAL);
@@ -2219,13 +2283,105 @@ public class MainActivity extends AppCompatActivity {
         scan.setOnClickListener(v -> startScan(key));
         box.addView(label(Language.msg(l10n_mail_name))); box.addView(name);
         box.addView(label(Language.msg(l10n_mail_mail_key))); box.addView(key); box.addView(scan);
-        languageDialog().setTitle(Language.msg(l10n_mail_add_contact)).setView(box)
-                .setPositiveButton(Language.msg(l10n_mail_add), (d, w) -> {
-                    String n = name.getText().toString().trim(), k = acceptKeyShare(key.getText().toString());
-                    if (n.isEmpty() || !CommsIdentity.isValidPublicId(k)) { toast(Language.msg(l10n_mail_contact_invalid)); return; }
-                    io.execute(() -> { db.addContact(n, k); ui.post(() -> { contactNames = null; refreshFolderIfVisible(); }); });
-                })
-                .setNegativeButton(Language.msg(l10n_mail_cancel), null).show();
+        TextView enter = textButton(Language.msg(l10n_mail_enter_words));
+        enter.setOnClickListener(v -> enterAddressWords(key)); box.addView(enter);
+        AlertDialog dialog = languageDialog().setTitle(Language.msg(l10n_mail_add_contact)).setView(box)
+                .setPositiveButton(Language.msg(l10n_mail_add), null).setNegativeButton(Language.msg(l10n_mail_cancel), null).create();
+        dialog.setOnShowListener(unused -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String n = name.getText().toString().trim();
+            if (n.isEmpty()) { name.setError("Enter a name"); return; }
+            resolveRecipient(key, k -> {
+                db.addContact(n, k);
+                contactNames = null;
+                dialog.dismiss();
+                refreshFolderIfVisible();
+            });
+        }));
+        dialog.show();
+    }
+
+    private void enterAddressWords(EditText target) {
+        AddressWordEntry entry = new AddressWordEntry(this, Design.TEXT);
+        ScrollView scroll = new ScrollView(this); scroll.addView(entry.view);
+        AlertDialog dialog = languageDialog().setTitle(Language.msg(l10n_mail_words_title)).setView(scroll)
+                .setPositiveButton(Language.msg(l10n_mail_use_address), null).setNegativeButton(Language.msg(l10n_mail_cancel), null).create();
+        dialog.setOnShowListener(unused -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String words = entry.phrase();
+            if (words == null) { toast("Check word " + entry.firstProblem()); return; }
+            Language.setText(target, MailAddress.normalize(words));
+            dialog.dismiss();
+        }));
+        dialog.show();
+    }
+
+    private void resolveRecipient(EditText field, java.util.function.Consumer<String> use) {
+        String typed = field.getText().toString();
+        String key = acceptKeyShare(typed);
+        if (MailAddress.isKey(key)) { use.accept(key); return; }
+        // Older Mail clients also accepted bare 128-digit keys.
+        if (key.matches("[0-9a-fA-F]{128}")) { use.accept(key); return; }
+        String phrase = MailAddress.normalize(typed);
+        if (phrase == null) { field.setError(Language.msg(l10n_mail_invalid_words)); return; }
+        String local = null;
+        for (String[] contact : db.contacts()) {
+            String id = contact[2];
+            if (!MailAddress.isKey(id) || !MailAddress.phrase(id).equals(phrase)) continue;
+            if (local != null && !local.equalsIgnoreCase(id)) { field.setError(Language.msg(l10n_mail_ambiguous_words)); return; }
+            local = id;
+        }
+        if (local != null) { use.accept(local); return; }
+        if (field.getTag() != null) return;
+        field.setTag(typed);
+        toast(Language.msg(l10n_mail_lookup));
+        MailBeacon.find(node, phrase, MailBeacon.DISCOVERY, (card, error) -> {
+            field.setTag(null);
+            if (!field.isAttachedToWindow() || !typed.equals(field.getText().toString())) return;
+            if (error != null || card == null) {
+                field.setError(error == null ? Language.msg(l10n_mail_no_beacon) : error);
+                return;
+            }
+            db.setMeta("card:" + card.key, card.link());
+            use.accept(card.key);
+        });
+    }
+
+    private void addAddressControls(LinearLayout form) {
+        String phrase = MailAddress.phrase(myId);
+        TextView words = label(phrase);
+        words.setTextIsSelectable(true); form.addView(words);
+        TextView copyWords = textButton(Language.msg(l10n_mail_copy_words));
+        copyWords.setOnClickListener(v -> { copy(phrase, Language.msg(l10n_mail_address_clipboard)); toast(Language.msg(l10n_mail_address_copied)); });
+        form.addView(copyWords);
+        TextView share = accentButton(Language.msg(l10n_mail_share_link));
+        share.setOnClickListener(v -> {
+            Intent send = new Intent(Intent.ACTION_SEND).setType("text/plain")
+                    .putExtra(Intent.EXTRA_TEXT, phrase + "\n" + MailAddress.directLink(myId));
+            startActivity(Intent.createChooser(send, Language.msg(l10n_mail_share_contact)));
+        });
+        form.addView(share);
+        boolean active = AddressRenewal.enabled(this, myId);
+        TextView publish = textButton(active ? Language.msg(l10n_mail_stop_publishing) : Language.msg(l10n_mail_publish_address));
+        publish.setOnClickListener(v -> changePublication(MailAddress.sign(identity)));
+        form.addView(publish);
+        if (active) {
+            String status = AddressRenewal.prefs(this).getString("status-" + myId, "Publication scheduled");
+            form.addView(label(status));
+            if (MailBeacon.PENDING_STATUS.equals(status)) form.addView(label("If you dismissed the request in Core, stop publishing and enable it again to retry."));
+        }
+    }
+
+    private void changePublication(MailAddress.Card card) {
+        if (AddressRenewal.enabled(this, card.key)) {
+            AddressRenewal.disable(this, card.key);
+            toast(Language.msg(l10n_mail_renewal_stopped));
+            refreshFolderIfVisible(); return;
+        }
+        languageDialog().setTitle(Language.msg(l10n_mail_publish_question))
+                .setMessage(Language.msg(l10n_mail_publish_help))
+                .setPositiveButton("Enable", (d,w) -> {
+                    AddressRenewal.enable(this, card); refreshFolderIfVisible();
+                    toast(Language.msg(l10n_mail_publication_scheduled));
+                }).setNegativeButton(Language.msg(l10n_mail_cancel), null).show();
     }
 
     private void pickContact(EditText target) {
@@ -2267,18 +2423,32 @@ public class MainActivity extends AppCompatActivity {
 
     // ---- view helpers ----
 
+    private void showSetupMessage(CharSequence message) {
+        Language.setText(setupMessage, message);
+        pairingBanner.setVisibility(View.VISIBLE);
+    }
+
     private LinearLayout buildPairingBanner() {
         LinearLayout b = new LinearLayout(this);
         b.setOrientation(LinearLayout.VERTICAL);
         b.setBackgroundColor(Design.SURFACE);
         b.setPadding(dp(16), dp(14), dp(16), dp(14));
-        TextView t1 = new TextView(this); Language.setText(t1, Language.msg(l10n_mail_node_not_ready)); t1.setTextColor(Design.ACCENT_TEXT); t1.setTextSize(15f); t1.setTypeface(Typeface.DEFAULT_BOLD);
-        TextView t2 = new TextView(this); Language.setText(t2, Language.msg(l10n_mail_node_retry)); t2.setTextColor(Design.DIM); t2.setTextSize(13f); t2.setPadding(0, dp(4), 0, dp(8));
+        setupMessage = new TextView(this);
+        setupMessage.setTextColor(Design.TEXT);
+        setupMessage.setTextSize(15f);
+        setupMessage.setPadding(0, 0, 0, dp(8));
         TextView open = accentButton(Language.msg(l10n_mail_open_core));
-        open.setOnClickListener(v -> { Intent i = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium");
-        if (i == null) i = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.minimablock");
-        if (i == null) i = getPackageManager().getLaunchIntentForPackage("com.eurobuddha.pandamonium"); if (i != null) startActivity(i); else toast(Language.msg(l10n_mail_no_core)); });
-        b.addView(t1); b.addView(t2); b.addView(open);
+        open.setOnClickListener(v -> {
+            Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+            if (intent == null) { toast(Language.msg(l10n_mail_no_core)); return; }
+            coreOpenedForSetup = true;
+            startActivity(intent);
+        });
+        TextView retry = textButton("Try again");
+        retry.setOnClickListener(v -> recreate());
+        b.addView(setupMessage);
+        b.addView(open);
+        b.addView(retry);
         return b;
     }
 
@@ -2297,7 +2467,7 @@ public class MainActivity extends AppCompatActivity {
         if (back) {
             h.addView(iconBtn(R.drawable.pm_mail_ic_back, v -> pop()));
         } else {
-            ImageView burger = iconBtn(R.drawable.pm_mail_ic_menu, v -> drawer.openDrawer(androidx.core.view.GravityCompat.START));
+            ImageView burger = iconBtn(R.drawable.pm_mail_ic_menu, v -> drawer.openDrawer(GravityCompat.START));
             h.addView(burger);
         }
         TextView t = new TextView(this);
@@ -2343,7 +2513,7 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText input(CharSequence hint) {
         EditText e = new EditText(this);
-        Language.hint(e, hint); e.setHintTextColor(Design.DIM2); e.setTextColor(Design.TEXT); e.setTextSize(14f);
+        Language.hint(e, hint); e.setHintTextColor(Design.DIM); e.setTextColor(Design.TEXT); e.setTextSize(14f);
         e.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         e.setBackground(Design.cardBg(this, Design.SURFACE, 10));
         int p = dp(12); e.setPadding(p, p, p, p);
@@ -2384,14 +2554,7 @@ public class MainActivity extends AppCompatActivity {
             contactNames = m;
         }
         String n = contactNames.get(key);
-        return n != null ? n : shortKey(key);
-    }
-
-    private static String shortKey(String key) {
-        if (key == null) return "—";
-        String h = key.startsWith("0x") ? key.substring(2) : key;
-        if (h.length() <= 14) return key;
-        return "0x" + h.substring(0, 8) + "…" + h.substring(h.length() - 6);
+        return n != null ? n : key;
     }
 
     private CharSequence previewText(MailMessage t) {

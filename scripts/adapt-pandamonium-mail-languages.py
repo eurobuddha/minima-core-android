@@ -59,18 +59,8 @@ def adapt(root):
  change('        super.onDestroy();','        for (AlertDialog value : new java.util.ArrayList<>(languageDialogs)) value.dismiss();\n        languageDialogs.clear();\n        for (PopupMenu value : new java.util.ArrayList<>(languageMenus.keySet())) value.dismiss();\n        languageMenus.clear();\n        super.onDestroy();')
  change('new AlertDialog.Builder(this)','languageDialog()');change('new AlertDialog.Builder(MainActivity.this)','languageDialog()')
  change('        pm.show();','        showLanguageMenu(pm);');change('        m.show();','        showLanguageMenu(m);')
- # Reuse the attachment popup's anchor pattern for the conversation actions.
- change('v -> conversationMenu(otherKey, hashref)', 'v -> conversationMenu(v, otherKey, hashref)')
- change('conversationMenu(String otherKey, String hashref)', 'conversationMenu(View anchor, String otherKey, String hashref)')
- change('new androidx.appcompat.widget.PopupMenu(this, container)', 'new androidx.appcompat.widget.PopupMenu(this, anchor)')
- # Apply the existing seed-dialog protection to the backup passphrase dialog too.
- start=s.index('    private void promptBackupPass(');end=s.index('    private void doExport(',start)
- backup=s[start:end].replace('        languageDialog()', '        AlertDialog secureBackup = languageDialog()',1)
- backup=backup.replace('.setNegativeButton("Cancel", null).show();', '.setNegativeButton("Cancel", null).create();\n        secureBackup.show();\n        secureBackup.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE);')
- s=s[:start]+backup+s[end:]
-
  change('"connecting to your node…"',msg('connecting'));change('"(connecting to your node…)"',msg('connecting'))
- change('"you · " + shortKey(myId)',msg('youKey','shortKey(myId)'))
+ change('"you · " + MailAddress.phrase(myId)',msg('youKey','MailAddress.phrase(myId)'))
  change('"Enable Minima Mail in Minima Core → Apps."',msg('nodeRetry'))
  # Retain display descriptors through all compositions; subject/name/memo inputs remain literal.
  change('String blk = chainBlock > 0 ? "block " + String.format(java.util.Locale.ENGLISH, "%,d", chainBlock) : "the chain";', 'CharSequence blk = chainBlock > 0 ? '+msg('block','chainBlock')+' : '+msg('chain')+';')
@@ -78,16 +68,13 @@ def adapt(root):
  change('String ago = m < 1 ? "just now" : m + " min ago";','CharSequence ago = Language.since(last);')
  change('"Checked " + blk + " · " + ago',msg('checked','blk','ago'))
  change('(t.incoming ? "" : "You: ") + previewText(t)','t.incoming ? previewText(t) : '+msg('youPreview','previewText(t)'))
- change('"To " + nameFor(m.topublickey) + " — " + subj',msg('toSubject','nameFor(m.topublickey)','subj'))
  change('"Confirmed" + (m.sentblock > 0 ? " · block " + String.format(java.util.Locale.ENGLISH, "%,d", m.sentblock) : "")','Language.join('+msg('confirmed')+', m.sentblock > 0 ? Language.join(" · ", '+msg('block','m.sentblock')+') : "")')
  change('"On-chain" + (m.sentblock > 0 ? " · block " + String.format(java.util.Locale.ENGLISH, "%,d", m.sentblock) : "") + " — confirming"',msg('confirming','Language.join('+msg('onChain')+', m.sentblock > 0 ? Language.join(" · ", '+msg('block','m.sentblock')+') : "")'))
  change('"On-chain" + (r.m.sentblock > 0 ? " · blk " + String.format(java.util.Locale.ENGLISH, "%,d", r.m.sentblock) : "")','Language.join('+msg('onChain')+', r.m.sentblock > 0 ? Language.join(" · ", '+msg('block','r.m.sentblock')+') : "")')
- change('nameFor(otherKey) + " · " + shortKey(otherKey)','Language.join(nameFor(otherKey), " · ", shortKey(otherKey))')
- change('"Delete contact " + name + "?"',msg('deleteContact','name'))
  change('"Send failed: " + err + " — kept in Outbox."',msg('sendError','MailMessages.message(err)'))
  change('(nameFor(m.frompublickey) + " sent you")',msg('sentYou','nameFor(m.frompublickey)'))
  change('sel[1] + "   ·   balance " + sel[2]',msg('tokenBalance','sel[1]','sel[2]'))
- change('"You\'ll receive at: " + (myPayaddr.isEmpty() ? "(getting your address…)" : shortKey(myPayaddr))',msg('youReceive','myPayaddr.isEmpty() ? '+msg('gettingAddress')+' : shortKey(myPayaddr)'))
+ change('"You\'ll receive at: " + (myPayaddr.isEmpty() ? "(getting your address…)" : myPayaddr)',msg('youReceive','myPayaddr.isEmpty() ? '+msg('gettingAddress')+' : myPayaddr'))
  change('"Send funds to " + nameFor(otherKey)',msg('sendTo','nameFor(otherKey)'))
  change('"Enter " + nameFor(otherKey) + "\'s Minima receiving address (0x… or Mx…)."',msg('enterAddress','nameFor(otherKey)'))
  change('"Send " + amountStr + " " + tokenname + "?"',msg('confirmSend','amountStr','tokenname'))
@@ -97,11 +84,15 @@ def adapt(root):
  change(r'"The node rejected the payment.\n" + j.optString("error", "")',msg('paymentRejected','j.optString("error", "")'))
  change('"Sent " + amountStr + " " + tokenname + " to " + nameFor(otherKey) + "."',msg('paid','amountStr','tokenname','nameFor(otherKey)'))
  change('"Payment failed: " + m',msg('paymentError','MailMessages.message(m)'))
- change(r'message + (ok && txid != null && !txid.isEmpty() ? "\n\nTx: " + shortKey(txid) : "")','Language.join(message, ok && txid != null && !txid.isEmpty() ? Language.join("\\n\\n", '+msg('tx','shortKey(txid)')+') : "")')
+ change(r'message + (ok && txid != null && !txid.isEmpty() ? "\n\nTx: " + txid : "")','Language.join(message, ok && txid != null && !txid.isEmpty() ? Language.join("\\n\\n", '+msg('tx','txid')+') : "")')
  change('"Image send failed: " + e + " — kept in Outbox."',msg('imageError','MailMessages.message(e)'))
  change('"Backup failed: " + e.getMessage()',msg('backupError','MailMessages.error(e)'))
  start=s.index('        t.setText("Minima Mail is on-chain');end=s.index(');',start)+2
  s=s[:start]+'        t.setText('+msg('help')+');'+s[end:]
+ # The host owns its embedded node. Retry setup in place without launching the standalone companion settings.
+ change('"Open Minima Core → Apps, enable Minima Mail and grant it Admin access."', msg('nodeRetry'))
+ change('void showSetupMessage(String message)', 'void showSetupMessage(CharSequence message)')
+ change('"Mail could not save your identity. Try again or restore a backup from Your key."', msg('identitySaveFailed'))
  # Use native locale-sensitive timestamps and the already tested relative-time implementation.
  start=s.index('    private static String clock(');end=s.index('\n    private int dp(',start)
  s=s[:start]+'''    private static CharSequence clock(long ms) { return Language.stamp(ms, "Hm"); }
@@ -129,8 +120,8 @@ def adapt(root):
   literal=json.dumps(catalog[labels[key]]['en'],ensure_ascii=False)
   # Some labels have already been consumed by a composed descriptor above.
   if literal in s:change(literal,msg(key))
-  elif key not in {'confirmed'}:raise AssertionError(('Unused Mail label',key))
- replacements=[('navItem(int iconRes, String label','navItem(int iconRes, CharSequence label'),('buildStatusList(String title','buildStatusList(CharSequence title'),('String label; int labelColor','CharSequence label; int labelColor'),('String label = null; int labelColor','CharSequence label = null; int labelColor'),('final String dateHeader','final CharSequence dateHeader'),('MailMessage m, String dateHeader','MailMessage m, CharSequence dateHeader'),('String header = null','CharSequence header = null'),('fieldRow(String label','fieldRow(CharSequence label'),('fieldChip(int iconRes, String label','fieldChip(int iconRes, CharSequence label'),('attachChip(int iconRes, String label','attachChip(int iconRes, CharSequence label'),('settingsGroup(String s)','settingsGroup(CharSequence s)'),('settingsRow(String title, String detail)','settingsRow(CharSequence title, CharSequence detail)'),('segOption(String label','segOption(CharSequence label'),('payResult(boolean ok, String message','payResult(boolean ok, CharSequence message'),('progressDialog(String title, String msg)','progressDialog(CharSequence title, CharSequence msg)'),('header(String title','header(CharSequence title'),('label(String s)','label(CharSequence s)'),('input(String hint)','input(CharSequence hint)'),('accentButton(String s)','accentButton(CharSequence s)'),('textButton(String s)','textButton(CharSequence s)'),('accentOutlineButton(String s)','accentOutlineButton(CharSequence s)'),('toast(String s)','toast(CharSequence s)'),('copy(String text, String label)','copy(String text, CharSequence label)'),('private String previewText','private CharSequence previewText'),('private String nameFor','private CharSequence nameFor'),('String name = nameFor','CharSequence name = nameFor'),('String subj = (m.subject','CharSequence subj = (m.subject'),('avatar(String key, String name','avatar(String key, CharSequence name'),('Avatars.view(this, key, name, sizeDp)','Avatars.view(this, key, name.toString(), sizeDp)'),('drawSwipeLabel(Canvas c, String text','drawSwipeLabel(Canvas c, CharSequence text'),('c.drawText(text, x, y, tp)','c.drawText(text.toString(), x, y, tp)'),('String[] items = {archivedView','CharSequence[] items = {archivedView'),('s.toUpperCase(java.util.Locale.ENGLISH)','Language.upper(s)')]
+  elif key not in {'confirmed', 'identitySaveFailed', 'seedHint', 'createIdentity', 'identityHelp', 'create', 'restoreInstead', 'toHint', 'validKeyFirst', 'theirKeyHint', 'contactInvalid', 'nodeNotReady', 'nodeRetry'}:raise AssertionError(('Unused Mail label',key))
+ replacements=[('navItem(int iconRes, String label','navItem(int iconRes, CharSequence label'),('buildStatusList(String title','buildStatusList(CharSequence title'),('String label; int labelColor','CharSequence label; int labelColor'),('String label = null; int labelColor','CharSequence label = null; int labelColor'),('final String dateHeader','final CharSequence dateHeader'),('MailMessage m, String dateHeader','MailMessage m, CharSequence dateHeader'),('String header = null','CharSequence header = null'),('fieldRow(String label','fieldRow(CharSequence label'),('fieldChip(int iconRes, String label','fieldChip(int iconRes, CharSequence label'),('attachChip(int iconRes, String label','attachChip(int iconRes, CharSequence label'),('settingsGroup(String s)','settingsGroup(CharSequence s)'),('settingsRow(String title, String detail)','settingsRow(CharSequence title, CharSequence detail)'),('segOption(String label','segOption(CharSequence label'),('payResult(boolean ok, String message','payResult(boolean ok, CharSequence message'),('progressDialog(String title, String msg)','progressDialog(CharSequence title, CharSequence msg)'),('header(String title','header(CharSequence title'),('label(String s)','label(CharSequence s)'),('input(String hint)','input(CharSequence hint)'),('accentButton(String s)','accentButton(CharSequence s)'),('textButton(String s)','textButton(CharSequence s)'),('accentOutlineButton(String s)','accentOutlineButton(CharSequence s)'),('toast(String s)','toast(CharSequence s)'),('copy(String text, String label)','copy(String text, CharSequence label)'),('private String previewText','private CharSequence previewText'),('private String nameFor','private CharSequence nameFor'),('String name = nameFor','CharSequence name = nameFor'),('String toName = nameFor','CharSequence toName = nameFor'),('String otherName = nameFor','CharSequence otherName = nameFor'),('avatar(String key, String name','avatar(String key, CharSequence name'),('Avatars.view(this, key, name, sizeDp)','Avatars.view(this, key, name.toString(), sizeDp)'),('drawSwipeLabel(Canvas c, String text','drawSwipeLabel(Canvas c, CharSequence text'),('c.drawText(text, x, y, tp)','c.drawText(text.toString(), x, y, tp)'),('String[] items = {archivedView','CharSequence[] items = {archivedView'),('s.toUpperCase(java.util.Locale.ENGLISH)','Language.upper(s)')]
  for old,new in replacements:change(old,new)
  change('o.setPrompt(isAddress ? '+msg('scanMailAddress')+' : '+msg('scanMailKey')+');','o.setPrompt((isAddress ? '+msg('scanMailAddress')+' : '+msg('scanMailKey')+').toString());')
  # Bound the existing factories, including raw text. Strings are literal and are never looked up.
@@ -147,17 +138,7 @@ def adapt(root):
  # Keep Minima orange for fills; the paper palette needs a darker orange for small text.
  s=s.replace('setTextColor(Design.ACCENT)', 'setTextColor(Design.ACCENT_TEXT)')
  s=s.replace('sel ? Design.ACCENT : Design.TEXT', 'sel ? Design.ACCENT_TEXT : Design.TEXT')
- s=s.replace('labelColor = Design.ACCENT', 'labelColor = Design.ACCENT_TEXT')
  p.write_text(s)
- p=folder/'Design.java';d=p.read_text()
- d=d.replace('public static int ACCENT;', 'public static int ACCENT;\n    public static int ACCENT_TEXT;')
- d=d.replace('0xFF9B968D','0xFF6E6A63').replace('ON_ACCENT = 0xFFFFFFFF','ON_ACCENT = 0xFF1A1000').replace('0xFF6A6A78','0xFF9A9AA8').replace('0xFFE74C3C','0xFFFF5B5B')
- d=d.replace('        IN = GREEN;', '        ACCENT_TEXT = LIGHT ? 0xFF9B4A00 : ACCENT;\n        IN = GREEN;');p.write_text(d)
- for qualifier in ['values','values-night']:
-  p=root/('mail/src/main/res/'+qualifier+'/themes.xml');d=p.read_text()
-  dark=qualifier=='values-night'
-  palette={'colorPrimary':'#F7931A' if dark else '#9B4A00', 'colorAccent':'#F7931A' if dark else '#9B4A00', 'colorSurface':'#15151F' if dark else '#FFFFFF','colorSurfaceContainerHigh':'#15151F' if dark else '#FFFFFF','colorOnSurface':'#FFFFFF' if dark else '#1C1B1A','colorOnSurfaceVariant':'#9A9AA8' if dark else '#6E6A63','android:textColorPrimary':'#FFFFFF' if dark else '#1C1B1A','android:textColorSecondary':'#9A9AA8' if dark else '#6E6A63'}
-  d=d.replace('    </style>',''.join('        <item name="'+k+'">'+v+'</item>\n' for k,v in palette.items())+'    </style>',1);p.write_text(d)
  # The wrapper and DirectNodeApi provide these exact diagnostics. Remote error fields stay literal.
  spec=json.loads((project/'localization/vestr-errors.json').read_text())
  spec['fixed']['NOT_ENABLED']='mail.nodeRetry'

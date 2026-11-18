@@ -8,10 +8,6 @@ def adapt(root):
         assert s.count(old)==count,(relative,old,s.count(old))
         p.write_text(s.replace(old,new))
     # Donors: apks/mail MainActivity, apks/NFTwallet ReceiveView, apks/merchstudio MainActivity.
-    for method,count in [('isDrawerOpen',1),('closeDrawer',2),('openDrawer',1)]:
-        change('mail/src/main/java/com/eurobuddha/mail/MainActivity.java',
-            'drawer.'+method+'(Gravity.START)',
-            'drawer.'+method+'(androidx.core.view.GravityCompat.START)',count)
     change('NFTwallet/src/main/java/com/eurobuddha/nftwallet/ReceiveView.java',
         'android.text.Layout.BREAK_STRATEGY_SIMPLE','android.graphics.text.LineBreaker.BREAK_STRATEGY_SIMPLE')
     change('merchstudio/src/main/java/com/eurobuddha/merchstudio/MainActivity.java',

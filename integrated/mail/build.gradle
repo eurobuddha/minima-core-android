@@ -5,8 +5,8 @@ android {
     compileSdk 36
     defaultConfig {
         minSdk 28
-        buildConfigField 'String', 'VERSION_NAME', '"0.5.11"'
-        buildConfigField 'int', 'VERSION_CODE', '511'
+        buildConfigField 'String', 'VERSION_NAME', '"0.5.19"'
+        buildConfigField 'int', 'VERSION_CODE', '519'
     }
     buildFeatures { buildConfig true }
     compileOptions {
@@ -16,7 +16,10 @@ android {
 }
 dependencies {
     implementation project(':localization')
+    implementation 'androidx.work:work-runtime:2.9.1'
     implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+    androidTestImplementation 'androidx.test:runner:1.7.0'
+    androidTestImplementation libs.ext.junit
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20240303'
     testImplementation 'org.mockito:mockito-core:5.12.0'

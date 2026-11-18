@@ -8532,4 +8532,26 @@
     <string name="l10n_apps_unverified_body">"此应用尚未证明它是 %1$s。请将其更新到最新版本并打开一次，它会自动完成验证。只有在您刚刚亲自安装它时，才可在未验证状态下启用。"</string>
     <string name="l10n_apps_twin_refused" formatted="false">"此应用的另一个已验证条目在过去一天内仍在使用，而此条目尚未证明其身份，因此无法启用。如果您亲自重新安装了此应用，请删除较旧的条目（或等待一天）。否则请删除此条目。"</string>
     <string name="l10n_apps_enable_anyway" formatted="false">"仍然启用"</string>
+    <string name="l10n_mail_address_input" formatted="false">"六个地址词、联系人链接或邮件公钥"</string>
+    <string name="l10n_mail_enter_words" formatted="false">"输入地址词"</string>
+    <string name="l10n_mail_words_title" formatted="false">"邮件地址词"</string>
+    <string name="l10n_mail_use_address" formatted="false">"使用地址"</string>
+    <string name="l10n_mail_copy_words" formatted="false">"复制地址词"</string>
+    <string name="l10n_mail_address_clipboard" formatted="false">"邮件地址"</string>
+    <string name="l10n_mail_share_link" formatted="false">"分享联系人链接"</string>
+    <string name="l10n_mail_share_contact" formatted="false">"分享邮件联系人"</string>
+    <string name="l10n_mail_stop_publishing" formatted="false">"停止发布地址"</string>
+    <string name="l10n_mail_publish_address" formatted="false">"发布我的地址"</string>
+    <string name="l10n_mail_publish_question" formatted="false">"允许其他人查找此地址？"</string>
+    <string name="l10n_mail_publish_help" formatted="false">"节点将发布公开联系人名片并定期续期。每次发布花费一个 nano-Minima，并使用一次钱包签名。其他设备可以转发名片。"</string>
+    <string name="l10n_mail_relay_address" formatted="false">"转发地址"</string>
+    <string name="l10n_mail_stop_relay" formatted="false">"停止转发"</string>
+    <string name="l10n_mail_relay_stopped" formatted="false">"已停止转发。"</string>
+    <string name="l10n_mail_ask_publish" formatted="false">"请先让此联系人发布地址。"</string>
+    <string name="l10n_mail_lookup" formatted="false">"正在查找地址…"</string>
+    <string name="l10n_mail_no_beacon" formatted="false">"当前找不到地址。请索要联系人链接。"</string>
+    <string name="l10n_mail_ambiguous_words" formatted="false">"地址不唯一。请索要联系人链接。"</string>
+    <string name="l10n_mail_invalid_words" formatted="false">"请输入六个地址词、联系人链接或邮件公钥。"</string>
+    <string name="l10n_mail_publication_scheduled" formatted="false">"已安排地址发布。"</string>
+    <string name="l10n_mail_renewal_stopped" formatted="false">"此设备已停止续期地址。"</string>
 </resources>

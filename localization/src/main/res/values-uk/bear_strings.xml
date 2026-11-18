@@ -8643,4 +8643,26 @@
     <string name="l10n_apps_unverified_body">"Цей застосунок ще не підтвердив, що він — %1$s. Оновіть його до останньої версії й відкрийте один раз: після цього він підтвердиться сам. Вмикайте його непідтвердженим, лише якщо ви щойно самі його встановили."</string>
     <string name="l10n_apps_twin_refused" formatted="false">"Інший, підтверджений запис цього застосунку використовувався протягом останньої доби, а цей запис не підтвердив свою справжність, тому його не можна ввімкнути. Якщо ви самі перевстановили застосунок, видаліть СТАРИЙ запис (або зачекайте добу). Інакше видаліть цей."</string>
     <string name="l10n_apps_enable_anyway" formatted="false">"Все одно ввімкнути"</string>
+    <string name="l10n_mail_address_input" formatted="false">"Шість слів, посилання на контакт або ключ пошти"</string>
+    <string name="l10n_mail_enter_words" formatted="false">"Ввести слова адреси"</string>
+    <string name="l10n_mail_words_title" formatted="false">"Слова поштової адреси"</string>
+    <string name="l10n_mail_use_address" formatted="false">"Використати адресу"</string>
+    <string name="l10n_mail_copy_words" formatted="false">"Копіювати слова адреси"</string>
+    <string name="l10n_mail_address_clipboard" formatted="false">"Поштова адреса"</string>
+    <string name="l10n_mail_share_link" formatted="false">"Поділитися посиланням на контакт"</string>
+    <string name="l10n_mail_share_contact" formatted="false">"Поділитися поштовим контактом"</string>
+    <string name="l10n_mail_stop_publishing" formatted="false">"Припинити публікацію адреси"</string>
+    <string name="l10n_mail_publish_address" formatted="false">"Опублікувати мою адресу"</string>
+    <string name="l10n_mail_publish_question" formatted="false">"Зробити адресу доступною для пошуку?"</string>
+    <string name="l10n_mail_publish_help" formatted="false">"Вузол опублікує відкриту картку контакту й оновлюватиме її. Кожна публікація витрачає одну нано-Minima та один підпис гаманця. Інші пристрої можуть ретранслювати картку."</string>
+    <string name="l10n_mail_relay_address" formatted="false">"Ретранслювати адресу"</string>
+    <string name="l10n_mail_stop_relay" formatted="false">"Зупинити ретрансляцію"</string>
+    <string name="l10n_mail_relay_stopped" formatted="false">"Ретрансляцію зупинено."</string>
+    <string name="l10n_mail_ask_publish" formatted="false">"Попросіть контакт спочатку опублікувати адресу."</string>
+    <string name="l10n_mail_lookup" formatted="false">"Пошук адреси…"</string>
+    <string name="l10n_mail_no_beacon" formatted="false">"Зараз адресу не знайдено. Попросіть посилання на контакт."</string>
+    <string name="l10n_mail_ambiguous_words" formatted="false">"Неоднозначна адреса. Попросіть посилання на контакт."</string>
+    <string name="l10n_mail_invalid_words" formatted="false">"Введіть шість слів адреси, посилання на контакт або ключ пошти."</string>
+    <string name="l10n_mail_publication_scheduled" formatted="false">"Публікацію адреси заплановано."</string>
+    <string name="l10n_mail_renewal_stopped" formatted="false">"Цей пристрій припинив оновлювати адресу."</string>
 </resources>

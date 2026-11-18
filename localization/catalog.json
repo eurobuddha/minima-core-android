@@ -43027,5 +43027,137 @@
     "zh-Hans": "keets 传输已关闭 - 请在启动参数中开启后再使用聊天",
     "ru": "Транспорт keets выключен - включите его в параметрах запуска, чтобы пользоваться чатом",
     "uk": "Транспорт keets вимкнено - увімкніть його в параметрах запуску, щоб користуватися чатом"
+  },
+  "mail.addressInput": {
+    "en": "Six words, contact link or Mail key",
+    "zh-Hans": "六个地址词、联系人链接或邮件公钥",
+    "ru": "Шесть слов, ссылка на контакт или ключ почты",
+    "uk": "Шість слів, посилання на контакт або ключ пошти"
+  },
+  "mail.enterWords": {
+    "en": "Enter address words",
+    "zh-Hans": "输入地址词",
+    "ru": "Ввести слова адреса",
+    "uk": "Ввести слова адреси"
+  },
+  "mail.wordsTitle": {
+    "en": "Mail address words",
+    "zh-Hans": "邮件地址词",
+    "ru": "Слова почтового адреса",
+    "uk": "Слова поштової адреси"
+  },
+  "mail.useAddress": {
+    "en": "Use address",
+    "zh-Hans": "使用地址",
+    "ru": "Использовать адрес",
+    "uk": "Використати адресу"
+  },
+  "mail.copyWords": {
+    "en": "Copy address words",
+    "zh-Hans": "复制地址词",
+    "ru": "Копировать слова адреса",
+    "uk": "Копіювати слова адреси"
+  },
+  "mail.addressClipboard": {
+    "en": "Mail address",
+    "zh-Hans": "邮件地址",
+    "ru": "Почтовый адрес",
+    "uk": "Поштова адреса"
+  },
+  "mail.shareLink": {
+    "en": "Share contact link",
+    "zh-Hans": "分享联系人链接",
+    "ru": "Поделиться ссылкой на контакт",
+    "uk": "Поділитися посиланням на контакт"
+  },
+  "mail.shareContact": {
+    "en": "Share Mail contact",
+    "zh-Hans": "分享邮件联系人",
+    "ru": "Поделиться почтовым контактом",
+    "uk": "Поділитися поштовим контактом"
+  },
+  "mail.stopPublishing": {
+    "en": "Stop publishing address",
+    "zh-Hans": "停止发布地址",
+    "ru": "Прекратить публикацию адреса",
+    "uk": "Припинити публікацію адреси"
+  },
+  "mail.publishAddress": {
+    "en": "Publish my address",
+    "zh-Hans": "发布我的地址",
+    "ru": "Опубликовать мой адрес",
+    "uk": "Опублікувати мою адресу"
+  },
+  "mail.publishQuestion": {
+    "en": "Keep this address discoverable?",
+    "zh-Hans": "允许其他人查找此地址？",
+    "ru": "Сделать адрес доступным для поиска?",
+    "uk": "Зробити адресу доступною для пошуку?"
+  },
+  "mail.publishHelp": {
+    "en": "Your node will post a public contact card and renew it when it fades. Each post uses one nano-Minima plus a wallet signing operation. Other devices can relay the card.",
+    "zh-Hans": "节点将发布公开联系人名片并定期续期。每次发布花费一个 nano-Minima，并使用一次钱包签名。其他设备可以转发名片。",
+    "ru": "Узел опубликует открытую карточку контакта и будет её обновлять. Каждая публикация расходует одну нано-Minima и одну подпись кошелька. Другие устройства могут ретранслировать карточку.",
+    "uk": "Вузол опублікує відкриту картку контакту й оновлюватиме її. Кожна публікація витрачає одну нано-Minima та один підпис гаманця. Інші пристрої можуть ретранслювати картку."
+  },
+  "mail.relayAddress": {
+    "en": "Relay address",
+    "zh-Hans": "转发地址",
+    "ru": "Ретранслировать адрес",
+    "uk": "Ретранслювати адресу"
+  },
+  "mail.stopRelay": {
+    "en": "Stop relaying",
+    "zh-Hans": "停止转发",
+    "ru": "Остановить ретрансляцию",
+    "uk": "Зупинити ретрансляцію"
+  },
+  "mail.relayStopped": {
+    "en": "Relay stopped.",
+    "zh-Hans": "已停止转发。",
+    "ru": "Ретрансляция остановлена.",
+    "uk": "Ретрансляцію зупинено."
+  },
+  "mail.askPublish": {
+    "en": "Ask this contact to publish their address first.",
+    "zh-Hans": "请先让此联系人发布地址。",
+    "ru": "Попросите контакт сначала опубликовать адрес.",
+    "uk": "Попросіть контакт спочатку опублікувати адресу."
+  },
+  "mail.lookup": {
+    "en": "Looking up address…",
+    "zh-Hans": "正在查找地址…",
+    "ru": "Поиск адреса…",
+    "uk": "Пошук адреси…"
+  },
+  "mail.noBeacon": {
+    "en": "Address isn’t currently discoverable. Ask for a contact link.",
+    "zh-Hans": "当前找不到地址。请索要联系人链接。",
+    "ru": "Сейчас адрес не найден. Попросите ссылку на контакт.",
+    "uk": "Зараз адресу не знайдено. Попросіть посилання на контакт."
+  },
+  "mail.ambiguousWords": {
+    "en": "Ambiguous address. Ask for a contact link.",
+    "zh-Hans": "地址不唯一。请索要联系人链接。",
+    "ru": "Неоднозначный адрес. Попросите ссылку на контакт.",
+    "uk": "Неоднозначна адреса. Попросіть посилання на контакт."
+  },
+  "mail.invalidWords": {
+    "en": "Enter six address words, a contact link or a Mail key.",
+    "zh-Hans": "请输入六个地址词、联系人链接或邮件公钥。",
+    "ru": "Введите шесть слов адреса, ссылку на контакт или ключ почты.",
+    "uk": "Введіть шість слів адреси, посилання на контакт або ключ пошти."
+  },
+  "mail.publicationScheduled": {
+    "en": "Address publication scheduled.",
+    "zh-Hans": "已安排地址发布。",
+    "ru": "Публикация адреса запланирована.",
+    "uk": "Публікацію адреси заплановано."
+  },
+  "mail.renewalStopped": {
+    "en": "This device stopped renewing the address.",
+    "zh-Hans": "此设备已停止续期地址。",
+    "ru": "Это устройство прекратило обновлять адрес.",
+    "uk": "Цей пристрій припинив оновлювати адресу."
   }
 }

@@ -73,6 +73,8 @@ def import_app(name, target_root=None):
                 text = text.replace('"com.eurobuddha.minimacore"', '"'+HOST+'"')
             if name in ('pandapools', 'pandadex'):
                 text = text.replace('"node-transport"', '"'+name+'-node-transport"')
+            if name == 'mail' and filename == 'MailBeaconTest.java':
+                text = text.replace('raw/mail_address_words.txt', 'raw/pm_mail_mail_address_words.txt')
             if filename == 'Bip39Test.java':
                 text = text.replace('src/main/res/raw/bip39_english.txt', 'src/main/res/raw/pm_entropy_bip39_english.txt')
             if filename == 'CreationEvidenceTest.java':

@@ -35,6 +35,8 @@ def adapt(root):
             s=re.sub(r'\s*if \((?:data|message) == null\) return;\n','\n',s)
             s=s.replace('new org.json.JSONObject(data).optString','nodeEvent.optString').replace('new JSONObject(data).optString','nodeEvent.optString').replace('JSONObject json = new JSONObject(message);','JSONObject json = nodeEvent;')
             s=s.replace('new JSONObject(i.getStringExtra(MinimaAPIMessages.MINIMA_API_NOTIFY_DATA)).optString', 'nodeEvent.optString')
+            s=s.replace('new JSONObject(DirectNodeApi.notifyData(i)).optString', 'nodeEvent.optString')
+            s=re.sub(r'ContextCompat.registerReceiver\(this, (\w+),\s*DirectNodeApi.notifyFilter\(\), ContextCompat.RECEIVER_\w+\);', r'DirectNodeEvents.subscribe(\1);', s)
             s=s.replace('intent.getStringExtra("event")','nodeEvent.optString("event")')
             s=re.sub(r'ContextCompat.registerReceiver\(this, (\w+),\s*new IntentFilter\((?:MinimaAPIMessages.MINIMA_API_NOTIFY|NodeTransportService.EVENT_ACTION)\), ContextCompat.RECEIVER_\w+\);',r'DirectNodeEvents.subscribe(\1);',s)
             s=re.sub(r'IntentFilter filter = new IntentFilter\(MinimaAPIMessages.MINIMA_API_NOTIFY\);.*?\n        mReceiverRegistered = true;', 'DirectNodeEvents.subscribe(mNotifyReceiver);\n        mReceiverRegistered = true;',s,flags=re.S)
