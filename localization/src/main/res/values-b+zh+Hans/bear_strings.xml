@@ -8567,4 +8567,11 @@
     <string name="l10n_mail_beacon_waiting">"信标尚不可见 · %1$s"</string>
     <string name="l10n_mail_beacon_off" formatted="false">"发布已关闭 · 未找到信标"</string>
     <string name="l10n_mail_beacon_conflict" formatted="false">"地址冲突"</string>
+    <string name="l10n_mail_share_mine" formatted="false">"分享我的联系人信息"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_mail_contact_options">"%1$s 的联系人选项"</string>
+    <string name="l10n_mail_keep_conversation" formatted="false">"聊天记录将保留在此设备上。"</string>
+    <string name="l10n_mail_enter_contact_name" formatted="false">"请输入姓名"</string>
+    <string name="l10n_mail_contact_gone" formatted="false">"联系人已不存在"</string>
+    <string name="l10n_mail_cannot_save_contact" formatted="false">"无法保存联系人"</string>
 </resources>

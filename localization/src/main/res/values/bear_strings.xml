@@ -8604,4 +8604,11 @@
     <string name="l10n_mail_beacon_waiting">"Beacon not yet visible · %1$s"</string>
     <string name="l10n_mail_beacon_off" formatted="false">"Publication off · no visible beacon"</string>
     <string name="l10n_mail_beacon_conflict" formatted="false">"Address conflict"</string>
+    <string name="l10n_mail_share_mine" formatted="false">"Share my contact"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_mail_contact_options">"Contact options for %1$s"</string>
+    <string name="l10n_mail_keep_conversation" formatted="false">"Your conversation history will stay on this device."</string>
+    <string name="l10n_mail_enter_contact_name" formatted="false">"Enter a name"</string>
+    <string name="l10n_mail_contact_gone" formatted="false">"Contact no longer exists"</string>
+    <string name="l10n_mail_cannot_save_contact" formatted="false">"Could not save contact"</string>
 </resources>

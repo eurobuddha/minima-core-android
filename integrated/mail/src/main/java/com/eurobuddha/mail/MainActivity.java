@@ -1512,8 +1512,16 @@ public class MainActivity extends AppCompatActivity {
     private View buildContacts() {
         LinearLayout col = column();
         LinearLayout head = header(Language.msg(l10n_mail_contacts), false);
-        head.addView(iconBtn(R.drawable.pm_mail_ic_plus, v -> addContactDialog(null)));
+        ImageView add = iconBtn(R.drawable.pm_mail_ic_plus, v -> addContactDialog(null));
+        Language.description(add, Language.msg(l10n_mail_add_contact));
+        head.addView(add);
         col.addView(head);
+        TextView shareMine = textButton(Language.msg(l10n_mail_share_mine));
+        shareMine.setOnClickListener(v -> {
+            if (myId != null) shareContact(myId);
+            else toast(Language.msg(l10n_mail_connect_first));
+        });
+        col.addView(shareMine);
         RecyclerView rv = new RecyclerView(this);
         rv.setLayoutManager(new LinearLayoutManager(this));
         final List<String[]> cs = db.contacts();
@@ -1539,39 +1547,97 @@ public class MainActivity extends AppCompatActivity {
                 TextView kv = new TextView(MainActivity.this); Language.setText(kv, address); kv.setTextColor(Design.DIM); kv.setTextSize(12f); kv.setTypeface(Typeface.MONOSPACE);
                 kv.setOnClickListener(v -> { copy(address, Language.msg(l10n_mail_address_clipboard)); toast(Language.msg(l10n_mail_address_copied)); });
                 mid.addView(nm); mid.addView(kv); row.addView(mid);
-                row.setOnClickListener(v -> push(buildCompose(key, null)));
-                row.setOnLongClickListener(v -> {
-                    AlertDialog.Builder actions = languageDialog().setTitle(name)
-                            .setPositiveButton("Delete contact", (d, w) -> {
-                                if (!key.equals(myId)) AddressRenewal.disable(MainActivity.this, key);
-                                io.execute(() -> { db.deleteContact(id); db.setMeta("card:" + key, "");
-                                    ui.post(() -> { contactNames = null; refreshFolderIfVisible(); }); });
-                            }).setNegativeButton(Language.msg(l10n_mail_cancel), null);
-                    MailAddress.Card card = MailAddress.link(db.getMeta("card:" + key, ""));
-                    if (MailAddress.isKey(key) && !key.equalsIgnoreCase(myId))
-                        actions.setNeutralButton(AddressRenewal.enabled(MainActivity.this,key) ? Language.msg(l10n_mail_stop_relay) : Language.msg(l10n_mail_relay_address),
-                                (d,w) -> {
-                                    if (AddressRenewal.enabled(MainActivity.this,key)) {
-                                        AddressRenewal.disable(MainActivity.this, key); toast(Language.msg(l10n_mail_relay_stopped)); return;
-                                    }
-                                    if (card != null) { changePublication(card); return; }
-                                    MailBeacon.find(node, MailAddress.phrase(key), MailBeacon.DISCOVERY, (found, error) -> {
-                                        if (found == null || !key.equalsIgnoreCase(found.key)) {
-                                            toast(error == null ? Language.msg(l10n_mail_ask_publish) : error);
-                                            return;
-                                        }
-                                        db.setMeta("card:" + key, found.link());
-                                        changePublication(found);
-                                    });
-                                });
-                    actions.show();
-                    return true;
-                });
+                String canonical = MailAddress.canonicalKey(key);
+                row.setOnClickListener(v -> push(buildCompose(canonical == null ? key : canonical, null)));
+                ImageView more = iconBtn(R.drawable.pm_mail_ic_dots, v -> contactMenu(v, id, name, canonical));
+                Language.description(more, Language.msg(l10n_mail_contact_options, name));
+                more.setLayoutParams(new LinearLayout.LayoutParams(dp(48), dp(48)));
+                row.addView(more);
+                row.setOnLongClickListener(v -> more.performClick());
             }
             @Override public int getItemCount() { return cs.size(); }
         });
         col.addView(rv, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
         return col;
+    }
+
+    private void contactMenu(View anchor, long id, String name, String key) {
+        androidx.appcompat.widget.PopupMenu menu = new androidx.appcompat.widget.PopupMenu(this, anchor);
+        menu.getMenu().add(Language.msg(l10n_chat_rename_contact)).setOnMenuItemClickListener(item -> {
+            editContactName(id, name);
+            return true;
+        });
+        if (key != null) {
+            menu.getMenu().add(Language.msg(l10n_mail_share_contact)).setOnMenuItemClickListener(item -> {
+                shareContact(key);
+                return true;
+            });
+            if (!key.equalsIgnoreCase(myId)) {
+                menu.getMenu().add(AddressRenewal.enabled(this, key) ? Language.msg(l10n_mail_stop_relay) : Language.msg(l10n_mail_relay_address))
+                        .setOnMenuItemClickListener(item -> { toggleContactRelay(key); return true; });
+            }
+        }
+        menu.getMenu().add(Language.msg(l10n_chat_delete_contact)).setOnMenuItemClickListener(item -> {
+            languageDialog().setTitle(Language.msg(l10n_mail_delete_contact, name))
+                    .setMessage(Language.msg(l10n_mail_keep_conversation))
+                    .setNegativeButton(Language.msg(l10n_mail_cancel), null)
+                    .setPositiveButton(Language.msg(l10n_mail_delete), (d, w) -> {
+                        if (!db.deleteContact(id)) { contactsChanged(); return; }
+                        if (key != null && !key.equalsIgnoreCase(myId)) {
+                            AddressRenewal.disable(this, key);
+                            db.setMeta("card:" + key, "");
+                        }
+                        contactsChanged();
+                    }).show();
+            return true;
+        });
+        menu.show();
+    }
+
+    private void contactsChanged() {
+        contactNames = null;
+        refreshFolderIfVisible();
+    }
+
+    private void editContactName(long id, String current) {
+        LinearLayout box = pad(column());
+        EditText name = input(Language.msg(l10n_mail_name));
+        name.setSingleLine(true);
+        name.setText(current);
+        name.selectAll();
+        box.addView(name);
+        AlertDialog dialog = languageDialog().setTitle(Language.msg(l10n_chat_rename_contact)).setView(box)
+                .setPositiveButton(Language.msg(l10n_mail_save), null).setNegativeButton(Language.msg(l10n_mail_cancel), null).create();
+        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String updated = name.getText().toString().trim();
+            if (updated.isEmpty()) { Language.error(name, Language.msg(l10n_mail_enter_contact_name)); return; }
+            if (!db.renameContact(id, updated)) { Language.error(name, Language.msg(l10n_mail_contact_gone)); return; }
+            dialog.dismiss();
+            contactsChanged();
+        }));
+        dialog.show();
+    }
+
+    private void toggleContactRelay(String key) {
+        MailAddress.Card card = MailAddress.link(db.getMeta("card:" + key, ""));
+        if (AddressRenewal.enabled(MainActivity.this,key)) {
+            AddressRenewal.disable(MainActivity.this, key); toast(Language.msg(l10n_mail_relay_stopped)); return;
+        }
+        if (card != null) { changePublication(card); return; }
+        MailBeacon.find(node, MailAddress.phrase(key), MailBeacon.DISCOVERY, (found, error) -> {
+            if (found == null || !key.equalsIgnoreCase(found.key)) {
+                toast(error == null ? Language.msg(l10n_mail_ask_publish) : error);
+                return;
+            }
+            db.setMeta("card:" + key, found.link());
+            changePublication(found);
+        });
+    }
+
+    private void shareContact(String key) {
+        Intent send = new Intent(Intent.ACTION_SEND).setType("text/plain")
+                .putExtra(Intent.EXTRA_TEXT, MailAddress.phrase(key) + "\n" + MailAddress.directLink(key));
+        startActivity(Intent.createChooser(send, Language.msg(l10n_mail_share_contact)));
     }
 
     // ---- YOUR KEY / IDENTITY ----
@@ -2330,9 +2396,9 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton(Language.msg(l10n_mail_add), null).setNegativeButton(Language.msg(l10n_mail_cancel), null).create();
         dialog.setOnShowListener(unused -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String n = name.getText().toString().trim();
-            if (n.isEmpty()) { name.setError("Enter a name"); return; }
+            if (n.isEmpty()) { Language.error(name, Language.msg(l10n_mail_enter_contact_name)); return; }
             resolveRecipient(key, k -> {
-                db.addContact(n, k);
+                if (!db.addContact(n, k)) { Language.error(name, Language.msg(l10n_mail_cannot_save_contact)); return; }
                 contactNames = null;
                 dialog.dismiss();
                 refreshFolderIfVisible();
@@ -2413,11 +2479,7 @@ public class MainActivity extends AppCompatActivity {
         copyWords.setOnClickListener(v -> { copy(phrase, Language.msg(l10n_mail_address_clipboard)); toast(Language.msg(l10n_mail_address_copied)); });
         form.addView(copyWords);
         TextView share = textButton(Language.msg(l10n_mail_share_link));
-        share.setOnClickListener(v -> {
-            Intent send = new Intent(Intent.ACTION_SEND).setType("text/plain")
-                    .putExtra(Intent.EXTRA_TEXT, phrase + "\n" + MailAddress.directLink(myId));
-            startActivity(Intent.createChooser(send, Language.msg(l10n_mail_share_contact)));
-        });
+        share.setOnClickListener(v -> shareContact(myId));
         form.addView(share);
     }
 
@@ -2626,14 +2688,19 @@ public class MainActivity extends AppCompatActivity {
 
     // ---- formatting ----
 
+    private static String contactKey(String key) {
+        String canonical = MailAddress.canonicalKey(key);
+        return canonical == null ? key : canonical;
+    }
+
     private CharSequence nameFor(String key) {
         if (key == null) return Language.msg(l10n_mail_unknown);
         if (contactNames == null) {
             java.util.HashMap<String, String> m = new java.util.HashMap<>();
-            for (String[] c : db.contacts()) m.put(c[2], c[1]);
+            for (String[] c : db.contacts()) m.put(contactKey(c[2]), c[1]);
             contactNames = m;
         }
-        String n = contactNames.get(key);
+        String n = contactNames.get(contactKey(key));
         return n != null && !n.trim().isEmpty() && !n.equalsIgnoreCase(key) ? n : MailAddress.display(key);
     }
 

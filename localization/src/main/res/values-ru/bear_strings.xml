@@ -8678,4 +8678,11 @@
     <string name="l10n_mail_beacon_waiting">"Маяк пока не виден · %1$s"</string>
     <string name="l10n_mail_beacon_off" formatted="false">"Публикация отключена · маяк не найден"</string>
     <string name="l10n_mail_beacon_conflict" formatted="false">"Конфликт адресов"</string>
+    <string name="l10n_mail_share_mine" formatted="false">"Поделиться своим контактом"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_mail_contact_options">"Действия с контактом %1$s"</string>
+    <string name="l10n_mail_keep_conversation" formatted="false">"История переписки останется на этом устройстве."</string>
+    <string name="l10n_mail_enter_contact_name" formatted="false">"Введите имя"</string>
+    <string name="l10n_mail_contact_gone" formatted="false">"Контакт больше не существует"</string>
+    <string name="l10n_mail_cannot_save_contact" formatted="false">"Не удалось сохранить контакт"</string>
 </resources>

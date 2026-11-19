@@ -43219,5 +43219,41 @@
     "zh-Hans": "地址冲突",
     "ru": "Конфликт адресов",
     "uk": "Конфлікт адрес"
+  },
+  "mail.shareMine": {
+    "en": "Share my contact",
+    "zh-Hans": "分享我的联系人信息",
+    "ru": "Поделиться своим контактом",
+    "uk": "Поділитися своїм контактом"
+  },
+  "mail.contactOptions": {
+    "en": "Contact options for {name}",
+    "zh-Hans": "{name} 的联系人选项",
+    "ru": "Действия с контактом {name}",
+    "uk": "Дії з контактом {name}"
+  },
+  "mail.keepConversation": {
+    "en": "Your conversation history will stay on this device.",
+    "zh-Hans": "聊天记录将保留在此设备上。",
+    "ru": "История переписки останется на этом устройстве.",
+    "uk": "Історія листування залишиться на цьому пристрої."
+  },
+  "mail.enterContactName": {
+    "en": "Enter a name",
+    "zh-Hans": "请输入姓名",
+    "ru": "Введите имя",
+    "uk": "Введіть ім’я"
+  },
+  "mail.contactGone": {
+    "en": "Contact no longer exists",
+    "zh-Hans": "联系人已不存在",
+    "ru": "Контакт больше не существует",
+    "uk": "Контакт більше не існує"
+  },
+  "mail.cannotSaveContact": {
+    "en": "Could not save contact",
+    "zh-Hans": "无法保存联系人",
+    "ru": "Не удалось сохранить контакт",
+    "uk": "Не вдалося зберегти контакт"
   }
 }

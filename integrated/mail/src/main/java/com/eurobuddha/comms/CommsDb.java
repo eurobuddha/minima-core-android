@@ -161,11 +161,39 @@ public class CommsDb extends SQLiteOpenHelper {
     // ----- contacts -----
 
     public boolean addContact(String username, String publickey) {
-        ContentValues v = new ContentValues(); v.put("username", username); v.put("publickey", publickey);
-        return getWritableDatabase().insertWithOnConflict(CON, null, v, SQLiteDatabase.CONFLICT_REPLACE) != -1;
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            values.put("username", username);
+            // Backups can use either prefix spelling or omit it entirely.
+            if (db.update(CON, values, CONTACT_KEY_MATCH, keyForms(publickey)) == 0) {
+                values.put("publickey", publickey);
+                if (db.insert(CON, null, values) == -1) return false;
+            }
+            db.setTransactionSuccessful();
+            return true;
+        } finally { db.endTransaction(); }
     }
 
-    public void deleteContact(long id) { getWritableDatabase().delete(CON, "id=?", new String[]{String.valueOf(id)}); }
+    private static final String CONTACT_KEY_MATCH = "publickey COLLATE NOCASE IN (?,?)";
+    private static String[] keyForms(String key) {
+        if (key != null && key.matches("(?i)(?:0x)?[0-9a-f]{128}")) {
+            String raw = key.length() == 128 ? key : key.substring(2);
+            return new String[]{raw, "0x" + raw};
+        }
+        return new String[]{key, key};
+    }
+
+    public boolean renameContact(long id, String name) {
+        ContentValues values = new ContentValues();
+        values.put("username", name);
+        return getWritableDatabase().update(CON, values, "id=?", new String[]{String.valueOf(id)}) == 1;
+    }
+
+    public boolean deleteContact(long id) {
+        return getWritableDatabase().delete(CON, "id=?", new String[]{String.valueOf(id)}) == 1;
+    }
 
     public List<String[]> contacts() {
         List<String[]> out = new ArrayList<>();
@@ -188,7 +216,7 @@ public class CommsDb extends SQLiteOpenHelper {
 
     /** Contact name for a publickey, or null. */
     public String contactName(String publickey) {
-        Cursor c = getReadableDatabase().rawQuery("SELECT username FROM " + CON + " WHERE publickey=?", new String[]{publickey});
+        Cursor c = getReadableDatabase().rawQuery("SELECT username FROM " + CON + " WHERE " + CONTACT_KEY_MATCH, keyForms(publickey));
         try { return c.moveToFirst() ? c.getString(0) : null; } finally { c.close(); }
     }
 
