@@ -1890,6 +1890,7 @@ public class MainActivity extends AppCompatActivity {
     private View textBubble(MailMessage m) {
         TextView b = new TextView(this);
         Language.setText(b, m.message);
+        b.setTextIsSelectable(true);
         b.setTextSize(15f);
         b.setPadding(dp(14), dp(9), dp(14), dp(9));
         b.setMaxWidth((int) (getResources().getDisplayMetrics().widthPixels * 0.75));
@@ -1923,6 +1924,7 @@ public class MainActivity extends AppCompatActivity {
         if (m.message != null && !m.message.isEmpty()) {
             TextView memo = new TextView(this);
             Language.setText(memo, m.message); memo.setTextColor(fg); memo.setTextSize(13f); memo.setPadding(0, dp(4), 0, 0);
+            memo.setTextIsSelectable(true);
             card.addView(memo);
         }
         return card;
