@@ -199,5 +199,12 @@
   "renewalStopped": "mail.renewalStopped",
   "pasteKey": "mail.pasteKey",
   "recipientReady": "mail.recipientReady",
-  "retryLookup": "mail.retryLookup"
+  "retryLookup": "mail.retryLookup",
+  "beaconChecking": "mail.beaconChecking",
+  "beaconLiveBlock": "mail.beaconLiveBlock",
+  "beaconLiveHere": "mail.beaconLiveHere",
+  "beaconCheckError": "mail.beaconCheckError",
+  "beaconWaiting": "mail.beaconWaiting",
+  "beaconOff": "mail.beaconOff",
+  "beaconConflict": "mail.beaconConflict"
 }

@@ -115,6 +115,10 @@ def adapt(root):
 ''' + s[end:]
  change('count == 1 ? "New mail" : count + " new messages"','Language.count(com.eurobuddha.minimacore.i18n.R.plurals.l10n_mail_new_messages, count)')
  dynamic={'youKey','block','chain','checking','checked','youPreview','toSubject','confirming','deleteContact','sendError','sentYou','tokenBalance','youReceive','sendTo','enterAddress','confirmSend','confirmFunds','sending','paymentRejected','paid','paymentError','tx','imageError','backupError','help','today','yesterday','newMessages','back','menu','more','attach','rejectedSend','encryptFailed','gettingAddress','onChain'}
+ dynamic.update({'beaconLiveBlock','beaconCheckError','beaconWaiting'})
+ change('"Beacon live · block " + block',msg('beaconLiveBlock','block'))
+ change('"Could not verify beacon: " + error',msg('beaconCheckError','error'))
+ change('"Beacon not yet visible · " + progress',msg('beaconWaiting','progress'))
  for key in labels:
   if key in dynamic:continue
   literal=json.dumps(catalog[labels[key]]['en'],ensure_ascii=False)

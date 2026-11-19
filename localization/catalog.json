@@ -43177,5 +43177,47 @@
     "zh-Hans": "点按重试",
     "ru": "Нажмите, чтобы повторить",
     "uk": "Торкніться, щоб повторити"
+  },
+  "mail.beaconChecking": {
+    "en": "Checking beacon…",
+    "zh-Hans": "正在检查信标…",
+    "ru": "Проверяем маяк…",
+    "uk": "Перевіряємо маяк…"
+  },
+  "mail.beaconLiveBlock": {
+    "en": "Beacon live · block {block}",
+    "zh-Hans": "信标已上链 · 区块 {block}",
+    "ru": "Маяк в сети · блок {block}",
+    "uk": "Маяк у мережі · блок {block}"
+  },
+  "mail.beaconLiveHere": {
+    "en": "Beacon live on this node",
+    "zh-Hans": "此节点已找到信标",
+    "ru": "Маяк виден на этом узле",
+    "uk": "Маяк видно на цьому вузлі"
+  },
+  "mail.beaconCheckError": {
+    "en": "Could not verify beacon: {error}",
+    "zh-Hans": "无法验证信标：{error}",
+    "ru": "Не удалось проверить маяк: {error}",
+    "uk": "Не вдалося перевірити маяк: {error}"
+  },
+  "mail.beaconWaiting": {
+    "en": "Beacon not yet visible · {status}",
+    "zh-Hans": "信标尚不可见 · {status}",
+    "ru": "Маяк пока не виден · {status}",
+    "uk": "Маяк поки не видно · {status}"
+  },
+  "mail.beaconOff": {
+    "en": "Publication off · no visible beacon",
+    "zh-Hans": "发布已关闭 · 未找到信标",
+    "ru": "Публикация отключена · маяк не найден",
+    "uk": "Публікацію вимкнено · маяка не знайдено"
+  },
+  "mail.beaconConflict": {
+    "en": "Address conflict",
+    "zh-Hans": "地址冲突",
+    "ru": "Конфликт адресов",
+    "uk": "Конфлікт адрес"
   }
 }

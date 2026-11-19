@@ -8668,4 +8668,14 @@
     <string name="l10n_mail_paste_key" formatted="false">"Вставити посилання або ключ пошти"</string>
     <string name="l10n_mail_recipient_ready" formatted="false">"Одержувача визначено"</string>
     <string name="l10n_mail_retry_lookup" formatted="false">"Торкніться, щоб повторити"</string>
+    <string name="l10n_mail_beacon_checking" formatted="false">"Перевіряємо маяк…"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mail_beacon_live_block">"Маяк у мережі · блок %1$s"</string>
+    <string name="l10n_mail_beacon_live_here" formatted="false">"Маяк видно на цьому вузлі"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_mail_beacon_check_error">"Не вдалося перевірити маяк: %1$s"</string>
+    <!-- Arguments: status -->
+    <string name="l10n_mail_beacon_waiting">"Маяк поки не видно · %1$s"</string>
+    <string name="l10n_mail_beacon_off" formatted="false">"Публікацію вимкнено · маяка не знайдено"</string>
+    <string name="l10n_mail_beacon_conflict" formatted="false">"Конфлікт адрес"</string>
 </resources>

@@ -8557,4 +8557,14 @@
     <string name="l10n_mail_paste_key" formatted="false">"粘贴链接或邮件公钥"</string>
     <string name="l10n_mail_recipient_ready" formatted="false">"收件人已确认"</string>
     <string name="l10n_mail_retry_lookup" formatted="false">"点按重试"</string>
+    <string name="l10n_mail_beacon_checking" formatted="false">"正在检查信标…"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mail_beacon_live_block">"信标已上链 · 区块 %1$s"</string>
+    <string name="l10n_mail_beacon_live_here" formatted="false">"此节点已找到信标"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_mail_beacon_check_error">"无法验证信标：%1$s"</string>
+    <!-- Arguments: status -->
+    <string name="l10n_mail_beacon_waiting">"信标尚不可见 · %1$s"</string>
+    <string name="l10n_mail_beacon_off" formatted="false">"发布已关闭 · 未找到信标"</string>
+    <string name="l10n_mail_beacon_conflict" formatted="false">"地址冲突"</string>
 </resources>

@@ -8594,4 +8594,14 @@
     <string name="l10n_mail_paste_key" formatted="false">"Paste link or Mail key"</string>
     <string name="l10n_mail_recipient_ready" formatted="false">"Recipient ready"</string>
     <string name="l10n_mail_retry_lookup" formatted="false">"Tap to retry"</string>
+    <string name="l10n_mail_beacon_checking" formatted="false">"Checking beacon…"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mail_beacon_live_block">"Beacon live · block %1$s"</string>
+    <string name="l10n_mail_beacon_live_here" formatted="false">"Beacon live on this node"</string>
+    <!-- Arguments: error -->
+    <string name="l10n_mail_beacon_check_error">"Could not verify beacon: %1$s"</string>
+    <!-- Arguments: status -->
+    <string name="l10n_mail_beacon_waiting">"Beacon not yet visible · %1$s"</string>
+    <string name="l10n_mail_beacon_off" formatted="false">"Publication off · no visible beacon"</string>
+    <string name="l10n_mail_beacon_conflict" formatted="false">"Address conflict"</string>
 </resources>

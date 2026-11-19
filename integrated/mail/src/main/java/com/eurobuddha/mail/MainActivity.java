@@ -576,6 +576,7 @@ public class MainActivity extends AppCompatActivity {
         identity = id;
         crypto = new LocalEcCryptoProvider(ls, id);
         myId = id.publicId();
+        AddressRenewal.ensureOwn(this, id);
         rebuildNav();
         scanner = new CommsScanner(node, crypto, db, myId, new CommsScanner.Listener() {
             @Override public void onDone(boolean ok, int newCount) { onScanDone(ok, newCount); }
@@ -2455,30 +2456,55 @@ public class MainActivity extends AppCompatActivity {
         String phrase = MailAddress.phrase(myId);
         TextView words = label(phrase);
         words.setTextIsSelectable(true); form.addView(words);
+        boolean active = AddressRenewal.enabled(this, myId);
+        TextView publish = accentButton(active ? Language.msg(l10n_mail_stop_publishing) : Language.msg(l10n_mail_publish_address));
+        publish.setOnClickListener(v -> changePublication(MailAddress.sign(identity)));
+        form.addView(publish);
+        showBeaconStatus(form, myId);
         TextView copyWords = textButton(Language.msg(l10n_mail_copy_words));
         copyWords.setOnClickListener(v -> { copy(phrase, Language.msg(l10n_mail_address_clipboard)); toast(Language.msg(l10n_mail_address_copied)); });
         form.addView(copyWords);
-        TextView share = accentButton(Language.msg(l10n_mail_share_link));
+        TextView share = textButton(Language.msg(l10n_mail_share_link));
         share.setOnClickListener(v -> {
             Intent send = new Intent(Intent.ACTION_SEND).setType("text/plain")
                     .putExtra(Intent.EXTRA_TEXT, phrase + "\n" + MailAddress.directLink(myId));
             startActivity(Intent.createChooser(send, Language.msg(l10n_mail_share_contact)));
         });
         form.addView(share);
-        boolean active = AddressRenewal.enabled(this, myId);
-        TextView publish = textButton(active ? Language.msg(l10n_mail_stop_publishing) : Language.msg(l10n_mail_publish_address));
-        publish.setOnClickListener(v -> changePublication(MailAddress.sign(identity)));
-        form.addView(publish);
-        if (active) {
-            String status = AddressRenewal.prefs(this).getString("status-" + myId, "Publication scheduled");
-            form.addView(label(status));
-            if (MailBeacon.PENDING_STATUS.equals(status)) form.addView(label("If you dismissed the request in Core, stop publishing and enable it again to retry."));
+    }
+
+    private void showBeaconStatus(LinearLayout form, final String key) {
+        final String phrase = MailAddress.phrase(key);
+        final TextView status = label(Language.msg(l10n_mail_beacon_checking));
+        status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        form.addView(status);
+        class Check implements Runnable, View.OnAttachStateChangeListener {
+            @Override public void run() {
+                if (!status.isAttachedToWindow() || isDestroyed() || isFinishing()) return;
+                if (!status.isShown() || node == null) { status.postDelayed(this, 15000); return; }
+                MailBeacon.inspect(node, phrase, MailBeacon.DISCOVERY, (card, block, error) -> {
+                    if (!status.isAttachedToWindow() || !key.equals(myId)) return;
+                    if (error != null) Language.setText(status, Language.msg(l10n_mail_beacon_check_error, error));
+                    else if (card != null && key.equals(card.key)) {
+                        Language.setText(status, block > 0 ? Language.msg(l10n_mail_beacon_live_block, block) : Language.msg(l10n_mail_beacon_live_here));
+                    } else if (card != null) Language.setText(status, Language.msg(l10n_mail_beacon_conflict));
+                    else if (AddressRenewal.enabled(MainActivity.this, key)) {
+                        String progress = AddressRenewal.prefs(MainActivity.this).getString("status-" + key, "Publication scheduled");
+                        if (MailBeacon.FRESH_STATUS.equals(progress)) progress = "Waiting for renewal";
+                        Language.setText(status, Language.msg(l10n_mail_beacon_waiting, progress));
+                    } else Language.setText(status, Language.msg(l10n_mail_beacon_off));
+                    status.postDelayed(this, 15000);
+                });
+            }
+            public void onViewAttachedToWindow(View v) { v.post(this); }
+            public void onViewDetachedFromWindow(View v) { v.removeCallbacks(this); }
         }
+        status.addOnAttachStateChangeListener(new Check());
     }
 
     private void changePublication(MailAddress.Card card) {
         if (AddressRenewal.enabled(this, card.key)) {
-            AddressRenewal.disable(this, card.key);
+            AddressRenewal.stopOwn(this, card.key);
             toast(Language.msg(l10n_mail_renewal_stopped));
             refreshFolderIfVisible(); return;
         }
