@@ -901,15 +901,15 @@
   },
   "mail": {
     "source": "../mail",
-    "revision": "774d34d49c26cacbf30a8f9b69d8c9b9ab1ec964",
-    "version": "0.5.25",
+    "revision": "49cc0d010e9507134c3ffc58a95550bc61b9fbbe",
+    "version": "0.5.26",
     "namespace": "com.eurobuddha.mail",
     "files": {
       "src/main/AndroidManifest.xml": "23cdc45abda52fa5ceade79be7c64fd7e81187844b896eacf5d2a0a062a77cfd",
       "src/main/java/com/eurobuddha/mail/Design.java": "460efd9c85f6a672f8bb4fd9c4a2c83741fb634dc0da7d0c9553e3f72600f0c1",
       "src/main/java/com/eurobuddha/mail/Util.java": "10607b642066958779029056506c2508d3497bc65fec2573871c6f5e57d89afc",
       "src/main/java/com/eurobuddha/mail/IdentityRecord.java": "417683ec8b01c652c525eb299e8782ca9c88816b9a4624edea40e9fed2dae1e6",
-      "src/main/java/com/eurobuddha/mail/MainActivity.java": "0f3540ba12a87c742c433e50829204c7f832ea36759073b71b65de09dcfc144b",
+      "src/main/java/com/eurobuddha/mail/MainActivity.java": "788743b5205496cf70529124baeb0e743d17d53bd9c9583a363b7c7c51a48314",
       "src/main/java/com/eurobuddha/mail/AddressWordEntry.java": "0e1bdeae7ae097a95a3ac22a041a3f133a5a41a255c970cb52924944e34f1274",
       "src/main/java/com/eurobuddha/mail/MailAddress.java": "f712efcc245c1c12ca71882b5a7bd110b70aabe82c7b4827d43dffbab699cc61",
       "src/main/java/com/eurobuddha/mail/MailBeacon.java": "8e277b4ce8ba451396fa0adbe12a8c67204c8f6cd08f3d0f8e9be661e92cb413",
@@ -977,7 +977,8 @@
       "src/test/java/com/eurobuddha/mail/NodeIdentitySeedTest.java": "b70e5aa37be8169474eafc9d47c88b9145228fd2c6b38c27c040bf7e45f83192",
       "src/test/java/com/eurobuddha/mail/MailBeaconTest.java": "85681513587ef97c53207cc1bb494723d63639cf9616678b1de75102ae600418",
       "src/test/java/com/eurobuddha/mail/IdentityRecordTest.java": "c5ce50c004b70bdfae6d7886899bb7b4863b2881f01bc9cc3a9a0f61d4208a6d",
-      "src/test/java/com/eurobuddha/comms/SendPinQueryTest.java": "1178dc3effd40687e772f6518fd6876c0af4db29c7665fd8e803c73f7337fc17"
+      "src/test/java/com/eurobuddha/comms/SendPinQueryTest.java": "1178dc3effd40687e772f6518fd6876c0af4db29c7665fd8e803c73f7337fc17",
+      "src/main/java/com/eurobuddha/mail/PaymentCurrency.java": "8d1d935ee7ed2f4b46dfe4ada0045a80eeea6ad3029950e752c789933363d06e"
     },
     "resource_prefix": "pm_mail_"
   },
