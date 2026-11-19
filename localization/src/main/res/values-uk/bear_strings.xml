@@ -8660,9 +8660,12 @@
     <string name="l10n_mail_relay_stopped" formatted="false">"Ретрансляцію зупинено."</string>
     <string name="l10n_mail_ask_publish" formatted="false">"Попросіть контакт спочатку опублікувати адресу."</string>
     <string name="l10n_mail_lookup" formatted="false">"Пошук адреси…"</string>
-    <string name="l10n_mail_no_beacon" formatted="false">"Зараз адресу не знайдено. Попросіть посилання на контакт."</string>
+    <string name="l10n_mail_no_beacon" formatted="false">"На цьому вузлі опубліковану адресу не знайдено. Попросіть одержувача опублікувати адресу або надіслати посилання на контакт."</string>
     <string name="l10n_mail_ambiguous_words" formatted="false">"Неоднозначна адреса. Попросіть посилання на контакт."</string>
     <string name="l10n_mail_invalid_words" formatted="false">"Введіть шість слів адреси, посилання на контакт або ключ пошти."</string>
     <string name="l10n_mail_publication_scheduled" formatted="false">"Публікацію адреси заплановано."</string>
     <string name="l10n_mail_renewal_stopped" formatted="false">"Цей пристрій припинив оновлювати адресу."</string>
+    <string name="l10n_mail_paste_key" formatted="false">"Вставити посилання або ключ пошти"</string>
+    <string name="l10n_mail_recipient_ready" formatted="false">"Одержувача визначено"</string>
+    <string name="l10n_mail_retry_lookup" formatted="false">"Торкніться, щоб повторити"</string>
 </resources>

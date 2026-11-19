@@ -8586,9 +8586,12 @@
     <string name="l10n_mail_relay_stopped" formatted="false">"Relay stopped."</string>
     <string name="l10n_mail_ask_publish" formatted="false">"Ask this contact to publish their address first."</string>
     <string name="l10n_mail_lookup" formatted="false">"Looking up address…"</string>
-    <string name="l10n_mail_no_beacon" formatted="false">"Address isn’t currently discoverable. Ask for a contact link."</string>
+    <string name="l10n_mail_no_beacon" formatted="false">"No published address found on this node. Ask the recipient to publish their address or share their contact link."</string>
     <string name="l10n_mail_ambiguous_words" formatted="false">"Ambiguous address. Ask for a contact link."</string>
     <string name="l10n_mail_invalid_words" formatted="false">"Enter six address words, a contact link or a Mail key."</string>
     <string name="l10n_mail_publication_scheduled" formatted="false">"Address publication scheduled."</string>
     <string name="l10n_mail_renewal_stopped" formatted="false">"This device stopped renewing the address."</string>
+    <string name="l10n_mail_paste_key" formatted="false">"Paste link or Mail key"</string>
+    <string name="l10n_mail_recipient_ready" formatted="false">"Recipient ready"</string>
+    <string name="l10n_mail_retry_lookup" formatted="false">"Tap to retry"</string>
 </resources>

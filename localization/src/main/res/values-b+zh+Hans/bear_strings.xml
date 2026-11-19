@@ -8549,9 +8549,12 @@
     <string name="l10n_mail_relay_stopped" formatted="false">"已停止转发。"</string>
     <string name="l10n_mail_ask_publish" formatted="false">"请先让此联系人发布地址。"</string>
     <string name="l10n_mail_lookup" formatted="false">"正在查找地址…"</string>
-    <string name="l10n_mail_no_beacon" formatted="false">"当前找不到地址。请索要联系人链接。"</string>
+    <string name="l10n_mail_no_beacon" formatted="false">"此节点未找到已发布的地址。请收件人发布地址或分享联系人链接。"</string>
     <string name="l10n_mail_ambiguous_words" formatted="false">"地址不唯一。请索要联系人链接。"</string>
     <string name="l10n_mail_invalid_words" formatted="false">"请输入六个地址词、联系人链接或邮件公钥。"</string>
     <string name="l10n_mail_publication_scheduled" formatted="false">"已安排地址发布。"</string>
     <string name="l10n_mail_renewal_stopped" formatted="false">"此设备已停止续期地址。"</string>
+    <string name="l10n_mail_paste_key" formatted="false">"粘贴链接或邮件公钥"</string>
+    <string name="l10n_mail_recipient_ready" formatted="false">"收件人已确认"</string>
+    <string name="l10n_mail_retry_lookup" formatted="false">"点按重试"</string>
 </resources>

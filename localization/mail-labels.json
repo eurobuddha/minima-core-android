@@ -196,5 +196,8 @@
   "ambiguousWords": "mail.ambiguousWords",
   "invalidWords": "mail.invalidWords",
   "publicationScheduled": "mail.publicationScheduled",
-  "renewalStopped": "mail.renewalStopped"
+  "renewalStopped": "mail.renewalStopped",
+  "pasteKey": "mail.pasteKey",
+  "recipientReady": "mail.recipientReady",
+  "retryLookup": "mail.retryLookup"
 }
