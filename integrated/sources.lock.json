@@ -1405,6 +1405,17 @@
           "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "66e770af6f2eafd20f10fc86a293b264e8d8e2d1dc432ea513ffc194080266fb",
           "src/test/java/com/eurobuddha/merchinbox/InboxShowsIdentifiersWholeTest.java": "05efc8e9087a3c0d65df80b6a205ae9332f957298ae52b467aa8f9bbc25797a9"
         }
+      },
+      {
+        "revision": "ac2863267940f2e4ff1824e7b2c50455e309b08c",
+        "version": "0.5.17",
+        "summary": "One-time repair of rows marked paid for a wrong or short coin; MerchDb.deliverable re-checked from a fresh row before every send.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "dc53576ed519c807234dd6430298982132ec34d185c4d76f6503ac51db017d41",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "6c33b48c46731a1c5e24aca70adda4428e5fadb7a2064fb3aef40546f0e38b1a",
+          "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "8ec14e60b05a6fca029fcf6460218d73e995d054ac6090264f015b8f6aa0a1df",
+          "src/test/java/com/eurobuddha/merchinbox/InboxShowsIdentifiersWholeTest.java": "09bdf44bae6badaf19b050ff544984ab652141e128d880c01e31088eeabe9123"
+        }
       }
     ]
   },
