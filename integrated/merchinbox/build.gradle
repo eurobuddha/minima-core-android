@@ -9,7 +9,7 @@ android {
         buildConfigField 'int', 'VERSION_CODE', '503'
     }
     buildFeatures { buildConfig true }
-    testOptions { unitTests.returnDefaultValues = true }
+    testOptions { unitTests.returnDefaultValues = true; unitTests.includeAndroidResources = true }   // as merchshop: Robolectric screens read the l10n resources
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11

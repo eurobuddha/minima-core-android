@@ -445,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
             Language.setText(s, paired ? Language.msg(l10n_mail_connecting) : Language.msg(l10n_mall_shop_node_unavailable));
             s.setTextColor(Design.DIM);
         } else {
-            Language.setText(s, Language.msg(l10n_mall_inbox_ready, shortId(myId)));
+            Language.setText(s, Language.msg(l10n_mall_inbox_ready, myId));
             s.setTextColor(Design.IN);
         }
         col.addView(s);
@@ -554,7 +554,7 @@ public class MainActivity extends AppCompatActivity {
             row.addView(top);
             TextView sub = new TextView(MainActivity.this);
             String shopPrefix = o.shopName.isEmpty() ? "" : o.shopName + "   ·   ";
-            Language.setText(sub, Language.join(shopPrefix, o.amount, " ", dispCurrency(o), "   ·   ", shortId(o.counterparty), "   ·   ", timeAgo(o.date)));
+            Language.setText(sub, Language.join(shopPrefix, o.amount, " ", dispCurrency(o), "   ·   ", o.counterparty, "   ·   ", timeAgo(o.date)));
             sub.setTextColor(Design.DIM); sub.setTextSize(12f); sub.setPadding(0, dp(3), 0, 0);
             row.addView(sub);
             row.setOnClickListener(v -> openOrder(o.ref));
@@ -618,7 +618,7 @@ public class MainActivity extends AppCompatActivity {
             body.addView(kv(Language.msg(l10n_mall_shop_total), o.amount + " " + dispCurrency(o)));
             body.addView(kv(Language.msg(l10n_mall_shop_reference), o.ref));
             if (!o.shopName.isEmpty()) body.addView(kv(Language.msg(l10n_mall_inbox_shop), o.shopName));
-            if (!o.coinid.isEmpty()) body.addView(copyRow(Language.msg(l10n_mall_inbox_order_tx), shortId(o.coinid), o.coinid));
+            if (!o.coinid.isEmpty()) body.addView(copyRow(Language.msg(l10n_mall_inbox_order_tx), o.coinid, o.coinid));
 
             // delivery
             body.addView(sectionLabel(Language.msg(l10n_mall_shop_delivery)));
@@ -633,7 +633,7 @@ public class MainActivity extends AppCompatActivity {
                 for (String[] line : nfts) body.addView(nftSendRow(o, line));
             }
         }
-        body.addView(copyRow(Language.msg(l10n_mall_inbox_buyer_key), shortId(o.counterparty), o.counterparty));
+        body.addView(copyRow(Language.msg(l10n_mall_inbox_buyer_key), o.counterparty, o.counterparty));
 
         // status actions (orders only — an enquiry has no lifecycle)
         if (!inquiry) {
@@ -741,7 +741,7 @@ public class MainActivity extends AppCompatActivity {
         String sentTx = deliveredTx(o, line);
         if (!sentTx.isEmpty()) {
             TextView t = new TextView(this);
-            Language.setText(t, Language.msg(l10n_mall_inbox_sent_label, label, (("sent".equals(sentTx) || "posted".equals(sentTx)) ? "" : " · " + shortId(sentTx))));
+            Language.setText(t, Language.msg(l10n_mall_inbox_sent_label, label, (("sent".equals(sentTx) || "posted".equals(sentTx)) ? "" : " · " + sentTx)));
             t.setTextColor(Design.IN); t.setTextSize(13f); t.setPadding(0, dp(4), 0, dp(4));
             return t;
         }
@@ -764,7 +764,7 @@ public class MainActivity extends AppCompatActivity {
             if (nftSending.contains(key)) return;
             languageDialog()
                     .setTitle(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mall_inbox_send_nft))
-                    .setMessage(recovering ? Language.msg(l10n_mall_inbox_resume_help, shortId(o.payaddr)) : Language.msg(l10n_mall_inbox_send_help, label, shortId(tokenid), shortId(o.payaddr)))
+                    .setMessage(recovering ? Language.msg(l10n_mall_inbox_resume_help, o.payaddr) : Language.msg(l10n_mall_inbox_send_help, label, tokenid, o.payaddr))
                     .setPositiveButton(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mail_send), (d, w) -> sendNft(o, line, false))
                     .setNegativeButton(Language.msg(l10n_common_cancel), null)
                     .show();
@@ -1073,10 +1073,6 @@ public class MainActivity extends AppCompatActivity {
         if (MerchDb.PAID.equals(s) || MerchDb.CONFIRMED.equals(s)) return Design.ACCENT;
         if (MerchDb.UNDERPAID.equals(s) || MerchDb.WRONG_TOKEN.equals(s) || MerchDb.TOKEN_MISMATCH.equals(s)) return Design.RED;
         return Design.DIM2;
-    }
-    private static String shortId(String s) {
-        if (s == null || s.length() < 14) return s == null ? "" : s;
-        return s.substring(0, 8) + "…" + s.substring(s.length() - 4);
     }
     private static CharSequence timeAgo(long ms) { return ms <= 0 ? "" : Language.since(ms); }
     private String loadShopName() {

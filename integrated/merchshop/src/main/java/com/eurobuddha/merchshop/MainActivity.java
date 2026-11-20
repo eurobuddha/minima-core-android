@@ -781,7 +781,7 @@ public class MainActivity extends AppCompatActivity {
                 body.addView(kv(Language.msg(l10n_mall_shop_edition), p.nftSupply > 0 ? Language.msg(l10n_mall_shop_edition_of, p.nftStateIdx, p.nftSupply) : "#" + p.nftStateIdx));
                 if (!p.nftCollection.isEmpty()) body.addView(kv(Language.msg(l10n_nft_collection), p.nftCollection));
             }
-            body.addView(copyRow(Language.msg(l10n_utxo_token_id), shortId(p.nftTokenId), p.nftTokenId));
+            body.addView(copyRow(Language.msg(l10n_utxo_token_id), p.nftTokenId, p.nftTokenId));
             if (p.nftSupply > 0) body.addView(kv(Language.msg(l10n_utxo_supply), p.nftSupply + (p.nftTicker.isEmpty() ? "" : " · " + p.nftTicker)));
             else if (!p.nftTicker.isEmpty()) body.addView(kv(Language.msg(l10n_utxo_ticker), p.nftTicker));
             final String ext = p.nftExternalUrl;
@@ -985,7 +985,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout row = new LinearLayout(this); row.setTag("checkoutWallet"); row.setOrientation(LinearLayout.HORIZONTAL); row.setGravity(Gravity.CENTER_VERTICAL);
         row.setBackground(Design.roundBg(this, Design.SURFACE, 12)); row.setPadding(dp(14), dp(12), dp(14), dp(12));
         TextView a = new TextView(this);
-        Language.setText(a, buyerPayaddr.isEmpty() ? Language.msg(l10n_mall_shop_reading_address) : "◈ " + shortId(buyerPayaddr));
+        Language.setText(a, buyerPayaddr.isEmpty() ? Language.msg(l10n_mall_shop_reading_address) : "◈ " + buyerPayaddr);
         a.setTextColor(buyerPayaddr.isEmpty() ? Design.DIM : Design.TEXT); a.setTextSize(14f); a.setTypeface(null, Typeface.BOLD);
         a.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         row.addView(a);
@@ -1287,10 +1287,10 @@ public class MainActivity extends AppCompatActivity {
                 if (!o.delivery.isEmpty()) body.addView(kv(Language.msg(l10n_mail_to), o.delivery));
             } else {
                 for (String[] line : nfts) {
-                    body.addView(copyRow(line[0] + " ×" + line[2], "NFT · " + shortId(line[1]), line[1]));
+                    body.addView(copyRow(line[0] + " ×" + line[2], "NFT · " + line[1], line[1]));
                 }
                 if (o.payaddr != null && !o.payaddr.isEmpty())
-                    body.addView(copyRow(Language.msg(l10n_mall_shop_delivered_to), shortId(o.payaddr), o.payaddr));
+                    body.addView(copyRow(Language.msg(l10n_mall_shop_delivered_to), o.payaddr, o.payaddr));
                 if (!o.delivery.isEmpty()) body.addView(kv(Language.msg(l10n_mail_to), o.delivery));   // mixed order: physical address
             }
             addPaymentStatus(body, o);
@@ -1424,10 +1424,6 @@ public class MainActivity extends AppCompatActivity {
         return wrap;
     }
 
-    private static String shortId(String s) {
-        if (s == null || s.length() < 14) return s == null ? "" : s;
-        return s.substring(0, 8) + "…" + s.substring(s.length() - 4);
-    }
     private void copy(String s) {
         ((android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE))
                 .setPrimaryClip(android.content.ClipData.newPlainText("minimall", s));
