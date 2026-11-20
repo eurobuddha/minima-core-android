@@ -29,6 +29,56 @@ final class Listing {
 
     private static boolean plain(String v) { return v != null && v.matches("\\d{1,30}(\\.\\d{0,44})?|\\.\\d{1,44}"); }
 
+    /** The listing inside a .shop as the vendor's Studio sealed it to the vendor ("listingSealed": the shop without
+     *  pictures, sealed and signed with the shop key, security review M1): returns that plaintext, or throws with
+     *  the plain reason. Only the holder of this shop key can make one; a file without it is refused. */
+    static String unseal(String shopJson, com.eurobuddha.merchinbox.integratedcomms.CryptoProvider crypto, String myId) {
+        String blob;
+        try { blob = new JSONObject(shopJson).optString("listingSealed", ""); } catch (Exception e) { throw new IllegalArgumentException("That is not a .shop file."); }
+        if (blob.isEmpty()) throw new IllegalArgumentException("This .shop file is not signed by your shop key. Export it again from miniMall Studio (it now signs the listing) and import that file.");
+        com.eurobuddha.merchinbox.integratedcomms.Opened opened;
+        try { opened = crypto == null ? null : crypto.open(blob); } catch (Throwable e) { opened = null; }
+        if (opened == null || !opened.valid || myId == null || !myId.equalsIgnoreCase(opened.fromPublicId))
+            throw new IllegalArgumentException("This .shop file's listing is not signed by your shop key. Export it again from miniMall Studio and import that file.");
+        return new String(opened.plaintext, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    /** Every product of a compact listing (name, token id whole, price, stock) and its delivery fees, and how it
+     *  differs from the current one (null = none), for the vendor to read before "Use this listing". */
+    static String summary(JSONObject next, JSONObject current) {
+        StringBuilder sb = new StringBuilder("Shop \"" + next.optString("shopName", next.optString("shopId")) + "\" (" + next.optString("shopId") + "), paid in " + MerchMessage.label(next.optString("currency")) + "\n");
+        java.util.Map<String, String> now = lines(next), before = current == null ? new java.util.LinkedHashMap<>() : lines(current);
+        for (String l : now.values()) sb.append("\n• ").append(l);
+        if (current != null) {
+            StringBuilder d = new StringBuilder();
+            for (java.util.Map.Entry<String, String> e : now.entrySet()) {
+                String old = before.get(e.getKey());
+                if (old == null) d.append("\n+ ").append(e.getValue());
+                else if (!old.equals(e.getValue())) d.append("\n~ ").append(old).append("\n  → ").append(e.getValue());
+            }
+            for (java.util.Map.Entry<String, String> e : before.entrySet()) if (!now.containsKey(e.getKey())) d.append("\n− ").append(e.getValue());
+            sb.append("\n\nChanges from the listing in use:").append(d.length() == 0 ? "\nnone" : d.toString());
+        }
+        return sb.toString();
+    }
+
+    private static java.util.Map<String, String> lines(JSONObject l) {
+        java.util.Map<String, String> m = new java.util.LinkedHashMap<>();
+        JSONArray p = l.optJSONArray("products");
+        for (int i = 0; p != null && i < p.length(); i++) {
+            JSONObject x = p.optJSONObject(i); if (x == null) continue;
+            String t = x.optString("nftTokenId"), key = x.optString("name") + "|" + t + "|" + x.optInt("nftStateIdx") + "|" + x.optInt("nftBundle");
+            m.put(key, "\"" + x.optString("name") + "\"" + (t.isEmpty() ? "" : " token " + t + (x.optInt("nftStateIdx") > 0 ? " #" + x.optInt("nftStateIdx") : "") + (x.optInt("nftBundle") > 0 ? " (complete collection)" : ""))
+                    + ": price " + x.optString("price") + ", stock " + (x.optInt("nftStateIdx") > 0 || x.optInt("nftBundle") > 0 ? 1 : x.optInt("maxUnits", 10)));
+        }
+        JSONArray s = l.optJSONArray("shipping");
+        for (int i = 0; s != null && i < s.length(); i++) {
+            JSONObject x = s.optJSONObject(i); if (x == null) continue;
+            m.put("ship|" + x.optString("id"), "delivery \"" + x.optString("id") + "\": fee " + x.optString("fee"));
+        }
+        return m;
+    }
+
     /** A compact copy of the vendor's own .shop, or IllegalArgumentException with the plain reason. */
     static JSONObject compact(String shopJson, String myId) {
         JSONObject o;
@@ -48,6 +98,8 @@ final class Listing {
                 JSONObject p = in.optJSONObject(i); if (p == null) continue;
                 String price = p.optString("price", "");
                 if (!plain(price)) throw new IllegalArgumentException("The price of \"" + p.optString("name") + "\" is not a plain number (" + price + ").");
+                if (!p.optString("nftTokenId", "").isEmpty() && new BigDecimal(price).signum() <= 0)
+                    throw new IllegalArgumentException("The NFT \"" + cap(p.optString("name"), 60) + "\" is priced at 0: an NFT is never listed for nothing.");
                 products.put(new JSONObject().put("name", p.optString("name", "Item")).put("price", price)
                         .put("maxUnits", p.optInt("maxUnits", 10)).put("nftTokenId", p.optString("nftTokenId", ""))
                         .put("nftStateIdx", p.optInt("nftStateIdx", 0)).put("nftBundle", p.optInt("nftBundle", 0) > 0 ? 1 : 0));
@@ -61,6 +113,31 @@ final class Listing {
             }
             out.put("products", products).put("shipping", shipping);
         } catch (org.json.JSONException e) { throw new IllegalArgumentException("That is not a .shop file."); }
+        return out;
+    }
+
+    /** A buyer's items JSON, or null: refused unread when over 64 KB or nested deeper than 8 (scanned as text
+     *  first, so nothing huge or deep is ever parsed), and any parsing failure at all is null (review M2). */
+    static JSONArray items(String raw) {
+        if (raw == null || raw.isEmpty()) return new JSONArray();
+        if (raw.length() > 64 * 1024) return null;
+        int depth = 0; boolean inString = false, escaped = false;
+        for (int i = 0; i < raw.length(); i++) {
+            char ch = raw.charAt(i);
+            if (inString) { if (escaped) escaped = false; else if (ch == '\\') escaped = true; else if (ch == '"') inString = false; continue; }
+            if (ch == '"') inString = true;
+            else if (ch == '[' || ch == '{') { if (++depth > 8) return null; }
+            else if (ch == ']' || ch == '}') depth--;
+        }
+        try { return new JSONArray(raw); } catch (Throwable e) { return null; }
+    }
+
+    private static List<String> bundledList(JSONArray items) {
+        List<String> out = new ArrayList<>();
+        for (int i = 0; items != null && i < items.length(); i++) {
+            JSONObject it = items.optJSONObject(i);
+            if (it != null && it.optInt("nftBundle", 0) > 0) out.add(it.optString("nftTokenId", "").toLowerCase(java.util.Locale.ROOT));
+        }
         return out;
     }
 
@@ -103,10 +180,11 @@ final class Listing {
         if (want == null || !want.equals(MerchMessage.tokenFor(o.currency)))
             problems.add("the order's currency (" + MerchMessage.label(o.currency) + ") is not your shop's (" + MerchMessage.label(listing.optString("currency")) + ")");
         JSONArray items;
-        try { items = new JSONArray(o.items == null || o.items.isEmpty() ? "[]" : o.items); } catch (Exception e) { items = null; }
+        items = items(o.items);
         if (items == null || items.length() == 0) problems.add("the order has no items you can read");
         JSONArray products = listing.optJSONArray("products");
         java.util.Map<JSONObject, BigDecimal> perProduct = new java.util.IdentityHashMap<>();   // all lines of one product together (L6)
+        java.util.Set<String> bundled = new java.util.HashSet<>(), pieced = new java.util.HashSet<>();   // a token as a whole collection and as pieces (L1)
         if (items != null) for (int i = 0; i < items.length(); i++) {
             JSONObject it = items.optJSONObject(i);
             if (it == null) { problems.add("an item cannot be read"); continue; }
@@ -131,11 +209,14 @@ final class Listing {
             BigDecimal stated = bounded(it.optString("unitPrice", ""), 30, 44);
             if (stated == null || stated.compareTo(price) != 0) { problems.add(what + ": the order's price " + cap(it.optString("unitPrice", "(none)"), 60) + " is not your price " + price.toPlainString()); continue; }
             due = due.add(price.multiply(qty));
+            (bundle == 1 ? bundled : pieced).add(token.toLowerCase(java.util.Locale.ROOT));
             BigDecimal together = perProduct.getOrDefault(match, BigDecimal.ZERO).add(qty);
             perProduct.put(match, together);
             int stock = bundle == 1 || idx > 0 ? 1 : Math.max(1, match.optInt("maxUnits", 10));
             if (together.compareTo(BigDecimal.valueOf(stock)) > 0) problems.add(what + ": the order's lines together ask for " + together.toPlainString() + ", more than you list (" + stock + ")");
         }
+        for (String t : bundled) if (pieced.contains(t) || java.util.Collections.frequency(bundledList(items), t) > 1)
+            problems.add("the order asks for the complete collection of token " + cap(t, 80) + " and for more of the same token");
         BigDecimal fee = null;
         JSONArray shipping = listing.optJSONArray("shipping");
         for (int j = 0; shipping != null && j < shipping.length(); j++) {

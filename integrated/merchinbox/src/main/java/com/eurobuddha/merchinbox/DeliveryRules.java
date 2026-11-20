@@ -38,17 +38,25 @@ final class DeliveryRules {
     /** The default minimum confirmations of a payment coin; the vendor may raise it, never below 1. */
     static final int DEFAULT_MIN_CONF = 3;
 
+    /** The most payment coins one check reads (the node hands a large reply over as a file, never inline). */
+    static final int MAX_PAYMENT_COINS = 2000;
+
     private DeliveryRules() {}
 
     /** Everything read for one check. Replies are the node's JSON (null = no answer). */
     static final class Inputs {
         MerchDb.Order order;          // a fresh read
         boolean mismatch;
+        boolean deliverable;          // MerchDb.deliverable: recorded paid in full against the listing's due
+        boolean conflict;             // MerchDb.conflict: a second, different order came with this ref
+        String nonce = "";            // MerchDb.nonce: the order's secret ("" = an older Shop: unverified ref)
         JSONObject listing;           // compact (Listing.compact), or null
         String[] line;                // {name, tokenid, quantity, stateIdx, bundle}
         String lineState = "";        // DeliveryLedger state of this line
         boolean resuming;             // Pandamonium: this line's delivery journal already exists (it only resumes)
         BigDecimal delivered = BigDecimal.ZERO, inflight = BigDecimal.ZERO;
+        BigDecimal deliveredOfToken = BigDecimal.ZERO;   // every product of this token in this shop (L1)
+        boolean bundleTaken;                             // its complete collection is reserved or sent (L1)
         JSONObject tokenReply, holdingsReply, paymentReply;
         long tip;                     // current chain height
         int minConf = DEFAULT_MIN_CONF;
@@ -75,6 +83,9 @@ final class DeliveryRules {
         // 6. recipient
         if (!Util.isValidAddress(o.payaddr)) v.reasons.add("the order's buyer address is not a valid Minima address: " + Listing.cap(o.payaddr, 120));
         if (in.mismatch) v.reasons.add("the order names a token that is not its currency's");
+        if (!MerchMessage.validRef(o.ref)) v.reasons.add("the order's reference is not one the Shop makes: " + Listing.cap(o.ref, 70));
+        if (!in.deliverable) v.reasons.add("the order is not recorded as paid in full against your listing");
+        if (in.conflict) v.reasons.add("two buyers sent orders with this reference: nothing is sent for it");
 
         // 1 + 2. listing, and only what is listed
         if (in.listing == null) {
@@ -96,6 +107,8 @@ final class DeliveryRules {
         else {
             String t = DeliveryGuard.token(tokenid, in.tokenReply);
             if (t != null) v.reasons.add(t);
+            else if ((piece || bundle) && !StateNft.isStateNftScript(script(in.tokenReply)))   // L2
+                v.reasons.add("token " + tokenid + " is not a StateNFT collection, so it has no editions to send");
         }
 
         // 3 + 5. stock across orders, holding, once only (a resumed Pandamonium journal is its own reservation)
@@ -103,6 +116,8 @@ final class DeliveryRules {
         if (!in.resuming) {
             if (DeliveryLedger.RESERVED.equals(in.lineState)) v.reasons.add("this line's send did not finish and may have gone: check your wallet's history first");
             if (DeliveryLedger.SENT.equals(in.lineState)) v.reasons.add("this line was already sent");
+            if (bundle && in.deliveredOfToken.signum() > 0) v.reasons.add("pieces of this collection were already delivered or are being sent: the complete collection is no longer whole");
+            if (!bundle && in.bundleTaken) v.reasons.add("the complete collection of this token was already delivered or is being sent");
             if (v.stock.signum() > 0 && in.delivered.add(v.qty).compareTo(v.stock) > 0)
                 v.reasons.add("you list " + v.stock.toPlainString() + " of this product and " + in.delivered.toPlainString() + " are already delivered or being sent");
             if (v.held == null) v.reasons.add("your holdings of token " + tokenid + " could not be read");
@@ -114,11 +129,14 @@ final class DeliveryRules {
         String want = MerchMessage.tokenFor(o.currency);
         JSONArray coins = in.paymentReply == null || !in.paymentReply.optBoolean("status", false) ? null : in.paymentReply.optJSONArray("response");
         if (in.tip <= 0) v.reasons.add("the chain height could not be read");
-        if (coins == null) v.reasons.add("your payment coins could not be read");
+        if (coins != null && coins.length() > MAX_PAYMENT_COINS) { v.reasons.add("more than " + MAX_PAYMENT_COINS + " coins of this token are at your address: consolidate them before sending (M3)"); coins = null; }
+        else if (coins == null) v.reasons.add("your payment coins could not be read");
         else if (want != null) for (int i = 0; i < coins.length(); i++) {
             JSONObject c = coins.optJSONObject(i);
             if (c == null || !want.equalsIgnoreCase(c.optString("tokenid", "")) || c.optBoolean("spent", false)) continue;
-            if (!o.ref.equals(text(CommsScanner.statePort(c, 1)))) continue;
+            String h = CommsScanner.statePort(c, 1);   // no port 1, or not hex UTF-8, is never a payment (C1)
+            if (o.ref.isEmpty() || h == null || !o.ref.equals(text(h))) continue;
+            if (!in.nonce.isEmpty() && !MerchMessage.commitment(in.nonce).equalsIgnoreCase(String.valueOf(CommsScanner.statePort(c, 2)))) continue;   // not this buyer's payment (H1)
             String id = c.optString("coinid", "").toLowerCase(java.util.Locale.ROOT);
             String owner = in.counted.get(id);
             if (owner != null && !owner.isEmpty() && !owner.equals(o.ref)) { v.reasons.add("coin " + id + " was counted for order " + owner); continue; }
@@ -133,6 +151,15 @@ final class DeliveryRules {
         return v;
     }
 
+    private static String script(JSONObject reply) {
+        Object r = reply == null ? null : reply.opt("response");
+        if (r instanceof JSONArray) r = ((JSONArray) r).length() == 1 ? ((JSONArray) r).opt(0) : null;
+        if (!(r instanceof JSONObject)) return "";
+        JSONObject o = (JSONObject) r;
+        if (o.optJSONObject("token") != null) return o.optJSONObject("token").optString("script", o.optString("script", ""));
+        return o.optString("script", "");
+    }
+
     /** The order ref a payment coin carries in state port 1 (hex of UTF-8), or "". */
     static String text(String hex) {
         if (hex == null) return "";
@@ -140,6 +167,9 @@ final class DeliveryRules {
         if (h.length() % 2 != 0 || !h.matches("[0-9a-fA-F]*")) return "";
         byte[] b = new byte[h.length() / 2];
         for (int i = 0; i < b.length; i++) b[i] = (byte) Integer.parseInt(h.substring(2 * i, 2 * i + 2), 16);
-        return new String(b, StandardCharsets.UTF_8);
+        try {
+            return StandardCharsets.UTF_8.newDecoder().onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT).decode(java.nio.ByteBuffer.wrap(b)).toString();
+        } catch (java.nio.charset.CharacterCodingException e) { return ""; }
     }
 }

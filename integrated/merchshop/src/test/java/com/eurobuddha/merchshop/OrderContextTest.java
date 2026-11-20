@@ -61,7 +61,8 @@ public class OrderContextTest {
         assertEquals(ADDRESS,db.getMeta("vendoraddr:"+message.ref,""));
         Catalog replacement=new Catalog();replacement.vendorAddress=OTHER;replacement.tokenid="0xaa";set("catalog",replacement);
         Language.select(activity,"uk");replies.remove(0).onResult(accepted());pump();assertEquals(2,commands.size());
-        assertEquals("sendnosign address:"+ADDRESS+" amount:24.790000 tokenid:0x00 split:1 burn:0 state:{\"1\":\"0x"+Hex.to(message.ref.getBytes(java.nio.charset.StandardCharsets.UTF_8))+"\"} file:"+commands.get(1).split(" file:")[1],commands.get(1));
+        assertTrue("the order carries a secret and its ref has 64 bits (H1)", MerchMessage.validNonce(message.nonce) && message.ref.matches("ORD-[0-9A-F]{16}"));
+        assertEquals("sendnosign address:"+ADDRESS+" amount:24.790000 tokenid:0x00 split:1 burn:0 state:{\"1\":\"0x"+Hex.to(message.ref.getBytes(java.nio.charset.StandardCharsets.UTF_8))+"\",\"2\":\""+MerchMessage.commitment(message.nonce)+"\"} file:"+commands.get(1).split(" file:")[1],commands.get(1));
     }
     MerchDb.Order order(){MerchDb.Order o=new MerchDb.Order();o.ref="ORD-original";o.amount="0012.340000";o.tokenid="0x00";o.currency="Minima";o.shopId="original";return o;}
     void retry(MerchDb.Order o)throws Exception{call("retryPayment",new Class<?>[]{MerchDb.Order.class},o);}

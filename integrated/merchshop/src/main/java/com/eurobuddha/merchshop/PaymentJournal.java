@@ -16,6 +16,8 @@ public final class PaymentJournal {
     static final String PREPARED="PREPARED", POSTING="POSTING", UNKNOWN="UNKNOWN", POSTED="POSTED", CONFIRMED="CONFIRMED", NOT_SUBMITTED="NOT_SUBMITTED";
     private final MerchDb store;
     PaymentJournal(MerchDb store){this.store=store;LIVE.add(owner);}
+    /** The commitment of this order's secret for the payment's state port 2, "" for an order without one (H1). */
+    String commitment(MerchDb.Order o){return com.eurobuddha.merchshop.integratedcomms.MerchMessage.commitment(store.nonce(o));}
     void close(){LIVE.remove(owner);}
     public static void create(SQLiteDatabase db){db.execSQL("CREATE TABLE IF NOT EXISTS shop_payment (orderref TEXT PRIMARY KEY NOT NULL,data TEXT NOT NULL)");}
     static JSONObject read(String raw) {

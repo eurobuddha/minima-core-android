@@ -19,7 +19,7 @@ public class ListingSaveTest {
     @Test public void theExportedShopIsSavedForTheInboxAndReplacedEachTime() throws Exception {
         JSONObject shop = new JSONObject().put("shopName", "Art").put("shopId", "art").put("vendorPublicId", "0x" + "ab".repeat(64)).put("currency", "Minima");
         File f = new ShopExport(shop, "art", Collections.emptyList()).saveListing(tmp.getRoot());
-        assertEquals(new File(new File(tmp.getRoot(), "mall_listings"), "art.shop"), f);
+        assertEquals(new File(tmp.getRoot(), "art.shop"), f);
         assertEquals("art", new JSONObject(new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8)).getString("shopId"));
         shop.put("currency", "USDT");
         new ShopExport(shop, "art", Collections.emptyList()).saveListing(tmp.getRoot());

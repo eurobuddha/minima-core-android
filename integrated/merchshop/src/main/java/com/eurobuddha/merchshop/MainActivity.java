@@ -1166,7 +1166,7 @@ public class MainActivity extends AppCompatActivity {
         if (items.length() == 0) { toast(Language.msg(l10n_mall_shop_empty_error)); return; }
         total = total.add(shippingFee(shipId));   // grand total = items + shipping
 
-        final String ref = "ORD-" + MailText.randomId().substring(0, 8).toUpperCase();
+        final String ref = "ORD-" + MailText.randomId().substring(0, 16).toUpperCase();   // 64 random bits (H1)
         final String totalStr = total.toPlainString();
         if (!totalStr.equals(shownTotal)) { refuse(Language.msg(l10n_mall_shop_total_changed, shownTotal, totalStr)); return; }
         final MerchMessage m = new MerchMessage();
@@ -1174,6 +1174,7 @@ public class MainActivity extends AppCompatActivity {
         m.from = myId; m.to = catalog.vendorPublicId; m.date = System.currentTimeMillis();
         m.items = items.toString(); m.product = summary.toString();
         m.amount = totalStr; m.currency = catalog.currency; m.tokenid = payToken;
+        m.nonce = MerchMessage.newNonce();   // the order's secret: only this buyer and the vendor see it; the payment carries its commitment (H1)
         m.shipping = shipId; m.delivery = delivery; m.message = note; m.buyerPayaddr = buyerPayaddr;
         m.shopId = catalog.shopId; m.shopName = catalog.shopName;
         final String vendorAddress = catalog.vendorAddress;

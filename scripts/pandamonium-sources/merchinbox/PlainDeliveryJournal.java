@@ -59,7 +59,7 @@ public final class PlainDeliveryJournal {
     JSONObject prepare(String key,MerchDb.Order o,String[] line,String handle,JSONObject intent) {
         SQLiteDatabase db=store.getWritableDatabase();db.beginTransaction();
         try {
-            if(!LIVE.contains(owner))throw DeliveryEvidence.invalid();JSONObject old=bound(db,key,o,line);
+            if(!LIVE.contains(owner)||!DeliveryLedger.reservedFor(db,key))throw DeliveryEvidence.invalid();JSONObject old=bound(db,key,o,line);   // a journal only for a reserved line
             if(!retryable(old)||old==null&&(!store.getMeta("nftsent:"+key,"").isEmpty()||!store.getMeta("nftposted:"+key,"").isEmpty()))throw DeliveryEvidence.invalid();
             JSONObject exact=OrderPaymentEvidence.storedIntent(intent.toString());OrderPaymentEvidence.binds(exact,o.payaddr,line[2],line[1]);
             Set<String> inputs=OrderPaymentEvidence.inputIds(exact);assertAvailable(db,inputs,key);

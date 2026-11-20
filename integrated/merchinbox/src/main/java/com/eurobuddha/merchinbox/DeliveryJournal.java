@@ -19,7 +19,7 @@ public final class DeliveryJournal {
         db.execSQL("CREATE TABLE IF NOT EXISTS nft_delivery (linekey TEXT PRIMARY KEY NOT NULL, data TEXT NOT NULL)");
     }
     static String binding(MerchDb.Order o,String[] line) {
-        if(o==null||o.ref==null||!Util.isValidAddress(o.payaddr)||line==null||line.length!=5||!Util.isValidHexId(line[1]))throw DeliveryEvidence.invalid();
+        if(o==null||o.ref==null||!Util.isValidAddress(o.payaddr)||line==null||line.length<5||!Util.isValidHexId(line[1]))throw DeliveryEvidence.invalid();
         try { return new JSONArray().put(o.ref).put(o.counterparty==null?"":o.counterparty)
             .put(o.payaddr.startsWith("0x")?o.payaddr.toLowerCase(Locale.ROOT):o.payaddr)
             .put(o.items==null?"":o.items).put(line[1].toLowerCase(Locale.ROOT)).put(line[2]).put(line[3]).put(line[4]).toString(); }

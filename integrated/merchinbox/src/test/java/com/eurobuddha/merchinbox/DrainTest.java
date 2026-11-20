@@ -211,8 +211,10 @@ public class DrainTest {
     @Test public void aShopPublishedFromStudioHereIsTheListingWithoutAnImport() throws Exception {
         String listing = db.getMeta("listing:art", "");
         db.getWritableDatabase().delete("meta", "k=?", new String[]{"listing:art"});
-        java.io.File dir = new java.io.File(activity.getFilesDir(), "mall_listings"); dir.mkdirs();
-        java.nio.file.Files.write(new java.io.File(dir, "art.shop").toPath(), new JSONObject(listing).put("vendorPublicId", ME).toString().getBytes(StandardCharsets.UTF_8));
+        java.io.File dir = activity.getDir("mall_listings", android.content.Context.MODE_PRIVATE);   // Studio's private save (M1)
+        String shop = new JSONObject(listing).put("vendorPublicId", ME).toString();
+        set("crypto", new ListingTest.FakeCrypto());
+        java.nio.file.Files.write(new java.io.File(dir, "art.shop").toPath(), new JSONObject(shop).put("listingSealed", "sealed:" + ME + ":" + shop).toString().getBytes(StandardCharsets.UTF_8));
         MerchDb.Order o = order("ORD-STUDIO", "Piece", NFT, 1, "10");
         pay("ORD-STUDIO", "10", tip - 5, "0xAC");
         send(o, false);
@@ -225,5 +227,29 @@ public class DrainTest {
         assertTrue(t, t.contains("эта строка уже отправлена"));
         assertTrue(t, t.contains("0x" + "ab".repeat(32)));
         Language.select(activity, "en");
+    }
+
+    @Test public void aStudioFileThatIsNotSignedByThisShopKeyIsNotTheListing() throws Exception {
+        String listing = db.getMeta("listing:art", "");
+        db.getWritableDatabase().delete("meta", "k=?", new String[]{"listing:art"});
+        set("crypto", new ListingTest.FakeCrypto());
+        java.io.File dir = activity.getDir("mall_listings", android.content.Context.MODE_PRIVATE);
+        java.nio.file.Files.write(new java.io.File(dir, "art.shop").toPath(), new JSONObject(listing).put("vendorPublicId", ME).toString().getBytes(StandardCharsets.UTF_8));
+        java.io.File old = new java.io.File(activity.getFilesDir(), "mall_listings"); old.mkdirs();   // the 2.2.68 place is never read
+        String shop = new JSONObject(listing).put("vendorPublicId", ME).toString();
+        java.nio.file.Files.write(new java.io.File(old, "art.shop").toPath(), new JSONObject(shop).put("listingSealed", "sealed:" + ME + ":" + shop).toString().getBytes(StandardCharsets.UTF_8));
+        MerchDb.Order o = order("ORD-UNSIGNED", "Piece", NFT, 1, "10");
+        pay("ORD-UNSIGNED", "10", tip - 5, "0xAD");
+        send(o, false);
+        assertTrue(sends.isEmpty());
+    }
+
+    @Test public void aStuckSendIsReleasedOnlyByTheVendorAndFailuresAreNotifiedOnce() throws Exception {
+        String key = "ORD-STUCK:" + NFT;
+        assertNull(DeliveryLedger.reserve(db.getWritableDatabase(), "ORD-STUCK|0", "p", NFT, java.math.BigDecimal.ONE, java.math.BigDecimal.TEN, java.math.BigDecimal.TEN, key));
+        db.setMeta("nftposted:" + key, "posted");
+        DeliveryLedger.vendorRelease(db.getWritableDatabase(), key);
+        assertEquals(DeliveryLedger.RELEASED, DeliveryLedger.state(db.getReadableDatabase(), "ORD-STUCK|0"));
+        assertEquals("", db.getMeta("nftposted:" + key, ""));
     }
 }

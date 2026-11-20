@@ -1195,6 +1195,23 @@
         "files": {
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "87729bdfa3972ef09f9b142ea6e20f58c4eb98bb873847036584653e152023d1"
         }
+      },
+      {
+        "revision": "4626e07612186c59c2fd972baa45671c6a4d9af0",
+        "version": "0.4.22",
+        "summary": "H1: the order carries a secret, the payment its commitment in port 2 (here via PaymentFlow, and OrderPaymentEvidence.referenceStamp accepts that port 2); 64-bit refs.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchMessage.java": "515843c20b0d2df67be326652cfdc94e0699ccf2e1225514b197fd5c81c99d42",
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "1dfa3c06249f34ac7496013237e5baf327ffd2777070bba7c88a0313f727f777"
+        }
+      },
+      {
+        "revision": "3fcb6d93abf63e71fe8b5ab6bc50bbbebe5f86f9",
+        "version": "0.4.23",
+        "summary": "INFO: the MXUSD constant.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/CommsTransport.java": "938ed18cb53256b4f125cef282f33eef9d5a6e82b46d7693f74bb5270d713ecd"
+        }
       }
     ]
   },
@@ -1312,6 +1329,23 @@
         "summary": "Shared comms parity (MerchDb from Inbox 0.5.21). Here also (Pandamonium only): every export saves the published shop to files/mall_listings for the Inbox.",
         "files": {
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "87729bdfa3972ef09f9b142ea6e20f58c4eb98bb873847036584653e152023d1"
+        }
+      },
+      {
+        "revision": "0190c44569d49ece94ef65cd39e83baea011fec5",
+        "version": "0.3.20",
+        "summary": "Shared comms parity (C1/H1).",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchMessage.java": "515843c20b0d2df67be326652cfdc94e0699ccf2e1225514b197fd5c81c99d42"
+        }
+      },
+      {
+        "revision": "1bb44cd34ca52e9348c6d18c6b89ef90142c7f3a",
+        "version": "0.3.21",
+        "summary": "M1: the export carries the listing signed with the shop key.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchstudio/ShopExport.java": "4d3785ec07809df53339eb9150b97beeae90c44de5b6110263ab1dfdb9af4628",
+          "src/main/java/com/eurobuddha/merchstudio/MainActivity.java": "17a2ee6669d1e7da9f041f8b9b05e905f758cfebe58eb67160e3c72a2e6424f0"
         }
       }
     ]
@@ -1493,6 +1527,55 @@
         "files": {
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "87729bdfa3972ef09f9b142ea6e20f58c4eb98bb873847036584653e152023d1",
           "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "3f12582841fd23a8bf1c58b44d6cd4f3ebd675ce4c2d5457405414bbce8ac739"
+        }
+      },
+      {
+        "revision": "8fb4e03f3c8cf07f3ed44ba12479f817ace38528",
+        "version": "0.5.22",
+        "summary": "C1: refs must be valid; a payment coin must carry the ref in port 1 as valid hex UTF-8; sends need MerchDb.deliverable.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryRules.java": "3600ff43c56a700f38403602304202eed756a334d01124d1bab1da2aa90a77ac",
+          "src/main/java/com/eurobuddha/comms/MerchMessage.java": "03b27642ccdc1f5da66414eb419377775aaa8a897322b9ef6df8964559855991",
+          "src/test/java/com/eurobuddha/merchinbox/PocTest.java": "f555a3106ad98567e3f1a99c6b69fdea2faf29f74654e2c0b30287055846392e"
+        }
+      },
+      {
+        "revision": "b21b3f359730d2635097ff1203a45bf38ebd2790",
+        "version": "0.5.23",
+        "summary": "H1: conflict flag for a second different order with one ref; order secret + payment commitment in port 2; oldest-first scanning.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "1dfa3c06249f34ac7496013237e5baf327ffd2777070bba7c88a0313f727f777",
+          "src/main/java/com/eurobuddha/comms/MerchMessage.java": "515843c20b0d2df67be326652cfdc94e0699ccf2e1225514b197fd5c81c99d42",
+          "src/main/java/com/eurobuddha/comms/CommsScanner.java": "c72b3e8b27b9f94ea829fc40e40c58095a83001e8ecb0c6e66b29e9722471b8d",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryRules.java": "7e38b30027e7898da96df7d928140371a658b0a072e0f54cf046df8baa94595c"
+        }
+      },
+      {
+        "revision": "8122a8f7c590f58ce675d142ca62b26716eab049",
+        "version": "0.5.24",
+        "summary": "M2/M3: items over 64 KB or 8 deep refused unread; payment coins read by the currency's token, bounded.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/Listing.java": "82535852b7685ce63e7690360720c664363c9c7cf90b88b8bb368e4ae286632f",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryRules.java": "60b960db105f08695c57868fada3a5cb1e96b8456aa5bfa813e38e3c052ba30e"
+        }
+      },
+      {
+        "revision": "f1c388e702e52fccc4868a219f26936992c4b76c",
+        "version": "0.5.25",
+        "summary": "M1: only a listing signed by this shop key (listingSealed); summary before use (standalone); NFT at 0 refused. Here: Studio's save lives in getDir(mall_listings), signed too.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/Listing.java": "ad34c7a38ee3b851dc12e16c9b97bd30286f2634962b05974f78defd5ed84727"
+        }
+      },
+      {
+        "revision": "20b4878ad0999e2cdad276041f68e36eefbf6ff2",
+        "version": "0.5.26",
+        "summary": "L1/L2/L5/INFO: collection and pieces share stock; editions are StateNFT one-unit coins; identical lines get distinct keys; MXUSD constant.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryRules.java": "527bd010d711f3642e00e39f72c5e4dcfd3fb70e1818e1f8a68685a6e4e497f1",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryLedger.java": "2d70485c059222f2274480c7a72560cfe924ef2e14c2c2f547773898ce36e91d",
+          "src/main/java/com/eurobuddha/merchinbox/Listing.java": "c238d59e5b1128d4d461eb7a5c31ae93a5eda217f2063faea943aa871b88cd97",
+          "src/test/java/com/eurobuddha/merchinbox/PiecesTest.java": "ed1a99cb31dd7a73044dde651c6e6b0925df4d513d77d6a02cfb2203ad089835"
         }
       }
     ]

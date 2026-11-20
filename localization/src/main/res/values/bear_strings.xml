@@ -8750,4 +8750,22 @@
     <string name="l10n_mall_inbox_paid_of_due">"Paid on chain\n%1$s of %2$s due"</string>
     <string name="l10n_mall_inbox_not_sent_list" formatted="false">"Not sent:"</string>
     <string name="l10n_mall_inbox_waiting_list" formatted="false">"Waiting, nothing is sent until:"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_bad_ref">"the order\'s reference is not one the Shop makes: %1$s"</string>
+    <string name="l10n_mall_inbox_drain_r_not_deliverable" formatted="false">"the order is not recorded as paid in full against your listing"</string>
+    <string name="l10n_mall_inbox_drain_r_conflict" formatted="false">"two buyers sent orders with this reference: nothing is sent for it"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_flood">"more than %1$s coins of this token are at your address: consolidate them before sending"</string>
+    <string name="l10n_mall_inbox_drain_r_not_whole" formatted="false">"pieces of this collection were already delivered or are being sent: the complete collection is no longer whole"</string>
+    <string name="l10n_mall_inbox_drain_r_bundle_taken" formatted="false">"the complete collection of this token was already delivered or is being sent"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_not_state">"token %1$s is not a StateNFT collection, so it has no editions to send"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_bundle_plus">"the order asks for the complete collection of token %1$s and for more of the same token"</string>
+    <string name="l10n_mall_inbox_drain_i_unsigned" formatted="false">"This .shop file is not signed by your shop key. Export it again from miniMall Studio (it now signs the listing) and import that file."</string>
+    <string name="l10n_mall_inbox_drain_i_bad_sig" formatted="false">"This .shop file\'s listing is not signed by your shop key. Export it again from miniMall Studio and import that file."</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_i_zero">"The NFT \"%1$s\" is priced at 0: an NFT is never listed for nothing."</string>
+    <string name="l10n_mall_inbox_conflict_line" formatted="false">"Two buyers sent orders with this reference (it is public once paid). Nothing is sent for it: ask the buyer who paid, by message, before you send anything by hand outside this app."</string>
+    <string name="l10n_mall_inbox_unverified_ref" formatted="false">"This order came from an older Shop without a payment secret: its payment is matched by its reference only."</string>
 </resources>

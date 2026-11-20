@@ -8824,4 +8824,22 @@
     <string name="l10n_mall_inbox_paid_of_due">"Оплачено в цепи\n%1$s из %2$s"</string>
     <string name="l10n_mall_inbox_not_sent_list" formatted="false">"Не отправлено:"</string>
     <string name="l10n_mall_inbox_waiting_list" formatted="false">"Ожидание, ничего не отправляется, пока:"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_bad_ref">"номер заказа не похож на номер из магазина: %1$s"</string>
+    <string name="l10n_mall_inbox_drain_r_not_deliverable" formatted="false">"заказ не отмечен как полностью оплаченный по вашему списку"</string>
+    <string name="l10n_mall_inbox_drain_r_conflict" formatted="false">"два покупателя прислали заказы с этим номером: по нему ничего не отправляется"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_flood">"на вашем адресе больше %1$s монет этого токена: объедините их перед отправкой"</string>
+    <string name="l10n_mall_inbox_drain_r_not_whole" formatted="false">"экземпляры этой коллекции уже доставлены или отправляются: полная коллекция больше не цела"</string>
+    <string name="l10n_mall_inbox_drain_r_bundle_taken" formatted="false">"полная коллекция этого токена уже доставлена или отправляется"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_not_state">"токен %1$s не коллекция StateNFT, у него нет экземпляров для отправки"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_bundle_plus">"заказ просит полную коллекцию токена %1$s и ещё этот же токен"</string>
+    <string name="l10n_mall_inbox_drain_i_unsigned" formatted="false">"Этот файл .shop не подписан ключом вашего магазина. Экспортируйте его снова из miniMall Studio (теперь список подписывается) и загрузите этот файл."</string>
+    <string name="l10n_mall_inbox_drain_i_bad_sig" formatted="false">"Список в этом файле .shop не подписан ключом вашего магазина. Экспортируйте его снова из miniMall Studio и загрузите этот файл."</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_i_zero">"NFT «%1$s» стоит 0: NFT никогда не выставляется бесплатно."</string>
+    <string name="l10n_mall_inbox_conflict_line" formatted="false">"Два покупателя прислали заказы с этим номером (после оплаты он публичен). По нему ничего не отправляется: прежде чем отправлять что-либо вручную вне этого приложения, спросите в сообщении покупателя, который заплатил."</string>
+    <string name="l10n_mall_inbox_unverified_ref" formatted="false">"Этот заказ пришёл из старого магазина без секрета оплаты: его оплата сопоставляется только по номеру."</string>
 </resources>

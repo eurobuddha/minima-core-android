@@ -43813,5 +43813,83 @@
     "zh-Hans": "等待中，在以下条件满足前不会发送：",
     "ru": "Ожидание, ничего не отправляется, пока:",
     "uk": "Очікування, нічого не надсилається, доки:"
+  },
+  "mallInboxDrain.rBadRef": {
+    "en": "the order's reference is not one the Shop makes: {a}",
+    "zh-Hans": "订单的编号不是商店生成的格式：{a}",
+    "ru": "номер заказа не похож на номер из магазина: {a}",
+    "uk": "номер замовлення не схожий на номер із магазину: {a}"
+  },
+  "mallInboxDrain.rNotDeliverable": {
+    "en": "the order is not recorded as paid in full against your listing",
+    "zh-Hans": "此订单未记录为已按您的商品列表全额付款",
+    "ru": "заказ не отмечен как полностью оплаченный по вашему списку",
+    "uk": "замовлення не позначене як повністю сплачене за вашим списком"
+  },
+  "mallInboxDrain.rConflict": {
+    "en": "two buyers sent orders with this reference: nothing is sent for it",
+    "zh-Hans": "有两位买家用同一编号下单：不会为其发送任何内容",
+    "ru": "два покупателя прислали заказы с этим номером: по нему ничего не отправляется",
+    "uk": "два покупці надіслали замовлення з цим номером: за ним нічого не надсилається"
+  },
+  "mallInboxDrain.rFlood": {
+    "en": "more than {a} coins of this token are at your address: consolidate them before sending",
+    "zh-Hans": "您的地址上有超过 {a} 个此代币的币：请先合并再发送",
+    "ru": "на вашем адресе больше {a} монет этого токена: объедините их перед отправкой",
+    "uk": "на вашій адресі понад {a} монет цього токена: об’єднайте їх перед надсиланням"
+  },
+  "mallInboxDrain.rNotWhole": {
+    "en": "pieces of this collection were already delivered or are being sent: the complete collection is no longer whole",
+    "zh-Hans": "此系列的部分藏品已交付或正在发送：完整系列已不再完整",
+    "ru": "экземпляры этой коллекции уже доставлены или отправляются: полная коллекция больше не цела",
+    "uk": "примірники цієї колекції вже доставлено або надсилаються: повна колекція вже не ціла"
+  },
+  "mallInboxDrain.rBundleTaken": {
+    "en": "the complete collection of this token was already delivered or is being sent",
+    "zh-Hans": "此代币的完整系列已交付或正在发送",
+    "ru": "полная коллекция этого токена уже доставлена или отправляется",
+    "uk": "повну колекцію цього токена вже доставлено або надсилається"
+  },
+  "mallInboxDrain.rNotState": {
+    "en": "token {a} is not a StateNFT collection, so it has no editions to send",
+    "zh-Hans": "代币 {a} 不是 StateNFT 系列，没有可发送的版本",
+    "ru": "токен {a} не коллекция StateNFT, у него нет экземпляров для отправки",
+    "uk": "токен {a} не колекція StateNFT, у нього немає примірників для надсилання"
+  },
+  "mallInboxDrain.lBundlePlus": {
+    "en": "the order asks for the complete collection of token {a} and for more of the same token",
+    "zh-Hans": "订单要求代币 {a} 的完整系列，同时还要更多同一代币",
+    "ru": "заказ просит полную коллекцию токена {a} и ещё этот же токен",
+    "uk": "замовлення просить повну колекцію токена {a} і ще цей самий токен"
+  },
+  "mallInboxDrain.iUnsigned": {
+    "en": "This .shop file is not signed by your shop key. Export it again from miniMall Studio (it now signs the listing) and import that file.",
+    "zh-Hans": "此 .shop 文件没有用您的商店密钥签名。请在 miniMall Studio 中重新导出（现在会签名商品列表），再导入该文件。",
+    "ru": "Этот файл .shop не подписан ключом вашего магазина. Экспортируйте его снова из miniMall Studio (теперь список подписывается) и загрузите этот файл.",
+    "uk": "Цей файл .shop не підписано ключем вашого магазину. Експортуйте його знову з miniMall Studio (тепер список підписується) і завантажте цей файл."
+  },
+  "mallInboxDrain.iBadSig": {
+    "en": "This .shop file's listing is not signed by your shop key. Export it again from miniMall Studio and import that file.",
+    "zh-Hans": "此 .shop 文件中的商品列表没有用您的商店密钥签名。请在 miniMall Studio 中重新导出，再导入该文件。",
+    "ru": "Список в этом файле .shop не подписан ключом вашего магазина. Экспортируйте его снова из miniMall Studio и загрузите этот файл.",
+    "uk": "Список у цьому файлі .shop не підписано ключем вашого магазину. Експортуйте його знову з miniMall Studio і завантажте цей файл."
+  },
+  "mallInboxDrain.iZero": {
+    "en": "The NFT \"{a}\" is priced at 0: an NFT is never listed for nothing.",
+    "zh-Hans": "NFT“{a}”的价格为 0：NFT 绝不会免费上架。",
+    "ru": "NFT «{a}» стоит 0: NFT никогда не выставляется бесплатно.",
+    "uk": "NFT «{a}» коштує 0: NFT ніколи не виставляється безкоштовно."
+  },
+  "mallInbox.conflictLine": {
+    "en": "Two buyers sent orders with this reference (it is public once paid). Nothing is sent for it: ask the buyer who paid, by message, before you send anything by hand outside this app.",
+    "zh-Hans": "有两位买家用同一编号下单（付款后编号即公开）。不会为其发送任何内容：在本应用之外手动发送任何东西之前，请先通过消息询问付款的买家。",
+    "ru": "Два покупателя прислали заказы с этим номером (после оплаты он публичен). По нему ничего не отправляется: прежде чем отправлять что-либо вручную вне этого приложения, спросите в сообщении покупателя, который заплатил.",
+    "uk": "Два покупці надіслали замовлення з цим номером (після оплати він публічний). За ним нічого не надсилається: перш ніж надсилати щось вручну поза цим застосунком, запитайте в повідомленні покупця, який заплатив."
+  },
+  "mallInbox.unverifiedRef": {
+    "en": "This order came from an older Shop without a payment secret: its payment is matched by its reference only.",
+    "zh-Hans": "此订单来自没有付款密钥的旧版商店：其付款仅按编号匹配。",
+    "ru": "Этот заказ пришёл из старого магазина без секрета оплаты: его оплата сопоставляется только по номеру.",
+    "uk": "Це замовлення прийшло зі старого магазину без секрету оплати: його оплата зіставляється лише за номером."
   }
 }

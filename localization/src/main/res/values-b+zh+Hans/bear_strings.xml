@@ -8713,4 +8713,22 @@
     <string name="l10n_mall_inbox_paid_of_due">"链上已付\n%1$s，应付 %2$s"</string>
     <string name="l10n_mall_inbox_not_sent_list" formatted="false">"未发送："</string>
     <string name="l10n_mall_inbox_waiting_list" formatted="false">"等待中，在以下条件满足前不会发送："</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_bad_ref">"订单的编号不是商店生成的格式：%1$s"</string>
+    <string name="l10n_mall_inbox_drain_r_not_deliverable" formatted="false">"此订单未记录为已按您的商品列表全额付款"</string>
+    <string name="l10n_mall_inbox_drain_r_conflict" formatted="false">"有两位买家用同一编号下单：不会为其发送任何内容"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_flood">"您的地址上有超过 %1$s 个此代币的币：请先合并再发送"</string>
+    <string name="l10n_mall_inbox_drain_r_not_whole" formatted="false">"此系列的部分藏品已交付或正在发送：完整系列已不再完整"</string>
+    <string name="l10n_mall_inbox_drain_r_bundle_taken" formatted="false">"此代币的完整系列已交付或正在发送"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_not_state">"代币 %1$s 不是 StateNFT 系列，没有可发送的版本"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_bundle_plus">"订单要求代币 %1$s 的完整系列，同时还要更多同一代币"</string>
+    <string name="l10n_mall_inbox_drain_i_unsigned" formatted="false">"此 .shop 文件没有用您的商店密钥签名。请在 miniMall Studio 中重新导出（现在会签名商品列表），再导入该文件。"</string>
+    <string name="l10n_mall_inbox_drain_i_bad_sig" formatted="false">"此 .shop 文件中的商品列表没有用您的商店密钥签名。请在 miniMall Studio 中重新导出，再导入该文件。"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_i_zero">"NFT“%1$s”的价格为 0：NFT 绝不会免费上架。"</string>
+    <string name="l10n_mall_inbox_conflict_line" formatted="false">"有两位买家用同一编号下单（付款后编号即公开）。不会为其发送任何内容：在本应用之外手动发送任何东西之前，请先通过消息询问付款的买家。"</string>
+    <string name="l10n_mall_inbox_unverified_ref" formatted="false">"此订单来自没有付款密钥的旧版商店：其付款仅按编号匹配。"</string>
 </resources>

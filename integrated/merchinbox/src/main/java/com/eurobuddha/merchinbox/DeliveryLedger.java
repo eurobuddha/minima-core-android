@@ -57,6 +57,25 @@ final class DeliveryLedger {
         return t;
     }
 
+    /** Units of every product of one token in one shop reserved or sent, and whether one of them is the complete
+     *  collection (review L1: a complete collection uses every piece's stock, and a piece uses the collection's). */
+    static BigDecimal deliveredOfToken(SQLiteDatabase db, String tokenPrefix) { return like(db, tokenPrefix, false); }
+    static boolean bundleTaken(SQLiteDatabase db, String tokenPrefix) { return like(db, tokenPrefix, true).signum() > 0; }
+
+    private static BigDecimal like(SQLiteDatabase db, String prefix, boolean bundlesOnly) {
+        BigDecimal t = BigDecimal.ZERO;
+        try (Cursor c = db.rawQuery("SELECT v FROM meta WHERE k LIKE 'ledger:%'", null)) {
+            while (c.moveToNext()) {
+                JSONObject r;
+                try { r = new JSONObject(c.getString(0)); } catch (org.json.JSONException e) { continue; }
+                String product = r.optString("product");
+                if (RELEASED.equals(r.optString("state", RESERVED)) || !product.startsWith(prefix) || bundlesOnly && !product.endsWith("|1")) continue;
+                try { t = t.add(new BigDecimal(r.optString("qty", "0"))); } catch (NumberFormatException ignored) {}
+            }
+        }
+        return t;
+    }
+
     /** Reserve a line for sending, or the reason it may not be sent (once only, stock across orders, holding). */
     static String reserve(SQLiteDatabase db, String lineKey, String product, String tokenid, BigDecimal qty, BigDecimal stock, BigDecimal held) {
         return reserve(db, lineKey, product, tokenid, qty, stock, held, "");
@@ -131,5 +150,19 @@ final class DeliveryLedger {
                 } catch (org.json.JSONException ignored) {}
             }
         }
+    }
+
+    /** The vendor checked the wallet history and the transfer of this journal key did not go (review L3: a send
+     *  stuck as unknown, or whose coins were moved): its journal rows are removed and its ledger row released, so
+     *  it can be sent again. Only from the vendor's confirmation; never automatically. */
+    static void vendorRelease(SQLiteDatabase db, String journalKey) {
+        db.beginTransaction();
+        try {
+            db.delete("nft_plain_delivery", "linekey=?", new String[]{journalKey});
+            db.delete("nft_delivery", "linekey=?", new String[]{journalKey});
+            db.delete("meta", "k=? OR k=?", new String[]{"nftposted:" + journalKey, "notified:" + journalKey});
+            markJournal(db, journalKey, RELEASED);
+            db.setTransactionSuccessful();
+        } finally { db.endTransaction(); }
     }
 }

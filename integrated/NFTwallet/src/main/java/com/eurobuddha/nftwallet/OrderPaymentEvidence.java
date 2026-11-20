@@ -31,12 +31,21 @@ public final class OrderPaymentEvidence {
         TransactionEvidence.receipt(reply,intent);
         return TransactionEvidence.storedIntent(intent.toString());
     }
+    /** The order ref in state port 1 and, for a miniMall order with a secret, its commitment (0x + 64 hex) in port 2
+     *  (Pandamonium 2.2.69, security review H1); nothing else. */
     public static void referenceStamp(JSONObject reply,String ref) {
         JSONObject txn=TransactionEvidence.txpow(reply).optJSONObject("body").optJSONObject("txn");
         JSONArray state=txn==null?null:txn.optJSONArray("state");
-        JSONObject stamp=state==null||state.length()!=1?null:state.optJSONObject(0);
-        if(stamp==null||!"1".equals(String.valueOf(stamp.opt("port")))
-                ||!(stamp.opt("data") instanceof String)||!reference(ref).equalsIgnoreCase(stamp.optString("data")))throw TransactionEvidence.invalid();
+        if(state==null||state.length()<1||state.length()>2)throw TransactionEvidence.invalid();
+        boolean refSeen=false;
+        for(int i=0;i<state.length();i++) {
+            JSONObject e=state.optJSONObject(i);
+            if(e==null||!(e.opt("data") instanceof String))throw TransactionEvidence.invalid();
+            String port=String.valueOf(e.opt("port"));
+            if("1".equals(port)&&!refSeen&&reference(ref).equalsIgnoreCase(e.optString("data")))refSeen=true;
+            else if(!"2".equals(port)||state.length()!=2||!e.optString("data").matches("0x[0-9a-fA-F]{64}"))throw TransactionEvidence.invalid();
+        }
+        if(!refSeen)throw TransactionEvidence.invalid();
     }
     public static JSONObject storedIntent(String raw){return TransactionEvidence.storedIntent(raw);}
     public static void binds(JSONObject intent,String address,String amount,String token) {

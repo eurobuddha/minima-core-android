@@ -33,6 +33,15 @@ final class ShopExport {
         this.images=Collections.unmodifiableList(new ArrayList<>(images));
     }
 
+    /** The listing Studio signs: the shop without pictures, collection icons or an earlier signature. */
+    static String listingOf(JSONObject shop) throws Exception {
+        JSONObject l=new JSONObject(shop.toString());
+        l.remove("nftCollections"); l.remove("listingSealed");
+        org.json.JSONArray p=l.optJSONArray("products");
+        for (int i=0;p!=null&&i<p.length();i++) { JSONObject x=p.optJSONObject(i); if (x!=null) x.remove("image"); }
+        return l.toString();
+    }
+
     JSONObject render(Resolver resolver) throws Exception {
         JSONObject result=new JSONObject(json);
         for (Image image:images) {
@@ -50,13 +59,12 @@ final class ShopExport {
         return n;
     }
 
-    /** Where the Inbox in this app reads the vendor's published listing (its MainActivity.LISTINGS): the shop as
-     *  exported, without pictures, at files/mall_listings/<shopId>.shop, replaced atomically on every export, so
-     *  every order of this shop is checked against what the vendor last published without an import. */
-    File saveListing(File filesDir) throws Exception {
+    /** Where the Inbox in this app reads the vendor's published listing: the shop as exported (without pictures, with
+     *  its signed listing) at <dir>/<shopId>.shop, dir = getDir("mall_listings") (private, outside the node's
+     *  file folder, review M1), replaced atomically on every export. */
+    File saveListing(File dir) throws Exception {
         String shopId=new JSONObject(json).optString("shopId","");
         if (!shopId.matches("[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*")) throw new IllegalArgumentException("Invalid shop id");
-        File dir=new File(filesDir,"mall_listings");
         if (!dir.isDirectory() && !dir.mkdirs()) throw new IOException("Cannot create the listing folder");
         File part=new File(dir,shopId+".part"), destination=new File(dir,shopId+".shop");
         try (FileOutputStream output=new FileOutputStream(part)) { output.write(json.getBytes(StandardCharsets.UTF_8)); output.getFD().sync(); }

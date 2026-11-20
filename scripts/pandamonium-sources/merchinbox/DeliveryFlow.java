@@ -43,7 +43,7 @@ final class DeliveryFlow {
                         JSONArray list=DeliveryEvidence.coins(reply,DeliveryFlow.this.line[1]);
                         for(int i=0;i<list.length();i++) {
                             JSONObject coin=list.getJSONObject(i);String stamp=StateNft.stamped(coin);
-                            if(StateNft.isBuried(coin)||stamp==null||!StateNft.replayableState(coin))continue;
+                            if(StateNft.isBuried(coin)||stamp==null||!StateNft.replayableState(coin)||!MainActivity.oneUnit(coin))continue;   // exactly 1 unit (L2)
                             if(!"1".equals(DeliveryFlow.this.line[4])&&!DeliveryFlow.this.line[3].equals(stamp))continue;
                             DeliveryEvidence.intent(coin,DeliveryFlow.this.line[1]);
                             selected.add(coin);coins.put(coin.getString("coinid").toLowerCase(Locale.ROOT),coin);

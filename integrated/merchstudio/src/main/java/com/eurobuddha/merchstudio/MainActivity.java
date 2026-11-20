@@ -90,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String vendorPublicId = "", vendorAddress = "";
+    /** The shop key itself (from the node seed), kept to sign the listing on export (security review M1). */
+    private volatile com.eurobuddha.merchstudio.integratedcomms.CommsIdentity studioId;
 
     private String shopName = "", about = "";
     private String currency = "Minima", tokenid = CommsTransport.MINIMA;
@@ -274,7 +276,9 @@ public class MainActivity extends AppCompatActivity {
         io.execute(() -> {
             try {
                 byte[] seed = ikm.startsWith("0x") ? Hex.from(ikm) : ikm.getBytes(StandardCharsets.UTF_8);
-                String pid = CommsIdentity.fromSeed(ls, seed).publicId();
+                com.eurobuddha.merchstudio.integratedcomms.CommsIdentity id = CommsIdentity.fromSeed(ls, seed);
+                studioId = id;
+                String pid = id.publicId();
                 ui.post(() -> { vendorPublicId = pid; refreshIfTag("gallery"); });
             } catch (Exception e) { ui.post(() -> toast(Language.msg(l10n_mall_shop_identity_error, StudioMessages.error(e)))); }
         });
@@ -1240,7 +1244,7 @@ public class MainActivity extends AppCompatActivity {
         body.addView(sectionLabel(Language.msg(l10n_mall_studio_ui_pays)));
         LinearLayout cur = new LinearLayout(this); cur.setOrientation(LinearLayout.HORIZONTAL);
         cur.addView(seg("Minima", currency.equals("Minima"), () -> { currency = "Minima"; tokenid = CommsTransport.MINIMA; refreshTop(buildShopDetails()); }));
-        cur.addView(seg("MxUSD", currency.equals("USDT"), () -> { currency = "USDT"; tokenid = CommsTransport.USDT; refreshTop(buildShopDetails()); }));
+        cur.addView(seg("MxUSD", currency.equals("USDT"), () -> { currency = "USDT"; tokenid = CommsTransport.MXUSD; refreshTop(buildShopDetails()); }));
         body.addView(cur);
 
         // Shipping only matters for typed goods — NFT-only shops deliver on-chain.
@@ -1364,7 +1368,7 @@ public class MainActivity extends AppCompatActivity {
         io.execute(() -> {
             try {
                 File f = snapshot.write(getCacheDir(), MainActivity::resolveExportImage);
-                snapshot.saveListing(getFilesDir());   // the Inbox here checks orders against what was just published
+                snapshot.saveListing(getDir("mall_listings", MODE_PRIVATE));   // the Inbox here checks orders against what was just published (M1: outside the node's file folder)
                 Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".merchstudio.fileprovider", f);
                 ui.post(() -> {
                     finishExport();
@@ -1496,6 +1500,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+        // The vendor's signed listing (security review M1): the shop without pictures, sealed and signed with the
+        // shop key to the shop key, so the vendor's own Inbox can tell it is theirs and unchanged.
+        if (studioId == null || !studioId.publicId().equals(vendorPublicId)) throw new IllegalStateException("Your shop key is not ready yet: connect your node and try again.");
+        o.put("listingSealed", new com.eurobuddha.merchstudio.integratedcomms.LocalEcCryptoProvider(ls, studioId).seal(vendorPublicId, ShopExport.listingOf(o).getBytes(StandardCharsets.UTF_8)));
         return new ShopExport(o, slug(shopName), images);
     }
 
