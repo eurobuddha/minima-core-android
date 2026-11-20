@@ -1178,6 +1178,15 @@
           "src/main/java/com/eurobuddha/merchshop/MainActivity.java": "15a93ee953efb2e8af20dd42a68d5e45aacdf7240ab9329b646393d17e384715",
           "src/test/java/com/eurobuddha/merchshop/ShopPaysCurrencyTokenTest.java": "22eb5761cad0714c1d5e9d213e421258c68415c6f933c21ae1e1494b77d8d46c"
         }
+      },
+      {
+        "revision": "035306649bc65c9ac6c349aff3053a64a883b0d3",
+        "version": "0.4.19",
+        "summary": "Shared comms parity (MerchDb from Inbox 0.5.15-0.5.18); already in this snapshot's MerchDb with 2.2.62-2.2.66. Shop 0.4.18 (standalone Retry payment) is not ported: this snapshot's PaymentJournal already decides retries.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "2ada9bac78d4a29afef4c4f3074ac5a3681b56e5f0b7b6fac3dfb568c3cbcf20",
+          "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "1f1286b27674966e18efb698007f46757b6ff0554f71b156c8f39fabfd7e95bc"
+        }
       }
     ]
   },
@@ -1279,6 +1288,14 @@
           "src/main/java/com/eurobuddha/merchstudio/MainActivity.java": "e135e939f2593c43350b960e88b25d7160d3d966c070f8d0f4ae946f82763046",
           "src/main/java/com/eurobuddha/merchstudio/Util.java": "2be531871285b44c8f15f3fd0111ae51028f4d044aa887f0f3809889f656e347",
           "src/test/java/com/eurobuddha/merchstudio/PlainAmountTest.java": "c207dbd89189f68d16ae3d68d252632da8fa4f7231ade5aac42690c8ab4ef2d8"
+        }
+      },
+      {
+        "revision": "803d17982d460dce2bd21a3fafbb99b998321335",
+        "version": "0.3.18",
+        "summary": "Shared comms parity (MerchDb from Inbox 0.5.15-0.5.18); already in this snapshot's MerchDb with 2.2.62-2.2.66.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "2ada9bac78d4a29afef4c4f3074ac5a3681b56e5f0b7b6fac3dfb568c3cbcf20"
         }
       }
     ]
