@@ -69,7 +69,13 @@ public class OrderContextTest {
     @Test public void retryUsesSavedAddressAndOriginalReferenceAcrossDelayedWork()throws Exception {
         Catalog c=prepare();c.vendorAddress=OTHER;MerchMessage m=new MerchMessage();m.ref="ORD-original";m.amount="0012.340000";m.tokenid="0x00";m.currency="Minima";
         PaymentJournal journal=new PaymentJournal(db);set("paymentJournal",journal);assertTrue(journal.saveOrder(m,ADDRESS));journal.orderSent(m.ref);
-        MerchDb.Order o=db.order(m.ref);retry(o);o.ref="ORD-mutated";o.amount="999";o.tokenid="0xff";pump();
+        MerchDb.Order o=db.order(m.ref);retry(o);
+        android.app.Dialog q=org.robolectric.shadows.ShadowDialog.getLatestDialog();   // the whole "Pay …?" question first (review L1)
+        String asked=((android.widget.TextView)q.findViewById(android.R.id.message)).getText().toString();
+        assertTrue(asked,asked.contains("\n0012.340000\n")&&asked.contains("\n0x00\n")&&asked.endsWith("\n"+ADDRESS));
+        assertTrue("nothing is sent before the answer",commands.isEmpty());
+        ((androidx.appcompat.app.AlertDialog)q).getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick();
+        o.ref="ORD-mutated";o.amount="999";o.tokenid="0xff";pump();
         assertEquals(1,commands.size());assertTrue(commands.get(0).startsWith("sendnosign address:"+ADDRESS+" amount:0012.340000 tokenid:0x00 "));
         assertTrue(commands.get(0).contains(Hex.to("ORD-original".getBytes(java.nio.charset.StandardCharsets.UTF_8))));verifyNoInteractions(store);
     }

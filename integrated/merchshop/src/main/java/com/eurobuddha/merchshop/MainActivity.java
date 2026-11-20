@@ -1212,15 +1212,28 @@ public class MainActivity extends AppCompatActivity {
         // An order placed before the fix may carry a token id that is not its currency's: refused here (and in
         // PaymentJournal.paymentOrder, which every payment path reads).
         if (MerchMessage.tokenProblem(o.currency, o.tokenid) != null) { refuse(tokenRefusal(o.currency, o.tokenid)); return; }
+        final MerchDb.Order current;
+        final boolean resend;
         try {
-            MerchDb.Order current = paymentJournal().paymentOrder(o.ref);
+            current = paymentJournal().paymentOrder(o.ref);
             if (!java.util.Objects.equals(o.amount, current.amount) || !java.util.Objects.equals(o.tokenid, current.tokenid)
                     || !java.util.Objects.equals(o.counterparty, current.counterparty) || !java.util.Objects.equals(o.items, current.items)
                     || !paymentJournal().available(current)) throw PaymentJournal.invalid();
+            resend = PaymentJournal.retryable(paymentJournal().load(current.ref, current));
         } catch (RuntimeException unavailable) { toast(Language.msg(l10n_mall_shop_payment_unavailable)); return; }
-        final AlertDialog progress = languageDialog().setTitle(Language.msg(l10n_mall_shop_order))
-                .setMessage(Language.msg(l10n_mall_shop_payment_checking)).setCancelable(false).create();
-        progress.show(); startPayment(o.ref, progress, null, null);
+        final Runnable go = () -> {
+            final AlertDialog progress = languageDialog().setTitle(Language.msg(l10n_mall_shop_order))
+                    .setMessage(Language.msg(l10n_mall_shop_payment_checking)).setCancelable(false).create();
+            progress.show(); startPayment(current.ref, progress, null, null);   // the ref read now, not the caller's object later
+        };
+        if (!resend) { go.run(); return; }   // only checks an earlier payment: nothing new is sent
+        // A new payment may be sent: the same whole question as checkout (review L1).
+        final String token = MerchMessage.tokenFor(current.currency), cur = MerchMessage.tokenName(token);
+        languageDialog()
+                .setTitle(Language.msg(l10n_mall_shop_pay_title, current.amount, cur))
+                .setMessage(Language.msg(l10n_mall_shop_pay_details, current.amount, cur, token, current.payaddr))
+                .setPositiveButton(Language.msg(l10n_mall_shop_pay), (d, w) -> go.run())
+                .setNegativeButton(Language.msg(l10n_explorer_back), null).show();
     }
 
     // ---- my orders ----
