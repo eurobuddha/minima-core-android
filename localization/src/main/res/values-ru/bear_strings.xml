@@ -8699,7 +8699,7 @@
     <string name="l10n_mall_shop_pay_details">"Отправляемая сумма\n%1$s\n\nТокен: %2$s\n%3$s\n\nАдрес продавца для оплаты\n%4$s"</string>
     <!-- Arguments: shown, now -->
     <string name="l10n_mall_shop_total_changed">"Сумма изменилась после вопроса (показано %1$s, сейчас %2$s). Ничего не отправлено."</string>
-    <string name="l10n_mall_shop_status_token_mismatch" formatted="false">"ТОКЕН НЕ СОВПАДАЕТ"</string>
+    <string name="l10n_mall_shop_status_token_mismatch" formatted="false">"ТОКЕН НЕ СООТВЕТСТВУЕТ ВАЛЮТЕ"</string>
     <!-- Arguments: amount, tokenid -->
     <string name="l10n_mall_inbox_received">"  получено %1$s токена %2$s"</string>
     <!-- Arguments: currency -->

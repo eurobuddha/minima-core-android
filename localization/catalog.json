@@ -43317,10 +43317,10 @@
     "uk": "Сума змінилася після запитання (показано {shown}, зараз {now}). Нічого не надіслано."
   },
   "mallShop.statusTokenMismatch": {
-    "en": "TOKEN_MISMATCH",
+    "en": "TOKEN DOES NOT MATCH CURRENCY",
     "zh-Hans": "代币与币种不符",
-    "ru": "ТОКЕН НЕ СОВПАДАЕТ",
-    "uk": "ТОКЕН НЕ ЗБІГАЄТЬСЯ"
+    "ru": "ТОКЕН НЕ СООТВЕТСТВУЕТ ВАЛЮТЕ",
+    "uk": "ТОКЕН НЕ ВІДПОВІДАЄ ВАЛЮТІ"
   },
   "mallInbox.received": {
     "en": "  received {amount} of token {tokenid}",

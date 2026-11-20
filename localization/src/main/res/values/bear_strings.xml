@@ -8625,7 +8625,7 @@
     <string name="l10n_mall_shop_pay_details">"Amount sent\n%1$s\n\nToken: %2$s\n%3$s\n\nVendor\'s payment address\n%4$s"</string>
     <!-- Arguments: shown, now -->
     <string name="l10n_mall_shop_total_changed">"The total changed after the question (%1$s shown, %2$s now). Nothing was sent."</string>
-    <string name="l10n_mall_shop_status_token_mismatch" formatted="false">"TOKEN_MISMATCH"</string>
+    <string name="l10n_mall_shop_status_token_mismatch" formatted="false">"TOKEN DOES NOT MATCH CURRENCY"</string>
     <!-- Arguments: amount, tokenid -->
     <string name="l10n_mall_inbox_received">"  received %1$s of token %2$s"</string>
     <!-- Arguments: currency -->

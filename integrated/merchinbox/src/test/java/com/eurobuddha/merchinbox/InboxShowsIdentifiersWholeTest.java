@@ -100,6 +100,16 @@ public class InboxShowsIdentifiersWholeTest {
         org.mockito.Mockito.verifyNoInteractions(node);
     }
 
+    @Test public void theMismatchLabelIsAReadablePhraseInEveryLanguage() throws Exception {
+        for (String lang : new String[]{"en", "zh-Hans", "ru", "uk"}) {
+            Language.select(activity, lang);
+            String t = Language.text(activity, com.eurobuddha.minimacore.i18n.R.string.l10n_mall_shop_status_token_mismatch).toString();
+            assertFalse(lang + ": " + t, t.contains("_") || t.isEmpty());
+        }
+        Language.select(activity, "en");
+        assertEquals("TOKEN DOES NOT MATCH CURRENCY", Language.text(activity, com.eurobuddha.minimacore.i18n.R.string.l10n_mall_shop_status_token_mismatch).toString());
+    }
+
     @Test public void anMxUsdOrderReadsMxUsdNeverTheWireValue() throws Exception {
         MerchMessage m = new MerchMessage();
         m.type = MerchMessage.ORDER; m.ref = "ORD-MXUSD"; m.from = BUYER; m.to = "0xME"; m.amount = "5"; m.currency = "USDT";
