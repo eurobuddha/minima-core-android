@@ -8574,6 +8574,11 @@
     <string name="l10n_mail_enter_contact_name" formatted="false">"请输入姓名"</string>
     <string name="l10n_mail_contact_gone" formatted="false">"联系人已不存在"</string>
     <string name="l10n_mail_cannot_save_contact" formatted="false">"无法保存联系人"</string>
+    <string name="l10n_entropy_node_bad" formatted="false">"节点的回答不一致；本次投掷未被使用。未记录任何内容。"</string>
+    <string name="l10n_entropy_node_mismatch" formatted="false">"节点的回答不一致 — 仅使用设备 CSPRNG（单一来源）"</string>
+    <string name="l10n_entropy_node_recheck" formatted="false">"节点回答被拒绝 — 正在重新检查节点…"</string>
+    <string name="l10n_entropy_pick_node_bad" formatted="false">"节点的回答不一致；未选择任何单词。请重试。"</string>
+    <string name="l10n_entropy_pick_error" formatted="false">"熵源错误 — 未选择任何单词。请重试。"</string>
     <string name="l10n_mall_shop_not_paid" formatted="false">"未付款"</string>
     <!-- Arguments: currency -->
     <string name="l10n_mall_shop_token_unpayable">"此商店要求以“%1$s”付款。miniMall 只用 Minima 或 MxUSD 付款。未发送任何内容。"</string>

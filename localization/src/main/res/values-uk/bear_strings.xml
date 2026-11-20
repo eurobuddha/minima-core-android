@@ -8685,6 +8685,11 @@
     <string name="l10n_mail_enter_contact_name" formatted="false">"Введіть ім’я"</string>
     <string name="l10n_mail_contact_gone" formatted="false">"Контакт більше не існує"</string>
     <string name="l10n_mail_cannot_save_contact" formatted="false">"Не вдалося зберегти контакт"</string>
+    <string name="l10n_entropy_node_bad" formatted="false">"Відповідь вузла не збіглася; цей кидок не використано. Нічого не записано."</string>
+    <string name="l10n_entropy_node_mismatch" formatted="false">"відповіді вузла не збіглися — лише CSPRNG пристрою (одне джерело)"</string>
+    <string name="l10n_entropy_node_recheck" formatted="false">"відповідь вузла відхилено — вузол перевіряється знову…"</string>
+    <string name="l10n_entropy_pick_node_bad" formatted="false">"Відповідь вузла не збіглася; слово не вибрано. Спробуйте ще раз."</string>
+    <string name="l10n_entropy_pick_error" formatted="false">"Помилка джерела ентропії — слово не вибрано. Спробуйте ще раз."</string>
     <string name="l10n_mall_shop_not_paid" formatted="false">"Не сплачено"</string>
     <!-- Arguments: currency -->
     <string name="l10n_mall_shop_token_unpayable">"Цей магазин просить оплату в «%1$s». miniMall платить лише в Minima або MxUSD. Нічого не надіслано."</string>

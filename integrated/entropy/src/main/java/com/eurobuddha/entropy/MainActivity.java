@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.pm_entropy_pairingBanner).setVisibility(enabled ? android.view.View.GONE : android.view.View.VISIBLE);
             if (enabled) verifyNode();
         });
-        engine = new RollEngine(node);
+        engine = new RollEngine(node::cmd);
 
         diceView = new DiceView(this);
         lastWordView = new LastWordView(this);
@@ -134,30 +134,24 @@ public class MainActivity extends AppCompatActivity {
         }, 5000);
     }
 
-    /** Prove the node answers `random` and `hash` with well-formed values before any roll uses it. */
+    /** Prove the node before any roll uses it, by the very check every roll passes (RollEngine.verify):
+     *  "verified" means one node + device SHA3 was worked out here and the node's answer was the same. */
     private void verifyNode() {
-        node.cmd("random", new NodeApi.Cb() {
-            @Override public void onResult(JSONObject r) {
-                String a = r != null && r.optJSONObject("response") != null
-                        ? r.optJSONObject("response").optString("random", "") : "";
-                if (!a.startsWith("0x")) { failVerify(); return; }
-                node.cmd("hash data:" + a, new NodeApi.Cb() {
-                    @Override public void onResult(JSONObject h) {
-                        String hash = h != null && h.optJSONObject("response") != null
-                                ? h.optJSONObject("response").optString("hash", "") : "";
-                        boolean ok = hash.startsWith("0x") && hash.length() >= 10;
-                        engine.setNodeOk(ok);
-                        engineReady = true;
-                        if (selfTestErr == null)
-                            diceView.setSourceLine(ok
-                                    ? Language.msg(l10n_entropy_verified)
-                                    : Language.msg(l10n_entropy_malformed), ok);
-                    }
-                    @Override public void onError(String m) { failVerify(); }
-                });
-            }
-            @Override public void onError(String m) { failVerify(); }
+        engine.verify((ok, why) -> {
+            engineReady = true;
+            if (selfTestErr == null)
+                diceView.setSourceLine(ok
+                        ? Language.msg(l10n_entropy_verified)
+                        : Language.msg(RollEngine.NODE_BAD.equals(why) ? l10n_entropy_node_mismatch : l10n_entropy_commands_failed), ok);
         });
+    }
+
+    /** The node answered a roll wrongly: nothing uses it until it is proved again (rolls wait meanwhile). */
+    public void reverifyNode() {
+        engine.setNodeOk(false);
+        engineReady = false;
+        if (selfTestErr == null) diceView.setSourceLine(Language.msg(l10n_entropy_node_recheck), false);
+        verifyNode();
     }
 
     private void refreshLanguage() {
@@ -174,13 +168,6 @@ public class MainActivity extends AppCompatActivity {
     @Override protected void onResume() {
         super.onResume();
         refreshLanguage();
-    }
-
-    private void failVerify() {
-        engine.setNodeOk(false);
-        engineReady = true;
-        if (selfTestErr == null)
-            diceView.setSourceLine(Language.msg(l10n_entropy_commands_failed), false);
     }
 
     @Override

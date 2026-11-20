@@ -311,11 +311,11 @@ public class DiceView extends BaseView {
         final int[] results = new int[DICE];
         final RollEngine.Audit[] auds = new RollEngine.Audit[DICE];
         final int[] pending = {DICE};
-        final boolean[] failed = {false}, settled = {false};
+        final boolean[] failed = {false}, settled = {false}, nodeBad = {false};
         Runnable watchdog = () -> {
             if (settled[0]) return;
             settled[0] = true;
-            finishThrow(results, auds, true);
+            finishThrow(results, auds, true, nodeBad[0]);
         };
         main.postDelayed(watchdog, 20000);
         for (int i = 0; i < DICE; i++) {
@@ -324,23 +324,27 @@ public class DiceView extends BaseView {
                 @Override public void onFace(int face, RollEngine.Audit audit) {
                     if (settled[0]) return;
                     results[idx] = face; auds[idx] = audit;
-                    if (--pending[0] == 0) { settled[0] = true; main.removeCallbacks(watchdog); finishThrow(results, auds, false); }
+                    if (--pending[0] == 0) { settled[0] = true; main.removeCallbacks(watchdog); finishThrow(results, auds, failed[0], nodeBad[0]); }
                 }
                 @Override public void onError(String m) {
                     if (settled[0]) return;
                     failed[0] = true;
-                    if (--pending[0] == 0) { settled[0] = true; main.removeCallbacks(watchdog); finishThrow(results, auds, true); }
+                    if (RollEngine.NODE_BAD.equals(m)) nodeBad[0] = true;
+                    if (--pending[0] == 0) { settled[0] = true; main.removeCallbacks(watchdog); finishThrow(results, auds, true, nodeBad[0]); }
                 }
             });
         }
     }
 
-    private void finishThrow(int[] results, RollEngine.Audit[] auds, boolean failed) {
+    /** A failed throw records nothing: one refused node answer discards all five dice and stops auto-roll. */
+    private void finishThrow(int[] results, RollEngine.Audit[] auds, boolean failed, boolean nodeBad) {
         if (failed) {
             for (DiceRollView d : dice) { d.cancel(); d.setIdleFace(0); }
             busy = false; auto = false;
             Language.setText(btnAuto, Language.msg(l10n_entropy_auto_off)); btnAuto.setTextColor(Theme.dim());
-            setStatus(Language.msg(l10n_entropy_source_error), true);
+            if (!nodeBad) { setStatus(Language.msg(l10n_entropy_source_error), true); return; }
+            setStatus(Language.msg(l10n_entropy_node_bad), true);
+            act.reverifyNode();   // the node is proved again before another roll may use it
             return;
         }
         if (Theme.sound()) Sfx.diceRoll(); // ONE shared sound for the whole 5-die throw

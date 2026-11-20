@@ -828,7 +828,23 @@
       "src/main/res/mipmap-anydpi/ic_launcher_round.xml": "88f7653499ef524126ea5018a99baf9cc3269e7e584d6205dfdd76db39f39cc0",
       "src/test/java/com/eurobuddha/entropy/Bip39Test.java": "8caa88883513bdced81b1b0faa9963832ba2bd49b50915165b59ca6a424da6bc"
     },
-    "resource_prefix": "pm_entropy_"
+    "resource_prefix": "pm_entropy_",
+    "patches": [
+      {
+        "revision": "a434e60fb251b9e869e7856dc0398c2ea927d6de",
+        "version": "0.1.15",
+        "summary": "The node cannot decide a die face: RollEngine checks the node hash against a local SHA3-256 (Sha3.java) and refuses a malformed or repeated node random; a refused answer discards the throw, stops auto-roll and re-verifies the node; the last-word pick refuses the same way; MainActivity.verifyNode uses the same check.",
+        "files": {
+          "src/main/java/com/eurobuddha/entropy/RollEngine.java": "4466f1287a0daabb4c33a009efe63579fc626e3d79f9d68c4466d66d7ba1e0c0",
+          "src/main/java/com/eurobuddha/entropy/Sha3.java": "ccdcae1d8d1af0529f741037b687f266d2f20bcff8951b957f26604661f7138f",
+          "src/main/java/com/eurobuddha/entropy/MainActivity.java": "137b6bc902d071eabe2ee2773e40a544fd80d388e66ede62f9ca3061a2a2c650",
+          "src/main/java/com/eurobuddha/entropy/DiceView.java": "02bb4d12c216573dd81940c8583e2a23695430e8fe8820be5ea98ee5a2cdc2f4",
+          "src/main/java/com/eurobuddha/entropy/LastWordView.java": "822bba735dd706e84e1477d072ea5c4e4180a2c56f46373b14e4e86a8506ff2d",
+          "src/test/java/com/eurobuddha/entropy/RollEngineTest.java": "9196fe6191bc3b1e171138ccdd6162c1e764c581eaa5f2b6803d7e9995e4aa73",
+          "src/test/java/com/eurobuddha/entropy/Sha3Test.java": "903405771785d642341599afb4eadb0c80659efa33267ddf3764e376d380c02c"
+        }
+      }
+    ]
   },
   "terminalide": {
     "source": "../terminalide",

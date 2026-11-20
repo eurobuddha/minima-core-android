@@ -8611,6 +8611,11 @@
     <string name="l10n_mail_enter_contact_name" formatted="false">"Enter a name"</string>
     <string name="l10n_mail_contact_gone" formatted="false">"Contact no longer exists"</string>
     <string name="l10n_mail_cannot_save_contact" formatted="false">"Could not save contact"</string>
+    <string name="l10n_entropy_node_bad" formatted="false">"The node\'s answer did not match; this roll was not used. Nothing was recorded."</string>
+    <string name="l10n_entropy_node_mismatch" formatted="false">"the node\'s answers did not match — device CSPRNG only (single source)"</string>
+    <string name="l10n_entropy_node_recheck" formatted="false">"node answer refused — checking the node again…"</string>
+    <string name="l10n_entropy_pick_node_bad" formatted="false">"The node\'s answer did not match; no word was picked. Try again."</string>
+    <string name="l10n_entropy_pick_error" formatted="false">"Entropy source error — no word was picked. Try again."</string>
     <string name="l10n_mall_shop_not_paid" formatted="false">"Not paid"</string>
     <!-- Arguments: currency -->
     <string name="l10n_mall_shop_token_unpayable">"This shop asks to be paid in \"%1$s\". miniMall pays in Minima or MxUSD only. Nothing was sent."</string>
