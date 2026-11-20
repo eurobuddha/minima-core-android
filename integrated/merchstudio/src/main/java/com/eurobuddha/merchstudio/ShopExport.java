@@ -50,6 +50,20 @@ final class ShopExport {
         return n;
     }
 
+    /** Where the Inbox in this app reads the vendor's published listing (its MainActivity.LISTINGS): the shop as
+     *  exported, without pictures, at files/mall_listings/<shopId>.shop, replaced atomically on every export, so
+     *  every order of this shop is checked against what the vendor last published without an import. */
+    File saveListing(File filesDir) throws Exception {
+        String shopId=new JSONObject(json).optString("shopId","");
+        if (!shopId.matches("[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*")) throw new IllegalArgumentException("Invalid shop id");
+        File dir=new File(filesDir,"mall_listings");
+        if (!dir.isDirectory() && !dir.mkdirs()) throw new IOException("Cannot create the listing folder");
+        File part=new File(dir,shopId+".part"), destination=new File(dir,shopId+".shop");
+        try (FileOutputStream output=new FileOutputStream(part)) { output.write(json.getBytes(StandardCharsets.UTF_8)); output.getFD().sync(); }
+        Files.move(part.toPath(),destination.toPath(),StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);
+        return destination;
+    }
+
     /** Reuse NodeFiles.replaceFrom's temporary-write, sync and atomic-rename ordering.
      * Each export has its own directory, so an already shared URI never changes contents. */
     File write(File cache, Resolver resolver) throws Exception {

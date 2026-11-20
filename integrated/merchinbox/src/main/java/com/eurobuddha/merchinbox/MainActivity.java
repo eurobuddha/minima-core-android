@@ -390,6 +390,7 @@ public class MainActivity extends AppCompatActivity {
                 pendingAutoDeliver.clear();
                 for (String r : refs) maybeAutoDeliver(r);
             }
+            if (autoDeliverOn()) autoDeliverSweep();   // each block: lines waiting for confirmations are checked again
             if (newCount <= 0) return;
             notifyNew(newCount);
             refreshVisibleOrderOrList();
@@ -417,7 +418,7 @@ public class MainActivity extends AppCompatActivity {
                 int checked = 0;
                 for (MerchDb.Order o : db.orders()) if ("seller".equals(o.role) && shopId.equals(o.shopId)) { recheck(o); checked++; }
                 msg = Language.msg(l10n_mall_inbox_listing_in, listing.optString("shopName", shopId), checked);
-            } catch (IllegalArgumentException e) { msg = e.getMessage(); }
+            } catch (IllegalArgumentException e) { msg = InboxMessages.message(e.getMessage()); }
             catch (Exception e) { msg = Language.msg(l10n_mall_shop_read_failed); }
             final CharSequence say = msg;
             ui.post(() -> { languageDialog().setTitle(Language.msg(l10n_mall_inbox_listing_title)).setMessage(say)
@@ -428,23 +429,26 @@ public class MainActivity extends AppCompatActivity {
     /** Recompute what an order is due from the vendor's own listing for its shop, if one was imported. */
     private void recheck(MerchDb.Order o) {
         if (o == null || !"seller".equals(o.role)) return;
-        String raw = db.getMeta("listing:" + o.shopId, "");
-        if (raw.isEmpty()) return;
+        JSONObject listing = listingFor(o.shopId);
+        if (listing == null) return;
+        db.setMeta("listingproblem:" + o.ref, "this order has not been checked yet");   // fail closed until the check ends (M1)
         try {
-            Listing.Check c = Listing.check(new JSONObject(raw), o);
+            Listing.Check c = Listing.check(listing, o);
+            List<String> kept = new ArrayList<>();
+            for (String p : c.problems) { if (kept.size() == 20) { kept.add("… and " + (c.problems.size() - 20) + " more"); break; } kept.add(Listing.cap(p, 400)); }
             db.setMeta("due:" + o.ref, c.due);
-            db.setMeta("listingproblem:" + o.ref, String.join("\n", c.problems));
-        } catch (Exception e) {
-            db.setMeta("listingproblem:" + o.ref, "your stored listing could not be read; import your .shop file again");
+            db.setMeta("listingproblem:" + o.ref, String.join("\n", kept));
+            db.reevaluate(o.ref);   // PAID follows the recomputed due (review L4)
+        } catch (Throwable e) {
+            db.setMeta("listingproblem:" + o.ref, "this order could not be checked against your listing; nothing is sent for it");
         }
     }
 
     // ---- automatic NFT delivery ----
 
-    /** OFF, and not switchable, until the Inbox checks an order against the vendor's own listing (security
-     *  review 2026-11-20): an order's NFT lines, quantities and total are the buyer's own figures. The stored
-     *  "autodeliver" setting is kept but never acted on. */
-    private boolean autoDeliverOn() { return false; }
+    /** Automatic delivery: OFF unless the vendor switches it on ("autosend"; the old "autodeliver" setting, ON by
+     *  default before, is never read). Even ON, an order is sent only when every DeliveryRules check passes. */
+    private boolean autoDeliverOn() { return "1".equals(db.getMeta("autosend", "0")); }
 
     /** Auto-send every unsent NFT line of a cleanly-paid order. Idempotent: nftsent: meta skips
      *  delivered lines, autoTried caps automatic attempts at one per line per session. */
@@ -457,8 +461,8 @@ public class MainActivity extends AppCompatActivity {
         for (String[] line : nftLines(o)) {
             String key = lineKey(ref, line);
             if (!deliveredTx(o, line).isEmpty()) continue;
-            if (!autoTried.add(key)) continue;
-            sendNft(o, line, true);
+            if (autoTried.contains(key) || !DeliveryLedger.state(db.getReadableDatabase(), ledgerKey(o, line)).isEmpty()) continue;   // one automatic send per line
+            sendNft(o, line, true);   // runs every DeliveryRules check; a line that fails waits (checked again at the next block)
         }
     }
 
@@ -502,12 +506,36 @@ public class MainActivity extends AppCompatActivity {
         }
         col.addView(s);
 
-        // Automatic NFT delivery is off and cannot be switched on (see autoDeliverOn).
+        // Automatic NFT delivery (default OFF) and the payment confirmations every send needs.
+        final boolean auto = autoDeliverOn();
         TextView ad = new TextView(this);
-        Language.setText(ad, Language.msg(l10n_mall_inbox_auto_off_why));
-        ad.setTextColor(Design.DIM);
-        ad.setTextSize(12.5f); ad.setPadding(dp(16), 0, dp(16), dp(8));
+        Language.setText(ad, Language.msg(auto ? l10n_mall_inbox_autosend_on : l10n_mall_inbox_autosend_off));
+        ad.setTextColor(auto ? Design.IN : Design.DIM);
+        ad.setTextSize(12.5f); ad.setPadding(dp(16), 0, dp(16), dp(4));
+        ad.setOnClickListener(v -> {
+            if (auto) { io.execute(() -> { db.setMeta("autosend", "0"); ui.post(() -> refreshTop(buildOrders())); }); return; }
+            languageDialog().setTitle(Language.msg(l10n_mall_inbox_autosend_title))
+                    .setMessage(Language.msg(l10n_mall_inbox_autosend_help, minConf()))
+                    .setPositiveButton(Language.msg(l10n_mall_inbox_autosend_turn_on), (d, w) -> io.execute(() -> { db.setMeta("autosend", "1"); ui.post(() -> refreshTop(buildOrders())); }))
+                    .setNegativeButton(Language.msg(l10n_common_cancel), null).show();
+        });
         col.addView(ad);
+        TextView mc = new TextView(this);
+        Language.setText(mc, Language.msg(l10n_mall_inbox_minconf_line, minConf()));
+        mc.setTextColor(Design.DIM); mc.setTextSize(12.5f); mc.setPadding(dp(16), 0, dp(16), dp(8));
+        mc.setOnClickListener(v -> {
+            final EditText in = new EditText(this);
+            in.setInputType(android.text.InputType.TYPE_CLASS_NUMBER); in.setText(String.valueOf(minConf()));
+            languageDialog().setTitle(Language.msg(l10n_mall_inbox_minconf_title)).setMessage(Language.msg(l10n_mall_inbox_minconf_help)).setView(in)
+                    .setPositiveButton(Language.msg(l10n_mall_inbox_minconf_save), (d, w) -> {
+                        int n; try { n = Integer.parseInt(in.getText().toString().trim()); } catch (NumberFormatException e) { n = 0; }
+                        if (n < 1) { toast(Language.msg(l10n_mall_inbox_minconf_min)); return; }
+                        final int keep = n;
+                        io.execute(() -> { db.setMeta("minconf", String.valueOf(keep)); ui.post(() -> refreshTop(buildOrders())); });
+                    })
+                    .setNegativeButton(Language.msg(l10n_common_cancel), null).show();
+        });
+        col.addView(mc);
 
         col.addView(filterBar());
         final HorizontalScrollView shopBar = new HorizontalScrollView(this);
@@ -661,7 +689,7 @@ public class MainActivity extends AppCompatActivity {
             body.addView(card(itemsText(o)));
             body.addView(kv(Language.msg(l10n_mall_shop_total), o.amount + " " + dispCurrency(o)));
             String problems = db.listingProblems(o);
-            TextView chk = label(!problems.isEmpty() ? Language.msg(l10n_mall_inbox_listing_problems, "• " + problems.replace("\n", "\n• "))
+            TextView chk = label(!problems.isEmpty() ? Language.msg(l10n_mall_inbox_listing_problems, InboxMessages.lines(problems))
                     : db.checked(o) ? Language.msg(l10n_mall_inbox_listing_checked, db.due(o), dispCurrency(o))
                     : Language.msg(l10n_mall_inbox_listing_unchecked, o.amount, dispCurrency(o)));
             if (!problems.isEmpty() || !db.checked(o)) chk.setTextColor(Design.RED);
@@ -796,7 +824,6 @@ public class MainActivity extends AppCompatActivity {
             return t;
         }
         LinearLayout wrap = new LinearLayout(this); wrap.setOrientation(LinearLayout.VERTICAL);
-        boolean ready = o.paid && o.payaddr != null && !o.payaddr.isEmpty() && !db.mismatch(o);
         boolean inFlight = nftSending.contains(key);
         boolean resume = false;
         {
@@ -805,29 +832,45 @@ public class MainActivity extends AppCompatActivity {
             catch (RuntimeException unavailable) { resume = true; }
         }
         final boolean recovering = resume;
-        TextView b = button(inFlight ? Language.msg(l10n_chat_sending) : recovering ? Language.msg(l10n_mall_inbox_resume_delivery) : Language.msg(l10n_mall_inbox_send_buyer, label), ready && !inFlight);
+        // Reserved but no journal: the app stopped between the reservation and the transfer. It may not have gone,
+        // but nothing more is sent until the vendor has checked the history.
+        if (!recovering && !inFlight && DeliveryLedger.RESERVED.equals(DeliveryLedger.state(db.getReadableDatabase(), ledgerKey(o, line)))) {
+            wrap.addView(label(Language.msg(l10n_mall_inbox_unfinished_help, bundle ? Language.msg(l10n_mall_inbox_all_pieces) : piece ? "1 (#" + line[3] + ")" : qty, tokenid, o.payaddr)));
+            TextView rel = button(Language.msg(l10n_mall_inbox_unfinished_release), true);
+            rel.setOnClickListener(v -> languageDialog().setTitle(Language.msg(l10n_mall_inbox_unfinished_title))
+                    .setMessage(Language.msg(l10n_mall_inbox_unfinished_confirm, tokenid, o.payaddr))
+                    .setPositiveButton(Language.msg(l10n_mall_inbox_unfinished_release), (d, w) -> io.execute(() -> { DeliveryLedger.mark(db.getWritableDatabase(), ledgerKey(o, line), DeliveryLedger.RELEASED); ui.post(() -> refreshOrderIfTopmost(o.ref)); }))
+                    .setNegativeButton(Language.msg(l10n_common_cancel), null).show());
+            wrap.addView(rel);
+            return wrap;
+        }
+        TextView b = button(inFlight ? Language.msg(l10n_chat_sending) : recovering ? Language.msg(l10n_mall_inbox_resume_delivery) : Language.msg(l10n_mall_inbox_send_buyer, label), !inFlight);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.topMargin = dp(6); b.setLayoutParams(lp);
+        final TextView why = new TextView(this);
+        Language.setText(why, Language.msg(l10n_mall_inbox_checking)); why.setTextColor(Design.DIM2); why.setTextSize(11f); why.setPadding(0, dp(2), 0, 0);
         b.setOnClickListener(v -> {
-            if (!o.paid) { toast(Language.msg(l10n_mall_inbox_wait_payment)); return; }
-            if (o.payaddr == null || o.payaddr.isEmpty()) { toast(Language.msg(l10n_mall_inbox_no_pay_address)); return; }
             if (nftSending.contains(key)) return;
-            languageDialog()
-                    .setTitle(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mall_inbox_send_nft))
-                    .setMessage(recovering ? Language.msg(l10n_mall_inbox_resume_help, o.payaddr) : Language.msg(l10n_mall_inbox_send_whole, label, tokenid,
-                            bundle ? Language.msg(l10n_mall_inbox_all_pieces) : piece ? "1 (#" + line[3] + ")" : qty, o.payaddr))
-                    .setPositiveButton(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mail_send), (d, w) -> sendNft(o, line, false))
-                    .setNegativeButton(Language.msg(l10n_common_cancel), null)
-                    .show();
+            checkDelivery(o.ref, line, verdict -> {
+                if (!verdict.reasons.isEmpty()) {   // refused: there is no override
+                    languageDialog().setTitle(Language.msg(l10n_mall_inbox_not_sent)).setMessage(InboxMessages.reasons(verdict.reasons, false))
+                            .setPositiveButton(Language.msg(l10n_common_ok), null).show();
+                    return;
+                }
+                MerchDb.Order now = db.order(o.ref);
+                languageDialog()
+                        .setTitle(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mall_inbox_send_nft))
+                        .setMessage(Language.join(recovering ? Language.msg(l10n_mall_inbox_resume_help, now.payaddr) : Language.msg(l10n_mall_inbox_send_whole, label, tokenid,
+                                bundle ? Language.msg(l10n_mall_inbox_all_pieces) : piece ? "1 (#" + line[3] + ")" : qty, now.payaddr),
+                                "\n\n", Language.msg(l10n_mall_inbox_paid_of_due, verdict.paid.toPlainString(), verdict.due.toPlainString())))
+                        .setPositiveButton(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mail_send), (d, w) -> sendNft(now, line, false))
+                        .setNegativeButton(Language.msg(l10n_common_cancel), null)
+                        .show();
+            });
         });
         wrap.addView(b);
-        if (!ready) {
-            TextView why = new TextView(this);
-            Language.setText(why, db.mismatch(o) ? Language.msg(l10n_mall_inbox_not_sent_mismatch)
-                    : !o.paid ? Language.msg(l10n_mall_inbox_available_paid) : Language.msg(l10n_mall_inbox_missing_pay_address));
-            why.setTextColor(Design.DIM2); why.setTextSize(11f); why.setPadding(0, dp(2), 0, 0);
-            wrap.addView(why);
-        }
+        wrap.addView(why);
+        checkDelivery(o.ref, line, verdict -> Language.setText(why, verdict.reasons.isEmpty() ? Language.msg(l10n_mall_inbox_ready_to_send) : InboxMessages.reasons(verdict.reasons, true)));
         return wrap;
     }
 
@@ -835,19 +878,104 @@ public class MainActivity extends AppCompatActivity {
      *  replayed; plain NFTs use a verified native unsigned transaction. auto=true is the headless
      *  payment-confirmed path: no toasts, notifications instead, refresh only if visible. */
     private void sendNft(final MerchDb.Order o, final String[] line, final boolean auto) {
-        final String tokenid = line[1], qty = line[2];
         final String key = lineKey(o.ref, line);
-        // The pay address is buyer-supplied chain data interpolated into a node command — validate hard.
-        if (!Util.isValidAddress(o.payaddr)) { deliverFailed(o, key, "buyer pay address is malformed", auto); return; }
-        if (!Util.isValidHexId(tokenid)) { deliverFailed(o, key, "token id is malformed", auto); return; }
-        MerchDb.Order now = db.order(o.ref);   // checked again at the moment of sending, never from the screen's copy
-        if (db.mismatch(now)) { deliverFailed(o, key, "this order names a token that is not its currency's; its NFTs are never sent", auto); return; }
-        if (!db.deliverable(now)) { deliverFailed(o, key, "this order is not paid in full in its currency's token; nothing was sent", auto); return; }
-        guardDelivery(o, line, key, auto, () -> {
-            if ("1".equals(line[4])) { collectionDeliver(o, line, auto); return; }
-            if (!"0".equals(line[3])) { stateNftDeliver(o, line, auto); return; }
-            plainDeliver(o, line, key, auto);
+        if (!nftSending.add(key)) return;   // one check-and-send per line at a time
+        checkDelivery(o.ref, line, v -> {
+            if (!v.reasons.isEmpty()) { deliverFailed(o, key, "Not sent:\n• " + String.join("\n• ", v.reasons), auto); return; }
+            io.execute(() -> {
+                final MerchDb.Order now = db.order(o.ref);   // the fresh row the checks used: its buyer address
+                final String lk = ledgerKey(now, line);
+                final android.database.sqlite.SQLiteDatabase w = db.getWritableDatabase();
+                String why;
+                if (!db.getMeta("nftsent:" + key, "").isEmpty()) why = "this line was already sent";
+                else if (deliveryStarted(now, line, key)) {   // a journalled delivery resumes: verify, never a second transfer
+                    DeliveryLedger.adopt(w, lk, v.product, v.token, v.qty, key);
+                    why = null;
+                } else why = DeliveryLedger.reserve(w, lk, v.product, v.token, v.qty, v.stock, v.held, key);
+                final String refused = why;
+                ui.post(() -> {
+                    if (refused != null) { deliverFailed(o, key, "Not sent: " + refused, auto); return; }
+                    if (auto) { autoTried.add(key); android.util.Log.i("miniMallInbox", "automatic delivery: " + v.qty.toPlainString() + " of token " + v.token
+                            + " for order " + now.ref + " to " + now.payaddr); }
+                    nftSending.remove(key);   // each transfer path below takes the line again
+                    if ("1".equals(line[4])) { collectionDeliver(now, line, auto); return; }
+                    if (!"0".equals(line[3])) { stateNftDeliver(now, line, auto); return; }
+                    plainDeliver(now, line, key, auto);
+                });
+            });
         });
+    }
+
+    /** The delivery ledger's key for one order line: the order ref and the line's index in the order (review L6). */
+    private String ledgerKey(MerchDb.Order o, String[] line) {
+        List<String[]> all = nftLines(o);
+        for (int i = 0; i < all.size(); i++) if (java.util.Arrays.equals(all.get(i), line)) return o.ref + "|" + i;
+        return o.ref + "|" + lineKey(o.ref, line);
+    }
+
+    /** Every rule of DeliveryRules, from fresh reads: the chain tip, the token, the vendor's holdings, the
+     *  payment coins at the vendor's own address, and (on the io thread) the order, its listing and the ledger. */
+    private void checkDelivery(final String ref, final String[] line, final java.util.function.Consumer<DeliveryRules.Verdict> then) {
+        final String tokenid = line[1];
+        final boolean askToken = DeliveryGuard.basic(tokenid) == null;
+        ask("block", b -> ask(askToken ? "tokens tokenid:" + tokenid : null, t -> ask(askToken ? "coins relevant:true tokenid:" + tokenid : null, h ->
+                ask(Util.isValidAddress(vendorAddr) ? "coins relevant:true address:" + vendorAddr : null, pay -> io.execute(() -> {
+            DeliveryRules.Inputs in = new DeliveryRules.Inputs();
+            in.order = db.order(ref);
+            in.mismatch = db.mismatch(in.order);
+            in.listing = in.order == null ? null : listingFor(in.order.shopId);
+            in.line = line;
+            String key = lineKey(ref, line);
+            android.database.sqlite.SQLiteDatabase w = db.getWritableDatabase();
+            in.lineState = !db.getMeta("nftsent:" + key, "").isEmpty() ? DeliveryLedger.SENT : in.order == null ? "" : DeliveryLedger.state(w, ledgerKey(in.order, line));
+            in.resuming = in.order != null && deliveryStarted(in.order, line, key);
+            in.tokenReply = t; in.holdingsReply = h; in.paymentReply = pay;
+            try { in.tip = Long.parseLong(b == null || b.optJSONObject("response") == null ? "" : b.optJSONObject("response").optString("block", "")); } catch (NumberFormatException e) { in.tip = 0; }
+            in.minConf = minConf();
+            JSONArray coins = pay == null ? null : pay.optJSONArray("response");
+            for (int i = 0; coins != null && i < coins.length(); i++) {
+                JSONObject c = coins.optJSONObject(i); if (c == null) continue;
+                String id = c.optString("coinid", "").toLowerCase(java.util.Locale.ROOT);
+                in.counted.put(id, db.getMeta("paycoin:" + id, ""));
+            }
+            DeliveryRules.Verdict v = DeliveryRules.reasons(in);
+            if (!v.product.isEmpty()) { in.delivered = DeliveryLedger.delivered(w, v.product); in.inflight = DeliveryLedger.inflight(w, tokenid); v = DeliveryRules.reasons(in); }
+            final DeliveryRules.Verdict out = v;
+            ui.post(() -> then.accept(out));
+        })))));
+    }
+
+    /** One node command; the callback gets the reply, or null on no answer (or when cmd is null). */
+    private void ask(String cmd, java.util.function.Consumer<JSONObject> next) {
+        if (cmd == null) { next.accept(null); return; }
+        node.cmd(cmd, new NodeApi.Cb() {
+            @Override public void onResult(JSONObject j) { next.accept(j); }
+            @Override public void onError(String m) { next.accept(null); }
+        });
+    }
+
+    /** Where Studio saves each shop it publishes, in this app's own data (shared by Studio and Inbox here). */
+    static final String LISTINGS = "mall_listings";
+
+    /** The vendor's own listing for a shop: the shop Studio last published from this app (read at once, no import
+     *  needed), else one imported with ⇪; null when there is none or it is not this vendor's. */
+    private JSONObject listingFor(String shopId) {
+        if (shopId != null && shopId.matches("[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*")) {
+            java.io.File f = new java.io.File(new java.io.File(getFilesDir(), LISTINGS), shopId + ".shop");
+            if (f.isFile() && f.length() <= 16L * 1024 * 1024) {
+                try { return Listing.compact(new String(java.nio.file.Files.readAllBytes(f.toPath()), java.nio.charset.StandardCharsets.UTF_8), myId); }
+                catch (Throwable notThisVendors) { /* fall through to an import */ }
+            }
+        }
+        String raw = db.getMeta("listing:" + shopId, "");
+        if (raw.isEmpty()) return null;
+        try { return new JSONObject(raw); } catch (Exception e) { return null; }
+    }
+
+    /** Minimum confirmations a payment coin needs before anything is sent: vendor setting, default 3, never below 1. */
+    private int minConf() {
+        try { return Math.max(1, Integer.parseInt(db.getMeta("minconf", String.valueOf(DeliveryRules.DEFAULT_MIN_CONF)))); }
+        catch (NumberFormatException e) { return DeliveryRules.DEFAULT_MIN_CONF; }
     }
 
     /** True once this line's delivery has a journal row or a posted/sent mark (its coins may be gone). */
@@ -856,36 +984,6 @@ public class MainActivity extends AppCompatActivity {
         try { return (piece || bundle ? deliveryJournal().load(key, o, line) : plainDeliveryJournal().load(key, o, line)) != null
                 || !db.getMeta("nftposted:" + key, "").isEmpty() || !db.getMeta("nftsent:" + key, "").isEmpty(); }
         catch (RuntimeException unavailable) { return true; }
-    }
-
-    /** Every delivery passes DeliveryGuard first: never Minima or MxUSD, only a token the node confirms has
-     *  0 decimals, never more than the vendor holds (that last check is skipped once this line's delivery has
-     *  started, when the coins may already be gone; the journals then only verify). Any doubt refuses. */
-    private void guardDelivery(final MerchDb.Order o, final String[] line, final String key, final boolean auto, final Runnable go) {
-        final String tokenid = line[1];
-        final String qty = "0".equals(line[3]) && "0".equals(line[4]) ? line[2] : "1";
-        String bad = DeliveryGuard.basic(tokenid);
-        if (bad != null) { deliverFailed(o, key, bad, auto); return; }
-        node.cmd("tokens tokenid:" + tokenid, new NodeApi.Cb() {
-            @Override public void onResult(JSONObject t) {
-                String why = DeliveryGuard.token(tokenid, t);
-                if (why != null) { deliverFailed(o, key, why, auto); return; }
-                io.execute(() -> {
-                    final boolean started = deliveryStarted(o, line, key);
-                    ui.post(() -> {
-                        if (started) { go.run(); return; }
-                        node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
-                            @Override public void onResult(JSONObject c) {
-                                String w = DeliveryGuard.held(tokenid, qty, c);
-                                if (w != null) deliverFailed(o, key, w, auto); else go.run();
-                            }
-                            @Override public void onError(String m) { deliverFailed(o, key, "your holdings could not be read; nothing was sent", auto); }
-                        });
-                    });
-                });
-            }
-            @Override public void onError(String m) { deliverFailed(o, key, "the node did not confirm the token; nothing was sent", auto); }
-        });
     }
 
     private void plainDeliver(final MerchDb.Order o, final String[] line, final String key, final boolean auto) {
@@ -972,6 +1070,8 @@ public class MainActivity extends AppCompatActivity {
                         ui.post(() -> deliveryStorageFailed(o, key, auto));
                         return;
                     }
+                    try { DeliveryLedger.markJournal(db.getWritableDatabase(), key, DeliveryLedger.SENT); }
+                    catch (RuntimeException ledgerUnwritten) { /* stays reserved: still counted, and nftsent: already says sent */ }
                     fresh = db.order(o.ref);
                     boolean all = fresh != null;
                     if (fresh != null) for (String[] l : nftLines(fresh)) {

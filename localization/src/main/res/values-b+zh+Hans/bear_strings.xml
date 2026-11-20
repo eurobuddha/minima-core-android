@@ -8618,5 +8618,99 @@
     <!-- Arguments: amount, currency -->
     <string name="l10n_mall_inbox_listing_checked">"已与您的商品列表核对：应付 %1$s %2$s。"</string>
     <!-- Arguments: amount, currency -->
-    <string name="l10n_mall_inbox_listing_unchecked">"未核对：商品和总额 %1$s %2$s 都是买家自己填写的。请导入您发布的 .shop 文件（订单页上的 ⇪），以便收件箱据您的商品列表核对订单。"</string>
+    <string name="l10n_mall_inbox_listing_unchecked">"未核对：商品和总额 %1$s %2$s 都是买家自己填写的。在您的商品列表就绪之前，不能为此订单发送任何内容：请在本应用的 Studio 中发布商店，或导入您发布的 .shop（订单页上的 ⇪）。"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_not_token">"代币 ID 无效：%1$s"</string>
+    <string name="l10n_mall_inbox_drain_r_minima" formatted="false">"订单行指定了 Minima (0x00)；Minima 绝不会作为 NFT 发送"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_mxusd">"订单行指定了 MxUSD（%1$s）；MxUSD 绝不会作为 NFT 发送"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_unconfirmed">"节点未确认代币 %1$s；未发送任何内容"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_no_decimals">"节点未给出代币 %1$s 的小数位；未发送任何内容"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_decimals">"代币 %1$s 有 %2$s 位小数；只发送整数单位的 NFT"</string>
+    <string name="l10n_mall_inbox_drain_r_unreadable" formatted="false">"无法读取订单或订单行"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_bad_address">"订单中的买家地址不是有效的 Minima 地址：%1$s"</string>
+    <string name="l10n_mall_inbox_drain_r_mismatch" formatted="false">"订单指定的代币与其币种不符"</string>
+    <string name="l10n_mall_inbox_drain_r_no_listing" formatted="false">"没有商品列表：在收件箱中有您为此商店发布的 .shop 之前，无法发送任何内容"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_not_one_product">"“%1$s”（代币 %2$s）不是您列表中的单一商品"</string>
+    <string name="l10n_mall_inbox_drain_r_unfinished" formatted="false">"此行的发送未完成，可能已经发出：请先检查钱包历史"</string>
+    <string name="l10n_mall_inbox_drain_r_already_sent" formatted="false">"此行已经发送"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_stock">"此商品您列出 %1$s 件，已有 %2$s 件已交付或正在发送"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_holdings_unread">"无法读取您持有的代币 %1$s"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_r_held">"您持有代币 %2$s %1$s 个，已有 %3$s 个正在发送"</string>
+    <string name="l10n_mall_inbox_drain_r_no_tip" formatted="false">"无法读取链高度"</string>
+    <string name="l10n_mall_inbox_drain_r_coins_unread" formatted="false">"无法读取您的付款币"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_coin_other">"币 %1$s 已计入订单 %2$s"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_r_conf">"币 %1$s 有 %2$s 个确认；需要 %3$s 个"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_paid">"链上已付且确认足够：%1$s，应付 %2$s"</string>
+    <string name="l10n_mall_inbox_drain_r_in_flight" formatted="false">"此行正在发送，或其发送未完成且可能已经发出：请先检查钱包历史"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_r_would_exceed">"发送 %1$s 件会使此商品已交付 %2$s 件，超过您列出的 %3$s 件"</string>
+    <string name="l10n_mall_inbox_drain_r_ledger" formatted="false">"无法写入交付记录"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_l_currency">"订单的币种（%1$s）不是您商店的币种（%2$s）"</string>
+    <string name="l10n_mall_inbox_drain_l_no_items" formatted="false">"订单中没有可读取的商品"</string>
+    <string name="l10n_mall_inbox_drain_l_item" formatted="false">"有一项无法读取"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_not_listed">"%1$s 不在您的商品列表中"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_twice">"%1$s 在列表中出现不止一次"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_l_qty">"%1$s：数量 %2$s 不是 1 到 999999999 之间的整数"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_l_qty_stock">"%1$s：数量 %2$s 超过您列出的数量（%3$s）"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_l_price">"%1$s：订单价格 %2$s 不是您的价格 %3$s"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_l_together">"%1$s：订单各行合计要 %2$s 件，超过您列出的数量（%3$s）"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_delivery">"配送方式“%1$s”不在您的列表中"</string>
+    <string name="l10n_mall_inbox_drain_l_pending" formatted="false">"此订单尚未核对"</string>
+    <string name="l10n_mall_inbox_drain_l_unchecked" formatted="false">"此订单无法与您的商品列表核对；不会为其发送任何内容"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_more">"……还有 %1$s 项"</string>
+    <string name="l10n_mall_inbox_drain_i_not_shop" formatted="false">"这不是 .shop 文件。"</string>
+    <string name="l10n_mall_inbox_drain_i_no_id" formatted="false">"此 .shop 文件没有商店 ID。"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_i_other">"此 .shop 文件属于另一位卖家：\n%1$s\n您的商店密钥是\n%2$s"</string>
+    <string name="l10n_mall_inbox_drain_i_no_products" formatted="false">"此 .shop 文件没有列出商品。"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_i_price">"“%1$s”的价格不是普通数字（%2$s）。"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_i_fee">"配送方式“%1$s”的费用不是普通数字（%2$s）。"</string>
+    <string name="l10n_mall_inbox_drain_i_too_large" formatted="false">"该文件太大，不可能是 .shop 文件。"</string>
+    <string name="l10n_mall_inbox_autosend_on" formatted="false">"⚡ 自动交付 NFT  ·  已开启  ·  仅限通过所有检查的订单（点按更改）"</string>
+    <string name="l10n_mall_inbox_autosend_off" formatted="false">"⚡ 自动交付 NFT  ·  已关闭  ·  仅限通过所有检查的订单（点按更改）"</string>
+    <string name="l10n_mall_inbox_autosend_title" formatted="false">"开启自动交付 NFT？"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_mall_inbox_autosend_help">"之后 NFT 会在不询问您的情况下发送，但仅当订单与您的商品列表一致、该行已列出且有库存、此前未发送，且付款已全额上链并至少有 %1$d 个确认时。其他情况都会等待您处理，并列出原因。"</string>
+    <string name="l10n_mall_inbox_autosend_turn_on" formatted="false">"开启"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_mall_inbox_minconf_line">"⛓ 付款需要 %1$d 个确认后才会发送任何内容（点按更改）"</string>
+    <string name="l10n_mall_inbox_minconf_title" formatted="false">"确认数"</string>
+    <string name="l10n_mall_inbox_minconf_help" formatted="false">"发送 NFT 前，付款币至少需要多少个区块（至少 1）。"</string>
+    <string name="l10n_mall_inbox_minconf_save" formatted="false">"保存"</string>
+    <string name="l10n_mall_inbox_minconf_min" formatted="false">"至少 1 个确认。"</string>
+    <!-- Arguments: quantity, tokenid, address -->
+    <string name="l10n_mall_inbox_unfinished_help">"此行的发送未完成，可能已经发出。请在钱包交易历史中查找发往\n%3$s\n的代币\n%2$s\n共 %1$s。在您确认未发送之前，不会再为其发送任何内容。"</string>
+    <string name="l10n_mall_inbox_unfinished_release" formatted="false">"我已检查：没有发送"</string>
+    <string name="l10n_mall_inbox_unfinished_title" formatted="false">"确实没有发送？"</string>
+    <!-- Arguments: tokenid, address -->
+    <string name="l10n_mall_inbox_unfinished_confirm">"仅当您的钱包历史中没有为此订单向\n%2$s\n发送代币\n%1$s\n的记录时。如果已经发出，说没有发送会导致重复发送。"</string>
+    <string name="l10n_mall_inbox_checking" formatted="false">"正在检查…"</string>
+    <string name="l10n_mall_inbox_ready_to_send" formatted="false">"所有检查均通过：可以发送。"</string>
+    <!-- Arguments: paid, due -->
+    <string name="l10n_mall_inbox_paid_of_due">"链上已付\n%1$s，应付 %2$s"</string>
+    <string name="l10n_mall_inbox_not_sent_list" formatted="false">"未发送："</string>
+    <string name="l10n_mall_inbox_waiting_list" formatted="false">"等待中，在以下条件满足前不会发送："</string>
 </resources>

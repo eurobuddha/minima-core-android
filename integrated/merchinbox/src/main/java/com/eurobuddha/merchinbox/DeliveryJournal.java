@@ -29,11 +29,9 @@ public final class DeliveryJournal {
         MerchDb.Order current=store.order(expected.ref);
         if(!binding(expected,line).equals(binding(current,line))||!current.paid||store.mismatch(current)
             ||!Arrays.asList(MerchDb.PAID,MerchDb.CONFIRMED,MerchDb.SHIPPED,MerchDb.DELIVERED).contains(current.status))throw DeliveryEvidence.invalid();
-        // Reuse MerchDb.recordPayment's token/amount gate even if the lifecycle status was edited.
+        // Paid in full against the due recomputed from the vendor's listing, never the buyer's own amount (review L2).
         try {
-            if(!DeliveryEvidence.same(current.tokenid,current.paidTokenid)
-                ||new java.math.BigDecimal(current.amount).signum()<=0
-                ||new java.math.BigDecimal(current.paidAmount).compareTo(new java.math.BigDecimal(current.amount))<0)throw DeliveryEvidence.invalid();
+            if(!DeliveryEvidence.same(current.tokenid,current.paidTokenid)||!store.deliverable(current))throw DeliveryEvidence.invalid();
         }catch(RuntimeException invalid){throw DeliveryEvidence.invalid();}
     }
     static JSONObject read(String raw) {
@@ -89,7 +87,7 @@ public final class DeliveryJournal {
         if(!LIVE.contains(owner))throw DeliveryEvidence.invalid();
         SQLiteDatabase db=store.getWritableDatabase();db.beginTransaction();
         try {
-            if(!LIVE.contains(owner))throw DeliveryEvidence.invalid();
+            if(!LIVE.contains(owner)||!DeliveryLedger.reservedFor(db,key))throw DeliveryEvidence.invalid();   // a journal only for a reserved line
             JSONObject row=bound(db,key,o,line);boolean insert=row==null;
             if(insert) {
                 if(!store.getMeta("nftposted:"+key,"").isEmpty()||!store.getMeta("nftsent:"+key,"").isEmpty()||coins.isEmpty())throw DeliveryEvidence.invalid();

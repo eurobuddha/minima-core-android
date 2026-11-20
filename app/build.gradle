@@ -203,8 +203,8 @@ android {
         // file:// path, Dexicon accepted only content://. Accepted now, only inside this app's files folder.
         // 2.2.42: Dexicon 0.3.60 (AtomiX 0.2.35): no identity halt on an incomplete `keys` list or on a single read -
         // a "not owned" / differing ETH verdict is re-read once and halts only when both complete reads agree.
-        versionCode 337
-        versionName "2.2.67"
+        versionCode 338
+        versionName "2.2.68"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

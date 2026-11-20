@@ -1187,6 +1187,14 @@
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "2ada9bac78d4a29afef4c4f3074ac5a3681b56e5f0b7b6fac3dfb568c3cbcf20",
           "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "1f1286b27674966e18efb698007f46757b6ff0554f71b156c8f39fabfd7e95bc"
         }
+      },
+      {
+        "revision": "1ddfb29563890aa194e3763b586e6d677634d21a",
+        "version": "0.4.21",
+        "summary": "Shared comms parity (MerchDb from Inbox 0.5.21). Shop 0.4.20 (standalone retry state written before the send) is not ported: this snapshot's PaymentJournal decides retries; 2.2.67 adds the whole question.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "87729bdfa3972ef09f9b142ea6e20f58c4eb98bb873847036584653e152023d1"
+        }
       }
     ]
   },
@@ -1296,6 +1304,14 @@
         "summary": "Shared comms parity (MerchDb from Inbox 0.5.15-0.5.18); already in this snapshot's MerchDb with 2.2.62-2.2.66.",
         "files": {
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "2ada9bac78d4a29afef4c4f3074ac5a3681b56e5f0b7b6fac3dfb568c3cbcf20"
+        }
+      },
+      {
+        "revision": "b92e14c09c21270ffb0fced9e5c817b34626bec9",
+        "version": "0.3.19",
+        "summary": "Shared comms parity (MerchDb from Inbox 0.5.21). Here also (Pandamonium only): every export saves the published shop to files/mall_listings for the Inbox.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "87729bdfa3972ef09f9b142ea6e20f58c4eb98bb873847036584653e152023d1"
         }
       }
     ]
@@ -1445,6 +1461,38 @@
           "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "1f1286b27674966e18efb698007f46757b6ff0554f71b156c8f39fabfd7e95bc",
           "src/test/java/com/eurobuddha/merchinbox/ListingTest.java": "1e2354288b09c564b69e52097f8b8bbbd98de7c12e0cbd0416090c670ea158d1",
           "src/test/java/com/eurobuddha/merchinbox/InboxShowsIdentifiersWholeTest.java": "eca8db6adc2ab3ac01223507f7efe17c1740965695eb7fd5030a0b03d7f0096a"
+        }
+      },
+      {
+        "revision": "4ec7b2a877789fa072e32456c40087f53bdb848d",
+        "version": "0.5.19",
+        "summary": "The vendor cannot be drained: DeliveryRules (listing required, only listed lines, stock across orders, paid in full on chain with confirmations, once only, buyer address) and DeliveryLedger; automatic delivery a vendor setting (default off). Here also: the listing comes from Studio's export in this app's files, the ledger guards the delivery journals, and refusals are localized.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryRules.java": "0f528f72f7101e8c3ac60fd3cb0b4fb78445640b449241360d05417f7004aed9",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryLedger.java": "6664b3c811d1357aae99eb8efe1c6aa39832ae537c8a4d3378b8e175f0173ede",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryGuard.java": "f23a3b345a64f5588bdb5b57e7e76276b4780f2b7f05e7d0de4a31c6c1d75b58",
+          "src/main/java/com/eurobuddha/merchinbox/Listing.java": "1304fe85c892db470c36ee9b72c9b56d705d2cd599a85c001e11b792cc6bb016",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "3f000c740f9d8d5bbbb0599bb9f4ac2654e6536334d01c54242ae6364556de62",
+          "src/test/java/com/eurobuddha/merchinbox/DrainTest.java": "9bf42ff3371e32474731ddb393e90e3443fa09caaff67feef0009d1e4dde605c"
+        }
+      },
+      {
+        "revision": "1e881efc5bee7969c4462e1610d49896258e765b",
+        "version": "0.5.20",
+        "summary": "Review M1: bounded buyer numbers, length-capped buyer strings, fail-closed recheck catching Throwable.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/Listing.java": "b7629f33911d3b65de0304ac1005f8c85c66925bf91a10cc4a159e6daa6eb7fa",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "1ffc8bcf8ce0a6a2b4a7ee7b4fe5cca95dd357d1f4b5d2975b3660218c90c3a1",
+          "src/test/java/com/eurobuddha/merchinbox/ListingTest.java": "a290df636c201cec3810a943047038182cdbc9b162464f8dd5d62c6d4b531e03"
+        }
+      },
+      {
+        "revision": "2b4a5afe43cb36f73b2d966817540782050294c1",
+        "version": "0.5.21",
+        "summary": "Review M2/L3/L4 (MerchDb): deliverable requires a checked order, PAID follows a recomputed due, old TOKEN_MISMATCH rows become durable flags.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "87729bdfa3972ef09f9b142ea6e20f58c4eb98bb873847036584653e152023d1",
+          "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "3f12582841fd23a8bf1c58b44d6cd4f3ebd675ce4c2d5457405414bbce8ac739"
         }
       }
     ]

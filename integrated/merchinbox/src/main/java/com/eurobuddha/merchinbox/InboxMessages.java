@@ -68,6 +68,15 @@ public final class InboxMessages {
             case "Invalid payment address, token or amount.": return Language.msg(l10n_mall_shop_invalid_payment);
             default: break;
         }
+        if (value.startsWith("Not sent:\n• ")) return reasons(java.util.Arrays.asList(value.substring(12).split("\n• ")), false);
+        if (value.startsWith("Not sent: ")) return reasons(java.util.Collections.singletonList(value.substring(10)), false);
+        for (int i = 0; i < DRAIN.length; i++) {
+            java.util.regex.Matcher m = DRAIN[i].matcher(value);
+            if (!m.matches()) continue;
+            Object[] a = new Object[m.groupCount()];
+            for (int j = 0; j < a.length; j++) a[j] = m.group(j + 1);
+            return Language.msg(DRAIN_RESOURCES[i], a);
+        }
         java.util.regex.Matcher command = java.util.regex.Pattern.compile("(txndelete|txncreate|txninput|txnoutput|txnstate|txnbasics|txncheck|txnsign|txnpost) failed(?: : ((?s:.*)))?").matcher(value);
         if (command.matches()) return command.group(2) == null ? Language.msg(l10n_casino_command_failed, command.group(1)) : Language.msg(l10n_casino_command_failed_detail, command.group(1), message(command.group(2), depth + 1));
         java.util.regex.Matcher piece = java.util.regex.Pattern.compile("piece #([0-9]+) of ((?s:.*)) is not in this wallet — sold or moved\\?").matcher(value);
@@ -88,6 +97,72 @@ public final class InboxMessages {
         }
         return value;
     }
+    /** Localized refusal reasons (DeliveryGuard, DeliveryRules, DeliveryLedger, Listing, the listing import);
+     *  identifiers in them are kept whole (review L5). */
+    private static final java.util.regex.Pattern[] DRAIN={
+        java.util.regex.Pattern.compile("the token id is not a token id: (.*)"),
+        java.util.regex.Pattern.compile("an order line names Minima \\(0x00\\); Minima is never sent as an NFT"),
+        java.util.regex.Pattern.compile("an order line names MxUSD \\((.*)\\); MxUSD is never sent as an NFT"),
+        java.util.regex.Pattern.compile("the node did not confirm token (.*); nothing was sent"),
+        java.util.regex.Pattern.compile("the node gave no decimals for token (.*); nothing was sent"),
+        java.util.regex.Pattern.compile("token (.*) has (-?[0-9]+) decimals; only whole-unit NFTs are sent"),
+        java.util.regex.Pattern.compile("the order or the line could not be read"),
+        java.util.regex.Pattern.compile("the order's buyer address is not a valid Minima address: (.*)"),
+        java.util.regex.Pattern.compile("the order names a token that is not its currency's"),
+        java.util.regex.Pattern.compile("no listing: nothing can be sent until the \\.shop you published for this shop is in the Inbox"),
+        java.util.regex.Pattern.compile("\\\"((?s:.*))\\\" \\(token (.*)\\) is not one product in your listing"),
+        java.util.regex.Pattern.compile("this line's send did not finish and may have gone: check your wallet's history first"),
+        java.util.regex.Pattern.compile("this line was already sent"),
+        java.util.regex.Pattern.compile("you list ([0-9.]+) of this product and ([0-9.]+) are already delivered or being sent"),
+        java.util.regex.Pattern.compile("your holdings of token (.*) could not be read"),
+        java.util.regex.Pattern.compile("you hold (.*) of token (.*) and ([0-9.]+) are already being sent"),
+        java.util.regex.Pattern.compile("the chain height could not be read"),
+        java.util.regex.Pattern.compile("your payment coins could not be read"),
+        java.util.regex.Pattern.compile("coin (.*) was counted for order (.*)"),
+        java.util.regex.Pattern.compile("coin (.*) has ([0-9]+) confirmation\\(s\\); ([0-9]+) are needed"),
+        java.util.regex.Pattern.compile("paid on chain with enough confirmations: (.*) of (.*) due"),
+        java.util.regex.Pattern.compile("this line is already being sent, or its send did not finish and may have gone: check your wallet's history first"),
+        java.util.regex.Pattern.compile("sending ([0-9.]+) would make ([0-9.]+) delivered of this product, more than the ([0-9.]+) you list"),
+        java.util.regex.Pattern.compile("the delivery record could not be written"),
+        java.util.regex.Pattern.compile("the order's currency \\((.*)\\) is not your shop's \\((.*)\\)"),
+        java.util.regex.Pattern.compile("the order has no items you can read"),
+        java.util.regex.Pattern.compile("an item cannot be read"),
+        java.util.regex.Pattern.compile("the delivery method \\\"((?s:.*))\\\" is not in your listing"),
+        java.util.regex.Pattern.compile("((?s:.*)) is not in your listing"),
+        java.util.regex.Pattern.compile("((?s:.*)) is listed more than once"),
+        java.util.regex.Pattern.compile("((?s:.*)): the quantity ((?s:.*)) is not a whole number from 1 to 999999999"),
+        java.util.regex.Pattern.compile("((?s:.*)): the quantity ([0-9.]+) is more than you list \\(([0-9]+)\\)"),
+        java.util.regex.Pattern.compile("((?s:.*)): the order's price ((?s:.*)) is not your price ([0-9.]+)"),
+        java.util.regex.Pattern.compile("((?s:.*)): the order's lines together ask for ([0-9.]+), more than you list \\(([0-9]+)\\)"),
+        java.util.regex.Pattern.compile("this order has not been checked yet"),
+        java.util.regex.Pattern.compile("this order could not be checked against your listing; nothing is sent for it"),
+        java.util.regex.Pattern.compile("\u2026 and ([0-9]+) more"),
+        java.util.regex.Pattern.compile("That is not a \\.shop file\\."),
+        java.util.regex.Pattern.compile("This \\.shop file has no shop id\\."),
+        java.util.regex.Pattern.compile("This \\.shop file belongs to another vendor:\\n((?s:.*))\\nYour shop key is\\n((?s:.*))"),
+        java.util.regex.Pattern.compile("This \\.shop file lists no products\\."),
+        java.util.regex.Pattern.compile("The price of \\\"((?s:.*))\\\" is not a plain number \\(((?s:.*))\\)\\."),
+        java.util.regex.Pattern.compile("The fee of the delivery method \\\"((?s:.*))\\\" is not a plain number \\(((?s:.*))\\)\\."),
+        java.util.regex.Pattern.compile("That file is too large to be a \\.shop file\\.")
+    };
+    private static final int[] DRAIN_RESOURCES={l10n_mall_inbox_drain_r_not_token,l10n_mall_inbox_drain_r_minima,l10n_mall_inbox_drain_r_mxusd,l10n_mall_inbox_drain_r_unconfirmed,l10n_mall_inbox_drain_r_no_decimals,l10n_mall_inbox_drain_r_decimals,l10n_mall_inbox_drain_r_unreadable,l10n_mall_inbox_drain_r_bad_address,l10n_mall_inbox_drain_r_mismatch,l10n_mall_inbox_drain_r_no_listing,l10n_mall_inbox_drain_r_not_one_product,l10n_mall_inbox_drain_r_unfinished,l10n_mall_inbox_drain_r_already_sent,l10n_mall_inbox_drain_r_stock,l10n_mall_inbox_drain_r_holdings_unread,l10n_mall_inbox_drain_r_held,l10n_mall_inbox_drain_r_no_tip,l10n_mall_inbox_drain_r_coins_unread,l10n_mall_inbox_drain_r_coin_other,l10n_mall_inbox_drain_r_conf,l10n_mall_inbox_drain_r_paid,l10n_mall_inbox_drain_r_in_flight,l10n_mall_inbox_drain_r_would_exceed,l10n_mall_inbox_drain_r_ledger,l10n_mall_inbox_drain_l_currency,l10n_mall_inbox_drain_l_no_items,l10n_mall_inbox_drain_l_item,l10n_mall_inbox_drain_l_delivery,l10n_mall_inbox_drain_l_not_listed,l10n_mall_inbox_drain_l_twice,l10n_mall_inbox_drain_l_qty,l10n_mall_inbox_drain_l_qty_stock,l10n_mall_inbox_drain_l_price,l10n_mall_inbox_drain_l_together,l10n_mall_inbox_drain_l_pending,l10n_mall_inbox_drain_l_unchecked,l10n_mall_inbox_drain_l_more,l10n_mall_inbox_drain_i_not_shop,l10n_mall_inbox_drain_i_no_id,l10n_mall_inbox_drain_i_other,l10n_mall_inbox_drain_i_no_products,l10n_mall_inbox_drain_i_price,l10n_mall_inbox_drain_i_fee,l10n_mall_inbox_drain_i_too_large};
+
+    /** A list of reasons, each localized, under "Not sent:" or (waiting) "Waiting, nothing is sent until:". */
+    public static CharSequence reasons(java.util.List<String> reasons, boolean waiting) {
+        Object[] parts = new Object[1 + reasons.size() * 2];
+        parts[0] = Language.msg(waiting ? l10n_mall_inbox_waiting_list : l10n_mall_inbox_not_sent_list);
+        for (int i = 0; i < reasons.size(); i++) { parts[1 + 2 * i] = "\n• "; parts[2 + 2 * i] = message(reasons.get(i)); }
+        return Language.join(parts);
+    }
+
+    /** A stored note of one reason per line, each localized and bulleted. */
+    public static CharSequence lines(String note) {
+        String[] l = note.split("\n");
+        Object[] parts = new Object[l.length * 2];
+        for (int i = 0; i < l.length; i++) { parts[2 * i] = i == 0 ? "• " : "\n• "; parts[2 * i + 1] = message(l[i]); }
+        return Language.join(parts);
+    }
+
     private static final java.util.regex.Pattern[] PATTERNS={
         java.util.regex.Pattern.compile("encrypt\\ failed:\\ ((?s:.*))"),
         java.util.regex.Pattern.compile("seal\\ error:\\ ((?s:.*))")

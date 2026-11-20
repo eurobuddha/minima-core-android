@@ -43431,9 +43431,387 @@
     "uk": "Перевірено за вашим списком: до сплати {amount} {currency}."
   },
   "mallInbox.listingUnchecked": {
-    "en": "Unchecked: the items and the total {amount} {currency} are the buyer's own figures. Import the .shop file you published (⇪ on the orders screen) so the Inbox checks orders against your listing.",
-    "zh-Hans": "未核对：商品和总额 {amount} {currency} 都是买家自己填写的。请导入您发布的 .shop 文件（订单页上的 ⇪），以便收件箱据您的商品列表核对订单。",
-    "ru": "Не проверено: позиции и сумма {amount} {currency} указаны самим покупателем. Загрузите опубликованный вами файл .shop (⇪ на экране заказов), чтобы Inbox сверял заказы с вашим списком.",
-    "uk": "Не перевірено: позиції та сума {amount} {currency} вказані самим покупцем. Завантажте опублікований вами файл .shop (⇪ на екрані замовлень), щоб Inbox звіряв замовлення з вашим списком."
+    "en": "Unchecked: the items and the total {amount} {currency} are the buyer's own figures. Nothing can be sent for this order until your listing is here: publish the shop from Studio in this app, or import the .shop you published (⇪ on the orders screen).",
+    "zh-Hans": "未核对：商品和总额 {amount} {currency} 都是买家自己填写的。在您的商品列表就绪之前，不能为此订单发送任何内容：请在本应用的 Studio 中发布商店，或导入您发布的 .shop（订单页上的 ⇪）。",
+    "ru": "Не проверено: позиции и сумма {amount} {currency} указаны самим покупателем. По этому заказу ничего нельзя отправить, пока здесь нет вашего списка: опубликуйте магазин из Studio в этом приложении или загрузите опубликованный вами .shop (⇪ на экране заказов).",
+    "uk": "Не перевірено: позиції та сума {amount} {currency} вказані самим покупцем. За цим замовленням нічого не можна надіслати, доки тут немає вашого списку: опублікуйте магазин зі Studio в цьому застосунку або завантажте опублікований вами .shop (⇪ на екрані замовлень)."
+  },
+  "mallInboxDrain.rNotToken": {
+    "en": "the token id is not a token id: {a}",
+    "zh-Hans": "代币 ID 无效：{a}",
+    "ru": "ID токена недействителен: {a}",
+    "uk": "ID токена недійсний: {a}"
+  },
+  "mallInboxDrain.rMinima": {
+    "en": "an order line names Minima (0x00); Minima is never sent as an NFT",
+    "zh-Hans": "订单行指定了 Minima (0x00)；Minima 绝不会作为 NFT 发送",
+    "ru": "строка заказа называет Minima (0x00); Minima никогда не отправляется как NFT",
+    "uk": "рядок замовлення називає Minima (0x00); Minima ніколи не надсилається як NFT"
+  },
+  "mallInboxDrain.rMxusd": {
+    "en": "an order line names MxUSD ({a}); MxUSD is never sent as an NFT",
+    "zh-Hans": "订单行指定了 MxUSD（{a}）；MxUSD 绝不会作为 NFT 发送",
+    "ru": "строка заказа называет MxUSD ({a}); MxUSD никогда не отправляется как NFT",
+    "uk": "рядок замовлення називає MxUSD ({a}); MxUSD ніколи не надсилається як NFT"
+  },
+  "mallInboxDrain.rUnconfirmed": {
+    "en": "the node did not confirm token {a}; nothing was sent",
+    "zh-Hans": "节点未确认代币 {a}；未发送任何内容",
+    "ru": "узел не подтвердил токен {a}; ничего не отправлено",
+    "uk": "вузол не підтвердив токен {a}; нічого не надіслано"
+  },
+  "mallInboxDrain.rNoDecimals": {
+    "en": "the node gave no decimals for token {a}; nothing was sent",
+    "zh-Hans": "节点未给出代币 {a} 的小数位；未发送任何内容",
+    "ru": "узел не сообщил число знаков токена {a}; ничего не отправлено",
+    "uk": "вузол не повідомив кількість знаків токена {a}; нічого не надіслано"
+  },
+  "mallInboxDrain.rDecimals": {
+    "en": "token {a} has {b} decimals; only whole-unit NFTs are sent",
+    "zh-Hans": "代币 {a} 有 {b} 位小数；只发送整数单位的 NFT",
+    "ru": "у токена {a} {b} знаков после запятой; отправляются только целые NFT",
+    "uk": "токен {a} має {b} знаків після коми; надсилаються лише цілі NFT"
+  },
+  "mallInboxDrain.rUnreadable": {
+    "en": "the order or the line could not be read",
+    "zh-Hans": "无法读取订单或订单行",
+    "ru": "не удалось прочитать заказ или строку",
+    "uk": "не вдалося прочитати замовлення або рядок"
+  },
+  "mallInboxDrain.rBadAddress": {
+    "en": "the order's buyer address is not a valid Minima address: {a}",
+    "zh-Hans": "订单中的买家地址不是有效的 Minima 地址：{a}",
+    "ru": "адрес покупателя в заказе не является адресом Minima: {a}",
+    "uk": "адреса покупця в замовленні не є адресою Minima: {a}"
+  },
+  "mallInboxDrain.rMismatch": {
+    "en": "the order names a token that is not its currency's",
+    "zh-Hans": "订单指定的代币与其币种不符",
+    "ru": "заказ называет токен, не соответствующий его валюте",
+    "uk": "замовлення називає токен, що не відповідає його валюті"
+  },
+  "mallInboxDrain.rNoListing": {
+    "en": "no listing: nothing can be sent until the .shop you published for this shop is in the Inbox",
+    "zh-Hans": "没有商品列表：在收件箱中有您为此商店发布的 .shop 之前，无法发送任何内容",
+    "ru": "нет списка товаров: ничего нельзя отправить, пока в Inbox нет опубликованного вами .shop этого магазина",
+    "uk": "немає списку товарів: нічого не можна надіслати, доки в Inbox немає опублікованого вами .shop цього магазину"
+  },
+  "mallInboxDrain.rNotOneProduct": {
+    "en": "\"{a}\" (token {b}) is not one product in your listing",
+    "zh-Hans": "“{a}”（代币 {b}）不是您列表中的单一商品",
+    "ru": "«{a}» (токен {b}) не является одним товаром из вашего списка",
+    "uk": "«{a}» (токен {b}) не є одним товаром із вашого списку"
+  },
+  "mallInboxDrain.rUnfinished": {
+    "en": "this line's send did not finish and may have gone: check your wallet's history first",
+    "zh-Hans": "此行的发送未完成，可能已经发出：请先检查钱包历史",
+    "ru": "отправка этой строки не завершилась и могла пройти: сначала проверьте историю кошелька",
+    "uk": "надсилання цього рядка не завершилося й могло пройти: спершу перевірте історію гаманця"
+  },
+  "mallInboxDrain.rAlreadySent": {
+    "en": "this line was already sent",
+    "zh-Hans": "此行已经发送",
+    "ru": "эта строка уже отправлена",
+    "uk": "цей рядок уже надіслано"
+  },
+  "mallInboxDrain.rStock": {
+    "en": "you list {a} of this product and {b} are already delivered or being sent",
+    "zh-Hans": "此商品您列出 {a} 件，已有 {b} 件已交付或正在发送",
+    "ru": "в вашем списке {a} шт. этого товара, и {b} уже доставлены или отправляются",
+    "uk": "у вашому списку {a} шт. цього товару, і {b} уже доставлено або надсилається"
+  },
+  "mallInboxDrain.rHoldingsUnread": {
+    "en": "your holdings of token {a} could not be read",
+    "zh-Hans": "无法读取您持有的代币 {a}",
+    "ru": "не удалось прочитать ваши запасы токена {a}",
+    "uk": "не вдалося прочитати ваші запаси токена {a}"
+  },
+  "mallInboxDrain.rHeld": {
+    "en": "you hold {a} of token {b} and {c} are already being sent",
+    "zh-Hans": "您持有代币 {b} {a} 个，已有 {c} 个正在发送",
+    "ru": "у вас {a} токена {b}, и {c} уже отправляются",
+    "uk": "у вас {a} токена {b}, і {c} уже надсилається"
+  },
+  "mallInboxDrain.rNoTip": {
+    "en": "the chain height could not be read",
+    "zh-Hans": "无法读取链高度",
+    "ru": "не удалось прочитать высоту цепи",
+    "uk": "не вдалося прочитати висоту ланцюга"
+  },
+  "mallInboxDrain.rCoinsUnread": {
+    "en": "your payment coins could not be read",
+    "zh-Hans": "无法读取您的付款币",
+    "ru": "не удалось прочитать ваши платёжные монеты",
+    "uk": "не вдалося прочитати ваші платіжні монети"
+  },
+  "mallInboxDrain.rCoinOther": {
+    "en": "coin {a} was counted for order {b}",
+    "zh-Hans": "币 {a} 已计入订单 {b}",
+    "ru": "монета {a} засчитана для заказа {b}",
+    "uk": "монету {a} зараховано для замовлення {b}"
+  },
+  "mallInboxDrain.rConf": {
+    "en": "coin {a} has {b} confirmation(s); {c} are needed",
+    "zh-Hans": "币 {a} 有 {b} 个确认；需要 {c} 个",
+    "ru": "у монеты {a} подтверждений: {b}; нужно {c}",
+    "uk": "монета {a} має підтверджень: {b}; потрібно {c}"
+  },
+  "mallInboxDrain.rPaid": {
+    "en": "paid on chain with enough confirmations: {a} of {b} due",
+    "zh-Hans": "链上已付且确认足够：{a}，应付 {b}",
+    "ru": "оплачено в цепи с достаточными подтверждениями: {a} из {b}",
+    "uk": "сплачено в ланцюгу з достатніми підтвердженнями: {a} з {b}"
+  },
+  "mallInboxDrain.rInFlight": {
+    "en": "this line is already being sent, or its send did not finish and may have gone: check your wallet's history first",
+    "zh-Hans": "此行正在发送，或其发送未完成且可能已经发出：请先检查钱包历史",
+    "ru": "эта строка уже отправляется, или её отправка не завершилась и могла пройти: сначала проверьте историю кошелька",
+    "uk": "цей рядок уже надсилається, або його надсилання не завершилося й могло пройти: спершу перевірте історію гаманця"
+  },
+  "mallInboxDrain.rWouldExceed": {
+    "en": "sending {a} would make {b} delivered of this product, more than the {c} you list",
+    "zh-Hans": "发送 {a} 件会使此商品已交付 {b} 件，超过您列出的 {c} 件",
+    "ru": "отправка {a} шт. дала бы {b} доставленных шт. этого товара — больше, чем {c} в вашем списке",
+    "uk": "надсилання {a} шт. дало б {b} доставлених шт. цього товару — більше, ніж {c} у вашому списку"
+  },
+  "mallInboxDrain.rLedger": {
+    "en": "the delivery record could not be written",
+    "zh-Hans": "无法写入交付记录",
+    "ru": "не удалось записать запись о доставке",
+    "uk": "не вдалося записати запис про доставку"
+  },
+  "mallInboxDrain.lCurrency": {
+    "en": "the order's currency ({a}) is not your shop's ({b})",
+    "zh-Hans": "订单的币种（{a}）不是您商店的币种（{b}）",
+    "ru": "валюта заказа ({a}) не валюта вашего магазина ({b})",
+    "uk": "валюта замовлення ({a}) не валюта вашого магазину ({b})"
+  },
+  "mallInboxDrain.lNoItems": {
+    "en": "the order has no items you can read",
+    "zh-Hans": "订单中没有可读取的商品",
+    "ru": "в заказе нет позиций, которые можно прочитать",
+    "uk": "у замовленні немає позицій, які можна прочитати"
+  },
+  "mallInboxDrain.lItem": {
+    "en": "an item cannot be read",
+    "zh-Hans": "有一项无法读取",
+    "ru": "позицию невозможно прочитать",
+    "uk": "позицію неможливо прочитати"
+  },
+  "mallInboxDrain.lNotListed": {
+    "en": "{a} is not in your listing",
+    "zh-Hans": "{a} 不在您的商品列表中",
+    "ru": "{a} нет в вашем списке товаров",
+    "uk": "{a} немає у вашому списку товарів"
+  },
+  "mallInboxDrain.lTwice": {
+    "en": "{a} is listed more than once",
+    "zh-Hans": "{a} 在列表中出现不止一次",
+    "ru": "{a} есть в списке больше одного раза",
+    "uk": "{a} є у списку більше одного разу"
+  },
+  "mallInboxDrain.lQty": {
+    "en": "{a}: the quantity {b} is not a whole number from 1 to 999999999",
+    "zh-Hans": "{a}：数量 {b} 不是 1 到 999999999 之间的整数",
+    "ru": "{a}: количество {b} не целое число от 1 до 999999999",
+    "uk": "{a}: кількість {b} не ціле число від 1 до 999999999"
+  },
+  "mallInboxDrain.lQtyStock": {
+    "en": "{a}: the quantity {b} is more than you list ({c})",
+    "zh-Hans": "{a}：数量 {b} 超过您列出的数量（{c}）",
+    "ru": "{a}: количество {b} больше, чем в вашем списке ({c})",
+    "uk": "{a}: кількість {b} більша, ніж у вашому списку ({c})"
+  },
+  "mallInboxDrain.lPrice": {
+    "en": "{a}: the order's price {b} is not your price {c}",
+    "zh-Hans": "{a}：订单价格 {b} 不是您的价格 {c}",
+    "ru": "{a}: цена в заказе {b} не ваша цена {c}",
+    "uk": "{a}: ціна в замовленні {b} не ваша ціна {c}"
+  },
+  "mallInboxDrain.lTogether": {
+    "en": "{a}: the order's lines together ask for {b}, more than you list ({c})",
+    "zh-Hans": "{a}：订单各行合计要 {b} 件，超过您列出的数量（{c}）",
+    "ru": "{a}: строки заказа вместе просят {b}, больше, чем в вашем списке ({c})",
+    "uk": "{a}: рядки замовлення разом просять {b}, більше, ніж у вашому списку ({c})"
+  },
+  "mallInboxDrain.lDelivery": {
+    "en": "the delivery method \"{a}\" is not in your listing",
+    "zh-Hans": "配送方式“{a}”不在您的列表中",
+    "ru": "способа доставки «{a}» нет в вашем списке",
+    "uk": "способу доставки «{a}» немає у вашому списку"
+  },
+  "mallInboxDrain.lPending": {
+    "en": "this order has not been checked yet",
+    "zh-Hans": "此订单尚未核对",
+    "ru": "этот заказ ещё не проверен",
+    "uk": "це замовлення ще не перевірено"
+  },
+  "mallInboxDrain.lUnchecked": {
+    "en": "this order could not be checked against your listing; nothing is sent for it",
+    "zh-Hans": "此订单无法与您的商品列表核对；不会为其发送任何内容",
+    "ru": "этот заказ не удалось сверить с вашим списком; по нему ничего не отправляется",
+    "uk": "це замовлення не вдалося звірити з вашим списком; за ним нічого не надсилається"
+  },
+  "mallInboxDrain.lMore": {
+    "en": "… and {a} more",
+    "zh-Hans": "……还有 {a} 项",
+    "ru": "… и ещё {a}",
+    "uk": "… і ще {a}"
+  },
+  "mallInboxDrain.iNotShop": {
+    "en": "That is not a .shop file.",
+    "zh-Hans": "这不是 .shop 文件。",
+    "ru": "Это не файл .shop.",
+    "uk": "Це не файл .shop."
+  },
+  "mallInboxDrain.iNoId": {
+    "en": "This .shop file has no shop id.",
+    "zh-Hans": "此 .shop 文件没有商店 ID。",
+    "ru": "В этом файле .shop нет ID магазина.",
+    "uk": "У цьому файлі .shop немає ID магазину."
+  },
+  "mallInboxDrain.iOther": {
+    "en": "This .shop file belongs to another vendor:\n{a}\nYour shop key is\n{b}",
+    "zh-Hans": "此 .shop 文件属于另一位卖家：\n{a}\n您的商店密钥是\n{b}",
+    "ru": "Этот файл .shop принадлежит другому продавцу:\n{a}\nКлюч вашего магазина\n{b}",
+    "uk": "Цей файл .shop належить іншому продавцю:\n{a}\nКлюч вашого магазину\n{b}"
+  },
+  "mallInboxDrain.iNoProducts": {
+    "en": "This .shop file lists no products.",
+    "zh-Hans": "此 .shop 文件没有列出商品。",
+    "ru": "В этом файле .shop нет товаров.",
+    "uk": "У цьому файлі .shop немає товарів."
+  },
+  "mallInboxDrain.iPrice": {
+    "en": "The price of \"{a}\" is not a plain number ({b}).",
+    "zh-Hans": "“{a}”的价格不是普通数字（{b}）。",
+    "ru": "Цена «{a}» — не обычное число ({b}).",
+    "uk": "Ціна «{a}» — не звичайне число ({b})."
+  },
+  "mallInboxDrain.iFee": {
+    "en": "The fee of the delivery method \"{a}\" is not a plain number ({b}).",
+    "zh-Hans": "配送方式“{a}”的费用不是普通数字（{b}）。",
+    "ru": "Стоимость способа доставки «{a}» — не обычное число ({b}).",
+    "uk": "Вартість способу доставки «{a}» — не звичайне число ({b})."
+  },
+  "mallInboxDrain.iTooLarge": {
+    "en": "That file is too large to be a .shop file.",
+    "zh-Hans": "该文件太大，不可能是 .shop 文件。",
+    "ru": "Этот файл слишком велик для файла .shop.",
+    "uk": "Цей файл завеликий для файлу .shop."
+  },
+  "mallInbox.autosendOn": {
+    "en": "⚡ Auto NFT delivery  ·  ON  ·  only orders that pass every check (tap to change)",
+    "zh-Hans": "⚡ 自动交付 NFT  ·  已开启  ·  仅限通过所有检查的订单（点按更改）",
+    "ru": "⚡ Автоотправка NFT  ·  ВКЛ  ·  только заказы, прошедшие все проверки (нажмите, чтобы изменить)",
+    "uk": "⚡ Автонадсилання NFT  ·  УВІМК  ·  лише замовлення, що пройшли всі перевірки (торкніться, щоб змінити)"
+  },
+  "mallInbox.autosendOff": {
+    "en": "⚡ Auto NFT delivery  ·  OFF  ·  only orders that pass every check (tap to change)",
+    "zh-Hans": "⚡ 自动交付 NFT  ·  已关闭  ·  仅限通过所有检查的订单（点按更改）",
+    "ru": "⚡ Автоотправка NFT  ·  ВЫКЛ  ·  только заказы, прошедшие все проверки (нажмите, чтобы изменить)",
+    "uk": "⚡ Автонадсилання NFT  ·  ВИМК  ·  лише замовлення, що пройшли всі перевірки (торкніться, щоб змінити)"
+  },
+  "mallInbox.autosendTitle": {
+    "en": "Turn on automatic NFT delivery?",
+    "zh-Hans": "开启自动交付 NFT？",
+    "ru": "Включить автоотправку NFT?",
+    "uk": "Увімкнути автонадсилання NFT?"
+  },
+  "mallInbox.autosendHelp": {
+    "en": "An NFT is then sent without asking you, but only when the order matches your listing, the line is listed and in stock, it was not sent before, and the payment is on chain in full with at least {count} confirmation(s). Anything else waits for you with the reasons listed.",
+    "zh-Hans": "之后 NFT 会在不询问您的情况下发送，但仅当订单与您的商品列表一致、该行已列出且有库存、此前未发送，且付款已全额上链并至少有 {count} 个确认时。其他情况都会等待您处理，并列出原因。",
+    "ru": "Тогда NFT отправляется без вопроса, но только если заказ совпадает с вашим списком, строка есть в списке и в наличии, ещё не отправлялась, а оплата полностью в цепи и имеет не меньше {count} подтверждений. Всё остальное ждёт вас с перечнем причин.",
+    "uk": "Тоді NFT надсилається без запитання, але лише якщо замовлення збігається з вашим списком, рядок є у списку й у наявності, ще не надсилався, а оплата повністю в ланцюгу й має не менше {count} підтверджень. Усе інше чекає на вас із переліком причин."
+  },
+  "mallInbox.autosendTurnOn": {
+    "en": "Turn on",
+    "zh-Hans": "开启",
+    "ru": "Включить",
+    "uk": "Увімкнути"
+  },
+  "mallInbox.minconfLine": {
+    "en": "⛓ Payments need {count} confirmation(s) before anything is sent (tap to change)",
+    "zh-Hans": "⛓ 付款需要 {count} 个确认后才会发送任何内容（点按更改）",
+    "ru": "⛓ Перед любой отправкой оплате нужно подтверждений: {count} (нажмите, чтобы изменить)",
+    "uk": "⛓ Перед будь-яким надсиланням оплаті потрібно підтверджень: {count} (торкніться, щоб змінити)"
+  },
+  "mallInbox.minconfTitle": {
+    "en": "Confirmations",
+    "zh-Hans": "确认数",
+    "ru": "Подтверждения",
+    "uk": "Підтвердження"
+  },
+  "mallInbox.minconfHelp": {
+    "en": "How many blocks a payment coin must have before an NFT is sent (at least 1).",
+    "zh-Hans": "发送 NFT 前，付款币至少需要多少个区块（至少 1）。",
+    "ru": "Сколько блоков должно быть у платёжной монеты до отправки NFT (не меньше 1).",
+    "uk": "Скільки блоків має бути в платіжної монети до надсилання NFT (не менше 1)."
+  },
+  "mallInbox.minconfSave": {
+    "en": "Save",
+    "zh-Hans": "保存",
+    "ru": "Сохранить",
+    "uk": "Зберегти"
+  },
+  "mallInbox.minconfMin": {
+    "en": "At least 1 confirmation.",
+    "zh-Hans": "至少 1 个确认。",
+    "ru": "Не меньше 1 подтверждения.",
+    "uk": "Не менше 1 підтвердження."
+  },
+  "mallInbox.unfinishedHelp": {
+    "en": "This line's send did not finish and may have gone. Check your wallet's transaction history for {quantity} of token\n{tokenid}\nto\n{address}\nNothing more is sent for it until you say it was not sent.",
+    "zh-Hans": "此行的发送未完成，可能已经发出。请在钱包交易历史中查找发往\n{address}\n的代币\n{tokenid}\n共 {quantity}。在您确认未发送之前，不会再为其发送任何内容。",
+    "ru": "Отправка этой строки не завершилась и могла пройти. Найдите в истории кошелька {quantity} токена\n{tokenid}\nна\n{address}\nНичего больше не отправляется, пока вы не подтвердите, что отправки не было.",
+    "uk": "Надсилання цього рядка не завершилося й могло пройти. Знайдіть в історії гаманця {quantity} токена\n{tokenid}\nна\n{address}\nНічого більше не надсилається, доки ви не підтвердите, що надсилання не було."
+  },
+  "mallInbox.unfinishedRelease": {
+    "en": "I checked: it was NOT sent",
+    "zh-Hans": "我已检查：没有发送",
+    "ru": "Я проверил: НЕ отправлено",
+    "uk": "Я перевірив: НЕ надіслано"
+  },
+  "mallInbox.unfinishedTitle": {
+    "en": "It was not sent?",
+    "zh-Hans": "确实没有发送？",
+    "ru": "Точно не отправлено?",
+    "uk": "Точно не надіслано?"
+  },
+  "mallInbox.unfinishedConfirm": {
+    "en": "Only if your wallet's history shows no send of token\n{tokenid}\nto\n{address}\nfor this order. If it went, saying it did not lets it be sent twice.",
+    "zh-Hans": "仅当您的钱包历史中没有为此订单向\n{address}\n发送代币\n{tokenid}\n的记录时。如果已经发出，说没有发送会导致重复发送。",
+    "ru": "Только если в истории кошелька нет отправки токена\n{tokenid}\nна\n{address}\nпо этому заказу. Если она была, такой ответ позволит отправить дважды.",
+    "uk": "Лише якщо в історії гаманця немає надсилання токена\n{tokenid}\nна\n{address}\nза цим замовленням. Якщо воно було, така відповідь дозволить надіслати двічі."
+  },
+  "mallInbox.checking": {
+    "en": "Checking…",
+    "zh-Hans": "正在检查…",
+    "ru": "Проверка…",
+    "uk": "Перевірка…"
+  },
+  "mallInbox.readyToSend": {
+    "en": "Every check passes: ready to send.",
+    "zh-Hans": "所有检查均通过：可以发送。",
+    "ru": "Все проверки пройдены: можно отправить.",
+    "uk": "Усі перевірки пройдено: можна надіслати."
+  },
+  "mallInbox.paidOfDue": {
+    "en": "Paid on chain\n{paid} of {due} due",
+    "zh-Hans": "链上已付\n{paid}，应付 {due}",
+    "ru": "Оплачено в цепи\n{paid} из {due}",
+    "uk": "Сплачено в ланцюгу\n{paid} з {due}"
+  },
+  "mallInbox.notSentList": {
+    "en": "Not sent:",
+    "zh-Hans": "未发送：",
+    "ru": "Не отправлено:",
+    "uk": "Не надіслано:"
+  },
+  "mallInbox.waitingList": {
+    "en": "Waiting, nothing is sent until:",
+    "zh-Hans": "等待中，在以下条件满足前不会发送：",
+    "ru": "Ожидание, ничего не отправляется, пока:",
+    "uk": "Очікування, нічого не надсилається, доки:"
   }
 }

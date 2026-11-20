@@ -1364,6 +1364,7 @@ public class MainActivity extends AppCompatActivity {
         io.execute(() -> {
             try {
                 File f = snapshot.write(getCacheDir(), MainActivity::resolveExportImage);
+                snapshot.saveListing(getFilesDir());   // the Inbox here checks orders against what was just published
                 Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".merchstudio.fileprovider", f);
                 ui.post(() -> {
                     finishExport();

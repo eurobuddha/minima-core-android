@@ -8729,5 +8729,99 @@
     <!-- Arguments: amount, currency -->
     <string name="l10n_mall_inbox_listing_checked">"Перевірено за вашим списком: до сплати %1$s %2$s."</string>
     <!-- Arguments: amount, currency -->
-    <string name="l10n_mall_inbox_listing_unchecked">"Не перевірено: позиції та сума %1$s %2$s вказані самим покупцем. Завантажте опублікований вами файл .shop (⇪ на екрані замовлень), щоб Inbox звіряв замовлення з вашим списком."</string>
+    <string name="l10n_mall_inbox_listing_unchecked">"Не перевірено: позиції та сума %1$s %2$s вказані самим покупцем. За цим замовленням нічого не можна надіслати, доки тут немає вашого списку: опублікуйте магазин зі Studio в цьому застосунку або завантажте опублікований вами .shop (⇪ на екрані замовлень)."</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_not_token">"ID токена недійсний: %1$s"</string>
+    <string name="l10n_mall_inbox_drain_r_minima" formatted="false">"рядок замовлення називає Minima (0x00); Minima ніколи не надсилається як NFT"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_mxusd">"рядок замовлення називає MxUSD (%1$s); MxUSD ніколи не надсилається як NFT"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_unconfirmed">"вузол не підтвердив токен %1$s; нічого не надіслано"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_no_decimals">"вузол не повідомив кількість знаків токена %1$s; нічого не надіслано"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_decimals">"токен %1$s має %2$s знаків після коми; надсилаються лише цілі NFT"</string>
+    <string name="l10n_mall_inbox_drain_r_unreadable" formatted="false">"не вдалося прочитати замовлення або рядок"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_bad_address">"адреса покупця в замовленні не є адресою Minima: %1$s"</string>
+    <string name="l10n_mall_inbox_drain_r_mismatch" formatted="false">"замовлення називає токен, що не відповідає його валюті"</string>
+    <string name="l10n_mall_inbox_drain_r_no_listing" formatted="false">"немає списку товарів: нічого не можна надіслати, доки в Inbox немає опублікованого вами .shop цього магазину"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_not_one_product">"«%1$s» (токен %2$s) не є одним товаром із вашого списку"</string>
+    <string name="l10n_mall_inbox_drain_r_unfinished" formatted="false">"надсилання цього рядка не завершилося й могло пройти: спершу перевірте історію гаманця"</string>
+    <string name="l10n_mall_inbox_drain_r_already_sent" formatted="false">"цей рядок уже надіслано"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_stock">"у вашому списку %1$s шт. цього товару, і %2$s уже доставлено або надсилається"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_holdings_unread">"не вдалося прочитати ваші запаси токена %1$s"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_r_held">"у вас %1$s токена %2$s, і %3$s уже надсилається"</string>
+    <string name="l10n_mall_inbox_drain_r_no_tip" formatted="false">"не вдалося прочитати висоту ланцюга"</string>
+    <string name="l10n_mall_inbox_drain_r_coins_unread" formatted="false">"не вдалося прочитати ваші платіжні монети"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_coin_other">"монету %1$s зараховано для замовлення %2$s"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_r_conf">"монета %1$s має підтверджень: %2$s; потрібно %3$s"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_paid">"сплачено в ланцюгу з достатніми підтвердженнями: %1$s з %2$s"</string>
+    <string name="l10n_mall_inbox_drain_r_in_flight" formatted="false">"цей рядок уже надсилається, або його надсилання не завершилося й могло пройти: спершу перевірте історію гаманця"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_r_would_exceed">"надсилання %1$s шт. дало б %2$s доставлених шт. цього товару — більше, ніж %3$s у вашому списку"</string>
+    <string name="l10n_mall_inbox_drain_r_ledger" formatted="false">"не вдалося записати запис про доставку"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_l_currency">"валюта замовлення (%1$s) не валюта вашого магазину (%2$s)"</string>
+    <string name="l10n_mall_inbox_drain_l_no_items" formatted="false">"у замовленні немає позицій, які можна прочитати"</string>
+    <string name="l10n_mall_inbox_drain_l_item" formatted="false">"позицію неможливо прочитати"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_not_listed">"%1$s немає у вашому списку товарів"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_twice">"%1$s є у списку більше одного разу"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_l_qty">"%1$s: кількість %2$s не ціле число від 1 до 999999999"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_l_qty_stock">"%1$s: кількість %2$s більша, ніж у вашому списку (%3$s)"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_l_price">"%1$s: ціна в замовленні %2$s не ваша ціна %3$s"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_l_together">"%1$s: рядки замовлення разом просять %2$s, більше, ніж у вашому списку (%3$s)"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_delivery">"способу доставки «%1$s» немає у вашому списку"</string>
+    <string name="l10n_mall_inbox_drain_l_pending" formatted="false">"це замовлення ще не перевірено"</string>
+    <string name="l10n_mall_inbox_drain_l_unchecked" formatted="false">"це замовлення не вдалося звірити з вашим списком; за ним нічого не надсилається"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_more">"… і ще %1$s"</string>
+    <string name="l10n_mall_inbox_drain_i_not_shop" formatted="false">"Це не файл .shop."</string>
+    <string name="l10n_mall_inbox_drain_i_no_id" formatted="false">"У цьому файлі .shop немає ID магазину."</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_i_other">"Цей файл .shop належить іншому продавцю:\n%1$s\nКлюч вашого магазину\n%2$s"</string>
+    <string name="l10n_mall_inbox_drain_i_no_products" formatted="false">"У цьому файлі .shop немає товарів."</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_i_price">"Ціна «%1$s» — не звичайне число (%2$s)."</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_i_fee">"Вартість способу доставки «%1$s» — не звичайне число (%2$s)."</string>
+    <string name="l10n_mall_inbox_drain_i_too_large" formatted="false">"Цей файл завеликий для файлу .shop."</string>
+    <string name="l10n_mall_inbox_autosend_on" formatted="false">"⚡ Автонадсилання NFT  ·  УВІМК  ·  лише замовлення, що пройшли всі перевірки (торкніться, щоб змінити)"</string>
+    <string name="l10n_mall_inbox_autosend_off" formatted="false">"⚡ Автонадсилання NFT  ·  ВИМК  ·  лише замовлення, що пройшли всі перевірки (торкніться, щоб змінити)"</string>
+    <string name="l10n_mall_inbox_autosend_title" formatted="false">"Увімкнути автонадсилання NFT?"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_mall_inbox_autosend_help">"Тоді NFT надсилається без запитання, але лише якщо замовлення збігається з вашим списком, рядок є у списку й у наявності, ще не надсилався, а оплата повністю в ланцюгу й має не менше %1$d підтверджень. Усе інше чекає на вас із переліком причин."</string>
+    <string name="l10n_mall_inbox_autosend_turn_on" formatted="false">"Увімкнути"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_mall_inbox_minconf_line">"⛓ Перед будь-яким надсиланням оплаті потрібно підтверджень: %1$d (торкніться, щоб змінити)"</string>
+    <string name="l10n_mall_inbox_minconf_title" formatted="false">"Підтвердження"</string>
+    <string name="l10n_mall_inbox_minconf_help" formatted="false">"Скільки блоків має бути в платіжної монети до надсилання NFT (не менше 1)."</string>
+    <string name="l10n_mall_inbox_minconf_save" formatted="false">"Зберегти"</string>
+    <string name="l10n_mall_inbox_minconf_min" formatted="false">"Не менше 1 підтвердження."</string>
+    <!-- Arguments: quantity, tokenid, address -->
+    <string name="l10n_mall_inbox_unfinished_help">"Надсилання цього рядка не завершилося й могло пройти. Знайдіть в історії гаманця %1$s токена\n%2$s\nна\n%3$s\nНічого більше не надсилається, доки ви не підтвердите, що надсилання не було."</string>
+    <string name="l10n_mall_inbox_unfinished_release" formatted="false">"Я перевірив: НЕ надіслано"</string>
+    <string name="l10n_mall_inbox_unfinished_title" formatted="false">"Точно не надіслано?"</string>
+    <!-- Arguments: tokenid, address -->
+    <string name="l10n_mall_inbox_unfinished_confirm">"Лише якщо в історії гаманця немає надсилання токена\n%1$s\nна\n%2$s\nза цим замовленням. Якщо воно було, така відповідь дозволить надіслати двічі."</string>
+    <string name="l10n_mall_inbox_checking" formatted="false">"Перевірка…"</string>
+    <string name="l10n_mall_inbox_ready_to_send" formatted="false">"Усі перевірки пройдено: можна надіслати."</string>
+    <!-- Arguments: paid, due -->
+    <string name="l10n_mall_inbox_paid_of_due">"Сплачено в ланцюгу\n%1$s з %2$s"</string>
+    <string name="l10n_mall_inbox_not_sent_list" formatted="false">"Не надіслано:"</string>
+    <string name="l10n_mall_inbox_waiting_list" formatted="false">"Очікування, нічого не надсилається, доки:"</string>
 </resources>

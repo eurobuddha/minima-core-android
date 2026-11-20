@@ -8655,5 +8655,99 @@
     <!-- Arguments: amount, currency -->
     <string name="l10n_mall_inbox_listing_checked">"Checked against your listing: due %1$s %2$s."</string>
     <!-- Arguments: amount, currency -->
-    <string name="l10n_mall_inbox_listing_unchecked">"Unchecked: the items and the total %1$s %2$s are the buyer\'s own figures. Import the .shop file you published (⇪ on the orders screen) so the Inbox checks orders against your listing."</string>
+    <string name="l10n_mall_inbox_listing_unchecked">"Unchecked: the items and the total %1$s %2$s are the buyer\'s own figures. Nothing can be sent for this order until your listing is here: publish the shop from Studio in this app, or import the .shop you published (⇪ on the orders screen)."</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_not_token">"the token id is not a token id: %1$s"</string>
+    <string name="l10n_mall_inbox_drain_r_minima" formatted="false">"an order line names Minima (0x00); Minima is never sent as an NFT"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_mxusd">"an order line names MxUSD (%1$s); MxUSD is never sent as an NFT"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_unconfirmed">"the node did not confirm token %1$s; nothing was sent"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_no_decimals">"the node gave no decimals for token %1$s; nothing was sent"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_decimals">"token %1$s has %2$s decimals; only whole-unit NFTs are sent"</string>
+    <string name="l10n_mall_inbox_drain_r_unreadable" formatted="false">"the order or the line could not be read"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_bad_address">"the order\'s buyer address is not a valid Minima address: %1$s"</string>
+    <string name="l10n_mall_inbox_drain_r_mismatch" formatted="false">"the order names a token that is not its currency\'s"</string>
+    <string name="l10n_mall_inbox_drain_r_no_listing" formatted="false">"no listing: nothing can be sent until the .shop you published for this shop is in the Inbox"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_not_one_product">"\"%1$s\" (token %2$s) is not one product in your listing"</string>
+    <string name="l10n_mall_inbox_drain_r_unfinished" formatted="false">"this line\'s send did not finish and may have gone: check your wallet\'s history first"</string>
+    <string name="l10n_mall_inbox_drain_r_already_sent" formatted="false">"this line was already sent"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_stock">"you list %1$s of this product and %2$s are already delivered or being sent"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_holdings_unread">"your holdings of token %1$s could not be read"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_r_held">"you hold %1$s of token %2$s and %3$s are already being sent"</string>
+    <string name="l10n_mall_inbox_drain_r_no_tip" formatted="false">"the chain height could not be read"</string>
+    <string name="l10n_mall_inbox_drain_r_coins_unread" formatted="false">"your payment coins could not be read"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_coin_other">"coin %1$s was counted for order %2$s"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_r_conf">"coin %1$s has %2$s confirmation(s); %3$s are needed"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_paid">"paid on chain with enough confirmations: %1$s of %2$s due"</string>
+    <string name="l10n_mall_inbox_drain_r_in_flight" formatted="false">"this line is already being sent, or its send did not finish and may have gone: check your wallet\'s history first"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_r_would_exceed">"sending %1$s would make %2$s delivered of this product, more than the %3$s you list"</string>
+    <string name="l10n_mall_inbox_drain_r_ledger" formatted="false">"the delivery record could not be written"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_l_currency">"the order\'s currency (%1$s) is not your shop\'s (%2$s)"</string>
+    <string name="l10n_mall_inbox_drain_l_no_items" formatted="false">"the order has no items you can read"</string>
+    <string name="l10n_mall_inbox_drain_l_item" formatted="false">"an item cannot be read"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_not_listed">"%1$s is not in your listing"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_twice">"%1$s is listed more than once"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_l_qty">"%1$s: the quantity %2$s is not a whole number from 1 to 999999999"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_l_qty_stock">"%1$s: the quantity %2$s is more than you list (%3$s)"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_l_price">"%1$s: the order\'s price %2$s is not your price %3$s"</string>
+    <!-- Arguments: a, b, c -->
+    <string name="l10n_mall_inbox_drain_l_together">"%1$s: the order\'s lines together ask for %2$s, more than you list (%3$s)"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_delivery">"the delivery method \"%1$s\" is not in your listing"</string>
+    <string name="l10n_mall_inbox_drain_l_pending" formatted="false">"this order has not been checked yet"</string>
+    <string name="l10n_mall_inbox_drain_l_unchecked" formatted="false">"this order could not be checked against your listing; nothing is sent for it"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_l_more">"… and %1$s more"</string>
+    <string name="l10n_mall_inbox_drain_i_not_shop" formatted="false">"That is not a .shop file."</string>
+    <string name="l10n_mall_inbox_drain_i_no_id" formatted="false">"This .shop file has no shop id."</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_i_other">"This .shop file belongs to another vendor:\n%1$s\nYour shop key is\n%2$s"</string>
+    <string name="l10n_mall_inbox_drain_i_no_products" formatted="false">"This .shop file lists no products."</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_i_price">"The price of \"%1$s\" is not a plain number (%2$s)."</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_i_fee">"The fee of the delivery method \"%1$s\" is not a plain number (%2$s)."</string>
+    <string name="l10n_mall_inbox_drain_i_too_large" formatted="false">"That file is too large to be a .shop file."</string>
+    <string name="l10n_mall_inbox_autosend_on" formatted="false">"⚡ Auto NFT delivery  ·  ON  ·  only orders that pass every check (tap to change)"</string>
+    <string name="l10n_mall_inbox_autosend_off" formatted="false">"⚡ Auto NFT delivery  ·  OFF  ·  only orders that pass every check (tap to change)"</string>
+    <string name="l10n_mall_inbox_autosend_title" formatted="false">"Turn on automatic NFT delivery?"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_mall_inbox_autosend_help">"An NFT is then sent without asking you, but only when the order matches your listing, the line is listed and in stock, it was not sent before, and the payment is on chain in full with at least %1$d confirmation(s). Anything else waits for you with the reasons listed."</string>
+    <string name="l10n_mall_inbox_autosend_turn_on" formatted="false">"Turn on"</string>
+    <!-- Arguments: count -->
+    <string name="l10n_mall_inbox_minconf_line">"⛓ Payments need %1$d confirmation(s) before anything is sent (tap to change)"</string>
+    <string name="l10n_mall_inbox_minconf_title" formatted="false">"Confirmations"</string>
+    <string name="l10n_mall_inbox_minconf_help" formatted="false">"How many blocks a payment coin must have before an NFT is sent (at least 1)."</string>
+    <string name="l10n_mall_inbox_minconf_save" formatted="false">"Save"</string>
+    <string name="l10n_mall_inbox_minconf_min" formatted="false">"At least 1 confirmation."</string>
+    <!-- Arguments: quantity, tokenid, address -->
+    <string name="l10n_mall_inbox_unfinished_help">"This line\'s send did not finish and may have gone. Check your wallet\'s transaction history for %1$s of token\n%2$s\nto\n%3$s\nNothing more is sent for it until you say it was not sent."</string>
+    <string name="l10n_mall_inbox_unfinished_release" formatted="false">"I checked: it was NOT sent"</string>
+    <string name="l10n_mall_inbox_unfinished_title" formatted="false">"It was not sent?"</string>
+    <!-- Arguments: tokenid, address -->
+    <string name="l10n_mall_inbox_unfinished_confirm">"Only if your wallet\'s history shows no send of token\n%1$s\nto\n%2$s\nfor this order. If it went, saying it did not lets it be sent twice."</string>
+    <string name="l10n_mall_inbox_checking" formatted="false">"Checking…"</string>
+    <string name="l10n_mall_inbox_ready_to_send" formatted="false">"Every check passes: ready to send."</string>
+    <!-- Arguments: paid, due -->
+    <string name="l10n_mall_inbox_paid_of_due">"Paid on chain\n%1$s of %2$s due"</string>
+    <string name="l10n_mall_inbox_not_sent_list" formatted="false">"Not sent:"</string>
+    <string name="l10n_mall_inbox_waiting_list" formatted="false">"Waiting, nothing is sent until:"</string>
 </resources>
