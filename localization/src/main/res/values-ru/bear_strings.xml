@@ -8703,9 +8703,9 @@
     <!-- Arguments: amount, tokenid -->
     <string name="l10n_mall_inbox_received">"  получено %1$s токена %2$s"</string>
     <!-- Arguments: currency -->
-    <string name="l10n_mall_inbox_mismatch_unpayable">"Этот заказ просит оплату в «%1$s», а это не Minima и не MxUSD. Он никогда не отмечается оплаченным и не доставляется автоматически."</string>
+    <string name="l10n_mall_inbox_mismatch_unpayable">"Этот заказ просит оплату в «%1$s», а это не Minima и не MxUSD. Он никогда не отмечается оплаченным, и его NFT никогда не отправляются из этого приложения."</string>
     <!-- Arguments: currency, tokenid -->
-    <string name="l10n_mall_inbox_mismatch">"Этот заказ называет токен, не соответствующий его валюте. Оплаченным он считается только в %1$s\n%2$s\nи никогда не доставляется автоматически."</string>
+    <string name="l10n_mall_inbox_mismatch">"Этот заказ называет токен, не соответствующий его валюте. Его NFT никогда не отправляются из этого приложения, каким бы ни был статус, а оплата засчитывается только в %1$s\n%2$s"</string>
     <!-- Arguments: name, price -->
     <string name="l10n_mall_shop_price_plain">"Цена «%1$s» — не обычное число (%2$s). Ничего не отправлено."</string>
     <!-- Arguments: name -->
@@ -8719,4 +8719,5 @@
     <string name="l10n_mall_inbox_all_pieces" formatted="false">"все ваши экземпляры"</string>
     <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT не отправлен"</string>
     <string name="l10n_entropy_node_down" formatted="false">"Узел не ответил; этот бросок не использован. Ничего не записано. Узел проверяется снова."</string>
+    <string name="l10n_mall_inbox_not_sent_mismatch" formatted="false">"Не отправлено: этот заказ называет токен, не соответствующий его валюте."</string>
 </resources>

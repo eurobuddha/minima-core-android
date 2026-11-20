@@ -8629,9 +8629,9 @@
     <!-- Arguments: amount, tokenid -->
     <string name="l10n_mall_inbox_received">"  received %1$s of token %2$s"</string>
     <!-- Arguments: currency -->
-    <string name="l10n_mall_inbox_mismatch_unpayable">"This order asks to be paid in \"%1$s\", which is neither Minima nor MxUSD. It is never marked paid or auto-delivered."</string>
+    <string name="l10n_mall_inbox_mismatch_unpayable">"This order asks to be paid in \"%1$s\", which is neither Minima nor MxUSD. It is never marked paid, and its NFTs are never sent from this app."</string>
     <!-- Arguments: currency, tokenid -->
-    <string name="l10n_mall_inbox_mismatch">"This order names a token that is not its currency\'s. It counts as paid only in %1$s\n%2$s\nand is never auto-delivered."</string>
+    <string name="l10n_mall_inbox_mismatch">"This order names a token that is not its currency\'s. Its NFTs are never sent from this app, whatever its status, and a payment counts only in %1$s\n%2$s"</string>
     <!-- Arguments: name, price -->
     <string name="l10n_mall_shop_price_plain">"The price of \"%1$s\" is not a plain number (%2$s). Nothing was sent."</string>
     <!-- Arguments: name -->
@@ -8645,4 +8645,5 @@
     <string name="l10n_mall_inbox_all_pieces" formatted="false">"every piece you hold"</string>
     <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT not sent"</string>
     <string name="l10n_entropy_node_down" formatted="false">"The node did not answer; this roll was not used. Nothing was recorded. Checking the node again."</string>
+    <string name="l10n_mall_inbox_not_sent_mismatch" formatted="false">"Not sent: this order names a token that is not its currency\'s."</string>
 </resources>

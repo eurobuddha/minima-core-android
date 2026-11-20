@@ -1394,6 +1394,17 @@
           "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "082f92f24d44e242c35e597a1b00b86b01390226252955f4c5dfbba9c2747780",
           "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "2cdbb2708da8dac48d584da74a4a7a7f5ca791bbe4292abeb409be958b71be9d"
         }
+      },
+      {
+        "revision": "2c3428d7e7bd7c1f7a3447e30c0a4baf62828571",
+        "version": "0.5.16",
+        "summary": "Mismatch flag stored apart from the status (MerchDb.mismatch); nothing is sent for a flagged order whatever its status.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "948665e8731268cb569ecd5b983d993704e7eb242c26b71d38e16a32edbdf088",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "fa61e2e1d4de6675dbbea8c3fbaa07f7ee1c71f69c07c42149e64b4f450d4fcd",
+          "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "66e770af6f2eafd20f10fc86a293b264e8d8e2d1dc432ea513ffc194080266fb",
+          "src/test/java/com/eurobuddha/merchinbox/InboxShowsIdentifiersWholeTest.java": "05efc8e9087a3c0d65df80b6a205ae9332f957298ae52b467aa8f9bbc25797a9"
+        }
       }
     ]
   },

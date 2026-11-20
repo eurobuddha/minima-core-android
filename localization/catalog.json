@@ -43329,16 +43329,16 @@
     "uk": "  отримано {amount} токена {tokenid}"
   },
   "mallInbox.mismatchUnpayable": {
-    "en": "This order asks to be paid in \"{currency}\", which is neither Minima nor MxUSD. It is never marked paid or auto-delivered.",
-    "zh-Hans": "此订单要求以“{currency}”付款，它既不是 Minima 也不是 MxUSD。它永远不会被标记为已付款或自动交付。",
-    "ru": "Этот заказ просит оплату в «{currency}», а это не Minima и не MxUSD. Он никогда не отмечается оплаченным и не доставляется автоматически.",
-    "uk": "Це замовлення просить оплату в «{currency}», а це не Minima і не MxUSD. Воно ніколи не позначається сплаченим і не доставляється автоматично."
+    "en": "This order asks to be paid in \"{currency}\", which is neither Minima nor MxUSD. It is never marked paid, and its NFTs are never sent from this app.",
+    "zh-Hans": "此订单要求以“{currency}”付款，它既不是 Minima 也不是 MxUSD。它永远不会被标记为已付款，本应用也绝不会发送其中的 NFT。",
+    "ru": "Этот заказ просит оплату в «{currency}», а это не Minima и не MxUSD. Он никогда не отмечается оплаченным, и его NFT никогда не отправляются из этого приложения.",
+    "uk": "Це замовлення просить оплату в «{currency}», а це не Minima і не MxUSD. Воно ніколи не позначається сплаченим, і його NFT ніколи не надсилаються з цього застосунку."
   },
   "mallInbox.mismatch": {
-    "en": "This order names a token that is not its currency's. It counts as paid only in {currency}\n{tokenid}\nand is never auto-delivered.",
-    "zh-Hans": "此订单指定的代币与其币种不符。只有以 {currency} 付款才算已付款\n{tokenid}\n且永远不会自动交付。",
-    "ru": "Этот заказ называет токен, не соответствующий его валюте. Оплаченным он считается только в {currency}\n{tokenid}\nи никогда не доставляется автоматически.",
-    "uk": "Це замовлення називає токен, що не відповідає його валюті. Сплаченим воно вважається лише в {currency}\n{tokenid}\nі ніколи не доставляється автоматично."
+    "en": "This order names a token that is not its currency's. Its NFTs are never sent from this app, whatever its status, and a payment counts only in {currency}\n{tokenid}",
+    "zh-Hans": "此订单指定的代币与其币种不符。无论订单状态如何，本应用都不会发送其中的 NFT；只有以 {currency} 付款才计入\n{tokenid}",
+    "ru": "Этот заказ называет токен, не соответствующий его валюте. Его NFT никогда не отправляются из этого приложения, каким бы ни был статус, а оплата засчитывается только в {currency}\n{tokenid}",
+    "uk": "Це замовлення називає токен, що не відповідає його валюті. Його NFT ніколи не надсилаються з цього застосунку, яким би не був статус, а оплата зараховується лише в {currency}\n{tokenid}"
   },
   "mallShop.pricePlain": {
     "en": "The price of \"{name}\" is not a plain number ({price}). Nothing was sent.",
@@ -43393,5 +43393,11 @@
     "zh-Hans": "节点没有回应；本次投掷未被使用。未记录任何内容。正在重新检查节点。",
     "ru": "Узел не ответил; этот бросок не использован. Ничего не записано. Узел проверяется снова.",
     "uk": "Вузол не відповів; цей кидок не використано. Нічого не записано. Вузол перевіряється знову."
+  },
+  "mallInbox.notSentMismatch": {
+    "en": "Not sent: this order names a token that is not its currency's.",
+    "zh-Hans": "未发送：此订单指定的代币与其币种不符。",
+    "ru": "Не отправлено: этот заказ называет токен, не соответствующий его валюте.",
+    "uk": "Не надіслано: це замовлення називає токен, що не відповідає його валюті."
   }
 }

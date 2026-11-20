@@ -8592,9 +8592,9 @@
     <!-- Arguments: amount, tokenid -->
     <string name="l10n_mall_inbox_received">"  已收到 %1$s，代币 %2$s"</string>
     <!-- Arguments: currency -->
-    <string name="l10n_mall_inbox_mismatch_unpayable">"此订单要求以“%1$s”付款，它既不是 Minima 也不是 MxUSD。它永远不会被标记为已付款或自动交付。"</string>
+    <string name="l10n_mall_inbox_mismatch_unpayable">"此订单要求以“%1$s”付款，它既不是 Minima 也不是 MxUSD。它永远不会被标记为已付款，本应用也绝不会发送其中的 NFT。"</string>
     <!-- Arguments: currency, tokenid -->
-    <string name="l10n_mall_inbox_mismatch">"此订单指定的代币与其币种不符。只有以 %1$s 付款才算已付款\n%2$s\n且永远不会自动交付。"</string>
+    <string name="l10n_mall_inbox_mismatch">"此订单指定的代币与其币种不符。无论订单状态如何，本应用都不会发送其中的 NFT；只有以 %1$s 付款才计入\n%2$s"</string>
     <!-- Arguments: name, price -->
     <string name="l10n_mall_shop_price_plain">"“%1$s”的价格不是普通数字（%2$s）。未发送任何内容。"</string>
     <!-- Arguments: name -->
@@ -8608,4 +8608,5 @@
     <string name="l10n_mall_inbox_all_pieces" formatted="false">"您持有的全部藏品"</string>
     <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT 未发送"</string>
     <string name="l10n_entropy_node_down" formatted="false">"节点没有回应；本次投掷未被使用。未记录任何内容。正在重新检查节点。"</string>
+    <string name="l10n_mall_inbox_not_sent_mismatch" formatted="false">"未发送：此订单指定的代币与其币种不符。"</string>
 </resources>

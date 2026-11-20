@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
         String tokenid = coin.optString("tokenid", "0x00");
         String result = db.recordPayment(ref, coinid, amount, tokenid);   // each coin counted once
         // Auto-deliver only on a clean PAID (the token received is the order currency's) — never
-        // UNDERPAID/WRONG_TOKEN, and maybeAutoDeliver also skips a TOKEN_MISMATCH order. Queued, drained at scan end.
+        // UNDERPAID/WRONG_TOKEN, and nothing is sent for a mismatched order (MerchDb.mismatch). Queued, drained at scan end.
         if (MerchDb.PAID.equals(result)) pendingAutoDeliver.add(ref);
         return result != null;
     }
@@ -600,7 +600,7 @@ public class MainActivity extends AppCompatActivity {
             st.addView(paid);
         }
         st.setPadding(0, 0, 0, dp(10)); body.addView(st);
-        if (MerchDb.TOKEN_MISMATCH.equals(o.status)) {
+        if (db.mismatch(o)) {
             String want = MerchMessage.tokenFor(o.currency);
             body.addView(label(want == null ? Language.msg(l10n_mall_inbox_mismatch_unpayable, o.currency)
                     : Language.msg(l10n_mall_inbox_mismatch, MerchMessage.tokenName(want), want)));
@@ -741,7 +741,7 @@ public class MainActivity extends AppCompatActivity {
             return t;
         }
         LinearLayout wrap = new LinearLayout(this); wrap.setOrientation(LinearLayout.VERTICAL);
-        boolean ready = o.paid && o.payaddr != null && !o.payaddr.isEmpty();
+        boolean ready = o.paid && o.payaddr != null && !o.payaddr.isEmpty() && !db.mismatch(o);
         boolean inFlight = nftSending.contains(key);
         boolean resume = false;
         {
@@ -768,7 +768,8 @@ public class MainActivity extends AppCompatActivity {
         wrap.addView(b);
         if (!ready) {
             TextView why = new TextView(this);
-            Language.setText(why, !o.paid ? Language.msg(l10n_mall_inbox_available_paid) : Language.msg(l10n_mall_inbox_missing_pay_address));
+            Language.setText(why, db.mismatch(o) ? Language.msg(l10n_mall_inbox_not_sent_mismatch)
+                    : !o.paid ? Language.msg(l10n_mall_inbox_available_paid) : Language.msg(l10n_mall_inbox_missing_pay_address));
             why.setTextColor(Design.DIM2); why.setTextSize(11f); why.setPadding(0, dp(2), 0, 0);
             wrap.addView(why);
         }
@@ -784,6 +785,7 @@ public class MainActivity extends AppCompatActivity {
         // The pay address is buyer-supplied chain data interpolated into a node command — validate hard.
         if (!Util.isValidAddress(o.payaddr)) { deliverFailed(o, key, "buyer pay address is malformed", auto); return; }
         if (!Util.isValidHexId(tokenid)) { deliverFailed(o, key, "token id is malformed", auto); return; }
+        if (db.mismatch(db.order(o.ref))) { deliverFailed(o, key, "this order names a token that is not its currency's; its NFTs are never sent", auto); return; }
         guardDelivery(o, line, key, auto, () -> {
             if ("1".equals(line[4])) { collectionDeliver(o, line, auto); return; }
             if (!"0".equals(line[3])) { stateNftDeliver(o, line, auto); return; }

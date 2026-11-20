@@ -27,7 +27,7 @@ public final class DeliveryJournal {
     }
     void fresh(MerchDb.Order expected,String[] line) {
         MerchDb.Order current=store.order(expected.ref);
-        if(!binding(expected,line).equals(binding(current,line))||!current.paid
+        if(!binding(expected,line).equals(binding(current,line))||!current.paid||store.mismatch(current)
             ||!Arrays.asList(MerchDb.PAID,MerchDb.CONFIRMED,MerchDb.SHIPPED,MerchDb.DELIVERED).contains(current.status))throw DeliveryEvidence.invalid();
         // Reuse MerchDb.recordPayment's token/amount gate even if the lifecycle status was edited.
         try {
