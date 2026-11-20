@@ -1384,6 +1384,16 @@
           "src/test/java/com/eurobuddha/merchinbox/DeliveryGuardTest.java": "a463283019d06a6dd71c168a132d315a6eb72dea57c51e03fa6e7345f9263cce",
           "src/test/java/com/eurobuddha/merchinbox/InboxShowsIdentifiersWholeTest.java": "f5d0a499cd7e71692a91b38c305dfd3c8716fa52bd3ade6644e61d4dc4b9c7d7"
         }
+      },
+      {
+        "revision": "e2900eb9b3f8f74763c180fe602d41dd97c516c7",
+        "version": "0.5.15",
+        "summary": "Payment coins of the currency's token add up, each coin id counted once; only PAID locks; a stranger's coin never blocks.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "9af2d6a90e354d4ff89538a823589f0554ef2513b922f4d88037f3cee3c1199e",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "082f92f24d44e242c35e597a1b00b86b01390226252955f4c5dfbba9c2747780",
+          "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "2cdbb2708da8dac48d584da74a4a7a7f5ca791bbe4292abeb409be958b71be9d"
+        }
       }
     ]
   },
