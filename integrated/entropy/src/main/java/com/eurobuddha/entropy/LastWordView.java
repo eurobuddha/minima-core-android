@@ -366,8 +366,7 @@ public class LastWordView extends BaseView {
                         RollEngine.SRC_NODE_DEVICE.equals(src) ? Language.msg(l10n_entropy_picked_node) : Language.msg(l10n_entropy_picked_device));
             }
             @Override public void onError(String m) {
-                if (!RollEngine.NODE_BAD.equals(m)) { setStatus(Language.msg(l10n_entropy_pick_error), true); return; }
-                setStatus(Language.msg(l10n_entropy_pick_node_bad), true);
+                setStatus(Language.msg(RollEngine.NODE_BAD.equals(m) ? l10n_entropy_pick_node_bad : l10n_entropy_pick_error), true);
                 act.reverifyNode();
             }
         });

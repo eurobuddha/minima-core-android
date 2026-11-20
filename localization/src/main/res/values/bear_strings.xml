@@ -2720,7 +2720,7 @@
     <string name="l10n_entropy_hide_audit" formatted="false">"Hide per-roll audit log"</string>
     <string name="l10n_entropy_audit_warning" formatted="false">"⚠ This log reveals every roll\'s secrets (A + B) — anyone who sees it can recompute the entire seed phrase. Treat it exactly like the seed words."</string>
     <!-- Arguments: command -->
-    <string name="l10n_entropy_audit_hint">"Each digital face = SHA3(node_secret ++ device_secret) → first 4 bytes mod 6 (values ≥ 4294967292 rerolled — zero modulo bias). Verify any roll in a Minima terminal: %1$s"</string>
+    <string name="l10n_entropy_audit_hint">"Each digital face = SHA3(node random A ++ device secret B), worked out on this phone (B never leaves it) → first 4 bytes mod 6 (values ≥ 4294967292 rerolled — zero modulo bias). H is that hash. Verify any roll in a Minima terminal: %1$s"</string>
     <string name="l10n_entropy_wipe" formatted="false">"Wipe &amp; start over"</string>
     <!-- Arguments: bits, target, rolls -->
     <string name="l10n_entropy_progress">"%1$s / %2$s bits — %3$s rolls"</string>
@@ -2733,15 +2733,15 @@
     <string name="l10n_entropy_summary">"%1$s rolls → %2$s unbiased bits → %3$s entropy bits + %4$s-bit SHA-256 checksum = %5$s words\nsources: %6$s"</string>
     <string name="l10n_entropy_single_warning" formatted="false">"\n⚠ some rolls used a single entropy source (node unavailable)"</string>
     <string name="l10n_entropy_distribution_warning" formatted="false">"\n⚠ roll distribution looks non-random — use a real, fair die"</string>
-    <string name="l10n_entropy_source_node" formatted="false">"node SHA3 + device"</string>
+    <string name="l10n_entropy_source_node" formatted="false">"node random + device, SHA3 on this phone"</string>
     <string name="l10n_entropy_source_device" formatted="false">"device only"</string>
     <string name="l10n_entropy_source_physical" formatted="false">"physical"</string>
     <!-- Arguments: index, face -->
     <string name="l10n_entropy_audit_physical">"#%1$s face:%2$s (physical)\n"</string>
     <!-- Arguments: index, face -->
     <string name="l10n_entropy_audit_device">"#%1$s face:%2$s (device CSPRNG only)\n"</string>
-    <!-- Arguments: index, a, b, number, face -->
-    <string name="l10n_entropy_audit_combined">"#%1$s A:%2$s B:%3$s n:%4$s face:%5$s\n"</string>
+    <!-- Arguments: index, a, b, hash, number, face -->
+    <string name="l10n_entropy_audit_combined">"#%1$s A:%2$s B:%3$s H:%4$s n:%5$s face:%6$s\n"</string>
     <string name="l10n_entropy_blocked_demo" formatted="false">"Blocked — demo mode is ON (screen capture enabled). Turn it off to roll."</string>
     <string name="l10n_entropy_last_calculator" formatted="false">"Last-word (checksum) calculator"</string>
     <string name="l10n_entropy_hide" formatted="false">"🙈 Hide"</string>
@@ -2760,7 +2760,7 @@
     <string name="l10n_entropy_manual" formatted="false">"chosen manually"</string>
     <!-- Arguments: index, word, method -->
     <string name="l10n_entropy_complete">"Phrase complete — word %1$s = \"%2$s\" (%3$s). Valid BIP39 ✓"</string>
-    <string name="l10n_entropy_picked_node" formatted="false">"picked by SHA3(node ++ device) entropy"</string>
+    <string name="l10n_entropy_picked_node" formatted="false">"picked by SHA3(node random ++ device), worked out on this phone"</string>
     <string name="l10n_entropy_picked_device" formatted="false">"picked by device entropy"</string>
     <string name="l10n_entropy_dice_tab" formatted="false">"🎲 DICE ROLL"</string>
     <string name="l10n_entropy_word_tab" formatted="false">"✓ LAST WORD"</string>
@@ -2769,7 +2769,7 @@
     <string name="l10n_entropy_self_failed" formatted="false">"self-test FAILED — blocked"</string>
     <string name="l10n_entropy_connecting" formatted="false">"BIP39 self-test ✓ — node: connecting…"</string>
     <string name="l10n_entropy_unavailable" formatted="false">"node unavailable — device CSPRNG only (single source)"</string>
-    <string name="l10n_entropy_verified" formatted="false">"BIP39 self-test ✓ — node SHA3 + device CSPRNG verified"</string>
+    <string name="l10n_entropy_verified" formatted="false">"BIP39 self-test ✓ — node random + device CSPRNG, SHA3 on this phone"</string>
     <string name="l10n_entropy_malformed" formatted="false">"node hash malformed — device CSPRNG only (single source)"</string>
     <string name="l10n_entropy_commands_failed" formatted="false">"node commands failed — device CSPRNG only (single source)"</string>
     <string name="l10n_entropy_demo_banner" formatted="false">"🎥 DEMO MODE — screen capture &amp; mirroring ALLOWED. Do NOT generate a real seed. Resets on restart."</string>
@@ -8611,11 +8611,11 @@
     <string name="l10n_mail_enter_contact_name" formatted="false">"Enter a name"</string>
     <string name="l10n_mail_contact_gone" formatted="false">"Contact no longer exists"</string>
     <string name="l10n_mail_cannot_save_contact" formatted="false">"Could not save contact"</string>
-    <string name="l10n_entropy_node_bad" formatted="false">"The node\'s answer did not match; this roll was not used. Nothing was recorded."</string>
-    <string name="l10n_entropy_node_mismatch" formatted="false">"the node\'s answers did not match — device CSPRNG only (single source)"</string>
-    <string name="l10n_entropy_node_recheck" formatted="false">"node answer refused — checking the node again…"</string>
-    <string name="l10n_entropy_pick_node_bad" formatted="false">"The node\'s answer did not match; no word was picked. Try again."</string>
-    <string name="l10n_entropy_pick_error" formatted="false">"Entropy source error — no word was picked. Try again."</string>
+    <string name="l10n_entropy_node_bad" formatted="false">"The node\'s random value was malformed or repeated; this roll was not used. Nothing was recorded. Checking the node again."</string>
+    <string name="l10n_entropy_node_mismatch" formatted="false">"the node\'s random value was malformed or repeated — device CSPRNG only (single source)"</string>
+    <string name="l10n_entropy_node_recheck" formatted="false">"node failed a roll — checking the node again…"</string>
+    <string name="l10n_entropy_pick_node_bad" formatted="false">"The node\'s random value was malformed or repeated; no word was picked. Checking the node again."</string>
+    <string name="l10n_entropy_pick_error" formatted="false">"The node did not answer; no word was picked. Checking the node again."</string>
     <string name="l10n_mall_shop_not_paid" formatted="false">"Not paid"</string>
     <!-- Arguments: currency -->
     <string name="l10n_mall_shop_token_unpayable">"This shop asks to be paid in \"%1$s\". miniMall pays in Minima or MxUSD only. Nothing was sent."</string>
@@ -8644,4 +8644,5 @@
     <string name="l10n_mall_inbox_send_whole">"Send %1$s?\n\nToken id\n%2$s\n\nQuantity\n%3$s\n\nTo\n%4$s\n\nThis transfers the NFT on-chain."</string>
     <string name="l10n_mall_inbox_all_pieces" formatted="false">"every piece you hold"</string>
     <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT not sent"</string>
+    <string name="l10n_entropy_node_down" formatted="false">"The node did not answer; this roll was not used. Nothing was recorded. Checking the node again."</string>
 </resources>

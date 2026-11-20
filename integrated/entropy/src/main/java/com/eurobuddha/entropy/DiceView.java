@@ -336,14 +336,14 @@ public class DiceView extends BaseView {
         }
     }
 
-    /** A failed throw records nothing: one refused node answer discards all five dice and stops auto-roll. */
+    /** A failed throw records nothing: one refused or missing node answer discards all five dice, stops
+     *  auto-roll, is said on screen and has the node checked again (it is not trusted until it passes). */
     private void finishThrow(int[] results, RollEngine.Audit[] auds, boolean failed, boolean nodeBad) {
         if (failed) {
             for (DiceRollView d : dice) { d.cancel(); d.setIdleFace(0); }
             busy = false; auto = false;
             Language.setText(btnAuto, Language.msg(l10n_entropy_auto_off)); btnAuto.setTextColor(Theme.dim());
-            if (!nodeBad) { setStatus(Language.msg(l10n_entropy_source_error), true); return; }
-            setStatus(Language.msg(l10n_entropy_node_bad), true);
+            setStatus(Language.msg(nodeBad ? l10n_entropy_node_bad : l10n_entropy_node_down), true);
             act.reverifyNode();   // the node is proved again before another roll may use it
             return;
         }
@@ -429,7 +429,7 @@ public class DiceView extends BaseView {
             RollEngine.Audit a = audits.get(i);
             if (RollEngine.SRC_PHYSICAL.equals(a.src)) log.append(Language.msg(l10n_entropy_audit_physical,i+1,a.face));
             else if (RollEngine.SRC_DEVICE_ONLY.equals(a.src)) log.append(Language.msg(l10n_entropy_audit_device,i+1,a.face));
-            else log.append(Language.msg(l10n_entropy_audit_combined,i+1,a.a,a.b,a.n,a.face));
+            else log.append(Language.msg(l10n_entropy_audit_combined,i+1,a.a,a.b,a.h,a.n,a.face));
         }
         Language.setText(auditLog, log.build());
 

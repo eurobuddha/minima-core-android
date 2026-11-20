@@ -2744,7 +2744,7 @@
     <string name="l10n_entropy_hide_audit" formatted="false">"Приховати аудит кидків"</string>
     <string name="l10n_entropy_audit_warning" formatted="false">"⚠ Журнал розкриває секрети кожного кидка (A + B): кожен, хто його побачить, зможе відновити всю сід-фразу. Захищайте його так само, як самі слова."</string>
     <!-- Arguments: command -->
-    <string name="l10n_entropy_audit_hint">"Цифровий результат = SHA3(node_secret ++ device_secret) → перші 4 байти mod 6 (значення ≥ 4294967292 відкидаються — без зміщення за модулем). Перевірка кидка в терміналі Minima: %1$s"</string>
+    <string name="l10n_entropy_audit_hint">"Цифровий результат = SHA3(випадкове значення вузла A ++ секрет пристрою B), обчислюється на цьому телефоні (B його не залишає) → перші 4 байти mod 6 (значення ≥ 4294967292 відкидаються — без зміщення за модулем). H — цей хеш. Перевірка кидка в терміналі Minima: %1$s"</string>
     <string name="l10n_entropy_wipe" formatted="false">"Стерти й почати знову"</string>
     <!-- Arguments: bits, target, rolls -->
     <string name="l10n_entropy_progress">"%1$s / %2$s біт — кидків: %3$s"</string>
@@ -2757,15 +2757,15 @@
     <string name="l10n_entropy_summary">"Кидків: %1$s → %2$s біт без зміщення → %3$s біт ентропії + %4$s біт контрольної суми SHA-256 = %5$s слів\nджерела: %6$s"</string>
     <string name="l10n_entropy_single_warning" formatted="false">"\n⚠ частина кидків використовувала одне джерело ентропії (вузол недоступний)"</string>
     <string name="l10n_entropy_distribution_warning" formatted="false">"\n⚠ розподіл кидків виглядає невипадковим — використовуйте справжній, чесний кубик"</string>
-    <string name="l10n_entropy_source_node" formatted="false">"SHA3 вузла + пристрій"</string>
+    <string name="l10n_entropy_source_node" formatted="false">"випадкове значення вузла + пристрій, SHA3 на цьому телефоні"</string>
     <string name="l10n_entropy_source_device" formatted="false">"лише пристрій"</string>
     <string name="l10n_entropy_source_physical" formatted="false">"фізичний кубик"</string>
     <!-- Arguments: index, face -->
     <string name="l10n_entropy_audit_physical">"#%1$s грань:%2$s (фізичний кубик)\n"</string>
     <!-- Arguments: index, face -->
     <string name="l10n_entropy_audit_device">"#%1$s грань:%2$s (лише CSPRNG пристрою)\n"</string>
-    <!-- Arguments: index, a, b, number, face -->
-    <string name="l10n_entropy_audit_combined">"#%1$s A:%2$s B:%3$s n:%4$s грань:%5$s\n"</string>
+    <!-- Arguments: index, a, b, hash, number, face -->
+    <string name="l10n_entropy_audit_combined">"#%1$s A:%2$s B:%3$s H:%4$s n:%5$s грань:%6$s\n"</string>
     <string name="l10n_entropy_blocked_demo" formatted="false">"Заблоковано — увімкнено деморежим (дозволено захоплення екрана). Вимкніть його для кидків."</string>
     <string name="l10n_entropy_last_calculator" formatted="false">"Калькулятор останнього слова (контрольної суми)"</string>
     <string name="l10n_entropy_hide" formatted="false">"🙈 Приховати"</string>
@@ -2784,7 +2784,7 @@
     <string name="l10n_entropy_manual" formatted="false">"вибрано вручну"</string>
     <!-- Arguments: index, word, method -->
     <string name="l10n_entropy_complete">"Фраза готова — слово %1$s = «%2$s» (%3$s). BIP39 правильна ✓"</string>
-    <string name="l10n_entropy_picked_node" formatted="false">"вибрано ентропією SHA3(вузол ++ пристрій)"</string>
+    <string name="l10n_entropy_picked_node" formatted="false">"вибрано за SHA3(випадкове значення вузла ++ пристрій), обчислено на цьому телефоні"</string>
     <string name="l10n_entropy_picked_device" formatted="false">"вибрано ентропією пристрою"</string>
     <string name="l10n_entropy_dice_tab" formatted="false">"🎲 КИДКИ КУБИКІВ"</string>
     <string name="l10n_entropy_word_tab" formatted="false">"✓ ОСТАННЄ СЛОВО"</string>
@@ -2793,7 +2793,7 @@
     <string name="l10n_entropy_self_failed" formatted="false">"самоперевірку НЕ ПРОЙДЕНО — заблоковано"</string>
     <string name="l10n_entropy_connecting" formatted="false">"Самоперевірка BIP39 ✓ — вузол: підключення…"</string>
     <string name="l10n_entropy_unavailable" formatted="false">"вузол недоступний — лише CSPRNG пристрою (одне джерело)"</string>
-    <string name="l10n_entropy_verified" formatted="false">"Самоперевірка BIP39 ✓ — SHA3 вузла + CSPRNG пристрою перевірено"</string>
+    <string name="l10n_entropy_verified" formatted="false">"Самоперевірка BIP39 ✓ — випадкове значення вузла + CSPRNG пристрою, SHA3 на цьому телефоні"</string>
     <string name="l10n_entropy_malformed" formatted="false">"неправильний формат хешу вузла — лише CSPRNG пристрою (одне джерело)"</string>
     <string name="l10n_entropy_commands_failed" formatted="false">"помилка команд вузла — лише CSPRNG пристрою (одне джерело)"</string>
     <string name="l10n_entropy_demo_banner" formatted="false">"🎥 ДЕМОРЕЖИМ — захоплення й трансляцію екрана ДОЗВОЛЕНО. НЕ створюйте справжню сід-фразу. Скидається після перезапуску."</string>
@@ -8685,11 +8685,11 @@
     <string name="l10n_mail_enter_contact_name" formatted="false">"Введіть ім’я"</string>
     <string name="l10n_mail_contact_gone" formatted="false">"Контакт більше не існує"</string>
     <string name="l10n_mail_cannot_save_contact" formatted="false">"Не вдалося зберегти контакт"</string>
-    <string name="l10n_entropy_node_bad" formatted="false">"Відповідь вузла не збіглася; цей кидок не використано. Нічого не записано."</string>
-    <string name="l10n_entropy_node_mismatch" formatted="false">"відповіді вузла не збіглися — лише CSPRNG пристрою (одне джерело)"</string>
-    <string name="l10n_entropy_node_recheck" formatted="false">"відповідь вузла відхилено — вузол перевіряється знову…"</string>
-    <string name="l10n_entropy_pick_node_bad" formatted="false">"Відповідь вузла не збіглася; слово не вибрано. Спробуйте ще раз."</string>
-    <string name="l10n_entropy_pick_error" formatted="false">"Помилка джерела ентропії — слово не вибрано. Спробуйте ще раз."</string>
+    <string name="l10n_entropy_node_bad" formatted="false">"Випадкове значення вузла неправильного формату або повторюється; цей кидок не використано. Нічого не записано. Вузол перевіряється знову."</string>
+    <string name="l10n_entropy_node_mismatch" formatted="false">"випадкове значення вузла неправильного формату або повторюється — лише CSPRNG пристрою (одне джерело)"</string>
+    <string name="l10n_entropy_node_recheck" formatted="false">"вузол не впорався з кидком — вузол перевіряється знову…"</string>
+    <string name="l10n_entropy_pick_node_bad" formatted="false">"Випадкове значення вузла неправильного формату або повторюється; слово не вибрано. Вузол перевіряється знову."</string>
+    <string name="l10n_entropy_pick_error" formatted="false">"Вузол не відповів; слово не вибрано. Вузол перевіряється знову."</string>
     <string name="l10n_mall_shop_not_paid" formatted="false">"Не сплачено"</string>
     <!-- Arguments: currency -->
     <string name="l10n_mall_shop_token_unpayable">"Цей магазин просить оплату в «%1$s». miniMall платить лише в Minima або MxUSD. Нічого не надіслано."</string>
@@ -8718,4 +8718,5 @@
     <string name="l10n_mall_inbox_send_whole">"Надіслати %1$s?\n\nID токена\n%2$s\n\nКількість\n%3$s\n\nОтримувач\n%4$s\n\nNFT буде передано в блокчейні."</string>
     <string name="l10n_mall_inbox_all_pieces" formatted="false">"усі ваші примірники"</string>
     <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT не надіслано"</string>
+    <string name="l10n_entropy_node_down" formatted="false">"Вузол не відповів; цей кидок не використано. Нічого не записано. Вузол перевіряється знову."</string>
 </resources>

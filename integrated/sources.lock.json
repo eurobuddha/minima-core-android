@@ -843,6 +843,18 @@
           "src/test/java/com/eurobuddha/entropy/RollEngineTest.java": "9196fe6191bc3b1e171138ccdd6162c1e764c581eaa5f2b6803d7e9995e4aa73",
           "src/test/java/com/eurobuddha/entropy/Sha3Test.java": "903405771785d642341599afb4eadb0c80659efa33267ddf3764e376d380c02c"
         }
+      },
+      {
+        "revision": "2c3f010cd87686dcbbe186cf81d17182f1f7376f",
+        "version": "0.1.16",
+        "summary": "The node is asked for random only; SHA3(a ++ b) is worked out on the phone and b is never sent; any node failure during a throw is said and the node re-verified; the audit keeps the local hash.",
+        "files": {
+          "src/main/java/com/eurobuddha/entropy/RollEngine.java": "ce44186c63cd08ee3cf6f7ade1f2d4d6458cd4a3670c648bfb535864fee47edd",
+          "src/main/java/com/eurobuddha/entropy/DiceView.java": "120511e807c83f21c80e752dd91aecc5903e6d735018abab2815c2b0e54134d3",
+          "src/main/java/com/eurobuddha/entropy/LastWordView.java": "53b79cf41b8bef67f6fb0ea9055a19b897bf4e21a03e9f8fb9b2f04287fa9b97",
+          "src/main/java/com/eurobuddha/entropy/MainActivity.java": "0f9cc37c85af16aff61f49760f302fd13fba513face985331777f589ddcbc4a3",
+          "src/test/java/com/eurobuddha/entropy/RollEngineTest.java": "142cce7988d8eb62f49fcd08d6674cdf1d07a0285610f9aae17485c1ea1050c1"
+        }
       }
     ]
   },

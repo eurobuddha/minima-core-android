@@ -2744,7 +2744,7 @@
     <string name="l10n_entropy_hide_audit" formatted="false">"Скрыть аудит бросков"</string>
     <string name="l10n_entropy_audit_warning" formatted="false">"⚠ Журнал раскрывает секреты каждого броска (A + B): любой, кто его увидит, сможет восстановить всю сид-фразу. Защищайте его так же, как сами слова."</string>
     <!-- Arguments: command -->
-    <string name="l10n_entropy_audit_hint">"Цифровой результат = SHA3(node_secret ++ device_secret) → первые 4 байта mod 6 (значения ≥ 4294967292 отбрасываются — без смещения по модулю). Проверка броска в терминале Minima: %1$s"</string>
+    <string name="l10n_entropy_audit_hint">"Цифровой результат = SHA3(случайное значение узла A ++ секрет устройства B), вычисляется на этом телефоне (B его не покидает) → первые 4 байта mod 6 (значения ≥ 4294967292 отбрасываются — без смещения по модулю). H — этот хеш. Проверка броска в терминале Minima: %1$s"</string>
     <string name="l10n_entropy_wipe" formatted="false">"Стереть и начать заново"</string>
     <!-- Arguments: bits, target, rolls -->
     <string name="l10n_entropy_progress">"%1$s / %2$s бит — бросков: %3$s"</string>
@@ -2757,15 +2757,15 @@
     <string name="l10n_entropy_summary">"Бросков: %1$s → %2$s бит без смещения → %3$s бит энтропии + %4$s бит контрольной суммы SHA-256 = %5$s слов\nисточники: %6$s"</string>
     <string name="l10n_entropy_single_warning" formatted="false">"\n⚠ часть бросков использовала один источник энтропии (узел недоступен)"</string>
     <string name="l10n_entropy_distribution_warning" formatted="false">"\n⚠ распределение бросков выглядит неслучайным — используйте настоящий, честный кубик"</string>
-    <string name="l10n_entropy_source_node" formatted="false">"SHA3 узла + устройство"</string>
+    <string name="l10n_entropy_source_node" formatted="false">"случайное значение узла + устройство, SHA3 на этом телефоне"</string>
     <string name="l10n_entropy_source_device" formatted="false">"только устройство"</string>
     <string name="l10n_entropy_source_physical" formatted="false">"физический кубик"</string>
     <!-- Arguments: index, face -->
     <string name="l10n_entropy_audit_physical">"#%1$s грань:%2$s (физический кубик)\n"</string>
     <!-- Arguments: index, face -->
     <string name="l10n_entropy_audit_device">"#%1$s грань:%2$s (только CSPRNG устройства)\n"</string>
-    <!-- Arguments: index, a, b, number, face -->
-    <string name="l10n_entropy_audit_combined">"#%1$s A:%2$s B:%3$s n:%4$s грань:%5$s\n"</string>
+    <!-- Arguments: index, a, b, hash, number, face -->
+    <string name="l10n_entropy_audit_combined">"#%1$s A:%2$s B:%3$s H:%4$s n:%5$s грань:%6$s\n"</string>
     <string name="l10n_entropy_blocked_demo" formatted="false">"Заблокировано — включён деморежим (разрешён захват экрана). Выключите его для бросков."</string>
     <string name="l10n_entropy_last_calculator" formatted="false">"Калькулятор последнего слова (контрольной суммы)"</string>
     <string name="l10n_entropy_hide" formatted="false">"🙈 Скрыть"</string>
@@ -2784,7 +2784,7 @@
     <string name="l10n_entropy_manual" formatted="false">"выбрано вручную"</string>
     <!-- Arguments: index, word, method -->
     <string name="l10n_entropy_complete">"Фраза готова — слово %1$s = «%2$s» (%3$s). BIP39 верна ✓"</string>
-    <string name="l10n_entropy_picked_node" formatted="false">"выбрано энтропией SHA3(узел ++ устройство)"</string>
+    <string name="l10n_entropy_picked_node" formatted="false">"выбрано по SHA3(случайное значение узла ++ устройство), вычислено на этом телефоне"</string>
     <string name="l10n_entropy_picked_device" formatted="false">"выбрано энтропией устройства"</string>
     <string name="l10n_entropy_dice_tab" formatted="false">"🎲 БРОСКИ КУБИКОВ"</string>
     <string name="l10n_entropy_word_tab" formatted="false">"✓ ПОСЛЕДНЕЕ СЛОВО"</string>
@@ -2793,7 +2793,7 @@
     <string name="l10n_entropy_self_failed" formatted="false">"самопроверка НЕ ПРОЙДЕНА — заблокировано"</string>
     <string name="l10n_entropy_connecting" formatted="false">"Самопроверка BIP39 ✓ — узел: подключение…"</string>
     <string name="l10n_entropy_unavailable" formatted="false">"узел недоступен — только CSPRNG устройства (один источник)"</string>
-    <string name="l10n_entropy_verified" formatted="false">"Самопроверка BIP39 ✓ — SHA3 узла + CSPRNG устройства проверены"</string>
+    <string name="l10n_entropy_verified" formatted="false">"Самопроверка BIP39 ✓ — случайное значение узла + CSPRNG устройства, SHA3 на этом телефоне"</string>
     <string name="l10n_entropy_malformed" formatted="false">"неверный формат хеша узла — только CSPRNG устройства (один источник)"</string>
     <string name="l10n_entropy_commands_failed" formatted="false">"ошибка команд узла — только CSPRNG устройства (один источник)"</string>
     <string name="l10n_entropy_demo_banner" formatted="false">"🎥 ДЕМОРЕЖИМ — захват и трансляция экрана РАЗРЕШЕНЫ. НЕ создавайте настоящую сид-фразу. Сбрасывается при перезапуске."</string>
@@ -8685,11 +8685,11 @@
     <string name="l10n_mail_enter_contact_name" formatted="false">"Введите имя"</string>
     <string name="l10n_mail_contact_gone" formatted="false">"Контакт больше не существует"</string>
     <string name="l10n_mail_cannot_save_contact" formatted="false">"Не удалось сохранить контакт"</string>
-    <string name="l10n_entropy_node_bad" formatted="false">"Ответ узла не совпал; этот бросок не использован. Ничего не записано."</string>
-    <string name="l10n_entropy_node_mismatch" formatted="false">"ответы узла не совпали — только CSPRNG устройства (один источник)"</string>
-    <string name="l10n_entropy_node_recheck" formatted="false">"ответ узла отклонён — узел проверяется снова…"</string>
-    <string name="l10n_entropy_pick_node_bad" formatted="false">"Ответ узла не совпал; слово не выбрано. Повторите попытку."</string>
-    <string name="l10n_entropy_pick_error" formatted="false">"Ошибка источника энтропии — слово не выбрано. Повторите попытку."</string>
+    <string name="l10n_entropy_node_bad" formatted="false">"Случайное значение узла неверного формата или повторяется; этот бросок не использован. Ничего не записано. Узел проверяется снова."</string>
+    <string name="l10n_entropy_node_mismatch" formatted="false">"случайное значение узла неверного формата или повторяется — только CSPRNG устройства (один источник)"</string>
+    <string name="l10n_entropy_node_recheck" formatted="false">"узел не справился с броском — узел проверяется снова…"</string>
+    <string name="l10n_entropy_pick_node_bad" formatted="false">"Случайное значение узла неверного формата или повторяется; слово не выбрано. Узел проверяется снова."</string>
+    <string name="l10n_entropy_pick_error" formatted="false">"Узел не ответил; слово не выбрано. Узел проверяется снова."</string>
     <string name="l10n_mall_shop_not_paid" formatted="false">"Не оплачено"</string>
     <!-- Arguments: currency -->
     <string name="l10n_mall_shop_token_unpayable">"Этот магазин просит оплату в «%1$s». miniMall платит только в Minima или MxUSD. Ничего не отправлено."</string>
@@ -8718,4 +8718,5 @@
     <string name="l10n_mall_inbox_send_whole">"Отправить %1$s?\n\nID токена\n%2$s\n\nКоличество\n%3$s\n\nПолучатель\n%4$s\n\nNFT будет передан в блокчейне."</string>
     <string name="l10n_mall_inbox_all_pieces" formatted="false">"все ваши экземпляры"</string>
     <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT не отправлен"</string>
+    <string name="l10n_entropy_node_down" formatted="false">"Узел не ответил; этот бросок не использован. Ничего не записано. Узел проверяется снова."</string>
 </resources>

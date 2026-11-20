@@ -8,12 +8,11 @@ import org.junit.Test;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
- * The node does not decide a die face: its `hash` answer is used only when it equals the SHA3-256
- * worked out on the device, and its `random` only when it is 0x + 64 hex not seen before.
- * The fake node answers synchronously; the "truthful" answers come from the JDK's own SHA3-256.
+ * The node does not see or decide a die face: it is asked for `random` only (0x + 64 hex, never repeated),
+ * the device bytes never leave the phone, and the face comes from the SHA3-256 worked out here (checked
+ * against the JDK's own SHA3-256). Any node failure discards the roll and reports it.
  */
 public class RollEngineTest {
 
@@ -27,27 +26,18 @@ public class RollEngineTest {
         return sb.toString();
     }
 
-    static JSONObject ok(String key, String value) throws Exception {
-        return new JSONObject().put("status", true).put("response", new JSONObject().put(key, value));
-    }
-
-    /** A node whose `random` answers come from a list and whose `hash` answer is hashOf(data). */
+    /** A node whose `random` answers come from a list ("ERR" = an error reply); it records every command. */
     static final class FakeNode implements RollEngine.Node {
-        final List<String> randoms; final Function<String, String> hashOf; int r = 0;
+        final List<String> randoms; int r = 0;
         final List<String> commands = new ArrayList<>();
-        FakeNode(List<String> randoms, Function<String, String> hashOf) { this.randoms = randoms; this.hashOf = hashOf; }
+        FakeNode(List<String> randoms) { this.randoms = randoms; }
         @Override public void cmd(String command, NodeApi.Cb cb) {
             commands.add(command);
-            try {
-                if (command.equals("random")) cb.onResult(ok("random", randoms.get(Math.min(r++, randoms.size() - 1))));
-                else if (command.startsWith("hash data:")) cb.onResult(ok("hash", hashOf.apply(command.substring(10))));
-                else fail("unexpected command " + command);
-            } catch (Exception e) { throw new RuntimeException(e); }
+            String v = randoms.get(Math.min(r++, randoms.size() - 1));
+            if ("ERR".equals(v)) { cb.onError("timeout"); return; }
+            try { cb.onResult(new JSONObject().put("status", true).put("response", new JSONObject().put("random", v))); }
+            catch (Exception e) { throw new RuntimeException(e); }
         }
-    }
-
-    static Function<String, String> truthful() {
-        return d -> { try { return jdkSha3(d); } catch (Exception e) { throw new RuntimeException(e); } };
     }
 
     static final class Result { Integer face; RollEngine.Audit audit; String error; }
@@ -63,9 +53,9 @@ public class RollEngineTest {
 
     static RollEngine engine(FakeNode n) { RollEngine e = new RollEngine(n); e.setNodeOk(true); return e; }
 
-    static void assertDiscarded(Result r) {
+    static void assertDiscarded(Result r, String why) {
         assertNull("no face may come from a refused answer", r.face);
-        assertEquals(RollEngine.NODE_BAD, r.error);
+        assertEquals(why, r.error);
     }
 
     @Test public void localDigestIsSha3_256OfTheRawBytes() {
@@ -73,64 +63,47 @@ public class RollEngineTest {
         assertEquals("0x3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532", RollEngine.localHash("0x616263"));
     }
 
-    @Test public void aTruthfulNodeGivesTheFaceOfItsHash() throws Exception {
-        FakeNode n = new FakeNode(List.of(A), truthful());
+    @Test public void theNodeIsAskedForRandomOnlyAndNeverSeesTheDeviceBytes() throws Exception {
+        FakeNode n = new FakeNode(List.of(A));
         Result r = roll(engine(n));
         assertNull(r.error);
+        assertEquals(List.of("random"), n.commands);
+        for (String c : n.commands) assertFalse(c.contains(r.audit.b.substring(2)));
         assertEquals(A, r.audit.a);
-        assertEquals("hash data:" + A + r.audit.b.substring(2), n.commands.get(1));
-        long v = Long.parseLong(jdkSha3(A + r.audit.b.substring(2)).substring(2, 10), 16);
+        String h = jdkSha3(A + r.audit.b.substring(2));
+        assertEquals("the audit keeps the local hash", h, r.audit.h);
+        long v = Long.parseLong(h.substring(2, 10), 16);
         if (v < RollEngine.REJECT_THRESHOLD) assertEquals(Integer.valueOf((int) (v % 6) + 1), r.face);
         assertEquals(RollEngine.SRC_NODE_DEVICE, r.audit.src);
     }
 
-    @Test public void anUpperCaseTruthfulHashIsAccepted() {
-        Result r = roll(engine(new FakeNode(List.of(A), d -> truthful().apply(d).toUpperCase().replace("0X", "0x"))));
-        assertNull(r.error);
-        assertNotNull(r.face);
-    }
-
-    @Test public void aWrongHashDiscardsTheRoll() {
-        assertDiscarded(roll(engine(new FakeNode(List.of(A), d -> truthful().apply(d + "00")))));
-    }
-
-    @Test public void aConstantHashDiscardsTheRoll() {
-        assertDiscarded(roll(engine(new FakeNode(List.of(A), d -> "0x" + "00".repeat(32)))));
-    }
-
-    @Test public void anEmptyOrShortHashDiscardsTheRoll() {
-        assertDiscarded(roll(engine(new FakeNode(List.of(A), d -> ""))));
-        assertDiscarded(roll(engine(new FakeNode(List.of(A), d -> truthful().apply(d).substring(0, 10)))));
-    }
-
-    @Test public void anEmptyRandomDiscardsTheRollAndAsksNoHash() {
-        FakeNode n = new FakeNode(List.of(""), truthful());
-        assertDiscarded(roll(engine(n)));
-        assertEquals(List.of("random"), n.commands);
+    @Test public void anEmptyRandomDiscardsTheRoll() {
+        assertDiscarded(roll(engine(new FakeNode(List.of("")))), RollEngine.NODE_BAD);
     }
 
     @Test public void aWrongLengthRandomDiscardsTheRoll() {
-        for (String bad : new String[]{"0x" + "1f".repeat(31), "0x" + "1f".repeat(33), "0x1f", "1f".repeat(32) + "ab", "0x" + "zz".repeat(32)}) {
-            FakeNode n = new FakeNode(List.of(bad), truthful());
-            assertDiscarded(roll(engine(n)));
-            assertEquals(bad, List.of("random"), n.commands);
-        }
+        for (String bad : new String[]{"0x" + "1f".repeat(31), "0x" + "1f".repeat(33), "0x1f", "1f".repeat(32) + "ab", "0x" + "zz".repeat(32)})
+            assertDiscarded(roll(engine(new FakeNode(List.of(bad)))), RollEngine.NODE_BAD);
     }
 
     @Test public void aRepeatedRandomDiscardsTheRoll() {
-        RollEngine e = engine(new FakeNode(List.of(A, A.toUpperCase().replace("0X", "0x")), truthful()));
+        RollEngine e = engine(new FakeNode(List.of(A, A.toUpperCase().replace("0X", "0x"))));
         assertNull(roll(e).error);
-        assertDiscarded(roll(e));
+        assertDiscarded(roll(e), RollEngine.NODE_BAD);
     }
 
     @Test public void freshRandomsKeepRolling() {
-        RollEngine e = engine(new FakeNode(List.of(A, A2), truthful()));
+        RollEngine e = engine(new FakeNode(List.of(A, A2)));
         assertNull(roll(e).error);
         assertNull(roll(e).error);
     }
 
-    @Test public void aWrongHashPicksNoLastWord() {
-        RollEngine e = engine(new FakeNode(List.of(A), d -> "0x" + "ff".repeat(32)));
+    @Test public void aNodeErrorDiscardsTheRollAndIsReported() {
+        assertDiscarded(roll(engine(new FakeNode(List.of("ERR")))), RollEngine.NODE_DOWN);
+    }
+
+    @Test public void aBadRandomPicksNoLastWord() {
+        RollEngine e = engine(new FakeNode(List.of("0x00")));
         String[] err = {null}; boolean[] picked = {false};
         e.randomN(new RollEngine.NCb() {
             @Override public void onN(long n, String src) { picked[0] = true; }
@@ -140,16 +113,16 @@ public class RollEngineTest {
         assertEquals(RollEngine.NODE_BAD, err[0]);
     }
 
-    @Test public void verifiedRestsOnTheSameCheck() {
-        RollEngine bad = new RollEngine(new FakeNode(List.of(A), d -> "0x" + "00".repeat(32)));
+    @Test public void verifiedRestsOnTheSamePath() {
+        RollEngine bad = new RollEngine(new FakeNode(List.of("ERR")));
         bad.setNodeOk(true);
         String[] why = {"unset"}; boolean[] ok = {true};
         bad.verify((o, w) -> { ok[0] = o; why[0] = w; });
         assertFalse(ok[0]);
-        assertEquals(RollEngine.NODE_BAD, why[0]);
+        assertEquals(RollEngine.NODE_DOWN, why[0]);
         assertFalse(bad.nodeOk());
 
-        RollEngine good = new RollEngine(new FakeNode(List.of(A), truthful()));
+        RollEngine good = new RollEngine(new FakeNode(List.of(A)));
         good.verify((o, w) -> { ok[0] = o; why[0] = w; });
         assertTrue(ok[0]);
         assertTrue(good.nodeOk());

@@ -2708,7 +2708,7 @@
     <string name="l10n_entropy_hide_audit" formatted="false">"隐藏逐次掷骰审计日志"</string>
     <string name="l10n_entropy_audit_warning" formatted="false">"⚠ 此日志包含每次掷骰的秘密值（A + B）— 任何看到它的人都能重新计算出完整助记词。请像保护助记词一样保护此日志。"</string>
     <!-- Arguments: command -->
-    <string name="l10n_entropy_audit_hint">"数字骰子点数 = SHA3(node_secret ++ device_secret) → 前 4 字节模 6（值 ≥ 4294967292 时重掷，消除取模偏差）。在 Minima 终端验证任意一次掷骰：%1$s"</string>
+    <string name="l10n_entropy_audit_hint">"数字骰子点数 = SHA3(节点随机值 A ++ 设备密值 B)，在本机计算（B 从不离开本机）→ 前 4 字节模 6（值 ≥ 4294967292 时重掷，消除取模偏差）。H 即该哈希。在 Minima 终端验证任意一次掷骰：%1$s"</string>
     <string name="l10n_entropy_wipe" formatted="false">"清除并重新开始"</string>
     <!-- Arguments: bits, target, rolls -->
     <string name="l10n_entropy_progress">"%1$s / %2$s 位 — %3$s 次掷骰"</string>
@@ -2721,15 +2721,15 @@
     <string name="l10n_entropy_summary">"%1$s 次掷骰 → %2$s 个无偏位 → %3$s 个熵位 + %4$s 位 SHA-256 校验和 = %5$s 个词\n来源：%6$s"</string>
     <string name="l10n_entropy_single_warning" formatted="false">"\n⚠ 部分掷骰仅使用一个熵源（节点不可用）"</string>
     <string name="l10n_entropy_distribution_warning" formatted="false">"\n⚠ 掷骰分布看起来并非随机 — 请使用真实且公平的骰子"</string>
-    <string name="l10n_entropy_source_node" formatted="false">"节点 SHA3 + 设备"</string>
+    <string name="l10n_entropy_source_node" formatted="false">"节点随机值 + 设备，SHA3 在本机计算"</string>
     <string name="l10n_entropy_source_device" formatted="false">"仅设备"</string>
     <string name="l10n_entropy_source_physical" formatted="false">"实体骰子"</string>
     <!-- Arguments: index, face -->
     <string name="l10n_entropy_audit_physical">"#%1$s 点数:%2$s（实体骰子）\n"</string>
     <!-- Arguments: index, face -->
     <string name="l10n_entropy_audit_device">"#%1$s 点数:%2$s（仅设备 CSPRNG）\n"</string>
-    <!-- Arguments: index, a, b, number, face -->
-    <string name="l10n_entropy_audit_combined">"#%1$s A:%2$s B:%3$s n:%4$s 点数:%5$s\n"</string>
+    <!-- Arguments: index, a, b, hash, number, face -->
+    <string name="l10n_entropy_audit_combined">"#%1$s A:%2$s B:%3$s H:%4$s n:%5$s 点数:%6$s\n"</string>
     <string name="l10n_entropy_blocked_demo" formatted="false">"已阻止 — 演示模式已开启（允许截屏）。请关闭演示模式后再掷骰。"</string>
     <string name="l10n_entropy_last_calculator" formatted="false">"最后一个词（校验和）计算器"</string>
     <string name="l10n_entropy_hide" formatted="false">"🙈 隐藏"</string>
@@ -2748,7 +2748,7 @@
     <string name="l10n_entropy_manual" formatted="false">"手动选择"</string>
     <!-- Arguments: index, word, method -->
     <string name="l10n_entropy_complete">"助记词已完成 — 第 %1$s 个词 = “%2$s”（%3$s）。BIP39 有效 ✓"</string>
-    <string name="l10n_entropy_picked_node" formatted="false">"由 SHA3(节点 ++ 设备) 熵选出"</string>
+    <string name="l10n_entropy_picked_node" formatted="false">"由 SHA3(节点随机值 ++ 设备) 选出，在本机计算"</string>
     <string name="l10n_entropy_picked_device" formatted="false">"由设备熵选出"</string>
     <string name="l10n_entropy_dice_tab" formatted="false">"🎲 掷骰"</string>
     <string name="l10n_entropy_word_tab" formatted="false">"✓ 最后一个词"</string>
@@ -2757,7 +2757,7 @@
     <string name="l10n_entropy_self_failed" formatted="false">"自检失败 — 已阻止"</string>
     <string name="l10n_entropy_connecting" formatted="false">"BIP39 自检 ✓ — 节点：连接中…"</string>
     <string name="l10n_entropy_unavailable" formatted="false">"节点不可用 — 仅使用设备 CSPRNG（单一来源）"</string>
-    <string name="l10n_entropy_verified" formatted="false">"BIP39 自检 ✓ — 节点 SHA3 + 设备 CSPRNG 已验证"</string>
+    <string name="l10n_entropy_verified" formatted="false">"BIP39 自检 ✓ — 节点随机值 + 设备 CSPRNG，SHA3 在本机计算"</string>
     <string name="l10n_entropy_malformed" formatted="false">"节点哈希格式错误 — 仅使用设备 CSPRNG（单一来源）"</string>
     <string name="l10n_entropy_commands_failed" formatted="false">"节点命令失败 — 仅使用设备 CSPRNG（单一来源）"</string>
     <string name="l10n_entropy_demo_banner" formatted="false">"🎥 演示模式 — 允许截屏和屏幕镜像。请勿生成真实种子。重启后重置。"</string>
@@ -8574,11 +8574,11 @@
     <string name="l10n_mail_enter_contact_name" formatted="false">"请输入姓名"</string>
     <string name="l10n_mail_contact_gone" formatted="false">"联系人已不存在"</string>
     <string name="l10n_mail_cannot_save_contact" formatted="false">"无法保存联系人"</string>
-    <string name="l10n_entropy_node_bad" formatted="false">"节点的回答不一致；本次投掷未被使用。未记录任何内容。"</string>
-    <string name="l10n_entropy_node_mismatch" formatted="false">"节点的回答不一致 — 仅使用设备 CSPRNG（单一来源）"</string>
-    <string name="l10n_entropy_node_recheck" formatted="false">"节点回答被拒绝 — 正在重新检查节点…"</string>
-    <string name="l10n_entropy_pick_node_bad" formatted="false">"节点的回答不一致；未选择任何单词。请重试。"</string>
-    <string name="l10n_entropy_pick_error" formatted="false">"熵源错误 — 未选择任何单词。请重试。"</string>
+    <string name="l10n_entropy_node_bad" formatted="false">"节点的随机值格式错误或重复；本次投掷未被使用。未记录任何内容。正在重新检查节点。"</string>
+    <string name="l10n_entropy_node_mismatch" formatted="false">"节点的随机值格式错误或重复 — 仅使用设备 CSPRNG（单一来源）"</string>
+    <string name="l10n_entropy_node_recheck" formatted="false">"节点在一次投掷中失败 — 正在重新检查节点…"</string>
+    <string name="l10n_entropy_pick_node_bad" formatted="false">"节点的随机值格式错误或重复；未选择任何单词。正在重新检查节点。"</string>
+    <string name="l10n_entropy_pick_error" formatted="false">"节点没有回应；未选择任何单词。正在重新检查节点。"</string>
     <string name="l10n_mall_shop_not_paid" formatted="false">"未付款"</string>
     <!-- Arguments: currency -->
     <string name="l10n_mall_shop_token_unpayable">"此商店要求以“%1$s”付款。miniMall 只用 Minima 或 MxUSD 付款。未发送任何内容。"</string>
@@ -8607,4 +8607,5 @@
     <string name="l10n_mall_inbox_send_whole">"发送 %1$s？\n\n代币 ID\n%2$s\n\n数量\n%3$s\n\n接收地址\n%4$s\n\n这会在链上转移 NFT。"</string>
     <string name="l10n_mall_inbox_all_pieces" formatted="false">"您持有的全部藏品"</string>
     <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT 未发送"</string>
+    <string name="l10n_entropy_node_down" formatted="false">"节点没有回应；本次投掷未被使用。未记录任何内容。正在重新检查节点。"</string>
 </resources>

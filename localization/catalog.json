@@ -14202,10 +14202,10 @@
     "uk": "⚠ Журнал розкриває секрети кожного кидка (A + B): кожен, хто його побачить, зможе відновити всю сід-фразу. Захищайте його так само, як самі слова."
   },
   "entropy.auditHint": {
-    "en": "Each digital face = SHA3(node_secret ++ device_secret) → first 4 bytes mod 6 (values ≥ 4294967292 rerolled — zero modulo bias). Verify any roll in a Minima terminal: {command}",
-    "zh-Hans": "数字骰子点数 = SHA3(node_secret ++ device_secret) → 前 4 字节模 6（值 ≥ 4294967292 时重掷，消除取模偏差）。在 Minima 终端验证任意一次掷骰：{command}",
-    "ru": "Цифровой результат = SHA3(node_secret ++ device_secret) → первые 4 байта mod 6 (значения ≥ 4294967292 отбрасываются — без смещения по модулю). Проверка броска в терминале Minima: {command}",
-    "uk": "Цифровий результат = SHA3(node_secret ++ device_secret) → перші 4 байти mod 6 (значення ≥ 4294967292 відкидаються — без зміщення за модулем). Перевірка кидка в терміналі Minima: {command}"
+    "en": "Each digital face = SHA3(node random A ++ device secret B), worked out on this phone (B never leaves it) → first 4 bytes mod 6 (values ≥ 4294967292 rerolled — zero modulo bias). H is that hash. Verify any roll in a Minima terminal: {command}",
+    "zh-Hans": "数字骰子点数 = SHA3(节点随机值 A ++ 设备密值 B)，在本机计算（B 从不离开本机）→ 前 4 字节模 6（值 ≥ 4294967292 时重掷，消除取模偏差）。H 即该哈希。在 Minima 终端验证任意一次掷骰：{command}",
+    "ru": "Цифровой результат = SHA3(случайное значение узла A ++ секрет устройства B), вычисляется на этом телефоне (B его не покидает) → первые 4 байта mod 6 (значения ≥ 4294967292 отбрасываются — без смещения по модулю). H — этот хеш. Проверка броска в терминале Minima: {command}",
+    "uk": "Цифровий результат = SHA3(випадкове значення вузла A ++ секрет пристрою B), обчислюється на цьому телефоні (B його не залишає) → перші 4 байти mod 6 (значення ≥ 4294967292 відкидаються — без зміщення за модулем). H — цей хеш. Перевірка кидка в терміналі Minima: {command}"
   },
   "entropy.wipe": {
     "en": "Wipe & start over",
@@ -14262,10 +14262,10 @@
     "uk": "\n⚠ розподіл кидків виглядає невипадковим — використовуйте справжній, чесний кубик"
   },
   "entropy.sourceNode": {
-    "en": "node SHA3 + device",
-    "zh-Hans": "节点 SHA3 + 设备",
-    "ru": "SHA3 узла + устройство",
-    "uk": "SHA3 вузла + пристрій"
+    "en": "node random + device, SHA3 on this phone",
+    "zh-Hans": "节点随机值 + 设备，SHA3 在本机计算",
+    "ru": "случайное значение узла + устройство, SHA3 на этом телефоне",
+    "uk": "випадкове значення вузла + пристрій, SHA3 на цьому телефоні"
   },
   "entropy.sourceDevice": {
     "en": "device only",
@@ -14292,10 +14292,10 @@
     "uk": "#{index} грань:{face} (лише CSPRNG пристрою)\n"
   },
   "entropy.auditCombined": {
-    "en": "#{index} A:{a} B:{b} n:{number} face:{face}\n",
-    "zh-Hans": "#{index} A:{a} B:{b} n:{number} 点数:{face}\n",
-    "ru": "#{index} A:{a} B:{b} n:{number} грань:{face}\n",
-    "uk": "#{index} A:{a} B:{b} n:{number} грань:{face}\n"
+    "en": "#{index} A:{a} B:{b} H:{hash} n:{number} face:{face}\n",
+    "zh-Hans": "#{index} A:{a} B:{b} H:{hash} n:{number} 点数:{face}\n",
+    "ru": "#{index} A:{a} B:{b} H:{hash} n:{number} грань:{face}\n",
+    "uk": "#{index} A:{a} B:{b} H:{hash} n:{number} грань:{face}\n"
   },
   "entropy.blockedDemo": {
     "en": "Blocked — demo mode is ON (screen capture enabled). Turn it off to roll.",
@@ -14388,10 +14388,10 @@
     "uk": "Фраза готова — слово {index} = «{word}» ({method}). BIP39 правильна ✓"
   },
   "entropy.pickedNode": {
-    "en": "picked by SHA3(node ++ device) entropy",
-    "zh-Hans": "由 SHA3(节点 ++ 设备) 熵选出",
-    "ru": "выбрано энтропией SHA3(узел ++ устройство)",
-    "uk": "вибрано ентропією SHA3(вузол ++ пристрій)"
+    "en": "picked by SHA3(node random ++ device), worked out on this phone",
+    "zh-Hans": "由 SHA3(节点随机值 ++ 设备) 选出，在本机计算",
+    "ru": "выбрано по SHA3(случайное значение узла ++ устройство), вычислено на этом телефоне",
+    "uk": "вибрано за SHA3(випадкове значення вузла ++ пристрій), обчислено на цьому телефоні"
   },
   "entropy.pickedDevice": {
     "en": "picked by device entropy",
@@ -14436,10 +14436,10 @@
     "uk": "вузол недоступний — лише CSPRNG пристрою (одне джерело)"
   },
   "entropy.verified": {
-    "en": "BIP39 self-test ✓ — node SHA3 + device CSPRNG verified",
-    "zh-Hans": "BIP39 自检 ✓ — 节点 SHA3 + 设备 CSPRNG 已验证",
-    "ru": "Самопроверка BIP39 ✓ — SHA3 узла + CSPRNG устройства проверены",
-    "uk": "Самоперевірка BIP39 ✓ — SHA3 вузла + CSPRNG пристрою перевірено"
+    "en": "BIP39 self-test ✓ — node random + device CSPRNG, SHA3 on this phone",
+    "zh-Hans": "BIP39 自检 ✓ — 节点随机值 + 设备 CSPRNG，SHA3 在本机计算",
+    "ru": "Самопроверка BIP39 ✓ — случайное значение узла + CSPRNG устройства, SHA3 на этом телефоне",
+    "uk": "Самоперевірка BIP39 ✓ — випадкове значення вузла + CSPRNG пристрою, SHA3 на цьому телефоні"
   },
   "entropy.malformed": {
     "en": "node hash malformed — device CSPRNG only (single source)",
@@ -43257,34 +43257,34 @@
     "uk": "Не вдалося зберегти контакт"
   },
   "entropy.nodeBad": {
-    "en": "The node's answer did not match; this roll was not used. Nothing was recorded.",
-    "zh-Hans": "节点的回答不一致；本次投掷未被使用。未记录任何内容。",
-    "ru": "Ответ узла не совпал; этот бросок не использован. Ничего не записано.",
-    "uk": "Відповідь вузла не збіглася; цей кидок не використано. Нічого не записано."
+    "en": "The node's random value was malformed or repeated; this roll was not used. Nothing was recorded. Checking the node again.",
+    "zh-Hans": "节点的随机值格式错误或重复；本次投掷未被使用。未记录任何内容。正在重新检查节点。",
+    "ru": "Случайное значение узла неверного формата или повторяется; этот бросок не использован. Ничего не записано. Узел проверяется снова.",
+    "uk": "Випадкове значення вузла неправильного формату або повторюється; цей кидок не використано. Нічого не записано. Вузол перевіряється знову."
   },
   "entropy.nodeMismatch": {
-    "en": "the node's answers did not match — device CSPRNG only (single source)",
-    "zh-Hans": "节点的回答不一致 — 仅使用设备 CSPRNG（单一来源）",
-    "ru": "ответы узла не совпали — только CSPRNG устройства (один источник)",
-    "uk": "відповіді вузла не збіглися — лише CSPRNG пристрою (одне джерело)"
+    "en": "the node's random value was malformed or repeated — device CSPRNG only (single source)",
+    "zh-Hans": "节点的随机值格式错误或重复 — 仅使用设备 CSPRNG（单一来源）",
+    "ru": "случайное значение узла неверного формата или повторяется — только CSPRNG устройства (один источник)",
+    "uk": "випадкове значення вузла неправильного формату або повторюється — лише CSPRNG пристрою (одне джерело)"
   },
   "entropy.nodeRecheck": {
-    "en": "node answer refused — checking the node again…",
-    "zh-Hans": "节点回答被拒绝 — 正在重新检查节点…",
-    "ru": "ответ узла отклонён — узел проверяется снова…",
-    "uk": "відповідь вузла відхилено — вузол перевіряється знову…"
+    "en": "node failed a roll — checking the node again…",
+    "zh-Hans": "节点在一次投掷中失败 — 正在重新检查节点…",
+    "ru": "узел не справился с броском — узел проверяется снова…",
+    "uk": "вузол не впорався з кидком — вузол перевіряється знову…"
   },
   "entropy.pickNodeBad": {
-    "en": "The node's answer did not match; no word was picked. Try again.",
-    "zh-Hans": "节点的回答不一致；未选择任何单词。请重试。",
-    "ru": "Ответ узла не совпал; слово не выбрано. Повторите попытку.",
-    "uk": "Відповідь вузла не збіглася; слово не вибрано. Спробуйте ще раз."
+    "en": "The node's random value was malformed or repeated; no word was picked. Checking the node again.",
+    "zh-Hans": "节点的随机值格式错误或重复；未选择任何单词。正在重新检查节点。",
+    "ru": "Случайное значение узла неверного формата или повторяется; слово не выбрано. Узел проверяется снова.",
+    "uk": "Випадкове значення вузла неправильного формату або повторюється; слово не вибрано. Вузол перевіряється знову."
   },
   "entropy.pickError": {
-    "en": "Entropy source error — no word was picked. Try again.",
-    "zh-Hans": "熵源错误 — 未选择任何单词。请重试。",
-    "ru": "Ошибка источника энтропии — слово не выбрано. Повторите попытку.",
-    "uk": "Помилка джерела ентропії — слово не вибрано. Спробуйте ще раз."
+    "en": "The node did not answer; no word was picked. Checking the node again.",
+    "zh-Hans": "节点没有回应；未选择任何单词。正在重新检查节点。",
+    "ru": "Узел не ответил; слово не выбрано. Узел проверяется снова.",
+    "uk": "Вузол не відповів; слово не вибрано. Вузол перевіряється знову."
   },
   "mallShop.notPaid": {
     "en": "Not paid",
@@ -43387,5 +43387,11 @@
     "zh-Hans": "NFT 未发送",
     "ru": "NFT не отправлен",
     "uk": "NFT не надіслано"
+  },
+  "entropy.nodeDown": {
+    "en": "The node did not answer; this roll was not used. Nothing was recorded. Checking the node again.",
+    "zh-Hans": "节点没有回应；本次投掷未被使用。未记录任何内容。正在重新检查节点。",
+    "ru": "Узел не ответил; этот бросок не использован. Ничего не записано. Узел проверяется снова.",
+    "uk": "Вузол не відповів; цей кидок не використано. Нічого не записано. Вузол перевіряється знову."
   }
 }

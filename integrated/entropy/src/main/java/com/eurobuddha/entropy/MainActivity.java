@@ -134,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
         }, 5000);
     }
 
-    /** Prove the node before any roll uses it, by the very check every roll passes (RollEngine.verify):
-     *  "verified" means one node + device SHA3 was worked out here and the node's answer was the same. */
+    /** Prove the node before any roll uses it, by the very path every roll takes (RollEngine.verify):
+     *  "verified" means the node gave a well-formed, fresh random; the SHA3 is always worked out here. */
     private void verifyNode() {
         engine.verify((ok, why) -> {
             engineReady = true;
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /** The node answered a roll wrongly: nothing uses it until it is proved again (rolls wait meanwhile). */
+    /** The node failed a roll: nothing uses it until it is proved again (rolls wait meanwhile). */
     public void reverifyNode() {
         engine.setNodeOk(false);
         engineReady = false;
