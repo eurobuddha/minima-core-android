@@ -1577,6 +1577,15 @@
           "src/main/java/com/eurobuddha/merchinbox/Listing.java": "c238d59e5b1128d4d461eb7a5c31ae93a5eda217f2063faea943aa871b88cd97",
           "src/test/java/com/eurobuddha/merchinbox/PiecesTest.java": "ed1a99cb31dd7a73044dde651c6e6b0925df4d513d77d6a02cfb2203ad089835"
         }
+      },
+      {
+        "revision": "dd131934ebe1bebfd0fdaffb9e6cadc7cd349bcc",
+        "version": "0.5.27",
+        "summary": "Unsigned .shop (desktop builder, older Studio) usable only through the vendor's explicit import: full summary under a not-signed warning, Use this listing each time; vendor key and NFT price rules unchanged; order screen shows signed or vendor-confirmed. Integrated adds localized strings and lets a confirmed import stand until Studio publishes again.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/Listing.java": "42080f302d976de8a1781e7d4165c1bb8a87d0f06eebfff712ad56b01b226f1c",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "0d205d864608450ea8de0aac50bd483a2b8322d0ac8e146fc8860902172129be"
+        }
       }
     ]
   },

@@ -414,18 +414,43 @@ public class MainActivity extends AppCompatActivity {
                     if (bos.size() + n > 16 * 1024 * 1024) throw new IllegalArgumentException("That file is too large to be a .shop file.");
                     bos.write(buf, 0, n);
                 }
-                JSONObject listing = Listing.compact(Listing.unseal(new String(bos.toByteArray(), java.nio.charset.StandardCharsets.UTF_8), crypto, me), me);   // signed by this shop key only (M1)
-                String shopId = listing.getString("shopId");
-                db.setMeta("listing:" + shopId, listing.toString());
-                int checked = 0;
-                for (MerchDb.Order o : db.orders()) if ("seller".equals(o.role) && shopId.equals(o.shopId)) { recheck(o); checked++; }
-                msg = Language.msg(l10n_mall_inbox_listing_in, listing.optString("shopName", shopId), checked);
+                // Shown in full first, every time; a signed listing must be this shop key's, an unsigned one (desktop
+                // builder, older Studio) is allowed only here, under the warning, and only on "Use this listing".
+                String raw = new String(bos.toByteArray(), java.nio.charset.StandardCharsets.UTF_8);
+                final Listing.Prepared p = Listing.prepare(raw, crypto, me, listingFor(new JSONObject(raw).optString("shopId", "")));
+                final CharSequence text = p.signed ? p.summary : Language.msg(l10n_mall_inbox_listing_unsigned_warning) + "\n\n" + p.summary;
+                ui.post(() -> languageDialog().setTitle(Language.msg(p.signed ? l10n_mall_inbox_listing_use_question : l10n_mall_inbox_listing_use_unsigned_question))
+                        .setMessage(text).setPositiveButton(Language.msg(l10n_mall_inbox_listing_use), (d, w) -> useListing(p.listing, p.signed))
+                        .setNegativeButton(Language.msg(l10n_common_cancel), null).show());
+                return;
             } catch (IllegalArgumentException e) { msg = InboxMessages.message(e.getMessage()); }
             catch (Exception e) { msg = Language.msg(l10n_mall_shop_read_failed); }
             final CharSequence say = msg;
             ui.post(() -> { languageDialog().setTitle(Language.msg(l10n_mall_inbox_listing_title)).setMessage(say)
                     .setPositiveButton(Language.msg(l10n_common_ok), null).show(); refreshVisibleOrderOrList(); });
         });
+    }
+
+    /** Store the listing the vendor confirmed, with whether it is signed and when (it replaces Studio's save of this
+     *  shop until Studio publishes again), and check every order of that shop against it. */
+    private void useListing(final JSONObject listing, final boolean signed) {
+        io.execute(() -> {
+            String shopId = listing.optString("shopId");
+            db.setMeta("listing:" + shopId, listing.toString());
+            db.setMeta("listingsigned:" + shopId, signed ? "1" : "0");
+            db.setMeta("listingat:" + shopId, String.valueOf(System.currentTimeMillis()));
+            int checked = 0;
+            for (MerchDb.Order o : db.orders()) if ("seller".equals(o.role) && shopId.equals(o.shopId)) { recheck(o); checked++; }
+            final CharSequence say = Language.msg(l10n_mall_inbox_listing_in, listing.optString("shopName", shopId), checked);
+            ui.post(() -> { languageDialog().setTitle(Language.msg(l10n_mall_inbox_listing_title)).setMessage(say)
+                    .setPositiveButton(Language.msg(l10n_common_ok), null).show(); refreshVisibleOrderOrList(); });
+        });
+    }
+
+    /** The order screen's line on the listing in use: Studio's save here is signed; an import says what it was (one
+     *  stored before 2.2.70 carries no mark and is not called signed). */
+    static CharSequence listingInUse(boolean signed) {
+        return Language.msg(signed ? l10n_mall_inbox_listing_in_use_signed : l10n_mall_inbox_listing_in_use_confirmed);
     }
 
     /** Recompute what an order is due from the vendor's own listing for its shop, if one was imported. */
@@ -692,6 +717,7 @@ public class MainActivity extends AppCompatActivity {
             body.addView(kv(Language.msg(l10n_mall_shop_total), o.amount + " " + dispCurrency(o)));
             if (db.conflict(o)) { TextView cf = label(Language.msg(l10n_mall_inbox_conflict_line)); cf.setTextColor(Design.RED); body.addView(cf); }
             else if (db.nonce(o).isEmpty()) body.addView(label(Language.msg(l10n_mall_inbox_unverified_ref)));
+            if (listingFor(o.shopId) != null) body.addView(label(listingInUse(studioListing(o.shopId) != null || "1".equals(db.getMeta("listingsigned:" + o.shopId, "")))));
             String problems = db.listingProblems(o);
             TextView chk = label(!problems.isEmpty() ? Language.msg(l10n_mall_inbox_listing_problems, InboxMessages.lines(problems))
                     : db.checked(o) ? Language.msg(l10n_mall_inbox_listing_checked, db.due(o), dispCurrency(o))
@@ -994,18 +1020,26 @@ public class MainActivity extends AppCompatActivity {
     /** The vendor's own listing for a shop: the shop Studio last published from this app (read at once, no import
      *  needed), else one imported with ⇪; null when there is none or it is not this vendor's. */
     private JSONObject listingFor(String shopId) {
-        if (shopId != null && shopId.matches("[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*")) {
-            // Studio's save in this app's private listing folder (M1: getDir, outside the node's file folder; a file in
-            // the old files/mall_listings place is never read: export again from Studio), signed by this shop key.
-            java.io.File f = new java.io.File(getDir(LISTINGS, MODE_PRIVATE), shopId + ".shop");
-            if (f.isFile() && f.length() <= 16L * 1024 * 1024) {
-                try { return Listing.compact(Listing.unseal(new String(java.nio.file.Files.readAllBytes(f.toPath()), java.nio.charset.StandardCharsets.UTF_8), crypto, myId), myId); }
-                catch (Throwable notThisVendors) { /* fall through to an import */ }
-            }
-        }
+        JSONObject studio = studioListing(shopId);
+        if (studio != null) return studio;
         String raw = db.getMeta("listing:" + shopId, "");
         if (raw.isEmpty()) return null;
         try { return new JSONObject(raw); } catch (Exception e) { return null; }
+    }
+
+    /** Studio's save of this shop in this app's private listing folder (M1: getDir, outside the node's file folder;
+     *  a file in the old files/mall_listings place is never read: export again from Studio), read automatically only
+     *  when signed by this shop key (an unsigned file is never read without the vendor's import), and only when it is
+     *  newer than the listing the vendor last imported by hand; else null. */
+    private JSONObject studioListing(String shopId) {
+        if (shopId == null || !shopId.matches("[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*")) return null;
+        java.io.File f = new java.io.File(getDir(LISTINGS, MODE_PRIVATE), shopId + ".shop");
+        if (!f.isFile() || f.length() > 16L * 1024 * 1024) return null;
+        long importedAt;
+        try { importedAt = Long.parseLong(db.getMeta("listingat:" + shopId, "0")); } catch (NumberFormatException e) { importedAt = 0; }
+        if (f.lastModified() <= importedAt) return null;
+        try { return Listing.compact(Listing.unseal(new String(java.nio.file.Files.readAllBytes(f.toPath()), java.nio.charset.StandardCharsets.UTF_8), crypto, myId), myId); }
+        catch (Throwable notThisVendors) { return null; }
     }
 
     /** When Studio published a shop again (its saved listing changed), every order of that shop is checked against

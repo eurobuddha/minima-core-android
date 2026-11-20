@@ -43,6 +43,24 @@ final class Listing {
         return new String(opened.plaintext, java.nio.charset.StandardCharsets.UTF_8);
     }
 
+    /** A .shop the vendor is importing: its listing, whether it is signed by this shop key, and the summary to read
+     *  (the caller puts the unsigned warning above it). A file that carries a signature must carry a valid one by
+     *  this shop key (a bad one is refused, never treated as unsigned); one with none (the miniMerch-core desktop
+     *  builder holds only the public Vendor Card, and older Studios did not sign) is allowed only through this
+     *  explicit import. The vendor key in the file must be this shop key and NFTs priced at 0 are refused either way. */
+    static final class Prepared {
+        final JSONObject listing; final boolean signed; final String summary;
+        Prepared(JSONObject listing, boolean signed, String summary) { this.listing = listing; this.signed = signed; this.summary = summary; }
+    }
+
+    static Prepared prepare(String shopJson, com.eurobuddha.merchinbox.integratedcomms.CryptoProvider crypto, String myId, JSONObject current) {
+        boolean signed;
+        try { signed = !new JSONObject(shopJson).optString("listingSealed", "").isEmpty(); }
+        catch (Exception e) { throw new IllegalArgumentException("That is not a .shop file."); }
+        JSONObject listing = compact(signed ? unseal(shopJson, crypto, myId) : shopJson, myId);
+        return new Prepared(listing, signed, summary(listing, current));
+    }
+
     /** Every product of a compact listing (name, token id whole, price, stock) and its delivery fees, and how it
      *  differs from the current one (null = none), for the vendor to read before "Use this listing". */
     static String summary(JSONObject next, JSONObject current) {

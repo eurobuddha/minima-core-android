@@ -8731,4 +8731,11 @@
     <string name="l10n_mall_inbox_drain_i_zero">"NFT“%1$s”的价格为 0：NFT 绝不会免费上架。"</string>
     <string name="l10n_mall_inbox_conflict_line" formatted="false">"有两位买家用同一编号下单（付款后编号即公开）。不会为其发送任何内容：在本应用之外手动发送任何东西之前，请先通过消息询问付款的买家。"</string>
     <string name="l10n_mall_inbox_unverified_ref" formatted="false">"此订单来自没有付款密钥的旧版商店：其付款仅按编号匹配。"</string>
+    <string name="l10n_mall_inbox_listing_use_question" formatted="false">"使用此商品列表？"</string>
+    <string name="l10n_mall_inbox_listing_use_unsigned_question" formatted="false">"使用此未签名的商品列表？"</string>
+    <string name="l10n_mall_inbox_listing_use" formatted="false">"使用此商品列表"</string>
+    <string name="l10n_mall_inbox_listing_unsigned_warning" formatted="false">"⚠ 此文件没有用本商店的密钥签名。请确认它就是您发布的 .shop：每个订单都按其中所列内容核对，而其中所列内容就是可能被发送的内容。"</string>
+    <string name="l10n_mall_inbox_listing_in_use_signed" formatted="false">"正在使用的商品列表：已用您的商店密钥签名。"</string>
+    <string name="l10n_mall_inbox_listing_in_use_confirmed" formatted="false">"正在使用的商品列表：您确认过的未签名文件（未用您的商店密钥签名）。"</string>
+    <string name="l10n_mall_studio_error_key_not_ready" formatted="false">"您的商店密钥尚未就绪：请连接您的节点后重试。"</string>
 </resources>

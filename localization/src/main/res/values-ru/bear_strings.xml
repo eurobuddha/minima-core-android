@@ -8842,4 +8842,11 @@
     <string name="l10n_mall_inbox_drain_i_zero">"NFT «%1$s» стоит 0: NFT никогда не выставляется бесплатно."</string>
     <string name="l10n_mall_inbox_conflict_line" formatted="false">"Два покупателя прислали заказы с этим номером (после оплаты он публичен). По нему ничего не отправляется: прежде чем отправлять что-либо вручную вне этого приложения, спросите в сообщении покупателя, который заплатил."</string>
     <string name="l10n_mall_inbox_unverified_ref" formatted="false">"Этот заказ пришёл из старого магазина без секрета оплаты: его оплата сопоставляется только по номеру."</string>
+    <string name="l10n_mall_inbox_listing_use_question" formatted="false">"Использовать этот список товаров?"</string>
+    <string name="l10n_mall_inbox_listing_use_unsigned_question" formatted="false">"Использовать этот НЕПОДПИСАННЫЙ список товаров?"</string>
+    <string name="l10n_mall_inbox_listing_use" formatted="false">"Использовать этот список"</string>
+    <string name="l10n_mall_inbox_listing_unsigned_warning" formatted="false">"⚠ Этот файл не подписан ключом этого магазина. Убедитесь, что это именно тот .shop, который вы опубликовали: каждый заказ проверяется по тому, что в нём указано, и именно это может быть отправлено."</string>
+    <string name="l10n_mall_inbox_listing_in_use_signed" formatted="false">"Используемый список товаров: подписан ключом вашего магазина."</string>
+    <string name="l10n_mall_inbox_listing_in_use_confirmed" formatted="false">"Используемый список товаров: неподписанный файл, который вы подтвердили (не подписан ключом вашего магазина)."</string>
+    <string name="l10n_mall_studio_error_key_not_ready" formatted="false">"Ключ вашего магазина ещё не готов: подключите узел и попробуйте снова."</string>
 </resources>

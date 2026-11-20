@@ -8768,4 +8768,11 @@
     <string name="l10n_mall_inbox_drain_i_zero">"The NFT \"%1$s\" is priced at 0: an NFT is never listed for nothing."</string>
     <string name="l10n_mall_inbox_conflict_line" formatted="false">"Two buyers sent orders with this reference (it is public once paid). Nothing is sent for it: ask the buyer who paid, by message, before you send anything by hand outside this app."</string>
     <string name="l10n_mall_inbox_unverified_ref" formatted="false">"This order came from an older Shop without a payment secret: its payment is matched by its reference only."</string>
+    <string name="l10n_mall_inbox_listing_use_question" formatted="false">"Use this listing?"</string>
+    <string name="l10n_mall_inbox_listing_use_unsigned_question" formatted="false">"Use this UNSIGNED listing?"</string>
+    <string name="l10n_mall_inbox_listing_use" formatted="false">"Use this listing"</string>
+    <string name="l10n_mall_inbox_listing_unsigned_warning" formatted="false">"⚠ This file is not signed by this shop\'s key. Be sure it is the .shop you published: every order is checked against what it lists, and what it lists is what may be sent."</string>
+    <string name="l10n_mall_inbox_listing_in_use_signed" formatted="false">"Listing in use: signed by your shop key."</string>
+    <string name="l10n_mall_inbox_listing_in_use_confirmed" formatted="false">"Listing in use: an unsigned file you confirmed (not signed by your shop key)."</string>
+    <string name="l10n_mall_studio_error_key_not_ready" formatted="false">"Your shop key is not ready yet: connect your node and try again."</string>
 </resources>

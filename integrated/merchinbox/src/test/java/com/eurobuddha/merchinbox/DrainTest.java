@@ -244,6 +244,68 @@ public class DrainTest {
         assertTrue(sends.isEmpty());
     }
 
+    /** Import a .shop through the real ⇪ path; returns the dialog it shows (summary first, nothing stored yet). */
+    androidx.appcompat.app.AlertDialog importFile(String content) throws Exception {
+        java.io.File f = new java.io.File(activity.getCacheDir(), "import.shop");
+        java.nio.file.Files.write(f.toPath(), content.getBytes(StandardCharsets.UTF_8));
+        call("importListing", new Class<?>[]{android.net.Uri.class}, android.net.Uri.fromFile(f));
+        ShadowLooper.idleMainLooper();
+        return (androidx.appcompat.app.AlertDialog) org.robolectric.shadows.ShadowDialog.getLatestDialog();
+    }
+    static String text(androidx.appcompat.app.AlertDialog d) { return ((android.widget.TextView) d.findViewById(android.R.id.message)).getText().toString(); }
+
+    @Test public void anUnsignedShopIsUsedOnlyAfterTheVendorReadsTheWarningAndSummaryAndConfirms() throws Exception {
+        set("crypto", new ListingTest.FakeCrypto());
+        String before = db.getMeta("listing:art", "");
+        String shop = new JSONObject(before).put("vendorPublicId", ME).put("products", new JSONArray()
+                .put(new JSONObject().put("name", "Piece").put("price", "12").put("maxUnits", 1).put("nftTokenId", NFT))).toString();   // the desktop builder's file
+        androidx.appcompat.app.AlertDialog d = importFile(shop);
+        String t = text(d);
+        assertTrue(t, t.startsWith("⚠ This file is not signed by this shop's key."));
+        assertTrue(t, t.contains("\"Piece\" token " + NFT + ": price 12, stock 1") && t.contains("Changes from the listing in use:") && t.contains("− \"Art\" token " + ART));
+        assertEquals(before, db.getMeta("listing:art", ""));             // never used without the vendor's confirmation
+        d.getButton(android.content.DialogInterface.BUTTON_NEGATIVE).performClick(); ShadowLooper.idleMainLooper();
+        assertEquals(before, db.getMeta("listing:art", ""));             // Cancel keeps the listing in use
+        d = importFile(shop);                                            // asked again, each time
+        d.getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick(); ShadowLooper.idleMainLooper();
+        assertTrue(db.getMeta("listing:art", "").contains("\"price\":\"12\""));
+        assertEquals("0", db.getMeta("listingsigned:art", ""));
+        assertEquals("Listing in use: an unsigned file you confirmed (not signed by your shop key).", MainActivity.listingInUse(false).toString());
+        // a signed file is shown in full too, without the warning, and is marked signed once confirmed
+        String signedShop = new JSONObject(shop).put("listingSealed", "sealed:" + ME + ":" + shop).toString();
+        d = importFile(signedShop);
+        assertFalse(text(d).contains("not signed"));
+        d.getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick(); ShadowLooper.idleMainLooper();
+        assertEquals("1", db.getMeta("listingsigned:art", ""));
+        assertEquals("Listing in use: signed by your shop key.", MainActivity.listingInUse(true).toString());
+        // another vendor's file, an NFT for nothing, or a bad signature: refused, no "Use this listing"
+        String now = db.getMeta("listing:art", "");
+        for (String bad : new String[]{ new JSONObject(shop).put("vendorPublicId", "0x" + "EE".repeat(64)).toString(),
+                shop.replace("\"price\":\"12\"", "\"price\":\"0\""),
+                new JSONObject(shop).put("listingSealed", "sealed:" + "0x" + "EE".repeat(64) + ":" + shop).toString() }) {
+            d = importFile(bad);
+            assertNotEquals("Use this listing", d.getButton(android.content.DialogInterface.BUTTON_POSITIVE).getText().toString());
+            assertEquals(now, db.getMeta("listing:art", ""));
+        }
+    }
+
+    @Test public void anImportedListingStandsUntilStudioPublishesAgain() throws Exception {
+        set("crypto", new ListingTest.FakeCrypto());
+        java.io.File dir = activity.getDir("mall_listings", android.content.Context.MODE_PRIVATE);
+        String studio = new JSONObject(db.getMeta("listing:art", "")).put("vendorPublicId", ME).toString();
+        java.io.File f = new java.io.File(dir, "art.shop");
+        java.nio.file.Files.write(f.toPath(), new JSONObject(studio).put("listingSealed", "sealed:" + ME + ":" + studio).toString().getBytes(StandardCharsets.UTF_8));
+        f.setLastModified(1000);
+        String imported = new JSONObject(studio).put("products", new JSONArray()
+                .put(new JSONObject().put("name", "Piece").put("price", "12").put("maxUnits", 1).put("nftTokenId", NFT))).toString();
+        importFile(imported).getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick(); ShadowLooper.idleMainLooper();
+        JSONObject inUse = (JSONObject) call("listingFor", new Class<?>[]{String.class}, "art");
+        assertEquals("12", inUse.getJSONArray("products").getJSONObject(0).getString("price"));   // the vendor's confirmed import
+        f.setLastModified(System.currentTimeMillis() + 60_000);           // Studio publishes again
+        inUse = (JSONObject) call("listingFor", new Class<?>[]{String.class}, "art");
+        assertEquals("10", inUse.getJSONArray("products").getJSONObject(0).getString("price"));
+    }
+
     @Test public void aStuckSendIsReleasedOnlyByTheVendorAndFailuresAreNotifiedOnce() throws Exception {
         String key = "ORD-STUCK:" + NFT;
         assertNull(DeliveryLedger.reserve(db.getWritableDatabase(), "ORD-STUCK|0", "p", NFT, java.math.BigDecimal.ONE, java.math.BigDecimal.TEN, java.math.BigDecimal.TEN, key));

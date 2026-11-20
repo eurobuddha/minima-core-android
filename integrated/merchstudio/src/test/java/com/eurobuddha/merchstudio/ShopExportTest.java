@@ -63,6 +63,13 @@ public class ShopExportTest {
   }
   assertArrayEquals(new String[]{"shops"},cache.list());
  }
+ @Test public void theShopKeyNotReadyRefusalIsTranslated()throws Exception{
+  String raw="Your shop key is not ready yet: connect your node and try again.";
+  CharSequence display=StudioMessages.error(new IllegalStateException(raw));
+  assertTrue(display instanceof com.eurobuddha.minimacore.i18n.Language.Message);
+  java.lang.reflect.Field resource=com.eurobuddha.minimacore.i18n.Language.Message.class.getDeclaredField("resource");resource.setAccessible(true);
+  assertEquals(com.eurobuddha.minimacore.i18n.R.string.l10n_mall_studio_error_key_not_ready,resource.get(display));
+ }
  @Test public void unknownExportDetailsRemainLiteral(){
   for(String raw:new String[]{"Unknown export failure 中文 Українська $1 {error}","Invalid shop filename: custom.shop","Cannot create export folder\nprivate/path"})
    assertEquals(raw,StudioMessages.error(new IOException(raw)));
