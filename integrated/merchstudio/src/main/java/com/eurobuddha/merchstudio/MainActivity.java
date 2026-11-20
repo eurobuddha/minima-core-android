@@ -512,7 +512,7 @@ public class MainActivity extends AppCompatActivity {
         return l.stateIdx > 0 ? l.tokenid + "#" + l.stateIdx : l.tokenid;
     }
 
-    private String currencyLabel() { return "USDT".equals(currency) ? "mxUSDT" : "Minima"; }
+    private String currencyLabel() { return "USDT".equals(currency) ? "MxUSD" : "Minima"; }   // "USDT" is the wire value; the token is MxUSD
 
     private boolean priced(NftListing l) {
         try { return new BigDecimal(l.price.trim()).signum() > 0; } catch (Exception e) { return false; }
@@ -1240,7 +1240,7 @@ public class MainActivity extends AppCompatActivity {
         body.addView(sectionLabel(Language.msg(l10n_mall_studio_ui_pays)));
         LinearLayout cur = new LinearLayout(this); cur.setOrientation(LinearLayout.HORIZONTAL);
         cur.addView(seg("Minima", currency.equals("Minima"), () -> { currency = "Minima"; tokenid = CommsTransport.MINIMA; refreshTop(buildShopDetails()); }));
-        cur.addView(seg("mxUSDT", currency.equals("USDT"), () -> { currency = "USDT"; tokenid = CommsTransport.USDT; refreshTop(buildShopDetails()); }));
+        cur.addView(seg("MxUSD", currency.equals("USDT"), () -> { currency = "USDT"; tokenid = CommsTransport.USDT; refreshTop(buildShopDetails()); }));
         body.addView(cur);
 
         // Shipping only matters for typed goods — NFT-only shops deliver on-chain.

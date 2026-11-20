@@ -1144,6 +1144,17 @@
           "src/main/java/com/eurobuddha/merchshop/Util.java": "e62dc435cb6fd9a231fb2365649a66e2d9148644715a69a73d376735b47904cf",
           "src/test/java/com/eurobuddha/merchshop/ShopPaysCurrencyTokenTest.java": "6fa56c4755c8c9e6f2399b07ca1641d2958adf90e3a579032f52f26dc5fb9ea9"
         }
+      },
+      {
+        "revision": "e52d157df2bda4d7b73d3c92aa612e9abadb7e73",
+        "version": "0.4.16",
+        "summary": "MxUSD in every displayed currency (MerchMessage.label); wire value USDT unchanged.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchMessage.java": "f3ee1e11a34fd01c69f1026c1bfa17f78f8c8d802a148ec6d0a15496d3122933",
+          "src/main/java/com/eurobuddha/merchshop/MainActivity.java": "f6e9bc746a42c55b9cf7310624783bf3abc51260709fdf6bf47e5f0f3010192f",
+          "src/test/java/com/eurobuddha/comms/MerchTokenRuleTest.java": "bec162a1f236d3e75fc8622a6a60b1210d2e0ebebfeb254a1c20a0739497691a",
+          "src/test/java/com/eurobuddha/merchshop/ShopPaysCurrencyTokenTest.java": "1908a5dff189b8c7c6cd2096bf08e51d6e6cf1701ab7a60676844d10215c6e3b"
+        }
       }
     ]
   },
@@ -1227,6 +1238,15 @@
           "src/main/java/com/eurobuddha/merchstudio/MainActivity.java": "6da160885c8e6a46b58939723d45f128c08c20d2d0b3f236dcb789c87b3f98ca",
           "src/main/java/com/eurobuddha/merchstudio/Util.java": "cf344f535f6158881174acf9a5cfa1965f3cc8b3ad0a3f17e1250b4769d65c94"
         }
+      },
+      {
+        "revision": "9d88f20ede3a8eafd76eda72f8dac18235c81f59",
+        "version": "0.3.16",
+        "summary": "Shared comms parity: MerchMessage.label. (Here also: the snapshot's own currency label and button said mxUSDT; now MxUSD, as the source already did.)",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchMessage.java": "f3ee1e11a34fd01c69f1026c1bfa17f78f8c8d802a148ec6d0a15496d3122933",
+          "src/test/java/com/eurobuddha/comms/MerchTokenRuleTest.java": "bec162a1f236d3e75fc8622a6a60b1210d2e0ebebfeb254a1c20a0739497691a"
+        }
       }
     ]
   },
@@ -1308,6 +1328,17 @@
           "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "0c7fd8f2dacfd4a9bcdd4ac12160e5fdece063c02f4c5033dc1c04c65e0d4d50",
           "src/main/java/com/eurobuddha/merchinbox/Util.java": "f4cd3062eea6c2d7ccef42f43dfea50b3460e5c608435c05c8713a8735b1f695",
           "src/test/java/com/eurobuddha/merchinbox/InboxShowsIdentifiersWholeTest.java": "af4c83f0da47f0573800e2674989661523dd4d5004b69dd5bcf933ee9f2a7b50"
+        }
+      },
+      {
+        "revision": "d55c37a3a24297fd59e704b22a9d0212f58781c2",
+        "version": "0.5.13",
+        "summary": "MxUSD in every displayed currency and the CSV export (dispCurrency uses MerchMessage.label); wire value USDT unchanged.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchMessage.java": "f3ee1e11a34fd01c69f1026c1bfa17f78f8c8d802a148ec6d0a15496d3122933",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "0afa45509330f8b1004aa4bb784eb9ba919463d6df55266edc8719b122ed621f",
+          "src/test/java/com/eurobuddha/comms/MerchTokenRuleTest.java": "bec162a1f236d3e75fc8622a6a60b1210d2e0ebebfeb254a1c20a0739497691a",
+          "src/test/java/com/eurobuddha/merchinbox/InboxShowsIdentifiersWholeTest.java": "a97f66b018419077dd378dc12fa9964534162ebb9777fb66a0649c5fdbf8e6da"
         }
       }
     ]

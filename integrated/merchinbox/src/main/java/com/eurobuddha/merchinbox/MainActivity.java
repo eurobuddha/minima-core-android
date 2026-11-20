@@ -1042,8 +1042,8 @@ public class MainActivity extends AppCompatActivity {
     // ---- helpers: formatting ----
 
     private String dispCurrency(MerchDb.Order o) {
-        if (!o.currency.isEmpty()) return o.currency;
-        return CommsTransport.USDT.equalsIgnoreCase(o.tokenid) ? "USDT" : "Minima";
+        if (!o.currency.isEmpty()) return MerchMessage.label(o.currency);   // the wire value "USDT" is MxUSD on Minima
+        return CommsTransport.USDT.equalsIgnoreCase(o.tokenid) ? "MxUSD" : "Minima";
     }
     private CharSequence shippingLabel(String s) {
         if ("uk".equalsIgnoreCase(s)) return Language.msg(l10n_mall_inbox_uk_shipping);

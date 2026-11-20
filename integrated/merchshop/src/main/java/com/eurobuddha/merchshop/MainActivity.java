@@ -375,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
                     Language.setText(name, c.shopName); name.setTextColor(Design.TEXT); name.setTextSize(16f); name.setTypeface(null, Typeface.BOLD);
                     row.addView(name);
                     TextView sub = new TextView(MainActivity.this);
-                    Language.setText(sub, Language.msg(l10n_mall_shop_products, c.products.size(), c.currency));
+                    Language.setText(sub, Language.msg(l10n_mall_shop_products, c.products.size(), MerchMessage.label(c.currency)));
                     sub.setTextColor(Design.DIM); sub.setTextSize(12f); sub.setPadding(0, dp(3), 0, 0);
                     row.addView(sub);
                     row.setOnClickListener(v -> openShop(shopKey(c)));
@@ -437,7 +437,7 @@ public class MainActivity extends AppCompatActivity {
         if (nftShop) {
             // collection header, marketplace-style
             TextView sub = new TextView(this);
-            Language.setText(sub, Language.msg(l10n_mall_shop_nft_pays, catalog.currency.toUpperCase(java.util.Locale.ROOT)));
+            Language.setText(sub, Language.msg(l10n_mall_shop_nft_pays, MerchMessage.label(catalog.currency)));
             sub.setTextColor(Design.ACCENT); sub.setTextSize(11f); sub.setTypeface(null, Typeface.BOLD);
             sub.setPadding(dp(16), dp(4), dp(16), 0);
             col.addView(sub);
@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             TextView ver = new TextView(this);
-            Language.setText(ver, Language.msg(l10n_mall_shop_pays, catalog.currency));
+            Language.setText(ver, Language.msg(l10n_mall_shop_pays, MerchMessage.label(catalog.currency)));
             ver.setTextColor(Design.DIM2); ver.setTextSize(11f); ver.setPadding(dp(16), dp(2), dp(16), dp(6));
             col.addView(ver);
         }
@@ -602,7 +602,7 @@ public class MainActivity extends AppCompatActivity {
             inner.addView(ed);
 
             TextView pr = new TextView(MainActivity.this);
-            Language.setText(pr, p.price + " " + catalog.currency);
+            Language.setText(pr, p.price + " " + MerchMessage.label(catalog.currency));
             pr.setTextColor(Design.ACCENT); pr.setTextSize(13f); pr.setTypeface(null, Typeface.BOLD);
             pr.setPadding(dp(4), dp(2), dp(4), 0);
             inner.addView(pr);
@@ -637,7 +637,7 @@ public class MainActivity extends AppCompatActivity {
         cartBarRef.removeAllViews();
         int count = cartCount();
         TextView info = new TextView(this);
-        Language.setText(info, count == 0 ? Language.msg(l10n_mall_shop_cart_empty) : Language.msg(l10n_mall_shop_cart_summary, count, cartTotal().toPlainString(), catalog.currency));
+        Language.setText(info, count == 0 ? Language.msg(l10n_mall_shop_cart_empty) : Language.msg(l10n_mall_shop_cart_summary, count, cartTotal().toPlainString(), MerchMessage.label(catalog.currency)));
         info.setTextColor(Design.TEXT); info.setTextSize(14f);
         cartBarRef.addView(info, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         TextView checkout = button(Language.msg(l10n_mall_shop_checkout), count > 0);
@@ -682,7 +682,7 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout ctl = new LinearLayout(MainActivity.this); ctl.setOrientation(LinearLayout.HORIZONTAL);
             ctl.setGravity(Gravity.CENTER_VERTICAL); ctl.setPadding(0, dp(8), 0, 0);
             TextView price = new TextView(MainActivity.this);
-            Language.setText(price, p.price + " " + catalog.currency); price.setTextColor(Design.ACCENT); price.setTextSize(15f); price.setTypeface(null, Typeface.BOLD);
+            Language.setText(price, p.price + " " + MerchMessage.label(catalog.currency)); price.setTextColor(Design.ACCENT); price.setTextSize(15f); price.setTypeface(null, Typeface.BOLD);
             ctl.addView(price, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
             ctl.addView(stepper(p));
             content.addView(ctl);
@@ -745,7 +745,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout pr = new LinearLayout(this); pr.setOrientation(LinearLayout.HORIZONTAL); pr.setGravity(Gravity.CENTER_VERTICAL);
         pr.setPadding(0, dp(14), 0, dp(8));
         TextView price = new TextView(this);
-        Language.setText(price, p.price + " " + catalog.currency); price.setTextColor(Design.ACCENT); price.setTextSize(20f);
+        Language.setText(price, p.price + " " + MerchMessage.label(catalog.currency)); price.setTextColor(Design.ACCENT); price.setTextSize(20f);
         price.setTypeface(null, Typeface.BOLD);
         pr.addView(price, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         if (p.isNft()) {
@@ -803,7 +803,7 @@ public class MainActivity extends AppCompatActivity {
             body.addView(stepper(p));
         }
 
-        TextView checkout = button(p.isNft() ? Language.msg(l10n_mall_shop_buy, p.price, catalog.currency) : Language.msg(l10n_mall_shop_go_checkout), true);
+        TextView checkout = button(p.isNft() ? Language.msg(l10n_mall_shop_buy, p.price, MerchMessage.label(catalog.currency)) : Language.msg(l10n_mall_shop_go_checkout), true);
         LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         alp.topMargin = dp(20); checkout.setLayoutParams(alp); checkout.setPadding(dp(16), dp(13), dp(16), dp(13));
         checkout.setOnClickListener(v -> {
@@ -909,7 +909,7 @@ public class MainActivity extends AppCompatActivity {
             n.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
             li.addView(n);
             TextView a = new TextView(this);
-            try { Language.setText(a, new BigDecimal(p.price).multiply(BigDecimal.valueOf(q)).toPlainString() + " " + catalog.currency); } catch (Exception e) { Language.setText(a, ""); }
+            try { Language.setText(a, new BigDecimal(p.price).multiply(BigDecimal.valueOf(q)).toPlainString() + " " + MerchMessage.label(catalog.currency)); } catch (Exception e) { Language.setText(a, ""); }
             a.setTextColor(Design.DIM); a.setTextSize(14f);
             li.addView(a);
             body.addView(li);
@@ -922,8 +922,8 @@ public class MainActivity extends AppCompatActivity {
         final TextView pay = button("", true);
         final Runnable updateTotal = () -> {
             BigDecimal items = cartTotal(), ship = shippingFee(chosenShipping), grand = items.add(ship);
-            Language.setText(tot, Language.join(ship.signum() > 0 ? Language.join(Language.msg(l10n_mall_shop_subtotal, items.toPlainString(), catalog.currency), "\n", Language.msg(l10n_mall_shop_shipping_fee, ship.toPlainString(), catalog.currency), "\n") : "", Language.msg(l10n_mall_shop_grand_total, grand.toPlainString(), catalog.currency)));
-            Language.setText(pay, Language.msg(l10n_mall_shop_pay_amount, grand.toPlainString(), catalog.currency));
+            Language.setText(tot, Language.join(ship.signum() > 0 ? Language.join(Language.msg(l10n_mall_shop_subtotal, items.toPlainString(), MerchMessage.label(catalog.currency)), "\n", Language.msg(l10n_mall_shop_shipping_fee, ship.toPlainString(), MerchMessage.label(catalog.currency)), "\n") : "", Language.msg(l10n_mall_shop_grand_total, grand.toPlainString(), MerchMessage.label(catalog.currency))));
+            Language.setText(pay, Language.msg(l10n_mall_shop_pay_amount, grand.toPlainString(), MerchMessage.label(catalog.currency)));
         };
         if (shippingPickerNeeded(nftOnly)) {
             body.addView(sectionLabel(Language.msg(l10n_mall_shop_delivery_method)));
@@ -1243,7 +1243,7 @@ public class MainActivity extends AppCompatActivity {
             top.addView(Design.pill(MainActivity.this, ShopMessages.status(o.status), statusColor(o.status), Design.ON_ACCENT));
             row.addView(top);
             TextView sub = new TextView(MainActivity.this);
-            Language.setText(sub, Language.join(o.amount, " ", o.currency, "  ·  ", timeAgo(o.date)));
+            Language.setText(sub, Language.join(o.amount, " ", MerchMessage.label(o.currency), "  ·  ", timeAgo(o.date)));
             sub.setTextColor(Design.DIM); sub.setTextSize(12f); sub.setPadding(0, dp(3), 0, 0);
             row.addView(sub);
             row.setOnClickListener(v -> push(buildOrderDetail(o.ref)));
@@ -1280,7 +1280,7 @@ public class MainActivity extends AppCompatActivity {
         if (!inquiry) {
             body.addView(sectionLabel(Language.msg(l10n_mall_shop_order)));
             body.addView(card(orderTitle(o)));
-            body.addView(kv(Language.msg(l10n_mall_shop_total), o.amount + " " + o.currency));
+            body.addView(kv(Language.msg(l10n_mall_shop_total), o.amount + " " + MerchMessage.label(o.currency)));
             body.addView(kv(Language.msg(l10n_mall_shop_reference), o.ref));
             if (nfts.isEmpty()) {
                 body.addView(kv(Language.msg(l10n_mall_shop_delivery), o.shipping));
