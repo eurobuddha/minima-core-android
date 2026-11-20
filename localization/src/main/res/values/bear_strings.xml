@@ -8639,4 +8639,9 @@
     <!-- Arguments: method, fee -->
     <string name="l10n_mall_shop_fee_plain">"The fee of the delivery method \"%1$s\" is not a plain number (%2$s). Nothing was sent."</string>
     <string name="l10n_mall_shop_total_zero" formatted="false">"The total is zero. Nothing was sent."</string>
+    <string name="l10n_mall_inbox_auto_off_why" formatted="false">"⚡ Auto NFT delivery is off: an order\'s NFTs, quantities and total are the buyer\'s own figures and are not checked against your listing. Check each order, then use Send NFT."</string>
+    <!-- Arguments: item, token, quantity, address -->
+    <string name="l10n_mall_inbox_send_whole">"Send %1$s?\n\nToken id\n%2$s\n\nQuantity\n%3$s\n\nTo\n%4$s\n\nThis transfers the NFT on-chain."</string>
+    <string name="l10n_mall_inbox_all_pieces" formatted="false">"every piece you hold"</string>
+    <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT not sent"</string>
 </resources>

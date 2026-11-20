@@ -43363,5 +43363,29 @@
     "zh-Hans": "总额为零。未发送任何内容。",
     "ru": "Сумма равна нулю. Ничего не отправлено.",
     "uk": "Сума дорівнює нулю. Нічого не надіслано."
+  },
+  "mallInbox.autoOffWhy": {
+    "en": "⚡ Auto NFT delivery is off: an order's NFTs, quantities and total are the buyer's own figures and are not checked against your listing. Check each order, then use Send NFT.",
+    "zh-Hans": "⚡ 自动交付 NFT 已关闭：订单中的 NFT、数量和总额都是买家自己填写的，未与您的商品列表核对。请逐一检查订单，再使用“发送 NFT”。",
+    "ru": "⚡ Автоотправка NFT выключена: NFT, количества и сумма заказа указаны самим покупателем и не сверяются с вашим списком товаров. Проверьте каждый заказ, затем используйте «Отправить NFT».",
+    "uk": "⚡ Автонадсилання NFT вимкнено: NFT, кількості та сума замовлення вказані самим покупцем і не звіряються з вашим списком товарів. Перевірте кожне замовлення, потім скористайтеся «Надіслати NFT»."
+  },
+  "mallInbox.sendWhole": {
+    "en": "Send {item}?\n\nToken id\n{token}\n\nQuantity\n{quantity}\n\nTo\n{address}\n\nThis transfers the NFT on-chain.",
+    "zh-Hans": "发送 {item}？\n\n代币 ID\n{token}\n\n数量\n{quantity}\n\n接收地址\n{address}\n\n这会在链上转移 NFT。",
+    "ru": "Отправить {item}?\n\nID токена\n{token}\n\nКоличество\n{quantity}\n\nПолучатель\n{address}\n\nNFT будет передан в блокчейне.",
+    "uk": "Надіслати {item}?\n\nID токена\n{token}\n\nКількість\n{quantity}\n\nОтримувач\n{address}\n\nNFT буде передано в блокчейні."
+  },
+  "mallInbox.allPieces": {
+    "en": "every piece you hold",
+    "zh-Hans": "您持有的全部藏品",
+    "ru": "все ваши экземпляры",
+    "uk": "усі ваші примірники"
+  },
+  "mallInbox.notSent": {
+    "en": "NFT not sent",
+    "zh-Hans": "NFT 未发送",
+    "ru": "NFT не отправлен",
+    "uk": "NFT не надіслано"
   }
 }

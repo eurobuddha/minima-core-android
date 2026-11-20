@@ -393,7 +393,10 @@ public class MainActivity extends AppCompatActivity {
 
     // ---- automatic NFT delivery ----
 
-    private boolean autoDeliverOn() { return "1".equals(db.getMeta("autodeliver", "1")); }
+    /** OFF, and not switchable, until the Inbox checks an order against the vendor's own listing (security
+     *  review 2026-11-20): an order's NFT lines, quantities and total are the buyer's own figures. The stored
+     *  "autodeliver" setting is kept but never acted on. */
+    private boolean autoDeliverOn() { return false; }
 
     /** Auto-send every unsent NFT line of a cleanly-paid order. Idempotent: nftsent: meta skips
      *  delivered lines, autoTried caps automatic attempts at one per line per session. */
@@ -450,19 +453,11 @@ public class MainActivity extends AppCompatActivity {
         }
         col.addView(s);
 
-        // Auto NFT delivery toggle — ON: paid NFT orders are sent to the buyer automatically.
-        final boolean auto = autoDeliverOn();
+        // Automatic NFT delivery is off and cannot be switched on (see autoDeliverOn).
         TextView ad = new TextView(this);
-        Language.setText(ad, auto ? Language.msg(l10n_mall_inbox_auto_on) : Language.msg(l10n_mall_inbox_auto_off));
-        ad.setTextColor(auto ? Design.IN : Design.DIM);
+        Language.setText(ad, Language.msg(l10n_mall_inbox_auto_off_why));
+        ad.setTextColor(Design.DIM);
         ad.setTextSize(12.5f); ad.setPadding(dp(16), 0, dp(16), dp(8));
-        ad.setOnClickListener(v -> {
-            final String next = auto ? "0" : "1";
-            io.execute(() -> {
-                db.setMeta("autodeliver", next);
-                ui.post(() -> { toast("1".equals(next) ? Language.msg(l10n_mall_inbox_auto_enabled) : Language.msg(l10n_mall_inbox_auto_disabled)); refreshTop(buildOrders()); });
-            });
-        });
         col.addView(ad);
 
         col.addView(filterBar());
@@ -764,7 +759,8 @@ public class MainActivity extends AppCompatActivity {
             if (nftSending.contains(key)) return;
             languageDialog()
                     .setTitle(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mall_inbox_send_nft))
-                    .setMessage(recovering ? Language.msg(l10n_mall_inbox_resume_help, o.payaddr) : Language.msg(l10n_mall_inbox_send_help, label, tokenid, o.payaddr))
+                    .setMessage(recovering ? Language.msg(l10n_mall_inbox_resume_help, o.payaddr) : Language.msg(l10n_mall_inbox_send_whole, label, tokenid,
+                            bundle ? Language.msg(l10n_mall_inbox_all_pieces) : piece ? "1 (#" + line[3] + ")" : qty, o.payaddr))
                     .setPositiveButton(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mail_send), (d, w) -> sendNft(o, line, false))
                     .setNegativeButton(Language.msg(l10n_common_cancel), null)
                     .show();
@@ -788,9 +784,52 @@ public class MainActivity extends AppCompatActivity {
         // The pay address is buyer-supplied chain data interpolated into a node command — validate hard.
         if (!Util.isValidAddress(o.payaddr)) { deliverFailed(o, key, "buyer pay address is malformed", auto); return; }
         if (!Util.isValidHexId(tokenid)) { deliverFailed(o, key, "token id is malformed", auto); return; }
-        if ("1".equals(line[4])) { collectionDeliver(o, line, auto); return; }
-        if (!"0".equals(line[3])) { stateNftDeliver(o, line, auto); return; }
+        guardDelivery(o, line, key, auto, () -> {
+            if ("1".equals(line[4])) { collectionDeliver(o, line, auto); return; }
+            if (!"0".equals(line[3])) { stateNftDeliver(o, line, auto); return; }
+            plainDeliver(o, line, key, auto);
+        });
+    }
 
+    /** True once this line's delivery has a journal row or a posted/sent mark (its coins may be gone). */
+    private boolean deliveryStarted(MerchDb.Order o, String[] line, String key) {
+        boolean piece = !"0".equals(line[3]), bundle = "1".equals(line[4]);
+        try { return (piece || bundle ? deliveryJournal().load(key, o, line) : plainDeliveryJournal().load(key, o, line)) != null
+                || !db.getMeta("nftposted:" + key, "").isEmpty() || !db.getMeta("nftsent:" + key, "").isEmpty(); }
+        catch (RuntimeException unavailable) { return true; }
+    }
+
+    /** Every delivery passes DeliveryGuard first: never Minima or MxUSD, only a token the node confirms has
+     *  0 decimals, never more than the vendor holds (that last check is skipped once this line's delivery has
+     *  started, when the coins may already be gone; the journals then only verify). Any doubt refuses. */
+    private void guardDelivery(final MerchDb.Order o, final String[] line, final String key, final boolean auto, final Runnable go) {
+        final String tokenid = line[1];
+        final String qty = "0".equals(line[3]) && "0".equals(line[4]) ? line[2] : "1";
+        String bad = DeliveryGuard.basic(tokenid);
+        if (bad != null) { deliverFailed(o, key, bad, auto); return; }
+        node.cmd("tokens tokenid:" + tokenid, new NodeApi.Cb() {
+            @Override public void onResult(JSONObject t) {
+                String why = DeliveryGuard.token(tokenid, t);
+                if (why != null) { deliverFailed(o, key, why, auto); return; }
+                io.execute(() -> {
+                    final boolean started = deliveryStarted(o, line, key);
+                    ui.post(() -> {
+                        if (started) { go.run(); return; }
+                        node.cmd("coins relevant:true tokenid:" + tokenid, new NodeApi.Cb() {
+                            @Override public void onResult(JSONObject c) {
+                                String w = DeliveryGuard.held(tokenid, qty, c);
+                                if (w != null) deliverFailed(o, key, w, auto); else go.run();
+                            }
+                            @Override public void onError(String m) { deliverFailed(o, key, "your holdings could not be read; nothing was sent", auto); }
+                        });
+                    });
+                });
+            }
+            @Override public void onError(String m) { deliverFailed(o, key, "the node did not confirm the token; nothing was sent", auto); }
+        });
+    }
+
+    private void plainDeliver(final MerchDb.Order o, final String[] line, final String key, final boolean auto) {
         if (!nftSending.add(key)) return;
         refreshOrderIfTopmost(o.ref);
         enqueueTx(() -> new PlainDeliveryFlow(node, plainDeliveryJournal(), io, ui,
@@ -850,7 +889,8 @@ public class MainActivity extends AppCompatActivity {
     private void deliverFailed(MerchDb.Order o, String key, String msg, boolean auto) {
         nftSending.remove(key);
         if (auto) notifyDelivery(o.ref, false, msg);
-        else toast(Language.msg(l10n_mall_inbox_send_error, InboxMessages.message(msg)));
+        else languageDialog().setTitle(Language.msg(l10n_mall_inbox_not_sent)).setMessage(Language.msg(l10n_mall_inbox_send_error, InboxMessages.message(msg)))
+                .setPositiveButton(Language.msg(l10n_common_ok), null).show();   // whole ids: a dialog, not a toast
         refreshOrderIfTopmost(o.ref);
     }
 

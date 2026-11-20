@@ -8713,4 +8713,9 @@
     <!-- Arguments: method, fee -->
     <string name="l10n_mall_shop_fee_plain">"Стоимость способа доставки «%1$s» — не обычное число (%2$s). Ничего не отправлено."</string>
     <string name="l10n_mall_shop_total_zero" formatted="false">"Сумма равна нулю. Ничего не отправлено."</string>
+    <string name="l10n_mall_inbox_auto_off_why" formatted="false">"⚡ Автоотправка NFT выключена: NFT, количества и сумма заказа указаны самим покупателем и не сверяются с вашим списком товаров. Проверьте каждый заказ, затем используйте «Отправить NFT»."</string>
+    <!-- Arguments: item, token, quantity, address -->
+    <string name="l10n_mall_inbox_send_whole">"Отправить %1$s?\n\nID токена\n%2$s\n\nКоличество\n%3$s\n\nПолучатель\n%4$s\n\nNFT будет передан в блокчейне."</string>
+    <string name="l10n_mall_inbox_all_pieces" formatted="false">"все ваши экземпляры"</string>
+    <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT не отправлен"</string>
 </resources>

@@ -8602,4 +8602,9 @@
     <!-- Arguments: method, fee -->
     <string name="l10n_mall_shop_fee_plain">"配送方式“%1$s”的费用不是普通数字（%2$s）。未发送任何内容。"</string>
     <string name="l10n_mall_shop_total_zero" formatted="false">"总额为零。未发送任何内容。"</string>
+    <string name="l10n_mall_inbox_auto_off_why" formatted="false">"⚡ 自动交付 NFT 已关闭：订单中的 NFT、数量和总额都是买家自己填写的，未与您的商品列表核对。请逐一检查订单，再使用“发送 NFT”。"</string>
+    <!-- Arguments: item, token, quantity, address -->
+    <string name="l10n_mall_inbox_send_whole">"发送 %1$s？\n\n代币 ID\n%2$s\n\n数量\n%3$s\n\n接收地址\n%4$s\n\n这会在链上转移 NFT。"</string>
+    <string name="l10n_mall_inbox_all_pieces" formatted="false">"您持有的全部藏品"</string>
+    <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT 未发送"</string>
 </resources>

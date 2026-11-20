@@ -1361,6 +1361,17 @@
           "src/test/java/com/eurobuddha/comms/MerchTokenRuleTest.java": "bec162a1f236d3e75fc8622a6a60b1210d2e0ebebfeb254a1c20a0739497691a",
           "src/test/java/com/eurobuddha/merchinbox/InboxShowsIdentifiersWholeTest.java": "a97f66b018419077dd378dc12fa9964534162ebb9777fb66a0649c5fdbf8e6da"
         }
+      },
+      {
+        "revision": "14f659046bd4cff6d3e3060b6dec632f6b705aaf",
+        "version": "0.5.14",
+        "summary": "Mitigation: DeliveryGuard before every send (never Minima/MxUSD, 0 decimals confirmed by the node, never more than held); automatic delivery off and not switchable; whole Send NFT question.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryGuard.java": "767bdf295c80834ff16aaf1dc0b265e912f6f2093473b51b4f923ec7d87bcd34",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "addab0f6b4dcee8bf8e86ecce775fc8743db898196d4d5c932e06f6cd49ffea3",
+          "src/test/java/com/eurobuddha/merchinbox/DeliveryGuardTest.java": "a463283019d06a6dd71c168a132d315a6eb72dea57c51e03fa6e7345f9263cce",
+          "src/test/java/com/eurobuddha/merchinbox/InboxShowsIdentifiersWholeTest.java": "f5d0a499cd7e71692a91b38c305dfd3c8716fa52bd3ade6644e61d4dc4b9c7d7"
+        }
       }
     ]
   },
