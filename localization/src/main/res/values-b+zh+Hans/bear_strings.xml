@@ -8609,4 +8609,14 @@
     <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT 未发送"</string>
     <string name="l10n_entropy_node_down" formatted="false">"节点没有回应；本次投掷未被使用。未记录任何内容。正在重新检查节点。"</string>
     <string name="l10n_mall_inbox_not_sent_mismatch" formatted="false">"未发送：此订单指定的代币与其币种不符。"</string>
+    <string name="l10n_mall_inbox_listing_title" formatted="false">"您的商品列表"</string>
+    <string name="l10n_mall_inbox_listing_need_key" formatted="false">"请先连接您的节点：收件箱需要您的商店密钥来确认该文件属于您。"</string>
+    <!-- Arguments: shop, count -->
+    <string name="l10n_mall_inbox_listing_in">"“%1$s”的商品列表已导入。已有 %2$d 个订单据此核对；新订单到达时也会核对。"</string>
+    <!-- Arguments: problems -->
+    <string name="l10n_mall_inbox_listing_problems">"与您的商品列表不符，因此不会为此订单发送任何内容：\n%1$s"</string>
+    <!-- Arguments: amount, currency -->
+    <string name="l10n_mall_inbox_listing_checked">"已与您的商品列表核对：应付 %1$s %2$s。"</string>
+    <!-- Arguments: amount, currency -->
+    <string name="l10n_mall_inbox_listing_unchecked">"未核对：商品和总额 %1$s %2$s 都是买家自己填写的。请导入您发布的 .shop 文件（订单页上的 ⇪），以便收件箱据您的商品列表核对订单。"</string>
 </resources>

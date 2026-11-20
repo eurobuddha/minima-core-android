@@ -43399,5 +43399,41 @@
     "zh-Hans": "未发送：此订单指定的代币与其币种不符。",
     "ru": "Не отправлено: этот заказ называет токен, не соответствующий его валюте.",
     "uk": "Не надіслано: це замовлення називає токен, що не відповідає його валюті."
+  },
+  "mallInbox.listingTitle": {
+    "en": "Your listing",
+    "zh-Hans": "您的商品列表",
+    "ru": "Ваш список товаров",
+    "uk": "Ваш список товарів"
+  },
+  "mallInbox.listingNeedKey": {
+    "en": "Connect your node first: the Inbox needs your shop key to check the file is yours.",
+    "zh-Hans": "请先连接您的节点：收件箱需要您的商店密钥来确认该文件属于您。",
+    "ru": "Сначала подключите узел: Inbox нужен ключ вашего магазина, чтобы проверить, что файл ваш.",
+    "uk": "Спершу під’єднайте вузол: Inbox потрібен ключ вашого магазину, щоб перевірити, що файл ваш."
+  },
+  "mallInbox.listingIn": {
+    "en": "Your listing for \"{shop}\" is in. {count} order(s) checked against it; new orders are checked as they arrive.",
+    "zh-Hans": "“{shop}”的商品列表已导入。已有 {count} 个订单据此核对；新订单到达时也会核对。",
+    "ru": "Список товаров «{shop}» загружен. Проверено заказов: {count}; новые заказы проверяются по мере поступления.",
+    "uk": "Список товарів «{shop}» завантажено. Перевірено замовлень: {count}; нові замовлення перевіряються, щойно надходять."
+  },
+  "mallInbox.listingProblems": {
+    "en": "Not as you list it, so nothing is sent for this order:\n{problems}",
+    "zh-Hans": "与您的商品列表不符，因此不会为此订单发送任何内容：\n{problems}",
+    "ru": "Не так, как в вашем списке, поэтому по этому заказу ничего не отправляется:\n{problems}",
+    "uk": "Не так, як у вашому списку, тому за цим замовленням нічого не надсилається:\n{problems}"
+  },
+  "mallInbox.listingChecked": {
+    "en": "Checked against your listing: due {amount} {currency}.",
+    "zh-Hans": "已与您的商品列表核对：应付 {amount} {currency}。",
+    "ru": "Проверено по вашему списку: к оплате {amount} {currency}.",
+    "uk": "Перевірено за вашим списком: до сплати {amount} {currency}."
+  },
+  "mallInbox.listingUnchecked": {
+    "en": "Unchecked: the items and the total {amount} {currency} are the buyer's own figures. Import the .shop file you published (⇪ on the orders screen) so the Inbox checks orders against your listing.",
+    "zh-Hans": "未核对：商品和总额 {amount} {currency} 都是买家自己填写的。请导入您发布的 .shop 文件（订单页上的 ⇪），以便收件箱据您的商品列表核对订单。",
+    "ru": "Не проверено: позиции и сумма {amount} {currency} указаны самим покупателем. Загрузите опубликованный вами файл .shop (⇪ на экране заказов), чтобы Inbox сверял заказы с вашим списком.",
+    "uk": "Не перевірено: позиції та сума {amount} {currency} вказані самим покупцем. Завантажте опублікований вами файл .shop (⇪ на екрані замовлень), щоб Inbox звіряв замовлення з вашим списком."
   }
 }

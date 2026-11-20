@@ -1416,6 +1416,19 @@
           "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "8ec14e60b05a6fca029fcf6460218d73e995d054ac6090264f015b8f6aa0a1df",
           "src/test/java/com/eurobuddha/merchinbox/InboxShowsIdentifiersWholeTest.java": "09bdf44bae6badaf19b050ff544984ab652141e128d880c01e31088eeabe9123"
         }
+      },
+      {
+        "revision": "edb77da9c82a4197c04580f49e917505c1fa79e2",
+        "version": "0.5.18",
+        "summary": "Orders checked against the vendor's own imported .shop (Listing): due recomputed from listed prices, stock and fees; recordPayment compares with it; any listing problem stops delivery; unchecked orders say their total is the buyer's own figure.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "2ada9bac78d4a29afef4c4f3074ac5a3681b56e5f0b7b6fac3dfb568c3cbcf20",
+          "src/main/java/com/eurobuddha/merchinbox/Listing.java": "c4fb02b2e6531338a5e4bf12f03d48f8b76890c74a39bcd9ae89032306476a85",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "26a72219aab6fd475909d548587071b10ff21a91e15295c56fbbfd258bef2d6c",
+          "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "1f1286b27674966e18efb698007f46757b6ff0554f71b156c8f39fabfd7e95bc",
+          "src/test/java/com/eurobuddha/merchinbox/ListingTest.java": "1e2354288b09c564b69e52097f8b8bbbd98de7c12e0cbd0416090c670ea158d1",
+          "src/test/java/com/eurobuddha/merchinbox/InboxShowsIdentifiersWholeTest.java": "eca8db6adc2ab3ac01223507f7efe17c1740965695eb7fd5030a0b03d7f0096a"
+        }
       }
     ]
   },

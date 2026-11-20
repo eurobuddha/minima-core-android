@@ -8646,4 +8646,14 @@
     <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT not sent"</string>
     <string name="l10n_entropy_node_down" formatted="false">"The node did not answer; this roll was not used. Nothing was recorded. Checking the node again."</string>
     <string name="l10n_mall_inbox_not_sent_mismatch" formatted="false">"Not sent: this order names a token that is not its currency\'s."</string>
+    <string name="l10n_mall_inbox_listing_title" formatted="false">"Your listing"</string>
+    <string name="l10n_mall_inbox_listing_need_key" formatted="false">"Connect your node first: the Inbox needs your shop key to check the file is yours."</string>
+    <!-- Arguments: shop, count -->
+    <string name="l10n_mall_inbox_listing_in">"Your listing for \"%1$s\" is in. %2$d order(s) checked against it; new orders are checked as they arrive."</string>
+    <!-- Arguments: problems -->
+    <string name="l10n_mall_inbox_listing_problems">"Not as you list it, so nothing is sent for this order:\n%1$s"</string>
+    <!-- Arguments: amount, currency -->
+    <string name="l10n_mall_inbox_listing_checked">"Checked against your listing: due %1$s %2$s."</string>
+    <!-- Arguments: amount, currency -->
+    <string name="l10n_mall_inbox_listing_unchecked">"Unchecked: the items and the total %1$s %2$s are the buyer\'s own figures. Import the .shop file you published (⇪ on the orders screen) so the Inbox checks orders against your listing."</string>
 </resources>

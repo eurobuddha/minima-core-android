@@ -8720,4 +8720,14 @@
     <string name="l10n_mall_inbox_not_sent" formatted="false">"NFT не надіслано"</string>
     <string name="l10n_entropy_node_down" formatted="false">"Вузол не відповів; цей кидок не використано. Нічого не записано. Вузол перевіряється знову."</string>
     <string name="l10n_mall_inbox_not_sent_mismatch" formatted="false">"Не надіслано: це замовлення називає токен, що не відповідає його валюті."</string>
+    <string name="l10n_mall_inbox_listing_title" formatted="false">"Ваш список товарів"</string>
+    <string name="l10n_mall_inbox_listing_need_key" formatted="false">"Спершу під’єднайте вузол: Inbox потрібен ключ вашого магазину, щоб перевірити, що файл ваш."</string>
+    <!-- Arguments: shop, count -->
+    <string name="l10n_mall_inbox_listing_in">"Список товарів «%1$s» завантажено. Перевірено замовлень: %2$d; нові замовлення перевіряються, щойно надходять."</string>
+    <!-- Arguments: problems -->
+    <string name="l10n_mall_inbox_listing_problems">"Не так, як у вашому списку, тому за цим замовленням нічого не надсилається:\n%1$s"</string>
+    <!-- Arguments: amount, currency -->
+    <string name="l10n_mall_inbox_listing_checked">"Перевірено за вашим списком: до сплати %1$s %2$s."</string>
+    <!-- Arguments: amount, currency -->
+    <string name="l10n_mall_inbox_listing_unchecked">"Не перевірено: позиції та сума %1$s %2$s вказані самим покупцем. Завантажте опублікований вами файл .shop (⇪ на екрані замовлень), щоб Inbox звіряв замовлення з вашим списком."</string>
 </resources>
