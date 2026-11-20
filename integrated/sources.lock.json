@@ -1093,7 +1093,24 @@
       "src/main/res/mipmap-anydpi/ic_launcher.xml": "7de0107b4bcfb9ea8952d8796a3cae2f985da4e7d07db07fcb594bd69deecc33",
       "src/main/res/mipmap-anydpi/ic_launcher_round.xml": "7de0107b4bcfb9ea8952d8796a3cae2f985da4e7d07db07fcb594bd69deecc33"
     },
-    "resource_prefix": "pm_merchshop_"
+    "resource_prefix": "pm_merchshop_",
+    "patches": [
+      {
+        "revision": "d4c9f91298b6699303d2d2b362a7fc83b7ed2db0",
+        "version": "0.4.13",
+        "summary": "A .shop pays the token its currency names (MerchMessage.tokenFor/tokenProblem): refused on import, open, before the Pay question, before the order is sent and on Retry payment (here also in PaymentJournal.paymentOrder/saveOrder); the question shows the amount, token id and vendor address whole; shared comms MerchDb flags TOKEN_MISMATCH and decides PAID by the token received.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchMessage.java": "b893594c4d06dc7705082662564ab1a2ea86628adec94e9fc650515422c43dbe",
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "e86d1bea11a4a701dc8cab29bd53ee8de67433a5dad751e0145ff3f8c27b95b6",
+          "src/main/java/com/eurobuddha/merchshop/Catalog.java": "1ef2f40522b4b5cfeb0e06ea03bb59f34c96e63a7c053294705ad08196b17db4",
+          "src/main/java/com/eurobuddha/merchshop/ShopStore.java": "a022e3bf12698488de45bbb7c5df8a06bd321565dbde646995e9b70178b13cdf",
+          "src/main/java/com/eurobuddha/merchshop/MainActivity.java": "880292de28a44ad66e8bc285ecf92e42e4b172ca1ae2f0518495ff7ee721b40b",
+          "src/test/java/com/eurobuddha/comms/MerchTokenRuleTest.java": "a873ea19b731eb615083c87669d76f56546e77954ca6d7029354836841f10975",
+          "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "79bc2a86a8795afb5961cfbedab8797ad388068b827389fb263ba1bdf37fec45",
+          "src/test/java/com/eurobuddha/merchshop/ShopPaysCurrencyTokenTest.java": "7025f093f1896b6812eb590e32ccc16da031c791181cbab5d679fe6de80bb69f"
+        }
+      }
+    ]
   },
   "merchstudio": {
     "source": "../merchstudio",
@@ -1147,7 +1164,19 @@
       "src/main/res/mipmap-anydpi/ic_launcher.xml": "7de0107b4bcfb9ea8952d8796a3cae2f985da4e7d07db07fcb594bd69deecc33",
       "src/main/res/mipmap-anydpi/ic_launcher_round.xml": "7de0107b4bcfb9ea8952d8796a3cae2f985da4e7d07db07fcb594bd69deecc33"
     },
-    "resource_prefix": "pm_merchstudio_"
+    "resource_prefix": "pm_merchstudio_",
+    "patches": [
+      {
+        "revision": "133b41b39cde5893022d74b7e6fca9f48ef7d588",
+        "version": "0.3.13",
+        "summary": "Shared comms parity: MerchMessage token rule and MerchDb TOKEN_MISMATCH flag and payment gate.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchMessage.java": "b893594c4d06dc7705082662564ab1a2ea86628adec94e9fc650515422c43dbe",
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "e86d1bea11a4a701dc8cab29bd53ee8de67433a5dad751e0145ff3f8c27b95b6",
+          "src/test/java/com/eurobuddha/comms/MerchTokenRuleTest.java": "a873ea19b731eb615083c87669d76f56546e77954ca6d7029354836841f10975"
+        }
+      }
+    ]
   },
   "merchinbox": {
     "source": "../merchinbox",
@@ -1195,7 +1224,21 @@
       "src/main/res/mipmap-anydpi/ic_launcher.xml": "7de0107b4bcfb9ea8952d8796a3cae2f985da4e7d07db07fcb594bd69deecc33",
       "src/main/res/mipmap-anydpi/ic_launcher_round.xml": "7de0107b4bcfb9ea8952d8796a3cae2f985da4e7d07db07fcb594bd69deecc33"
     },
-    "resource_prefix": "pm_merchinbox_"
+    "resource_prefix": "pm_merchinbox_",
+    "patches": [
+      {
+        "revision": "d3573a60fb3beb82fac862f9cdd928d41b2db317",
+        "version": "0.5.10",
+        "summary": "An order is paid in the token its currency names: shared comms MerchDb stores the currency token, flags a disagreeing stated token id TOKEN_MISMATCH (never auto-delivered), decides PAID by the token received and sets paid only on PAID; the order screen names what was received by its whole token id.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchMessage.java": "b893594c4d06dc7705082662564ab1a2ea86628adec94e9fc650515422c43dbe",
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "e86d1bea11a4a701dc8cab29bd53ee8de67433a5dad751e0145ff3f8c27b95b6",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "be9f11540912289e8980332a262e40daf3de57f226ea686b3d711e4d1486dcfd",
+          "src/test/java/com/eurobuddha/comms/MerchTokenRuleTest.java": "a873ea19b731eb615083c87669d76f56546e77954ca6d7029354836841f10975",
+          "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "79bc2a86a8795afb5961cfbedab8797ad388068b827389fb263ba1bdf37fec45"
+        }
+      }
+    ]
   },
   "NFTwallet": {
     "source": "../NFTwallet",

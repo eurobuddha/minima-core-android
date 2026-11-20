@@ -8574,4 +8574,20 @@
     <string name="l10n_mail_enter_contact_name" formatted="false">"请输入姓名"</string>
     <string name="l10n_mail_contact_gone" formatted="false">"联系人已不存在"</string>
     <string name="l10n_mail_cannot_save_contact" formatted="false">"无法保存联系人"</string>
+    <string name="l10n_mall_shop_not_paid" formatted="false">"未付款"</string>
+    <!-- Arguments: currency -->
+    <string name="l10n_mall_shop_token_unpayable">"此商店要求以“%1$s”付款。miniMall 只用 Minima 或 MxUSD 付款。未发送任何内容。"</string>
+    <!-- Arguments: currency, tokenid -->
+    <string name="l10n_mall_shop_token_mismatch">"此商店声称以 %1$s 收款，却指定了另一种代币：\n%2$s\n\n未发送任何内容。请向卖家索取更正后的 .shop 文件。"</string>
+    <!-- Arguments: amount, currency, tokenid, address -->
+    <string name="l10n_mall_shop_pay_details">"发送金额\n%1$s\n\n代币：%2$s\n%3$s\n\n卖家收款地址\n%4$s"</string>
+    <!-- Arguments: shown, now -->
+    <string name="l10n_mall_shop_total_changed">"确认后总额已变化（显示 %1$s，现在 %2$s）。未发送任何内容。"</string>
+    <string name="l10n_mall_shop_status_token_mismatch" formatted="false">"代币与币种不符"</string>
+    <!-- Arguments: amount, tokenid -->
+    <string name="l10n_mall_inbox_received">"  已收到 %1$s，代币 %2$s"</string>
+    <!-- Arguments: currency -->
+    <string name="l10n_mall_inbox_mismatch_unpayable">"此订单要求以“%1$s”付款，它既不是 Minima 也不是 MxUSD。它永远不会被标记为已付款或自动交付。"</string>
+    <!-- Arguments: currency, tokenid -->
+    <string name="l10n_mall_inbox_mismatch">"此订单指定的代币与其币种不符。只有以 %1$s 付款才算已付款\n%2$s\n且永远不会自动交付。"</string>
 </resources>

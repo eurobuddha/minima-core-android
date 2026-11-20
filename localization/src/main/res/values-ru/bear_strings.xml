@@ -8685,4 +8685,20 @@
     <string name="l10n_mail_enter_contact_name" formatted="false">"Введите имя"</string>
     <string name="l10n_mail_contact_gone" formatted="false">"Контакт больше не существует"</string>
     <string name="l10n_mail_cannot_save_contact" formatted="false">"Не удалось сохранить контакт"</string>
+    <string name="l10n_mall_shop_not_paid" formatted="false">"Не оплачено"</string>
+    <!-- Arguments: currency -->
+    <string name="l10n_mall_shop_token_unpayable">"Этот магазин просит оплату в «%1$s». miniMall платит только в Minima или MxUSD. Ничего не отправлено."</string>
+    <!-- Arguments: currency, tokenid -->
+    <string name="l10n_mall_shop_token_mismatch">"Этот магазин указывает оплату в %1$s, но называет другой токен:\n%2$s\n\nНичего не отправлено. Попросите у продавца исправленный файл .shop."</string>
+    <!-- Arguments: amount, currency, tokenid, address -->
+    <string name="l10n_mall_shop_pay_details">"Отправляемая сумма\n%1$s\n\nТокен: %2$s\n%3$s\n\nАдрес продавца для оплаты\n%4$s"</string>
+    <!-- Arguments: shown, now -->
+    <string name="l10n_mall_shop_total_changed">"Сумма изменилась после вопроса (показано %1$s, сейчас %2$s). Ничего не отправлено."</string>
+    <string name="l10n_mall_shop_status_token_mismatch" formatted="false">"ТОКЕН НЕ СОВПАДАЕТ"</string>
+    <!-- Arguments: amount, tokenid -->
+    <string name="l10n_mall_inbox_received">"  получено %1$s токена %2$s"</string>
+    <!-- Arguments: currency -->
+    <string name="l10n_mall_inbox_mismatch_unpayable">"Этот заказ просит оплату в «%1$s», а это не Minima и не MxUSD. Он никогда не отмечается оплаченным и не доставляется автоматически."</string>
+    <!-- Arguments: currency, tokenid -->
+    <string name="l10n_mall_inbox_mismatch">"Этот заказ называет токен, не соответствующий его валюте. Оплаченным он считается только в %1$s\n%2$s\nи никогда не доставляется автоматически."</string>
 </resources>

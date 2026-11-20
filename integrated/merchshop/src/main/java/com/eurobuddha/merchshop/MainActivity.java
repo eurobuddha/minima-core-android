@@ -200,6 +200,7 @@ public class MainActivity extends AppCompatActivity {
     private void openShop(String shopId) {
         Catalog c = store.get(shopId);
         if (c == null) { toast(Language.msg(l10n_mall_shop_open_failed)); return; }
+        if (c.tokenProblem() != null) { refuse(tokenRefusal(c.currency, c.tokenid)); return; }   // a shop stored before the fix
         catalog = c; cart.clear();
         push(buildStorefront());
     }
@@ -407,9 +408,12 @@ public class MainActivity extends AppCompatActivity {
                     bos.write(buf, 0, n);
                 }
                 String json = new String(bos.toByteArray(), java.nio.charset.StandardCharsets.UTF_8);
-                final Catalog c = store.importBundle(json);
+                final Catalog probe = Catalog.fromJson(json);
+                final boolean badToken = probe.tokenProblem() != null;
+                final Catalog c = badToken ? null : store.importBundle(json);
                 ui.post(() -> {
-                    if (c == null) toast(Language.msg(l10n_mall_shop_invalid_file));
+                    if (badToken) refuse(tokenRefusal(probe.currency, probe.tokenid));
+                    else if (c == null) toast(Language.msg(l10n_mall_shop_invalid_file));
                     else { toast(Language.msg(l10n_mall_shop_added, c.shopName)); showHome(); }
                 });
             } catch (Exception e) { ui.post(() -> toast(Language.msg(l10n_mall_shop_read_failed))); }
@@ -1092,16 +1096,36 @@ public class MainActivity extends AppCompatActivity {
         } catch (RuntimeException unavailable) { body.addView(card(Language.msg(l10n_mall_shop_payment_unavailable))); }
     }
 
+    /** The "Pay …?" question names what is sent, in which token and to whom, each whole on its own line. */
     private void confirmAndPlace(final String shipId, final String delivery, final String note) {
-        final String total = grandTotal(shipId).toPlainString();
+        if (catalog.tokenProblem() != null) { refuse(tokenRefusal(catalog.currency, catalog.tokenid)); return; }
+        final String total = grandTotal(shipId).toPlainString(), token = catalog.payTokenid(), cur = MerchMessage.tokenName(token);
         languageDialog()
-                .setTitle(Language.msg(l10n_mall_shop_pay_title, total, catalog.currency))
-                .setMessage(Language.msg(l10n_mall_shop_pay_help, catalog.shopName, total, catalog.currency))
-                .setPositiveButton(Language.msg(l10n_mall_shop_pay), (d, w) -> placeOrder(shipId, delivery, note))
+                .setTitle(Language.msg(l10n_mall_shop_pay_title, total, cur))
+                .setMessage(Language.join(Language.msg(l10n_mall_shop_pay_help, catalog.shopName, total, cur), "\n\n",
+                        Language.msg(l10n_mall_shop_pay_details, total, cur, token, catalog.vendorAddress)))
+                .setPositiveButton(Language.msg(l10n_mall_shop_pay), (d, w) -> placeOrder(shipId, delivery, note, total))
                 .setNegativeButton(Language.msg(l10n_explorer_back), null).show();
     }
 
-    private void placeOrder(String shipId, String delivery, String note) {
+    /** A .shop or order whose token id is not its currency's (MerchMessage.tokenProblem), naming the whole id. */
+    private CharSequence tokenRefusal(String currency, String tokenid) {
+        String want = MerchMessage.tokenFor(currency);
+        String c = currency == null ? "" : currency, t = tokenid == null ? "" : tokenid;
+        if (c.length() > 80 || t.length() > 80) return MerchMessage.tokenProblem(currency, tokenid);   // not a token id: said by its length
+        return want == null ? Language.msg(l10n_mall_shop_token_unpayable, c)
+                : Language.msg(l10n_mall_shop_token_mismatch, MerchMessage.tokenName(want), t);
+    }
+
+    /** A refusal carries a whole token id: a dialog the buyer can read, not a toast. */
+    private void refuse(CharSequence why) {
+        languageDialog().setTitle(Language.msg(l10n_mall_shop_not_paid)).setMessage(why)
+                .setPositiveButton(Language.msg(l10n_common_ok), null).show();
+    }
+
+    private void placeOrder(String shipId, String delivery, String note, String shownTotal) {
+        final String payToken = catalog.payTokenid();   // the currency's token, never the file's own tokenid
+        if (payToken == null) { refuse(tokenRefusal(catalog.currency, catalog.tokenid)); return; }
         final JSONArray items = new JSONArray();
         final StringBuilder summary = new StringBuilder();
         BigDecimal total = BigDecimal.ZERO;
@@ -1129,11 +1153,12 @@ public class MainActivity extends AppCompatActivity {
 
         final String ref = "ORD-" + MailText.randomId().substring(0, 8).toUpperCase();
         final String totalStr = total.toPlainString();
+        if (!totalStr.equals(shownTotal)) { refuse(Language.msg(l10n_mall_shop_total_changed, shownTotal, totalStr)); return; }
         final MerchMessage m = new MerchMessage();
         m.type = MerchMessage.ORDER; m.ref = ref; m.randomid = MailText.randomId();
         m.from = myId; m.to = catalog.vendorPublicId; m.date = System.currentTimeMillis();
         m.items = items.toString(); m.product = summary.toString();
-        m.amount = totalStr; m.currency = catalog.currency; m.tokenid = catalog.tokenid;
+        m.amount = totalStr; m.currency = catalog.currency; m.tokenid = payToken;
         m.shipping = shipId; m.delivery = delivery; m.message = note; m.buyerPayaddr = buyerPayaddr;
         m.shopId = catalog.shopId; m.shopName = catalog.shopName;
         final String vendorAddress = catalog.vendorAddress;
@@ -1169,6 +1194,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void retryPayment(final MerchDb.Order o) {
+        // An order placed before the fix may carry a token id that is not its currency's: refused here (and in
+        // PaymentJournal.paymentOrder, which every payment path reads).
+        if (MerchMessage.tokenProblem(o.currency, o.tokenid) != null) { refuse(tokenRefusal(o.currency, o.tokenid)); return; }
         try {
             MerchDb.Order current = paymentJournal().paymentOrder(o.ref);
             if (!java.util.Objects.equals(o.amount, current.amount) || !java.util.Objects.equals(o.tokenid, current.tokenid)
@@ -1244,7 +1272,7 @@ public class MainActivity extends AppCompatActivity {
 
         final boolean inquiry = MerchDb.INQUIRY.equals(o.status) || o.ref.startsWith("INQ-");
         final List<String[]> nfts = inquiry ? new ArrayList<>() : nftLines(o);
-        final boolean badStatus = MerchDb.UNDERPAID.equals(o.status) || MerchDb.WRONG_TOKEN.equals(o.status);
+        final boolean badStatus = MerchDb.UNDERPAID.equals(o.status) || MerchDb.WRONG_TOKEN.equals(o.status) || MerchDb.TOKEN_MISMATCH.equals(o.status);
 
         if (!nfts.isEmpty() && !badStatus) body.addView(buildTimeline(o.status));   // Placed → Paid → Delivered
         else body.addView(Design.pill(this, inquiry ? Language.msg(l10n_mall_shop_enquiry) : ShopMessages.status(o.status), statusColor(o.status), Design.ON_ACCENT));
@@ -1313,7 +1341,7 @@ public class MainActivity extends AppCompatActivity {
                 seed.type = MerchMessage.INQUIRY; seed.ref = ref;
                 seed.from = myId; seed.to = catalog.vendorPublicId; seed.date = System.currentTimeMillis();
                 seed.product = "Messages with " + catalog.shopName;
-                seed.currency = catalog.currency; seed.tokenid = catalog.tokenid; seed.buyerPayaddr = buyerPayaddr;
+                seed.currency = catalog.currency; seed.tokenid = catalog.payTokenid() == null ? "" : catalog.payTokenid(); seed.buyerPayaddr = buyerPayaddr;
                 seed.shopId = catalog.shopId; seed.shopName = catalog.shopName;
                 db.upsertOrder(seed, "buyer", "");   // local-only until the first message is sent
             }
@@ -1421,7 +1449,7 @@ public class MainActivity extends AppCompatActivity {
     private int statusColor(String s) {
         if (MerchDb.DELIVERED.equals(s) || MerchDb.SHIPPED.equals(s)) return Design.IN;
         if (MerchDb.PAID.equals(s) || MerchDb.CONFIRMED.equals(s)) return Design.ACCENT;
-        if (MerchDb.UNDERPAID.equals(s) || MerchDb.WRONG_TOKEN.equals(s)) return Design.RED;
+        if (MerchDb.UNDERPAID.equals(s) || MerchDb.WRONG_TOKEN.equals(s) || MerchDb.TOKEN_MISMATCH.equals(s)) return Design.RED;
         return Design.DIM2;
     }
     private static CharSequence timeAgo(long ms) { return ms <= 0 ? "" : Language.since(ms); }

@@ -52,7 +52,7 @@ public class OrderContextTest {
     }
     static JSONObject accepted()throws Exception{return new JSONObject().put("status",true).put("response",new JSONObject().put("txpowid","0x"+"56".repeat(32)));}
     @Test public void delayedOrderAndPaymentStayWithOriginalRecipientAndTerms()throws Exception {
-        Catalog original=prepare();call("placeOrder",new Class<?>[]{String.class,String.class,String.class},"postal","  delivery 中文  ","note Українська");
+        Catalog original=prepare();call("placeOrder",new Class<?>[]{String.class,String.class,String.class,String.class},"postal","  delivery 中文  ","note Українська","24.790000");
         original.vendorAddress=OTHER;original.vendorPublicId="changed-seller";original.tokenid="0xff";original.products.get(0).price="999";
         set("catalog",null);work.remove(0).run();assertEquals(1,commands.size());
         org.mockito.ArgumentCaptor<byte[]> wire=org.mockito.ArgumentCaptor.forClass(byte[].class);
@@ -67,7 +67,7 @@ public class OrderContextTest {
     void retry(MerchDb.Order o)throws Exception{call("retryPayment",new Class<?>[]{MerchDb.Order.class},o);}
     void pump(){for(int i=0;i<8;i++){while(!work.isEmpty())work.remove(0).run();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();}}
     @Test public void retryUsesSavedAddressAndOriginalReferenceAcrossDelayedWork()throws Exception {
-        Catalog c=prepare();c.vendorAddress=OTHER;MerchMessage m=new MerchMessage();m.ref="ORD-original";m.amount="0012.340000";m.tokenid="0x00";
+        Catalog c=prepare();c.vendorAddress=OTHER;MerchMessage m=new MerchMessage();m.ref="ORD-original";m.amount="0012.340000";m.tokenid="0x00";m.currency="Minima";
         PaymentJournal journal=new PaymentJournal(db);set("paymentJournal",journal);assertTrue(journal.saveOrder(m,ADDRESS));journal.orderSent(m.ref);
         MerchDb.Order o=db.order(m.ref);retry(o);o.ref="ORD-mutated";o.amount="999";o.tokenid="0xff";pump();
         assertEquals(1,commands.size());assertTrue(commands.get(0).startsWith("sendnosign address:"+ADDRESS+" amount:0012.340000 tokenid:0x00 "));
@@ -83,7 +83,7 @@ public class OrderContextTest {
     }
 
     @Test @SuppressWarnings("unchecked") public void paymentRefreshPreservesReplyEditableThroughAllLanguages()throws Exception {
-        MerchMessage m=new MerchMessage();m.ref="ORD-draft";m.amount="1";m.tokenid="0x00";
+        MerchMessage m=new MerchMessage();m.ref="ORD-draft";m.amount="1";m.tokenid="0x00";m.currency="Minima";
         PaymentJournal journal=new PaymentJournal(db);set("paymentJournal",journal);assertTrue(journal.saveOrder(m,ADDRESS));journal.orderSent(m.ref);
         android.view.View page=(android.view.View)call("buildOrderDetail",new Class<?>[]{String.class},m.ref);
         java.util.ArrayDeque<android.view.View> stack=(java.util.ArrayDeque<android.view.View>)get("stack");stack.push(page);

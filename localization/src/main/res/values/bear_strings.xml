@@ -8611,4 +8611,20 @@
     <string name="l10n_mail_enter_contact_name" formatted="false">"Enter a name"</string>
     <string name="l10n_mail_contact_gone" formatted="false">"Contact no longer exists"</string>
     <string name="l10n_mail_cannot_save_contact" formatted="false">"Could not save contact"</string>
+    <string name="l10n_mall_shop_not_paid" formatted="false">"Not paid"</string>
+    <!-- Arguments: currency -->
+    <string name="l10n_mall_shop_token_unpayable">"This shop asks to be paid in \"%1$s\". miniMall pays in Minima or MxUSD only. Nothing was sent."</string>
+    <!-- Arguments: currency, tokenid -->
+    <string name="l10n_mall_shop_token_mismatch">"This shop says it is paid in %1$s but names another token:\n%2$s\n\nNothing was sent. Ask the vendor for a corrected .shop file."</string>
+    <!-- Arguments: amount, currency, tokenid, address -->
+    <string name="l10n_mall_shop_pay_details">"Amount sent\n%1$s\n\nToken: %2$s\n%3$s\n\nVendor\'s payment address\n%4$s"</string>
+    <!-- Arguments: shown, now -->
+    <string name="l10n_mall_shop_total_changed">"The total changed after the question (%1$s shown, %2$s now). Nothing was sent."</string>
+    <string name="l10n_mall_shop_status_token_mismatch" formatted="false">"TOKEN_MISMATCH"</string>
+    <!-- Arguments: amount, tokenid -->
+    <string name="l10n_mall_inbox_received">"  received %1$s of token %2$s"</string>
+    <!-- Arguments: currency -->
+    <string name="l10n_mall_inbox_mismatch_unpayable">"This order asks to be paid in \"%1$s\", which is neither Minima nor MxUSD. It is never marked paid or auto-delivered."</string>
+    <!-- Arguments: currency, tokenid -->
+    <string name="l10n_mall_inbox_mismatch">"This order names a token that is not its currency\'s. It counts as paid only in %1$s\n%2$s\nand is never auto-delivered."</string>
 </resources>

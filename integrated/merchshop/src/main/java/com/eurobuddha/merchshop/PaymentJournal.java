@@ -108,6 +108,8 @@ public final class PaymentJournal {
     /** Fresh detached payment view; the database buyer delivery address is never overwritten. */
     MerchDb.Order paymentOrder(String ref) {
         MerchDb.Order o=store.order(ref);if(o==null||!"buyer".equals(o.role))throw invalid();
+        // An order is paid in the token its currency names; one stored with another token id is never paid (shop 0.4.13 rule).
+        if(com.eurobuddha.merchshop.integratedcomms.MerchMessage.tokenProblem(o.currency,o.tokenid)!=null)throw invalid();
         o.payaddr=store.getMeta("vendoraddr:"+ref,"");
         OrderPaymentEvidence.request(o.payaddr,o.amount,o.tokenid,o.ref);return o;
     }
@@ -127,6 +129,7 @@ public final class PaymentJournal {
     /** Reuse Inbox's SQLite transaction boundary: order and original address commit together. */
     boolean saveOrder(com.eurobuddha.merchshop.integratedcomms.MerchMessage message,String address) {
         OrderPaymentEvidence.request(address,message.amount,message.tokenid,message.ref);
+        if(message.tokenid==null||!message.tokenid.equals(com.eurobuddha.merchshop.integratedcomms.MerchMessage.tokenFor(message.currency)))throw invalid();
         SQLiteDatabase db=store.getWritableDatabase();db.beginTransaction();
         try {
             if(!store.upsertOrder(message,"buyer",""))return false;

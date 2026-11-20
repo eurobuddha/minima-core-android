@@ -43255,5 +43255,59 @@
     "zh-Hans": "无法保存联系人",
     "ru": "Не удалось сохранить контакт",
     "uk": "Не вдалося зберегти контакт"
+  },
+  "mallShop.notPaid": {
+    "en": "Not paid",
+    "zh-Hans": "未付款",
+    "ru": "Не оплачено",
+    "uk": "Не сплачено"
+  },
+  "mallShop.tokenUnpayable": {
+    "en": "This shop asks to be paid in \"{currency}\". miniMall pays in Minima or MxUSD only. Nothing was sent.",
+    "zh-Hans": "此商店要求以“{currency}”付款。miniMall 只用 Minima 或 MxUSD 付款。未发送任何内容。",
+    "ru": "Этот магазин просит оплату в «{currency}». miniMall платит только в Minima или MxUSD. Ничего не отправлено.",
+    "uk": "Цей магазин просить оплату в «{currency}». miniMall платить лише в Minima або MxUSD. Нічого не надіслано."
+  },
+  "mallShop.tokenMismatch": {
+    "en": "This shop says it is paid in {currency} but names another token:\n{tokenid}\n\nNothing was sent. Ask the vendor for a corrected .shop file.",
+    "zh-Hans": "此商店声称以 {currency} 收款，却指定了另一种代币：\n{tokenid}\n\n未发送任何内容。请向卖家索取更正后的 .shop 文件。",
+    "ru": "Этот магазин указывает оплату в {currency}, но называет другой токен:\n{tokenid}\n\nНичего не отправлено. Попросите у продавца исправленный файл .shop.",
+    "uk": "Цей магазин вказує оплату в {currency}, але називає інший токен:\n{tokenid}\n\nНічого не надіслано. Попросіть у продавця виправлений файл .shop."
+  },
+  "mallShop.payDetails": {
+    "en": "Amount sent\n{amount}\n\nToken: {currency}\n{tokenid}\n\nVendor's payment address\n{address}",
+    "zh-Hans": "发送金额\n{amount}\n\n代币：{currency}\n{tokenid}\n\n卖家收款地址\n{address}",
+    "ru": "Отправляемая сумма\n{amount}\n\nТокен: {currency}\n{tokenid}\n\nАдрес продавца для оплаты\n{address}",
+    "uk": "Сума до надсилання\n{amount}\n\nТокен: {currency}\n{tokenid}\n\nАдреса продавця для оплати\n{address}"
+  },
+  "mallShop.totalChanged": {
+    "en": "The total changed after the question ({shown} shown, {now} now). Nothing was sent.",
+    "zh-Hans": "确认后总额已变化（显示 {shown}，现在 {now}）。未发送任何内容。",
+    "ru": "Сумма изменилась после вопроса (показано {shown}, сейчас {now}). Ничего не отправлено.",
+    "uk": "Сума змінилася після запитання (показано {shown}, зараз {now}). Нічого не надіслано."
+  },
+  "mallShop.statusTokenMismatch": {
+    "en": "TOKEN_MISMATCH",
+    "zh-Hans": "代币与币种不符",
+    "ru": "ТОКЕН НЕ СОВПАДАЕТ",
+    "uk": "ТОКЕН НЕ ЗБІГАЄТЬСЯ"
+  },
+  "mallInbox.received": {
+    "en": "  received {amount} of token {tokenid}",
+    "zh-Hans": "  已收到 {amount}，代币 {tokenid}",
+    "ru": "  получено {amount} токена {tokenid}",
+    "uk": "  отримано {amount} токена {tokenid}"
+  },
+  "mallInbox.mismatchUnpayable": {
+    "en": "This order asks to be paid in \"{currency}\", which is neither Minima nor MxUSD. It is never marked paid or auto-delivered.",
+    "zh-Hans": "此订单要求以“{currency}”付款，它既不是 Minima 也不是 MxUSD。它永远不会被标记为已付款或自动交付。",
+    "ru": "Этот заказ просит оплату в «{currency}», а это не Minima и не MxUSD. Он никогда не отмечается оплаченным и не доставляется автоматически.",
+    "uk": "Це замовлення просить оплату в «{currency}», а це не Minima і не MxUSD. Воно ніколи не позначається сплаченим і не доставляється автоматично."
+  },
+  "mallInbox.mismatch": {
+    "en": "This order names a token that is not its currency's. It counts as paid only in {currency}\n{tokenid}\nand is never auto-delivered.",
+    "zh-Hans": "此订单指定的代币与其币种不符。只有以 {currency} 付款才算已付款\n{tokenid}\n且永远不会自动交付。",
+    "ru": "Этот заказ называет токен, не соответствующий его валюте. Оплаченным он считается только в {currency}\n{tokenid}\nи никогда не доставляется автоматически.",
+    "uk": "Це замовлення називає токен, що не відповідає його валюті. Сплаченим воно вважається лише в {currency}\n{tokenid}\nі ніколи не доставляється автоматично."
   }
 }

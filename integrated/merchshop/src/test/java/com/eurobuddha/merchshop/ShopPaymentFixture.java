@@ -9,11 +9,11 @@ import static org.junit.Assert.*;
 
 /** Public quote and real SQLite fixture reused from InboxPlainFixture. No node or keys. */
 abstract class ShopPaymentFixture {
-    static final String TOKEN="0x"+"ab".repeat(32),ADDRESS="0x"+"12".repeat(32),DEST="0x"+"34".repeat(32);
+    static final String TOKEN="0x7D39745FBD29049BE29850B55A18BF550E4D442F930F86266E34193D89042A90",ADDRESS="0x"+"12".repeat(32),DEST="0x"+"34".repeat(32);
     static final String KEY="fixture",HANDLE="ms_pay_"+"a".repeat(32),TX="0x"+"ee".repeat(32),MINED="0x"+"dd".repeat(32);
     Context context;MerchDb db;PaymentJournal plain;MerchDb.Order order;
     @Before public void setup(){context=org.robolectric.RuntimeEnvironment.getApplication();context.deleteDatabase("pandamonium_merchshop.db");db=new MerchDb(context);plain=new PaymentJournal(db);createOrder(KEY);order=plain.paymentOrder(KEY);}
-    void createOrder(String ref){MerchMessage m=new MerchMessage();m.ref=ref;m.to="public-seller";m.amount="3";m.tokenid=TOKEN;m.currency="fixture token";m.items="[]";assertTrue(plain.saveOrder(m,DEST));plain.orderSent(ref);}
+    void createOrder(String ref){MerchMessage m=new MerchMessage();m.ref=ref;m.to="public-seller";m.amount="3";m.tokenid=TOKEN;m.currency="USDT";m.items="[]";assertTrue(plain.saveOrder(m,DEST));plain.orderSent(ref);}
     @After public void close(){plain.close();db.close();context.deleteDatabase("pandamonium_merchshop.db");}
     static JSONObject object(Object... pairs){try{JSONObject j=new JSONObject();for(int i=0;i<pairs.length;i+=2)j.put((String)pairs[i],pairs[i+1]);return j;}catch(Exception e){throw new AssertionError(e);}}
     static JSONObject txn(JSONObject reply){return reply.optJSONObject("response").optJSONObject("body").optJSONObject("txn");}

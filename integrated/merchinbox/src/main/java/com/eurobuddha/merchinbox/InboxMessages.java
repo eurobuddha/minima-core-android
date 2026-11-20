@@ -19,6 +19,7 @@ public final class InboxMessages {
             case "DELIVERED": return Language.msg(l10n_mall_shop_status_delivered);
             case "UNDERPAID": return Language.msg(l10n_mall_shop_status_underpaid);
             case "WRONG_TOKEN": return Language.msg(l10n_mall_shop_status_wrong_token);
+            case "TOKEN_MISMATCH": return Language.msg(l10n_mall_shop_status_token_mismatch);
             case "INQUIRY": return Language.msg(l10n_mall_shop_enquiry);
             default: return value;
         }

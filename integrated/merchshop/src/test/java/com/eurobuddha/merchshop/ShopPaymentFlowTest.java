@@ -55,7 +55,7 @@ public class ShopPaymentFlowTest extends ShopPaymentFixture {
     }
     @Test public void shallowChainProofDoesNotCompleteOrReleaseThePostedAttempt()throws Exception {chain.getJSONObject("response").put("tip","101").put("confirmations","1");start();assertEquals(POSTED,plainPhase());assertEquals(1,delayed.size());verify(listener,never()).confirmed();assertThrows(RuntimeException.class,this::preparePlain);}
     @Test public void minimaPaymentUsesTheSameExactEvidenceAndConfirmationPath()throws Exception {
-        db.getWritableDatabase().execSQL("UPDATE orders SET tokenid='0x00'");order=plain.paymentOrder(KEY);plain.orderSent(KEY);posted=quote();signed=quote();start();assertEquals(CONFIRMED,plainPhase());verify(listener).confirmed();
+        db.getWritableDatabase().execSQL("UPDATE orders SET tokenid='0x00',currency='Minima'");order=plain.paymentOrder(KEY);plain.orderSent(KEY);posted=quote();signed=quote();start();assertEquals(CONFIRMED,plainPhase());verify(listener).confirmed();
     }
     @Test public void aLegacyUncertainPaymentNeverStartsASecondNativeSend(){db.setMeta("paymentready:"+KEY,"");start();assertEquals(0,count("sendnosign "));assertEquals(0,count("sendpost "));verify(listener).unconfirmed();}
 

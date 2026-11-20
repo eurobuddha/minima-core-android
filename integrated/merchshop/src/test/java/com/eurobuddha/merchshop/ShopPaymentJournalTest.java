@@ -16,7 +16,7 @@ public class ShopPaymentJournalTest extends ShopPaymentFixture {
         finally{other.close();}
     }
     @Test public void orderAndAddressCommitTogetherAndDuplicateOrderCannotOverwriteAddress()throws Exception {
-        MerchMessage m=new MerchMessage();m.ref="new";m.amount="3";m.tokenid=TOKEN;
+        MerchMessage m=new MerchMessage();m.ref="new";m.amount="3";m.tokenid=TOKEN;m.currency="USDT";
         db.getWritableDatabase().execSQL("CREATE TRIGGER deny_meta BEFORE INSERT ON meta BEGIN SELECT RAISE(ABORT,'fixture'); END");
         assertThrows(RuntimeException.class,()->plain.saveOrder(m,DEST));assertNull(db.order("new"));db.getWritableDatabase().execSQL("DROP TRIGGER deny_meta");
         m.ref=KEY;assertFalse(plain.saveOrder(m,ADDRESS));assertEquals(DEST,db.getMeta("vendoraddr:"+KEY,""));
