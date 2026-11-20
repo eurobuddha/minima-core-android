@@ -1415,7 +1415,7 @@ public class MainActivity extends AppCompatActivity {
             for (Catalog.Shipping s : shipping) {
                 JSONObject so = new JSONObject();
                 so.put("id", s.id); so.put("label", s.label);
-                so.put("fee", s.fee == null || s.fee.isEmpty() ? "0" : s.fee);
+                so.put("fee", Util.plainAmount(s.fee == null || s.fee.isEmpty() ? "0" : s.fee));
                 sh.put(so);
             }
         }
@@ -1427,7 +1427,7 @@ public class MainActivity extends AppCompatActivity {
             po.put("id", "p" + (i++));
             po.put("name", p.name.trim());
             po.put("description", p.description == null ? "" : p.description.trim());
-            po.put("mode", "units"); po.put("price", p.price.trim());
+            po.put("mode", "units"); po.put("price", Util.plainAmount(p.price));
             po.put("maxUnits", Math.max(1, p.maxUnits));
             po.put("image", p.imageB64 == null ? "" : p.imageB64);
             ps.put(po);
@@ -1438,7 +1438,7 @@ public class MainActivity extends AppCompatActivity {
             po.put("id", "p" + (i++));
             po.put("name", displayName(l));
             po.put("description", l.description == null ? "" : l.description.trim());
-            po.put("mode", "units"); po.put("price", l.price.trim());
+            po.put("mode", "units"); po.put("price", Util.plainAmount(l.price));
             po.put("image", l.cachedB64);
             if (l.cachedB64.isEmpty()) images.add(new ShopExport.Image("products", ps.length(), "image",
                     artUrlOf(l), identiconKey(l), 900, 512, 90000));

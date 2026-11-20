@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
     private void openShop(String shopId) {
         Catalog c = store.get(shopId);
         if (c == null) { toast(Language.msg(l10n_mall_shop_open_failed)); return; }
-        if (c.tokenProblem() != null) { refuse(tokenRefusal(c.currency, c.tokenid)); return; }   // a shop stored before the fix
+        if (c.problem() != null) { refuse(shopRefusal(c)); return; }   // a shop stored before the fix
         catalog = c; cart.clear();
         push(buildStorefront());
     }
@@ -409,10 +409,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 String json = new String(bos.toByteArray(), java.nio.charset.StandardCharsets.UTF_8);
                 final Catalog probe = Catalog.fromJson(json);
-                final boolean badToken = probe.tokenProblem() != null;
+                final boolean badToken = probe.problem() != null;
                 final Catalog c = badToken ? null : store.importBundle(json);
                 ui.post(() -> {
-                    if (badToken) refuse(tokenRefusal(probe.currency, probe.tokenid));
+                    if (badToken) refuse(shopRefusal(probe));
                     else if (c == null) toast(Language.msg(l10n_mall_shop_invalid_file));
                     else { toast(Language.msg(l10n_mall_shop_added, c.shopName)); showHome(); }
                 });
@@ -1098,7 +1098,8 @@ public class MainActivity extends AppCompatActivity {
 
     /** The "Pay …?" question names what is sent, in which token and to whom, each whole on its own line. */
     private void confirmAndPlace(final String shipId, final String delivery, final String note) {
-        if (catalog.tokenProblem() != null) { refuse(tokenRefusal(catalog.currency, catalog.tokenid)); return; }
+        if (catalog.problem() != null) { refuse(shopRefusal(catalog)); return; }
+        if (grandTotal(shipId).signum() <= 0) { refuse(Language.msg(l10n_mall_shop_total_zero)); return; }
         final String total = grandTotal(shipId).toPlainString(), token = catalog.payTokenid(), cur = MerchMessage.tokenName(token);
         languageDialog()
                 .setTitle(Language.msg(l10n_mall_shop_pay_title, total, cur))
@@ -1107,6 +1108,20 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton(Language.msg(l10n_mall_shop_pay), (d, w) -> placeOrder(shipId, delivery, note, total))
                 .setNegativeButton(Language.msg(l10n_explorer_back), null).show();
     }
+
+    /** Why a shop cannot be used (Catalog.problem), in the chosen language: its token, then its prices, fees and stock. */
+    private CharSequence shopRefusal(Catalog c) {
+        if (c.tokenProblem() != null) return tokenRefusal(c.currency, c.tokenid);
+        for (Catalog.Product p : c.products) {
+            if (!Catalog.plain(p.price)) return Language.msg(l10n_mall_shop_price_plain, cut(p.name), cut(p.price));
+            if (p.maxUnits < 1) return Language.msg(l10n_mall_shop_stock_whole, cut(p.name));
+        }
+        for (Catalog.Shipping s : c.shipping)
+            if (!Catalog.plain(s.fee == null || s.fee.isEmpty() ? "0" : s.fee)) return Language.msg(l10n_mall_shop_fee_plain, cut(s.label), cut(s.fee));
+        return c.problem();
+    }
+    /** A vendor-supplied name or price in a message (not an identifier): at most 60 characters. */
+    private static String cut(String s) { return s == null ? "" : s.length() <= 60 ? s : s.substring(0, 60) + "…"; }
 
     /** A .shop or order whose token id is not its currency's (MerchMessage.tokenProblem), naming the whole id. */
     private CharSequence tokenRefusal(String currency, String tokenid) {
@@ -1125,7 +1140,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void placeOrder(String shipId, String delivery, String note, String shownTotal) {
         final String payToken = catalog.payTokenid();   // the currency's token, never the file's own tokenid
-        if (payToken == null) { refuse(tokenRefusal(catalog.currency, catalog.tokenid)); return; }
+        if (payToken == null || catalog.priceProblem() != null) { refuse(shopRefusal(catalog)); return; }
         final JSONArray items = new JSONArray();
         final StringBuilder summary = new StringBuilder();
         BigDecimal total = BigDecimal.ZERO;

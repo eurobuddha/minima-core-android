@@ -8706,4 +8706,11 @@
     <string name="l10n_mall_inbox_mismatch_unpayable">"Этот заказ просит оплату в «%1$s», а это не Minima и не MxUSD. Он никогда не отмечается оплаченным и не доставляется автоматически."</string>
     <!-- Arguments: currency, tokenid -->
     <string name="l10n_mall_inbox_mismatch">"Этот заказ называет токен, не соответствующий его валюте. Оплаченным он считается только в %1$s\n%2$s\nи никогда не доставляется автоматически."</string>
+    <!-- Arguments: name, price -->
+    <string name="l10n_mall_shop_price_plain">"Цена «%1$s» — не обычное число (%2$s). Ничего не отправлено."</string>
+    <!-- Arguments: name -->
+    <string name="l10n_mall_shop_stock_whole">"Запас «%1$s» — не целое число больше нуля. Ничего не отправлено."</string>
+    <!-- Arguments: method, fee -->
+    <string name="l10n_mall_shop_fee_plain">"Стоимость способа доставки «%1$s» — не обычное число (%2$s). Ничего не отправлено."</string>
+    <string name="l10n_mall_shop_total_zero" formatted="false">"Сумма равна нулю. Ничего не отправлено."</string>
 </resources>

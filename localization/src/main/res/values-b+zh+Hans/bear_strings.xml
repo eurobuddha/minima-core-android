@@ -8595,4 +8595,11 @@
     <string name="l10n_mall_inbox_mismatch_unpayable">"此订单要求以“%1$s”付款，它既不是 Minima 也不是 MxUSD。它永远不会被标记为已付款或自动交付。"</string>
     <!-- Arguments: currency, tokenid -->
     <string name="l10n_mall_inbox_mismatch">"此订单指定的代币与其币种不符。只有以 %1$s 付款才算已付款\n%2$s\n且永远不会自动交付。"</string>
+    <!-- Arguments: name, price -->
+    <string name="l10n_mall_shop_price_plain">"“%1$s”的价格不是普通数字（%2$s）。未发送任何内容。"</string>
+    <!-- Arguments: name -->
+    <string name="l10n_mall_shop_stock_whole">"“%1$s”的库存不是大于零的整数。未发送任何内容。"</string>
+    <!-- Arguments: method, fee -->
+    <string name="l10n_mall_shop_fee_plain">"配送方式“%1$s”的费用不是普通数字（%2$s）。未发送任何内容。"</string>
+    <string name="l10n_mall_shop_total_zero" formatted="false">"总额为零。未发送任何内容。"</string>
 </resources>

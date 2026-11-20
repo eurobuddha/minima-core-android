@@ -1155,6 +1155,17 @@
           "src/test/java/com/eurobuddha/comms/MerchTokenRuleTest.java": "bec162a1f236d3e75fc8622a6a60b1210d2e0ebebfeb254a1c20a0739497691a",
           "src/test/java/com/eurobuddha/merchshop/ShopPaysCurrencyTokenTest.java": "1908a5dff189b8c7c6cd2096bf08e51d6e6cf1701ab7a60676844d10215c6e3b"
         }
+      },
+      {
+        "revision": "de852c679fcbaabc90903cda717e0969c4593ebf",
+        "version": "0.4.17",
+        "summary": "Plain-price rule (Catalog.plain/priceProblem/problem): non-plain prices or fees, stock below one and a zero total are refused on import, open and before the question.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchshop/Catalog.java": "0c07c13dbc9a274439e9cedfcb93b7d8195c9a72976f88464cb7d9f97e6c3dca",
+          "src/main/java/com/eurobuddha/merchshop/ShopStore.java": "3adae5fc2edd1b5e4846a8d37d434eca124f1ff97ec3cc9fc31433bd36ebd134",
+          "src/main/java/com/eurobuddha/merchshop/MainActivity.java": "15a93ee953efb2e8af20dd42a68d5e45aacdf7240ab9329b646393d17e384715",
+          "src/test/java/com/eurobuddha/merchshop/ShopPaysCurrencyTokenTest.java": "22eb5761cad0714c1d5e9d213e421258c68415c6f933c21ae1e1494b77d8d46c"
+        }
       }
     ]
   },
@@ -1246,6 +1257,16 @@
         "files": {
           "src/main/java/com/eurobuddha/comms/MerchMessage.java": "f3ee1e11a34fd01c69f1026c1bfa17f78f8c8d802a148ec6d0a15496d3122933",
           "src/test/java/com/eurobuddha/comms/MerchTokenRuleTest.java": "bec162a1f236d3e75fc8622a6a60b1210d2e0ebebfeb254a1c20a0739497691a"
+        }
+      },
+      {
+        "revision": "b152cf6397f35b8f8107bb0c6df51fc6a5da18c0",
+        "version": "0.3.17",
+        "summary": "The .shop export writes prices and fees as plain decimals (Util.plainAmount).",
+        "files": {
+          "src/main/java/com/eurobuddha/merchstudio/MainActivity.java": "e135e939f2593c43350b960e88b25d7160d3d966c070f8d0f4ae946f82763046",
+          "src/main/java/com/eurobuddha/merchstudio/Util.java": "2be531871285b44c8f15f3fd0111ae51028f4d044aa887f0f3809889f656e347",
+          "src/test/java/com/eurobuddha/merchstudio/PlainAmountTest.java": "c207dbd89189f68d16ae3d68d252632da8fa4f7231ade5aac42690c8ab4ef2d8"
         }
       }
     ]

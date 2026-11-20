@@ -43339,5 +43339,29 @@
     "zh-Hans": "此订单指定的代币与其币种不符。只有以 {currency} 付款才算已付款\n{tokenid}\n且永远不会自动交付。",
     "ru": "Этот заказ называет токен, не соответствующий его валюте. Оплаченным он считается только в {currency}\n{tokenid}\nи никогда не доставляется автоматически.",
     "uk": "Це замовлення називає токен, що не відповідає його валюті. Сплаченим воно вважається лише в {currency}\n{tokenid}\nі ніколи не доставляється автоматично."
+  },
+  "mallShop.pricePlain": {
+    "en": "The price of \"{name}\" is not a plain number ({price}). Nothing was sent.",
+    "zh-Hans": "“{name}”的价格不是普通数字（{price}）。未发送任何内容。",
+    "ru": "Цена «{name}» — не обычное число ({price}). Ничего не отправлено.",
+    "uk": "Ціна «{name}» — не звичайне число ({price}). Нічого не надіслано."
+  },
+  "mallShop.stockWhole": {
+    "en": "The stock of \"{name}\" is not a whole number above zero. Nothing was sent.",
+    "zh-Hans": "“{name}”的库存不是大于零的整数。未发送任何内容。",
+    "ru": "Запас «{name}» — не целое число больше нуля. Ничего не отправлено.",
+    "uk": "Запас «{name}» — не ціле число більше нуля. Нічого не надіслано."
+  },
+  "mallShop.feePlain": {
+    "en": "The fee of the delivery method \"{method}\" is not a plain number ({fee}). Nothing was sent.",
+    "zh-Hans": "配送方式“{method}”的费用不是普通数字（{fee}）。未发送任何内容。",
+    "ru": "Стоимость способа доставки «{method}» — не обычное число ({fee}). Ничего не отправлено.",
+    "uk": "Вартість способу доставки «{method}» — не звичайне число ({fee}). Нічого не надіслано."
+  },
+  "mallShop.totalZero": {
+    "en": "The total is zero. Nothing was sent.",
+    "zh-Hans": "总额为零。未发送任何内容。",
+    "ru": "Сумма равна нулю. Ничего не отправлено.",
+    "uk": "Сума дорівнює нулю. Нічого не надіслано."
   }
 }

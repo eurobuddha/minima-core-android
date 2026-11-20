@@ -8632,4 +8632,11 @@
     <string name="l10n_mall_inbox_mismatch_unpayable">"This order asks to be paid in \"%1$s\", which is neither Minima nor MxUSD. It is never marked paid or auto-delivered."</string>
     <!-- Arguments: currency, tokenid -->
     <string name="l10n_mall_inbox_mismatch">"This order names a token that is not its currency\'s. It counts as paid only in %1$s\n%2$s\nand is never auto-delivered."</string>
+    <!-- Arguments: name, price -->
+    <string name="l10n_mall_shop_price_plain">"The price of \"%1$s\" is not a plain number (%2$s). Nothing was sent."</string>
+    <!-- Arguments: name -->
+    <string name="l10n_mall_shop_stock_whole">"The stock of \"%1$s\" is not a whole number above zero. Nothing was sent."</string>
+    <!-- Arguments: method, fee -->
+    <string name="l10n_mall_shop_fee_plain">"The fee of the delivery method \"%1$s\" is not a plain number (%2$s). Nothing was sent."</string>
+    <string name="l10n_mall_shop_total_zero" formatted="false">"The total is zero. Nothing was sent."</string>
 </resources>
