@@ -1125,6 +1125,15 @@
           "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "79bc2a86a8795afb5961cfbedab8797ad388068b827389fb263ba1bdf37fec45",
           "src/test/java/com/eurobuddha/merchshop/ShopPaysCurrencyTokenTest.java": "7025f093f1896b6812eb590e32ccc16da031c791181cbab5d679fe6de80bb69f"
         }
+      },
+      {
+        "revision": "ee9e8b5769e7c5719a6f24b24e4d2bac86b46282",
+        "version": "0.4.14",
+        "summary": "Shared comms parity: MerchDb.coinAmount and the positive-total gate.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "fa2b72727fddfab00e192630d84b5aa05819b508d8335cca28a6261d5d797c38",
+          "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "e85650fae3467d83ae2a5eec88627925de3fa8a9bd219f4cf19d5f3d791b4a24"
+        }
       }
     ]
   },
@@ -1191,6 +1200,14 @@
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "e86d1bea11a4a701dc8cab29bd53ee8de67433a5dad751e0145ff3f8c27b95b6",
           "src/test/java/com/eurobuddha/comms/MerchTokenRuleTest.java": "a873ea19b731eb615083c87669d76f56546e77954ca6d7029354836841f10975"
         }
+      },
+      {
+        "revision": "a7e718b6c6c58e8126f0b2f017238eeda4e7805f",
+        "version": "0.3.14",
+        "summary": "Shared comms parity: MerchDb.coinAmount and the positive-total gate.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "fa2b72727fddfab00e192630d84b5aa05819b508d8335cca28a6261d5d797c38"
+        }
       }
     ]
   },
@@ -1252,6 +1269,16 @@
           "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "be9f11540912289e8980332a262e40daf3de57f226ea686b3d711e4d1486dcfd",
           "src/test/java/com/eurobuddha/comms/MerchTokenRuleTest.java": "a873ea19b731eb615083c87669d76f56546e77954ca6d7029354836841f10975",
           "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "79bc2a86a8795afb5961cfbedab8797ad388068b827389fb263ba1bdf37fec45"
+        }
+      },
+      {
+        "revision": "dbc6e8dbec4375258c5d4a75dd5519e186a72079",
+        "version": "0.5.11",
+        "summary": "A payment coin is measured by its own token amount (MerchDb.coinAmount: tokenamount for a token coin); an order total not above zero is never paid.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "fa2b72727fddfab00e192630d84b5aa05819b508d8335cca28a6261d5d797c38",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "dbf76af9d4708879ce43df211942037b8defb05ea5163ad2998eb385dbbea378",
+          "src/test/java/com/eurobuddha/comms/MerchDbTokenTest.java": "e85650fae3467d83ae2a5eec88627925de3fa8a9bd219f4cf19d5f3d791b4a24"
         }
       }
     ]
