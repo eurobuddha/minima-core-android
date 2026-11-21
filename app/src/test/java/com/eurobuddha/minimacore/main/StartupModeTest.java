@@ -59,4 +59,31 @@ public class StartupModeTest {
         assertEquals("", StartupMode.withoutManagedArguments(""));
         assertEquals("-p2pnodes lowram.example:9001", StartupMode.withoutManagedArguments("-p2pnodes lowram.example:9001"));
     }
+
+    /** 2.2.75: the RPC switch opens the RPC to the phone's network (the node binds 127.0.0.1 unless -rpcbind),
+     *  always with Basic auth; typed RPC flags are stripped so only the switch sets them. */
+    @Test public void rpcSwitchBindsEveryInterfaceWithItsPassword() {
+        try {
+            GeneralParams.resetDefaults();
+            assertEquals("127.0.0.1", GeneralParams.RPC_BIND_HOST);   // the node's default: loopback only
+            ArrayList<String> args = new ArrayList<>();
+            StartupMode.addRpcArguments(args, "0123abcd");
+            assertEquals(java.util.Arrays.asList("-rpcenable", "-rpcpassword", "0123abcd", "-rpcbind", "all"), args);
+            assertTrue(ParamConfigurer.checkParams(args.toArray(new String[0])));
+            assertTrue(GeneralParams.RPC_ENABLED);
+            assertEquals("0123abcd", GeneralParams.RPC_PASSWORD);
+            assertEquals("", GeneralParams.RPC_BIND_HOST);              // "" = every interface
+        } finally { GeneralParams.resetDefaults(); }
+    }
+
+    @Test public void typedRpcFlagsAreStrippedWithTheirValues() {
+        assertEquals("-p2pnodes node.example:9001 -limitbandwidth", StartupMode.withoutRpcSwitchFlags(
+                "-rpcenable -rpcpassword secret -p2pnodes node.example:9001 -rpcbind all -rpcallowhost a.example "
+                + "-rpcalloworigin http://x.example -limitbandwidth -rpcenable true"));
+        assertEquals("", StartupMode.withoutRpcSwitchFlags(" -rpcbind\t0.0.0.0 "));
+        assertEquals("-rpcdummy x", StartupMode.withoutRpcSwitchFlags("-rpcdummy x"));
+        for (String f : new String[]{"-rpcenable", "-rpcpassword", "-rpcbind", "-rpcallowhost", "-rpcalloworigin"})
+            assertTrue(f, StartupMode.isRpcSwitchFlag(f));
+        assertFalse(StartupMode.isRpcSwitchFlag("-rpc"));
+    }
 }

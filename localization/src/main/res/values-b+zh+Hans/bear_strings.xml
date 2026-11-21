@@ -922,7 +922,7 @@
     <string name="l10n_params_mega" formatted="false">"MegaMMR（-megammr）"</string>
     <string name="l10n_params_mega_body" formatted="false">"保留完整的 Mega MMR，使此节点能够为种子重新同步提供服务。这会使用显著更多的内存和存储空间。"</string>
     <string name="l10n_params_rpc" formatted="false">"启用 RPC（-rpcenable）"</string>
-    <string name="l10n_params_rpc_body" formatted="false">"端口 11005 上的 HTTP RPC 接口。任何能访问此端口的程序都能向节点发送命令，因此始终启用 Basic 身份验证：用户名为 minima，密码见下方。"</string>
+    <string name="l10n_params_rpc_body" formatted="false">"HTTP RPC 接口，端口为节点端口加 4。开启后，它会对这部手机所在的网络（Wi-Fi、热点或移动网络）开放：该网络中任何能连到这部手机的设备，都可以用下面的密码控制这个节点。它从不在没有 Basic 身份验证（用户名 minima，密码见下方）的情况下启动。如非需要，请保持关闭。"</string>
     <string name="l10n_params_rpc_password" formatted="false">"RPC 密码"</string>
     <string name="l10n_params_copy_rpc" formatted="false">"复制 RPC 密码"</string>
     <string name="l10n_params_rpc_clipboard" formatted="false">"Minima RPC 密码"</string>

@@ -203,8 +203,11 @@ android {
         // file:// path, Dexicon accepted only content://. Accepted now, only inside this app's files folder.
         // 2.2.42: Dexicon 0.3.60 (AtomiX 0.2.35): no identity halt on an incomplete `keys` list or on a single read -
         // a "not owned" / differing ETH verdict is re-read once and halts only when both complete reads agree.
-        versionCode 344
-        versionName "2.2.74"
+        // 2.2.75: the node jar with the 21 Nov 2026 command-injection fix and RPC hardening (minima-core
+        // 1.1.2.31-euro13); the RPC switch passes -rpcbind all (the node now binds 127.0.0.1 by default) and owns
+        // every RPC flag (typed ones refused, stored ones stripped); its help says it opens the RPC to the phone's network.
+        versionCode 345
+        versionName "2.2.75"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

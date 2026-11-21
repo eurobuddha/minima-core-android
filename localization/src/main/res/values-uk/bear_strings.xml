@@ -955,7 +955,7 @@
     <string name="l10n_params_mega" formatted="false">"MegaMMR (-megammr)"</string>
     <string name="l10n_params_mega_body" formatted="false">"Зберігати повний Mega MMR, щоб вузол міг обслуговувати синхронізацію за сід-фразою. Потребує значно більше пам’яті та місця."</string>
     <string name="l10n_params_rpc" formatted="false">"Увімкнути RPC (-rpcenable)"</string>
-    <string name="l10n_params_rpc_body" formatted="false">"Інтерфейс HTTP RPC на порту 11005. Будь-хто з доступом до порту може надсилати вузлу команди, тому він завжди запускається з Basic-автентифікацією: користувач minima, пароль нижче."</string>
+    <string name="l10n_params_rpc_body" formatted="false">"Інтерфейс HTTP RPC на порту вузла плюс 4. Увімкнення відкриває його для мережі, до якої підключено цей телефон (Wi-Fi, точка доступу або мобільна мережа): будь-який пристрій у ній, що може зв'язатися з телефоном, може керувати цим вузлом за паролем нижче. Він ніколи не запускається без Basic-автентифікації (користувач minima, пароль нижче). Не вмикайте без потреби."</string>
     <string name="l10n_params_rpc_password" formatted="false">"Пароль RPC"</string>
     <string name="l10n_params_copy_rpc" formatted="false">"Копіювати пароль RPC"</string>
     <string name="l10n_params_rpc_clipboard" formatted="false">"Пароль RPC Minima"</string>

@@ -116,7 +116,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="HTTP RPC interface on port 11005. Anything that can reach the port can command this node, so it is never started without Basic auth: user minima, password below." android:tag="l10n:text=l10n_params_rpc_body"
+                android:text="HTTP RPC interface on the node&apos;s port plus 4. Switching it ON opens it to the network this phone is on (Wi-Fi, hotspot or mobile network): anything there that can reach the phone can command this node with the password below. It is never started without Basic auth (user minima, password below). Leave it OFF unless you need it." android:tag="l10n:text=l10n_params_rpc_body"
                 android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                 android:textSize="12sp"
                 android:textColor="@color/core_text_mid" />

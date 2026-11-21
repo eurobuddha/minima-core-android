@@ -24,6 +24,40 @@ public final class StartupMode {
         return extra.replaceAll("(?<!\\S)-keets(?:sidecar(?:args)?)?(?!\\S)", "");
     }
 
+    /** The flags the RPC switch owns: -rpcenable and -rpcpassword, -rpcbind (the switch opens the RPC to the network
+     *  the phone is on), and the node's Host / Origin allow-lists. Typed ones are refused in ParamsActivity. */
+    static final String[] RPC_SWITCH_FLAGS = {"-rpcenable", "-rpcpassword", "-rpcbind", "-rpcallowhost", "-rpcalloworigin"};
+
+    public static boolean isRpcSwitchFlag(String arg) {
+        for (String f : RPC_SWITCH_FLAGS) if (f.equals(arg)) return true;
+        return false;
+    }
+
+    /** Remove stored RPC flags (and the value after one) from older extra parameters, so only the switch sets them. */
+    public static String withoutRpcSwitchFlags(String extra) {
+        String[] tokens = extra.trim().split("\\s+");
+        StringBuilder kept = new StringBuilder();
+        for (int i = 0; i < tokens.length; i++) {
+            if (isRpcSwitchFlag(tokens[i])) {
+                if (i + 1 < tokens.length && !tokens[i + 1].startsWith("-")) i++;
+            } else if (!tokens[i].isEmpty()) {
+                if (kept.length() > 0) kept.append(' ');
+                kept.append(tokens[i]);
+            }
+        }
+        return kept.toString();
+    }
+
+    /** The node arguments of the RPC switch (ON): Basic auth always, and bound to every interface - minima-core
+     *  1.1.2.31-euro13 binds the RPC to 127.0.0.1 unless -rpcbind says otherwise. */
+    public static void addRpcArguments(java.util.List<String> args, String password) {
+        args.add("-rpcenable");
+        args.add("-rpcpassword");
+        args.add(password);
+        args.add("-rpcbind");
+        args.add("all");
+    }
+
     /** Tab geometry: Chat is the only optional tab. -1 = no Chat tab. */
     static int chatPosition(boolean pandaShell, boolean chat) {
         return !chat ? -1 : pandaShell ? 3 : 4;

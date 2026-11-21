@@ -327,12 +327,9 @@ public class MinimaService extends Service {
             vars.add("-megammr");
         }
         if(pref.getBoolean("PARAM_RPC", false)){
-            vars.add("-rpcenable");
-            //Never RPC without auth: HTTPServer binds every interface and CMDHandler only checks
-            //credentials when a password is set, so a bare -rpcenable is unauthenticated command
-            //execution for anything that can reach the port.
-            vars.add("-rpcpassword");
-            vars.add(ParamsActivity.ensureRpcPassword(pref));
+            //Never RPC without auth (CMDHandler only checks credentials when a password is set), and the switch
+            //opens it to the network the phone is on: the node binds the RPC to 127.0.0.1 unless -rpcbind.
+            com.eurobuddha.minimacore.main.StartupMode.addRpcArguments(vars, ParamsActivity.ensureRpcPassword(pref));
         }
 
         //TESTER HACK
@@ -355,11 +352,13 @@ public class MinimaService extends Service {
         //Remove the wipe flags.. and USE the stripped string this boot too (previously the
         //original string was tokenized, so a -clean slipped through on the boot it was set)
         //(and the flags the Keets transport switch owns - a stored -keets would override "off")
-        String newprefs = com.eurobuddha.minimacore.main.StartupMode.withoutKeetsSwitchFlags(prefstring
+        //(and the RPC flags the RPC switch owns - a stored -rpcbind would open the RPC with the switch off)
+        String newprefs = com.eurobuddha.minimacore.main.StartupMode.withoutRpcSwitchFlags(
+                com.eurobuddha.minimacore.main.StartupMode.withoutKeetsSwitchFlags(prefstring
                 .replaceAll("-clean","")
                 .replaceAll("-genesis","")
                 .replaceAll("-solo",""))
-                .trim().replaceAll("\\s+"," ");
+                .trim().replaceAll("\\s+"," "));
         if (BuildConfig.PANDAMONIUM) {
             newprefs = com.eurobuddha.minimacore.main.StartupMode.withoutManagedArguments(newprefs);
         }

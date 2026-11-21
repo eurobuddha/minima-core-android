@@ -56,7 +56,9 @@ public class ParamsActivity extends AppCompatActivity {
             "-data", "-basefolder", "-conf", "-daemon", "-noshutdownhook",
             "-server", "-isclient",
             //the Keets transport switch owns these (a typed -keets would re-enable a switched-off transport)
-            "-keets", "-keetssidecar", "-keetssidecarargs"
+            "-keets", "-keetssidecar", "-keetssidecarargs",
+            //the RPC switch owns these (a typed -rpcbind would open the RPC to the network with the switch off)
+            "-rpcenable", "-rpcpassword", "-rpcbind", "-rpcallowhost", "-rpcalloworigin"
     };
 
     SwitchMaterial mKeetsSwitch;
