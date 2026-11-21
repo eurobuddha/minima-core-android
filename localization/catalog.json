@@ -44017,5 +44017,17 @@
     "zh-Hans": "此 .shop 文件中签名的内容不是 miniMall 商品列表。请从 miniMall Studio 重新导出并导入该文件。",
     "ru": "Подписанный текст этого файла .shop не является списком товаров miniMall. Экспортируйте его заново из miniMall Studio и импортируйте этот файл.",
     "uk": "Підписаний текст цього файлу .shop не є списком товарів miniMall. Експортуйте його знову з miniMall Studio та імпортуйте цей файл."
+  },
+  "mallInbox.contendedFull": {
+    "en": "More payments with this reference arrived than the Inbox keeps, so they could not all be read: no order can be switched here.",
+    "zh-Hans": "使用此编号的付款超过了收件箱可保存的数量，因此无法全部读取：此处不能切换任何订单。",
+    "ru": "Платежей с этим номером пришло больше, чем хранит Inbox, поэтому их не удалось прочитать все: здесь нельзя переключить ни один заказ.",
+    "uk": "Платежів із цим номером надійшло більше, ніж зберігає Inbox, тому їх не вдалося прочитати всі: тут не можна перемкнути жодне замовлення."
+  },
+  "mallInbox.unassignedCoin": {
+    "en": "A payment with this reference and no payment secret, counted for no order: coin {coin}, {amount} of token {token}.",
+    "zh-Hans": "一笔带有此编号但没有付款密钥的付款，未计入任何订单：币 {coin}，代币 {token} 数量 {amount}。",
+    "ru": "Платёж с этим номером без секрета оплаты, не засчитанный ни одному заказу: монета {coin}, {amount} токена {token}.",
+    "uk": "Платіж із цим номером без секрету оплати, не зарахований жодному замовленню: монета {coin}, {amount} токена {token}."
   }
 }

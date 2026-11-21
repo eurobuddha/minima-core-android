@@ -8794,4 +8794,7 @@
     <string name="l10n_mall_inbox_summary_changes" formatted="false">"Changes from the listing in use:"</string>
     <string name="l10n_mall_inbox_summary_none" formatted="false">"none"</string>
     <string name="l10n_mall_inbox_drain_i_not_listing" formatted="false">"This .shop file\'s signed text is not a miniMall listing. Export it again from miniMall Studio and import that file."</string>
+    <string name="l10n_mall_inbox_contended_full" formatted="false">"More payments with this reference arrived than the Inbox keeps, so they could not all be read: no order can be switched here."</string>
+    <!-- Arguments: coin, amount, token -->
+    <string name="l10n_mall_inbox_unassigned_coin">"A payment with this reference and no payment secret, counted for no order: coin %1$s, %2$s of token %3$s."</string>
 </resources>

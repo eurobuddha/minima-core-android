@@ -381,6 +381,7 @@ public class MainActivity extends AppCompatActivity {
         if (!MerchMessage.validRef(ref)) return false;
         MerchDb.Order o = db.order(ref);
         if (o == null || o.paid) return false;   // PAID locks; any other coin is counted once (recordPayment keeps its id)
+        db.dues = this::contenderDue;   // another kept order's coins flag the ref only once they reach its listed due (M-A)
         String amount = MerchDb.coinAmount(coin);   // a token coin's tokenamount, never the Minima amount backing it
         String tokenid = coin.optString("tokenid", "0x00");
         String result = db.recordPayment(ref, coinid, amount, tokenid, CommsScanner.statePort(coin, 2));   // each coin counted once; port 2 = the order secret's commitment (H1)
@@ -469,6 +470,17 @@ public class MainActivity extends AppCompatActivity {
      *  stored before 2.2.70 carries no mark and is not called signed). */
     static CharSequence listingInUse(boolean signed) {
         return Language.msg(signed ? l10n_mall_inbox_listing_in_use_signed : l10n_mall_inbox_listing_in_use_confirmed);
+    }
+
+    /** What another order kept with a ref is due, from the vendor's listing for its shop (null when it departs from the
+     *  listing: it never counts as paid), else its own stated amount (no listing: nothing can be sent anyway). */
+    private String contenderDue(String ref, JSONObject c) {
+        MerchDb.Order x = new MerchDb.Order();
+        x.ref = ref; x.role = "seller"; x.shopId = c.optString("shopId"); x.currency = c.optString("currency"); x.shipping = c.optString("shipping");
+        x.items = c.optString("items"); x.product = c.optString("product"); x.amount = c.optString("amount");
+        JSONObject listing = listingFor(x.shopId);
+        if (listing == null) return x.amount;
+        try { Listing.Check k = Listing.check(listing, x); return k.problems.isEmpty() ? k.due : null; } catch (Throwable e) { return null; }
     }
 
     /** Recompute what an order is due from the vendor's own listing for its shop, if one was imported. */
@@ -778,8 +790,15 @@ public class MainActivity extends AppCompatActivity {
      *  a payment commits to, and the one action the vendor has: make THAT order the order of record. */
     private void addContenders(LinearLayout body, final MerchDb.Order o) {
         JSONArray cs = db.contenders(o.ref);
-        if (cs.length() == 0) return;
+        JSONArray un = db.unassignedCoins(o.ref);
+        if (cs.length() == 0 && un.length() == 0 && !db.contendedCoinsFull(o.ref)) return;
         int committed = db.committedContender(o);
+        if (db.contendedCoinsFull(o.ref)) { TextView t = label(Language.msg(l10n_mall_inbox_contended_full)); t.setTextColor(Design.RED); body.addView(t); }
+        for (int i = 0; i < un.length(); i++) {
+            JSONObject u = un.optJSONObject(i); if (u == null) continue;
+            body.addView(label(Language.msg(l10n_mall_inbox_unassigned_coin, u.optString("coinid"), u.optString("amount"), u.optString("tokenid"))));
+        }
+        if (cs.length() == 0) return;
         body.addView(sectionLabel(Language.msg(l10n_mall_inbox_contenders_title)));
         for (int i = 0; i < cs.length(); i++) {
             JSONObject c = cs.optJSONObject(i); if (c == null) continue;
@@ -793,6 +812,7 @@ public class MainActivity extends AppCompatActivity {
         if (committed >= 0) {
             TextView b = button(Language.msg(l10n_mall_inbox_make_order_of_record), false);
             b.setOnClickListener(v -> io.execute(() -> {
+                db.dues = this::contenderDue;
                 if (db.switchToCommitted(o.ref)) recheck(db.order(o.ref));
                 ui.post(() -> refreshOrderIfTopmost(o.ref));
             }));
@@ -914,6 +934,49 @@ public class MainActivity extends AppCompatActivity {
         return phases.contains(DeliveryJournal.UNKNOWN) ? RELEASE_UNKNOWN : RELEASE_IF_MOVED;
     }
 
+    static final int STALE_BLOCKS = 10;
+
+    /** The inputs of a journal's POSTING attempt(s), or empty when nothing is POSTING. */
+    static java.util.List<String> postingInputs(JSONObject row) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        if (row == null) return out;
+        JSONArray es = row.optJSONArray("entries");
+        if (es != null) { for (int i = 0; i < es.length(); i++) { JSONObject e = es.optJSONObject(i); if (e != null && DeliveryJournal.POSTING.equals(e.optString("phase"))) out.add(e.optString("input")); } }
+        else if (DeliveryJournal.POSTING.equals(row.optString("phase"))) out.addAll(journalInputs(row));
+        return out;
+    }
+
+    /** Final check L-D: a line POSTING for 10 blocks or more (counted from when the Inbox first saw it so) whose input
+     *  coins are all still unspent and out of the mempool went neither on chain nor into the mempool: it becomes
+     *  UNKNOWN, so the vendor may release it; a re-send then reuses those coins (DeliveryLedger.pinned). */
+    private void checkStalePost(final MerchDb.Order o, final String[] line, final String key, JSONObject row, final boolean state) {
+        final java.util.List<String> inputs = postingInputs(row);
+        if (inputs.isEmpty() || chainBlock <= 0) return;
+        long seen;
+        try { seen = Long.parseLong(db.getMeta("postingblock:" + key, "0")); } catch (NumberFormatException e) { seen = 0; }
+        if (seen <= 0) { db.setMeta("postingblock:" + key, String.valueOf(chainBlock)); return; }
+        if (chainBlock - seen < STALE_BLOCKS) return;
+        allUnspentOutOfMempool(inputs, 0, ok -> {
+            if (!ok) return;
+            io.execute(() -> {
+                try { if (state) deliveryJournal().stale(key, o, line); else plainDeliveryJournal().stale(key, o, line); }
+                catch (RuntimeException notStale) { return; }
+                ui.post(() -> refreshOrderIfTopmost(o.ref));
+            });
+        });
+    }
+
+    private void allUnspentOutOfMempool(java.util.List<String> ids, int i, java.util.function.Consumer<Boolean> then) {
+        if (i >= ids.size()) { ui.post(() -> then.accept(true)); return; }
+        String id = ids.get(i);
+        if (id == null || !id.matches("0x[0-9a-fA-F]{1,128}")) { ui.post(() -> then.accept(false)); return; }
+        ask("coins relevant:true checkmempool:true coinid:" + id, r -> {
+            JSONArray a = r == null || !r.optBoolean("status", false) ? null : r.optJSONArray("response");
+            if (a == null || a.length() == 0) ui.post(() -> then.accept(false));
+            else allUnspentOutOfMempool(ids, i + 1, then);
+        });
+    }
+
     static java.util.List<String> journalInputs(JSONObject row) {
         java.util.List<String> out = new java.util.ArrayList<>();
         if (row == null) return out;
@@ -960,6 +1023,7 @@ public class MainActivity extends AppCompatActivity {
         }
         final boolean recovering = resume;
         final int release = journalUnread ? RELEASE_NEVER : releasable(journalRow);
+        if (!inFlight && !journalUnread) checkStalePost(o, line, key, journalRow, piece || bundle);
         // Reserved but no journal: the app stopped between the reservation and the transfer. It may not have gone,
         // but nothing more is sent until the vendor has checked the history.
         if (!recovering && !inFlight && DeliveryLedger.RESERVED.equals(DeliveryLedger.state(db.getReadableDatabase(), ledgerKey(o, line)))) {

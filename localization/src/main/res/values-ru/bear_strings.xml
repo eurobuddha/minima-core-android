@@ -8868,4 +8868,7 @@
     <string name="l10n_mall_inbox_summary_changes" formatted="false">"Изменения по сравнению с используемым списком:"</string>
     <string name="l10n_mall_inbox_summary_none" formatted="false">"нет"</string>
     <string name="l10n_mall_inbox_drain_i_not_listing" formatted="false">"Подписанный текст этого файла .shop не является списком товаров miniMall. Экспортируйте его заново из miniMall Studio и импортируйте этот файл."</string>
+    <string name="l10n_mall_inbox_contended_full" formatted="false">"Платежей с этим номером пришло больше, чем хранит Inbox, поэтому их не удалось прочитать все: здесь нельзя переключить ни один заказ."</string>
+    <!-- Arguments: coin, amount, token -->
+    <string name="l10n_mall_inbox_unassigned_coin">"Платёж с этим номером без секрета оплаты, не засчитанный ни одному заказу: монета %1$s, %2$s токена %3$s."</string>
 </resources>

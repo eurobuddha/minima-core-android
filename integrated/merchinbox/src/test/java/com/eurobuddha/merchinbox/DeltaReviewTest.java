@@ -33,6 +33,11 @@ public class DeltaReviewTest extends DrainTest {
         assertEquals("no journal: a send from before it", MainActivity.RELEASE_UNKNOWN, MainActivity.releasable(null));
         assertEquals(MainActivity.RELEASE_IF_MOVED, MainActivity.releasable(plain(DeliveryJournal.PREPARED)));
         assertEquals(java.util.Collections.singletonList("0x" + "11".repeat(32)), MainActivity.journalInputs(state(DeliveryJournal.PREPARED)));
+        // L-D: only POSTING attempts are checked for going stale
+        assertEquals(java.util.Collections.singletonList("0x" + "11".repeat(32)), MainActivity.postingInputs(state(DeliveryJournal.POSTING, DeliveryJournal.CONFIRMED)));
+        assertTrue(MainActivity.postingInputs(state(DeliveryJournal.UNKNOWN, DeliveryJournal.POSTED)).isEmpty());
+        assertTrue(MainActivity.postingInputs(null).isEmpty());
+        assertTrue(MainActivity.STALE_BLOCKS >= 10);
     }
 
     @Test public void theImportSummaryReadsInTheChosenLanguage() throws Exception {

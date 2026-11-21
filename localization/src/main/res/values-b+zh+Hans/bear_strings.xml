@@ -8757,4 +8757,7 @@
     <string name="l10n_mall_inbox_summary_changes" formatted="false">"与正在使用的商品列表相比的变化："</string>
     <string name="l10n_mall_inbox_summary_none" formatted="false">"无"</string>
     <string name="l10n_mall_inbox_drain_i_not_listing" formatted="false">"此 .shop 文件中签名的内容不是 miniMall 商品列表。请从 miniMall Studio 重新导出并导入该文件。"</string>
+    <string name="l10n_mall_inbox_contended_full" formatted="false">"使用此编号的付款超过了收件箱可保存的数量，因此无法全部读取：此处不能切换任何订单。"</string>
+    <!-- Arguments: coin, amount, token -->
+    <string name="l10n_mall_inbox_unassigned_coin">"一笔带有此编号但没有付款密钥的付款，未计入任何订单：币 %1$s，代币 %3$s 数量 %2$s。"</string>
 </resources>

@@ -152,12 +152,43 @@ final class DeliveryLedger {
         }
     }
 
+    /** The input coins of released attempts of this line (lower case), which a re-send must reuse (L-D). */
+    static java.util.Set<String> pinned(SQLiteDatabase db, String journalKey) {
+        java.util.Set<String> out = new java.util.HashSet<>();
+        try (Cursor c = db.rawQuery("SELECT v FROM meta WHERE k=?", new String[]{"pinned:" + journalKey})) {
+            if (c.moveToFirst()) { org.json.JSONArray a = new org.json.JSONArray(c.getString(0)); for (int i = 0; i < a.length(); i++) out.add(a.getString(i).toLowerCase(java.util.Locale.ROOT)); }
+        } catch (org.json.JSONException ignored) {}
+        return out;
+    }
+
+    static java.util.Set<String> inputsOf(String raw) {
+        java.util.Set<String> out = new java.util.HashSet<>();
+        try {
+            JSONObject row = new JSONObject(raw);
+            org.json.JSONArray es = row.optJSONArray("entries");
+            if (es != null) { for (int i = 0; i < es.length(); i++) if (es.optJSONObject(i) != null && !es.optJSONObject(i).optString("input").isEmpty()) out.add(es.optJSONObject(i).optString("input").toLowerCase(java.util.Locale.ROOT)); }
+            else for (String id : com.eurobuddha.nftwallet.OrderPaymentEvidence.inputIds(row.optJSONObject("intent"))) out.add(id.toLowerCase(java.util.Locale.ROOT));
+        } catch (RuntimeException | org.json.JSONException ignored) {}
+        return out;
+    }
+
     /** The vendor checked the wallet history and the transfer of this journal key did not go (review L3: a send
      *  stuck as unknown, or whose coins were moved): its journal rows are removed and its ledger row released, so
      *  it can be sent again. Only from the vendor's confirmation; never automatically. */
     static void vendorRelease(SQLiteDatabase db, String journalKey) {
         db.beginTransaction();
         try {
+            // the released attempt's input coins: a re-send must spend at least one of them, so if the first transfer
+            // did go after all, the two conflict and only one can confirm (final check L-D)
+            java.util.Set<String> pin = pinned(db, journalKey);
+            for (String table : new String[]{"nft_plain_delivery", "nft_delivery"})
+                try (Cursor c = db.rawQuery("SELECT data FROM " + table + " WHERE linekey=?", new String[]{journalKey})) {
+                    while (c.moveToNext()) pin.addAll(inputsOf(c.getString(0)));
+                }
+            if (!pin.isEmpty()) {
+                ContentValues p = new ContentValues(); p.put("k", "pinned:" + journalKey); p.put("v", new org.json.JSONArray(pin).toString());
+                db.insertWithOnConflict("meta", null, p, SQLiteDatabase.CONFLICT_REPLACE);
+            }
             db.delete("nft_plain_delivery", "linekey=?", new String[]{journalKey});
             db.delete("nft_delivery", "linekey=?", new String[]{journalKey});
             db.delete("meta", "k=? OR k=?", new String[]{"nftposted:" + journalKey, "notified:" + journalKey});

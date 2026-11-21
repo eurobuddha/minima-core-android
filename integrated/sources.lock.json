@@ -1220,6 +1220,14 @@
         "files": {
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "eeceb8294cc6a010f4a0a03fae00a0c7df0ed20d5c020699c69d1b8c87e8b8f3"
         }
+      },
+      {
+        "revision": "1be2a40fb7f4dfd5e9014edbde0b329d08ba2458",
+        "version": "0.4.25",
+        "summary": "Shared MerchDb identical to Inbox 0.5.30.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "a34437ce9e30d902de004f1d88145a69c7ed0311f4a92d0a2b9a45d9ba46a034"
+        }
       }
     ]
   },
@@ -1370,6 +1378,14 @@
         "summary": "Delta L-c: the signed listing carries kind minimall-listing-v1 and signedAt.",
         "files": {
           "src/main/java/com/eurobuddha/merchstudio/ShopExport.java": "4d55245cc574e333e9698ac2e5e8032b7cad3f4028f0a7a3ffce919f8f33f6b8"
+        }
+      },
+      {
+        "revision": "0c331efa26af1d0715117dfbd09146f4eca0eac1",
+        "version": "0.3.24",
+        "summary": "Shared MerchDb identical to Inbox 0.5.30.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "a34437ce9e30d902de004f1d88145a69c7ed0311f4a92d0a2b9a45d9ba46a034"
         }
       }
     ]
@@ -1628,6 +1644,15 @@
         "files": {
           "src/main/java/com/eurobuddha/merchinbox/Listing.java": "6d41c292e409a7d354eb096b9e69b7413e61ccf8efb9fe0a8cafc1721d791165",
           "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "b8f6197effe6c9d76b5a4f7a9e94c6078ef9a5ea08c8c30d84081e41620bf09d"
+        }
+      },
+      {
+        "revision": "278d5ac5e90038152e7fb70ed2421aab93354749",
+        "version": "0.5.30",
+        "summary": "Final check M-A/L-A/L-B/L-C: contended coins flag only at the contender's listed due; a secret order paid in full is deliverable; commitments past 8 kept orders recorded (cap 64, then overflow mark); full coin list offers no switch; no-secret newcomer kept, unassigned coins shown; switch checks in its transaction and moves counted coins. Integrated adds L-D (stale POSTING to UNKNOWN after 10 blocks, re-send pinned to the released inputs).",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "a34437ce9e30d902de004f1d88145a69c7ed0311f4a92d0a2b9a45d9ba46a034",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "50e4e7ce42af422bef1b6180aae792ec3792aa8c2147e7fd4ae543e00756d9a4"
         }
       }
     ]

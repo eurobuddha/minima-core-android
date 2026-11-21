@@ -7,6 +7,20 @@ import static com.eurobuddha.merchinbox.DeliveryEvidenceTest.*;
 import static com.eurobuddha.merchinbox.DeliveryJournal.*;
 @org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner.class) @org.robolectric.annotation.Config(sdk=33,manifest=org.robolectric.annotation.Config.NONE)
 public class InboxPlainJournalTest extends InboxPlainFixture {
+    /** Final check L-D: a POSTING attempt found stale becomes UNKNOWN whoever owned it; once released, a re-send must
+     *  spend at least one of its input coins, so the two transfers conflict instead of both confirming. */
+    @Test public void aStalePostBecomesUnknownAndAReSendReusesItsCoins()throws Exception {
+        preparePlain();assertThrows(RuntimeException.class,()->plain.stale(KEY,order,line));   // not POSTING: refused
+        plainPhase(POSTING);plain.close();plain=new PlainDeliveryJournal(db,journal);
+        plain.stale(KEY,order,line);assertEquals(UNKNOWN,plainPhase());
+        DeliveryLedger.vendorRelease(db.getWritableDatabase(),KEY);
+        assertEquals(Collections.singleton(coin(1).optString("coinid").toLowerCase(Locale.ROOT)),DeliveryLedger.pinned(db.getReadableDatabase(),KEY));
+        DeliveryLedger.markJournal(db.getWritableDatabase(),KEY,DeliveryLedger.RESERVED);   // reserved again for the re-send
+        JSONObject q=quote();q.getJSONObject("response").getJSONObject("body").getJSONObject("txn").getJSONArray("inputs").put(0,coin(2).put("amount","0.00000001").put("tokenamount","10"));
+        JSONObject other=com.eurobuddha.nftwallet.OrderPaymentEvidence.intent(q,DEST,"3",TOKEN,order.ref,Collections.singleton(ADDRESS.toLowerCase(Locale.ROOT)));
+        assertThrows("other coins: refused",RuntimeException.class,()->plain.prepare(KEY,order,line,HANDLE,other));
+        preparePlain();assertEquals(PREPARED,plainPhase());   // the same coin: allowed
+    }
     @Test public void aNewHelperCanReclaimAbandonedPreparationButNotPosting()throws Exception {
         preparePlain();plain.close();plain=new PlainDeliveryJournal(db,journal);preparePlain();plainPhase(POSTING);plain.close();plain=new PlainDeliveryJournal(db,journal);
         assertThrows(RuntimeException.class,this::preparePlain);assertEquals(POSTING,plainPhase());

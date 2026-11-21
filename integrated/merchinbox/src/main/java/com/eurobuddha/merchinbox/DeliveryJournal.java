@@ -91,6 +91,9 @@ public final class DeliveryJournal {
             JSONObject row=bound(db,key,o,line);boolean insert=row==null;
             if(insert) {
                 if(!store.getMeta("nftposted:"+key,"").isEmpty()||!store.getMeta("nftsent:"+key,"").isEmpty()||coins.isEmpty())throw DeliveryEvidence.invalid();
+                Set<String> pin=DeliveryLedger.pinned(db,key),ids=new HashSet<>();
+                for(JSONObject coin:coins)ids.add(coin.optString("coinid").toLowerCase(Locale.ROOT));
+                if(!pin.isEmpty()&&Collections.disjoint(ids,pin))throw DeliveryEvidence.invalid();   // a re-send after a release reuses its coins (L-D)
                 JSONArray entries=new JSONArray();
                 for(JSONObject coin:coins)entries.put(DeliveryEvidence.intent(coin,line[1]).put("phase",NOT_SUBMITTED).put("owner",""));
                 row=new JSONObject().put("binding",binding(o,line)).put("tokenid",line[1]).put("entries",entries);
@@ -131,6 +134,17 @@ public final class DeliveryJournal {
     }
     boolean owned(JSONObject e) {return LIVE.contains(owner)&&PREPARED.equals(e.optString("phase"))&&owner.equals(e.optString("owner"));}
     /** PREPARED may be retried only before POSTING was durably recorded. */
+    /** As PlainDeliveryJournal.stale: every POSTING entry becomes UNKNOWN (final check L-D). */
+    void stale(String key,MerchDb.Order o,String[] line) {
+        SQLiteDatabase db=store.getWritableDatabase();db.beginTransaction();
+        try {
+            JSONObject row=bound(db,key,o,line);if(row==null)throw DeliveryEvidence.invalid();
+            JSONArray es=row.getJSONArray("entries");boolean any=false;
+            for(int i=0;i<es.length();i++)if(POSTING.equals(es.getJSONObject(i).optString("phase"))){es.getJSONObject(i).put("phase",UNKNOWN);any=true;}
+            if(!any)throw DeliveryEvidence.invalid();
+            save(db,key,row,false);db.setTransactionSuccessful();
+        }catch(JSONException e){throw DeliveryEvidence.invalid();}finally{db.endTransaction();}
+    }
     void phase(String key,MerchDb.Order o,String[] line,String input,String next) {
         SQLiteDatabase db=store.getWritableDatabase();db.beginTransaction();
         try {
