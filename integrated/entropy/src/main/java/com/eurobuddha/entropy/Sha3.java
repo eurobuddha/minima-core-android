@@ -6,9 +6,10 @@ package com.eurobuddha.entropy;
  * <p>Copied unchanged (package aside) from apks/keyreuses (Sha3.java at
  * 570d934d96c24d9fbc3fbca069d0abc951c51cec, which pins it with FIPS-202 vectors).
  *
- * <p>SEED-ADJACENT. {@link RollEngine} checks the node's `hash` answer against this digest before a
- * die face is taken from it; a one-bit deviation would refuse every node roll (never accept a wrong
- * one). Do not "optimise" it without re-running {@code Sha3Test}.
+ * <p>SEED-ADJACENT. {@link RollEngine} works out every die face's SHA3-256(node random ++ device random)
+ * with this class on the phone (the node is asked only for `random`; the device bytes never leave the
+ * phone). A wrong digest would make wrong faces, so {@link #selfTest} runs at startup and generation is
+ * refused if it fails. Do not "optimise" it without re-running {@code Sha3Test}.
  *
  * <p>Why not {@code MessageDigest.getInstance("SHA3-256")}: Android's documented MessageDigest
  * algorithms (SDK 36 sources) list no SHA3, and this app's minSdk is 28; the app carries no
@@ -130,9 +131,8 @@ public final class Sha3 {
     /**
      * Known-answer self-test on the two canonical FIPS-202 vectors.
      *
-     * <p>Called once at startup: if this implementation were ever miscompiled or mangled, every
-     * address the app derives would be wrong, and a wrong address reads as "0 uses" — i.e. it would
-     * report SAFE. Failing loudly is the only acceptable behaviour.
+     * <p>Called once at startup (MainActivity): if this implementation were ever miscompiled or mangled,
+     * every die face would come from a wrong digest. Generation is then refused, loudly.
      *
      * @return true if both vectors match
      */

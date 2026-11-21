@@ -20,8 +20,12 @@ public final class OrderPaymentEvidence {
     public static Set<String> changeAddresses(JSONObject reply){return PreparedSendEvidence.ownedOutputs(reply,1,false);}
     public static boolean defaultAddress(JSONObject reply,String address){return PreparedSendEvidence.defaultAddress(reply,address);}
     public static JSONObject intent(JSONObject reply,String address,String amount,String token,String ref,Set<String> owned) {
+        return intent(reply,address,amount,token,ref,"",owned);
+    }
+    /** {@code commitment}: the order secret's commitment the payment must carry in port 2, or "" for none. */
+    public static JSONObject intent(JSONObject reply,String address,String amount,String token,String ref,String commitment,Set<String> owned) {
         request(address,amount,token,ref);
-        referenceStamp(reply,ref);
+        referenceStamp(reply,ref,commitment);
         JSONObject txn=TransactionEvidence.txpow(reply).optJSONObject("body").optJSONObject("txn");
         JSONObject first=txn.optJSONArray("outputs").optJSONObject(0);
         if(first==null||!Boolean.TRUE.equals(first.opt("storestate")))throw TransactionEvidence.invalid();
@@ -31,21 +35,26 @@ public final class OrderPaymentEvidence {
         TransactionEvidence.receipt(reply,intent);
         return TransactionEvidence.storedIntent(intent.toString());
     }
-    /** The order ref in state port 1 and, for a miniMall order with a secret, its commitment (0x + 64 hex) in port 2
-     *  (Pandamonium 2.2.69, security review H1); nothing else. */
-    public static void referenceStamp(JSONObject reply,String ref) {
+    /** A stamp with the order ref in port 1 and no port 2. */
+    public static void referenceStamp(JSONObject reply,String ref){referenceStamp(reply,ref,"");}
+    /** The order ref in state port 1 and, exactly, the expected commitment of the order's secret in port 2 (0x + 64
+     *  hex), or no port 2 when {@code commitment} is "" (delta review L-d); nothing else. */
+    public static void referenceStamp(JSONObject reply,String ref,String commitment) {
+        String want=commitment==null?"":commitment;
+        if(!want.isEmpty()&&!want.matches("0x[0-9a-fA-F]{64}"))throw TransactionEvidence.invalid();
         JSONObject txn=TransactionEvidence.txpow(reply).optJSONObject("body").optJSONObject("txn");
         JSONArray state=txn==null?null:txn.optJSONArray("state");
-        if(state==null||state.length()<1||state.length()>2)throw TransactionEvidence.invalid();
-        boolean refSeen=false;
+        if(state==null||state.length()!=(want.isEmpty()?1:2))throw TransactionEvidence.invalid();
+        boolean refSeen=false,commitSeen=false;
         for(int i=0;i<state.length();i++) {
             JSONObject e=state.optJSONObject(i);
             if(e==null||!(e.opt("data") instanceof String))throw TransactionEvidence.invalid();
             String port=String.valueOf(e.opt("port"));
             if("1".equals(port)&&!refSeen&&reference(ref).equalsIgnoreCase(e.optString("data")))refSeen=true;
-            else if(!"2".equals(port)||state.length()!=2||!e.optString("data").matches("0x[0-9a-fA-F]{64}"))throw TransactionEvidence.invalid();
+            else if("2".equals(port)&&!commitSeen&&!want.isEmpty()&&want.equalsIgnoreCase(e.optString("data")))commitSeen=true;
+            else throw TransactionEvidence.invalid();
         }
-        if(!refSeen)throw TransactionEvidence.invalid();
+        if(!refSeen||commitSeen==want.isEmpty())throw TransactionEvidence.invalid();
     }
     public static JSONObject storedIntent(String raw){return TransactionEvidence.storedIntent(raw);}
     public static void binds(JSONObject intent,String address,String amount,String token) {

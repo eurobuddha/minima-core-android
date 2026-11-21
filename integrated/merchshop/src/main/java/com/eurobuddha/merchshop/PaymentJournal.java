@@ -16,7 +16,6 @@ public final class PaymentJournal {
     static final String PREPARED="PREPARED", POSTING="POSTING", UNKNOWN="UNKNOWN", POSTED="POSTED", CONFIRMED="CONFIRMED", NOT_SUBMITTED="NOT_SUBMITTED";
     private final MerchDb store;
     PaymentJournal(MerchDb store){this.store=store;LIVE.add(owner);}
-    /** The commitment of this order's secret for the payment's state port 2, "" for an order without one (H1). */
     /** The commitment a payment of this order must carry in port 2: "" for an order without a secret; an order that
      *  has a secret is never paid with port 1 only (delta review L-d), so a secret that yields none is refused. */
     String commitment(MerchDb.Order o){

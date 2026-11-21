@@ -33,6 +33,28 @@ final class ShopExport {
         this.images=Collections.unmodifiableList(new ArrayList<>(images));
     }
 
+    /** This snapshot with the vendor's signed listing added (built from the snapshot, never the editable model, and
+     *  sealed off the main thread: point release item 7). */
+    ShopExport sealed(java.util.function.Function<byte[], String> seal) throws Exception {
+        JSONObject shop = new JSONObject(json);
+        shop.put("listingSealed", seal.apply(listingOf(shop).getBytes(StandardCharsets.UTF_8)));
+        return new ShopExport(shop, slug, images);
+    }
+
+    /** The listing Studio signs: the shop without pictures, collection icons or an earlier signature. */
+    static final String LISTING_KIND = "minimall-listing-v1";
+
+    static String listingOf(JSONObject shop) throws Exception {
+        JSONObject l=new JSONObject(shop.toString());
+        l.remove("nftCollections"); l.remove("listingSealed");
+        org.json.JSONArray p=l.optJSONArray("products");
+        for (int i=0;p!=null&&i<p.length();i++) { JSONObject x=p.optJSONObject(i); if (x!=null) x.remove("image"); }
+        // what this text is and when it was signed (delta review L-c): the Inbox refuses any other kind of signed text
+        // and warns when a listing older than the one in use is imported
+        l.put("kind", LISTING_KIND).put("signedAt", System.currentTimeMillis());
+        return l.toString();
+    }
+
     JSONObject render(Resolver resolver) throws Exception {
         JSONObject result=new JSONObject(json);
         for (Image image:images) {
@@ -48,6 +70,19 @@ final class ShopExport {
         int n=new java.math.BigDecimal(value).intValueExact();
         if (n<=0) throw new ArithmeticException("Non-positive shop count");
         return n;
+    }
+
+    /** Where the Inbox in this app reads the vendor's published listing: the shop as exported (without pictures, with
+     *  its signed listing) at <dir>/<shopId>.shop, dir = getDir("mall_listings") (private, outside the node's
+     *  file folder, review M1), replaced atomically on every export. */
+    File saveListing(File dir) throws Exception {
+        String shopId=new JSONObject(json).optString("shopId","");
+        if (!shopId.matches("[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*")) throw new IllegalArgumentException("Invalid shop id");
+        if (!dir.isDirectory() && !dir.mkdirs()) throw new IOException("Cannot create the listing folder");
+        File part=new File(dir,shopId+".part"), destination=new File(dir,shopId+".shop");
+        try (FileOutputStream output=new FileOutputStream(part)) { output.write(json.getBytes(StandardCharsets.UTF_8)); output.getFD().sync(); }
+        Files.move(part.toPath(),destination.toPath(),StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);
+        return destination;
     }
 
     /** Reuse NodeFiles.replaceFrom's temporary-write, sync and atomic-rename ordering.

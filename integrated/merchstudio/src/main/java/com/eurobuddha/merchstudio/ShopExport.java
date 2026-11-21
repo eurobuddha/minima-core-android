@@ -33,6 +33,14 @@ final class ShopExport {
         this.images=Collections.unmodifiableList(new ArrayList<>(images));
     }
 
+    /** This snapshot with the vendor's signed listing added (built from the snapshot, never the editable model, and
+     *  sealed off the main thread: point release item 7). */
+    ShopExport sealed(java.util.function.Function<byte[], String> seal) throws Exception {
+        JSONObject shop = new JSONObject(json);
+        shop.put("listingSealed", seal.apply(listingOf(shop).getBytes(StandardCharsets.UTF_8)));
+        return new ShopExport(shop, slug, images);
+    }
+
     /** The listing Studio signs: the shop without pictures, collection icons or an earlier signature. */
     static final String LISTING_KIND = "minimall-listing-v1";
 

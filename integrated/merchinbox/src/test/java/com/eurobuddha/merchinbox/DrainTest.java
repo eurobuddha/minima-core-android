@@ -39,7 +39,8 @@ public class DrainTest {
     final Map<String, Integer> decimals = new HashMap<>();
     final Map<String, String> held = new HashMap<>();
     final List<JSONObject> payments = new ArrayList<>();
-    final List<String> sends = new ArrayList<>();
+    final List<String> sends = new ArrayList<>(), coinReads = new ArrayList<>();
+    final java.util.Set<String> spent = new java.util.HashSet<>();   // coin ids (lower case) the vendor has since spent
 
     /** Runs io work at once, so a test needs only the main looper. */
     static final class Inline extends AbstractExecutorService {
@@ -62,7 +63,13 @@ public class DrainTest {
             } else if (c.startsWith("coins relevant:true tokenid:")) {
                 String id = c.substring(28);
                 r.put("response", new JSONArray().put(new JSONObject().put("coinid", "0x" + "99".repeat(32)).put("tokenid", id).put("tokenamount", held.getOrDefault(id, "0"))));
-            } else if (c.startsWith("coins relevant:true address:")) r.put("response", new JSONArray(payments));
+            } else if (c.startsWith("coins relevant:true address:")) { coinReads.add(c); r.put("response", new JSONArray(payments)); }
+            else if (c.startsWith("coins relevant:true coinid:")) {   // a read by id: the coin while it is unspent, else nothing
+                coinReads.add(c);
+                JSONArray a = new JSONArray(); String id = c.substring(27);
+                for (JSONObject p : payments) if (id.equalsIgnoreCase(p.optString("coinid")) && !spent.contains(id.toLowerCase(java.util.Locale.ROOT))) a.put(p);
+                r.put("response", a);
+            }
             else { if (c.contains("address:" + BUYER)) sends.add(c); r.put("response", new JSONObject().put("txpowid", "0x" + "77".repeat(32))); }
             cb.onResult(r);
             return null;
@@ -168,11 +175,11 @@ public class DrainTest {
         pay("ORD-CNF", "10", tip, "0xA5");           // 1 confirmation; 3 are needed by default
         send(o, false);
         assertTrue(sends.isEmpty());
-        payments.clear(); pay("ORD-CNF", "10", tip + 1, "0xA6");   // not yet in a block: 0 confirmations
-        send(db.order("ORD-CNF"), false);
-        assertTrue(sends.isEmpty());
+        MerchDb.Order z = order("ORD-CNF0", "Art", ART, 1, "1");
+        pay("ORD-CNF0", "1", tip + 1, "0xA6");       // not yet in a block: 0 confirmations
         db.setMeta("minconf", "1");
-        payments.clear(); pay("ORD-CNF", "10", tip, "0xA7");
+        send(z, false);
+        assertTrue(sends.isEmpty());
         send(db.order("ORD-CNF"), false);
         assertEquals("1 confirmation is enough when the vendor sets 1", 1, sends.size());
     }
@@ -313,5 +320,118 @@ public class DrainTest {
         DeliveryLedger.vendorRelease(db.getWritableDatabase(), key);
         assertEquals(DeliveryLedger.RELEASED, DeliveryLedger.state(db.getReadableDatabase(), "ORD-STUCK|0"));
         assertEquals("", db.getMeta("nftposted:" + key, ""));
+    }
+
+    /** Point release item 1: thousands of old coins at the vendor's address change nothing: the address is never
+     *  read, only the order's own coins, by id. */
+    @Test public void theVendorsAddressIsNeverReadAndItsOldCoinsChangeNothing() throws Exception {
+        MerchDb.Order o = order("ORD-FLOOD", "Piece", NFT, 1, "10");
+        pay("ORD-FLOOD", "10", tip - 5, "0xF0");
+        for (int i = 0; i < 5000; i++)
+            payments.add(new JSONObject().put("coinid", "0x1" + i).put("tokenid", "0x00").put("amount", "0.000000001").put("created", "1"));
+        send(o, false);
+        assertEquals(1, sends.size());
+        for (String c : coinReads) assertTrue(c, c.startsWith("coins relevant:true coinid:"));
+        assertEquals(java.util.Collections.singletonList("coins relevant:true coinid:0xf0"), coinReads);
+    }
+
+    /** Point release item 1: a coin that reached the confirmations is kept confirmed, so the vendor may spend or
+     *  consolidate it and still deliver; a coin that vanished before reaching them (a reorg) never counts. */
+    @Test public void spentRevenueStillCountsButACoinGoneBeforeItsConfirmationsDoesNot() throws Exception {
+        MerchDb.Order o = order("ORD-SPENT", "Piece", NFT, 1, "10");
+        payments.add(new JSONObject().put("coinid", "0xB1").put("tokenid", "0x00").put("amount", "10").put("tokenamount", "10").put("created", String.valueOf(tip - 5))
+                .put("state", new JSONArray().put(new JSONObject().put("port", 1).put("data", "0x" + hex("ORD-SPENT")))));
+        db.recordPayment("ORD-SPENT", "0xB1", "10", "0x00", null, tip - 5);
+        call("confirmSweep", new Class<?>[]{long.class}, tip);   // the per-block sweep reads it back once
+        ShadowLooper.idleMainLooper();
+        assertEquals(String.valueOf(tip), db.getMeta("paidconf:0xb1", ""));
+        spent.add("0xb1");                                       // the vendor consolidates the revenue
+        send(o, false);
+        assertEquals(1, sends.size());
+        MerchDb.Order r = order("ORD-REORG", "Piece", ART, 1, "1");
+        payments.add(new JSONObject().put("coinid", "0xB2").put("tokenid", "0x00").put("amount", "1").put("tokenamount", "1").put("created", String.valueOf(tip - 1))
+                .put("state", new JSONArray().put(new JSONObject().put("port", 1).put("data", "0x" + hex("ORD-REORG")))));
+        db.recordPayment("ORD-REORG", "0xB2", "1", "0x00", null, tip - 1);
+        spent.add("0xb2");                                       // gone at 2 of 3 confirmations
+        tip += 5;
+        send(r, false);
+        assertEquals("never counted", 1, sends.size());
+    }
+
+    /** Point release item 2: Studio exports a product's stock as what the vendor holds; after a re-export, the
+     *  deliveries under the earlier listing are already out of that holding and do not count again. */
+    @Test public void aReExportedListingCountsOnlyItsOwnDeliveries() throws Exception {
+        android.database.sqlite.SQLiteDatabase w = db.getWritableDatabase();
+        String p = "art|" + ART.toLowerCase(java.util.Locale.ROOT) + "|0|0";
+        java.math.BigDecimal one = java.math.BigDecimal.ONE, five = java.math.BigDecimal.valueOf(5), ten = java.math.BigDecimal.TEN;
+        for (int k = 0; k < 5; k++) { assertNull(DeliveryLedger.reserve(w, "ORD-OLD" + k + "|0", p, ART, one, five, ten, "", "s1")); DeliveryLedger.mark(w, "ORD-OLD" + k + "|0", DeliveryLedger.SENT); }
+        assertNotNull("the first listing's stock is used up", DeliveryLedger.reserve(w, "ORD-OLD5|0", p, ART, one, five, ten, "", "s1"));
+        db.setMeta("ledger:ORD-LEGACY|0", new JSONObject().put("product", p).put("token", ART).put("qty", "3").put("state", "sent").toString());   // before 0.5.32
+        assertNull("the re-exported listing starts from its own stock", DeliveryLedger.reserve(w, "ORD-NEW|0", p, ART, one, five, ten, "", "s2"));
+        assertEquals(0, one.compareTo(DeliveryLedger.delivered(w, p, "s2")));
+        assertEquals("in flight still counts across listings", 0, one.compareTo(DeliveryLedger.inflight(w, ART)));
+        assertEquals("s5", Listing.id(new JSONObject().put("signedAt", 5)));
+        assertEquals("c7", Listing.id(new JSONObject().put("confirmedAt", 7)));
+    }
+
+    /** Point release item 3: an automatic attempt that waits for confirmations is not a failure (no notification);
+     *  a real automatic failure is notified once per line, not at every attempt. */
+    @Test public void waitingIsNeverAFailureAndAFailureIsNotifiedOnce() throws Exception {
+        org.robolectric.Shadows.shadowOf(RuntimeEnvironment.getApplication()).grantPermissions("android.permission.POST_NOTIFICATIONS");
+        android.app.NotificationManager nm = (android.app.NotificationManager) RuntimeEnvironment.getApplication().getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+        db.setMeta("autosend", "1");
+        order("ORD-WAIT", "Piece", NFT, 1, "10");
+        pay("ORD-WAIT", "10", tip, "0xC1");   // 1 of 3 confirmations
+        call("maybeAutoDeliver", new Class<?>[]{String.class}, "ORD-WAIT");
+        ShadowLooper.idleMainLooper();
+        assertEquals("waiting: no notification", 0, org.robolectric.Shadows.shadowOf(nm).size());
+        assertTrue(sends.isEmpty());
+        MerchDb.Order f = order("ORD-FAIL", "Art", ART, 1, "1");
+        pay("ORD-FAIL", "1", tip - 5, "0xC2");
+        held.put(ART, "0");                    // a real failure: the vendor no longer holds the token
+        call("maybeAutoDeliver", new Class<?>[]{String.class}, "ORD-FAIL");
+        ShadowLooper.idleMainLooper();
+        assertEquals(1, org.robolectric.Shadows.shadowOf(nm).size());
+        nm.cancelAll();
+        call("maybeAutoDeliver", new Class<?>[]{String.class}, "ORD-FAIL");
+        ShadowLooper.idleMainLooper();
+        assertEquals("notified once per line", 0, org.robolectric.Shadows.shadowOf(nm).size());
+    }
+
+    /** Point release item 12: an order an older Inbox recorded (no coin list) that the vendor already advanced is not
+     *  flipped to UNDERPAID by a listing import; a merely paid one is, and says "upgraded"; and the old automatic
+     *  delivery setting shows a one-time notice. */
+    @Test public void olderOrdersAreNotFlippedWhenAdvancedAndTheOldAutoSettingIsAnnounced() throws Exception {
+        for (String[] r : new String[][]{{"ORD-OLDD", "DELIVERED"}, {"ORD-OLDP", "PAID"}}) {
+            order(r[0], "Piece", NFT, 1, "10");
+            db.getWritableDatabase().execSQL("UPDATE orders SET paid=1, status=?, paidamount='0.0001', paidtokenid='0x00' WHERE ref=?", new Object[]{r[1], r[0]});
+            db.setMeta("due:" + r[0], "10");
+            db.reevaluate(r[0]);
+        }
+        assertTrue("advanced: kept", db.order("ORD-OLDD").paid);
+        assertEquals(MerchDb.DELIVERED, db.order("ORD-OLDD").status);
+        assertFalse(db.order("ORD-OLDP").paid);
+        assertEquals("1", db.getMeta("upgraded:ORD-OLDP", ""));
+        assertFalse((Boolean) call("autoDeliverWasOn", new Class<?>[]{}));
+        db.setMeta("autodeliver", "1");
+        assertTrue((Boolean) call("autoDeliverWasOn", new Class<?>[]{}));
+        db.setMeta("autodeliverbanner", "1");
+        assertFalse((Boolean) call("autoDeliverWasOn", new Class<?>[]{}));
+    }
+
+    /** Point release items 7 and 8: a scanner's message is stored on the io executor and counted for the scan's end;
+     *  no dialog is shown once the screen is finishing. */
+    @Test public void scannerWorkRunsOnIoAndNoDialogOutlivesTheScreen() throws Exception {
+        java.util.List<String> handled = new java.util.ArrayList<>();
+        com.eurobuddha.merchinbox.integratedcomms.CommsScanner.Router r = (com.eurobuddha.merchinbox.integratedcomms.CommsScanner.Router) call("onIo",
+                new Class<?>[]{com.eurobuddha.merchinbox.integratedcomms.CommsScanner.Router.class},
+                (com.eurobuddha.merchinbox.integratedcomms.CommsScanner.Router) (cid, op, coin) -> { handled.add(cid); return true; });
+        assertFalse("the scanner thread never waits for the database", r.handle("0xC9", null, new JSONObject()));
+        assertEquals(java.util.Collections.singletonList("0xC9"), handled);
+        java.lang.reflect.Field f = MainActivity.class.getDeclaredField("routedNew"); f.setAccessible(true);
+        assertEquals(1, ((java.util.concurrent.atomic.AtomicInteger) f.get(activity)).get());
+        activity.finish();
+        androidx.appcompat.app.AlertDialog d = ((com.eurobuddha.minimacore.i18n.LanguageDialog) call("languageDialog", new Class<?>[]{})).setMessage("late").show();
+        assertFalse("not shown on a finishing screen", d.isShowing());
     }
 }

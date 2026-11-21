@@ -63,6 +63,8 @@ public final class PlainDeliveryJournal {
             if(!retryable(old)||old==null&&(!store.getMeta("nftsent:"+key,"").isEmpty()||!store.getMeta("nftposted:"+key,"").isEmpty()))throw DeliveryEvidence.invalid();
             JSONObject exact=OrderPaymentEvidence.storedIntent(intent.toString());OrderPaymentEvidence.binds(exact,o.payaddr,line[2],line[1]);
             Set<String> inputs=OrderPaymentEvidence.inputIds(exact);assertAvailable(db,inputs,key);
+            Set<String> pin=DeliveryLedger.pinned(db,key),lower=new HashSet<>();for(String id:inputs)lower.add(id.toLowerCase(Locale.ROOT));
+            if(!pin.isEmpty()&&Collections.disjoint(lower,pin))throw DeliveryEvidence.invalid();   // a re-send after a release reuses its coins (L-D)
             try(Cursor c=db.rawQuery("SELECT data FROM nft_delivery",null)) {
                 while(c.moveToNext()) {
                     JSONArray entries=DeliveryJournal.read(c.getString(0)).optJSONArray("entries");
@@ -83,6 +85,15 @@ public final class PlainDeliveryJournal {
             String old=row.optString("phase");
             if(!(PREPARED.equals(old)&&LIVE.contains(owner)&&(POSTING.equals(next)||NOT_SUBMITTED.equals(next))||POSTING.equals(old)&&UNKNOWN.equals(next)))throw DeliveryEvidence.invalid();
             row.put("phase",next);save(db,key,row,false);db.setTransactionSuccessful();
+        }catch(JSONException e){throw DeliveryEvidence.invalid();}finally{db.endTransaction();}
+    }
+    /** A post that reached neither the chain nor the mempool (final check L-D: its input coins are still unspent,
+     *  out of the mempool, 10 blocks on): POSTING becomes UNKNOWN, whichever run owned it, so the vendor may release it. */
+    void stale(String key,MerchDb.Order o,String[] line) {
+        SQLiteDatabase db=store.getWritableDatabase();db.beginTransaction();
+        try {
+            JSONObject row=bound(db,key,o,line);if(row==null||!POSTING.equals(row.optString("phase")))throw DeliveryEvidence.invalid();
+            row.put("phase",UNKNOWN);save(db,key,row,false);db.setTransactionSuccessful();
         }catch(JSONException e){throw DeliveryEvidence.invalid();}finally{db.endTransaction();}
     }
     void receipt(String key,MerchDb.Order o,String[] line,JSONObject reply,JSONObject chain) {

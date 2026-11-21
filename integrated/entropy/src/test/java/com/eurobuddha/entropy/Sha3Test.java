@@ -2,6 +2,7 @@ package com.eurobuddha.entropy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
@@ -73,5 +74,13 @@ public class Sha3Test {
     @Test
     public void selfTestPasses() {
         assertTrue(Sha3.selfTest());
+    }
+
+    /** Point release item 13: a failed SHA3 self-test blocks generation at startup. */
+    @Test public void aFailedSha3SelfTestBlocksGeneration() {
+        assertTrue(Sha3.selfTest());
+        assertNull(MainActivity.startupError(null, true));
+        assertEquals("SHA3-256 known-answer test failed", MainActivity.startupError(null, false));
+        assertEquals("bip39", MainActivity.startupError("bip39", true));
     }
 }

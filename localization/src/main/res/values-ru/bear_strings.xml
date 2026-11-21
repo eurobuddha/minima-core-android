@@ -8763,7 +8763,7 @@
     <!-- Arguments: a, b, c -->
     <string name="l10n_mall_inbox_drain_r_conf">"у монеты %1$s подтверждений: %2$s; нужно %3$s"</string>
     <!-- Arguments: a, b -->
-    <string name="l10n_mall_inbox_drain_r_paid">"оплачено в цепи с достаточными подтверждениями: %1$s из %2$s"</string>
+    <string name="l10n_mall_inbox_drain_r_paid">"ещё не оплачено полностью в цепи: из %2$s к оплате достаточно подтверждений у %1$s"</string>
     <string name="l10n_mall_inbox_drain_r_in_flight" formatted="false">"эта строка уже отправляется, или её отправка не завершилась и могла пройти: сначала проверьте историю кошелька"</string>
     <!-- Arguments: a, b, c -->
     <string name="l10n_mall_inbox_drain_r_would_exceed">"отправка %1$s шт. дала бы %2$s доставленных шт. этого товара — больше, чем %3$s в вашем списке"</string>
@@ -8871,4 +8871,21 @@
     <string name="l10n_mall_inbox_contended_full" formatted="false">"Платежей с этим номером пришло больше, чем хранит Inbox, поэтому их не удалось прочитать все: здесь нельзя переключить ни один заказ."</string>
     <!-- Arguments: coin, amount, token -->
     <string name="l10n_mall_inbox_unassigned_coin">"Платёж с этим номером без секрета оплаты, не засчитанный ни одному заказу: монета %1$s, %2$s токена %3$s."</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_coin_gone">"монеты %1$s больше нет в цепи, и она так и не получила %2$s подтверждений"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_coin_unread">"не удалось прочитать монету %1$s"</string>
+    <string name="l10n_mall_inbox_not_checked_yet" formatted="false">"Ещё не проверено: нажмите «Отправить», чтобы проверить эту строку (ничего не отправляется, пока не пройдены все проверки)."</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_checked_ready">"На блоке %1$s все проверки пройдены: можно отправлять."</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_checked_waiting">"На блоке %1$s ничего нельзя было отправить, пока не будет выполнено:"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_came_first">"Собственная монета этого заказа находится в блоке %1$s, раньше каждого засчитанного ему платежа, значит, он существовал до того, как его номер стал публичным."</string>
+    <!-- Arguments: address -->
+    <string name="l10n_mall_inbox_deliver_to_record">"Отправить по основному заказу (%1$s)"</string>
+    <string name="l10n_mall_inbox_deliver_to_record_question" formatted="false">"Отправить по основному заказу?"</string>
+    <string name="l10n_mall_inbox_deliver_to_record_help" formatted="false">"Другой заказ с этим номером пришёл после того, как оплата этого заказа сделала номер публичным. Больше ничего не меняется: все остальные проверки по-прежнему действуют."</string>
+    <string name="l10n_mall_inbox_upgraded_recheck" formatted="false">"Обновлено: перепроверьте оплату этого заказа. Она записана старой версией Inbox, и ничего не отправляется, пока её монеты не будут прочитаны в цепи."</string>
+    <string name="l10n_mall_inbox_auto_off_banner" formatted="false">"После этого обновления автоматическая отправка NFT выключена. Включите её снова строкой автоматической отправки ниже; тогда она отправляет только по заказам, прошедшим все проверки. (Нажмите, чтобы скрыть.)"</string>
 </resources>

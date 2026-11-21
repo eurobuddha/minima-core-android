@@ -74,15 +74,20 @@ public final class Util {
         return fallback;
     }
 
-    /** Trim trailing zeros from a decimal amount string for tidy display. */
     /** A price or fee as the .shop carries it: the same number as a plain decimal (no exponent, sign "+" or
      *  spaces), so miniMall Shop 0.4.17+ accepts it; e.g. "1e3" → "1000", " .5" → "0.5". A value that is not a
      *  number is passed on trimmed (the shop refuses it). */
     public static String plainAmount(String amt) {
         String t = amt == null ? "" : amt.trim();
-        try { return new BigDecimal(t).toPlainString(); } catch (NumberFormatException e) { return t; }
+        if (t.length() > 80) return t;   // point release item 13: a huge exponent is never expanded
+        try {
+            BigDecimal d = new BigDecimal(t);
+            if (d.scale() > 44 || d.precision() - d.scale() > 30) return t;
+            return d.toPlainString();
+        } catch (NumberFormatException e) { return t; }
     }
 
+    /** Trim trailing zeros from a decimal amount string for tidy display. */
     public static String tidyAmount(String amt) {
         if (amt == null || amt.isEmpty()) return "0";
         if (!amt.contains(".")) return amt;

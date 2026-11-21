@@ -21,4 +21,18 @@ public class ListingOfTest {
         long at = l.getLong("signedAt");
         assertTrue(at > 1_700_000_000_000L && at <= System.currentTimeMillis());
     }
+
+    /** Point release item 7: the signature is made from the export snapshot (off the main thread), over its listing. */
+    @Test public void aSnapshotIsSealedFromItsOwnListing() throws Exception {
+        JSONObject shop = new JSONObject().put("shopName", "Art").put("shopId", "art").put("currency", "Minima")
+                .put("products", new JSONArray().put(new JSONObject().put("name", "Piece").put("price", "10")));
+        ShopExport s = new ShopExport(shop, "art", java.util.Collections.emptyList());
+        final String[] signed = new String[1];
+        ShopExport t = s.sealed(b -> { signed[0] = new String(b, java.nio.charset.StandardCharsets.UTF_8); return "SEALED"; });
+        JSONObject l = new JSONObject(signed[0]);
+        assertEquals("minimall-listing-v1", l.getString("kind"));
+        assertEquals("10", l.getJSONArray("products").getJSONObject(0).getString("price"));
+        assertNotSame(s, t);
+        assertFalse("the snapshot it came from is unchanged", shop.has("listingSealed"));
+    }
 }

@@ -8763,7 +8763,7 @@
     <!-- Arguments: a, b, c -->
     <string name="l10n_mall_inbox_drain_r_conf">"монета %1$s має підтверджень: %2$s; потрібно %3$s"</string>
     <!-- Arguments: a, b -->
-    <string name="l10n_mall_inbox_drain_r_paid">"сплачено в ланцюгу з достатніми підтвердженнями: %1$s з %2$s"</string>
+    <string name="l10n_mall_inbox_drain_r_paid">"ще не сплачено повністю в ланцюгу: з %2$s до сплати достатньо підтверджень має %1$s"</string>
     <string name="l10n_mall_inbox_drain_r_in_flight" formatted="false">"цей рядок уже надсилається, або його надсилання не завершилося й могло пройти: спершу перевірте історію гаманця"</string>
     <!-- Arguments: a, b, c -->
     <string name="l10n_mall_inbox_drain_r_would_exceed">"надсилання %1$s шт. дало б %2$s доставлених шт. цього товару — більше, ніж %3$s у вашому списку"</string>
@@ -8871,4 +8871,21 @@
     <string name="l10n_mall_inbox_contended_full" formatted="false">"Платежів із цим номером надійшло більше, ніж зберігає Inbox, тому їх не вдалося прочитати всі: тут не можна перемкнути жодне замовлення."</string>
     <!-- Arguments: coin, amount, token -->
     <string name="l10n_mall_inbox_unassigned_coin">"Платіж із цим номером без секрету оплати, не зарахований жодному замовленню: монета %1$s, %2$s токена %3$s."</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_coin_gone">"монети %1$s більше немає в ланцюгу, і вона так і не отримала %2$s підтверджень"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_coin_unread">"не вдалося прочитати монету %1$s"</string>
+    <string name="l10n_mall_inbox_not_checked_yet" formatted="false">"Ще не перевірено: натисніть «Надіслати», щоб перевірити цей рядок (нічого не надсилається, доки не пройдено всі перевірки)."</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_checked_ready">"На блоці %1$s усі перевірки пройдено: можна надсилати."</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_checked_waiting">"На блоці %1$s нічого не можна було надіслати, доки не буде виконано:"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_came_first">"Власна монета цього замовлення в блоці %1$s, раніше за кожен зарахований йому платіж, отже, воно існувало до того, як його номер став публічним."</string>
+    <!-- Arguments: address -->
+    <string name="l10n_mall_inbox_deliver_to_record">"Надіслати за основним замовленням (%1$s)"</string>
+    <string name="l10n_mall_inbox_deliver_to_record_question" formatted="false">"Надіслати за основним замовленням?"</string>
+    <string name="l10n_mall_inbox_deliver_to_record_help" formatted="false">"Інше замовлення з цим номером надійшло після того, як оплата цього замовлення зробила номер публічним. Більше нічого не змінюється: усі інші перевірки й далі діють."</string>
+    <string name="l10n_mall_inbox_upgraded_recheck" formatted="false">"Оновлено: перевірте оплату цього замовлення ще раз. Її записала старіша версія Inbox, і нічого не надсилається, доки її монети не буде прочитано в ланцюгу."</string>
+    <string name="l10n_mall_inbox_auto_off_banner" formatted="false">"Після цього оновлення автоматичне надсилання NFT вимкнено. Увімкніть його знову рядком автоматичного надсилання нижче; тоді воно надсилає лише за замовленнями, що пройшли всі перевірки. (Натисніть, щоб приховати.)"</string>
 </resources>

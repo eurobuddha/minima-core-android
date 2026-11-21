@@ -16,6 +16,12 @@ public final class PaymentJournal {
     static final String PREPARED="PREPARED", POSTING="POSTING", UNKNOWN="UNKNOWN", POSTED="POSTED", CONFIRMED="CONFIRMED", NOT_SUBMITTED="NOT_SUBMITTED";
     private final MerchDb store;
     PaymentJournal(MerchDb store){this.store=store;LIVE.add(owner);}
+    /** The commitment a payment of this order must carry in port 2: "" for an order without a secret; an order that
+     *  has a secret is never paid with port 1 only (delta review L-d), so a secret that yields none is refused. */
+    String commitment(MerchDb.Order o){
+        String n=store.nonce(o);if(n.isEmpty())return "";
+        String c=com.eurobuddha.merchshop.integratedcomms.MerchMessage.commitment(n);if(c.isEmpty())throw invalid();return c;
+    }
     void close(){LIVE.remove(owner);}
     public static void create(SQLiteDatabase db){db.execSQL("CREATE TABLE IF NOT EXISTS shop_payment (orderref TEXT PRIMARY KEY NOT NULL,data TEXT NOT NULL)");}
     static JSONObject read(String raw) {
@@ -88,7 +94,7 @@ public final class PaymentJournal {
         try {
             JSONObject row=bound(db,key,o);
             if(row==null||!Arrays.asList(POSTING,UNKNOWN,POSTED).contains(row.optString("phase")))throw invalid();
-            OrderPaymentEvidence.referenceStamp(reply,o.ref);
+            OrderPaymentEvidence.referenceStamp(reply,o.ref,commitment(o));
             row.put("receipt",OrderPaymentEvidence.publicReceipt(reply,row.getJSONObject("intent"))).put("phase",chain==null?POSTED:CONFIRMED);
             if(chain!=null)row.put("inclusion",OrderPaymentEvidence.inclusion(chain));
             save(db,key,row,false);db.setTransactionSuccessful();
@@ -108,6 +114,8 @@ public final class PaymentJournal {
     /** Fresh detached payment view; the database buyer delivery address is never overwritten. */
     MerchDb.Order paymentOrder(String ref) {
         MerchDb.Order o=store.order(ref);if(o==null||!"buyer".equals(o.role))throw invalid();
+        // An order is paid in the token its currency names; one stored with another token id is never paid (shop 0.4.13 rule).
+        if(com.eurobuddha.merchshop.integratedcomms.MerchMessage.tokenProblem(o.currency,o.tokenid)!=null)throw invalid();
         o.payaddr=store.getMeta("vendoraddr:"+ref,"");
         OrderPaymentEvidence.request(o.payaddr,o.amount,o.tokenid,o.ref);return o;
     }
@@ -127,6 +135,7 @@ public final class PaymentJournal {
     /** Reuse Inbox's SQLite transaction boundary: order and original address commit together. */
     boolean saveOrder(com.eurobuddha.merchshop.integratedcomms.MerchMessage message,String address) {
         OrderPaymentEvidence.request(address,message.amount,message.tokenid,message.ref);
+        if(message.tokenid==null||!message.tokenid.equals(com.eurobuddha.merchshop.integratedcomms.MerchMessage.tokenFor(message.currency)))throw invalid();
         SQLiteDatabase db=store.getWritableDatabase();db.beginTransaction();
         try {
             if(!store.upsertOrder(message,"buyer",""))return false;

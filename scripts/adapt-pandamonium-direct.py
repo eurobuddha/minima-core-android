@@ -329,6 +329,9 @@ public final class MinimaNotifyReceiver implements DirectNodeEvents.Listener {
     spec=importlib.util.spec_from_file_location('inbox_plain_delivery',Path(__file__).with_name('adapt-pandamonium-inbox-plain-delivery.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 
+    spec=importlib.util.spec_from_file_location('mall_security',Path(__file__).with_name('adapt-pandamonium-mall-security.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
+
     spec=importlib.util.spec_from_file_location('nft_distribution_recovery',Path(__file__).with_name('adapt-pandamonium-nft-distribution-recovery.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);module.adapt(root)
 

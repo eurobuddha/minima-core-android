@@ -15,7 +15,7 @@ final class PaymentFlow {
     interface Listener {void posted();void confirmed();void unconfirmed();}
     private final NodeApi node;private final PaymentJournal journal;private final Executor io;private final Handler ui;
     private final BooleanSupplier active;private final Listener listener;
-    private MerchDb.Order order;private String key;private JSONObject saved,quote;
+    private MerchDb.Order order;private String key,commitment="";private JSONObject saved,quote;
     private final String handle="ms_pay_"+UUID.randomUUID().toString().replace("-","");
     private String signedFile;private boolean released,ended,filesVerified,filesDiscarded;private int attempts,offset,pageSize=4,pages;
     PaymentFlow(NodeApi node,PaymentJournal journal,Executor io,Handler ui,BooleanSupplier active,Listener listener) {
@@ -36,16 +36,22 @@ final class PaymentFlow {
         try{io.execute(()->{try{work.run();}catch(RuntimeException failed){ui.post(failure);return;}ui.post(()->{if(live())then.run();});});}
         catch(RuntimeException failed){failure.run();}
     }
+    /** Port 1 = the order ref; port 2 = the commitment of the order's secret when it has one (security review H1). */
+    private JSONObject stamp(String ref) throws JSONException {
+        JSONObject s=new JSONObject().put("1",OrderPaymentEvidence.reference(ref));
+        if(!commitment.isEmpty())s.put("2",commitment);
+        return s;
+    }
     void start(MerchDb.Order o) {
         this.order=o;this.key=o.ref;
         try{OrderPaymentEvidence.request(o.payaddr,order.amount,order.tokenid,o.ref);}catch(RuntimeException invalid){stop();return;}
-        work(()->saved=journal.load(key,o),()->{
+        work(()->{saved=journal.load(key,o);commitment=journal.commitment(o);},()->{
             if(PaymentJournal.complete(saved)){success();return;}
             if(!journal.available(o)){stop();return;}
             if(!PaymentJournal.retryable(saved)){release();poll();return;}
             if(o.paid||!MerchDb.PENDING.equals(o.status)){stop();return;}
             final String command;
-            try{command="sendnosign address:"+o.payaddr+" amount:"+order.amount+" tokenid:"+order.tokenid+" split:1 burn:0 state:"+new JSONObject().put("1",OrderPaymentEvidence.reference(o.ref))+" file:"+handle+".txn";}
+            try{command="sendnosign address:"+o.payaddr+" amount:"+order.amount+" tokenid:"+order.tokenid+" split:1 burn:0 state:"+stamp(o.ref)+" file:"+handle+".txn";}
             catch(JSONException invalid){stop();return;}
             node.cmd(command,new NodeApi.Cb(){
                 public void onResult(JSONObject reply){if(!live())return;if(!ok(reply)){stop();return;}viewUnsigned();}
@@ -68,7 +74,7 @@ final class PaymentFlow {
         if(!live())return;
         if(index>=addresses.size()) {
             final JSONObject intent;
-            try{intent=OrderPaymentEvidence.intent(quote,order.payaddr,order.amount,order.tokenid,order.ref,verified);}catch(RuntimeException invalid){stop();return;}
+            try{intent=OrderPaymentEvidence.intent(quote,order.payaddr,order.amount,order.tokenid,order.ref,commitment,verified);}catch(RuntimeException invalid){stop();return;}
             work(()->saved=journal.prepare(key,order,handle,intent),this::sign);return;
         }
         String address=addresses.get(index);
@@ -97,7 +103,7 @@ final class PaymentFlow {
         node.cmd("sendview file:"+signedFile,new NodeApi.Cb(){
             public void onResult(JSONObject reply) {
                 if(!live())return;
-                try{OrderPaymentEvidence.referenceStamp(reply,order.ref);OrderPaymentEvidence.publicReceipt(reply,saved.optJSONObject("intent"));}catch(RuntimeException mismatch){failPrepared();return;}
+                try{OrderPaymentEvidence.referenceStamp(reply,order.ref,commitment);OrderPaymentEvidence.publicReceipt(reply,saved.optJSONObject("intent"));}catch(RuntimeException mismatch){failPrepared();return;}
                 filesVerified=true;
                 work(()->journal.phase(key,order,handle,POSTING),PaymentFlow.this::post,PaymentFlow.this::failPrepared);
             }

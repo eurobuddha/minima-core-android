@@ -43557,10 +43557,10 @@
     "uk": "монета {a} має підтверджень: {b}; потрібно {c}"
   },
   "mallInboxDrain.rPaid": {
-    "en": "paid on chain with enough confirmations: {a} of {b} due",
-    "zh-Hans": "链上已付且确认足够：{a}，应付 {b}",
-    "ru": "оплачено в цепи с достаточными подтверждениями: {a} из {b}",
-    "uk": "сплачено в ланцюгу з достатніми підтвердженнями: {a} з {b}"
+    "en": "not yet paid in full on chain: {a} of {b} due has enough confirmations",
+    "zh-Hans": "链上尚未付清：应付 {b}，其中有足够确认的为 {a}",
+    "ru": "ещё не оплачено полностью в цепи: из {b} к оплате достаточно подтверждений у {a}",
+    "uk": "ще не сплачено повністю в ланцюгу: з {b} до сплати достатньо підтверджень має {a}"
   },
   "mallInboxDrain.rInFlight": {
     "en": "this line is already being sent, or its send did not finish and may have gone: check your wallet's history first",
@@ -44029,5 +44029,71 @@
     "zh-Hans": "一笔带有此编号但没有付款密钥的付款，未计入任何订单：币 {coin}，代币 {token} 数量 {amount}。",
     "ru": "Платёж с этим номером без секрета оплаты, не засчитанный ни одному заказу: монета {coin}, {amount} токена {token}.",
     "uk": "Платіж із цим номером без секрету оплати, не зарахований жодному замовленню: монета {coin}, {amount} токена {token}."
+  },
+  "mallInboxDrain.rCoinGone": {
+    "en": "coin {a} is not on chain any more and never reached {b} confirmation(s)",
+    "zh-Hans": "币 {a} 已不在链上，且从未达到 {b} 个确认",
+    "ru": "монеты {a} больше нет в цепи, и она так и не получила {b} подтверждений",
+    "uk": "монети {a} більше немає в ланцюгу, і вона так і не отримала {b} підтверджень"
+  },
+  "mallInboxDrain.rCoinUnread": {
+    "en": "coin {a} could not be read",
+    "zh-Hans": "无法读取币 {a}",
+    "ru": "не удалось прочитать монету {a}",
+    "uk": "не вдалося прочитати монету {a}"
+  },
+  "mallInbox.notCheckedYet": {
+    "en": "Not checked yet: tap Send to check this line (nothing is sent unless every check passes).",
+    "zh-Hans": "尚未检查：点按“发送”检查此行（只有全部检查通过才会发送）。",
+    "ru": "Ещё не проверено: нажмите «Отправить», чтобы проверить эту строку (ничего не отправляется, пока не пройдены все проверки).",
+    "uk": "Ще не перевірено: натисніть «Надіслати», щоб перевірити цей рядок (нічого не надсилається, доки не пройдено всі перевірки)."
+  },
+  "mallInbox.checkedReady": {
+    "en": "Every check passed at block {block}: ready to send.",
+    "zh-Hans": "在区块 {block} 时全部检查通过：可以发送。",
+    "ru": "На блоке {block} все проверки пройдены: можно отправлять.",
+    "uk": "На блоці {block} усі перевірки пройдено: можна надсилати."
+  },
+  "mallInbox.checkedWaiting": {
+    "en": "At block {block}, nothing could be sent until:",
+    "zh-Hans": "在区块 {block} 时，以下条件满足前不能发送：",
+    "ru": "На блоке {block} ничего нельзя было отправить, пока не будет выполнено:",
+    "uk": "На блоці {block} нічого не можна було надіслати, доки не буде виконано:"
+  },
+  "mallInbox.cameFirst": {
+    "en": "This order's own coin is in block {block}, before every payment counted for it, so it existed before its reference was public.",
+    "zh-Hans": "此订单自己的币在区块 {block}，早于计入它的每一笔付款，因此它在编号公开之前就已存在。",
+    "ru": "Собственная монета этого заказа находится в блоке {block}, раньше каждого засчитанного ему платежа, значит, он существовал до того, как его номер стал публичным.",
+    "uk": "Власна монета цього замовлення в блоці {block}, раніше за кожен зарахований йому платіж, отже, воно існувало до того, як його номер став публічним."
+  },
+  "mallInbox.deliverToRecord": {
+    "en": "Deliver to the order of record ({address})",
+    "zh-Hans": "发送给正式订单（{address}）",
+    "ru": "Отправить по основному заказу ({address})",
+    "uk": "Надіслати за основним замовленням ({address})"
+  },
+  "mallInbox.deliverToRecordQuestion": {
+    "en": "Deliver to the order of record?",
+    "zh-Hans": "发送给正式订单？",
+    "ru": "Отправить по основному заказу?",
+    "uk": "Надіслати за основним замовленням?"
+  },
+  "mallInbox.deliverToRecordHelp": {
+    "en": "The other order with this reference arrived after this one's payment made the reference public. Nothing else changes: every other check still applies.",
+    "zh-Hans": "使用此编号的另一订单是在此订单的付款使编号公开之后才到达的。其他一切不变：其余检查仍然适用。",
+    "ru": "Другой заказ с этим номером пришёл после того, как оплата этого заказа сделала номер публичным. Больше ничего не меняется: все остальные проверки по-прежнему действуют.",
+    "uk": "Інше замовлення з цим номером надійшло після того, як оплата цього замовлення зробила номер публічним. Більше нічого не змінюється: усі інші перевірки й далі діють."
+  },
+  "mallInbox.upgradedRecheck": {
+    "en": "Upgraded: re-check this order's payment. It was recorded by an older Inbox, and nothing is sent until its coins are read back on chain.",
+    "zh-Hans": "已升级：请重新检查此订单的付款。它由旧版收件箱记录，在其币于链上读回之前不会发送任何内容。",
+    "ru": "Обновлено: перепроверьте оплату этого заказа. Она записана старой версией Inbox, и ничего не отправляется, пока её монеты не будут прочитаны в цепи.",
+    "uk": "Оновлено: перевірте оплату цього замовлення ще раз. Її записала старіша версія Inbox, і нічого не надсилається, доки її монети не буде прочитано в ланцюгу."
+  },
+  "mallInbox.autoOffBanner": {
+    "en": "Automatic NFT delivery is now OFF after this update. Switch it on again from the automatic delivery line below; it then sends only for orders that pass every check. (Tap to dismiss.)",
+    "zh-Hans": "此更新后，自动 NFT 发送现已关闭。可通过下方的自动发送一行重新开启；开启后只会为通过全部检查的订单发送。（点按以关闭此提示。）",
+    "ru": "После этого обновления автоматическая отправка NFT выключена. Включите её снова строкой автоматической отправки ниже; тогда она отправляет только по заказам, прошедшим все проверки. (Нажмите, чтобы скрыть.)",
+    "uk": "Після цього оновлення автоматичне надсилання NFT вимкнено. Увімкніть його знову рядком автоматичного надсилання нижче; тоді воно надсилає лише за замовленнями, що пройшли всі перевірки. (Натисніть, щоб приховати.)"
   }
 }

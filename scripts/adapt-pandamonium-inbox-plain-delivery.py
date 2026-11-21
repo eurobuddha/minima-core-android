@@ -1,22 +1,25 @@
 """Reuse NFT Wallet's native prepared-send evidence directly for ordinary Inbox NFT orders."""
 from pathlib import Path
 
+def journal_edits(s):
+    """The DeliveryJournal edits this step makes (also used by scripts/verify-pandamonium-sources.py)."""
+    s=s.replace('    private void fresh(', '    void fresh(')
+    needle='            save(db,key,row,insert);db.setTransactionSuccessful();return row;';assert s.count(needle)==1
+    s=s.replace(needle,'            PlainDeliveryJournal.assertAvailable(db,claiming,null);\n'+needle)
+    needle='    boolean owned(JSONObject e)';assert s.count(needle)==1
+    return s.replace(needle,'''    static boolean reserved(JSONObject e) {
+        return !NOT_SUBMITTED.equals(e.optString("phase"))
+                && !(PREPARED.equals(e.optString("phase"))&&!LIVE.contains(e.optString("owner")));
+    }
+    boolean owned(JSONObject e)''')
+
 def adapt(root):
     source=Path(__file__).with_name('pandamonium-sources')
     nft=root/'NFTwallet/src/main/java/com/eurobuddha/nftwallet'
     (nft/'OrderPaymentEvidence.java').write_text((source/'NFTwallet/OrderPaymentEvidence.java').read_text())
     folder=root/'merchinbox/src/main/java/com/eurobuddha/merchinbox'
     for name in ['PlainDeliveryJournal.java','PlainDeliveryFlow.java']:(folder/name).write_text((source/'merchinbox'/name).read_text())
-    p=folder/'DeliveryJournal.java';s=p.read_text()
-    s=s.replace('    private void fresh(', '    void fresh(')
-    needle='            save(db,key,row,insert);db.setTransactionSuccessful();return row;';assert s.count(needle)==1
-    s=s.replace(needle,'            PlainDeliveryJournal.assertAvailable(db,claiming,null);\n'+needle)
-    needle='    boolean owned(JSONObject e)';assert s.count(needle)==1
-    s=s.replace(needle,'''    static boolean reserved(JSONObject e) {
-        return !NOT_SUBMITTED.equals(e.optString("phase"))
-                && !(PREPARED.equals(e.optString("phase"))&&!LIVE.contains(e.optString("owner")));
-    }
-    boolean owned(JSONObject e)''');p.write_text(s)
+    p=folder/'DeliveryJournal.java';p.write_text(journal_edits(p.read_text()))
     p=root/'merchinbox/src/main/java/com/eurobuddha/comms/MerchDb.java';s=p.read_text()
     s=s.replace('private static final int VERSION = 3;   // v3: durable StateNFT delivery journal','private static final int VERSION = 4;   // v4: ordinary NFT delivery journal')
     needle='        com.eurobuddha.merchinbox.DeliveryJournal.create(db);';assert s.count(needle)==2

@@ -8652,7 +8652,7 @@
     <!-- Arguments: a, b, c -->
     <string name="l10n_mall_inbox_drain_r_conf">"币 %1$s 有 %2$s 个确认；需要 %3$s 个"</string>
     <!-- Arguments: a, b -->
-    <string name="l10n_mall_inbox_drain_r_paid">"链上已付且确认足够：%1$s，应付 %2$s"</string>
+    <string name="l10n_mall_inbox_drain_r_paid">"链上尚未付清：应付 %2$s，其中有足够确认的为 %1$s"</string>
     <string name="l10n_mall_inbox_drain_r_in_flight" formatted="false">"此行正在发送，或其发送未完成且可能已经发出：请先检查钱包历史"</string>
     <!-- Arguments: a, b, c -->
     <string name="l10n_mall_inbox_drain_r_would_exceed">"发送 %1$s 件会使此商品已交付 %2$s 件，超过您列出的 %3$s 件"</string>
@@ -8760,4 +8760,21 @@
     <string name="l10n_mall_inbox_contended_full" formatted="false">"使用此编号的付款超过了收件箱可保存的数量，因此无法全部读取：此处不能切换任何订单。"</string>
     <!-- Arguments: coin, amount, token -->
     <string name="l10n_mall_inbox_unassigned_coin">"一笔带有此编号但没有付款密钥的付款，未计入任何订单：币 %1$s，代币 %3$s 数量 %2$s。"</string>
+    <!-- Arguments: a, b -->
+    <string name="l10n_mall_inbox_drain_r_coin_gone">"币 %1$s 已不在链上，且从未达到 %2$s 个确认"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_coin_unread">"无法读取币 %1$s"</string>
+    <string name="l10n_mall_inbox_not_checked_yet" formatted="false">"尚未检查：点按“发送”检查此行（只有全部检查通过才会发送）。"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_checked_ready">"在区块 %1$s 时全部检查通过：可以发送。"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_checked_waiting">"在区块 %1$s 时，以下条件满足前不能发送："</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_came_first">"此订单自己的币在区块 %1$s，早于计入它的每一笔付款，因此它在编号公开之前就已存在。"</string>
+    <!-- Arguments: address -->
+    <string name="l10n_mall_inbox_deliver_to_record">"发送给正式订单（%1$s）"</string>
+    <string name="l10n_mall_inbox_deliver_to_record_question" formatted="false">"发送给正式订单？"</string>
+    <string name="l10n_mall_inbox_deliver_to_record_help" formatted="false">"使用此编号的另一订单是在此订单的付款使编号公开之后才到达的。其他一切不变：其余检查仍然适用。"</string>
+    <string name="l10n_mall_inbox_upgraded_recheck" formatted="false">"已升级：请重新检查此订单的付款。它由旧版收件箱记录，在其币于链上读回之前不会发送任何内容。"</string>
+    <string name="l10n_mall_inbox_auto_off_banner" formatted="false">"此更新后，自动 NFT 发送现已关闭。可通过下方的自动发送一行重新开启；开启后只会为通过全部检查的订单发送。（点按以关闭此提示。）"</string>
 </resources>

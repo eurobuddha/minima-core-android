@@ -133,7 +133,6 @@ public final class DeliveryJournal {
                 && !(PREPARED.equals(e.optString("phase"))&&!LIVE.contains(e.optString("owner")));
     }
     boolean owned(JSONObject e) {return LIVE.contains(owner)&&PREPARED.equals(e.optString("phase"))&&owner.equals(e.optString("owner"));}
-    /** PREPARED may be retried only before POSTING was durably recorded. */
     /** As PlainDeliveryJournal.stale: every POSTING entry becomes UNKNOWN (final check L-D). */
     void stale(String key,MerchDb.Order o,String[] line) {
         SQLiteDatabase db=store.getWritableDatabase();db.beginTransaction();
@@ -145,6 +144,7 @@ public final class DeliveryJournal {
             save(db,key,row,false);db.setTransactionSuccessful();
         }catch(JSONException e){throw DeliveryEvidence.invalid();}finally{db.endTransaction();}
     }
+    /** PREPARED may be retried only before POSTING was durably recorded. */
     void phase(String key,MerchDb.Order o,String[] line,String input,String next) {
         SQLiteDatabase db=store.getWritableDatabase();db.beginTransaction();
         try {

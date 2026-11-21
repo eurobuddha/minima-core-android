@@ -15,4 +15,12 @@ public class PlainAmountTest {
         assertEquals("", Util.plainAmount(""));          // empty stays empty (fees are written "0" before this)
         assertEquals("1,5", Util.plainAmount(" 1,5"));   // not a number: passed on, the shop refuses it
     }
+
+    /** Point release item 13: a huge exponent is never expanded into a huge string. */
+    @Test(timeout = 2000) public void aHugeExponentIsNotExpanded() {
+        assertEquals("1e1000000", Util.plainAmount("1e1000000"));
+        assertEquals("1e-1000000", Util.plainAmount("1e-1000000"));
+        assertEquals("x".repeat(81), Util.plainAmount("x".repeat(81)));
+        assertEquals("123.45", Util.plainAmount("1.2345e2"));
+    }
 }

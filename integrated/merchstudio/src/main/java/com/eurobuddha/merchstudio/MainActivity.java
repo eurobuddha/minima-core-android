@@ -1365,10 +1365,13 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception e) { toast(Language.msg(l10n_mall_inbox_export_error, StudioMessages.error(e))); return; }
         exporting = true;
         refreshTop(buildPreview());
+        final com.eurobuddha.merchstudio.integratedcomms.LocalEcCryptoProvider signer = new com.eurobuddha.merchstudio.integratedcomms.LocalEcCryptoProvider(ls, studioId);
+        final String to = vendorPublicId;
         io.execute(() -> {
             try {
-                File f = snapshot.write(getCacheDir(), MainActivity::resolveExportImage);
-                snapshot.saveListing(getDir("mall_listings", MODE_PRIVATE));   // the Inbox here checks orders against what was just published (M1: outside the node's file folder)
+                final ShopExport signed = snapshot.sealed(b -> signer.seal(to, b));   // signed off the main thread (item 7)
+                File f = signed.write(getCacheDir(), MainActivity::resolveExportImage);
+                signed.saveListing(getDir("mall_listings", MODE_PRIVATE));   // the Inbox here checks orders against what was just published (M1: outside the node's file folder)
                 Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".merchstudio.fileprovider", f);
                 ui.post(() -> {
                     finishExport();
@@ -1502,8 +1505,8 @@ public class MainActivity extends AppCompatActivity {
 
         // The vendor's signed listing (security review M1): the shop without pictures, sealed and signed with the
         // shop key to the shop key, so the vendor's own Inbox can tell it is theirs and unchanged.
+        // The signature itself is made on the io executor from this snapshot (ShopExport.sealed).
         if (studioId == null || !studioId.publicId().equals(vendorPublicId)) throw new IllegalStateException("Your shop key is not ready yet: connect your node and try again.");
-        o.put("listingSealed", new com.eurobuddha.merchstudio.integratedcomms.LocalEcCryptoProvider(ls, studioId).seal(vendorPublicId, ShopExport.listingOf(o).getBytes(StandardCharsets.UTF_8)));
         return new ShopExport(o, slug(shopName), images);
     }
 

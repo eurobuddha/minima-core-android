@@ -855,6 +855,15 @@
           "src/main/java/com/eurobuddha/entropy/MainActivity.java": "0f9cc37c85af16aff61f49760f302fd13fba513face985331777f589ddcbc4a3",
           "src/test/java/com/eurobuddha/entropy/RollEngineTest.java": "142cce7988d8eb62f49fcd08d6674cdf1d07a0285610f9aae17485c1ea1050c1"
         }
+      },
+      {
+        "revision": "25e5a1903509642a48e3e5c0711638bd007bb793",
+        "version": "0.1.17",
+        "summary": "SHA3-256 self-test at startup; comments.",
+        "files": {
+          "src/main/java/com/eurobuddha/entropy/Sha3.java": "cc75b0585f77f08b7317cee85e1e7bc8498d17df51c70bcd23a0d39454363468",
+          "src/main/java/com/eurobuddha/entropy/MainActivity.java": "78199ea0d8ea9409fd20b359f87992ec89103d408a29eb8ef8547278d0813b65"
+        }
       }
     ]
   },
@@ -1228,6 +1237,14 @@
         "files": {
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "a34437ce9e30d902de004f1d88145a69c7ed0311f4a92d0a2b9a45d9ba46a034"
         }
+      },
+      {
+        "revision": "9789fb3cd354e10bddde56b0d061969fb22d4a46",
+        "version": "0.4.26",
+        "summary": "Shared MerchDb identical to Inbox 0.5.39.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "d271ccf133ca586107967b3d5228397dd2058974319d3f5fc0626db87a0b2571"
+        }
       }
     ]
   },
@@ -1386,6 +1403,17 @@
         "summary": "Shared MerchDb identical to Inbox 0.5.30.",
         "files": {
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "a34437ce9e30d902de004f1d88145a69c7ed0311f4a92d0a2b9a45d9ba46a034"
+        }
+      },
+      {
+        "revision": "52ae2e76014b0d74af4bfb0857adc24e58dcd097",
+        "version": "0.3.27",
+        "summary": "Shared MerchDb identical to Inbox 0.5.39 (0.3.25); listing sealed on io from the snapshot and plainAmount bounded (0.3.26); comments (0.3.27).",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "d271ccf133ca586107967b3d5228397dd2058974319d3f5fc0626db87a0b2571",
+          "src/main/java/com/eurobuddha/merchstudio/ShopExport.java": "6d431c738381b1441edebf95427817093d38b9d1ec78c48d412e9cde9815b50b",
+          "src/main/java/com/eurobuddha/merchstudio/MainActivity.java": "0c834a41ef20b1b16444c1978b713dda969107f46d051072274d9fa510d9034d",
+          "src/main/java/com/eurobuddha/merchstudio/Util.java": "758b766ba65a03ba5d61135f95bf8077189302840c4084489ca9044550fdd5f9"
         }
       }
     ]
@@ -1653,6 +1681,19 @@
         "files": {
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "a34437ce9e30d902de004f1d88145a69c7ed0311f4a92d0a2b9a45d9ba46a034",
           "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "50e4e7ce42af422bef1b6180aae792ec3792aa8c2147e7fd4ae543e00756d9a4"
+        }
+      },
+      {
+        "revision": "9171d7d51931fc84776c04f09029fa869c899980",
+        "version": "0.5.39",
+        "summary": "Point release 2026-11-21 (0.5.31-0.5.39): payment coins kept with their block and read back by id, never the address; stock per listing; no notification storm; NFT-only digital orders fee 0; re-send reuses the first attempt's coins and 'it WAS sent'; older-Shop order that came first deliverable to the order of record; upgrade handling; order screen and scanners on io; lifecycle guards; nits.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "d271ccf133ca586107967b3d5228397dd2058974319d3f5fc0626db87a0b2571",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "2068c359b6d05265f3dfb3de355ea29c6492050383598a0de12aabee0bf27fd7",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryRules.java": "d42ff775aa25ddb5b1aa5e50aa742c5c0a076ac87cad5c4b1e28a4f7ef1d59bd",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryLedger.java": "4bb98234c60005417fd10189b030991dbe8db8a41be646ff52ba92790d8f58fb",
+          "src/main/java/com/eurobuddha/merchinbox/Listing.java": "f29329739289426da62aade1e4c5f729e5ea696021d0f6f7d4c29345b4de2ecc",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryGuard.java": "45383f8653d5bc00e840975d3a3d779458d310243f6d00ca901443cefa6b8968"
         }
       }
     ]

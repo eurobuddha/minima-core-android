@@ -30,6 +30,11 @@ public class MainActivity extends AppCompatActivity {
 
     public RollEngine engine() { return engine; }
     public String selfTestError() { return selfTestErr; }
+
+    /** What blocks generation at startup: the BIP39 self-test's error, else a failed SHA3-256 known-answer test. */
+    static String startupError(String bip39Error, boolean sha3Ok) {
+        return bip39Error != null ? bip39Error : sha3Ok ? null : "SHA3-256 known-answer test failed";
+    }
     public boolean engineReady() { return engineReady; }
     public boolean demoMode() { return demoMode; }
 
@@ -82,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             Bip39.init(this);
             selfTestErr = Bip39.selfTest();
+            selfTestErr = startupError(selfTestErr, Sha3.selfTest());   // every face is hashed here: refuse if SHA3 fails
         } catch (Exception e) {
             selfTestErr = "init failed: " + e.getMessage();
         }

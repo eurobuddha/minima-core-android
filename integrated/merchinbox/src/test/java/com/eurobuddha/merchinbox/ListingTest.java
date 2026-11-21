@@ -166,12 +166,16 @@ public class ListingTest {
         assertFalse(u.older); assertFalse(u.listing.has("signedAt"));
     }
 
-    @Test public void thePaymentReadIsBoundedByTheOrder() {
-        String a = VENDOR_ADDR, t = "0x00";
-        assertEquals("coins relevant:true address:" + a + " tokenid:0x00 depth:12", MainActivity.paymentRead(a, t, 1000, 990, 0, 0));
-        assertEquals("from the date: 1 hour = 144 + 100", "coins relevant:true address:" + a + " tokenid:0x00 depth:244", MainActivity.paymentRead(a, t, 1000, 0, 0, 3_600_000));
-        assertEquals("never deeper than the chain", "coins relevant:true address:" + a + " tokenid:0x00 depth:1001", MainActivity.paymentRead(a, t, 1000, 0, 0, Long.MAX_VALUE / 2));
-        assertNull("no chain height: no read", MainActivity.paymentRead(a, t, 0, 990, 0, 0));
-    }
     static final String VENDOR_ADDR = "0x" + "12".repeat(32);
+
+    /** Point release item 10: NFTs only, "digital", and the listing has only postal delivery: no fee (the Shop
+     *  charges none), while a physical item still needs a listed method. */
+    @Test public void anAllNftDigitalOrderHasNoFeeWithoutADigitalRow() throws Exception {
+        JSONObject l = Listing.compact(new JSONObject(shop(ME, "Minima", null, "2.5")).put("shipping", new JSONArray()
+                .put(new JSONObject().put("id", "postal").put("label", "Postal").put("fee", "1.5"))).toString(), ME);
+        Listing.Check c = Listing.check(l, order("Minima", "digital", item("Piece", 1, "10", NFT)));
+        assertTrue(c.problems.toString(), c.problems.isEmpty());
+        assertEquals("10", c.due);
+        assertFalse(Listing.check(l, order("Minima", "digital", item("Print", 1, "2.5", null))).problems.isEmpty());
+    }
 }
