@@ -43881,10 +43881,10 @@
     "uk": "NFT «{a}» коштує 0: NFT ніколи не виставляється безкоштовно."
   },
   "mallInbox.conflictLine": {
-    "en": "Two buyers sent orders with this reference (it is public once paid). Nothing is sent for it: ask the buyer who paid, by message, before you send anything by hand outside this app.",
-    "zh-Hans": "有两位买家用同一编号下单（付款后编号即公开）。不会为其发送任何内容：在本应用之外手动发送任何东西之前，请先通过消息询问付款的买家。",
-    "ru": "Два покупателя прислали заказы с этим номером (после оплаты он публичен). По нему ничего не отправляется: прежде чем отправлять что-либо вручную вне этого приложения, спросите в сообщении покупателя, который заплатил.",
-    "uk": "Два покупці надіслали замовлення з цим номером (після оплати він публічний). За ним нічого не надсилається: перш ніж надсилати щось вручну поза цим застосунком, запитайте в повідомленні покупця, який заплатив."
+    "en": "Another order arrived with this reference (a reference is public once paid), so nothing is sent for it while it is contested. A payment counts only for the order whose secret it commits to; the other orders with this reference are listed below.",
+    "zh-Hans": "有另一个订单使用了此编号（付款后编号即公开），因此在有争议期间不会为其发送任何内容。付款只计入其承诺所对应密钥的订单；使用此编号的其他订单列在下方。",
+    "ru": "Пришёл ещё один заказ с этим номером (после оплаты номер публичен), поэтому, пока он оспаривается, по нему ничего не отправляется. Оплата засчитывается только заказу, к секрету которого она привязана; другие заказы с этим номером перечислены ниже.",
+    "uk": "Надійшло ще одне замовлення з цим номером (після оплати номер публічний), тому, поки його оскаржено, за ним нічого не надсилається. Оплата зараховується лише замовленню, до секрету якого вона прив’язана; інші замовлення з цим номером наведено нижче."
   },
   "mallInbox.unverifiedRef": {
     "en": "This order came from an older Shop without a payment secret: its payment is matched by its reference only.",
@@ -43933,5 +43933,89 @@
     "zh-Hans": "您的商店密钥尚未就绪：请连接您的节点后重试。",
     "ru": "Ключ вашего магазина ещё не готов: подключите узел и попробуйте снова.",
     "uk": "Ключ вашого магазину ще не готовий: під’єднайте вузол і спробуйте знову."
+  },
+  "mallInbox.contendersTitle": {
+    "en": "Other orders with this reference",
+    "zh-Hans": "使用此编号的其他订单",
+    "ru": "Другие заказы с этим номером",
+    "uk": "Інші замовлення з цим номером"
+  },
+  "mallInbox.contender": {
+    "en": "Sender {sender}\nBuyer address {address}\n{items}\nTotal {amount} {currency}",
+    "zh-Hans": "发送者 {sender}\n买家地址 {address}\n{items}\n总计 {amount} {currency}",
+    "ru": "Отправитель {sender}\nАдрес покупателя {address}\n{items}\nИтого {amount} {currency}",
+    "uk": "Відправник {sender}\nАдреса покупця {address}\n{items}\nРазом {amount} {currency}"
+  },
+  "mallInbox.contenderNoSecret": {
+    "en": "No payment secret (an older Shop).",
+    "zh-Hans": "没有付款密钥（旧版商店）。",
+    "ru": "Без секрета оплаты (старый магазин).",
+    "uk": "Без секрету оплати (старий магазин)."
+  },
+  "mallInbox.contenderCommitted": {
+    "en": "The payment at your address commits to THIS order.",
+    "zh-Hans": "您地址上的付款承诺对应的是此订单。",
+    "ru": "Оплата на вашем адресе привязана к ЭТОМУ заказу.",
+    "uk": "Оплата на вашій адресі прив’язана до ЦЬОГО замовлення."
+  },
+  "mallInbox.makeOrderOfRecord": {
+    "en": "Make the order the payment commits to the order of record",
+    "zh-Hans": "将付款所承诺的订单设为正式订单",
+    "ru": "Сделать заказ, к которому привязана оплата, основным",
+    "uk": "Зробити замовлення, до якого прив’язана оплата, основним"
+  },
+  "mallInbox.listingOlderWarning": {
+    "en": "⚠ This listing was signed BEFORE the one in use: it is an older listing. Use it only if you mean to go back to it.",
+    "zh-Hans": "⚠ 此商品列表的签名时间早于正在使用的列表：这是一个较旧的列表。只有在您确实想恢复到它时才使用。",
+    "ru": "⚠ Этот список товаров подписан РАНЬШЕ используемого: это более старый список. Используйте его, только если хотите к нему вернуться.",
+    "uk": "⚠ Цей список товарів підписано РАНІШЕ за той, що використовується: це старіший список. Використовуйте його, лише якщо хочете до нього повернутися."
+  },
+  "mallInbox.summaryShop": {
+    "en": "Shop \"{name}\" ({id}), paid in {currency}",
+    "zh-Hans": "商店“{name}”（{id}），以 {currency} 支付",
+    "ru": "Магазин «{name}» ({id}), оплата в {currency}",
+    "uk": "Магазин «{name}» ({id}), оплата в {currency}"
+  },
+  "mallInbox.summaryToken": {
+    "en": " token {token}",
+    "zh-Hans": " 代币 {token}",
+    "ru": " токен {token}",
+    "uk": " токен {token}"
+  },
+  "mallInbox.summaryCollection": {
+    "en": " (complete collection)",
+    "zh-Hans": "（完整收藏集）",
+    "ru": " (вся коллекция)",
+    "uk": " (уся колекція)"
+  },
+  "mallInbox.summaryProduct": {
+    "en": "\"{name}\"{token}: price {price}, stock {stock}",
+    "zh-Hans": "“{name}”{token}：价格 {price}，库存 {stock}",
+    "ru": "«{name}»{token}: цена {price}, в наличии {stock}",
+    "uk": "«{name}»{token}: ціна {price}, у наявності {stock}"
+  },
+  "mallInbox.summaryDelivery": {
+    "en": "delivery \"{id}\": fee {fee}",
+    "zh-Hans": "配送“{id}”：费用 {fee}",
+    "ru": "доставка «{id}»: стоимость {fee}",
+    "uk": "доставка «{id}»: вартість {fee}"
+  },
+  "mallInbox.summaryChanges": {
+    "en": "Changes from the listing in use:",
+    "zh-Hans": "与正在使用的商品列表相比的变化：",
+    "ru": "Изменения по сравнению с используемым списком:",
+    "uk": "Зміни порівняно зі списком, що використовується:"
+  },
+  "mallInbox.summaryNone": {
+    "en": "none",
+    "zh-Hans": "无",
+    "ru": "нет",
+    "uk": "немає"
+  },
+  "mallInboxDrain.iNotListing": {
+    "en": "This .shop file's signed text is not a miniMall listing. Export it again from miniMall Studio and import that file.",
+    "zh-Hans": "此 .shop 文件中签名的内容不是 miniMall 商品列表。请从 miniMall Studio 重新导出并导入该文件。",
+    "ru": "Подписанный текст этого файла .shop не является списком товаров miniMall. Экспортируйте его заново из miniMall Studio и импортируйте этот файл.",
+    "uk": "Підписаний текст цього файлу .shop не є списком товарів miniMall. Експортуйте його знову з miniMall Studio та імпортуйте цей файл."
   }
 }

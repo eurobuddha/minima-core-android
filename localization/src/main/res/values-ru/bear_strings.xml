@@ -8840,7 +8840,7 @@
     <string name="l10n_mall_inbox_drain_i_bad_sig" formatted="false">"Список в этом файле .shop не подписан ключом вашего магазина. Экспортируйте его снова из miniMall Studio и загрузите этот файл."</string>
     <!-- Arguments: a -->
     <string name="l10n_mall_inbox_drain_i_zero">"NFT «%1$s» стоит 0: NFT никогда не выставляется бесплатно."</string>
-    <string name="l10n_mall_inbox_conflict_line" formatted="false">"Два покупателя прислали заказы с этим номером (после оплаты он публичен). По нему ничего не отправляется: прежде чем отправлять что-либо вручную вне этого приложения, спросите в сообщении покупателя, который заплатил."</string>
+    <string name="l10n_mall_inbox_conflict_line" formatted="false">"Пришёл ещё один заказ с этим номером (после оплаты номер публичен), поэтому, пока он оспаривается, по нему ничего не отправляется. Оплата засчитывается только заказу, к секрету которого она привязана; другие заказы с этим номером перечислены ниже."</string>
     <string name="l10n_mall_inbox_unverified_ref" formatted="false">"Этот заказ пришёл из старого магазина без секрета оплаты: его оплата сопоставляется только по номеру."</string>
     <string name="l10n_mall_inbox_listing_use_question" formatted="false">"Использовать этот список товаров?"</string>
     <string name="l10n_mall_inbox_listing_use_unsigned_question" formatted="false">"Использовать этот НЕПОДПИСАННЫЙ список товаров?"</string>
@@ -8849,4 +8849,23 @@
     <string name="l10n_mall_inbox_listing_in_use_signed" formatted="false">"Используемый список товаров: подписан ключом вашего магазина."</string>
     <string name="l10n_mall_inbox_listing_in_use_confirmed" formatted="false">"Используемый список товаров: неподписанный файл, который вы подтвердили (не подписан ключом вашего магазина)."</string>
     <string name="l10n_mall_studio_error_key_not_ready" formatted="false">"Ключ вашего магазина ещё не готов: подключите узел и попробуйте снова."</string>
+    <string name="l10n_mall_inbox_contenders_title" formatted="false">"Другие заказы с этим номером"</string>
+    <!-- Arguments: sender, address, items, amount, currency -->
+    <string name="l10n_mall_inbox_contender">"Отправитель %1$s\nАдрес покупателя %2$s\n%3$s\nИтого %4$s %5$s"</string>
+    <string name="l10n_mall_inbox_contender_no_secret" formatted="false">"Без секрета оплаты (старый магазин)."</string>
+    <string name="l10n_mall_inbox_contender_committed" formatted="false">"Оплата на вашем адресе привязана к ЭТОМУ заказу."</string>
+    <string name="l10n_mall_inbox_make_order_of_record" formatted="false">"Сделать заказ, к которому привязана оплата, основным"</string>
+    <string name="l10n_mall_inbox_listing_older_warning" formatted="false">"⚠ Этот список товаров подписан РАНЬШЕ используемого: это более старый список. Используйте его, только если хотите к нему вернуться."</string>
+    <!-- Arguments: name, id, currency -->
+    <string name="l10n_mall_inbox_summary_shop">"Магазин «%1$s» (%2$s), оплата в %3$s"</string>
+    <!-- Arguments: token -->
+    <string name="l10n_mall_inbox_summary_token">" токен %1$s"</string>
+    <string name="l10n_mall_inbox_summary_collection" formatted="false">" (вся коллекция)"</string>
+    <!-- Arguments: name, token, price, stock -->
+    <string name="l10n_mall_inbox_summary_product">"«%1$s»%2$s: цена %3$s, в наличии %4$s"</string>
+    <!-- Arguments: id, fee -->
+    <string name="l10n_mall_inbox_summary_delivery">"доставка «%1$s»: стоимость %2$s"</string>
+    <string name="l10n_mall_inbox_summary_changes" formatted="false">"Изменения по сравнению с используемым списком:"</string>
+    <string name="l10n_mall_inbox_summary_none" formatted="false">"нет"</string>
+    <string name="l10n_mall_inbox_drain_i_not_listing" formatted="false">"Подписанный текст этого файла .shop не является списком товаров miniMall. Экспортируйте его заново из miniMall Studio и импортируйте этот файл."</string>
 </resources>

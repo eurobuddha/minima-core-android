@@ -34,11 +34,16 @@ final class ShopExport {
     }
 
     /** The listing Studio signs: the shop without pictures, collection icons or an earlier signature. */
+    static final String LISTING_KIND = "minimall-listing-v1";
+
     static String listingOf(JSONObject shop) throws Exception {
         JSONObject l=new JSONObject(shop.toString());
         l.remove("nftCollections"); l.remove("listingSealed");
         org.json.JSONArray p=l.optJSONArray("products");
         for (int i=0;p!=null&&i<p.length();i++) { JSONObject x=p.optJSONObject(i); if (x!=null) x.remove("image"); }
+        // what this text is and when it was signed (delta review L-c): the Inbox refuses any other kind of signed text
+        // and warns when a listing older than the one in use is imported
+        l.put("kind", LISTING_KIND).put("signedAt", System.currentTimeMillis());
         return l.toString();
     }
 

@@ -353,16 +353,22 @@ public class MainActivity extends AppCompatActivity {
         if (!MerchMessage.validRef(m.ref)) return false;                       // an empty or odd ref is never stored (C1)
         if (MerchMessage.ORDER.equals(m.type)) {
             boolean fresh = db.upsertOrder(m, "seller", coinid);
+            if (fresh && coin != null && coin.optLong("created", 0) > 0) db.setMeta("orderblock:" + m.ref, String.valueOf(coin.optLong("created")));   // bounds the payment read (L-a)
             if (fresh) recheck(db.order(m.ref));   // what is due, from the vendor's own listing
             return fresh;
         }
+        // A message on an existing ref is stored only from that order's own buyer, with its sender (delta review M-2).
         if (MerchMessage.INQUIRY.equals(m.type)) {
             boolean rowNew = db.upsertOrder(m, "seller", coinid);   // ensures the inquiry row exists
-            boolean chatNew = db.insertChat(m.ref, true, m.message, m.randomid, m.date > 0 ? m.date : System.currentTimeMillis());
+            MerchDb.Order o = db.order(m.ref);
+            if (o == null || !m.from.equals(o.counterparty)) return rowNew;
+            boolean chatNew = db.insertChat(m.ref, true, m.message, m.randomid, m.date > 0 ? m.date : System.currentTimeMillis(), m.from);
             return rowNew || chatNew;
         }
         if (MerchMessage.BUYER_REPLY.equals(m.type)) {
-            return db.insertChat(m.ref, true, m.message, m.randomid, m.date > 0 ? m.date : System.currentTimeMillis());
+            MerchDb.Order o = db.order(m.ref);
+            if (o == null || !m.from.equals(o.counterparty)) return false;
+            return db.insertChat(m.ref, true, m.message, m.randomid, m.date > 0 ? m.date : System.currentTimeMillis(), m.from);
         }
         return false;
     }
@@ -371,8 +377,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean routePayment(String coinid, com.eurobuddha.merchinbox.integratedcomms.Opened ignored, JSONObject coin) {
         String refHex = CommsScanner.statePort(coin, 1);
         if (refHex == null) return false;
-        String ref = hexToText(refHex);
-        if (ref.isEmpty()) return false;
+        String ref = DeliveryRules.text(refHex);   // strict: hex of valid UTF-8 only (delta review L-f)
+        if (!MerchMessage.validRef(ref)) return false;
         MerchDb.Order o = db.order(ref);
         if (o == null || o.paid) return false;   // PAID locks; any other coin is counted once (recordPayment keeps its id)
         String amount = MerchDb.coinAmount(coin);   // a token coin's tokenamount, never the Minima amount backing it
@@ -417,8 +423,9 @@ public class MainActivity extends AppCompatActivity {
                 // Shown in full first, every time; a signed listing must be this shop key's, an unsigned one (desktop
                 // builder, older Studio) is allowed only here, under the warning, and only on "Use this listing".
                 String raw = new String(bos.toByteArray(), java.nio.charset.StandardCharsets.UTF_8);
-                final Listing.Prepared p = Listing.prepare(raw, crypto, me, listingFor(new JSONObject(raw).optString("shopId", "")));
-                final CharSequence text = p.signed ? p.summary : Language.msg(l10n_mall_inbox_listing_unsigned_warning) + "\n\n" + p.summary;
+                final Listing.Prepared p = Listing.prepare(raw, crypto, me, this::listingFor, SUMMARY_WORDS);
+                CharSequence t = p.signed ? p.summary : Language.msg(l10n_mall_inbox_listing_unsigned_warning) + "\n\n" + p.summary;
+                final CharSequence text = p.older ? Language.msg(l10n_mall_inbox_listing_older_warning) + "\n\n" + t : t;
                 ui.post(() -> languageDialog().setTitle(Language.msg(p.signed ? l10n_mall_inbox_listing_use_question : l10n_mall_inbox_listing_use_unsigned_question))
                         .setMessage(text).setPositiveButton(Language.msg(l10n_mall_inbox_listing_use), (d, w) -> useListing(p.listing, p.signed))
                         .setNegativeButton(Language.msg(l10n_common_cancel), null).show());
@@ -430,6 +437,17 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton(Language.msg(l10n_common_ok), null).show(); refreshVisibleOrderOrList(); });
         });
     }
+
+    /** The import summary's words in the chosen language (names, ids and figures stay the file's, whole). */
+    static final Listing.Words SUMMARY_WORDS = new Listing.Words() {
+        public String shop(String name, String id, String currency) { return Language.msg(l10n_mall_inbox_summary_shop, name, id, currency).toString(); }
+        public String token(String tokenid) { return Language.msg(l10n_mall_inbox_summary_token, tokenid).toString(); }
+        public String collection() { return Language.msg(l10n_mall_inbox_summary_collection).toString(); }
+        public String product(String name, String token, String price, String stock) { return Language.msg(l10n_mall_inbox_summary_product, name, token, price, stock).toString(); }
+        public String delivery(String id, String fee) { return Language.msg(l10n_mall_inbox_summary_delivery, id, fee).toString(); }
+        public String changes() { return Language.msg(l10n_mall_inbox_summary_changes).toString(); }
+        public String none() { return Language.msg(l10n_mall_inbox_summary_none).toString(); }
+    };
 
     /** Store the listing the vendor confirmed, with whether it is signed and when (it replaces Studio's save of this
      *  shop until Studio publishes again), and check every order of that shop against it. */
@@ -742,6 +760,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         body.addView(copyRow(Language.msg(l10n_mall_inbox_buyer_key), o.counterparty, o.counterparty));
+        if (!inquiry) addContenders(body, o);
 
         // status actions (orders only — an enquiry has no lifecycle)
         if (!inquiry) {
@@ -753,6 +772,32 @@ public class MainActivity extends AppCompatActivity {
         body.addView(sectionLabel(inquiry ? Language.msg(l10n_mall_shop_conversation) : Language.msg(l10n_mall_inbox_message_buyer)));
         body.addView(replyRow(o));
         return col;
+    }
+
+    /** The other orders that arrived with this ref (delta review H-1): sender, buyer address and items whole, which one
+     *  a payment commits to, and the one action the vendor has: make THAT order the order of record. */
+    private void addContenders(LinearLayout body, final MerchDb.Order o) {
+        JSONArray cs = db.contenders(o.ref);
+        if (cs.length() == 0) return;
+        int committed = db.committedContender(o);
+        body.addView(sectionLabel(Language.msg(l10n_mall_inbox_contenders_title)));
+        for (int i = 0; i < cs.length(); i++) {
+            JSONObject c = cs.optJSONObject(i); if (c == null) continue;
+            MerchDb.Order x = new MerchDb.Order(); x.items = c.optString("items"); x.product = c.optString("product");
+            StringBuilder sb = new StringBuilder(Language.msg(l10n_mall_inbox_contender, c.optString("from"), c.optString("payaddr"), itemsText(x),
+                    c.optString("amount"), MerchMessage.label(c.optString("currency"))).toString());
+            if (c.optString("commitment").isEmpty()) sb.append("\n").append(Language.msg(l10n_mall_inbox_contender_no_secret));
+            if (i == committed) sb.append("\n").append(Language.msg(l10n_mall_inbox_contender_committed));
+            body.addView(card(sb.toString()));
+        }
+        if (committed >= 0) {
+            TextView b = button(Language.msg(l10n_mall_inbox_make_order_of_record), false);
+            b.setOnClickListener(v -> io.execute(() -> {
+                if (db.switchToCommitted(o.ref)) recheck(db.order(o.ref));
+                ui.post(() -> refreshOrderIfTopmost(o.ref));
+            }));
+            body.addView(b);
+        }
     }
 
     private View statusButtons(final MerchDb.Order o) {
@@ -853,6 +898,43 @@ public class MainActivity extends AppCompatActivity {
         return ref + ":" + line[1] + ("0".equals(line[3]) ? "" : "#" + line[3]);
     }
 
+    static final int RELEASE_NEVER = 0, RELEASE_UNKNOWN = 1, RELEASE_IF_MOVED = 2;
+
+    /** When the vendor may release an unfinished line (delta review L-e): never while a transfer is being posted, is
+     *  posted and awaiting confirmation, or is confirmed (any entry); at once when its outcome is UNKNOWN or there is
+     *  no journal (a send from before it, outcome unknown); otherwise (prepared, not submitted) only when an input
+     *  coin was moved. */
+    static int releasable(JSONObject row) {
+        if (row == null) return RELEASE_UNKNOWN;
+        java.util.List<String> phases = new java.util.ArrayList<>();
+        JSONArray es = row.optJSONArray("entries");
+        if (es != null) for (int i = 0; i < es.length(); i++) phases.add(es.optJSONObject(i) == null ? "" : es.optJSONObject(i).optString("phase"));
+        else phases.add(row.optString("phase"));
+        for (String p : new String[]{DeliveryJournal.POSTING, DeliveryJournal.POSTED, DeliveryJournal.CONFIRMED}) if (phases.contains(p)) return RELEASE_NEVER;
+        return phases.contains(DeliveryJournal.UNKNOWN) ? RELEASE_UNKNOWN : RELEASE_IF_MOVED;
+    }
+
+    static java.util.List<String> journalInputs(JSONObject row) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        if (row == null) return out;
+        JSONArray es = row.optJSONArray("entries");
+        if (es != null) { for (int i = 0; i < es.length(); i++) if (es.optJSONObject(i) != null) out.add(es.optJSONObject(i).optString("input")); }
+        else try { out.addAll(com.eurobuddha.nftwallet.OrderPaymentEvidence.inputIds(row.optJSONObject("intent"))); } catch (RuntimeException ignored) {}
+        return out;
+    }
+
+    /** True when one of these coins is no longer in the wallet (one bounded read per coin, by id). */
+    private void anyInputGone(java.util.List<String> ids, int i, java.util.function.Consumer<Boolean> then) {
+        if (i >= ids.size()) { then.accept(false); return; }
+        String id = ids.get(i);
+        if (id == null || !id.matches("0x[0-9a-fA-F]{1,128}")) { anyInputGone(ids, i + 1, then); return; }
+        ask("coins relevant:true coinid:" + id, r -> {
+            JSONArray a = r == null || !r.optBoolean("status", false) ? null : r.optJSONArray("response");
+            if (a != null && a.length() == 0) ui.post(() -> then.accept(true));
+            else anyInputGone(ids, i + 1, then);
+        });
+    }
+
     private View nftSendRow(final MerchDb.Order o, final String[] line) {
         final String name = line[0], tokenid = line[1], qty = line[2];
         final boolean piece = !"0".equals(line[3]);
@@ -870,12 +952,14 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout wrap = new LinearLayout(this); wrap.setOrientation(LinearLayout.VERTICAL);
         boolean inFlight = nftSending.contains(key);
         boolean resume = false;
+        JSONObject journalRow = null; boolean journalUnread = false;
         {
-            try { resume = (piece || bundle ? deliveryJournal().load(key, o, line) : plainDeliveryJournal().load(key, o, line)) != null
-                    || !db.getMeta("nftposted:" + key, "").isEmpty() || !db.getMeta("nftsent:" + key, "").isEmpty(); }
-            catch (RuntimeException unavailable) { resume = true; }
+            try { journalRow = piece || bundle ? deliveryJournal().load(key, o, line) : plainDeliveryJournal().load(key, o, line);
+                resume = journalRow != null || !db.getMeta("nftposted:" + key, "").isEmpty() || !db.getMeta("nftsent:" + key, "").isEmpty(); }
+            catch (RuntimeException unavailable) { resume = true; journalUnread = true; }
         }
         final boolean recovering = resume;
+        final int release = journalUnread ? RELEASE_NEVER : releasable(journalRow);
         // Reserved but no journal: the app stopped between the reservation and the transfer. It may not have gone,
         // but nothing more is sent until the vendor has checked the history.
         if (!recovering && !inFlight && DeliveryLedger.RESERVED.equals(DeliveryLedger.state(db.getReadableDatabase(), ledgerKey(o, line)))) {
@@ -913,13 +997,17 @@ public class MainActivity extends AppCompatActivity {
             });
         });
         wrap.addView(b);
-        if (recovering && !inFlight) {   // a send stuck as unknown, or whose coins were moved: released only by the vendor (L3)
+        if (recovering && !inFlight && release != RELEASE_NEVER) {   // a send stuck as unknown, or whose coins were moved: released only by the vendor (L3, L-e)
             TextView rel = button(Language.msg(l10n_mall_inbox_unfinished_release), true);
             rel.setOnClickListener(v -> languageDialog().setTitle(Language.msg(l10n_mall_inbox_unfinished_title))
                     .setMessage(Language.msg(l10n_mall_inbox_unfinished_confirm, tokenid, o.payaddr))
                     .setPositiveButton(Language.msg(l10n_mall_inbox_unfinished_release), (d, w) -> io.execute(() -> { DeliveryLedger.vendorRelease(db.getWritableDatabase(), key); ui.post(() -> refreshOrderIfTopmost(o.ref)); }))
                     .setNegativeButton(Language.msg(l10n_common_cancel), null).show());
-            wrap.addView(rel);
+            if (release == RELEASE_UNKNOWN) wrap.addView(rel);
+            else {   // never posted: offered only once one of its input coins is gone from the wallet (moved)
+                final java.util.List<String> inputs = journalInputs(journalRow);
+                anyInputGone(inputs, 0, gone -> { if (gone && rel.getParent() == null) wrap.addView(rel, Math.max(0, wrap.indexOfChild(b) + 1)); });
+            }
         }
         wrap.addView(why);
         checkDelivery(o.ref, line, verdict -> Language.setText(why, verdict.reasons.isEmpty() ? Language.msg(l10n_mall_inbox_ready_to_send) : InboxMessages.reasons(verdict.reasons, true)));
@@ -965,13 +1053,32 @@ public class MainActivity extends AppCompatActivity {
 
     /** Every rule of DeliveryRules, from fresh reads: the chain tip, the token, the vendor's holdings, the
      *  payment coins at the vendor's own address, and (on the io thread) the order, its listing and the ledger. */
+    static long tipOf(JSONObject b) {
+        try { return Long.parseLong(b == null || b.optJSONObject("response") == null ? "" : b.optJSONObject("response").optString("block", "")); }
+        catch (NumberFormatException e) { return 0; }
+    }
+
+    /** The read of an order's payment coins (delta review L-a): the currency's token at the vendor address, and only
+     *  as deep as the order: from the block its order coin was created at, else from its date at 2 x the 50 s block
+     *  time plus 100 blocks (a payment never predates its order). Unspent coins older than the node's tree sit in
+     *  its root node, at the far end of that depth, so they are still in the reply. With no chain height there is
+     *  no read at all (null): the delivery is refused for want of it. */
+    static String paymentRead(String vendorAddr, String payToken, long tip, long orderBlock, long orderDate, long now) {
+        if (tip <= 0) return null;
+        String cmd = "coins relevant:true address:" + vendorAddr + " tokenid:" + payToken;
+        long depth = orderBlock > 0 && orderBlock <= tip ? tip - orderBlock + 2 : Math.max(0, now - orderDate) / 25_000L + 100;
+        return cmd + " depth:" + Math.max(1, Math.min(depth, tip + 1));
+    }
+
     private void checkDelivery(final String ref, final String[] line, final java.util.function.Consumer<DeliveryRules.Verdict> then) {
         final String tokenid = line[1];
         final boolean askToken = DeliveryGuard.basic(tokenid) == null;
         MerchDb.Order pre = db.order(ref);
         final String payToken = pre == null ? null : MerchMessage.tokenFor(pre.currency);   // only the currency's coins are read (M3)
+        long ob; try { ob = Long.parseLong(db.getMeta("orderblock:" + ref, "0")); } catch (NumberFormatException e) { ob = 0; }
+        final long orderBlock = ob, orderDate = pre == null ? 0 : pre.date;
         ask("block", b -> ask(askToken ? "tokens tokenid:" + tokenid : null, t -> ask(askToken ? "coins relevant:true tokenid:" + tokenid : null, h ->
-                ask(Util.isValidAddress(vendorAddr) && payToken != null ? "coins relevant:true address:" + vendorAddr + " tokenid:" + payToken : null, pay -> io.execute(() -> {
+                ask(Util.isValidAddress(vendorAddr) && payToken != null ? paymentRead(vendorAddr, payToken, tipOf(b), orderBlock, orderDate, System.currentTimeMillis()) : null, pay -> io.execute(() -> {
             DeliveryRules.Inputs in = new DeliveryRules.Inputs();
             in.order = db.order(ref);
             in.mismatch = db.mismatch(in.order);
@@ -985,7 +1092,7 @@ public class MainActivity extends AppCompatActivity {
             in.lineState = !db.getMeta("nftsent:" + key, "").isEmpty() ? DeliveryLedger.SENT : in.order == null ? "" : DeliveryLedger.state(w, ledgerKey(in.order, line));
             in.resuming = in.order != null && deliveryStarted(in.order, line, key);
             in.tokenReply = t; in.holdingsReply = h; in.paymentReply = pay;
-            try { in.tip = Long.parseLong(b == null || b.optJSONObject("response") == null ? "" : b.optJSONObject("response").optString("block", "")); } catch (NumberFormatException e) { in.tip = 0; }
+            in.tip = tipOf(b);
             in.minConf = minConf();
             JSONArray coins = pay == null ? null : pay.optJSONArray("response");
             for (int i = 0; coins != null && i < coins.length(); i++) {
@@ -1371,13 +1478,6 @@ public class MainActivity extends AppCompatActivity {
             java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
             byte[] buf = new byte[4096]; int n; while ((n = is.read(buf)) > 0) bos.write(buf, 0, n);
             return new JSONObject(new String(bos.toByteArray(), StandardCharsets.UTF_8)).optString("shopName", "");
-        } catch (Exception e) { return ""; }
-    }
-
-    private static String hexToText(String hex) {
-        try {
-            String h = hex.startsWith("0x") ? hex.substring(2) : hex;
-            return new String(Hex.from("0x" + h), StandardCharsets.UTF_8);
         } catch (Exception e) { return ""; }
     }
 

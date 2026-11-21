@@ -17,7 +17,13 @@ public class OrderPaymentEvidenceTest {
     @Test public void staleOrderAmountAndUnownedChangeAreRejected()throws Exception {JSONObject q=quote(),intent=plan(q);assertThrows(RuntimeException.class,()->OrderPaymentEvidence.binds(intent,DEST,"4",TOKEN));assertThrows(RuntimeException.class,()->OrderPaymentEvidence.binds(intent,CHANGE,"3",TOKEN));assertThrows(RuntimeException.class,()->OrderPaymentEvidence.intent(q,DEST,"3",TOKEN,REF,Collections.emptySet()));}
     @Test public void malformedAndPartialPostedRepliesRemainUnconfirmed()throws Exception {JSONObject intent=plan(quote());for(JSONObject bad:new JSONObject[]{null,object("status",true),object("pending",true)})assertThrows(RuntimeException.class,()->OrderPaymentEvidence.publicReceipt(bad,intent));JSONObject q=quote();txn(q).getJSONArray("outputs").remove(1);assertThrows(RuntimeException.class,()->OrderPaymentEvidence.publicReceipt(q,intent));}
     @Test public void aMiniMallCommitmentInPortTwoIsAcceptedAndNothingElse()throws Exception {
-        JSONObject q=quote();txn(q).getJSONArray("state").put(object("port",2,"data","0x"+"AB".repeat(32)));plan(q);   // 2.2.69 (H1)
+        JSONObject q=quote();txn(q).getJSONArray("state").put(object("port",2,"data","0x"+"AB".repeat(32)));
+        OrderPaymentEvidence.intent(q,DEST,"3",TOKEN,REF,"0x"+"ab".repeat(32),PreparedSendEvidenceTest.OWN);   // 2.2.69 (H1); exact, any case
+        // delta review L-d: the expected commitment, exactly: not another one, not none, and none when it is expected
+        assertThrows(RuntimeException.class,()->OrderPaymentEvidence.intent(q,DEST,"3",TOKEN,REF,"0x"+"CD".repeat(32),PreparedSendEvidenceTest.OWN));
+        assertThrows(RuntimeException.class,()->plan(q));
+        assertThrows(RuntimeException.class,()->OrderPaymentEvidence.intent(quote(),DEST,"3",TOKEN,REF,"0x"+"AB".repeat(32),PreparedSendEvidenceTest.OWN));
+        assertThrows(RuntimeException.class,()->OrderPaymentEvidence.referenceStamp(q,REF,"0xnothex"));
         JSONObject r=quote();txn(r).getJSONArray("state").put(object("port",3,"data","0x"+"AB".repeat(32)));assertThrows(RuntimeException.class,()->plan(r));
         JSONObject t=quote();txn(t).getJSONArray("state").put(object("port",2,"data","0x"+"AB".repeat(32))).put(object("port",2,"data","0x"+"CD".repeat(32)));assertThrows(RuntimeException.class,()->plan(t));
     }

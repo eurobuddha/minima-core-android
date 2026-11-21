@@ -1212,6 +1212,14 @@
         "files": {
           "src/main/java/com/eurobuddha/comms/CommsTransport.java": "938ed18cb53256b4f125cef282f33eef9d5a6e82b46d7693f74bb5270d713ecd"
         }
+      },
+      {
+        "revision": "bba4d49f0ff00cfd8113a6022eb6ae504e6c2205",
+        "version": "0.4.24",
+        "summary": "Shared MerchDb identical to Inbox 0.5.28 (delta H-1/M-1/M-2). Integrated also: L-d exact commitment in the payment stamp, an order with a secret never paid with port 1 only.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "eeceb8294cc6a010f4a0a03fae00a0c7df0ed20d5c020699c69d1b8c87e8b8f3"
+        }
       }
     ]
   },
@@ -1346,6 +1354,22 @@
         "files": {
           "src/main/java/com/eurobuddha/merchstudio/ShopExport.java": "4d3785ec07809df53339eb9150b97beeae90c44de5b6110263ab1dfdb9af4628",
           "src/main/java/com/eurobuddha/merchstudio/MainActivity.java": "17a2ee6669d1e7da9f041f8b9b05e905f758cfebe58eb67160e3c72a2e6424f0"
+        }
+      },
+      {
+        "revision": "af81a77603fd9e589b82fba4ef68ab43a7141676",
+        "version": "0.3.22",
+        "summary": "Shared MerchDb identical to Inbox 0.5.28.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "eeceb8294cc6a010f4a0a03fae00a0c7df0ed20d5c020699c69d1b8c87e8b8f3"
+        }
+      },
+      {
+        "revision": "46e73ce2887a3f40b35b924877409843a3ab1f75",
+        "version": "0.3.23",
+        "summary": "Delta L-c: the signed listing carries kind minimall-listing-v1 and signedAt.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchstudio/ShopExport.java": "4d55245cc574e333e9698ac2e5e8032b7cad3f4028f0a7a3ffce919f8f33f6b8"
         }
       }
     ]
@@ -1585,6 +1609,25 @@
         "files": {
           "src/main/java/com/eurobuddha/merchinbox/Listing.java": "42080f302d976de8a1781e7d4165c1bb8a87d0f06eebfff712ad56b01b226f1c",
           "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "0d205d864608450ea8de0aac50bd483a2b8322d0ac8e146fc8860902172129be"
+        }
+      },
+      {
+        "revision": "2ce8ce63c8c5661eb76d6c89dcc9a9674546ad55",
+        "version": "0.5.28",
+        "summary": "Delta H-1/M-1/M-2/L-f: a different second order with a stored ref is kept beside it (secret) or ignored (no secret vs secret), its coins flag and count nothing, the vendor may switch to the committed order only; commitment coins pay only their order, reference-only orders only coins without port 2; chat only from the order's buyer with sender; strict hex UTF-8 refs; conflict screen reworded.",
+        "files": {
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "eeceb8294cc6a010f4a0a03fae00a0c7df0ed20d5c020699c69d1b8c87e8b8f3",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "3d7e71139e7db41219e104cb87decc2ffa4b6f8ac5d7c971ef90cfd8baab8da7",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryRules.java": "79bcdd90044549dccd9e140fc0382c03bbcc12bea522a8fc431e6e63946a8562"
+        }
+      },
+      {
+        "revision": "eea7125ee2eb626f5b4c114b1e6e65b16f3bc120",
+        "version": "0.5.29",
+        "summary": "Delta L-a/L-b/L-c: payment coin read bounded by the order's block or date; summary entries one line, control/bidi characters removed, capped; diff against the signed inner shopId; signed text must be kind minimall-listing-v1; older-listing warning. Integrated adds translated summary words.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/Listing.java": "6d41c292e409a7d354eb096b9e69b7413e61ccf8efb9fe0a8cafc1721d791165",
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "b8f6197effe6c9d76b5a4f7a9e94c6078ef9a5ea08c8c30d84081e41620bf09d"
         }
       }
     ]

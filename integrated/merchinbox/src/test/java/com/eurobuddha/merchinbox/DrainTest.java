@@ -214,7 +214,7 @@ public class DrainTest {
         java.io.File dir = activity.getDir("mall_listings", android.content.Context.MODE_PRIVATE);   // Studio's private save (M1)
         String shop = new JSONObject(listing).put("vendorPublicId", ME).toString();
         set("crypto", new ListingTest.FakeCrypto());
-        java.nio.file.Files.write(new java.io.File(dir, "art.shop").toPath(), new JSONObject(shop).put("listingSealed", "sealed:" + ME + ":" + shop).toString().getBytes(StandardCharsets.UTF_8));
+        java.nio.file.Files.write(new java.io.File(dir, "art.shop").toPath(), new JSONObject(shop).put("listingSealed", "sealed:" + ME + ":" + ListingTest.signedText(shop, 1000)).toString().getBytes(StandardCharsets.UTF_8));
         MerchDb.Order o = order("ORD-STUDIO", "Piece", NFT, 1, "10");
         pay("ORD-STUDIO", "10", tip - 5, "0xAC");
         send(o, false);
@@ -237,7 +237,7 @@ public class DrainTest {
         java.nio.file.Files.write(new java.io.File(dir, "art.shop").toPath(), new JSONObject(listing).put("vendorPublicId", ME).toString().getBytes(StandardCharsets.UTF_8));
         java.io.File old = new java.io.File(activity.getFilesDir(), "mall_listings"); old.mkdirs();   // the 2.2.68 place is never read
         String shop = new JSONObject(listing).put("vendorPublicId", ME).toString();
-        java.nio.file.Files.write(new java.io.File(old, "art.shop").toPath(), new JSONObject(shop).put("listingSealed", "sealed:" + ME + ":" + shop).toString().getBytes(StandardCharsets.UTF_8));
+        java.nio.file.Files.write(new java.io.File(old, "art.shop").toPath(), new JSONObject(shop).put("listingSealed", "sealed:" + ME + ":" + ListingTest.signedText(shop, 1000)).toString().getBytes(StandardCharsets.UTF_8));
         MerchDb.Order o = order("ORD-UNSIGNED", "Piece", NFT, 1, "10");
         pay("ORD-UNSIGNED", "10", tip - 5, "0xAD");
         send(o, false);
@@ -272,7 +272,7 @@ public class DrainTest {
         assertEquals("0", db.getMeta("listingsigned:art", ""));
         assertEquals("Listing in use: an unsigned file you confirmed (not signed by your shop key).", MainActivity.listingInUse(false).toString());
         // a signed file is shown in full too, without the warning, and is marked signed once confirmed
-        String signedShop = new JSONObject(shop).put("listingSealed", "sealed:" + ME + ":" + shop).toString();
+        String signedShop = new JSONObject(shop).put("listingSealed", "sealed:" + ME + ":" + ListingTest.signedText(shop, 1000)).toString();
         d = importFile(signedShop);
         assertFalse(text(d).contains("not signed"));
         d.getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick(); ShadowLooper.idleMainLooper();
@@ -282,7 +282,7 @@ public class DrainTest {
         String now = db.getMeta("listing:art", "");
         for (String bad : new String[]{ new JSONObject(shop).put("vendorPublicId", "0x" + "EE".repeat(64)).toString(),
                 shop.replace("\"price\":\"12\"", "\"price\":\"0\""),
-                new JSONObject(shop).put("listingSealed", "sealed:" + "0x" + "EE".repeat(64) + ":" + shop).toString() }) {
+                new JSONObject(shop).put("listingSealed", "sealed:" + "0x" + "EE".repeat(64) + ":" + ListingTest.signedText(shop, 1000)).toString() }) {
             d = importFile(bad);
             assertNotEquals("Use this listing", d.getButton(android.content.DialogInterface.BUTTON_POSITIVE).getText().toString());
             assertEquals(now, db.getMeta("listing:art", ""));
@@ -294,7 +294,7 @@ public class DrainTest {
         java.io.File dir = activity.getDir("mall_listings", android.content.Context.MODE_PRIVATE);
         String studio = new JSONObject(db.getMeta("listing:art", "")).put("vendorPublicId", ME).toString();
         java.io.File f = new java.io.File(dir, "art.shop");
-        java.nio.file.Files.write(f.toPath(), new JSONObject(studio).put("listingSealed", "sealed:" + ME + ":" + studio).toString().getBytes(StandardCharsets.UTF_8));
+        java.nio.file.Files.write(f.toPath(), new JSONObject(studio).put("listingSealed", "sealed:" + ME + ":" + ListingTest.signedText(studio, 1000)).toString().getBytes(StandardCharsets.UTF_8));
         f.setLastModified(1000);
         String imported = new JSONObject(studio).put("products", new JSONArray()
                 .put(new JSONObject().put("name", "Piece").put("price", "12").put("maxUnits", 1).put("nftTokenId", NFT))).toString();

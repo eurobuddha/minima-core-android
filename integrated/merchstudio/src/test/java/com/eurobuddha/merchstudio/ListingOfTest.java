@@ -17,5 +17,8 @@ public class ListingOfTest {
         assertFalse(l.getJSONArray("products").getJSONObject(0).has("image"));
         assertEquals("10", l.getJSONArray("products").getJSONObject(0).getString("price"));
         assertTrue("the shop itself is unchanged", shop.has("listingSealed"));
+        assertEquals("minimall-listing-v1", l.getString("kind"));
+        long at = l.getLong("signedAt");
+        assertTrue(at > 1_700_000_000_000L && at <= System.currentTimeMillis());
     }
 }

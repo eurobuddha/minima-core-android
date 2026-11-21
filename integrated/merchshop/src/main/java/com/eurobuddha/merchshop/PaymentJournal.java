@@ -17,7 +17,12 @@ public final class PaymentJournal {
     private final MerchDb store;
     PaymentJournal(MerchDb store){this.store=store;LIVE.add(owner);}
     /** The commitment of this order's secret for the payment's state port 2, "" for an order without one (H1). */
-    String commitment(MerchDb.Order o){return com.eurobuddha.merchshop.integratedcomms.MerchMessage.commitment(store.nonce(o));}
+    /** The commitment a payment of this order must carry in port 2: "" for an order without a secret; an order that
+     *  has a secret is never paid with port 1 only (delta review L-d), so a secret that yields none is refused. */
+    String commitment(MerchDb.Order o){
+        String n=store.nonce(o);if(n.isEmpty())return "";
+        String c=com.eurobuddha.merchshop.integratedcomms.MerchMessage.commitment(n);if(c.isEmpty())throw invalid();return c;
+    }
     void close(){LIVE.remove(owner);}
     public static void create(SQLiteDatabase db){db.execSQL("CREATE TABLE IF NOT EXISTS shop_payment (orderref TEXT PRIMARY KEY NOT NULL,data TEXT NOT NULL)");}
     static JSONObject read(String raw) {
@@ -90,7 +95,7 @@ public final class PaymentJournal {
         try {
             JSONObject row=bound(db,key,o);
             if(row==null||!Arrays.asList(POSTING,UNKNOWN,POSTED).contains(row.optString("phase")))throw invalid();
-            OrderPaymentEvidence.referenceStamp(reply,o.ref);
+            OrderPaymentEvidence.referenceStamp(reply,o.ref,commitment(o));
             row.put("receipt",OrderPaymentEvidence.publicReceipt(reply,row.getJSONObject("intent"))).put("phase",chain==null?POSTED:CONFIRMED);
             if(chain!=null)row.put("inclusion",OrderPaymentEvidence.inclusion(chain));
             save(db,key,row,false);db.setTransactionSuccessful();

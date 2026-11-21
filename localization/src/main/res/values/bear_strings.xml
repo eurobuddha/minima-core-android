@@ -8766,7 +8766,7 @@
     <string name="l10n_mall_inbox_drain_i_bad_sig" formatted="false">"This .shop file\'s listing is not signed by your shop key. Export it again from miniMall Studio and import that file."</string>
     <!-- Arguments: a -->
     <string name="l10n_mall_inbox_drain_i_zero">"The NFT \"%1$s\" is priced at 0: an NFT is never listed for nothing."</string>
-    <string name="l10n_mall_inbox_conflict_line" formatted="false">"Two buyers sent orders with this reference (it is public once paid). Nothing is sent for it: ask the buyer who paid, by message, before you send anything by hand outside this app."</string>
+    <string name="l10n_mall_inbox_conflict_line" formatted="false">"Another order arrived with this reference (a reference is public once paid), so nothing is sent for it while it is contested. A payment counts only for the order whose secret it commits to; the other orders with this reference are listed below."</string>
     <string name="l10n_mall_inbox_unverified_ref" formatted="false">"This order came from an older Shop without a payment secret: its payment is matched by its reference only."</string>
     <string name="l10n_mall_inbox_listing_use_question" formatted="false">"Use this listing?"</string>
     <string name="l10n_mall_inbox_listing_use_unsigned_question" formatted="false">"Use this UNSIGNED listing?"</string>
@@ -8775,4 +8775,23 @@
     <string name="l10n_mall_inbox_listing_in_use_signed" formatted="false">"Listing in use: signed by your shop key."</string>
     <string name="l10n_mall_inbox_listing_in_use_confirmed" formatted="false">"Listing in use: an unsigned file you confirmed (not signed by your shop key)."</string>
     <string name="l10n_mall_studio_error_key_not_ready" formatted="false">"Your shop key is not ready yet: connect your node and try again."</string>
+    <string name="l10n_mall_inbox_contenders_title" formatted="false">"Other orders with this reference"</string>
+    <!-- Arguments: sender, address, items, amount, currency -->
+    <string name="l10n_mall_inbox_contender">"Sender %1$s\nBuyer address %2$s\n%3$s\nTotal %4$s %5$s"</string>
+    <string name="l10n_mall_inbox_contender_no_secret" formatted="false">"No payment secret (an older Shop)."</string>
+    <string name="l10n_mall_inbox_contender_committed" formatted="false">"The payment at your address commits to THIS order."</string>
+    <string name="l10n_mall_inbox_make_order_of_record" formatted="false">"Make the order the payment commits to the order of record"</string>
+    <string name="l10n_mall_inbox_listing_older_warning" formatted="false">"⚠ This listing was signed BEFORE the one in use: it is an older listing. Use it only if you mean to go back to it."</string>
+    <!-- Arguments: name, id, currency -->
+    <string name="l10n_mall_inbox_summary_shop">"Shop \"%1$s\" (%2$s), paid in %3$s"</string>
+    <!-- Arguments: token -->
+    <string name="l10n_mall_inbox_summary_token">" token %1$s"</string>
+    <string name="l10n_mall_inbox_summary_collection" formatted="false">" (complete collection)"</string>
+    <!-- Arguments: name, token, price, stock -->
+    <string name="l10n_mall_inbox_summary_product">"\"%1$s\"%2$s: price %3$s, stock %4$s"</string>
+    <!-- Arguments: id, fee -->
+    <string name="l10n_mall_inbox_summary_delivery">"delivery \"%1$s\": fee %2$s"</string>
+    <string name="l10n_mall_inbox_summary_changes" formatted="false">"Changes from the listing in use:"</string>
+    <string name="l10n_mall_inbox_summary_none" formatted="false">"none"</string>
+    <string name="l10n_mall_inbox_drain_i_not_listing" formatted="false">"This .shop file\'s signed text is not a miniMall listing. Export it again from miniMall Studio and import that file."</string>
 </resources>

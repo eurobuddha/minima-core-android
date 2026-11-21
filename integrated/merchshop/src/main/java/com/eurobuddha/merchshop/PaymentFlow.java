@@ -74,7 +74,7 @@ final class PaymentFlow {
         if(!live())return;
         if(index>=addresses.size()) {
             final JSONObject intent;
-            try{intent=OrderPaymentEvidence.intent(quote,order.payaddr,order.amount,order.tokenid,order.ref,verified);}catch(RuntimeException invalid){stop();return;}
+            try{intent=OrderPaymentEvidence.intent(quote,order.payaddr,order.amount,order.tokenid,order.ref,commitment,verified);}catch(RuntimeException invalid){stop();return;}
             work(()->saved=journal.prepare(key,order,handle,intent),this::sign);return;
         }
         String address=addresses.get(index);
@@ -103,7 +103,7 @@ final class PaymentFlow {
         node.cmd("sendview file:"+signedFile,new NodeApi.Cb(){
             public void onResult(JSONObject reply) {
                 if(!live())return;
-                try{OrderPaymentEvidence.referenceStamp(reply,order.ref);OrderPaymentEvidence.publicReceipt(reply,saved.optJSONObject("intent"));}catch(RuntimeException mismatch){failPrepared();return;}
+                try{OrderPaymentEvidence.referenceStamp(reply,order.ref,commitment);OrderPaymentEvidence.publicReceipt(reply,saved.optJSONObject("intent"));}catch(RuntimeException mismatch){failPrepared();return;}
                 filesVerified=true;
                 work(()->journal.phase(key,order,handle,POSTING),PaymentFlow.this::post,PaymentFlow.this::failPrepared);
             }

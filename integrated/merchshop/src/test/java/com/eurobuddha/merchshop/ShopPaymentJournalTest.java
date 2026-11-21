@@ -6,6 +6,14 @@ import static org.junit.Assert.*;
 import static com.eurobuddha.merchshop.PaymentJournal.*;
 @org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner.class) @org.robolectric.annotation.Config(sdk=33,manifest=org.robolectric.annotation.Config.NONE)
 public class ShopPaymentJournalTest extends ShopPaymentFixture {
+    /** Delta review L-d: an order with a secret is never paid with port 1 only, and a receipt must carry its commitment exactly. */
+    @Test public void anOrderWithASecretIsNeverPaidOrReceiptedWithoutItsCommitment()throws Exception {
+        assertEquals("",plain.commitment(order));
+        db.setMeta("nonce:"+KEY,"0xnot-a-secret");assertThrows(RuntimeException.class,()->plain.commitment(order));
+        String n=MerchMessage.newNonce();db.setMeta("nonce:"+KEY,n);assertEquals(MerchMessage.commitment(n),plain.commitment(order));
+        preparePlain();plainPhase(POSTING);
+        assertThrows("the fixture's receipt has port 1 only",RuntimeException.class,()->plain.receipt(KEY,order,quote(),null));
+    }
     @Test public void restartCanReclaimPreparationButCannotRepeatAnUnknownPost()throws Exception {
         preparePlain();plain.close();plain=new PaymentJournal(db);preparePlain();plainPhase(POSTING);plain.close();plain=new PaymentJournal(db);
         assertThrows(RuntimeException.class,this::preparePlain);assertEquals(POSTING,plainPhase());

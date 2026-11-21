@@ -8840,7 +8840,7 @@
     <string name="l10n_mall_inbox_drain_i_bad_sig" formatted="false">"Список у цьому файлі .shop не підписано ключем вашого магазину. Експортуйте його знову з miniMall Studio і завантажте цей файл."</string>
     <!-- Arguments: a -->
     <string name="l10n_mall_inbox_drain_i_zero">"NFT «%1$s» коштує 0: NFT ніколи не виставляється безкоштовно."</string>
-    <string name="l10n_mall_inbox_conflict_line" formatted="false">"Два покупці надіслали замовлення з цим номером (після оплати він публічний). За ним нічого не надсилається: перш ніж надсилати щось вручну поза цим застосунком, запитайте в повідомленні покупця, який заплатив."</string>
+    <string name="l10n_mall_inbox_conflict_line" formatted="false">"Надійшло ще одне замовлення з цим номером (після оплати номер публічний), тому, поки його оскаржено, за ним нічого не надсилається. Оплата зараховується лише замовленню, до секрету якого вона прив’язана; інші замовлення з цим номером наведено нижче."</string>
     <string name="l10n_mall_inbox_unverified_ref" formatted="false">"Це замовлення прийшло зі старого магазину без секрету оплати: його оплата зіставляється лише за номером."</string>
     <string name="l10n_mall_inbox_listing_use_question" formatted="false">"Використати цей список товарів?"</string>
     <string name="l10n_mall_inbox_listing_use_unsigned_question" formatted="false">"Використати цей НЕПІДПИСАНИЙ список товарів?"</string>
@@ -8849,4 +8849,23 @@
     <string name="l10n_mall_inbox_listing_in_use_signed" formatted="false">"Список товарів, що використовується: підписаний ключем вашого магазину."</string>
     <string name="l10n_mall_inbox_listing_in_use_confirmed" formatted="false">"Список товарів, що використовується: непідписаний файл, який ви підтвердили (не підписаний ключем вашого магазину)."</string>
     <string name="l10n_mall_studio_error_key_not_ready" formatted="false">"Ключ вашого магазину ще не готовий: під’єднайте вузол і спробуйте знову."</string>
+    <string name="l10n_mall_inbox_contenders_title" formatted="false">"Інші замовлення з цим номером"</string>
+    <!-- Arguments: sender, address, items, amount, currency -->
+    <string name="l10n_mall_inbox_contender">"Відправник %1$s\nАдреса покупця %2$s\n%3$s\nРазом %4$s %5$s"</string>
+    <string name="l10n_mall_inbox_contender_no_secret" formatted="false">"Без секрету оплати (старий магазин)."</string>
+    <string name="l10n_mall_inbox_contender_committed" formatted="false">"Оплата на вашій адресі прив’язана до ЦЬОГО замовлення."</string>
+    <string name="l10n_mall_inbox_make_order_of_record" formatted="false">"Зробити замовлення, до якого прив’язана оплата, основним"</string>
+    <string name="l10n_mall_inbox_listing_older_warning" formatted="false">"⚠ Цей список товарів підписано РАНІШЕ за той, що використовується: це старіший список. Використовуйте його, лише якщо хочете до нього повернутися."</string>
+    <!-- Arguments: name, id, currency -->
+    <string name="l10n_mall_inbox_summary_shop">"Магазин «%1$s» (%2$s), оплата в %3$s"</string>
+    <!-- Arguments: token -->
+    <string name="l10n_mall_inbox_summary_token">" токен %1$s"</string>
+    <string name="l10n_mall_inbox_summary_collection" formatted="false">" (уся колекція)"</string>
+    <!-- Arguments: name, token, price, stock -->
+    <string name="l10n_mall_inbox_summary_product">"«%1$s»%2$s: ціна %3$s, у наявності %4$s"</string>
+    <!-- Arguments: id, fee -->
+    <string name="l10n_mall_inbox_summary_delivery">"доставка «%1$s»: вартість %2$s"</string>
+    <string name="l10n_mall_inbox_summary_changes" formatted="false">"Зміни порівняно зі списком, що використовується:"</string>
+    <string name="l10n_mall_inbox_summary_none" formatted="false">"немає"</string>
+    <string name="l10n_mall_inbox_drain_i_not_listing" formatted="false">"Підписаний текст цього файлу .shop не є списком товарів miniMall. Експортуйте його знову з miniMall Studio та імпортуйте цей файл."</string>
 </resources>
