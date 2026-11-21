@@ -64,6 +64,13 @@ public class DrainTest {
                 String id = c.substring(28);
                 r.put("response", new JSONArray().put(new JSONObject().put("coinid", "0x" + "99".repeat(32)).put("tokenid", id).put("tokenamount", held.getOrDefault(id, "0"))));
             } else if (c.startsWith("coins relevant:true address:")) { coinReads.add(c); r.put("response", new JSONArray(payments)); }
+            else if (c.startsWith("coins address:")) r.put("response", new JSONArray(payments));   // a scanner page
+            else if (c.startsWith("coins relevant:false address:")) {   // a find window: the unspent coins of the window
+                coinReads.add(c);
+                JSONArray a = new JSONArray();
+                for (JSONObject p : payments) if (!spent.contains(p.optString("coinid").toLowerCase(java.util.Locale.ROOT))) a.put(p);
+                r.put("response", a);
+            }
             else if (c.startsWith("coins relevant:true coinid:")) {   // a read by id: the coin while it is unspent, else nothing
                 coinReads.add(c);
                 JSONArray a = new JSONArray(); String id = c.substring(27);
@@ -344,7 +351,7 @@ public class DrainTest {
         db.recordPayment("ORD-SPENT", "0xB1", "10", "0x00", null, tip - 5);
         call("confirmSweep", new Class<?>[]{long.class}, tip);   // the per-block sweep reads it back once
         ShadowLooper.idleMainLooper();
-        assertEquals(String.valueOf(tip), db.getMeta("paidconf:0xb1", ""));
+        assertTrue(db.getMeta("paidconf:0xb1", ""), db.getMeta("paidconf:0xb1", "").contains("\"block\":" + tip));
         spent.add("0xb1");                                       // the vendor consolidates the revenue
         send(o, false);
         assertEquals(1, sends.size());
@@ -371,7 +378,7 @@ public class DrainTest {
         assertEquals(0, one.compareTo(DeliveryLedger.delivered(w, p, "s2")));
         assertEquals("in flight still counts across listings", 0, one.compareTo(DeliveryLedger.inflight(w, ART)));
         assertEquals("s5", Listing.id(new JSONObject().put("signedAt", 5)));
-        assertEquals("c7", Listing.id(new JSONObject().put("confirmedAt", 7)));
+        assertTrue(Listing.id(new JSONObject().put("confirmedAt", 7)).startsWith("h"));   // an unsigned listing: its content (m3)
     }
 
     /** Point release item 3: an automatic attempt that waits for confirmations is not a failure (no notification);
@@ -434,4 +441,69 @@ public class DrainTest {
         androidx.appcompat.app.AlertDialog d = ((com.eurobuddha.minimacore.i18n.LanguageDialog) call("languageDialog", new Class<?>[]{})).setMessage("late").show();
         assertFalse("not shown on a finishing screen", d.isShowing());
     }
+
+    /** Point release m3: an unsigned listing's id is its content (confirming it again changes nothing, changing it
+     *  does); ledger rows from before rows named their listing are tagged once with the listing then in use. */
+    @Test public void anUnsignedListingIsItsContentAndOlderRowsAreTaggedOnce() throws Exception {
+        JSONObject l = new JSONObject(db.getMeta("listing:art", ""));
+        String id = Listing.id(l);
+        assertTrue(id, id.matches("h[0-9a-f]{64}"));
+        assertEquals(id, Listing.id(new JSONObject(l.toString()).put("confirmedAt", 123)));
+        assertNotEquals(id, Listing.id(new JSONObject(l.toString()).put("shopName", "Other")));
+        db.setMeta("ledger:ORD-T1|0", new JSONObject().put("product", "art|" + ART.toLowerCase(java.util.Locale.ROOT) + "|0|0").put("token", ART).put("qty", "2").put("state", "sent").toString());
+        call("tagLedger", new Class<?>[]{});
+        assertEquals(id, new JSONObject(db.getMeta("ledger:ORD-T1|0", "")).getString("listing"));
+        db.setMeta("ledger:ORD-T2|0", new JSONObject().put("product", "art|x|0|0").put("token", ART).put("qty", "1").put("state", "sent").toString());
+        call("tagLedger", new Class<?>[]{});
+        assertFalse("once only", new JSONObject(db.getMeta("ledger:ORD-T2|0", "")).has("listing"));
+    }
+
+    /** Runs io work only when drained; drop() loses it, as a killed app would. */
+    static final class Queued extends AbstractExecutorService {
+        final java.util.ArrayDeque<Runnable> q = new java.util.ArrayDeque<>();
+        public void execute(Runnable r) { q.add(r); }
+        void drain() { while (!q.isEmpty()) q.poll().run(); }
+        void drop() { q.clear(); }
+        public void shutdown() {} public List<Runnable> shutdownNow() { return new ArrayList<>(); }
+        public boolean isShutdown() { return false; } public boolean isTerminated() { return false; }
+        public boolean awaitTermination(long t, TimeUnit u) { return true; }
+    }
+
+    /** Point release M1: a scan whose coins were queued but never stored (the app closed or was killed) leaves its
+     *  bookmark where it was, so the next scan reads them again; nothing is lost and nothing is counted twice. */
+    @Test public void aScanClosedBeforeItsCoinsAreStoredIsReadAgainAndNothingIsCountedTwice() throws Exception {
+        order("ORD-SCAN", "Piece", NFT, 1, "10");
+        payments.add(new JSONObject().put("coinid", "0xE5").put("tokenid", "0x00").put("amount", "10").put("tokenamount", "10").put("created", String.valueOf(tip - 5))
+                .put("state", new JSONArray().put(new JSONObject().put("port", 1).put("data", "0x" + hex("ORD-SCAN")))));
+        Queued q = new Queued(); set("io", q);
+        call("startPaymentScanner", new Class<?>[]{});
+        Field ps = MainActivity.class.getDeclaredField("paymentScanner"); ps.setAccessible(true);
+        ((com.eurobuddha.merchinbox.integratedcomms.CommsScanner) ps.get(activity)).scan((int) tip);
+        assertFalse("queued, not stored yet", db.order("ORD-SCAN").paid);
+        q.drop();                                                    // closed or killed before the queue ran
+        assertEquals("the bookmark did not advance", "", db.getMeta("scanned_tip_pay_12121212", ""));
+        set("io", new Inline());
+        call("startPaymentScanner", new Class<?>[]{});
+        ((com.eurobuddha.merchinbox.integratedcomms.CommsScanner) ps.get(activity)).scan((int) tip);
+        assertTrue("read again and stored", db.order("ORD-SCAN").paid);
+        assertEquals(String.valueOf(tip), db.getMeta("scanned_tip_pay_12121212", ""));
+        String paid = db.order("ORD-SCAN").paidAmount;
+        call("startPaymentScanner", new Class<?>[]{});
+        ((com.eurobuddha.merchinbox.integratedcomms.CommsScanner) ps.get(activity)).scan((int) tip + 1);
+        assertEquals("not counted twice", paid, db.order("ORD-SCAN").paidAmount);
+        // a coin that cannot be stored keeps the bookmark too
+        Queued q2 = new Queued(); set("io", q2);
+        db.setMeta("scanned_tip_pay_12121212", "1");
+        ScanQueue: {
+            Field pq = MainActivity.class.getDeclaredField("paymentQueue"); pq.setAccessible(true);
+            Object queue = pq.get(activity);
+            com.eurobuddha.merchinbox.integratedcomms.CommsScanner.Router r = (com.eurobuddha.merchinbox.integratedcomms.CommsScanner.Router) queue.getClass().getDeclaredMethod("route", com.eurobuddha.merchinbox.integratedcomms.CommsScanner.Router.class)
+                    .invoke(queue, (com.eurobuddha.merchinbox.integratedcomms.CommsScanner.Router) (cid, op, coin) -> { throw new IllegalStateException("disk full"); });
+            r.handle("0xE6", null, new JSONObject());
+            ((com.eurobuddha.merchinbox.integratedcomms.CommsScanner.MetaStore) queue).setMeta("scanned_tip_pay_12121212", "200");
+            q2.drain();
+            assertEquals("a failed coin keeps the bookmark", "1", db.getMeta("scanned_tip_pay_12121212", ""));
+        }
+    }
+
 }

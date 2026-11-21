@@ -8809,7 +8809,7 @@
     <!-- Arguments: count -->
     <string name="l10n_mall_inbox_minconf_line">"⛓ Перед любой отправкой оплате нужно подтверждений: %1$d (нажмите, чтобы изменить)"</string>
     <string name="l10n_mall_inbox_minconf_title" formatted="false">"Подтверждения"</string>
-    <string name="l10n_mall_inbox_minconf_help" formatted="false">"Сколько блоков должно быть у платёжной монеты до отправки NFT (не меньше 1)."</string>
+    <string name="l10n_mall_inbox_minconf_help" formatted="false">"Сколько блоков должно быть у платёжной монеты до отправки NFT (не меньше 1). Когда платёж их получил, он остаётся засчитанным, даже если позже более глубокая реорганизация цепи его отбросит."</string>
     <string name="l10n_mall_inbox_minconf_save" formatted="false">"Сохранить"</string>
     <string name="l10n_mall_inbox_minconf_min" formatted="false">"Не меньше 1 подтверждения."</string>
     <!-- Arguments: quantity, tokenid, address -->
@@ -8888,4 +8888,12 @@
     <string name="l10n_mall_inbox_deliver_to_record_help" formatted="false">"Другой заказ с этим номером пришёл после того, как оплата этого заказа сделала номер публичным. Больше ничего не меняется: все остальные проверки по-прежнему действуют."</string>
     <string name="l10n_mall_inbox_upgraded_recheck" formatted="false">"Обновлено: перепроверьте оплату этого заказа. Она записана старой версией Inbox, и ничего не отправляется, пока её монеты не будут прочитаны в цепи."</string>
     <string name="l10n_mall_inbox_auto_off_banner" formatted="false">"После этого обновления автоматическая отправка NFT выключена. Включите её снова строкой автоматической отправки ниже; тогда она отправляет только по заказам, прошедшим все проверки. (Нажмите, чтобы скрыть.)"</string>
+    <string name="l10n_mall_inbox_legacy_paid" formatted="false">"Этот заказ оплачен при старой версии Inbox, которая не сохранила его платёжные монеты, поэтому по нему ничего не отправляется, пока они не найдены."</string>
+    <string name="l10n_mall_inbox_legacy_not_found" formatted="false">"Они не найдены на вашем адресе: платёж мог быть потрачен до подтверждения здесь или он старше того, что хранит ваш узел. Проверьте его вручную в истории кошелька."</string>
+    <string name="l10n_mall_inbox_legacy_unread" formatted="false">"Последний поиск не смог прочитать все блоки: попробуйте ещё раз."</string>
+    <string name="l10n_mall_inbox_legacy_by_hand" formatted="false">"До тех пор проверяйте платёж вручную в кошельке."</string>
+    <string name="l10n_mall_inbox_find_payment" formatted="false">"Найти оплату этого заказа"</string>
+    <string name="l10n_mall_inbox_searching" formatted="false">"Поиск…"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_amount_unread">"монета %1$s: её сумму не удалось прочитать, поэтому она не засчитана"</string>
 </resources>

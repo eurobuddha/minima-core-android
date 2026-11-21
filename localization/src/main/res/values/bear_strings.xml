@@ -8735,7 +8735,7 @@
     <!-- Arguments: count -->
     <string name="l10n_mall_inbox_minconf_line">"⛓ Payments need %1$d confirmation(s) before anything is sent (tap to change)"</string>
     <string name="l10n_mall_inbox_minconf_title" formatted="false">"Confirmations"</string>
-    <string name="l10n_mall_inbox_minconf_help" formatted="false">"How many blocks a payment coin must have before an NFT is sent (at least 1)."</string>
+    <string name="l10n_mall_inbox_minconf_help" formatted="false">"How many blocks a payment coin must have before an NFT is sent (at least 1). Once a payment has them it stays counted, even if a deeper reorganisation of the chain later drops it."</string>
     <string name="l10n_mall_inbox_minconf_save" formatted="false">"Save"</string>
     <string name="l10n_mall_inbox_minconf_min" formatted="false">"At least 1 confirmation."</string>
     <!-- Arguments: quantity, tokenid, address -->
@@ -8814,4 +8814,12 @@
     <string name="l10n_mall_inbox_deliver_to_record_help" formatted="false">"The other order with this reference arrived after this one\'s payment made the reference public. Nothing else changes: every other check still applies."</string>
     <string name="l10n_mall_inbox_upgraded_recheck" formatted="false">"Upgraded: re-check this order\'s payment. It was recorded by an older Inbox, and nothing is sent until its coins are read back on chain."</string>
     <string name="l10n_mall_inbox_auto_off_banner" formatted="false">"Automatic NFT delivery is now OFF after this update. Switch it on again from the automatic delivery line below; it then sends only for orders that pass every check. (Tap to dismiss.)"</string>
+    <string name="l10n_mall_inbox_legacy_paid" formatted="false">"This order was paid under an older Inbox, which did not keep its payment coins, so nothing is sent for it until they are found."</string>
+    <string name="l10n_mall_inbox_legacy_not_found" formatted="false">"They were not found at your address: the payment may have been spent before it was confirmed here, or it is older than your node keeps. Check your wallet history for it by hand."</string>
+    <string name="l10n_mall_inbox_legacy_unread" formatted="false">"The last search could not read every block: try again."</string>
+    <string name="l10n_mall_inbox_legacy_by_hand" formatted="false">"Until then, check the payment by hand in your wallet."</string>
+    <string name="l10n_mall_inbox_find_payment" formatted="false">"Find this order\'s payment"</string>
+    <string name="l10n_mall_inbox_searching" formatted="false">"Searching…"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_amount_unread">"coin %1$s: its amount could not be read, so it is not counted"</string>
 </resources>

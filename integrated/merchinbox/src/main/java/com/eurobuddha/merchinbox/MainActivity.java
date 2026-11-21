@@ -162,6 +162,8 @@ public class MainActivity extends AppCompatActivity {
         replyDrafts.restore(b);
         ls = Sodium.get();
         db = new MerchDb(getApplicationContext());   // item 8: the store never holds this Activity
+        io.execute(this::tagLedger);   // m3, once: earlier deliveries count under the listing then in use
+        io.execute(() -> { autoWasOn = autoDeliverWasOn(); if (autoWasOn) ui.post(this::refreshVisibleOrderOrList); });
         shopName = loadShopName();
 
         root = new LinearLayout(this);
@@ -214,12 +216,17 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (notifyReceiver != null) try { DirectNodeEvents.unsubscribe(notifyReceiver); } catch (Exception ignored) {}
         if (node != null) node.onDestroy();
-        if (deliveryJournal != null) deliveryJournal.close();
-        if (plainDeliveryJournal != null) plainDeliveryJournal.close();
-        io.shutdownNow();
         ui.removeCallbacksAndMessages(null);   // item 8: nothing posted earlier runs against a dead screen
-        db.dues = null;                        // the store keeps no reference to this Activity
-        db.close();
+        // Drain, never drop (M1): every scanned message and payment already queued is stored, the scan bookmarks after
+        // them; the journals and the store close last, and the store keeps no reference to this Activity.
+        try {
+            io.execute(() -> {
+                if (deliveryJournal != null) deliveryJournal.close();
+                if (plainDeliveryJournal != null) plainDeliveryJournal.close();
+                db.dues = null; db.close();
+            });
+        } catch (java.util.concurrent.RejectedExecutionException ignored) {}
+        io.shutdown();
     }
 
     @Override public void onBackPressed() { if (stack.size() > 1) pop(); else super.onBackPressed(); }
@@ -313,25 +320,53 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /** One scanner's io queue (point release M1): its coins are stored on the io executor, in order, and its bookmarks
+     *  are written through the same queue after them, so a bookmark advances only once every coin of its scan was
+     *  stored; never when one failed (the next scan reads them again: storing is idempotent, nothing is counted twice),
+     *  and never when the queue was dropped because the app was closed or killed first. */
+    final class ScanQueue implements CommsScanner.MetaStore {
+        final java.util.concurrent.atomic.AtomicBoolean failed = new java.util.concurrent.atomic.AtomicBoolean();
+        CommsScanner.Router route(final CommsScanner.Router r) {
+            return (cid, opened, coin) -> {
+                try {
+                    io.execute(() -> {
+                        try { if (r.handle(cid, opened, coin)) routedNew.incrementAndGet(); }
+                        catch (RuntimeException e) { failed.set(true); android.util.Log.w("miniMallInbox", "not stored, the next scan reads it again: " + cid, e); }
+                    });
+                } catch (java.util.concurrent.RejectedExecutionException closing) { failed.set(true); }
+                return false;
+            };
+        }
+        @Override public String getMeta(String k, String def) { return db.getMeta(k, def); }
+        @Override public void setMeta(final String k, final String v) {
+            try {
+                io.execute(() -> {
+                    boolean skip = failed.get();
+                    if (k.startsWith("scanned_tip_")) failed.set(false);   // the scan's last bookmark: the next scan starts clean
+                    if (!skip) db.setMeta(k, v);
+                });
+            } catch (java.util.concurrent.RejectedExecutionException closing) { /* not advanced: read again next time */ }
+        }
+    }
+    private final ScanQueue orderQueue = new ScanQueue(), paymentQueue = new ScanQueue();
+
     /** Item 7: a scanner's message or payment is stored on the io executor (in order: one thread), never on the main
      *  thread; what it adds is counted for the scan's end. */
     private final java.util.concurrent.atomic.AtomicInteger routedNew = new java.util.concurrent.atomic.AtomicInteger();
-    private CommsScanner.Router onIo(final CommsScanner.Router r) {
-        return (cid, opened, coin) -> { io.execute(() -> { if (r.handle(cid, opened, coin)) routedNew.incrementAndGet(); }); return false; };
-    }
+    CommsScanner.Router onIo(final CommsScanner.Router r) { return orderQueue.route(r); }
 
     private void adoptIdentity(CommsIdentity id) {
         identity = id;
         crypto = new LocalEcCryptoProvider(ls, id);
         myId = id.publicId();
-        orderScanner = new CommsScanner(node, crypto, db, CommsTransport.MINIMERCH_ADDRESS,
-                onIo(this::routeIncoming), (ok, n) -> io.execute(() -> onScanDone(routedNew.getAndSet(0))));
+        orderScanner = new CommsScanner(node, crypto, orderQueue, CommsTransport.MINIMERCH_ADDRESS,
+                orderQueue.route(this::routeIncoming), (ok, n) -> io.execute(() -> onScanDone(routedNew.getAndSet(0))));
         if (!vendorAddr.isEmpty()) startPaymentScanner();
     }
 
     private void startPaymentScanner() {
-        paymentScanner = new CommsScanner(node, crypto, db, vendorAddr,
-                onIo(this::routePayment), (ok, n) -> io.execute(() -> {
+        paymentScanner = new CommsScanner(node, crypto, paymentQueue, vendorAddr,
+                paymentQueue.route(this::routePayment), (ok, n) -> io.execute(() -> {
                     onScanDone(routedNew.getAndSet(0));   // after every routed coin (the io executor runs in order)
                     // After the first clean pass, auto-deliver anything paid-but-unsent (e.g. an
                     // auto-send that failed last session, or a payment that landed while closed).
@@ -369,6 +404,8 @@ public class MainActivity extends AppCompatActivity {
         if (MerchMessage.ORDER.equals(m.type)) {
             boolean fresh = db.upsertOrder(m, "seller", coinid);
             if (fresh && coin != null && coin.optLong("created", 0) > 0) db.setMeta("orderblock:" + m.ref, String.valueOf(coin.optLong("created")));   // bounds the payment read (L-a)
+            if (!fresh && coin != null && coin.optLong("created", 0) > 0 && coinid != null)   // another order with a stored ref: when it came (m2)
+                db.setMeta("contenderblock:" + m.ref + ":" + coinid.toLowerCase(java.util.Locale.ROOT), String.valueOf(coin.optLong("created")));
             if (fresh) recheck(db.order(m.ref));   // what is due, from the vendor's own listing
             return fresh;
         }
@@ -399,7 +436,11 @@ public class MainActivity extends AppCompatActivity {
         db.dues = this::contenderDue;   // another kept order's coins flag the ref only once they reach its listed due (M-A)
         String amount = MerchDb.coinAmount(coin);   // a token coin's tokenamount, never the Minima amount backing it
         String tokenid = coin.optString("tokenid", "0x00");
-        String result = db.recordPayment(ref, coinid, amount, tokenid, CommsScanner.statePort(coin, 2), coin.optLong("created", 0));   // each coin counted once; port 2 = the order secret's commitment (H1)
+        long created = coin.optLong("created", 0);
+        String result = db.recordPayment(ref, coinid, amount, tokenid, CommsScanner.statePort(coin, 2), created);
+        // M2 c: read by the scanner already at the minimum confirmations: confirmed now, so spending it later is fine
+        if (result != null && created > 0 && chainBlock > 0 && chainBlock - created + 1 >= minConf())
+            confirm(coinid, amount, tokenid, created, chainBlock);   // each coin counted once; port 2 = the order secret's commitment (H1)
         // Auto-deliver only on a clean PAID (the token received is the order currency's) — never
         // UNDERPAID/WRONG_TOKEN, and nothing is sent for a mismatched order (MerchDb.mismatch). Queued, drained at scan end.
         if (MerchDb.PAID.equals(result)) pendingAutoDeliver.add(ref);
@@ -522,6 +563,9 @@ public class MainActivity extends AppCompatActivity {
     // ---- automatic NFT delivery ----
 
     /** The old "autodeliver" setting was on and the one-time notice was not dismissed yet (item 12). */
+    /** autoDeliverWasOn, read on io at start (the orders screen reads this field, never the database). */
+    volatile boolean autoWasOn;
+
     boolean autoDeliverWasOn() { return "1".equals(db.getMeta("autodeliver", "")) && db.getMeta("autodeliverbanner", "").isEmpty(); }
 
     /** Automatic delivery: OFF unless the vendor switches it on ("autosend"; the old "autodeliver" setting, ON by
@@ -530,18 +574,24 @@ public class MainActivity extends AppCompatActivity {
 
     /** Auto-send every unsent NFT line of a cleanly-paid order. Idempotent: nftsent: meta skips
      *  delivered lines, autoTried caps automatic attempts at one per line per session. */
-    private void maybeAutoDeliver(String ref) {
-        if (!autoDeliverOn()) return;
-        MerchDb.Order o = db.order(ref);
-        if (!db.deliverable(o)) return;
-        if (!MerchDb.PAID.equals(o.status) && !MerchDb.CONFIRMED.equals(o.status)) return;
-        if (o.payaddr == null || o.payaddr.isEmpty()) return;   // undeliverable — order screen explains
-        for (String[] line : nftLines(o)) {
-            String key = lineKey(ref, line);
-            if (!deliveredTx(o, line).isEmpty()) continue;
-            if (autoTried.contains(key) || !DeliveryLedger.state(db.getReadableDatabase(), ledgerKey(o, line)).isEmpty()) continue;   // one automatic send per line
-            sendNft(o, line, true);   // runs every DeliveryRules check; a line that fails waits (checked again at the next block)
-        }
+    private void maybeAutoDeliver(final String ref) {
+        io.execute(() -> {   // m4: the checks read the database on io; the sends start on the main thread
+            if (!autoDeliverOn()) return;
+            final MerchDb.Order o = db.order(ref);
+            if (!db.deliverable(o)) return;
+            if (!MerchDb.PAID.equals(o.status) && !MerchDb.CONFIRMED.equals(o.status)) return;
+            if (o.payaddr == null || o.payaddr.isEmpty()) return;   // undeliverable — order screen explains
+            final List<String[]> todo = new ArrayList<>();
+            for (String[] line : nftLines(o)) {
+                String key = lineKey(ref, line);
+                if (!db.getMeta("nftsent:" + key, "").isEmpty()) continue;
+                if (!DeliveryLedger.state(db.getReadableDatabase(), ledgerKey(o, line)).isEmpty()) continue;   // one automatic send per line
+                todo.add(line);
+            }
+            if (!todo.isEmpty()) ui.post(() -> {
+                for (String[] line : todo) if (!autoTried.contains(lineKey(ref, line))) sendNft(o, line, true);   // every DeliveryRules check runs; a line that fails waits
+            });
+        });
     }
 
     /** Once per process: re-attempt paid-but-unsent NFT orders (failed auto-send last session,
@@ -572,10 +622,10 @@ public class MainActivity extends AppCompatActivity {
         ver.setTextColor(Design.DIM2); ver.setTextSize(10f);
         ver.setPadding(dp(16), dp(2), dp(16), dp(4));
         col.addView(ver);
-        if (autoDeliverWasOn()) {   // item 12: once, the old setting was on and automatic delivery is now off
+        if (autoWasOn) {   // item 12: once, the old setting was on and automatic delivery is now off
             TextView ban = label(Language.msg(l10n_mall_inbox_auto_off_banner));
             ban.setTextColor(Design.RED); ban.setPadding(dp(16), dp(4), dp(16), dp(4));
-            ban.setOnClickListener(v -> io.execute(() -> { db.setMeta("autodeliverbanner", "1"); ui.post(() -> refreshTop(buildOrders())); }));
+            ban.setOnClickListener(v -> io.execute(() -> { db.setMeta("autodeliverbanner", "1"); autoWasOn = false; ui.post(() -> refreshTop(buildOrders())); }));
             col.addView(ban);
         }
 
@@ -736,7 +786,8 @@ public class MainActivity extends AppCompatActivity {
     /** Everything the order screen shows, read on the io executor (item 7: no database work while a screen is built). */
     static final class OrderModel {
         String ref; MerchDb.Order o;
-        boolean mismatch, conflict, upgraded, listing, listingSigned, autoOn, contendedFull, cameFirst, checked;
+        boolean mismatch, conflict, upgraded, listing, listingSigned, autoOn, contendedFull, cameFirst, checked, legacyPaid;
+        String findResult = "";
         String nonce = "", problems = "", due = "", orderBlock = "";
         List<String[]> nfts = new ArrayList<>();
         java.util.Map<String, String> sentTx = new java.util.HashMap<>(), ledger = new java.util.HashMap<>();
@@ -776,6 +827,8 @@ public class MainActivity extends AppCompatActivity {
         m.contenders = db.contenders(ref); m.unassigned = db.unassignedCoins(ref);
         m.committed = db.committedContender(o); m.contendedFull = db.contendedCoinsFull(ref);
         m.cameFirst = m.conflict && m.nonce.isEmpty() && o.paid && recordCameFirst(o);
+        m.legacyPaid = legacyPaid(o);
+        m.findResult = db.getMeta("findpayment:" + ref, "");
         m.orderBlock = db.getMeta("orderblock:" + ref, "");
         m.chat = db.chat(ref);
         return m;
@@ -841,6 +894,14 @@ public class MainActivity extends AppCompatActivity {
             body.addView(kv(Language.msg(l10n_mall_shop_total), o.amount + " " + dispCurrency(o)));
             if (m.conflict) { TextView cf = label(Language.msg(l10n_mall_inbox_conflict_line)); cf.setTextColor(Design.RED); body.addView(cf); }
             else if (m.nonce.isEmpty()) body.addView(label(Language.msg(l10n_mall_inbox_unverified_ref)));
+            if (m.legacyPaid) {   // M2 a: paid under an older Inbox that kept no coin list
+                TextView lg = label(Language.join(Language.msg(l10n_mall_inbox_legacy_paid), " ", Language.msg("none".equals(m.findResult) ? l10n_mall_inbox_legacy_not_found
+                        : "unread".equals(m.findResult) ? l10n_mall_inbox_legacy_unread : l10n_mall_inbox_legacy_by_hand)));
+                lg.setTextColor(Design.RED); body.addView(lg);
+                TextView find = button(Language.msg(l10n_mall_inbox_find_payment), false);
+                find.setOnClickListener(v -> { find.setEnabled(false); Language.setText(find, Language.msg(l10n_mall_inbox_searching)); findPayment(ref); });
+                body.addView(find);
+            }
             if (m.upgraded) { TextView up = label(Language.msg(l10n_mall_inbox_upgraded_recheck)); up.setTextColor(Design.RED); body.addView(up); }
             if (m.listing) body.addView(label(listingInUse(m.listingSigned)));
             String problems = m.problems;
@@ -1279,7 +1340,16 @@ public class MainActivity extends AppCompatActivity {
                 if (seen.add(id)) out.add(new DeliveryRules.PaidCoin(id, null, null, 0));   // counted before 2.2.73
             }
         }
-        for (DeliveryRules.PaidCoin c : out) if (!db.getMeta("paidconf:" + c.coinid, "").isEmpty()) c.state = DeliveryRules.PaidCoin.CONFIRMED;
+        for (DeliveryRules.PaidCoin c : out) {
+            // confirmed for good, with what was read then (point release M2 b): a coin known only by its marker keeps
+            // its amount, token and block once it was confirmed, even after the vendor spends it
+            JSONObject k = confirmed(c.coinid);
+            if (k == null) continue;
+            c.state = DeliveryRules.PaidCoin.CONFIRMED;
+            if (c.amount == null) c.amount = k.optString("amount", null);
+            if (c.tokenid == null) c.tokenid = k.optString("tokenid", null);
+            if (c.created <= 0) c.created = k.optLong("created", 0);
+        }
         return out;
     }
 
@@ -1301,6 +1371,11 @@ public class MainActivity extends AppCompatActivity {
         if (i >= coins.size()) { then.accept(coins); return; }
         DeliveryRules.PaidCoin c = coins.get(i);
         boolean waiting = c.created > 0 && (tip <= 0 || tip - c.created + 1 < minConf);
+        if (!waiting && !DeliveryRules.PaidCoin.CONFIRMED.equals(c.state) && goneUntil(c.coinid) > tip) {   // read again only after a back-off
+            c.state = DeliveryRules.PaidCoin.GONE;
+            settleNext(ref, nonce, tip, minConf, coins, i + 1, reads, then);
+            return;
+        }
         if (DeliveryRules.PaidCoin.CONFIRMED.equals(c.state) || waiting || reads >= DeliveryRules.MAX_COIN_READS || !c.coinid.matches("0x[0-9a-f]{1,128}")) {
             if (waiting) c.state = DeliveryRules.PaidCoin.WAITING;
             settleNext(ref, nonce, tip, minConf, coins, i + 1, reads, then);
@@ -1308,7 +1383,8 @@ public class MainActivity extends AppCompatActivity {
         }
         ask("coins relevant:true coinid:" + c.coinid, r -> {
             DeliveryRules.settle(c, r, ref, nonce, tip, minConf);
-            if (DeliveryRules.PaidCoin.CONFIRMED.equals(c.state)) io.execute(() -> db.setMeta("paidconf:" + c.coinid, String.valueOf(tip)));
+            if (DeliveryRules.PaidCoin.CONFIRMED.equals(c.state)) io.execute(() -> confirm(c.coinid, c.amount, c.tokenid, c.created, tip));
+            else if (DeliveryRules.PaidCoin.GONE.equals(c.state)) io.execute(() -> gone(c.coinid, tip));
             ui.post(() -> settleNext(ref, nonce, tip, minConf, coins, i + 1, reads + 1, then));
         });
     }
@@ -1326,11 +1402,124 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    void tagLedger() { DeliveryLedger.tagUntagged(db.getWritableDatabase(), shop -> Listing.id(listingFor(shop))); }
+
+    /** Paid (or part paid) under an Inbox that kept no coin list: no paidcoins and no paycoin marker for it. */
+    boolean legacyPaid(MerchDb.Order o) {
+        return o != null && "seller".equals(o.role) && (o.paid || !o.paidAmount.isEmpty()) && paidCoins(o.ref).isEmpty();
+    }
+
+    static final int FIND_WINDOW = 64, FIND_MAX_READS = 400, FIND_MAX_BLOCKS = 50_000;
+
+    /** M2 a, the vendor's "Find this order's payment": reads the vendor address window by window, from the tip back to
+     *  the order's block (else its date), at most FIND_WINDOW blocks per read (halved when a reply is refused, so no
+     *  reply is large) with relevant:false, depth and coinage, in the currency's token only; records each coin that is
+     *  this order's payment (its ref in port 1, no commitment for an order without a secret, its commitment otherwise)
+     *  with its block, and confirms it when it is deep enough. Never more than FIND_MAX_READS reads or FIND_MAX_BLOCKS. */
+    void findPayment(final String ref) {
+        io.execute(() -> {
+            final MerchDb.Order o = db.order(ref);
+            final String token = o == null ? null : MerchMessage.tokenFor(o.currency);
+            if (o == null || token == null || !Util.isValidAddress(vendorAddr) || chainBlock <= 0) { db.setMeta("findpayment:" + ref, "unread"); ui.post(() -> refreshOrderIfTopmost(ref)); return; }
+            final long tip = chainBlock;
+            long ob;
+            try { ob = Long.parseLong(db.getMeta("orderblock:" + ref, "0")); } catch (NumberFormatException e) { ob = 0; }
+            if (ob <= 0) ob = tip - Math.max(0, System.currentTimeMillis() - o.date) / 25_000L - 100;   // its date, at 2 x the block time
+            final long from = Math.max(1, Math.max(ob, tip - FIND_MAX_BLOCKS));
+            final String nonce = db.nonce(o);
+            ui.post(() -> findWindow(ref, token, nonce, tip, from, 0, FIND_WINDOW, 0, 0));
+        });
+    }
+
+    private void findWindow(String ref, String token, String nonce, long tip, long from, long coinage, int window, int reads, int found) {
+        if (tip - coinage < from || reads >= FIND_MAX_READS) { endFind(ref, found, tip - coinage < from); return; }
+        String cmd = "coins relevant:false address:" + vendorAddr + " tokenid:" + token + " depth:" + (coinage + window) + " coinage:" + coinage;
+        ask(cmd, r -> {
+            JSONArray a = r == null || !r.optBoolean("status", false) ? null : r.optJSONArray("response");
+            if (a == null) {   // refused or too large: a smaller window, else stop with what was read
+                if (window > 1) findWindow(ref, token, nonce, tip, from, coinage, window / 2, reads + 1, found);
+                else endFind(ref, found, false);
+                return;
+            }
+            io.execute(() -> {
+                int n = 0;
+                for (int i = 0; i < a.length(); i++) if (foundCoin(ref, nonce, token, tip, a.optJSONObject(i))) n++;
+                final int total = found + n;
+                ui.post(() -> findWindow(ref, token, nonce, tip, from, coinage + window, FIND_WINDOW, reads + 1, total));
+            });
+        });
+    }
+
+    /** One coin of a find: kept for the order when it is its payment; its marker makes it counted once only. */
+    boolean foundCoin(String ref, String nonce, String token, long tip, JSONObject c) {
+        if (c == null || !token.equalsIgnoreCase(c.optString("tokenid"))) return false;
+        String h = CommsScanner.statePort(c, 1), cc = CommsScanner.statePort(c, 2);
+        if (h == null || !ref.equals(DeliveryRules.text(h)) || !(nonce.isEmpty() ? cc == null : MerchMessage.commitment(nonce).equalsIgnoreCase(cc))) return false;
+        String id = c.optString("coinid").toLowerCase(java.util.Locale.ROOT);
+        long created = c.optLong("created", 0);
+        if (!id.matches("0x[0-9a-f]{1,128}") || created <= 0) return false;
+        String owner = db.getMeta("paycoin:" + id, "");
+        if (!owner.isEmpty() && !owner.equals(ref)) return false;
+        String amount = MerchDb.coinAmount(c);
+        JSONArray pc;
+        try { pc = new JSONArray(db.getMeta("paidcoins:" + ref, "[]")); } catch (Exception e) { pc = new JSONArray(); }
+        for (int i = 0; i < pc.length(); i++) if (pc.optJSONObject(i) != null && id.equalsIgnoreCase(pc.optJSONObject(i).optString("coinid"))) return false;
+        try { pc.put(new JSONObject().put("coinid", id).put("amount", amount).put("tokenid", token).put("commitment", cc == null ? "" : cc.toLowerCase(java.util.Locale.ROOT)).put("created", created)); }
+        catch (org.json.JSONException e) { return false; }
+        db.setMeta("paidcoins:" + ref, pc.toString());
+        db.setMeta("paycoin:" + id, ref);
+        if (tip - created + 1 >= minConf()) confirm(id, amount, token, created, tip);
+        return true;
+    }
+
+    private void endFind(final String ref, final int found, final boolean complete) {
+        io.execute(() -> {
+            db.setMeta("findpayment:" + ref, found > 0 ? "found" : complete ? "none" : "unread");
+            ui.post(() -> refreshOrderIfTopmost(ref));
+        });
+    }
+
+    /** A coin confirmed for this Inbox: {coinid, amount, tokenid, created, block}, or null. */
+    JSONObject confirmed(String coinid) {
+        String v = db.getMeta("paidconf:" + coinid.toLowerCase(java.util.Locale.ROOT), "");
+        if (!v.startsWith("{")) return null;   // a bare block from an unreleased build: read the coin again
+        try { JSONObject k = new JSONObject(v); return k.optString("amount").isEmpty() ? null : k; } catch (org.json.JSONException e) { return null; }
+    }
+
+    void confirm(String coinid, String amount, String tokenid, long created, long block) {
+        try {
+            db.setMeta("paidconf:" + coinid.toLowerCase(java.util.Locale.ROOT), new JSONObject().put("coinid", coinid).put("amount", amount)
+                    .put("tokenid", tokenid).put("created", created).put("block", block).toString());
+            db.setMeta("paidgone:" + coinid.toLowerCase(java.util.Locale.ROOT), "");
+        } catch (org.json.JSONException ignored) {}
+    }
+
+    /** A coin read back and not found: read again only after 2, 4, 8 ... blocks (at most a day), never every block. */
+    void gone(String coinid, long tip) {
+        String k = "paidgone:" + coinid.toLowerCase(java.util.Locale.ROOT);
+        int n;
+        try { n = new JSONObject(db.getMeta(k, "{}")).optInt("n", 0); } catch (org.json.JSONException e) { n = 0; }
+        n = Math.min(n + 1, 11);
+        try { db.setMeta(k, new JSONObject().put("n", n).put("until", tip + Math.min(1440, 1L << n)).toString()); } catch (org.json.JSONException ignored) {}
+    }
+
+    long goneUntil(String coinid) {
+        String v = db.getMeta("paidgone:" + coinid.toLowerCase(java.util.Locale.ROOT), "");
+        if (v.isEmpty()) return 0;
+        try { return new JSONObject(v).optLong("until", 0); } catch (org.json.JSONException e) { return 0; }
+    }
+
     /** recordCameFirst for a stored order, from its orderblock and the coins counted for it (item 6). */
     boolean recordCameFirst(MerchDb.Order o) {
         long ob;
         try { ob = Long.parseLong(db.getMeta("orderblock:" + o.ref, "0")); } catch (NumberFormatException e) { ob = 0; }
-        return DeliveryRules.recordCameFirst(ob, paidCoins(o.ref), db.contendedCoins(o.ref).length() > 0);
+        List<Long> blocks = new ArrayList<>();
+        JSONArray cs = db.contenders(o.ref);
+        for (int i = 0; i < cs.length(); i++) {
+            String b = db.getMeta("contenderblock:" + o.ref + ":" + cs.optJSONObject(i).optString("coinid").toLowerCase(java.util.Locale.ROOT), "");
+            try { blocks.add(Long.parseLong(b)); } catch (NumberFormatException e) { blocks.add(0L); }
+        }
+        return DeliveryRules.recordCameFirst(ob, paidCoins(o.ref), db.contendedCoins(o.ref).length() > 0, blocks);
     }
 
     /** The verdict of the last check of this line, as stored by checkDelivery. */
@@ -1473,7 +1662,11 @@ public class MainActivity extends AppCompatActivity {
     private void deliverFailed(MerchDb.Order o, String key, String msg, boolean auto) {
         nftSending.remove(key);
         if (auto) {   // an automatic failure is notified once per line, not at every block (L3)
-            if (!"1".equals(db.getMeta("notified:" + key, ""))) { db.setMeta("notified:" + key, "1"); notifyDelivery(o.ref, false, msg); }
+            io.execute(() -> {   // m4: the once-per-line mark is read and written on io
+                if ("1".equals(db.getMeta("notified:" + key, ""))) return;
+                db.setMeta("notified:" + key, "1");
+                ui.post(() -> notifyDelivery(o.ref, false, msg));
+            });
         } else languageDialog().setTitle(Language.msg(l10n_mall_inbox_not_sent)).setMessage(Language.msg(l10n_mall_inbox_send_error, InboxMessages.message(msg)))
                 .setPositiveButton(Language.msg(l10n_common_ok), null).show();   // whole ids: a dialog, not a toast
         refreshOrderIfTopmost(o.ref);

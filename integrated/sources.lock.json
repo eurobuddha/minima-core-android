@@ -1695,6 +1695,17 @@
           "src/main/java/com/eurobuddha/merchinbox/Listing.java": "f29329739289426da62aade1e4c5f729e5ea696021d0f6f7d4c29345b4de2ecc",
           "src/main/java/com/eurobuddha/merchinbox/DeliveryGuard.java": "45383f8653d5bc00e840975d3a3d779458d310243f6d00ca901443cefa6b8968"
         }
+      },
+      {
+        "revision": "12a658cff1e15b05fa019121b94d18e5405d5ac7",
+        "version": "0.5.45",
+        "summary": "Point release fixes (0.5.40-0.5.45): bookmarks through the io queue, drained on close (M1); legacy payments: Find this order's payment, confirmed coins keep their data, record-time confirmation, GONE back-off (M2); contender blocks in the order-of-record evidence (m2); unsigned listing id by content and one-time ledger tagging (m3); io and wording nits (m4). Standalone only: real send coins kept (m1).",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "5598d95347eb61ac39b1558bfee0a19de9182c4f80b04f0a32a88eeeeb1bfa49",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryRules.java": "e852e4bdf9a652bf6bd60f9ab510af2537effff58faa09b764e86d775790676d",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryLedger.java": "2eba3b37d416937bc0d1bc3ab0fe92fca03d655a38c8e80075089530c1f3721d",
+          "src/main/java/com/eurobuddha/merchinbox/Listing.java": "02ca16131d219ef2af077b65e66c93fd9c5ba4ccc14a1c5fdbfce1475b1ec621"
+        }
       }
     ]
   },

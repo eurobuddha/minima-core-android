@@ -31,9 +31,9 @@ def main():
     ] + [('merchinbox/' + n, INBOX + n, None) for n in security.FILES]
     bad = 0
     for template, target, edit in checks:
-        made = (T/template).read_text()
+        made = (T/template).read_text(encoding='utf-8')
         if edit: made = edit(made)
-        have = (I/target).read_text()
+        have = (I/target).read_text(encoding='utf-8')
         if made != have:
             bad += 1
             print('MISMATCH ' + template + ' -> integrated/' + target)

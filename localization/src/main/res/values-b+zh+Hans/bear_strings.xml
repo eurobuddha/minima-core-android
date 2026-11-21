@@ -8698,7 +8698,7 @@
     <!-- Arguments: count -->
     <string name="l10n_mall_inbox_minconf_line">"⛓ 付款需要 %1$d 个确认后才会发送任何内容（点按更改）"</string>
     <string name="l10n_mall_inbox_minconf_title" formatted="false">"确认数"</string>
-    <string name="l10n_mall_inbox_minconf_help" formatted="false">"发送 NFT 前，付款币至少需要多少个区块（至少 1）。"</string>
+    <string name="l10n_mall_inbox_minconf_help" formatted="false">"发送 NFT 前，付款币至少需要多少个区块（至少 1）。付款一旦达到该数量就会一直计入，即使之后更深的链重组将其移除。"</string>
     <string name="l10n_mall_inbox_minconf_save" formatted="false">"保存"</string>
     <string name="l10n_mall_inbox_minconf_min" formatted="false">"至少 1 个确认。"</string>
     <!-- Arguments: quantity, tokenid, address -->
@@ -8777,4 +8777,12 @@
     <string name="l10n_mall_inbox_deliver_to_record_help" formatted="false">"使用此编号的另一订单是在此订单的付款使编号公开之后才到达的。其他一切不变：其余检查仍然适用。"</string>
     <string name="l10n_mall_inbox_upgraded_recheck" formatted="false">"已升级：请重新检查此订单的付款。它由旧版收件箱记录，在其币于链上读回之前不会发送任何内容。"</string>
     <string name="l10n_mall_inbox_auto_off_banner" formatted="false">"此更新后，自动 NFT 发送现已关闭。可通过下方的自动发送一行重新开启；开启后只会为通过全部检查的订单发送。（点按以关闭此提示。）"</string>
+    <string name="l10n_mall_inbox_legacy_paid" formatted="false">"此订单在旧版收件箱中付款，旧版没有保存其付款币，因此在找到它们之前不会为其发送任何内容。"</string>
+    <string name="l10n_mall_inbox_legacy_not_found" formatted="false">"在您的地址上未找到它们：该付款可能在此处确认之前已被花费，或早于您的节点保存的范围。请手动在钱包历史中核对。"</string>
+    <string name="l10n_mall_inbox_legacy_unread" formatted="false">"上次搜索未能读取所有区块：请重试。"</string>
+    <string name="l10n_mall_inbox_legacy_by_hand" formatted="false">"在此之前，请在钱包中手动核对该付款。"</string>
+    <string name="l10n_mall_inbox_find_payment" formatted="false">"查找此订单的付款"</string>
+    <string name="l10n_mall_inbox_searching" formatted="false">"正在搜索…"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_amount_unread">"币 %1$s：无法读取其金额，因此不计入"</string>
 </resources>

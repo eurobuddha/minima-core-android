@@ -8809,7 +8809,7 @@
     <!-- Arguments: count -->
     <string name="l10n_mall_inbox_minconf_line">"⛓ Перед будь-яким надсиланням оплаті потрібно підтверджень: %1$d (торкніться, щоб змінити)"</string>
     <string name="l10n_mall_inbox_minconf_title" formatted="false">"Підтвердження"</string>
-    <string name="l10n_mall_inbox_minconf_help" formatted="false">"Скільки блоків має бути в платіжної монети до надсилання NFT (не менше 1)."</string>
+    <string name="l10n_mall_inbox_minconf_help" formatted="false">"Скільки блоків має бути в платіжної монети до надсилання NFT (не менше 1). Коли платіж їх отримав, він лишається зарахованим, навіть якщо пізніше глибша реорганізація ланцюга його відкине."</string>
     <string name="l10n_mall_inbox_minconf_save" formatted="false">"Зберегти"</string>
     <string name="l10n_mall_inbox_minconf_min" formatted="false">"Не менше 1 підтвердження."</string>
     <!-- Arguments: quantity, tokenid, address -->
@@ -8888,4 +8888,12 @@
     <string name="l10n_mall_inbox_deliver_to_record_help" formatted="false">"Інше замовлення з цим номером надійшло після того, як оплата цього замовлення зробила номер публічним. Більше нічого не змінюється: усі інші перевірки й далі діють."</string>
     <string name="l10n_mall_inbox_upgraded_recheck" formatted="false">"Оновлено: перевірте оплату цього замовлення ще раз. Її записала старіша версія Inbox, і нічого не надсилається, доки її монети не буде прочитано в ланцюгу."</string>
     <string name="l10n_mall_inbox_auto_off_banner" formatted="false">"Після цього оновлення автоматичне надсилання NFT вимкнено. Увімкніть його знову рядком автоматичного надсилання нижче; тоді воно надсилає лише за замовленнями, що пройшли всі перевірки. (Натисніть, щоб приховати.)"</string>
+    <string name="l10n_mall_inbox_legacy_paid" formatted="false">"Це замовлення оплачено за старішої версії Inbox, яка не зберегла його платіжні монети, тому за ним нічого не надсилається, доки їх не знайдено."</string>
+    <string name="l10n_mall_inbox_legacy_not_found" formatted="false">"Їх не знайдено на вашій адресі: платіж міг бути витрачений до підтвердження тут або він старіший за те, що зберігає ваш вузол. Перевірте його вручну в історії гаманця."</string>
+    <string name="l10n_mall_inbox_legacy_unread" formatted="false">"Останній пошук не зміг прочитати всі блоки: спробуйте ще раз."</string>
+    <string name="l10n_mall_inbox_legacy_by_hand" formatted="false">"До того перевіряйте платіж вручну в гаманці."</string>
+    <string name="l10n_mall_inbox_find_payment" formatted="false">"Знайти оплату цього замовлення"</string>
+    <string name="l10n_mall_inbox_searching" formatted="false">"Пошук…"</string>
+    <!-- Arguments: a -->
+    <string name="l10n_mall_inbox_drain_r_amount_unread">"монета %1$s: її суму не вдалося прочитати, тому її не зараховано"</string>
 </resources>

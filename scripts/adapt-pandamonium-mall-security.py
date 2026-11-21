@@ -8,4 +8,4 @@ FILES = ['DeliveryLedger.java', 'DeliveryRules.java', 'Listing.java', 'InboxMess
 def adapt(root):
     source=Path(__file__).with_name('pandamonium-sources')/'merchinbox'
     folder=root/'merchinbox/src/main/java/com/eurobuddha/merchinbox'
-    for name in FILES: (folder/name).write_text((source/name).read_text())
+    for name in FILES: (folder/name).write_text((source/name).read_text(encoding='utf-8'), encoding='utf-8')
