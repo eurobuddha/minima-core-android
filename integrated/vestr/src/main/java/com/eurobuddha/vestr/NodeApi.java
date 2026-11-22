@@ -119,6 +119,20 @@ public class NodeApi {
         });
     }
 
+    /**
+     * Send one command that must still reach the node after the calling screen is gone (the txndelete of a collect
+     * abandoned before txnpost). The screen's own connection drops queued commands when it closes, so this one gets
+     * a connection of its own on the application context, closed again after the reply or the timeout.
+     */
+    public static void detached(Context ctx, String command) {
+        final NodeApi[] own = new NodeApi[1];
+        own[0] = new NodeApi(ctx.getApplicationContext(), null);
+        own[0].cmd(command, new Cb() {
+            @Override public void onResult(JSONObject json) { own[0].onDestroy(); }
+            @Override public void onError(String message) { own[0].onDestroy(); }
+        });
+    }
+
     public void onDestroy() {
         mReleased = true;
         for (Runnable r : mPending) mMain.removeCallbacks(r);

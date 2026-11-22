@@ -23,6 +23,25 @@ public class NodeApiResponseTest {
         check(new JSONObject().put("status", true), true);
         check(new JSONObject().put("status", false).put("error", "Rejected"), true);
     }
+    @Test public void aDetachedCommandIsSentOnItsOwnConnectionWhichClosesAfterTheReply() throws Exception {
+        JSONObject reply=new JSONObject().put("status", true);
+        java.util.List<Object> contexts=new java.util.ArrayList<>();
+        try (MockedConstruction<Handler> handlers=mockConstruction(Handler.class,(h,c)->{
+            when(h.post(any())).thenAnswer(i->{ ((Runnable)i.getArgument(0)).run(); return true; });
+        }); MockedConstruction<DirectNodeApi> clients=mockConstruction(DirectNodeApi.class,(api,c)->{
+            contexts.add(c.arguments().get(0));
+            doAnswer(i->{ ((MinimaAPIListener)i.getArgument(1)).response(reply); return null; })
+                    .when(api).Command(anyString(),any());
+        })) {
+            Context app=mock(Context.class), screen=mock(Context.class);
+            when(screen.getApplicationContext()).thenReturn(app);
+            NodeApi.detached(screen,"txndelete id:vc1700000000000");
+            org.junit.Assert.assertEquals(1, clients.constructed().size());
+            org.junit.Assert.assertSame("a connection of its own, on the application context", app, contexts.get(0));
+            verify(clients.constructed().get(0)).Command(eq("txndelete id:vc1700000000000"),any());
+            verify(clients.constructed().get(0)).onDestroy();
+        }
+    }
     private void check(JSONObject reply, boolean complete) {
         try (MockedConstruction<Handler> handlers=mockConstruction(Handler.class,(h,c)->{
             when(h.post(any())).thenAnswer(i->{ ((Runnable)i.getArgument(0)).run(); return true; });

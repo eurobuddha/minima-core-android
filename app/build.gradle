@@ -218,8 +218,12 @@ android {
         // 2.2.78: Vestr runs txncheck on the finished collect and posts only when the node says validtransaction:true
         // (txnpost only queues for mining and checked nothing, so a txn the chain refuses was reported as collected);
         // the success text now says the collect was sent and is waiting for the chain.
-        versionCode 348
-        versionName "2.2.78"
+        // 2.2.79: Vestr collect error paths: a screen closed before txnpost still deletes the half-built txn (over a
+        // connection of its own); a txnpost without a reply is "not known yet, look after the next block", never "Failed",
+        // and the button stays off (no second spend of the coin); the typed burn is sent as a plain positive decimal, as
+        // the standalone app does (CollectRun, Contract.burnParam).
+        versionCode 349
+        versionName "2.2.79"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

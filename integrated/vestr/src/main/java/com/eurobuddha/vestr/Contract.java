@@ -124,6 +124,20 @@ public class Contract {
         return r != null && Boolean.TRUE.equals(r.opt("validtransaction"));
     }
 
+    /**
+     * The typed network fee as a {@code burn:} value, the same in Pandamonium and the standalone app: the plain
+     * decimal of a positive number ({@code new BigDecimal(typed).toPlainString()}), else "" = no burn (empty, zero,
+     * not a number, negative, as before). An exponent that would expand to a huge string, or a fee of a trillion or
+     * more, is not a fee anyone meant: "" too, so the string stays short.
+     */
+    static String burnParam(String typed) {
+        try {
+            BigDecimal b = new BigDecimal(typed.trim());
+            if (b.signum() <= 0 || b.scale() > 40 || b.precision() - b.scale() > 12) return "";
+            return b.toPlainString();
+        } catch (Exception notANumber) { return ""; }
+    }
+
     /** Blocks left in the current grace window (0 = collectible now). */
     public long graceBlocksRemaining(long tip) {
         long age = Math.max(0, tip - createdBlock);

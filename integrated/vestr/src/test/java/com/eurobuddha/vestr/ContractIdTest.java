@@ -185,4 +185,19 @@ public class ContractIdTest {
         assertFalse(Contract.txnCheckValid(new JSONObject().put("status", true).put("response", "validtransaction:true")));
         assertFalse(Contract.txnCheckValid(null));
     }
+
+    @Test public void theTypedBurnIsSentAsAPlainPositiveDecimal() {
+        assertEquals("0.001", Contract.burnParam("1e-3"));
+        assertEquals("1.50", Contract.burnParam("01.50"));
+        assertEquals("0.25", Contract.burnParam(" 0.25 "));
+        assertEquals("", Contract.burnParam(""));
+        assertEquals("", Contract.burnParam("0"));
+        assertEquals("", Contract.burnParam("-1"));
+        assertEquals("", Contract.burnParam("abc"));
+        assertEquals("", Contract.burnParam("1 amount:99"));
+        // an exponent that would expand to a billion characters, or a fee above the whole supply: no burn
+        assertEquals("", Contract.burnParam("1e999999999"));
+        assertEquals("", Contract.burnParam("1e-999999999"));
+        assertEquals("", Contract.burnParam("1000000000000"));
+    }
 }

@@ -2986,6 +2986,7 @@
     <string name="l10n_vestr_collected_ok" formatted="false">"✓ Получение отправлено. Ожидается подтверждение в блокчейне."</string>
     <string name="l10n_vestr_collect_failed" formatted="false">"Не удалось получить"</string>
     <string name="l10n_vestr_check_invalid" formatted="false">"Узел счёл эту транзакцию получения недействительной. Ничего не отправлено."</string>
+    <string name="l10n_vestr_post_unknown" formatted="false">"Узел не подтвердил получение. Возможно, оно уже отправлено: проверьте снова после следующего блока, прежде чем получать ещё раз."</string>
     <!-- Arguments: error -->
     <string name="l10n_vestr_failed">"Ошибка: %1$s"</string>
     <string name="l10n_vestr_none" formatted="false">"Нет"</string>

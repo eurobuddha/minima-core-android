@@ -28,6 +28,7 @@ public class ContractDetailActivity extends SubActivity {
     private int tip = 0;
     private BigDecimal cancollect = BigDecimal.ZERO, change = BigDecimal.ZERO;
     private boolean mathsReady = false;
+    private CollectRun run;   // the collect in progress; null = none (or the last one failed and may be retried)
     private EditText burnInput;
     private TextView collectBtn, status, availableTv;
 
@@ -201,14 +202,14 @@ public class ContractDetailActivity extends SubActivity {
 
     /** Assemble the collect transaction command-by-command and run it as a strict sequence. */
     private void collect(BigDecimal canCollect) {
-        if (!c.safeForCommands() || canCollect.signum() <= 0) return;
-        String burn = burnInput.getText().toString().trim();
+        if (run != null || !c.safeForCommands() || canCollect.signum() <= 0) return;
+        String burn = Contract.burnParam(burnInput.getText().toString());
         BigDecimal change = this.change;   // @AMOUNT - payout (Contract.collectPlan), 0 = no change output
         String id = "vc" + System.currentTimeMillis();
         String tid = c.tokenid;
 
         // Build the txn in pieces because txncreate/input/output/state are separate node commands that
-        // mutate one named pending txn; they must run in order against the same id, hence runSequence.
+        // mutate one named pending txn; they must run in order against the same id (CollectRun).
         List<String> cmds = new ArrayList<>();
         cmds.add("txncreate id:" + id);
         // scriptmmr:true gives the input the MMR proof so the contract script can run when posted.
@@ -229,45 +230,57 @@ public class ContractDetailActivity extends SubActivity {
         // The node judges the finished txn (amounts, proofs, scripts at the tip) before anything is posted:
         // txnpost only queues it for mining and checks none of that.
         cmds.add("txncheck id:" + id);
-        String post = "txnpost id:" + id;
-        if (!burn.isEmpty() && isPositive(burn)) post += " burn:" + burn;
-        cmds.add(post);
+        cmds.add("txnpost id:" + id + (burn.isEmpty() ? "" : " burn:" + burn));
 
         collectBtn.setEnabled(false);
         setStatus(status, Language.msg(l10n_vestr_collecting), true);
-        runSequence(cmds, 0, id);
+        run = new CollectRun(id, cmds);
+        step(run);
     }
 
-    /** Run the build/post commands in order; clean up the txn on completion or error. */
-    private void runSequence(final List<String> cmds, final int i, final String id) {
-        // node.cmd is async, so we recurse from each callback rather than loop — this guarantees each
-        // command finishes (and didn't fail) before the next mutates the same txn. Index past the end = done.
-        if (i >= cmds.size()) {
-            node.cmd("txndelete id:" + id, null);
-            setStatus(status, Language.msg(l10n_vestr_collected_ok), true);
-            collectBtn.postDelayed(this::finish, 1400);
-            return;
-        }
-        node.cmd(cmds.get(i), new NodeApi.Cb() {
+    /** Send the run's next command; node.cmd is async, so each reply sends the one after it. */
+    private void step(final CollectRun r) {
+        String cmd = r.next();
+        if (cmd == null) return;
+        node.cmd(cmd, new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
-                // every build step returns status:true; txnpost returns the posted txpow
-                if (!j.optBoolean("status", false)) { fail(j.has("error") ? j.optString("error") : Language.msg(l10n_vestr_collect_failed), id); return; }
-                if (cmds.get(i).startsWith("txncheck ") && !Contract.txnCheckValid(j)) { fail(Language.msg(l10n_vestr_check_invalid), id); return; }
-                runSequence(cmds, i + 1, id);
+                switch (r.replied(j)) {
+                    case RUN: step(r); break;
+                    case DONE:
+                        // txnpost returned the txpow it queued for mining; the custom txn row is no longer needed.
+                        node.cmd("txndelete id:" + r.id, null);
+                        setStatus(status, Language.msg(l10n_vestr_collected_ok), true);
+                        collectBtn.postDelayed(ContractDetailActivity.this::finish, 1400);
+                        break;
+                    case INVALID: fail(Language.msg(l10n_vestr_check_invalid), r.id); break;
+                    default: fail(j.has("error") ? j.optString("error") : Language.msg(l10n_vestr_collect_failed), r.id);
+                }
             }
             @Override public void onError(String m) {
-                fail(NodeApi.ERR_NOT_ENABLED.equals(m) ? Language.msg(l10n_explorer_node_retry) : VestrMessages.message(m), id);
+                if (r.noReply() == CollectRun.Next.UNKNOWN) {
+                    // txnpost may have gone through: no txndelete, no "Failed", and the button stays off so the same
+                    // coin is not spent twice.
+                    setStatus(status, Language.msg(l10n_vestr_post_unknown), false);
+                    return;
+                }
+                fail(NodeApi.ERR_NOT_ENABLED.equals(m) ? Language.msg(l10n_explorer_node_retry) : VestrMessages.message(m), r.id);
             }
         });
     }
 
-    /** Abort: drop the half-built txn, re-enable the button, and surface the error. */
+    /** Abort before anything was posted: drop the half-built txn, re-enable the button, and surface the error. */
     private void fail(CharSequence msg, String id) {
         node.cmd("txndelete id:" + id, null);
+        run = null;
         collectBtn.setEnabled(true);
         setStatus(status, Language.msg(l10n_vestr_failed, msg), false);
     }
 
-    /** True if s parses as a strictly-positive number. */
-    private boolean isPositive(String s) { try { return new BigDecimal(s).signum() > 0; } catch (Exception e) { return false; } }
+    /** Closed mid-build: this screen's replies are dropped from here on, so the half-built txn is deleted over a
+     *  connection of its own. Never once txnpost was sent (CollectRun.abandon). */
+    @Override protected void onDestroy() {
+        String owed = run == null ? null : run.abandon();
+        if (owed != null) NodeApi.detached(this, owed);
+        super.onDestroy();
+    }
 }

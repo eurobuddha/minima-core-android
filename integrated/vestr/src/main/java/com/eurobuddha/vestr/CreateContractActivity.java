@@ -217,7 +217,8 @@ public class CreateContractActivity extends SubActivity {
                 .append(" tokenid:").append(tokenid)
                 .append(" state:").append(state);
         if (!pw.isEmpty()) cmd.append(" password:").append(pw);
-        if (!burn.isEmpty() && isPositive(burn)) cmd.append(" burn:").append(burn);
+        String fee = Contract.burnParam(burn);
+        if (!fee.isEmpty()) cmd.append(" burn:").append(fee);
 
         createBtn.setEnabled(false);
         setStatus(status, Language.msg(l10n_vestr_creating), true);
@@ -261,6 +262,4 @@ public class CreateContractActivity extends SubActivity {
         }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH))).show();
     }
 
-    /** True if s parses as a strictly-positive number. */
-    private boolean isPositive(String s) { try { return new BigDecimal(s).signum() > 0; } catch (Exception e) { return false; } }
 }
