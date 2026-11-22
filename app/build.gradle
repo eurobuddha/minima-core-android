@@ -299,8 +299,10 @@ android {
         // 2.2.107: miniMall Inbox: DELIVERED of a no-secret order asks first too, unless it is already SHIPPED (final
         // review F4).
         // 2.2.108: miniMall Inbox: a no-secret order's coin is shown once, in the facts (final review F6).
-        versionCode 378
-        versionName "2.2.108"
+        // 2.2.109: miniMall Inbox: a held scan pass (tip not confirmed) keeps the refused blocks and the count of
+        // refused passes; only a whole pass clears them.
+        versionCode 379
+        versionName "2.2.109"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
