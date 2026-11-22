@@ -276,8 +276,11 @@ android {
         // orders and payments of one range are one line; a dismissed line's rows are deleted (r3 I3).
         // 2.2.97: miniMall Inbox: a stalled orders scan shows one red line (5 failed passes in a row, or one and the tip
         // 64 past the bookmark), cleared by the next whole pass (r3 I4).
-        versionCode 367
-        versionName "2.2.97"
+        // 2.2.98: miniMall Inbox: an order with no secret and no NFT line shows the older-Shop facts, coins listed when a
+        // block is unknown, and confirming or shipping it asks the vendor to accept the Send confirmation's warning (r3
+        // I5).
+        versionCode 368
+        versionName "2.2.98"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

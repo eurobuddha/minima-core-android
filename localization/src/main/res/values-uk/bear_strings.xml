@@ -8929,4 +8929,8 @@
     <string name="l10n_mall_inbox_both_unread_window">"Замовлення і платежі між блоком %1$s і блоком %2$s не були прочитані: Inbox читає щонайбільше 64 блоки назад. Замовлення чи платежу, надісланого тоді, тут може не бути. Торкніться, щоб приховати."</string>
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_orders_stalled">"Замовлення не читалися з блоку %1$s: вузол відмовив у читанні."</string>
+    <!-- Arguments: status -->
+    <string name="l10n_mall_inbox_mark_question">"Установити цьому замовленню статус %1$s?"</string>
+    <!-- Arguments: status -->
+    <string name="l10n_mall_inbox_mark_status">"Установити статус %1$s"</string>
 </resources>

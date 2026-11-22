@@ -980,7 +980,10 @@ public class MainActivity extends AppCompatActivity {
             body.addView(card(itemsText(o)));
             body.addView(kv(Language.msg(l10n_mall_shop_total), o.amount + " " + dispCurrency(o)));
             if (m.conflict) { TextView cf = label(Language.msg(l10n_mall_inbox_conflict_line)); cf.setTextColor(Design.RED); body.addView(cf); }
-            else if (m.nonce.isEmpty()) body.addView(label(Language.msg(l10n_mall_inbox_unverified_ref)));
+            else if (m.nonce.isEmpty()) {   // every order with no secret, NFT lines or not (r3 I5): the facts as stored
+                body.addView(label(Language.msg(l10n_mall_inbox_unverified_ref)));
+                oldShopFacts(body, DeliveryRules.oldShopFacts(parseBlock(m.orderBlock), m.paid), m.paid, o.coinid);
+            }
             if (m.legacyPaid) {   // M2 a: paid under an older Inbox that kept no coin list
                 TextView lg = label(Language.join(Language.msg(l10n_mall_inbox_legacy_paid), " ", Language.msg("none".equals(m.findResult) ? l10n_mall_inbox_legacy_not_found
                         : "unread".equals(m.findResult) ? l10n_mall_inbox_legacy_unread : l10n_mall_inbox_legacy_by_hand)));
@@ -1019,7 +1022,6 @@ public class MainActivity extends AppCompatActivity {
                 body.addView(sectionLabel(m.autoOn && !byHand ? Language.msg(l10n_mall_inbox_nft_auto) : Language.msg(l10n_mall_inbox_nft_delivery)));
                 if (byHand) {
                     TextView bh = label(Language.msg(l10n_mall_inbox_auto_no_secret)); bh.setTextColor(Design.RED); body.addView(bh);
-                    oldShopFacts(body, DeliveryRules.oldShopFacts(parseBlock(m.orderBlock), m.paid), m.paid, o.coinid);
                 }
                 for (String[] line : nfts) body.addView(nftSendRow(m, o, line));
             }
@@ -1030,7 +1032,7 @@ public class MainActivity extends AppCompatActivity {
         // status actions (orders only — an enquiry has no lifecycle)
         if (!inquiry) {
             body.addView(sectionLabel(Language.msg(l10n_mall_inbox_update_status)));
-            body.addView(statusButtons(o));
+            body.addView(statusButtons(m, o));
         }
 
         // reply / conversation
@@ -1042,13 +1044,13 @@ public class MainActivity extends AppCompatActivity {
     static long parseBlock(String b) { try { return Long.parseLong(b); } catch (NumberFormatException e) { return 0; } }
 
     /** An older Shop's order, as stored (DeliveryRules.oldShopFacts): its own coin and block, each coin counted for it with
-     *  its block (whole, one tap to copy), then a red line when the order was mined after its earliest payment, or a
-     *  softer one when both are in the same block. Nothing but the generic sentence when a block is unknown. */
+     *  its block (whole, one tap to copy; "?" for a block not known), then a red line when the order was mined after its
+     *  earliest payment, or a softer one when both are in the same block; neither when a block is unknown. */
     private void oldShopFacts(LinearLayout into, DeliveryRules.OldShopFacts f, List<DeliveryRules.PaidCoin> coins, String orderCoin) {
-        if (!f.facts) return;
-        if (!orderCoin.isEmpty()) into.addView(copyRow(Language.msg(l10n_mall_inbox_order_coin_block, String.valueOf(f.orderBlock)), orderCoin, orderCoin));
-        for (DeliveryRules.PaidCoin c : coins)
+        if (!orderCoin.isEmpty()) into.addView(copyRow(Language.msg(l10n_mall_inbox_order_coin_block, f.orderBlock > 0 ? String.valueOf(f.orderBlock) : "?"), orderCoin, orderCoin));
+        if (coins != null) for (DeliveryRules.PaidCoin c : coins)
             into.addView(copyRow(Language.msg(l10n_mall_inbox_payment_coin_block, c.created > 0 ? String.valueOf(c.created) : "?"), c.shown, c.shown));
+        if (!f.facts) return;
         if (f.after > 0) {
             TextView t = label(Language.msg(l10n_mall_inbox_order_after_payment, String.valueOf(f.after), String.valueOf(f.orderBlock), String.valueOf(f.earliest)));
             t.setTextColor(Design.RED); into.addView(t);
@@ -1119,7 +1121,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private View statusButtons(final MerchDb.Order o) {
+    private View statusButtons(final OrderModel m, final MerchDb.Order o) {
         LinearLayout wrap = new LinearLayout(this);
         wrap.setOrientation(LinearLayout.VERTICAL);
         LinearLayout actionRow = null;
@@ -1130,7 +1132,13 @@ public class MainActivity extends AppCompatActivity {
             TextView b = button(InboxMessages.status(s), s.equals(o.status));
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
             lp.rightMargin = dp(6); b.setLayoutParams(lp);
-            b.setOnClickListener(v -> advanceStatus(o, s));
+            // r3 I5: confirming or shipping an order with no secret needs the Send confirmation's warning accepted first
+            if (!DeliveryRules.autoAllowed(m.nonce) && (MerchDb.CONFIRMED.equals(s) || MerchDb.SHIPPED.equals(s)))
+                b.setOnClickListener(v -> languageDialog().setTitle(Language.msg(l10n_mall_inbox_mark_question, InboxMessages.status(s)))
+                        .setView(wrapScroll(oldShopSendFacts(m, o, null)))
+                        .setPositiveButton(Language.msg(l10n_mall_inbox_mark_status, InboxMessages.status(s)), (d, w) -> advanceStatus(o, s))
+                        .setNegativeButton(Language.msg(l10n_common_cancel), null).show());
+            else b.setOnClickListener(v -> advanceStatus(o, s));
             actionRow.addView(b);
         }
         return wrap;

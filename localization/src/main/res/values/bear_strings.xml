@@ -8855,4 +8855,8 @@
     <string name="l10n_mall_inbox_both_unread_window">"Orders and payments between block %1$s and block %2$s were not read: the Inbox reads at most 64 blocks back. An order or payment sent then may be missing here. Tap to dismiss."</string>
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_orders_stalled">"Orders have not been read since block %1$s: the node refused the reads."</string>
+    <!-- Arguments: status -->
+    <string name="l10n_mall_inbox_mark_question">"Mark this order %1$s?"</string>
+    <!-- Arguments: status -->
+    <string name="l10n_mall_inbox_mark_status">"Mark %1$s"</string>
 </resources>

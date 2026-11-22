@@ -44233,5 +44233,17 @@
     "zh-Hans": "自区块 {block} 以来订单一直未能读取：节点拒绝了读取。",
     "ru": "Заказы не читались с блока {block}: узел отказал в чтении.",
     "uk": "Замовлення не читалися з блоку {block}: вузол відмовив у читанні."
+  },
+  "mallInbox.markQuestion": {
+    "en": "Mark this order {status}?",
+    "zh-Hans": "将此订单标记为 {status}？",
+    "ru": "Установить этому заказу статус {status}?",
+    "uk": "Установити цьому замовленню статус {status}?"
+  },
+  "mallInbox.markStatus": {
+    "en": "Mark {status}",
+    "zh-Hans": "标记为 {status}",
+    "ru": "Установить статус {status}",
+    "uk": "Установити статус {status}"
   }
 }
