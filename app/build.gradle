@@ -281,8 +281,10 @@ android {
         // I5).
         // 2.2.99: miniMall Inbox: sendNft itself refuses an automatic send of an order with no secret and releases the
         // line (r3 I6).
-        versionCode 369
-        versionName "2.2.99"
+        // 2.2.100: miniMall Inbox: an identical order re-sent by its own signer keeps the earliest copy's block and coin
+        // as the order's; another sender never moves them (r3 I7).
+        versionCode 370
+        versionName "2.2.100"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
