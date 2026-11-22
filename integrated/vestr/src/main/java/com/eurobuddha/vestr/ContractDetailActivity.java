@@ -231,10 +231,11 @@ public class ContractDetailActivity extends SubActivity {
         node.cmd(Contract.spendCheckCommand(c.coinid), new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 if (Contract.alreadySpending(j, tip)) {
-                    // nothing was created on the node, so nothing is owed; the button stays off
+                    // nothing was created on the node, so nothing is owed; the screen is drawn again (r3 V3): the button
+                    // off and faded with the neutral label, as every other blocked state, and the sentence under it
                     checking = false;
                     spending = true;
-                    setStatus(status, Language.msg(l10n_vestr_already_spending), false);
+                    render();
                     return;
                 }
                 build(canCollect);
