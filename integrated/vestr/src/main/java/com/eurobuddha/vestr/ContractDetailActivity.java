@@ -284,19 +284,21 @@ public class ContractDetailActivity extends SubActivity {
                         collectBtn.postDelayed(ContractDetailActivity.this::finish, 1400);
                         break;
                     case INVALID: fail(Language.msg(l10n_vestr_check_invalid), r.id); break;
+                    case UNKNOWN: postUnknown(); break;
                     default: fail(j.has("error") ? j.optString("error") : Language.msg(l10n_vestr_collect_failed), r.id);
                 }
             }
             @Override public void onError(String m) {
-                if (r.noReply() == CollectRun.Next.UNKNOWN) {
-                    // txnpost may have gone through: no txndelete, no "Failed", and the button stays off so the same
-                    // coin is not spent twice.
-                    setStatus(status, Language.msg(l10n_vestr_post_unknown), false);
-                    return;
-                }
+                if (r.noReply() == CollectRun.Next.UNKNOWN) { postUnknown(); return; }
                 fail(NodeApi.ERR_NOT_ENABLED.equals(m) ? Language.msg(l10n_explorer_node_retry) : VestrMessages.message(m), r.id);
             }
         });
+    }
+
+    /** txnpost may have gone through: no txndelete, no "Failed", and the button stays off so the same coin is not
+     *  spent twice. */
+    private void postUnknown() {
+        setStatus(status, Language.msg(l10n_vestr_post_unknown), false);
     }
 
     /** Abort before anything was posted: drop the half-built txn, re-enable the button, and surface the error. */

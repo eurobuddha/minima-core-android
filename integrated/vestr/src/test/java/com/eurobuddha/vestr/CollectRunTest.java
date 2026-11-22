@@ -74,10 +74,63 @@ public class CollectRunTest {
         assertNull(r.next());
     }
 
+    /** The node's refusal of txnpost: Command.getJSONReply when txnpost throws, or CommandRunner's gates (the whole line). */
+    static JSONObject refused(String command, String error) throws Exception {
+        return new JSONObject().put("command", command).put("params", new JSONObject().put("id", ID))
+                .put("status", false).put("pending", false).put("error", error);
+    }
+
     @Test public void aRefusedPostIsAFailure() throws Exception {
         CollectRun r = upToThePost();
         r.next();
-        assertEquals(CollectRun.Next.FAILED, r.replied(new JSONObject().put("status", false).put("error", "Transaction not found : " + ID)));
+        assertEquals(CollectRun.Next.FAILED, r.replied(refused("txnpost", "Transaction not found : " + ID)));
+        assertNull("fail() already deletes", r.abandon());
+
+        r = upToThePost();
+        r.next();
+        assertEquals(CollectRun.Next.FAILED, r.replied(refused("txnpost id:" + ID + " burn:0.1",
+                "You need ADMIN privileges to run this command (burn)")));
+        assertEquals(CollectRun.Next.FAILED, refusedAfterThePost(new JSONObject(
+                "{\"command\":\"txnpost\",\"params\":{\"id\":\"" + ID + "\"},\"status\":false,\"pending\":false,"
+                + "\"error\":\"TxPoW size too large.. 70000/64000\"}")));
+    }
+
+    static CollectRun.Next refusedAfterThePost(JSONObject reply) throws Exception {
+        CollectRun r = upToThePost();
+        assertEquals("txnpost id:" + ID, r.next());
+        return r.replied(reply);
+    }
+
+    @Test public void aFailureTheSdkMadeUpAfterThePostIsUnknown() throws Exception {
+        // the bundled minimaapi.aar invents these when it cannot read the node's reply: the post may have gone through
+        assertEquals(CollectRun.Next.UNKNOWN, refusedAfterThePost(new JSONObject().put("status", false)
+                .put("error", "Failed to read large response: java.io.FileNotFoundException")));
+        assertEquals(CollectRun.Next.UNKNOWN, refusedAfterThePost(new JSONObject().put("status", false)
+                .put("error", "Node returned an invalid JSON response")));
+        // not txnpost's own answer, not a definite false, or still pending: unknown as well
+        assertEquals(CollectRun.Next.UNKNOWN, refusedAfterThePost(refused("txncheck", "Transaction not found : " + ID)));
+        assertEquals(CollectRun.Next.UNKNOWN, refusedAfterThePost(refused("txnposted", "?")));
+        assertEquals(CollectRun.Next.UNKNOWN, refusedAfterThePost(refused("txnpost", "?").put("status", "false")));
+        assertEquals(CollectRun.Next.UNKNOWN, refusedAfterThePost(refused("txnpost", "?").put("pending", true)));
+        assertEquals(CollectRun.Next.UNKNOWN, refusedAfterThePost(new JSONObject()));
+
+        CollectRun r = upToThePost();
+        r.next();
+        assertEquals(CollectRun.Next.UNKNOWN, r.replied(new JSONObject().put("status", false)));
+        assertNull("never a txndelete once posted", r.abandon());
+        assertNull(r.next());
+    }
+
+    @Test public void beforeThePostEveryFailureStillOwesTheTxndelete() throws Exception {
+        CollectRun r = new CollectRun(ID, CMDS);
+        r.next();
+        assertEquals(CollectRun.Next.FAILED, r.replied(new JSONObject().put("status", false)
+                .put("error", "Failed to read large response: java.io.FileNotFoundException")));
+        r = new CollectRun(ID, CMDS);
+        r.next();
+        r.replied(ok());
+        r.next();
+        assertEquals(CollectRun.Next.FAILED, r.replied(refused("txninput", "Coin not found")));
     }
 
     @Test public void anInvalidCheckStopsTheRunBeforeThePost() throws Exception {
