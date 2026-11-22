@@ -235,8 +235,11 @@ android {
         // 2.2.84: miniMall Inbox: a payment coin is judged only once the tip and the orders read reach its block + 3
         // (DeliveryRules.judgeable); every pass reads the tip first, then orders, then payments; a failed read moves no
         // bookmark; the payment scan reads its gap + 8 blocks and never past the orders read (CommsScanner.follows).
-        versionCode 354
-        versionName "2.2.84"
+        // 2.2.85: miniMall Inbox: an order with no secret is not paid by a coin mined more than 3 blocks before the order
+        // (MerchDb.olderThanOrder): the coin is kept as counted for no order with one note per order, and the order's block
+        // is stored inside upsertOrder's transaction.
+        versionCode 355
+        versionName "2.2.85"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

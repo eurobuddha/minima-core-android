@@ -8789,4 +8789,6 @@
     <!-- Arguments: a -->
     <string name="l10n_mall_inbox_drain_r_amount_unread">"币 %1$s：无法读取其金额，因此不计入"</string>
     <string name="l10n_mall_inbox_auto_no_secret" formatted="false">"此订单来自旧版商店，无法证明哪笔付款属于它，因此永远不会自动发送：请核对后手动发送。"</string>
+    <!-- Arguments: coin, block, orderBlock -->
+    <string name="l10n_mall_inbox_older_payment">"带有此订单参考号的付款早于订单（付款币 %1$s 位于区块 %2$s，订单位于区块 %3$s）：请人工核对。它不计入此订单。"</string>
 </resources>

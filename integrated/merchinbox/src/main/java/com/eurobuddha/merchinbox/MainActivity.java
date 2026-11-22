@@ -420,8 +420,7 @@ public class MainActivity extends AppCompatActivity {
         if (!myId.equals(m.to)) return false;                                  // addressed to me
         if (!MerchMessage.validRef(m.ref)) return false;                       // an empty or odd ref is never stored (C1)
         if (MerchMessage.ORDER.equals(m.type)) {
-            boolean fresh = db.upsertOrder(m, "seller", coinid);
-            if (fresh && coin != null && coin.optLong("created", 0) > 0) db.setMeta("orderblock:" + m.ref, String.valueOf(coin.optLong("created")));   // bounds the payment read (L-a)
+            boolean fresh = db.upsertOrder(m, "seller", coinid, coin == null ? 0 : coin.optLong("created", 0));   // with its block, in one transaction
             if (!fresh && coin != null && coin.optLong("created", 0) > 0 && coinid != null)   // another order with a stored ref: when it came (m2)
                 db.setMeta("contenderblock:" + m.ref + ":" + coinid.toLowerCase(java.util.Locale.ROOT), String.valueOf(coin.optLong("created")));
             if (fresh) recheck(db.order(m.ref));   // what is due, from the vendor's own listing
@@ -808,6 +807,7 @@ public class MainActivity extends AppCompatActivity {
         String ref; MerchDb.Order o;
         boolean mismatch, conflict, upgraded, listing, listingSigned, autoOn, contendedFull, cameFirst, checked, legacyPaid;
         String findResult = "";
+        JSONObject olderPay;
         String nonce = "", problems = "", due = "", orderBlock = "";
         List<String[]> nfts = new ArrayList<>();
         java.util.Map<String, String> sentTx = new java.util.HashMap<>(), ledger = new java.util.HashMap<>();
@@ -849,6 +849,7 @@ public class MainActivity extends AppCompatActivity {
         m.cameFirst = m.conflict && m.nonce.isEmpty() && o.paid && recordCameFirst(o);
         m.legacyPaid = legacyPaid(o);
         m.findResult = db.getMeta("findpayment:" + ref, "");
+        m.olderPay = db.olderPayment(ref);
         m.orderBlock = db.getMeta("orderblock:" + ref, "");
         m.chat = db.chat(ref);
         return m;
@@ -923,6 +924,11 @@ public class MainActivity extends AppCompatActivity {
                 body.addView(find);
             }
             if (m.upgraded) { TextView up = label(Language.msg(l10n_mall_inbox_upgraded_recheck)); up.setTextColor(Design.RED); body.addView(up); }
+            if (m.olderPay != null) {   // a payment older than this no-secret order: not counted, checked by hand (tap: the whole coin id)
+                final String coin = m.olderPay.optString("coinid");
+                TextView op = label(Language.msg(l10n_mall_inbox_older_payment, coin, m.olderPay.optString("created"), m.olderPay.optString("orderblock")));
+                op.setTextColor(Design.RED); op.setOnClickListener(v -> copy(coin)); body.addView(op);
+            }
             if (m.listing) body.addView(label(listingInUse(m.listingSigned)));
             String problems = m.problems;
             TextView chk = label(!problems.isEmpty() ? Language.msg(l10n_mall_inbox_listing_problems, InboxMessages.lines(problems))
