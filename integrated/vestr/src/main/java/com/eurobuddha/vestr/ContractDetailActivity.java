@@ -75,10 +75,9 @@ public class ContractDetailActivity extends SubActivity {
             @Override public void onResult(JSONObject j) {
                 JSONObject r = j.optJSONObject("response");
                 JSONObject vars = r == null ? null : r.optJSONObject("variables");
-                if (vars != null) {
-                    cancollect = bd(vars.optString("cancollect", "0"));
-                    change = bd(vars.optString("change", c.amount.subtract(cancollect).toPlainString()));
-                }
+                BigDecimal[] plan = c.collectPlan(vars);
+                cancollect = plan[0];
+                change = plan[1];
                 mathsReady = true;
                 render();
             }
@@ -204,7 +203,7 @@ public class ContractDetailActivity extends SubActivity {
     private void collect(BigDecimal canCollect) {
         if (!c.safeForCommands() || canCollect.signum() <= 0) return;
         String burn = burnInput.getText().toString().trim();
-        BigDecimal change = this.change;   // exact runscript value (@AMOUNT - cancollect), NOT recomputed here
+        BigDecimal change = this.change;   // @AMOUNT - payout (Contract.collectPlan), 0 = no change output
         String id = "vc" + System.currentTimeMillis();
         String tid = c.tokenid;
 

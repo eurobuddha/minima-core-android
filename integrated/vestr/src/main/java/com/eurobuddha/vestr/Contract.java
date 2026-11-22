@@ -54,12 +54,25 @@ public class Contract {
         if (!Util.isValidAddress(address) || !Util.isValidAddress(unlockAddr)
                 || coinid == null || !coinid.matches("(?i)0x[0-9a-f]{64}")
                 || tokenid == null || !tokenid.matches("(?i)0x(?:00|[0-9a-f]{64})")
-                || uid == null || !uid.matches("(?i)0x[0-9a-f]{64}")) return false;
+                || !isContractId(uid)) return false;
         for (int port = 1; port <= 8; port++) {
             String value = state(raw, port);
             if (!value.matches("[0-9]{1,40}(\\.[0-9]{1,40})?")) return false;
         }
         return amount != null && amount.signum() > 0 && total.signum() > 0;
+    }
+
+    /**
+     * The contract id (state port 199), re-written by the collect txn as {@code txnstate port:199 value:<uid>}
+     * and checked on chain by {@code PREVSTATE(199) EQ STATE(199)}. The node stores a {@code 0x} state value as
+     * HEX bytes and reports it back as {@code 0x} + upper-case, even-length hex (StateVariable / MiniData), so
+     * any id the node itself reports re-writes to the same bytes. Accepted: {@code 0x} + 1 to 64 whole bytes.
+     * This app before 2.2.76 made 16-byte ids ({@code randomHex(32)} = 32 hex chars), the Vestr MiniDapp makes
+     * {@code hash} ids (32 bytes), the desktop 32 bytes. Rejected: {@code 0x} alone (the node turns it into a
+     * blank value txnstate refuses), odd length (never node output), anything else (never interpolated).
+     */
+    static boolean isContractId(String uid) {
+        return uid != null && uid.matches("(?i)0x(?:[0-9a-f]{2}){1,64}");
     }
 
     public boolean isMinima() { return Util.isMinima(tokenid); }
@@ -69,6 +82,21 @@ public class Contract {
     public BigDecimal canCollect(long tip) {
         long age = Math.max(0, tip - createdBlock);
         return VestingContract.canCollect(tip, startBlock, endBlock, graceBlocks, total, amount, age);
+    }
+
+    /**
+     * What the collect txn pays out, from the variables of {@code runscript} on CHECK_MATHS; [0] = payout to
+     * the unlock address, [1] = change back to the contract (0 = no change output). CHECK_MATHS computes its
+     * {@code change} BEFORE an expired contract's {@code cancollect} is raised to @AMOUNT, so at and just
+     * after the end block it reports change > 0 next to a full payout: outputs above the input, a txn the
+     * chain drops after txnpost already "succeeded". Change is therefore @AMOUNT - payout, as the on-chain
+     * script computes it. Within the grace period ({@code mustwait}) nothing is collectible: the script
+     * refuses @COINAGE below the minimum wait (the MiniDapp refuses it too).
+     */
+    BigDecimal[] collectPlan(JSONObject vars) {
+        BigDecimal payout = vars == null || "TRUE".equals(vars.optString("mustwait"))
+                ? BigDecimal.ZERO : bd(vars.optString("cancollect", "0")).max(BigDecimal.ZERO).min(amount);
+        return new BigDecimal[]{payout, amount.subtract(payout)};
     }
 
     /** Blocks left in the current grace window (0 = collectible now). */

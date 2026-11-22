@@ -59,12 +59,11 @@ public final class ContractUi {
         LinearLayout titleCol = new LinearLayout(act);
         titleCol.setOrientation(LinearLayout.VERTICAL);
         titleCol.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        // No user nickname in the model — label by the truncated coin UID instead.
+        // No user nickname in the model: label by the contract id, whole (never shortened).
         TextView nick = new TextView(act);
-        Language.setText(nick, Language.msg(l10n_vestr_contract_uid, shortHex(c.uid)));
+        Language.setText(nick, Language.msg(l10n_vestr_contract_uid, c.uid));
         nick.setTextColor(VestrDesign.DIM);
         nick.setTextSize(12f);
-        nick.setSingleLine(true);
         titleCol.addView(nick);
         TextView amt = new TextView(act);
         Language.setText(amt, Language.join(amount(c.amount), " ", VestrText.token(c.raw.opt("token"), c.tokenid)));
@@ -143,13 +142,6 @@ public final class ContractUi {
             if (b.scale() > 6) t = b.setScale(6, RoundingMode.DOWN);
             return t.stripTrailingZeros().toPlainString();
         } catch (Exception e) { return b.toPlainString(); }
-    }
-
-    /** Abbreviate a long hex id to "0x"-stripped "abcdef…wxyz"; short strings pass through unchanged. */
-    static String shortHex(String s) {
-        if (s == null) return "";
-        s = s.startsWith("0x") ? s.substring(2) : s;
-        return s.length() <= 10 ? s : s.substring(0, 6) + "…" + s.substring(s.length() - 4);
     }
 
     /** "starts in 3 days" / "started 2 days ago" / "ends in …". */

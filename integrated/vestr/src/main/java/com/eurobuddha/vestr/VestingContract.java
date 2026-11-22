@@ -70,6 +70,16 @@ public final class VestingContract {
         public static Grace fromHours(int h) { for (Grace g : values()) if (g.hours == h) return g; return NONE; }
     }
 
+    /** A new contract id (state port 199): 32 random bytes from SecureRandom, {@code 0x} + 64 upper-case hex
+     *  (the desktop's form). Ids made before 2.2.76 were 16 bytes and stay valid. */
+    public static String newContractId() {
+        byte[] b = new byte[32];
+        new java.security.SecureRandom().nextBytes(b);
+        StringBuilder s = new StringBuilder("0x");
+        for (byte x : b) s.append(String.format("%02X", x & 0xFF));
+        return s.toString();
+    }
+
     /** Convert a future date (ms) to an estimated block height: tip + (then - now) / 50s. */
     public static long blockHeightForDate(long tipBlock, long whenMs) {
         long deltaSec = (whenMs - System.currentTimeMillis()) / 1000L;

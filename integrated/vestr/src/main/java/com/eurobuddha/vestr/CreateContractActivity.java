@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 /** Create a vesting contract — token, withdrawal address, amount, start/end, grace, burn → send state:{}. */
 public class CreateContractActivity extends SubActivity {
@@ -199,7 +198,7 @@ public class CreateContractActivity extends SubActivity {
         long endBlock = VestingContract.blockHeightForDate(tip, endMs);
         long graceBlocks = grace.blocks();
         long now = System.currentTimeMillis();
-        String uid = "0x" + randomHex(32);
+        String uid = VestingContract.newContractId();
 
         StringBuilder state = new StringBuilder("{");
         state.append("\"0\":\"").append(unlockHex).append("\",");
@@ -264,13 +263,4 @@ public class CreateContractActivity extends SubActivity {
 
     /** True if s parses as a strictly-positive number. */
     private boolean isPositive(String s) { try { return new BigDecimal(s).signum() > 0; } catch (Exception e) { return false; } }
-
-    /** Random uppercase-hex string of the given length (used for the contract's unique state[199] id). */
-    private String randomHex(int chars) {
-        Random r = new Random();
-        StringBuilder s = new StringBuilder();
-        String hex = "0123456789ABCDEF";
-        for (int i = 0; i < chars; i++) s.append(hex.charAt(r.nextInt(16)));
-        return s.toString();
-    }
 }

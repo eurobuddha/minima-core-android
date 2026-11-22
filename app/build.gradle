@@ -206,8 +206,14 @@ android {
         // 2.2.75: the node jar with the 21 Nov 2026 command-injection fix and RPC hardening (minima-core
         // 1.1.2.31-euro13); the RPC switch passes -rpcbind all (the node now binds 127.0.0.1 by default) and owns
         // every RPC flag (typed ones refused, stored ones stripped); its help says it opens the RPC to the phone's network.
-        versionCode 345
-        versionName "2.2.75"
+        // 2.2.76: Vestr shows and collects the contracts it creates. Its ids were 16 bytes ("0x" + 32 hex chars from
+        // java.util.Random) while the 19 Oct 2026 safety check accepted only 32-byte ids, so every contract made in the app
+        // was hidden and could not be collected. Ids of 1 to 64 whole bytes are accepted (the node re-writes them byte for
+        // byte), new ids are 32 SecureRandom bytes; an expired contract is collected without a change output (CHECK_MATHS
+        // reports change before the expiry raises cancollect), nothing is offered within the grace period; the card shows
+        // the whole contract id.
+        versionCode 346
+        versionName "2.2.76"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
