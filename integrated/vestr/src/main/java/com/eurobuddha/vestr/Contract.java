@@ -151,12 +151,14 @@ public class Contract {
      * The typed network fee as a {@code burn:} value, the same in Pandamonium and the standalone app: the plain
      * decimal of a positive number ({@code new BigDecimal(typed).toPlainString()}), else "" = no burn (empty, zero,
      * not a number, negative, as before). An exponent that would expand to a huge string, or a fee of a trillion or
-     * more, is not a fee anyone meant: "" too, so the string stays short.
+     * more, is not a fee anyone meant: "" too, so the string stays short. The digits before the point are worked out in
+     * long: in int, "1e2147483647" (precision 1, scale -2147483647) overflowed to a negative number, passed, and
+     * toPlainString ran out of memory.
      */
     static String burnParam(String typed) {
         try {
             BigDecimal b = new BigDecimal(typed.trim());
-            if (b.signum() <= 0 || b.scale() > 40 || b.precision() - b.scale() > 12) return "";
+            if (b.signum() <= 0 || (long) b.scale() > 40 || (long) b.precision() - b.scale() > 12) return "";
             return b.toPlainString();
         } catch (Exception notANumber) { return ""; }
     }

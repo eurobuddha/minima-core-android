@@ -228,8 +228,10 @@ android {
         // 2.2.81: Vestr counts a txnpost as refused (txndelete, button back on) only when the reply is the node's own
         // answer for txnpost with status false; a status false the SDK made up because it could not read the reply is
         // "not known yet", no txndelete, the button stays off (CollectRun.refusedPost).
-        versionCode 351
-        versionName "2.2.81"
+        // 2.2.82: Vestr's burn guard works out the digits of the typed fee in long: "1e2147483647" overflowed the int,
+        // passed the guard and ran toPlainString out of memory (Contract.burnParam).
+        versionCode 352
+        versionName "2.2.82"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

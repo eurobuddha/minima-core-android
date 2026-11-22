@@ -230,5 +230,10 @@ public class ContractIdTest {
         assertEquals("", Contract.burnParam("1e999999999"));
         assertEquals("", Contract.burnParam("1e-999999999"));
         assertEquals("", Contract.burnParam("1000000000000"));
+        // the extremes of BigDecimal's scale: no burn, and no int overflow letting them through to toPlainString
+        assertEquals("", Contract.burnParam("1e2147483647"));
+        assertEquals("", Contract.burnParam("1e-2147483647"));
+        assertEquals("", Contract.burnParam("1e12"));
+        assertEquals("100000000000", Contract.burnParam("1e11"));
     }
 }
