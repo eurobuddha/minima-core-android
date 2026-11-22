@@ -491,7 +491,7 @@ public class MainActivity extends AppCompatActivity {
             }
             io.execute(this::refreshListings);           // a shop published again from Studio re-checks its orders (M4)
             if (autoDeliverOn() && chainBlock > sweptBlock) { sweptBlock = chainBlock; autoDeliverSweep(); }   // once per block, not per scanner callback
-            if (newCount <= 0) { if (restall) refreshVisibleOrderOrList(); return; }
+            if (newCount <= 0) { if (restall && stack.size() == 1) refreshVisibleOrderOrList(); return; }   // the line is on the list only: an open order keeps its scroll
             notifyNew(newCount);
             refreshVisibleOrderOrList();
         });
