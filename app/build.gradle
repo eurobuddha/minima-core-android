@@ -212,8 +212,11 @@ android {
         // byte), new ids are 32 SecureRandom bytes; an expired contract is collected without a change output (CHECK_MATHS
         // reports change before the expiry raises cancollect), nothing is offered within the grace period; the card shows
         // the whole contract id.
-        versionCode 346
-        versionName "2.2.76"
+        // 2.2.77: Vestr offers no collect while the coin is younger than the grace period at the tip, age 0 included
+        // (CHECK_MATHS's mustwait tests age GT 0, so a change coin was offered a collect in the block that created it,
+        // a txn the script refuses for the whole grace period). From the final block on the grace does not apply.
+        versionCode 347
+        versionName "2.2.77"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

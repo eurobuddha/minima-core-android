@@ -97,22 +97,70 @@ public class ContractIdTest {
         // runscript CHECK_MATHS at tip 1000004: owed 3 x SIGDIG(2 100/3)=99, change computed as 1, then the
         // expiry raises cancollect to 100. Paying 100 plus a change of 1 would spend 101 of a 100 coin.
         JSONObject atEnd = new JSONObject().put("cancollect", "100").put("change", "1").put("mustwait", "FALSE");
-        BigDecimal[] plan = c.collectPlan(atEnd);
+        BigDecimal[] plan = c.collectPlan(atEnd, 1000004);
         assertEquals(0, new BigDecimal("100").compareTo(plan[0]));
         assertEquals(0, plan[1].signum());
         // Later tips: cancollect 100, change 0.
-        plan = c.collectPlan(new JSONObject().put("cancollect", "100").put("change", "0").put("mustwait", "FALSE"));
+        plan = c.collectPlan(new JSONObject().put("cancollect", "100").put("change", "0").put("mustwait", "FALSE"), 1000005);
         assertEquals(0, new BigDecimal("100").compareTo(plan[0]));
         assertEquals(0, plan[1].signum());
     }
 
     @Test public void nothingIsCollectibleWithinTheGracePeriod() throws Exception {
         Contract c = Contract.from(ownerCoin());
-        BigDecimal[] plan = c.collectPlan(new JSONObject().put("cancollect", "33").put("change", "67").put("mustwait", "TRUE"));
+        BigDecimal[] plan = c.collectPlan(new JSONObject().put("cancollect", "33").put("change", "67").put("mustwait", "TRUE"), 1000003);
         assertEquals(0, plan[0].signum());
         // A partly vested, collectible contract keeps its change output: payout + change = the coin.
-        plan = c.collectPlan(new JSONObject().put("cancollect", "33").put("change", "67").put("mustwait", "FALSE"));
+        plan = c.collectPlan(new JSONObject().put("cancollect", "33").put("change", "67").put("mustwait", "FALSE"), 1000003);
         assertEquals(0, new BigDecimal("33").compareTo(plan[0]));
         assertEquals(0, new BigDecimal("67").compareTo(plan[1]));
+    }
+
+    /** total 1000, blocks 100 to 1100, grace 50: a coin of {@code amount} created at block {@code created}. */
+    static Contract graceCoin(String amount, long created) throws Exception {
+        JSONObject coin = ownerCoin().put("amount", amount).put("created", String.valueOf(created));
+        JSONArray st = coin.getJSONArray("state");
+        st.getJSONObject(1).put("data", "1000");
+        st.getJSONObject(2).put("data", "100");
+        st.getJSONObject(3).put("data", "1100");
+        st.getJSONObject(4).put("data", "50");
+        return Contract.from(coin);
+    }
+
+    static JSONObject vars(String cancollect, String change, String mustwait) throws Exception {
+        return new JSONObject().put("cancollect", cancollect).put("change", change).put("mustwait", mustwait);
+    }
+
+    // The CHECK_MATHS variables below are what the node jar's KISS VM returns for these coins and tips; the
+    // verdicts are CLEAN_SCRIPT run on the exact collect txn with @BLOCK = the tip (txncheck, relay) and tip + 1.
+
+    @Test public void aChangeCoinOfAgeZeroOffersNothing() throws Exception {
+        // The review case: the 900 change coin of a collect mined at 203. CHECK_MATHS says mustwait FALSE (age 0
+        // is not GT 0) and cancollect 3; paying 3 + 897 fails the script at 203, 204 ... 252 (@COINAGE LT 50).
+        BigDecimal[] plan = graceCoin("900", 203).collectPlan(vars("3", "897", "FALSE"), 203);
+        assertEquals(0, plan[0].signum());
+        assertEquals(0, new BigDecimal("900").compareTo(plan[1]));
+    }
+
+    @Test public void oneBlockShortOfTheGraceOffersNothing() throws Exception {
+        // tip 252, age 49: 52 + 848 fails with @BLOCK 252 (txncheck and the node's relay check refuse it).
+        assertEquals(0, graceCoin("900", 203).collectPlan(vars("52", "848", "TRUE"), 252)[0].signum());
+        assertEquals(0, graceCoin("900", 203).collectPlan(vars("52", "848", "FALSE"), 252)[0].signum());
+    }
+
+    @Test public void atTheGraceTheVestedAmountIsOffered() throws Exception {
+        // tip 253, age 50: 53 + 847 passes with @BLOCK 253 and 254.
+        BigDecimal[] plan = graceCoin("900", 203).collectPlan(vars("53", "847", "FALSE"), 253);
+        assertEquals(0, new BigDecimal("53").compareTo(plan[0]));
+        assertEquals(0, new BigDecimal("847").compareTo(plan[1]));
+    }
+
+    @Test public void fromTheFinalBlockTheGraceDoesNotApply() throws Exception {
+        // Created AT the final block 1100 (age 0): the expired branch pays the whole coin, no age check.
+        BigDecimal[] plan = graceCoin("300", 1100).collectPlan(vars("300", "0", "FALSE"), 1100);
+        assertEquals(0, new BigDecimal("300").compareTo(plan[0]));
+        assertEquals(0, plan[1].signum());
+        // One block before the final block the grace still applies: 290 + 10 at age 0 fails at 1099.
+        assertEquals(0, graceCoin("300", 1099).collectPlan(vars("290", "10", "FALSE"), 1099)[0].signum());
     }
 }

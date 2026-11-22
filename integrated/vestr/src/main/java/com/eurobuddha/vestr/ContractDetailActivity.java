@@ -75,7 +75,7 @@ public class ContractDetailActivity extends SubActivity {
             @Override public void onResult(JSONObject j) {
                 JSONObject r = j.optJSONObject("response");
                 JSONObject vars = r == null ? null : r.optJSONObject("variables");
-                BigDecimal[] plan = c.collectPlan(vars);
+                BigDecimal[] plan = c.collectPlan(vars, tip);
                 cancollect = plan[0];
                 change = plan[1];
                 mathsReady = true;

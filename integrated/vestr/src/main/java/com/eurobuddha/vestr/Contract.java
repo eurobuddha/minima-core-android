@@ -91,12 +91,26 @@ public class Contract {
      * after the end block it reports change > 0 next to a full payout: outputs above the input, a txn the
      * chain drops after txnpost already "succeeded". Change is therefore @AMOUNT - payout, as the on-chain
      * script computes it. Within the grace period ({@code mustwait}) nothing is collectible: the script
-     * refuses @COINAGE below the minimum wait (the MiniDapp refuses it too).
+     * refuses @COINAGE below the minimum wait (the MiniDapp refuses it too), see {@link #inGrace}.
      */
-    BigDecimal[] collectPlan(JSONObject vars) {
-        BigDecimal payout = vars == null || "TRUE".equals(vars.optString("mustwait"))
+    BigDecimal[] collectPlan(JSONObject vars, long tip) {
+        BigDecimal payout = vars == null || "TRUE".equals(vars.optString("mustwait")) || inGrace(tip)
                 ? BigDecimal.ZERO : bd(vars.optString("cancollect", "0")).max(BigDecimal.ZERO).min(amount);
         return new BigDecimal[]{payout, amount.subtract(payout)};
+    }
+
+    /**
+     * The script's {@code IF @COINAGE LT minblockwait THEN RETURN FALSE}, which it skips from the final block on
+     * (the expired branch pays the whole coin first). CHECK_MATHS's {@code mustwait} misses a coin of age 0 (it
+     * tests age GT 0), so a change coin was offered a collect in the block that created it, which the chain
+     * refuses. The age is taken at the tip, as CHECK_MATHS, {@code txncheck} and the node's own relay check
+     * (NIOMessage: a failing non-monotonic txn is kept but never forwarded) all run the script with
+     * {@code @BLOCK} = the tip: a collect only the next block would accept never leaves the phone.
+     */
+    boolean inGrace(long tip) {
+        BigDecimal at = BigDecimal.valueOf(tip);
+        return at.compareTo(bd(state(raw, 3))) < 0
+                && at.subtract(BigDecimal.valueOf(createdBlock)).compareTo(bd(state(raw, 4))) < 0;
     }
 
     /** Blocks left in the current grace window (0 = collectible now). */
