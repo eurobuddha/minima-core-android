@@ -266,8 +266,10 @@ android {
         // 2.2.92: miniMall Inbox: a scan request dropped while a pass runs is tried again every 4.5 s until a pass starts
         // (2.2.84 said once), and no longer while the screen is not visible: onStop removes it, as it stops the block
         // events; it never outlived the Activity (onDestroy removes every callback).
-        versionCode 362
-        versionName "2.2.92"
+        // 2.2.93: miniMall Inbox: a scan pass reads the tip again before it ends and reads the blocks the tip moved by (r3
+        // I1); the orders scan re-reads the 8-block margin as payments; an unread range names the lowest block read too.
+        versionCode 363
+        versionName "2.2.93"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
