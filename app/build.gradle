@@ -289,8 +289,11 @@ android {
         // a syncing node shows the loading state (r3 V2).
         // 2.2.103: Vestr: Collect blocked by the tap-time spend check draws the screen again: button faded, neutral label,
         // the sentence (r3 V3).
-        versionCode 373
-        versionName "2.2.103"
+        // 2.2.104: miniMall Inbox: orders scan reads its gap only; a failed tip read is read again; a moved tip's blocks
+        // are read with the margin; a pass that read every page is not counted as refused; the stalled line names the
+        // first block not read; refused only where refused passes tried (final review F1).
+        versionCode 374
+        versionName "2.2.104"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
