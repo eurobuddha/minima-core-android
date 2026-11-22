@@ -263,8 +263,11 @@ android {
         // node will not serve alone ends the pass partly read and the bookmark stays. A gap wider than the 64-block window
         // is no longer claimed silently: the Inbox says in red which blocks of orders or payments could not be read
         // (CommsScanner.UNREAD), tap to dismiss.
-        versionCode 361
-        versionName "2.2.91"
+        // 2.2.92: miniMall Inbox: a scan request dropped while a pass runs is tried again every 4.5 s until a pass starts
+        // (2.2.84 said once), and no longer while the screen is not visible: onStop removes it, as it stops the block
+        // events; it never outlived the Activity (onDestroy removes every callback).
+        versionCode 362
+        versionName "2.2.92"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

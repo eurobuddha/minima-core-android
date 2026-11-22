@@ -402,14 +402,16 @@ public class MainActivity extends AppCompatActivity {
     // ---- scanning + routing ----
 
     private boolean rescanPosted;
+    private final Runnable rescan = () -> { rescanPosted = false; if (!isFinishing() && !isDestroyed()) requestScan(); };
 
     /** One pass: orders, then payments (started when the orders scan ends). A request dropped because a pass is running
-     *  or ended under 4 s ago is tried again once, so a new block is not left unread until the next event. */
+     *  or ended under 4 s ago is tried again 4.5 s later, and again while it is dropped, until a pass starts; never while
+     *  the screen is not visible (onStop removes it, as it stops the block events) nor after it is destroyed. */
     private void requestScan() {
         if (crypto == null || orderScanner == null) return;
         if (orderScanner.scan(chainBlock) || rescanPosted) return;
         rescanPosted = true;
-        ui.postDelayed(() -> { rescanPosted = false; if (!isFinishing() && !isDestroyed()) requestScan(); }, 4500);
+        ui.postDelayed(rescan, 4500);
     }
 
     /** An opened MINIMERCH message: orders/inquiries land as orders; buyer replies append to the order chat. */
@@ -2132,6 +2134,7 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override protected void onStop() {
         DirectNodeEvents.unsubscribe(notifyReceiver);
+        ui.removeCallbacks(rescan); rescanPosted = false;   // a dropped scan request is not tried while the screen is not visible
         super.onStop();
     }
 }
