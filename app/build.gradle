@@ -268,8 +268,10 @@ android {
         // events; it never outlived the Activity (onDestroy removes every callback).
         // 2.2.93: miniMall Inbox: a scan pass reads the tip again before it ends and reads the blocks the tip moved by (r3
         // I1); the orders scan re-reads the 8-block margin as payments; an unread range names the lowest block read too.
-        versionCode 363
-        versionName "2.2.93"
+        // 2.2.94: miniMall Inbox: the payment scan keeps its own read-whole mark and never notes as unread a block it read
+        // (r3 I2).
+        versionCode 364
+        versionName "2.2.94"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
