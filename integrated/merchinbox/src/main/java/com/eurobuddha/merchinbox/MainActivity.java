@@ -808,6 +808,8 @@ public class MainActivity extends AppCompatActivity {
         boolean mismatch, conflict, upgraded, listing, listingSigned, autoOn, contendedFull, cameFirst, checked, legacyPaid;
         String findResult = "";
         JSONObject olderPay;
+        DeliveryRules.PaidCoin firstPay;                     // cameFirst: the earliest payment coin counted for the order
+        List<String[]> otherOrders = new ArrayList<>();      // cameFirst: each other order's {coin id, block}
         String nonce = "", problems = "", due = "", orderBlock = "";
         List<String[]> nfts = new ArrayList<>();
         java.util.Map<String, String> sentTx = new java.util.HashMap<>(), ledger = new java.util.HashMap<>();
@@ -847,6 +849,13 @@ public class MainActivity extends AppCompatActivity {
         m.contenders = db.contenders(ref); m.unassigned = db.unassignedCoins(ref);
         m.committed = db.committedContender(o); m.contendedFull = db.contendedCoinsFull(ref);
         m.cameFirst = m.conflict && m.nonce.isEmpty() && o.paid && recordCameFirst(o);
+        if (m.cameFirst) {   // what is known, shown whole (P4): the blocks and the coins they come from
+            for (DeliveryRules.PaidCoin c : paidCoins(ref)) if (c.created > 0 && (m.firstPay == null || c.created < m.firstPay.created)) m.firstPay = c;
+            for (int i = 0; i < m.contenders.length(); i++) {
+                String id = m.contenders.optJSONObject(i) == null ? "" : m.contenders.optJSONObject(i).optString("coinid");
+                m.otherOrders.add(new String[]{id, db.getMeta("contenderblock:" + ref + ":" + id.toLowerCase(java.util.Locale.ROOT), "")});
+            }
+        }
         m.legacyPaid = legacyPaid(o);
         m.findResult = db.getMeta("findpayment:" + ref, "");
         m.olderPay = db.olderPayment(ref);
@@ -976,7 +985,10 @@ public class MainActivity extends AppCompatActivity {
         JSONArray cs = m.contenders;
         JSONArray un = m.unassigned;
         if (m.cameFirst) {   // item 6: an older-Shop order that came first may be delivered to the order of record
-            body.addView(label(Language.msg(l10n_mall_inbox_came_first, m.orderBlock)));
+            // Only what is known (P4): an order mined before its payment can still be a copy made from the unmined payment
+            body.addView(label(Language.msg(l10n_mall_inbox_came_first, m.orderBlock, m.firstPay == null ? "" : String.valueOf(m.firstPay.created))));
+            if (m.firstPay != null) body.addView(copyRow(Language.msg(l10n_mall_inbox_earliest_payment_coin, String.valueOf(m.firstPay.created)), m.firstPay.coinid, m.firstPay.coinid));
+            for (String[] x : m.otherOrders) body.addView(copyRow(Language.msg(l10n_mall_inbox_other_order_coin, x[1]), x[0], x[0]));
             TextView keep = button(Language.msg(l10n_mall_inbox_deliver_to_record, o.payaddr), false);
             keep.setOnClickListener(v -> languageDialog().setTitle(Language.msg(l10n_mall_inbox_deliver_to_record_question))
                     .setMessage(Language.msg(l10n_mall_inbox_deliver_to_record_help))

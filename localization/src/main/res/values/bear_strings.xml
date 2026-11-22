@@ -8809,12 +8809,12 @@
     <string name="l10n_mall_inbox_checked_ready">"Every check passed at block %1$s: ready to send."</string>
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_checked_waiting">"At block %1$s, nothing could be sent until:"</string>
-    <!-- Arguments: block -->
-    <string name="l10n_mall_inbox_came_first">"This order\'s own coin is in block %1$s, before every payment counted for it, so it existed before its reference was public."</string>
+    <!-- Arguments: block, payBlock -->
+    <string name="l10n_mall_inbox_came_first">"This order\'s own coin is in block %1$s and the earliest payment counted for it is in block %2$s; every other order with this reference is in a later block than that payment (the coins are below). That does not prove this order is the buyer\'s: a payment\'s reference can be read while the payment waits to be mined, so a copy made from it can be mined before it. Confirm with the buyer before you send."</string>
     <!-- Arguments: address -->
     <string name="l10n_mall_inbox_deliver_to_record">"Deliver to the order of record (%1$s)"</string>
     <string name="l10n_mall_inbox_deliver_to_record_question" formatted="false">"Deliver to the order of record?"</string>
-    <string name="l10n_mall_inbox_deliver_to_record_help" formatted="false">"The other order with this reference arrived after this one\'s payment made the reference public. Nothing else changes: every other check still applies."</string>
+    <string name="l10n_mall_inbox_deliver_to_record_help" formatted="false">"Known: this order\'s coin is in an earlier block than its earliest payment, and every other order with this reference is in a later block than that payment. An order mined before the payment can still be a copy made from the payment while it waited to be mined, so confirm with the buyer before sending. Nothing else changes: every other check still applies."</string>
     <string name="l10n_mall_inbox_upgraded_recheck" formatted="false">"Upgraded: re-check this order\'s payment. It was recorded by an older Inbox, and nothing is sent until its coins are read back on chain."</string>
     <string name="l10n_mall_inbox_auto_off_banner" formatted="false">"Automatic NFT delivery is now OFF after this update. Switch it on again from the automatic delivery line below; it then sends only for orders that pass every check. (Tap to dismiss.)"</string>
     <string name="l10n_mall_inbox_legacy_paid" formatted="false">"This order was paid under an older Inbox, which did not keep its payment coins, so nothing is sent for it until they are found."</string>
@@ -8828,4 +8828,8 @@
     <string name="l10n_mall_inbox_auto_no_secret" formatted="false">"This order came from an older Shop that does not prove which payment is its own, so it is never sent automatically: check it and send by hand."</string>
     <!-- Arguments: coin, block, orderBlock -->
     <string name="l10n_mall_inbox_older_payment">"A payment with this order\'s reference is older than the order (payment coin %1$s at block %2$s, the order at block %3$s): check by hand. It is not counted for this order."</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_earliest_payment_coin">"Earliest payment coin (block %1$s)"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_other_order_coin">"Other order\'s coin (block %1$s)"</string>
 </resources>

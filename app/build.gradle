@@ -238,8 +238,11 @@ android {
         // 2.2.85: miniMall Inbox: an order with no secret is not paid by a coin mined more than 3 blocks before the order
         // (MerchDb.olderThanOrder): the coin is kept as counted for no order with one note per order, and the order's block
         // is stored inside upsertOrder's transaction.
-        versionCode 355
-        versionName "2.2.85"
+        // 2.2.86: miniMall Inbox: "Deliver to the order of record" says only what is known (the blocks of this order,
+        // of its earliest payment and of every other order, the coins whole, tap to copy) and that an order mined before
+        // the payment can still be a copy made from the unmined payment: confirm with the buyer. The rule is unchanged.
+        versionCode 356
+        versionName "2.2.86"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

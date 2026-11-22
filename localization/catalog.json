@@ -44061,10 +44061,10 @@
     "uk": "На блоці {block} нічого не можна було надіслати, доки не буде виконано:"
   },
   "mallInbox.cameFirst": {
-    "en": "This order's own coin is in block {block}, before every payment counted for it, so it existed before its reference was public.",
-    "zh-Hans": "此订单自己的币在区块 {block}，早于计入它的每一笔付款，因此它在编号公开之前就已存在。",
-    "ru": "Собственная монета этого заказа находится в блоке {block}, раньше каждого засчитанного ему платежа, значит, он существовал до того, как его номер стал публичным.",
-    "uk": "Власна монета цього замовлення в блоці {block}, раніше за кожен зарахований йому платіж, отже, воно існувало до того, як його номер став публічним."
+    "en": "This order's own coin is in block {block} and the earliest payment counted for it is in block {payBlock}; every other order with this reference is in a later block than that payment (the coins are below). That does not prove this order is the buyer's: a payment's reference can be read while the payment waits to be mined, so a copy made from it can be mined before it. Confirm with the buyer before you send.",
+    "zh-Hans": "此订单自己的币在区块 {block}，计入它的最早一笔付款在区块 {payBlock}；使用此编号的其他每个订单都在该付款之后的区块（相关币列在下方）。这并不能证明此订单属于买家：付款在等待打包时其编号即可被读取，因此据此复制的订单可能先于付款被打包。发送前请与买家确认。",
+    "ru": "Собственная монета этого заказа находится в блоке {block}, а самый ранний засчитанный ему платёж — в блоке {payBlock}; каждый другой заказ с этим номером находится в более позднем блоке, чем этот платёж (монеты ниже). Это не доказывает, что заказ принадлежит покупателю: номер платежа можно прочитать, пока платёж ждёт включения в блок, поэтому копия, сделанная по нему, может попасть в блок раньше него. Подтвердите у покупателя, прежде чем отправлять.",
+    "uk": "Власна монета цього замовлення в блоці {block}, а найраніший зарахований йому платіж — у блоці {payBlock}; кожне інше замовлення з цим номером у пізнішому блоці, ніж цей платіж (монети нижче). Це не доводить, що замовлення належить покупцеві: номер платежу можна прочитати, поки платіж чекає на включення до блоку, тож копія, зроблена з нього, може потрапити до блоку раніше за нього. Підтвердьте з покупцем, перш ніж надсилати."
   },
   "mallInbox.deliverToRecord": {
     "en": "Deliver to the order of record ({address})",
@@ -44079,10 +44079,10 @@
     "uk": "Надіслати за основним замовленням?"
   },
   "mallInbox.deliverToRecordHelp": {
-    "en": "The other order with this reference arrived after this one's payment made the reference public. Nothing else changes: every other check still applies.",
-    "zh-Hans": "使用此编号的另一订单是在此订单的付款使编号公开之后才到达的。其他一切不变：其余检查仍然适用。",
-    "ru": "Другой заказ с этим номером пришёл после того, как оплата этого заказа сделала номер публичным. Больше ничего не меняется: все остальные проверки по-прежнему действуют.",
-    "uk": "Інше замовлення з цим номером надійшло після того, як оплата цього замовлення зробила номер публічним. Більше нічого не змінюється: усі інші перевірки й далі діють."
+    "en": "Known: this order's coin is in an earlier block than its earliest payment, and every other order with this reference is in a later block than that payment. An order mined before the payment can still be a copy made from the payment while it waited to be mined, so confirm with the buyer before sending. Nothing else changes: every other check still applies.",
+    "zh-Hans": "已知的只有：此订单的币所在区块早于其最早的付款，使用此编号的其他每个订单都在该付款之后的区块。先于付款被打包的订单仍可能是在付款等待打包时据其复制的，因此发送前请与买家确认。其他一切不变：其余检查仍然适用。",
+    "ru": "Известно лишь следующее: монета этого заказа находится в более раннем блоке, чем его самый ранний платёж, а каждый другой заказ с этим номером — в более позднем блоке, чем этот платёж. Заказ, попавший в блок раньше платежа, всё равно может быть копией, сделанной по платежу, пока тот ждал включения в блок, поэтому подтвердите у покупателя, прежде чем отправлять. Больше ничего не меняется: все остальные проверки по-прежнему действуют.",
+    "uk": "Відомо лише таке: монета цього замовлення в ранішому блоці, ніж його найраніший платіж, а кожне інше замовлення з цим номером — у пізнішому блоці, ніж цей платіж. Замовлення, що потрапило до блоку раніше за платіж, усе одно може бути копією, зробленою з платежу, поки той чекав на включення до блоку, тож підтвердьте з покупцем, перш ніж надсилати. Більше нічого не змінюється: усі інші перевірки й далі діють."
   },
   "mallInbox.upgradedRecheck": {
     "en": "Upgraded: re-check this order's payment. It was recorded by an older Inbox, and nothing is sent until its coins are read back on chain.",
@@ -44149,5 +44149,17 @@
     "zh-Hans": "带有此订单参考号的付款早于订单（付款币 {coin} 位于区块 {block}，订单位于区块 {orderBlock}）：请人工核对。它不计入此订单。",
     "ru": "Платёж с номером этого заказа старше самого заказа (монета платежа {coin} в блоке {block}, заказ в блоке {orderBlock}): проверьте вручную. Он не засчитан этому заказу.",
     "uk": "Платіж із номером цього замовлення старший за саме замовлення (монета платежу {coin} у блоці {block}, замовлення в блоці {orderBlock}): перевірте вручну. Його не зараховано цьому замовленню."
+  },
+  "mallInbox.earliestPaymentCoin": {
+    "en": "Earliest payment coin (block {block})",
+    "zh-Hans": "最早的付款币（区块 {block}）",
+    "ru": "Самая ранняя монета платежа (блок {block})",
+    "uk": "Найраніша монета платежу (блок {block})"
+  },
+  "mallInbox.otherOrderCoin": {
+    "en": "Other order's coin (block {block})",
+    "zh-Hans": "另一订单的币（区块 {block}）",
+    "ru": "Монета другого заказа (блок {block})",
+    "uk": "Монета іншого замовлення (блок {block})"
   }
 }

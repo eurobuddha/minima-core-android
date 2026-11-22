@@ -8772,12 +8772,12 @@
     <string name="l10n_mall_inbox_checked_ready">"在区块 %1$s 时全部检查通过：可以发送。"</string>
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_checked_waiting">"在区块 %1$s 时，以下条件满足前不能发送："</string>
-    <!-- Arguments: block -->
-    <string name="l10n_mall_inbox_came_first">"此订单自己的币在区块 %1$s，早于计入它的每一笔付款，因此它在编号公开之前就已存在。"</string>
+    <!-- Arguments: block, payBlock -->
+    <string name="l10n_mall_inbox_came_first">"此订单自己的币在区块 %1$s，计入它的最早一笔付款在区块 %2$s；使用此编号的其他每个订单都在该付款之后的区块（相关币列在下方）。这并不能证明此订单属于买家：付款在等待打包时其编号即可被读取，因此据此复制的订单可能先于付款被打包。发送前请与买家确认。"</string>
     <!-- Arguments: address -->
     <string name="l10n_mall_inbox_deliver_to_record">"发送给正式订单（%1$s）"</string>
     <string name="l10n_mall_inbox_deliver_to_record_question" formatted="false">"发送给正式订单？"</string>
-    <string name="l10n_mall_inbox_deliver_to_record_help" formatted="false">"使用此编号的另一订单是在此订单的付款使编号公开之后才到达的。其他一切不变：其余检查仍然适用。"</string>
+    <string name="l10n_mall_inbox_deliver_to_record_help" formatted="false">"已知的只有：此订单的币所在区块早于其最早的付款，使用此编号的其他每个订单都在该付款之后的区块。先于付款被打包的订单仍可能是在付款等待打包时据其复制的，因此发送前请与买家确认。其他一切不变：其余检查仍然适用。"</string>
     <string name="l10n_mall_inbox_upgraded_recheck" formatted="false">"已升级：请重新检查此订单的付款。它由旧版收件箱记录，在其币于链上读回之前不会发送任何内容。"</string>
     <string name="l10n_mall_inbox_auto_off_banner" formatted="false">"此更新后，自动 NFT 发送现已关闭。可通过下方的自动发送一行重新开启；开启后只会为通过全部检查的订单发送。（点按以关闭此提示。）"</string>
     <string name="l10n_mall_inbox_legacy_paid" formatted="false">"此订单在旧版收件箱中付款，旧版没有保存其付款币，因此在找到它们之前不会为其发送任何内容。"</string>
@@ -8791,4 +8791,8 @@
     <string name="l10n_mall_inbox_auto_no_secret" formatted="false">"此订单来自旧版商店，无法证明哪笔付款属于它，因此永远不会自动发送：请核对后手动发送。"</string>
     <!-- Arguments: coin, block, orderBlock -->
     <string name="l10n_mall_inbox_older_payment">"带有此订单参考号的付款早于订单（付款币 %1$s 位于区块 %2$s，订单位于区块 %3$s）：请人工核对。它不计入此订单。"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_earliest_payment_coin">"最早的付款币（区块 %1$s）"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_other_order_coin">"另一订单的币（区块 %1$s）"</string>
 </resources>
