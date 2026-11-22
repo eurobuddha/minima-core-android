@@ -687,6 +687,9 @@ public class MainActivity extends AppCompatActivity {
                     .setNegativeButton(Language.msg(l10n_common_cancel), null).show();
         });
         col.addView(mc);
+        final LinearLayout unread = new LinearLayout(this);   // blocks a scan moved past unread (CommsScanner.UNREAD), filled below
+        unread.setOrientation(LinearLayout.VERTICAL); unread.setPadding(dp(16), 0, dp(16), dp(4));
+        col.addView(unread);
 
         col.addView(filterBar());
         final HorizontalScrollView shopBar = new HorizontalScrollView(this);
@@ -699,6 +702,8 @@ public class MainActivity extends AppCompatActivity {
         rv.setAdapter(adapter);
         col.addView(rv, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
         io.execute(() -> {
+            final List<String[]> gaps = unreadRanges();
+            ui.post(() -> { for (String[] g : gaps) unread.addView(unreadLine(g)); });
             List<MerchDb.Order> all = db.orders();
             java.util.LinkedHashSet<String> shops = new java.util.LinkedHashSet<>();
             for (MerchDb.Order o : all) if (!o.shopName.isEmpty()) shops.add(o.shopName);
@@ -714,6 +719,27 @@ public class MainActivity extends AppCompatActivity {
             });
         });
         return col;
+    }
+
+    /** The ranges the scans moved past unread, newest first, at most 5: {key, first block, last block, "pay" or ""}. */
+    List<String[]> unreadRanges() {
+        List<String[]> out = new ArrayList<>();
+        try (android.database.Cursor q = db.getReadableDatabase().rawQuery("SELECT k, v FROM meta WHERE k LIKE ? AND v <> ''", new String[]{CommsScanner.UNREAD + "%"})) {
+            while (q.moveToNext()) {
+                String k = q.getString(0);
+                out.add(new String[]{k, k.substring(k.lastIndexOf(':') + 1), q.getString(1), k.startsWith(CommsScanner.UNREAD + "pay_") ? "pay" : ""});
+            }
+        }
+        out.sort((a, b) -> Long.compare(parseBlock(b[2]), parseBlock(a[2])));
+        return out.size() > 5 ? new ArrayList<>(out.subList(0, 5)) : out;
+    }
+
+    /** One unread range, in red, truthful about what was not read; a tap dismisses it. */
+    private TextView unreadLine(final String[] g) {
+        TextView t = label(Language.msg("pay".equals(g[3]) ? l10n_mall_inbox_payments_unread : l10n_mall_inbox_orders_unread, g[1], g[2]));
+        t.setTextColor(Design.RED);
+        t.setOnClickListener(v -> io.execute(() -> { db.setMeta(g[0], ""); ui.post(() -> refreshTop(buildOrders())); }));
+        return t;
     }
 
     private LinearLayout shopFilterRow(java.util.Set<String> shops) {

@@ -258,8 +258,13 @@ android {
         // coin and block, whole and one tap away, a red line when the order was mined after its earliest payment, a softer
         // one in the same block, and the olderpay note again. The order screen says it whether automatic delivery is on or
         // off.
-        versionCode 360
-        versionName "2.2.90"
+        // 2.2.91: miniMall Inbox: a scan pass moves its bookmark only over blocks it read: a deeper page refused after a
+        // smaller one was read is read in older windows (coinage:, halved while refused, as findWindow pages); a block the
+        // node will not serve alone ends the pass partly read and the bookmark stays. A gap wider than the 64-block window
+        // is no longer claimed silently: the Inbox says in red which blocks of orders or payments could not be read
+        // (CommsScanner.UNREAD), tap to dismiss.
+        versionCode 361
+        versionName "2.2.91"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

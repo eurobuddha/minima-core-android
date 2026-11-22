@@ -8804,4 +8804,8 @@
     <string name="l10n_mall_inbox_order_after_payment">"此订单比其付款晚 %1$s 个区块才被打包（订单位于区块 %2$s，付款位于区块 %3$s）：诚实的商店会先发送订单。"</string>
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_order_same_block">"此订单与其付款在同一区块（%1$s）中被打包：无法判断哪个在先。"</string>
+    <!-- Arguments: from, to -->
+    <string name="l10n_mall_inbox_orders_unread">"区块 %1$s 至区块 %2$s 之间的订单无法读取：那段时间发出的订单可能不在这里。点按即可关闭。"</string>
+    <!-- Arguments: from, to -->
+    <string name="l10n_mall_inbox_payments_unread">"区块 %1$s 至区块 %2$s 之间的付款无法读取：那段时间的付款可能未被计入。点按即可关闭。"</string>
 </resources>

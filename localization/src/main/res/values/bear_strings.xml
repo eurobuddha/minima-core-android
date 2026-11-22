@@ -8841,4 +8841,8 @@
     <string name="l10n_mall_inbox_order_after_payment">"This order was mined %1$s block(s) AFTER its payment (the order at block %2$s, the payment at block %3$s): an honest Shop sends the order first."</string>
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_order_same_block">"This order and its payment were mined in the same block (%1$s): which came first cannot be told."</string>
+    <!-- Arguments: from, to -->
+    <string name="l10n_mall_inbox_orders_unread">"Orders between block %1$s and block %2$s could not be read: an order sent then may be missing here. Tap to dismiss."</string>
+    <!-- Arguments: from, to -->
+    <string name="l10n_mall_inbox_payments_unread">"Payments between block %1$s and block %2$s could not be read: a payment made then may not be counted. Tap to dismiss."</string>
 </resources>
