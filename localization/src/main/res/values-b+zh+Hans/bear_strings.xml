@@ -8788,11 +8788,20 @@
     <string name="l10n_mall_inbox_searching" formatted="false">"正在搜索…"</string>
     <!-- Arguments: a -->
     <string name="l10n_mall_inbox_drain_r_amount_unread">"币 %1$s：无法读取其金额，因此不计入"</string>
-    <string name="l10n_mall_inbox_auto_no_secret" formatted="false">"此订单来自旧版商店，无法证明哪笔付款属于它，因此永远不会自动发送：请核对后手动发送。"</string>
+    <string name="l10n_mall_inbox_auto_no_secret" formatted="false">"此订单来自旧版商店：它只凭参考号与付款对应，而参考号可以从付款中复制。它永远不会自动发送；请核对并与买家确认后手动发送。"</string>
     <!-- Arguments: coin, block, orderBlock -->
     <string name="l10n_mall_inbox_older_payment">"带有此订单参考号的付款早于订单（付款币 %1$s 位于区块 %2$s，订单位于区块 %3$s）。订单的副本可以用付款上的参考号制作：发送前请与买家确认。"</string>
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_earliest_payment_coin">"最早的付款币（区块 %1$s）"</string>
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_other_order_coin">"另一订单的币（区块 %1$s）"</string>
+    <string name="l10n_mall_inbox_old_shop_send" formatted="false">"此订单来自旧版商店，只凭参考号与付款对应。参考号可以从付款中复制。"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_order_coin_block">"订单币（区块 %1$s）"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_payment_coin_block">"付款币（区块 %1$s）"</string>
+    <!-- Arguments: blocks, orderBlock, payBlock -->
+    <string name="l10n_mall_inbox_order_after_payment">"此订单比其付款晚 %1$s 个区块才被打包（订单位于区块 %2$s，付款位于区块 %3$s）：诚实的商店会先发送订单。"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_order_same_block">"此订单与其付款在同一区块（%1$s）中被打包：无法判断哪个在先。"</string>
 </resources>

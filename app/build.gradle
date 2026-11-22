@@ -252,8 +252,14 @@ android {
         // 2.2.89: miniMall Inbox: a counted payment coin is shown as the node gave it (the Earliest payment coin row and
         // the reasons of a check), like every other row; it is still compared and read by id lower-cased
         // (DeliveryRules.PaidCoin.shown).
-        versionCode 359
-        versionName "2.2.89"
+        // 2.2.90: miniMall Inbox: an order with no secret is warned about at the moment of sending: the vendor's Send
+        // confirmation always says it came from an older Shop and is matched by its reference only (which can be copied
+        // from a payment), then the facts as stored (DeliveryRules.oldShopFacts): the order coin and block, each counted
+        // coin and block, whole and one tap away, a red line when the order was mined after its earliest payment, a softer
+        // one in the same block, and the olderpay note again. The order screen says it whether automatic delivery is on or
+        // off.
+        versionCode 360
+        versionName "2.2.90"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

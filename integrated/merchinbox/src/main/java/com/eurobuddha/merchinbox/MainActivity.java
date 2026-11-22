@@ -806,6 +806,7 @@ public class MainActivity extends AppCompatActivity {
         boolean mismatch, conflict, upgraded, listing, listingSigned, autoOn, contendedFull, cameFirst, checked, legacyPaid;
         String findResult = "";
         JSONObject olderPay;
+        List<DeliveryRules.PaidCoin> paid = new ArrayList<>();   // no secret: the coins counted for it (the old-Shop facts)
         DeliveryRules.PaidCoin firstPay;                     // cameFirst: the earliest payment coin counted for the order
         List<String[]> otherOrders = new ArrayList<>();      // cameFirst: each other order's {coin id, block}
         String nonce = "", problems = "", due = "", orderBlock = "";
@@ -858,6 +859,7 @@ public class MainActivity extends AppCompatActivity {
         m.findResult = db.getMeta("findpayment:" + ref, "");
         m.olderPay = db.olderPayment(ref);
         m.orderBlock = db.getMeta("orderblock:" + ref, "");
+        if (m.nonce.isEmpty()) m.paid = paidCoins(ref);
         m.chat = db.chat(ref);
         return m;
     }
@@ -956,9 +958,12 @@ public class MainActivity extends AppCompatActivity {
             // NFT delivery — order lines that carry an NFT tokenid (from an NFT Studio .shop)
             List<String[]> nfts = m.nfts;
             if (!nfts.isEmpty()) {
-                boolean byHand = m.autoOn && !DeliveryRules.autoAllowed(m.nonce);
+                boolean byHand = !DeliveryRules.autoAllowed(m.nonce);   // an older Shop's order: said whether automatic delivery is on or off
                 body.addView(sectionLabel(m.autoOn && !byHand ? Language.msg(l10n_mall_inbox_nft_auto) : Language.msg(l10n_mall_inbox_nft_delivery)));
-                if (byHand) { TextView bh = label(Language.msg(l10n_mall_inbox_auto_no_secret)); bh.setTextColor(Design.RED); body.addView(bh); }
+                if (byHand) {
+                    TextView bh = label(Language.msg(l10n_mall_inbox_auto_no_secret)); bh.setTextColor(Design.RED); body.addView(bh);
+                    oldShopFacts(body, DeliveryRules.oldShopFacts(parseBlock(m.orderBlock), m.paid), m.paid, o.coinid);
+                }
                 for (String[] line : nfts) body.addView(nftSendRow(m, o, line));
             }
         }
@@ -975,6 +980,37 @@ public class MainActivity extends AppCompatActivity {
         body.addView(sectionLabel(inquiry ? Language.msg(l10n_mall_shop_conversation) : Language.msg(l10n_mall_inbox_message_buyer)));
         body.addView(replyRow(o, m.chat));
         return col;
+    }
+
+    static long parseBlock(String b) { try { return Long.parseLong(b); } catch (NumberFormatException e) { return 0; } }
+
+    /** An older Shop's order, as stored (DeliveryRules.oldShopFacts): its own coin and block, each coin counted for it with
+     *  its block (whole, one tap to copy), then a red line when the order was mined after its earliest payment, or a
+     *  softer one when both are in the same block. Nothing but the generic sentence when a block is unknown. */
+    private void oldShopFacts(LinearLayout into, DeliveryRules.OldShopFacts f, List<DeliveryRules.PaidCoin> coins, String orderCoin) {
+        if (!f.facts) return;
+        if (!orderCoin.isEmpty()) into.addView(copyRow(Language.msg(l10n_mall_inbox_order_coin_block, String.valueOf(f.orderBlock)), orderCoin, orderCoin));
+        for (DeliveryRules.PaidCoin c : coins)
+            into.addView(copyRow(Language.msg(l10n_mall_inbox_payment_coin_block, c.created > 0 ? String.valueOf(c.created) : "?"), c.shown, c.shown));
+        if (f.after > 0) {
+            TextView t = label(Language.msg(l10n_mall_inbox_order_after_payment, String.valueOf(f.after), String.valueOf(f.orderBlock), String.valueOf(f.earliest)));
+            t.setTextColor(Design.RED); into.addView(t);
+        } else if (f.sameBlock) into.addView(label(Language.msg(l10n_mall_inbox_order_same_block, String.valueOf(f.orderBlock))));
+    }
+
+    /** The paragraph the vendor's Send confirmation always shows for an older Shop's order: matched by its reference only,
+     *  which can be copied from a payment; the facts as stored; and the older-payment note, repeated, when there is one. */
+    View oldShopSendFacts(OrderModel m, MerchDb.Order now, List<DeliveryRules.PaidCoin> coins) {
+        LinearLayout box = new LinearLayout(this); box.setOrientation(LinearLayout.VERTICAL); box.setPadding(dp(24), 0, dp(24), dp(8));
+        box.addView(label(Language.msg(l10n_mall_inbox_old_shop_send)));
+        List<DeliveryRules.PaidCoin> paid = coins == null ? m.paid : coins;
+        oldShopFacts(box, DeliveryRules.oldShopFacts(parseBlock(m.orderBlock), paid), paid, now.coinid);
+        if (m.olderPay != null) {
+            final String coin = m.olderPay.optString("coinid");
+            TextView op = label(Language.msg(l10n_mall_inbox_older_payment, coin, m.olderPay.optString("created"), m.olderPay.optString("orderblock")));
+            op.setTextColor(Design.RED); op.setOnClickListener(v -> copy(coin)); box.addView(op);
+        }
+        return box;
     }
 
     /** The other orders that arrived with this ref (delta review H-1): sender, buyer address and items whole, which one
@@ -1250,14 +1286,15 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 MerchDb.Order now = verdict.order;
-                languageDialog()
+                LanguageDialog confirm = languageDialog()
                         .setTitle(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mall_inbox_send_nft))
                         .setMessage(Language.join(recovering ? Language.msg(l10n_mall_inbox_resume_help, now.payaddr) : Language.msg(l10n_mall_inbox_send_whole, label, tokenid,
                                 bundle ? Language.msg(l10n_mall_inbox_all_pieces) : piece ? "1 (#" + line[3] + ")" : qty, now.payaddr),
                                 "\n\n", Language.msg(l10n_mall_inbox_paid_of_due, verdict.paid.toPlainString(), verdict.due.toPlainString())))
                         .setPositiveButton(Language.msg(recovering ? l10n_mall_inbox_resume_delivery : l10n_mail_send), (d, w) -> sendNft(now, line, false))
-                        .setNegativeButton(Language.msg(l10n_common_cancel), null)
-                        .show();
+                        .setNegativeButton(Language.msg(l10n_common_cancel), null);
+                if (!DeliveryRules.autoAllowed(verdict.nonce)) confirm.setView(wrapScroll(oldShopSendFacts(m, now, verdict.coins)));   // always, for an older Shop's order
+                confirm.show();
             });
         });
         wrap.addView(b);

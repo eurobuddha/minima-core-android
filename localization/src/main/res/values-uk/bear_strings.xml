@@ -8899,11 +8899,20 @@
     <string name="l10n_mall_inbox_searching" formatted="false">"Пошук…"</string>
     <!-- Arguments: a -->
     <string name="l10n_mall_inbox_drain_r_amount_unread">"монета %1$s: її суму не вдалося прочитати, тому її не зараховано"</string>
-    <string name="l10n_mall_inbox_auto_no_secret" formatted="false">"Це замовлення прийшло зі старого магазину, який не доводить, який платіж є його власним, тому воно ніколи не надсилається автоматично: перевірте його та надішліть вручну."</string>
+    <string name="l10n_mall_inbox_auto_no_secret" formatted="false">"Це замовлення прийшло зі старого магазину: воно зіставлене з платежем лише за номером, а номер можна скопіювати з платежу. Воно ніколи не надсилається автоматично; перевірте його, підтвердьте з покупцем і надішліть вручну."</string>
     <!-- Arguments: coin, block, orderBlock -->
     <string name="l10n_mall_inbox_older_payment">"Платіж із номером цього замовлення старший за саме замовлення (монета платежу %1$s у блоці %2$s, замовлення в блоці %3$s). Копію замовлення можна зробити за номером із платежу: перед надсиланням підтвердьте з покупцем."</string>
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_earliest_payment_coin">"Найраніша монета платежу (блок %1$s)"</string>
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_other_order_coin">"Монета іншого замовлення (блок %1$s)"</string>
+    <string name="l10n_mall_inbox_old_shop_send" formatted="false">"Це замовлення прийшло зі старого магазину і зіставлене з платежем лише за номером. Номер можна скопіювати з платежу."</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_order_coin_block">"Монета замовлення (блок %1$s)"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_payment_coin_block">"Монета платежу (блок %1$s)"</string>
+    <!-- Arguments: blocks, orderBlock, payBlock -->
+    <string name="l10n_mall_inbox_order_after_payment">"Це замовлення записане в ланцюжок на %1$s блок(ів) ПІЗНІШЕ за свій платіж (замовлення в блоці %2$s, платіж у блоці %3$s): чесний магазин спершу надсилає замовлення."</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_order_same_block">"Це замовлення і його платіж записані в одному блоці (%1$s): що було першим, визначити неможливо."</string>
 </resources>

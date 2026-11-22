@@ -44139,10 +44139,10 @@
     "uk": "монета {a}: її суму не вдалося прочитати, тому її не зараховано"
   },
   "mallInbox.autoNoSecret": {
-    "en": "This order came from an older Shop that does not prove which payment is its own, so it is never sent automatically: check it and send by hand.",
-    "zh-Hans": "此订单来自旧版商店，无法证明哪笔付款属于它，因此永远不会自动发送：请核对后手动发送。",
-    "ru": "Этот заказ пришёл из старого магазина, который не доказывает, какой платёж его собственный, поэтому он никогда не отправляется автоматически: проверьте его и отправьте вручную.",
-    "uk": "Це замовлення прийшло зі старого магазину, який не доводить, який платіж є його власним, тому воно ніколи не надсилається автоматично: перевірте його та надішліть вручну."
+    "en": "This order came from an older Shop: it is matched to its payment by its reference only, and a reference can be copied from a payment. It is never sent automatically; check it, confirm with the buyer and send by hand.",
+    "zh-Hans": "此订单来自旧版商店：它只凭参考号与付款对应，而参考号可以从付款中复制。它永远不会自动发送；请核对并与买家确认后手动发送。",
+    "ru": "Этот заказ пришёл из старого магазина: он сопоставлен с платежом только по номеру, а номер можно скопировать из платежа. Он никогда не отправляется автоматически; проверьте его, подтвердите у покупателя и отправьте вручную.",
+    "uk": "Це замовлення прийшло зі старого магазину: воно зіставлене з платежем лише за номером, а номер можна скопіювати з платежу. Воно ніколи не надсилається автоматично; перевірте його, підтвердьте з покупцем і надішліть вручну."
   },
   "mallInbox.olderPayment": {
     "en": "A payment with this order's reference is older than the order (payment coin {coin} at block {block}, the order at block {orderBlock}). A copy of an order can be made from a payment's reference: confirm with the buyer before sending.",
@@ -44161,5 +44161,35 @@
     "zh-Hans": "另一订单的币（区块 {block}）",
     "ru": "Монета другого заказа (блок {block})",
     "uk": "Монета іншого замовлення (блок {block})"
+  },
+  "mallInbox.oldShopSend": {
+    "en": "This order came from an older Shop and is matched to its payment by its reference only. A reference can be copied from a payment.",
+    "zh-Hans": "此订单来自旧版商店，只凭参考号与付款对应。参考号可以从付款中复制。",
+    "ru": "Этот заказ пришёл из старого магазина и сопоставлен с платежом только по номеру. Номер можно скопировать из платежа.",
+    "uk": "Це замовлення прийшло зі старого магазину і зіставлене з платежем лише за номером. Номер можна скопіювати з платежу."
+  },
+  "mallInbox.orderCoinBlock": {
+    "en": "Order coin (block {block})",
+    "zh-Hans": "订单币（区块 {block}）",
+    "ru": "Монета заказа (блок {block})",
+    "uk": "Монета замовлення (блок {block})"
+  },
+  "mallInbox.paymentCoinBlock": {
+    "en": "Payment coin (block {block})",
+    "zh-Hans": "付款币（区块 {block}）",
+    "ru": "Монета платежа (блок {block})",
+    "uk": "Монета платежу (блок {block})"
+  },
+  "mallInbox.orderAfterPayment": {
+    "en": "This order was mined {blocks} block(s) AFTER its payment (the order at block {orderBlock}, the payment at block {payBlock}): an honest Shop sends the order first.",
+    "zh-Hans": "此订单比其付款晚 {blocks} 个区块才被打包（订单位于区块 {orderBlock}，付款位于区块 {payBlock}）：诚实的商店会先发送订单。",
+    "ru": "Этот заказ записан в цепочку на {blocks} блок(ов) ПОЗЖЕ своего платежа (заказ в блоке {orderBlock}, платёж в блоке {payBlock}): честный магазин сначала отправляет заказ.",
+    "uk": "Це замовлення записане в ланцюжок на {blocks} блок(ів) ПІЗНІШЕ за свій платіж (замовлення в блоці {orderBlock}, платіж у блоці {payBlock}): чесний магазин спершу надсилає замовлення."
+  },
+  "mallInbox.orderSameBlock": {
+    "en": "This order and its payment were mined in the same block ({block}): which came first cannot be told.",
+    "zh-Hans": "此订单与其付款在同一区块（{block}）中被打包：无法判断哪个在先。",
+    "ru": "Этот заказ и его платёж записаны в одном блоке ({block}): что было первым, определить нельзя.",
+    "uk": "Це замовлення і його платіж записані в одному блоці ({block}): що було першим, визначити неможливо."
   }
 }
