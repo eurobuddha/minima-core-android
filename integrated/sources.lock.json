@@ -1717,6 +1717,17 @@
           "src/main/java/com/eurobuddha/comms/CommsScanner.java": "bc753558ec58f7e83f950b45578bfa99534ae32cfad3eedc165daee37b4e48b6",
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "3578d60fc4008f3a62af1be6aa98904c7da348475b9a18c8772a8f532fae4287"
         }
+      },
+      {
+        "revision": "53757211b43877fbf872c1b7c6490824783ac2bc",
+        "version": "0.5.54",
+        "summary": "Payment matching rework (0.5.50-0.5.54, Pandamonium 2.2.87-2.2.91): a payment coin is judged the first time it is seen again (R1); a coin older than a no-secret order is counted with the olderpay note, confirm with the buyer (R2); counted coins are shown as the node gave them (R5); the Send confirmation and order screen of a no-secret order show the old-Shop facts (R3); a partly read scan reads the rest in coinage: windows and never claims unread blocks, a gap over the window is shown (R4).",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "d18cba2a97b35c21f67d1426a0326f323d4c5a83901ee3551609acd396e7d384",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryRules.java": "40b9c7ef18f22c3e23c9f784739cd49ef3ef9564a1dc14efdbdfa19ac215328b",
+          "src/main/java/com/eurobuddha/comms/CommsScanner.java": "e9231172109a8ca6e234e1409e82ccfabff3e600445b7c8f07aa42f73a31c956",
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "313657d7d0cd0944f79f78e44486ce46e10a7374073f6a9696da5544849b9312"
+        }
       }
     ]
   },
