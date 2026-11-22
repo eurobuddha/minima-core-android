@@ -8827,7 +8827,7 @@
     <string name="l10n_mall_inbox_drain_r_amount_unread">"coin %1$s: its amount could not be read, so it is not counted"</string>
     <string name="l10n_mall_inbox_auto_no_secret" formatted="false">"This order came from an older Shop that does not prove which payment is its own, so it is never sent automatically: check it and send by hand."</string>
     <!-- Arguments: coin, block, orderBlock -->
-    <string name="l10n_mall_inbox_older_payment">"A payment with this order\'s reference is older than the order (payment coin %1$s at block %2$s, the order at block %3$s): check by hand. It is not counted for this order."</string>
+    <string name="l10n_mall_inbox_older_payment">"A payment with this order\'s reference is older than the order (payment coin %1$s at block %2$s, the order at block %3$s). A copy of an order can be made from a payment\'s reference: confirm with the buyer before sending."</string>
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_earliest_payment_coin">"Earliest payment coin (block %1$s)"</string>
     <!-- Arguments: block -->

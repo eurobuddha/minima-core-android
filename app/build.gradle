@@ -245,8 +245,12 @@ android {
         // read says (as 2.2.74; the judgeable wait is gone): a coin that waited could be spent by the wallet or leave the
         // window. Kept: tip, orders, payments in that order, a failed read moves no bookmark, the payment scan re-reads
         // gap + 8 and never passes the orders read.
-        versionCode 357
-        versionName "2.2.87"
+        // 2.2.88: miniMall Inbox: a coin mined more than 3 blocks before an order with no secret is counted for it again
+        // (the order can be paid and the vendor's Send is there, as in 2.2.74); the order keeps its single olderpay note
+        // with the first such coin, in red, now saying that a copy of an order can be made from a payment's reference:
+        // confirm with the buyer before sending.
+        versionCode 358
+        versionName "2.2.88"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

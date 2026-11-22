@@ -931,7 +931,7 @@ public class MainActivity extends AppCompatActivity {
                 body.addView(find);
             }
             if (m.upgraded) { TextView up = label(Language.msg(l10n_mall_inbox_upgraded_recheck)); up.setTextColor(Design.RED); body.addView(up); }
-            if (m.olderPay != null) {   // a payment older than this no-secret order: not counted, checked by hand (tap: the whole coin id)
+            if (m.olderPay != null) {   // a payment older than this no-secret order: counted, confirmed with the buyer (tap: the whole coin id)
                 final String coin = m.olderPay.optString("coinid");
                 TextView op = label(Language.msg(l10n_mall_inbox_older_payment, coin, m.olderPay.optString("created"), m.olderPay.optString("orderblock")));
                 op.setTextColor(Design.RED); op.setOnClickListener(v -> copy(coin)); body.addView(op);
