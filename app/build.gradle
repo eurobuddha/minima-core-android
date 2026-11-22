@@ -241,8 +241,12 @@ android {
         // 2.2.86: miniMall Inbox: "Deliver to the order of record" says only what is known (the blocks of this order,
         // of its earliest payment and of every other order, the coins whole, tap to copy) and that an order mined before
         // the payment can still be a copy made from the unmined payment: confirm with the buyer. The rule is unchanged.
-        versionCode 356
-        versionName "2.2.86"
+        // 2.2.87: miniMall Inbox: a payment coin is judged the first time it is seen, at any tip and whatever the orders
+        // read says (as 2.2.74; the judgeable wait is gone): a coin that waited could be spent by the wallet or leave the
+        // window. Kept: tip, orders, payments in that order, a failed read moves no bookmark, the payment scan re-reads
+        // gap + 8 and never passes the orders read.
+        versionCode 357
+        versionName "2.2.87"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
