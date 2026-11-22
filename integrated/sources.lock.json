@@ -1728,6 +1728,16 @@
           "src/main/java/com/eurobuddha/comms/CommsScanner.java": "e9231172109a8ca6e234e1409e82ccfabff3e600445b7c8f07aa42f73a31c956",
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "313657d7d0cd0944f79f78e44486ce46e10a7374073f6a9696da5544849b9312"
         }
+      },
+      {
+        "revision": "0582e686ded31b83a944253b4d74eaaf80446f51",
+        "version": "0.5.61",
+        "summary": "Scanner and order-screen polish (0.5.55-0.5.61, Pandamonium 2.2.93-2.2.100, reviewer r3): a pass reads the tip again and the blocks it moved by, the orders scan re-reads the 8-block margin (I1); the payment scan keeps its own read-whole mark (I2); unread lines say window or refused, one line per range, rows deleted on dismiss (I3); a stalled orders scan shows one red line (I4); no-secret orders without NFT lines show the older-Shop facts and confirm/ship asks first (I5); sendNft refuses an automatic no-secret send itself (I6); an identical re-sent order keeps its earliest block (I7).",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "3d629263ee28e9f6758d3035025262e46c24bec561548566a88ec109e5045f9d",
+          "src/main/java/com/eurobuddha/comms/CommsScanner.java": "7c67e5ffd3e4e2182e713bb01ed22fb87209f2d8e56b1f363b3b5bafad99a040",
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "2c930f5e3d7f9db71ae6ec017e73df5aca74d511d1763bf08c98eacabcf686ba"
+        }
       }
     ]
   },
