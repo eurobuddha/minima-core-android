@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
  * 0x3C432D5099AB27EA901079EF54D9A97AB4DB3BD1CFFF670296C31B7C83C1C8BE, state exactly as the node reported it.
  */
 public class ContractIdTest {
+    static final int TIP = 1000;   // a known chain tip
 
     static final String COINID = "0x23456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF01";
     static final String SCRIPT = "0x3C432D5099AB27EA901079EF54D9A97AB4DB3BD1CFFF670296C31B7C83C1C8BE";
@@ -197,24 +198,31 @@ public class ContractIdTest {
     @Test public void aCoinAlreadyBeingSpentIsNotCollectedAgain() throws Exception {
         assertEquals("coins coinid:" + COINID + " checkmempool:true", Contract.spendCheckCommand(COINID));
         // the coin is there and no txn spends it: collect
-        assertFalse(Contract.alreadySpending(coinsReply(true, new JSONArray().put(ownerCoin()))));
+        assertFalse(Contract.alreadySpending(coinsReply(true, new JSONArray().put(ownerCoin())), TIP));
         // a clean empty list: a collect is waiting for the chain, or the coin is spent
-        assertTrue(Contract.alreadySpending(coinsReply(true, new JSONArray())));
+        assertTrue(Contract.alreadySpending(coinsReply(true, new JSONArray()), TIP));
         assertTrue(Contract.alreadySpending(new JSONObject("{\"command\":\"coins\",\"params\":{\"coinid\":\"" + COINID
-                + "\",\"checkmempool\":\"true\"},\"status\":true,\"pending\":false,\"response\":[]}")));
+                + "\",\"checkmempool\":\"true\"},\"status\":true,\"pending\":false,\"response\":[]}"), TIP));
         // anything else is no answer, and the collect goes on as before
-        assertFalse(Contract.alreadySpending(coinsReply(false, new JSONArray())));
-        assertFalse(Contract.alreadySpending(coinsReply(false, null).put("error", "Coin not found")));
+        assertFalse(Contract.alreadySpending(coinsReply(false, new JSONArray()), TIP));
+        assertFalse(Contract.alreadySpending(coinsReply(false, null).put("error", "Coin not found"), TIP));
         assertFalse(Contract.alreadySpending(new JSONObject().put("command", "coins coinid:" + COINID + " checkmempool:true")
                 .put("params", new JSONObject().put("coinid", COINID).put("checkmempool", "true"))
-                .put("status", false).put("pending", false).put("error", "Invalid parameter : checkmempool")));
-        assertFalse(Contract.alreadySpending(coinsReply("true", new JSONArray())));
-        assertFalse(Contract.alreadySpending(coinsReply(null, new JSONArray())));
-        assertFalse(Contract.alreadySpending(coinsReply(true, null)));
-        assertFalse(Contract.alreadySpending(coinsReply(true, "[]")));
-        assertFalse(Contract.alreadySpending(coinsReply(true, new JSONObject())));
-        assertFalse(Contract.alreadySpending(new JSONObject().put("transporterror", "Failed to read large response")));
-        assertFalse(Contract.alreadySpending(null));
+                .put("status", false).put("pending", false).put("error", "Invalid parameter : checkmempool"), TIP));
+        assertFalse(Contract.alreadySpending(coinsReply("true", new JSONArray()), TIP));
+        assertFalse(Contract.alreadySpending(coinsReply(null, new JSONArray()), TIP));
+        assertFalse(Contract.alreadySpending(coinsReply(true, null), TIP));
+        assertFalse(Contract.alreadySpending(coinsReply(true, "[]"), TIP));
+        assertFalse(Contract.alreadySpending(coinsReply(true, new JSONObject()), TIP));
+        assertFalse(Contract.alreadySpending(new JSONObject().put("transporterror", "Failed to read large response"), TIP));
+        assertFalse(Contract.alreadySpending(null, TIP));
+    }
+
+    /** r3 V2: a node still syncing (no tip) answers a clean empty list for a coin it has not read: not "already spent". */
+    @Test public void anEmptyListWithoutATipIsNotSpending() throws Exception {
+        assertFalse(Contract.alreadySpending(coinsReply(true, new JSONArray()), 0));
+        assertFalse(Contract.alreadySpending(coinsReply(true, new JSONArray()), -1));
+        assertTrue(Contract.alreadySpending(coinsReply(true, new JSONArray()), 1));
     }
 
     @Test public void theTypedBurnIsSentAsAPlainPositiveDecimal() {

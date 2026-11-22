@@ -139,10 +139,12 @@ public class Contract {
      * success and an empty list (a collect of this coin is already waiting for the chain, or the coin is spent). Only
      * that blocks. A refusal (a node that does not know the parameter answers "Invalid parameter : checkmempool" with
      * status false), any other status false, a missing or non-list response, or a list that still holds the coin, all
-     * let the collect go on as before: txninput and txncheck still judge it.
+     * let the collect go on as before: txninput and txncheck still judge it. A node with no chain tip yet ({@code tip}
+     * not above 0: still syncing) answers the same clean empty list for a coin it has not read, so the list counts only
+     * once the tip is known (r3 V2).
      */
-    static boolean alreadySpending(JSONObject reply) {
-        if (reply == null || !Boolean.TRUE.equals(reply.opt("status"))) return false;
+    static boolean alreadySpending(JSONObject reply, int tip) {
+        if (tip <= 0 || reply == null || !Boolean.TRUE.equals(reply.opt("status"))) return false;
         Object coins = reply.opt("response");
         return coins instanceof JSONArray && ((JSONArray) coins).length() == 0;
     }

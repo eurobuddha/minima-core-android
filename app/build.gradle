@@ -285,8 +285,10 @@ android {
         // as the order's; another sender never moves them (r3 I7).
         // 2.2.101: Vestr: the already-spending sentence says to look again after a few blocks and collect again after
         // about an hour and a half; onResume asks the node again while the button is blocked (r3 V1).
-        versionCode 371
-        versionName "2.2.101"
+        // 2.2.102: Vestr: the spend check's clean empty list counts as already spending only once the chain tip is known;
+        // a syncing node shows the loading state (r3 V2).
+        versionCode 372
+        versionName "2.2.102"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

@@ -59,17 +59,19 @@ public class ContractDetailActivity extends SubActivity {
      *  Then the tip and the maths, so the button is drawn once with all three known. */
     private void checkSpend() {
         node.cmd(Contract.spendCheckCommand(c.coinid), new NodeApi.Cb() {
-            @Override public void onResult(JSONObject j) { spending = Contract.alreadySpending(j); fetchBlock(); }
-            @Override public void onError(String m) { fetchBlock(); }
+            @Override public void onResult(JSONObject j) { fetchBlock(j); }
+            @Override public void onError(String m) { fetchBlock(null); }
         });
     }
 
-    /** Fetch the chain tip, then run the collect maths against it. */
-    private void fetchBlock() {
+    /** Fetch the chain tip, judge the spend check's reply against it (no tip: still syncing, the screen keeps loading),
+     *  then run the collect maths against it. */
+    private void fetchBlock(final JSONObject spendReply) {
         node.cmd("block", new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
                 JSONObject r = j.optJSONObject("response");
                 if (r != null) try { tip = Integer.parseInt(r.optString("block", "0")); } catch (Exception ignored) {}
+                spending = Contract.alreadySpending(spendReply, tip);
                 runMaths();
             }
             @Override public void onError(String m) {}
@@ -228,7 +230,7 @@ public class ContractDetailActivity extends SubActivity {
         setStatus(status, Language.msg(l10n_vestr_collecting), true);
         node.cmd(Contract.spendCheckCommand(c.coinid), new NodeApi.Cb() {
             @Override public void onResult(JSONObject j) {
-                if (Contract.alreadySpending(j)) {
+                if (Contract.alreadySpending(j, tip)) {
                     // nothing was created on the node, so nothing is owed; the button stays off
                     checking = false;
                     spending = true;
