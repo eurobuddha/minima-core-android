@@ -1706,6 +1706,17 @@
           "src/main/java/com/eurobuddha/merchinbox/DeliveryLedger.java": "2eba3b37d416937bc0d1bc3ab0fe92fca03d655a38c8e80075089530c1f3721d",
           "src/main/java/com/eurobuddha/merchinbox/Listing.java": "02ca16131d219ef2af077b65e66c93fd9c5ba4ccc14a1c5fdbfce1475b1ec621"
         }
+      },
+      {
+        "revision": "885d74d65bff92a3bde3668a69ed7599789d0478",
+        "version": "0.5.49",
+        "summary": "Payment matching (0.5.46-0.5.49, Pandamonium 2.2.83-2.2.86): no automatic delivery for an order with no secret (P1); a payment is judged only once the tip and the orders read reach its block + 3, orders read before payments, a failed read keeps the bookmark, the payment scan re-reads its gap + 8 blocks (P2); a no-secret order is not paid by a coin more than 3 blocks older than the order, its block stored with it (P3); the order-of-record wording states only what is known (P4).",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "89ad0aa7e58eac3be803ca90754a58809ca919f18276dd30421dc54f0e0f1dc6",
+          "src/main/java/com/eurobuddha/merchinbox/DeliveryRules.java": "2cc11e6d5a031f994cefc0ce6adcb9bbb25ece5e4a2abae6ff02f93e49677a33",
+          "src/main/java/com/eurobuddha/comms/CommsScanner.java": "bc753558ec58f7e83f950b45578bfa99534ae32cfad3eedc165daee37b4e48b6",
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "3578d60fc4008f3a62af1be6aa98904c7da348475b9a18c8772a8f532fae4287"
+        }
       }
     ]
   },
