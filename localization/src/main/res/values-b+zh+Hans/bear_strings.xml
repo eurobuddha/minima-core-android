@@ -8816,4 +8816,6 @@
     <string name="l10n_mall_inbox_payments_unread_window">"区块 %1$s 至区块 %2$s 之间的付款未被读取：收件箱最多只回读 64 个区块。那段时间的付款可能未被计入。点按即可关闭。"</string>
     <!-- Arguments: from, to -->
     <string name="l10n_mall_inbox_both_unread_window">"区块 %1$s 至区块 %2$s 之间的订单和付款未被读取：收件箱最多只回读 64 个区块。那段时间发出的订单或付款可能不在这里。点按即可关闭。"</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_orders_stalled">"自区块 %1$s 以来订单一直未能读取：节点拒绝了读取。"</string>
 </resources>

@@ -8853,4 +8853,6 @@
     <string name="l10n_mall_inbox_payments_unread_window">"Payments between block %1$s and block %2$s were not read: the Inbox reads at most 64 blocks back. A payment made then may not be counted. Tap to dismiss."</string>
     <!-- Arguments: from, to -->
     <string name="l10n_mall_inbox_both_unread_window">"Orders and payments between block %1$s and block %2$s were not read: the Inbox reads at most 64 blocks back. An order or payment sent then may be missing here. Tap to dismiss."</string>
+    <!-- Arguments: block -->
+    <string name="l10n_mall_inbox_orders_stalled">"Orders have not been read since block %1$s: the node refused the reads."</string>
 </resources>
