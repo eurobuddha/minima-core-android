@@ -249,8 +249,11 @@ android {
         // (the order can be paid and the vendor's Send is there, as in 2.2.74); the order keeps its single olderpay note
         // with the first such coin, in red, now saying that a copy of an order can be made from a payment's reference:
         // confirm with the buyer before sending.
-        versionCode 358
-        versionName "2.2.88"
+        // 2.2.89: miniMall Inbox: a counted payment coin is shown as the node gave it (the Earliest payment coin row and
+        // the reasons of a check), like every other row; it is still compared and read by id lower-cased
+        // (DeliveryRules.PaidCoin.shown).
+        versionCode 359
+        versionName "2.2.89"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

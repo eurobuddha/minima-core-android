@@ -985,7 +985,7 @@ public class MainActivity extends AppCompatActivity {
         if (m.cameFirst) {   // item 6: an older-Shop order that came first may be delivered to the order of record
             // Only what is known (P4): an order mined before its payment can still be a copy made from the unmined payment
             body.addView(label(Language.msg(l10n_mall_inbox_came_first, m.orderBlock, m.firstPay == null ? "" : String.valueOf(m.firstPay.created))));
-            if (m.firstPay != null) body.addView(copyRow(Language.msg(l10n_mall_inbox_earliest_payment_coin, String.valueOf(m.firstPay.created)), m.firstPay.coinid, m.firstPay.coinid));
+            if (m.firstPay != null) body.addView(copyRow(Language.msg(l10n_mall_inbox_earliest_payment_coin, String.valueOf(m.firstPay.created)), m.firstPay.shown, m.firstPay.shown));
             for (String[] x : m.otherOrders) body.addView(copyRow(Language.msg(l10n_mall_inbox_other_order_coin, x[1]), x[0], x[0]));
             TextView keep = button(Language.msg(l10n_mall_inbox_deliver_to_record, o.payaddr), false);
             keep.setOnClickListener(v -> languageDialog().setTitle(Language.msg(l10n_mall_inbox_deliver_to_record_question))
@@ -1370,7 +1370,9 @@ public class MainActivity extends AppCompatActivity {
             if (id.isEmpty() || !seen.add(id)) continue;
             String owner = db.getMeta("paycoin:" + id, "");
             if (!owner.isEmpty() && !owner.equals(ref)) continue;   // counted for another order: never here
-            out.add(new DeliveryRules.PaidCoin(id, x.optString("amount", null), x.optString("tokenid", null), x.optLong("created", 0)));
+            DeliveryRules.PaidCoin c = new DeliveryRules.PaidCoin(id, x.optString("amount", null), x.optString("tokenid", null), x.optLong("created", 0));
+            c.shown = x.optString("coinid");   // shown as the node gave it; compared and read lower-cased
+            out.add(c);
         }
         try (android.database.Cursor q = db.getReadableDatabase().rawQuery("SELECT k FROM meta WHERE k LIKE 'paycoin:%' AND v=?", new String[]{ref})) {
             while (q.moveToNext()) {
