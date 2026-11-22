@@ -2944,8 +2944,9 @@
     <string name="l10n_vestr_nothing" formatted="false">"暂无可领取的代币"</string>
     <string name="l10n_vestr_copied" formatted="false">"已复制"</string>
     <string name="l10n_vestr_collecting" formatted="false">"正在领取…"</string>
-    <string name="l10n_vestr_collected_ok" formatted="false">"✓ 已领取，代币即将到账。"</string>
+    <string name="l10n_vestr_collected_ok" formatted="false">"✓ 领取已发送，正在等待区块链确认。"</string>
     <string name="l10n_vestr_collect_failed" formatted="false">"领取失败"</string>
+    <string name="l10n_vestr_check_invalid" formatted="false">"节点判定此领取交易无效。未发送任何内容。"</string>
     <!-- Arguments: error -->
     <string name="l10n_vestr_failed">"失败：%1$s"</string>
     <string name="l10n_vestr_none" formatted="false">"无"</string>

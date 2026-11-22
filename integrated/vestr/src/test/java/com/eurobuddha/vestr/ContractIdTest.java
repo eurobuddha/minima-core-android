@@ -163,4 +163,26 @@ public class ContractIdTest {
         // One block before the final block the grace still applies: 290 + 10 at age 0 fails at 1099.
         assertEquals(0, graceCoin("300", 1099).collectPlan(vars("290", "10", "FALSE"), 1099)[0].signum());
     }
+
+    static JSONObject check(Object status, Object valid) throws Exception {
+        JSONObject response = new JSONObject().put("validamounts", true).put("signatures", 0).put("allsignaturesvalid", true);
+        if (valid != null) response.put("validtransaction", valid);
+        JSONObject reply = new JSONObject().put("command", "txncheck").put("response", response);
+        return status == null ? reply : reply.put("status", status);
+    }
+
+    @Test public void onlyAValidTxncheckLetsTheCollectBePosted() throws Exception {
+        assertTrue(Contract.txnCheckValid(check(true, true)));
+        // the node ran the scripts / proofs / amounts and judged the txn invalid
+        assertFalse(Contract.txnCheckValid(check(true, false)));
+        // malformed or missing: refuse
+        assertFalse(Contract.txnCheckValid(check(true, null)));
+        assertFalse(Contract.txnCheckValid(check(true, "true")));
+        assertFalse(Contract.txnCheckValid(check(false, true)));
+        assertFalse(Contract.txnCheckValid(check(null, true)));
+        assertFalse(Contract.txnCheckValid(check("true", true)));
+        assertFalse(Contract.txnCheckValid(new JSONObject().put("status", true)));
+        assertFalse(Contract.txnCheckValid(new JSONObject().put("status", true).put("response", "validtransaction:true")));
+        assertFalse(Contract.txnCheckValid(null));
+    }
 }

@@ -2957,8 +2957,9 @@
     <string name="l10n_vestr_nothing" formatted="false">"Nothing to collect yet"</string>
     <string name="l10n_vestr_copied" formatted="false">"Copied"</string>
     <string name="l10n_vestr_collecting" formatted="false">"Collecting…"</string>
-    <string name="l10n_vestr_collected_ok" formatted="false">"✓ Collected — tokens will arrive shortly."</string>
+    <string name="l10n_vestr_collected_ok" formatted="false">"✓ Collect sent — waiting for the chain to confirm it."</string>
     <string name="l10n_vestr_collect_failed" formatted="false">"Collect failed"</string>
+    <string name="l10n_vestr_check_invalid" formatted="false">"The node judged this collect transaction invalid. Nothing was sent."</string>
     <!-- Arguments: error -->
     <string name="l10n_vestr_failed">"Failed: %1$s"</string>
     <string name="l10n_vestr_none" formatted="false">"None"</string>

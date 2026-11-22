@@ -113,6 +113,17 @@ public class Contract {
                 && at.subtract(BigDecimal.valueOf(createdBlock)).compareTo(bd(state(raw, 4))) < 0;
     }
 
+    /**
+     * The verdict of {@code txncheck id:<id>} on the finished collect txn: post only when the reply is a complete
+     * node success whose {@code response.validtransaction} is the boolean true. That field is checkTxPoWBasic (amounts
+     * add up, inputs) AND the MMR proofs AND every script run with {@code @BLOCK} = the tip, the same block the node's
+     * relay check uses. Anything else (false, missing, a string, no response) refuses: nothing is posted.
+     */
+    static boolean txnCheckValid(JSONObject reply) {
+        JSONObject r = reply == null || !Boolean.TRUE.equals(reply.opt("status")) ? null : reply.optJSONObject("response");
+        return r != null && Boolean.TRUE.equals(r.opt("validtransaction"));
+    }
+
     /** Blocks left in the current grace window (0 = collectible now). */
     public long graceBlocksRemaining(long tip) {
         long age = Math.max(0, tip - createdBlock);

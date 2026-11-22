@@ -2983,8 +2983,9 @@
     <string name="l10n_vestr_nothing" formatted="false">"Поки нічого отримувати"</string>
     <string name="l10n_vestr_copied" formatted="false">"Скопійовано"</string>
     <string name="l10n_vestr_collecting" formatted="false">"Отримання…"</string>
-    <string name="l10n_vestr_collected_ok" formatted="false">"✓ Отримано. Токени незабаром надійдуть."</string>
+    <string name="l10n_vestr_collected_ok" formatted="false">"✓ Отримання надіслано. Очікується підтвердження в блокчейні."</string>
     <string name="l10n_vestr_collect_failed" formatted="false">"Не вдалося отримати"</string>
+    <string name="l10n_vestr_check_invalid" formatted="false">"Вузол визнав цю транзакцію отримання недійсною. Нічого не надіслано."</string>
     <!-- Arguments: error -->
     <string name="l10n_vestr_failed">"Помилка: %1$s"</string>
     <string name="l10n_vestr_none" formatted="false">"Немає"</string>

@@ -226,6 +226,9 @@ public class ContractDetailActivity extends SubActivity {
         for (int port : new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 199}) {
             cmds.add("txnstate id:" + id + " port:" + port + " value:" + Contract.state(c.raw, port));
         }
+        // The node judges the finished txn (amounts, proofs, scripts at the tip) before anything is posted:
+        // txnpost only queues it for mining and checks none of that.
+        cmds.add("txncheck id:" + id);
         String post = "txnpost id:" + id;
         if (!burn.isEmpty() && isPositive(burn)) post += " burn:" + burn;
         cmds.add(post);
@@ -249,6 +252,7 @@ public class ContractDetailActivity extends SubActivity {
             @Override public void onResult(JSONObject j) {
                 // every build step returns status:true; txnpost returns the posted txpow
                 if (!j.optBoolean("status", false)) { fail(j.has("error") ? j.optString("error") : Language.msg(l10n_vestr_collect_failed), id); return; }
+                if (cmds.get(i).startsWith("txncheck ") && !Contract.txnCheckValid(j)) { fail(Language.msg(l10n_vestr_check_invalid), id); return; }
                 runSequence(cmds, i + 1, id);
             }
             @Override public void onError(String m) {
