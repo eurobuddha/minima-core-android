@@ -232,8 +232,11 @@ android {
         // passed the guard and ran toPlainString out of memory (Contract.burnParam).
         // 2.2.83: miniMall Inbox: an order with no secret (an older Shop) is never sent automatically; it waits for the
         // vendor's own Send (every rule still applies) and its order screen says why (DeliveryRules.autoAllowed).
-        versionCode 353
-        versionName "2.2.83"
+        // 2.2.84: miniMall Inbox: a payment coin is judged only once the tip and the orders read reach its block + 3
+        // (DeliveryRules.judgeable); every pass reads the tip first, then orders, then payments; a failed read moves no
+        // bookmark; the payment scan reads its gap + 8 blocks and never past the orders read (CommsScanner.follows).
+        versionCode 354
+        versionName "2.2.84"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
