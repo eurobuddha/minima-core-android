@@ -8899,4 +8899,5 @@
     <string name="l10n_mall_inbox_searching" formatted="false">"Поиск…"</string>
     <!-- Arguments: a -->
     <string name="l10n_mall_inbox_drain_r_amount_unread">"монета %1$s: её сумму не удалось прочитать, поэтому она не засчитана"</string>
+    <string name="l10n_mall_inbox_auto_no_secret" formatted="false">"Этот заказ пришёл из старого магазина, который не доказывает, какой платёж его собственный, поэтому он никогда не отправляется автоматически: проверьте его и отправьте вручную."</string>
 </resources>

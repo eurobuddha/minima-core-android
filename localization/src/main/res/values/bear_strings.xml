@@ -8825,4 +8825,5 @@
     <string name="l10n_mall_inbox_searching" formatted="false">"Searching…"</string>
     <!-- Arguments: a -->
     <string name="l10n_mall_inbox_drain_r_amount_unread">"coin %1$s: its amount could not be read, so it is not counted"</string>
+    <string name="l10n_mall_inbox_auto_no_secret" formatted="false">"This order came from an older Shop that does not prove which payment is its own, so it is never sent automatically: check it and send by hand."</string>
 </resources>

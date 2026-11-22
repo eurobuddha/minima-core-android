@@ -230,8 +230,10 @@ android {
         // "not known yet", no txndelete, the button stays off (CollectRun.refusedPost).
         // 2.2.82: Vestr's burn guard works out the digits of the typed fee in long: "1e2147483647" overflowed the int,
         // passed the guard and ran toPlainString out of memory (Contract.burnParam).
-        versionCode 352
-        versionName "2.2.82"
+        // 2.2.83: miniMall Inbox: an order with no secret (an older Shop) is never sent automatically; it waits for the
+        // vendor's own Send (every rule still applies) and its order screen says why (DeliveryRules.autoAllowed).
+        versionCode 353
+        versionName "2.2.83"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

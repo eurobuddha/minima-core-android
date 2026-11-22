@@ -8788,4 +8788,5 @@
     <string name="l10n_mall_inbox_searching" formatted="false">"正在搜索…"</string>
     <!-- Arguments: a -->
     <string name="l10n_mall_inbox_drain_r_amount_unread">"币 %1$s：无法读取其金额，因此不计入"</string>
+    <string name="l10n_mall_inbox_auto_no_secret" formatted="false">"此订单来自旧版商店，无法证明哪笔付款属于它，因此永远不会自动发送：请核对后手动发送。"</string>
 </resources>
