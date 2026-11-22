@@ -279,8 +279,10 @@ android {
         // 2.2.98: miniMall Inbox: an order with no secret and no NFT line shows the older-Shop facts, coins listed when a
         // block is unknown, and confirming or shipping it asks the vendor to accept the Send confirmation's warning (r3
         // I5).
-        versionCode 368
-        versionName "2.2.98"
+        // 2.2.99: miniMall Inbox: sendNft itself refuses an automatic send of an order with no secret and releases the
+        // line (r3 I6).
+        versionCode 369
+        versionName "2.2.99"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
