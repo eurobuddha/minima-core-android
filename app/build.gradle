@@ -270,8 +270,10 @@ android {
         // I1); the orders scan re-reads the 8-block margin as payments; an unread range names the lowest block read too.
         // 2.2.94: miniMall Inbox: the payment scan keeps its own read-whole mark and never notes as unread a block it read
         // (r3 I2).
-        versionCode 364
-        versionName "2.2.94"
+        // 2.2.95: miniMall Inbox: the dismiss tap of an unread-blocks line checks isFinishing/isDestroyed before it
+        // rebuilds the orders screen (r3 I8).
+        versionCode 365
+        versionName "2.2.95"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

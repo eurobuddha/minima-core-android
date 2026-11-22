@@ -16,4 +16,21 @@ public class UnreadRangeTest extends DrainTest {
         assertTrue(all, all.contains("Orders between block 101 and block 235 could not be read"));
         assertTrue(all, all.contains("Payments between block 90 and block 120 could not be read"));
     }
+
+    /** A dismiss tap whose io work ends after the Inbox was closed does not rebuild the closed screen (r3 I8). */
+    @Test public void aDismissAfterTheInboxClosedRebuildsNothing() throws Exception {
+        db.setMeta("unread_pay_12121212:90", "120");
+        android.view.View list = (android.view.View) call("buildOrders", new Class<?>[]{});
+        ShadowLooper.idleMainLooper();
+        android.widget.TextView line = OldShopSendTest.find(list, "Payments between block 90");
+        assertNotNull(InboxShowsIdentifiersWholeTest.texts(list).toString(), line);
+        java.lang.reflect.Field st = MainActivity.class.getDeclaredField("stack"); st.setAccessible(true);
+        @SuppressWarnings("unchecked") java.util.ArrayDeque<android.view.View> stack = (java.util.ArrayDeque<android.view.View>) st.get(activity);
+        stack.push(list);
+        set("container", new android.widget.FrameLayout(activity));
+        activity.finish();
+        line.performClick();
+        ShadowLooper.idleMainLooper();
+        assertSame("the closed screen was not rebuilt", list, stack.peek());
+    }
 }

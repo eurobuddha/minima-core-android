@@ -740,7 +740,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView unreadLine(final String[] g) {
         TextView t = label(Language.msg("pay".equals(g[3]) ? l10n_mall_inbox_payments_unread : l10n_mall_inbox_orders_unread, g[1], g[2]));
         t.setTextColor(Design.RED);
-        t.setOnClickListener(v -> io.execute(() -> { db.setMeta(g[0], ""); ui.post(() -> refreshTop(buildOrders())); }));
+        t.setOnClickListener(v -> io.execute(() -> { db.setMeta(g[0], ""); ui.post(() -> { if (!isFinishing() && !isDestroyed()) refreshTop(buildOrders()); }); }));
         return t;
     }
 
