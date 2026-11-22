@@ -8842,7 +8842,15 @@
     <!-- Arguments: block -->
     <string name="l10n_mall_inbox_order_same_block">"This order and its payment were mined in the same block (%1$s): which came first cannot be told."</string>
     <!-- Arguments: from, to -->
-    <string name="l10n_mall_inbox_orders_unread">"Orders between block %1$s and block %2$s could not be read: an order sent then may be missing here. Tap to dismiss."</string>
+    <string name="l10n_mall_inbox_orders_unread">"Orders between block %1$s and block %2$s could not be read: the node refused the reads. An order sent then may be missing here. Tap to dismiss."</string>
     <!-- Arguments: from, to -->
-    <string name="l10n_mall_inbox_payments_unread">"Payments between block %1$s and block %2$s could not be read: a payment made then may not be counted. Tap to dismiss."</string>
+    <string name="l10n_mall_inbox_payments_unread">"Payments between block %1$s and block %2$s could not be read: the node refused the reads. A payment made then may not be counted. Tap to dismiss."</string>
+    <!-- Arguments: from, to -->
+    <string name="l10n_mall_inbox_both_unread">"Orders and payments between block %1$s and block %2$s could not be read: the node refused the reads. An order or payment sent then may be missing here. Tap to dismiss."</string>
+    <!-- Arguments: from, to -->
+    <string name="l10n_mall_inbox_orders_unread_window">"Orders between block %1$s and block %2$s were not read: the Inbox reads at most 64 blocks back. An order sent then may be missing here. Tap to dismiss."</string>
+    <!-- Arguments: from, to -->
+    <string name="l10n_mall_inbox_payments_unread_window">"Payments between block %1$s and block %2$s were not read: the Inbox reads at most 64 blocks back. A payment made then may not be counted. Tap to dismiss."</string>
+    <!-- Arguments: from, to -->
+    <string name="l10n_mall_inbox_both_unread_window">"Orders and payments between block %1$s and block %2$s were not read: the Inbox reads at most 64 blocks back. An order or payment sent then may be missing here. Tap to dismiss."</string>
 </resources>

@@ -44193,15 +44193,39 @@
     "uk": "Це замовлення і його платіж записані в одному блоці ({block}): що було першим, визначити неможливо."
   },
   "mallInbox.ordersUnread": {
-    "en": "Orders between block {from} and block {to} could not be read: an order sent then may be missing here. Tap to dismiss.",
-    "zh-Hans": "区块 {from} 至区块 {to} 之间的订单无法读取：那段时间发出的订单可能不在这里。点按即可关闭。",
-    "ru": "Заказы между блоком {from} и блоком {to} не удалось прочитать: заказа, отправленного тогда, здесь может не быть. Нажмите, чтобы скрыть.",
-    "uk": "Замовлення між блоком {from} і блоком {to} не вдалося прочитати: замовлення, надісланого тоді, тут може не бути. Торкніться, щоб приховати."
+    "en": "Orders between block {from} and block {to} could not be read: the node refused the reads. An order sent then may be missing here. Tap to dismiss.",
+    "zh-Hans": "区块 {from} 至区块 {to} 之间的订单无法读取：节点拒绝了读取。那段时间发出的订单可能不在这里。点按即可关闭。",
+    "ru": "Заказы между блоком {from} и блоком {to} не удалось прочитать: узел отказал в чтении. Заказа, отправленного тогда, здесь может не быть. Нажмите, чтобы скрыть.",
+    "uk": "Замовлення між блоком {from} і блоком {to} не вдалося прочитати: вузол відмовив у читанні. Замовлення, надісланого тоді, тут може не бути. Торкніться, щоб приховати."
   },
   "mallInbox.paymentsUnread": {
-    "en": "Payments between block {from} and block {to} could not be read: a payment made then may not be counted. Tap to dismiss.",
-    "zh-Hans": "区块 {from} 至区块 {to} 之间的付款无法读取：那段时间的付款可能未被计入。点按即可关闭。",
-    "ru": "Платежи между блоком {from} и блоком {to} не удалось прочитать: платёж, сделанный тогда, может быть не засчитан. Нажмите, чтобы скрыть.",
-    "uk": "Платежі між блоком {from} і блоком {to} не вдалося прочитати: платіж, зроблений тоді, може бути не зарахований. Торкніться, щоб приховати."
+    "en": "Payments between block {from} and block {to} could not be read: the node refused the reads. A payment made then may not be counted. Tap to dismiss.",
+    "zh-Hans": "区块 {from} 至区块 {to} 之间的付款无法读取：节点拒绝了读取。那段时间的付款可能未被计入。点按即可关闭。",
+    "ru": "Платежи между блоком {from} и блоком {to} не удалось прочитать: узел отказал в чтении. Платёж, сделанный тогда, может быть не засчитан. Нажмите, чтобы скрыть.",
+    "uk": "Платежі між блоком {from} і блоком {to} не вдалося прочитати: вузол відмовив у читанні. Платіж, зроблений тоді, може бути не зарахований. Торкніться, щоб приховати."
+  },
+  "mallInbox.bothUnread": {
+    "en": "Orders and payments between block {from} and block {to} could not be read: the node refused the reads. An order or payment sent then may be missing here. Tap to dismiss.",
+    "zh-Hans": "区块 {from} 至区块 {to} 之间的订单和付款无法读取：节点拒绝了读取。那段时间发出的订单或付款可能不在这里。点按即可关闭。",
+    "ru": "Заказы и платежи между блоком {from} и блоком {to} не удалось прочитать: узел отказал в чтении. Заказа или платежа, отправленного тогда, здесь может не быть. Нажмите, чтобы скрыть.",
+    "uk": "Замовлення і платежі між блоком {from} і блоком {to} не вдалося прочитати: вузол відмовив у читанні. Замовлення чи платежу, надісланого тоді, тут може не бути. Торкніться, щоб приховати."
+  },
+  "mallInbox.ordersUnreadWindow": {
+    "en": "Orders between block {from} and block {to} were not read: the Inbox reads at most 64 blocks back. An order sent then may be missing here. Tap to dismiss.",
+    "zh-Hans": "区块 {from} 至区块 {to} 之间的订单未被读取：收件箱最多只回读 64 个区块。那段时间发出的订单可能不在这里。点按即可关闭。",
+    "ru": "Заказы между блоком {from} и блоком {to} не были прочитаны: Inbox читает не более 64 блоков назад. Заказа, отправленного тогда, здесь может не быть. Нажмите, чтобы скрыть.",
+    "uk": "Замовлення між блоком {from} і блоком {to} не були прочитані: Inbox читає щонайбільше 64 блоки назад. Замовлення, надісланого тоді, тут може не бути. Торкніться, щоб приховати."
+  },
+  "mallInbox.paymentsUnreadWindow": {
+    "en": "Payments between block {from} and block {to} were not read: the Inbox reads at most 64 blocks back. A payment made then may not be counted. Tap to dismiss.",
+    "zh-Hans": "区块 {from} 至区块 {to} 之间的付款未被读取：收件箱最多只回读 64 个区块。那段时间的付款可能未被计入。点按即可关闭。",
+    "ru": "Платежи между блоком {from} и блоком {to} не были прочитаны: Inbox читает не более 64 блоков назад. Платёж, сделанный тогда, может быть не засчитан. Нажмите, чтобы скрыть.",
+    "uk": "Платежі між блоком {from} і блоком {to} не були прочитані: Inbox читає щонайбільше 64 блоки назад. Платіж, зроблений тоді, може бути не зарахований. Торкніться, щоб приховати."
+  },
+  "mallInbox.bothUnreadWindow": {
+    "en": "Orders and payments between block {from} and block {to} were not read: the Inbox reads at most 64 blocks back. An order or payment sent then may be missing here. Tap to dismiss.",
+    "zh-Hans": "区块 {from} 至区块 {to} 之间的订单和付款未被读取：收件箱最多只回读 64 个区块。那段时间发出的订单或付款可能不在这里。点按即可关闭。",
+    "ru": "Заказы и платежи между блоком {from} и блоком {to} не были прочитаны: Inbox читает не более 64 блоков назад. Заказа или платежа, отправленного тогда, здесь может не быть. Нажмите, чтобы скрыть.",
+    "uk": "Замовлення і платежі між блоком {from} і блоком {to} не були прочитані: Inbox читає щонайбільше 64 блоки назад. Замовлення чи платежу, надісланого тоді, тут може не бути. Торкніться, щоб приховати."
   }
 }
