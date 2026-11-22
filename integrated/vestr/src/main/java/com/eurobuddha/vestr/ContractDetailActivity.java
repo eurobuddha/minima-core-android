@@ -29,6 +29,8 @@ public class ContractDetailActivity extends SubActivity {
     private BigDecimal cancollect = BigDecimal.ZERO, change = BigDecimal.ZERO;
     private boolean mathsReady = false;
     private CollectRun run;   // the collect in progress; null = none (or the last one failed and may be retried)
+    private boolean checking; // the spend check before a collect is built is in flight
+    private boolean spending; // the node says a txn already spends this coin, or it is spent: no collect from this screen
     private EditText burnInput;
     private TextView collectBtn, status, availableTv;
 
@@ -43,7 +45,16 @@ public class ContractDetailActivity extends SubActivity {
             finish(); return;
         }
         render();
-        fetchBlock();
+        checkSpend();
+    }
+
+    /** On open: a coin a txn already spends (a collect from a screen that has since been recreated) offers no collect.
+     *  Then the tip and the maths, so the button is drawn once with all three known. */
+    private void checkSpend() {
+        node.cmd(Contract.spendCheckCommand(c.coinid), new NodeApi.Cb() {
+            @Override public void onResult(JSONObject j) { spending = Contract.alreadySpending(j); fetchBlock(); }
+            @Override public void onError(String m) { fetchBlock(); }
+        });
     }
 
     /** Fetch the chain tip, then run the collect maths against it. */
@@ -93,7 +104,7 @@ public class ContractDetailActivity extends SubActivity {
     private void render() {
         form.removeAllViews();
         BigDecimal canCollect = cancollect;
-        boolean collectable = mathsReady && canCollect.signum() > 0;
+        boolean collectable = mathsReady && canCollect.signum() > 0 && !spending;
 
         // Available-to-collect hero card
         LinearLayout hero = new LinearLayout(this);
@@ -150,6 +161,7 @@ public class ContractDetailActivity extends SubActivity {
         collectBtn.setAlpha(collectable ? 1f : 0.4f);
         collectBtn.setOnClickListener(v -> collect(canCollect));
         status = status();
+        if (spending) setStatus(status, Language.msg(l10n_vestr_already_spending), false);
     }
 
     /** Append a key/value stat row (label left, bold value right). */
@@ -200,9 +212,30 @@ public class ContractDetailActivity extends SubActivity {
 
     // ---- collect ----
 
-    /** Assemble the collect transaction command-by-command and run it as a strict sequence. */
+    /** Ask the node first whether a txn already spends this coin (Contract.alreadySpending); only a clean empty answer
+     *  stops the collect, any other answer or none lets it go on as before. Nothing is built before the answer. */
     private void collect(BigDecimal canCollect) {
-        if (run != null || !c.safeForCommands() || canCollect.signum() <= 0) return;
+        if (spending || checking || run != null || !c.safeForCommands() || canCollect.signum() <= 0) return;
+        checking = true;
+        collectBtn.setEnabled(false);
+        setStatus(status, Language.msg(l10n_vestr_collecting), true);
+        node.cmd(Contract.spendCheckCommand(c.coinid), new NodeApi.Cb() {
+            @Override public void onResult(JSONObject j) {
+                if (Contract.alreadySpending(j)) {
+                    // nothing was created on the node, so nothing is owed; the button stays off
+                    spending = true;
+                    setStatus(status, Language.msg(l10n_vestr_already_spending), false);
+                    return;
+                }
+                build(canCollect);
+            }
+            @Override public void onError(String m) { build(canCollect); }
+        });
+    }
+
+    /** Assemble the collect transaction command-by-command and run it as a strict sequence. */
+    private void build(BigDecimal canCollect) {
+        checking = false;
         String burn = Contract.burnParam(burnInput.getText().toString());
         BigDecimal change = this.change;   // @AMOUNT - payout (Contract.collectPlan), 0 = no change output
         String id = "vc" + System.currentTimeMillis();
@@ -232,8 +265,6 @@ public class ContractDetailActivity extends SubActivity {
         cmds.add("txncheck id:" + id);
         cmds.add("txnpost id:" + id + (burn.isEmpty() ? "" : " burn:" + burn));
 
-        collectBtn.setEnabled(false);
-        setStatus(status, Language.msg(l10n_vestr_collecting), true);
         run = new CollectRun(id, cmds);
         step(run);
     }

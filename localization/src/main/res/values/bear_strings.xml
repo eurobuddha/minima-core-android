@@ -2961,6 +2961,7 @@
     <string name="l10n_vestr_collect_failed" formatted="false">"Collect failed"</string>
     <string name="l10n_vestr_check_invalid" formatted="false">"The node judged this collect transaction invalid. Nothing was sent."</string>
     <string name="l10n_vestr_post_unknown" formatted="false">"The node did not confirm the collect. It may still have been sent: look again after the next block before collecting again."</string>
+    <string name="l10n_vestr_already_spending" formatted="false">"A collect of this coin is already waiting for the chain, or the coin is already spent. Nothing was sent."</string>
     <!-- Arguments: error -->
     <string name="l10n_vestr_failed">"Failed: %1$s"</string>
     <string name="l10n_vestr_none" formatted="false">"None"</string>

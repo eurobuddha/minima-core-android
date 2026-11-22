@@ -222,8 +222,11 @@ android {
         // connection of its own); a txnpost without a reply is "not known yet, look after the next block", never "Failed",
         // and the button stays off (no second spend of the coin); the typed burn is sent as a plain positive decimal, as
         // the standalone app does (CollectRun, Contract.burnParam).
-        versionCode 349
-        versionName "2.2.79"
+        // 2.2.80: Vestr asks the node (coins coinid: checkmempool:true) before building a collect and when the contract
+        // screen opens: a coin a txn already spends (a collect from a screen since recreated: rotation, unfolding, back
+        // and reopen) offers no collect and sends nothing. Only a clean empty answer blocks (Contract.alreadySpending).
+        versionCode 350
+        versionName "2.2.80"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

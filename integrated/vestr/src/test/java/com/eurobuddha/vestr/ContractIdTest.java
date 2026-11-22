@@ -186,6 +186,37 @@ public class ContractIdTest {
         assertFalse(Contract.txnCheckValid(null));
     }
 
+    /** Replies as coins.java builds them (Command.getJSONReply + response; CommandRunner's parameter gate). */
+    static JSONObject coinsReply(Object status, Object response) throws Exception {
+        JSONObject j = new JSONObject().put("command", "coins").put("pending", false);
+        if (status != null) j.put("status", status);
+        if (response != null) j.put("response", response);
+        return j;
+    }
+
+    @Test public void aCoinAlreadyBeingSpentIsNotCollectedAgain() throws Exception {
+        assertEquals("coins coinid:" + COINID + " checkmempool:true", Contract.spendCheckCommand(COINID));
+        // the coin is there and no txn spends it: collect
+        assertFalse(Contract.alreadySpending(coinsReply(true, new JSONArray().put(ownerCoin()))));
+        // a clean empty list: a collect is waiting for the chain, or the coin is spent
+        assertTrue(Contract.alreadySpending(coinsReply(true, new JSONArray())));
+        assertTrue(Contract.alreadySpending(new JSONObject("{\"command\":\"coins\",\"params\":{\"coinid\":\"" + COINID
+                + "\",\"checkmempool\":\"true\"},\"status\":true,\"pending\":false,\"response\":[]}")));
+        // anything else is no answer, and the collect goes on as before
+        assertFalse(Contract.alreadySpending(coinsReply(false, new JSONArray())));
+        assertFalse(Contract.alreadySpending(coinsReply(false, null).put("error", "Coin not found")));
+        assertFalse(Contract.alreadySpending(new JSONObject().put("command", "coins coinid:" + COINID + " checkmempool:true")
+                .put("params", new JSONObject().put("coinid", COINID).put("checkmempool", "true"))
+                .put("status", false).put("pending", false).put("error", "Invalid parameter : checkmempool")));
+        assertFalse(Contract.alreadySpending(coinsReply("true", new JSONArray())));
+        assertFalse(Contract.alreadySpending(coinsReply(null, new JSONArray())));
+        assertFalse(Contract.alreadySpending(coinsReply(true, null)));
+        assertFalse(Contract.alreadySpending(coinsReply(true, "[]")));
+        assertFalse(Contract.alreadySpending(coinsReply(true, new JSONObject())));
+        assertFalse(Contract.alreadySpending(new JSONObject().put("transporterror", "Failed to read large response")));
+        assertFalse(Contract.alreadySpending(null));
+    }
+
     @Test public void theTypedBurnIsSentAsAPlainPositiveDecimal() {
         assertEquals("0.001", Contract.burnParam("1e-3"));
         assertEquals("1.50", Contract.burnParam("01.50"));

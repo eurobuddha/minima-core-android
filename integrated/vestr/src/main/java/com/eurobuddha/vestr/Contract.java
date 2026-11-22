@@ -125,6 +125,29 @@ public class Contract {
     }
 
     /**
+     * Asked of the node before a collect is built and when the screen opens: this coin, leaving out every coin that a
+     * txn in the node's mempool or its miner already spends (coins.java, {@code checkmempool:true}: checkForMiningCoin
+     * and checkMempoolCoins). {@code txncheck} looks at neither, so without this a second collect of the same coin (a
+     * recreated screen) was posted, held by the node and never forwarded, while the screen said "Collect sent".
+     */
+    static String spendCheckCommand(String coinid) {
+        return "coins coinid:" + coinid + " checkmempool:true";
+    }
+
+    /**
+     * The verdict on the reply to {@link #spendCheckCommand}: true = do not collect, the node answered with a clean
+     * success and an empty list (a collect of this coin is already waiting for the chain, or the coin is spent). Only
+     * that blocks. A refusal (a node that does not know the parameter answers "Invalid parameter : checkmempool" with
+     * status false), any other status false, a missing or non-list response, or a list that still holds the coin, all
+     * let the collect go on as before: txninput and txncheck still judge it.
+     */
+    static boolean alreadySpending(JSONObject reply) {
+        if (reply == null || !Boolean.TRUE.equals(reply.opt("status"))) return false;
+        Object coins = reply.opt("response");
+        return coins instanceof JSONArray && ((JSONArray) coins).length() == 0;
+    }
+
+    /**
      * The typed network fee as a {@code burn:} value, the same in Pandamonium and the standalone app: the plain
      * decimal of a positive number ({@code new BigDecimal(typed).toPlainString()}), else "" = no burn (empty, zero,
      * not a number, negative, as before). An exponent that would expand to a huge string, or a fee of a trillion or
