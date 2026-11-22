@@ -292,8 +292,10 @@ android {
         // 2.2.104: miniMall Inbox: orders scan reads its gap only; a failed tip read is read again; a moved tip's blocks
         // are read with the margin; a pass that read every page is not counted as refused; the stalled line names the
         // first block not read; refused only where refused passes tried (final review F1).
-        versionCode 374
-        versionName "2.2.104"
+        // 2.2.105: miniMall Inbox: a kept order read again does not flag a resolved conflict; a new order still does
+        // (final review F2).
+        versionCode 375
+        versionName "2.2.105"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
