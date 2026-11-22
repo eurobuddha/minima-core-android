@@ -1012,7 +1012,7 @@ public class MainActivity extends AppCompatActivity {
             body.addView(chk);
             body.addView(kv(Language.msg(l10n_mall_shop_reference), o.ref));
             if (!o.shopName.isEmpty()) body.addView(kv(Language.msg(l10n_mall_inbox_shop), o.shopName));
-            if (!o.coinid.isEmpty()) body.addView(copyRow(Language.msg(l10n_mall_inbox_order_tx), o.coinid, o.coinid));
+            if (!o.coinid.isEmpty() && (m.conflict || !m.nonce.isEmpty())) body.addView(copyRow(Language.msg(l10n_mall_inbox_order_tx), o.coinid, o.coinid));   // else in the facts above, once
 
             // delivery
             body.addView(sectionLabel(Language.msg(l10n_mall_shop_delivery)));
