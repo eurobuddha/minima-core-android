@@ -1748,6 +1748,16 @@
           "src/main/java/com/eurobuddha/comms/CommsScanner.java": "69d52b30e2da8d9c854d0dea4ee349c9e4257084927201e6a3fad1aab6b8eb04",
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "2dea78e2c141df05ba5e134ec161da24e68fc0511e286889dc7d7d8e037b8321"
         }
+      },
+      {
+        "revision": "0b54d61c68c8e687a9d6f895355f852d2af0ce22",
+        "version": "0.5.67",
+        "summary": "Final review, phone (0.5.67, Pandamonium 2.2.109): a scan pass that read every page but could not confirm the tip (held) keeps the refused blocks and the count of refused passes; only a whole pass clears them.",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "23273a0e6c53b795d80b46306ec499c497ec61a15a724bde57dd7ee703873195",
+          "src/main/java/com/eurobuddha/comms/CommsScanner.java": "bc437e5afffde1b2e44ae97fec47b4801cb77bd0d584102e2f20960b744e08ed",
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "2dea78e2c141df05ba5e134ec161da24e68fc0511e286889dc7d7d8e037b8321"
+        }
       }
     ]
   },
