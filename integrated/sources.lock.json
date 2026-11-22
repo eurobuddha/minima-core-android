@@ -1738,6 +1738,16 @@
           "src/main/java/com/eurobuddha/comms/CommsScanner.java": "7c67e5ffd3e4e2182e713bb01ed22fb87209f2d8e56b1f363b3b5bafad99a040",
           "src/main/java/com/eurobuddha/comms/MerchDb.java": "2c930f5e3d7f9db71ae6ec017e73df5aca74d511d1763bf08c98eacabcf686ba"
         }
+      },
+      {
+        "revision": "8530a076d7079f1224a19a9f0983947b862ffebf",
+        "version": "0.5.66",
+        "summary": "Final review (0.5.62-0.5.66, Pandamonium 2.2.104-2.2.108): the orders scan reads its gap only, a failed tip read is read again, a moved tip's blocks are read with the margin, a pass that read every page is not counted as refused, the stalled line names the first block not read and needs refused blocks, refused only where refused passes tried (F1); a kept order read again does not flag a resolved conflict (F2); the stalled line alone refreshes only the orders list (F3); DELIVERED of a no-secret order asks first unless SHIPPED (F4); a no-secret order's coin is shown once (F6).",
+        "files": {
+          "src/main/java/com/eurobuddha/merchinbox/MainActivity.java": "23273a0e6c53b795d80b46306ec499c497ec61a15a724bde57dd7ee703873195",
+          "src/main/java/com/eurobuddha/comms/CommsScanner.java": "69d52b30e2da8d9c854d0dea4ee349c9e4257084927201e6a3fad1aab6b8eb04",
+          "src/main/java/com/eurobuddha/comms/MerchDb.java": "2dea78e2c141df05ba5e134ec161da24e68fc0511e286889dc7d7d8e037b8321"
+        }
       }
     ]
   },
