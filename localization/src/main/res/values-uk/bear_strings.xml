@@ -2987,7 +2987,7 @@
     <string name="l10n_vestr_collect_failed" formatted="false">"Не вдалося отримати"</string>
     <string name="l10n_vestr_check_invalid" formatted="false">"Вузол визнав цю транзакцію отримання недійсною. Нічого не надіслано."</string>
     <string name="l10n_vestr_post_unknown" formatted="false">"Вузол не підтвердив отримання. Можливо, його вже надіслано: перевірте знову після наступного блоку, перш ніж отримувати ще раз."</string>
-    <string name="l10n_vestr_already_spending" formatted="false">"Отримання з цієї монети вже очікує підтвердження в блокчейні, або монету вже витрачено. Нічого не надіслано."</string>
+    <string name="l10n_vestr_already_spending" formatted="false">"Отримання з цієї монети вже очікує підтвердження в блокчейні, або монету вже витрачено. Нічого не надіслано. Перевірте знову через кілька блоків; якщо контракт усе ще у списку приблизно через півтори години, виконайте отримання знову."</string>
     <!-- Arguments: error -->
     <string name="l10n_vestr_failed">"Помилка: %1$s"</string>
     <string name="l10n_vestr_none" formatted="false">"Немає"</string>

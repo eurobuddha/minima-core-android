@@ -2948,7 +2948,7 @@
     <string name="l10n_vestr_collect_failed" formatted="false">"领取失败"</string>
     <string name="l10n_vestr_check_invalid" formatted="false">"节点判定此领取交易无效。未发送任何内容。"</string>
     <string name="l10n_vestr_post_unknown" formatted="false">"节点未确认此次领取，它可能已经发送。请在下一个区块之后再查看，然后再决定是否重新领取。"</string>
-    <string name="l10n_vestr_already_spending" formatted="false">"此硬币的一次领取已在等待区块链确认，或此硬币已被花费。未发送任何内容。"</string>
+    <string name="l10n_vestr_already_spending" formatted="false">"此硬币的一次领取已在等待区块链确认，或此硬币已被花费。未发送任何内容。请在几个区块后再查看；如果大约一个半小时后该合约仍在列表中，请重新领取。"</string>
     <!-- Arguments: error -->
     <string name="l10n_vestr_failed">"失败：%1$s"</string>
     <string name="l10n_vestr_none" formatted="false">"无"</string>

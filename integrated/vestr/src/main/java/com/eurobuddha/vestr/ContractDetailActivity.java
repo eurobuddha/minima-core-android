@@ -48,6 +48,13 @@ public class ContractDetailActivity extends SubActivity {
         checkSpend();
     }
 
+    /** Back on this screen while the button is blocked because a txn spends the coin: ask again, so the button comes
+     *  back once the node dropped a txn that was never mined (it leaves the node's memory within 60 to 90 minutes). */
+    @Override protected void onResume() {
+        super.onResume();
+        if (c != null && spending && run == null && !checking) checkSpend();
+    }
+
     /** On open: a coin a txn already spends (a collect from a screen that has since been recreated) offers no collect.
      *  Then the tip and the maths, so the button is drawn once with all three known. */
     private void checkSpend() {
@@ -223,6 +230,7 @@ public class ContractDetailActivity extends SubActivity {
             @Override public void onResult(JSONObject j) {
                 if (Contract.alreadySpending(j)) {
                     // nothing was created on the node, so nothing is owed; the button stays off
+                    checking = false;
                     spending = true;
                     setStatus(status, Language.msg(l10n_vestr_already_spending), false);
                     return;
