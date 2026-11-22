@@ -1137,8 +1137,10 @@ public class MainActivity extends AppCompatActivity {
             TextView b = button(InboxMessages.status(s), s.equals(o.status));
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
             lp.rightMargin = dp(6); b.setLayoutParams(lp);
-            // r3 I5: confirming or shipping an order with no secret needs the Send confirmation's warning accepted first
-            if (!DeliveryRules.autoAllowed(m.nonce) && (MerchDb.CONFIRMED.equals(s) || MerchDb.SHIPPED.equals(s)))
+            // r3 I5: confirming, shipping or delivering an order with no secret needs the Send confirmation's warning accepted
+            // first (delivering straight from PAID or CONFIRMED too; once SHIPPED the vendor has accepted it, final review F4)
+            if (!DeliveryRules.autoAllowed(m.nonce) && (MerchDb.CONFIRMED.equals(s) || MerchDb.SHIPPED.equals(s)
+                    || MerchDb.DELIVERED.equals(s) && !MerchDb.SHIPPED.equals(o.status)))
                 b.setOnClickListener(v -> languageDialog().setTitle(Language.msg(l10n_mall_inbox_mark_question, InboxMessages.status(s)))
                         .setView(wrapScroll(oldShopSendFacts(m, o, null)))
                         .setPositiveButton(Language.msg(l10n_mall_inbox_mark_status, InboxMessages.status(s)), (d, w) -> advanceStatus(o, s))
