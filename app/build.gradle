@@ -307,8 +307,10 @@ android {
         // 2.2.111: the Zero Edge Casino is removed from the APK pending an audit and rebuild (owner, 23 Nov: its
         // coin-state values reached admin node commands). Source kept, unreferenced, in integrated/casino; its old
         // WorkManager job and notification channels are cleared at every start; its bet secrets are kept.
-        versionCode 381
-        versionName "2.2.111"
+        // 2.2.112: Dexicon (AtomiX engine): the wallet keeper's split asks for coinage:3 (every real node refuses a send
+        // below 3, so the coinage:1 split never ran) and a failed keeper merge/split backs off quietly (logged, retried).
+        versionCode 382
+        versionName "2.2.112"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

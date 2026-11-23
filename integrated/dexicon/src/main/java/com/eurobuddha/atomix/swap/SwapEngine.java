@@ -501,9 +501,10 @@ public final class SwapEngine {
                     ui.post(() -> notifier.notify(title, why + ". Coins stay in your wallet." + (txpowid == null || txpowid.isEmpty() ? "" : " txpow " + txpowid)));
                 }
                 @Override public void err(String msg) {
+                    // Automatic upkeep: back off quietly (logged, retried after KEEP_GAP_MS), never a failure notice
+                    // - the wallet is untouched and the user can not act on it (Pandamonium 2.2.112).
                     endConsolidate(); keepLastMs = System.currentTimeMillis();
-                    SwapLog.w("wallet keeper " + plan + " failed: " + msg);
-                    ui.post(() -> notifier.notify(title + " failed", String.valueOf(msg)));
+                    SwapLog.w("wallet keeper " + plan + " failed, retrying later: " + msg);
                 }
             };
             if ("merge".equals(plan)) minima.consolidateCoins(KEEP_MERGE_INPUTS, cb);

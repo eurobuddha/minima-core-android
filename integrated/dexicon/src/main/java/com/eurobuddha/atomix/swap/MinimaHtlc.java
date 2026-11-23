@@ -538,12 +538,14 @@ public final class MinimaHtlc {
         tokenBalance(b -> ok.accept(new java.math.BigDecimal(b.unconfirmed).signum() > 0), err);
     }
 
-    /** Split my own coins into {@code count} equal coins totalling {@code totalAmount} mxUSDT, in ONE tx, from
-     *  CONFIRMED inputs only (coinage:1) — so a multi-tranche ask ladder has enough separately-spendable coins to
-     *  lock every leg of a sweep concurrently (native {@code send split:} sends to my own address). */
+    /** Split my own coins into {@code count} equal coins totalling {@code totalAmount} MxUSD, in ONE tx, from
+     *  CONFIRMED inputs only — so a multi-tranche ask ladder has enough separately-spendable coins to
+     *  lock every leg of a sweep concurrently (native {@code send split:} sends to my own address).
+     *  coinage:3 — every real node refuses a send with coinage below 3 ("Coinage MUST be >= 3"), so the old
+     *  coinage:1 split never ran (Pandamonium 2.2.112). */
     public void splitCoins(int count, String totalAmount, PostCb cb) {
         String send = "send amount:" + totalAmount + " address:" + myAddress
-                + " tokenid:" + activeToken + " split:" + count + " coinage:1 mine:true";
+                + " tokenid:" + activeToken + " split:" + count + " coinage:3 mine:true";
         // M1: `send split:` signs on the node → route through SignGate (same reason as lock()).
         runSigned(send, r -> {
             JSONObject resp = r.optJSONObject("response");
