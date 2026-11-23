@@ -97,11 +97,15 @@ public class ChatDrainer {
     private static java.lang.Thread mThread = null;
     private static volatile boolean mStop = false;
     private static String mLastErr = null;
+    private static String mLastBadId = null;
+    /** A keets identity: exactly 0x + 64 hex. Inbox ids are the sidecar's hex digests. */
+    static final java.util.regex.Pattern PEER_KEY = java.util.regex.Pattern.compile("0x[0-9a-fA-F]{64}");
+    static final java.util.regex.Pattern INBOX_ID = java.util.regex.Pattern.compile("[0-9a-fA-F]{1,128}");
     //payaddr auto-responder guard: a peer gets one address reply per 10 minutes
     private static final java.util.HashMap<String, Long> mPayAddrReplied = new java.util.HashMap<>();
     /** Receipts dial the peer (up to the sidecar's 15 s dial timeout) - never on the drainer
      *  thread, or a slow peer would delay the notification for the message we just stored. */
-    private static final java.util.concurrent.ExecutorService RECEIPTS =
+    static java.util.concurrent.Executor receipts =
             java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
                 java.lang.Thread t = new java.lang.Thread(r, "keets-chat-receipts");
                 t.setDaemon(true);
@@ -172,144 +176,164 @@ public class ChatDrainer {
             if (!waitNextPoll()) break;
             if (!MinimaCMD.checkMinimaStarted()) continue;
             try {
-                JSONObject res = MinimaCMD.execute("keets action:inbox");
-                if (!(Boolean) res.getOrDefault("status", false)) {
-                    //sidecar starting is normal — but log a CHANGED error so a wedged
-                    //command path is never silent (the 401 token bug cost a device test)
-                    String err = "" + res.get("error");
-                    if (!err.equals(mLastErr)) { mLastErr = err; logger.log("[CHAT] inbox unavailable: " + err); }
-                    continue;
-                }
-                mLastErr = null;
-                JSONArray inbox = (JSONArray) res.get("response");
-                int fresh = 0;
-                boolean allOnScreen = true;   // every fresh message is from the thread being read
-                java.util.ArrayList<String> toAck = new java.util.ArrayList<>();   // stored messages, acked AFTER notify
-                String lastFrom = null, lastName = null, lastBody = null;
-                for (Object o : inbox) {
-                    JSONObject msg = (JSONObject) o;
-                    String from = (String) msg.get("from");
-                    String raw;
-                    try { raw = new String(Base64.getDecoder().decode((String) msg.get("payload")), "UTF-8"); }
-                    catch (Exception e) { raw = "" + msg.get("message"); }
-                    ChatSchema.Decoded d = ChatSchema.decode(raw);
-
-                    // File controls retain transport-authenticated sender and fan out to Parlons.
-                    if (d.state.equals("file-control")) {
-                        ChatFileDelivery.get(zService).inbound(from,d.body);
-                        fanout(zService,msg,d,from);
-                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
-                        continue;
-                    }
-                    //Control messages: consumed, never stored or notified
-                    if (d.state.equals("read")) {
-                        //prefer the referenced message's own timestamp (peer clocks drift)
-                        long upto = d.ts != 0 ? d.ts : System.currentTimeMillis();
-                        if (!d.ref.equals("")) {
-                            long t = db.messageTs(d.ref);
-                            if (t != 0) upto = t;
-                        }
-                        db.markPeerRead(from, upto);
-                        fanout(zService, msg, d, from);
-                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
-                        for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
-                        continue;
-                    }
-                    if (d.state.equals("delivered")) {
-                        //the peer stored our message: single tick -> double tick (2.0.35+)
-                        if (!d.ref.equals("")) db.setVia(d.ref, "delivered");
-                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
-                        for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
-                        continue;
-                    }
-                    if (d.state.equals("payaddr")) {
-                        //contacts only: a control message must never create a contact,
-                        //or any stranger can plant a payee row with their address
-                        if (db.hasContact(from) && d.addr.matches("(0x|Mx)[0-9A-Za-z]+")) {
-                            db.setContactPayAddr(from, d.addr);
-                            fanout(zService, msg, d, from);
-                        }
-                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
-                        for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
-                        continue;
-                    }
-                    if (d.state.equals("payaddr-req")) {
-                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
-                        //contacts only: answering strangers links the chat identity to the wallet
-                        //(control messages never create contacts, so a cold caller gets nothing)
-                        Long last = mPayAddrReplied.get(from);
-                        if (db.hasContact(from) && (last == null || System.currentTimeMillis() - last > 10 * 60 * 1000)) {
-                            mPayAddrReplied.put(from, System.currentTimeMillis());
-                            JSONObject ga = MinimaCMD.execute("getaddress");
-                            if ((Boolean) ga.getOrDefault("status", false)) {
-                                String myaddr = (String) ((JSONObject) ga.get("response")).get("miniaddress");
-                                org.minima.utils.json.JSONObject reply = ChatSchema.base("", "", "");
-                                reply.put("state", "payaddr");
-                                reply.put("addr", myaddr);
-                                MinimaCMD.execute("keets action:send to:" + from +
-                                        " datahex:" + ChatSchema.toDataHex(reply.toString()));
-                            }
-                        }
-                        continue;
-                    }
-
-                    //Unknown states: a future control type must never become a
-                    //garbage chat row (the keetchat 0.2.1 lesson) - ack + consume
-                    if (!d.state.equals("") && !d.state.equals("image")
-                            && !d.state.equals("audio") && !d.state.equals("payment") && !d.state.equals("file")) {
-                        MinimaCMD.execute("keets action:ack id:" + msg.get("id"));
-                        continue;
-                    }
-
-                    if(d.state.equals("file")) {
-                        try {
-                            com.eurobuddha.maxima.core.chat.ChatFile file=com.eurobuddha.maxima.core.chat.ChatFile.parse(d.ref);
-                            com.eurobuddha.maxima.files.KeetsFiles.validate(file);
-                            d.body=file.name;
-                        }catch(Exception invalid){MinimaCMD.execute("keets action:ack id:"+msg.get("id"));continue;}
-                    }
-
-                    ChatDb.Msg m = new ChatDb.Msg();
-                    m.msgid = d.id != null ? d.id : (String) msg.get("id");
-                    m.pubkey = from;
-                    m.incoming = true;
-                    m.body = d.body;
-                    m.name = d.name;
-                    m.ref = d.ref;
-                    m.ts = d.ts != 0 ? d.ts : envTs(msg);
-                    m.via = (String) msg.get("via");
-                    m.state = d.state; m.amt = d.amt; m.tokname = d.tokname; m.txid = d.txid;
-                    boolean isNew = db.addMessage(m);
-                    if (isNew) {
-                        db.ensureContact(from, d.name);
-                        sendDelivered(from, m.msgid);
-                        fresh++;
-                        if (!from.equals(ChatThreadActivity.sForegroundPubkey)) allOnScreen = false;
-                        lastFrom = from;
-                        lastName = db.contactName(from);
-                        lastBody = d.state.equals("image") ? Language.text(zService, l10n_media_photo)
-                                 : d.state.equals("audio") ? Language.text(zService, l10n_media_voice)
-                                 : d.state.equals("payment") ? "💸 " + d.amt + " " + (d.tokname.equals("") ? "Minima" : d.tokname)
-                                 : d.body;
-
-                        // companion fan-out — the Android twin of the MDS KEETS event
-                        fanout(zService, msg, d, from);
-                    }
-                    // ack ONLY after the durable store write - and only after the user has
-                    // been told (below): node commands serialise behind the receipt dial,
-                    // and a stored-but-unacked message simply dedupes on the next poll.
-                    toAck.add("" + msg.get("id"));
-                }
-                if (fresh > 0) {
-                    //a message landing in the conversation you are looking at stays silent
-                    if (!allOnScreen) notifyUser(zService, fresh, lastFrom, lastName, lastBody);
-                    for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
-                }
-                for (String id : toAck) MinimaCMD.execute("keets action:ack id:" + id);
+                drainOnce(zService, db);
             } catch (Exception exc) {
                 logger.log("[CHAT] drainer: " + exc);
             }
         }
+    }
+
+    /** One poll of the inbox: store, notify, receipt, ack. Throws on a malformed reply. */
+    static void drainOnce(MinimaService zService, ChatDb db) throws Exception {
+        JSONObject res = MinimaCMD.execute("keets action:inbox");
+        if (!(Boolean) res.getOrDefault("status", false)) {
+            //sidecar starting is normal — but log a CHANGED error so a wedged
+            //command path is never silent (the 401 token bug cost a device test)
+            String err = "" + res.get("error");
+            if (!err.equals(mLastErr)) { mLastErr = err; logger.log("[CHAT] inbox unavailable: " + err); }
+            return;
+        }
+        mLastErr = null;
+        JSONArray inbox = (JSONArray) res.get("response");
+        int fresh = 0;
+        boolean allOnScreen = true;   // every fresh message is from the thread being read
+        java.util.ArrayList<String> toAck = new java.util.ArrayList<>();   // stored messages, acked AFTER notify
+        String lastFrom = null, lastName = null, lastBody = null;
+        for (Object o : inbox) {
+            JSONObject msg = (JSONObject) o;
+            // SECURITY: the row id and sender go into admin node commands (ack, receipt, payaddr) and
+            // the node runs every ";"-separated piece. A mailbox envelope's "from" is signed only up to
+            // its first non-hex character, so anything after it is a stranger's text: refuse the row.
+            String id = String.valueOf(msg.get("id"));
+            if (!INBOX_ID.matcher(id).matches()) {
+                if (!id.equals(mLastBadId)) { mLastBadId = id; logger.log("[CHAT] SECURITY: inbox row with a non-hex id left unread: " + org.json.JSONObject.quote(id)); }
+                continue;   // an id that is not hex can not be acked safely either
+            }
+            Object rawFrom = msg.get("from");
+            if (!(rawFrom instanceof String) || !PEER_KEY.matcher((String) rawFrom).matches()) {
+                logger.log("[CHAT] SECURITY: inbox row " + id + " refused, its sender is not a 0x + 64 hex key: "
+                        + org.json.JSONObject.quote(String.valueOf(rawFrom)));
+                MinimaCMD.execute("keets action:ack id:" + id);
+                continue;
+            }
+            String from = (String) rawFrom;
+            String raw;
+            try { raw = new String(Base64.getDecoder().decode((String) msg.get("payload")), "UTF-8"); }
+            catch (Exception e) { raw = "" + msg.get("message"); }
+            ChatSchema.Decoded d = ChatSchema.decode(raw);
+
+            // File controls retain transport-authenticated sender and fan out to Parlons.
+            if (d.state.equals("file-control")) {
+                ChatFileDelivery.get(zService).inbound(from,d.body);
+                fanout(zService,msg,d,from);
+                MinimaCMD.execute("keets action:ack id:" + id);
+                continue;
+            }
+            //Control messages: consumed, never stored or notified
+            if (d.state.equals("read")) {
+                //prefer the referenced message's own timestamp (peer clocks drift)
+                long upto = d.ts != 0 ? d.ts : System.currentTimeMillis();
+                if (!d.ref.equals("")) {
+                    long t = db.messageTs(d.ref);
+                    if (t != 0) upto = t;
+                }
+                db.markPeerRead(from, upto);
+                fanout(zService, msg, d, from);
+                MinimaCMD.execute("keets action:ack id:" + id);
+                for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
+                continue;
+            }
+            if (d.state.equals("delivered")) {
+                //the peer stored our message: single tick -> double tick (2.0.35+)
+                if (!d.ref.equals("")) db.setVia(d.ref, "delivered");
+                MinimaCMD.execute("keets action:ack id:" + id);
+                for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
+                continue;
+            }
+            if (d.state.equals("payaddr")) {
+                //contacts only: a control message must never create a contact,
+                //or any stranger can plant a payee row with their address
+                if (db.hasContact(from) && d.addr.matches("(0x|Mx)[0-9A-Za-z]+")) {
+                    db.setContactPayAddr(from, d.addr);
+                    fanout(zService, msg, d, from);
+                }
+                MinimaCMD.execute("keets action:ack id:" + id);
+                for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
+                continue;
+            }
+            if (d.state.equals("payaddr-req")) {
+                MinimaCMD.execute("keets action:ack id:" + id);
+                //contacts only: answering strangers links the chat identity to the wallet
+                //(control messages never create contacts, so a cold caller gets nothing)
+                Long last = mPayAddrReplied.get(from);
+                if (db.hasContact(from) && (last == null || System.currentTimeMillis() - last > 10 * 60 * 1000)) {
+                    mPayAddrReplied.put(from, System.currentTimeMillis());
+                    JSONObject ga = MinimaCMD.execute("getaddress");
+                    if ((Boolean) ga.getOrDefault("status", false)) {
+                        String myaddr = (String) ((JSONObject) ga.get("response")).get("miniaddress");
+                        org.minima.utils.json.JSONObject reply = ChatSchema.base("", "", "");
+                        reply.put("state", "payaddr");
+                        reply.put("addr", myaddr);
+                        MinimaCMD.execute("keets action:send to:" + from +
+                                " datahex:" + ChatSchema.toDataHex(reply.toString()));
+                    }
+                }
+                continue;
+            }
+
+            //Unknown states: a future control type must never become a
+            //garbage chat row (the keetchat 0.2.1 lesson) - ack + consume
+            if (!d.state.equals("") && !d.state.equals("image")
+                    && !d.state.equals("audio") && !d.state.equals("payment") && !d.state.equals("file")) {
+                MinimaCMD.execute("keets action:ack id:" + id);
+                continue;
+            }
+
+            if(d.state.equals("file")) {
+                try {
+                    com.eurobuddha.maxima.core.chat.ChatFile file=com.eurobuddha.maxima.core.chat.ChatFile.parse(d.ref);
+                    com.eurobuddha.maxima.files.KeetsFiles.validate(file);
+                    d.body=file.name;
+                }catch(Exception invalid){MinimaCMD.execute("keets action:ack id:"+id);continue;}
+            }
+
+            ChatDb.Msg m = new ChatDb.Msg();
+            m.msgid = d.id != null ? d.id : id;
+            m.pubkey = from;
+            m.incoming = true;
+            m.body = d.body;
+            m.name = d.name;
+            m.ref = d.ref;
+            m.ts = d.ts != 0 ? d.ts : envTs(msg);
+            m.via = (String) msg.get("via");
+            m.state = d.state; m.amt = d.amt; m.tokname = d.tokname; m.txid = d.txid;
+            boolean isNew = db.addMessage(m);
+            if (isNew) {
+                db.ensureContact(from, d.name);
+                sendDelivered(from, m.msgid);
+                fresh++;
+                if (!from.equals(ChatThreadActivity.sForegroundPubkey)) allOnScreen = false;
+                lastFrom = from;
+                lastName = db.contactName(from);
+                lastBody = d.state.equals("image") ? Language.text(zService, l10n_media_photo)
+                         : d.state.equals("audio") ? Language.text(zService, l10n_media_voice)
+                         : d.state.equals("payment") ? "💸 " + d.amt + " " + (d.tokname.equals("") ? "Minima" : d.tokname)
+                         : d.body;
+
+                // companion fan-out — the Android twin of the MDS KEETS event
+                fanout(zService, msg, d, from);
+            }
+            // ack ONLY after the durable store write - and only after the user has
+            // been told (below): node commands serialise behind the receipt dial,
+            // and a stored-but-unacked message simply dedupes on the next poll.
+            toAck.add(id);
+        }
+        if (fresh > 0) {
+            //a message landing in the conversation you are looking at stays silent
+            if (!allOnScreen) notifyUser(zService, fresh, lastFrom, lastName, lastBody);
+            for (Runnable l : UI_LISTENERS) { try { l.run(); } catch (Exception e) {} }
+        }
+        for (String id : toAck) MinimaCMD.execute("keets action:ack id:" + id);
     }
 
     /** The envelope ts, or now when absent/garbled — a bad peer timestamp must
@@ -346,7 +370,7 @@ public class ChatDrainer {
     /** Tell the sender we stored their message (their single tick becomes a double tick).
      *  Fire-and-forget: a failed receipt only leaves their tick single. */
     private static void sendDelivered(String zTo, String zMsgId) {
-        RECEIPTS.execute(() -> {
+        receipts.execute(() -> {
             try {
                 org.minima.utils.json.JSONObject r = ChatSchema.base("", "", "");
                 r.put("state", "delivered");

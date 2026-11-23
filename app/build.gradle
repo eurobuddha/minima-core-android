@@ -301,8 +301,11 @@ android {
         // 2.2.108: miniMall Inbox: a no-secret order's coin is shown once, in the facts (final review F6).
         // 2.2.109: miniMall Inbox: a held scan pass (tip not confirmed) keeps the refused blocks and the count of
         // refused passes; only a whole pass clears them.
-        versionCode 379
-        versionName "2.2.109"
+        // 2.2.110: SECURITY, Keets chat: an inbox row whose sender is not exactly 0x + 64 hex (a mailbox envelope's
+        // "from" is signed only up to its first non-hex character) or whose id is not hex never reaches a node
+        // command, the contacts or the messages; media refs must be keets://<64 hex>/<path>?hash=<64 hex>.
+        versionCode 380
+        versionName "2.2.110"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

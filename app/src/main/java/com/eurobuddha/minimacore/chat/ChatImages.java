@@ -30,6 +30,13 @@ public final class ChatImages {
 
     private ChatImages() {}
 
+    /** A media ref as the sidecar publishes it: keets://<64-hex drive>/<path>?hash=<64 hex>. The ref
+     *  is a stranger's text and goes into a node command: no ";", quotes, spaces or control characters. */
+    static final java.util.regex.Pattern MEDIA_REF = java.util.regex.Pattern.compile(
+            "keets://[0-9a-fA-F]{64}/[A-Za-z0-9._~%+=/-]{1,512}(?:\\?hash=[0-9a-fA-F]{64})?");
+
+    static boolean mediaRef(String zRef) { return zRef != null && MEDIA_REF.matcher(zRef).matches(); }
+
     /** The disk-cache file for a keets:// ref (exists only after a successful load). */
     public static File file(Context zContext, String zRef) {
         File dir = new File(zContext.getCacheDir(), "chatimg");
@@ -52,7 +59,7 @@ public final class ChatImages {
         // Untrusted inbound ref interpolated into a node command (whitespace-split,
         // last-key-wins tokenizer) - same gate as ChatAudio, or a hostile ref
         // rewrites the command.
-        if (zRef == null || !zRef.matches("keets://\\S+")) {
+        if (!mediaRef(zRef)) {
             MAIN.post(() -> zCb.accept(null));
             return;
         }

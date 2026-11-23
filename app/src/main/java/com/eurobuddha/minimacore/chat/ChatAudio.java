@@ -36,7 +36,7 @@ public final class ChatAudio {
         Handler main = new Handler(Looper.getMainLooper());
         // An inbound ref is untrusted: whitespace would inject extra command
         // parameters into the fetch below. One guard covers the whole path.
-        if (zRef == null || !zRef.matches("keets://\\S+")) {
+        if (!ChatImages.mediaRef(zRef)) {
             main.post(() -> zCb.done(null));
             return;
         }
