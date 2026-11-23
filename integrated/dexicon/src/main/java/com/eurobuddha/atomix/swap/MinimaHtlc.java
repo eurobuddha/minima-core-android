@@ -541,11 +541,15 @@ public final class MinimaHtlc {
     /** Split my own coins into {@code count} equal coins totalling {@code totalAmount} MxUSD, in ONE tx, from
      *  CONFIRMED inputs only — so a multi-tranche ask ladder has enough separately-spendable coins to
      *  lock every leg of a sweep concurrently (native {@code send split:} sends to my own address).
-     *  coinage:3 — every real node refuses a send with coinage below 3 ("Coinage MUST be >= 3"), so the old
-     *  coinage:1 split never ran (Pandamonium 2.2.112). */
+     *  KNOWN, LEFT AS IS (Pandamonium 2.2.117, reverting 2.2.112): every real node refuses coinage below 3
+     *  ("Coinage MUST be >= 3"), so this coinage:1 split never runs. Do NOT raise it to 3 on its own: it sends the
+     *  WHOLE sendable balance to the persisted swap-identity address, and nothing here proves the node owns that
+     *  address now (an orphaned identity after a reseed happened on a real phone). Only together with a proof read
+     *  immediately before the send: `scripts address:` gives a simple:true row whose publickey is in a complete
+     *  `keys` read; an incomplete or failed read means no split. */
     public void splitCoins(int count, String totalAmount, PostCb cb) {
         String send = "send amount:" + totalAmount + " address:" + myAddress
-                + " tokenid:" + activeToken + " split:" + count + " coinage:3 mine:true";
+                + " tokenid:" + activeToken + " split:" + count + " coinage:1 mine:true";
         // M1: `send split:` signs on the node → route through SignGate (same reason as lock()).
         runSigned(send, r -> {
             JSONObject resp = r.optJSONObject("response");

@@ -320,8 +320,11 @@ android {
         // 2.2.115: the Minima dollar token is MxUSD in every shipped string (five strings in four languages, the
         // catalog and the message templates still said mxUSDT).
         // 2.2.116: test only - the Keets inbox test drops the ChatDb singleton afterwards (its rows broke ChatBackupTest).
-        versionCode 386
-        versionName "2.2.116"
+        // 2.2.117: reverts the coinage:3 of 2.2.112 - the keeper split stays coinage:1 (refused by the node, harmless):
+        // made to run it would send the whole sendable balance to the persisted swap-identity address with no proof
+        // the node owns it. The quiet back-off of 2.2.112 stays.
+        versionCode 387
+        versionName "2.2.117"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
