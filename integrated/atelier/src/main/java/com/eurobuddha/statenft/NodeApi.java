@@ -146,7 +146,23 @@ public class NodeApi {
     }
 
     public void cmd(String command, long timeoutMs, Cb cb) {
+        if (unsafe(command)) {
+            // The node splits command text at every ';' and runs each piece as admin: a typed name, description or
+            // trait with ';' would run whatever follows it. Nothing is sent.
+            android.util.Log.w("Atelier", "SECURITY refused a node command holding ';' or a control character");
+            mMain.post(() -> { if (cb != null) cb.onError("Unsafe command data. Nothing was sent to the node."); });
+            return;
+        }
         mMain.post(() -> cmdOnMain(command, timeoutMs, cb));
+    }
+
+    static boolean unsafe(String command) {
+        if (command == null) return true;
+        for (int i = 0; i < command.length(); i++) {
+            char c = command.charAt(i);
+            if (c == ';' || c < 32 || c == 127) return true;
+        }
+        return false;
     }
 
     private void cmdOnMain(String command, long timeoutMs, Cb cb) {

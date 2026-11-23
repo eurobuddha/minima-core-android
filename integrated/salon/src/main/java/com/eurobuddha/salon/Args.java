@@ -33,9 +33,15 @@ final class Args {
         if (s == null) return true;
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c == '{' || c == '}' || c == '\n' || c == '\r' || c == '\t' || c < 0x20) return false;
+            // ';' too: the node splits the tokencreate command at every ';' (even inside the JSON) and runs each piece.
+            if (c == '{' || c == '}' || c == ';' || c < 0x20 || c == 0x7f) return false;
         }
         return true;
+    }
+
+    /** The hosted profile URL rides the identity tokencreate: http(s), no spaces, quotes, ';' or control characters. */
+    static boolean isSafeUrl(String u) {
+        return u != null && u.matches("https?://[^\\s\"';{}]+") && isSafeMeta(u);
     }
 
     private Args() {}

@@ -41,10 +41,10 @@ public final class Node {
      * The ONLY shapes allowed into a command string.
      *
      * <p>Addresses reach this app from the node (trusted) but also from the remote audit service,
-     * whose reply feeds the at-risk set and from there {@code scripts address:…} lookups. Minima
-     * commands are chained with ';' — this app relies on that itself when posting transactions — so
-     * an unvalidated value interpolated into a command is arbitrary command execution on the user's
-     * node, driven by an HTTP endpoint we tell users only ever sees public keys.
+     * whose reply feeds the at-risk set and from there {@code scripts address:…} lookups. The node
+     * splits command text at every ';' and runs each piece as admin (this app sends every step on its
+     * own, and NodeApi.cmd refuses ';' and control characters), so an unvalidated value interpolated
+     * into a command would be arbitrary command execution on the user's node.
      */
     public static boolean validAddr(String s) { return validHexAddr(s) || validMx(s); }
 

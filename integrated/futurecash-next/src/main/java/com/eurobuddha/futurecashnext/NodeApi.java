@@ -77,6 +77,13 @@ public class NodeApi {
     }
 
     public void cmd(String command, Cb cb) {
+        String unsafe = CommandSafety.failure(command);
+        if (unsafe != null) {
+            int sp = command == null ? -1 : command.indexOf(' ');
+            android.util.Log.w("FutureCash", "SECURITY refused a node command (" + (command == null ? "null" : sp < 0 ? "?" : command.substring(0, sp)) + "): " + unsafe);
+            if (cb != null) mMain.post(() -> cb.onError(unsafe));
+            return;
+        }
         mMain.post(() -> dispatch(command, cb));
     }
 

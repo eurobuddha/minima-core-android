@@ -3321,7 +3321,7 @@ public class MainActivity extends AppCompatActivity {
                     String url=ProfileHosting.upload(op.host,op.handle,op.profile.toString(),op.html);
                     runOnUiThread(()->{
                         if(!requireClaim(op)) return;
-                        if(url==null || url.isEmpty() || !Args.isSafeMeta(url)) { endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return; }
+                        if(!Args.isSafeUrl(url)) { endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_publish_storage)); return; }
                         JSONObject change=new JSONObject();putJson(change,"profileUrl",url);
                         if(!saveClaim(op,change)) return;
                         op.url=url;publicationStatus(op.status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_checking));adoptOrMint(op);

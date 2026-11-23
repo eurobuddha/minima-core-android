@@ -473,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (Util.isAllDigits(q)) {                       // block number
             fetchAndShowBlock(Long.parseLong(q));
-        } else if (Util.isHex(q) || q.startsWith("Mx")) {
+        } else if (Util.isHex(q) || q.matches("Mx[0-9A-Za-z]{30,100}")) {   // typed text goes into txpow address:
             // A 0x 64-hex string can be a TxPoW id OR an address — try txpowid first, fall back.
             if (q.startsWith("Mx")) searchAddress(q);
             else searchTxpowThenAddress(q);

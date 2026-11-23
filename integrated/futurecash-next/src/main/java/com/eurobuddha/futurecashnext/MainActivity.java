@@ -924,6 +924,8 @@ public class MainActivity extends AppCompatActivity {
                     payoutHex = guardian.wallet().cleanAddressHex();
                 } else if (Node.validHexAddr(rcp)) {
                     payoutHex = rcp;
+                } else if (!Node.validMx(rcp)) {   // typed text goes into checkaddress: only an Mx address
+                    toast(Language.msg(l10n_future_resolve_failed)); return;
                 } else {
                     final JSONObject r = node.cmd("checkaddress address:" + rcp);
                     final JSONObject resp = Node.obj(r);

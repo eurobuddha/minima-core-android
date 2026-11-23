@@ -313,8 +313,12 @@ android {
         // never proof: a posted sweep with no row is swept once its output is at the safe (else unverified after 30
         // blocks, never the theft alarm, never dropped as a reorg); a posted collect with no row is done once its
         // output is at the payout (safe collects stay safe instead of falling back to the sweep).
-        versionCode 383
-        versionName "2.2.113"
+        // 2.2.114: SECURITY, typed text never reaches a node command with ';' (the node splits there and runs each
+        // piece as admin): Future Cash refuses ';' and control characters in every command and resolves only an Mx
+        // recipient with checkaddress; Atelier refuses them in every command (typed mint fields); the Salon identity
+        // claim refuses ';' in name / bio and needs an http(s) profile URL; Block Explorer searches only a real Mx.
+        versionCode 384
+        versionName "2.2.114"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
