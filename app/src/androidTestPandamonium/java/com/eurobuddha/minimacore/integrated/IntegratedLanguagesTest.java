@@ -64,7 +64,7 @@ public class IntegratedLanguagesTest {
         PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_ACTIVITIES);
         java.util.Set<String> covered = new java.util.HashSet<>();
         // 2.2.34: AtomiX, PandaPools and PandaDEX left with the Dexicon tab (a tab, not a drawer Activity).
-        String[] modules = {"ethwallet", "futurecashnext", "casino",
+        String[] modules = {"ethwallet", "futurecashnext",   // 2.2.111: casino removed
                 "blockexplorer", "filez", "history", "vestr", "entropy", "terminalide", "mail", "utxo", "merchshop", "merchstudio", "merchinbox", "nftwallet", "wallet"};
         for (ActivityInfo activity : info.activities) for (String module : modules) {
             if (!activity.name.startsWith("com.eurobuddha." + module + ".")) continue;

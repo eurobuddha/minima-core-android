@@ -27,7 +27,9 @@ include ':maxima-core'   // the Parlons/Maxima transport core, vendored (MAX# co
 
 // Reviewed source snapshots of the existing native companion apps.
 // 2.2.34: Dexicon (one trading tab on the host node wallet) replaces the built-in AtomiX, PandaPools and PandaDEX.
-['ethwallet','dexicon','futurecash-next','casino','blockexplorer','filez','history','vestr','entropy','terminalide','mail','utxo','merchshop','merchstudio','merchinbox','NFTwallet','wallet','atelier','salon','keyreuses','faucet'].each { feature ->
+// 2.2.111: the Zero Edge Casino is out of every build pending an audit (state-to-command injection); its source
+// stays in integrated/casino, unreferenced (see its README.md).
+['ethwallet','dexicon','futurecash-next','blockexplorer','filez','history','vestr','entropy','terminalide','mail','utxo','merchshop','merchstudio','merchinbox','NFTwallet','wallet','atelier','salon','keyreuses','faucet'].each { feature ->
     include ":integrated-${feature}"
     project(":integrated-${feature}").projectDir = file("integrated/${feature}")
 }

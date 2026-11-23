@@ -8,15 +8,16 @@ public final class PandamoniumDestinations {
     public static final String[] NAMES = {
         // 2.2.34: AtomiX, PandaPools and PandaDEX are gone. 2.2.39: Dexicon is the trading TAB and also an app-list entry
         // (opens the tab; freeze / hide like any app - owner, 14 Nov). Its "class" is the tab's screen, never launched.
+        // 2.2.111: Zero Edge Casino removed (pending audit). Saved order / hidden / frozen lists name classes, so an old
+        // casino entry is simply ignored.
         "Minima Core", "ETH Wallet", "Future Cash Next",
-        "Zero Edge Casino", "Minima Explorer", "Filez", "Minima Vestr", "Entropy", "Terminal IDE", "MinimaMail", "UTXO Wallet", "miniMall", "NFT Wallet", "minimaWallet", "Atelier", "The Salon", "KeyUses", "Minima Faucet", "Dexicon"
+        "Minima Explorer", "Filez", "Minima Vestr", "Entropy", "Terminal IDE", "MinimaMail", "UTXO Wallet", "miniMall", "NFT Wallet", "minimaWallet", "Atelier", "The Salon", "KeyUses", "Minima Faucet", "Dexicon"
     };
     // Existing launcher artwork, indexed by destination identity rather than display order.
     public static final int[] ICONS = {
         com.eurobuddha.minimacore.R.drawable.ic_minima,
         com.eurobuddha.ethwallet.R.mipmap.pm_ethwallet_ic_launcher,
         com.eurobuddha.futurecashnext.R.mipmap.pm_futurecash_next_ic_launcher,
-        com.eurobuddha.casino.R.mipmap.pm_casino_ic_launcher,
         com.eurobuddha.blockexplorer.R.mipmap.pm_blockexplorer_ic_launcher,
         com.eurobuddha.filez.R.mipmap.pm_filez_ic_launcher,
         com.eurobuddha.vestr.R.mipmap.pm_vestr_ic_launcher,
@@ -36,7 +37,7 @@ public final class PandamoniumDestinations {
     public static final String[] CLASSES = {
         "com.eurobuddha.minimacore.main.MainActivity", "com.eurobuddha.ethwallet.MainActivity",
         "com.eurobuddha.futurecashnext.MainActivity",
-        "com.eurobuddha.casino.MainActivity", "com.eurobuddha.blockexplorer.MainActivity",
+        "com.eurobuddha.blockexplorer.MainActivity",
         "com.eurobuddha.filez.MainActivity",
         "com.eurobuddha.vestr.MainActivity",
         "com.eurobuddha.entropy.MainActivity", "com.eurobuddha.terminalide.MainActivity", "com.eurobuddha.mail.MainActivity",

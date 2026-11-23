@@ -304,8 +304,11 @@ android {
         // 2.2.110: SECURITY, Keets chat: an inbox row whose sender is not exactly 0x + 64 hex (a mailbox envelope's
         // "from" is signed only up to its first non-hex character) or whose id is not hex never reaches a node
         // command, the contacts or the messages; media refs must be keets://<64 hex>/<path>?hash=<64 hex>.
-        versionCode 380
-        versionName "2.2.110"
+        // 2.2.111: the Zero Edge Casino is removed from the APK pending an audit and rebuild (owner, 23 Nov: its
+        // coin-state values reached admin node commands). Source kept, unreferenced, in integrated/casino; its old
+        // WorkManager job and notification channels are cleared at every start; its bet secrets are kept.
+        versionCode 381
+        versionName "2.2.111"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
@@ -504,7 +507,6 @@ dependencies {
     // 2.2.34: one Dexicon tab on the host node wallet replaces the built-in AtomiX, PandaPools and PandaDEX.
     pandamoniumImplementation project(':integrated-dexicon')
     pandamoniumImplementation project(':integrated-futurecash-next')
-    pandamoniumImplementation project(':integrated-casino')
     pandamoniumImplementation project(':integrated-blockexplorer')
     pandamoniumImplementation project(':integrated-filez')
     pandamoniumImplementation project(':integrated-history')

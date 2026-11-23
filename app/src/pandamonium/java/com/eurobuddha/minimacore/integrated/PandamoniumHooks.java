@@ -119,7 +119,6 @@ public final class PandamoniumHooks {
     public static boolean hasMoneyInFlight(android.content.Context ctx, int id) {
         try {
             switch (PandamoniumDestinations.CLASSES[id]) {
-                case "com.eurobuddha.casino.MainActivity": return com.eurobuddha.casino.CasinoService.hasWork(ctx);
                 case "com.eurobuddha.futurecashnext.MainActivity":
                     return new com.eurobuddha.futurecashnext.Cfg(ctx).is(com.eurobuddha.futurecashnext.Cfg.GUARDIAN_ON, false);
                 case "com.eurobuddha.nftwallet.MainActivity": return com.eurobuddha.nftwallet.MintDriver.hasWork(ctx);
@@ -352,6 +351,7 @@ public final class PandamoniumHooks {
         com.eurobuddha.minimacore.maxchat.MaxChat.APPLICATION_LISTENERS.add(com.eurobuddha.salon.MaximaLink::onMessage);
         com.eurobuddha.minimacore.maxchat.MaxChat.UI_LISTENERS.add(com.eurobuddha.salon.MaximaLink::refresh);
         settleDexiconUpgrade(context);
+        retireCasino(context);
         // Dexicon speaks Pandamonium's language (tab, dialogs, toasts and its notifications - even before the tab opens).
         com.eurobuddha.dexicon.HostMode.setTranslator(new DexiconTranslations(context));
         // Terminal IDE's log store and the Salon's event watcher follow each app's freeze state.
@@ -606,6 +606,21 @@ public final class PandamoniumHooks {
      * Dexicon pool keep-alive silently off. Dexicon is a tab, never frozen: every one of its components goes back to its
      * manifest default at each start. The removed apps' WorkManager jobs name classes that no longer exist: cancelled.
      */
+    /**
+     * 2.2.111: the Zero Edge Casino is out of the APK pending an audit (integrated/casino/README.md). An installed older
+     * build may have left its WorkManager job (its worker class no longer exists) and its notification channels:
+     * cancelled and deleted at every start, both idempotent. Its bet secrets (EncryptedSharedPreferences
+     * "casino_secrets") are KEPT, so a later build that brings the casino back can still reveal and resolve.
+     */
+    static void retireCasino(android.content.Context context) {
+        try { androidx.work.WorkManager.getInstance(context).cancelUniqueWork("casino_auto_process"); }
+        catch (RuntimeException ignored) { /* WorkManager not initialised yet: nothing was scheduled */ }
+        android.app.NotificationManager nm = context.getSystemService(android.app.NotificationManager.class);
+        if (nm != null) for (String channel : new String[]{"casino_fg", "casino_alert", "casino_timeouts"}) {
+            try { nm.deleteNotificationChannel(channel); } catch (RuntimeException ignored) { /* never created */ }
+        }
+    }
+
     static void settleDexiconUpgrade(android.content.Context context) {
         // ONCE: from 2.2.39 Dexicon can be frozen, and a reset on every start would undo that.
         android.content.SharedPreferences once = nav(context);
