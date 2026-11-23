@@ -4711,9 +4711,9 @@
     <!-- Arguments: id -->
     <string name="l10n_atomix_notice_consolidating_deal">"Триває об’єднання монет. Повторіть після підтвердження. Угода: %1$s"</string>
     <!-- Arguments: amount, available -->
-    <string name="l10n_atomix_notice_fill_shortfall">"Неможливо виконати угоду — потрібно %1$s mxUSDT, доступно лише %2$s"</string>
+    <string name="l10n_atomix_notice_fill_shortfall">"Неможливо виконати угоду — потрібно %1$s MxUSD, доступно лише %2$s"</string>
     <!-- Arguments: amount -->
-    <string name="l10n_atomix_notice_fragmented">"mxUSDT розділено на надто багато монет для блокування %1$s однією транзакцією — об’єднайте монети"</string>
+    <string name="l10n_atomix_notice_fragmented">"MxUSD розділено на надто багато монет для блокування %1$s однією транзакцією — об’єднайте монети"</string>
     <!-- Arguments: error, id -->
     <string name="l10n_atomix_notice_consolidate_error">"%1$s. Перед прийняттям купівель відкрийте «Гаманець → Об’єднати». Угода: %2$s"</string>
     <string name="l10n_atomix_otc_intro" formatted="false">"Узгодьте обсяг і ціну з постачальником ліквідності, а потім проведіть обмін через HTLC без довіри до контрагента."</string>
@@ -4808,7 +4808,7 @@
     <string name="l10n_atomix_market_peg">"Прив’язати рівні до %1$s (автооновлення цін)"</string>
     <!-- Arguments: 0, 1 -->
     <string name="l10n_atomix_market_peg_help">"За кожної публікації рівні будуються навколо середньої ціни %1$s з вашим кроком та обсягами. Рух ціни понад поріг запускає нову публікацію. За застарілих даних спред розширюється навколо останньої правильної ціни. Без доступної ціни або після 12 годин збою заявка знімається й повертається після відновлення даних. Ліквідність %2$s на %1$s може бути низькою: використовуйте малі обсяги та крок вище звичного спреду. За цими цінами відбуваються автоматичні угоди."</string>
-    <string name="l10n_atomix_market_parity_help" formatted="false">"Середня ціна фіксована: 1 USDT за mxUSDT. За кожної публікації рівні будуються з вашим кроком, зміщенням та обсягами. За цими цінами відбуваються автоматичні угоди."</string>
+    <string name="l10n_atomix_market_parity_help" formatted="false">"Середня ціна фіксована: 1 USDT за MxUSD. За кожної публікації рівні будуються з вашим кроком, зміщенням та обсягами. За цими цінами відбуваються автоматичні угоди."</string>
     <string name="l10n_atomix_market_skew" formatted="false">"зміщення ±%"</string>
     <string name="l10n_atomix_market_reprice" formatted="false">"перерахунок ≥ %"</string>
     <string name="l10n_atomix_market_auto_fill" formatted="false">"АВТОЗАПОВНЕННЯ — середня ціна, крок %, кількість рівнів та обсяги продажу/купівлі. Потім можна змінити окремі рівні."</string>
@@ -5676,8 +5676,8 @@
     <string name="l10n_pools_create_before_title" formatted="false">"Перед створенням пулу"</string>
     <string name="l10n_pools_create_acknowledge_required" formatted="false">"Поставте прапорець, щоб підтвердити, що ви розумієте умови."</string>
     <string name="l10n_pools_create_battery_required" formatted="false">"Налаштуйте виняток з оптимізації батареї або поставте другий прапорець."</string>
-    <string name="l10n_pools_create_get_token_title" formatted="false">"Спочатку отримайте mxUSDT"</string>
-    <string name="l10n_pools_create_get_token_body" formatted="false">"У цій відповіді про баланс немає доступних для витрачання mxUSDT. PandaPools створює пули MINIMA / USDT з опорною ціною, коли вона доступна. Отримайте mxUSDT або перевірте вузол і баланс, а потім повторіть спробу."</string>
+    <string name="l10n_pools_create_get_token_title" formatted="false">"Спочатку отримайте MxUSD"</string>
+    <string name="l10n_pools_create_get_token_body" formatted="false">"У цій відповіді про баланс немає доступних для витрачання MxUSD. PandaPools створює пули MINIMA / USDT з опорною ціною, коли вона доступна. Отримайте MxUSD або перевірте вузол і баланс, а потім повторіть спробу."</string>
     <!-- Arguments: token, amount -->
     <string name="l10n_pools_create_available_token">"%1$s · доступно %2$s"</string>
     <string name="l10n_pools_create_choose_token" formatted="false">"Створити пул MINIMA з…"</string>

@@ -23643,16 +23643,16 @@
     "uk": "Триває об’єднання монет. Повторіть після підтвердження. Угода: {id}"
   },
   "atomixNotice.fillShortfall": {
-    "en": "Can't fill deal — need {amount} mxUSDT, only {available} free",
-    "zh-Hans": "无法完成交易，需要 {amount} mxUSDT，可用仅 {available}",
-    "ru": "Невозможно исполнить сделку — нужно {amount} mxUSDT, доступно только {available}",
-    "uk": "Неможливо виконати угоду — потрібно {amount} mxUSDT, доступно лише {available}"
+    "en": "Can't fill deal — need {amount} MxUSD, only {available} free",
+    "zh-Hans": "无法完成交易，需要 {amount} MxUSD，可用仅 {available}",
+    "ru": "Невозможно исполнить сделку — нужно {amount} MxUSD, доступно только {available}",
+    "uk": "Неможливо виконати угоду — потрібно {amount} MxUSD, доступно лише {available}"
   },
   "atomixNotice.fragmented": {
-    "en": "mxUSDT too fragmented to lock {amount} in one tx — consolidate your coins",
-    "zh-Hans": "mxUSDT 币输出过于分散，无法在一笔交易中锁定 {amount}，请先合并币输出",
-    "ru": "mxUSDT разделены на слишком много монет для блокировки {amount} одной транзакцией — объедините монеты",
-    "uk": "mxUSDT розділено на надто багато монет для блокування {amount} однією транзакцією — об’єднайте монети"
+    "en": "MxUSD too fragmented to lock {amount} in one tx — consolidate your coins",
+    "zh-Hans": "MxUSD 币输出过于分散，无法在一笔交易中锁定 {amount}，请先合并币输出",
+    "ru": "MxUSD разделены на слишком много монет для блокировки {amount} одной транзакцией — объедините монеты",
+    "uk": "MxUSD розділено на надто багато монет для блокування {amount} однією транзакцією — об’єднайте монети"
   },
   "atomixNotice.consolidateError": {
     "en": "{error}. Open Wallet → Consolidate before accepting buys. Deal: {id}",
@@ -24087,10 +24087,10 @@
     "uk": "За кожної публікації рівні будуються навколо середньої ціни {0} з вашим кроком та обсягами. Рух ціни понад поріг запускає нову публікацію. За застарілих даних спред розширюється навколо останньої правильної ціни. Без доступної ціни або після 12 годин збою заявка знімається й повертається після відновлення даних. Ліквідність {1} на {0} може бути низькою: використовуйте малі обсяги та крок вище звичного спреду. За цими цінами відбуваються автоматичні угоди."
   },
   "atomixMarket.parityHelp": {
-    "en": "The midpoint is fixed at 1 USDT per mxUSDT. Each publish rebuilds the levels using your step, skew and sizes. These prices are used for automatic trades.",
-    "zh-Hans": "中间价固定为每 mxUSDT 兑 1 USDT。每次发布都会按您设置的间距、偏移和数量重建档位。这些价格用于自动交易。",
-    "ru": "Средняя цена фиксирована: 1 USDT за mxUSDT. При каждой публикации уровни строятся с вашим шагом, смещением и объёмами. По этим ценам совершаются автоматические сделки.",
-    "uk": "Середня ціна фіксована: 1 USDT за mxUSDT. За кожної публікації рівні будуються з вашим кроком, зміщенням та обсягами. За цими цінами відбуваються автоматичні угоди."
+    "en": "The midpoint is fixed at 1 USDT per MxUSD. Each publish rebuilds the levels using your step, skew and sizes. These prices are used for automatic trades.",
+    "zh-Hans": "中间价固定为每 MxUSD 兑 1 USDT。每次发布都会按您设置的间距、偏移和数量重建档位。这些价格用于自动交易。",
+    "ru": "Средняя цена фиксирована: 1 USDT за MxUSD. При каждой публикации уровни строятся с вашим шагом, смещением и объёмами. По этим ценам совершаются автоматические сделки.",
+    "uk": "Середня ціна фіксована: 1 USDT за MxUSD. За кожної публікації рівні будуються з вашим кроком, зміщенням та обсягами. За цими цінами відбуваються автоматичні угоди."
   },
   "atomixMarket.skew": {
     "en": "skew ±%",
@@ -27981,16 +27981,16 @@
     "uk": "Налаштуйте виняток з оптимізації батареї або поставте другий прапорець."
   },
   "pools.createGetTokenTitle": {
-    "en": "Get mxUSDT first",
-    "zh-Hans": "请先获取 mxUSDT",
-    "ru": "Сначала получите mxUSDT",
-    "uk": "Спочатку отримайте mxUSDT"
+    "en": "Get MxUSD first",
+    "zh-Hans": "请先获取 MxUSD",
+    "ru": "Сначала получите MxUSD",
+    "uk": "Спочатку отримайте MxUSD"
   },
   "pools.createGetTokenBody": {
-    "en": "No spendable mxUSDT was reported in this balance read. PandaPools creates MINIMA / USDT pools using a reference price when available. Receive mxUSDT or check your node and balance before trying again.",
-    "zh-Hans": "本次余额查询未返回可用的 mxUSDT。PandaPools 创建 MINIMA / USDT 池时会在可用情况下使用参考价格。请先接收 mxUSDT，或检查节点和余额后重试。",
-    "ru": "В этом ответе о балансе нет доступных для расходования mxUSDT. PandaPools создаёт пулы MINIMA / USDT с опорной ценой, когда она доступна. Получите mxUSDT или проверьте узел и баланс, затем повторите попытку.",
-    "uk": "У цій відповіді про баланс немає доступних для витрачання mxUSDT. PandaPools створює пули MINIMA / USDT з опорною ціною, коли вона доступна. Отримайте mxUSDT або перевірте вузол і баланс, а потім повторіть спробу."
+    "en": "No spendable MxUSD was reported in this balance read. PandaPools creates MINIMA / USDT pools using a reference price when available. Receive MxUSD or check your node and balance before trying again.",
+    "zh-Hans": "本次余额查询未返回可用的 MxUSD。PandaPools 创建 MINIMA / USDT 池时会在可用情况下使用参考价格。请先接收 MxUSD，或检查节点和余额后重试。",
+    "ru": "В этом ответе о балансе нет доступных для расходования MxUSD. PandaPools создаёт пулы MINIMA / USDT с опорной ценой, когда она доступна. Получите MxUSD или проверьте узел и баланс, затем повторите попытку.",
+    "uk": "У цій відповіді про баланс немає доступних для витрачання MxUSD. PandaPools створює пули MINIMA / USDT з опорною ціною, коли вона доступна. Отримайте MxUSD або перевірте вузол і баланс, а потім повторіть спробу."
   },
   "pools.createAvailableToken": {
     "en": "{token} · {amount} available",

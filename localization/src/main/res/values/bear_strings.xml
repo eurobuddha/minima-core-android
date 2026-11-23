@@ -4657,9 +4657,9 @@
     <!-- Arguments: id -->
     <string name="l10n_atomix_notice_consolidating_deal">"Consolidation in progress. Retry after confirmation. Deal: %1$s"</string>
     <!-- Arguments: amount, available -->
-    <string name="l10n_atomix_notice_fill_shortfall">"Can\'t fill deal — need %1$s mxUSDT, only %2$s free"</string>
+    <string name="l10n_atomix_notice_fill_shortfall">"Can\'t fill deal — need %1$s MxUSD, only %2$s free"</string>
     <!-- Arguments: amount -->
-    <string name="l10n_atomix_notice_fragmented">"mxUSDT too fragmented to lock %1$s in one tx — consolidate your coins"</string>
+    <string name="l10n_atomix_notice_fragmented">"MxUSD too fragmented to lock %1$s in one tx — consolidate your coins"</string>
     <!-- Arguments: error, id -->
     <string name="l10n_atomix_notice_consolidate_error">"%1$s. Open Wallet → Consolidate before accepting buys. Deal: %2$s"</string>
     <string name="l10n_atomix_otc_intro" formatted="false">"Negotiate a custom size + price directly with a liquidity provider, then settle as a trustless HTLC swap."</string>
@@ -4754,7 +4754,7 @@
     <string name="l10n_atomix_market_peg">"Peg ladder to %1$s (auto-reprice)"</string>
     <!-- Arguments: 0, 1 -->
     <string name="l10n_atomix_market_peg_help">"Each publish rebuilds levels around the %1$s midpoint using your step and sizes. Price moves beyond your threshold trigger a new publish. A stale feed uses wider spreads around the last good price. With no usable price, or after a 12-hour outage, the order is withdrawn. It returns when the feed recovers. %2$s liquidity on %1$s can be thin: use small sizes and a step above the usual spread. These prices are used for automatic trades."</string>
-    <string name="l10n_atomix_market_parity_help" formatted="false">"The midpoint is fixed at 1 USDT per mxUSDT. Each publish rebuilds the levels using your step, skew and sizes. These prices are used for automatic trades."</string>
+    <string name="l10n_atomix_market_parity_help" formatted="false">"The midpoint is fixed at 1 USDT per MxUSD. Each publish rebuilds the levels using your step, skew and sizes. These prices are used for automatic trades."</string>
     <string name="l10n_atomix_market_skew" formatted="false">"skew ±%"</string>
     <string name="l10n_atomix_market_reprice" formatted="false">"reprice ≥ %"</string>
     <string name="l10n_atomix_market_auto_fill" formatted="false">"AUTO-FILL — mid, step %, levels, then ask/bid sizes. You can edit individual levels afterward."</string>
@@ -5614,8 +5614,8 @@
     <string name="l10n_pools_create_before_title" formatted="false">"Before you create a pool"</string>
     <string name="l10n_pools_create_acknowledge_required" formatted="false">"Tick the box to confirm you understand."</string>
     <string name="l10n_pools_create_battery_required" formatted="false">"Either fix battery optimisation, or tick the second box."</string>
-    <string name="l10n_pools_create_get_token_title" formatted="false">"Get mxUSDT first"</string>
-    <string name="l10n_pools_create_get_token_body" formatted="false">"No spendable mxUSDT was reported in this balance read. PandaPools creates MINIMA / USDT pools using a reference price when available. Receive mxUSDT or check your node and balance before trying again."</string>
+    <string name="l10n_pools_create_get_token_title" formatted="false">"Get MxUSD first"</string>
+    <string name="l10n_pools_create_get_token_body" formatted="false">"No spendable MxUSD was reported in this balance read. PandaPools creates MINIMA / USDT pools using a reference price when available. Receive MxUSD or check your node and balance before trying again."</string>
     <!-- Arguments: token, amount -->
     <string name="l10n_pools_create_available_token">"%1$s · %2$s available"</string>
     <string name="l10n_pools_create_choose_token" formatted="false">"Pool MINIMA with…"</string>

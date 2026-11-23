@@ -212,7 +212,7 @@
       ]
     },
     {
-      "template": "Can't fill deal — need {0} mxUSDT, only {1} free",
+      "template": "Can't fill deal — need {0} MxUSD, only {1} free",
       "key": "atomixNotice.fillShortfall",
       "kinds": [
         "number",
@@ -220,7 +220,7 @@
       ]
     },
     {
-      "template": "mxUSDT too fragmented to lock {0} in one tx — consolidate your coins",
+      "template": "MxUSD too fragmented to lock {0} in one tx — consolidate your coins",
       "key": "atomixNotice.fragmented",
       "kinds": [
         "number"

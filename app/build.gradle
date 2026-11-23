@@ -317,8 +317,10 @@ android {
         // piece as admin): Future Cash refuses ';' and control characters in every command and resolves only an Mx
         // recipient with checkaddress; Atelier refuses them in every command (typed mint fields); the Salon identity
         // claim refuses ';' in name / bio and needs an http(s) profile URL; Block Explorer searches only a real Mx.
-        versionCode 384
-        versionName "2.2.114"
+        // 2.2.115: the Minima dollar token is MxUSD in every shipped string (five strings in four languages, the
+        // catalog and the message templates still said mxUSDT).
+        versionCode 385
+        versionName "2.2.115"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

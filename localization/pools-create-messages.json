@@ -13,7 +13,7 @@
     "Continue": "wallet.continue",
     "Tick the box to confirm you understand.": "pools.createAcknowledgeRequired",
     "Either fix battery optimisation, or tick the second box.": "pools.createBatteryRequired",
-    "Get mxUSDT first": "pools.createGetTokenTitle",
+    "Get MxUSD first": "pools.createGetTokenTitle",
     "Pool MINIMA with…": "pools.createChooseToken",
     "e.g. 1.90": "pools.createExampleUsdt",
     "Fetching MINIMA/USDT market price…": "pools.createFetchingPrice",

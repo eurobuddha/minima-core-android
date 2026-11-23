@@ -4630,9 +4630,9 @@
     <!-- Arguments: id -->
     <string name="l10n_atomix_notice_consolidating_deal">"正在合并币输出，请在确认后重试。交易：%1$s"</string>
     <!-- Arguments: amount, available -->
-    <string name="l10n_atomix_notice_fill_shortfall">"无法完成交易，需要 %1$s mxUSDT，可用仅 %2$s"</string>
+    <string name="l10n_atomix_notice_fill_shortfall">"无法完成交易，需要 %1$s MxUSD，可用仅 %2$s"</string>
     <!-- Arguments: amount -->
-    <string name="l10n_atomix_notice_fragmented">"mxUSDT 币输出过于分散，无法在一笔交易中锁定 %1$s，请先合并币输出"</string>
+    <string name="l10n_atomix_notice_fragmented">"MxUSD 币输出过于分散，无法在一笔交易中锁定 %1$s，请先合并币输出"</string>
     <!-- Arguments: error, id -->
     <string name="l10n_atomix_notice_consolidate_error">"%1$s。接受买入前，请打开钱包 → 合并。交易：%2$s"</string>
     <string name="l10n_atomix_otc_intro" formatted="false">"与流动性提供方直接协商数量和价格，然后通过无需信任对方的 HTLC 兑换结算。"</string>
@@ -4727,7 +4727,7 @@
     <string name="l10n_atomix_market_peg">"将阶梯报价锚定 %1$s（自动调价）"</string>
     <!-- Arguments: 0, 1 -->
     <string name="l10n_atomix_market_peg_help">"每次发布都会按您设置的间距和数量，围绕 %1$s 中间价重建档位。价格变动超过阈值时会重新发布。行情过期时，将围绕最后有效价格扩大价差。没有可用价格或行情中断 12 小时后，报价会被撤回；行情恢复后重新发布。%1$s 上 %2$s 的流动性可能不足：请使用较小数量，并将间距设在通常价差以上。这些价格用于自动交易。"</string>
-    <string name="l10n_atomix_market_parity_help" formatted="false">"中间价固定为每 mxUSDT 兑 1 USDT。每次发布都会按您设置的间距、偏移和数量重建档位。这些价格用于自动交易。"</string>
+    <string name="l10n_atomix_market_parity_help" formatted="false">"中间价固定为每 MxUSD 兑 1 USDT。每次发布都会按您设置的间距、偏移和数量重建档位。这些价格用于自动交易。"</string>
     <string name="l10n_atomix_market_skew" formatted="false">"偏移 ±%"</string>
     <string name="l10n_atomix_market_reprice" formatted="false">"调价 ≥ %"</string>
     <string name="l10n_atomix_market_auto_fill" formatted="false">"自动填充 — 中间价、间距 %、档位数，再设置卖盘/买盘数量。之后可逐档编辑。"</string>
@@ -5583,8 +5583,8 @@
     <string name="l10n_pools_create_before_title" formatted="false">"创建池之前"</string>
     <string name="l10n_pools_create_acknowledge_required" formatted="false">"请勾选复选框以确认您已了解。"</string>
     <string name="l10n_pools_create_battery_required" formatted="false">"请设置电池优化豁免，或勾选第二个复选框。"</string>
-    <string name="l10n_pools_create_get_token_title" formatted="false">"请先获取 mxUSDT"</string>
-    <string name="l10n_pools_create_get_token_body" formatted="false">"本次余额查询未返回可用的 mxUSDT。PandaPools 创建 MINIMA / USDT 池时会在可用情况下使用参考价格。请先接收 mxUSDT，或检查节点和余额后重试。"</string>
+    <string name="l10n_pools_create_get_token_title" formatted="false">"请先获取 MxUSD"</string>
+    <string name="l10n_pools_create_get_token_body" formatted="false">"本次余额查询未返回可用的 MxUSD。PandaPools 创建 MINIMA / USDT 池时会在可用情况下使用参考价格。请先接收 MxUSD，或检查节点和余额后重试。"</string>
     <!-- Arguments: token, amount -->
     <string name="l10n_pools_create_available_token">"%1$s · 可用 %2$s"</string>
     <string name="l10n_pools_create_choose_token" formatted="false">"将 MINIMA 与…组成池"</string>
