@@ -309,8 +309,12 @@ android {
         // WorkManager job and notification channels are cleared at every start; its bet secrets are kept.
         // 2.2.112: Dexicon (AtomiX engine): the wallet keeper's split asks for coinage:3 (every real node refuses a send
         // below 3, so the coinage:1 split never ran) and a failed keeper merge/split backs off quietly (logged, retried).
-        versionCode 382
-        versionName "2.2.112"
+        // 2.2.113: Future Cash: a real node's "coins coinid:" returns no row for a spent coin, so "no row" is unknown,
+        // never proof: a posted sweep with no row is swept once its output is at the safe (else unverified after 30
+        // blocks, never the theft alarm, never dropped as a reorg); a posted collect with no row is done once its
+        // output is at the payout (safe collects stay safe instead of falling back to the sweep).
+        versionCode 383
+        versionName "2.2.113"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

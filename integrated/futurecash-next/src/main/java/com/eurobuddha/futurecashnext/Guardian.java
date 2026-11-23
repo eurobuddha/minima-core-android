@@ -130,7 +130,9 @@ public final class Guardian {
             }
             final JSONObject coin = seenStakes.get(row.coinid);
             if (coin == null) {
-                // Not in this pass's relevant set. If it's spent, someone (probably us) collected it.
+                // Not in this pass's relevant set. If it has no unspent row, someone (probably us) collected it:
+                // the covenant pins the only output to the payout, and a reorg that undid the collect brings the
+                // stake back unspent (detect() re-arms it).
                 if (!node.coinIsUnspent(row.coinid)) store.setCollectStatus(row.coinid, Store.COLLECTED);
                 continue;
             }
@@ -167,6 +169,31 @@ public final class Guardian {
         return s4 > 0 && created > 0 && (tip - created) >= s4;
     }
 
+    /** A posted collect is done when the node reports its stake SPENT, or - since a real node returns NO row for a
+     *  spent coin, which a reorg also produces - when the stake has no row AND the collect's output is at the payout
+     *  (2.2.113: before, a real node's empty reply never finished a collect: after 8 blocks it fell back to DETECTED
+     *  and was then marked COLLECTED without its safe flag, sending even safe collects to the sweep). */
+    static boolean collectDone(Node.CoinState st, boolean outputArrived) {
+        return st == Node.CoinState.SPENT || (st == Node.CoinState.GONE && outputArrived);
+    }
+
+    /** The coin a collect paid to its payout: our token and amount, created at or after the collect. */
+    private JSONObject collectOutput(Store.CollectRow row, Set<String> claimed) {
+        final JSONArray arr = Node.arr(node.cmd("coins address:" + row.payout + " checkmempool:true"));
+        for (int i = 0; i < arr.length(); i++) {
+            final JSONObject c = arr.optJSONObject(i);
+            if (c == null || c.optBoolean("spent", false)) continue;
+            final String cid = c.optString("coinid", "");
+            if (cid.isEmpty() || claimed.contains(cid)) continue;
+            if (!row.tokenid.equals(c.optString("tokenid", ""))) continue;
+            if (!row.amount.equals(Node.outAmount(c))) continue;
+            final long created = parseLong(c.optString("created", "0"));
+            if (created > 0 && created < row.collectBlock) continue;   // predates our collect
+            return c;
+        }
+        return null;
+    }
+
     private void reconcileCollects(long tip) {
         for (Store.CollectRow row : store.collectsWithStatus(Store.COLLECT_POSTED, Store.COLLECT_POSTED_SAFE)) {
             // Terminal state comes from the LIVE at_risk flag, not just the posted status: a coin
@@ -175,7 +202,8 @@ public final class Guardian {
             final boolean safe = Store.COLLECT_POSTED_SAFE.equals(row.status) && !row.atRisk;
             final Node.CoinState st = node.coinState(row.coinid);
 
-            if (st == Node.CoinState.SPENT) {
+            if (collectDone(st, st == Node.CoinState.GONE
+                    && collectOutput(row, java.util.Collections.emptySet()) != null)) {
                 store.setCollectStatus(row.coinid, safe ? Store.COLLECTED_SAFE : Store.COLLECTED);
                 if (safe) notifier.notify("Future Cash", "Collected " + row.amount + " safely");
                 cfg.log(Cfg.LVL_INFO, "Collected " + row.amount
@@ -203,21 +231,7 @@ public final class Guardian {
     private void detectCollectedForSweep(long tip) {
         final Set<String> claimed = new HashSet<>(store.allSweepCoinIds());
         for (Store.CollectRow row : store.collectsWithStatus(Store.COLLECTED)) {
-            final JSONObject r = node.cmd("coins address:" + row.payout + " checkmempool:true");
-            final JSONArray arr = Node.arr(r);
-            JSONObject found = null;
-            for (int i = 0; i < arr.length(); i++) {
-                final JSONObject c = arr.optJSONObject(i);
-                if (c == null || c.optBoolean("spent", false)) continue;
-                final String cid = c.optString("coinid", "");
-                if (cid.isEmpty() || claimed.contains(cid)) continue;
-                if (!row.tokenid.equals(c.optString("tokenid", ""))) continue;
-                if (!row.amount.equals(Node.outAmount(c))) continue;
-                final long created = parseLong(c.optString("created", "0"));
-                if (created > 0 && created < row.collectBlock) continue;   // predates our collect
-                found = c;
-                break;
-            }
+            final JSONObject found = collectOutput(row, claimed);
             if (found == null) continue;
             final String cid = found.optString("coinid", "");
             claimed.add(cid);
@@ -321,56 +335,73 @@ public final class Guardian {
 
         for (Store.SweepRow row : store.sweepsWithStatus(Store.SWEEP_POSTED)) {
             final Node.CoinState st = node.coinState(row.coinid);
-
-            // REORG: the collected coin we were sweeping no longer exists, so the collect that made
-            // it was rolled back. Nothing was swept and nothing was stolen — drop the sweep row and
-            // let detection re-arm the stake. Marking this SWEPT (what treating "gone" as "spent"
-            // did) both lost the stake and raised the compromise alarm on an ordinary shallow reorg.
-            if (st == Node.CoinState.GONE) {
-                store.deleteSweep(row.coinid);
-                cfg.log(Cfg.LVL_WARN, "Sweep abandoned — the collected coin was rolled back by a chain "
-                        + "reorg; the stake will be collected again | coin:" + row.coinid
-                        + " | on:" + row.address);
-                continue;
-            }
-
-            if (st == Node.CoinState.SPENT) {
-                if (!canVerify) { markSwept(row, null, safe, tip); continue; }
+            String outCoin = null;
+            boolean reliable = true;
+            if (canVerify && (st == Node.CoinState.SPENT || st == Node.CoinState.GONE)) {
                 final Object[] res = outputArrivedAtSafe(safe, row);
-                final boolean reliable = (Boolean) res[0];
-                final String outCoin = (String) res[1];
-
-                if (outCoin != null) { markSwept(row, outCoin, safe, tip); continue; }
-                if (reliable && (tip - row.sweepBlock) >= VERIFY_GRACE) {
+                reliable = (Boolean) res[0];
+                outCoin = (String) res[1];
+            }
+            switch (sweepVerdict(st, canVerify, reliable, outCoin != null, tip - row.sweepBlock)) {
+                case SWEPT:
+                    markSwept(row, outCoin, safe, tip);
+                    break;
+                case TAKEN:
                     store.setSweepStatus(row.coinid, Store.TAKEN, null);
                     notifier.notify("Future Cash ⚠️", "A collected stake (" + row.amount + ") was spent but "
                             + "did NOT reach your safe address. Your old key may be compromised — check now.");
                     cfg.log(Cfg.LVL_ERROR, "⚠️ ALERT: a collected stake was spent but NOT seen at your safe "
                             + "— check for key-reuse loss | coin:" + row.coinid + " | from:" + row.address);
-                    continue;
-                }
-                if (!reliable && (tip - row.sweepBlock) >= VERIFY_MAX) {
+                    break;
+                case UNVERIFIED:
                     store.setSweepStatus(row.coinid, Store.SWEPT, "unverified");
                     notifier.notify("Future Cash", "A stake was spent but the node couldn't confirm it "
                             + "reached your safe address — please verify it arrived.");
                     cfg.log(Cfg.LVL_WARN, "Sweep spent but UNVERIFIED — please check it arrived | coin:"
                             + row.coinid + " | from:" + row.address);
-                }
-                continue;
+                    break;
+                case RETRY:
+                    retrySweep(row);
+                    break;
+                default:
+                    break;   // WAIT
             }
+        }
+    }
 
-            if (tip - row.sweepBlock >= RETRY_BLOCKS) {
-                store.setSweepStatus(row.coinid, Store.PENDING, null);
-                if (row.attempts == MAX_ATTEMPTS) {
-                    notifier.notify("Future Cash", "A sweep keeps failing — funds still on an exposed "
-                            + "address. Is your vault unlocked?");
-                    cfg.log(Cfg.LVL_ERROR, "Sweep still failing after " + row.attempts + " tries | coin:"
-                            + row.coinid + " | from:" + row.address);
-                } else {
-                    cfg.log(Cfg.LVL_WARN, "Sweep retry scheduled | coin:" + row.coinid
-                            + " | from:" + row.address);
-                }
-            }
+    enum Sweep { WAIT, SWEPT, TAKEN, UNVERIFIED, RETRY }
+
+    /**
+     * What a posted sweep becomes this pass. {@code coins coinid:} on a real node returns NO row once the coin is
+     * spent (never a row with spent:true), so GONE is how our own sweep normally looks - and a reorg that undid the
+     * collect looks the same. "No row" is unknown, never proof: only our output at the safe proves the sweep, and only
+     * a node that reports the coin SPENT with no output at the safe is evidence of theft (2.2.113; the old reading of
+     * GONE as a reorg dropped every successful sweep's row with a "rolled back" log).
+     */
+    static Sweep sweepVerdict(Node.CoinState st, boolean canVerify, boolean reliable, boolean arrived, long age) {
+        if (st == Node.CoinState.GONE) {
+            if (arrived) return Sweep.SWEPT;
+            return age >= VERIFY_MAX ? Sweep.UNVERIFIED : Sweep.WAIT;
+        }
+        if (st == Node.CoinState.SPENT) {
+            if (!canVerify || arrived) return Sweep.SWEPT;
+            if (reliable && age >= VERIFY_GRACE) return Sweep.TAKEN;
+            if (!reliable && age >= VERIFY_MAX) return Sweep.UNVERIFIED;
+            return Sweep.WAIT;
+        }
+        return age >= RETRY_BLOCKS ? Sweep.RETRY : Sweep.WAIT;
+    }
+
+    private void retrySweep(Store.SweepRow row) {
+        store.setSweepStatus(row.coinid, Store.PENDING, null);
+        if (row.attempts == MAX_ATTEMPTS) {
+            notifier.notify("Future Cash", "A sweep keeps failing — funds still on an exposed "
+                    + "address. Is your vault unlocked?");
+            cfg.log(Cfg.LVL_ERROR, "Sweep still failing after " + row.attempts + " tries | coin:"
+                    + row.coinid + " | from:" + row.address);
+        } else {
+            cfg.log(Cfg.LVL_WARN, "Sweep retry scheduled | coin:" + row.coinid
+                    + " | from:" + row.address);
         }
     }
 

@@ -123,11 +123,13 @@ public final class Node {
     }
 
     /**
-     * Coin liveness, with "gone" kept distinct from "spent".
+     * Coin liveness, with "no row" kept distinct from "spent".
      *
-     * <p>A spent coin stays in the node's coin DB; a coin that has VANISHED was rolled back by a
-     * reorg. Treating the second as the first is how an ordinary shallow reorg turns into "your key
-     * may be compromised" — the loudest alarm this app has.
+     * <p>GONE means the node returned NO row. A real node's {@code coins coinid:} never returns a spent
+     * coin (it answers [] once the coin is spent), and a coin a reorg rolled back also answers [], so
+     * GONE proves neither: callers need other evidence (our output arriving where it was sent). Only a
+     * row flagged spent:true is SPENT. Reading GONE as "spent" or as "reorg" is how an ordinary sweep
+     * turned into a "rolled back" log, and a reorg into "your key may be compromised".
      */
     public enum CoinState { UNSPENT, SPENT, GONE, UNKNOWN }
 
