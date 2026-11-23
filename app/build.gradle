@@ -319,8 +319,9 @@ android {
         // claim refuses ';' in name / bio and needs an http(s) profile URL; Block Explorer searches only a real Mx.
         // 2.2.115: the Minima dollar token is MxUSD in every shipped string (five strings in four languages, the
         // catalog and the message templates still said mxUSDT).
-        versionCode 385
-        versionName "2.2.115"
+        // 2.2.116: test only - the Keets inbox test drops the ChatDb singleton afterwards (its rows broke ChatBackupTest).
+        versionCode 386
+        versionName "2.2.116"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

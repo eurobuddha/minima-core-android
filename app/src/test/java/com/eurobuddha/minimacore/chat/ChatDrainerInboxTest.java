@@ -10,6 +10,7 @@ import com.eurobuddha.minimacore.i18n.Language;
 import com.eurobuddha.minimacore.service.MinimaService;
 import com.eurobuddha.minimacore.utils.MinimaCMD;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.minima.utils.json.JSONArray;
@@ -31,6 +32,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ChatDrainerInboxTest {
     static final String PEER = "0x" + "AB".repeat(32), ATTACKER = "0x" + "66".repeat(32);
     static final String SEND = "send amount:1000 address:" + ATTACKER + " tokenid:0x00";
+
+    /** ChatDb is a process singleton: drop it so the rows written here never reach another test class. */
+    @After public void forgetTheChatDb() throws Exception {
+        java.lang.reflect.Field f = ChatDb.class.getDeclaredField("instance");
+        f.setAccessible(true);
+        ChatDb db = (ChatDb) f.get(null);
+        if (db != null) db.close();
+        f.set(null, null);
+    }
 
     static JSONObject row(String id, Object from) {
         JSONObject r = new JSONObject();
