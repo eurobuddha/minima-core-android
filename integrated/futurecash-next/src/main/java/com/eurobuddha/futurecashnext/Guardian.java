@@ -327,7 +327,7 @@ public final class Guardian {
         return new Object[]{true, null};
     }
 
-    private void reconcileSweeps(long tip, String safe) {
+    void reconcileSweeps(long tip, String safe) {
         // Only a SAMENODE safe can be verified: an external safe is required to be an address this
         // node does NOT track, so the lookup is always empty — which the check below would read as
         // "verified absent" and report as theft. No ability to verify is not evidence of loss.
@@ -353,8 +353,24 @@ public final class Guardian {
                     cfg.log(Cfg.LVL_ERROR, "⚠️ ALERT: a collected stake was spent but NOT seen at your safe "
                             + "— check for key-reuse loss | coin:" + row.coinid + " | from:" + row.address);
                     break;
+                case NOT_ARRIVED:
+                    // The safe is this node's own address and the lookup worked: nothing arrived. Not SWEPT.
+                    store.setSweepStatus(row.coinid, Store.UNVERIFIED, "not-arrived");
+                    notifier.notify("Future Cash ⚠️", "A stake left its exposed address but did NOT arrive at your "
+                            + "safe address. The key of the exposed address may be compromised — check now.");
+                    cfg.log(Cfg.LVL_ERROR, "⚠️ ALERT: a swept coin left the exposed address but did NOT arrive at "
+                            + "your safe — the key may be compromised | coin:" + row.coinid + " | from:" + row.address);
+                    break;
+                case UNVERIFIABLE:
+                    // An external safe is an address this node does not track: sent, never proven. Not SWEPT, no alarm.
+                    store.setSweepStatus(row.coinid, Store.UNVERIFIED, "external");
+                    notifier.notify("Future Cash", "A stake was sent to your external safe address. This node "
+                            + "cannot verify that it arrived.");
+                    cfg.log(Cfg.LVL_INFO, "Sweep sent to the external safe — cannot be verified from this node | coin:"
+                            + row.coinid + " | from:" + row.address + " | to:" + safe);
+                    break;
                 case UNVERIFIED:
-                    store.setSweepStatus(row.coinid, Store.SWEPT, "unverified");
+                    store.setSweepStatus(row.coinid, Store.UNVERIFIED, "unverified");
                     notifier.notify("Future Cash", "A stake was spent but the node couldn't confirm it "
                             + "reached your safe address — please verify it arrived.");
                     cfg.log(Cfg.LVL_WARN, "Sweep spent but UNVERIFIED — please check it arrived | coin:"
@@ -369,7 +385,7 @@ public final class Guardian {
         }
     }
 
-    enum Sweep { WAIT, SWEPT, TAKEN, UNVERIFIED, RETRY }
+    enum Sweep { WAIT, SWEPT, TAKEN, NOT_ARRIVED, UNVERIFIABLE, UNVERIFIED, RETRY }
 
     /**
      * What a posted sweep becomes this pass. {@code coins coinid:} on a real node returns NO row once the coin is
@@ -377,14 +393,23 @@ public final class Guardian {
      * collect looks the same. "No row" is unknown, never proof: only our output at the safe proves the sweep, and only
      * a node that reports the coin SPENT with no output at the safe is evidence of theft (2.2.113; the old reading of
      * GONE as a reorg dropped every successful sweep's row with a "rolled back" log).
+     *
+     * <p>SWEPT is written ONLY for an output seen at the safe (2.2.120). The unproven endings are told apart, when
+     * each is reached is unchanged: NOT_ARRIVED - the safe is this node's, the lookup worked and nothing arrived by
+     * VERIFY_MAX (said plainly: left the exposed address, did not arrive, the key may be compromised);
+     * UNVERIFIABLE - an external safe, which this node can never see (sent, can not be verified, no alarm);
+     * UNVERIFIED - the lookup itself kept failing.
      */
     static Sweep sweepVerdict(Node.CoinState st, boolean canVerify, boolean reliable, boolean arrived, long age) {
         if (st == Node.CoinState.GONE) {
             if (arrived) return Sweep.SWEPT;
-            return age >= VERIFY_MAX ? Sweep.UNVERIFIED : Sweep.WAIT;
+            if (age < VERIFY_MAX) return Sweep.WAIT;
+            if (!canVerify) return Sweep.UNVERIFIABLE;
+            return reliable ? Sweep.NOT_ARRIVED : Sweep.UNVERIFIED;
         }
         if (st == Node.CoinState.SPENT) {
-            if (!canVerify || arrived) return Sweep.SWEPT;
+            if (arrived) return Sweep.SWEPT;
+            if (!canVerify) return Sweep.UNVERIFIABLE;
             if (reliable && age >= VERIFY_GRACE) return Sweep.TAKEN;
             if (!reliable && age >= VERIFY_MAX) return Sweep.UNVERIFIED;
             return Sweep.WAIT;
@@ -517,7 +542,7 @@ public final class Guardian {
 
     public static final class Status {
         public long tip;
-        public int watching, collecting, collectedSafe, collected, sweeping, swept, taken;
+        public int watching, collecting, collectedSafe, collected, sweeping, swept, taken, unverified;
         public double readySafeN, readySafeA, readyRiskN, readyRiskA;
         public double pendRiskN, pendRiskSoonest, pendRiskA;
         public boolean vaultLocked, walletLocked;
@@ -534,6 +559,7 @@ public final class Guardian {
         s.sweeping = store.countSweep(Store.PENDING) + store.countSweep(Store.SWEEP_POSTED);
         s.swept = store.countSweep(Store.SWEPT);
         s.taken = store.countSweep(Store.TAKEN);
+        s.unverified = store.countSweep(Store.UNVERIFIED);
         final double[] safe = store.readyTotals(tip, false), risk = store.readyTotals(tip, true);
         s.readySafeN = safe[0]; s.readySafeA = safe[1];
         s.readyRiskN = risk[0]; s.readyRiskA = risk[1];

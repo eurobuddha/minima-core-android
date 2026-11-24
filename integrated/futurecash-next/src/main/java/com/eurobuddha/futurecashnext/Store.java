@@ -45,6 +45,10 @@ public final class Store extends SQLiteOpenHelper {
     public static final String SWEEP_POSTED = "SWEEP_POSTED";
     public static final String SWEPT        = "SWEPT";
     public static final String TAKEN        = "TAKEN";
+    /** Left the exposed address, arrival at the safe NOT proven (2.2.120; before, these rows were written SWEPT).
+     *  The note says why: "not-arrived" (own safe, nothing came), "external" (can not be seen from this node),
+     *  "unverified" (the lookup failed). Terminal like SWEPT: never re-posted, never re-queued. */
+    public static final String UNVERIFIED   = "UNVERIFIED";
 
     public Store(Context ctx) {
         super(ctx.getApplicationContext(), DB, null, VERSION);
@@ -306,7 +310,7 @@ public final class Store extends SQLiteOpenHelper {
     /** Clear completed history, keeping anything still in flight. */
     public void resetHistory() {
         final SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM fc_sweep WHERE status IN (?,?)", new Object[]{SWEPT, TAKEN});
+        db.execSQL("DELETE FROM fc_sweep WHERE status IN (?,?,?)", new Object[]{SWEPT, TAKEN, UNVERIFIED});
         db.execSQL("DELETE FROM fc_collect WHERE status IN (?,?,?)",
                 new Object[]{DETECTED, SWEEP_QUEUED, COLLECTED_SAFE});
     }

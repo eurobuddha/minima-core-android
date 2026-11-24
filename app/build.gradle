@@ -333,8 +333,13 @@ android {
         // collection, also a stored collection row), Salon (name, bio, URL; its NodeApi now has the central ';'
         // refusal), NFT Wallet (control characters, URL brackets, stored collection rows). Future Cash: checked, its
         // typed fields are exact shapes already (tests added).
-        versionCode 389
-        versionName "2.2.119"
+        // 2.2.120: Future Cash wording, no fund-moving change: a sweep is recorded SWEPT only when its output is seen
+        // at the safe. Unproven endings get the new status UNVERIFIED (before: SWEPT) and say which kind: own safe and
+        // nothing arrived after the verify window - "left its exposed address but did NOT arrive at your safe, the key
+        // may be compromised"; external safe - "sent, this node cannot verify that it arrived" (no alarm); the lookup
+        // failed - the old "couldn't confirm" notice.
+        versionCode 390
+        versionName "2.2.120"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

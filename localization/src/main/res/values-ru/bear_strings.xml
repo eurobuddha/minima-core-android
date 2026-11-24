@@ -1434,6 +1434,8 @@
     <string name="l10n_future_notice_stopped_body" formatted="false">"Без безопасного адреса защитник не мог спасти платёж под угрозой. Откройте приложение и выберите, куда направлять спасённые средства."</string>
     <string name="l10n_future_notice_collect_failed" formatted="false">"Получение продолжает завершаться ошибкой — проверьте этот узел"</string>
     <string name="l10n_future_notice_unverified" formatted="false">"Платёж потрачен, но узел не смог подтвердить поступление на безопасный адрес. Проверьте, что средства дошли."</string>
+    <string name="l10n_future_notice_not_arrived" formatted="false">"Платёж покинул раскрытый адрес, но НЕ дошёл до безопасного адреса. Ключ раскрытого адреса мог быть скомпрометирован — проверьте сейчас."</string>
+    <string name="l10n_future_notice_external_sent" formatted="false">"Платёж отправлен на ваш внешний безопасный адрес. Этот узел не может проверить, что он дошёл."</string>
     <string name="l10n_future_notice_sweep_failed" formatted="false">"Перевод продолжает завершаться ошибкой, средства остаются на раскрытом адресе. Хранилище разблокировано?"</string>
     <string name="l10n_future_notice_rescue_off" formatted="false">"Future Cash: спасение выключено"</string>
     <string name="l10n_future_reason_reused" formatted="false">"безопасный адрес отмечен как ПОВТОРНО ИСПОЛЬЗОВАННЫЙ"</string>
@@ -1549,6 +1551,8 @@
     <string name="l10n_future_log_sweep_reorg" formatted="false">"Перевод отменён: полученная монета отменена реорганизацией цепочки; платёж будет получен снова"</string>
     <string name="l10n_future_log_missing_safe" formatted="false">"⚠️ ВНИМАНИЕ: полученный платёж потрачен, но НЕ найден на безопасном адресе. Проверьте возможную потерю из-за повторного использования ключа"</string>
     <string name="l10n_future_log_sweep_unverified" formatted="false">"Монета перевода потрачена, но поступление НЕ ПОДТВЕРЖДЕНО. Проверьте, что средства дошли"</string>
+    <string name="l10n_future_log_sweep_not_arrived" formatted="false">"⚠️ ВНИМАНИЕ: монета перевода покинула раскрытый адрес, но НЕ дошла до безопасного адреса — ключ мог быть скомпрометирован"</string>
+    <string name="l10n_future_log_sweep_external" formatted="false">"Перевод отправлен на внешний безопасный адрес — этот узел не может его проверить"</string>
     <string name="l10n_future_log_sweep_retry" formatted="false">"Назначена повторная попытка перевода"</string>
     <string name="l10n_future_log_vault_locked" formatted="false">"Хранилище заблокировано. Спасение приостановлено до разблокировки"</string>
     <string name="l10n_future_log_repair_contract" formatted="false">"Исправление регистрации контракта: узел отслеживал все платежи FutureCash/Maximize в цепочке, включая чужие"</string>

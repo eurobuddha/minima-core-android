@@ -13,14 +13,29 @@ public class SpentCoinReadTest {
     @Test public void aSweepWithNoRowIsSweptOnceItsOutputIsAtTheSafe() {
         assertEquals(Guardian.Sweep.SWEPT, Guardian.sweepVerdict(GONE, true, true, true, 1));
         for (long age : new long[]{0, Guardian.VERIFY_GRACE, Guardian.VERIFY_MAX - 1})
-            assertEquals(Guardian.Sweep.WAIT, Guardian.sweepVerdict(GONE, true, true, false, age));
-        // no row and no output: unknown, never the theft alarm and never dropped as a reorg
-        for (boolean canVerify : new boolean[]{true, false}) for (boolean reliable : new boolean[]{true, false})
-            assertEquals(Guardian.Sweep.UNVERIFIED, Guardian.sweepVerdict(GONE, canVerify, reliable, false, Guardian.VERIFY_MAX));
+            for (boolean canVerify : new boolean[]{true, false})
+                assertEquals(Guardian.Sweep.WAIT, Guardian.sweepVerdict(GONE, canVerify, true, false, age));
+    }
+
+    /** No row and no output is never SWEPT: the three unproven endings are told apart (2.2.120). */
+    @Test public void anUnprovenSweepIsNeverSweptAndSaysWhichKindItIs() {
+        // own safe, the lookup worked, nothing arrived: said plainly
+        assertEquals(Guardian.Sweep.NOT_ARRIVED, Guardian.sweepVerdict(GONE, true, true, false, Guardian.VERIFY_MAX));
+        // own safe, the lookup itself failed
+        assertEquals(Guardian.Sweep.UNVERIFIED, Guardian.sweepVerdict(GONE, true, false, false, Guardian.VERIFY_MAX));
+        // external safe: this node can never see it - sent, not verifiable, no alarm
+        for (boolean reliable : new boolean[]{true, false}) {
+            assertEquals(Guardian.Sweep.UNVERIFIABLE, Guardian.sweepVerdict(GONE, false, reliable, false, Guardian.VERIFY_MAX));
+            assertEquals(Guardian.Sweep.UNVERIFIABLE, Guardian.sweepVerdict(SPENT, false, reliable, false, 0));
+        }
+        for (Node.CoinState st : new Node.CoinState[]{GONE, SPENT, UNSPENT, UNKNOWN})
+            for (boolean canVerify : new boolean[]{true, false}) for (boolean reliable : new boolean[]{true, false})
+                for (long age = 0; age <= Guardian.VERIFY_MAX + 1; age++)
+                    assertNotEquals("SWEPT without the output at the safe", Guardian.Sweep.SWEPT,
+                            Guardian.sweepVerdict(st, canVerify, reliable, false, age));
     }
 
     @Test public void aNodeThatReportsSpentKeepsTheOldRules() {
-        assertEquals(Guardian.Sweep.SWEPT, Guardian.sweepVerdict(SPENT, false, true, false, 0));
         assertEquals(Guardian.Sweep.SWEPT, Guardian.sweepVerdict(SPENT, true, true, true, 0));
         assertEquals(Guardian.Sweep.WAIT, Guardian.sweepVerdict(SPENT, true, true, false, Guardian.VERIFY_GRACE - 1));
         assertEquals(Guardian.Sweep.TAKEN, Guardian.sweepVerdict(SPENT, true, true, false, Guardian.VERIFY_GRACE));

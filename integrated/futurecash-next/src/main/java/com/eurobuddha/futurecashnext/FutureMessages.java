@@ -21,6 +21,8 @@ public final class FutureMessages {
             case "It had no safe destination, so it could not rescue an at-risk stake. Open the app and pick where rescued funds should go.": return Language.msg(l10n_future_notice_stopped_body);
             case "A collection keeps failing — check this node": return Language.msg(l10n_future_notice_collect_failed);
             case "A stake was spent but the node couldn't confirm it reached your safe address — please verify it arrived.": return Language.msg(l10n_future_notice_unverified);
+            case "A stake left its exposed address but did NOT arrive at your safe address. The key of the exposed address may be compromised — check now.": return Language.msg(l10n_future_notice_not_arrived);
+            case "A stake was sent to your external safe address. This node cannot verify that it arrived.": return Language.msg(l10n_future_notice_external_sent);
             case "A sweep keeps failing — funds still on an exposed address. Is your vault unlocked?": return Language.msg(l10n_future_notice_sweep_failed);
             case "Future Cash: rescue is off": return Language.msg(l10n_future_notice_rescue_off);
             case "your safe destination is flagged as a REUSED address": return Language.msg(l10n_future_reason_reused);
@@ -100,6 +102,8 @@ public final class FutureMessages {
             case "Sweep abandoned — the collected coin was rolled back by a chain reorg; the stake will be collected again": return Language.msg(l10n_future_log_sweep_reorg);
             case "⚠️ ALERT: a collected stake was spent but NOT seen at your safe — check for key-reuse loss": return Language.msg(l10n_future_log_missing_safe);
             case "Sweep spent but UNVERIFIED — please check it arrived": return Language.msg(l10n_future_log_sweep_unverified);
+            case "⚠️ ALERT: a swept coin left the exposed address but did NOT arrive at your safe — the key may be compromised": return Language.msg(l10n_future_log_sweep_not_arrived);
+            case "Sweep sent to the external safe — cannot be verified from this node": return Language.msg(l10n_future_log_sweep_external);
             case "Sweep retry scheduled": return Language.msg(l10n_future_log_sweep_retry);
             case "Vault locked — rescue paused until you unlock it": return Language.msg(l10n_future_log_vault_locked);
             case "Repairing contract registration — this node was tracking every FutureCash/Maximize stake on the chain, not just yours": return Language.msg(l10n_future_log_repair_contract);

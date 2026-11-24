@@ -1434,6 +1434,8 @@
     <string name="l10n_future_notice_stopped_body" formatted="false">"Без безпечної адреси захисник не міг врятувати платіж під загрозою. Відкрийте застосунок і виберіть, куди спрямовувати врятовані кошти."</string>
     <string name="l10n_future_notice_collect_failed" formatted="false">"Отримання й далі завершується помилкою — перевірте цей вузол"</string>
     <string name="l10n_future_notice_unverified" formatted="false">"Платіж витрачено, але вузол не зміг підтвердити надходження на безпечну адресу. Перевірте, чи кошти дійшли."</string>
+    <string name="l10n_future_notice_not_arrived" formatted="false">"Платіж залишив розкриту адресу, але НЕ дійшов до безпечної адреси. Ключ розкритої адреси міг бути скомпрометований — перевірте зараз."</string>
+    <string name="l10n_future_notice_external_sent" formatted="false">"Платіж надіслано на вашу зовнішню безпечну адресу. Цей вузол не може перевірити, що він дійшов."</string>
     <string name="l10n_future_notice_sweep_failed" formatted="false">"Переказ і далі завершується помилкою, кошти залишаються на розкритій адресі. Сховище розблоковане?"</string>
     <string name="l10n_future_notice_rescue_off" formatted="false">"Future Cash: порятунок вимкнено"</string>
     <string name="l10n_future_reason_reused" formatted="false">"безпечну адресу позначено як ПОВТОРНО ВИКОРИСТАНУ"</string>
@@ -1549,6 +1551,8 @@
     <string name="l10n_future_log_sweep_reorg" formatted="false">"Переказ скасовано: отриману монету скасовано реорганізацією ланцюга; платіж буде отримано знову"</string>
     <string name="l10n_future_log_missing_safe" formatted="false">"⚠️ УВАГА: отриманий платіж витрачено, але НЕ знайдено на безпечній адресі. Перевірте можливу втрату через повторне використання ключа"</string>
     <string name="l10n_future_log_sweep_unverified" formatted="false">"Монету переказу витрачено, але надходження НЕ ПІДТВЕРДЖЕНО. Перевірте, чи кошти дійшли"</string>
+    <string name="l10n_future_log_sweep_not_arrived" formatted="false">"⚠️ УВАГА: монета переказу залишила розкриту адресу, але НЕ дійшла до безпечної адреси — ключ міг бути скомпрометований"</string>
+    <string name="l10n_future_log_sweep_external" formatted="false">"Переказ надіслано на зовнішню безпечну адресу — цей вузол не може його перевірити"</string>
     <string name="l10n_future_log_sweep_retry" formatted="false">"Призначено повторну спробу переказу"</string>
     <string name="l10n_future_log_vault_locked" formatted="false">"Сховище заблоковане. Порятунок призупинено до розблокування"</string>
     <string name="l10n_future_log_repair_contract" formatted="false">"Виправлення реєстрації контракту: вузол відстежував усі платежі FutureCash/Maximize у ланцюгу, включно з чужими"</string>
