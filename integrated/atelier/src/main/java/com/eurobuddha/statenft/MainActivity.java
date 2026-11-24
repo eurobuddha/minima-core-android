@@ -1977,6 +1977,10 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_safe_urls));
             return;
         }
+        JSONObject typedCollection = new JSONObject();
+        put(typedCollection, "name", n); put(typedCollection, "description", d); put(typedCollection, "ext", x);
+        if (collectionItemTraits != null) put(typedCollection, "traits", collectionItemTraits);
+        if (unsafeTyped(typedCollection)) return;
         final String extValue = x;
         if ("embed".equals(createMode)) {
             ensureCreateImages(count);
@@ -2344,6 +2348,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
             if (url.isEmpty() || !validCmdUrl(url)) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_image_url_required)); return; }
         }
         if (!validCmdUrl(nftExternal.trim()) || !validCmdUrl(nftWeb.trim())) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_safe_urls)); return; }
+        if (unsafeTyped(StateNft.nftMetadata(n, nftDesc.trim(), "", nftOwner.trim(), "", "", StateNft.traitsToAttributes(nftTraits)))) return;
         if (!hostGatePassed) {
             java.util.List<String> urls = new java.util.ArrayList<>();
             if (!nftEmbed && nftUrl.trim().startsWith("http")) urls.add(nftUrl.trim());
@@ -2517,6 +2522,7 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         int dec = parseIntSafe(tokDecimals.trim());
         if (dec < 0 || dec > 16) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_decimals_range)); return; }
         if (!validCmdUrl(tokUrl.trim())) { toast(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_safe_icon_url)); return; }
+        if (unsafeTyped(StateNft.tokenMeta(n, tokDesc.trim(), tokTicker.trim(), "", tokPairs))) return;
         if (!hostGatePassed && tokUrl.trim().startsWith("http")) {
             java.util.List<String> urls = new java.util.ArrayList<>();
             urls.add(tokUrl.trim());
@@ -5356,6 +5362,15 @@ public class MainActivity extends AppCompatActivity implements ViewerScreen.Host
         intent.setClassName(getPackageName(),"com.eurobuddha.minimacore.main.MainActivity");
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
+    }
+
+    /** Typed mint text is refused at the field, never escaped (StateNft.badChar): toasts the rule with the field
+     *  and the character, and returns true when any typed piece of the metadata is unsafe. */
+    private boolean unsafeTyped(JSONObject typedMeta) {
+        String problem = StateNft.metaProblem(typedMeta);
+        if (problem == null) return false;
+        toast(Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_atelier_create_safe_text), " (" + problem + ")"));
+        return true;
     }
 
     private void toast(CharSequence s) {

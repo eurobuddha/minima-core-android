@@ -3283,7 +3283,9 @@ public class MainActivity extends AppCompatActivity {
         if(claiming) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_claiming)); return; }
         handle=Hosting.slug(handle);
         if(handle.isEmpty() || name.trim().isEmpty()) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_required)); return; }
-        if(!Args.isSafeMeta(name) || !Args.isSafeMeta(bio)) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_safe_metadata)); return; }
+        // Refused at the field, never escaped: the message names the field and the character.
+        String badName=Args.badChar(name), badBio=Args.badChar(bio);
+        if(badName!=null || badBio!=null) { publicationStatus(status,Language.join(Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_safe_metadata)," ("+(badName!=null?"name: "+badName:"bio: "+badBio)+")")); return; }
         Hosting.Profile host=HostingStore.getDefault(this);
         if(host==null) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_hosting_first)); return; }
         if(!nodeUp || node==null) { publicationStatus(status,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_waiting_node)); return; }
@@ -3353,6 +3355,8 @@ public class MainActivity extends AppCompatActivity {
     private void mintIdentity(IdentityClaim op) {
         if(!requireClaim(op)) return;
         JSONObject pending=new JSONObject(),changes=new JSONObject(),meta=new JSONObject();
+        // The last line before the command is built: every typed piece of the claim, whatever path brought it here.
+        if(Args.badChar(op.handle)!=null || Args.badChar(op.name)!=null || Args.badChar(op.bio)!=null || !Args.isSafeUrl(op.url)) { endClaim(op,Language.msg(com.eurobuddha.minimacore.i18n.R.string.l10n_salon_setup_safe_metadata)); return; }
         try {
             pending.put("handle",op.handle).put("url",op.url).put("signer",op.signer);
             changes.put("claimPending",pending);

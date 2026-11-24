@@ -139,6 +139,12 @@ public final class MintEngine {
             setError(ctx, row, gate, done);
             return;
         }
+        // A row saved by an older version re-enters here without the screen's check, and would be re-posted.
+        String wv = row.optString("webvalidate");
+        if (StateNft.unsafeMeta(m) || StateNft.unsafeText(wv) || wv.contains(" ") || StateNft.unsafeText(row.optString("creatorpk"))) {
+            setError(ctx, row, "Unsafe collection text: quotes, backslashes, semicolons, brackets and line breaks are not allowed. Nothing was sent to the node.", done);
+            return;
+        }
         String cmd = "tokencreate name:" + StateNft.tokenMetadata(m).toString()
                 + " amount:" + row.optInt("size")
                 + " decimals:0"

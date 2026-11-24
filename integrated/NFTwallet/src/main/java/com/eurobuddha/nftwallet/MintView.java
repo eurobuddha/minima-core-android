@@ -1695,8 +1695,8 @@ public class MintView extends BaseView {
         // Braces/brackets break the node's JSON-parameter tokenizer (it counts them without string
         // awareness), truncating name:{...} — and for collections the broken command would be
         // re-posted every block from the persisted row with no way to edit it.
-        if (s.contains("\"") || s.contains("\\") || s.contains(";") || s.contains("\n")
-                || s.contains("{") || s.contains("}") || s.contains("[") || s.contains("]")) {
+        // StateNft.unsafeText: the same list plus every control character (a tab starts a new parameter).
+        if (StateNft.unsafeText(s)) {
             return "may not contain quotes, backslashes, semicolons or brackets.";
         }
         return null;
@@ -1704,7 +1704,7 @@ public class MintView extends BaseView {
 
     /** Characters that break the command line or the metadata JSON. */
     private boolean hasBreakers(String u) {
-        return u.contains(" ") || u.contains("\"") || u.contains("\\") || u.contains(";") || u.contains("\n");
+        return u.contains(" ") || StateNft.unsafeText(u);
     }
 
     /** URLs ride the command line outside JSON too (webvalidate:) — no spaces or breakers allowed. */

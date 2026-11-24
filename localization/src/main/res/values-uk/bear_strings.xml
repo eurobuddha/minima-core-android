@@ -7097,7 +7097,7 @@
     <string name="l10n_salon_setup_fetching_key" formatted="false">"Отримуємо ваш ключ… повторіть за кілька секунд."</string>
     <string name="l10n_salon_setup_publishing" formatted="false">"Публікуємо вашу сторінку…"</string>
     <string name="l10n_salon_setup_checking" formatted="false">"Сторінку опубліковано. Перевіряємо ідентичність…"</string>
-    <string name="l10n_salon_setup_safe_metadata" formatted="false">"Видаліть { } та переноси рядків з імені й опису."</string>
+    <string name="l10n_salon_setup_safe_metadata" formatted="false">"Видаліть { } [ ] \" \\ ; та переноси рядків з імені й опису."</string>
     <string name="l10n_salon_setup_confirming" formatted="false">"Створюємо токен… очікуємо підтвердження. Залиште сторінку відкритою."</string>
     <string name="l10n_salon_setup_pending" formatted="false">"Токен надіслано на створення, очікується підтвердження. Відкрийте сторінку трохи пізніше — застосунок знайде вашу ідентичність."</string>
     <string name="l10n_salon_setup_opened" formatted="false">"Ваш Salon відкрито."</string>
@@ -7273,7 +7273,7 @@
     <string name="l10n_atelier_create_editions_range" formatted="false">"Кількість примірників: від 1 до 1000"</string>
     <string name="l10n_atelier_create_image_required" formatted="false">"Спочатку виберіть зображення роботи"</string>
     <string name="l10n_atelier_create_image_url_required" formatted="false">"Вкажіть URL зображення без пробілів, лапок і крапок з комою"</string>
-    <string name="l10n_atelier_create_safe_urls" formatted="false">"URL не мають містити пробіли, лапки чи крапки з комою"</string>
+    <string name="l10n_atelier_create_safe_urls" formatted="false">"URL не мають містити пробіли, лапки, крапки з комою, дужки чи зворотні скісні риски"</string>
     <string name="l10n_atelier_create_nft_minted" formatted="false">"NFT створено, він з’явиться в галереї після підтвердження"</string>
     <string name="l10n_atelier_create_art_shrunk" formatted="false">"Зображення зменшено для підпису й передачі NFT"</string>
     <string name="l10n_atelier_create_key_failed" formatted="false">"Не вдалося отримати ключ підпису"</string>
@@ -7292,7 +7292,8 @@
     <string name="l10n_atelier_create_name_required" formatted="false">"Назва має містити 1–40 символів"</string>
     <string name="l10n_atelier_create_supply_required" formatted="false">"Обсяг випуску має бути додатним цілим числом"</string>
     <string name="l10n_atelier_create_decimals_range" formatted="false">"Кількість знаків після коми: від 0 до 16"</string>
-    <string name="l10n_atelier_create_safe_icon_url" formatted="false">"URL значка не має містити пробіли, лапки чи крапки з комою"</string>
+    <string name="l10n_atelier_create_safe_icon_url" formatted="false">"URL значка не має містити пробіли, лапки, крапки з комою, дужки чи зворотні скісні риски"</string>
+    <string name="l10n_atelier_create_safe_text" formatted="false">"Назви, описи та властивості не мають містити { } [ ] \" \\ ; чи переноси рядків"</string>
     <string name="l10n_atelier_create_icon_shrunk" formatted="false">"Значок зменшено, щоб зберегти підпис токена"</string>
     <string name="l10n_atelier_create_icon_too_large" formatted="false">"Значок і поля перевищують ліміт підписаного запису. Використайте URL значка або скоротіть поля"</string>
     <string name="l10n_atelier_create_record_too_large" formatted="false">"Запис перевищує ліміт для підпису. Скоротіть опис або додаткові поля"</string>

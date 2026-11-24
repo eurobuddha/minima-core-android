@@ -34860,10 +34860,10 @@
     "uk": "Сторінку опубліковано. Перевіряємо ідентичність…"
   },
   "salonSetup.safeMetadata": {
-    "en": "Please remove { } or line breaks from your name/bio.",
-    "zh-Hans": "请移除姓名或简介中的 { } 和换行符。",
-    "ru": "Удалите { } и переносы строк из имени и описания.",
-    "uk": "Видаліть { } та переноси рядків з імені й опису."
+    "en": "Please remove { } [ ] \" \\ ; and line breaks from your name/bio.",
+    "zh-Hans": "请移除姓名或简介中的 { } [ ] \" \\ ; 和换行符。",
+    "ru": "Удалите { } [ ] \" \\ ; и переносы строк из имени и описания.",
+    "uk": "Видаліть { } [ ] \" \\ ; та переноси рядків з імені й опису."
   },
   "salonSetup.confirming": {
     "en": "Minting… confirming (leave open).",
@@ -35820,10 +35820,10 @@
     "uk": "Вкажіть URL зображення без пробілів, лапок і крапок з комою"
   },
   "atelierCreate.safeUrls": {
-    "en": "URLs must not contain spaces, quotes or semicolons",
-    "zh-Hans": "URL 不得含空格、引号或分号",
-    "ru": "URL не должны содержать пробелы, кавычки или точки с запятой",
-    "uk": "URL не мають містити пробіли, лапки чи крапки з комою"
+    "en": "URLs must not contain spaces, quotes, semicolons, brackets or backslashes",
+    "zh-Hans": "URL 不得含空格、引号、分号、括号或反斜杠",
+    "ru": "URL не должны содержать пробелы, кавычки, точки с запятой, скобки или обратные косые черты",
+    "uk": "URL не мають містити пробіли, лапки, крапки з комою, дужки чи зворотні скісні риски"
   },
   "atelierCreate.nftMinted": {
     "en": "NFT minted — it appears in the gallery once confirmed",
@@ -35934,10 +35934,16 @@
     "uk": "Кількість знаків після коми: від 0 до 16"
   },
   "atelierCreate.safeIconUrl": {
-    "en": "Icon URL must not contain spaces, quotes or semicolons",
-    "zh-Hans": "图标 URL 不得含空格、引号或分号",
-    "ru": "URL значка не должен содержать пробелы, кавычки или точки с запятой",
-    "uk": "URL значка не має містити пробіли, лапки чи крапки з комою"
+    "en": "Icon URL must not contain spaces, quotes, semicolons, brackets or backslashes",
+    "zh-Hans": "图标 URL 不得含空格、引号、分号、括号或反斜杠",
+    "ru": "URL значка не должен содержать пробелы, кавычки, точки с запятой, скобки или обратные косые черты",
+    "uk": "URL значка не має містити пробіли, лапки, крапки з комою, дужки чи зворотні скісні риски"
+  },
+  "atelierCreate.safeText": {
+    "en": "Names, descriptions and traits must not contain { } [ ] \" \\ ; or line breaks",
+    "zh-Hans": "名称、描述和特征不得含 { } [ ] \" \\ ; 或换行符",
+    "ru": "Названия, описания и свойства не должны содержать { } [ ] \" \\ ; и переносы строк",
+    "uk": "Назви, описи та властивості не мають містити { } [ ] \" \\ ; чи переноси рядків"
   },
   "atelierCreate.iconShrunk": {
     "en": "icon auto-slimmed to keep the token signed",

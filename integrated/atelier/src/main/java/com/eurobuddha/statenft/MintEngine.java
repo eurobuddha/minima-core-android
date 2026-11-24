@@ -192,6 +192,15 @@ public final class MintEngine {
         });
     }
 
+    /** The collection create's typed pieces (name, description, extension, URLs, traits), checked one by one
+     *  before the JSON is built into the command: null when safe, else the refusal naming field and character. */
+    static String unsafeCreate(JSONObject tokenMeta, JSONObject row) {
+        String problem = StateNft.metaProblem(tokenMeta);
+        if (problem == null && !Util.validCmdUrl(row.optString("webvalidate"))) problem = "webvalidate";
+        if (problem == null && StateNft.badChar(row.optString("creatorpk")) != null) problem = "creatorpk";
+        return problem == null ? null : "Unsafe collection text (" + problem + "): { } [ ] \" \\ ; and line breaks are not allowed. Nothing was sent to the node.";
+    }
+
     private static void postTokenCreate(Context ctx, NodeApi node, JSONObject row, int tip, Done done) {
         if (LocalStore.createAttempted(ctx,row)) {
             setError(ctx,row,"A collection submission is already recorded. Checking for its confirmation; recovery will not mint another copy.",done);
@@ -207,6 +216,9 @@ public final class MintEngine {
             setError(ctx, row, gate, done);
             return;
         }
+        // A row saved by an older version (or a restored one) re-enters here without the screen's check.
+        String unsafe = unsafeCreate(tokenMeta, row);
+        if (unsafe != null) { setError(ctx, row, unsafe, done); return; }
         String cmd = "tokencreate name:" + tokenMeta
                 + " amount:" + row.optInt("size")
                 + " decimals:0"

@@ -7097,7 +7097,7 @@
     <string name="l10n_salon_setup_fetching_key" formatted="false">"Получаем ваш ключ… повторите через несколько секунд."</string>
     <string name="l10n_salon_setup_publishing" formatted="false">"Публикуем вашу страницу…"</string>
     <string name="l10n_salon_setup_checking" formatted="false">"Страница опубликована. Проверяем идентичность…"</string>
-    <string name="l10n_salon_setup_safe_metadata" formatted="false">"Удалите { } и переносы строк из имени и описания."</string>
+    <string name="l10n_salon_setup_safe_metadata" formatted="false">"Удалите { } [ ] \" \\ ; и переносы строк из имени и описания."</string>
     <string name="l10n_salon_setup_confirming" formatted="false">"Создаём токен… ожидаем подтверждения. Оставьте страницу открытой."</string>
     <string name="l10n_salon_setup_pending" formatted="false">"Токен отправлен на создание, ожидается подтверждение. Откройте страницу чуть позже — приложение найдёт вашу идентичность."</string>
     <string name="l10n_salon_setup_opened" formatted="false">"Ваш Salon открыт."</string>
@@ -7273,7 +7273,7 @@
     <string name="l10n_atelier_create_editions_range" formatted="false">"Количество экземпляров: от 1 до 1000"</string>
     <string name="l10n_atelier_create_image_required" formatted="false">"Сначала выберите изображение работы"</string>
     <string name="l10n_atelier_create_image_url_required" formatted="false">"Укажите URL изображения без пробелов, кавычек и точек с запятой"</string>
-    <string name="l10n_atelier_create_safe_urls" formatted="false">"URL не должны содержать пробелы, кавычки или точки с запятой"</string>
+    <string name="l10n_atelier_create_safe_urls" formatted="false">"URL не должны содержать пробелы, кавычки, точки с запятой, скобки или обратные косые черты"</string>
     <string name="l10n_atelier_create_nft_minted" formatted="false">"NFT создан и появится в галерее после подтверждения"</string>
     <string name="l10n_atelier_create_art_shrunk" formatted="false">"Изображение уменьшено для подписи и передачи NFT"</string>
     <string name="l10n_atelier_create_key_failed" formatted="false">"Не удалось получить ключ подписи"</string>
@@ -7292,7 +7292,8 @@
     <string name="l10n_atelier_create_name_required" formatted="false">"Название должно содержать 1–40 символов"</string>
     <string name="l10n_atelier_create_supply_required" formatted="false">"Объём выпуска должен быть положительным целым числом"</string>
     <string name="l10n_atelier_create_decimals_range" formatted="false">"Число знаков после запятой: от 0 до 16"</string>
-    <string name="l10n_atelier_create_safe_icon_url" formatted="false">"URL значка не должен содержать пробелы, кавычки или точки с запятой"</string>
+    <string name="l10n_atelier_create_safe_icon_url" formatted="false">"URL значка не должен содержать пробелы, кавычки, точки с запятой, скобки или обратные косые черты"</string>
+    <string name="l10n_atelier_create_safe_text" formatted="false">"Названия, описания и свойства не должны содержать { } [ ] \" \\ ; и переносы строк"</string>
     <string name="l10n_atelier_create_icon_shrunk" formatted="false">"Значок уменьшен, чтобы сохранить подпись токена"</string>
     <string name="l10n_atelier_create_icon_too_large" formatted="false">"Значок и поля превышают лимит подписанной записи. Используйте URL значка или сократите поля"</string>
     <string name="l10n_atelier_create_record_too_large" formatted="false">"Запись превышает лимит для подписи. Сократите описание или дополнительные поля"</string>

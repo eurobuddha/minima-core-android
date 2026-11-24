@@ -7033,7 +7033,7 @@
     <string name="l10n_salon_setup_fetching_key" formatted="false">"Fetching your key… try again in a moment."</string>
     <string name="l10n_salon_setup_publishing" formatted="false">"Publishing your page…"</string>
     <string name="l10n_salon_setup_checking" formatted="false">"Page live. Checking identity…"</string>
-    <string name="l10n_salon_setup_safe_metadata" formatted="false">"Please remove { } or line breaks from your name/bio."</string>
+    <string name="l10n_salon_setup_safe_metadata" formatted="false">"Please remove { } [ ] \" \\ ; and line breaks from your name/bio."</string>
     <string name="l10n_salon_setup_confirming" formatted="false">"Minting… confirming (leave open)."</string>
     <string name="l10n_salon_setup_pending" formatted="false">"Minted — confirming. Reopen shortly, it\'ll adopt."</string>
     <string name="l10n_salon_setup_opened" formatted="false">"Your Salon is open."</string>
@@ -7209,7 +7209,7 @@
     <string name="l10n_atelier_create_editions_range" formatted="false">"Editions must be 1–1000"</string>
     <string name="l10n_atelier_create_image_required" formatted="false">"Choose an artwork image first"</string>
     <string name="l10n_atelier_create_image_url_required" formatted="false">"Image URL required — no spaces, quotes or semicolons"</string>
-    <string name="l10n_atelier_create_safe_urls" formatted="false">"URLs must not contain spaces, quotes or semicolons"</string>
+    <string name="l10n_atelier_create_safe_urls" formatted="false">"URLs must not contain spaces, quotes, semicolons, brackets or backslashes"</string>
     <string name="l10n_atelier_create_nft_minted" formatted="false">"NFT minted — it appears in the gallery once confirmed"</string>
     <string name="l10n_atelier_create_art_shrunk" formatted="false">"artwork auto-shrunk so the NFT signs and travels"</string>
     <string name="l10n_atelier_create_key_failed" formatted="false">"could not fetch the signing key"</string>
@@ -7228,7 +7228,8 @@
     <string name="l10n_atelier_create_name_required" formatted="false">"Name must be 1–40 characters"</string>
     <string name="l10n_atelier_create_supply_required" formatted="false">"Supply must be a positive whole number"</string>
     <string name="l10n_atelier_create_decimals_range" formatted="false">"Decimals must be 0–16"</string>
-    <string name="l10n_atelier_create_safe_icon_url" formatted="false">"Icon URL must not contain spaces, quotes or semicolons"</string>
+    <string name="l10n_atelier_create_safe_icon_url" formatted="false">"Icon URL must not contain spaces, quotes, semicolons, brackets or backslashes"</string>
+    <string name="l10n_atelier_create_safe_text" formatted="false">"Names, descriptions and traits must not contain { } [ ] \" \\ ; or line breaks"</string>
     <string name="l10n_atelier_create_icon_shrunk" formatted="false">"icon auto-slimmed to keep the token signed"</string>
     <string name="l10n_atelier_create_icon_too_large" formatted="false">"icon + fields exceed the signed record budget - hosted icon URL or shorter fields"</string>
     <string name="l10n_atelier_create_record_too_large" formatted="false">"record exceeds the signed budget - shorten the description or custom fields"</string>

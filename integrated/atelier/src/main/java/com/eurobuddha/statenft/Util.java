@@ -60,10 +60,11 @@ public final class Util {
         return nested == null ? root : nested;
     }
 
-    /** URLs ride the tokencreate command line outside JSON — no spaces, quotes or semicolons. */
+    /** URLs ride the tokencreate command line (inside the JSON, and webvalidate: outside it): no spaces, quotes,
+     *  semicolons, and none of { } [ ] \ or a control character (StateNft.badChar: the node's tokenizer). */
     public static boolean validCmdUrl(String u) {
         if (u == null || u.isEmpty()) return true;
-        return !u.contains(" ") && !u.contains("\"") && !u.contains("'") && !u.contains(";");
+        return !u.contains(" ") && !u.contains("'") && StateNft.badChar(u) == null;
     }
 
     public static String enc(String s) {

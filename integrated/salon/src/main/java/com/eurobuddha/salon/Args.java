@@ -27,21 +27,39 @@ final class Args {
     /** A plain decimal amount — no exponent, sign, NaN, or Infinity. */
     static boolean isDecimal(String s) { return s != null && DEC.matcher(s).matches(); }
 
-    /** True if the free text is safe to embed inside a JSON metadata value passed to a
-     *  command (rejects command/JSON-structure breakers; quotes are JSON-escaped upstream). */
-    static boolean isSafeMeta(String s) {
-        if (s == null) return true;
+    /** Typed text is REFUSED, never escaped. The node's command tokenizer counts { } [ ] with one depth counter
+     *  even inside a JSON string (a "]" in a name closes "name:{...}" early and the rest becomes new parameters),
+     *  ends a quoted value at the first '"', has no backslash escape, splits the whole command at every ';' and
+     *  starts a new parameter at a control character.
+     *  @return the first such character as shown to the user, or null when the text is safe */
+    static String badChar(String s) {
+        if (s == null) return null;
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            // ';' too: the node splits the tokencreate command at every ';' (even inside the JSON) and runs each piece.
-            if (c == '{' || c == '}' || c == ';' || c < 0x20 || c == 0x7f) return false;
+            if (c < 0x20 || c == 0x7f) return "line break / control character";
+            if ("{}[]\"\\;".indexOf(c) >= 0) return String.valueOf(c);
         }
-        return true;
+        return null;
     }
 
-    /** The hosted profile URL rides the identity tokencreate: http(s), no spaces, quotes, ';' or control characters. */
+    /** True if the free text is safe inside the JSON metadata of a node command: none of { } [ ] " \ ; and no
+     *  control character (see badChar). */
+    static boolean isSafeMeta(String s) { return badChar(s) == null; }
+
+    /** The hosted profile URL rides the identity tokencreate: http(s), no spaces, quotes, and nothing badChar refuses. */
     static boolean isSafeUrl(String u) {
-        return u != null && u.matches("https?://[^\\s\"';{}]+") && isSafeMeta(u);
+        return u != null && u.matches("https?://[^\\s']+") && isSafeMeta(u);
+    }
+
+    /** Every command is checked once more where it leaves the app: the node splits command text at every ';'
+     *  and starts a new parameter at a control character, and runs each piece as admin. */
+    static boolean unsafeCommand(String command) {
+        if (command == null) return true;
+        for (int i = 0; i < command.length(); i++) {
+            char c = command.charAt(i);
+            if (c == ';' || c < 0x20 || c == 0x7f) return true;
+        }
+        return false;
     }
 
     private Args() {}

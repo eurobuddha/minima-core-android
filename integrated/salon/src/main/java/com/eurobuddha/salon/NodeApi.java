@@ -144,6 +144,12 @@ public class NodeApi {
     }
 
     public void cmd(String command, long timeoutMs, Cb cb) {
+        if (Args.unsafeCommand(command)) {
+            // Same central refusal as Atelier and Future Cash. Nothing is sent.
+            android.util.Log.w("Salon", "SECURITY refused a node command holding ';' or a control character");
+            mMain.post(() -> { if (cb != null) cb.onError("Unsafe command data. Nothing was sent to the node."); });
+            return;
+        }
         mMain.post(() -> request(timeoutFor(command) == WRITE_TIMEOUT_MS, timeoutMs, listener -> mApi.Command(command, listener), cb));
     }
 

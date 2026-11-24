@@ -173,6 +173,26 @@ public final class StateNft {
         return "sign";
     }
 
+    /** Typed text is REFUSED, never escaped. The node's command tokenizer counts { } [ ] with one depth counter
+     *  even inside a JSON string (a "]" in a name closes "name:{...}" early and the rest becomes new parameters),
+     *  ends a quoted value at the first '"', has no backslash escape, splits the whole command at every ';' and
+     *  starts a new parameter at a control character. */
+    public static boolean unsafeText(String typed) {
+        if (typed == null) return false;
+        for (int i = 0; i < typed.length(); i++) {
+            char c = typed.charAt(i);
+            if (c < 32 || c == 127 || "{}[]\"\\;".indexOf(c) >= 0) return true;
+        }
+        return false;
+    }
+
+    /** True when any typed piece of a collection (name, description, base URL, extension, icon, links) could
+     *  not ride tokencreate safely. Checked on the pieces, before the JSON is built. */
+    public static boolean unsafeMeta(Meta m) {
+        return unsafeText(m.name) || unsafeText(m.description) || unsafeText(m.mode) || unsafeText(m.base)
+                || unsafeText(m.ext) || unsafeText(m.icon) || unsafeText(m.externalUrl);
+    }
+
     public static JSONObject tokenMetadata(Meta m) {
         JSONObject meta = new JSONObject();
         put(meta, "name", m.name);

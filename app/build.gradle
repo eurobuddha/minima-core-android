@@ -327,8 +327,14 @@ android {
         // that is not exactly 0x + 64 hex (2.2.110 checked only new inbox rows; a row stored earlier or restored from
         // a backup still reached the command from the thread screen). The thread screen closes on such a key, the
         // database removes such rows once at upgrade (counted in the log), a backup restore skips them (counted).
-        versionCode 388
-        versionName "2.2.118"
+        // 2.2.119: SECURITY, typed mint / claim text is refused at the field when it holds any of { } [ ] " \ ; or a
+        // control character (2.2.114 refused only ';' and control characters; the node's tokenizer counts brackets
+        // inside JSON strings, so "Nice art] amount:1 burn:1000" added parameters to tokencreate): Atelier (NFT, token,
+        // collection, also a stored collection row), Salon (name, bio, URL; its NodeApi now has the central ';'
+        // refusal), NFT Wallet (control characters, URL brackets, stored collection rows). Future Cash: checked, its
+        // typed fields are exact shapes already (tests added).
+        versionCode 389
+        versionName "2.2.119"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

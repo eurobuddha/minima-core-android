@@ -280,6 +280,55 @@ public final class StateNft {
         return cmds;
     }
 
+    /** Typed text is REFUSED, never escaped. The node's command tokenizer counts { } [ ] with one depth counter
+     *  even inside a JSON string (a "]" in a name closes "name:{...}" early and the rest of the name becomes new
+     *  parameters: burn:, webvalidate:, a second amount:), ends a quoted value at the first '"', has no backslash
+     *  escape, splits the whole command at every ';' and starts a new parameter at a control character.
+     *  @return the first such character as shown to the user, or null when the text is safe */
+    public static String badChar(String typed) {
+        if (typed == null) return null;
+        for (int i = 0; i < typed.length(); i++) {
+            char c = typed.charAt(i);
+            if (c < 32 || c == 127) return "line break / control character";
+            if ("{}[]\"\\;".indexOf(c) >= 0) return String.valueOf(c);
+        }
+        return null;
+    }
+
+    /** Checks every typed PIECE of a metadata object (each key and each string value, nested traits and the
+     *  attributes array included) before it is serialised: the finished JSON legitimately holds { } [ ] and ".
+     *  @return "field: character" for the first unsafe piece, or null */
+    public static String metaProblem(Object meta) { return metaProblem(meta, "metadata"); }
+
+    private static String metaProblem(Object value, String field) {
+        if (value instanceof JSONObject) {
+            JSONObject o = (JSONObject) value;
+            for (java.util.Iterator<String> k = o.keys(); k.hasNext(); ) {
+                String key = k.next();
+                String bad = badChar(key);
+                if (bad != null) return field + " key: " + bad;
+                String inner = metaProblem(o.opt(key), key);
+                if (inner != null) return inner;
+            }
+        } else if (value instanceof JSONArray) {
+            JSONArray a = (JSONArray) value;
+            for (int i = 0; i < a.length(); i++) {
+                String inner = metaProblem(a.opt(i), field);
+                if (inner != null) return inner;
+            }
+        } else if (value instanceof String) {
+            String bad = badChar((String) value);
+            if (bad != null) return field + ": " + bad;
+        }
+        return null;
+    }
+
+    private static JSONObject safeMeta(JSONObject meta) {
+        String problem = metaProblem(meta);
+        if (problem != null) throw new IllegalArgumentException("Unsafe mint text (" + problem + "). Nothing was sent to the node.");
+        return meta;
+    }
+
     /** Wallet-standard single-NFT metadata (NFTwallet-compatible), with an
      *  OpenSea-style attributes array when traits are supplied. */
     public static JSONObject nftMetadata(String name, String desc, String url, String owner,
@@ -299,7 +348,10 @@ public final class StateNft {
     public static String nftCreateCommand(String name, String desc, String url, String owner,
                                           String externalUrl, String webvalidate, JSONArray attributes,
                                           int editions, String signPk) {
-        JSONObject meta = nftMetadata(name, desc, url, owner, externalUrl, webvalidate, attributes);
+        // The last line: the screens refuse the same text first, with the field and the character named.
+        JSONObject meta = safeMeta(nftMetadata(name, desc, url, owner, externalUrl, webvalidate, attributes));
+        if (!Util.validCmdUrl(webvalidate) || (signPk != null && badChar(signPk) != null))
+            throw new IllegalArgumentException("Unsafe mint text (webvalidate). Nothing was sent to the node.");
         String cmd = "tokencreate name:" + meta + " amount:" + editions + " decimals:0";
         if (webvalidate != null && !webvalidate.isEmpty()) cmd += " webvalidate:" + webvalidate;
         if (signPk != null && !signPk.isEmpty()) cmd += " signtoken:" + signPk;
@@ -349,7 +401,7 @@ public final class StateNft {
 
     public static String tokenCreateCommand(String name, String desc, String ticker, String url,
                                             long supply, int decimals, java.util.List<String[]> pairs) {
-        return "tokencreate name:" + tokenMeta(name, desc, ticker, url, pairs)
+        return "tokencreate name:" + safeMeta(tokenMeta(name, desc, ticker, url, pairs))
                 + " amount:" + supply + " decimals:" + decimals;
     }
 
