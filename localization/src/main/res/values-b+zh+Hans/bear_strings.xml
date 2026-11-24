@@ -1515,7 +1515,7 @@
     <string name="l10n_future_log_sweep_reorg" formatted="false">"已取消转移：领取的币因区块链重组而回滚，将重新领取锁定付款"</string>
     <string name="l10n_future_log_missing_safe" formatted="false">"⚠️ 警报：已领取的付款被花费，但未在安全地址发现，请检查是否因密钥重复使用而损失资金"</string>
     <string name="l10n_future_log_sweep_unverified" formatted="false">"转移的币已花费，但尚未验证，请检查是否到账"</string>
-    <string name="l10n_future_log_sweep_not_arrived" formatted="false">"⚠️ 警报：转移的币已离开暴露的地址，但未到达安全地址，密钥可能已泄露"</string>
+    <string name="l10n_future_log_sweep_not_arrived" formatted="false">"⚠️ 转移的币已离开暴露的地址，30 个区块后仍未在安全地址看到——可能已到达并被花费、链重组，或密钥可能已泄露"</string>
     <string name="l10n_future_log_sweep_external" formatted="false">"已转移到外部安全地址，此节点无法验证"</string>
     <string name="l10n_future_log_sweep_retry" formatted="false">"已安排重试转移"</string>
     <string name="l10n_future_log_vault_locked" formatted="false">"保险库已锁定，救援暂停，请解锁后继续"</string>

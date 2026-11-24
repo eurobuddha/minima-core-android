@@ -1551,7 +1551,7 @@
     <string name="l10n_future_log_sweep_reorg" formatted="false">"Перевод отменён: полученная монета отменена реорганизацией цепочки; платёж будет получен снова"</string>
     <string name="l10n_future_log_missing_safe" formatted="false">"⚠️ ВНИМАНИЕ: полученный платёж потрачен, но НЕ найден на безопасном адресе. Проверьте возможную потерю из-за повторного использования ключа"</string>
     <string name="l10n_future_log_sweep_unverified" formatted="false">"Монета перевода потрачена, но поступление НЕ ПОДТВЕРЖДЕНО. Проверьте, что средства дошли"</string>
-    <string name="l10n_future_log_sweep_not_arrived" formatted="false">"⚠️ ВНИМАНИЕ: монета перевода покинула раскрытый адрес, но НЕ дошла до безопасного адреса — ключ мог быть скомпрометирован"</string>
+    <string name="l10n_future_log_sweep_not_arrived" formatted="false">"⚠️ Монета перевода покинула раскрытый адрес и через 30 блоков не замечена на безопасном адресе — дошла и уже потрачена, реорганизация цепи, либо ключ мог быть скомпрометирован"</string>
     <string name="l10n_future_log_sweep_external" formatted="false">"Перевод отправлен на внешний безопасный адрес — этот узел не может его проверить"</string>
     <string name="l10n_future_log_sweep_retry" formatted="false">"Назначена повторная попытка перевода"</string>
     <string name="l10n_future_log_vault_locked" formatted="false">"Хранилище заблокировано. Спасение приостановлено до разблокировки"</string>

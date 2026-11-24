@@ -359,8 +359,7 @@ public final class Guardian {
                     notifier.notify("Future Cash ⚠️", "A stake left its exposed address and was not seen at your safe "
                             + "address after 30 blocks. It may have arrived and already been spent, or a chain reorg may have undone it. "
                             + "If neither, the key of the exposed address may be compromised. Check the coin in the Future Cash log.");
-                    cfg.log(Cfg.LVL_ERROR, "⚠️ ALERT: a swept coin left the exposed address but did NOT arrive at "
-                            + "your safe — the key may be compromised | coin:" + row.coinid + " | from:" + row.address);
+                    cfg.log(Cfg.LVL_ERROR, "⚠️ A swept coin left the exposed address and was not seen at your safe after 30 blocks — arrived and already spent, a chain reorg, or the key may be compromised | coin:" + row.coinid + " | from:" + row.address);
                     break;
                 case UNVERIFIABLE:
                     // An external safe is an address this node does not track: sent, never proven. Not SWEPT, no alarm.

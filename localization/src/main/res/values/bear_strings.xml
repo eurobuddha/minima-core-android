@@ -1527,7 +1527,7 @@
     <string name="l10n_future_log_sweep_reorg" formatted="false">"Sweep abandoned — the collected coin was rolled back by a chain reorg; the stake will be collected again"</string>
     <string name="l10n_future_log_missing_safe" formatted="false">"⚠️ ALERT: a collected stake was spent but NOT seen at your safe — check for key-reuse loss"</string>
     <string name="l10n_future_log_sweep_unverified" formatted="false">"Sweep spent but UNVERIFIED — please check it arrived"</string>
-    <string name="l10n_future_log_sweep_not_arrived" formatted="false">"⚠️ ALERT: a swept coin left the exposed address but did NOT arrive at your safe — the key may be compromised"</string>
+    <string name="l10n_future_log_sweep_not_arrived" formatted="false">"⚠️ A swept coin left the exposed address and was not seen at your safe after 30 blocks — arrived and already spent, a chain reorg, or the key may be compromised"</string>
     <string name="l10n_future_log_sweep_external" formatted="false">"Sweep sent to the external safe — cannot be verified from this node"</string>
     <string name="l10n_future_log_sweep_retry" formatted="false">"Sweep retry scheduled"</string>
     <string name="l10n_future_log_vault_locked" formatted="false">"Vault locked — rescue paused until you unlock it"</string>

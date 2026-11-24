@@ -1551,7 +1551,7 @@
     <string name="l10n_future_log_sweep_reorg" formatted="false">"Переказ скасовано: отриману монету скасовано реорганізацією ланцюга; платіж буде отримано знову"</string>
     <string name="l10n_future_log_missing_safe" formatted="false">"⚠️ УВАГА: отриманий платіж витрачено, але НЕ знайдено на безпечній адресі. Перевірте можливу втрату через повторне використання ключа"</string>
     <string name="l10n_future_log_sweep_unverified" formatted="false">"Монету переказу витрачено, але надходження НЕ ПІДТВЕРДЖЕНО. Перевірте, чи кошти дійшли"</string>
-    <string name="l10n_future_log_sweep_not_arrived" formatted="false">"⚠️ УВАГА: монета переказу залишила розкриту адресу, але НЕ дійшла до безпечної адреси — ключ міг бути скомпрометований"</string>
+    <string name="l10n_future_log_sweep_not_arrived" formatted="false">"⚠️ Монета переказу залишила розкриту адресу і через 30 блоків не помічена на безпечній адресі — надійшла і вже витрачена, реорганізація ланцюга, або ключ міг бути скомпрометований"</string>
     <string name="l10n_future_log_sweep_external" formatted="false">"Переказ надіслано на зовнішню безпечну адресу — цей вузол не може його перевірити"</string>
     <string name="l10n_future_log_sweep_retry" formatted="false">"Призначено повторну спробу переказу"</string>
     <string name="l10n_future_log_vault_locked" formatted="false">"Сховище заблоковане. Порятунок призупинено до розблокування"</string>

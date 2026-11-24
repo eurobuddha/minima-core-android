@@ -357,8 +357,10 @@ android {
         // 2.2.124 = that selector AND the fixes of 2.2.118-2.2.123 on this line, in one build.
         // 2.2.125 (review of 2.2.122-2.2.123, approved): tests for the restore path of a pay address and a real-shaped
         // address in the instrumented chat test; a chat database marked version 4 opens (onDowngrade does nothing).
-        versionCode 395
-        versionName "2.2.125"
+        // 2.2.126: Future Cash: the LOG line for a sweep not seen at the safe says what the notice says since 2.2.123 (the
+        // ordinary causes before a compromised key); it still carried the old alarm.
+        versionCode 396
+        versionName "2.2.126"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

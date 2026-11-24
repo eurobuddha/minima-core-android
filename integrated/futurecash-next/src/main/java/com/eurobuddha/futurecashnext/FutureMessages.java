@@ -102,7 +102,7 @@ public final class FutureMessages {
             case "Sweep abandoned — the collected coin was rolled back by a chain reorg; the stake will be collected again": return Language.msg(l10n_future_log_sweep_reorg);
             case "⚠️ ALERT: a collected stake was spent but NOT seen at your safe — check for key-reuse loss": return Language.msg(l10n_future_log_missing_safe);
             case "Sweep spent but UNVERIFIED — please check it arrived": return Language.msg(l10n_future_log_sweep_unverified);
-            case "⚠️ ALERT: a swept coin left the exposed address but did NOT arrive at your safe — the key may be compromised": return Language.msg(l10n_future_log_sweep_not_arrived);
+            case "⚠️ A swept coin left the exposed address and was not seen at your safe after 30 blocks — arrived and already spent, a chain reorg, or the key may be compromised": return Language.msg(l10n_future_log_sweep_not_arrived);
             case "Sweep sent to the external safe — cannot be verified from this node": return Language.msg(l10n_future_log_sweep_external);
             case "Sweep retry scheduled": return Language.msg(l10n_future_log_sweep_retry);
             case "Vault locked — rescue paused until you unlock it": return Language.msg(l10n_future_log_vault_locked);
