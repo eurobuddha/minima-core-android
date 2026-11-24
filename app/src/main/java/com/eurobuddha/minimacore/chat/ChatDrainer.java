@@ -99,7 +99,7 @@ public class ChatDrainer {
     private static String mLastErr = null;
     private static String mLastBadId = null;
     /** A keets identity: exactly 0x + 64 hex. Inbox ids are the sidecar's hex digests. */
-    static final java.util.regex.Pattern PEER_KEY = java.util.regex.Pattern.compile("0x[0-9a-fA-F]{64}");
+    static final java.util.regex.Pattern PEER_KEY = ChatSchema.PEER_KEY;
     static final java.util.regex.Pattern INBOX_ID = java.util.regex.Pattern.compile("[0-9a-fA-F]{1,128}");
     //payaddr auto-responder guard: a peer gets one address reply per 10 minutes
     private static final java.util.HashMap<String, Long> mPayAddrReplied = new java.util.HashMap<>();
@@ -274,8 +274,7 @@ public class ChatDrainer {
                         org.minima.utils.json.JSONObject reply = ChatSchema.base("", "", "");
                         reply.put("state", "payaddr");
                         reply.put("addr", myaddr);
-                        MinimaCMD.execute("keets action:send to:" + from +
-                                " datahex:" + ChatSchema.toDataHex(reply.toString()));
+                        MinimaCMD.execute(ChatSchema.sendCommand(from, reply.toString()));
                     }
                 }
                 continue;
@@ -375,7 +374,7 @@ public class ChatDrainer {
                 org.minima.utils.json.JSONObject r = ChatSchema.base("", "", "");
                 r.put("state", "delivered");
                 r.put("ref", zMsgId);
-                JSONObject res = MinimaCMD.execute("keets action:send to:" + zTo + " datahex:" + ChatSchema.toDataHex(r.toString()));
+                JSONObject res = MinimaCMD.execute(ChatSchema.sendCommand(zTo, r.toString()));
                 logger.log("[CHAT] delivered receipt for " + zMsgId + " -> " + zTo + " via "
                         + ((Boolean) res.getOrDefault("status", false) ? ((JSONObject) res.get("response")).get("delivered") : "FAILED " + res.get("error")));
             } catch (Exception e) {

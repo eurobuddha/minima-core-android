@@ -200,7 +200,8 @@ public final class ChatBackup {
         }
     }
 
-    static void apply(Context c, Map<String, byte[]> e) throws Exception {
+    /** @return the number of chat rows skipped because their pubkey is not a keets key */
+    static int apply(Context c, Map<String, byte[]> e) throws Exception {
         byte[] keypair = e.get("keets/keypair");
         if (keypair != null) {
             if (keypair.length != 32) throw new IOException("keets keypair is " + keypair.length + " bytes, expected 32");
@@ -223,31 +224,38 @@ public final class ChatBackup {
         }
 
         SQLiteDatabase db = ChatDb.get(c).getWritableDatabase();
+        int skipped = 0;
         db.beginTransaction();
         try {
             for (String table : TABLES) {
                 byte[] rows = e.get("chat/" + table + ".json");
-                if (rows != null) mergeTable(db, table, new JSONArray(new String(rows, StandardCharsets.UTF_8)));
+                if (rows != null) skipped += mergeTable(db, table, new JSONArray(new String(rows, StandardCharsets.UTF_8)));
             }
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
+        if (skipped > 0) MinimaLogger.log("Chat backup SECURITY: " + skipped + " rows skipped, their key is not 0x + 64 hex");
 
         byte[] m = e.get("manifest.json");
         String name = m == null ? "" : new JSONObject(new String(m, StandardCharsets.UTF_8)).optString("chatName", "");
         android.content.SharedPreferences prefs = c.getSharedPreferences("main_prefs", Context.MODE_PRIVATE);
         if (!name.isEmpty() && prefs.getString("chat_name", "").isEmpty()) prefs.edit().putString("chat_name", name).commit();
+        return skipped;
     }
 
-    /** Only columns this app's schema has; rows already here win (same msgid / pubkey). */
-    private static void mergeTable(SQLiteDatabase db, String table, JSONArray rows) throws Exception {
+    /** Only columns this app's schema has; rows already here win (same msgid / pubkey). A row whose pubkey is
+     *  not exactly a keets key is skipped (it would reach "keets action:send to:"); returns how many were. */
+    private static int mergeTable(SQLiteDatabase db, String table, JSONArray rows) throws Exception {
+        int skipped = 0;
         Set<String> cols = new HashSet<>();
         try (Cursor cur = db.rawQuery("PRAGMA table_info(" + table + ")", null)) {
             while (cur.moveToNext()) cols.add(cur.getString(cur.getColumnIndexOrThrow("name")));
         }
         for (int i = 0; i < rows.length(); i++) {
             JSONObject row = rows.getJSONObject(i);
+            Object key = row.opt("pubkey");
+            if (!(key instanceof String) || !com.eurobuddha.minimacore.chat.ChatSchema.isPeerKey((String) key)) { skipped++; continue; }
             ContentValues v = new ContentValues();
             for (java.util.Iterator<String> k = row.keys(); k.hasNext(); ) {
                 String col = k.next();
@@ -258,6 +266,7 @@ public final class ChatBackup {
             }
             if (v.size() > 0) db.insertWithOnConflict(table, null, v, SQLiteDatabase.CONFLICT_IGNORE);
         }
+        return skipped;
     }
 
     // ---- files --------------------------------------------------------------------------------

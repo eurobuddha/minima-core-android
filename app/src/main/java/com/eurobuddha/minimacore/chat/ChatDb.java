@@ -24,7 +24,7 @@ public class ChatDb extends SQLiteOpenHelper {
     }
 
     private ChatDb(Context zContext) {
-        super(zContext, "keetchat.db", null, 3);
+        super(zContext, "keetchat.db", null, 4);
     }
 
     @Override
@@ -63,6 +63,28 @@ public class ChatDb extends SQLiteOpenHelper {
                     "AND lower(trim(m.name))<>lower(contacts.pubkey) ORDER BY m.rowid DESC LIMIT 1),name) " +
                     "WHERE trim(name)='' OR lower(trim(name))=lower(pubkey)");
         }
+        if (oldV < 4) {
+            // SECURITY (2.2.118): rows stored before 2.2.110 validated the inbox can carry a sender with text
+            // after the key, and the thread screen put it into "keets action:send to:" run as admin.
+            int[] n = purgeBadKeys(db);
+            com.eurobuddha.minimacore.utils.logger.log("[CHAT] SECURITY: one-time purge of rows whose key is not 0x + 64 hex: "
+                    + n[0] + " contacts, " + n[1] + " messages removed");
+        }
+    }
+
+    /** Deletes every contact and message whose pubkey is not exactly a keets key (ChatSchema.PEER_KEY).
+     *  @return {contacts removed, messages removed} */
+    static int[] purgeBadKeys(SQLiteDatabase db) {
+        int[] removed = new int[2];
+        String[] tables = {"contacts", "messages"};
+        for (int i = 0; i < tables.length; i++) {
+            ArrayList<String> bad = new ArrayList<>();
+            try (Cursor c = db.rawQuery("SELECT DISTINCT pubkey FROM " + tables[i], null)) {
+                while (c.moveToNext()) if (!ChatSchema.isPeerKey(c.getString(0))) bad.add(c.getString(0));
+            }
+            for (String key : bad) removed[i] += db.delete(tables[i], "pubkey=?", new String[]{key});
+        }
+        return removed;
     }
 
     public static class Msg {
@@ -82,6 +104,7 @@ public class ChatDb extends SQLiteOpenHelper {
 
     /** @return true if the message was new (false = duplicate re-delivery). */
     public boolean addMessage(Msg m) {
+        if (!ChatSchema.isPeerKey(m.pubkey)) return false;   // never store a key that could not be sent to
         ContentValues v = new ContentValues();
         v.put("msgid", m.msgid);
         v.put("pubkey", m.pubkey);
@@ -168,6 +191,7 @@ public class ChatDb extends SQLiteOpenHelper {
      *  itself learned from an earlier message (2.0.35+). A name the user typed never
      *  changes: it matches neither the bare key nor any name the sender ever declared. */
     public void ensureContact(String zPubkey, String zSenderName) {
+        if (!ChatSchema.isPeerKey(zPubkey)) return;   // never store a key that could not be sent to
         String name = zSenderName == null ? "" : zSenderName.trim();
         ContentValues v = new ContentValues();
         v.put("pubkey", zPubkey);

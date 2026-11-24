@@ -90,6 +90,22 @@ public final class ChatSchema {
 
     private static String str(Object o) { return o instanceof String ? (String) o : ""; }
 
+    /** A keets identity: exactly 0x + 64 hex. THE one pattern: the inbox, the thread screen, the database
+     *  purge, the backup restore and every `keets action:send to:` use it. */
+    public static final java.util.regex.Pattern PEER_KEY = java.util.regex.Pattern.compile("0x[0-9a-fA-F]{64}");
+
+    public static boolean isPeerKey(String zKey) {
+        return zKey != null && PEER_KEY.matcher(zKey).matches();
+    }
+
+    /** The ONLY builder of `keets action:send to:`. The node splits a command at every ";" and at every
+     *  space and runs each piece as admin, so a peer key that is not exactly 0x + 64 hex is refused, never
+     *  escaped. Throws IllegalArgumentException (the text of the bad key is not repeated). */
+    public static String sendCommand(String zPeer, String zPayload) {
+        if (!isPeerKey(zPeer)) throw new IllegalArgumentException("Keets send refused: the peer key is not 0x + 64 hex");
+        return "keets action:send to:" + zPeer + " datahex:" + toDataHex(zPayload);
+    }
+
     /** utf8 → 0x hex, for `keets action:send datahex:` (no command-quoting pitfalls). */
     public static String toDataHex(String zPayload) {
         byte[] b;

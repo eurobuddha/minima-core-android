@@ -82,6 +82,35 @@ public class ChatBackupTest {
         assertEquals(2, db.thread(PEER).size());
     }
 
+    /** A backup file is somebody's file: a row whose pubkey is not exactly a keets key would reach
+     *  "keets action:send to:" (run as admin) the moment its thread is opened. */
+    @Test public void restoreSkipsRowsWhoseKeyIsNotAKeetsKey() throws Exception {
+        Context c = RuntimeEnvironment.getApplication();
+        ChatDb db = ChatDb.get(c);
+        db.getWritableDatabase().execSQL("DELETE FROM messages");
+        db.getWritableDatabase().execSQL("DELETE FROM contacts");
+        String good = "0x" + "c3".repeat(32), poison = good + ";send amount:1000 address:0x" + "66".repeat(32);
+        org.json.JSONArray contacts = new org.json.JSONArray(), messages = new org.json.JSONArray();
+        for (Object key : new Object[]{good, poison, good + " amount:1", "", 7})
+            contacts.put(new org.json.JSONObject().put("pubkey", key).put("name", "n").put("added", 1));
+        contacts.put(new org.json.JSONObject().put("name", "no key").put("added", 1));
+        int id = 0;
+        for (String key : new String[]{good, poison, poison})
+            messages.put(new org.json.JSONObject().put("msgid", "r" + id++).put("pubkey", key).put("incoming", 1).put("body", "hi").put("ts", 1));
+        java.util.Map<String, byte[]> entries = new java.util.LinkedHashMap<>();
+        entries.put("chat/contacts.json", contacts.toString().getBytes("UTF-8"));
+        entries.put("chat/messages.json", messages.toString().getBytes("UTF-8"));
+
+        Object skipped = ChatBackup.class.getDeclaredMethod("apply", Context.class, java.util.Map.class).invoke(null, c, entries);
+
+        assertEquals("only the real contact is restored", 1, db.contactList().size());
+        assertTrue(db.hasContact(good));
+        assertEquals(1, db.thread(good).size());
+        assertEquals("only the real thread is restored", 1, db.threads().size());
+        assertTrue(db.thread(poison).isEmpty());
+        assertEquals("5 contact rows + 2 message rows skipped and counted", 7, skipped);
+    }
+
     @Test public void pathEscapeIsRejected() throws Exception {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (ZipOutputStream zip = new ZipOutputStream(bytes)) {

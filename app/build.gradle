@@ -323,8 +323,12 @@ android {
         // 2.2.117: reverts the coinage:3 of 2.2.112 - the keeper split stays coinage:1 (refused by the node, harmless):
         // made to run it would send the whole sendable balance to the persisted swap-identity address with no proof
         // the node owns it. The quiet back-off of 2.2.112 stays.
-        versionCode 387
-        versionName "2.2.117"
+        // 2.2.118: SECURITY, Keets chat: every "keets action:send to:" goes through one builder that refuses a peer key
+        // that is not exactly 0x + 64 hex (2.2.110 checked only new inbox rows; a row stored earlier or restored from
+        // a backup still reached the command from the thread screen). The thread screen closes on such a key, the
+        // database removes such rows once at upgrade (counted in the log), a backup restore skips them (counted).
+        versionCode 388
+        versionName "2.2.118"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

@@ -20,8 +20,8 @@ final class ChatKeetsTransport implements KeetsTransport {
         return (JSONObject)r.get("response");
     }
     public boolean send(String peer,String payload)throws Exception {
-        if(!peer.matches("(?i)0x[0-9a-f]{64}"))throw new IOException("Invalid contact");
-        JSONObject r=result("keets action:send to:"+peer+" datahex:"+ChatSchema.toDataHex(payload));
+        if(!ChatSchema.isPeerKey(peer))throw new IOException("Invalid contact");
+        JSONObject r=result(ChatSchema.sendCommand(peer,payload));
         via=String.valueOf(r.get("delivered"));return true;
     }
     public String publish(String path,byte[] bytes)throws Exception {

@@ -96,7 +96,9 @@ public class ChatThreadActivity extends AppCompatActivity {
         Language.apply(findViewById(android.R.id.content));
 
         mPubkey = getIntent().getStringExtra("pubkey");
-        if (mPubkey == null) { finish(); return; }
+        // SECURITY: this key goes into "keets action:send to:" run as admin (the read receipt fires by itself on
+        // open). A row stored before 2.2.110, a restored backup or a stale notification can carry anything.
+        if (!ChatSchema.isPeerKey(mPubkey)) { mPubkey = null; finish(); return; }
         //Keets transport off (Startup Params): nothing here can send or fetch. Reached only via a
         //stale notification or a saved shortcut - the Chat tab itself is gone.
         if (!com.eurobuddha.minimacore.main.StartupMode.keetsEnabled(getSharedPreferences("main_prefs", MODE_PRIVATE))) {
@@ -264,7 +266,7 @@ public class ChatThreadActivity extends AppCompatActivity {
             org.minima.utils.json.JSONObject r = ChatSchema.base("", "", "");
             r.put("state", "read");
             r.put("ref", latest.msgid);
-            MinimaCMD.execute("keets action:send to:" + mPubkey + " datahex:" + ChatSchema.toDataHex(r.toString()));
+            MinimaCMD.execute(ChatSchema.sendCommand(mPubkey, r.toString()));
         }, "chat-receipt").start();
     }
 
@@ -273,7 +275,7 @@ public class ChatThreadActivity extends AppCompatActivity {
         new Thread(() -> {
             org.minima.utils.json.JSONObject r = ChatSchema.base("", "", "");
             r.put("state", "payaddr-req");
-            MinimaCMD.execute("keets action:send to:" + mPubkey + " datahex:" + ChatSchema.toDataHex(r.toString()));
+            MinimaCMD.execute(ChatSchema.sendCommand(mPubkey, r.toString()));
         }, "chat-payaddr-req").start();
         if (zToast) Toast.makeText(this, Language.msg(l10n_chat_address_requested), Toast.LENGTH_SHORT).show();
     }
@@ -338,7 +340,7 @@ public class ChatThreadActivity extends AppCompatActivity {
             ChatDb.get(this).addMessage(m);
             runOnUiThread(() -> mAdapter.reload());
 
-            MinimaCMD.runMinima("keets action:send to:" + mPubkey + " datahex:" + ChatSchema.toDataHex(payload),
+            MinimaCMD.runMinima(ChatSchema.sendCommand(mPubkey, payload),
                     zR2 -> runOnUiThread(() -> {
                         boolean ok2 = (Boolean) zR2.getOrDefault("status", false);
                         String via = ok2 ? (String) ((JSONObject) zR2.get("response")).get("delivered") : "FAILED";
@@ -382,8 +384,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                 ChatDb.get(this).addMessage(m);
                 runOnUiThread(() -> mAdapter.reload());
 
-                JSONObject sr = MinimaCMD.execute("keets action:send to:" + mPubkey +
-                        " datahex:" + ChatSchema.toDataHex(payload));
+                JSONObject sr = MinimaCMD.execute(ChatSchema.sendCommand(mPubkey, payload));
                 String via = (Boolean) sr.getOrDefault("status", false)
                         ? (String) ((JSONObject) sr.get("response")).get("delivered") : "FAILED";
                 ChatDb.get(this).setVia(msgid, via);
@@ -474,8 +475,7 @@ public class ChatThreadActivity extends AppCompatActivity {
                 ChatDb.get(this).addMessage(m);
                 runOnUiThread(() -> mAdapter.reload());
 
-                JSONObject sr = MinimaCMD.execute("keets action:send to:" + mPubkey +
-                        " datahex:" + ChatSchema.toDataHex(payload));
+                JSONObject sr = MinimaCMD.execute(ChatSchema.sendCommand(mPubkey, payload));
                 String via = (Boolean) sr.getOrDefault("status", false)
                         ? (String) ((JSONObject) sr.get("response")).get("delivered") : "FAILED";
                 ChatDb.get(this).setVia(msgid, via);
@@ -583,7 +583,7 @@ public class ChatThreadActivity extends AppCompatActivity {
         ChatDb.get(this).addMessage(m);
         mAdapter.reload();
 
-        MinimaCMD.runMinima("keets action:send to:" + mPubkey + " datahex:" + ChatSchema.toDataHex(payload),
+        MinimaCMD.runMinima(ChatSchema.sendCommand(mPubkey, payload),
                 zResult -> runOnUiThread(() -> {
                     boolean ok = (Boolean) zResult.getOrDefault("status", false);
                     String via = "FAILED";
