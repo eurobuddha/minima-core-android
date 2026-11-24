@@ -92,6 +92,11 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
             if (GeneralParams.TEST_PARAMS) {
                 args.add("--topic"); args.add("minima-testnet-keets-v1");
             }
+            // Chat only (Startup Params -> -keetschatonly): chat, media and the mailbox stay, the
+            // sidecar joins no chain topic and bridges no Minima traffic (sidecar 1.3.5).
+            if (GeneralParams.KEETS_CHAT_ONLY) {
+                args.add("--chat-only");
+            }
             // The signed mailbox list (eurobuddha.com/keets/mailboxes.json, verified against the
             // key baked in GeneralParams, cached in data/keets). "" = the sidecar's baked defaults.
             // Never lets a list problem stop the worklet.
@@ -116,7 +121,8 @@ public class KeetsWorklet implements com.eurobuddha.minimacore.service.BatteryPo
                     args.toArray(new String[0]));
             mContext = zContext.getApplicationContext();
             logger.log("KEETS worklet started port:" + GeneralParams.MINIMA_PORT
-                    + " datadir:" + GeneralParams.DATA_FOLDER + " dht:" + mDhtMode);
+                    + " datadir:" + GeneralParams.DATA_FOLDER + " dht:" + mDhtMode
+                    + (GeneralParams.KEETS_CHAT_ONLY ? " chat-only" : ""));
             com.eurobuddha.minimacore.service.BatteryPolicy.addListener(this);
             return true;
         } catch (Throwable t) {

@@ -8625,8 +8625,11 @@
     <string name="l10n_pools_recovery_ready_count">"У %1$s із %2$s пулів знайдено ключі та перевірено резерви. Підписання призупинено."</string>
     <!-- Arguments: ready, total -->
     <string name="l10n_pools_recovery_ready_body">"У %1$s із %2$s пулів перевірено резерви та знайдено ключі власника. Підписання залишається на паузі. Підписи відновлення й виведення коштів не надсилалися."</string>
-    <string name="l10n_params_keets" formatted="false">"Транспорт Keets (-keets)"</string>
-    <string name="l10n_params_keets_body" formatted="false">"Увімк.: KeetChat і одноранговий транспорт keets, як раніше. Вимк.: без сайдкара Hyperswarm, без DHT і без вкладки Чат - вузол працює лише через класичний транспорт Minima та витрачає менше батареї й пам\'яті. Ваші чати та ідентичність keets залишаються на телефоні й повертаються після ввімкнення. Застосовується після перезапуску."</string>
+    <string name="l10n_params_keets" formatted="false">"Keets"</string>
+    <string name="l10n_params_keets_body" formatted="false">"Чат і мережа: KeetChat, а блоки й транзакції передаються також через keets, як раніше. Лише чат: KeetChat, файли та поштова скринька залишаються, але блоки й транзакції йдуть лише через класичну мережу Minima. Лише класична мережа: без keets і без вкладки Чат - менше витрат батареї та пам’яті. Ваші чати та особа keets залишаються на телефоні за будь-якого налаштування. Застосовується після перезапуску."</string>
+    <string name="l10n_params_keets_full" formatted="false">"Чат і мережа"</string>
+    <string name="l10n_params_keets_chat" formatted="false">"Лише чат"</string>
+    <string name="l10n_params_keets_classic" formatted="false">"Лише класична мережа"</string>
     <string name="l10n_chat_keets_off" formatted="false">"Транспорт keets вимкнено - увімкніть його в параметрах запуску, щоб користуватися чатом"</string>
     <string name="l10n_chatbak_title" formatted="false">"Резервна копія чату"</string>
     <string name="l10n_chatbak_help" formatted="false">"Зберегти або відновити адреси чату keets і MAX#, контакти й повідомлення."</string>

@@ -313,9 +313,9 @@ public class MinimaService extends Service {
         //know the transport exists — the `keets` command refuses without -keets, which
         //starved the chat drainer (proven on the Fold 2026-10-13). KeetsManager with no
         //-keetssidecar path spawns nothing, and its MDS poller is gated off.
-        if (com.eurobuddha.minimacore.main.StartupMode.keetsEnabled(pref)) {
-            vars.add("-keets");
-        }
+        com.eurobuddha.minimacore.main.StartupMode.addKeetsArguments(vars,
+                com.eurobuddha.minimacore.main.StartupMode.keetsEnabled(pref),
+                com.eurobuddha.minimacore.main.StartupMode.keetsChatOnly(pref));
 
         // Pandamonium can opt into classic mode; other flavors retain their fixed policy.
         // Minima.main resets GeneralParams before applying these arguments on every restart.

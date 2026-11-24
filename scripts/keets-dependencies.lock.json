@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "source": {
-    "revision": "b99bce1bf0c558061f3444deadf853ef5f60147c",
-    "url": "https://codeload.github.com/eurobuddha/keets/tar.gz/b99bce1bf0c558061f3444deadf853ef5f60147c",
-    "sha256": "a49fa66960599c81db472a231ae19f23e8cb7a9a9f7bad12628e9e5753afc9e9",
-    "lock_sha256": "87d948ba4cb73c6bf5b18b50933ea37bcbb1fe6dc0def6b80d267e2192d143ae"
+    "revision": "c3ac90351c7150de0c41c9e064fe453cceabb1a4",
+    "url": "https://codeload.github.com/eurobuddha/keets/tar.gz/c3ac90351c7150de0c41c9e064fe453cceabb1a4",
+    "sha256": "aeb940fee3d56f7ec0275d85ba15f1c0677f1c9578862de99c60e5b0d289a374",
+    "lock_sha256": "d3e92bcb48b784883301fb72d936f80732cf6611797ada4a6328342e6bb9a924"
   },
   "runtime": {
     "version": "v2.5.5",
@@ -39,7 +39,7 @@
   },
   "outputs": {
     "app/libs/bare-kit.aar": "ca5407bfe77780bbf38c1c2be7c6b7459fe527e6dbeee733189395e6f865a801",
-    "app/src/main/assets/keets.bundle": "d08b5c5d762cee5da2a75ab972099547755a62ab781a18f8560e03db9df07824",
+    "app/src/main/assets/keets.bundle": "e0b7b459217e5e62fc866dd5e097856999c4846ad84a211b2c7038702676e67c",
     "app/src/main/jniLibs/arm64-v8a/libbare-dns.2.3.0.so": "2a483c38c23f7ad3a9a9ae64cfdec2764a64f2f378bdecf08ba9fecd2b293619",
     "app/src/main/jniLibs/arm64-v8a/libbare-fs.4.4.7.so": "58f2f4c5fae31d3f48966b1d2a0b9588b57a57325c7d4e7a13653a7fcabe48a4",
     "app/src/main/jniLibs/arm64-v8a/libbare-hrtime.2.1.2.so": "b30976af73222862cbf2b43b37fce30a9704ab774c7bf32f4fb235bb51bc93c2",

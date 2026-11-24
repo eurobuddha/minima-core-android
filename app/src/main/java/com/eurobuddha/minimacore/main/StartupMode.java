@@ -17,11 +17,27 @@ public final class StartupMode {
         return prefs.getBoolean(PREF_KEETS, true);
     }
 
-    /** Drop the three flags the Keets transport switch owns (-keets, -keetssidecar, -keetssidecarargs)
-     *  from stored extra params - a stored copy would override "off". Whole tokens only: -keetsbootstrap,
+    /** Keets "chat only" (Startup Params, with keets on): the sidecar keeps chat, media and the mailbox but
+     *  carries no Minima traffic - blocks and transactions travel over classic P2P only. Default off. */
+    public static final String PREF_KEETS_CHAT_ONLY = "keets_chat_only";
+
+    public static boolean keetsChatOnly(SharedPreferences prefs) {
+        return keetsEnabled(prefs) && prefs.getBoolean(PREF_KEETS_CHAT_ONLY, false);
+    }
+
+    /** The node arguments of the Keets selector: chat and network (-keets), chat only
+     *  (-keets -keetschatonly) or classic only (nothing). */
+    public static void addKeetsArguments(List<String> args, boolean keets, boolean chatOnly) {
+        if (!keets) return;
+        args.add("-keets");
+        if (chatOnly) args.add("-keetschatonly");
+    }
+
+    /** Drop the flags the Keets selector owns (-keets, -keetschatonly, -keetssidecar, -keetssidecarargs)
+     *  from stored extra params - a stored copy would override the selector. Whole tokens only: -keetsbootstrap,
      *  -keetsconnect, -keetsmaxconns, -keetsmailboxurl and -keetsnode stay the user's to set. */
     public static String withoutKeetsSwitchFlags(String extra) {
-        return extra.replaceAll("(?<!\\S)-keets(?:sidecar(?:args)?)?(?!\\S)", "");
+        return extra.replaceAll("(?<!\\S)-keets(?:sidecar(?:args)?|chatonly)?(?!\\S)", "");
     }
 
     /** The flags the RPC switch owns: -rpcenable and -rpcpassword, -rpcbind (the switch opens the RPC to the network

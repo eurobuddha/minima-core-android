@@ -8551,8 +8551,11 @@
     <string name="l10n_pools_recovery_ready_count">"%1$s of %2$s pool(s) have matching keys and verified reserves. Signing paused."</string>
     <!-- Arguments: ready, total -->
     <string name="l10n_pools_recovery_ready_body">"%1$s of %2$s pool(s) have verified reserves and matching owner keys. Signing remains paused. No recovery signature or withdrawal was sent."</string>
-    <string name="l10n_params_keets" formatted="false">"Keets transport (-keets)"</string>
-    <string name="l10n_params_keets_body" formatted="false">"On: KeetChat and the peer-to-peer keets transport, as before. Off: no Hyperswarm sidecar, no DHT and no Chat tab - the node runs on the classic Minima transport only and uses less battery and RAM. Your chats and keets identity stay on the phone and return when you switch it back on. Applies after a restart."</string>
+    <string name="l10n_params_keets" formatted="false">"Keets"</string>
+    <string name="l10n_params_keets_body" formatted="false">"Chat and network: KeetChat, and blocks and transactions also travel over keets, as before. Chat only: KeetChat, files and the mailbox stay, but blocks and transactions use the classic Minima network only. Classic only: no keets at all and no Chat tab - less battery and RAM. Your chats and keets identity stay on the phone in every setting. Applies after a restart."</string>
+    <string name="l10n_params_keets_full" formatted="false">"Chat and network"</string>
+    <string name="l10n_params_keets_chat" formatted="false">"Chat only"</string>
+    <string name="l10n_params_keets_classic" formatted="false">"Classic only"</string>
     <string name="l10n_chat_keets_off" formatted="false">"The keets transport is off - turn it on in Startup Params to use Chat"</string>
     <string name="l10n_chatbak_title" formatted="false">"Chat backup"</string>
     <string name="l10n_chatbak_help" formatted="false">"Save or restore your keets and MAX# chat addresses, contacts and messages."</string>

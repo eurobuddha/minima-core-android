@@ -8625,8 +8625,11 @@
     <string name="l10n_pools_recovery_ready_count">"У %1$s из %2$s пулов найдены ключи и проверены резервы. Подписание приостановлено."</string>
     <!-- Arguments: ready, total -->
     <string name="l10n_pools_recovery_ready_body">"У %1$s из %2$s пулов проверены резервы и найдены ключи владельца. Подписание остаётся на паузе. Подписи восстановления и вывод средств не отправлялись."</string>
-    <string name="l10n_params_keets" formatted="false">"Транспорт Keets (-keets)"</string>
-    <string name="l10n_params_keets_body" formatted="false">"Вкл.: KeetChat и одноранговый транспорт keets, как прежде. Выкл.: без сайдкара Hyperswarm, без DHT и без вкладки Чат - узел работает только через классический транспорт Minima и расходует меньше батареи и памяти. Ваши чаты и идентичность keets остаются на телефоне и возвращаются при включении. Применяется после перезапуска."</string>
+    <string name="l10n_params_keets" formatted="false">"Keets"</string>
+    <string name="l10n_params_keets_body" formatted="false">"Чат и сеть: KeetChat, а блоки и транзакции передаются также через keets, как прежде. Только чат: KeetChat, файлы и почтовый ящик остаются, но блоки и транзакции идут только через классическую сеть Minima. Только классическая сеть: без keets и без вкладки Чат - меньше расход батареи и памяти. Ваши чаты и личность keets остаются на телефоне при любой настройке. Применяется после перезапуска."</string>
+    <string name="l10n_params_keets_full" formatted="false">"Чат и сеть"</string>
+    <string name="l10n_params_keets_chat" formatted="false">"Только чат"</string>
+    <string name="l10n_params_keets_classic" formatted="false">"Только классическая сеть"</string>
     <string name="l10n_chat_keets_off" formatted="false">"Транспорт keets выключен - включите его в параметрах запуска, чтобы пользоваться чатом"</string>
     <string name="l10n_chatbak_title" formatted="false">"Резервная копия чата"</string>
     <string name="l10n_chatbak_help" formatted="false">"Сохранить или восстановить адреса чата keets и MAX#, контакты и сообщения."</string>

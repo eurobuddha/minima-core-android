@@ -163,19 +163,40 @@
                 android:textSize="12sp"
                 android:textColor="@color/core_text_mid" />
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/params_switch_keets"
+            <TextView style="@style/FormLabel" android:text="Keets" android:tag="l10n:text=l10n_params_keets" />
+
+            <RadioGroup
+                android:id="@+id/params_keets_mode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Keets transport (-keets)" android:tag="l10n:text=l10n_params_keets"
-                android:textAppearance="@style/TextAppearance.MinimaCore.Body"
-                android:textColor="@color/core_text" />
+                android:orientation="vertical">
+                <RadioButton
+                    android:id="@+id/params_keets_full"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chat and network" android:tag="l10n:text=l10n_params_keets_full"
+                    android:textAppearance="@style/TextAppearance.MinimaCore.Body"
+                    android:textColor="@color/core_text" />
+                <RadioButton
+                    android:id="@+id/params_keets_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chat only" android:tag="l10n:text=l10n_params_keets_chat"
+                    android:textAppearance="@style/TextAppearance.MinimaCore.Body"
+                    android:textColor="@color/core_text" />
+                <RadioButton
+                    android:id="@+id/params_keets_classic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Classic only" android:tag="l10n:text=l10n_params_keets_classic"
+                    android:textAppearance="@style/TextAppearance.MinimaCore.Body"
+                    android:textColor="@color/core_text" />
+            </RadioGroup>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="On: KeetChat and the peer-to-peer keets transport, as before. Off: no Hyperswarm sidecar, no DHT and no Chat tab - the node runs on the classic Minima transport only and uses less battery and RAM. Your chats and keets identity stay on the phone and return when you switch it back on. Applies after a restart." android:tag="l10n:text=l10n_params_keets_body"
+                android:text="Chat and network: KeetChat, and blocks and transactions also travel over keets, as before. Chat only: KeetChat, files and the mailbox stay, but blocks and transactions use the classic Minima network only. Classic only: no keets at all and no Chat tab - less battery and RAM. Your chats and keets identity stay on the phone in every setting. Applies after a restart." android:tag="l10n:text=l10n_params_keets_body"
                 android:textAppearance="@style/TextAppearance.MinimaCore.Body"
                 android:textSize="12sp"
                 android:textColor="@color/core_text_mid" />

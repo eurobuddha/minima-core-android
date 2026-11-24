@@ -33,6 +33,25 @@ public class StartupModeTest {
         assertEquals(" /p  -megammr", StartupMode.withoutKeetsSwitchFlags("-keetssidecar /p -keetssidecarargs -megammr"));
         assertEquals("", StartupMode.withoutKeetsSwitchFlags("-keets"));
         assertEquals("-keetsconnect x", StartupMode.withoutKeetsSwitchFlags("-keetsconnect x"));
+        assertEquals(" -megammr", StartupMode.withoutKeetsSwitchFlags("-keetschatonly -megammr"));
+    }
+
+    @Test public void keetsSelectorPassesTheNodeItsThreeSettings() {
+        try {
+            // chat and network, chat only, classic only
+            boolean[][] modes = {{true, false}, {true, true}, {false, false}, {false, true}};
+            String[] expected = {"[-keets]", "[-keets, -keetschatonly]", "[]", "[]"};
+            for (int i = 0; i < modes.length; i++) {
+                GeneralParams.resetDefaults();
+                ArrayList<String> args = new ArrayList<>();
+                StartupMode.addKeetsArguments(args, modes[i][0], modes[i][1]);
+                assertEquals(expected[i], args.toString());
+                // The bundled node jar must know both flags (minima-core with -keetschatonly).
+                assertTrue(ParamConfigurer.checkParams(args.toArray(new String[0])));
+                assertEquals(modes[i][0], GeneralParams.KEETS_ENABLED);
+                assertEquals(modes[i][0] && modes[i][1], GeneralParams.KEETS_CHAT_ONLY);
+            }
+        } finally { GeneralParams.resetDefaults(); }
     }
 
     @Test public void nodeParserAppliesBothProfilesAcrossRepeatedRestarts() {

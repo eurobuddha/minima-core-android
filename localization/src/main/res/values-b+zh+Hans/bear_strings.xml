@@ -8514,8 +8514,11 @@
     <string name="l10n_pools_recovery_ready_count">"%2$s 个池中有 %1$s 个已匹配密钥并验证储备。签名保持暂停。"</string>
     <!-- Arguments: ready, total -->
     <string name="l10n_pools_recovery_ready_body">"%2$s 个池中有 %1$s 个已验证储备并匹配所有者密钥。签名保持暂停。未发送恢复签名或提现。"</string>
-    <string name="l10n_params_keets" formatted="false">"Keets 传输（-keets）"</string>
-    <string name="l10n_params_keets_body" formatted="false">"开启：KeetChat 与点对点 keets 传输，与之前相同。关闭：无 Hyperswarm 边车、无 DHT、无\"聊天\"标签页，节点仅使用经典 Minima 传输，耗电和内存更少。您的聊天记录和 keets 身份保留在手机上，重新开启后恢复。重启后生效。"</string>
+    <string name="l10n_params_keets" formatted="false">"Keets"</string>
+    <string name="l10n_params_keets_body" formatted="false">"聊天和网络：KeetChat，并且区块和交易也通过 keets 传输，与之前相同。仅聊天：保留 KeetChat、文件和邮箱，但区块和交易仅使用经典 Minima 网络。仅经典网络：完全不使用 keets，也没有\"聊天\"标签页，耗电和内存更少。无论哪种设置，您的聊天记录和 keets 身份都保留在手机上。重启后生效。"</string>
+    <string name="l10n_params_keets_full" formatted="false">"聊天和网络"</string>
+    <string name="l10n_params_keets_chat" formatted="false">"仅聊天"</string>
+    <string name="l10n_params_keets_classic" formatted="false">"仅经典网络"</string>
     <string name="l10n_chat_keets_off" formatted="false">"keets 传输已关闭 - 请在启动参数中开启后再使用聊天"</string>
     <string name="l10n_chatbak_title" formatted="false">"聊天备份"</string>
     <string name="l10n_chatbak_help" formatted="false">"保存或恢复您的 keets 和 MAX# 聊天地址、联系人和消息。"</string>
