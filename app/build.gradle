@@ -359,8 +359,9 @@ android {
         // address in the instrumented chat test; a chat database marked version 4 opens (onDowngrade does nothing).
         // 2.2.126: Future Cash: the LOG line for a sweep not seen at the safe says what the notice says since 2.2.123 (the
         // ordinary causes before a compromised key); it still carried the old alarm.
-        versionCode 396
-        versionName "2.2.126"
+        // 2.2.127: the chat database opens a file marked version 4 only (2.2.125 let any newer version open).
+        versionCode 397
+        versionName "2.2.127"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

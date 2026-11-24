@@ -75,7 +75,9 @@ public class ChatDb extends SQLiteOpenHelper {
     /** A version 4 file (2.2.118-2.2.121 source, never released) has the version 3 tables: it opens, it is not refused
      *  for ever with "Can't downgrade database" (2.2.125). */
     @Override
-    public void onDowngrade(SQLiteDatabase db, int oldV, int newV) { }
+    public void onDowngrade(SQLiteDatabase db, int oldV, int newV) {
+        if (oldV != 4) super.onDowngrade(db, oldV, newV);   // 2.2.127: only version 4 is known to have these tables; anything newer is refused as before
+    }
 
     @Override
     public void onOpen(SQLiteDatabase db) {
