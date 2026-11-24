@@ -377,8 +377,12 @@ android {
         // its bytes. Seeding is asked for at most every 10 minutes (was 3). P2PManager and P2PManager$1 recompiled from
         // minima-core 56c5ac445a570cac90912fef022bad11113500a1;
         // new sha256 2374ad4bd4bbd49a07509b6c43878edc62f02f3560503e9353e9eda9db514ae6. Never publish 2.2.129.
-        versionCode 400
-        versionName "2.2.130"
+        // 2.2.131: node jar: a peers-list fetch that got nothing (offline at the first start) is tried again within minutes,
+        // not after 12 (review of 2.2.130). P2PManager and P2PManager$1 recompiled from minima-core
+        // 4169b72b8cfdd46fe99b4b97f7669b9bde6d202e; new sha256
+        // 84f78147b0efad6440419d17713e285d072f6b8ec89cb2a0228745e3cfbf76b0.
+        versionCode 401
+        versionName "2.2.131"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
