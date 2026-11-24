@@ -24,7 +24,9 @@ public class ChatDb extends SQLiteOpenHelper {
     }
 
     private ChatDb(Context zContext) {
-        super(zContext, "keetchat.db", null, 4);
+        // Version 3, and it stays 3 (2.2.122): 2.2.118 moved it to 4 only to run a purge once, and an older copy of the
+        // app then could not open the chat database at all (SQLiteOpenHelper refuses a database newer than itself).
+        super(zContext, "keetchat.db", null, 3);
     }
 
     @Override
@@ -63,12 +65,23 @@ public class ChatDb extends SQLiteOpenHelper {
                     "AND lower(trim(m.name))<>lower(contacts.pubkey) ORDER BY m.rowid DESC LIMIT 1),name) " +
                     "WHERE trim(name)='' OR lower(trim(name))=lower(pubkey)");
         }
-        if (oldV < 4) {
-            // SECURITY (2.2.118): rows stored before 2.2.110 validated the inbox can carry a sender with text
-            // after the key, and the thread screen put it into "keets action:send to:" run as admin.
+    }
+
+    /** SECURITY (2.2.118, moved here in 2.2.122): rows stored before 2.2.110 validated the inbox can carry a sender with
+     *  text after the key, and the thread screen put it into "keets action:send to:" run as admin. They are removed at
+     *  every open, with no change of the database version: a row an older copy of the app wrote in between goes too,
+     *  and that older copy can still open the database. Nothing is found after the first time (addMessage and
+     *  ensureContact refuse such a key). */
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (db.isReadOnly()) return;
+        try {
             int[] n = purgeBadKeys(db);
-            com.eurobuddha.minimacore.utils.logger.log("[CHAT] SECURITY: one-time purge of rows whose key is not 0x + 64 hex: "
-                    + n[0] + " contacts, " + n[1] + " messages removed");
+            if (n[0] + n[1] > 0) com.eurobuddha.minimacore.utils.logger.log("[CHAT] SECURITY: rows whose key is not 0x + 64 hex removed: "
+                    + n[0] + " contacts, " + n[1] + " messages");
+        } catch (Exception e) {
+            com.eurobuddha.minimacore.utils.logger.log("[CHAT] the check for rows with a bad key could not run: " + e);   // sendCommand still refuses them
         }
     }
 

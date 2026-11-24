@@ -341,8 +341,11 @@ android {
         // 2.2.121: the Minima dollar token is MxUSD in four more PandaPools create strings (four languages and the
         // catalog): "MINIMA / MxUSD pools", "Enter the MxUSD amount", "Reduce MxUSD to". The MEXC market price lines
         // stay USDT/MINIMA (that market really is USDT).
-        versionCode 391
-        versionName "2.2.121"
+        // 2.2.122: the chat database stays at version 3. 2.2.118 moved it to 4 only to run its one-time purge of rows with
+        // a bad key, and an older copy of the app then could not open the chat database. The purge now runs at every
+        // open (ChatDb.onOpen), with no version change.
+        versionCode 392
+        versionName "2.2.122"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

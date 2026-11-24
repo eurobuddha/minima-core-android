@@ -59,6 +59,10 @@ public class ChatDbPurgeTest {
         assertFalse(db.hasContact(POISON));
         assertTrue(db.thread(POISON).isEmpty());
         assertTrue(db.thread("stranger").isEmpty());
+        // 2.2.122: the purge does not move the database version, so an older copy of the app can still open it
+        db.close();
+        SQLiteDatabase after = SQLiteDatabase.openDatabase(file.getPath(), null, SQLiteDatabase.OPEN_READONLY);
+        try { assertEquals("the chat database stays at version 3", 3, after.getVersion()); } finally { after.close(); }
     }
 
     @Test public void aBadKeyIsNeverStoredAgain() throws Exception {
