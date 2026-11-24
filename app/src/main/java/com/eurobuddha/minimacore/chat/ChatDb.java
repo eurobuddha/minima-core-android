@@ -72,6 +72,11 @@ public class ChatDb extends SQLiteOpenHelper {
      *  every open, with no change of the database version: a row an older copy of the app wrote in between goes too,
      *  and that older copy can still open the database. Nothing is found after the first time (addMessage and
      *  ensureContact refuse such a key). */
+    /** A version 4 file (2.2.118-2.2.121 source, never released) has the version 3 tables: it opens, it is not refused
+     *  for ever with "Can't downgrade database" (2.2.125). */
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldV, int newV) { }
+
     @Override
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);

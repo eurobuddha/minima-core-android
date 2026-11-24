@@ -87,6 +87,18 @@ public class ChatDbPurgeTest {
         }
     }
 
+    // 2.2.125: a file a 2.2.118-2.2.121 build marked version 4 still opens (same tables)
+    @Test public void aVersion4FileOpens() throws Exception {
+        Context c = RuntimeEnvironment.getApplication();
+        ChatDb db = ChatDb.get(c); db.putContact(PEER, "n"); db.getWritableDatabase().setVersion(4);
+        forgetTheChatDbKeepingTheFile();
+        assertTrue(ChatDb.get(c).hasContact(PEER));
+    }
+    private void forgetTheChatDbKeepingTheFile() throws Exception {
+        java.lang.reflect.Field f = ChatDb.class.getDeclaredField("instance"); f.setAccessible(true);
+        ChatDb db = (ChatDb) f.get(null); if (db != null) db.close(); f.set(null, null);
+    }
+
     @Test public void aBadKeyIsNeverStoredAgain() throws Exception {
         ChatDb db = ChatDb.get(RuntimeEnvironment.getApplication());
         db.ensureContact(POISON, "x");

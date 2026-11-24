@@ -355,8 +355,10 @@ android {
         // node jar = 1.1.2.31-euro13 + three commits: keets peers no longer count when giving up on a classic peer,
         // classic peers are seeded from the published minimapeers.txt lists, and the -keetschatonly flag.
         // 2.2.124 = that selector AND the fixes of 2.2.118-2.2.123 on this line, in one build.
-        versionCode 394
-        versionName "2.2.124"
+        // 2.2.125 (review of 2.2.122-2.2.123, approved): tests for the restore path of a pay address and a real-shaped
+        // address in the instrumented chat test; a chat database marked version 4 opens (onDowngrade does nothing).
+        versionCode 395
+        versionName "2.2.125"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

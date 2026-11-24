@@ -67,14 +67,14 @@ public class ChatThreadLanguagesTest {
     private void snapshot(String name)throws Exception{settle();java.io.File dir=new java.io.File(context.getExternalFilesDir(null),"language-tests");assertTrue(dir.isDirectory()||dir.mkdirs());android.graphics.Bitmap bm=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(bm);try(java.io.FileOutputStream out=new java.io.FileOutputStream(new java.io.File(dir,name+".png"))){assertTrue(bm.compress(android.graphics.Bitmap.CompressFormat.PNG,100,out));}finally{bm.recycle();}}
     private static EditText input(View v){if(v instanceof EditText)return (EditText)v;if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++){EditText found=input(((ViewGroup)v).getChildAt(i));if(found!=null)return found;}return null;}
     @Test public void nativeDraftPaymentAndRenameStayInPlaceAcrossLanguages()throws Exception{
-        db.putContact(KEY,"Photo");db.setContactPayAddr(KEY,"MxLanguageFixtureAddress");
+        db.putContact(KEY,"Photo");db.setContactPayAddr(KEY,"MxG080CRJB1D4NHGRYGNF7Q52FK7023UM3FUUPVD1W1WCQZSA8MDQ25982N842G");
         AtomicReference<ChatThreadActivity> first=new AtomicReference<>();AtomicReference<EditText> draft=new AtomicReference<>(),amount=new AtomicReference<>();AtomicReference<AlertDialog> sheet=new AtomicReference<>();
         try(ActivityScenario<ChatThreadActivity> screen=nativeScreen()){
             screen.onActivity(a->{first.set(a);draft.set(a.findViewById(R.id.chat_input));draft.get().setText(RAW);draft.get().setSelection(3,8);invoke(a,"startPayment",new Class<?>[]{});sheet.set(dialog(a));amount.set(sheet.get().findViewById(R.id.pay_amount));amount.get().setText(AMOUNT);amount.get().setSelection(2,6);});
             for(String code:CODES){select(code);screen.onActivity(a->{assertSame(first.get(),a);assertSame(draft.get(),a.findViewById(R.id.chat_input));assertSame(sheet.get(),dialog(a));
                 assertEquals(RAW,draft.get().getText().toString());assertEquals(3,draft.get().getSelectionStart());assertEquals(8,draft.get().getSelectionEnd());assertEquals(AMOUNT,amount.get().getText().toString());assertEquals(2,amount.get().getSelectionStart());assertEquals(6,amount.get().getSelectionEnd());
                 assertEquals(text(l10n_chat_message),draft.get().getHint().toString());assertEquals(text(l10n_chat_amount_minima),amount.get().getHint().toString());
-                assertEquals("MxLanguageFixtureAddress",value(sheet.get().getWindow().getDecorView(),R.id.pay_to));assertEquals(text(l10n_wallet_send),sheet.get().getButton(-1).getText().toString());
+                assertEquals("MxG080CRJB1D4NHGRYGNF7Q52FK7023UM3FUUPVD1W1WCQZSA8MDQ25982N842G",value(sheet.get().getWindow().getDecorView(),R.id.pay_to));assertEquals(text(l10n_wallet_send),sheet.get().getButton(-1).getText().toString());
                 Toolbar bar=a.findViewById(R.id.chat_thread_toolbar);assertEquals("Photo",bar.getTitle().toString());assertEquals(text(l10n_chat_delete_chat),bar.getMenu().findItem(R.id.chatmenu_clear).getTitle().toString());
                 assertEquals(text(l10n_chat_attach),a.findViewById(R.id.chat_attach).getContentDescription().toString());assertTrue(db.thread(KEY).isEmpty());
             });onView(withText(text(l10n_chat_real_funds))).inRoot(isDialog()).check(matches(isDisplayed()));}

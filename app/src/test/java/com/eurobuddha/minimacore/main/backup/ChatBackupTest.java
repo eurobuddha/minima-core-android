@@ -84,6 +84,28 @@ public class ChatBackupTest {
 
     /** A backup file is somebody's file: a row whose pubkey is not exactly a keets key would reach
      *  "keets action:send to:" (run as admin) the moment its thread is opened. */
+    // 2.2.125 (review of 2.2.123): the restore path itself. A contact with a good key and a pay address followed by
+    // text is restored with the address blanked; a good address is kept.
+    @Test public void restoreBlanksAPayAddressThatIsNotExactlyAnAddress() throws Exception {
+        Context c = RuntimeEnvironment.getApplication();
+        ChatDb db = ChatDb.get(c);
+        db.getWritableDatabase().execSQL("DELETE FROM messages");
+        db.getWritableDatabase().execSQL("DELETE FROM contacts");
+        String a = "0x" + "a1".repeat(32), b = "0x" + "b2".repeat(32), mx = "MxG080CRJB1D4NHGRYGNF7Q52FK7023UM3FUUPVD1W1WCQZSA8MDQ25982N842G";
+        org.json.JSONArray contacts = new org.json.JSONArray();
+        contacts.put(new org.json.JSONObject().put("pubkey", a).put("name", "bad").put("added", 1).put("payaddr", mx + ";send amount:1 address:0x" + "66".repeat(32)));
+        contacts.put(new org.json.JSONObject().put("pubkey", b).put("name", "good").put("added", 1).put("payaddr", mx));
+        java.util.Map<String, byte[]> entries = new java.util.LinkedHashMap<>();
+        entries.put("chat/contacts.json", contacts.toString().getBytes("UTF-8"));
+        entries.put("chat/messages.json", "[]".getBytes("UTF-8"));
+        ChatBackup.class.getDeclaredMethod("apply", Context.class, java.util.Map.class).invoke(null, c, entries);
+        assertTrue(db.hasContact(a)); assertTrue(db.hasContact(b));
+        try (android.database.Cursor cur = db.getReadableDatabase().rawQuery("SELECT payaddr FROM contacts WHERE pubkey=?", new String[]{a})) {
+            assertTrue(cur.moveToNext()); assertEquals("the stored column itself is blank", "", cur.getString(0));
+        }
+        assertEquals(mx, db.contactPayAddr(b));
+    }
+
     @Test public void restoreSkipsRowsWhoseKeyIsNotAKeetsKey() throws Exception {
         Context c = RuntimeEnvironment.getApplication();
         ChatDb db = ChatDb.get(c);
