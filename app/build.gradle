@@ -372,8 +372,13 @@ android {
         // 64 KB loses its last (partial) entry, one list gets 30 s in all, and this machine or a private network is never
         // checked. P2PManager and P2PManager$1 recompiled from minima-core 6f17de90a8d4859923002d6af038bd334297e3de;
         // new sha256 9dc69bbcf5c07f3ca1c9aaf7adcc2d747f2112f31591a361fc229c8af56693f8.
-        versionCode 399
-        versionName "2.2.129"
+        // 2.2.130: node jar: a node with many saved peers and none alive is seeded from the published lists again (2.2.129
+        // refused it: review, Required); the 50 checked are drawn from EVERY entry of the lists; a list is "too long" by
+        // its bytes. Seeding is asked for at most every 10 minutes (was 3). P2PManager and P2PManager$1 recompiled from
+        // minima-core 56c5ac445a570cac90912fef022bad11113500a1;
+        // new sha256 2374ad4bd4bbd49a07509b6c43878edc62f02f3560503e9353e9eda9db514ae6. Never publish 2.2.129.
+        versionCode 400
+        versionName "2.2.130"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
