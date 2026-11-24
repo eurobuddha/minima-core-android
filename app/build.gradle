@@ -367,8 +367,13 @@ android {
         // recompiled (javac --release 8) from minima-core branch fix/seed-peers-bounds-2026-11-24 @
         // 9279c41924a812e98c9ca37cde2b437246c993e7; new sha256
         // 75bfe0ecf38a4d6efeffd36e757e2fa55e08645cf207cecd57b00d2370e9d408. The other 486 entries are unchanged.
-        versionCode 398
-        versionName "2.2.128"
+        // 2.2.129: node jar: the published peers list is handled more carefully still (review of 2.2.128, approved; its five
+        // optional points): no second seeding beside one that runs, a different choice of 50 each time, a list cut at
+        // 64 KB loses its last (partial) entry, one list gets 30 s in all, and this machine or a private network is never
+        // checked. P2PManager and P2PManager$1 recompiled from minima-core 6f17de90a8d4859923002d6af038bd334297e3de;
+        // new sha256 9dc69bbcf5c07f3ca1c9aaf7adcc2d747f2112f31591a361fc229c8af56693f8.
+        versionCode 399
+        versionName "2.2.129"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
