@@ -311,6 +311,9 @@ public class ChatThreadActivity extends AppCompatActivity {
     static final String MXUSD_TOKENID = "0x7D39745FBD29049BE29850B55A18BF550E4D442F930F86266E34193D89042A90";
 
     private void doPayment(String zAddr, String zAmt, String zTokenId, String zTokName) {
+        // SECURITY (2.2.123): the stored pay address goes into "send address:" run as admin; a restored backup could
+        // carry text after it. Exact shape or nothing is sent.
+        if (!ChatSchema.isPayAddr(zAddr)) { showFailure(Language.msg(l10n_chat_no_pay_address)); return; }
         Toast.makeText(this, Language.msg(l10n_chat_sending_amount_token, zAmt, zTokName), Toast.LENGTH_SHORT).show();
         String cmd = "send address:" + zAddr + " amount:" + zAmt + ("0x00".equals(zTokenId) ? "" : " tokenid:" + zTokenId);
         MinimaCMD.runMinima(cmd, zResult -> {

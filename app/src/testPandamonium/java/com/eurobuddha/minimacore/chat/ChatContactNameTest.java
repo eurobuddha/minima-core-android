@@ -23,8 +23,8 @@ public class ChatContactNameTest {
         db.ensureContact(PEER,"Alice");assertEquals("Alice",db.contactName(PEER));assertEquals("Alice",db.threads().get(0).name);assertEquals("Alice",db.contactList().get(0).name);
     }
     @Test public void customNamesPaymentAddressesAndReadReceiptsArePreserved(){
-        db.putContact(PEER,"My friend");db.setContactPayAddr(PEER,"Mx123");db.setLastReceipt(PEER,"receipt");
-        db.ensureContact(PEER,"Alice");assertEquals("My friend",db.contactName(PEER));assertEquals("Mx123",db.contactPayAddr(PEER));assertEquals("receipt",db.lastReceipt(PEER));
+        db.putContact(PEER,"My friend");db.setContactPayAddr(PEER,"MxG080CRJB1D4NHGRYGNF7Q52FK7023UM3FUUPVD1W1WCQZSA8MDQ25982N842G");db.setLastReceipt(PEER,"receipt");
+        db.ensureContact(PEER,"Alice");assertEquals("My friend",db.contactName(PEER));assertEquals("MxG080CRJB1D4NHGRYGNF7Q52FK7023UM3FUUPVD1W1WCQZSA8MDQ25982N842G",db.contactPayAddr(PEER));assertEquals("receipt",db.lastReceipt(PEER));
     }
     @Test public void blankWireNamesCannotReplaceNamesOrBecomeWhitespaceContacts(){
         db.ensureContact(PEER,"  ");assertEquals(PEER,db.contactName(PEER));
@@ -33,8 +33,8 @@ public class ChatContactNameTest {
     @Test public void migrationRecoversAlreadyReceivedNameWithoutWaitingForAnotherMessage()throws Exception {
         db.ensureContact(PEER,"");message(PEER,"one","Old name",true);message(PEER,"two","Alice",true);
         message(PEER,"three","My outgoing name",false);message(OTHER,"four","Other peer",true);
-        db.setContactPayAddr(PEER,"Mx123");db.setLastReceipt(PEER,"receipt");upgradeFrom(2);
-        assertEquals("Alice",db.contactName(PEER));assertEquals(3,db.thread(PEER).size());assertEquals("Mx123",db.contactPayAddr(PEER));assertEquals("receipt",db.lastReceipt(PEER));
+        db.setContactPayAddr(PEER,"MxG080CRJB1D4NHGRYGNF7Q52FK7023UM3FUUPVD1W1WCQZSA8MDQ25982N842G");db.setLastReceipt(PEER,"receipt");upgradeFrom(2);
+        assertEquals("Alice",db.contactName(PEER));assertEquals(3,db.thread(PEER).size());assertEquals("MxG080CRJB1D4NHGRYGNF7Q52FK7023UM3FUUPVD1W1WCQZSA8MDQ25982N842G",db.contactPayAddr(PEER));assertEquals("receipt",db.lastReceipt(PEER));
         assertFalse(db.hasContact(OTHER));
     }
     @Test public void migrationDoesNotOverwriteNamedContactsAndSurvivesReopen()throws Exception {

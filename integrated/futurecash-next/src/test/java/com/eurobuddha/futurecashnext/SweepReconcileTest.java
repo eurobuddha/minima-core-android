@@ -74,7 +74,8 @@ public class SweepReconcileTest {
         assertEquals("not-arrived", w.get(0)[1]);
         assertEquals(1, notices.size());
         String notice = notices.get(0);
-        assertTrue(notice, notice.contains("left its exposed address") && notice.contains("did NOT arrive at your safe address")
+        assertTrue(notice, notice.contains("left its exposed address") && notice.contains("was not seen at your safe address after 30 blocks")
+                && notice.contains("already been spent") && notice.contains("chain reorg")   // 2.2.123: the ordinary causes are named first
                 && notice.contains("may be compromised"));
         verify(store, never()).setSweepStatus(anyString(), eq(Store.SWEPT), any());
     }

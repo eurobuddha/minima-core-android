@@ -356,8 +356,9 @@ public final class Guardian {
                 case NOT_ARRIVED:
                     // The safe is this node's own address and the lookup worked: nothing arrived. Not SWEPT.
                     store.setSweepStatus(row.coinid, Store.UNVERIFIED, "not-arrived");
-                    notifier.notify("Future Cash ⚠️", "A stake left its exposed address but did NOT arrive at your "
-                            + "safe address. The key of the exposed address may be compromised — check now.");
+                    notifier.notify("Future Cash ⚠️", "A stake left its exposed address and was not seen at your safe "
+                            + "address after 30 blocks. It may have arrived and already been spent, or a chain reorg may have undone it. "
+                            + "If neither, the key of the exposed address may be compromised. Check the coin in the Future Cash log.");
                     cfg.log(Cfg.LVL_ERROR, "⚠️ ALERT: a swept coin left the exposed address but did NOT arrive at "
                             + "your safe — the key may be compromised | coin:" + row.coinid + " | from:" + row.address);
                     break;

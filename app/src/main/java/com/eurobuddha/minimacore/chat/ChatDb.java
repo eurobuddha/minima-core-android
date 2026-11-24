@@ -97,6 +97,12 @@ public class ChatDb extends SQLiteOpenHelper {
             }
             for (String key : bad) removed[i] += db.delete(tables[i], "pubkey=?", new String[]{key});
         }
+        // 2.2.123: a pay address that is not exactly an address is blanked (the contact stays; the address is asked for again)
+        ArrayList<String> badPay = new ArrayList<>();
+        try (Cursor c = db.rawQuery("SELECT pubkey, payaddr FROM contacts WHERE payaddr IS NOT NULL AND payaddr<>''", null)) {
+            while (c.moveToNext()) if (!ChatSchema.isPayAddr(c.getString(1))) badPay.add(c.getString(0));
+        }
+        for (String key : badPay) db.execSQL("UPDATE contacts SET payaddr='' WHERE pubkey=?", new Object[]{key});
         return removed;
     }
 
@@ -265,6 +271,7 @@ public class ChatDb extends SQLiteOpenHelper {
     }
 
     public void setContactPayAddr(String zPubkey, String zAddr) {
+        if (zAddr != null && !zAddr.isEmpty() && !ChatSchema.isPayAddr(zAddr)) return;   // 2.2.123: an address, or nothing
         ContentValues v = new ContentValues();
         v.put("payaddr", zAddr);
         getWritableDatabase().update("contacts", v, "pubkey=?", new String[]{zPubkey});
@@ -274,7 +281,7 @@ public class ChatDb extends SQLiteOpenHelper {
         Cursor c = getReadableDatabase().rawQuery("SELECT payaddr FROM contacts WHERE pubkey=?", new String[]{zPubkey});
         String a = c.moveToNext() ? c.getString(0) : "";
         c.close();
-        return a == null ? "" : a;
+        return ChatSchema.isPayAddr(a) ? a : "";   // 2.2.123: never hand out text that is not exactly an address
     }
 
     /** Receipt dedupe: the newest incoming msgid we have receipted to this contact. */

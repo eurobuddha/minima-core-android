@@ -94,6 +94,14 @@ public final class ChatSchema {
      *  purge, the backup restore and every `keets action:send to:` use it. */
     public static final java.util.regex.Pattern PEER_KEY = java.util.regex.Pattern.compile("0x[0-9a-fA-F]{64}");
 
+    /** A Minima address as a contact's pay address: 0x + 64 hex, or Mx + 40 to 118 letters and digits. It goes into
+     *  "send address:" run as admin, so nothing else is ever stored, restored, shown or sent to (2.2.123). */
+    public static final java.util.regex.Pattern PAY_ADDR = java.util.regex.Pattern.compile("0x[0-9a-fA-F]{64}|Mx[0-9A-Za-z]{40,118}");
+
+    public static boolean isPayAddr(String zAddr) {
+        return zAddr != null && PAY_ADDR.matcher(zAddr).matches();
+    }
+
     public static boolean isPeerKey(String zKey) {
         return zKey != null && PEER_KEY.matcher(zKey).matches();
     }

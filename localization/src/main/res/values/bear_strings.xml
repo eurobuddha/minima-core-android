@@ -1410,7 +1410,7 @@
     <string name="l10n_future_notice_stopped_body" formatted="false">"It had no safe destination, so it could not rescue an at-risk stake. Open the app and pick where rescued funds should go."</string>
     <string name="l10n_future_notice_collect_failed" formatted="false">"A collection keeps failing — check this node"</string>
     <string name="l10n_future_notice_unverified" formatted="false">"A stake was spent but the node couldn\'t confirm it reached your safe address — please verify it arrived."</string>
-    <string name="l10n_future_notice_not_arrived" formatted="false">"A stake left its exposed address but did NOT arrive at your safe address. The key of the exposed address may be compromised — check now."</string>
+    <string name="l10n_future_notice_not_arrived" formatted="false">"A stake left its exposed address and was not seen at your safe address after 30 blocks. It may have arrived and already been spent, or a chain reorg may have undone it. If neither, the key of the exposed address may be compromised. Check the coin in the Future Cash log."</string>
     <string name="l10n_future_notice_external_sent" formatted="false">"A stake was sent to your external safe address. This node cannot verify that it arrived."</string>
     <string name="l10n_future_notice_sweep_failed" formatted="false">"A sweep keeps failing — funds still on an exposed address. Is your vault unlocked?"</string>
     <string name="l10n_future_notice_rescue_off" formatted="false">"Future Cash: rescue is off"</string>

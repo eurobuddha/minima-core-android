@@ -21,7 +21,7 @@ public final class FutureMessages {
             case "It had no safe destination, so it could not rescue an at-risk stake. Open the app and pick where rescued funds should go.": return Language.msg(l10n_future_notice_stopped_body);
             case "A collection keeps failing — check this node": return Language.msg(l10n_future_notice_collect_failed);
             case "A stake was spent but the node couldn't confirm it reached your safe address — please verify it arrived.": return Language.msg(l10n_future_notice_unverified);
-            case "A stake left its exposed address but did NOT arrive at your safe address. The key of the exposed address may be compromised — check now.": return Language.msg(l10n_future_notice_not_arrived);
+            case "A stake left its exposed address and was not seen at your safe address after 30 blocks. It may have arrived and already been spent, or a chain reorg may have undone it. If neither, the key of the exposed address may be compromised. Check the coin in the Future Cash log.": return Language.msg(l10n_future_notice_not_arrived);
             case "A stake was sent to your external safe address. This node cannot verify that it arrived.": return Language.msg(l10n_future_notice_external_sent);
             case "A sweep keeps failing — funds still on an exposed address. Is your vault unlocked?": return Language.msg(l10n_future_notice_sweep_failed);
             case "Future Cash: rescue is off": return Language.msg(l10n_future_notice_rescue_off);

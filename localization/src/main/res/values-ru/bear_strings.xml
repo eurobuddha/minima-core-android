@@ -1434,7 +1434,7 @@
     <string name="l10n_future_notice_stopped_body" formatted="false">"Без безопасного адреса защитник не мог спасти платёж под угрозой. Откройте приложение и выберите, куда направлять спасённые средства."</string>
     <string name="l10n_future_notice_collect_failed" formatted="false">"Получение продолжает завершаться ошибкой — проверьте этот узел"</string>
     <string name="l10n_future_notice_unverified" formatted="false">"Платёж потрачен, но узел не смог подтвердить поступление на безопасный адрес. Проверьте, что средства дошли."</string>
-    <string name="l10n_future_notice_not_arrived" formatted="false">"Платёж покинул раскрытый адрес, но НЕ дошёл до безопасного адреса. Ключ раскрытого адреса мог быть скомпрометирован — проверьте сейчас."</string>
+    <string name="l10n_future_notice_not_arrived" formatted="false">"Платёж покинул раскрытый адрес и через 30 блоков не был замечен на безопасном адресе. Возможно, он дошёл и уже потрачен, либо его отменила реорганизация цепи. Если ни то ни другое, ключ раскрытого адреса мог быть скомпрометирован. Проверьте монету в журнале Future Cash."</string>
     <string name="l10n_future_notice_external_sent" formatted="false">"Платёж отправлен на ваш внешний безопасный адрес. Этот узел не может проверить, что он дошёл."</string>
     <string name="l10n_future_notice_sweep_failed" formatted="false">"Перевод продолжает завершаться ошибкой, средства остаются на раскрытом адресе. Хранилище разблокировано?"</string>
     <string name="l10n_future_notice_rescue_off" formatted="false">"Future Cash: спасение выключено"</string>

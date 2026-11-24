@@ -344,8 +344,12 @@ android {
         // 2.2.122: the chat database stays at version 3. 2.2.118 moved it to 4 only to run its one-time purge of rows with
         // a bad key, and an older copy of the app then could not open the chat database. The purge now runs at every
         // open (ChatDb.onOpen), with no version change.
-        versionCode 392
-        versionName "2.2.122"
+        // 2.2.123 (review of 2.2.118-2.2.121): a contact's pay address is exactly an address (0x + 64 hex, or Mx + 40-118
+        // letters and digits) wherever it is stored, restored, read or sent to: a restored backup could carry text
+        // after it, and it goes into "send address:". Future Cash: the "did not arrive" notice names the ordinary
+        // causes first (arrived and already spent, a chain reorg) before a compromised key.
+        versionCode 393
+        versionName "2.2.123"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

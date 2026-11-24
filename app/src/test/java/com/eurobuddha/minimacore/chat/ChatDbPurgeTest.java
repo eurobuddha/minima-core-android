@@ -65,6 +65,28 @@ public class ChatDbPurgeTest {
         try { assertEquals("the chat database stays at version 3", 3, after.getVersion()); } finally { after.close(); }
     }
 
+    // 2.2.123 (review of 2.2.118-2.2.121): a contact's pay address goes into "send address:" run as admin
+    @Test public void aPayAddressIsAnAddressOrNothing() throws Exception {
+        ChatDb db = ChatDb.get(RuntimeEnvironment.getApplication());
+        String hex = "0x" + "CD".repeat(32), mx = "MxG080CRJB1D4NHGRYGNF7Q52FK7023UM3FUUPVD1W1WCQZSA8MDQ25982N842G";
+        assertTrue(ChatSchema.isPayAddr(hex)); assertTrue(ChatSchema.isPayAddr(mx));
+        for (String bad : new String[]{mx + ";send amount:1000 address:0x" + "66".repeat(32), mx + " burn:1000", hex + "0", "Mx", "", null, mx + "\n", "0X" + "CD".repeat(32)})
+            assertFalse(String.valueOf(bad), ChatSchema.isPayAddr(bad));
+        db.putContact(PEER, "n");
+        db.setContactPayAddr(PEER, mx + ";send amount:1000 address:0x" + "66".repeat(32));
+        assertEquals("a bad address is not stored", "", db.contactPayAddr(PEER));
+        db.setContactPayAddr(PEER, mx);
+        assertEquals(mx, db.contactPayAddr(PEER));
+        // a row written by an older copy or a restored file: blanked at the next open, the contact kept
+        db.getWritableDatabase().execSQL("UPDATE contacts SET payaddr=? WHERE pubkey=?", new Object[]{mx + ";send amount:1 address:0xEE", PEER});
+        assertEquals("never handed out", "", db.contactPayAddr(PEER));
+        ChatDb.purgeBadKeys(db.getWritableDatabase());
+        assertTrue(db.hasContact(PEER));
+        try (android.database.Cursor c = db.getReadableDatabase().rawQuery("SELECT payaddr FROM contacts WHERE pubkey=?", new String[]{PEER})) {
+            assertTrue(c.moveToNext()); assertEquals("", c.getString(0));
+        }
+    }
+
     @Test public void aBadKeyIsNeverStoredAgain() throws Exception {
         ChatDb db = ChatDb.get(RuntimeEnvironment.getApplication());
         db.ensureContact(POISON, "x");

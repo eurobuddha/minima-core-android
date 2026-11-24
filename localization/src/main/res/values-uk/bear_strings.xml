@@ -1434,7 +1434,7 @@
     <string name="l10n_future_notice_stopped_body" formatted="false">"Без безпечної адреси захисник не міг врятувати платіж під загрозою. Відкрийте застосунок і виберіть, куди спрямовувати врятовані кошти."</string>
     <string name="l10n_future_notice_collect_failed" formatted="false">"Отримання й далі завершується помилкою — перевірте цей вузол"</string>
     <string name="l10n_future_notice_unverified" formatted="false">"Платіж витрачено, але вузол не зміг підтвердити надходження на безпечну адресу. Перевірте, чи кошти дійшли."</string>
-    <string name="l10n_future_notice_not_arrived" formatted="false">"Платіж залишив розкриту адресу, але НЕ дійшов до безпечної адреси. Ключ розкритої адреси міг бути скомпрометований — перевірте зараз."</string>
+    <string name="l10n_future_notice_not_arrived" formatted="false">"Платіж залишив розкриту адресу і через 30 блоків не був помічений на безпечній адресі. Можливо, він надійшов і вже витрачений, або його скасувала реорганізація ланцюга. Якщо ні те ні інше, ключ розкритої адреси міг бути скомпрометований. Перевірте монету в журналі Future Cash."</string>
     <string name="l10n_future_notice_external_sent" formatted="false">"Платіж надіслано на вашу зовнішню безпечну адресу. Цей вузол не може перевірити, що він дійшов."</string>
     <string name="l10n_future_notice_sweep_failed" formatted="false">"Переказ і далі завершується помилкою, кошти залишаються на розкритій адресі. Сховище розблоковане?"</string>
     <string name="l10n_future_notice_rescue_off" formatted="false">"Future Cash: порятунок вимкнено"</string>

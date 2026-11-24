@@ -261,6 +261,8 @@ public final class ChatBackup {
                 String col = k.next();
                 if (!cols.contains(col)) continue;
                 Object val = row.get(col);
+                // 2.2.123: a pay address in somebody's backup file goes into "send address:" later: exact shape or blank
+                if ("contacts".equals(table) && "payaddr".equals(col) && !com.eurobuddha.minimacore.chat.ChatSchema.isPayAddr(String.valueOf(val))) { v.put(col, ""); continue; }
                 if (val instanceof Number) v.put(col, ((Number) val).longValue());
                 else v.put(col, String.valueOf(val));
             }

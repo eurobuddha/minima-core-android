@@ -253,7 +253,7 @@ public class ChatDrainer {
             if (d.state.equals("payaddr")) {
                 //contacts only: a control message must never create a contact,
                 //or any stranger can plant a payee row with their address
-                if (db.hasContact(from) && d.addr.matches("(0x|Mx)[0-9A-Za-z]+")) {
+                if (db.hasContact(from) && ChatSchema.isPayAddr(d.addr)) {
                     db.setContactPayAddr(from, d.addr);
                     fanout(zService, msg, d, from);
                 }

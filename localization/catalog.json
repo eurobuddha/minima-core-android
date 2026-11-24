@@ -7146,10 +7146,10 @@
     "uk": "Платіж витрачено, але вузол не зміг підтвердити надходження на безпечну адресу. Перевірте, чи кошти дійшли."
   },
   "future.noticeNotArrived": {
-    "en": "A stake left its exposed address but did NOT arrive at your safe address. The key of the exposed address may be compromised — check now.",
-    "zh-Hans": "付款已离开暴露的地址，但未到达您的安全地址。该暴露地址的密钥可能已泄露，请立即检查。",
-    "ru": "Платёж покинул раскрытый адрес, но НЕ дошёл до безопасного адреса. Ключ раскрытого адреса мог быть скомпрометирован — проверьте сейчас.",
-    "uk": "Платіж залишив розкриту адресу, але НЕ дійшов до безпечної адреси. Ключ розкритої адреси міг бути скомпрометований — перевірте зараз."
+    "en": "A stake left its exposed address and was not seen at your safe address after 30 blocks. It may have arrived and already been spent, or a chain reorg may have undone it. If neither, the key of the exposed address may be compromised. Check the coin in the Future Cash log.",
+    "zh-Hans": "付款已离开暴露的地址，30 个区块后仍未在您的安全地址看到。它可能已到达并已被花费，也可能被链重组撤销。如果都不是，该暴露地址的密钥可能已泄露。请在 Future Cash 日志中查看该币。",
+    "ru": "Платёж покинул раскрытый адрес и через 30 блоков не был замечен на безопасном адресе. Возможно, он дошёл и уже потрачен, либо его отменила реорганизация цепи. Если ни то ни другое, ключ раскрытого адреса мог быть скомпрометирован. Проверьте монету в журнале Future Cash.",
+    "uk": "Платіж залишив розкриту адресу і через 30 блоків не був помічений на безпечній адресі. Можливо, він надійшов і вже витрачений, або його скасувала реорганізація ланцюга. Якщо ні те ні інше, ключ розкритої адреси міг бути скомпрометований. Перевірте монету в журналі Future Cash."
   },
   "future.noticeExternalSent": {
     "en": "A stake was sent to your external safe address. This node cannot verify that it arrived.",

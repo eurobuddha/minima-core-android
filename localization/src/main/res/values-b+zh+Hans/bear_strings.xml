@@ -1398,7 +1398,7 @@
     <string name="l10n_future_notice_stopped_body" formatted="false">"未设置安全目标地址，因此无法救援风险锁定付款。请打开应用并选择救援资金的去向。"</string>
     <string name="l10n_future_notice_collect_failed" formatted="false">"领取持续失败，请检查此节点"</string>
     <string name="l10n_future_notice_unverified" formatted="false">"付款已被花费，但节点无法确认其是否到达安全地址，请检查是否到账。"</string>
-    <string name="l10n_future_notice_not_arrived" formatted="false">"付款已离开暴露的地址，但未到达您的安全地址。该暴露地址的密钥可能已泄露，请立即检查。"</string>
+    <string name="l10n_future_notice_not_arrived" formatted="false">"付款已离开暴露的地址，30 个区块后仍未在您的安全地址看到。它可能已到达并已被花费，也可能被链重组撤销。如果都不是，该暴露地址的密钥可能已泄露。请在 Future Cash 日志中查看该币。"</string>
     <string name="l10n_future_notice_external_sent" formatted="false">"付款已发送到您的外部安全地址。此节点无法验证其是否到账。"</string>
     <string name="l10n_future_notice_sweep_failed" formatted="false">"转移持续失败，资金仍在已暴露的地址上。您的保险库已解锁吗？"</string>
     <string name="l10n_future_notice_rescue_off" formatted="false">"Future Cash：救援已关闭"</string>
