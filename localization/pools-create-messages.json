@@ -19,7 +19,7 @@
     "Fetching MINIMA/USDT market price…": "pools.createFetchingPrice",
     "↻ Price": "pools.createRefreshPrice",
     "No price yet — tap ↻ and retry.": "pools.createNoPrice",
-    "Enter the USDT amount.": "pools.createEnterUsdt",
+    "Enter the MxUSD amount.": "pools.createEnterUsdt",
     "Not enough balance for that amount.": "pools.createBalanceShort",
     "Refreshing price…": "pools.createRefreshingPrice",
     "⚠ No market price available — YOU are setting the opening price.": "pools.createManualPriceWarning",

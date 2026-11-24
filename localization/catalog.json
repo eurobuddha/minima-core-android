@@ -28011,10 +28011,10 @@
     "uk": "Спочатку отримайте MxUSD"
   },
   "pools.createGetTokenBody": {
-    "en": "No spendable MxUSD was reported in this balance read. PandaPools creates MINIMA / USDT pools using a reference price when available. Receive MxUSD or check your node and balance before trying again.",
-    "zh-Hans": "本次余额查询未返回可用的 MxUSD。PandaPools 创建 MINIMA / USDT 池时会在可用情况下使用参考价格。请先接收 MxUSD，或检查节点和余额后重试。",
-    "ru": "В этом ответе о балансе нет доступных для расходования MxUSD. PandaPools создаёт пулы MINIMA / USDT с опорной ценой, когда она доступна. Получите MxUSD или проверьте узел и баланс, затем повторите попытку.",
-    "uk": "У цій відповіді про баланс немає доступних для витрачання MxUSD. PandaPools створює пули MINIMA / USDT з опорною ціною, коли вона доступна. Отримайте MxUSD або перевірте вузол і баланс, а потім повторіть спробу."
+    "en": "No spendable MxUSD was reported in this balance read. PandaPools creates MINIMA / MxUSD pools using a reference price when available. Receive MxUSD or check your node and balance before trying again.",
+    "zh-Hans": "本次余额查询未返回可用的 MxUSD。PandaPools 创建 MINIMA / MxUSD 池时会在可用情况下使用参考价格。请先接收 MxUSD，或检查节点和余额后重试。",
+    "ru": "В этом ответе о балансе нет доступных для расходования MxUSD. PandaPools создаёт пулы MINIMA / MxUSD с опорной ценой, когда она доступна. Получите MxUSD или проверьте узел и баланс, затем повторите попытку.",
+    "uk": "У цій відповіді про баланс немає доступних для витрачання MxUSD. PandaPools створює пули MINIMA / MxUSD з опорною ціною, коли вона доступна. Отримайте MxUSD або перевірте вузол і баланс, а потім повторіть спробу."
   },
   "pools.createAvailableToken": {
     "en": "{token} · {amount} available",
@@ -28077,10 +28077,10 @@
     "uk": "У вас: {minima} MINIMA · {amount} {token}\n"
   },
   "pools.createEnterUpTo": {
-    "en": "Enter the USDT amount to provide (max ≈ {amount}).",
-    "zh-Hans": "请输入要提供的 USDT 数量（最多约 {amount}）。",
-    "ru": "Введите сумму USDT для внесения (максимум ≈ {amount}).",
-    "uk": "Введіть суму USDT для внесення (максимум ≈ {amount})."
+    "en": "Enter the MxUSD amount to provide (max ≈ {amount}).",
+    "zh-Hans": "请输入要提供的 MxUSD 数量（最多约 {amount}）。",
+    "ru": "Введите сумму MxUSD для внесения (максимум ≈ {amount}).",
+    "uk": "Введіть суму MxUSD для внесення (максимум ≈ {amount})."
   },
   "pools.createMinimaRequired": {
     "en": "MINIMA required: {amount}\n",
@@ -28095,10 +28095,10 @@
     "uk": "Загальна вартість пулу: ≈ {amount} USD"
   },
   "pools.createMinimaShort": {
-    "en": "\n⚠ Not enough MINIMA. Reduce USDT to ≤ {amount}.",
-    "zh-Hans": "\n⚠ MINIMA 不足。请将 USDT 减少至 ≤ {amount}。",
-    "ru": "\n⚠ Недостаточно MINIMA. Уменьшите сумму USDT до ≤ {amount}.",
-    "uk": "\n⚠ Недостатньо MINIMA. Зменште суму USDT до ≤ {amount}."
+    "en": "\n⚠ Not enough MINIMA. Reduce MxUSD to ≤ {amount}.",
+    "zh-Hans": "\n⚠ MINIMA 不足。请将 MxUSD 减少至 ≤ {amount}。",
+    "ru": "\n⚠ Недостаточно MINIMA. Уменьшите сумму MxUSD до ≤ {amount}.",
+    "uk": "\n⚠ Недостатньо MINIMA. Зменште суму MxUSD до ≤ {amount}."
   },
   "pools.createTokenShort": {
     "en": "\n⚠ You only have {amount} {token}.",
@@ -28125,10 +28125,10 @@
     "uk": "Ціна поки недоступна. Натисніть ↻ і повторіть спробу."
   },
   "pools.createEnterUsdt": {
-    "en": "Enter the USDT amount.",
-    "zh-Hans": "请输入 USDT 数量。",
-    "ru": "Введите сумму USDT.",
-    "uk": "Введіть суму USDT."
+    "en": "Enter the MxUSD amount.",
+    "zh-Hans": "请输入 MxUSD 数量。",
+    "ru": "Введите сумму MxUSD.",
+    "uk": "Введіть суму MxUSD."
   },
   "pools.createBalanceShort": {
     "en": "Not enough balance for that amount.",

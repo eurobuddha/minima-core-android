@@ -5619,7 +5619,7 @@
     <string name="l10n_pools_create_acknowledge_required" formatted="false">"Tick the box to confirm you understand."</string>
     <string name="l10n_pools_create_battery_required" formatted="false">"Either fix battery optimisation, or tick the second box."</string>
     <string name="l10n_pools_create_get_token_title" formatted="false">"Get MxUSD first"</string>
-    <string name="l10n_pools_create_get_token_body" formatted="false">"No spendable MxUSD was reported in this balance read. PandaPools creates MINIMA / USDT pools using a reference price when available. Receive MxUSD or check your node and balance before trying again."</string>
+    <string name="l10n_pools_create_get_token_body" formatted="false">"No spendable MxUSD was reported in this balance read. PandaPools creates MINIMA / MxUSD pools using a reference price when available. Receive MxUSD or check your node and balance before trying again."</string>
     <!-- Arguments: token, amount -->
     <string name="l10n_pools_create_available_token">"%1$s · %2$s available"</string>
     <string name="l10n_pools_create_choose_token" formatted="false">"Pool MINIMA with…"</string>
@@ -5636,20 +5636,20 @@
     <!-- Arguments: minima, amount, token -->
     <string name="l10n_pools_create_balance_preview">"You have: %1$s MINIMA · %2$s %3$s\n"</string>
     <!-- Arguments: amount -->
-    <string name="l10n_pools_create_enter_up_to">"Enter the USDT amount to provide (max ≈ %1$s)."</string>
+    <string name="l10n_pools_create_enter_up_to">"Enter the MxUSD amount to provide (max ≈ %1$s)."</string>
     <!-- Arguments: amount -->
     <string name="l10n_pools_create_minima_required">"MINIMA required: %1$s\n"</string>
     <!-- Arguments: amount -->
     <string name="l10n_pools_create_total_value">"Total pool value: ≈ US$ %1$s"</string>
     <!-- Arguments: amount -->
-    <string name="l10n_pools_create_minima_short">"\n⚠ Not enough MINIMA. Reduce USDT to ≤ %1$s."</string>
+    <string name="l10n_pools_create_minima_short">"\n⚠ Not enough MINIMA. Reduce MxUSD to ≤ %1$s."</string>
     <!-- Arguments: amount, token -->
     <string name="l10n_pools_create_token_short">"\n⚠ You only have %1$s %2$s."</string>
     <!-- Arguments: token -->
     <string name="l10n_pools_create_pool_title">"Create MINIMA / %1$s pool"</string>
     <string name="l10n_pools_create_refresh_price" formatted="false">"↻ Price"</string>
     <string name="l10n_pools_create_no_price" formatted="false">"No price yet — tap ↻ and retry."</string>
-    <string name="l10n_pools_create_enter_usdt" formatted="false">"Enter the USDT amount."</string>
+    <string name="l10n_pools_create_enter_usdt" formatted="false">"Enter the MxUSD amount."</string>
     <string name="l10n_pools_create_balance_short" formatted="false">"Not enough balance for that amount."</string>
     <string name="l10n_pools_create_refreshing_price" formatted="false">"Refreshing price…"</string>
     <string name="l10n_pools_create_manual_price_warning" formatted="false">"⚠ No market price available — YOU are setting the opening price."</string>

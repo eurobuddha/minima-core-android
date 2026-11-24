@@ -338,8 +338,11 @@ android {
         // nothing arrived after the verify window - "left its exposed address but did NOT arrive at your safe, the key
         // may be compromised"; external safe - "sent, this node cannot verify that it arrived" (no alarm); the lookup
         // failed - the old "couldn't confirm" notice.
-        versionCode 390
-        versionName "2.2.120"
+        // 2.2.121: the Minima dollar token is MxUSD in four more PandaPools create strings (four languages and the
+        // catalog): "MINIMA / MxUSD pools", "Enter the MxUSD amount", "Reduce MxUSD to". The MEXC market price lines
+        // stay USDT/MINIMA (that market really is USDT).
+        versionCode 391
+        versionName "2.2.121"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded

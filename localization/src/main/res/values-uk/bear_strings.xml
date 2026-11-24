@@ -5681,7 +5681,7 @@
     <string name="l10n_pools_create_acknowledge_required" formatted="false">"Поставте прапорець, щоб підтвердити, що ви розумієте умови."</string>
     <string name="l10n_pools_create_battery_required" formatted="false">"Налаштуйте виняток з оптимізації батареї або поставте другий прапорець."</string>
     <string name="l10n_pools_create_get_token_title" formatted="false">"Спочатку отримайте MxUSD"</string>
-    <string name="l10n_pools_create_get_token_body" formatted="false">"У цій відповіді про баланс немає доступних для витрачання MxUSD. PandaPools створює пули MINIMA / USDT з опорною ціною, коли вона доступна. Отримайте MxUSD або перевірте вузол і баланс, а потім повторіть спробу."</string>
+    <string name="l10n_pools_create_get_token_body" formatted="false">"У цій відповіді про баланс немає доступних для витрачання MxUSD. PandaPools створює пули MINIMA / MxUSD з опорною ціною, коли вона доступна. Отримайте MxUSD або перевірте вузол і баланс, а потім повторіть спробу."</string>
     <!-- Arguments: token, amount -->
     <string name="l10n_pools_create_available_token">"%1$s · доступно %2$s"</string>
     <string name="l10n_pools_create_choose_token" formatted="false">"Створити пул MINIMA з…"</string>
@@ -5698,20 +5698,20 @@
     <!-- Arguments: minima, amount, token -->
     <string name="l10n_pools_create_balance_preview">"У вас: %1$s MINIMA · %2$s %3$s\n"</string>
     <!-- Arguments: amount -->
-    <string name="l10n_pools_create_enter_up_to">"Введіть суму USDT для внесення (максимум ≈ %1$s)."</string>
+    <string name="l10n_pools_create_enter_up_to">"Введіть суму MxUSD для внесення (максимум ≈ %1$s)."</string>
     <!-- Arguments: amount -->
     <string name="l10n_pools_create_minima_required">"Потрібно MINIMA: %1$s\n"</string>
     <!-- Arguments: amount -->
     <string name="l10n_pools_create_total_value">"Загальна вартість пулу: ≈ %1$s USD"</string>
     <!-- Arguments: amount -->
-    <string name="l10n_pools_create_minima_short">"\n⚠ Недостатньо MINIMA. Зменште суму USDT до ≤ %1$s."</string>
+    <string name="l10n_pools_create_minima_short">"\n⚠ Недостатньо MINIMA. Зменште суму MxUSD до ≤ %1$s."</string>
     <!-- Arguments: amount, token -->
     <string name="l10n_pools_create_token_short">"\n⚠ У вас лише %1$s %2$s."</string>
     <!-- Arguments: token -->
     <string name="l10n_pools_create_pool_title">"Створити пул MINIMA / %1$s"</string>
     <string name="l10n_pools_create_refresh_price" formatted="false">"↻ Ціна"</string>
     <string name="l10n_pools_create_no_price" formatted="false">"Ціна поки недоступна. Натисніть ↻ і повторіть спробу."</string>
-    <string name="l10n_pools_create_enter_usdt" formatted="false">"Введіть суму USDT."</string>
+    <string name="l10n_pools_create_enter_usdt" formatted="false">"Введіть суму MxUSD."</string>
     <string name="l10n_pools_create_balance_short" formatted="false">"Недостатньо коштів для цієї суми."</string>
     <string name="l10n_pools_create_refreshing_price" formatted="false">"Оновлення ціни…"</string>
     <string name="l10n_pools_create_manual_price_warning" formatted="false">"⚠ Ринкова ціна недоступна. Початкову ціну задаєте ВИ."</string>

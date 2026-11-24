@@ -5588,7 +5588,7 @@
     <string name="l10n_pools_create_acknowledge_required" formatted="false">"请勾选复选框以确认您已了解。"</string>
     <string name="l10n_pools_create_battery_required" formatted="false">"请设置电池优化豁免，或勾选第二个复选框。"</string>
     <string name="l10n_pools_create_get_token_title" formatted="false">"请先获取 MxUSD"</string>
-    <string name="l10n_pools_create_get_token_body" formatted="false">"本次余额查询未返回可用的 MxUSD。PandaPools 创建 MINIMA / USDT 池时会在可用情况下使用参考价格。请先接收 MxUSD，或检查节点和余额后重试。"</string>
+    <string name="l10n_pools_create_get_token_body" formatted="false">"本次余额查询未返回可用的 MxUSD。PandaPools 创建 MINIMA / MxUSD 池时会在可用情况下使用参考价格。请先接收 MxUSD，或检查节点和余额后重试。"</string>
     <!-- Arguments: token, amount -->
     <string name="l10n_pools_create_available_token">"%1$s · 可用 %2$s"</string>
     <string name="l10n_pools_create_choose_token" formatted="false">"将 MINIMA 与…组成池"</string>
@@ -5605,20 +5605,20 @@
     <!-- Arguments: minima, amount, token -->
     <string name="l10n_pools_create_balance_preview">"余额：%1$s MINIMA · %2$s %3$s\n"</string>
     <!-- Arguments: amount -->
-    <string name="l10n_pools_create_enter_up_to">"请输入要提供的 USDT 数量（最多约 %1$s）。"</string>
+    <string name="l10n_pools_create_enter_up_to">"请输入要提供的 MxUSD 数量（最多约 %1$s）。"</string>
     <!-- Arguments: amount -->
     <string name="l10n_pools_create_minima_required">"所需 MINIMA：%1$s\n"</string>
     <!-- Arguments: amount -->
     <string name="l10n_pools_create_total_value">"池总价值：约 %1$s 美元"</string>
     <!-- Arguments: amount -->
-    <string name="l10n_pools_create_minima_short">"\n⚠ MINIMA 不足。请将 USDT 减少至 ≤ %1$s。"</string>
+    <string name="l10n_pools_create_minima_short">"\n⚠ MINIMA 不足。请将 MxUSD 减少至 ≤ %1$s。"</string>
     <!-- Arguments: amount, token -->
     <string name="l10n_pools_create_token_short">"\n⚠ 您只有 %1$s %2$s。"</string>
     <!-- Arguments: token -->
     <string name="l10n_pools_create_pool_title">"创建 MINIMA / %1$s 池"</string>
     <string name="l10n_pools_create_refresh_price" formatted="false">"↻ 价格"</string>
     <string name="l10n_pools_create_no_price" formatted="false">"尚无价格，请点按 ↻ 后重试。"</string>
-    <string name="l10n_pools_create_enter_usdt" formatted="false">"请输入 USDT 数量。"</string>
+    <string name="l10n_pools_create_enter_usdt" formatted="false">"请输入 MxUSD 数量。"</string>
     <string name="l10n_pools_create_balance_short" formatted="false">"余额不足，无法提供该数量。"</string>
     <string name="l10n_pools_create_refreshing_price" formatted="false">"正在刷新价格…"</string>
     <string name="l10n_pools_create_manual_price_warning" formatted="false">"⚠ 无可用市场价格，初始价格由您设定。"</string>
