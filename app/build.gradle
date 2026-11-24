@@ -360,8 +360,15 @@ android {
         // 2.2.126: Future Cash: the LOG line for a sweep not seen at the safe says what the notice says since 2.2.123 (the
         // ordinary causes before a compromised key); it still carried the old alarm.
         // 2.2.127: the chat database opens a file marked version 4 only (2.2.125 let any newer version open).
-        versionCode 397
-        versionName "2.2.127"
+        // 2.2.128: node jar: a published peers list (minimapeers.txt) can no longer stop the app, and it is bounded. One
+        // entry with a port outside 0..65535 threw on the node's P2PSeedPeers thread and stopped the whole app at every
+        // start; the list had no read timeout, no size bound and no entry bound. app/libs/minima.jar = the 2.2.124 jar
+        // (sha256 a69e92c70f2c148a95bf14b7d3a6de6e10331aac9604d256efaf213db4194b1e) with P2PManager and P2PManager$1
+        // recompiled (javac --release 8) from minima-core branch fix/seed-peers-bounds-2026-11-24 @
+        // 9279c41924a812e98c9ca37cde2b437246c993e7; new sha256
+        // 75bfe0ecf38a4d6efeffd36e757e2fa55e08645cf207cecd57b00d2370e9d408. The other 486 entries are unchanged.
+        versionCode 398
+        versionName "2.2.128"
 
         buildConfigField "boolean", "PANDAMONIUM", "false"
         // PANDA_SHELL: Pandamonium-style tabs (Wallet/History/Apps/Chat/Node) + the embedded
